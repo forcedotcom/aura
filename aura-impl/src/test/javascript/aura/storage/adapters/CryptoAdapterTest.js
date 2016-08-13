@@ -346,9 +346,12 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
 
 
     [Fixture]
-    function getItemsInternal() {
-        var AdapterClass = function() {
-        }
+    function getItems() {
+        var AdapterClass = function() {};
+        AdapterClass.prototype.initialize = function() {
+                return ResolvePromise();
+        };
+
         var mocks = Mocks.GetMocks(Object.Global(), {
             $A: {
                 storageService: {
@@ -403,14 +406,10 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
                         return ResolvePromise(value);
                     };
 
-                    adapter.getItemsInternal(
-                        [],
-                        function resolve(values) {
+                    adapter.getItems([], true)
+                        .then(function(values) {
                             actual = values;
-                        },
-                        function reject() {},
-                        true // includeInternalKeys
-                    );
+                        });
                 });
             });
 
@@ -442,14 +441,10 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
                         return ResolvePromise(value);
                     };
 
-                    adapter.getItemsInternal(
-                        [],
-                        function resolve(values) {
+                    adapter.getItems([], false)
+                        .then(function(values) {
                             actual = values;
-                        },
-                        function reject() {},
-                        false // includeInternalKeys
-                    );
+                        });
                 });
             });
 
@@ -460,8 +455,11 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
 
     [Fixture]
     function clear() {
-        var AdapterClass = function() {
-        }
+        var AdapterClass = function() {};
+        AdapterClass.prototype.initialize = function() {
+                return ResolvePromise();
+        };
+
         var mocks = Mocks.GetMocks(Object.Global(), {
             $A: {
                 storageService: {
@@ -541,8 +539,11 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
 
     [Fixture]
     function sweep() {
-        var AdapterClass = function() {
-        }
+        var AdapterClass = function() {};
+        AdapterClass.prototype.initialize = function() {
+                return ResolvePromise();
+        };
+
         var mocks = Mocks.GetMocks(Object.Global(), {
             $A: {
                 storageService: {
@@ -623,12 +624,17 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
 
     [Fixture]
     function setSentinelItem() {
+        var AdapterClass = function() {};
+        AdapterClass.prototype.initialize = function() {
+                return ResolvePromise();
+        };
+
         var mocks = Mocks.GetMocks(Object.Global(), {
             $A: {
                 storageService: {
                     "getAdapterConfig": function() {
                         return {
-                            adapterClass: function(){}
+                            adapterClass: AdapterClass
                         };
                     }
                 }
@@ -658,7 +664,7 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
                     }
 
                     var adapter = new Aura.Storage.CryptoAdapter({});
-                    adapter.setItemsInternal = function(tuples, resolve, reject) {
+                    adapter.setItems = function(tuples) {
                         actual = tuples[0][1];
                     };
 
@@ -679,7 +685,7 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
                     }
 
                     var adapter = new Aura.Storage.CryptoAdapter({});
-                    adapter.setItemsInternal = function(tuples, resolve, reject) {
+                    adapter.setItems = function(tuples) {
                         actual = tuples[0][1];
                     };
 
@@ -700,7 +706,7 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
                     }
 
                     var adapter = new Aura.Storage.CryptoAdapter({});
-                    adapter.setItemsInternal = function(tuples, resolve, reject) {
+                    adapter.setItems = function(tuples) {
                         actual = tuples[0][1];
                     };
 

@@ -111,6 +111,7 @@ Test.Aura.Storage.Adapters.IndexedDBAdapterTest = function(){
 
             mockIndexedDB(function() { mocks(function() { mockSetTimeout(function() {
                 var adapter = new Aura.Storage.IndexedDBAdapter({});
+                adapter.initialize();
             }); }); });
 
             Assert.True(actual);
@@ -132,6 +133,7 @@ Test.Aura.Storage.Adapters.IndexedDBAdapterTest = function(){
                 };
 
                 var adapter = new Aura.Storage.IndexedDBAdapter({});
+                adapter.initialize();
                 Assert.False(adapter.ready);
             }); }); });
         }
@@ -171,62 +173,12 @@ Test.Aura.Storage.Adapters.IndexedDBAdapterTest = function(){
 
             mockIndexedDB(function() { mocks(function() { mockIDB(function() {
                 var adapter = new Aura.Storage.IndexedDBAdapter({});
+                adapter.initialize();
                 adapter.setupDB = function() {
                     actual = true;
                 };
 
                 IDBOpenDBRequest.onsuccess();
-            }); }); });
-
-            Assert.True(actual);
-        }
-    }
-
-    [Fixture]
-    function executeQueue(){
-        var mocks = Mocks.GetMocks(Object.Global(), {
-            $A: {
-                getContext: function() {},
-                log: function() {},
-                warning: function() {},
-            },
-            setTimeout: function() {},
-            window: {
-                indexedDB: {
-                    open: function() {
-                        return {};
-                    }
-                }
-
-            }
-        });
-
-        [Fact]
-        function InvocationSetsMultiInvocationGuard(){
-            mockIndexedDB(function() { mocks(function() {
-                var adapter = new Aura.Storage.IndexedDBAdapter({});
-                adapter.executeQueue(false);
-
-                Assert.True(adapter.executeQueueInvoked);
-            }); });
-        }
-
-        [Fact]
-        function InvocationClearsTimerId(){
-            var actual;
-            var timerId = 12345;
-            var extraMocks = Mocks.GetMocks(Object.Global(), {
-                setTimeout: function() {
-                    return timerId;
-                },
-                clearTimeout: function(id) {
-                    actual = timerId === id
-                }
-            });
-
-            mockIndexedDB(function() { mocks(function() { extraMocks(function() {
-                var adapter = new Aura.Storage.IndexedDBAdapter({});
-                adapter.executeQueue(false);
             }); }); });
 
             Assert.True(actual);

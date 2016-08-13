@@ -1280,7 +1280,7 @@ Action.prototype.getRefreshAction = function(originalResponse) {
     var now = new Date().getTime();
     if ((now - storage["created"]) >= autoRefreshInterval && this.def) {
         var refreshAction = this.copyToRefresh();
-        storageService.log("Action.refresh(): auto refresh begin: " + this.getId() + " to " + refreshAction.getId());
+        $A.log("Action.refresh(): auto refresh begin: " + this.getId() + " to " + refreshAction.getId());
         refreshAction.originalResponse = originalResponse;
         refreshAction.originalReturnValueClone = this.returnValueClone;
 

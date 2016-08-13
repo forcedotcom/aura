@@ -341,20 +341,6 @@
         }
     },
 
-    /**
-     * Tests that verify behavior specific to CryptoAdapter.
-     */
-
-    testFallbackModeNotReported: {
-        test:[function(cmp){
-            // do a get so next test stage is run after adapter finishes initializing
-            return cmp._storageLib.testGetNullValue(cmp, this.storage);
-        },
-        function(cmp){
-            $A.test.assertTrue(this.storage.isPersistent(), "CryptoAdapter should not be in fallback mode so is persistent");
-        }]
-    },
-
     testValueTooLarge: {
         test: function(cmp) {
                 var storage = $A.storageService.getStorage("crypto-store");
@@ -488,7 +474,7 @@
 
             return this.storage.set("key1", "decryptable")
                 .then(function() {
-                    return $A.test.setItemsToCryptoAdapter(that.storage.adapter, [emptyCipherAndIv, absentValue]);
+                    return $A.test.storageAdapterSetItems(that.storage, [emptyCipherAndIv, absentValue]);
                 })
                 .then(function() {
                     return that.storage.getAll();

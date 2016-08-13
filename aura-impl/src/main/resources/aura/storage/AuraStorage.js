@@ -25,8 +25,20 @@ var AuraStorage = function AuraStorage(config) {
     this.keyPrefix = this.generateKeyPrefix(config["isolationKey"], this.version);
     config["keyPrefix"] = this.keyPrefix;
 
+    // requests are enqueud until adapter indicates it is ready
+    this.ready = undefined;
+    this.queue = [];
+
+    // if the primary adapter fails to init then fallback to a secondary adapter (memory)
+    this.fallbackMode = false;
+
+    // freeze to prevent mutation (config is reused if adapter fails initialization)
+    this.config = Object.freeze(config);
+
+    // create the adapter (init is done below)
     var AdapterCtr = config["adapterClass"];
-    this.adapter = new AdapterCtr(config);
+    this.adapter = new AdapterCtr(this.config);
+    this.adapterAntiObfuscation(this.adapter);
 
     // extract values this class uses
     this.name = config["name"];
@@ -35,6 +47,7 @@ var AuraStorage = function AuraStorage(config) {
     this.autoRefreshInterval = config["autoRefreshInterval"] * 1000;
     this.debugLogging = config["debugLogging"];
 
+    // telemetry
     this.operationsInFlight = 0;
 
     // frequency guard for sweeping
@@ -44,32 +57,52 @@ var AuraStorage = function AuraStorage(config) {
 
     this.sweepPromise = undefined;
 
-    this.log($A.util.format("initializing storage adapter using { maxSize: {0} KB, expiration: {1} sec, autoRefreshInterval: {2} sec, clearStorageOnInit: {3}, isolationKey: {4} }",
-            (this.maxSize/1024).toFixed(1), this.expiration/1000, this.autoRefreshInterval/1000, config["clearOnInit"], this.keyPrefix
+    this.log(this.LOG_LEVEL.INFO, $A.util.format("initializing storage adapter using { maxSize: {0} KB, expiration: {1} sec, autoRefreshInterval: {2} sec, clearStorageOnInit: {3}, isolationKey: {4} }",
+            (this.maxSize/1024).toFixed(1),
+            (this.expiration/1000).toFixed(0),
+            (this.autoRefreshInterval/1000).toFixed(0),
+            config["clearOnInit"],
+            this.keyPrefix
         ));
 
-    // work around the obfuscation logic to allow external adapters to properly plug in
-    this.adapter.clear = this.adapter.clear || this.adapter["clear"];
-    this.adapter.sweep = this.adapter.sweep || this.adapter["sweep"];
-    this.adapter.getName = this.adapter.getName || this.adapter["getName"];
-    this.adapter.getSize = this.adapter.getSize || this.adapter["getSize"];
-    this.adapter.setItems = this.adapter.setItems || this.adapter["setItems"];
-    this.adapter.getItems = this.adapter.getItems || this.adapter["getItems"];
-    this.adapter.removeItems = this.adapter.removeItems || this.adapter["removeItems"];
-    this.adapter.deleteStorage = this.adapter.deleteStorage || this.adapter["deleteStorage"];
-    this.adapter.isSecure = this.adapter.isSecure || this.adapter["isSecure"];
-    this.adapter.isPersistent = this.adapter.isPersistent || this.adapter["isPersistent"];
-    this.adapter.clearOnInit = this.adapter.clearOnInit || this.adapter["clearOnInit"];
-    this.adapter.suspendSweeping = this.adapter.suspendSweeping || this.adapter["suspendSweeping"];
-    this.adapter.resumeSweeping = this.adapter.resumeSweeping || this.adapter["resumeSweeping"];
+    // initialize the adapter
+    this.adapter.initialize().then(this.adapterInitialize.bind(this, true), this.adapterInitialize.bind(this, false));
+};
+
+/** Log levels */
+AuraStorage.prototype.LOG_LEVEL = {
+    INFO:    { id: 0, fn: "log" },
+    WARNING: { id: 1, fn: "warning" }
+};
+
+/**
+ * Anti-obfuscate to support adapters provided by non-framework.
+ */
+AuraStorage.prototype.adapterAntiObfuscation = function(adapter) {
+    // functions not guarded by this.ready
+    adapter.initialize = adapter.initialize || adapter["initialize"];
+    adapter.getName = adapter.getName || adapter["getName"];
+    adapter.isSecure = adapter.isSecure || adapter["isSecure"];
+    adapter.isPersistent = adapter.isPersistent || adapter["isPersistent"];
+    adapter.suspendSweeping = adapter.suspendSweeping || adapter["suspendSweeping"];
+    adapter.resumeSweeping = adapter.resumeSweeping || adapter["resumeSweeping"];
+
+    // functions guarded by this.ready
+    adapter.setItems = adapter.setItems || adapter["setItems"];
+    adapter.getItems = adapter.getItems || adapter["getItems"];
+    adapter.removeItems = adapter.removeItems || adapter["removeItems"];
+    adapter.clear = adapter.clear || adapter["clear"];
+    adapter.sweep = adapter.sweep || adapter["sweep"];
+    adapter.getSize = adapter.getSize || adapter["getSize"];
+    adapter.deleteStorage = adapter.deleteStorage || adapter["deleteStorage"];
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     // for storage adapter testing
-    this["adapter"] = this.adapter;
-    this.adapter["getItems"] = this.adapter.getItems;
-    this.adapter["getMRU"] = this.adapter.getMRU;
-    this.adapter["getSize"] = this.adapter.getSize;
-    this.adapter["sweep"] = this.adapter.sweep;
+    this["adapter"] = adapter;
+    adapter["getItems"] = adapter.getItems;
+    adapter["getMRU"] = adapter.getMRU;
+    adapter["getSize"] = adapter.getSize;
+    adapter["sweep"] = adapter.sweep;
     //#end
 };
 
@@ -88,9 +121,19 @@ AuraStorage.prototype.getName = function() {
  * @export
  */
 AuraStorage.prototype.getSize = function() {
-    return this.adapter.getSize()
-        .then(function(size) { return size / 1024.0; } );
+    return this.enqueue(this.getSizeInternal.bind(this));
 };
+
+AuraStorage.prototype.getSizeInternal = function(resolve, reject) {
+    this.adapter.getSize()
+        .then(
+            function(size) {
+                return size / 1024.0;
+            }
+        )
+        .then(resolve, reject);
+};
+
 
 /**
  * Returns the maximum storage size in KB.
@@ -102,14 +145,138 @@ AuraStorage.prototype.getMaxSize = function() {
 };
 
 /**
+ * Enqueues a function to execute when the adapter is ready.
+ * @param {Function} execute the function to execute.
+ * @returns {Promise} a promise that resolves when the function is executed.
+ * @private
+ */
+AuraStorage.prototype.enqueue = function(execute) {
+    var that = this;
+
+    // adapter is ready so execute immediately
+    if (this.ready === true) {
+        return new Promise(function(resolve, reject) { execute(resolve, reject); });
+    }
+    // adapter is in permanent error state
+    else if (this.ready === false) {
+        // already logged when permanent error state entered so do not re-log each operation
+        return Promise["reject"](new Error(this.getInitializationError()));
+    }
+
+    // adapter not yet initialized
+    return new Promise(function(resolve, reject) {
+        that.queue.push({ "execute":execute, "resolve":resolve, "reject":reject});
+        if (that.ready !== undefined) {
+            // rare race condition. intentionally do not pass a new ready state.
+            that.executeQueue();
+        }
+    });
+};
+
+/**
+ * Callback function provided to adapters to indicate initialization is complete.
+ * @param {Boolean} readyState true if the adapter successfully completed initialization, false if initialization failed.
+ * @param {Error} error details if initialization failed, undefined otherwise.
+ * @private
+ */
+AuraStorage.prototype.adapterInitialize = function(readyState, error) {
+    if (this.ready !== undefined) {
+        return;
+    }
+
+    // if primary adapter failed then fallback to memory
+    if (!readyState && !this.fallbackMode) {
+        this.log(this.LOG_LEVEL.WARNING, $A.util.format("adapterReady(): {0} adapter failed initialization, falling back to memory adapter", this.adapter.getName()));
+        this.logError({ "operation":"adapterReady", "error":error });
+
+        this.fallbackMode = true;
+        var adapterClass = $A.storageService.getAdapterConfig(Aura.Storage.MemoryAdapter.NAME)["adapterClass"];
+        this.adapter = new adapterClass(this.config);
+        this.adapterAntiObfuscation(this.adapter);
+        this.adapter.initialize().then(this.adapterInitialize.bind(this, true), this.adapterInitialize.bind(this, false));
+        return;
+    }
+
+    // adapter is ready (either success or permanent error state)
+    var that = this;
+    var promise;
+    // clear adapter prior to processing the queue
+    if (readyState && this.config["clearOnInit"]) {
+        promise = new Promise(function(resolve, reject) {
+            that.clearInternal(resolve, reject);
+        })
+        .then(undefined, function() {
+            // no-op to move promise to resolve state
+        });
+    } else {
+        promise = Promise["resolve"]();
+    }
+
+    promise.then(function() {
+        // flip the switch so subsequent requests are immediately processed
+        that.ready = !!readyState;
+        that.executeQueue();
+    });
+};
+
+
+/**
+ * Runs the pending queue of requests.
+ * @private
+ */
+AuraStorage.prototype.executeQueue = function() {
+    var queue = this.queue;
+    this.queue = [];
+
+    if (this.ready) {
+        this.log(this.LOG_LEVEL.INFO, "executeQueue(): adapter completed initialization. Processing " + queue.length + " operations.");
+        // TODO logError() that init was successful?
+    } else {
+        var message = "executeQueue(): adapter failed initialization, entering permanent error state. All future operations will fail. Failing " + queue.length + " enqueued operations.";
+        this.log(this.LOG_LEVEL.WARNING, message);
+        this.logError({"operation":"initialize", "error":message});
+    }
+
+
+    for (var i = 0; i < queue.length; i++) {
+        if (!this.ready) {
+            // adapter is in permanent error state, reject all queued promises
+            queue[i]["reject"](new Error(this.getInitializationError()));
+        } else {
+            try {
+                // run the queued logic, which will resolve the promises
+                queue[i]["execute"](queue[i]["resolve"], queue[i]["reject"]);
+            } catch (e) {
+                queue[i]["reject"](e);
+            }
+        }
+    }
+};
+
+
+/**
+ * Gets the error message when the adapter fails to initialize.
+ * @private
+ */
+AuraStorage.prototype.getInitializationError = function() {
+    // should use same format as log()
+    return "AuraStorage[" + this.name + "] adapter failed to initialize";
+};
+
+
+/**
  * Returns a promise that clears the storage.
  * @returns {Promise} A promise that will clear storage.
  * @export
  */
 AuraStorage.prototype.clear = function() {
+    return this.enqueue(this.clearInternal.bind(this));
+};
+
+AuraStorage.prototype.clearInternal = function(resolve, reject) {
     var that = this;
     this.operationsInFlight += 1;
-    return this.adapter.clear()
+    this.adapter.clear()
         .then(
             function() {
                 that.operationsInFlight -= 1;
@@ -117,11 +284,13 @@ AuraStorage.prototype.clear = function() {
             },
             function(e) {
                 that.operationsInFlight -= 1;
-                that.logError({ "operation": "clear", "error": e });
+                that.logError({ "operation":"clear", "error":e });
                 throw e;
             }
-        );
+        )
+        .then(resolve, reject);
 };
+
 
 /**
  * Asynchronously gets an item from storage corresponding to the specified key.
@@ -155,6 +324,7 @@ AuraStorage.prototype.inFlightOperations = function() {
     return this.operationsInFlight;
 };
 
+
 /**
  * Asynchronously gets multiple items from storage.
  * @param {String[]} [keys] The set of keys to retrieve. Empty array or falsey to retrieve all items.
@@ -166,6 +336,10 @@ AuraStorage.prototype.getAll = function(keys, includeExpired) {
     $A.assert(!keys || Array.isArray(keys), "AuraStorage.getAll(): 'keys' must be an Array.");
     $A.assert(!includeExpired || $A.util.isBoolean(includeExpired), "AuraStorage.getAll(): 'includeExpired' must be a Boolean.");
 
+    return this.enqueue(this.getAllInternal.bind(this, keys, includeExpired));
+};
+
+AuraStorage.prototype.getAllInternal = function(keys, includeExpired, resolve, reject) {
     var that = this;
 
     // helper function to log cache hits & misses
@@ -181,16 +355,14 @@ AuraStorage.prototype.getAll = function(keys, includeExpired) {
             }
         }
         if (hit.length > 0) {
-            that.log("get() - HIT on key(s): " + hit.join(", "));
+            that.log(that.LOG_LEVEL.INFO, "getAll() - HIT on key(s): " + hit.join(", "));
         }
         if (miss.length > 0) {
-            that.log("get() - MISS on key(s): " + miss.join(", "));
+            that.log(that.LOG_LEVEL.INFO, "getAll() - MISS on key(s): " + miss.join(", "));
         }
     }
 
-
-    var prefixedKeys = undefined;
-
+    var prefixedKeys;
     if (Array.isArray(keys) && keys.length > 0) {
         prefixedKeys = [];
         for (var i = 0; i < keys.length; i++) {
@@ -199,7 +371,7 @@ AuraStorage.prototype.getAll = function(keys, includeExpired) {
     }
 
     this.operationsInFlight += 1;
-    return this.adapter.getItems(prefixedKeys, includeExpired)
+    this.adapter.getItems(prefixedKeys, includeExpired)
         .then(
             function(items) {
                 that.operationsInFlight -= 1;
@@ -230,10 +402,11 @@ AuraStorage.prototype.getAll = function(keys, includeExpired) {
             undefined,
             function(e) {
                 that.operationsInFlight -= 1;
-                that.logError({ "operation": "getAll", "error": e });
+                that.logError({ "operation":"getAll", "error":e });
                 throw e;
             }
-        );
+        )
+        .then(resolve, reject);
 };
 
 /**
@@ -287,6 +460,10 @@ AuraStorage.prototype.set = function(key, value) {
 AuraStorage.prototype.setAll = function(values) {
     $A.assert($A.util.isObject(values), "AuraStorage.setAll(): 'values' must be an Object.");
 
+    return this.enqueue(this.setAllInternal.bind(this, values));
+};
+
+AuraStorage.prototype.setAllInternal = function(values, resolve, reject) {
     var now = new Date().getTime();
     var storablesSize = 0;
     var storables = [];
@@ -298,39 +475,39 @@ AuraStorage.prototype.setAll = function(values) {
             storablesSize += storable[2];
         }
     } catch (e) {
-        this.logError({ "operation": "set", "error": e });
-        return Promise["reject"](e);
+        this.logError({ "operation":"setAll", "error":e });
+        reject(e);
+        return;
     }
 
     if (storablesSize > this.maxSize) {
         var e2 = new Error("AuraStorage.set() cannot store " + Object.keys(values).length + " items of total size " + storablesSize + "b because it's over the max size of " + this.maxSize + "b");
-        this.logError({ "operation": "set", "error": e2 });
-        return Promise["reject"](e2);
+        this.logError({ "operation":"setAll", "error":e2 });
+        reject(e2);
+        return;
     }
 
     var that = this;
     this.operationsInFlight += 1;
-    var promise = this.adapter.setItems(storables)
+    this.adapter.setItems(storables)
         .then(
             function() {
                 that.operationsInFlight -= 1;
                 var keys = Object.keys(values);
-                that.log("set() - " + keys.length + " key(s): " + keys.join(", "));
+                that.log(that.LOG_LEVEL.INFO, "setAll() - " + keys.length + " key(s): " + keys.join(", "));
                 that.fireModified();
-            }
-        )
-        .then(
-            undefined,
+            },
             function(e) {
                 that.operationsInFlight -= 1;
-                that.logError({ "operation": "set", "error": e });
+                that.logError({ "operation":"setAll", "error":e });
                 throw e;
             }
-        );
+        )
+        .then(resolve, reject);
 
     this.sweep();
-    return promise;
 };
+
 
 /**
  * Asynchronously removes the value from storage corresponding to the specified key.
@@ -342,6 +519,7 @@ AuraStorage.prototype.setAll = function(values) {
 AuraStorage.prototype.remove = function(key, doNotFireModified) {
     $A.assert($A.util.isString(key), "AuraStorage.remove(): 'key' must be a String.");
     $A.assert(!doNotFireModified || $A.util.isBoolean(doNotFireModified), "AuraStorage.remove(): 'doNotFireModified' must be a Boolean.");
+
     return this.removeAll([key], doNotFireModified);
 };
 
@@ -354,8 +532,12 @@ AuraStorage.prototype.remove = function(key, doNotFireModified) {
  */
 AuraStorage.prototype.removeAll = function(keys, doNotFireModified) {
     $A.assert($A.util.isArray(keys), "AuraStorage.removeAll(): 'keys' must be an Array.");
-    $A.assert(!doNotFireModified || $A.util.isBoolean(doNotFireModified), "AuraStorage.removeAll(): 'doNotFireModified' must be a Boolean.");
+    $A.assert(doNotFireModified === undefined || $A.util.isBoolean(doNotFireModified), "AuraStorage.removeAll(): 'doNotFireModified' must be undefined or a Boolean.");
 
+    return this.enqueue(this.removeAllInternal.bind(this, keys, doNotFireModified));
+};
+
+AuraStorage.prototype.removeAllInternal = function(keys, doNotFireModified, resolve, reject) {
     var prefixedKeys = [];
     for (var i = 0; i < keys.length; i++) {
         prefixedKeys.push(this.keyPrefix + keys[i]);
@@ -363,29 +545,27 @@ AuraStorage.prototype.removeAll = function(keys, doNotFireModified) {
 
     var that = this;
     this.operationsInFlight += 1;
-    return this.adapter.removeItems(prefixedKeys)
+    this.adapter.removeItems(prefixedKeys)
         .then(
             function() {
                 that.operationsInFlight -= 1;
                 if (that.debugLogging) {
                     for (i = 0; i < prefixedKeys.length; i++) {
-                        that.log("remove() - key " + prefixedKeys[i]);
+                        that.log(that.LOG_LEVEL.INFO, "removeAll() - key " + prefixedKeys[i]);
                     }
                 }
 
                 if (!doNotFireModified) {
                     that.fireModified();
                 }
-            }
-        )
-        .then(
-            undefined,
+            },
             function(e) {
                 that.operationsInFlight -= 1;
-                that.logError({ "operation": "remove", "error": e });
+                that.logError({ "operation":"removeAll", "error":e });
                 throw e;
             }
-        );
+        )
+        .then(resolve, reject);
 };
 
 
@@ -396,6 +576,8 @@ AuraStorage.prototype.removeAll = function(keys, doNotFireModified) {
  * @private
  */
 AuraStorage.prototype.sweep = function(ignoreInterval) {
+    $A.assert(ignoreInterval === undefined || $A.util.isBoolean(ignoreInterval), "AuraStorage.sweep(): 'ignoreInterval' must be undefined or a Boolean.");
+
     // sweeping guards:
     // 1. sweeping is in progress
     if (this.sweepPromise) {
@@ -405,23 +587,26 @@ AuraStorage.prototype.sweep = function(ignoreInterval) {
     if (this.sweepingSuspended) {
         return Promise["resolve"]();
     }
-    // 3. framework hasn't finished init'ing
+    // 3. adapter isn't ready
+    if (!this.ready) {
+        return Promise["resolve"]();
+    }
+    // 4. framework hasn't finished init'ing
     if (!$A["finishedInit"]) {
         return Promise["resolve"]();
     }
-    // 4. frequency (yet respect ignoreInterval)
+    // 5. frequency (yet respect ignoreInterval)
     var sweepInterval = new Date().getTime() - this.lastSweepTime;
     if (!ignoreInterval && sweepInterval < this.sweepInterval) {
         return Promise["resolve"]();
     }
-
 
     // Final thenable on sweep() promise chain.
     // @param {Boolean} doNotFireModified true if no items were evicted.
     // @param {Error} e the error if the promise was rejected
     function doneSweeping(doNotFireModified, e) {
         this.operationsInFlight -= 1;
-        this.log("sweep() - complete" + (e ? " (with errors)" : ""));
+        this.log(this.LOG_LEVEL.INFO, "sweep() - complete" + (e ? " (with errors)" : ""));
         this.sweepPromise = undefined;
         this.lastSweepTime = new Date().getTime();
         if (!doNotFireModified) {
@@ -435,7 +620,7 @@ AuraStorage.prototype.sweep = function(ignoreInterval) {
     this.sweepPromise = this.adapter.sweep().then(
             undefined, // noop
             function(e) {
-                this.logError({ "operation": "sweep", "error": e });
+                this.logError({ "operation":"sweep", "error":e });
                 throw e;
             }.bind(this)
         )
@@ -452,7 +637,7 @@ AuraStorage.prototype.sweep = function(ignoreInterval) {
  * @export
  */
 AuraStorage.prototype.suspendSweeping = function() {
-    this.log("suspendSweeping()");
+    this.log(this.LOG_LEVEL.INFO, "suspendSweeping()");
 
     this.sweepingSuspended = true;
 
@@ -466,7 +651,7 @@ AuraStorage.prototype.suspendSweeping = function() {
  * @export
  */
 AuraStorage.prototype.resumeSweeping = function() {
-    this.log("resumeSweeping()");
+    this.log(this.LOG_LEVEL.INFO, "resumeSweeping()");
 
     this.sweepingSuspended = false;
 
@@ -478,12 +663,15 @@ AuraStorage.prototype.resumeSweeping = function() {
 };
 
 /**
+ * Log a message.
+ * @param {LOG_LEVEL} level The log level.
+ * @param {String} msg The msg to log.
+ * @param {Object} [obj] Optional object to log.
  * @private
  */
-AuraStorage.prototype.log = function() {
-    if (this.debugLogging) {
-        var msg = Array.prototype.join.call(arguments, " ");
-        $A.log("AuraStorage '" + this.name + "' [" + this.getName() + "] : " + msg);
+AuraStorage.prototype.log = function(level, msg, obj) {
+    if (this.debugLogging || level.id >= this.LOG_LEVEL.WARNING.id) {
+        $A[level.fn]("AuraStorage['" + this.name + "'] " + msg, obj);
     }
 };
 
@@ -554,18 +742,25 @@ AuraStorage.prototype.getDefaultAutoRefreshInterval = function() {
  * @private
  */
 AuraStorage.prototype.deleteStorage = function() {
-    var that = this;
-    if (this.adapter.deleteStorage) {
-        return this.adapter.deleteStorage()
-            .then(
-                undefined,
-                function(e) {
-                    that.logError({ "operation": "deleteStorage", "error": e });
-                    throw e;
-                }
-            );
+    return this.enqueue(this.deleteStorageInternal.bind(this));
+};
+
+AuraStorage.prototype.deleteStorageInternal = function(resolve, reject) {
+    if (!this.adapter.deleteStorage) {
+        resolve();
+        return;
     }
-    return Promise["resolve"]();
+
+    var that = this;
+    this.adapter.deleteStorage()
+        .then(
+            undefined,
+            function(e) {
+                that.logError({ "operation":"deleteStorage", "error":e });
+                throw e;
+            }
+        )
+        .then(resolve, reject);
 };
 
 /**

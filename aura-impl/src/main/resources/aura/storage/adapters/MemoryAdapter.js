@@ -54,6 +54,14 @@ MemoryAdapter.prototype.getName = function() {
 };
 
 /**
+ * Starts the initialization process.
+ * @return {Promise} a promise that resolves when initialization has completed, or rejects if initialization has failed.
+ */
+MemoryAdapter.prototype.initialize = function() {
+    return Promise["resolve"]();
+};
+
+/**
  * Gets the adapter's size.
  * @returns {Promise} A promise that resolves with the size in bytes.
  */
@@ -219,7 +227,6 @@ MemoryAdapter.prototype.clear = function() {
     });
 };
 
-
 /**
  * Evicts items. Expired items are evicted first. If additional space is required then
  * items are evicted based on LRU.
@@ -259,7 +266,6 @@ MemoryAdapter.prototype.expireCache = function(spaceNeeded) {
         resolve();
     });
 };
-
 
 /**
  * Gets the most-recently-used list.
@@ -353,4 +359,3 @@ $A.storageService.registerAdapter({
 });
 
 Aura.Storage.MemoryAdapter = MemoryAdapter;
-

@@ -28,7 +28,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
         Import("aura-impl/src/main/resources/aura/storage/AuraStorage.js");
     });
 
-    // promise mocks
+    // mocks for synchronous promises
     var ResolvePromise = function ResolvePromise(value) {
         return {
             then: function(resolve, reject) {
@@ -73,6 +73,22 @@ Test.Aura.Storage.AuraStorageTest = function() {
         };
     };
 
+    var MockPromise = function MockPromise(f) {
+        var ret;
+        try {
+            f(
+                function resolve(v) { ret = ResolvePromise(v); },
+                function reject(e) { ret = RejectPromise(e); }
+            );
+            return ret;
+        } catch (e) {
+            return RejectPromise(e);
+        }
+    };
+    MockPromise.resolve = ResolvePromise;
+    MockPromise.reject = RejectPromise;
+
+
     // aura event mocks + collector for fired aura events.
     // any testing using firedEvents must first reset it.
     var firedEvents = [];
@@ -89,6 +105,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
     var makeConfigAndAdapter = function() {
         var AdapterClass = function() {};
         AdapterClass.prototype.getName = function() {};
+        AdapterClass.prototype.initialize = function() { return ResolvePromise(); };
         return {
             adapterClass: AdapterClass
         };
@@ -132,6 +149,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
             var AdapterClass = function(adapterConfig) {
                 actual = adapterConfig;
             };
+            AdapterClass.prototype.initialize = function() { return ResolvePromise(); };
             AdapterClass.prototype.getName = function() {};
 
             var config = {
@@ -236,6 +254,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
     [Fixture]
     function getVersion() {
         var AdapterClass = function() {};
+        AdapterClass.prototype.initialize = function() { return ResolvePromise(); };
         AdapterClass.prototype.getName = function() {};
         var config = {
             adapterClass: AdapterClass
@@ -291,8 +310,9 @@ Test.Aura.Storage.AuraStorageTest = function() {
             },
             "AuraStorage": {
                 KEY_DELIMITER: ":"
-            }
-        });
+            },
+            "Promise": MockPromise
+       });
 
         [Fact]
         function ThrowsErrorWhenKeyIsNotString() {
@@ -440,7 +460,8 @@ Test.Aura.Storage.AuraStorageTest = function() {
             },
             "AuraStorage": {
                 KEY_DELIMITER: ":"
-            }
+            },
+            "Promise": MockPromise
         });
 
         [Fact]
@@ -530,7 +551,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
         }
 
         [Fact]
-        function IncludesAllStoredItemsWhenKeysIsFalsy() {
+        function IncludesAllStoredItemsWhenKeysIsFalsey() {
             var config = makeConfigAndAdapter();
             var storedItem = {
                 value: "value",
@@ -765,7 +786,8 @@ Test.Aura.Storage.AuraStorageTest = function() {
                 },
                 util: {
                     format: function() {},
-                    isUndefinedOrNull: function(obj) { return obj === undefined || obj === null; }
+                    isUndefinedOrNull: function(obj) { return obj === undefined || obj === null; },
+                    isBoolean: function(b) { return typeof b === "boolean"; }
                 },
                 eventService: {
                     getNewEvent: function(name) {
@@ -776,7 +798,8 @@ Test.Aura.Storage.AuraStorageTest = function() {
                 },
                 metricsService: {
                     transaction: function() {}
-                }
+                },
+                assert: function() {}
             },
             "AuraStorage": {
                 KEY_DELIMITER: ":"
@@ -1105,6 +1128,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
     [Fixture]
     function set() {
         var AdapterClass = function() {};
+        AdapterClass.prototype.initialize = function() { return ResolvePromise(); };
         AdapterClass.prototype.getName = function() {};
         AdapterClass.prototype.sweep = function() { return ResolvePromise(); };
 
@@ -1307,6 +1331,7 @@ Test.Aura.Storage.AuraStorageTest = function() {
     [Fixture]
     function remove() {
         var AdapterClass = function() {};
+        AdapterClass.prototype.initialize = function() { return ResolvePromise(); };
         AdapterClass.prototype.getName = function() {};
         AdapterClass.prototype.sweep = function() { return ResolvePromise(); };
 

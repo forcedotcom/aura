@@ -558,7 +558,7 @@
                         // Store a normal item to guarantee expired item gets evicted so that we
                         // don't have false positive result.
                         // Setting item through adapter to avoid calling sweep() when setting items.
-                        return $A.test.storageAdapterSetItems(cmp._storage.adapter, [evictedItem]);
+                        return $A.test.storageAdapterSetItems(cmp._storage, [evictedItem]);
                     });
             },
             function sweepAndVerify(cmp) {
@@ -613,7 +613,7 @@
                     },
                     15];
 
-                return $A.test.storageAdapterSetItems(cmp._storage.adapter, [diffPrefixedKeyItem])
+                return $A.test.storageAdapterSetItems(cmp._storage, [diffPrefixedKeyItem])
                     .then(function() {
                         // TODO: add a case for getItems with explicitly given keys when W-2531907 is done.
                         // Currently only getting all items excludes different prefix keyed item.
@@ -653,7 +653,7 @@
                     },
                     cmp._expectedSize];
 
-                return $A.test.storageAdapterSetItems(cmp._storage.adapter, [diffPrefixedKeyItem])
+                return $A.test.storageAdapterSetItems(cmp._storage, [diffPrefixedKeyItem])
                     .then(function() {
                         // storage.getSize() uses KB as unit, so getting size through adapter (Byte as unit)
                         // for more accurate comparison.
@@ -697,7 +697,7 @@
                     },
                     15];
 
-                return $A.test.storageAdapterSetItems(cmp._storage.adapter, [diffPrefixedKeyItem])
+                return $A.test.storageAdapterSetItems(cmp._storage, [diffPrefixedKeyItem])
                     .then(function() {
                         return $A.test.storageSweep(cmp._storage);
                     })

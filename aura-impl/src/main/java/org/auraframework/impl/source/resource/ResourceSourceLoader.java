@@ -83,7 +83,23 @@ public class ResourceSourceLoader extends BaseSourceLoader implements InternalNa
                     PathMatchingResourcePatternResolver p = new PathMatchingResourcePatternResolver(resourceLoader);
                     Resource[] res = p.getResources("classpath*:/" + resourcePrefix + "/*/*/*.*");
                     for (Resource r : res) {
-                        files.add(r.getURL().toString());
+                        //
+                        // TOTAL HACK: Move this to getAllDescriptors later.
+                        //
+                        String filename = r.getURL().toString();
+                        List<String> names = AuraTextUtil.splitSimple("/", filename);
+                        if (names.size() < 3) {
+                            continue;
+                        }
+                        String last = names.get(names.size() - 1);
+                        String name = names.get(names.size() - 2);
+                        String ns = names.get(names.size() - 3);
+
+                        //
+                        // This is needed to match case, because, surprise, people have different case
+                        // on different files in the same directory, and they differ from the directory too.
+                        //
+                        files.add(ns+"/"+name+'/'+last);
                     }
                 }
         } catch (IOException x) {
@@ -164,7 +180,7 @@ public class ResourceSourceLoader extends BaseSourceLoader implements InternalNa
         String path = index.get(descriptor);
         if (path == null) {
             return null;
-                }
+        }
         return new ResourceSource<>(descriptor, resourcePrefix+"/"+path, getFormat(descriptor));
     }
 

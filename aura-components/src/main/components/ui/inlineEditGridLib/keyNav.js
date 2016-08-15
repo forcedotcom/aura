@@ -113,7 +113,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 // workaround: better performance gains with use of requestAnimationFrame to let a small amount of time pass
                 window.requestAnimationFrame($A.getCallback(function() {
                     // we use the row index and column index here because in rerender scenarios the active cell is an outdated dom element
-                    this._setActiveCell(this.activeRowIndex, this.activeColumnIndex, false);
+                    this.setActiveCell(this.activeRowIndex, this.activeColumnIndex, false);
                 }.bind(this)));
             }
 
@@ -169,7 +169,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                     // means that the row was updated and therefore the active dom element doesn't exist anymore
                     // in these cases we have to get the activeCell from the row and column index
                     if (!$A.util.isUndefined(this.activeRowIndex) && !$A.util.isUndefined(this.activeColumnIndex) && !clearActiveCell) {
-                        this._setActiveCell(this.activeRowIndex, this.activeColumnIndex, false);
+                        this.setActiveCell(this.activeRowIndex, this.activeColumnIndex, false);
                     }
                     else {
                         this._initActiveCell(editActiveCell);
@@ -253,7 +253,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             for (var rowIndex=1; rowIndex<rowLength; rowIndex++){
                 var columnIndex = this._findUsableColumnInRow(true, rowIndex, true, mustBeTriggerCell);
                 if (columnIndex !== -1) {
-                    this._setActiveCell(rowIndex, columnIndex);
+                    this.setActiveCell(rowIndex, columnIndex);
                     this._blurActiveCellInput();
                     break;
                 }
@@ -483,7 +483,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             this._onAutoResumeKeyboardModeHandler = null;
 
             var cellLocation = this._getClickedCellLocation(e);
-            this._setActiveCell(cellLocation.row, cellLocation.column);
+            this.setActiveCell(cellLocation.row, cellLocation.column);
 
             this.resumeKeyboardMode(true);
         },
@@ -546,11 +546,10 @@ function lib(w) { //eslint-disable-line no-unused-vars
          * @param selectLastInput if true, the last input element is selected within the column
          * @param allInputs = won't skip any input elements. This is the TAB usecase
          */
-        _setActiveCell: function (rowIndex, columnIndex, selectLastInput, allInputs) {
+        setActiveCell: function (rowIndex, columnIndex, selectLastInput, allInputs) {
 
             // Need to ensure column and row index are in range
             if (this._targetRowAvailable(rowIndex) && this._targetColumnAvailable(rowIndex, columnIndex)){
-
                 var failsafe = {
                     activeCell : this.activeCell,
                     activeRowIndex : this.activeRowIndex,
@@ -613,7 +612,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             // we have to set the slds class before hand to make the trigger visible - VERY IMPORTANT
 
             // we have to set the style on the cellContainer because slds requires this to be on the same element as slds-cell-edit and not on the TD
-            var cellContainer = this.activeCell.querySelector(".cellContainer");
+            var cellContainer = (this.activeCell)?this.activeCell.querySelector(".cellContainer"):null;
             $A.util.addClass((cellContainer)?cellContainer:this.activeCell, this.ACTIVE_CELL_CLASS);
 
             var result = this._focusActiveCellInput();
@@ -706,7 +705,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 }
                 if (this._targetColumnAvailable(currentRow, targetColumn)){
                     var selectLastInput = (direction === "prev");
-                    this._setActiveCell(currentRow, targetColumn, selectLastInput, allInputs);
+                    this.setActiveCell(currentRow, targetColumn, selectLastInput, allInputs);
                 }
                 else if (wrapAround) {
                     var columnIndex;
@@ -777,7 +776,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                     }
                 }
 
-                this._setActiveCell(targetRow, currentColumn, selectLastInput);
+                this.setActiveCell(targetRow, currentColumn, selectLastInput);
             }
         },
 
@@ -791,7 +790,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             if (this._isTriggerDisabled(rowIndex, columnIndex)){
                 this._gotoNextCell(rowIndex, columnIndex);
             } else {
-                this._setActiveCell(rowIndex, columnIndex);
+                this.setActiveCell(rowIndex, columnIndex);
             }
         },
 
@@ -805,7 +804,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             if (this._isTriggerDisabled(rowIndex, columnIndex)){
                 this._gotoNextCell(rowIndex, columnIndex);
             } else {
-                this._setActiveCell(rowIndex, columnIndex);
+                this.setActiveCell(rowIndex, columnIndex);
             }
         },
 
@@ -962,7 +961,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 this.enterKeyboardMode(this.cmp, null, null, true);
             }
 
-            this._setActiveCell(cellLocation.row, cellLocation.column);
+            this.setActiveCell(cellLocation.row, cellLocation.column);
         },
 
         /**
@@ -982,7 +981,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 this.enterKeyboardMode(this.cmp, null, null, true);
             }
 
-            this._setActiveCell(cellLocation.row, cellLocation.column);
+            this.setActiveCell(cellLocation.row, cellLocation.column);
             this._triggerEditOnActiveCell(true);
         },
 

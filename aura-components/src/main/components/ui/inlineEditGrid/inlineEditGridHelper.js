@@ -59,6 +59,15 @@
         var editLayout = editLayouts[payload.name];
         
         if (editLayout) {
+
+        	var targetElement = this.getTargetElement(cmp, payload);
+
+        	if (targetElement===null){
+        		return;
+        	}
+
+			this.getKeyboardManager(cmp).pauseKeyboardMode();
+
             // TODO: Need check that editLayout follows a certain interface so we can attach the appropriate
             // attributes and events.
             if (!editLayout.attributes) {
@@ -80,12 +89,31 @@
                     inputComponent : inputComponent
             };
             
-            this.displayEditPanel(cmp, panelBodyAttributes, payload.targetElement);
+            this.displayEditPanel(cmp, panelBodyAttributes, targetElement);
         }
+	},
+
+	getTargetElement: function(cmp, payload) {
+		// special handling in case the row was re-rendered and the targetElement is no longer valid
+		var tableRootNode = cmp.getElement(),
+			targetElement = payload.targetElement,
+			partOfTable = (tableRootNode)?tableRootNode.contains(targetElement):null;
+
+		if (!partOfTable) {
+			// get the new current targetElement based on the old row and cell index
+			tableRootNode = tableRootNode.querySelector('table');
+			if (!tableRootNode) {
+				return null;
+			}
+			
+			return tableRootNode.rows[payload.targetRowIndex].cells[payload.targetCellIndex];	
+			
+		}
+
+		return targetElement;
 	},
 	
 	createEditPanel : function(cmp, newPanelBody, referenceElement) {
-		var _keyNav = this.getKeyboardManager(cmp);
 		var config = this.getPanelConfig(cmp, referenceElement);
 		
 		newPanelBody.addHandler('submit', cmp, 'c.handlePanelSubmit');
@@ -99,10 +127,14 @@
 				cmp._panelCmp = panel;
 			},
 			onDestroy : function(){
-				// On Esc set focus for keyboard interaction and resume keyboard mode
-				_keyNav._setActiveCell(_keyNav.activeRowIndex,_keyNav.activeColumnIndex);
-				_keyNav.resumeKeyboardMode();
-			}
+				cmp._panelCmp = null;
+				if (cmp._delayedEditEvent) {
+					window.requestAnimationFrame($A.getCallback(function() {
+						this.handleEditAction(cmp, cmp._delayedEditEvent);
+						cmp._delayedEditEvent = null;
+					}.bind(this)));
+				}
+			}.bind(this)
 		}).fire();
 	},
 	displayEditPanel : function(cmp, panelBodyAttributes, referenceElement) {
@@ -154,8 +186,9 @@
 					panel.get("v.body")[0].submitValues(closeBehavior);
 				}
 				else {
-					panel.hide();
-					this.getKeyboardManager(cmp).resumeKeyboardMode();
+					panel.close($A.getCallback(function() {
+						this.getKeyboardManager(cmp).resumeKeyboardMode();
+					}.bind(this)));
 				}
 			}.bind(this))
         };

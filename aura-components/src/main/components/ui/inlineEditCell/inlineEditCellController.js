@@ -19,12 +19,17 @@
 		var outputCmp = cmp.get("v.body")[0];
 		
 		if (outputCmp) {
-		    var value = outputCmp.get("v." + cmp.get("v.valueAttribute"));
+			var value = outputCmp.get("v." + cmp.get("v.valueAttribute")),
+			targetElement = cmp.getElement().parentNode;
 		    
+		    // Added targetRowIndex and targetCellIndex to access targetElement IF the initial target element does not exist in the DOM
+		    // This can happen when the row is updated and the DOM is changed.
 		    cmp.getEvent("gridAction").setParams({
                 action : "edit",
                 payload : {
-                    targetElement : cmp.getElement().parentNode,
+					targetElement : targetElement,
+					targetCellIndex : targetElement.cellIndex,
+					targetRowIndex : targetElement.parentNode.rowIndex,
                     name : cmp.get("v.name"),
                     errors : cmp.get("v.errors"),
                     value : value

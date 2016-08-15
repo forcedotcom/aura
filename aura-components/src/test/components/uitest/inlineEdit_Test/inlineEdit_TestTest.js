@@ -298,12 +298,13 @@
      getPanelFromDomElement : function(cmp, panelIndex) {
          panelIndex = panelIndex ? panelIndex : 0;
          var panels = $A.test.getElementByClass(this.EDIT_PANEL_CLASS);
-         if (0 < panelIndex > panels.length) {
+         if (!panels || (0 < panelIndex > panels.length)) {
              return undefined;
          }
          var panel = panels[panelIndex];
          var htmlCmp = $A.componentService.getRenderingComponentForElement(panel);
-         return htmlCmp.getAttributeValueProvider();
+         return htmlCmp.getAttributeValueProvider ? 
+        		 htmlCmp.getAttributeValueProvider() : undefined;
      },
      
      waitForPanelOpen : function(cmp) {

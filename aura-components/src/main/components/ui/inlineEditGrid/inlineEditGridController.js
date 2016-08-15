@@ -39,8 +39,20 @@
                 evt.stopPropagation();
                 return;
             }
-		    helper.handleEditAction(cmp, evt);
-			helper.getKeyboardManager(cmp).pauseKeyboardMode();
+			if (cmp._panelCmp && cmp._panelCmp.isValid()) {
+				// there is another panel currently active.
+				// kick off the event after it is done.
+				cmp._delayedEditEvent = evt;
+
+				// TODO: Setting the activeCell here as a workaround
+				// In the onClick, the keyboard is paused and will just return without doing anything. 
+				// Researching better ways to handle this
+				var payload = evt.getParam("payload");
+				helper.getKeyboardManager(cmp).setActiveCell(payload.targetRowIndex, payload.targetCellIndex);
+			}
+			else {
+				helper.handleEditAction(cmp, evt);
+			}
 		}
 	},
 	
@@ -68,10 +80,10 @@
 		// Update only the specified item
 		// TODO: Revisit post feature freeze as right now we are doing two updates. - One here and one in the listViewManagerGrid
 		helper.updateItem(cmp, item, index);
-		cmp._panelCmp.hide();
-		
-		helper.fireEditEvent(cmp, payload);
-		helper.getKeyboardManager(cmp).resumeKeyboardMode();
+		cmp._panelCmp.close($A.getCallback(function() {
+			helper.fireEditEvent(cmp, payload);
+			helper.getKeyboardManager(cmp).resumeKeyboardMode();
+		}));
 	},
 	
 	enterKeyboardMode: function(cmp, evt, helper){

@@ -42,4 +42,11 @@ public interface IncludeDefRef extends Definition, HasJavascriptReferences, Java
      * @return the export identifier.
      */
 	String getExport();
+	
+	/**
+     * Gets client descriptor
+     *
+     * @return the client descriptor identifier.
+     */
+	String getClientDescriptor();
 }

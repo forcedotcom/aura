@@ -605,6 +605,36 @@ AuraComponentService.prototype.getComponentClass = function(descriptor) {
 };
 
 /**
+ * Initializes event configs
+ * @export
+*/
+AuraComponentService.prototype.initEventDefs = function(evtConfigs) {
+    for (var i = 0; i < evtConfigs.length; i++) {
+        $A.eventService.saveEventConfig(evtConfigs[i]);
+    }
+};
+
+/**
+ * Initializes library configs
+ * @export
+*/
+AuraComponentService.prototype.initLibraryDefs = function(libraryConfigs) {
+    for (var i = 0; i < libraryConfigs.length; i++) {
+        $A.componentService.saveLibraryConfig(libraryConfigs[i]);
+    }
+};
+
+/**
+ * Init controller configs
+ * @export
+*/
+AuraComponentService.prototype.initControllerDefs = function(controllerConfigs) {
+    for (var i = 0; i < controllerConfigs.length; i++) {
+        $A.componentService.createControllerDef(controllerConfigs[i]);
+    }
+};
+
+/**
  * Detects of the component class has been already defined without actually defining it.
  * hasComponentClass is more performant that running getComponentClass() since if the class
  * hasn't been built yet, we don't want it to be forcably built if not requested.
@@ -1041,6 +1071,14 @@ AuraComponentService.prototype.addComponent = function(descriptor, exporter) {
 };
 
 
+AuraComponentService.prototype.hydrateComponent = function(descriptor, exporter) {
+    var tmp = exporter.toString();
+    var pos = [tmp.indexOf('/*') + 2, tmp.indexOf('*/')];
+    tmp = tmp.substr(pos[0], pos[1] - pos[0]);
+    exporter = $A.util.globalEval("function () {" + tmp + " }");
+    return exporter();
+};
+
 /**
  * Checks for saved component config, creates if available, and deletes the config
  *
@@ -1051,7 +1089,7 @@ AuraComponentService.prototype.addComponent = function(descriptor, exporter) {
 AuraComponentService.prototype.createFromSavedComponentConfigs = function(config) {
     var descriptor = this.getDescriptorFromConfig(config);
     var cmpConfig = this.savedComponentConfigs[descriptor];
-    var definition = typeof cmpConfig === 'function' ? cmpConfig() : cmpConfig;
+    var definition = typeof cmpConfig === 'function' ? this.hydrateComponent(descriptor, cmpConfig) : cmpConfig;
     var def = new ComponentDef(definition);
     this.componentDefRegistry[descriptor] = def;
     delete this.savedComponentConfigs[descriptor];
@@ -1184,6 +1222,16 @@ AuraComponentService.prototype.saveLibraryConfig = function(config) {
         var includeClasses = $A.util.json.decode(config["includeClasses"]);
         includeClasses();
     }
+};
+
+/**
+ * Store a library exporter.
+ * @param {String} descriptor name of the include.
+ * @param {Function} exporter A function that when executed will return the include object.
+ * @export
+ */
+AuraComponentService.prototype.addLibraryExporter = function(descriptor, exporter) {
+    this.libraryIncludeRegistry.addLibraryExporter(descriptor, exporter);
 };
 
 /**

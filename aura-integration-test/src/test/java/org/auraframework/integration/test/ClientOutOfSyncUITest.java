@@ -612,7 +612,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         DefDescriptor<?> libraryDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class, null);
         DefDescriptor<?> includeDesc = getAuraTestingUtil().createStringSourceDescriptor(null, IncludeDef.class,
                 libraryDesc);
-        addSourceAutoCleanup(includeDesc, "function(){return 'initialized'}");
+        addSourceAutoCleanup(includeDesc, "function a(){return 'initialized'}");
         addSourceAutoCleanup(libraryDesc,
                 String.format("<aura:library><aura:include name='%s'/></aura:library>", includeDesc.getName()));
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
@@ -626,7 +626,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         assertEquals("initialized", getAuraUITestingUtil().getEval(String.format(
                 "return $A.getRoot().getDef().getHelper().mylib.%s;", includeDesc.getName())));
 
-        updateStringSource(includeDesc, "function(){return 'updated'}");
+        updateStringSource(includeDesc, "function b(){return 'updated'}");
 
         open(cmpDesc);
         assertEquals("updated", getAuraUITestingUtil().getEval(String.format(
@@ -639,10 +639,10 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         DefDescriptor<?> libraryDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class, null);
         DefDescriptor<?> includeDesc = getAuraTestingUtil().createStringSourceDescriptor(null, IncludeDef.class,
                 libraryDesc);
-        addSourceAutoCleanup(includeDesc, "function(){return 'firstpick'}");
+        addSourceAutoCleanup(includeDesc, "function a(){return 'firstpick'}");
         DefDescriptor<?> includeOtherDesc = getAuraTestingUtil().createStringSourceDescriptor(null, IncludeDef.class,
                 libraryDesc);
-        addSourceAutoCleanup(includeOtherDesc, "function(){return 'secondpick'}");
+        addSourceAutoCleanup(includeOtherDesc, "function b(){return 'secondpick'}");
         addSourceAutoCleanup(libraryDesc,
                 String.format("<aura:library><aura:include name='%s'/></aura:library>", includeDesc.getName()));
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
@@ -670,7 +670,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         DefDescriptor<?> libraryDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class, null);
         final DefDescriptor<?> includeDesc = getAuraTestingUtil().createStringSourceDescriptor(null, IncludeDef.class,
                 libraryDesc);
-        addSourceAutoCleanup(includeDesc, "function(){return 'initialized'}");
+        addSourceAutoCleanup(includeDesc, "function a(){return 'initialized'}");
         addSourceAutoCleanup(libraryDesc,
                 String.format("<aura:library><aura:include name='%s'/></aura:library>", includeDesc.getName()));
         DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent(
@@ -681,7 +681,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         assertEquals("initialized", getAuraUITestingUtil().getEval(String.format(
                 "return $A.getRoot().getDef().getHelper().mylib.%s;", includeDesc.getName())));
 
-        updateStringSource(includeDesc, "function(){return 'updated'}");
+        updateStringSource(includeDesc, "function b(){return 'updated'}");
 
         triggerServerAction();
         getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
@@ -701,10 +701,10 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         DefDescriptor<?> libraryDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class, null);
         DefDescriptor<?> includeDesc = getAuraTestingUtil().createStringSourceDescriptor(null, IncludeDef.class,
                 libraryDesc);
-        addSourceAutoCleanup(includeDesc, "function(){return 'firstpick'}");
+        addSourceAutoCleanup(includeDesc, "function a(){return 'firstpick'}");
         final DefDescriptor<?> includeOtherDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 IncludeDef.class, libraryDesc);
-        addSourceAutoCleanup(includeOtherDesc, "function(){return 'secondpick'}");
+        addSourceAutoCleanup(includeOtherDesc, "function b(){return 'secondpick'}");
         addSourceAutoCleanup(libraryDesc,
                 String.format("<aura:library><aura:include name='%s'/></aura:library>", includeDesc.getName()));
         DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent(

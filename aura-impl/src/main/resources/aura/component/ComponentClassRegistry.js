@@ -58,10 +58,15 @@ ComponentClassRegistry.prototype.addComponentClass = function(descriptor, export
  */
 ComponentClassRegistry.prototype.getComponentClass = function(descriptor) {
     var storedConstructor = this.classConstructors[descriptor];
+    var url;
 
     if (!storedConstructor) {
         var exporter = this.classExporter[descriptor];
         if (exporter) {
+            //#if {"excludeModes" : ["PRODUCTION"]}
+                url = $A.clientService.getSourceMapsUrl(descriptor);
+                exporter = $A.util.globalEval(exporter.toString(), null, url);
+            //#end
             var componentProperties = exporter();
             storedConstructor = this.buildComponentClass(componentProperties);
             this.classConstructors[descriptor] = storedConstructor;

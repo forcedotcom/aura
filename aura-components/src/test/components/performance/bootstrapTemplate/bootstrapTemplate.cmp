@@ -17,20 +17,4 @@
 -->
 <aura:component isTemplate="true" extensible="true" extends="aura:template">
     <aura:set attribute="title" value="Aura Bootstrap"/>
-
-    <aura:set attribute="extraMetaTags">
-        <meta name="description" content="Test" />
-    </aura:set>
-
-    <aura:set attribute="auraPreInitBlock">
-        <auraStorage:init name="actions"
-                          maxSize="4096"
-                          defaultExpiration="3600"
-                          secure="true"
-                          persistent="false"
-                          defaultAutoRefreshInterval="3600"
-                          debugLoggingEnabled="true"
-                          clearStorageOnInit="false"/>
-        <auraStorage:crypto debugLoggingEnabled="true" fetchRemoteKey="true"/>
-    </aura:set>
 </aura:component>

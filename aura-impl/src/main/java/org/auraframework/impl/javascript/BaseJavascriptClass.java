@@ -107,7 +107,7 @@ public abstract class BaseJavascriptClass implements Serializable {
 			}
 	    }
 
-        private void validateCodeErrors(List<JavascriptProcessingError> codeErrors) throws InvalidDefinitionException {
+        protected void validateCodeErrors(List<JavascriptProcessingError> codeErrors) throws InvalidDefinitionException {
 	    	if (codeErrors != null && !codeErrors.isEmpty()) {
 	            StringBuilder sb = new StringBuilder();
 	            boolean first = true;

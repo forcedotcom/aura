@@ -33,6 +33,7 @@ public enum JavascriptWriter {
         @Override
         public void setClosureOptions(CompilerOptions options) {
             CompilationLevel.WHITESPACE_ONLY.setOptionsForCompilationLevel(options);
+            options.setPrettyPrint(true);
         }
     },
 

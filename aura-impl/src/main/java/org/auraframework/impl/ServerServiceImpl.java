@@ -303,18 +303,18 @@ public class ServerServiceImpl implements ServerService {
         final String key = "JS:" + mKey + uid;
 
         String cached = context.getDefRegistry().getAltCachedString(uid, appDesc, key,
-                new Callable<String>() {
-                    @Override
-                    public String call() throws Exception {
-                        String res = getDefinitionsString(dependencies, key);
-                        //log the cache miss here
-                        Aura.getCachingService().getAltStringsCache().logCacheStatus("cache miss for key: "+key+";");
-                        return res;
-                    }
-                });
+               new Callable<String>() {
+                   @Override
+                   public String call() throws Exception {
+                       String res = getDefinitionsString(dependencies, key);
+                       //log the cache miss here
+                       Aura.getCachingService().getAltStringsCache().logCacheStatus("cache miss for key: "+key+";");
+                       return res;
+                   }
+               });
 
         if (out != null) {
-            out.append(cached);
+           out.append(cached);
         }
     }
 
@@ -323,74 +323,67 @@ public class ServerServiceImpl implements ServerService {
 
         AuraContext context = Aura.getContextService().getCurrentContext();
         boolean minify = context.getMode().minify();
+        
         MasterDefRegistry masterDefRegistry = context.getDefRegistry();
-
-        StringBuilder sb = new StringBuilder();
-
-        // Process Libraries with a lower granularity level, to prevent duplication of external includes.
-        Collection<LibraryDef> libraryDefs = filterAndLoad(LibraryDef.class, dependencies, null);
-        for (LibraryDef libraryDef : libraryDefs) {
-            List<IncludeDefRef> includeDefs = libraryDef.getIncludes();
-            for (IncludeDefRef defRef : includeDefs) {
-                sb.append(defRef.getCode(minify));
-                masterDefRegistry.setClientClassLoaded(defRef.getDescriptor(), true);
-            }
-        }
-
+        
         JsonSerializationContext serializationContext = context.getJsonSerializationContext();
         serializationContext.pushFormatRootItems();
         // no ref support needed for defs
         serializationContext.pushRefSupport(false);
         
+        StringBuilder sb = new StringBuilder();
         
-     // Append component classes.
+        // Process Libraries with a lower granularity level, to prevent duplication of external includes.
+        Collection<LibraryDef> libraryDefs = filterAndLoad(LibraryDef.class, dependencies, null);
+        for (LibraryDef libraryDef : libraryDefs) {
+            List<IncludeDefRef> includeDefs = libraryDef.getIncludes();
+            for (IncludeDefRef defRef : includeDefs) {
+            	sb.append("$A.componentService.addLibraryExporter(\"" + defRef.getClientDescriptor() + "\", function (){/*");
+                sb.append(defRef.getCode(minify));
+                sb.append("*/});");
+                	
+                masterDefRegistry.setClientClassLoaded(defRef.getDescriptor(), true);
+            }
+        }
+        
+        // Append component classes.
         Collection<BaseComponentDef> componentDefs = filterAndLoad(BaseComponentDef.class, dependencies, null);
         for (BaseComponentDef def : componentDefs) {
-            sb.append("$A.componentService.addComponent(\"" + def.getDescriptor() + "\", function (){\n");
+            sb.append("$A.componentService.addComponent(\"" + def.getDescriptor() + "\", function (){/*");
             
-            	// Definition
-            	sb.append("var def = ");
-            	Aura.getSerializationService().write(def, null, BaseComponentDef.class, sb, "JSON");
-            	sb.append(";\n");
+            	// Mark class as loaded in the client
+            	masterDefRegistry.setClientClassLoaded(def.getDescriptor(), true);
             	
             	// Component Class
             	sb.append(def.getCode(minify));
-            	masterDefRegistry.setClientClassLoaded(def.getDescriptor(), true);
             	
-            	sb.append("return def;");
-            	
-            sb.append("});\n");
+            	// Component definition
+            	sb.append("return ");
+            	Aura.getSerializationService().write(def, null, BaseComponentDef.class, sb, "JSON");
+            	sb.append(";");
+
+            sb.append("*/});\n");
         }
 
-        sb.append("$A.clientService.initDefs({");
-
-        // append event definitions
-        sb.append("eventDefs:");
+        // Append event definitions
+        sb.append("$A.componentService.initEventDefs(");
         Collection<EventDef> events = filterAndLoad(EventDef.class, dependencies, null);
         Aura.getSerializationService().writeCollection(events, EventDef.class, sb, "JSON");
-        sb.append(",");
+        sb.append(");\n");
 
-        // append library definitions
-        sb.append("libraryDefs:");
+        // Append library definitions
+        sb.append("$A.componentService.initLibraryDefs(");
         Aura.getSerializationService().writeCollection(libraryDefs, LibraryDef.class, sb, "JSON");
-        sb.append(",");
+        sb.append(");\n");
 
-        //
-        // append controller definitions
+        // Append controller definitions
         // Dunno how this got to be this way. The code in the Format adaptor was twisted and stupid,
         // as it walked the namespaces looking up the same descriptor, with a string.format that had
         // the namespace but did not use it. This ends up just getting a single controller.
-        //
-        sb.append("controllerDefs:");
+        sb.append("$A.componentService.initControllerDefs(");
         Collection<ControllerDef> controllers = filterAndLoad(ControllerDef.class, dependencies, ACF);
         Aura.getSerializationService().writeCollection(controllers, ControllerDef.class, sb, "JSON");
-        //sb.append(",");
-
-        // append component definitions
-         //sb.append("componentDefs:");
-         //Aura.getSerializationService().writeCollection(componentDefs, BaseComponentDef.class, sb, "JSON");
-
-        sb.append("});\n\n");
+        sb.append(");\n");
 
         serializationContext.popRefSupport();
 

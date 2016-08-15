@@ -296,6 +296,23 @@ AuraClientService.prototype.deferPendingActions = function() {
     }
 };
 
+//#if {"excludeModes" : ["PRODUCTION"]}
+AuraClientService.prototype.getSourceMapsUrl = function (descriptor, type) {
+    if (window.location) {
+        var splitChar = ':';
+        var folder = '/components/';
+
+        if (type === 'lib') {
+            splitChar = '.';    
+            folder = '/libraries/';
+        }
+
+        var parts = descriptor.split('://').pop().split(splitChar);
+        return [window.location.origin, folder, parts.join('/'),'.js'].join('');
+    }
+};
+//#end
+
 /**
  * Take a json (hopefully) response and decode it. If the input is invalid JSON, we try to handle it gracefully.
  *
@@ -1189,14 +1206,18 @@ AuraClientService.prototype.setNamespacePrivileges = function(sentNs) {
  * @export
  */
 
-AuraClientService.prototype.initDefs = function(config, resolved) {
-    var i;
+AuraClientService.prototype.initDefs = function() {
+    if (!Aura["appJsReady"]) {
+        Aura["appDefsReady"] = this.initDefs.bind(this);
+        return;
+    }
 
-    if (resolved) {
-        var libraryDefs = config["libraryDefs"];
+    var i, config = Aura["ApplicationDefs"];
+
+    if (config) {
+        var libraryDefs = config["libExporter"];
         for (i in libraryDefs) {
-            var libDef = libraryDefs[i];
-            $A.componentService.addLibraryInclude(i, libDef["dependencies"], libDef["exporter"]);
+            $A.componentService.addLibraryExporter(i, libraryDefs[i]);
         }
 
         var cmpExporter = config["cmpExporter"];
@@ -1204,36 +1225,18 @@ AuraClientService.prototype.initDefs = function(config, resolved) {
             $A.componentService.addComponent(i, cmpExporter[i]);
         }
 
-        config = config["resolvedDefs"];
+        $A.componentService.initEventDefs(config["eventDefs"]);
+        $A.componentService.initLibraryDefs(config["libraryDefs"]);
+        $A.componentService.initControllerDefs(config["controllerDefs"]);
+
+        delete Aura["ApplicationDefs"];
     }
-
-
-    var evtConfigs = config["eventDefs"];
-    for (i = 0; i < evtConfigs.length; i++) {
-        $A.eventService.saveEventConfig(evtConfigs[i]);
-    }
-
-    var libraryConfigs = config["libraryDefs"];
-    for (i = 0; i < libraryConfigs.length; i++) {
-        $A.componentService.saveLibraryConfig(libraryConfigs[i]);
-    }
-
-    var controllerConfigs = config["controllerDefs"];
-    for (i = 0; i < controllerConfigs.length; i++) {
-        $A.componentService.createControllerDef(controllerConfigs[i]);
-    }
-
-    var defObservers = Aura["afterAppDefsReady"] || [];
-
-    // Let any interested parties know that defs have been initialized
-    for ( var n = 0, olen = defObservers.length; n < olen; n++) {
-        defObservers[n]();
-    }
-
-    Aura["afterAppDefsReady"] = [];
-    $A.log("initDefs complete");
 
     this.finishedInitDefs = true;
+
+    if (Aura["afterAppDefsReady"]) {
+        Aura["afterAppDefsReady"].forEach(function (fn) { fn();});
+    }
 };
 
 AuraClientService.prototype.getAppBootstrap = function() {
@@ -1397,21 +1400,14 @@ AuraClientService.prototype.checkBootstrapUpgrade = function() {
  * @private
  */
 AuraClientService.prototype.runAfterInitDefs = function(callback) {
-    if (!this.finishedInitDefs) {
-        // Add to the list of callbacks waiting until initDefs() is done
-        Aura["afterAppDefsReady"] = Aura["afterAppDefsReady"] || [];
-        Aura["afterAppDefsReady"].push(callback);
-
-        if (Aura["ApplicationDefs"]) {
-            var resolvedDefs = Aura["ApplicationDefs"];
-            delete Aura["ApplicationDefs"];
-            this.initDefs(resolvedDefs, true/*resolved*/);
-        }
-
-    } else {
-        // initDefs() is done and gone so just run the callback
-        callback();
+    if (this.finishedInitDefs) {
+        return callback();
     }
+
+    // Add to the list of callbacks waiting until initDefs() is done
+    Aura["afterAppDefsReady"] = Aura["afterAppDefsReady"] || [];
+    Aura["afterAppDefsReady"].push(callback);
+
 };
 
 /**

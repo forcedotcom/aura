@@ -22,6 +22,8 @@
  * @constructor
  */
 function LibraryIncludeRegistry() {
+    // A map of Function that holds a preproccessed (commented) instance.
+    this.libExporter = {};
     // A map of Function[] that each return a library include instance.
     this.exporter = {};
 
@@ -67,6 +69,16 @@ LibraryIncludeRegistry.prototype.hasLibraryInclude = function(descriptor) {
 };
 
 /**
+ * The function that handles definitions of library includes.
+ * @param {String} descriptor name of the include.
+ * @param {Function} exporter A function that when executed will return the include object.
+ */
+LibraryIncludeRegistry.prototype.addLibraryExporter = function(descriptor, exporter) {
+    this.libExporter[descriptor] = exporter;
+};
+
+
+/**
  * Get or build the instance for the specified library include. his works like a simplfied version of
  * RequireJS's "require" function, without a callback.
  * @param {String} descriptor in the form markup://namespace:include.
@@ -79,7 +91,6 @@ LibraryIncludeRegistry.prototype.getLibraryInclude = function(descriptor) {
     if (descriptor in this.instance) {
         instance = this.instance[descriptor];
     } else {
-
         // Reset the queue from any previous failed runs.
         this.clearDependencyQueue();
 
@@ -107,15 +118,30 @@ LibraryIncludeRegistry.prototype.getLibraryInclude = function(descriptor) {
     return instance;
 };
 
+
+LibraryIncludeRegistry.prototype.hydrateLibrary = function(descriptor, exporter) {
+    var tmp = exporter.toString();
+    var pos = [tmp.indexOf('/*') + 2, tmp.indexOf('*/')];
+    
+    tmp = tmp.substr(pos[0], pos[1] - pos[0]);
+    exporter = $A.util.globalEval("function () {" + tmp + " }");
+    return exporter();
+};
+
+
+
 /**
  * Try to build an instance for the specified library include.
  * @param {Array} dependencies The list of descriptors markup://namespace:include.
  * @returns {Array} the list of instances or undefined.
  */
 LibraryIncludeRegistry.prototype.buildLibraryInclude = function(descriptor) {
+    if (this.libExporter[descriptor]) {
+        this.hydrateLibrary(descriptor, this.libExporter[descriptor]);
+        delete this.libExporter[descriptor];
+    }
 
     var resolved = true;
-
     // Attempt to resolve missing dependencies for the requested descriptor.
     var dependencies = this.dependencies[descriptor] || [];
     var dependenciesInstances = this.dependenciesInstances[descriptor] || [];
@@ -141,6 +167,12 @@ LibraryIncludeRegistry.prototype.buildLibraryInclude = function(descriptor) {
     // build the include.
     if (resolved) {
         var exporter = this.exporter[descriptor];
+        var url;
+
+        //#if {"excludeModes" : ["PRODUCTION"]}
+            url = $A.clientService.getSourceMapsUrl(descriptor, 'lib');
+            exporter = ($A.util.globalEval("function() { return " + exporter.toString() + "}", null, url)());
+        //#end
         if (!$A.util.isFunction(exporter)) {
             throw new Error("Library include not defined: " + descriptor);
         }

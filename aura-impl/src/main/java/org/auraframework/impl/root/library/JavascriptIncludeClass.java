@@ -16,6 +16,8 @@
 
 package org.auraframework.impl.root.library;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.List;
 
 import org.auraframework.def.DefDescriptor;
@@ -23,9 +25,12 @@ import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.impl.javascript.BaseJavascriptClass;
 import org.auraframework.system.Location;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.javascript.JavascriptProcessingError;
+import org.auraframework.util.javascript.JavascriptWriter;
 
 public class JavascriptIncludeClass extends BaseJavascriptClass {
 	private static final long serialVersionUID = -5018742964727407807L;
@@ -125,6 +130,17 @@ public class JavascriptIncludeClass extends BaseJavascriptClass {
 			List<String> aliases = includeDefRef.getAliases();
 			String export = includeDefRef.getExport();
 			String include = includeDef.getCode();
+			
+			try {
+				StringWriter sw = new StringWriter();
+				List<JavascriptProcessingError> codeErrors = JavascriptWriter.CLOSURE_WHITESPACE.compress(include, sw, getFilename());
+				validateCodeErrors(codeErrors);
+				StringBuffer sb = sw.getBuffer();
+				sb.deleteCharAt(sb.length() - 1);
+				include = sb.toString();
+			} catch (IOException | InvalidDefinitionException e) {
+				throw new AuraRuntimeException(e.getMessage());
+			}
 
 	        boolean hasAliases = aliases != null && !aliases.isEmpty();
 	        boolean hasExport = !AuraTextUtil.isNullEmptyOrWhitespace(export);
@@ -142,7 +158,7 @@ public class JavascriptIncludeClass extends BaseJavascriptClass {
 	        	out.append(include);
 	        	out.append("\n");
 	        }
-	
+	        
 	        if (hasAliases || hasExport || !hasCode) {
 		        // add the return statement if required
 		        if (hasExport) {

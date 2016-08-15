@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function (StorageUtil) {
+function lib(StorageUtil) {
     /**
      * The Operations class is a performance runner. Specify
      * the configuration values with the "set" functions then

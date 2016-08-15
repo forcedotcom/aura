@@ -1,3 +1,3 @@
 ({
-    init: function () {}
+    init: function (cmp) {}
 })

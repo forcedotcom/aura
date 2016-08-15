@@ -153,7 +153,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
         addSourceAutoCleanup(libDesc,
                 String.format("<aura:library><aura:include name='%s'/></aura:library>", includeDesc.getName()));
         addSourceAutoCleanup(includeDesc,
-                "function(){\n\tvar renamed = 'truth';\n\tif(window.blah)\n\t\t{renamed+=' hurts'}\n\treturn renamed}");
+                "function X(){\n\tvar renamed = 'truth';\n\tif(window.blah)\n\t\t{renamed+=' hurts'}\n\treturn renamed}");
 
         Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);

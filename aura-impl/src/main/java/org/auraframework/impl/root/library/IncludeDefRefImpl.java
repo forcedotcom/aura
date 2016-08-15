@@ -69,6 +69,11 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
     public String getExport() {
         return export;
     }
+    
+    @Override
+    public String getClientDescriptor() {
+    	return JavascriptIncludeClass.getClientDescriptor(this.getDescriptor());
+    }
 
     @Override
     public String getCode(boolean minify) throws QuickFixException {

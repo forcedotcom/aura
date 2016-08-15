@@ -30,10 +30,19 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
             "util": {
                 "isString": function(obj){ return typeof obj === 'string' },
                 "isFunction": function(obj){ return typeof obj === 'function' },
-                "globalEval": function(src){ return eval(src); }
+                "globalEval": function(src){ 
+                    var returnableEx = /^(\s*)([{(["']|function\s*\()/;
+                    var match = src.match(returnableEx);
+                    if (match) src = src.replace(match[1], 'return ');
+                    eval ("function x() {" + src + "}");
+                    return x();
+                }
             },
             "componentService": {
                 "getLibrary": function(descriptor) { return descriptor }
+            },
+            clientService: {
+                getSourceMapsUrl: function () {return;}
             }
         }
     });
@@ -71,7 +80,7 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
             var exporter = function() {
                 return {
                     "meta": {
-                        "name": expected
+                        "name": "componentClassName"
                     }
                 }
             };
@@ -293,7 +302,7 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
                     "meta": {
                         "name": "componentClassName",
                         "imports": {
-                            "testLib":expected
+                            "testLib": "test:libName"
                         }
                     }
                 }

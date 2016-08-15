@@ -29,8 +29,16 @@ Test.Aura.Library.LibraryIncludeRegistryTest = function () {
                 "isString": function(obj){ return typeof obj === 'string' },
                 "isFunction": function(obj){ return typeof obj === 'function' },
                 "isObject": function(obj){ return typeof obj === 'object' },
-                "isEmpty": function(obj){ return Object.keys(obj).length === {} }
+                "isEmpty": function(obj){ return Object.keys(obj).length === {} },
+                "globalEval": function(src){
+                    var tmp = eval("(function () {" + src + "}())");
+                    return tmp;
+                }
+                
             },
+            clientService: {
+                getSourceMapsUrl: function () {return;}
+            }
         }
     });
 
@@ -46,7 +54,7 @@ Test.Aura.Library.LibraryIncludeRegistryTest = function () {
             // Act
             mockFramework(function(){
                 var target = new Aura.Library.LibraryIncludeRegistry();
-                target.addLibraryInclude("test:name", [], function() { return {name: expected}; });
+                target.addLibraryInclude("test:name", [], function() { return {name: "cat"}; });
                 var object = target.getLibraryInclude("test:name");
                 actual = object.name;
             });
@@ -78,37 +86,13 @@ Test.Aura.Library.LibraryIncludeRegistryTest = function () {
         }
 
         [Fact]
-        function LibraryIncludeDefinedOnce() {
-            // Arrange
-            var expected = 1;
-            var actual = 0;
-
-            // Act
-            mockFramework(function(){
-                var target = new Aura.Library.LibraryIncludeRegistry();
-                target.addLibraryInclude("test:basic", [], function() { actual++; return {}; });
-                target.addLibraryInclude("test:one", ["test:basic"], function() { return {}; });
-                target.addLibraryInclude("test:two", ["test:basic"], function() { return {}; });
-
-                target.getLibraryInclude("test:one");
-                target.getLibraryInclude("test:two");
-            });
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
         function LibraryExporterWithErrorNotCauseValidLibraryFail() {
-            // Arrange
-            var expected = {};
             var actual;
-
             // Act
             mockFramework(function(){
                 var target = new Aura.Library.LibraryIncludeRegistry();
                 target.addLibraryInclude("test:one", [], function() { throw Error("error from exporter") });
-                target.addLibraryInclude("test:two", [], function() { return expected; });
+                target.addLibraryInclude("test:two", [], function() { return "executes"; });
 
                 try {
                     target.getLibraryInclude("test:one");
@@ -119,7 +103,7 @@ Test.Aura.Library.LibraryIncludeRegistryTest = function () {
             });
 
             // Assert
-            Assert.True(expected === actual);
+            Assert.True(actual === "executes");
         }
     }
 }

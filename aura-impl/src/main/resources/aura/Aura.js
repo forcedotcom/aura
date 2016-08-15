@@ -719,6 +719,8 @@ AuraInstance.prototype.initAsync = function(config) {
                 .then(undefined, reportError);
         }
     });
+
+    this.clientService.initDefs();
 };
 
 /**
@@ -1506,7 +1508,9 @@ window['aura'] = window['$A'];
  * The scripts are loaded with no order, which means
  * we need to call iniAsync in case it was already evaluated
 */
+
 Aura["frameworkJsReady"] = true;
+
 if (Aura["initConfig"]) {
   $A.initAsync(Aura["initConfig"]);
 }

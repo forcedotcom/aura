@@ -23,6 +23,7 @@ import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.def.DefinitionTest;
 import org.auraframework.impl.javascript.BaseJavascriptClass;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
@@ -32,7 +33,7 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
 
     @Test
     public void testSerializeMinimal() throws Exception {
-        String code = "function(){}";
+        String code = "function a() {}";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 LibraryDef.class, null);
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("minimal",
@@ -43,14 +44,14 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
         IncludeDefRef def = builder.build();
         def.validateReferences();
 
-        String expected = String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s\n);\n",
-                JavascriptIncludeClass.getClientDescriptor(includeDesc), code);
+        String expected = String.format("$A.componentService.addLibraryInclude(\"%s\",[],function a() {\n}\n\n);\n",
+                JavascriptIncludeClass.getClientDescriptor(includeDesc));
         assertEquals(expected, def.getCode(false));
     }
 
     @Test
     public void testSerializeWithSingleComments() throws Exception {
-        String code = "//this doc should be helpful\nfunction(){\n//fix later\nreturn this;}//last word";
+        String code = "//this doc should be helpful\nfunction a(){\n//fix later\nreturn this;}//last word";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 LibraryDef.class, null);
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("singleComments",
@@ -62,13 +63,13 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
         def.validateReferences();
 
         assertEquals(
-                String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s\n);\n",
+                String.format("$A.componentService.addLibraryInclude(\"%s\",[],function a() {\n  return this\n}\n\n);\n",
                         JavascriptIncludeClass.getClientDescriptor(includeDesc), code), def.getCode(false));
     }
 
     @Test
     public void testSerializeWithMultiComments() throws Exception {
-        String code = "/*this doc should be helpful*/function(){/*fix later*/return this;}/*last word*/";
+        String code = "function a(){/*fix later*/return this;}/*last word*/";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 LibraryDef.class, null);
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("multiComments",
@@ -80,13 +81,13 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
         def.validateReferences();
 
         assertEquals(
-                String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s\n);\n",
-                        JavascriptIncludeClass.getClientDescriptor(includeDesc), code), def.getCode(false));
+                String.format("$A.componentService.addLibraryInclude(\"%s\",[],function a() {\n  return this\n}\n\n);\n",
+                        JavascriptIncludeClass.getClientDescriptor(includeDesc)), def.getCode(false));
     }
 
     @Test
     public void testSerializeWithImport() throws Exception {
-        String code = "function(){}";
+        String code = "function a(){}";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 LibraryDef.class, null);
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("hasImport",
@@ -102,14 +103,14 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
         def.validateReferences();
 
         assertEquals(
-                String.format("$A.componentService.addLibraryInclude(\"%s\",[\"%s\"],%s\n);\n",
+                String.format("$A.componentService.addLibraryInclude(\"%s\",[\"%s\"],function a() {\n}\n\n);\n",
                         JavascriptIncludeClass.getClientDescriptor(includeDesc),
                         JavascriptIncludeClass.getClientDescriptor(importDesc), code), def.getCode(false));
     }
 
     @Test
     public void testSerializeWithExternalImport() throws Exception {
-        String code = "function(){}";
+        String code = "function a(){}";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 LibraryDef.class, null);
         DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("hasImport",
@@ -129,14 +130,14 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
         def.validateReferences();
 
         assertEquals(
-                String.format("$A.componentService.addLibraryInclude(\"%s\",[\"%s\"],%s\n);\n",
+                String.format("$A.componentService.addLibraryInclude(\"%s\",[\"%s\"],function a() {\n}\n\n);\n",
                         JavascriptIncludeClass.getClientDescriptor(includeDesc),
                         JavascriptIncludeClass.getClientDescriptor(extIncludeDesc), code), def.getCode(false));
     }
 
     @Test
     public void testSerializeWithMultipleImports() throws Exception {
-        String code = "function(){}";
+        String code = "function a(){}";
         DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 LibraryDef.class, null);
         DefDescriptor<IncludeDef> import1Desc = getAuraTestingUtil().createStringSourceDescriptor("firstimport",
@@ -158,31 +159,11 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
         IncludeDefRef def = builder.build();
         def.validateReferences();
 
-        String expected = String.format("$A.componentService.addLibraryInclude(\"%s\",[\"%s\", \"%s\"],%s\n);\n",
+        String expected = String.format("$A.componentService.addLibraryInclude(\"%s\",[\"%s\", \"%s\"],function a() {\n}\n\n);\n",
                 JavascriptIncludeClass.getClientDescriptor(import1Desc),
                 JavascriptIncludeClass.getClientDescriptor(import2Desc),
                 JavascriptIncludeClass.getClientDescriptor(extImportDesc),
                 code);
-        assertEquals(expected, def.getCode(false));
-    }
-
-    @Test
-    public void testSerializeWithExports() throws Exception {
-        String code = "var myexpt=function(){return 'something'}";
-        String export = "myexpt";
-        DefDescriptor<LibraryDef> libDesc = getAuraTestingUtil().createStringSourceDescriptor(null, LibraryDef.class,
-                null);
-        DefDescriptor<IncludeDef> includeDesc = getAuraTestingUtil().createStringSourceDescriptor("hasExports",
-                IncludeDef.class, libDesc);
-        addSourceAutoCleanup(includeDesc, code);
-
-        builder.setDescriptor(includeDesc);
-        builder.setExport(export);
-        IncludeDefRef def = builder.build();
-        def.validateReferences();
-
-        String expected = String.format("$A.componentService.addLibraryInclude(\"%s\",[],function lib(){\n%s\n;\nreturn %s;\n});\n",
-                JavascriptIncludeClass.getClientDescriptor(includeDesc), code, export);
         assertEquals(expected, def.getCode(false));
     }
 
@@ -249,8 +230,8 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
             jsIncludeBuilder.build();
             fail("Expecting a InvalidDefinitionException.");
         } catch (Exception e) {
-            String expectedMsg = String.format("JS Processing Error: %s", includeDesc.getQualifiedName());
-            this.assertExceptionMessageContains(e, InvalidDefinitionException.class, expectedMsg);
+            String expectedMsg = "Parse error";
+            this.assertExceptionMessageContains(e, AuraRuntimeException.class, expectedMsg);
         }
     }
 
@@ -266,8 +247,12 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
         builder.setDescriptor(includeDesc);
         IncludeDefRef includeDefRef = builder.build();
         BaseJavascriptClass.Builder jsIncludeBuilder = new JavascriptIncludeClass.Builder().setDefinition(includeDefRef).setMinify(false);
-
-        BaseJavascriptClass javascriptClass = jsIncludeBuilder.build();
-        assertNotNull(javascriptClass);
+        try {
+        	BaseJavascriptClass javascriptClass = jsIncludeBuilder.build();
+        	fail("expected exception");
+        } catch (Exception e) {
+        	checkExceptionContains(e, AuraRuntimeException.class, "Parse error");
+        }
+        
     }
 }

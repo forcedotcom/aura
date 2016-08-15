@@ -28,7 +28,7 @@ Test.Aura.LoggerTest = function() {
 
     var messageCalled = false,
         showErrors    = true,
-        mockUtil      = Mocks.GetMock(Object.Global(), "$A", {
+        mockGlobal      = Mocks.GetMock(Object.Global(), "$A", {
             util: {
                 isString: function (obj) {
                     return typeof obj === 'string';
@@ -52,6 +52,9 @@ Test.Aura.LoggerTest = function() {
             },
             showErrors: function() {
                 return showErrors;
+            },
+            auraError: function(message) {
+                return Error(message);
             }
         });
 
@@ -69,7 +72,7 @@ Test.Aura.LoggerTest = function() {
             logger.subscribe(level, function(level, message, error) {
                 actual = level;
             });
-            mockUtil(function() {
+            mockGlobal(function() {
                 logger.info(expected);
             });
 
@@ -84,7 +87,7 @@ Test.Aura.LoggerTest = function() {
             logger.subscribe(level, function(level, message, error) {
                 actual = message;
             });
-            mockUtil(function() {
+            mockGlobal(function() {
                 logger.info(expected);
             });
 
@@ -110,7 +113,7 @@ Test.Aura.LoggerTest = function() {
             logger.subscribe(level, function(level, message, error) {
                 actual = error;
             });
-            mockUtil(function() {
+            mockGlobal(function() {
                 logger.info(expected);
             });
 
@@ -134,7 +137,7 @@ Test.Aura.LoggerTest = function() {
             var expectedLevel = "WARNING",
                 expectedMsg = "expectedMsg";
             logger.subscribe(expectedLevel, cb);
-            mockUtil(function() {
+            mockGlobal(function() {
                 logger.warning(expectedMsg);
             });
 
@@ -159,7 +162,7 @@ Test.Aura.LoggerTest = function() {
                 expectedMsg = "expectedMsg",
                 condition = false;
             logger.subscribe(expectedLevel, cb);
-            mockUtil(function() {
+            mockGlobal(function() {
                 logger.assert(false, expectedMsg);
             });
 
@@ -193,7 +196,7 @@ Test.Aura.LoggerTest = function() {
                 expectedMsg = "expectedMsg";
             logger.subscribe(expectedLevel, function(level, message, error){actual = level;});
             
-            mockUtil(function() {
+            mockGlobal(function() {
                 logger.error(expectedMsg);
             });
 
@@ -206,7 +209,7 @@ Test.Aura.LoggerTest = function() {
             var expected = "expectedMsg";
             logger.subscribe("ERROR", function(level, message, error){actual = message;});
             
-            mockUtil(function() {
+            mockGlobal(function() {
                 logger.error(expected);
             });
 
@@ -224,15 +227,15 @@ Test.Aura.LoggerTest = function() {
         }
 
         [Fact]
-        function ErrorNotSpecified() {
+        function ErrorNotSpecifiedStillHasCallStack() {
             var actual;
             logger.subscribe("ERROR", function(level, message, error){ actual = error; });
 
-            mockUtil(function() {
+            mockGlobal(function() {
                 logger.error("error");
             });
 
-            Assert.Undefined(actual);
+            Assert.NotNull(actual.stack);
         }
 
         [Fact]
@@ -241,7 +244,7 @@ Test.Aura.LoggerTest = function() {
                 expectedMsg = "expectedMsg";
             logger.subscribe(expectedLevel, function(level, message, error){});
             showErrors = false;
-            mockUtil(function() {
+            mockGlobal(function() {
                 logger.error(expectedMsg);
             });
 

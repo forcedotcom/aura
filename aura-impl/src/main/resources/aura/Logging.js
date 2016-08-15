@@ -20,7 +20,6 @@
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     $A.logger.subscribe("INFO", $A.logger.devDebugConsoleLog);
     $A.logger.subscribe("WARNING", $A.logger.devDebugConsoleLog);
-    $A.logger.subscribe("ERROR", $A.logger.devDebugConsoleLog);
     //#end
 
     //#if {"modes" : ["PRODUCTIONDEBUG"]}

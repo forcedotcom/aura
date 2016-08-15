@@ -112,8 +112,6 @@ Logger.prototype.error = function(msg, e){
         logMsg = logMsg + " : " + e.message;
     }
 
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    //
     // Error objects in older versions of IE are represented as maps with multiple entries containing the error message
     // string. Checking that the object here is not an Error object prevents the error message from being displayed
     // multiple times.
@@ -137,11 +135,16 @@ Logger.prototype.error = function(msg, e){
             }
         }
     }
-    var stack = this.getStackTrace(e);
-    if (stack) {
-        logMsg = logMsg + "\n" + stack.join("\n");
+
+    // remove the 1st line because it's basically $A.error
+    var stack = this.getStackTrace(e, 1);
+    if (stack && !e) {
+        // create a dummy error object to keep the stacktrace
+        e = new $A.auraError(msg);
+        e.name = Error.prototype.name;
+        e.stack = stack;
+        e.stackTrace = e.stack;
     }
-    //#end
 
     if (!$A.initialized) {
         $A["hasErrors"] = true;
@@ -224,6 +227,11 @@ Logger.prototype.notify = function(level, msg, error) {
  * @export
  */
 Logger.prototype.getStackTrace = function(e, remove) {
+    // instances of $A.auraError keep stack in stackTrace property.
+    if (e && e instanceof $A.auraError) {
+        return e.stackTrace;
+    }
+
     var stack = undefined;
 
     if (!remove) {
@@ -238,7 +246,7 @@ Logger.prototype.getStackTrace = function(e, remove) {
         }
     }
     if (e) {
-        stack = e.stackTrace || e.stack;
+        stack = e.stack;
     }
 
     // Chrome adds the error message to the beginning of the stacktrace. Strip that we only want the the actual stack.

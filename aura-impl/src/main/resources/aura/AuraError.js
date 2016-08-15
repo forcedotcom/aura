@@ -41,38 +41,6 @@ function AuraError() {
         });
 
     function AuraErrorInternal(message, innerError, severity) {
-        // for IE8
-        function getName(method) {
-            var funcStr = method.toString();
-            var name = null;
-            var matches = funcStr.match(/\bfunction\s?([^(]*)\(/);
-            if (matches && matches.length === 2) {
-                name = matches[1];
-            }
-            return name || "[anonymous]";
-        }
-
-        function getStack() {
-            // in strict mode accessing .caller throws an error
-            try {
-                var map = {};
-                var stack = [];
-                var caller = getStack.caller && getStack.caller.caller;
-                while (caller) {
-                    if (map[caller]) {
-                        stack.push(getName(caller) + " (Recursion Entry Point)");
-                        break;
-                    }
-                    stack.push(getName(caller));
-                    map[caller]=true;
-                    caller=caller.caller;
-                }
-                return stack.join('\n\tat ');
-            } catch (e) {
-                return '(Unavailable)';
-            }
-        }
-
         function getStackTrace(err) {
             var stack;
             if (err.stack) {
@@ -83,7 +51,7 @@ function AuraError() {
                     stack = stack.substring(chromeStart.length + 1);
                 }
             } else {
-                stack = getStack(this);
+                stack = '(Unavailable)';
             }
             return stack;
         }
@@ -94,8 +62,6 @@ function AuraError() {
 
         var error = innerError || new Error(message);
         this.name = innerError ? innerError.name : this.name;
-        this.lineNumber = error.lineNumber;
-        this.number = error.number;
         this.message = message + (innerError ? " [" + (innerError.message || innerError.toString()) + "]" : "");
         this.stackTrace = getStackTrace(error);
         this.severity = innerError ? (innerError.severity || severity) : severity;

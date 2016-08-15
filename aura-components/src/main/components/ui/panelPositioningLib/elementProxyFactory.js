@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-function lib(elementProxy, win) { //eslint-disable-line no-unused-vars
+function lib(elementProxy, utils, win) { //eslint-disable-line no-unused-vars
     'use strict';
     var w = win || window; // window injected for testing
-
+    
     var ElementProxy = elementProxy.ElementProxy;
     
     var proxyCache = {};
@@ -63,17 +63,17 @@ function lib(elementProxy, win) { //eslint-disable-line no-unused-vars
     function elementProxyFactory(el) {
         var key, newProxy;
 
-        if(el !== w) {
+        if(!utils.isWindow(el)) {
     
             $A.assert(el && el.nodeType && (el.nodeType !== 1 || el.nodeType !== 11), "Element Proxy requires an element");
         }
         
         //validate node
-        if(el !== w && !el.id) {
+        if(!utils.isWindow(el) && !el.id) {
             el.id = w.$A.getComponent(el).getGlobalId();
         }
 
-        if(el === w) {
+        if(utils.isWindow(el)) {
             key = 'window';
         } else {
             key = el.id;

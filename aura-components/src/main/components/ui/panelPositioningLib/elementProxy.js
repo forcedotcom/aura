@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function lib(w) { //eslint-disable-line no-unused-vars
+function lib(utils, w) { //eslint-disable-line no-unused-vars
     'use strict';
      w || (w = window);
 
@@ -78,19 +78,27 @@ function lib(w) { //eslint-disable-line no-unused-vars
             throw new Error('Element missing');
         }
 
+        // W-3262919
+        // for some reason I cannot figure out sometimes the 
+        // window, which clearly a window object, is not the window object
+        // this will correct that. It might be related to locker
+        if(utils.isWindow(el)) {
+            el = w;
+        }
+
         this._node = el;
 
         // this check is because phantomjs does not support
         // mutation observers. The consqeuence here
         // is that any browser without mutation observers will
-        // fail to update dimensions if they change after the proxy 
+        // fail to update dimensions if they changwe after the proxy 
         // is created and the proxy is not not refreshed
         if("MutationObserver" in w) {
                 // Use mutation observers to invalidate cache. It's magic!
             this._observer = new w.MutationObserver(this.refresh.bind(this));
 
             //do not observe the window
-            if(this._node !== w) {
+            if(!utils.isWindow(this._node)) {
                 this._observer.observe(this._node, {
                     attributes: true, 
                     childList: true, 
@@ -148,7 +156,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 scrollLeft = w.scrollX;
             }
 
-            if(this._node !== w) {
+            if(!utils.isWindow(this._node)) {
                 //force paint
                 this._node.offsetHeight;
                 box = this._node.getBoundingClientRect();

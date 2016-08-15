@@ -231,10 +231,9 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
 
                 config.element.addEventListener('wheel', handleWheel);
             }
-        
-            
+
             $A.assert(config.element && isDomNode(config.element), 'Element is undefined or missing');
-            $A.assert(config.target && (config.target === w || isDomNode(config.target)), 'Target is undefined or missing');
+            $A.assert(config.target && (utils.isWindow(config.target) || isDomNode(config.target)), 'Target is undefined or missing');
 
             if(config.appendToBody) {
                 document.body.appendChild(config.element);

@@ -35,6 +35,19 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 			}
 		}));
 
+	var mockUtils = {
+		getScrollableParent: function() {
+			return null;
+		},
+                // duck type the mock window
+		isWindow: function (el) {
+			if(!el) {
+				return false;
+			}
+			return !!el.innerWidth;
+		}
+	};
+
 	
 	var callback = function (path, fn) {fn();};
 	[ImportJson("aura-components/src/main/components/ui/panelPositioningLib/elementProxyFactory.js", function(path, result) {
@@ -77,7 +90,7 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 
 	
 
-		var obj = result({ElementProxy:ElementProxy}, windowMock);
+		var obj = result({ElementProxy:ElementProxy}, mockUtils, windowMock);
 		proxyFactory = obj;
 	})]
 

@@ -32,11 +32,22 @@ Test.Components.Ui.PanelPositioning.elementProxyTest = function() {
 
 		windowMock.MutationObserver = function() {
 			this.observe = function() {};
+		};
+
+	var mockUtils = {
+		getScrollableParent: function() {
+			return null;
+		},
+		// simple duck type for
+		// the mock object 
+		isWindow: function (el) {
+			return !!el.innerWidth;
 		}
+	};
 
 	windowMock(function(){
 		ImportJson("aura-components/src/main/components/ui/panelPositioningLib/elementProxy.js", function(path, result) {
-			var obj = result(windowMock);
+			var obj = result(mockUtils, windowMock);
 			positioningNS = obj;
 
 		});

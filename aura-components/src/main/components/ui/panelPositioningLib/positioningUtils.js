@@ -51,7 +51,12 @@ function lib() { //eslint-disable-line no-unused-vars
         return getScrollableParent(elem.parentNode);
 	}
 
+    function isWindow(elem) {
+        return elem.toString() === '[object Window]';
+    }
+
 	return {
-		getScrollableParent: getScrollableParent
+		getScrollableParent: getScrollableParent,
+        isWindow: isWindow
 	};
 }

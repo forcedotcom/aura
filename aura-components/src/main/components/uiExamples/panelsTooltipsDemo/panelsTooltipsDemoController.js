@@ -33,15 +33,19 @@
             panelType   :'panel',
             visible: true,
             panelConfig : {
-                referenceElement: refEl,
+                referenceElement: window,
                 showCloseButton: false,
                 closeOnClickOut: true,
                 useTransition: true,
                 body  : body,
                 direction: 'south',
-                showPointer: true,
+                showPointer: false,
                 animation: 'pop',
-                boundingElement: boundingEl
+                // boundingElement: boundingEl,
+                advancedConfig: {
+                                    targetAlign: 'center center',
+                                    align: 'center center'
+                                }
             },
             onDestroy: function (panel) {
                 btn.set('v.selected', false);

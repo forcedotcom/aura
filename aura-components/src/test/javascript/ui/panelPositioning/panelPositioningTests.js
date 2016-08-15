@@ -52,6 +52,9 @@ Test.Components.Ui.PanelPositioning.panelPositioningTest=function(){
 	var mockUtils = {
 		getScrollableParent: function() {
 			return null;
+		},
+		isWindow: function () {
+			return false;
 		}
 	};
 

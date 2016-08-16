@@ -44,7 +44,6 @@ import org.auraframework.impl.clientlibrary.ClientLibraryServiceImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 

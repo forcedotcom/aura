@@ -18,8 +18,6 @@ package org.auraframework.http.resource;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anySet;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.doThrow;
@@ -31,20 +29,16 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.PrintWriter;
-import java.io.Writer;
-import java.net.URL;
 import java.util.HashSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
-import org.auraframework.util.resource.ResourceLoader;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -78,58 +72,40 @@ public class AppJsTest extends UnitTestCase {
      * Most of this is internal, but we want to make sure that we call handleServletException if there
      * is an exception in the writing of the CSS.
      */
-    @SuppressWarnings("unchecked")
     @Test
     public void testExceptionInWrite() throws Exception {
         // Arrange
         ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
         ServerService serverService = mock(ServerService.class);
-        ConfigAdapter configAdapter = mock(ConfigAdapter.class);
-        ResourceLoader loader = mock(ResourceLoader.class);
         Throwable expectedException = new RuntimeException();
-        HttpServletResponse response = mock(HttpServletResponse.class);
-
-        when(loader.getResource(anyString())).thenReturn(new URL("http://foo.test.com"));
+        MockHttpServletResponse response = new MockHttpServletResponse();
 
         HashSet<DefDescriptor<?>> dependencies = new HashSet<>();
         when(servletUtilAdapter.verifyTopLevel(any(HttpServletRequest.class),
                     any(HttpServletResponse.class), any(AuraContext.class)))
             .thenReturn(dependencies);
-        doThrow(expectedException).when(serverService).writeDefinitions(anySet(), any(Writer.class));
-        PrintWriter writer = mock(PrintWriter.class);
-        when(response.getWriter()).thenReturn(writer);
-
-        when(configAdapter.getResourceLoader()).thenReturn(loader);
+        doThrow(expectedException).when(serverService).writeDefinitions(eq(dependencies), any(PrintWriter.class));
 
         AppJs appJs = new AppJs();
         appJs.setServletUtilAdapter(servletUtilAdapter);
         appJs.setServerService(serverService);
-        appJs.setConfigAdapter(configAdapter);
 
         // Act
         appJs.write(null, response, null);
 
         // Assert
-        //
         // Verify the exception first. Because we catch all exceptions and generate gacks,
         // make sure the expected code path is exercised.
-        //
         verify(servletUtilAdapter, times(1)).handleServletException(eq(expectedException),
                 eq(false), any(AuraContext.class), any(HttpServletRequest.class),
                 any(HttpServletResponse.class), anyBoolean());
 
-        //
         // Knock off the known calls. These are mocked above, and are internal implementation dependent.
-        //
         verify(servletUtilAdapter, times(1)).verifyTopLevel(any(HttpServletRequest.class),
                 any(HttpServletResponse.class), any(AuraContext.class));
-        verify(response, times(1)).getWriter();
-        verify(serverService, times(1)).writeDefinitions(same(dependencies), same(writer));
+        verify(serverService, times(1)).writeDefinitions(same(dependencies), any(PrintWriter.class));
 
-        //
         // Make sure nothing else happens.
-        //
-        verifyNoMoreInteractions(response);
         verifyNoMoreInteractions(serverService);
         verifyNoMoreInteractions(servletUtilAdapter);
     }

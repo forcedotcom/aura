@@ -108,11 +108,17 @@ Aura.Utils.Util.prototype.globalEval = function(src, globals, optionalSourceURL)
     // This evaluation occurs in the global scope and with the extra globals visible but not defined there.
     var keys = [];
     var vals = [];
+    var sourceURL = "";
     for (var key in globals) {
         keys.push(key);
         vals.push(globals[key]);
     }
-    return new Function(keys, "var a = " + src + "; return a;").apply({}, vals);
+    
+    if (optionalSourceURL) {
+        sourceURL = '\n//# sourceURL=' + optionalSourceURL;
+    }
+
+    return new Function(keys, "var a = " + src + "; return a;" + sourceURL).apply({}, vals);
 };
 
 /**

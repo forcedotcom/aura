@@ -944,6 +944,8 @@ TestInstance.prototype.assertAuraType = function(type, condition, assertMessage)
 
         case "AuraError": return condition instanceof AuraError;
 
+        case "PropertyReferenceValue": return condition instanceof PropertyReferenceValue;
+
         default: this.fail(assertMessage, "\nExpected: Aura object of type {" + type + "}");
     }
 };

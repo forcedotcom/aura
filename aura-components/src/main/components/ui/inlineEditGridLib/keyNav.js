@@ -224,8 +224,8 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 var activeCellMarker = this.table.querySelector(".slds-cell-marker");
                 if (activeCellMarker) {
                     $A.util.removeClass(activeCellMarker, "slds-cell-marker");
-                    $A.util.removeClass(this.table, "slds-no-cell-focus");
                 }
+                $A.util.removeClass(this.table, "slds-no-cell-focus");
 
             }
         },

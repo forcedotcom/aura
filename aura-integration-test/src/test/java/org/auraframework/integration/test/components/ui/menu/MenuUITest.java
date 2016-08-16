@@ -713,7 +713,13 @@ public class MenuUITest extends WebDriverTestCase {
      * @param actionMenu The WebElement on which to wait for the visible class to be present
      */
     private void openMenu(WebElement menuLabel, WebElement actionMenu) {
-        menuLabel.click();
+        if (getBrowserType() == BrowserType.IE11) {
+            // on win 7 IE11, for some reason webdriver moves the focus to the
+            // last element of the list when activating the menu through click()
+            getAuraUITestingUtil().pressEnter(menuLabel);
+        } else {
+            menuLabel.click();  
+        }
         waitForMenuOpen(actionMenu);
     }
     

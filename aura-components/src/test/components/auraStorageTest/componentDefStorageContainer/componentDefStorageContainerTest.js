@@ -49,7 +49,7 @@
 
     // TODO(W-2979502): this test should keep adding defs until something is evicted instead of adding a set amount and
     // assuming it will get evicted.
-    testComponentDefStorageEviction: {
+    _testComponentDefStorageEviction: {
         // TODO - this test should now be reliable. let is run in jenkins for a bit before removing the annotation.
         labels : ["flapper"],
         test: [
@@ -113,7 +113,7 @@
      * server to not send the defs, resulting in a broken def graph being persisted on the client (the in-memory graph is correct
      * though).
      */
-    testEvictedDefsAreRefetchedWithoutReload: {
+    _testEvictedDefsAreRefetchedWithoutReload: {
         // tbliss: lots of potential races here between storage, actions, and evictions. passes for me locally consistently
         // but mark it as a flapper to monitor on autobuilds for a bit.
         labels : ["flapper"],

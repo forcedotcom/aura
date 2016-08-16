@@ -673,7 +673,7 @@ Aura.Services.MetricsService.prototype.markEnd = function (ns, name, context) {
  * @private
 **/
 Aura.Services.MetricsService.prototype.createMarkNode = function (ns, name, eventType, options) {
-    var context = options ? (options.context || options) : null;
+    var context = options ? (options["context"] || options) : null;
     return {
         "ns"      : ns,
         "name"    : name,

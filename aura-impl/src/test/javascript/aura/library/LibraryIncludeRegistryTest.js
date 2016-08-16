@@ -30,9 +30,12 @@ Test.Aura.Library.LibraryIncludeRegistryTest = function () {
                 "isFunction": function(obj){ return typeof obj === 'function' },
                 "isObject": function(obj){ return typeof obj === 'object' },
                 "isEmpty": function(obj){ return Object.keys(obj).length === {} },
-                "globalEval": function(src){
-                    var tmp = eval("(function () {" + src + "}())");
-                    return tmp;
+                "globalEval": function(src){ 
+                    var returnableEx = /^(\s*)([{(["']|function\s*\()/;
+                    var match = src.match(returnableEx);
+                    if (match) src = src.replace(match[1], 'return ');
+                    eval ("function x() {" + src + "}");
+                    return x();
                 }
                 
             },
@@ -54,7 +57,7 @@ Test.Aura.Library.LibraryIncludeRegistryTest = function () {
             // Act
             mockFramework(function(){
                 var target = new Aura.Library.LibraryIncludeRegistry();
-                target.addLibraryInclude("test:name", [], function() { return {name: "cat"}; });
+                target.addLibraryInclude("test:name", [], function lib() { return {name: "cat"}; });
                 var object = target.getLibraryInclude("test:name");
                 actual = object.name;
             });
@@ -75,8 +78,8 @@ Test.Aura.Library.LibraryIncludeRegistryTest = function () {
                 target.addLibraryInclude("test:name", ["test:first", "test:last"], function(first, last) {
                     return {name: first.name + " " + last.name};
                 });
-                target.addLibraryInclude("test:first", [], function() { return {name: "john"}; });
-                target.addLibraryInclude("test:last", [], function() { return {name: "doe"}; });
+                target.addLibraryInclude("test:first", [], function lib() { return {name: "john"}; });
+                target.addLibraryInclude("test:last", [], function lib() { return {name: "doe"}; });
                 var object = target.getLibraryInclude("test:name");
                 actual = object.name;
             });

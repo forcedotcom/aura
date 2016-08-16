@@ -177,10 +177,18 @@ function lib(w){ //eslint-disable-line no-unused-vars
                     var handle = this._createHandle();
                     this._attachHandle(column, handle);
                     
-                    var initialWidth = initialWidths[i] || column.clientWidth;
-                    if (initialWidth < this.config.minWidth) {
-                        initialWidth = this.config.minWidth;
+                    // If the column already has a width style, default to that.
+                    // Otherwise, use the specified initialWidth or the column's actual width.
+                    var initialWidth;
+                    if (column.style.width) {
+                        initialWidth = column.style.width.replace('px','');
+                    } else {
+                        initialWidth = initialWidths[i] || column.clientWidth;
+                        if (initialWidth < this.config.minWidth) {
+                            initialWidth = this.config.minWidth;
+                        }
                     }
+                    
                     this._setDividerHeight(handle);
                     this._resize(column, initialWidth);
                     this._resize(column.firstChild, initialWidth);

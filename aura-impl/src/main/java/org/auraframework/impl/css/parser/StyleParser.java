@@ -26,11 +26,12 @@ import org.auraframework.impl.css.util.Styles;
 import org.auraframework.system.Client;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.salesforce.omakase.broadcast.emitter.SubscriptionException;
 
 /**
  * Basic CSS style parser.
@@ -78,6 +79,13 @@ public final class StyleParser implements Parser<StyleDef> {
         } catch (QuickFixException qfe) {
             builder.setParseError(qfe);
             return builder.build();
+        } catch (SubscriptionException se) {
+            //
+            // Subscription exceptions are a special case (read !!!!HACK!!!!) that allow someone to pass through
+            // an exception. We should probably disallow this and figure out a better way to handle the exceptions,
+            // as this currently bypasses the aura framework and leaves things in a bad state.
+            //
+            throw se;
         } catch (Throwable t) {
             builder.setParseError(new InvalidDefinitionException("Unable to parse css", builder.getLocation(), t));
             return builder.build();

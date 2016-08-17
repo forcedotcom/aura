@@ -1011,7 +1011,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
          * @param e
          */
         _onTableBlur: function() {
-            if (this.keyboardModePaused) {
+            if (this.keyboardModePaused || !this.initialized) {
                 return;
             }
             // this RAF is required because all the browsers at the time of blur-ing do not set the target of the blur
@@ -1019,12 +1019,17 @@ function lib(w) { //eslint-disable-line no-unused-vars
             // need to wait a bit
             // http://stackoverflow.com/questions/121499/when-onblur-occurs-how-can-i-find-out-which-element-focus-went-to
             window.requestAnimationFrame($A.getCallback(function() {
-                // relatedTarget is used for blur event, target is used for click event
-                var targetElement = document.activeElement,
-                    partOfTable = this.table.contains(targetElement);
+                // we have to check again because the grid might have been destroyed in the meantime
+                if (this.keyboardModePaused || !this.initialized) {
+                    return;
+                }
+                if (this.table) {
+                    var targetElement = document.activeElement,
+                        partOfTable = this.table.contains(targetElement);
 
-                if (!partOfTable && this.inKeyboardMode) {
-                    this.exitKeyboardMode(this.cmp, "exitOnBlur");
+                    if (!partOfTable && this.inKeyboardMode) {
+                        this.exitKeyboardMode(this.cmp, "exitOnBlur");
+                    }
                 }
             }.bind(this)));
         },
@@ -1036,11 +1041,16 @@ function lib(w) { //eslint-disable-line no-unused-vars
             // BLUR and FOCUS need to be in sync and therefore we need to give the focus also time,
             // otherwise the FOCUS event happens before the BLUR event
             window.requestAnimationFrame($A.getCallback(function() {
+                // we have to check again because the grid might have been destroyed in the meantime
+                if (this.keyboardModePaused || !this.initialized) {
+                    return;
+                }
+                if (this.table) {
+                    var partOfTable = this.table.contains(e.target);
 
-                var partOfTable = this.table.contains(e.target);
-
-                if (partOfTable && !this.inKeyboardMode) {
-                    this.enterKeyboardMode(this.cmp, null, null, true);
+                    if (partOfTable && !this.inKeyboardMode) {
+                        this.enterKeyboardMode(this.cmp, null, null, true);
+                    }
                 }
             }.bind(this)));
         },

@@ -66,7 +66,7 @@
         <div aura:id="content" class="{! join(' ',$Browser.isIOS ? 'IOS' : '','container') }">
             <span class="assistiveText">{!v.startOfDialogLabel}</span>
 
-            <aura:if isTrue="{! v.header.length || !empty(v.title) }">
+            <aura:if isTrue="{! v.header.length || !empty(v.title) || v.showCloseButton}">
                 <div class="panel-header">
                     <aura:if isTrue="{!!empty(v.title)}">
                         <h2 id="{!'title_' + globalId}" class="{!join(' ', v.titleDisplay ? 'title' : 'assistiveText', and(v.titleTruncate, v.titleDisplay) ? token('uiPanel.truncate') : '')}">{!v.title}</h2>

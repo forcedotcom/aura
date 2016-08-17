@@ -52,7 +52,6 @@
     },
      
     _getReferenceElement: function(cmp) {
-
         var referenceElementSelector = cmp.get("v.referenceElementSelector");
         var referenceEl = cmp.get('v.referenceElement');
         
@@ -61,7 +60,7 @@
         }
         
         // refereceElement is an array or NodeList, grabbing first element 
-        if (referenceEl && ($A.util.isArray(referenceEl) || referenceEl.hasOwnProperty('length') || 
+        if (referenceEl && !this.positioningLib.positioningUtils.isWindow(referenceEl) && ($A.util.isArray(referenceEl) || referenceEl.hasOwnProperty('length') || 
         		typeof referenceEl.length === 'number')) {
         	referenceEl = referenceEl.length > 0 ? referenceEl[0] : null;
         }

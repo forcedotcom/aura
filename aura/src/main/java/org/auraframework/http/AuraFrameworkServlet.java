@@ -28,7 +28,7 @@ import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
-import org.auraframework.http.resource.StaticResourceFactory;
+import org.auraframework.http.resource.FileStaticResource;
 import org.auraframework.system.StaticResource;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.resource.ResourceLoader;
@@ -131,8 +131,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             }
 
             boolean isProduction = Aura.getConfigAdapter().isProduction();
-            StaticResource staticResource = StaticResourceFactory.getResource(file, format, nonceUid, isProduction,
-                    resourceLoader);
+            StaticResource staticResource = new FileStaticResource(file, format, nonceUid, isProduction, resourceLoader);
 
             //
             // Check whether path has wrong nonce or the path contains no nonce

@@ -65,6 +65,12 @@ public interface ConfigAdapter extends AuraAdapter {
     String getAvailableTimezone(String timezone);
 
     /**
+     * Timezone from current context or GMT
+     * @return timezone
+     */
+    String getCurrentTimezone();
+
+    /**
      * Returns js libs file url
      * @return url of js libs file
      */

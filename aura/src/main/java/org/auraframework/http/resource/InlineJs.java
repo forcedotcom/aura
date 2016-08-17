@@ -16,7 +16,10 @@
 
 package org.auraframework.http.resource;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -26,14 +29,59 @@ import org.auraframework.instance.Component;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.resource.ResourceLoader;
+
+import com.google.common.collect.Maps;
 
 public class InlineJs extends TemplateResource {
+
+    private static final String WALLTIME_FILE_PATH = "/aura/resources/walltime-js/olson/walltime-data_";
+    private static final Map<String, String> WALLTIME_TZ_CONTENT = Maps.newConcurrentMap();
+
     public InlineJs() {
         super("inline.js", Format.JS);
     }
 
     @Override
     protected void doRender(Component template, Appendable out) throws IOException, QuickFixException {
+
+        // write walltime tz data
+        String tz = configAdapter.getCurrentTimezone();
+        tz = tz.replace("/", "-");
+        if (!"GMT".equals(tz)) {
+            String tzContent = WALLTIME_TZ_CONTENT.get(tz);
+
+            if (tzContent == null) {
+                ResourceLoader resourceLoader = configAdapter.getResourceLoader();
+                String tzPath = WALLTIME_FILE_PATH + tz;
+                String minFile = tzPath + ".min.js";
+                String devFile = tzPath + tz + ".js";
+
+                // use min file if exists, otherwise use dev version
+                String filePath = resourceLoader.getResource(minFile) != null ? minFile :
+                        (resourceLoader.getResource(devFile) != null ? devFile : null);
+
+                if (filePath != null) {
+                    try (InputStream is = resourceLoader.getResourceAsStream(filePath);
+                         ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+                        byte[] buffer = new byte[1024];
+                        int length;
+                        while ((length = is.read(buffer)) != -1) {
+                            os.write(buffer, 0, length);
+                        }
+                        tzContent = os.toString();
+                        WALLTIME_TZ_CONTENT.put(tz, tzContent);
+                        os.close();
+                    }
+                }
+            }
+
+            if (tzContent != null) {
+                out.append(tzContent).append(";");
+            }
+        }
+
+        // write inline scripts from template
         renderingService.render(template, null, out);
     }
 

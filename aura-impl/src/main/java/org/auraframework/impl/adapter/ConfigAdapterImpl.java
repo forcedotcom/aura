@@ -377,20 +377,23 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         return "";
     }
 
+    @Override
+    public String getCurrentTimezone() {
+        AuraLocale al = localizationAdapter.getAuraLocale();
+        String tz = al.getTimeZone().getID();
+        return getAvailableTimezone(tz);
+    }
+
     /**
      * Combined js libs filename will contain timezone for walltime.js
      * @return url of combined js libs file
      */
     @Override
     public String getJSLibsURL() {
-        AuraLocale al = localizationAdapter.getAuraLocale();
-        String tz = al.getTimeZone().getID();
-        tz = getAvailableTimezone(tz);
-        tz = tz.replace("/", "-");
         AuraContext context = contextService.getCurrentContext();
         String contextPath = context.getContextPath();
         String nonce = context.getFrameworkUID();
-        return String.format("%s/auraFW/resources/%s/libs_%s.js", contextPath, nonce, tz);
+        return String.format("%s/auraFW/resources/%s/libs.js", contextPath, nonce);
     }
 
     /**

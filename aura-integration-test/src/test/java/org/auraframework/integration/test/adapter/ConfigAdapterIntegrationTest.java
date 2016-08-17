@@ -15,29 +15,19 @@
  */
 package org.auraframework.integration.test.adapter;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 
 import org.auraframework.Aura;
-import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.adapter.ConfigAdapterImpl;
 import org.auraframework.impl.util.AuraImplFiles;
-import org.auraframework.impl.util.AuraLocaleImpl;
 import org.auraframework.system.AuraContext;
-import org.auraframework.util.AuraLocale;
-import org.auraframework.util.resource.ResourceLoader;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.junit.Test;
@@ -49,32 +39,6 @@ import com.google.common.collect.Sets;
  * Tests for ConfigAdapterImpl requiring Aura services to be available
  */
 public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
-    private void validateTimezoneIds(String[] timezonesToCheck) throws Exception {
-        ConfigAdapterImpl configAdapter = new ConfigAdapterImpl();
-        ResourceLoader loader = Aura.getConfigAdapter().getResourceLoader();
-        List<String> failures = Lists.newLinkedList();
-        for (String timezone : timezonesToCheck) {
-            String equivalent = configAdapter.getAvailableTimezone(timezone);
-            if (loader.getResource(String.format("/aura/resources/libs_%s.js", equivalent.replace("/", "-"))) == null) {
-                failures.add(equivalent);
-            }
-        }
-        if (!failures.isEmpty()) {
-            Collections.sort(failures);
-            fail(String.format("The following timezone IDs failed to map to a valid resource (%s out of %s): %s",
-                    failures.size(), timezonesToCheck.length, failures));
-        }
-    }
-
-    @Test
-    public void testIcuTimezones() throws Exception {
-        validateTimezoneIds(com.ibm.icu.util.TimeZone.getAvailableIDs());
-    }
-
-    @Test
-    public void testJavaTimezones() throws Exception {
-        validateTimezoneIds(TimeZone.getAvailableIDs());
-    }
 
     @Test
     public void testGetEquivalentTimezoneSamples() throws Exception {
@@ -412,34 +376,5 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         );
         ctx.setFrameworkUID("#FAKEUID#");
         return app;
-    }
-
-    @Test
-    public void testJSLibsEqualivalentTimezone() throws Exception {
-        AuraLocale auraLocale = new AuraLocaleImpl(Locale.US, TimeZone.getTimeZone("US/Pacific"));
-        LocalizationAdapter mockAdapter = mock(LocalizationAdapter.class);
-        when(mockAdapter.getAuraLocale()).thenReturn(auraLocale);
-
-        ConfigAdapterImpl configAdapter = new ConfigAdapterImpl();
-        configAdapter.setLocalizationAdapter(mockAdapter);
-        startAppContext("<aura:application></aura:application>");
-
-        assertTrue("JS libs file should be libs_America-Los-Angeles.js",
-                configAdapter.getJSLibsURL().contains("libs_America-Los_Angeles.js"));
-    }
-
-    @Test
-    public void testJSLibsInvalidTimezone() throws Exception {
-        AuraLocale auraLocale = new AuraLocaleImpl(Locale.US, TimeZone.getTimeZone("HammerTime"));
-        LocalizationAdapter mockAdapter = mock(LocalizationAdapter.class);
-        when(mockAdapter.getAuraLocale()).thenReturn(auraLocale);
-
-        ConfigAdapterImpl configAdapter = new ConfigAdapterImpl();
-        configAdapter.setLocalizationAdapter(mockAdapter);
-
-        startAppContext("<aura:application></aura:application>");
-
-        assertTrue("JS libs file should be the default libs_GMT.js for invalid timezones",
-                configAdapter.getJSLibsURL().contains("libs_GMT.js"));
     }
 }

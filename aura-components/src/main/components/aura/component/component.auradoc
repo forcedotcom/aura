@@ -29,7 +29,7 @@
 			To create a component, follow this syntax.
 <pre>
 &lt;aura:component&gt;
-  &lt;!-- Optional coponent attributes here -->
+  &lt;!-- Optional component attributes here -->
   &lt;!-- Optional HTML markup -->
   &lt;div class="container"&gt; 
     Hello world!

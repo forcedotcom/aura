@@ -15,250 +15,256 @@
  */
 function lib() { //eslint-disable-line no-unused-vars
 
-	var lib = { //eslint-disable-line no-shadow, no-unused-vars
-		
-		/** 
-		 * Store a unique id on the element to track for event deduping.
-		 * This key is different than the one in interactiveHelper since the unique id counts
-		 * NEED to be different. Otherwise you could end up with 2 #1's for example.
-		 * @type {String}
-		 */
-	    DATA_UID_KEY: "data-interactive-lib-uid",
+    var lib = { //eslint-disable-line no-shadow, no-unused-vars
+        
+        /** 
+         * Store a unique id on the element to track for event deduping.
+         * This key is different than the one in interactiveHelper since the unique id counts
+         * NEED to be different. Otherwise you could end up with 2 #1's for example.
+         * @type {String}
+         */
+        DATA_UID_KEY: "data-interactive-lib-uid",
 
-		/**
-		 * We can't just add and remove the handler for dom events, we need
-		 * to wrap it in a getCallback() call. Which we then need to remove at a
-		 * later time. So we need to keep a reference from the component to the
-		 * event handler to properly remove it later.
-		 */
-		domEventMap: {},
+        /**
+         * We can't just add and remove the handler for dom events, we need
+         * to wrap it in a getCallback() call. Which we then need to remove at a
+         * later time. So we need to keep a reference from the component to the
+         * event handler to properly remove it later.
+         */
+        domEventMap: {},
 
-		/**
-		 * Where to start the count for the unique id for dom elements referenced
-		 * by the lib library.
-		 * @type {Number}
-		 */
-	    interactiveUid: 1,
-		
-		/**
-	     * Adds an event handler for every DOM event for which this input has a Aura-equivalent handler
-	     */
-	    addDomEvents : function(component) {
-	        var events = lib.getHandledDOMEvents(component);
-	        //work around for bug W-1744442
-	        var helper = component.getConcreteComponent().getDef().getHelper() || this;
-	        for (var event in events) {
-	        	if (helper.addDomHandler) {
-	                helper.addDomHandler(component, event);
-	        	} else {
-	        		lib.addDomHandler(component, event);
-	        	}
-	        }
-	    },
+        /**
+         * Where to start the count for the unique id for dom elements referenced
+         * by the lib library.
+         * @type {Number}
+         */
+        interactiveUid: 1,
+        
+        /**
+         * Adds an event handler for every DOM event for which this input has a Aura-equivalent handler
+         */
+        addDomEvents : function(component) {
+            var events = lib.getHandledDOMEvents(component);
+            //work around for bug W-1744442
+            var helper = component.getConcreteComponent().getDef().getHelper() || this;
+            for (var event in events) {
+                if (helper.addDomHandler) {
+                    helper.addDomHandler(component, event);
+                } else {
+                    lib.addDomHandler(component, event);
+                }
+            }
+        },
 
-	    /**
-	     * Adds an event handler for the given DOM event
-	     */
-	    addDomHandler : function(component, event) {
-	        var el = component.getElement(); // Do we need component.getConcreteComponent()?
-	        this.attachDomHandlerToElement(component, el, event);
-	    },
+        /**
+         * Adds an event handler for the given DOM event
+         */
+        addDomHandler : function(component, event) {
+            var el = component.getElement(); // Do we need component.getConcreteComponent()?
+            this.attachDomHandlerToElement(component, el, event);
+        },
 
-	    /**
-	     * Adds an event handler to an element, and wraps the handler in a getCallback.
-	     * If you are adding a handler to an element and that component has already done that, it will
-	     * unregister the previous handler.
-	     */
-	    attachDomHandlerToElement: function(component, element, event) {
-			// we need to use the rendering component for the element otherwise we get multiple component
-			// registrations for the same element and therefore duplicate events @bug W-2987574@
-			// this happens when a ui:input contains another ui:input (which really shouldn't be happening!)
-			var renderingCmp = $A.componentService.getRenderingComponentForElement(element);
-			if (!renderingCmp) {
-				renderingCmp = component;
-			}
-			var globalId = renderingCmp.getGlobalId();
-	        var handler = $A.getCallback(this.domEventHandler);
-	        var elementId = this.getUid(element) || this.newUid(element);
+        /**
+         * Adds an event handler to an element, and wraps the handler in a getCallback.
+         * If you are adding a handler to an element and that component has already done that, it will
+         * unregister the previous handler.
+         */
+        attachDomHandlerToElement: function(component, element, event) {
+            // @bug W-3271818@
+            // element could be undefined when afterRender is called
+            if (!element) {
+                return;
+            }
 
-	        $A.util.on(element, event, handler);
+            // we need to use the rendering component for the element otherwise we get multiple component
+            // registrations for the same element and therefore duplicate events @bug W-2987574@
+            // this happens when a ui:input contains another ui:input (which really shouldn't be happening!)
+            var renderingCmp = $A.componentService.getRenderingComponentForElement(element);
+            if (!renderingCmp) {
+                renderingCmp = component;
+            }
+            var globalId = renderingCmp.getGlobalId();
+            var handler = $A.getCallback(this.domEventHandler);
+            var elementId = this.getUid(element) || this.newUid(element);
 
-			// We're doing this cause of the $A.getCallback() we need to wrap domEventHandler in.
-	        // Since its a new function, we lose native dom deduping. So we ensure we only add one per component
-	        // per event.
-	    	if(!this.domEventMap[globalId]) {
-	    		this.domEventMap[globalId] = {};
-	    	}
-	    	
-	        if(!this.domEventMap[globalId][elementId]) {
-	        	this.domEventMap[globalId][elementId] = {};
-	        }
-	        
-	        // Already present, so we'll need to remove it before adding it.
-	        var existing = this.domEventMap[globalId][elementId][event];
-	        if(existing) {
-	        	// If we've already added a handler for this component / event combo, remove it first.
-	        	$A.util.removeOn(element, event, existing);
-	        }
-	        
-	        this.domEventMap[globalId][elementId][event] = handler;
-	    },
+            $A.util.on(element, event, handler);
 
-	    /**
-	     * Get the unique ID on the dom element. Does not add a unique ID if one does not exist.
-	     */
-	    getUid: function(element) {
-	        return element.getAttribute(this.DATA_UID_KEY);
-	    },
+            // We're doing this cause of the $A.getCallback() we need to wrap domEventHandler in.
+            // Since its a new function, we lose native dom deduping. So we ensure we only add one per component
+            // per event.
+            if(!this.domEventMap[globalId]) {
+                this.domEventMap[globalId] = {};
+            }
+            
+            if(!this.domEventMap[globalId][elementId]) {
+                this.domEventMap[globalId][elementId] = {};
+            }
+            
+            // Already present, so we'll need to remove it before adding it.
+            var existing = this.domEventMap[globalId][elementId][event];
+            if(existing) {
+                // If we've already added a handler for this component / event combo, remove it first.
+                $A.util.removeOn(element, event, existing);
+            }
+            
+            this.domEventMap[globalId][elementId][event] = handler;
+        },
 
-	    /**
-	     * Generate a new UID on the dom element to track unique dom elements.
-	     */
-	    newUid: function(element) {
-	        var nextUid = ++this.interactiveUid;
-	        element.setAttribute(this.DATA_UID_KEY, nextUid);
-	        return nextUid;
-	    },
+        /**
+         * Get the unique ID on the dom element. Does not add a unique ID if one does not exist.
+         */
+        getUid: function(element) {
+            return element.getAttribute(this.DATA_UID_KEY);
+        },
 
-	    /**
-	     * We track event listeners added from a component to its elements.
-	     * When we unrender the component, we should delete our entries in the map so
-	     * the Map doesn't continiously grow.
-	     */
-	    removeDomEventsFromMap:  function(component) {
-	        var globalId = component.getGlobalId();
-	        if(this.domEventMap.hasOwnProperty(globalId)) {
-	            this.domEventMap[globalId] = undefined;
-	        }
-	    },
+        /**
+         * Generate a new UID on the dom element to track unique dom elements.
+         */
+        newUid: function(element) {
+            var nextUid = ++this.interactiveUid;
+            element.setAttribute(this.DATA_UID_KEY, nextUid);
+            return nextUid;
+        },
 
-	    /**
-	     * Handles a DOM-level event and throws the Aura-level equivalent.
-	     *
-	     * This same function is used for all DOM->Aura event wireup on components, which has multiple benefits:
-	     * - decreased memory footprint
-	     * - no need to protect against a handler being added more than once
-	     * - no need to track event->handler function mappings for later removal
-	     */
-	    domEventHandler : function (event) {
-	        var element = event.target;
-	        var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
+        /**
+         * We track event listeners added from a component to its elements.
+         * When we unrender the component, we should delete our entries in the map so
+         * the Map doesn't continiously grow.
+         */
+        removeDomEventsFromMap:  function(component) {
+            var globalId = component.getGlobalId();
+            if(this.domEventMap.hasOwnProperty(globalId)) {
+                this.domEventMap[globalId] = undefined;
+            }
+        },
 
-	        // cmp might be destroyed, just ignore this event. 
-	        if (!htmlCmp) {
-	            return;
-	        }
+        /**
+         * Handles a DOM-level event and throws the Aura-level equivalent.
+         *
+         * This same function is used for all DOM->Aura event wireup on components, which has multiple benefits:
+         * - decreased memory footprint
+         * - no need to protect against a handler being added more than once
+         * - no need to track event->handler function mappings for later removal
+         */
+        domEventHandler : function (event) {
+            var element = event.target;
+            var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
 
-	        var component = htmlCmp.getComponentValueProvider().getConcreteComponent();
-			// patch for input number(inputNumber, inputCurrency, inputPercent)
-			component = component.meta.name ===  'ui$inputSmartNumber' ?  component.getComponentValueProvider().getConcreteComponent() : component;
-	        var helper = component.getDef().getHelper();
+            // cmp might be destroyed, just ignore this event. 
+            if (!htmlCmp) {
+                return;
+            }
 
-	        if (component._recentlyClicked) {
-	            return;
-	        }
+            var component = htmlCmp.getComponentValueProvider().getConcreteComponent();
+            // patch for input number(inputNumber, inputCurrency, inputPercent)
+            component = component.meta.name ===  'ui$inputSmartNumber' ?  component.getComponentValueProvider().getConcreteComponent() : component;
+            var helper = component.getDef().getHelper();
 
-	        // extended components can do some event processing before the Aura event gets fired
-	        // for example, input component uses this method to update its value if the event is the "updateOn" event.
-	        if (helper && helper.preEventFiring) {
-	            helper.preEventFiring(component, event);
-	        }
+            if (component._recentlyClicked) {
+                return;
+            }
 
-	        // fire the equivalent Aura event
-	        if (helper && helper.fireEvent) {
-	            helper.fireEvent(component, event, helper);
-	        } else {
-	        	lib.fireEvent(component, event, helper);
-	        }
-	        
-	        if (event.type === "click" && component.get("v.disableDoubleClicks")) {
-	        	component._recentlyClicked = true;
-	        	window.setTimeout(function() { component._recentlyClicked = false; }, 350);
-	        }
-	    },
+            // extended components can do some event processing before the Aura event gets fired
+            // for example, input component uses this method to update its value if the event is the "updateOn" event.
+            if (helper && helper.preEventFiring) {
+                helper.preEventFiring(component, event);
+            }
 
-	    /**
-	     * Fire the equivalent Aura event for DOM one.
-	     * This can be overridden by extended component
-	     *
-	     * @param event must be a DOM event
-	     */
-	     fireEvent : function (component, event) {
-	    	 // As the result as another event
-	    	 // this component could become invalid, so guard just in-case
-	    	 if(component.isValid()) {
-		        var e = component.getEvent(event.type);
-		        lib.setEventParams(e, event);
-		        e.fire();
-	    	 }
-	     },
+            // fire the equivalent Aura event
+            if (helper && helper.fireEvent) {
+                helper.fireEvent(component, event, helper);
+            } else {
+                lib.fireEvent(component, event, helper);
+            }
+            
+            if (event.type === "click" && component.get("v.disableDoubleClicks")) {
+                component._recentlyClicked = true;
+                window.setTimeout(function() { component._recentlyClicked = false; }, 350);
+            }
+        },
 
-	    /**
-	     * Returns the list of valid DOM events this component may handle
-	     *
-	     * NOTE: this currently assumes that interactive.cmp only handles events that are valid DOM events.
-	     * We may wish to change this to an explicit list at some point.
-	     */
-	    getDomEvents : function(component) {
-	        return component.getDef().getAllEvents();
-	    },
+        /**
+         * Fire the equivalent Aura event for DOM one.
+         * This can be overridden by extended component
+         *
+         * @param event must be a DOM event
+         */
+         fireEvent : function (component, event) {
+             // As the result as another event
+             // this component could become invalid, so guard just in-case
+             if(component.isValid()) {
+                var e = component.getEvent(event.type);
+                lib.setEventParams(e, event);
+                e.fire();
+             }
+         },
 
-	    /**
-	     * Returns an object whose keys are the lower-case names of DOM-equivalent Aura events for which this component currently has handlers
-	     */
-	    getHandledDOMEvents : function(component){
-	        var ret = {};
-	        var handledEvents = component.getHandledEvents();
-	        var domEvents = lib.getDomEvents(component);
+        /**
+         * Returns the list of valid DOM events this component may handle
+         *
+         * NOTE: this currently assumes that interactive.cmp only handles events that are valid DOM events.
+         * We may wish to change this to an explicit list at some point.
+         */
+        getDomEvents : function(component) {
+            return component.getDef().getAllEvents();
+        },
 
-	        if(domEvents){
-	            for(var i=0,len=domEvents.length; i<len; i++){
-	                var eventName = domEvents[i].toLowerCase();
-	                if (handledEvents[eventName]) {
-	                    ret[eventName] = true;
-	                }
-	            }
-	        }
-	        return ret;
-	    },
+        /**
+         * Returns an object whose keys are the lower-case names of DOM-equivalent Aura events for which this component currently has handlers
+         */
+        getHandledDOMEvents : function(component){
+            var ret = {};
+            var handledEvents = component.getHandledEvents();
+            var domEvents = lib.getDomEvents(component);
 
-	    /**
-	     * Set event's parameters with the value from DOM event.
-	     * The event's parameter name should be the same as the property name in DOM event.
-	     */
-	    setEventParams : function(e, DOMEvent) {
-	        // set parameters if there is any
-	        var attributeDefs = e.getDef().getAttributeDefs();
-	        var params = {};
-	        for (var key in attributeDefs) {
-	            if (key === "domEvent") {
-	                params[key] = DOMEvent;
-	            } else if (key === "keyCode") { // we need to re-visit this keyCode madness soon
-	                params[key] = DOMEvent.which || DOMEvent.keyCode;
-	            } else {
-	                params[key] = DOMEvent[key];
-	            }
-	        }
-	        e.setParams(params);
-	    },
+            if(domEvents){
+                for(var i=0,len=domEvents.length; i<len; i++){
+                    var eventName = domEvents[i].toLowerCase();
+                    if (handledEvents[eventName]) {
+                        ret[eventName] = true;
+                    }
+                }
+            }
+            return ret;
+        },
 
-	    /**
-	     * Toggle a component's disabled state and an optional CSS class.
-	     * @param {Component} component The component being toggled.
-	     * @param {Boolean} disabled True to set disabled; false for enabled.
-	     * @param {String} disabledCss Optional css class to apply when disabled, and remove when enabled.
-	     */
-	    setDisabled: function(component, disabled, disabledCss) {
-	        component.set('v.disabled', disabled);
-	        if (disabledCss) {
-	            if(disabled){
-	                $A.util.addClass(component.getElement(),disabledCss);
-	            }else{
-	                $A.util.removeClass(component.getElement(), disabledCss);
-	            }
-	        }
-	    }
-	};
-	
-	return lib;
+        /**
+         * Set event's parameters with the value from DOM event.
+         * The event's parameter name should be the same as the property name in DOM event.
+         */
+        setEventParams : function(e, DOMEvent) {
+            // set parameters if there is any
+            var attributeDefs = e.getDef().getAttributeDefs();
+            var params = {};
+            for (var key in attributeDefs) {
+                if (key === "domEvent") {
+                    params[key] = DOMEvent;
+                } else if (key === "keyCode") { // we need to re-visit this keyCode madness soon
+                    params[key] = DOMEvent.which || DOMEvent.keyCode;
+                } else {
+                    params[key] = DOMEvent[key];
+                }
+            }
+            e.setParams(params);
+        },
+
+        /**
+         * Toggle a component's disabled state and an optional CSS class.
+         * @param {Component} component The component being toggled.
+         * @param {Boolean} disabled True to set disabled; false for enabled.
+         * @param {String} disabledCss Optional css class to apply when disabled, and remove when enabled.
+         */
+        setDisabled: function(component, disabled, disabledCss) {
+            component.set('v.disabled', disabled);
+            if (disabledCss) {
+                if(disabled){
+                    $A.util.addClass(component.getElement(),disabledCss);
+                }else{
+                    $A.util.removeClass(component.getElement(), disabledCss);
+                }
+            }
+        }
+    };
+
+    return lib;
 }

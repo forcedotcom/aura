@@ -15,29 +15,16 @@
  */
 package org.auraframework.http.resource;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.service.DefinitionService;
-import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
-import org.auraframework.test.util.DummyHttpServletResponse;
-import org.auraframework.throwable.AuraUnhandledException;
-import org.auraframework.util.json.DefaultJsonSerializationContext;
-import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 public class BootstrapTest extends UnitTestCase {
 	@Test
@@ -48,44 +35,6 @@ public class BootstrapTest extends UnitTestCase {
     @Test
     public void testFormat() {
         assertEquals(Format.JS, new Bootstrap().getFormat());
-    }
-
-    @SuppressWarnings("unchecked")
-	@Test
-
-    public void testWriteHandlesExceptionWhenTokenValidationFails() throws Exception {
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        DummyHttpServletResponse response = new DummyHttpServletResponse();
-        DefDescriptor<ApplicationDef> appDef = Mockito.mock(DefDescriptor.class);
-        Mockito.when(appDef.getDescriptorName()).thenReturn("");
-        AuraContext context = Mockito.mock(AuraContext.class);
-        Mockito.when(context.getApplicationDescriptor()).thenAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                return appDef;
-            }
-        });
-        Mockito.when(((DefDescriptor<? extends BaseComponentDef>) appDef).getDefType()).thenReturn(DefType.APPLICATION);
-        DefinitionService definitionService = Mockito.mock(DefinitionService.class);
-        Mockito.when(definitionService.getDefDescriptor(Mockito.any(), Mockito.any())).thenReturn(null);
-        ExceptionAdapter exceptionAdapter = Mockito.mock(ExceptionAdapter.class);
-        Mockito.when(exceptionAdapter.handleException(Mockito.any())).thenReturn(new AuraUnhandledException("Invalid jwt parameter"));
-        JsonSerializationContext serializationContext = new DefaultJsonSerializationContext(true, true, true);
-        Mockito.when(context.getJsonSerializationContext()).thenReturn(serializationContext);
-        ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
-        Bootstrap bootstrap = new Bootstrap();
-        bootstrap.setConfigAdapter(configAdapter);
-        bootstrap.setDefinitionService(definitionService);
-        bootstrap.setExceptionAdapter(exceptionAdapter);
-
-        // Force token validation to fail
-        Mockito.when(configAdapter.validateBootstrap(Mockito.anyString())).thenReturn(false);
-        bootstrap.write(request, response, context);
-
-        ArgumentCaptor<Exception> argument = ArgumentCaptor.forClass(Exception.class);
-        Mockito.verify(exceptionAdapter).handleException(argument.capture());
-        assertEquals("Unexpected exception type thrown", Exception.class, argument.getValue().getClass());
-        assertEquals("Unexpected exception message", "Invalid jwt parameter", argument.getValue().getMessage());
     }
 
     @Test

@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
-import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -46,8 +45,6 @@ import org.auraframework.util.json.JsonSerializationContext;
 public class Bootstrap extends AuraResourceImpl {
 
     private ContextService contextService = Aura.getContextService();
-    private ExceptionAdapter exceptionAdapter = Aura.getExceptionAdapter();
-
     public Bootstrap() {
         super("bootstrap.js", Format.JS);
     }
@@ -137,7 +134,6 @@ public class Bootstrap extends AuraResourceImpl {
             json.writeMapEnd();
             out.append(APPEND_JS);
         } catch (Throwable t) {
-            t = exceptionAdapter.handleException(t);
             writeError(t, response, context);
         }
     }
@@ -203,14 +199,5 @@ public class Bootstrap extends AuraResourceImpl {
      */
     public void setContextService(ContextService contextService) {
         this.contextService = contextService;
-    }
-
-    /**
-     * Injection override.
-     *
-     * @param contextService the ContextService to set
-     */
-    public void setExceptionAdapter(ExceptionAdapter exceptionAdapter) {
-        this.exceptionAdapter = exceptionAdapter;
     }
 }

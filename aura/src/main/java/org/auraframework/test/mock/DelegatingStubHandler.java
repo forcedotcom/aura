@@ -17,6 +17,7 @@ package org.auraframework.test.mock;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.List;
 
 import org.auraframework.test.Resettable;
@@ -30,7 +31,7 @@ public class DelegatingStubHandler implements InvocationHandler {
     private final List<Stub<?>> stubs;
 
     public DelegatingStubHandler(Object delegate, List<Stub<?>> stubs) {
-        this.delegate = delegate;
+        this.delegate = getSourceDelegate(delegate);
         this.stubs = stubs;
     }
 
@@ -38,6 +39,32 @@ public class DelegatingStubHandler implements InvocationHandler {
         for (Stub<?> stub : stubs) {
             stub.reset();
         }
+    }
+    
+    /**
+	* If you try to execute a method, and it is NOT part of THIS stub, then I want to call the "original" controller method. 
+	* 
+	* testA mocks
+	*  getFirst
+	*  getLast
+	* 
+	* testB mocks
+	*  getFirst
+	* 
+	* when testB calls getLast, it was sometimes ending up calling the mock of getLast from testA.
+	* 
+	* This change fixes that, and makes testing with multiple stubs of actions a more trustworthy means of testing.
+    */
+    private static Object getSourceDelegate(Object delegate) {
+        Object value = delegate;
+        if(value instanceof Proxy) {
+            value = Proxy.getInvocationHandler(value);
+            if(value instanceof DelegatingStubHandler) {
+                return getSourceDelegate(value);
+            }
+        }
+        
+        return value;
     }
 
     @Override

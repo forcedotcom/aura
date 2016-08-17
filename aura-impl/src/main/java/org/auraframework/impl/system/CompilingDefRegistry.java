@@ -88,9 +88,10 @@ public class CompilingDefRegistry implements DefRegistry<Definition> {
         synchronized (holder) { 
             if (!holder.initialized) {
                 try {
-                    Source<Definition> source = sourceLoader.getSource(descriptor);
+                    @SuppressWarnings("unchecked")
+                    DefDescriptor<Definition> canonical = (DefDescriptor<Definition>)holder.descriptor;
+                    Source<Definition> source = sourceLoader.getSource(canonical);
                     if (source != null && source.exists()) {
-                        DefDescriptor<Definition> canonical = source.getDescriptor();
                         Parser<Definition> parser = ParserFactory.getParser(source.getFormat(), canonical);
                         holder.def = parser.parse(canonical, source);
                         holder.def.validateDefinition();

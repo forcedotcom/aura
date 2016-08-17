@@ -449,7 +449,7 @@
           entry._onerror = null;
           this._settledAt(entry._state, i, entry._result);
         } else {
-          this._willSettleAt(c.resolve(entry), i);
+          this._willSettleAt(c["resolve"](entry), i);
         }
       } else {
         this._remaining--;
@@ -515,7 +515,7 @@
       }
 
       for (var i = 0; promise._state === $$$internal$$PENDING && i < length; i++) {
-        $$$internal$$subscribe(Constructor.resolve(entries[i]), undefined, onFulfillment, onRejection);
+        $$$internal$$subscribe(Constructor["resolve"](entries[i]), undefined, onFulfillment, onRejection);
       }
 
       return promise;

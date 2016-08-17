@@ -14,32 +14,53 @@
  * limitations under the License.
  */
 ({
-    testResetTokenNormalCase : {
+    testResetTokenSavesTokenToStorage : {
+        // CSRF is only stored in persistent storage. indexedDB is not supported on Safari,
+        // so persistent storage is not able to be created on Safari.
+        browsers: ["-SAFARI", "-IPAD", "-IPHONE"],
         test: function(cmp) {
-                var actual;
-                var myToken = "myToken";
+            // Arrage
+            var expected = "myToken";
+            var actual;
 
-                $A.clientService.resetToken(myToken);
+            var storage = $A.storageService.getStorage("actions");
+            $A.test.assertNotUndefinedOrNull(storage, "Storage 'actions' is required for the test");
+            $A.test.assertTrue(storage.isPersistent(), "CSRF token is only stored into persistent storage");
 
-                var storage = $A.storageService.getStorage("actions");
-                $A.test.assertNotUndefinedOrNull(storage);
-                // Key from AuraClientService.TOKEN_KEY
-                // Verify the token in storage gets updated
-                var key = "$AuraClientService.token$";
-                storage.adapter.getItems([key]).then(
-                    function(items) {
+            // Act
+            $A.clientService.resetToken(expected);
+
+            // Assert
+            // Key from AuraClientService.TOKEN_KEY
+            var key = "$AuraClientService.token$";
+
+            // Verify the token in storage gets updated
+            function checkTokenInStorage() {
+                // short-circuit once the test times out
+                if ($A.test.isComplete()) {
+                    return;
+                }
+
+                storage.adapter.getItems([key])
+                    .then(function(items) {
                         if(items[key]) {
                             actual = items[key].value.token;
+                        } else {
+                            setTimeout(function() { checkTokenInStorage(); }, 100);
                         }
-                    }, function() {
-                        $A.test.fail("Failed to get value from storage.");
+                    })
+                    .catch(function(e) {
+                        $A.test.fail("Failed to get value from storage: " + e);
                     });
+            };
 
-                $A.test.addWaitFor(true, function() {
-                        return typeof actual !== "undefined";
-                    }, function() {
-                        $A.test.assertEquals(myToken, actual);
-                    });
-            }
+            // resetToken saves token asynclly
+            checkTokenInStorage();
+
+            $A.test.addWaitFor(true, function() { return !!actual; },
+                function() {
+                    $A.test.assertEquals(expected, actual, "Failed to find expected token");
+                });
+        }
     }
 })

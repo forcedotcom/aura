@@ -47,10 +47,8 @@
         ]
     },
 
-    // TODO(W-2979502): this test should keep adding defs until something is evicted instead of adding a set amount and
-    // assuming it will get evicted.
-    _testComponentDefStorageEviction: {
-        // TODO - this test should now be reliable. let is run in jenkins for a bit before removing the annotation.
+    testComponentDefStorageEviction: {
+        // TODO(tbliss 8/18/2016): let it run in jenkins and monitor for a bit before removing the annotation.
         labels : ["flapper"],
         test: [
             function loadIframe(cmp) {
@@ -73,21 +71,18 @@
             function verifyTargetCmpStored(cmp) {
                 cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
             },
-            function fetchDifferentCmpFromServer(cmp) {
-                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:menu");
-            },
-            function verifyDifferentCmpStored(cmp) {
-                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:menu");
-            },
-            function fetchCmpFromServerToEvictTargetCmp(cmp) {
-                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:pillContainer");
-            },
-            function fetchCmpFromServerToEvictTargetCmpInStorage(cmp) {
-                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:pillContainer");
-            },
-            function verifyTargetCmpEvicted(cmp) {
-                // Ideally we would keep adding defs until the original got evicted instead of just waiting here (W-2979502)
-                cmp.helper.lib.iframeTest.waitForDefRemovedFromStorage("ui:scroller");
+            function fetchCmpsUntilEvictTargetCmp(cmp) {
+                var complete = false;
+                this.fetchCmpsUntilEviction(cmp, "ui:scroller")
+                    .then(function() { 
+                        complete = true;
+                    },
+                    function(e) {
+                        $A.test.fail("Error while adding defs to evict ui:scroller. " + e);
+                    }
+                );
+                $A.test.addWaitForWithFailureMessage(true, function() { return complete; },
+                        "ui:scroller never evicted from storage");
             },
             function reloadPage(cmp) {
                 // Reload page to clear anything saved in javascript memory
@@ -105,17 +100,14 @@
         ]
     },
 
-    // TODO(W-2979502): this test should keep adding defs until something is evicted instead of adding a set amount and
-    // assuming it will get evicted.
     /**
      * Verifies that aura.context.loaded is reset when defs are evicted causing evicted defs to be re-downloaded from the server.
      * If aura.context.loaded is not reset then the client reports that it has more defs than it has persisted, which causes the
      * server to not send the defs, resulting in a broken def graph being persisted on the client (the in-memory graph is correct
      * though).
      */
-    _testEvictedDefsAreRefetchedWithoutReload: {
-        // tbliss: lots of potential races here between storage, actions, and evictions. passes for me locally consistently
-        // but mark it as a flapper to monitor on autobuilds for a bit.
+    testEvictedDefsAreRefetchedWithoutReload: {
+        // TODO(tbliss 8/18/2016): let it run in jenkins and monitor for a bit before removing the annotation.
         labels : ["flapper"],
         test: [
             function loadIframe(cmp) {
@@ -135,24 +127,21 @@
             function verifyTargetCmpStored(cmp) {
                 cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
             },
-            function fetchDifferentCmpFromServer(cmp) {
-                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:menu");
-            },
-            function fetchCmpFromServerToEvictTargetCmp(cmp) {
-                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:pillContainer");
-            },
-            function verifyTargetCmpEvicted(cmp) {
-                // Ideally we would keep adding defs until the original got evicted instead of just waiting here (W-2979502)
-                cmp.helper.lib.iframeTest.waitForDefRemovedFromStorage("ui:scroller");
+            function fetchCmpsUntilEvictTargetCmp(cmp) {
+                var complete = false;
+                this.fetchCmpsUntilEviction(cmp, "ui:scroller")
+                    .then(function() { 
+                        complete = true;
+                    },
+                    function(e) {
+                        $A.test.fail("Error while adding defs to evict ui:scroller. " + e);
+                    }
+                );
+                $A.test.addWaitForWithFailureMessage(true, function() { return complete; },
+                        "ui:scroller never evicted from storage");
             },
             function verifyTargetCmpNotInContext(cmp) {
                 cmp.helper.lib.iframeTest.verifyDefNotInLoaded("ui:scroller");
-            },
-            function verifyStableStateBeforeContinuing(cmp) {
-                // When scroller is evicted, we still do a put on the component that caused the eviction (pillContainer).
-                // Wait for that def to be stored in storage before continuing to try to have a stable state (no conflicting
-                // storage operations).
-                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:pillContainer");
             },
             function fetchCmpFromServerThatDependsOnTargetCmp(cmp) {
                 // ui:carousel contains ui:scroller. if aura.context.loaded reports that it still has
@@ -186,5 +175,43 @@
                 cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
             }
         ]
+    },
+
+    /**
+     * Keep fetching components from the server until targetCmp is evicted from storage.
+     */
+    fetchCmpsUntilEviction: function(cmp, targetCmp) {
+        var defs = ["ui:dataTable", "ui:panel", "ui:autocomplete", "ui:dropzone", "ui:image", "ui:inlineEditGrid",
+                    "ui:pillContainer", "ui:menu"];
+
+        /**
+         * Fetch the next cmp, waiting for it to be retrieved and 
+         * placed in storage (aka def in storage, sentinel is gone).
+         */
+        function fetchAnotherCmp() {
+            return cmp.helper.lib.iframeTest.fetchCmpAndWaitAsPromise(defs.pop());
+        }
+
+        /**
+         * Checks whether the provided def is in storage.
+         */
+        function checkInStorage() {
+            return cmp.helper.lib.iframeTest.checkDefInStorage(targetCmp);
+        }
+
+        /** 
+         * Uses promise recursion until targetCmp is not in storage
+         */
+        function recurse(inStorage) {
+            if (!inStorage) { 
+                // end recursion
+                return Promise["resolve"](); 
+            }
+            // still present so keep recursing
+            return fetchAnotherCmp().then(checkInStorage).then(recurse);
+        }
+
+        // start the recursion
+        return checkInStorage().then(recurse);
     }
 })

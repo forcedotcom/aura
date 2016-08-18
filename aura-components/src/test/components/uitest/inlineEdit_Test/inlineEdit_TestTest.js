@@ -129,6 +129,8 @@
       * Test editing multiple cells opens and closes appropriate panel for cell.
       */
      testEditPanelForMulitpleCells : {
+         // TODO(W-3306269): Flapping heavily on Jenkins autobuilds
+         labels: ["flapper"],
          test : [function(cmp) {
              this.triggerEditOnCell(cmp, 0, 2);
          }, function(cmp) {

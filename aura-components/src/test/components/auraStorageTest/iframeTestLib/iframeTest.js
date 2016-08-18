@@ -100,11 +100,90 @@ function iframeTest() {
         },
 
         /** Fetches the specified component (format is namespace:name). */
-        fetchCmpAndWait: function(desc) {
+        fetchCmp: function(desc) {
             var iframeCmp = this.getIframeRootCmp();
             iframeCmp.set("v.load", desc);
             iframeCmp.fetchCmp();
+        },
+
+        /** Fetches the specified component (format is namespace:name) and waits for the server response. */
+        fetchCmpAndWait: function(desc) {
+            this.fetchCmp(desc);
             this.waitForStatus("Fetching: " + desc, "Fetched: " + desc);
+        },
+
+        /** 
+         * Fetches the specified component (format is namespace:name) and waits for component to be inserted
+         *  in to storage.
+         */
+        fetchCmpAndWaitAsPromise: function(desc) {
+            var that = this;
+
+            if (!desc) {
+                return Promise["reject"](new Error("No component to fetch"));
+            }
+
+            function waitForDefInStorage(desc) {
+                // short-circuit recursion if test is complete
+                if ($A.test.isComplete()) {
+                    return Promise["reject"](new Error("Test complete, killing recursion"));
+                }
+
+                return that.checkDefInStorage(desc)
+                   .then(function(inStorage) {
+                       if (!inStorage) {
+                           return that.delayPromise(waitForDefInStorage.bind(that, desc));
+                       }
+                   });
+            }
+
+            return new Promise(function(resolve, reject) {
+                that.fetchCmp(desc);
+                resolve(desc);
+            })
+            .then(function(def) {
+                return waitForDefInStorage(def);
+            });
+        },
+
+        /** Check ComponentDefStorage for targetCmp. */
+        checkDefInStorage: function(targetCmp) {
+            var that = this;
+
+            function innerCheckDefInStorage() {
+                if ($A.test.isComplete()) {
+                    return Promise["reject"](new Error("Test complete, killing recursion"));
+                }
+
+                return that.getIframe().$A.storageService.getStorage("ComponentDefStorage").getAll([], true)
+                .then(
+                    function(items) {
+                        if (items[that.TRANSACTION_SENTINEL_KEY]) {
+                            // storage is in the middle of an operation so recurse
+                            return that.delayPromise(innerCheckDefInStorage);
+                        }
+                        return !!(items["markup://" + targetCmp]);
+                    }
+                );
+            }
+            return innerCheckDefInStorage();
+        },
+
+        /**
+         * Executes a function as a promise after a certain delay. This delay is often necessary during recurisve calls
+         * to prevent the framework and browser from getting flooded with calls and crashing.
+         */
+        delayPromise: function(func, delay) {
+            delay = delay || 100;
+            return new Promise(function(resolve) {
+                setTimeout(function() {
+                    try {
+                        resolve(func());
+                    } catch (e) {
+                        reject(e);
+                    }
+                }, delay);
+            });
         },
 
         /** Creates the specified component (format is namespace:name) using $A.createComponentFromConfig. */

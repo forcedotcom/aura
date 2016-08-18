@@ -1,0 +1,35 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation> 
+    <aura:description>
+        <p>A <code>ui:scrollerWrapper</code> creates a container that enables native scrolling in Salesforce1. This component enables you to nest more than one scroller inside the container.
+        Use the <code>class</code> attribute to define the height and width of the container.</p>
+        <p>The Lightning Design System <code>scrollable</code> class isn't compatible with native scrolling on mobile devices. Use <code>ui:scrollerWrapper</code> if you want to enable scrolling in Salesforce1.</p>
+        <p>Here is an example.</p>
+        <pre>&lt;aura:component>
+    &lt;ui:scrollerWrapper>
+        &lt;!--Scrollable content here -->
+    &lt;/ui:scrollerWrapper>
+&lt;/aura:component>
+        </pre>
+    </aura:description>
+</aura:documentation> 
+
+    
+
+    

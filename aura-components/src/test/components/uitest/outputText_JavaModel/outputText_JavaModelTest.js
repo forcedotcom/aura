@@ -19,9 +19,11 @@
      */
     testObjectValueFromJavaModel:{
         test:function(cmp){
-            var testCmp = cmp.find('myComp1');
-            aura.test.assertNotNull(testCmp);
-            aura.test.assertEquals('', $A.test.getText(testCmp.find('span').getElement()), "Failed to handle Object from Java model");
+        	$A.test.addWaitForWithFailureMessage(true, function() {
+        		var testCmp = cmp.find('myComp1');
+        		return (!$A.util.isEmpty(testCmp) &&
+        				$A.test.getText(testCmp.find('span').getElement()) === "");
+        	});
         }
     },
 

@@ -16,8 +16,8 @@
     limitations under the License.
 
 -->
-<aura:application template="performance:bootstrapTemplate">
-
+<aura:application template="bootstrapTest:bootTestTemplate">
+    <aura:handler event="aura:applicationRefreshed" action="{!c.handleRefreshed}"/>
     <section class="container" aura:id="container"> Bootstrap App </section>
     <div aura:id="iframeContainer"/>
 </aura:application>

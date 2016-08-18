@@ -2,6 +2,8 @@
     // Only run on Firefox for now until we are able to upgrade Chrome to a compatible version in autobuilds
     browsers: ["FIREFOX"],
 
+    BOOTSTRAP_KEY: "$AuraClientService.bootstrap$",
+
     testBootstrapScriptsOrdering_default: {
         test: [
             function(cmp) {
@@ -93,6 +95,57 @@
                 $A.test.addWaitForWithFailureMessage(true, function() {
                     return frame.contentWindow.$A && frame.contentWindow.$A.finishedInit;
                 }, "iframe failed to fully boot Aura");
+            }
+        ]
+    },
+
+    testBootstrapMd5DiffFiresApplicationRefresh: {
+        test: [
+            function loadIframe(cmp) {
+                this.loadIframe(cmp);
+                $A.test.addWaitFor(true, function(){ return cmp._frameLoaded; });
+            },
+            function changeStoredBootstrapMd5(cmp) {
+                // update md5 in storage to guarantee value is different from value returned from server.
+                var that = this;
+                var completed = false;
+                var storage = $A.storageService.getStorage("actions");
+                storage.get(this.BOOTSTRAP_KEY)
+                    .then(function(item) {
+                        item.md5 = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+                        return storage.set(that.BOOTSTRAP_KEY, item);
+                    })
+                    .then(function() {
+                        completed = true;
+                    })
+                    ["catch"](function(e) { $A.test.fail("Error modifying bootstrap entry in storage: " + e)});
+                $A.test.addWaitFor(true, function(){ return completed });
+            },
+            function loadScriptsSansBootstrap(cmp) {
+                // bootstrap.js will be cached in persistent storage from initial load so we are able to load the app
+                // without the bootstrap script. 
+                var scriptOrder = ["inline", "framework", "libraries", "appJs"];
+                var frame = document.getElementById("myFrame");
+                var scripts = this.getScripts(cmp);
+                this.addScriptsToIframe(frame, scripts, scriptOrder);
+
+                $A.test.addWaitForWithFailureMessage(true, function() {
+                    return frame.contentWindow.$A && frame.contentWindow.$A.finishedInit;
+                }, "iframe failed to load Aura when bootstrap.js is from cache");
+            },
+            function loadBootstrapScript(cmp) {
+                // now load bootstrap script which will go to the server and return with the original md5. When the
+                // client processes bootstrap.js it will detect the new md5 and fire the applicationRefreshed event.
+                var scriptOrder = ["bootstrap"];
+                var frame = document.getElementById("myFrame");
+                frame.contentWindow.$A.getRoot()._applicationRefreshedCalled = false;
+                var scripts = this.getScripts(cmp);
+                this.addScriptsToIframe(frame, scripts, scriptOrder);
+
+                $A.test.addWaitForWithFailureMessage(true, function() {
+                    // _applicationRefreshedCalled flag is set in components aura:applicationRefreshed event handler
+                    return frame.contentWindow.$A.getRoot()._applicationRefreshedCalled;
+                }, "applicationRefreshed event not fired after bootstrap.js fetched from server");
             }
         ]
     },

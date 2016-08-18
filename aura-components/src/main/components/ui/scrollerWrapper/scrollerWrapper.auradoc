@@ -17,7 +17,7 @@
 -->
 <aura:documentation> 
     <aura:description>
-        <p>A <code>ui:scrollerWrapper</code> creates a container that enables native scrolling in Salesforce1. This component incorporates the Lightning Design System  CSS styles and enables you to nest more than one scroller inside the container.
+        <p>A <code>ui:scrollerWrapper</code> creates a container that enables native scrolling in Salesforce1. This component enables you to nest more than one scroller inside the container.
         Use the <code>class</code> attribute to define the height and width of the container.</p>
         <p>The Lightning Design System <code>scrollable</code> class isn't compatible with native scrolling on mobile devices. Use <code>ui:scrollerWrapper</code> if you want to enable scrolling in Salesforce1.</p>
         <p>Here is an example.</p>

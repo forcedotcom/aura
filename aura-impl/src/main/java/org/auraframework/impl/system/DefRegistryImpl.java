@@ -32,7 +32,10 @@ public abstract class DefRegistryImpl<T extends Definition> implements DefRegist
 
     public DefRegistryImpl(Set<DefType> defTypes, Set<String> prefixes, Set<String> namespaces) {
         this.defTypes = defTypes;
-        this.prefixes = prefixes;
+        this.prefixes = Sets.newHashSet();
+        for (String prefix : prefixes) {
+            this.prefixes.add(prefix.toLowerCase());
+        }
         if (namespaces == null) {
             this.namespaces = Sets.newHashSet("*");
         } else {

@@ -57,7 +57,10 @@ public class CompilingDefRegistry implements DefRegistry<Definition> {
         this.sourceLoader = sourceLoader;
         this.namespaces = Sets.newHashSet();
         this.registry = Maps.newHashMap();
-        this.prefixes = prefixes;
+        this.prefixes = Sets.newHashSet();
+        for (String prefix : prefixes) {
+            this.prefixes.add(prefix.toLowerCase());
+        }
         this.defTypes = defTypes;
         reset();
     }

@@ -93,7 +93,7 @@ public final class SourceFactory {
     }
 
     public <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
-        LoaderKey key = new LoaderKey(descriptor.getNamespace(), descriptor.getPrefix());
+        LoaderKey key = new LoaderKey(descriptor.getNamespace(), descriptor.getPrefix().toLowerCase());
         SourceLoader loader = loaders.get(key);
         if (loader == null) {
             return null;

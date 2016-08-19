@@ -57,8 +57,11 @@ public class StringSourceLoaderImpl implements StringSourceLoader {
 
     private static final String DEFAULT_NAME_PREFIX = "thing";
     private static final Set<String> PREFIXES = ImmutableSet.of(
-            DefDescriptor.MARKUP_PREFIX, DefDescriptor.JAVASCRIPT_PREFIX,
-            DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX, DefDescriptor.CUSTOM_FLAVOR_PREFIX);
+            DefDescriptor.MARKUP_PREFIX.toLowerCase(),
+            DefDescriptor.JAVASCRIPT_PREFIX.toLowerCase(),
+            DefDescriptor.CSS_PREFIX.toLowerCase(),
+            DefDescriptor.TEMPLATE_CSS_PREFIX.toLowerCase(),
+            DefDescriptor.CUSTOM_FLAVOR_PREFIX.toLowerCase());
     private static final Set<DefType> DEFTYPES = ImmutableSet.of(
             DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT, DefType.LIBRARY,
             DefType.INCLUDE, DefType.INTERFACE, DefType.CONTROLLER,

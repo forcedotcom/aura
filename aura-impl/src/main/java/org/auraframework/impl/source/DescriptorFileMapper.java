@@ -108,7 +108,7 @@ public class DescriptorFileMapper {
         eiList.add(ei);
 
         defTypes.add(defType);
-        prefixes.add(ei.prefix);
+        prefixes.add(ei.prefix.toLowerCase());
     }
 
     private boolean havePrefix(DefDescriptor<?> desc) {

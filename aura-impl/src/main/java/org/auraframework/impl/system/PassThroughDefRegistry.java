@@ -28,6 +28,8 @@ import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.collect.Sets;
+
 public class PassThroughDefRegistry implements DefRegistry<Definition> {
     private static final long serialVersionUID = 1741611975153818048L;
 
@@ -39,7 +41,10 @@ public class PassThroughDefRegistry implements DefRegistry<Definition> {
     public PassThroughDefRegistry(SourceLoader sourceLoader, Set<DefType> defTypes, Set<String> prefixes,
             boolean cacheable) {
         this.sourceLoader = sourceLoader;
-        this.prefixes = prefixes;
+        this.prefixes = Sets.newHashSet();
+        for (String prefix : prefixes) {
+            this.prefixes.add(prefix.toLowerCase());
+        }
         this.defTypes = defTypes;
         this.cacheable = cacheable;
     }

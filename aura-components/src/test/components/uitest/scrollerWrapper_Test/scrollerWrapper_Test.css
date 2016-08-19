@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.uitestScrollerWrapper_Test.test {
-	height: 100px;
-	width: 200px;
-	border: solid 1px blue;
-	margin: 8px;
+.THIS.test {
+	font-size: 4rem;
+	height: 80%;
+	border: solid 3px blue;
 }
 
+.THIS .scrollerSmall {
+	height: 50%;
+	border: solid 3px orange;
+}

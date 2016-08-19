@@ -15,42 +15,46 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.components.test.java.model.TestJavaModel">
-	<aura:attribute name="scrollToBottomCount" type="Integer" default="0"/>
-	
-   	<ui:scrollerWrapper class="test" aura:id="basic">
+<aura:component
+	model="java://org.auraframework.components.test.java.model.TestJavaModel">
+	<aura:attribute name="scrollToBottomCount" type="Integer" default="0" />
+
+	<ui:scrollerWrapper class="test" aura:id="basic">
 		<div aura:id="lyrics1.1">
-	           When I walk on by, girls be looking like damn he fly
-	           I pimp to the beat, walking down the street in my new lafreak, yeah
-	           This is how I roll, animal print, pants out control,
-	           It's RedFoo with the big afro
-	           And like Bruce Lee I've got the claw
-			
-			<div aura:id="lyrics1.2">
-	           Girl look at that body (x3)
-	           I work out
-	           Girl look at that body (x3)
-	           I work out
-			</div>
+			When I walk on by, girls be looking like damn he fly I pimp to the
+			beat, walking down the street in my new lafreak, yeah This is how I
+			roll, animal print, pants out control, It's RedFoo with the big afro
+			And like Bruce Lee I've got the claw
+
+			<div aura:id="lyrics1.2">Girl look at that body (x3) I work out
+				Girl look at that body (x3) I work out</div>
 		</div>
-		
-		<div aura:id="lyrics2.1" class="skipTransform">	
-	           When I walk in the spot, this is what I see
-	           Everybody stops and they staring at me
-	           I got passion in my pants and I ain't afraid to show it
-	
-	           I'm sexy and I know it (x2)
-	
-			<div aura:id="lyrics2.2">
-	           When I'm at the mall, security just can't fight 'em off
-	           When I'm at the beach, I'm in a speedo trying to tan my cheeks
-	           This is how I roll, come on ladies it's time to go
-	           We headed to the bar, baby don't be nervous
-	           No shoes, no shirt, and I still get service
-	
-	           Girl look at that body (x3)
-	           I work out
-           </div>
+
+		<ui:scrollerWrapper class="scrollerSmall">
+			<div>
+			    Lorem Ipsum is simply dummy text of the printing and
+				typesetting industry. Lorem Ipsum has been the industry's standard
+				dummy text ever since the 1500s, when an unknown printer took a
+				galley of type and scrambled it to make a type specimen book.
+				It has survived not only five centuries, but also the leap into electronic
+				typesetting, remaining essentially unchanged. It was popularised in
+				the 1960s with the release of Letraset sheets containing Lorem Ipsum
+				passages, and more recently with desktop publishing software like
+				Aldus PageMaker including versions of Lorem Ipsum.
+			</div>
+		</ui:scrollerWrapper>
+
+		<div aura:id="lyrics2.1" class="skipTransform">
+			When I walk in the spot, this is what I see Everybody stops and they
+			staring at me I got passion in my pants and I ain't afraid to show it
+
+			I'm sexy and I know it (x2)
+
+			<div aura:id="lyrics2.2">When I'm at the mall, security just
+				can't fight 'em off When I'm at the beach, I'm in a speedo trying to
+				tan my cheeks This is how I roll, come on ladies it's time to go We
+				headed to the bar, baby don't be nervous No shoes, no shirt, and I
+				still get service Girl look at that body (x3) I work out</div>
 		</div>
 	</ui:scrollerWrapper>
 </aura:component>

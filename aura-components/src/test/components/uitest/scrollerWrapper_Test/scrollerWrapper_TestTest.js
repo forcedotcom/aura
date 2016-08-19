@@ -15,47 +15,46 @@
  */
 ({
 	/**
-	 * When using scrollerWrapper, subelements should have a 
-	 * transform CSS property set to translate3d(0,0,0)
+	 * When using scrollerWrapper, subelements should have a transform CSS
+	 * property set to translate3d(0,0,0)
 	 */
-	testTransform: {
-		browsers: ["IPHONE, IPAD"],
-	    test: function(component) {
-	    	var lyricsSty1 = this.getTransformValue(component, "lyrics1.1"),
-	    		lyricsSty2 = this.getTransformValue(component, "lyrics1.2");
-	    	
-	    	$A.test.assertEquals("matrix(1, 0, 0, 1, 0, 0)", lyricsSty1, "There should be a transform CSS property");
-	    	$A.test.assertEquals("matrix(1, 0, 0, 1, 0, 0)", lyricsSty2, "There should be a transform CSS property");
-       }
+	testTransform : {
+		browsers : [ "IPHONE, IPAD" ],
+		test : function(component) {
+			var lyricsSty1 = this.getTransformValue(component, "lyrics1.1"), 
+				lyricsSty2 = this.getTransformValue(component, "lyrics1.2");
+
+			$A.test.assertEquals("matrix(1, 0, 0, 1, 0, 0)", lyricsSty1, "There should be a transform CSS property");
+			$A.test.assertEquals("none", lyricsSty2, "There should not be a transform CSS property");
+		}
 	},
-	
+
 	/**
-	 * When using scrollerWrapper, elements with the 
-	 * skipTransform class should not have a transform 
-	 * CSS property set
+	 * When using scrollerWrapper, elements with the skipTransform class should
+	 * not have a transform CSS property set
 	 */
-	testSkipTransform: {
-		browsers: ["IPHONE, IPAD"],
-	    test: function(component) {
-	    	//debugger;
-	    	var lyricsSty1 = this.getTransformValue(component, "lyrics2.1"),
-    		    lyricsSty2 = this.getTransformValue(component, "lyrics2.2");
-	    	
-	    	$A.test.assertEquals("none", lyricsSty1, "There should not be a transform CSS property");
-	    	$A.test.assertEquals("matrix(1, 0, 0, 1, 0, 0)", lyricsSty2, "There should be a transform CSS property");
-       }
+	testSkipTransform : {
+		browsers : [ "IPHONE, IPAD" ],
+		test : function(component) {
+			// debugger;
+			var lyricsSty1 = this.getTransformValue(component, "lyrics2.1"), lyricsSty2 = this
+					.getTransformValue(component, "lyrics2.2");
+
+			$A.test.assertEquals("none", lyricsSty1, "There should not be a transform CSS property");
+			$A.test.assertEquals("none", lyricsSty2, "There should not be a transform CSS property");
+		}
 	},
-	
+
 	/**
 	 * Utility function for retrieving the transform CSS property
 	 * 
 	 * @param the component
-	 * @param auraid  of the element being observed
+	 * @param auraid of the element being observed
 	 * @return the computed value of the transform CSS property
 	 */
-	getTransformValue: function(component, idName) {
-    	var lyricsCmp = component.find(idName);
-    	var	lyricsEle = lyricsCmp.getElement();
-    	return $A.test.getStyle(lyricsEle, "transform");
+	getTransformValue : function(component, idName) {
+		var lyricsCmp = component.find(idName);
+		var lyricsEle = lyricsCmp.getElement();
+		return $A.test.getStyle(lyricsEle, "transform");
 	}
 })

@@ -14,38 +14,41 @@
  * limitations under the License.
  */
 ({
-	
+
 	/**
-	 * When using scrollerWrapper there should be a 
-	 * scrollable and a v.class
+	 * When using scrollerWrapper there should be a scrollable and a v.class
 	 */
-	testClassAttribute: {
-		attributes: {"class" : "test"},
-	    test: function(component) {
-    	   $A.test.assertTrue($A.util.hasClass(component, "scrollable"), "There should be a scrollable class");
-    	   $A.test.assertTrue($A.util.hasClass(component, "test"), "There should be a v.class");
-       }
+	testClassAttribute : {
+		attributes : {
+			"class" : "test"
+		},
+		test : function(component) {
+			$A.test.assertTrue($A.util.hasClass(component, "scrollable"),
+					"There should be a scrollable class");
+			$A.test.assertTrue($A.util.hasClass(component, "test"),
+					"There should be a v.class");
+		}
 	},
-	
+
 	/**
-	 * When using IOS there should be a scrollingOnIOS 
-	 * class
+	 * When using IOS there should be a scrollingOnIOS class
 	 */
-	testClassAttributeIOS: {
-		browsers: ["IPHONE, IPAD"],
-	    test: function(component) {
-    	   $A.test.assertTrue($A.util.hasClass(component, "scrollingOnIOS"), "There should be a scrollingOnIOS class");
-       }
+	testClassAttributeIOS : {
+		browsers : [ "IPHONE, IPAD" ],
+		test : function(component) {
+			$A.test.assertTrue($A.util.hasClass(component, "scrollingOnIOS"),
+					"There should be a scrollingOnIOS class");
+		}
 	},
-	
+
 	/**
-	 * When using nonIOS there should NOT be a scrollingOnIOS
-	 * class
+	 * When using nonIOS there should NOT be a scrollingOnIOS class
 	 */
-	testClassAttributeNonIOS: {
-		browsers: ["-IPHONE, -IPAD"],
-		test: function(component) {
-    	   $A.test.assertFalse($A.util.hasClass(component, "scrollingOnIOS"), "There should NOT be a scrollingOnIOS class");
-	    }
+	testClassAttributeNonIOS : {
+		browsers : [ "-IPHONE, -IPAD" ],
+		test : function(component) {
+			$A.test.assertFalse($A.util.hasClass(component, "scrollingOnIOS"),
+					"There should NOT be a scrollingOnIOS class");
+		}
 	}
-})//eslint-disable-line semi
+})// eslint-disable-line semi

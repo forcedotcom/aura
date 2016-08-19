@@ -186,7 +186,6 @@
     /**
      * A stream represents an ordered sequence of tokens.
      *
-     * @constructor
      * @param {!(Array|Uint8Array)} tokens Array of tokens that provide
      * the stream.
      */
@@ -387,7 +386,6 @@
     // 8.1 Interface TextDecoder
 
     /**
-     * @constructor
      * @param {string=} label The label of the encoding;
      *     defaults to 'utf-8'.
      * @param {Object=} options
@@ -598,7 +596,6 @@
     // 8.2 Interface TextEncoder
 
     /**
-     * @constructor
      * @param {string=} label The label of the encoding. NONSTANDARD.
      * @param {Object=} options NONSTANDARD.
      */
@@ -721,7 +718,6 @@
 
     // 9.1.1 utf-8 decoder
     /**
-     * @constructor
      * @implements {Decoder}
      * @param {{fatal: boolean}} options
      */
@@ -864,7 +860,6 @@
 
     // 9.1.2 utf-8 encoder
     /**
-     * @constructor
      * @implements {Encoder}
      * @param {{fatal: boolean}} options
      */
@@ -961,7 +956,6 @@
 
     // 15.2.1 shared utf-16 decoder
     /**
-     * @constructor
      * @implements {Decoder}
      * @param {boolean} utf16_be True if big-endian, false if little-endian.
      * @param {{fatal: boolean}} options
@@ -1055,7 +1049,6 @@
 
     // 15.2.2 shared utf-16 encoder
     /**
-     * @constructor
      * @implements {Encoder}
      * @param {boolean} utf16_be True if big-endian, false if little-endian.
      * @param {{fatal: boolean}} options

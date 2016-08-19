@@ -652,10 +652,7 @@
       });
       ```
 
-      @class Promise
       @param {function} resolver
-      Useful for tooling.
-      @constructor
     */
     function $$es6$promise$promise$$Promise(resolver) {
       this._id = $$es6$promise$promise$$counter++;

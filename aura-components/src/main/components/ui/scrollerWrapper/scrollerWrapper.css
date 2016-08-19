@@ -20,11 +20,10 @@
     -webkit-overflow-scrolling: touch;
 }
 
-.THIS.scrollable.scrollingOnIOS *:not(.skipTransform) {
+.THIS.scrollable.scrollingOnIOS > *:not(.skipTransform) {
     /**
      * put in memory every element inside of the scroll wrapper
      * making faster the render process and avoiding white screen
      */
     transform: translate3d(0,0,0);
 }
-

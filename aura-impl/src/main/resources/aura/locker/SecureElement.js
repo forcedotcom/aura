@@ -511,7 +511,7 @@ SecureElement.elementSpecificAttributeWhitelists = {
     "PARAM" : [ "name", "value" ],
     "PROGRESS" : [ "max", "value" ],
     "Q" : [ "cite" ],
-    "SELECT" : [ "autofocus", "disabled", "form", "multiple", "name", "required", "size" ],
+    "SELECT" : [ "autofocus", "disabled", "form", "multiple", "name", "required", "size", "value" ],
     "SOURCE" : [ "src", "type" ],
     "TD" : [ "colSpan", "headers", "rowSpan" ],
     "TEMPLATE" : [ "content" ],

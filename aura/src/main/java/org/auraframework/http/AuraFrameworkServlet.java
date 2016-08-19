@@ -161,10 +161,6 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 return;
             }
 
-            response.reset();
-
-            servletUtilAdapter.setCSPHeaders(null, request, response);
-
             // handle any MIME content type, using only file name (not contents)
             String mimeType = mimeTypesMap.getContentType(path);
 

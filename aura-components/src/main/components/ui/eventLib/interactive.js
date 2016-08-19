@@ -132,9 +132,39 @@ function lib() { //eslint-disable-line no-unused-vars
          * the Map doesn't continiously grow.
          */
         removeDomEventsFromMap:  function(component) {
-            var globalId = component.getGlobalId();
-            if(this.domEventMap.hasOwnProperty(globalId)) {
-                this.domEventMap[globalId] = undefined;
+            var element = component.getElement();
+            if (!element) {
+                return;
+            }
+
+            var renderingComponent;
+            var elementId = this.getUid(element);
+            if (!elementId) {
+                // component.getElement() doesn't return an input element
+                // need to find the input element in childNodes
+                var inputElement = element.getElementsByTagName('input')[0] || element.getElementsByTagName('textarea')[0];
+                if (inputElement) {
+                    elementId = this.getUid(inputElement);
+                    renderingComponent = $A.componentService.getRenderingComponentForElement(inputElement);
+                    element = inputElement;
+                }
+            }
+
+            renderingComponent = renderingComponent || component;
+            var globalId = renderingComponent.getGlobalId();
+
+            // clean up handler references and map entries
+            if(globalId && elementId && this.domEventMap.hasOwnProperty(globalId)) {
+                var eventHandlers = this.domEventMap[globalId][elementId];
+                for (var event in eventHandlers) {
+                    var existing = eventHandlers[event];
+                    if(existing) {
+                        $A.util.removeOn(element, event, existing);
+                    }
+                }
+
+                delete this.domEventMap[globalId][elementId];
+                delete this.domEventMap[globalId];
             }
         },
 

@@ -301,7 +301,7 @@ AuraClientService.prototype.getSourceMapsUrl = function (descriptor, type) {
         var folder = '/components/';
 
         if (type === 'lib') {
-            splitChar = '.';    
+            splitChar = '.';
             folder = '/libraries/';
         }
 
@@ -562,7 +562,7 @@ AuraClientService.prototype.isDisconnectedOrCancelled = function(response) {
  * @private
  */
 AuraClientService.prototype.singleAction = function(action, actionResponse, key, store) {
-    var storage, toStore, needUpdate, errorHandler, needsRefresh;
+    var storage, toStore, needUpdate, needsRefresh;
 
     try {
         // Force the transaction id to 'this' action, so that we maintain chains.
@@ -581,19 +581,13 @@ AuraClientService.prototype.singleAction = function(action, actionResponse, key,
             storage = action.getStorage();
         }
         if (storage) {
-            errorHandler = action.getStorageErrorHandler();
-
             if (!key) {
                 try {
                     key = action.getStorageKey();
                 } catch (e) {
-                    if (errorHandler && $A.util.isFunction(errorHandler)) {
-                        errorHandler(e);
-                    } else {
-                        var errorWrapper = new $A.auraError(null, e);
-                        errorWrapper.action = action;
-                        $A.logger.reportError(errorWrapper);
-                    }
+                    var errorWrapper = new $A.auraError(null, e);
+                    errorWrapper.action = action;
+                    $A.logger.reportError(errorWrapper);
                     return;
                 }
             }
@@ -607,14 +601,8 @@ AuraClientService.prototype.singleAction = function(action, actionResponse, key,
                 storage.set(key, toStore).then(
                     function() {},
                     function(error){
-                        $A.run(function() {
-                            if (errorHandler && $A.util.isFunction(errorHandler)) {
-                                errorHandler(error);
-                            } else {
-                                // storage problems should warn rather than the agressive error.
-                                $A.warning("AuraClientService.singleAction, problem when putting "+key+" into storage, error:"+error);
-                            }
-                        });
+                        // storage problems should warn rather than the aggressive error.
+                        $A.warning("AuraClientService.singleAction, problem when putting "+key+" into storage, error:"+error);
                     }
                 );
             }
@@ -1779,7 +1767,7 @@ AuraClientService.prototype.processStorableActions = function() {
  * @param {Array} actions An array of storable actions to persist.
  */
 AuraClientService.prototype.persistStorableActions = function(actions) {
-    var action, key, value, errorHandler;
+    var action, key, value;
     var doStore = false;
 
     var values = {};
@@ -1787,18 +1775,12 @@ AuraClientService.prototype.persistStorableActions = function(actions) {
         action = actions[i];
         value = action.getStored();
         if (value) {
-            errorHandler = action.getStorageErrorHandler();
-
             try {
                 key = action.getStorageKey();
             } catch (e) {
-                if (errorHandler && $A.util.isFunction(errorHandler)) {
-                    errorHandler(e);
-                } else {
-                    var errorWrapper = new $A.auraError(null, e);
-                    errorWrapper.action = action;
-                    $A.logger.reportError(errorWrapper);
-                }
+                var errorWrapper = new $A.auraError(null, e);
+                errorWrapper.action = action;
+                $A.logger.reportError(errorWrapper);
             }
 
             doStore = true;
@@ -1815,15 +1797,9 @@ AuraClientService.prototype.persistStorableActions = function(actions) {
             .then(
                 undefined,
                 function(error){
-                    $A.run(function() {
-                        if (errorHandler && $A.util.isFunction(errorHandler)) {
-                            errorHandler(error);
-                        } else {
-                            // storage problems should warn rather than the aggressive error.
-                            var keys = Object.keys(values);
-                            $A.warning("AuraClientService.persistStorableActions, problem storing "+keys.length+" actions:\n"+keys.join("\n")+"\n"+error);
-                        }
-                    });
+                    // storage problems should warn rather than the aggressive error.
+                    var keys = Object.keys(values);
+                    $A.warning("AuraClientService.persistStorableActions, problem storing "+keys.length+" actions:\n"+keys.join("\n")+"\n"+error);
                 }
             );
     }

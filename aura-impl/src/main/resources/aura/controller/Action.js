@@ -858,13 +858,6 @@ Action.prototype.getStored = function() {
 };
 
 /**
- * Gets the configured storage error handler callback.
- */
-Action.prototype.getStorageErrorHandler = function() {
-    return this.storableConfig && this.storableConfig["errorHandler"];
-};
-
-/**
  * Returns the json representation of the action
  * @private
  */
@@ -1260,11 +1253,7 @@ Action.prototype.incomplete = function(context) {
 Action.prototype.copyToRefresh = function() {
     var refreshAction = this.def.newInstance(this.cmp);
     refreshAction.setParams(this.params);
-    refreshAction.setStorable({
-        "ignoreExisting" : true,
-        "errorHandler": this.getStorageErrorHandler()
-    });
-
+    refreshAction.setStorable({"ignoreExisting" : true});
     refreshAction.background = this.background;
     refreshAction.abortable = this.abortable;
 

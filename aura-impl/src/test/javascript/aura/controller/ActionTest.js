@@ -1483,37 +1483,6 @@ Test.Aura.Controller.ActionTest = function() {
         }
 
         [Fact]
-        function StorableErrorHandlerFromParam() {
-            // Arrange
-            var expected = function expected() {
-            };
-
-            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
-                assert : function() {
-                }
-            });
-            var target = newAction();
-            target.def = {
-                isServerAction : function() {
-                }
-            };
-            target.setAbortable = target.getStorageKey = function() {
-            };
-            var actual;
-
-            // Act
-            mockAssert(function() {
-                target.setStorable({
-                    errorHandler : expected
-                });
-                actual = target.getStorageErrorHandler();
-            })
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
         function SetsStorableSetsAbortableToTrue() {
             // Arrange
             var mockAssert = Mocks.GetMock(Object.Global(), "$A", {

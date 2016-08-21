@@ -91,62 +91,6 @@
     },
 
     /**
-     * Verifies that Action#setStorable()'s errorHandler parameter is invoked when storage fails to store the action response.
-     */
-    testErrorHandlerHook: {
-        test : [
-            function verifyErrorHandlerInvoked(cmp) {
-                // to simulate a storage rejection which will trigger the error callback we
-                // hook the size estimator and, if it's our magic payload, return a size much
-                // larger than the actions store's max size.
-                var payload = new Array(100).join("!");
-                var original = $A.util.estimateSize;
-                $A.test.overrideFunction($A.util, "estimateSize",
-                    function(value) {
-                        if (value && value.returnValue && value.returnValue === payload) {
-                            // actionStorage.app's template sets action max size to 4096
-                            // so reply with a size much larger
-                            return 4069*10000;
-                        }
-                        return original.call($A.util, value);
-                    }
-                );
-
-                var errorHandled = null;
-                var action = cmp.get("c.getString");
-                action.setParams({ param: payload });
-
-                action.setStorable({
-                    errorHandler: function(error) {
-                        errorHandled = error;
-                    }
-                });
-
-                $A.enqueueAction(action);
-
-                $A.test.addWaitForWithFailureMessage(
-                    true,
-                    function() { return errorHandled !== null; },
-                    "error handler didn't get called",
-                    function() {
-                        $A.test.assertTrue(
-                            errorHandled.message.indexOf("AuraStorage.set() cannot store") === 0,
-                            "Should have returned error indicating cannot store"
-                        );
-                        $A.test.assertTrue(
-                                errorHandled.message.indexOf("over the max size") > -1,
-                                "Should have returned error referencing over max size"
-                        );
-                    }
-                );
-            },
-            function verifyActionResponseNotInStorage(cmp) {
-                this.verifyActionNotInStorage(cmp);
-            }
-        ]
-    },
-
-    /**
      * Verifies that AuraClientService#invalidateAction removes an action response from storage.
      */
     testInvalidate: {

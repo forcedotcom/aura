@@ -205,9 +205,6 @@ function AuraClientService () {
     //
     this.optionClientSynchronous = true;
 
-    // whether to use bulk storage apis for storable actions
-    this.optionBulkStorage = true;
-
     this.reloadFunction = undefined;
     this.reloadPointPassed = false;
 
@@ -556,13 +553,10 @@ AuraClientService.prototype.isDisconnectedOrCancelled = function(response) {
  *
  * @param {Action} action the action.
  * @param {Object} actionResponse the server response.
- * @param {string} key the storage key (may be null).
- * @param {Boolean} store should storable action responses get stored? Set to false when
- *        for duplicate storable actions are deduped on the client.
  * @private
  */
-AuraClientService.prototype.singleAction = function(action, actionResponse, key, store) {
-    var storage, toStore, needUpdate, needsRefresh;
+AuraClientService.prototype.singleAction = function(action, actionResponse) {
+    var needUpdate, needsRefresh;
 
     try {
         // Force the transaction id to 'this' action, so that we maintain chains.
@@ -575,36 +569,6 @@ AuraClientService.prototype.singleAction = function(action, actionResponse, key,
             }
             if (needsRefresh) {
                 action.fireRefreshEvent("refreshEnd", needUpdate);
-            }
-        }
-        if (store && !this.optionBulkStorage) {
-            storage = action.getStorage();
-        }
-        if (storage) {
-            if (!key) {
-                try {
-                    key = action.getStorageKey();
-                } catch (e) {
-                    var errorWrapper = new $A.auraError(null, e);
-                    errorWrapper.action = action;
-                    $A.logger.reportError(errorWrapper);
-                    return;
-                }
-            }
-
-            toStore = action.getStored();
-
-            if (toStore) {
-                if (this.persistedActionFilter) {
-                    this.persistedActionFilter[key] = true;
-                }
-                storage.set(key, toStore).then(
-                    function() {},
-                    function(error){
-                        // storage problems should warn rather than the aggressive error.
-                        $A.warning("AuraClientService.singleAction, problem when putting "+key+" into storage, error:"+error);
-                    }
-                );
             }
         }
     } catch (e) {
@@ -1591,11 +1555,7 @@ AuraClientService.prototype.continueProcessing = function() {
                 this.collector.collected[index] = undefined;
                 this.collector.collecting[index] = action;
                 if (!action.isRefreshAction() && action.isStorable() && storage) {
-                    if (this.optionBulkStorage) {
-                        this.collectStorableAction(action, index);
-                    } else {
-                        this.getStoredResult(action, storage, index);
-                    }
+                    this.collectStorableAction(action, index);
                 } else {
                     this.collectServerAction(action, index);
                 }
@@ -1610,9 +1570,7 @@ AuraClientService.prototype.continueProcessing = function() {
         }
     }
 
-    if (this.optionBulkStorage) {
-        this.processStorableActions();
-    }
+    this.processStorableActions();
 
     this.collector.actionsToCollect -= 1;
     // Start our index at 0
@@ -2577,10 +2535,10 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
                 actionsToPersist.push(action);
                 var key = this.actionStoreMap[action.getId()];
                 dupes = this.getAndClearDupes(key);
-                this.singleAction(action, response, key, true);
+                this.singleAction(action, response);
                 if (dupes) {
                     for (var i = 0; i < dupes.length; i++) {
-                        this.singleAction(dupes[i], response, key, false);
+                        this.singleAction(dupes[i], response);
                     }
                 }
 
@@ -2596,10 +2554,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
         }
     }
 
-    if (this.optionBulkStorage) {
-        this.persistStorableActions(actionsToPersist);
-    }
-
+    this.persistStorableActions(actionsToPersist);
 };
 
 AuraClientService.prototype.buildStorableServerAction = function(response) {

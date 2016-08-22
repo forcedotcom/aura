@@ -26,8 +26,8 @@ import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class BootstrapTest extends UnitTestCase {
-	@Test
+public class BootstrapUnitTest extends UnitTestCase {
+    @Test
     public void testName() {
         assertEquals("bootstrap.js", new Bootstrap().getName());
     }
@@ -51,7 +51,6 @@ public class BootstrapTest extends UnitTestCase {
     public void testPublicCacheExpirationValidValue() throws Exception {
         verifyCacheHeaders(600, true);
     }
-
 
     /**
      * Verify logic setting cache-related HTTP headers in response.

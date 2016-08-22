@@ -189,7 +189,7 @@ public class Bootstrap extends AuraResourceImpl {
         json.writeMapBegin();
         json.writeMapEntry("error", t);
         json.writeMapEnd();
-        out.print(";\n" + APPEND_JS);
+        out.print(APPEND_JS);
     }
 
     /**

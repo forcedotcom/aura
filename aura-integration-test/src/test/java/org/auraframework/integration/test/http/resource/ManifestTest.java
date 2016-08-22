@@ -258,4 +258,41 @@ public class ManifestTest extends AuraImplTestCase {
         String token = matcher.group(1);
         assertEquals("Found unexpected token", expectedToken, token);
     }
+
+    @Test
+    public void testManifestContainsFallbackScripts() throws Exception {
+        // Arrange
+        if (contextService.isEstablished()) {
+            contextService.endContext();
+        }
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor("appCache:testApp", ApplicationDef.class);
+        AuraContext context = contextService.startContext(AuraContext.Mode.PROD, AuraContext.Format.MANIFEST,
+                AuraContext.Authentication.AUTHENTICATED, appDesc);
+        context.setApplicationDescriptor(appDesc);
+
+        MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        MockHttpServletResponse mockResponse = new MockHttpServletResponse();
+        ServletUtilAdapterImpl servletUtilAdapter = new ServletUtilAdapterImpl();
+        servletUtilAdapter.setClientLibraryService(new ClientLibraryServiceImpl());
+
+        Manifest manifest = new Manifest();
+        manifest.setServletUtilAdapter(servletUtilAdapter);
+
+        // Act
+        manifest.write(mockRequest, mockResponse, context);
+        String content = mockResponse.getContentAsString();
+
+        // Assert
+        // Refer to the order in ServletUtilAdapterImpl.getFrameworkFallbackScripts
+        String[] expectedScripts = new String[]{"fallback.bootstrap.js", "fallback.app.encryptionkey.js"};
+
+        String[] lines = content.split("\n");
+        int start = Arrays.asList(lines).indexOf("FALLBACK:");
+        assertTrue("Could not find FALLBACK part in appcache manifest: " + content, start >= 0);
+        for(int i = 0; i < expectedScripts.length; i++) {
+            int index = start + 1 + i;
+            assertTrue("Missing expected fallback scripts: " + content, index < lines.length);
+            assertThat("Failed to find expected fallback script", lines[index], containsString(expectedScripts[i]));
+        }
+    }
 }

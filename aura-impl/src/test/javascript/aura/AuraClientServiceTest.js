@@ -73,6 +73,9 @@ Test.Aura.AuraClientServiceTest = function() {
                     encodeForServer: function(){},
                     getCurrentAccess: function(){}
                 };
+            },
+            auraError: function(msg) {
+                this.message = msg;
             }
         },
         window:{},
@@ -938,6 +941,415 @@ Test.Aura.AuraClientServiceTest = function() {
 
             var actual = tuple[0];
             Assert.Equal(expected, actual);
+        }
+
+    }
+
+    [Fixture]
+    function saveTokenToStorage() {
+
+        [Fact]
+        function DoesNotSaveTokenToNonpersistentStorage() {
+
+            var mockSetItems = Stubs.GetMethod();
+            var mockAction = Mocks.GetMocks(Object.Global(), {
+                Action: {
+                    getStorage: function() {
+                        return {
+                            adapter:{
+                                setItems: mockSetItems
+                            },
+                            isPersistent: function() {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            });
+
+            mockGlobal(function() {
+                mockAction(function() {
+                    var targetService = new Aura.Services.AuraClientService();
+                    targetService._token = "myToken";
+
+                    targetService.saveTokenToStorage();
+                });
+            });
+
+            Assert.Equal(0, mockSetItems.Calls.length);
+        }
+
+    }
+
+    [Fixture]
+    function loadBootstrapFromStorage() {
+
+        [Fact]
+        function ReturnsResolvedPromiseWhenGlobalAppBootstrapExists() {
+            var actual;
+            var resolved = false;
+
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                Aura["appBootstrap"] = {data: "data"};
+                actual = target.loadBootstrapFromStorage();
+
+                // reset global
+                delete Aura["appBootstrap"];
+            });
+
+            actual.then(function() {
+                resolved = true;
+            });
+
+            Assert.True(resolved);
+        }
+
+        [Fact]
+        function SetsGlobalAppBootstrapCacheStatusFailedWhenStorageIsNonpersistent() {
+            var actual;
+
+            var mockAction = Mocks.GetMocks(Object.Global(), {
+                Action: {
+                    getStorage: function() {
+                        return {
+                            isPersistent: function() {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            });
+
+            mockGlobal(function() {
+                mockAction(function() {
+                    var target = new Aura.Services.AuraClientService();
+                    target.loadBootstrapFromStorage();
+                    actual = Aura["appBootstrapCacheStatus"];
+                    delete Aura["appBootstrapCacheStatus"];
+                });
+            });
+
+            Assert.Equal("failed", actual);
+        }
+
+        [Fact]
+        function SetsGlobalAppBootstrapCacheStatusFailedWhenFailToGetBootstrapFromStorage() {
+            var actual;
+
+            var mockAction = Mocks.GetMocks(Object.Global(), {
+                Action: {
+                    getStorage: function() {
+                        return {
+                            get: function() {
+                                return RejectPromise();
+                            },
+                            isPersistent: function() {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            });
+
+            mockGlobal(function() {
+                mockAction(function() {
+                    var target = new Aura.Services.AuraClientService();
+                    target.loadBootstrapFromStorage();
+                    actual = Aura["appBootstrapCacheStatus"];
+                    delete Aura["appBootstrapCacheStatus"];
+                });
+            });
+
+            Assert.Equal("failed", actual);
+        }
+
+        [Fact]
+        function SetsGlobalAppBootstrapCacheStatusFailedWhenBootstrapNotExistsInStorage() {
+            var actual;
+
+            var mockAction = Mocks.GetMocks(Object.Global(), {
+                Action: {
+                    getStorage: function() {
+                        return {
+                            get: function() {
+                                return ResolvePromise();
+                            },
+                            isPersistent: function() {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            });
+
+            mockGlobal(function() {
+                mockAction(function() {
+                    var target = new Aura.Services.AuraClientService();
+                    target.loadBootstrapFromStorage();
+                    actual = Aura["appBootstrapCacheStatus"];
+                    delete Aura["appBootstrapCacheStatus"];
+                });
+            });
+
+            Assert.Equal("failed", actual);
+        }
+
+        [Fact]
+        function SetsAppBootstrapCacheWhenSucceedToGetBootstrapFromStorage() {
+            var actual;
+            var expected = {data:"data"};
+
+            var mockAction = Mocks.GetMocks(Object.Global(), {
+                Action: {
+                    getStorage: function() {
+                        return {
+                            get: function(key) {
+                                if(key === AuraClientService.BOOTSTRAP_KEY) {
+                                    return ResolvePromise(expected);
+                                }
+                            },
+                            isPersistent: function() {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            });
+
+            mockGlobal(function() {
+                mockAction(function() {
+                    var target = new Aura.Services.AuraClientService();
+                    target.loadBootstrapFromStorage();
+                    actual = Aura["appBootstrapCache"];
+                    delete Aura["appBootstrapCache"];
+                });
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function SetsAppBootstrapCacheStatusLoadedWhenSucceedToGetBootstrapFromStorage() {
+            var actual;
+
+            var mockAction = Mocks.GetMocks(Object.Global(), {
+                Action: {
+                    getStorage: function() {
+                        return {
+                            get: function(key) {
+                                return ResolvePromise({data:"data"});
+                            },
+                            isPersistent: function() {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            });
+
+            mockGlobal(function() {
+                mockAction(function() {
+                    var target = new Aura.Services.AuraClientService();
+                    target.loadBootstrapFromStorage();
+                    actual = Aura["appBootstrapCacheStatus"];
+                    delete Aura["appBootstrapCacheStatus"];
+                });
+            });
+
+            Assert.Equal("loaded", actual);
+        }
+
+    }
+
+    [Fixture]
+    function getAppBootstrap() {
+
+        [Fact]
+        function ReturnsBootstrapFromServerIfLoaded() {
+            var actual;
+            var appBootstrap = {};
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                Aura["appBootstrapStatus"] = "loaded";
+                Aura["appBootstrap"] = appBootstrap;
+
+                try {
+                    actual = target.getAppBootstrap();
+                } finally {
+                    delete Aura["appBootstrapStatus"];
+                    delete Aura["appBootstrap"];
+                    delete document.cookie;
+                }
+            });
+
+            Assert.True(actual.source === "network" && actual.value === appBootstrap);
+        }
+
+        [Fact]
+        function ReturnsCachedBootstrapIfServerDataIsLoadingAndCachedDataIsLoadedForParallelLoading() {
+            var actual;
+            var appBootstrap = {};
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                Aura["appBootstrapStatus"] = undefined;
+                Aura["appBootstrapCacheStatus"] = "loaded";
+                Aura["appBootstrapCache"] = appBootstrap;
+                target.getParallelBootstrapLoad = function() {
+                    return true;
+                }
+
+                try {
+                    actual = target.getAppBootstrap();
+                } finally {
+                    delete Aura["appBootstrapStatus"];
+                    delete Aura["appBootstrapCacheStatus"];
+                    delete Aura["appBootstrapCache"];
+                }
+            });
+
+            Assert.True(actual.source === "cache" && actual.value === appBootstrap);
+        }
+
+        [Fact]
+        function ReturnsUndefinedIfServerDataIsLoadingForSerialLoading() {
+            var actual;
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                Aura["appBootstrapStatus"] = undefined;
+                // Even if cached data is loaded from storage
+                Aura["appBootstrapCacheStatus"] = "loaded";
+
+                try {
+                    target.setParallelBootstrapLoad(false);
+                    actual = target.getAppBootstrap();
+                } finally {
+                    delete Aura["appBootstrapCacheStatus"];
+                    delete Aura["appBootstrapStatus"];
+                }
+            });
+
+            Assert.Undefined(actual);
+        }
+
+        [Fact]
+        function ReturnsCachedBootstrapIfServerDataFailsForSerialLoading() {
+            var actual;
+            var appBootstrap = {};
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                Aura["appBootstrapStatus"] = "failed";
+                Aura["appBootstrapCacheStatus"] = "loaded";
+                Aura["appBootstrapCache"] = appBootstrap;
+
+                try {
+                    target.setParallelBootstrapLoad(false);
+                    actual = target.getAppBootstrap();
+                } finally {
+                    delete Aura["appBootstrapStatus"];
+                    delete Aura["appBootstrapCacheStatus"];
+                    delete Aura["appBootstrapCache"];
+                }
+            });
+
+            Assert.True(actual.source === "cache" && actual.value === appBootstrap);
+        }
+
+        [Fact]
+        function ReturnsUndefinedIfServerDataIsLoadingAndCachedDataFailsForParallelLoading() {
+            var actual;
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                Aura["appBootstrapStatus"] = undefined;
+                Aura["appBootstrapCacheStatus"] = "failed";
+                target.getParallelBootstrapLoad = function() {
+                    return true;
+                }
+
+                try {
+                    actual = target.getAppBootstrap();
+                } finally {
+                    delete Aura["appBootstrapStatus"];
+                    delete Aura["appBootstrapCacheStatus"];
+                }
+            });
+
+            Assert.Undefined(actual);
+        }
+
+        [Fact]
+        function ReturnsCachedBootstrapIfServerDataFailsAndCachedDataIsLoadedForSerialLoading() {
+            var actual;
+            var appBootstrap = {};
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                Aura["appBootstrapStatus"] = "failed";
+                Aura["appBootstrapCacheStatus"] = "loaded";
+                Aura["appBootstrapCache"] = appBootstrap;
+
+                try {
+                    target.setParallelBootstrapLoad(false);
+                    actual = target.getAppBootstrap();
+                } finally {
+                    delete Aura["appBootstrapStatus"];
+                    delete Aura["appBootstrapCacheStatus"];
+                    delete Aura["appBootstrapCache"];
+                }
+            });
+
+            Assert.True(actual.source === "cache" && actual.value === appBootstrap);
+        }
+
+        [Fact]
+        function ThrowsErrorWhenBootstrapBothFailAndAppcacheHasNoRecovery() {
+            var actual;
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                Aura["appBootstrapStatus"] = "failed";
+                Aura["appBootstrapCacheStatus"] = "failed";
+
+                window.applicationCache = {
+                    UNCACHED: 0,
+                    IDLE: 1,
+                    status: 0 //UNCACHED
+                };
+
+                try {
+                    target.setParallelBootstrapLoad(false);
+                    actual = target.getAppBootstrap();
+                    Assert.fail("Expecting an error.");
+                } catch(e) {
+                    var expected = "AuraClientService.getAppBootstrap: bootstrap.js failed to load from network or cache";
+                    Assert.Equal(expected, e.message);
+                } finally {
+                    delete window["applicationCache"];
+                    delete Aura["appBootstrapStatus"];
+                    delete Aura["appBootstrapCacheStatus"];
+                }
+            });
+        }
+
+        [Fact]
+        function EnablesParallelBootstrapWhenBootstrapIsLoadedFromServerForParallelLoading() {
+            var actual;
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                document.cookie = undefined;
+                Aura["appBootstrapStatus"] = "loaded";
+
+                try {
+                    target.setParallelBootstrapLoad(true);
+                    target.getAppBootstrap();
+
+                    // Since we expire cookie to remove auraDisableBootstrapCache, verifying cookie string
+                    // here VS. calling getParallelBootstrapLoad().
+                    var expected = "auraDisableBootstrapCache=true; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                    Assert.Equal(expected, document.cookie);
+                } finally {
+                    delete Aura["appBootstrapStatus"];
+                    delete document.cookie;
+                }
+            });
         }
 
     }

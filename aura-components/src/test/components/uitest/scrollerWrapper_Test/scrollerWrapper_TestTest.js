@@ -19,7 +19,7 @@
 	 * property set to translate3d(0,0,0)
 	 */
 	testTransform : {
-		browsers : [ "IPHONE, IPAD" ],
+		browsers : [ "IPHONE", "IPAD" ],
 		test : function(component) {
 			var lyricsSty1 = this.getTransformValue(component, "lyrics1.1"), 
 				lyricsSty2 = this.getTransformValue(component, "lyrics1.2");
@@ -34,7 +34,7 @@
 	 * not have a transform CSS property set
 	 */
 	testSkipTransform : {
-		browsers : [ "IPHONE, IPAD" ],
+		browsers : [ "IPHONE", "IPAD" ],
 		test : function(component) {
 			// debugger;
 			var lyricsSty1 = this.getTransformValue(component, "lyrics2.1"), lyricsSty2 = this

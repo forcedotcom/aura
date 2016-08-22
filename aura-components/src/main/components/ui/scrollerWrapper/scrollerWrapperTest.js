@@ -34,7 +34,7 @@
 	 * When using IOS there should be a scrollingOnIOS class
 	 */
 	testClassAttributeIOS : {
-		browsers : [ "IPHONE, IPAD" ],
+		browsers : [ "IPHONE", "IPAD" ],
 		test : function(component) {
 			$A.test.assertTrue($A.util.hasClass(component, "scrollingOnIOS"),
 					"There should be a scrollingOnIOS class");
@@ -45,7 +45,7 @@
 	 * When using nonIOS there should NOT be a scrollingOnIOS class
 	 */
 	testClassAttributeNonIOS : {
-		browsers : [ "-IPHONE, -IPAD" ],
+		browsers : [ "-IPHONE", "-IPAD" ],
 		test : function(component) {
 			$A.test.assertFalse($A.util.hasClass(component, "scrollingOnIOS"),
 					"There should NOT be a scrollingOnIOS class");

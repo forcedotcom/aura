@@ -61,6 +61,8 @@
     },
 
     testGvpsAreLoadedFromStorageWhenOffline: {
+        // TODO: W-3306953
+        labels : ["flapper"],
         test: [
             function setLabelToStorage(cmp) {
                 var completed = false;
@@ -73,12 +75,39 @@
                         }
                     }
                 };
+
                 storage.set("globalValueProviders", [item]).then(
-                    function() {
+                    function() { completed = true; },
+                    function(e) {
+                        $A.test.fail("Failed to save label to storage: " + e.toString());
+                    }
+                );
+                $A.test.addWaitFor(true, function() { return completed; });
+            },
+            // for debugging only. remove it if found the flapping cause.
+            function verifyLabelInStorage(cmp) {
+                var completed = false;
+                var gvpKey = "globalValueProviders";
+                var storage = $A.storageService.getStorage("actions");
+
+                $A.test.assertTrue(storage.isPersistent(), "The test expects a persistent storage.");
+
+                storage.get("globalValueProviders").then(
+                    function(gvps) {
+                        var labels;
+                        for(var i = 0, len = gvps.length; i < len ;i++) {
+                            if("$Label" === gvps[i]["type"]) {
+                                labels = gvps[i]["values"];
+                                break;
+                            }
+                        }
+
+                        $A.test.assertDefined(labels["section"]);
+                        $A.test.assertEquals("expected", labels["section"]["name"]);
                         completed = true;
                     },
                     function(e) {
-                        $A.test.fail(e.toString());
+                        $A.test.fail("Failed to find stored label from storage: " + e.toString());
                     }
                 );
                 $A.test.addWaitFor(true, function() { return completed; });

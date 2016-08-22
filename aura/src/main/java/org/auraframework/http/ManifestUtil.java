@@ -32,8 +32,6 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.net.HttpHeaders;
-
 /**
  * A set of manifest utilities.
  *

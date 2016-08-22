@@ -46,7 +46,6 @@ import com.google.common.io.LineReader;
 public class AppCacheManifestHttpTest extends AuraHttpTestCase {
 
     private static final String APPCACHE_SUPPORTED_USERAGENT = UserAgent.GOOGLE_CHROME.getUserAgentString();
-    private static final String APPCACHE_UNSUPPORTED_USERAGENT = UserAgent.EMPTY.getUserAgentString();
     private static final Pattern HTML_MANIFEST_PATTERN = Pattern.compile("<html[^>]* manifest=\"(.*?)\"[^>]*>");
 
     private String getManifestURL(String appPath, Mode mode, boolean expectNull) throws Exception {

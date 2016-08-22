@@ -36,9 +36,8 @@
 	testSkipTransform : {
 		browsers : [ "IPHONE", "IPAD" ],
 		test : function(component) {
-			// debugger;
-			var lyricsSty1 = this.getTransformValue(component, "lyrics2.1"), lyricsSty2 = this
-					.getTransformValue(component, "lyrics2.2");
+			var lyricsSty1 = this.getTransformValue(component, "lyrics2.1"), 
+				lyricsSty2 = this.getTransformValue(component, "lyrics2.2");
 
 			$A.test.assertEquals("none", lyricsSty1, "There should not be a transform CSS property");
 			$A.test.assertEquals("none", lyricsSty2, "There should not be a transform CSS property");

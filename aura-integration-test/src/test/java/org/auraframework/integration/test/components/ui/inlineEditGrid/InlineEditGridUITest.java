@@ -39,7 +39,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 @TargetBrowsers({BrowserType.GOOGLECHROME, BrowserType.FIREFOX, BrowserType.IE11})
 public class InlineEditGridUITest extends WebDriverTestCase {
 
-    private final String inlineURL = "uitest/inlineEdit_Test.cmp";
+    private final String inlineURL = "/uitest/inlineEdit_Test.cmp";
     private final String ACTIVE_CELL_CLASS = ".slds-has-focus";
     private final String BUTTON_SELECTORS = ".uiButton";
     private final String EDIT_TRIGGER_SELECTOR = ".slds-has-focus .slds-cell-edit__button";
@@ -180,7 +180,7 @@ public class InlineEditGridUITest extends WebDriverTestCase {
      */
     @Test
     public void testInlineEditKeyNavCellNavigateTo() throws Exception {
-    	open("uitest/inlineEditKeyNavCell_test.cmp");
+    	open("/uitest/inlineEditKeyNavCell_test.cmp");
     	WebDriver driver = getDriver();
         switchKeyboardMode(driver);
         

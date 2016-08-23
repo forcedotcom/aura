@@ -220,6 +220,7 @@
         
         if (cmp.returnFocus) {
             cmp.returnFocus.focus();
+            cmp.returnFocus = null;
         }
 
         // Notify the destroy

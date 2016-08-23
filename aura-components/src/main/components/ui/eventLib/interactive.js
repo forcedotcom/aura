@@ -76,14 +76,6 @@ function lib() { //eslint-disable-line no-unused-vars
                 return;
             }
 
-            // we need to use the rendering component for the element otherwise we get multiple component
-            // registrations for the same element and therefore duplicate events @bug W-2987574@
-            // this happens when a ui:input contains another ui:input (which really shouldn't be happening!)
-            var renderingCmp = $A.componentService.getRenderingComponentForElement(element);
-            if (!renderingCmp) {
-                renderingCmp = component;
-            }
-            var globalId = renderingCmp.getGlobalId();
             var handler = $A.getCallback(this.domEventHandler);
             var elementId = this.getUid(element) || this.newUid(element);
 
@@ -92,22 +84,18 @@ function lib() { //eslint-disable-line no-unused-vars
             // We're doing this cause of the $A.getCallback() we need to wrap domEventHandler in.
             // Since its a new function, we lose native dom deduping. So we ensure we only add one per component
             // per event.
-            if(!this.domEventMap[globalId]) {
-                this.domEventMap[globalId] = {};
+            if(!this.domEventMap[elementId]) {
+                this.domEventMap[elementId] = {};
             }
-            
-            if(!this.domEventMap[globalId][elementId]) {
-                this.domEventMap[globalId][elementId] = {};
-            }
-            
+
             // Already present, so we'll need to remove it before adding it.
-            var existing = this.domEventMap[globalId][elementId][event];
+            var existing = this.domEventMap[elementId][event];
             if(existing) {
                 // If we've already added a handler for this component / event combo, remove it first.
                 $A.util.removeOn(element, event, existing);
             }
             
-            this.domEventMap[globalId][elementId][event] = handler;
+            this.domEventMap[elementId][event] = handler;
         },
 
         /**
@@ -137,7 +125,6 @@ function lib() { //eslint-disable-line no-unused-vars
                 return;
             }
 
-            var renderingComponent;
             var elementId = this.getUid(element);
             if (!elementId) {
                 // component.getElement() doesn't return an input element
@@ -145,17 +132,13 @@ function lib() { //eslint-disable-line no-unused-vars
                 var inputElement = element.getElementsByTagName('input')[0] || element.getElementsByTagName('textarea')[0];
                 if (inputElement) {
                     elementId = this.getUid(inputElement);
-                    renderingComponent = $A.componentService.getRenderingComponentForElement(inputElement);
                     element = inputElement;
                 }
             }
 
-            renderingComponent = renderingComponent || component;
-            var globalId = renderingComponent.getGlobalId();
-
             // clean up handler references and map entries
-            if(globalId && elementId && this.domEventMap.hasOwnProperty(globalId)) {
-                var eventHandlers = this.domEventMap[globalId][elementId];
+            if(elementId && this.domEventMap.hasOwnProperty(elementId)) {
+                var eventHandlers = this.domEventMap[elementId];
                 for (var event in eventHandlers) {
                     var existing = eventHandlers[event];
                     if(existing) {
@@ -163,8 +146,7 @@ function lib() { //eslint-disable-line no-unused-vars
                     }
                 }
 
-                delete this.domEventMap[globalId][elementId];
-                delete this.domEventMap[globalId];
+                delete this.domEventMap[elementId];
             }
         },
 

@@ -47,6 +47,9 @@
         if (cmp.isDirty("v.disabled")) {
             helper.handleDisabled(cmp);
         }
-    }
+    },
 
+    unrender: function(component, helper) {
+        helper.lib.interactive.removeDomEventsFromMap(component);
+    }
 });

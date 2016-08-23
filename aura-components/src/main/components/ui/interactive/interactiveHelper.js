@@ -44,31 +44,26 @@
      */
     addDomHandler : function(component, event) {
         var element = component.getElement();
-        var globalId = component.getGlobalId();
         var elementId = this.getUid(element) || this.newUid(element);
-        
+
         var handler = $A.getCallback(this.domEventHandler);
         $A.util.on(element, event, handler);
 
         // We're doing this cause of the $A.getCallback() we need to wrap domEventHandler in.
         // Since its a new function, we lose native dom deduping. So we ensure we only add one per component
         // per event.
-    	if(!this.domEventMap[globalId]) {
-    		this.domEventMap[globalId] = {};
-    	}
-    	
-        if(!this.domEventMap[globalId][elementId]) {
-        	this.domEventMap[globalId][elementId] = {};
+        if(!this.domEventMap[elementId]) {
+        	this.domEventMap[elementId] = {};
         }
         
         // Already present, so we'll need to remove it before adding it.
-        var existing = this.domEventMap[globalId][elementId][event];
+        var existing = this.domEventMap[elementId][event];
         if(existing) {
         	// If we've already added a handler for this component / event combo, remove it first.
         	$A.util.removeOn(element, event, existing);
         }
         
-        this.domEventMap[globalId][elementId][event] = handler;
+        this.domEventMap[elementId][event] = handler;
     },
 
     /**
@@ -93,9 +88,24 @@
      * the Map doesn't continiously grow.
      */
     removeDomEventsFromMap:  function(component) {
-        var globalId = component.getGlobalId();
-        if(this.domEventMap.hasOwnProperty(globalId)) {
-            this.domEventMap[globalId] = undefined;
+        var element = component.getElement();
+        if (!element) {
+            return;
+        }
+
+        var elementId = this.getUid(element);
+
+        // clean up handler references and map entries
+        if(elementId && this.domEventMap.hasOwnProperty(elementId)) {
+            var eventHandlers = this.domEventMap[elementId];
+            for (var event in eventHandlers) {
+                var existing = eventHandlers[event];
+                if(existing) {
+                    $A.util.removeOn(element, event, existing);
+                }
+            }
+
+            delete this.domEventMap[elementId];
         }
     },
 

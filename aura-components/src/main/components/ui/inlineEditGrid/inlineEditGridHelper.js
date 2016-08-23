@@ -219,6 +219,65 @@
 	    map[name] = 'value';
 	    return map;
 	},
+	/*
+	 * Retrieving the status object, testing to see if the value has been edited by comparing the new value to the
+	 * original value. Returns an object with the name and edited set to true or false:
+	 * Example:
+	 * Name = "Account.Id"
+	 * returned object will be { "Account" :{ "Id": { edited: true }}} 
+	 * @param item  - contains the original value
+	 * @param updateMap - Map used to get the name of cell that has been updated, we need the dot notation if it is present.
+	 * @param values - new values
+	 * @return object 
+	 */
+	getEditedStatus: function(item, values, updateMap){
+		// Here we are testing to see if the value has been edited (changed from its previous value)
+		var editedStatus = {};
+		var edited;
+
+		// Using the updateMap because it will not be a nested object at this point so if there is dot notation present, it is preserved here
+		for (var name in updateMap){
+			var value = values[name];
+
+			// Checking to see if the value has been edited
+			// Preparing to test for any keys that have dot notation
+			var keys = name.split('.');
+			var keysLen = keys.length;
+			var originalValue = item;
+
+			// Construct the "originalValue"
+			for (var i=0;i<keysLen;i++){
+				// If the original value is an object continue drilling down
+				if ($A.util.isObject(originalValue)) {
+					originalValue = originalValue[keys[i]];
+				}
+			}						
+
+			// If the value has changed set edited to true. 
+			if(originalValue!==value){
+				edited = true;
+			} else {
+				edited = false;
+			}	
+
+			this.updateNestedMap(editedStatus, name+".edited", edited);
+
+			return editedStatus;
+
+		}
+	},
+	updateNestedMap : function(inputMap, name, value) {
+		var keys = name.split(".");
+		var map = inputMap;
+		
+		// In case the name is in dot notation (ex. record.Account.Name), we need to create nested mappings
+		for (var i = 0; i < keys.length - 1; i++) {
+			var key = keys[i];
+			map[key] = map[key] || {};
+			map = map[key];
+		}
+		map[keys[keys.length - 1]] = value;
+	},
 
 	/* UTILITY FUNCTIONS */
 	bubbleEvent : function(cmp, evt, eventName) {

@@ -28,14 +28,12 @@
 
 	_submit : function(cmp) {
 		var values = {},
-			status = {},
 			updateMap = cmp.get("v.updateMap");
 		if (updateMap) {
 			// Construct the map of name : updated input values
 			for (var name in updateMap) {
 				var value = cmp.get("v.inputComponent")[0].get("v." + updateMap[name]);
 				this.updateNestedMap(values, name, value);
-				this.updateNestedMap(status, name+".edited", true);
 			}
 		}
 
@@ -43,7 +41,7 @@
 			payload : {
 				index : cmp.get("v.index"),
 				values : values,
-				status : status
+				updateMap: updateMap // Need to pass the update map so that we preserve the dot notation on the name (if available)
 			}
 		}).fire();
 	},

@@ -62,10 +62,13 @@
 	    
 		var payload = evt.getParam("payload");
 		var values = payload.values;
-		var status = payload.status;
 		var index = payload.index;
 		var item = items[index];
-		
+		var updateMap = payload.updateMap;
+
+		// Retrieving the edited status object of the item (edited = true || false)
+		var status = helper.getEditedStatus(item[dataVar], values, updateMap);
+
 		// TODO: Move into preprocessing logic when items are initially set
 		item.status = item.status || {};
 		

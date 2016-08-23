@@ -14,20 +14,29 @@
  * limitations under the License.
  */
 ({
-	/**
-	 * ui:outputDate formatDate in its afterRender, if ui:label's afterRender is not called, we won't see any date.
-	 */
+    /**
+     * ui:outputDate formatDate in its afterRender, if ui:label's afterRender is not called, we won't see any date.
+     */
     testAfterRenderCalled : {
-    	attributes : {value: "{0}"},
-    	test: [
-    		function(cmp) {
-	    		var outputDateInLabelCmp = cmp.find("outputDateInLabel");
-	    		var expected = "Sep 8, 2015";
-	    		var actual;
-	    		actual = $A.test.getText(outputDateInLabelCmp.getElement());
-	    		$A.test.assertEquals(expected, actual);
-	    	}
-	    ]
+        attributes : {value: "{0}"},
+        test: [
+            function(cmp) {
+                var outputDateElementInLabelCmp = cmp.find("outputDateInLabel").getElement();
+                var expected = "Sep 8, 2015";
+                var actual;
+
+                $A.test.addWaitForWithFailureMessage(true,
+                    function() {
+                        actual = $A.test.getText(outputDateElementInLabelCmp);
+                        return !!actual;
+                    },
+                    "ui:label's afterRender may not get called.",
+                    function() {
+                        $A.test.assertEquals(expected, actual, "Failed to find expected date.");
+                    }
+                );
+            }
+        ]
     },
 
     testValueEmpty: {
@@ -51,12 +60,12 @@
             $A.test.assertEquals("just text", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution");
             $A.test.assertEquals("testjust text", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label");
         }, function checkLabelInsideIf(component) {
-        	 $A.test.assertEquals("just text", $A.test.getText(component.find("testBodyEmptyWithIf").getElement()), "value not expected for testBodyEmptyWithIf");
+             $A.test.assertEquals("just text", $A.test.getText(component.find("testBodyEmptyWithIf").getElement()), "value not expected for testBodyEmptyWithIf");
         }, function toggleIf(component) {
-        	 component.set("v.valueElse", "just text else");
-        	 component.set("v.booleanForIf", false);
+             component.set("v.valueElse", "just text else");
+             component.set("v.booleanForIf", false);
         }, function verifyValueChange(component) {
-        	 $A.test.assertEquals("just text else", $A.test.getText(component.find("testBodyEmptyWithIf").getElement()), "value not expected for testBodyEmptyWithIf after toggle If");
+             $A.test.assertEquals("just text else", $A.test.getText(component.find("testBodyEmptyWithIf").getElement()), "value not expected for testBodyEmptyWithIf after toggle If");
         }
         ]
     },
@@ -187,8 +196,8 @@
         },
         test: [function(component){
             $A.test.assertEquals("blah - meh", $A.test.getText(component.find("bodyWithString").getElement()), "value not expected for text node substitution");
-        	component.set("v.string", "60");
-        },	function(component){
+            component.set("v.string", "60");
+        },  function(component){
             $A.test.assertEquals("blah 60 meh", $A.test.getText(component.find("bodyWithString").getElement()), "value not expected for text node substitution");
         }]
     }

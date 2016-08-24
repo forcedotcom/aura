@@ -128,8 +128,8 @@
      /**
       * Test editing multiple cells opens and closes appropriate panel for cell.
       */
-     testEditPanelForMulitpleCells : {
-         // TODO(W-3306269): Flapping heavily on Jenkins autobuilds
+     // TODO(W-3306269): Flapping so heavily on Jenkins autobuilds the flapper annotation is not sufficient
+     _testEditPanelForMulitpleCells : {
          labels: ["flapper"],
          test : [function(cmp) {
              this.triggerEditOnCell(cmp, 0, 2);

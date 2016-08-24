@@ -13,23 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
+({
+	click: function(cmp, event, helper) {
+	   console.log("test anchor clicked");
+	}
+})
 
-import java.util.Map;
-
-public interface LocatorDef extends Definition, ParentedDef {
-
-    @Override
-    DefDescriptor<LocatorDef> getDescriptor();
-
-    @Override
-    public String getDescription();
-
-    public String getTarget();
-    
-    public String getAlias();
-    
-    public Boolean getIsPrimitive();
-
-    public Map<String, Object> getLocatorContextMap();
-}

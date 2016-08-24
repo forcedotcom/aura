@@ -22,6 +22,7 @@
  */
 function AuraExpressionService() {
     this.references={};
+    this.PRIMITIVE_SEPARATOR = "__";
 }
 
 AuraExpressionService.prototype.getReference = function (expression, valueProvider) {
@@ -300,15 +301,18 @@ AuraExpressionService.prototype.resolveLocatorContext = function (cmp, locatorDe
     return context;
 };
 
+
 /**
  * @param component The component that contains the locator defining localId
  * @param localId The ID of the locator that needs resolving
+ * @param primitiveFound The ID of the primitive if any that's been found
  * @returns This will produce a locator object giving the localId of the component that the locator 
  * refers to, along with the localId of the lexical scope owner of 'component'
  */
-AuraExpressionService.prototype.resolveLocator = function (component, localId) {
+AuraExpressionService.prototype.resolveLocator = function (component, localId, primitiveFound) {
     var ownerLocalId = component.getLocalId();
     var locator;
+    
 
     if (!localId || !ownerLocalId) {
         return locator;
@@ -329,15 +333,32 @@ AuraExpressionService.prototype.resolveLocator = function (component, localId) {
         return locator;
     }
 
+    var rootLocatorDefs = currentCmp.getDef().getLocatorDefs();
+    var rootLocatorDef = rootLocatorDefs && rootLocatorDefs[localId];
+    
+    // figure out if we need to jump another level
+    if (rootLocatorDef) {
+        if (rootLocatorDef["isPrimitive"] && !primitiveFound) {
+            primitiveFound =  {};
+            primitiveFound["target"] = rootLocatorDef["alias"] || localId;
+            // resolve the locatorContext at this point since we have access to the primitive hosting component
+            primitiveFound["resolvedContext"] = this.resolveLocatorContext(currentCmp, rootLocatorDef);
+            localId = currentCmp.getLocalId();
+            // Skip this component since it's a primitive. move up the lexical scope chain
+            currentCmp = currentCmp.getComponentValueProvider();
+            return this.resolveLocator(currentCmp, localId, primitiveFound);
+        } else if (primitiveFound && primitiveFound["resolvedContext"]) {
+            // merge resolved context from primitive
+            rootLocatorDef["context"] = $A.util.apply(rootLocatorDef["context"] || {}, primitiveFound["resolvedContext"] );
+        }
+    }
+    
     var ownerCmp = component.getComponentValueProvider();
 
     if (ownerCmp.isInstanceOf('ui:virtualComponent')) {
         ownerCmp = ownerCmp.getComponentValueProvider();
     }
     
-    var rootLocatorDefs = currentCmp.getDef().getLocatorDefs();
-    var rootLocatorDef = rootLocatorDefs && rootLocatorDefs[localId];
-
     var ownerLocatorDefs = ownerCmp.getDef().getLocatorDefs();
     var ownerLocatorDef = ownerLocatorDefs && ownerLocatorDefs[ownerLocalId];
     
@@ -359,6 +380,10 @@ AuraExpressionService.prototype.resolveLocator = function (component, localId) {
     // Apply aliases from target and scope as needed
     locator["target"] = rootLocatorDef["alias"] || localId;
     locator["scope"] = ownerLocatorDef["alias"] || ownerLocalId;
+    
+    if (primitiveFound) {
+        locator["target"] = locator["target"] + this.PRIMITIVE_SEPARATOR + primitiveFound["target"];
+    }
     
     return locator;
 };

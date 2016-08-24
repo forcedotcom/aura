@@ -39,6 +39,7 @@ public class LocatorDefImpl extends DefinitionImpl<LocatorDef> implements Locato
     private transient String target = null;
     private Map<String, Object> locatorContextDefs = null;
 	private String alias = null;
+	private Boolean isPrimitive = null;
 
     private static final long serialVersionUID = -6148857447543915255L;
 
@@ -47,6 +48,7 @@ public class LocatorDefImpl extends DefinitionImpl<LocatorDef> implements Locato
         this.target = builder.target;
         this.alias = builder.alias;
         this.locatorContextDefs = AuraUtil.immutableMap(builder.locatorContextDefs);
+        this.isPrimitive = builder.isPrimitive;
     }
 
     @Override
@@ -72,6 +74,10 @@ public class LocatorDefImpl extends DefinitionImpl<LocatorDef> implements Locato
             json.writeMapEntry("alias", this.alias);
         }
         
+        if (this.isPrimitive != null) {
+            json.writeMapEntry("isPrimitive", this.isPrimitive);
+        }
+        
         json.writeMapEnd();
     }
 
@@ -94,12 +100,18 @@ public class LocatorDefImpl extends DefinitionImpl<LocatorDef> implements Locato
     public String getAlias() {
         return this.alias;
     }
+    
+    @Override
+    public Boolean getIsPrimitive() {
+        return this.isPrimitive;
+    }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<LocatorDef> {
 
         private String target;
         private Map<String, Object> locatorContextDefs;
 		private String alias = null;
+		private Boolean isPrimitive = null;
 
         public Builder() {
             super(LocatorDef.class);
@@ -123,8 +135,18 @@ public class LocatorDefImpl extends DefinitionImpl<LocatorDef> implements Locato
             return this;
         }
 
-        public void setAlias(String alias) {
+        public Builder setAlias(String alias) {
             this.alias = alias;
+            return this;
+        }
+        
+        public Builder setIsPrimitive(Boolean isPrimitive) {
+            this.isPrimitive = isPrimitive;
+            return this;
+        }
+        
+        public Boolean getIsPrimitive() {
+            return this.isPrimitive;
         }
 
     }
@@ -133,4 +155,5 @@ public class LocatorDefImpl extends DefinitionImpl<LocatorDef> implements Locato
     public Map<String, Object> getLocatorContextMap() {
         return locatorContextDefs;
     }
+
 }

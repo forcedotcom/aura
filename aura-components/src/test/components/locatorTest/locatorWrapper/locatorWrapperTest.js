@@ -33,8 +33,8 @@
         var actualScope = actualLocator.scope;
         var actualContext = actualLocator.context;
         
-        $A.test.assertEquals(expectedTarget, actualTarget);
-        $A.test.assertEquals(expectedScope, actualScope);
+        $A.test.assertEquals(expectedTarget, actualTarget, "Target Mismatch");
+        $A.test.assertEquals(expectedScope, actualScope, "Scope Mismatch");
         
         if (!expectedContext) {
             $A.test.assertUndefined(actualContext);
@@ -91,6 +91,16 @@
                         // keyRef is set from a data-keyRef attribute on the inner div
                         "keyRef": cmp.find("locatorWrapperIdWithDefActual").get("v.innerTextValue")
                         // there is no parent key for this locator
+                    });
+        }
+    },
+    testParentWithAuraIdLocatorChildAnchorWithLocatorPrimitive: {
+        test: function (cmp) {
+            var trx = this.clickDivAndGetTransaction($A.util.format(".{0} .{1}", "locatorWrapperIdWithDef", "primitiveAnchor"));
+            this.validateLocatorResult(trx.context.locator, "innerAnchorWrapper__primitiveAnchor" /*target*/, "locatorWrapperIdWithDef" /*scope*/, 
+                    {
+                        "parentKey": cmp.get("v.wrapperText"),
+                        "primitiveKey": "primitiveValue"
                     });
         }
     }

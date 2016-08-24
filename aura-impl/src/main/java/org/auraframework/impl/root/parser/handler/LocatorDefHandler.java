@@ -39,7 +39,8 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
     private static String ATTRIBUTE_TARGET = "target";
     private static String ATTRIBUTE_DESCRIPTION = "description";
     private static String ATTRIBUTE_ALIAS = "alias";
-    private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_TARGET, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ALIAS);
+    private static String ATTRIBUTE_ISPRIMITIVE = "isPrimitive";
+    private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_TARGET, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ALIAS, ATTRIBUTE_ISPRIMITIVE);
 
     private final LocatorDefImpl.Builder builder = new LocatorDefImpl.Builder();
 
@@ -85,6 +86,7 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
         String description = getAttributeValue(ATTRIBUTE_DESCRIPTION);
         String target = getAttributeValue(ATTRIBUTE_TARGET);
         String alias = getAttributeValue(ATTRIBUTE_ALIAS);
+        String isPrimitive = getAttributeValue(ATTRIBUTE_ISPRIMITIVE);
 
         if (AuraTextUtil.isNullEmptyOrWhitespace(target)) {
             error("The attribute '%s' is required on '<%s>'.", ATTRIBUTE_TARGET, TAG);
@@ -100,6 +102,10 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
         
         if (!AuraTextUtil.isNullEmptyOrWhitespace(alias)) {
         	builder.setAlias(alias);
+        }
+        
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(isPrimitive)) {
+            builder.setIsPrimitive(Boolean.parseBoolean(isPrimitive));
         }
     }
 

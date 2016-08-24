@@ -24,6 +24,7 @@
     </aura:locator>
     
     <aura:locator target="innerWithAuraIdDataRef" description="Inner Div with auraID and data ref attributes on dom element"/>
+    <aura:locator target="innerAnchorWrapper" description="target expected for innerAnchorWrapper"/>
     
     <div class="innerWithAuraIdLocator" aura:id="innerWithAuraIdLocator" onclick="{!c.clickHandler}">
         {!v.innerTextValue + ' | inner has auraid and locator'}
@@ -41,4 +42,5 @@
         {!v.innerTextValue + ' | inner has auraid without locator def but uses data-refid'}
     </div>
     
+    <locatorTest:locatorTestAnchor aura:id="innerAnchorWrapper"/>
 </aura:component>

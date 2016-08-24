@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    browsers: ["-IE7", "-IE8"],
+    browsers: ["-IE7", "-IE8", "-IPHONE", "-IPAD"],
     COLUMN_IDS: ["id", "name", "id"],
     
     /**

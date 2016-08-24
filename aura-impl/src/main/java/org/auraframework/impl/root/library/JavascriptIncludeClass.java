@@ -133,7 +133,7 @@ public class JavascriptIncludeClass extends BaseJavascriptClass {
 			
 			try {
 				StringWriter sw = new StringWriter();
-				List<JavascriptProcessingError> codeErrors = JavascriptWriter.CLOSURE_WHITESPACE.compress(include, sw, getFilename());
+				List<JavascriptProcessingError> codeErrors = JavascriptWriter.CLOSURE_LIBRARY.compress(include, sw, getFilename());
 				validateCodeErrors(codeErrors);
 				StringBuffer sb = sw.getBuffer();
 				sb.deleteCharAt(sb.length() - 1);

@@ -20,8 +20,11 @@ import java.util.*;
 
 import org.auraframework.util.IOUtil;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.google.javascript.jscomp.*;
 import com.google.javascript.jscomp.CompilerOptions.LanguageMode;
+
 import com.google.javascript.jscomp.Compiler;
 
 /**
@@ -34,6 +37,23 @@ public enum JavascriptWriter {
         public void setClosureOptions(CompilerOptions options) {
             CompilationLevel.WHITESPACE_ONLY.setOptionsForCompilationLevel(options);
             options.setPrettyPrint(true);
+        }
+    },
+    
+    CLOSURE_LIBRARY {
+        @Override
+        public void setClosureOptions(CompilerOptions options) {
+            CompilationLevel.WHITESPACE_ONLY.setOptionsForCompilationLevel(options);
+            options.setPrettyPrint(true);
+
+            
+        }
+        @Override
+        public void setCustomPasses(CompilerOptions options, AbstractCompiler compiler) {
+        	Multimap<CustomPassExecutionTime, CompilerPass> passes = ArrayListMultimap.create();
+        	passes.put(CustomPassExecutionTime.AFTER_OPTIMIZATION_LOOP, new JavascriptASTCommentSymbolsPass(compiler));
+        	options.setCustomPasses(passes);
+        	options.setSkipAllPasses(false);
         }
     },
 
@@ -110,6 +130,11 @@ public enum JavascriptWriter {
 
     /** Gets the Closure CompilationLevel for this compression. */
     public abstract void setClosureOptions(CompilerOptions options);
+    
+    /** Set custom passes. */
+    public void setCustomPasses (CompilerOptions options, AbstractCompiler compiler) {
+    	return;
+    }
 
     /**
      * To remove global namespace pollution, we wrap the compiled code inside a private scope by default.
@@ -221,7 +246,6 @@ public enum JavascriptWriter {
             }
         }
 
-        setClosureOptions(options);
 
         // Disable reporting non-standard jsdoc comments as warnings. Should have been able to do:
         // options.setWarningLevel(DiagnosticGroups.NON_STANDARD_JSDOC, CheckLevel.OFF);
@@ -229,6 +253,8 @@ public enum JavascriptWriter {
 
         try {
             Compiler compiler = new Compiler();
+            setClosureOptions(options);
+            setCustomPasses(options, compiler);
 
             // use a custom error manager so that we can keep the error source code snippet
             // it makes more sense for the line and char number with the code snippet.
@@ -269,7 +295,9 @@ public enum JavascriptWriter {
         return msgs;
     }
 
-    // Diagnostic type appears to be inconsistent with DiagnosticGroups.NON_STANDARD_JSDOC -
+
+
+	// Diagnostic type appears to be inconsistent with DiagnosticGroups.NON_STANDARD_JSDOC -
     // https://code.google.com/p/closure-compiler/issues/detail?id=1156
     private static final WarningsGuard NON_STANDARD_JSDOC_GUARD = new WarningsGuard() {
         private static final long serialVersionUID = 4797480123361380748L;

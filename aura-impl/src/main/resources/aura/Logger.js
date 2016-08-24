@@ -413,8 +413,12 @@ Logger.prototype.devDebugConsoleLog = function(level, message, error) {
                 console[filter]("%o", error);
             }
             if ((filter === "error" || filter === "warn") && trace) {
-                for ( var j = 0; j < trace.length; j++) {
-                    console[filter]("%s", trace[j]);
+                if ($A.util.isString(trace)) {
+                    console[filter]("%s", trace);
+                } else {
+                    for (var j = 0; j < trace.length; j++) {
+                        console[filter]("%s", trace[j]);
+                    }
                 }
             }
         } else if (console["group"]) {

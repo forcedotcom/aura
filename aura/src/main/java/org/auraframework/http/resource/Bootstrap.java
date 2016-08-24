@@ -104,9 +104,12 @@ public class Bootstrap extends AuraResourceImpl {
         DefType type = app.getDefType();
 
         DefDescriptor<?> desc = definitionService.getDefDescriptor(app.getDescriptorName(), type.getPrimaryInterface());
-
+        
+        Boolean gackOnException = true;
         try {
             if (!configAdapter.validateBootstrap(request.getParameter("jwt"))) {
+                // If jwt validation fails, just write error to client. Do not gack.
+                gackOnException = false;
                 throw new Exception("Invalid jwt parameter");
             }
             setCacheHeaders(response, app);
@@ -134,6 +137,9 @@ public class Bootstrap extends AuraResourceImpl {
             json.writeMapEnd();
             out.append(APPEND_JS);
         } catch (Throwable t) {
+            if (gackOnException) {
+                t = Aura.getExceptionAdapter().handleException(t);                
+            }
             writeError(t, response, context);
         }
     }

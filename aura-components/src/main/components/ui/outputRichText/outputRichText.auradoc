@@ -26,10 +26,24 @@
 <pre>&lt;div class="uiOutputRichText">
     &lt;b>Aura&lt;/b>, &lt;span style="color:red">input rich text demo&lt;/span>
 &lt;/div></pre>
+        <p>This component supports the following HTML tags: <code>a</code>, <code>b</code>, <code>br</code>, <code>big</code>, <code>blockquote</code>, <code>caption</code>, <code>cite</code>, <code>code</code>,
+         <code>del</code>, <code>div</code>, <code>em</code>, <code>h1</code>, <code>h2</code>, <code>h3</code>, <code>hr</code>, <code>i</code>, <code>img</code>, <code>ins</code>,
+         <code>kbd</code>, <code>li</code>, <code>ol</code>, <code>p</code>, <code>param</code>, <code>pre</code>, <code>q</code>, <code>s</code>, <code>samp</code>, <code>small</code>,
+         <code>span</code>, <code>strong</code>, <code>sub</code>, <code>sup</code>, <code>table</code>, <code>tbody</code>, <code>td</code>, <code>tfoot</code>, <code>th</code>,
+         <code>thead</code>, <code>tr</code>, <code>tt</code>, <code>u</code>, <code>ul</code>, <code>var</code>, <code>strike</code>.</p>
+         <p>Supported HTML attributes include: <code>accept</code>, <code>action</code>, <code>align</code>, <code>alt</code>, <code>autocomplete</code>, <code>background</code>, <code>bgcolor</code>,
+         <code>border</code>, <code>cellpadding</code>, <code>cellspacing</code>, <code>checked</code>, <code>cite</code>, <code>class</code>, <code>clear</code>, <code>color</code>,
+         <code>cols</code>, <code>colspan</code>, <code>coords</code>, <code>datetime</code>, <code>default</code>, <code>dir</code>, <code>disabled</code>,
+         <code>download</code>, <code>enctype</code>, <code>face</code>, <code>for</code>, <code>headers</code>, <code>height</code>, <code>hidden</code>, <code>high</code>, <code>href</code>,
+         <code>hreflang</code>, <code>id</code>, <code>ismap</code>, <code>label</code>, <code>lang</code>, <code>list</code>, <code>loop</code>, <code>low</code>, <code>max</code>,
+         <code>maxlength</code>, <code>media</code>, <code>method</code>, <code>min</code>, <code>multiple</code>, <code>name</code>, <code>noshade</code>, <code>novalidate</code>,
+         <code>nowrap</code>, <code>open</code>, <code>optimum</code>, <code>pattern</code>, <code>placeholder</code>, <code>poster</code>, <code>preload</code>, <code>pubdate</code>,
+         <code>radiogroup</code>, <code>readonly</code>, <code>rel</code>, <code>required</code>, <code>rev</code>, <code>reversed</code>, <code>rows</code>,
+         <code>rowspan</code>, <code>spellcheck</code>, <code>scope</code>, <code>selected</code>, <code>shape</code>, <code>size</code>, <code>span</code>,
+         <code>srclang</code>, <code>start</code>, <code>src</code>, <code>step</code>, <code>style</code>, <code>summary</code>, <code>tabindex</code>, <code>target</code>, <code>title</code>,
+         <code>type</code>, <code>usemap</code>, <code>valign</code>, <code>value</code>, <code>width</code>, <code>xmlns</code>.</p>
 	</aura:description>	
 		<aura:example name="richtext" ref="auradocs:demoInputRT" label="Using ui:outputRichText">
     	<p>This example shows how you can bind data from a <code>ui:inputRichText</code> component.</p>
 	   </aura:example>
-	   
-	
 </aura:documentation>

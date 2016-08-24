@@ -36,6 +36,7 @@ import com.google.common.collect.Maps;
 public class InlineJs extends TemplateResource {
 
     private static final String WALLTIME_FILE_PATH = "/aura/resources/walltime-js/olson/walltime-data_";
+    private static final String WALLTIME_INIT_JS = ";(function(){ if(window.WallTime.init) { window.WallTime.init(window.WallTime.data.rules, window.WallTime.data.zones); } }).call(this);";
     private static final Map<String, String> WALLTIME_TZ_CONTENT = Maps.newConcurrentMap();
 
     public InlineJs() {
@@ -77,7 +78,7 @@ public class InlineJs extends TemplateResource {
             }
 
             if (tzContent != null) {
-                out.append(tzContent).append(";");
+                out.append(tzContent).append(WALLTIME_INIT_JS);
             }
         }
 

@@ -2404,7 +2404,11 @@ AuraClientService.prototype.buildActionNameList = function(actions) {
 
     for (var i = 0; i < actions.length; i++) {
         var actionDescriptor = actions[i]["descriptor"];
-        var actionName = actionDescriptor.split("/ACTION$")[1];
+        var parts = actionDescriptor.split('/');
+        var controllerMethod = parts.pop().split('$').pop();
+        var controller = parts.pop().split('.').pop().split('Controller').shift();
+        var actionName = controller + "." + controllerMethod;
+
         map[actionName] = map[actionName] ? map[actionName] + 1 : 1;
     }
 

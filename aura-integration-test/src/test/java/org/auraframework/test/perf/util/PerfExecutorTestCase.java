@@ -177,7 +177,7 @@ public class PerfExecutorTestCase extends WebDriverTestCase {
     	// If descriptor is component type, then attach cmp def to url
     	StringBuilder relativeUrl = new StringBuilder(RUNNER_BASE_URL);               
         relativeUrl.append("aura.mode=").append(mode).append(customUrl);
-        Map<String, String> hash = ImmutableMap.of("componentDef", descriptor.getQualifiedName());
+        Map<String, String> hash = ImmutableMap.of("descriptor", descriptor.getQualifiedName());
         relativeUrl.append("#").append(URLEncoder.encode(JsonEncoder.serialize(hash), "UTF-8"));        
         String url = getAbsoluteURI(relativeUrl.toString()).toString();
         return url;

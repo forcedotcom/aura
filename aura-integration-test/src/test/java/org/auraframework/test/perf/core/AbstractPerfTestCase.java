@@ -101,9 +101,9 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
 
             String relativeUrl = "/perfTest/perf.app?";
             Map<String, Object> attributeValues = getComponentAttributeValues(descriptor);
-            Map<String, Serializable> hash = ImmutableMap.of("componentDef", descriptor.getQualifiedName(),
-                    "attributes",
-                    ImmutableMap.of("values", attributeValues));
+            Map<String, Serializable> hash = ImmutableMap.of(
+            		"descriptor", descriptor.getQualifiedName(),
+                    "attributes", ImmutableMap.of("values", attributeValues));
 
             relativeUrl += "aura.mode=" + mode;
             relativeUrl += "#" + URLEncoder.encode(JsonEncoder.serialize(hash), "UTF-8");

@@ -105,7 +105,7 @@ function PerfRunner(COQL, Memory) {
                 
                 if (perfIntf) {
                     // Create and render the wrapper
-                    $A.newCmpAsync(this, function (component) {
+                    $A.createComponent(cmpConfig.descriptor, cmpConfig.attributes, function (component) {
                         this.component = component;
                         $A.render(component, this.getContainerDOM()); 
 
@@ -123,7 +123,7 @@ function PerfRunner(COQL, Memory) {
                         if (!asyncSetup) {
                             setupDone();
                         }
-                    }, cmpConfig, this.containerComponent);
+                    }.bind(this), cmpConfig, this.containerComponent);
                 } else {
                     setupDone();
                 }

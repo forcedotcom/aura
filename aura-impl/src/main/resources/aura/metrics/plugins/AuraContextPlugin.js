@@ -84,7 +84,7 @@ AuraContextPlugin.prototype.bind = function (metricsService) {
         }
 
         if (hasDefs) {
-            metricsService['transaction']('aura', 'newDefs', { "context": payload });
+            metricsService['transaction']('aura', 'newDefs', { "context": {"attributes" : payload } });
         }
         
         return ret;

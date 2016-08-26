@@ -94,7 +94,7 @@ public class StaticDefRegistryImpl<T extends Definition> extends DefRegistryImpl
 
     @Override
     public boolean isCacheable() {
-        return false;
+        return true;
     }
     
     @Override

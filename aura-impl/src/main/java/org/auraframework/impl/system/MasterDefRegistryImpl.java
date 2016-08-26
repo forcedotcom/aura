@@ -528,6 +528,24 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             }
         }
 
+        @SuppressWarnings("unchecked")
+        Optional<D> opt = (Optional<D>) defsCache.getIfPresent(compiling.descriptor);
+        if (opt != null) {
+            D cachedDef = opt.orNull();
+
+            if (cachedDef != null) {
+                @SuppressWarnings("unchecked")
+                DefDescriptor<D> canonical = (DefDescriptor<D>) cachedDef.getDescriptor();
+
+                compiling.def = cachedDef;
+                compiling.descriptor = canonical;
+                compiling.built = false;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
         //
         // If there is no local cache, we must first check to see if there is a registry, as we may not have
         // a registry (depending on configuration). In the case that we don't find one, we are done here.
@@ -545,24 +563,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         //
         if (registry.isCacheable() && shouldCache(compiling.descriptor)) {
             compiling.cacheable = true;
-
-            @SuppressWarnings("unchecked")
-            Optional<D> opt = (Optional<D>) defsCache.getIfPresent(compiling.descriptor);
-            if (opt != null) {
-                D cachedDef = opt.orNull();
-
-                if (cachedDef != null) {
-                    @SuppressWarnings("unchecked")
-                    DefDescriptor<D> canonical = (DefDescriptor<D>) cachedDef.getDescriptor();
-
-                    compiling.def = cachedDef;
-                    compiling.descriptor = canonical;
-                    compiling.built = false;
-                    return true;
-                } else {
-                    return false;
-                }
-            }
         } else if (!registry.isStatic()) {
             // if not a cacheable registry or not shouldCache, test other exceptions that might still
             // allow dependency caching (if it's from static registry, it can't affect our decision on
@@ -585,10 +585,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             return false;
         }
         compiling.built = true;
+        @SuppressWarnings("unchecked")
+        DefDescriptor<D> canonical = (DefDescriptor<D>) compiling.def.getDescriptor();
+        compiling.descriptor = canonical;
         if (!registry.isStatic()) {
-            @SuppressWarnings("unchecked")
-            DefDescriptor<D> canonical = (DefDescriptor<D>) compiling.def.getDescriptor();
-            compiling.descriptor = canonical;
             currentCC.loggingService.incrementNum(LoggingService.DEF_COUNT);
             compiling.def.validateDefinition();
         }
@@ -1178,39 +1178,34 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         if (hasLocalDef(descriptor)) {
             return getLocalDef(descriptor) != null;
         }
-        DefRegistry<D> reg = getRegistryFor(descriptor);
-        if (reg == null) {
-            return false;
-        }
-        cacheable = reg.isCacheable() && shouldCache(descriptor);
-        if (cacheable) {
-            //
-            // Try our various caches.
-            //
-            Boolean val = existsCache.getIfPresent(descriptor);
-            if (val != null && val.booleanValue()) {
-                return true;
-            }
+        //
+        // Try our various caches.
+        //
+        Boolean val = existsCache.getIfPresent(descriptor);
+        if (val != null && val.booleanValue()) {
+            return true;
         }
         rLock.lock();
         try {
-            if (cacheable) {
-                Optional<?> opt = defsCache.getIfPresent(descriptor);
-                if (opt != null) {
-                    //
-                    // We cache here.
-                    //
-                    if (opt.isPresent()) {
-                        existsCache.put(descriptor, Boolean.TRUE);
-                        return true;
-                    } else {
-                        existsCache.put(descriptor, Boolean.FALSE);
-                        return false;
-                    }
+            Optional<?> opt = defsCache.getIfPresent(descriptor);
+            if (opt != null) {
+                //
+                // We cache here.
+                //
+                if (opt.isPresent()) {
+                    existsCache.put(descriptor, Boolean.TRUE);
+                    return true;
+                } else {
+                    existsCache.put(descriptor, Boolean.FALSE);
+                    return false;
                 }
             }
+            DefRegistry<D> reg = getRegistryFor(descriptor);
+            if (reg == null) {
+                return false;
+            }
             regExists = reg.exists(descriptor);
-            if (cacheable) {
+            if (reg.isCacheable() && shouldCache(descriptor)) {
                 Boolean cacheVal = Boolean.valueOf(regExists);
                 existsCache.put(descriptor, cacheVal);
             }

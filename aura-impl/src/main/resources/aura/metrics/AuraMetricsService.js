@@ -34,15 +34,16 @@ Aura.Services.MetricsService = function MetricsService() {
 };
 
 // Version
-Aura.Services.MetricsService.VERSION  = '2.1.0';
+Aura.Services.MetricsService.VERSION  = '2.2.0';
 
-Aura.Services.MetricsService.PERFTIME = !!(window.performance && window.performance.now);
-Aura.Services.MetricsService.TIMER    = Aura.Services.MetricsService.PERFTIME ? function () { return Math.floor(window.performance.now() * 100) / 100; } : Date.now.bind(Date);
-Aura.Services.MetricsService.START    = 'start';
-Aura.Services.MetricsService.END      = 'end';
-Aura.Services.MetricsService.STAMP    = 'stamp';
-Aura.Services.MetricsService.DEFAULT  = 'default';
-Aura.Services.MetricsService.MAXTIME  = 30000; // Max time for a transaction to finish
+Aura.Services.MetricsService.PERFTIME     = !!(window.performance && window.performance.now);
+Aura.Services.MetricsService.TIMER        = Aura.Services.MetricsService.PERFTIME ? function () { return Math.floor(window.performance.now() * 100) / 100; } : Date.now.bind(Date);
+Aura.Services.MetricsService.START        = 'start';
+Aura.Services.MetricsService.END          = 'end';
+Aura.Services.MetricsService.STAMP        = 'stamp';
+Aura.Services.MetricsService.DEFAULT      = 'default';
+Aura.Services.MetricsService.MAXTIME      = 30000; // Max time for a transaction to finish
+Aura.Services.MetricsService.CUSTOM_MARKS = 'custom';
 
 /**
  * Initialize function
@@ -346,7 +347,7 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
     var id             = ns + ':' + name,
         transaction    = this.transactions[id],
         transactionCfg = $A.util.apply((transaction && transaction["config"]) || {}, config, true, true),
-        beacon         = this.beaconProviders[ns]|| this.beaconProviders[Aura.Services.MetricsService.DEFAULT];
+        beacon         = this.beaconProviders[ns] || this.beaconProviders[Aura.Services.MetricsService.DEFAULT];
 
     postProcess = typeof config === 'function' ? config : postProcess || transactionCfg["postProcess"];
 
@@ -354,7 +355,7 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
         var parsedTransaction = {
                 "id"            : id,
                 "ts"            : transaction["ts"],
-                "duration"      : Math.floor((this.time() - transaction["ts"]) * 100) / 100,
+                "duration"      : parseInt(this.time() - transaction["ts"]),
                 "pageStartTime" : this.pageStartTime,
                 "marks"         : {},
                 "context"       : transactionCfg["context"] || {},
@@ -371,14 +372,15 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
                     initialOffset     = transaction["offsets"] && (transaction["offsets"][plugin] || 0),
                     tMarks            = pluginCollector.slice(initialOffset),
                     pluginPostProcess = instance && instance.postProcess,
-                    parsedMarks       = pluginPostProcess ? instance.postProcess(tMarks, transactionCfg) : tMarks;
+                    parsedMarks       = pluginPostProcess ? instance.postProcess(tMarks, transactionCfg) : tMarks,
+                    pluginName        = instance ? plugin : Aura.Services.MetricsService.CUSTOM_MARKS;
 
                 if (!pluginPostProcess && tMarks.length) {
                     parsedMarks = this.defaultPostProcessing(tMarks);
                 }
 
                 if (parsedMarks && parsedMarks.length) {
-                    parsedTransaction["marks"][plugin] = parsedMarks;
+                    parsedTransaction["marks"][pluginName] = parsedMarks;
                 }
             }
         }

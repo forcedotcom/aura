@@ -65,7 +65,7 @@ TransportMetricsPlugin.prototype.sendOverride = function (/* config, auraXHR, ac
         var actionDefs = [];
         for (var id in auraXHR.actions) {
             if (auraXHR.actions.hasOwnProperty(id)) {
-                actionDefs.push(auraXHR.actions[id].getDef().name + '$' + id);
+                actionDefs.push(id);
             }
         }
 
@@ -135,8 +135,10 @@ TransportMetricsPlugin.prototype.postProcess = function (transportMarks) {
             queue[id] = transportMarks[i];
         } else if (phase === 'end' && queue[id]){
             var mark = $A.util.apply({}, queue[id], true, true);
+            var duration = parseInt(transportMarks[i]["ts"] - mark["ts"]);
             mark["context"]  = $A.util.apply(mark["context"], transportMarks[i]["context"]);
-            mark["duration"] = Math.round((transportMarks[i]["ts"] - mark["ts"]) * 100) / 100;
+            mark["duration"] = duration;
+            mark["context"]["xhrDelay"] = duration - mark["context"]["xhrDuration"];
             mark["phase"]    = 'processed';
             procesedMarks.push(mark);
             delete queue[id];

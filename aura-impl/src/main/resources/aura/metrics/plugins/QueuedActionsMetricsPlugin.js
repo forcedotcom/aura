@@ -61,8 +61,6 @@ QueuedActionsMetricsPlugin.prototype.enqueueActionOverride = function() {
         "abortable"  : action.isAbortable(),
         "storable"   : action.isStorable(),
         "background" : action.isBackground(),
-        "state"      : action.getState(),
-        "isRefresh"  : action.isRefreshAction(),
         "def"        : action.getDef().toString()
     });
 
@@ -89,35 +87,14 @@ QueuedActionsMetricsPlugin.prototype.actionSendOverride = function() {
 QueuedActionsMetricsPlugin.prototype.actionFinishOverride = function() {
     var config = Array.prototype.shift.apply(arguments);
     this.metricsService["markEnd"](QueuedActionsMetricsPlugin.NAME, 'send', {
-        "id" : config["self"].getId()
+        "id"    : config["self"].getId(),
+        "state" : config["self"].getState(),
+        "cache" : config["self"].isFromStorage()
     });
     
     //console.log('>>> ActionFinish :: ', config["self"].getId());
 
     return config["fn"].apply(config["scope"], arguments);
-};
-
-QueuedActionsMetricsPlugin.prototype.markStart = function(action) {
-    var startMark = this.metricsService["markStart"](QueuedActionsMetricsPlugin.NAME, 'finish');
-    startMark["context"] = {
-        "id"         : action.getId(),
-        //"params"     : action.getParams(),
-        "abortable"  : action.isAbortable(),
-        "storable"   : action.isStorable(),
-        "background" : action.isBackground(),
-        "state"      : action.getState(),
-        "isRefresh"  : action.isRefreshAction(),
-        "def"        : action.getDef().toString()
-    };
-};
-
-QueuedActionsMetricsPlugin.prototype.markEnd = function(action) {
-    var endMark = this.metricsService["markEnd"](QueuedActionsMetricsPlugin.NAME, 'finish');
-    endMark["context"] = {
-        "id"            : action.getId(),
-        "isFromStorage" : action.isFromStorage(),
-        "state"         : action.getState()
-    };
 };
 
 QueuedActionsMetricsPlugin.prototype.bind = function () {
@@ -132,10 +109,9 @@ QueuedActionsMetricsPlugin.prototype.bind = function () {
 };
 
 /** @export */
-QueuedActionsMetricsPlugin.prototype.postProcess = function (actionMarks, trxConfig) {
+QueuedActionsMetricsPlugin.prototype.postProcess = function (actionMarks /*, trxConfig*/) {
     var processedMarks = [];
     var queue  = {};
-    var scopeActionId = trxConfig["scopeAction"] && trxConfig["scopeAction"].getId();
 
     // This loop is to assemble the action time
     for (var i = 0; i < actionMarks.length; i++) {
@@ -144,19 +120,15 @@ QueuedActionsMetricsPlugin.prototype.postProcess = function (actionMarks, trxCon
         var phase = actionMark["phase"];
         var mark = queue[id];
 
-        if (!scopeActionId || scopeActionId === id) {
-            if (phase === 'stamp') {
-                queue[id] = $A.util.apply({}, actionMark, true, true);
-
-            } else if (phase === 'start' && mark) {
-                mark["enqueueWait"] = Math.round((actionMark["ts"] - mark["ts"]) * 100) / 100;
-
-            } else if (phase === 'end' && mark) {
-                mark["context"]["state"] = actionMark["context"]["state"];
-                mark["duration"] = Math.round((actionMark["ts"] - mark["ts"]) * 100) / 100;
-                processedMarks.push(mark);
-                delete queue[id];
-            }
+        if (phase === 'stamp') {
+            queue[id] = $A.util.apply({}, actionMark);
+        } else if (phase === 'start' && mark) {
+            mark["enqueueWait"] = parseInt(actionMark["ts"] - mark["ts"]);
+        } else if (phase === 'end' && mark) {
+            $A.util.apply(mark["context"], actionMark["context"]);
+            mark["duration"] = parseInt(actionMark["ts"] - mark["ts"]);
+            processedMarks.push(mark);
+            delete queue[id];
         }
     }
 

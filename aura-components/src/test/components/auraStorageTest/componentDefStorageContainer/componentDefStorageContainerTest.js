@@ -74,7 +74,7 @@
             function fetchCmpsUntilEvictTargetCmp(cmp) {
                 var complete = false;
                 this.fetchCmpsUntilEviction(cmp, "ui:scroller")
-                    .then(function() { 
+                    .then(function() {
                         complete = true;
                     },
                     function(e) {
@@ -130,7 +130,7 @@
             function fetchCmpsUntilEvictTargetCmp(cmp) {
                 var complete = false;
                 this.fetchCmpsUntilEviction(cmp, "ui:scroller")
-                    .then(function() { 
+                    .then(function() {
                         complete = true;
                     },
                     function(e) {
@@ -185,11 +185,15 @@
                     "ui:pillContainer", "ui:menu"];
 
         /**
-         * Fetch the next cmp, waiting for it to be retrieved and 
+         * Fetch the next cmp, waiting for it to be retrieved and
          * placed in storage (aka def in storage, sentinel is gone).
          */
         function fetchAnotherCmp() {
-            return cmp.helper.lib.iframeTest.fetchCmpAndWaitAsPromise(defs.pop());
+            var def = defs.pop();
+            if (!def) {
+                return Promise["reject"](new Error("Ran out of defs to fetch while trying to get " + targetCmp + " to evict"))
+            }
+            return cmp.helper.lib.iframeTest.fetchCmpAndWaitAsPromise(def);
         }
 
         /**
@@ -199,13 +203,13 @@
             return cmp.helper.lib.iframeTest.checkDefInStorage(targetCmp);
         }
 
-        /** 
+        /**
          * Uses promise recursion until targetCmp is not in storage
          */
         function recurse(inStorage) {
-            if (!inStorage) { 
+            if (!inStorage) {
                 // end recursion
-                return Promise["resolve"](); 
+                return Promise["resolve"]();
             }
             // still present so keep recursing
             return fetchAnotherCmp().then(checkInStorage).then(recurse);

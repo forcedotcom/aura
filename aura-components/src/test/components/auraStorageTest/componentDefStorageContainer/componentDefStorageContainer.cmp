@@ -17,6 +17,7 @@
 -->
 <aura:component>
     <aura:import library="auraStorageTest:iframeTestLib" property="lib" />
+    <aura:import library="auraStorageTest:storageTestLib" property="storage" />
 
     <div aura:id="iframeContainer" />
 </aura:component>

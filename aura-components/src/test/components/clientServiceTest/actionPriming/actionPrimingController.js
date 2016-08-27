@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 ({
+    init: function(cmp) {
+        // capture descriptor + param of the non-primed action. used in tests.
+        var def = cmp.get("c.getString").getDef();
+        cmp.ACTION_DESCRIPTOR = def.toString();
+        cmp.ACTION_PARAM = "sent from actionPrimingController.js";
+    },
+
     getStringAction: function(cmp) {
         var action = cmp.get("c.getString");
         action.setStorable();
         action.setParams({
-            param: "sent from actionPrimingController.js"
+            param: cmp.ACTION_PARAM
         });
         action.setCallback(this, function(a) {
             cmp.set("v.completed", true);

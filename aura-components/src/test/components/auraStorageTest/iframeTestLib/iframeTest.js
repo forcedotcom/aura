@@ -13,15 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function iframeTest() {
+function iframeTest(storageContents) {
 
     return {
-        /**
-         * Must match ComponentDefStorage.prototype.TRANSACTION_SENTINEL_KEY;
-         * TODO W-2365447 - eliminate this and its checks when bulk remove + put is added
-         */
-        TRANSACTION_SENTINEL_KEY: "sentinel_key",
-
         /** Gets the iframe window. */
         getIframe: function() {
             return document.getElementById("myFrame").contentWindow;
@@ -34,10 +28,10 @@ function iframeTest() {
 
         /**
          * Creates, inserts and waits for an iframe to load.
-         * @param {Component} cmp the component that will host the iframe
-         * @param {String} url the URL to load in the iframe
-         * @param {String} iframeAuraId the aura:id in cmp in which the iframe is inserted
-         * @param {String} errorMsg message prefix displayed when an error occurs
+         * @param {Component} cmp the component that will host the iframe.
+         * @param {String} url the URL to load in the iframe.
+         * @param {String} iframeAuraId the aura:id in cmp in which the iframe is inserted.
+         * @param {String} errorMsg message prefix displayed when an error occurs.
          */
         loadIframe: function(cmp, url, iframeAuraId, errorMsg) {
             cmp._frameLoaded = false;
@@ -57,9 +51,9 @@ function iframeTest() {
 
         /**
          * Reloads the iframe.
-         * @param {Component} cmp the component that will host the iframe
-         * @param {Boolean} saveLogs true to save the logs before reload so they're store after load
-         * @param {String} errorMsg message prefix displayed when an error occurs
+         * @param {Component} cmp the component that will host the iframe.
+         * @param {Boolean} saveLogs true to save the logs before reload so they're store after load.
+         * @param {String} errorMsg message prefix displayed when an error occurs.
          */
         reloadIframe: function(cmp, saveLogs, errorMsg) {
             cmp._frameLoaded = false;
@@ -71,21 +65,21 @@ function iframeTest() {
         },
 
         /**
-         * Waits for the iframe and Aura within it to load.
-         * @param {Component} cmp the component that will host the iframe
-         * @param {String} errorMsg message prefix displayed when an error occurs
+         * Waits for an iframe and Aura within it to load.
+         * @param {Component} cmp the component that will host the iframe.
+         * @param {String} errorMsg message prefix displayed when an error occurs.
          */
         waitForIframeLoad: function(cmp, errorMsg) {
             var iframe = this.getIframe();
             $A.test.addWaitFor(true,
                 function() {
-                    return cmp._frameLoaded
-                        && iframe.$A
-                        && iframe.$A.finishedInit === true;
+                    return cmp._frameLoaded &&
+                        iframe.$A &&
+                        iframe.$A.finishedInit === true;
                 },
                 function() {
                     if (iframe.$A.util.hasClass(iframe.document.body, "auraError")) {
-                        var error = iframe.$A.util.getText(iframe.$A.util.getElement("auraErrorMessage"))
+                        var error = iframe.$A.util.getText(iframe.$A.util.getElement("auraErrorMessage"));
                         $A.test.fail("Error during iframe load: " + errorMsg + "\n" + error);
                     }
                 }
@@ -99,94 +93,63 @@ function iframeTest() {
             this.waitForStatus("Clearing Caches and Logs", "Cleared Caches and Logs");
         },
 
-        /** Fetches the specified component (format is namespace:name). */
+        /**
+         * Initiates fetching a component. Does not wait for fetch or storage to complete.
+         * @param {String} desc Component name, in format namespace:name.
+         */
         fetchCmp: function(desc) {
+            $A.assert(typeof desc === "string", "desc must be a string in form namespace:name");
             var iframeCmp = this.getIframeRootCmp();
             iframeCmp.set("v.load", desc);
             iframeCmp.fetchCmp();
         },
 
-        /** Fetches the specified component (format is namespace:name) and waits for the server response. */
+        /**
+         * Fetches a component and waits for the client to receive it. Does not wait for the
+         * component def to be stored.
+         * @param {String} desc Component name, in format namespace:name.
+         */
         fetchCmpAndWait: function(desc) {
+            $A.assert(typeof desc === "string", "desc must be a string in form namespace:name");
             this.fetchCmp(desc);
             this.waitForStatus("Fetching: " + desc, "Fetched: " + desc);
         },
 
-        /** 
-         * Fetches the specified component (format is namespace:name) and waits for component to be inserted
-         *  in to storage.
+        /**
+         * Fetches a component and waits for component to be stored in storage.
+         * @param {String} desc Component name, in format namespace:name.
+         * @return {Promise} a promise that resolves when the component is placed in storage.
          */
         fetchCmpAndWaitAsPromise: function(desc) {
+            $A.assert(typeof desc === "string", "desc must be a string in form namespace:name");
+
             var that = this;
-
-            if (!desc) {
-                return Promise["reject"](new Error("No component to fetch"));
-            }
-
-            function waitForDefInStorage(desc) {
-                // short-circuit recursion if test is complete
-                if ($A.test.isComplete()) {
-                    return Promise["reject"](new Error("Test complete, killing recursion"));
-                }
-
-                return that.checkDefInStorage(desc)
-                   .then(function(inStorage) {
-                       if (!inStorage) {
-                           return that.delayPromise(waitForDefInStorage.bind(that, desc));
-                       }
-                   });
-            }
-
-            return new Promise(function(resolve, reject) {
-                that.fetchCmp(desc);
-                resolve(desc);
-            })
-            .then(function(def) {
-                return waitForDefInStorage(def);
-            });
-        },
-
-        /** Check ComponentDefStorage for targetCmp. */
-        checkDefInStorage: function(targetCmp) {
-            var that = this;
-
-            function innerCheckDefInStorage() {
-                if ($A.test.isComplete()) {
-                    return Promise["reject"](new Error("Test complete, killing recursion"));
-                }
-
-                return that.getIframe().$A.storageService.getStorage("ComponentDefStorage").getAll([], true)
-                .then(
-                    function(items) {
-                        if (items[that.TRANSACTION_SENTINEL_KEY]) {
-                            // storage is in the middle of an operation so recurse
-                            return that.delayPromise(innerCheckDefInStorage);
-                        }
-                        return !!(items["markup://" + targetCmp]);
-                    }
-                );
-            }
-            return innerCheckDefInStorage();
+            return new Promise(function(resolve) {
+                    that.fetchCmp(desc);
+                    resolve(desc);
+                })
+                .then(function(desc) {
+                    var iframe = that.getIframe();
+                    return storageContents.waitForDefInStorage(desc, iframe);
+                });
         },
 
         /**
-         * Executes a function as a promise after a certain delay. This delay is often necessary during recurisve calls
-         * to prevent the framework and browser from getting flooded with calls and crashing.
+         * Gets whether a def is in storage.
+         * @param {String} desc Component name, in format namespace:name.
+         * @return {Promise} a promise that resolves with whether the def is in storage.
          */
-        delayPromise: function(func, delay) {
-            delay = delay || 100;
-            return new Promise(function(resolve) {
-                setTimeout(function() {
-                    try {
-                        resolve(func());
-                    } catch (e) {
-                        reject(e);
-                    }
-                }, delay);
-            });
+        checkDefInStorage: function(desc) {
+            $A.assert(typeof desc === "string", "desc must be a string in form namespace:name");
+
+            var iframe = this.getIframe();
+            return storageContents.isDefInStorage(desc, iframe);
         },
 
-        /** Creates the specified component (format is namespace:name) using $A.createComponentFromConfig. */
+        /**
+         * Creates a component using $A.createComponentFromConfig.
+         * @param {String} desc Component name, in format namespace:name.
+         */
         createComponentFromConfig: function(desc) {
             var iframeCmp = this.getIframeRootCmp();
             iframeCmp.set("v.load", desc);
@@ -194,81 +157,53 @@ function iframeTest() {
             this.waitForStatus("Creating: " + desc, "Created: " + desc);
         },
 
-        /** Waits for a def (format is namespace:name) to be present in ComponentDefStorage, with an optional error message. */
+        /**
+         * Waits for a def to be in storage.
+         * @param {String} desc Component name, in format namespace:name.
+         * @param {String=} msg error message.
+         */
         waitForDefInStorage : function(desc, msg) {
             var iframe = this.getIframe();
             var found = false;
-            var that = this;
+            storageContents.waitForDefInStorage(desc, iframe)
+                .then(
+                    function() {
+                        found = true;
+                    },
+                    function(e) {
+                        $A.test.fail("waitForDefInStorage(" + desc + ") failed: " + e);
+                    }
+                );
 
-            function checkDefStorage(desc) {
-                // short-circuit once the test times out
-                if ($A.test.isComplete()) {
-                    return;
-                }
-
-                iframe.$A.storageService.getStorage("ComponentDefStorage").getAll([], true)
-                    .then(
-                        function(items) {
-                            // if transaction key present or def not present, recurse
-                            if (items[that.TRANSACTION_SENTINEL_KEY] || !items["markup://" + desc]) {
-                                setTimeout(function() { checkDefStorage(desc); }, 100);
-                                return;
-                            }
-
-                            found = true;
-                        },
-                        function(e) {
-                            $A.test.fail("ComponentDefStorage.getAll() failed: " + e);
-                        }
-                    );
-            }
-
-            checkDefStorage(desc);
-
-            msg = msg || "Def " + desc + " never present in ComponentDefStorage";
-            $A.test.addWaitForWithFailureMessage(true,
+            $A.test.addWaitForWithFailureMessage(
+                true,
                 function() { return found; },
-                msg
+                msg || "Def " + desc + " never present in ComponentDefStorage"
             );
         },
 
-        /** Waits for a def (format is namespace:name) to be absent from ComponentDefStorage, with an optional error message. */
+        /**
+         * Waits for a def to be absent from storage.
+         * @param {String} desc Component name, in format namespace:name.
+         * @param {String=} msg error message.
+         */
         waitForDefRemovedFromStorage : function(desc, msg) {
             var iframe = this.getIframe();
-            var removed = false;
-            var that = this;
+            var found = false;
+            storageContents.waitForDefNotInStorage(desc, iframe)
+                .then(
+                    function() {
+                        found = true;
+                    },
+                    function(e) {
+                        $A.test.fail("waitForDefInStorage(" + desc + ") failed: " + e);
+                    }
+                );
 
-            function checkDefStorage(desc) {
-                // short-circuit once the test times out
-                if ($A.test.isComplete()) {
-                    return;
-                }
-
-
-                iframe.$A.storageService.getStorage("ComponentDefStorage").getAll([], true)
-                    .then(
-                        function(items) {
-                            // if transaction key or def is present, recurse
-                            if (items[that.TRANSACTION_SENTINEL_KEY] || items["markup://" + desc]) {
-                                // pause before rechecking
-                                setTimeout(function() { checkDefStorage(desc); }, 100);
-                                return;
-                            }
-
-                            removed = true;
-                        },
-                        function(e) {
-                            $A.test.fail("ComponentDefStorage.getAll() failed: " + e);
-                        }
-                    );
-            }
-
-            checkDefStorage(desc);
-
-            msg = msg || "Def " + desc + " never removed from ComponentDefStorage";
-            $A.test.addWaitForWithFailureMessage(true,
-                function() { return removed; },
-                msg
+            $A.test.addWaitForWithFailureMessage(
+                true,
+                function() { return found; },
+                msg || "Def " + desc + " never removed from ComponentDefStorage"
             );
         },
 
@@ -276,6 +211,8 @@ function iframeTest() {
          * Waits for the iframe component to update its status. First wait for the initial message to not be present
          * anymore, then verify the expected new status is present. This pattern, as opposed to simply waiting for the
          * final message, is used to fail fast and prevent long timeouts.
+         * @param {String} initialMessage initial message to wait for removal.
+         * @param {String} finalMessage expected message after initial message is removed.
          */
         waitForStatus: function(initialMessage, finalMessage) {
             var iframeCmp = this.getIframeRootCmp();
@@ -304,70 +241,47 @@ function iframeTest() {
          */
         waitForGvpsInStorage: function() {
             var iframe = this.getIframe();
-            var that = this;
+            var storage = iframe.$A.storageService.getStorage("actions");
             var found = false;
-            var gvpStorageKey = "globalValueProviders";
+            storageContents.waitForKeyInStorage(storage, "globalValueProviders", iframe)
+                .then(
+                    function() {
+                        found = true;
+                    },
+                    function(e) {
+                        $A.test.fail("waitForGvpsInStorage() failed: " + e);
+                    }
+                );
 
-            function checkGvpsInStorage() {
-                // short-circuit once the test times out
-                if ($A.test.isComplete()) {
-                    return;
-                }
-
-                iframe.$A.storageService.getStorage("actions").get(gvpStorageKey, true)
-                    .then(function (value) {
-                        if (value) {
-                            found = true;
-                            return;
-                        }
-
-                        // not found so pause a brief moment then recheck
-                        setTimeout(function() { checkGvpsInStorage(); }, 100);
-                });
-            }
-
-            checkGvpsInStorage();
-
-            $A.test.addWaitForWithFailureMessage(true,
+            $A.test.addWaitForWithFailureMessage(
+                true,
                 function() { return found; },
                 "GVPs never persisted to actions store"
             );
         },
 
-        /** Waits for an action to be present in the 'actions' store, with an optional error message. */
+        /**
+         * Waits for an action to be present in the actions store.
+         * @param {String} key action descriptor.
+         * @param {String=} msg error message.
+         */
         waitForActionInStorage : function(key, msg) {
             var iframe = this.getIframe();
             var found = false;
+            storageContents.waitForActionInStorage(key, false, iframe)
+                .then(
+                    function() {
+                        found = true;
+                    },
+                    function(e) {
+                        $A.test.fail("waitForActionInStorage(" + key + ") failed: " + e);
+                    }
+                );
 
-            function checkActionStorage(key) {
-                // short-circuit once the test times out
-                if ($A.test.isComplete()) {
-                    return;
-                }
-
-                iframe.$A.storageService.getStorage("actions").getAll([], true)
-                    .then(
-                        function(items) {
-                            if (items[key]) {
-                                found = true;
-                                return;
-                            }
-
-                            // not found so pause a brief moment then recheck
-                            setTimeout(function() { checkActionStorage(key); }, 100);
-                        },
-                        function(e) {
-                            $A.test.fail("action store getAll() failed: " + e);
-                        }
-                    );
-            }
-
-            checkActionStorage(key);
-
-            msg = msg || "Action " + key + " never present in action store";
-            $A.test.addWaitForWithFailureMessage(true,
+            $A.test.addWaitForWithFailureMessage(
+                true,
                 function() { return found; },
-                msg
+                msg || "Action " + key + " never present in action store"
             );
         }
     };

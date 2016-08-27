@@ -15,173 +15,169 @@
  */
 ({
     /**
-     * Extra actions serialized down from the server will be stored in the client-side actions cache.
+     * Extra actions sent from the server are stored in the actions storage.
      */
-    testProcessPrimingActionsMarkedSuccess: {
+    testExtraActionsAddedToStorage: {
         test: [
-        function(cmp) {
-            // New action to be added to action storage in priming scenario
-            cmp._actionDescriptorPrefix = "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getInt";
-            var that = this;
-            var addAction = function(response) {
-                // Make sure this is the action response we care about
-                if (response["responseText"].indexOf("sent from actionPrimingController.js") === -1) {
-                    return response;
-                }
+            function primeAction(cmp) {
+                // prefix of action descriptors to be be primed
+                cmp.PRIMED_ACTION_DESCRIPTOR1 = "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getInt";
+                cmp.PRIMED_ACTION_DESCRIPTOR2 = "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getLoggableString";
 
-                // Copy response and add an additional storable action to the response object
-                var newResponse = $A.util.copy(response);
-                var responseMessage = that.decodeResponse(response);
+                // actions with and without parameters
+                var actionsToInject = [
+                   { descriptor: cmp.PRIMED_ACTION_DESCRIPTOR1, params: {} },
+                   { descriptor: cmp.PRIMED_ACTION_DESCRIPTOR2, params: undefined },
+                ];
+                var config = $A.test.addPreDecodeCallback(this.injectActionsToResponse.bind(this, cmp, actionsToInject));
+                $A.test.addCleanup(function(){ $A.test.removePreDecodeCallback(config); });
 
-                // action with params
-                var action = that.copyAction(responseMessage["actions"][0], cmp._actionDescriptorPrefix, {});
-                responseMessage["actions"].push(action);
+                cmp.getStringAction();
+                $A.test.addWaitForWithFailureMessage(true, function(){ return cmp.get("v.completed"); }, "action failed to complete");
+            },
+            function verifyActionsStored(cmp) {
+                var completed = false;
+                this.verifyActionInStorage(cmp, cmp.PRIMED_ACTION_DESCRIPTOR1, this.ACTION_RETURN_VALUE)
+                    .then(function() {
+                        this.verifyActionInStorage(cmp, cmp.PRIMED_ACTION_DESCRIPTOR2, this.ACTION_RETURN_VALUE)
+                    }.bind(this))
+                    .then(function() {
+                        completed = true;
+                    })
+                    ["catch"](function(error) { $A.test.fail(error.toString()); });
 
-                // action without params
-                action = that.copyAction(responseMessage["actions"][0], cmp._actionDescriptorPrefix, undefined);
-                responseMessage["actions"].push(action);
-
-                var newResponseMessage = that.encodeResponse(responseMessage);
-                newResponse["response"] = newResponseMessage;
-                newResponse["responseText"] = newResponseMessage;
-
-                return newResponse;
+                $A.test.addWaitForWithFailureMessage(true, function() { return completed; }, "error verifying action in storage");
             }
-            var config = $A.test.addPreDecodeCallback(addAction);
-            $A.test.addCleanup(function(){ $A.test.removePreDecodeCallback(config) });
-
-            cmp.getStringAction();
-
-            $A.test.addWaitFor(true, function(){ return cmp.get("v.completed"); });
-        },
-        function(cmp) {
-            var completed = false;
-            var found = false;
-            $A.storageService.getStorage("actions").getAll([], true)
-                .then(function(items) {
-                    for (key in items) {
-                        if (key.indexOf(cmp._actionDescriptorPrefix) === 0 && items[key]["returnValue"].indexOf("return modified in test") === 0) {
-                            found = true;
-                        }
-                    }
-
-                    completed = true;
-                })
-                ["catch"](function(error) { $A.test.fail(error.toString()); });
-
-            $A.test.addWaitFor(
-                    true,
-                    function() {
-                        return completed;
-                    },
-                    function() {
-                        $A.test.assertTrue(found, "Priming action not saved to actions storage");
-                    });
-
-        }]
+        ]
     },
 
+
     /**
-     * Priming actions in the error state should not be saved to client-side actions storage.
+     * Extra actions, from controllers other than this component's controller, are stored in the actions storage.
      */
-    testNoProcessOfPrimingActionsMarkedError: {
+    testExtraActionsFromOtherControllersAddedToStorage: {
         test: [
-        function(cmp) {
-            cmp._actionDescriptorPrefix = "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getInt";
-            var that = this;
-            var addAction = function(response) {
-                // Make sure this is the action response we care about
-                if (response["responseText"].indexOf("sent from actionPrimingController.js") === -1) {
-                    return response;
-                }
-
-                // Copy response and add an action in the ERROR state
-                var newResponse = $A.util.copy(response);
-                var responseMessage = that.decodeResponse(response);
-                var action = that.copyAction(responseMessage["actions"][0], cmp._actionDescriptorPrefix, {});
-                action["state"] = "ERROR";
-                responseMessage["actions"].push(action);
-
-                var newResponseMessage = that.encodeResponse(responseMessage);
-                newResponse["response"] = newResponseMessage;
-                newResponse["responseText"] = newResponseMessage;
-
-                return newResponse;
-            }
-            var config = $A.test.addPreDecodeCallback(addAction);
-            $A.test.addCleanup(function(){ $A.test.removePreDecodeCallback(config) });
-
-            cmp.getStringAction();
-
-            $A.test.addWaitFor(true, function(){ return cmp.get("v.completed"); });
-        },
-        function(cmp) {
-            var completed = false;
-            var found = false;
-            $A.storageService.getStorage("actions").getAll([], true)
-                .then(function(items) {
-                    for (key in items) {
-                        if (key.indexOf(cmp._actionDescriptorPrefix) === 0 && items[key]["returnValue"].indexOf("return modified in test") === 0) {
-                            found = true;
-                        }
+            function hydrateDef(cmp) {
+                var completed = false;
+                // prerequisite: component def (and therefore controller def and action defs) must be hydrated
+                var desc = "markup://clientServiceTest:actionPrimingDependency";
+                $A.getDefinition(desc, function(def) {
+                    if (!def) {
+                        $A.test.fail("Def not found: " + desc);
                     }
-
                     completed = true;
-                })
-                ["catch"](function(error) { $A.test.fail(error.toString()); });
+                });
+                $A.test.addWaitForWithFailureMessage(true, function() { return completed; }, "Def failed to load: " + desc);
+            },
+            function primeAction(cmp) {
+                // prefix of action descriptor to be be primed. controller is different than in auraStorageTest:actionPriming
+                cmp.PRIMED_ACTION_DESCRIPTOR = "java://org.auraframework.components.test.java.controller.TestController/ACTION$getString";
+                var actionsToInject = [{ descriptor: cmp.PRIMED_ACTION_DESCRIPTOR, params: {} }];
+                var config = $A.test.addPreDecodeCallback(this.injectActionsToResponse.bind(this, cmp, actionsToInject));
+                $A.test.addCleanup(function(){ $A.test.removePreDecodeCallback(config); });
 
-            $A.test.addWaitFor(
-                    true,
-                    function() {
-                        return completed;
-                    },
-                    function() {
-                        $A.test.assertFalse(found, "Priming action in ERROR state should not be saved to actions storage");
-                    });
-        }]
+                cmp.getStringAction();
+                $A.test.addWaitForWithFailureMessage(true, function(){ return cmp.get("v.completed"); }, "action failed to complete");
+            },
+            function verifyActionStored(cmp) {
+                var completed = false;
+                this.verifyActionInStorage(cmp, cmp.PRIMED_ACTION_DESCRIPTOR, this.ACTION_RETURN_VALUE)
+                    .then(function() {
+                        completed = true;
+                    })
+                    ["catch"](function(error) { $A.test.fail(error.toString()); });
+
+                $A.test.addWaitForWithFailureMessage(true, function() { return completed; }, "error verifying action in storage");
+            }
+        ]
     },
 
+
     /**
-     * Priming actions must be marked storable otherwise an error will be thrown.
+     * Extra actions in ERROR state are not added to the actions storage.
      */
-    testProcessPrimingActionsNotStorable: {
+    testExtraActionsInErrorStateNotAddedToStorage: {
+        test: [
+            function(cmp) {
+                // prefix of action descriptor to be be primed
+                cmp.PRIMED_ACTION_DESCRIPTOR = "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getInt";
+                var actionsToInject = [{
+                    state: "ERROR", // action is in error state
+                    descriptor: cmp.PRIMED_ACTION_DESCRIPTOR,
+                    params: undefined
+                }];
+                var config = $A.test.addPreDecodeCallback(this.injectActionsToResponse.bind(this, cmp, actionsToInject));
+                $A.test.addCleanup(function(){ $A.test.removePreDecodeCallback(config); });
+
+                cmp.getStringAction();
+                $A.test.addWaitForWithFailureMessage(true, function(){ return cmp.get("v.completed"); }, "action failed to complete");
+            },
+            function verifyActionNotStored(cmp) {
+                // action storage is async so wait for:
+                // a) action store to become idle
+                // b) verify the successful action is in storage
+                // then c) check that the errored action is not in storage.
+                var completed = false;
+                var storageContents = cmp.helper.storageTestLib.storageContents;
+                storageContents.waitForActionStorageIdle()
+                    .then(function() {
+                        return this.verifyActionInStorage(cmp, cmp.ACTION_DESCRIPTOR, cmp.ACTION_PARAM);
+                    }.bind(this))
+                    .then(function() {
+                        return storageContents.waitForActionNotInStorage(cmp.PRIMED_ACTION_DESCRIPTOR, true);
+                    })
+                    .then(function() {
+                        completed = true;
+                    })
+                    ["catch"](function(error) { $A.test.fail(error.toString()); });
+
+                $A.test.addWaitForWithFailureMessage(true, function() { return completed; }, "error verifying actions in storage");
+            }
+        ]
+    },
+
+
+    /**
+     * Extra actions not marked as storable throw an error.
+     */
+    testExtraActionsNotStorableDisplaysError: {
         test: function(cmp) {
-            // The error message we expect displayed to the user
+            // error message thrown by framework
             var expected = "Unable to find an action for 12345;a";
             $A.test.expectAuraError(expected);
 
-            var that = this;
-            var addAction = function(response) {
-                if (response["responseText"].indexOf("sent from actionPrimingController.js") === -1) {
-                    return response;
-                }
+            // prefix of action descriptor to be be primed
+            cmp.PRIMED_ACTION_DESCRIPTOR = "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getInt";
+            var actionsToInject = [{
+                storable: false, // action is not storable
+                descriptor: cmp.PRIMED_ACTION_DESCRIPTOR,
+                params: undefined
+            }];
 
-                // Copy response and add a non-storable action
-                var newResponse = $A.util.copy(response);
-                var responseMessage = that.decodeResponse(response);
-                var action = that.copyAction(responseMessage["actions"][0], cmp._actionDescriptorPrefix, {});
-                action["storable"] = false;
-                responseMessage["actions"].push(action);
+            var config = $A.test.addPreDecodeCallback(this.injectActionsToResponse.bind(this, cmp, actionsToInject));
+            $A.test.addCleanup(function(){ $A.test.removePreDecodeCallback(config); });
 
-                var newResponseMessage = that.encodeResponse(responseMessage);
-                newResponse["response"] = newResponseMessage;
-                newResponse["responseText"] = newResponseMessage;
-
-                return newResponse;
-            }
-            var config = $A.test.addPreDecodeCallback(addAction);
-            $A.test.addCleanup(function(){ $A.test.removePreDecodeCallback(config) });
+            cmp.getStringAction();
+            $A.test.addWaitForWithFailureMessage(true, function(){ return cmp.get("v.completed"); }, "action failed to complete");
 
             cmp.getStringAction();
 
             // The priming action is handled in a special way so we cannot wait for the action like we do in other
             // tests. Instead, just wait for the expected error message to be displayed.
-            $A.test.addWaitFor(true, function(){
-                return $A.test.getText(document.getElementById("auraErrorMessage")).indexOf(expected) > -1;
-            });
+            $A.test.addWaitForWithFailureMessage(true,
+                function() {
+                    var errorElement = document.getElementById("auraErrorMessage");
+                    return $A.test.getText(errorElement).indexOf(expected) > -1;
+                },
+                "Error dialog not displayed"
+            );
         }
     },
 
+
+    /**
+     * Trims and decodes the action response.
+     */
     decodeResponse: function(response) {
         var text = response["responseText"];
         // Strip off the while(1) at the beginning. Logic borrowed from AuraClientService.js#decode
@@ -191,20 +187,88 @@
         return $A.test.json.decode(text);
     },
 
+    /**
+     * Encodes and pads the action response so AuraClientService can process it.
+     */
     encodeResponse: function(response) {
         return "while(1);\n" + $A.util.json.encode(response);
     },
 
     /**
-     * Make a copy of an action and add fields AuraClientService.js#buildStorableServerAction expects
+     * Copies an action and add fields AuraClientService.js#buildStorableServerAction expects
+     * @param {Action} action the action to copy.
+     * @param {String} descriptor the action descriptor.
+     * @param {Object} params the action parameters.
      */
-    copyAction: function(original, descriptor, params) {
-        var action = $A.util.copy(original);
-        action["id"] = "12345;a";
+    copyAction: function(action, descriptor, params) {
+        action = $A.util.copy(action);
+        action["id"] = this.ACTION_ID;
         action["storable"] = true;
         action["action"] = descriptor;
         action["params"] = params;
-        action["returnValue"] = "return modified in test";
+        action["returnValue"] = this.ACTION_RETURN_VALUE;
         return action;
-    }
+    },
+
+    /**
+     * Injects the actions into the response. To be done in the preDecodeCallback hook.
+     * @param {Component} cmp
+     * @param {Object[]} actions List of actions to inject. The properties of each object are copied onto the cloned action.
+     * @param {Object} response the XHR response object
+     * @return {Object} the modified response object.
+     */
+    injectActionsToResponse: function(cmp, actions, response) {
+        // ensure this is the action response we care about
+        if (response["responseText"].indexOf(cmp.ACTION_PARAM) === -1) {
+            return response;
+        }
+
+        response = $A.util.copy(response);
+        var decoded = this.decodeResponse(response);
+
+        var propertiesToIgnore = ["descriptor", "params"];
+        var newAction;
+        for (var i = 0; i < actions.length; i++) {
+            newAction = this.copyAction(decoded["actions"][0], actions[i].descriptor, actions[i].params);
+            for (var prop in actions[i]) {
+                if (propertiesToIgnore.indexOf(prop) === -1) {
+                    newAction[prop] = actions[i][prop];
+                }
+            }
+            decoded["actions"].push(newAction);
+        }
+
+        var encoded = this.encodeResponse(decoded);
+        response["response"] = encoded;
+        response["responseText"] = encoded;
+
+        return response;
+    },
+
+
+    /**
+     * Verifies an action, identified by descriptor, is in storage with a known return value.
+     * @param {Component} cmp
+     * @param {String} descriptorPrefix prefix of the action descriptor to verify
+     * @param {String} expectedReturnValue the return value to verify
+     * @return {Promise} a promise that resolves when the action is verified in storage, rejects otherwise.
+     */
+    verifyActionInStorage: function(cmp, descriptorPrefix, expectedReturnValue) {
+        var storageContents = cmp.helper.storageTestLib.storageContents;
+        return storageContents.waitForActionInStorage(descriptorPrefix, true)
+            .then(function(value) {
+                $A.test.assertEquals(expectedReturnValue, value["returnValue"], "Action (" + descriptorPrefix + ") found in storage but with wrong value");
+            });
+    },
+
+
+    /**
+     * Return value of copied actions.
+     */
+    ACTION_RETURN_VALUE: "copied action response",
+
+    /**
+     * Action ID of copied actions.
+     */
+    ACTION_ID: "12345;a"
 })

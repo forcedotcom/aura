@@ -56,7 +56,7 @@
          * for the transaction key. If it's found then loop until it's gone.
          *
          * Must match ComponentDefStorage.prototype.TRANSACTION_SENTINEL_KEY;
-         * TODO W-2365447 - eliminate this and its checks when bulk remove + put is added
+         * TODO W-3314745 - eliminate this and its checks, rely on bulk storage apis
          */
         var TRANSACTION_SENTINEL_KEY = "sentinel_key";
         var MAX_ITERATIONS = 20;

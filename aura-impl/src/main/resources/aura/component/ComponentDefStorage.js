@@ -33,7 +33,7 @@ ComponentDefStorage.prototype.EVICTION_HEADROOM = 0.1;
 
 /**
  * Storage key used to track transactional bounds.
- * TODO W-2365447 - replace this with bulk remove + put
+ * TODO W-3314745 - replace this with bulk remove + put
  */
 ComponentDefStorage.prototype.TRANSACTION_SENTINEL_KEY = "sentinel_key";
 
@@ -178,7 +178,7 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, evtCo
                                 undefined,
                                 function() {
                                     // we can't recover: the defs were properly stored but the sentinel is still there.
-                                    // W-2365447 removes the need for a sentinel which eliminates this possibility.
+                                    // W-3314745 removes the need for a sentinel which eliminates this possibility.
                                 }
                             );
                 },
@@ -217,7 +217,7 @@ ComponentDefStorage.prototype.removeDefs = function(descriptors) {
                             undefined,
                             function() {
                                 // we can't recover: the defs were properly removed but the sentinel is still there.
-                                // W-2365447 removes the need for a sentinel which eliminates this possibility.
+                                // W-3314745 removes the need for a sentinel which eliminates this possibility.
                             }
                         );
                     },

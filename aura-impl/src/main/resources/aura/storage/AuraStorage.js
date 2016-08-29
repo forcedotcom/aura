@@ -35,7 +35,7 @@ var AuraStorage = function AuraStorage(config) {
     this.autoRefreshInterval = config["autoRefreshInterval"] * 1000;
     this.debugLogging = config["debugLogging"];
 
-    this.getOperationsInFlight = 0;
+    this.operationsInFlight = 0;
 
     // frequency guard for sweeping
     this.sweepInterval = Math.min(Math.max(this.expiration*0.5, AuraStorage["SWEEP_INTERVAL"]["MIN"]), AuraStorage["SWEEP_INTERVAL"]["MAX"]);
@@ -108,10 +108,14 @@ AuraStorage.prototype.getMaxSize = function() {
  */
 AuraStorage.prototype.clear = function() {
     var that = this;
+    this.operationsInFlight += 1;
     return this.adapter.clear()
         .then(
-            undefined,
+            function() {
+                that.operationsInFlight -= 1;
+            },
             function(e) {
+                that.operationsInFlight -= 1;
                 that.logError({ "operation": "clear", "error": e });
                 throw e;
             }
@@ -140,14 +144,14 @@ AuraStorage.prototype.get = function(key, includeExpired) {
         );
 };
 
-
 /**
- * In-flight operations counter.
- * @returns {Integer} Number of operations currently waiting on being resolved.
+ * Gets the count of in-flight operations. Note that it's possible the underlying
+ * adapter is performing operations that are not triggered from this API.
+ * @returns {Number} Number of operations currently waiting on being resolved.
  * @export
  */
 AuraStorage.prototype.inFlightOperations = function() {
-    return this.getOperationsInFlight;
+    return this.operationsInFlight;
 };
 
 /**
@@ -193,12 +197,11 @@ AuraStorage.prototype.getAll = function(keys, includeExpired) {
         }
     }
 
-    this.getOperationsInFlight += 1;
-
+    this.operationsInFlight += 1;
     return this.adapter.getItems(prefixedKeys, includeExpired)
         .then(
             function(items) {
-                that.getOperationsInFlight -= 1;
+                that.operationsInFlight -= 1;
 
                 var now = new Date().getTime();
                 var results = {};
@@ -225,8 +228,8 @@ AuraStorage.prototype.getAll = function(keys, includeExpired) {
         .then(
             undefined,
             function(e) {
+                that.operationsInFlight -= 1;
                 that.logError({ "operation": "getAll", "error": e });
-                that.getOperationsInFlight -= 1;
                 throw e;
             }
         );
@@ -305,9 +308,11 @@ AuraStorage.prototype.setAll = function(values) {
     }
 
     var that = this;
+    this.operationsInFlight += 1;
     var promise = this.adapter.setItems(storables)
         .then(
             function() {
+                that.operationsInFlight -= 1;
                 var keys = Object.keys(values);
                 that.log("set() - " + keys.length + " key(s): " + keys.join(", "));
                 that.fireModified();
@@ -316,6 +321,7 @@ AuraStorage.prototype.setAll = function(values) {
         .then(
             undefined,
             function(e) {
+                that.operationsInFlight -= 1;
                 that.logError({ "operation": "set", "error": e });
                 throw e;
             }
@@ -355,9 +361,11 @@ AuraStorage.prototype.removeAll = function(keys, doNotFireModified) {
     }
 
     var that = this;
+    this.operationsInFlight += 1;
     return this.adapter.removeItems(prefixedKeys)
         .then(
             function() {
+                that.operationsInFlight -= 1;
                 if (that.debugLogging) {
                     for (i = 0; i < prefixedKeys.length; i++) {
                         that.log("remove() - key " + prefixedKeys[i]);
@@ -372,6 +380,7 @@ AuraStorage.prototype.removeAll = function(keys, doNotFireModified) {
         .then(
             undefined,
             function(e) {
+                that.operationsInFlight -= 1;
                 that.logError({ "operation": "remove", "error": e });
                 throw e;
             }
@@ -410,6 +419,7 @@ AuraStorage.prototype.sweep = function(ignoreInterval) {
     // @param {Boolean} doNotFireModified true if no items were evicted.
     // @param {Error} e the error if the promise was rejected
     function doneSweeping(doNotFireModified, e) {
+        this.operationsInFlight -= 1;
         this.log("sweep() - complete" + (e ? " (with errors)" : ""));
         this.sweepPromise = undefined;
         this.lastSweepTime = new Date().getTime();
@@ -420,6 +430,7 @@ AuraStorage.prototype.sweep = function(ignoreInterval) {
     }
 
     // start the sweep + prevent concurrent sweeps
+    this.operationsInFlight += 1;
     this.sweepPromise = this.adapter.sweep().then(
             undefined, // noop
             function(e) {

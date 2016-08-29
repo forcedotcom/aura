@@ -133,6 +133,7 @@
                     <stopKey>foo</stopKey>
                     <stopPort>${jetty.port.stop}</stopPort>
                     <webAppSourceDirectory>${aura.home}/aura/src/main/webapp</webAppSourceDirectory>
+                    <contextXml>${aura.home}/aura/src/main/webapp/WEB-INF/jetty-context.xml</contextXml>
                     <webAppConfig>
                         <contextPath>/</contextPath>
                         <descriptor>${aura.home}/aura/src/main/webapp/WEB-INF/web.xml</descriptor>

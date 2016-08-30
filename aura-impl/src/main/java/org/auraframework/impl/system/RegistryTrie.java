@@ -21,10 +21,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.throwable.AuraError;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -48,6 +51,13 @@ public class RegistryTrie {
             defTypeMap = new EnumMap<>(DefType.class);
         }
         for (DefType dt : reg.getDefTypes()) {
+            if (defTypeMap.containsKey(dt)) {
+                DefRegistry<?> existing = defTypeMap.get(dt);
+                throw new AuraError(String.format(
+                        "Duplicate DefType/Prefix/Namespace combination claimed by 2 DefRegistries : {%s/%s/%s} and {%s/%s/%s}",
+                        existing.getDefTypes(), existing.getPrefixes(), existing.getNamespaces(), reg.getDefTypes(),
+                        reg.getPrefixes(), reg.getNamespaces()));
+            }
             defTypeMap.put(dt, reg);
         }
         return defTypeMap;
@@ -57,6 +67,7 @@ public class RegistryTrie {
         if (prefixMap == null) {
             prefixMap = Maps.newHashMap();
         }
+        // We expect getPrefixes() to always return lower case values here
         for (String prefix : reg.getPrefixes()) {
             Object orig = prefixMap.get(prefix);
             Map<String, Object> namespaceMap;
@@ -107,12 +118,14 @@ public class RegistryTrie {
     private void initializeHashes() {
         for (DefRegistry<?> reg : allRegistries) {
             insertPrefixReg(root, reg);
-            allNamespaces.addAll(reg.getNamespaces());
+            for (String ns : reg.getNamespaces()) {
+                allNamespaces.add(ns.toLowerCase());
+            }
         }
         allNamespaces.remove("*");
     }
 
-    public RegistryTrie(DefRegistry<?>... registries) {
+    public RegistryTrie(@Nonnull DefRegistry<?>... registries) {
         allRegistries = registries;
         initializeHashes();
     }
@@ -189,7 +202,7 @@ public class RegistryTrie {
             return null;
         }
         if (nsObj instanceof DefRegistry) {
-            return (DefRegistry<?>)nsObj;
+            return (DefRegistry<?>) nsObj;
         }
 
         @SuppressWarnings("unchecked")

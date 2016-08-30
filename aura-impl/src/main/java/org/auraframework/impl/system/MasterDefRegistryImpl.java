@@ -1257,7 +1257,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @Override
     public boolean namespaceExists(String ns) {
-        return delegateRegistries.getAllNamespaces().contains(ns);
+        return delegateRegistries.getAllNamespaces().contains(ns.toLowerCase());
     }
 
     @Override

@@ -76,6 +76,9 @@ Test.Aura.AuraClientServiceTest = function() {
             },
             auraError: function(msg) {
                 this.message = msg;
+            },
+            clientService: {
+                hardRefresh: function(){}
             }
         },
         window:{},
@@ -977,6 +980,86 @@ Test.Aura.AuraClientServiceTest = function() {
             });
 
             Assert.Equal(0, mockSetItems.Calls.length);
+        }
+
+    }
+
+    [Fixture]
+    function invalidSession() {
+
+        [Fact]
+        function DisablesParallelBootstrapWhenFailedToStoreToken() {
+
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                // Since we use document.cookie to switch parallel bootstrap,
+                // we just verify the method gets called.
+                target.disableParallelBootstrapLoadOnNextLoad = Stubs.GetMethod();
+                target.saveTokenToStorage = function() {
+                    return RejectPromise();
+                };
+
+                // Act
+                target.invalidSession({newToken: "myToken"});
+
+                // Assert
+                Assert.Equal(1, target.disableParallelBootstrapLoadOnNextLoad.Calls.length)
+            });
+        }
+
+        [Fact]
+        function DisablesParallelBootstrapWhenGivenInvalidToken() {
+
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                // Since we use document.cookie to switch parallel bootstrap,
+                // we just verify the method gets called.
+                target.disableParallelBootstrapLoadOnNextLoad = Stubs.GetMethod();
+                target.saveTokenToStorage = function() {
+                    return ResolvePromise();
+                };
+
+                // Act
+                target.invalidSession();
+
+                // Assert
+                Assert.Equal(1, target.disableParallelBootstrapLoadOnNextLoad.Calls.length)
+            });
+        }
+
+        [Fact]
+        function KeepsCurrentParallelBootstrapCookieIfStoredNewToken() {
+            var actual;
+            var mockAction = Mocks.GetMocks(Object.Global(), {
+                Action: {
+                    getStorage: function() {
+                        return {
+                            isPersistent: function() {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            });
+
+            mockGlobal(function() {
+                mockAction(function() {
+                    var target = new Aura.Services.AuraClientService();
+
+                    target.saveTokenToStorage = function() {
+                        return ResolvePromise();
+                    };
+
+                    document.cookie = "expected";
+                    try {
+                        target.invalidSession({newToken: "myToken"});
+
+                        Assert.Equal("expected", document.cookie);
+                    } finally {
+                        delete document.cookie;
+                    }
+                });
+            });
         }
 
     }

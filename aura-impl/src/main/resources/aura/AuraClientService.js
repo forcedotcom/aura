@@ -3191,7 +3191,11 @@ AuraClientService.prototype.invalidSession = function(token) {
     // fails then we must go to the server for bootstrap.js to get a new token.
     if (token && token["newToken"]) {
         this._token = token["newToken"];
-        this.saveTokenToStorage().then(refresh.bind(null, false), refresh.bind(null, true));
+        this.saveTokenToStorage()
+            .then(refresh.bind(null, false), refresh.bind(null, true))
+            .then(undefined, function(err) {
+                $A.warning("AuraClientService.invalidSession(): Failed to refresh, " + err);
+            });
     } else {
         // refresh (to get a new session id) and force bootstrap.js to the server
         // (to get a new csrf token).

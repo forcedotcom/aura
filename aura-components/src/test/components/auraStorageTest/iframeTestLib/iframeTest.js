@@ -189,11 +189,11 @@ function iframeTest(storageContents) {
          */
         waitForDefRemovedFromStorage : function(desc, msg) {
             var iframe = this.getIframe();
-            var found = false;
+            var removed = false;
             storageContents.waitForDefNotInStorage(desc, iframe)
                 .then(
                     function() {
-                        found = true;
+                        removed = true;
                     },
                     function(e) {
                         $A.test.fail("waitForDefInStorage(" + desc + ") failed: " + e);
@@ -202,7 +202,7 @@ function iframeTest(storageContents) {
 
             $A.test.addWaitForWithFailureMessage(
                 true,
-                function() { return found; },
+                function() { return removed; },
                 msg || "Def " + desc + " never removed from ComponentDefStorage"
             );
         },
@@ -243,7 +243,7 @@ function iframeTest(storageContents) {
             var iframe = this.getIframe();
             var storage = iframe.$A.storageService.getStorage("actions");
             var found = false;
-            storageContents.waitForKeyInStorage(storage, "globalValueProviders", iframe)
+            storageContents.waitForKeyInStorage(storage, "globalValueProviders")
                 .then(
                     function() {
                         found = true;

@@ -15,9 +15,12 @@
  */
 ({
     render: function (cmp, helper) {
+        var url = cmp.get("v.value");
         if ($A.util.getBooleanValue(cmp.get("v.fixURL"))) {
-            cmp.set("v.value", helper.makeAbsolute(cmp.get("v.value")));
+            url = helper.makeAbsolute(url);
         }
+
+        cmp.set("v.absoluteURL", url);
 
         var ret = this.superRender();
 
@@ -34,9 +37,12 @@
     },
 
     rerender: function (cmp, helper) {
+        var url = cmp.get("v.value");
         if (cmp.isDirty("v.value") && $A.util.getBooleanValue(cmp.get("v.fixURL"))) {
-            cmp.set("v.value", helper.makeAbsolute(cmp.get("v.value")));
+            url = helper.makeAbsolute(url);
         }
+
+        cmp.set("v.absoluteURL", url);
 
         this.superRerender();
 

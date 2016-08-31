@@ -158,6 +158,14 @@
 	        	this.injectComponent(cmp, contentCmp, !isLoadSuccessful);
 				return isLoadSuccessful;
 			}	
+		} else if (actionState === "ERROR") {
+			var showMessageEvt = $A.getEvt('markup://force:showMessage');
+			if(showMessageEvt){
+				showMessageEvt.setParams({
+	                message: action.getError()[0].message,
+	                severity: "error"
+	            }).fire();
+			}
 		}
 	},
 	injectComponent: function (cmp, content, noMore) {

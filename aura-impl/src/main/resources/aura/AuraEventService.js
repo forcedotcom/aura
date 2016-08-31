@@ -1186,8 +1186,11 @@ AuraEventService.prototype.getDefinition = function(descriptor, callback) {
     });
     action.setCallback(this, function (actionReponse) {
         var definition = null;
-        if(actionReponse.getState() === "SUCCESS") {
+        var state = actionReponse.getState();
+        if(state === "SUCCESS") {
             definition = this.getDef(descriptorName);
+        } else if(state === "INCOMPLETE" || state === "ERROR") {
+            throw new Error("Failed to get eventDef from server: "+actionReponse.getError());
         }
         callback(definition);
     });

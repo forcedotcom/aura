@@ -179,7 +179,8 @@ AuraStyleService.prototype.applyAllTokens = function(descriptors, config) {
 
 
         action.setCallback(this, function(a) {
-            if (a.getState() === "SUCCESS") {
+        	var state = a.getState();
+            if (cmp.isValid() && state === "SUCCESS") {
                 // if custom handler is specified, give it the CSS and do nothing else
                 if ($A.util.isFunction(config["customHandler"])) {
                     config["customHandler"](a.getReturnValue());
@@ -195,7 +196,12 @@ AuraStyleService.prototype.applyAllTokens = function(descriptors, config) {
                 } else {
                     that.added.push(node);
                 }
-            } else {
+            } else if (cmp.isValid() && state === "INCOMPLETE") {
+            	var offlineMessageEvt = $A.getEvt('markup://force:showOfflineMessage');
+            	if(offlineMessageEvt){
+            		offlineMessageEvt.setParams({retryAction: action}).fire();
+            	}
+            } else if (cmp.isValid() && state === "ERROR") {
                 var errors = a.getError();
                 if (errors && errors[0] && errors[0].message) {
                     throw new $A.auraError(errors[0].message);

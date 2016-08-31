@@ -508,12 +508,15 @@
         } else if (response) {
             // TODO: handle responses of the following object signature
             // { data : Array, sortBy : String, state : String, error : Object }
-            if (response.state === 'SUCCESS') {
+        	var resposeState = response.state;
+        	if (resposeState === 'SUCCESS') {
                 var data   = response.data || [];
                 var sortBy = response.sortBy || '';
                 
                 cmp.set('v.items', data);
                 this.updateSortData(cmp, sortBy);
+        	} else if(resposeState === "INCOMPLETE" || resposeState === "ERROR") {
+                throw new Error("Failed to get response from server");
             }
         }
     },

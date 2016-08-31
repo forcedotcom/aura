@@ -51,7 +51,8 @@
             if(!cmp.isValid()){
                 return;
             }
-            if (a.getState() === "SUCCESS"){
+            var state = a.getState();
+            if (state === "SUCCESS"){
                 var config= a.getReturnValue();
                 if(!config.hasOwnProperty("attributes")){
                     config["attributes"]={"values":{}};
@@ -59,7 +60,12 @@
                 $A.util.apply(config["attributes"]["values"], attributes);
                 config["attributes"]["valueProvider"] = avp;
                 newBody = $A.createComponentFromConfig(config);
-            } else {
+            } else if (state === "INCOMPLETE") { // user is offline
+            	var offlineMessageEvt = $A.getEvt('markup://force:showOfflineMessage');
+            	if(offlineMessageEvt){
+            		offlineMessageEvt.setParams({retryAction: action}).fire();
+            	}
+            } else if (state === "ERROR") {
                 var errors = a.getError();
                 newBody = $A.createComponentFromConfig({ "descriptor" : "markup://aura:text" });
                 if (errors) {

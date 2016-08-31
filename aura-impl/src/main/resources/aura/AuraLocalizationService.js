@@ -1216,7 +1216,9 @@ AuraLocalizationService.prototype.getTimeZoneInfo = function(timezone, callback)
                     WallTime["init"](WallTime["data"]["rules"], WallTime["data"]["zones"]);
                     }
                 }
-            }
+        	} else if(state === "INCOMPLETE" || state === "ERROR") {
+        		throw new Error("Failed to get Time Zone Info from server: "+action.getError());
+        	}
             callback();
         });
         $A.enqueueAction(a);

@@ -18,10 +18,11 @@
         var a = cmp.get("c.updateAuraAssistServer");
 
         a.setCallback(cmp, function(action){
-            if (action.getState() === "SUCCESS") {
+        	var state = action.getState();
+            if (state === "SUCCESS") {
             	/*eslint-disable no-alert*/
                alert('Done! Content written to:'+ action.getReturnValue());
-            } else {
+            } else if(state === "INCOMPLETE" || state === "ERROR") {
             	/*eslint-disable no-alert*/
                alert('Ooops! Something went wrong check your console.');
             }

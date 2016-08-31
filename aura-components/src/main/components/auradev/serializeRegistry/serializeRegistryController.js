@@ -19,15 +19,14 @@
         serializeBtn.set("v.disabled", true);
     	var a = cmp.get("c.serializeComponentRegistryToJson");
     	a.setCallback(cmp, function(action){
+    		var state = action.getState();
     	    serializeBtn.set("v.disabled", false);
-    	    if(action.getState() === "SUCCESS"){
+    	    if(state === "SUCCESS"){
     	    	/*eslint-disable no-alert*/
     	    	alert("Registry Serialized to: "+action.getReturnValue());
-    	    }
-    	    else{
-    	    	/*eslint-disable no-alert*/
-    			alert("Oops something went wrong.");
-    		}
+    	    } else if(state === "INCOMPLETE" || state === "ERROR") {
+    	    	throw new Error("Failed to get serializeComponentRegistryToJson from server: "+action.getError());
+            } 
         });
         $A.enqueueAction(a);
     }

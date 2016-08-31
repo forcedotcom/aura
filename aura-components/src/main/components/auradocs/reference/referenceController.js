@@ -39,6 +39,8 @@
 
                     content.set("v.body", newComponents);
                 }
+            } else if(state === "INCOMPLETE" || state === "ERROR") {
+            	throw new Error("Failed to get getReference from server: "+action.getError());
             }
         });
 

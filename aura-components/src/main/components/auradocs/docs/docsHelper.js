@@ -56,7 +56,7 @@
                     
 
                 }
-            } else {
+            } else if(state === "INCOMPLETE" || state === "ERROR") {
 
                 // KRIS
                 // Lets cause this to fail so we can give a better error message.

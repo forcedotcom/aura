@@ -23,9 +23,12 @@
             "keyword": keyword
         });
         action.setCallback(this, function(act) {
-            if (act.getState() === "SUCCESS") {
+        	var state = act.getState();
+            if (state === "SUCCESS") {
                 var result = act.getReturnValue();                    
                 this.fireDataChangeEvent(dataProvider, result); 
+            } else if(state === "INCOMPLETE" || state === "ERROR") {
+            	throw new Error("Failed to get getItems from server: "+act.getError());
             }
         });
         $A.enqueueAction(action);

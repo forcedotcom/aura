@@ -50,7 +50,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
     private final Map<String,AuraResource> nameToResource = Maps.newHashMap();
 
     private ContextService contextService;
-
+    
     private void addResource(AuraResource resource) {
         String name = resource.getName();
         if (name != null) {

@@ -113,7 +113,7 @@ Aura.Utils.Util.prototype.globalEval = function(src, globals, optionalSourceURL)
         keys.push(key);
         vals.push(globals[key]);
     }
-    
+
     if (optionalSourceURL) {
         sourceURL = '\n//# sourceURL=' + optionalSourceURL;
     }
@@ -350,6 +350,19 @@ Aura.Utils.Util.prototype.clearNode = function (node) {
     }
 };
 
+/**
+ * Sanitize
+ * Public method providing core sanitation functionality
+ *
+ * @param {String} dirty string
+ * @param {Object} configuration object
+ * @return {String} sanitized string
+ * @export
+*/
+
+Aura.Utils.Util.prototype.sanitizeDOM = function (dirty, config) {
+    return DOMPurify["sanitize"](dirty, config);
+};
 
 // -- Sanitize Facade (secure-filters) -----------------------------------------------
 

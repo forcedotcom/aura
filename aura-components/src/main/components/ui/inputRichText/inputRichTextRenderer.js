@@ -17,8 +17,9 @@
 ({
 
 	afterRender: function (cmp, helper) {
-		helper.initEditor(cmp);
-		helper.setContent(cmp, cmp.get("v.value"));
+		helper.initEditor(cmp, function () {
+			helper.setContent(cmp, cmp.get("v.value"));
+		});
 		this.superAfterRender();
 	},
 

@@ -117,7 +117,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "clientLibraryTest:clientLibraryTest", ApplicationDef.class);
         Set<String> jsUrls = getClientLibraryUrls(appDesc, Type.JS);
-        assertEquals(1, jsUrls.size());
+        assertEquals(2, jsUrls.size());
         Iterator<String> it = jsUrls.iterator();
         assertEquals(getResolver("CkEditor", Type.JS).getUrl(), it.next());
     }
@@ -176,7 +176,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
                 "clientLibraryTest:testDependencies", ApplicationDef.class);
         Set<String> jsUrls = getClientLibraryUrls(appDesc, Type.JS);
         String url = getResolver("CkEditor", Type.JS).getUrl();
-        assertEquals(1, jsUrls.size());
+        assertEquals(2, jsUrls.size());
         assertTrue(jsUrls.contains(url));
     }
 

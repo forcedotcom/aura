@@ -54,7 +54,6 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.util.AuraImplFiles;
-import org.auraframework.impl.util.BrowserInfo;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -398,18 +397,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     /**
-     * Combined js libs filename will contain timezone for walltime.js
-     * @return url of combined js libs file
-     */
-    @Override
-    public String getJSLibsURL() {
-        AuraContext context = contextService.getCurrentContext();
-        String contextPath = context.getContextPath();
-        String nonce = context.getFrameworkUID();
-        return String.format("%s/auraFW/resources/%s/libs.js", contextPath, nonce);
-    }
-
-    /**
      * walltime.js data does not provide all timezones due to duplicates so we return the
      * one that is equivalent and available.
      *
@@ -444,22 +431,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         }
         return equivalents;
     }
-
-    @Override
-    public String getHTML5ShivURL() {
-        String ret = null;
-        AuraContext context = contextService.getCurrentContext();
-        String ua = context != null ? context.getClient().getUserAgent() : null;
-        BrowserInfo b = new BrowserInfo(ua);
-        if (b.isIE7() || b.isIE8()) {
-            String nonce = context.getFrameworkUID();
-            String contextPath = context.getContextPath();
-            ret = String.format("%s/auraFW/resources/%s/html5shiv/html5shiv.js", contextPath, nonce);
-        }
-
-        return ret;
-    }
-
+    
     @Override
     public String getAuraJSURL() {
         AuraContext context = contextService.getCurrentContext();

@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.net.URL;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -26,8 +27,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
+import org.auraframework.util.IOUtil;
 import org.auraframework.util.javascript.CommonJavascriptGroupImpl;
+import org.auraframework.util.resource.ResourceLoader;
 import org.auraframework.util.text.Hash;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 
 /**
  * Javascript group that contains directives for parsing instructions or metadata or other fun stuff. It starts from one
@@ -85,6 +91,10 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
             return builder.toString();
         }
     }
+    
+    // Caching for resources
+    private static final String LIB_CACHE_TEMP_DIR = IOUtil.newTempDir("auracache");
+    
 
     // name for threads that compress and write the output
     public static final String THREAD_NAME = "jsgen.";
@@ -97,6 +107,8 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
     // used during parsing, should be clear for storing in memory
     private DirectiveParser parser;
+    
+    private ResourceLoader resourceLoader;
 
     public DirectiveBasedJavascriptGroup(String name, File root, String start) throws IOException {
         this(name, root, start, DirectiveTypes.DEFAULT_TYPES, EnumSet.of(JavascriptGeneratorMode.DEVELOPMENT,
@@ -110,6 +122,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         this.directiveTypes = directiveTypes;
         this.modes = modes;
         this.startFile = addFile(start);
+        
     }
 
     public List<DirectiveType<?>> getDirectiveTypes() {
@@ -175,6 +188,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                         writer = new FileWriter(dest);
                         mode.getJavascriptWriter().compress(everything, writer, dest.getName());
                         writer.write('\n');
+                        appendExternalLibraries(writer);
                     } finally {
                         if (writer != null) {
                             writer.close();
@@ -189,6 +203,30 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                     counter.countDown();
                 }
             }
+
+			private void appendExternalLibraries(Writer writer) throws IOException {
+				ResourceLoader rl = getResourceLoader();
+					writer.write("\n Aura.externalLibraries = function() {\n");
+					try {
+						appendResourceToWriter(writer, "momentWithLocales", rl.getResource("aura/resources/momentWithLocales/momentWithLocales.min.js"));
+						appendResourceToWriter(writer, "DOMPurify", rl.getResource("aura/resources/domPurify/DOMPurify.min.js"));
+					} catch (Exception e) {}
+
+					writer.write("\n};");
+			}
+			
+			private void appendResourceToWriter(Writer writer, String name, URL url ) throws IOException {
+				writer.write("// "+ name +"\n");
+				writer.write(Resources.toString(url, Charsets.UTF_8));
+				writer.write("\n");
+			}
+
+			private ResourceLoader getResourceLoader() throws IOException {
+				if (resourceLoader == null) {
+					resourceLoader = new ResourceLoader(LIB_CACHE_TEMP_DIR, true);
+				}
+				return resourceLoader;
+			}
         }, threadName);
         t.start();
     }

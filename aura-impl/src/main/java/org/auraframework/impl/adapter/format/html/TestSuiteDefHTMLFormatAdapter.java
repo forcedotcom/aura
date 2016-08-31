@@ -25,6 +25,8 @@ import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.TestSuiteDef;
+
+import org.auraframework.impl.util.TemplateUtil.Script;
 import org.auraframework.instance.Component;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.InstanceService;
@@ -72,7 +74,7 @@ public class TestSuiteDefHTMLFormatAdapter extends HTMLFormatAdapter<TestSuiteDe
         attribs.put("auraStyleTags", sb.toString());
 
         sb = new StringBuilder();
-        writeHtmlScripts(context, servletUtilAdapter.getScripts(context, true, false, attributes), false, sb);
+        writeHtmlScripts(context, servletUtilAdapter.getScripts(context, true, false, attributes), Script.SYNC, sb);
         attribs.put("auraScriptTags", sb.toString());
 
         sb = new StringBuilder();

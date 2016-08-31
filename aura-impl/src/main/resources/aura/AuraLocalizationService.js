@@ -1016,7 +1016,8 @@ AuraLocalizationService.prototype.translateToOtherCalendar = function(date) {
  * @platform
  */
 AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callback) {
-    if (typeof callback === 'function') {
+    $A.assert(callback, 'Callback is required');
+    this.initializeWalltime(function () {
         if (!timezone) {
             timezone = $A.get("$Locale.timezone");
         }
@@ -1035,7 +1036,7 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
         } else {
             callback(this.getWallTimeFromUTC(date, timezone));
         }
-    }
+    }.bind(this));
 };
 
 /**
@@ -1053,26 +1054,30 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
  * @platform
  */
 AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callback) {
-    if (typeof callback === 'function') {
-        if (!timezone) {
-            timezone = $A.get("$Locale.timezone");
-        }
+    $A.assert(callback, 'Callback is required');
 
-        if (timezone === "GMT" || timezone === "UTC") {
-            callback(date);
-            return;
-        }
+    this.initializeWalltime(function () {
+        if (typeof callback === 'function') {
+            if (!timezone) {
+                timezone = $A.get("$Locale.timezone");
+            }
 
-        if (!WallTime["zones"] || !WallTime["zones"][timezone]) {
-            // retrieve timezone data from server
-            var that = this;
-            this.getTimeZoneInfo(timezone, function() {
-                callback(that.getUTCFromWallTime(date, timezone));
-            });
-        } else {
-            callback(this.getUTCFromWallTime(date, timezone));
+            if (timezone === "GMT" || timezone === "UTC") {
+                callback(date);
+                return;
+            }
+
+            if (!WallTime["zones"] || !WallTime["zones"][timezone]) {
+                // retrieve timezone data from server
+                var that = this;
+                this.getTimeZoneInfo(timezone, function() {
+                    callback(that.getUTCFromWallTime(date, timezone));
+                });
+            } else {
+                callback(this.getUTCFromWallTime(date, timezone));
+            }
         }
-    }
+    }.bind(this));
 };
 
 /**---------- Private functions ----------*/
@@ -1150,6 +1155,20 @@ AuraLocalizationService.prototype.getStrictModeDateTimeString = function(dateTim
     }
     return dateTimeString;
 };
+
+/**
+ * Initializes Walltime
+ *
+ * @private
+ */
+AuraLocalizationService.prototype.initializeWalltime = function(callback) {
+    $A.clientService.loadClientLibrary('Walltime', function (err) {
+        // If walltime autoinit changes, we need to init here:
+        // window.WallTime.init(window.WallTime.data.rules, window.WallTime.data.zones); } }).call(this);
+        callback(err);
+    });
+};
+
 
 /**
  * Normalize the input Java locale string to moment.js compatible one.

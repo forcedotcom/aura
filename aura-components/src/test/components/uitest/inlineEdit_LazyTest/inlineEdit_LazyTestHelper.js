@@ -82,7 +82,7 @@
 	                date: "0123" + rand,
 	                checkbox: (i % 2 == 0),
 	                notes: "special string that is long with special char!@#$%^&*()",
-	                modDateTime: "1/1/2000 12:00 AM",
+	                modDateTime: "2000-01-01 12:00",
 	                url: 'www.salesforce.com',
 	                phone: "555-555-555" + rand
 	            },

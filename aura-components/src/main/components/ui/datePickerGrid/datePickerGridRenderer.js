@@ -29,6 +29,8 @@
         });
 
         if (shouldRender) {
+            component.set("v._setFocus", component.get("v.setFocus"));
+
             helper.renderGrid(component);
             this.superRerender();
         }

@@ -293,7 +293,6 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
     this.isLockerServiceEnabled = this["isLockerServiceEnabled"] = otherContext["lockerEnabled"];
 
     this.globalValueProviders.merge(otherContext["globalValueProviders"]);
-    $A.localizationService.init();
 
     if (otherContext["libraryDefs"]) {
         defs = otherContext["libraryDefs"];

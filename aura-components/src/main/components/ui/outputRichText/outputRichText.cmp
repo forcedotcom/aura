@@ -17,8 +17,6 @@
 -->
 <aura:component access="GLOBAL" support="GA" implements="ui:visible" extensible="true" description="Displays richly-formatted text including tags such as paragraph, image, and hyperlink, as specified in the value attribute.">
 
-	<!-- Library which holds the sanitization library -->
-    <aura:import library="ui:securityLib" property="securityLib"/>
     <aura:import library="ui:urlLib" property="urlLib"/>
 
     <aura:attribute access="GLOBAL" name="value" type="String" description="The richly-formatted text used for output."/>

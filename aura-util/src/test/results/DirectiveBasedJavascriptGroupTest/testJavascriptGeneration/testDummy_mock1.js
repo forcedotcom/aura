@@ -52,3 +52,8 @@ var stuff = {
 
 
 
+
+ Aura.externalLibraries = function() {
+// momentWithLocales
+
+};

@@ -61,12 +61,9 @@ public class CombineJavascriptLibraries {
         BufferedReader br = Files.newBufferedReader(configPath, StandardCharsets.UTF_8);
         Gson gson = new Gson();
         ResourcesConfig config = gson.fromJson(br, ResourcesConfig.class);
+        List<String> existingTimezones = Lists.newArrayList();
 
-        List<String> devFiles = config.files;
-
-        List<Path> minFiles = Lists.newArrayList();
-
-        // create destination folder if doesn't already exist
+         // Create destination folder if doesn't already exist
         File destination = destDir.toFile();
         if (!destination.exists()) {
             destination.mkdirs();
@@ -74,64 +71,12 @@ public class CombineJavascriptLibraries {
             throw new IOException(destination.getPath() + " is supposed to be a directory");
         }
 
-        StringBuilder outputDev = new StringBuilder();
-        outputDev.append(System.lineSeparator()).append(";"); // prevent syntax issues with combining files
-        StringBuilder logging = new StringBuilder("Non minified version includes ");
-
-        // calculate non-minified and minified paths
-        for (String file : devFiles) {
-
-            Path devPath = resourcesSourceDir.resolve(file);
-            boolean devExists = Files.exists(devPath);
-
-            String minFile = getMinFilePath(file);
-            Path minPath = resourcesSourceDir.resolve(minFile);
-            boolean minExists = Files.exists(minPath);
-
-            if (!devExists && !minExists) {
-                throw new IOException("Both " + file + " and " + minFile + " don't exist");
-            }
-
-            if (minExists) {
-                minFiles.add(minPath);
-                if (!devExists) {
-                    devPath = minPath;
-                }
-            } else if (devExists) {
-                minFiles.add(devPath);
-            }
-
-            // cache non minified output without walltime timezones
-            outputDev.append(readFile(devPath)).append(System.lineSeparator()).append(";");
-            logging.append(devPath.toString()).append(" ");
-        }
-
-        Files.write(destDir.resolve("libs.js"), outputDev.toString().getBytes());
-
-        LOG.info(logging.toString());
-        logging.setLength(0);
-
-        StringBuilder outputMin = new StringBuilder();
-        outputMin.append(System.lineSeparator()).append(";"); // prevent syntax issues with combining files
-        logging.append("Minified version includes ");
-        for (Path minFile : minFiles) {
-            // cache minified output
-            outputMin.append(readFile(minFile)).append(System.lineSeparator()).append(";");
-            logging.append(minFile.toString()).append(" ");
-        }
-
-        Files.write(destDir.resolve("libs.min.js"), outputMin.toString().getBytes());
-
-        LOG.info(logging.toString());
-
-        List<String> existingTimezones = Lists.newArrayList();
-
         Path walltimeLocaleDirectory = resourcesSourceDir.resolve(config.walltimeLocaleDir);
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(walltimeLocaleDirectory)) {
             for (Path path : directoryStream) {
                 String fileName = path.getFileName().toString();
                 if (!fileName.endsWith(".js")) {
-                	continue;
+                    continue;
                 }
                 String ending = fileName.substring(fileName.indexOf("_"), fileName.length());
                 int extIndex = ending.lastIndexOf(".");
@@ -144,7 +89,7 @@ public class CombineJavascriptLibraries {
                 existingTimezones.add(timezone.replace("-", "/"));
             }
         }
-
+        
         LOG.info("Generating equivalent timezones json");
         String timezonesJson = generateEquivalentTimezonesJson(existingTimezones, gson);
         Files.write(destDir.resolve("timezones.json"), timezonesJson.getBytes());

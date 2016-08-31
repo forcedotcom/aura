@@ -46,7 +46,7 @@
 
     sanitize: function(component, value) {
         if ($A.util.isEmpty(value)) {
-        	component.set("v.displayValue", '');
+            component.set("v.displayValue", '');
             return;
         }
 
@@ -54,13 +54,18 @@
         var supportedAttrs = this.getSupportedAttributes(component);
 
         try {
-            var sanitizedValue = this.securityLib.DOMPurify.sanitize(value, {ALLOWED_TAGS: supportedTags, ALLOWED_ATTR: supportedAttrs});
+            var cfg = {
+                ALLOWED_TAGS: supportedTags,
+                ALLOWED_ATTR: supportedAttrs,
+                ALLOW_UNKNOWN_PROTOCOLS: true
+            };
+            var sanitizedValue = $A.util.sanitizeDOM(value, cfg);
             if (sanitizedValue !== component.get("v.displayValue")) {
                 component.set("v.displayValue", sanitizedValue);
             }
         } catch (e) {
-        	$A.warning("Exception caught while attempting to sanitize " + component.getGlobalId() + "; " + e);
-        	component.set("v.displayValue", $A.util.sanitizeHtml(value));
+            $A.warning("Exception caught while attempting to sanitize " + component.getGlobalId() + "; " + e);
+            component.set("v.displayValue", $A.util.sanitizeHtml(value));
         }
     },
 

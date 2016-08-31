@@ -16,7 +16,7 @@
     limitations under the License.
 
 -->
-<aura:application template="performance:bootstrapTemplate" access="global" useAppcache="true">
+<aura:application template="performance:bootstrapTemplate" access="global" useAppcache="false">
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <!-- 
         DO NOT MODIFY THIS APPLICATION!! 

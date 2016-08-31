@@ -413,7 +413,7 @@ function AuraInstance () {
     this.enqueueAction             = this.clientService.enqueueAction.bind(this.clientService);
     this.deferAction               = this.clientService.deferAction.bind(this.clientService);
     this.deferPendingActions       = this.clientService.deferPendingActions.bind(this.clientService);
-    this.runAfterInit               = this.clientService.runAfterInitDefs.bind(this.clientService);
+    this.runAfterInit              = this.clientService.runAfterInitDefs.bind(this.clientService);
 
     this.render                    = this.renderingService.render.bind(this.renderingService);
     this.rerender                  = this.renderingService.rerender.bind(this.renderingService);
@@ -547,7 +547,6 @@ function AuraInstance () {
 
     // TODO: convert to //#exportSymbols when available
 
-
     services["rendering"] = services.rendering;
     services["event"] = services.event;
     services["component"] = services.component;
@@ -559,12 +558,10 @@ function AuraInstance () {
     services["cmp"] = services.cmp;
     services["e"] = services.e;
     services["c"] = {
-
         get: function(name) {
             var path = (name||'').split('.');
             var controllerDef = path.shift();
             var action = path.shift();
-
             return services.component.getControllerDef(controllerDef).get(action);
         }
     };
@@ -674,8 +671,6 @@ AuraInstance.prototype.initAsync = function(config) {
         }
 
         $A.clientService.initHost(config["host"]);
-        $A.setLanguage();
-
         $A.metricsService.initialize();
 
 
@@ -687,6 +682,8 @@ AuraInstance.prototype.initAsync = function(config) {
         function reportError(e) {
             $A.reportError("getApplication threw error", e);
         }
+
+        $A.executeExternalLibraries();
 
         // actions depend on defs depend on GVP (labels). so load them in dependency order and skip
         // loading depending items if anything fails to load.
@@ -724,13 +721,13 @@ AuraInstance.prototype.initAsync = function(config) {
 };
 
 /**
- * Set the language for the HTML document.
- *
- * This must be called after the context is initialized and we have our GVPs set up.
+ * This funciton initializes external libraries that were appended on aura.js
+ * An example of library is moment.js
  */
-AuraInstance.prototype.setLanguage = function() {
-    var lang = $A.get("$Locale.userLocalLang") || "en";
-    document["getElementsByTagName"]("html")[0]["setAttribute"]("lang", lang);
+AuraInstance.prototype.executeExternalLibraries = function () {
+    if (Aura["externalLibraries"]) {
+        Aura["externalLibraries"].call(window);
+    }
 };
 
 /**
@@ -749,15 +746,18 @@ AuraInstance.prototype.setLanguage = function() {
 AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializeServices) {
     config = $A.util.json.resolveRefsObject(config);
     this.clientService.setNamespacePrivileges(config["ns"]);
+    this.beforeInitHooks();
 
     if (!useExisting || $A.util.isUndefined($A.getContext())) {
         $A.clientService.initHost(config["host"], config["sid"]);
         // creating context.
-        $A.context = new Aura.Context.AuraContext(config["context"]);
-        $A.setLanguage();
-        this.initPriv(config["instance"], config["token"], null, doNotInitializeServices);
-        $A.context.finishComponentConfigs($A.context.getCurrentAction().getId());
-        $A.context.setCurrentAction(null);
+        $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
+            $A.context = context;
+            $A.clientService.initDefs();
+            $A.initPriv(config["instance"], config["token"], null, doNotInitializeServices);
+            $A.context.finishComponentConfigs($A.context.getCurrentAction().getId());
+            $A.context.setCurrentAction(null);
+        });
     } else {
         // Use the existing context and just join the new context into it
         // FIXME: This is used by integration service, and will not work correctly with components.
@@ -778,24 +778,20 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
  */
 AuraInstance.prototype.initPriv = function(config, token, container, doNotInitializeServices) {
     if (!$A["hasErrors"]) {
-        if (Aura["frameworkLibrariesReady"]) {
-            Aura.bootstrapMark("runAfterLibsReady");
-            $A.addTearDownHandler();
-            Aura.bootstrapMark("createAndRenderAppInit");
-            var app = $A.clientService["init"](config, token, $A.util.getElement(container));
-            $A.setRoot(app);
-            Aura.bootstrapMark("createAndRenderAppReady");
+        $A.addTearDownHandler();
+        $A.clientService.initializeClientLibraries();
+        $A.localizationService.init();
 
-            if (!$A.initialized) {
-                $A.initialized = true;
-                $A.addDefaultErrorHandler(app);
-                $A.afterInitHooks();
-                $A.finishInit(doNotInitializeServices);
-            }
+        Aura.bootstrapMark("createAndRenderAppInit");
+        var app = $A.clientService["init"](config, token, $A.util.getElement(container));
+        $A.setRoot(app);
+        Aura.bootstrapMark("createAndRenderAppReady");
 
-        } else {
-            Aura["afterLibrariesLoaded"] = Aura["afterLibrariesLoaded"] || [];
-            Aura["afterLibrariesLoaded"].push($A.initPriv.bind(null, config, token, container, doNotInitializeServices));
+        if (!$A.initialized) {
+            $A.initialized = true;
+            $A.addDefaultErrorHandler(app);
+            $A.afterInitHooks();
+            $A.finishInit(doNotInitializeServices);
         }
     }
 };
@@ -843,6 +839,13 @@ AuraInstance.prototype.finishInit = function(doNotInitializeServices) {
     if (!doNotInitializeServices) {
         $A.historyService.init();
     }
+
+    // Notify handlers () we are done
+    var readyCallbacks = Aura["afterAppReady"];
+    for (var i in readyCallbacks) {
+        readyCallbacks[i]();
+    }
+    delete Aura["afterAppReady"];
 };
 
 /**
@@ -1481,7 +1484,6 @@ AuraInstance.prototype.Perf = window['Perf'] || PerfShim;
      */
     window['$A'] = new AuraInstance();
     Aura.bootstrapMark("execAuraJs");
-
 })();
 
 // TODO: Remove the legacy 'aura' top-level name.
@@ -1510,7 +1512,8 @@ window['aura'] = window['$A'];
 */
 
 Aura["frameworkJsReady"] = true;
-
 if (Aura["initConfig"]) {
   $A.initAsync(Aura["initConfig"]);
 }
+
+// External libraries (like moment.js) will be appended here

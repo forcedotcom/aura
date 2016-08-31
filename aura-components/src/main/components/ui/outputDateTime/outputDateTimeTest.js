@@ -30,7 +30,13 @@
     testInvalidValue: {
         attributes: {value: 'cornholio'},
         test: function(component){
-            $A.test.assertEquals("Invalid date time value", $A.test.getText(component.find('span').getElement()), "Value must be an ISO8601-formatted string or a number of milliseconds from Epoch.");
+            var targetElement = component.find('span').getElement();
+
+            $A.test.addWaitFor(true, function(){ return !!$A.test.getText(targetElement); },
+                function() {
+                    $A.test.assertEquals("Invalid date time value", $A.test.getText(targetElement),
+                        "Value must be an ISO8601-formatted string or a number of milliseconds from Epoch.");
+                });
         }
     },
 

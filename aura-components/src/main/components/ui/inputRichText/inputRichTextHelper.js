@@ -80,23 +80,24 @@
 	 * Called from renderer (afterRender) and controller (toggle)
 	 *
 	 */
-	initEditor : function(cmp) {
+	initEditor : function(cmp, callback) {
 		if ($A.util.getBooleanValue(cmp.get('v.isRichText'))) {
-			if (!this.isLibraryLoaded(cmp)) {
-				$A.warning("Richtext editor library is not loaded");
-				return;
-			}
-			var editorInstance = this.getEditorInstance(cmp);
+            $A.clientService.loadClientLibrary('CKEditor', function () {
 
-			if (!editorInstance) {
-				var helper = cmp.getConcreteComponent().getDef().getHelper() || this;
-				editorInstance = CKEDITOR.replace(helper.getEditorId(cmp),  helper.getEditorConfig(cmp));
-			}
-			editorInstance.on("instanceReady", $A.getCallback(function() {
-				if (cmp.isValid()) {
-					cmp.getEvent("editorInstanceReady").fire();
-				}
-			}));
+    			var editorInstance = this.getEditorInstance(cmp);
+    			if (!editorInstance) {
+    				var helper = cmp.getConcreteComponent().getDef().getHelper() || this;
+    				editorInstance = CKEDITOR.replace(helper.getEditorId(cmp),  helper.getEditorConfig(cmp));
+    			}
+
+    			editorInstance.on("instanceReady", $A.getCallback(function() {
+    				if (cmp.isValid()) {
+    					cmp.getEvent("editorInstanceReady").fire();
+    				}
+                    callback();
+    			}));
+                
+            }.bind(this));
 		}
     },
 

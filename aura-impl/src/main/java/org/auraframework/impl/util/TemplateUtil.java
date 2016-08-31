@@ -19,13 +19,27 @@ import java.io.IOException;
 import java.util.List;
 
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.Client.Type;
 
 public class TemplateUtil {
-
-    private static final String HTML_STYLE = "        <link href=\"%s\" rel=\"stylesheet\" type=\"text/css\"/>\n";
-    private static final String HTML_INLINE_SCRIPT = "       <script src=\"%s\"></script>\n";
-    private static final String HTML_DEFER_SCRIPT = "       <script src=\"%s\" defer></script>\n";
-    private static final String HTML_ASYNC_SCRIPT = "       <script src=\"%s\" async defer></script>\n";
+	public enum Script {
+		SYNC("<script src=\"%s\"></script>"), 
+		ASYNC("<script src=\"%s\" async defer></script>"), 
+		DEFER("<script src=\"%s\" defer></script>"), 
+		LAZY("<script data-src=\"%s\"></script>");
+		
+		private final String tag;
+		
+		Script (String tag) {
+			this.tag = tag;
+		}
+		public String toHTML (String url) {
+			return String.format(tag, url);
+		}
+	} 
+	
+	
+    private static final String HTML_STYLE = "<link href=\"%s\" rel=\"stylesheet\" type=\"text/css\"/>\n";
 
     public void writeHtmlStyle(String url, Appendable out) throws IOException {
         if (url != null) {
@@ -43,33 +57,32 @@ public class TemplateUtil {
 
     public void writeInlineHtmlScripts(AuraContext context, List<String> scripts, Appendable out) throws IOException {
         if (scripts != null) {
-            for (String script : scripts) {
-                out.append(String.format(HTML_INLINE_SCRIPT, script));
+            for (String src : scripts) {
+                out.append(Script.SYNC.toHTML(src));
             }
         }
     }
 
-    public void writeHtmlScripts(AuraContext context, List<String> scripts, boolean canBeAsync, Appendable out)
+    public void writeHtmlScript(AuraContext context, String scriptUrl, Script scriptLoadingType, Appendable out)
+            throws IOException {
+        if (scriptUrl != null) {
+        	Type type = context.getClient().getType();
+            if (type == Type.IE9 || type == Type.IE8 || type == Type.IE7 || type == Type.IE6) {
+            	scriptLoadingType = Script.DEFER;
+            }
+            out.append(scriptLoadingType.toHTML(scriptUrl));
+        }
+    }
+    
+    public void writeHtmlScripts(AuraContext context, List <String> scripts, Script scriptLoadingType, Appendable out)
             throws IOException {
         if (scripts != null && !scripts.isEmpty()) {
-            String format = null;
-            switch (context.getClient().getType()) {
-            case IE9:
-            case IE8:
-            case IE7:
-            case IE6:
-                format = HTML_DEFER_SCRIPT;
-                break;
-            default:
-                if (canBeAsync) {
-                    format = HTML_ASYNC_SCRIPT;
-                } else {
-                    format = HTML_INLINE_SCRIPT;
-                }
-                break;
+        	Type type = context.getClient().getType();
+            if (type == Type.IE9 || type == Type.IE8 || type == Type.IE7 || type == Type.IE6) {
+            	scriptLoadingType = Script.DEFER;
             }
-            for (String script : scripts) {
-                out.append(String.format(format, script));
+            for (String src : scripts) {
+            	out.append(scriptLoadingType.toHTML(src));
             }
         }
     }

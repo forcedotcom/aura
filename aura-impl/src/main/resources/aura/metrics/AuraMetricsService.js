@@ -880,8 +880,7 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
             };
 
             bootstrap["cache"] = {
-                "appCache": bootstrap["timing"]["appCache"] === 0 && $A.clientService.appCache,
-                "bootstrapCache" : Aura["appBootstrapFromCache"] === "cache"
+                "appCache": bootstrap["timing"]["appCache"] === 0 && $A.clientService.appCache
             };
 
             if (performance.getEntries) {

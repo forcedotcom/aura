@@ -44,6 +44,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
 	var targetCurrencyFormat = "cFormat";
 
 	var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
+        assert: function () {},
         get:function(value){
             if(value == "$Locale.dateFormat") return targetDateFormat;
             if(value == "$Locale.datetimeFormat") return targetDateTimeFormat;
@@ -52,6 +53,11 @@ Test.Aura.AuraLocalizationServiceTest = function(){
         	if(value == "$Locale.numberFormat") return targetNumberFormat;
 			if(value == "$Locale.percentFormat") return targetPercentFormat;
 			if(value == "$Locale.currencyFormat") return targetCurrencyFormat;
+        },
+        clientService: {
+            loadClientLibrary: function (name, callback) {
+                callback();
+            }
         }
     });
 
@@ -1272,7 +1278,10 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             var expected = targetDateTime;
 
             // Act
-			targetService.UTCToWallTime(mockDateTime, "GMT", callback);
+            mockUtil(function () {
+                targetService.UTCToWallTime(mockDateTime, "GMT", callback);    
+            });
+			
 
             // Assert
             Assert.Equal(expected, actual);
@@ -1286,6 +1295,12 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 get:function(value){
                     if(value == "$Locale.timezone") return "UTC";
+                },
+                assert: function () {},
+                clientService: {
+                    loadClientLibrary: function (name, callback) {
+                        callback();
+                    }
                 }
             });
 
@@ -1306,7 +1321,9 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             // Act
         	mockWallTime(function(){
     			mockGetWallTimeFromUTC(function(){
-    				targetService.UTCToWallTime(mockDateTime, targetTimezone, callback);
+                    mockUtil(function () {
+    				    targetService.UTCToWallTime(mockDateTime, targetTimezone, callback);
+                    });
     			});
         	});
 
@@ -1323,7 +1340,9 @@ Test.Aura.AuraLocalizationServiceTest = function(){
         	mockWallTime(function(){
         		mockGetTimeZoneInfo(function(){
             		mockGetWallTimeFromUTC(function(){
-        				targetService.UTCToWallTime(mockDateTime, "EST", callback);
+                        mockUtil(function () {
+        				    targetService.UTCToWallTime(mockDateTime, "EST", callback);
+                        });
             		});
         		});
         	});
@@ -1353,7 +1372,9 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             var expected = targetDateTime;
 
             // Act
-			targetService.WallTimeToUTC(mockDateTime, "GMT", callback);
+            mockUtil(function () {
+			    targetService.WallTimeToUTC(mockDateTime, "GMT", callback);
+            });
 
             // Assert
             Assert.Equal(expected, actual);
@@ -1367,6 +1388,14 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
                 get:function(value){
                     if(value == "$Locale.timezone") return "UTC";
+                },
+                assert: function () {
+                    return;
+                },
+                clientService: {
+                    loadClientLibrary: function (name, callback) {
+                        callback();
+                    }
                 }
             });
 
@@ -1387,7 +1416,9 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             // Act
         	mockWallTime(function(){
         		mockGetUTCFromWallTime(function(){
-    				targetService.WallTimeToUTC(mockDateTime, targetTimezone, callback);
+                    mockUtil(function () {
+    				    targetService.WallTimeToUTC(mockDateTime, targetTimezone, callback);
+                    });
     			});
         	});
 
@@ -1404,7 +1435,9 @@ Test.Aura.AuraLocalizationServiceTest = function(){
         	mockWallTime(function(){
         		mockGetTimeZoneInfo(function(){
         			mockGetUTCFromWallTime(function(){
-        				targetService.WallTimeToUTC(mockDateTime, "EST", callback);
+                        mockUtil(function () {
+        				    targetService.WallTimeToUTC(mockDateTime, "EST", callback);
+                        });
             		});
         		});
         	});

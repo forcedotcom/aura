@@ -229,7 +229,9 @@
     localizeToday: function(component) {
     	// Get today's date based on the time zone
         $A.localizationService.getToday($A.get("$Locale.timezone"), function(dateString) {
-    		component.set("v._today", dateString);
+            if (component.isValid()) {
+    		    component.set("v._today", dateString);
+            }
         });
 
         // Get the localized "Today" label

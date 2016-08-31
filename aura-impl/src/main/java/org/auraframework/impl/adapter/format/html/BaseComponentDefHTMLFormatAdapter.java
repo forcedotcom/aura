@@ -30,6 +30,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.http.ManifestUtil;
+import org.auraframework.impl.util.TemplateUtil.Script;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.service.ContextService;
@@ -107,17 +108,21 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
                 }
                 
                 sb.setLength(0);
-                writeHtmlScripts(context, servletUtilAdapter.getFrameworkScripts(context, true/*inlineJS*/, false/*dontIgnoreBootstrap*/, componentAttributes), false/*async*/, sb);
+                
+                // ClientLibraries
+                writeHtmlScripts(context, servletUtilAdapter.getJsClientLibraryUrls(context), Script.LAZY, sb);
+                
+                /*
+                 * For sync scripts the optimal order or execution is:
+                 * inline.js, aura.js, app.js, bootstrap.js
+                 */
+                writeHtmlScript(context, servletUtilAdapter.getInlineJsUrl(context, componentAttributes), Script.SYNC, sb);
+                writeHtmlScript(context, servletUtilAdapter.getFrameworkUrl(), Script.SYNC, sb);
+                writeHtmlScript(context, servletUtilAdapter.getAppJsUrl(context, null), Script.SYNC, sb);
+                writeHtmlScript(context, servletUtilAdapter.getBootstrapUrl(context, componentAttributes), Script.SYNC, sb);
+
                 attributes.put("auraNamespacesScriptTags", sb.toString());
-
-                sb.setLength(0);
-                writeHtmlScripts(context, servletUtilAdapter.getBaseScripts(context, componentAttributes), true/*async*/, sb);
-                attributes.put("auraBaseScriptTags", sb.toString());
-
-                sb.setLength(0);
-                writeHtmlScripts(context, servletUtilAdapter.getFrameworkScripts(context, true/*inlineJS*/, false/*dontIgnoreBootstrap*/, componentAttributes), true/*async*/, sb);
-                attributes.put("auraNamespacesScriptTags", sb.toString());
-
+                
                 Map<String, Object> auraInit = Maps.newHashMap();
                 if (componentAttributes != null && !componentAttributes.isEmpty()) {
                     auraInit.put("attributes", componentAttributes);

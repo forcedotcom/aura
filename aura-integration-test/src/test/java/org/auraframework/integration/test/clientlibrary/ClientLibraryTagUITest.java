@@ -23,19 +23,6 @@ import org.junit.Test;
 
 @CheckAccessibility(false)
 public class ClientLibraryTagUITest extends WebDriverTestCase {
-    /**
-     * Verify that Javascript and Style resources marked as uncombinable are available at the client. WalltimeLocale is
-     * an uncombinable JS resource.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testNonCombinableResources() throws Exception {
-        open("/clientLibraryTest/clientLibraryTest.app");
-        waitForAuraFrameworkReady();
-        Boolean walltimeLocale = (Boolean)getAuraUITestingUtil().getEval("return !!WallTime");
-        assertTrue(walltimeLocale);
-    }
 
     /**
      * Verify that resource change depending on Mode.

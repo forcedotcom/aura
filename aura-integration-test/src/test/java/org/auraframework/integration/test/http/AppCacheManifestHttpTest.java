@@ -341,26 +341,6 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     *
-     * UIPerf, UIPerfUi, UIPerfCSS, walltimelocale are uncombinable in PTEST mode.
-     */
-    @Test
-    public void testUncombinableResourceUrlsAreAddedToAppCacheManifest() throws Exception{
-        setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-        String manifest = getManifestURL("/clientLibraryTest/clientLibraryTest.app", Mode.PTEST, false);
-
-        HttpGet get  = obtainGetMethod(manifest);
-        HttpResponse response = perform(get);
-        assertEquals("Failed to fetch manifest", HttpStatus.SC_OK,getStatusCode(response));
-        String responseString = getResponseBody(response);
-        get.releaseConnection();
-        assertNotNull(responseString);
-
-        //Verify the urls of uncombinable resources
-        assertTrue("Missing combined libs", responseString.contains("/libs"));
-    }
-
-    /**
      * A basic appcache manifest parser and representation.
      */
     class Manifest {

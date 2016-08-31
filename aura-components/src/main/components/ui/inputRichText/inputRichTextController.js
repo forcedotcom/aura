@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-({	
+({
+    init: function () {
+        $A.clientService.loadClientLibrary('CKEditor', function (error) {
+            if (error) {
+                $A.error('Error loading CKEditor');
+            }
+        });
+    },
 	/**
 	 * Toggle between CKEditor and plain textarea
 	 * Triggered by the application event "ui:toggleRichText"

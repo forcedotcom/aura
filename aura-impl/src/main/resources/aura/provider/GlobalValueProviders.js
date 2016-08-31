@@ -226,8 +226,9 @@ GlobalValueProviders.prototype.loadFromStorage = function(callback) {
                 }
             );
     } else {
-        // nothing loaded from persistent storage
-        callback(false);
+        setTimeout(function () { // Preserve asyncronizity
+            callback(false);
+        }, 0);
     }
 };
 

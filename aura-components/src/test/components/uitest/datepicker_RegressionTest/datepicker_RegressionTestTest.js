@@ -200,12 +200,16 @@
     // test date picker focus on initial render when setFocus = false
     testDatePickerSetFocusFalse: {
         attributes: {"renderItem": "testDatepickerSetFocus", "setFocus": "false"},
-        test: [function(cmp) {
-            var tagName = $A.test.getActiveElement().tagName;
-            $A.test.assertEquals('BODY', tagName,
-                'with SetFocus=false, focused elm should be an "BODY" tag'
-            );
-        }]
+        test: function(cmp) {
+
+            $A.test.addWaitFor(true, function(){return !!document.querySelector("td.is-today.is-selected")},
+                function() {
+                    var activeElement = $A.test.getActiveElement();
+                    $A.test.assertEquals('BODY', activeElement.tagName,
+                        'with SetFocus=false, focused element should be an "BODY" tag, but actual: ' + activeElement
+                    );
+                });
+        }
     },
 
     // test date picker focus on initial render when setFocus = true

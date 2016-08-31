@@ -1,13 +1,5 @@
 {
-    "files": [
-        "moment/moment.js",
-        "walltime-js/walltime.js",
-        "domPurify/purify.js",
-        "libraryBootstrap/libraryBootstrap.js"
-    ],
-
     "walltimeLocaleDir": "walltime-js/olson",
-
     "cdn": {
         "host": "https://sfdc.azureedge.net/assetsblob/%s",
         "files": {

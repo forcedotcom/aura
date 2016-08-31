@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.auraframework.impl.adapter;
 
 import java.io.IOException;
@@ -295,6 +296,8 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     public List<String> getScripts(AuraContext context, boolean safeInlineJs, boolean ignoreNonCacheableScripts, Map<String,Object> attributes)
             throws QuickFixException {
         List<String> ret = Lists.newArrayList();
+        // Client libraries
+        ret.addAll(getJsClientLibraryUrls(context));
         ret.addAll(getBaseScripts(context, attributes));
         ret.addAll(getFrameworkScripts(context, safeInlineJs, ignoreNonCacheableScripts, attributes));
         return ret;
@@ -320,9 +323,9 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      * @param type CSS or JS
      * @return list of urls for client libraries
      */
-    private Set<String> getClientLibraryUrls(AuraContext context, ClientLibraryDef.Type type)
+    private List<String> getClientLibraryUrls(AuraContext context, ClientLibraryDef.Type type)
             throws QuickFixException {
-        return clientLibraryService.getUrls(context, type);
+    	return new ArrayList<>(clientLibraryService.getUrls(context, type));
     }
 
     /**
@@ -331,17 +334,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     @Override
     public List<String> getBaseScripts(AuraContext context, Map<String,Object> attributes) throws QuickFixException {
         Set<String> ret = Sets.newLinkedHashSet();
-
-        String shiv = getHTML5ShivUrl();
-        if (shiv != null) {
-            ret.add(shiv);
-        }
-
-        // Dependent libraries for framework (moment, promises,...)
-        ret.add(getFrameworkLibUrl());
-
-        // Client libraries
-        ret.addAll(getJsClientLibraryUrls(context));
 
         // Aura framework
         ret.add(getFrameworkUrl());
@@ -354,7 +346,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         throws QuickFixException {
         List<String> ret = Lists.newArrayList();
 
-        if (safeInlineJs) {
+        if (safeInlineJs && !ignoreNonCacheableScripts) {
             ret.add(getInlineJsUrl(context, attributes));
         }
 
@@ -380,18 +372,13 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     @Override
-    public  Set<String> getJsClientLibraryUrls (AuraContext context) throws QuickFixException {
-        return getClientLibraryUrls(context, ClientLibraryDef.Type.JS);
+    public  List <String> getJsClientLibraryUrls (AuraContext context) throws QuickFixException {
+    	return getClientLibraryUrls(context, ClientLibraryDef.Type.JS);
     }
 
     @Override
-    public  Set<String> getCssClientLibraryUrls (AuraContext context) throws QuickFixException {
-        return getClientLibraryUrls(context, ClientLibraryDef.Type.CSS);
-    }
-
-    @Override
-    public String getFrameworkLibUrl() {
-        return configAdapter.getJSLibsURL();
+    public  List <String> getCssClientLibraryUrls (AuraContext context) throws QuickFixException {
+    	return new ArrayList<>(getClientLibraryUrls(context, ClientLibraryDef.Type.CSS));
     }
 
     @Override
@@ -399,10 +386,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         return configAdapter.getAuraJSURL();
     }
 
-    @Override
-    public String getHTML5ShivUrl() {
-        return configAdapter.getHTML5ShivURL();
-    }
 
     private void addAttributes(StringBuilder builder, Map<String,Object> attributes) {
         //

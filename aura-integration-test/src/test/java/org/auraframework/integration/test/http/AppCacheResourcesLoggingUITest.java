@@ -40,6 +40,7 @@ import org.openqa.selenium.Cookie;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.html5.AppCacheStatus;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import com.google.common.base.Function;
@@ -60,28 +61,33 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     private final static String COOKIE_NAME = "%s_%s_%s_lm";
     private final static String TOKEN = "@@@TOKEN@@@";
 
-    private final static String SRC_COMPONENT = "<aura:component>"
-            + "<aura:attribute name='output' type='String'/>"
-            + "<div class='clickableme' onclick='{!c.cssalert}'>@@@TOKEN@@@</div>"
-            + "<div class='attroutput'>{!v.output}</div>"
-            + "</aura:component>";
-    private final static String SRC_CONTROLLER = "{ cssalert:function(c){"
-            + "function getStyle(elem, style){"
-            + "var val = '';"
-            + "if(document.defaultView && document.defaultView.getComputedStyle){"
-            + "val = document.defaultView.getComputedStyle(elem, '').getPropertyValue(style);"
-            + "} else if(elem.currentStyle){"
-            + "style = style.replace(/\\-(\\w)/g, function (s, ch){"
-            + "return ch.toUpperCase();"
-            + "});"
-            + "val = elem.currentStyle[style];"
-            + "}"
-            + "return val;"
-            + "};"
-            + "var style = getStyle(c.getElement(),'background-image');"
-            + "c.set('v.output','@@@TOKEN@@@' + style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')')-1)"
-            + "+ ($A.test ? $A.test.dummyFunction() : '@@@TOKEN@@@'));"
-            + "}}";
+    private final static String SRC_COMPONENT =
+            "<aura:component>" +
+            "    <aura:attribute name='output' type='String'/>" +
+            "    <div class='clickableme' onclick='{!c.cssalert}'>@@@TOKEN@@@</div>"+
+            "    <div class='attroutput'>{!v.output}</div>" +
+            "</aura:component>";
+
+    private final static String SRC_CONTROLLER =
+            "({ " +
+            "    cssalert: function(c) {" +
+            "        function getStyle(elem, style) {" +
+            "            var val = '';" +
+            "            if(document.defaultView && document.defaultView.getComputedStyle) {" +
+            "                val = document.defaultView.getComputedStyle(elem, '').getPropertyValue(style);" +
+            "            } else if(elem.currentStyle) {" +
+            "                style = style.replace(/\\-(\\w)/g, function (s, ch) {" +
+            "                    return ch.toUpperCase();"+
+            "                });"+
+            "                val = elem.currentStyle[style];" +
+            "            }" +
+            "            return val;" +
+            "        };" +
+            "        var style = getStyle(c.getElement(),'background-image');" +
+            "        c.set('v.output','@@@TOKEN@@@' + style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')')-1)"+
+            "            + ($A.test ? $A.test.dummyFunction() : '@@@TOKEN@@@'));" +
+            "    }" +
+            "})";
 
     private enum Status {
         UNCACHED, IDLE, CHECKING, DOWNLOADING, UPDATEREADY, OBSOLETE;
@@ -135,12 +141,12 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     // TODO(W-2944620): Adding safeEval.html to manifest causing unnecessary manifest requests
     public void _testNoChanges() throws Exception {
         AppDescription app = new AppDescription();
-        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
+        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN, true);
         assertRequests(getExpectedInitialRequests(app), logs);
         assertAppCacheStatus(Status.IDLE);
 
         // only expect a fetch for the manifest and the initAsync component load
-        logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
+        logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN, true);
         List<Request> expected = Lists.newArrayList(new Request("/auraResource", "manifest", 200));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
@@ -157,7 +163,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     @Test
     public void testCacheError() throws Exception {
         AppDescription app = new AppDescription();
-        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
+        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN, false);
         assertRequests(getExpectedInitialRequests(app), logs);
         assertAppCacheStatus(Status.IDLE);
 
@@ -165,7 +171,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         String cookieName = getManifestCookieName(app);
         updateCookie(cookieName, "error", expiry, "/");
 
-        logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
+        logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN, false);
         List<Request> expectedChange = Lists.newArrayList();
         expectedChange.add(new Request("/auraResource", "manifest", 404)); // reset
         expectedChange.add(new Request(getUrl(app), null, 302)); // hard refresh
@@ -205,7 +211,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         String cookieName = getManifestCookieName(app);
         updateCookie(cookieName, "error", expiry, "/");
 
-        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
+        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN, false);
         List<Request> expectedChange = Lists.newArrayList();
         expectedChange.add(new Request("/auraResource", "manifest", 404)); // reset
         expectedChange.add(new Request("/auraResource", "css", 200));
@@ -238,7 +244,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     @Test
     public void testManifestRequestLimitExceeded() throws Exception {
         AppDescription app = new AppDescription();
-        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
+        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN, false);
         assertRequests(getExpectedInitialRequests(app), logs);
         assertAppCacheStatus(Status.IDLE);
 
@@ -247,7 +253,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         Cookie cookie = getDriver().manage().getCookieNamed(cookieName);
         String timeVal = cookie.getValue().split(":")[1];
         updateCookie(cookieName, "16:" + timeVal, expiry, "/");
-        logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
+        logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN, false);
         List<Request> expectedChange = Lists.newArrayList();
 
         expectedChange.add(new Request("/auraResource", "manifest", 404)); // reset
@@ -283,7 +289,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         DefDescriptor<StyleDef> styleDesc = createDef(StyleDef.class,
                 String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, app.namespace, app.cmpName), src_style);
 
-        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, TOKEN, TOKEN);
+        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, TOKEN, TOKEN, true);
 
         Request sGif = new Request("/auraFW/resources/qa/images/s.gif", null, 200);
         List<Request> expectedInitialRequests = Lists.newArrayList(getExpectedInitialRequests(app));
@@ -296,7 +302,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         String replacement = getName() + System.currentTimeMillis();
         updateStringSource(styleDesc, src_style.replace(TOKEN, replacement));
 
-        logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, replacement, TOKEN);
+        logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, replacement, TOKEN, true);
 
         List<Request> expectedChangeRequests = Lists.newArrayList(getExpectedChangeRequests(app));
         expectedChangeRequests.add(sGif);
@@ -315,13 +321,13 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     @Test
     public void testComponentJsChange() throws Exception {
         AppDescription app = new AppDescription();
-        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
+        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN, true);
         assertRequests(getExpectedInitialRequests(app), logs);
         assertAppCacheStatus(Status.IDLE);
         // update a component's js controller file
         String replacement = getName() + System.currentTimeMillis();
         updateStringSource(app.controllerDesc, SRC_CONTROLLER.replace(TOKEN, replacement));
-        logs = loadMonitorAndValidateApp(app, TOKEN, replacement, "", TOKEN);
+        logs = loadMonitorAndValidateApp(app, TOKEN, replacement, "", TOKEN, true);
         assertRequests(getExpectedChangeRequests(app), logs);
         assertAppCacheStatus(Status.IDLE);
 
@@ -340,13 +346,13 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
     @Test
     public void testComponentMarkupChange() throws Exception {
         AppDescription app = new AppDescription();
-        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
+        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN, true);
         assertRequests(getExpectedInitialRequests(app), logs);
         assertAppCacheStatus(Status.IDLE);
         // update markup of namespaced component used by app
         String replacement = getName() + System.currentTimeMillis();
         updateStringSource(app.cmpDesc, SRC_COMPONENT.replace(TOKEN, replacement));
-        logs = loadMonitorAndValidateApp(app, replacement, TOKEN, "", TOKEN);
+        logs = loadMonitorAndValidateApp(app, replacement, TOKEN, "", TOKEN, true);
         assertRequests(getExpectedChangeRequests(app), logs);
         assertAppCacheStatus(Status.IDLE);
         /*
@@ -373,87 +379,107 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         String storageCmpName = "cachecomponentStorage";
         String templateName = "templatecomponentStorage";
 
+        String templateMarkup =
+                "<aura:component isTemplate='true' extends='aura:template'>" +
+                "    <aura:set attribute='auraPreInitBlock'>" +
+                "        <auraStorage:init name='actions' persistent='true' secure='false' clearStorageOnInit='false' debugLoggingEnabled='true' defaultExpiration='60' defaultAutoRefreshInterval='60'/>" +
+                "        <auraStorage:init name='ComponentDefStorage' persistent='true' secure='false' clearStorageOnInit='false' debugLoggingEnabled='true' defaultExpiration='60'/>" +
+                "    </aura:set>" +
+                "</aura:component>";
         DefDescriptor<ComponentDef> templateDesc = createDef(ComponentDef.class,
-                String.format("%s:%s", app.namespace, templateName),
-                "<aura:component isTemplate='true' extends='aura:template'>"
-                        + "  <aura:set attribute='auraPreInitBlock'>"
-                        + "    <auraStorage:init name='actions' persistent='true' secure='false' clearStorageOnInit='false' debugLoggingEnabled='true' defaultExpiration='60' defaultAutoRefreshInterval='60'/>"
-                        + "    <auraStorage:init name='ComponentDefStorage' persistent='true' secure='false' clearStorageOnInit='false' debugLoggingEnabled='true' defaultExpiration='60'/>"
-                        + "  </aura:set>"
-                        + "</aura:component>");
+                String.format("%s:%s", app.namespace, templateName), templateMarkup);
 
+        String cmpMarkup =
+                "<aura:component>" +
+                "    <aura:attribute name='storageOutput' type='String' default='Waiting'/>" +
+                "    <aura:attribute name='status' type='String' default='Pending'/>" +
+                "    <ui:button label='Add to storage' class='addToStorage' press='{!c.addToStorage}'/>" +
+                "    <ui:button label='Check storage' class='checkStorage' press='{!c.checkStorage}'/>" +
+                "    Storage Output: <div class='storageOutput'>{!v.storageOutput}</div>" +
+                "    Storage Action Status: <div class='status'>{!v.status}</div>" +
+                "</aura:component>";
         DefDescriptor<ComponentDef> storageCmpDesc = createDef(ComponentDef.class,
-                String.format("%s:%s", app.namespace, storageCmpName),
-                "<aura:component>"
-                        + "  <aura:attribute name='storageOutput' type='String' default='Waiting'/>"
-                        + "    <ui:button label='Add to storage' class='addToStorage' press='{!c.addToStorage}'/>"
-                        + "    <ui:button label='Check storage' class='checkStorage' press='{!c.checkStorage}'/>"
-                        + "    <div class='storageOutput'>{!v.storageOutput}</div>"
-                        + "</aura:component>");
+                String.format("%s:%s", app.namespace, storageCmpName), cmpMarkup);
 
-        createDef(
-                ControllerDef.class,
-                String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, app.namespace, storageCmpName),
-                "{ addToStorage: function(cmp) { "
-                        + "  $A.storageService.getStorage('actions').set('testkey','testvalue')"
-                        + "    .then(function(){"
-                        + "      return $A.storageService.getStorage('ComponentDefStorage').set('testkey','{2:1}');"
-                        + "    }).then(function() {"
-                        + "      cmp.set('v.storageOutput','Storage Done')"
-                        + "    })"
-                        + "    ['catch'](function(err){ cmp.set('v.storageOutput','Storage Failed ' + err.toString())});"
-                        + "  },"
-                        + "  checkStorage: function(cmp) {"
-                        + "    var findKey = function(name) {"
-                        + "      return $A.storageService.getStorage(name).getAll().then(function(items){"
-                        + "        if (!items['testkey']) {"
-                        + "          return Promise.reject('Cache miss');"
-                        + "        }"
-                        + "      });"
-                        + "    };"
-                        + "    findKey('actions').then(function() {"
-                        + "      return findKey('ComponentDefStorage');"
-                        + "    }).then(function(){"
-                        + "      cmp.set('v.storageOutput', 'Cache hit');"
-                        + "    })"
-                        + "    ['catch'](function(err){ cmp.set('v.storageOutput', err); });"
-                        + "  }"
-                        + "}");
+        String controllerJs =
+                "({" +
+                "    addToStorage: function(cmp) { " +
+                "        cmp.set('v.status', 'Pending');" +
+                "        $A.storageService.getStorage('actions').set('testkey','testvalue')" +
+                "            .then(function(){" +
+                "                return $A.storageService.getStorage('ComponentDefStorage').set('testkey','{2:1}');" +
+                "            }).then(function() {" +
+                "                cmp.set('v.storageOutput','Storage Done');" +
+                "                cmp.set('v.status','Done');" +
+                "            })" +
+                "            ['catch'](function(err){ cmp.set('v.storageOutput','Storage Failed ' + err.toString())});" +
+                "    }," +
+                "    checkStorage: function(cmp) {" +
+                "        cmp.set('v.status', 'Pending');" +
+                "        var findKey = function(name) {" +
+                "            return $A.storageService.getStorage(name).getAll()" +
+                "                .then(function(items) {" +
+                "                    if (!items['testkey']) {" +
+                "                        return Promise.reject('Cache miss');" +
+                "                    }" +
+                "                });" +
+                "        };" +
+                "        findKey('actions')" +
+                "            .then(function() {" +
+                "                return findKey('ComponentDefStorage');" +
+                "            })" +
+                "            .then(function(){" +
+                "                cmp.set('v.storageOutput', 'Cache hit');" +
+                "                cmp.set('v.status', 'Done');" +
+                "            })" +
+                "            ['catch'](function(err) { " +
+                "                cmp.set('v.storageOutput', err);" +
+                "                cmp.set('v.status', 'Done');" +
+                "            });" +
+                "    }"+
+                "})";
+        createDef(ControllerDef.class, String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, app.namespace, storageCmpName),
+                controllerJs);
 
-        createDef(ApplicationDef.class, String.format("%s:%s", app.namespace, app.appName), String.format(
-                "<aura:application useAppcache='true' render='client' template='%s:%s'>"
-                        + "<%s:%s/> <%s:%s/>"
-                        + "</aura:application>",
-                app.namespace, templateDesc.getName(), app.namespace, app.cmpName, app.namespace,
-                storageCmpDesc.getName()));
+        String appMarkup = String.format(
+                "<aura:application useAppcache='true' render='client' template='%s:%s'>" +
+                "    <%s:%s/> <%s:%s/>" +
+                "</aura:application>",
+                app.namespace, templateDesc.getName(),
+                app.namespace, app.cmpName, app.namespace, storageCmpDesc.getName());
+        createDef(ApplicationDef.class, String.format("%s:%s", app.namespace, app.appName), appMarkup);
 
-        loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN);
+        loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN, true);
 
         // Add stuff to storage
-        findDomElement(By.cssSelector(".addToStorage")).click();
-        waitForStorage("Storage Done", "Failed to add items to storage");
+        WebElement addStorageButton = findDomElement(By.cssSelector(".addToStorage"));
+        waitForStorage(addStorageButton, "Storage Done", "Failed to add items to storage");
 
         // Verify items actually added to storage
-        findDomElement(By.cssSelector(".checkStorage")).click();
-        waitForStorage("Cache hit", "Item never added to actions storage");
+        WebElement checkStorageButton = findDomElement(By.cssSelector(".checkStorage"));
+        waitForStorage(checkStorageButton, "Cache hit", "Item never added to actions storage");
 
         // Update markup of component used by app and reload
         String replacement = getName() + System.currentTimeMillis();
         updateStringSource(app.cmpDesc, SRC_COMPONENT.replace(TOKEN, replacement));
-        loadMonitorAndValidateApp(app, replacement, TOKEN, "", TOKEN);
+        loadMonitorAndValidateApp(app, replacement, TOKEN, "", TOKEN, true);
 
+        // appcache update takes a while. Wait here to avoid repeatedly clicking.
+        Thread.sleep(1000);
         // Verify caches cleared
-        findDomElement(By.cssSelector(".checkStorage")).click();
-        waitForStorage("Cache miss", "Actions cache never cleared on appcache update");
+        checkStorageButton = findDomElement(By.cssSelector(".checkStorage"));
+        waitForStorage(checkStorageButton, "Cache miss", "Actions cache never cleared on appcache update");
     }
 
-    private void waitForStorage(final String waitForText, String failMessage) {
+    private void waitForStorage(WebElement clickableElement, final String waitForText, String failMessage) {
         getAuraUITestingUtil().waitUntil(new Function<WebDriver, String>() {
             @Override
             public String apply(WebDriver input) {
+                clickableElement.click();
+                getAuraUITestingUtil().waitForElementText(By.cssSelector("div.status"), "Done", true);
+
                 try {
-                    WebElement output = findDomElement(By.cssSelector("div.storageOutput"));
-                    String text = output.getText();
+                    String text = findDomElement(By.cssSelector("div.storageOutput")).getText();
                     if (text.equals(waitForText)) {
                         return text;
                     }
@@ -565,80 +591,83 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
      * @param cssToken The text to be found from css.
      * @param fwToken The text to be found from the framework.
      */
-    private List<Request> loadMonitorAndValidateApp(final AppDescription app,
-            final String markupToken, String jsToken, String cssToken, String fwToken) throws Exception {
+    private List<Request> loadMonitorAndValidateApp(final AppDescription app, final String markupToken,
+            String jsToken, String cssToken, String fwToken, boolean waitForAura) throws Exception {
+
         appender.clearLogs();
         // Opening a page through WebDriverTestCase adds a nonce to ensure fresh resources. In this case we want to see
         // what's cached, so build our URL and call WebDriver.get() directly.
         String url = getUrl(app);
         Map<String, String> params = new HashMap<>();
         params.put("aura.mode", getAuraModeForCurrentBrowser().toString());
-        url = addUrlParams(url, params);
-        getDriver().get(getAbsoluteURI(url).toString());
+        url = getAbsoluteURI(addUrlParams(url, params)).toString();
 
-        getAuraUITestingUtil().waitUntilWithCallback(
-                new Function<WebDriver, Integer>() {
-                    @Override
-                    public Integer apply(WebDriver input) {
-                        Integer appCacheStatus = Integer.parseInt(getAuraUITestingUtil().getEval(
-                                "return window.applicationCache.status;").toString());
-                        if (appCacheStatus != 3 && appCacheStatus != 2) {
-                            return appCacheStatus;
-                        } else {
-                            return null;
+        if(waitForAura) {
+            open(url);
+        } else {
+            getDriver().get(url);
+        }
+
+        getAuraUITestingUtil().waitUntilWithCallback(new Function<WebDriver, Integer>() {
+                @Override
+                public Integer apply(WebDriver input) {
+                    String script = "return window.applicationCache.status;";
+                    int appCacheStatus = Integer.parseInt(getAuraUITestingUtil().getEval(script).toString());
+                    if (appCacheStatus != AppCacheStatus.DOWNLOADING.value() && appCacheStatus != AppCacheStatus.CHECKING.value()) {
+                        return appCacheStatus;
+                    } else {
+                        return null;
+                    }
+                }
+            },
+            new ExpectedCondition<String>() {
+                @Override
+                public String apply(WebDriver d) {
+                    String script = "return window.applicationCache.status;";
+                    int appCacheStatus = Integer.parseInt(getAuraUITestingUtil().getEval(script).toString());
+
+                    return "Current AppCache status is: " + AppCacheStatus.getEnum(appCacheStatus).toString();
+                }
+            },
+            10,
+            "Application cache status is stuck on Downloading or Checking.");
+
+        getAuraUITestingUtil().waitUntil(new Function<WebDriver, WebElement>() {
+                @Override
+                public WebElement apply(WebDriver input) {
+                    try {
+                        WebElement find = findDomElement(By.cssSelector(".clickableme"));
+                        if (markupToken.equals(find.getText())) {
+                            return find;
                         }
+                    } catch (StaleElementReferenceException e) {
+                        // slight chance of happening between the findDomElement and getText
                     }
-                },
-                new ExpectedCondition<String>() {
-                    @Override
-                    public String apply(WebDriver d) {
-                        Object ret = getAuraUITestingUtil().getRawEval("return window.applicationCache.status");
-                        return "Current AppCache status is "
-                                + getAuraUITestingUtil().appCacheStatusIntToString(((Long) ret).intValue());
-                    }
-                },
-                10,
-                "fail waiting on application cache not to be Downloading or Checking before clicking on 'clickableme'");
-
-        getAuraUITestingUtil()
-                .waitUntil(
-                        new Function<WebDriver, WebElement>() {
-                            @Override
-                            public WebElement apply(WebDriver input) {
-                                try {
-                                    WebElement find = findDomElement(By.cssSelector(".clickableme"));
-                                    if (markupToken.equals(find.getText())) {
-                                        return find;
-                                    }
-                                } catch (StaleElementReferenceException e) {
-                                    // slight chance of happening between the findDomElement and getText
-                                }
-                                return null;
-                            }
-                        },
-                        "fail to load clickableme");
+                    return null;
+                }
+            },
+            "fail to load clickableme");
         Thread.sleep(200);
         List<Request> logs = parseLogs(appender.getLog());
 
-        String output = getAuraUITestingUtil().waitUntil(
-                new Function<WebDriver, String>() {
-                    @Override
-                    public String apply(WebDriver input) {
-                        try {
-                            WebElement find = findDomElement(By.cssSelector(".clickableme"));
-                            find.click();
-                            WebElement outputEl = findDomElement(By.cssSelector("div.attroutput"));
-                            return outputEl.getText();
-                        } catch (StaleElementReferenceException e) {
-                            // could happen before the click or if output is
-                            // rerendering
-                        }
-                        return null;
+        String output = getAuraUITestingUtil().waitUntil(new Function<WebDriver, String>() {
+                @Override
+                public String apply(WebDriver input) {
+                    try {
+                        WebElement find = findDomElement(By.cssSelector(".clickableme"));
+                        find.click();
+                        WebElement outputEl = findDomElement(By.cssSelector("div.attroutput"));
+                        return outputEl.getText();
+                    } catch (StaleElementReferenceException e) {
+                        // could happen before the click or if output is
+                        // rerendering
                     }
-                }, "fail to click on clickableme or couldn't locate output value");
+                    return null;
+                }
+            }, "fail to click on clickableme or couldn't locate output value");
 
-        assertEquals("Unexpected alert text",
-                String.format("%s%s%s", jsToken, cssToken, fwToken), output);
+        String expected = String.format("%s%s%s", jsToken, cssToken, fwToken);
+        assertEquals("Unexpected alert text", expected, output);
 
         appender.clearLogs();
         return logs;

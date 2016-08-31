@@ -17,6 +17,7 @@ package org.auraframework.impl.util;
 
 import java.util.EnumSet;
 
+import org.auraframework.impl.util.TemplateUtil.Script;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.system.Client.Type;
@@ -35,7 +36,7 @@ public class TemplateUtilTest extends UnitTestCase {
         TemplateUtil templateUtil = new TemplateUtil();
         AuraContext context = Mockito.mock(AuraContext.class);
         StringBuffer buffer = new StringBuffer();
-        templateUtil.writeHtmlScripts(context, null, true, buffer);
+        templateUtil.writeHtmlScripts(context, null, Script.SYNC, buffer);
         assertEquals(0, buffer.length());
     }
 
@@ -44,7 +45,7 @@ public class TemplateUtilTest extends UnitTestCase {
         TemplateUtil templateUtil = new TemplateUtil();
         AuraContext context = Mockito.mock(AuraContext.class);
         StringBuffer buffer = new StringBuffer();
-        templateUtil.writeHtmlScripts(context, Lists.newArrayList(), true, buffer);
+        templateUtil.writeHtmlScripts(context, Lists.newArrayList(), Script.SYNC, buffer);
         assertEquals(0, buffer.length());
     }
 
@@ -59,7 +60,7 @@ public class TemplateUtilTest extends UnitTestCase {
             Mockito.doReturn(type).when(client).getType();
             StringBuffer buffer = new StringBuffer();
 
-            templateUtil.writeHtmlScripts(context, Lists.newArrayList("x"), true, buffer);
+            templateUtil.writeHtmlScripts(context, Lists.newArrayList("x"), Script.DEFER, buffer);
 
             if (!buffer.toString().contains("<script src=\"x\" defer></script>")) {
                 fail(String.format("Expected 'defer' for %s: %s", type, buffer));
@@ -78,7 +79,7 @@ public class TemplateUtilTest extends UnitTestCase {
             Mockito.doReturn(type).when(client).getType();
             StringBuffer buffer = new StringBuffer();
 
-            templateUtil.writeHtmlScripts(context, Lists.newArrayList("x", "y"), false, buffer);
+            templateUtil.writeHtmlScripts(context, Lists.newArrayList("x", "y"), Script.DEFER, buffer);
 
             if (!buffer.toString().contains("<script src=\"x\" defer></script>")
                     || !buffer.toString().contains("<script src=\"y\" defer></script>")) {
@@ -98,7 +99,7 @@ public class TemplateUtilTest extends UnitTestCase {
             Mockito.doReturn(type).when(client).getType();
             StringBuffer buffer = new StringBuffer();
 
-            templateUtil.writeHtmlScripts(context, Lists.newArrayList("a", "b"), false, buffer);
+            templateUtil.writeHtmlScripts(context, Lists.newArrayList("a", "b"), Script.SYNC, buffer);
 
             if (!buffer.toString().contains("<script src=\"a\"></script>")
                     || !buffer.toString().contains("<script src=\"b\"></script>")) {

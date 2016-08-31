@@ -15,17 +15,17 @@
  */
 ({
     testSetNull : {
-    	test : function(cmp) {
-    		var richTextDiv = cmp.getElement();
-    		
-    		// Check to make sure the rich text has some children tags before setting it to null. 
-    		$A.test.assert(richTextDiv.children.length > 0, "Rich Text should not be empty");
-    		
-    		cmp.find("richText").set("v.value", null);
-    		$A.test.addWaitForWithFailureMessage(0, function() {
-    			return cmp.getElement().children.length;
-    		}, "Rich Text should be empty");
-    	}
+        test : function(cmp) {
+            var richTextDiv = cmp.getElement();
+
+            // Check to make sure the rich text has some children tags before setting it to null.
+            $A.test.assert(richTextDiv.children.length > 0, "Rich Text should not be empty");
+
+            cmp.find("richText").set("v.value", null);
+            $A.test.addWaitForWithFailureMessage(0, function() {
+                return cmp.getElement().children.length;
+            }, "Rich Text should be empty");
+        }
     }
 
 })// eslint-disable-line semi

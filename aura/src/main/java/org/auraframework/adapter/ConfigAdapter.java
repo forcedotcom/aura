@@ -60,8 +60,6 @@ public interface ConfigAdapter extends AuraAdapter {
 
     boolean validateCss();
 
-    String getHTML5ShivURL();
-
     String getAvailableTimezone(String timezone);
 
     /**
@@ -69,12 +67,6 @@ public interface ConfigAdapter extends AuraAdapter {
      * @return timezone
      */
     String getCurrentTimezone();
-
-    /**
-     * Returns js libs file url
-     * @return url of js libs file
-     */
-    String getJSLibsURL();
 
     /**
      * Returns reset css file url

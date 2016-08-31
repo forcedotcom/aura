@@ -162,11 +162,12 @@ public abstract class TemplateResource extends AuraResourceImpl {
             }
 
             sb.setLength(0);
+            writeHtmlScripts(servletUtilAdapter.getJsClientLibraryUrls(context), true/*lazy*/, sb);
             writeHtmlScripts(servletUtilAdapter.getBaseScripts(context, componentAttributes), sb);
             attributes.put("auraBaseScriptTags", sb.toString());
 
             sb.setLength(0);
-            writeHtmlScripts(servletUtilAdapter.getFrameworkScripts(context, true, false, componentAttributes), true, sb);
+            writeHtmlScripts(servletUtilAdapter.getFrameworkScripts(context, true, false, componentAttributes), true/*lazy*/, sb);
             attributes.put("auraNamespacesScriptTags", sb.toString());
 
             // init namespaces.

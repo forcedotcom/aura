@@ -113,6 +113,7 @@
     },
 
     testDisablesParallelBootstrapOnNextLoadWhenFailedToLoadCsrfTokenFromStorage: {
+        labels : ["flapper"],
         test: [
             function loadApplication(cmp) {
                 cmp._iframeLib = cmp.helper.lib.iframeTest;

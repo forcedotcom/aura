@@ -447,12 +447,4 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
 
         get.releaseConnection();
     }
-
-    public void testLibsJavascriptResources() throws Exception {
-        HttpGet get = obtainNoncedGetMethod("/auraFW/resources/%s/libs.js", false);
-        HttpResponse response = perform(get);
-        assertEquals("libs.js response should be 200", HttpServletResponse.SC_OK,
-                response.getStatusLine().getStatusCode());
-        get.releaseConnection();
-    }
 }

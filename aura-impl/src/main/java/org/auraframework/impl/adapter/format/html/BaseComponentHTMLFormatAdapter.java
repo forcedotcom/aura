@@ -40,6 +40,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.JsonEncoder;
+import org.auraframework.impl.util.TemplateUtil.Script;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -85,7 +86,7 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
             attributes.put("auraStyleTags", sb.toString());
 
             sb.setLength(0);
-            writeHtmlScripts(context, servletUtilAdapter.getScripts(context, true, false, componentAttributes), false, sb);
+            writeHtmlScripts(context, servletUtilAdapter.getScripts(context, true, false, componentAttributes), Script.SYNC, sb);
             DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
             if (styleDefDesc != null) {
                 attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode());

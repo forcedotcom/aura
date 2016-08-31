@@ -22,7 +22,10 @@ import java.io.IOException;
 import java.util.List;
 
 import org.auraframework.impl.util.TemplateUtil;
+import org.auraframework.impl.util.TemplateUtil.Script;
 import org.auraframework.system.AuraContext;
+
+import com.google.common.collect.Lists;
 
 /**
  */
@@ -45,9 +48,15 @@ public abstract class HTMLFormatAdapter<T> extends BaseFormatAdapter<T> {
     protected void writeHtmlStyles(List<String> urls, Appendable out) throws IOException {
         templateUtil.writeHtmlStyles(urls, out);
     }
+    
+    protected void writeHtmlScript(AuraContext context, String url, Script scriptLoadingType, Appendable out) throws IOException {
+    	templateUtil.writeHtmlScript(context, url, scriptLoadingType, out);
+    }
 
-    protected void writeHtmlScripts(AuraContext context, List<String> scripts, boolean canBeAsync, Appendable out)
+    protected void writeHtmlScripts(AuraContext context, List<String> scripts, Script scriptLoadingType, Appendable out)
             throws IOException {
-        templateUtil.writeHtmlScripts(context, scripts, canBeAsync, out);
+    	for (String scriptUrl : scripts) {
+    		templateUtil.writeHtmlScript(context, scriptUrl, scriptLoadingType, out);
+    	}
     }
 }

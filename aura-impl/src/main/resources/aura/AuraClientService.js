@@ -142,6 +142,7 @@ function AuraClientService () {
     this.protocols={"layout":true};
     this.namespaces={internal:{},privileged:{}};
     this.lastSendTime = Date.now();
+    this.clientLibraries = {};
 
     // TODO - what is this used for?
     this.appCache = true;
@@ -163,19 +164,6 @@ function AuraClientService () {
     this._disableBootstrapCacheCookie = "auraDisableBootstrapCache";
 
     this.NOOP = function() {};
-
-    Aura.Utils.Util.prototype.on(window, "load", function() {
-        // Lazy load data-src scripts
-        var scripts = document.getElementsByTagName("script");
-        if (scripts) {
-            for ( var i = 0, len = scripts.length; i < len; i++) {
-                var script = scripts[i];
-                if (script.getAttribute("data-src") && !script.getAttribute("src")) {
-                    script.src = script.getAttribute("data-src");
-                }
-            }
-        }
-    });
 
     var auraXHR = new Aura.Services.AuraClientService$AuraXHR();
     this.availableXHRs = [ auraXHR ];
@@ -509,6 +497,58 @@ AuraClientService.prototype.fireDoneWaiting = function() {
  */
 AuraClientService.prototype.tearDown = function() {
     this._appNotTearingDown = false;
+};
+
+
+/**
+ * Initializes the clientLibraries sent as part of the lazy HTML scripts
+ * This will be called before instanciating the app 
+ * @private
+*/
+AuraClientService.prototype.initializeClientLibraries = function () {
+// Lazy load data-src scripts
+    var scripts = document.getElementsByTagName("script");
+    if (scripts) {
+        for ( var i = 0, len = scripts.length; i < len; i++) {
+            var script = scripts[i];
+            if (script.getAttribute("data-src") && !script.getAttribute("src")) {
+                var source = script.getAttribute("data-src");
+                var name = source.split('/').pop().split('.').shift();
+                this.clientLibraries[name] = {
+                    script : script,
+                    loaded : false,
+                    loading : []
+                };
+            }
+        }
+    }
+};
+
+/**
+ * Load ClientLibraries
+ * @export
+ */
+AuraClientService.prototype.loadClientLibrary = function(name, callback) {
+    var lib = this.clientLibraries[name.toLowerCase()];
+    $A.assert(lib, 'ClientLibrary has not been registered');
+
+    if (lib.loaded) {
+        return callback();
+    }
+
+    lib.loading.push($A.getCallback(callback));
+
+    function afterLoad() {
+        lib.loaded = true;
+        for (var i in lib.loading) {
+            lib.loading[i]();
+        }
+        lib.loading = [];
+    }
+
+    lib.script.onload = afterLoad;
+    lib.script.onerror = afterLoad;
+    lib.script.src = lib.script.getAttribute('data-src');
 };
 
 
@@ -1187,6 +1227,7 @@ AuraClientService.prototype.initDefs = function() {
     if (Aura["afterAppDefsReady"]) {
         Aura["afterAppDefsReady"].forEach(function (fn) { fn();});
     }
+    delete Aura["afterAppDefsReady"];
 };
 
 AuraClientService.prototype.getAppBootstrap = function() {
@@ -1360,6 +1401,26 @@ AuraClientService.prototype.runAfterInitDefs = function(callback) {
 
 };
 
+
+/**
+ * Run a callback after the application is ready (rendered)
+ *
+ * This is for internal use only. The function is called synchronously if definitions have
+ * already been initialized.
+ *
+ * @param {function} callback the callback that should be invoked after defs are initialized
+ * @private
+ */
+AuraClientService.prototype.runAfterAppReady = function(callback) {
+    if ($A["finishedInit"]) {
+        return callback();
+    }
+
+    // Add to the list of callbacks waiting until the app is ready (finishInit)
+    Aura["afterAppReady"] = Aura["afterAppReady"] || [];
+    Aura["afterAppReady"].push(callback);
+
+};
 /**
  * Loads bootstrap.js from storage, if it exists, and populates several
  * global variables consumed by runAfterBootstrapReady().

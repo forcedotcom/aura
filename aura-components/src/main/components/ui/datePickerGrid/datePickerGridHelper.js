@@ -142,6 +142,8 @@
                 var tdClassName = "",
                     trClassName = "";
 
+                var isSelectedDate = this.dateEquals(d, selectedDate);
+
                 if (dayOfWeek === 0 || dayOfWeek === 6) {
                     className = "weekend";
                 } else {
@@ -163,7 +165,7 @@
                     className += " todayDate";
                     tdClassName += " is-today";
                 }
-                if (this.dateEquals(d, selectedDate)) {
+                if (isSelectedDate) {
                     tdClassName += " is-selected";
                     className += " selectedDate";
                     firstFocusableDate = cellCmp;
@@ -207,9 +209,8 @@
                 var _setFocus = component.get("v._setFocus");
                 if (this.dateEquals(d, date) && _setFocus === true) {
                     cellCmp.getElement().focus();
-                } else {
-                    cellCmp.set("v.ariaSelected", false);
                 }
+                cellCmp.set("v.ariaSelected", isSelectedDate);
             }
             d.setDate(d.getDate() + 1);
         }
@@ -217,10 +218,6 @@
             firstFocusableDate.set("v.tabIndex", 0);
         }
         component.set("v._setFocus", true);
-    },
-
-    getEventTarget: function(e) {
-        return (window.event) ? e.srcElement : e.target;
     },
 
     goToFirstOfMonth: function(component) {
@@ -326,7 +323,10 @@
     },
 
     selectDate: function(component, event) {
-        var source = event.getSource();
+        var selectedCell = event.getSource();
+
+        this.updateAriaSelected(component, selectedCell);
+
         var hasTime = $A.util.getBooleanValue(component.get("v.hasTime"));
         if (hasTime === true) {
 
@@ -350,8 +350,8 @@
             var lastDateId = parseInt(lastDateCellCmp.getLocalId(),10);
             lastDateId += offset;
 
-            var currentId = parseInt(source.getLocalId(),10);
-            var currentDate = source.get("v.label");
+            var currentId = parseInt(selectedCell.getLocalId(),10);
+            var currentDate = selectedCell.get("v.label");
             var targetDate;
             if (currentId < firstDateId) { // previous month
                 targetDate = new Date(component.get("v.year"), component.get("v.month") - 1, currentDate);
@@ -369,9 +369,12 @@
                 component.set("v.date", currentDate);
             }
             component.set("v.selectedDate", component.get("v.year") + "-" + (component.get("v.month") + 1) + "-" + component.get("v.date"));
-        } else { // fire selectdate event
+        } else {
+            // update selectedDate, but no need to fire a rerender.
+            component.set("v.selectedDate", selectedCell.get("v.value"), true);
+
             var selectDateEvent = component.getEvent("selectDate");
-            selectDateEvent.setParams({"value": source.get("v.value")});
+            selectDateEvent.setParams({"value": selectedCell.get("v.value")});
             selectDateEvent.fire();
         }
     },
@@ -432,6 +435,21 @@
             component.set("v._namesOfWeekdays", days);
         } else {
             component.set("v._namesOfWeekdays", namesOfWeekDays);
+        }
+    },
+
+    updateAriaSelected: function (component, selectedCell) {
+        var previousSelectedDate = component.get("v.selectedDate");
+        if (!$A.util.isEmpty(previousSelectedDate)) {
+            var previousDate = moment(previousSelectedDate, "YYYY-MM-DD").toDate();
+            var previousSelectedDateCell = this.findDateComponent(component, previousDate);
+            if (previousSelectedDateCell) {
+                previousSelectedDateCell.set("v.ariaSelected", false);
+            }
+        }
+
+        if (selectedCell) {
+            selectedCell.set("v.ariaSelected", true);
         }
     }
 });

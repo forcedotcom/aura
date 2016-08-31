@@ -45,6 +45,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     private final String DATEPICKER_SEL = "div.uiDatePicker.visible";
 
     private final String CLASSNAME = "return $A.test.getActiveElement().className";
+    private final String ACTIVE_ELEMENT = "return $A.test.getActiveElement()";
 
     /**
      * Excluded Browser Reasons:
@@ -64,13 +65,13 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     /***********************************************************************************************
      *********************************** HELPER FUNCTIONS********************************************
      ***********************************************************************************************/
-    private WebElement loopThroughKeys(WebElement element, WebDriver driver, String keyString, int iterCondition,
-            String cssSel, String assertVal) {
+    private WebElement loopThroughKeys(WebElement element, String keyString, int iterCondition,
+                                       String cssSel, String assertVal) {
         // Pressing one button iterCondition times
         for (int i = 0; i < iterCondition; i++) {
             element.sendKeys(keyString);
-            element = findDomElement(By.cssSelector(cssSel));
-            assertTrue(assertVal + "combination could not find aria-selected='true'", element != null);
+            element = (WebElement) getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);
+            assertTrue(assertVal + "combination could not find active element", element != null);
         }
 
         return element;
@@ -78,8 +79,6 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
     private String pageUpDownHelper(int iterCondition, String keyString)
     {
-        WebDriver driver = getDriver();
-        // Test Begins
         // Making sure the textBox is empty so we always start at the same date
         WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
         element.clear();
@@ -90,7 +89,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         String classOfActiveElem = "" + getAuraUITestingUtil().getEval(CLASSNAME);
         element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
 
-        element = loopThroughKeys(element, driver, keyString, iterCondition, ARIA_SELECTED_SEL, "Shift+Page Up/Down");
+        element = loopThroughKeys(element, keyString, iterCondition, ARIA_SELECTED_SEL, "Shift+Page Up/Down");
 
         // Selecting the date that we are on to get the value and compare it to what it should be
         element.sendKeys(Keys.SPACE);
@@ -118,10 +117,10 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
         // Pressing the home or End button and grabbing the associated date
         element.sendKeys(buttonToPress);
-        element = findDomElement(By.cssSelector(ARIA_SELECTED_SEL));
 
         // Clicking on that element to compare it to the date we should receive
-        element.sendKeys(Keys.SPACE);
+        element = (WebElement) getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);
+        element.sendKeys(Keys.ENTER);
 
         // Repointing to the InputTextBox
         element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
@@ -262,7 +261,6 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     public void _testTab() throws Exception {
         open(URL);
 
-        // Tab test Begins
         // Getting input textbox in focus
         WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
 
@@ -293,7 +291,6 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     @Test
     public void testValueChangeEvent() throws Exception {
         open(URL);
-        // Tab test Begins
         // Getting input textbox in focus
         WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
 
@@ -332,7 +329,6 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
         WebDriver driver = getDriver();
 
-        // Tab test Begins
         // Getting input textbox in focus
         WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
         element.click();
@@ -387,7 +383,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     public void testEscape() throws Exception {
         open(URL);
 
-        boolean escButtonClosedCal = false;
+        boolean escButtonClosedCal;
 
         openDatePicker();
 
@@ -423,7 +419,6 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
     	// the different keys we will use to close the datePicker
     	Keys[] keysToClose = {Keys.ESCAPE, Keys.ENTER, Keys.SPACE};
-        String getActiveElem = "return $A.test.getActiveElement()";
 
     	open(URL);
 
@@ -433,7 +428,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
             inputDate.sendKeys(Keys.TAB);
 
             //active element should now be the calendar icon - hit enter to open datePicker
-            WebElement activeElement = (WebElement)getAuraUITestingUtil().getEval(getActiveElem);
+            WebElement activeElement = (WebElement)getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);
             activeElement.sendKeys(Keys.ENTER);
 
             //datePicker should be open
@@ -447,7 +442,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
             waitForElementDisappear("datePicker should not be present, but it is", By.cssSelector(".uiDatePicker.visible"));
 
             //check if active element is the inputDate
-            activeElement = (WebElement)getAuraUITestingUtil().getEval(getActiveElem);
+            activeElement = (WebElement)getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);
             assertEquals("Focus not on the right element", activeElement, inputDate);
 
         }
@@ -460,10 +455,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     @Test
     public void testDateWithOneArrow() throws Exception {
         open(URL);
-        WebDriver driver = getDriver();
 
-        // Test Begins
-        // Getting the calendar Icon
         WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
         element.sendKeys("2013-10-01");
         element.click();
@@ -474,8 +466,8 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
         element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
 
-        // Loop through 355 days
-        element = loopThroughKeys(element, driver, "" + Keys.ARROW_RIGHT, 151, ARIA_SELECTED_SEL, "Arrow-Right ");
+        // Loop through 151 days
+        element = loopThroughKeys(element, "" + Keys.ARROW_RIGHT, 151, ARIA_SELECTED_SEL, "Arrow-Right ");
 
         element.sendKeys(Keys.SPACE);
 
@@ -487,15 +479,12 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     @Test
     public void testLeftAndRightArrows() throws Exception {
-        // Increase day in month by 1
         open(URL);
-        WebDriver driver = getDriver();
 
         WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
         element.sendKeys(TEST_DATE_TO_USE);
         element.click();
 
-        // Test Begins
         openDatePicker();
 
         // Find todays date, which should be focused
@@ -503,10 +492,10 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         element = findDomElement(activeElmLoc);
 
         // Move from todays date, to the todays date +41
-        element = loopThroughKeys(element, driver, "" + Keys.ARROW_RIGHT, 41, ARIA_SELECTED_SEL, "Arrow-Right key ");
+        element = loopThroughKeys(element, "" + Keys.ARROW_RIGHT, 41, ARIA_SELECTED_SEL, "Arrow-Right key ");
 
         // Move from today (date+41), to the todays date+1
-        element = loopThroughKeys(element, driver, "" + Keys.ARROW_LEFT, 40, ARIA_SELECTED_SEL, "Arrow-Left key");
+        element = loopThroughKeys(element, "" + Keys.ARROW_LEFT, 40, ARIA_SELECTED_SEL, "Arrow-Left key");
 
         // Select element
         element.sendKeys(Keys.SPACE);
@@ -520,16 +509,13 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     @Test
     public void testUpAndDownArrows() throws Exception {
-
         open(URL);
-        WebDriver driver = getDriver();
 
         // Start at specific date
         WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
         element.sendKeys(TEST_DATE_TO_USE);
         element.click();
 
-        // Test Begins
         openDatePicker();
 
         // Find todays date, which should be focused
@@ -537,10 +523,10 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
 
         // Move 4 months up
-        element = loopThroughKeys(element, driver, "" + Keys.ARROW_UP, 4, ARIA_SELECTED_SEL, "Arrow-Up key");
+        element = loopThroughKeys(element, "" + Keys.ARROW_UP, 4, ARIA_SELECTED_SEL, "Arrow-Up key");
 
         // Move 4 months down
-        element = loopThroughKeys(element, driver, "" + Keys.ARROW_DOWN, 4, ARIA_SELECTED_SEL, "Arrow-Down key");
+        element = loopThroughKeys(element, "" + Keys.ARROW_DOWN, 4, ARIA_SELECTED_SEL, "Arrow-Down key");
 
         // Focus should be back on todays date
         element.sendKeys(Keys.SPACE);

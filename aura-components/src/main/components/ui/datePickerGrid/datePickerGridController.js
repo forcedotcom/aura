@@ -20,8 +20,6 @@
             if (cellCmp) {
                 cellCmp.addHandler("click", component, "c.handleClick");
                 cellCmp.addHandler("keydown", component, "c.handleKeydown");
-                cellCmp.addHandler("focus", component, "c.handleFocus");
-                cellCmp.addHandler("blur", component, "c.handleBlur");
             }
         }
 
@@ -33,27 +31,13 @@
             component.set("v._setFocus", false);
         }
     },
-
+  
     focus: function(component, event, helper) {
         helper.setFocus(component);
     },
 
-    handleBlur: function(component, event) {
-        var source = event.getSource();
-        if (source) {
-            source.set("v.ariaSelected", false);
-        }
-    },
-
     handleClick: function(component, event, helper) {
         helper.selectDate(component, event);
-    },
-
-    handleFocus: function(component, event) {
-        var source = event.getSource();
-        if (source) {
-            source.set("v.ariaSelected", true);
-        }
     },
 
     handleKeydown: function(component, event, helper) {

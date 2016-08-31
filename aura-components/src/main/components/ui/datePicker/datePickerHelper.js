@@ -428,7 +428,7 @@
         var initialDate = new Date();
         var initialDateStr = component.get("v._today");
         var value = component.get("v.value");
-        if (!$A.util.isUndefinedOrNull(value) && !$A.util.isEmpty(value)) {
+        if (!$A.util.isEmpty(value)) {
             var d = moment(value, "YYYY-MM-DD");
             initialDate = d.toDate();
         } else {

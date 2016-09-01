@@ -36,6 +36,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
     }
 
     @Test
+    @Ignore // Fix or remove usage of setNonInternalNamespace
     public void testGlobalComponentAccessibleFromExternalNamespace() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("componentTest");
         open("/componentTest/accessExternalNamespace.cmp?cmpToCreate=auratest:accessGlobalComponent");
@@ -70,6 +71,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
      * accessExternalNamespace, this will attempt to get the component from the server.
      */
 	@Test
+    @Ignore // Fix or remove usage of setNonInternalNamespace
     public void testInternalComponentInaccessibleFromExternalNamespace() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("componentTest");
         open("/componentTest/accessExternalNamespace.cmp?cmpToCreate=auratest:accessInternalComponent");
@@ -94,6 +96,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
      * Component in a External namespace can _not_ extend a Internal namespace component marked PUBLIC
      */
 	@Test
+    @Ignore // Fix or remove usage of setNonInternalNamespace
     public void testExternalComponentExtendsInternalComponent() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("componentTest");
         open("/componentTest/accessExternalNamespace.cmp?cmpToCreate=componentTest:accessExtendsPublic");
@@ -107,6 +110,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
      * External component cannot access public attribute of Internal namespace
      */
 	@Test
+    @Ignore // Fix or remove usage of setNonInternalNamespace
     public void testAccessPublicMarkupOnInternalNamespaceFromExternal() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("componentTest");
         open("/componentTest/accessExternalNamespace.cmp?cmpToCreate=auratest:accessPublicAttribute");
@@ -123,6 +127,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
     }
 
 	@Test
+    @Ignore // Fix or remove usage of setNonInternalNamespace
     public void testAccessGlobalMarkupOnInternalNamespaceFromExternal() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("componentTest");
         open("/componentTest/accessExternalNamespace.cmp?cmpToCreate=auratest:accessGlobalAttribute");
@@ -147,6 +152,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
     }
 
 	@Test
+    @Ignore // Fix or remove usage of setNonInternalNamespace
     public void testAccessPrivateMarkupOnInternalNamespaceFromExternal() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("componentTest");
         open("/componentTest/accessExternalNamespace.cmp?cmpToCreate=auratest:accessPrivateAttribute");

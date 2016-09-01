@@ -48,6 +48,7 @@ public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
     }
 
     @Test
+    @Ignore // Fix or remove usage of setNonInternalNamespace
     public void testGetComponentDefinitionWithoutAccess() throws Exception {
         getMockConfigAdapter().setNonInternalNamespace("clientApiTest");
         open("/clientApiTest/getDefinition.cmp");

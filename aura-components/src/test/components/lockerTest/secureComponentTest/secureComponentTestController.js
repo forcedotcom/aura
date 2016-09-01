@@ -19,7 +19,6 @@
         var deepInnerCmp = innerCmp.find("outputText");
         testUtils.assertStartsWith("SecureComponentRef", deepInnerCmp.toString(), "Expected deep inner component found via find()"
             + " to be a SecureComponentRef");
-
     },
 
     testGetElementReturnsSecureElement: function(cmp) {
@@ -27,6 +26,15 @@
         var secureElement = cmp.getElement();
         testUtils.assertStartsWith("SecureElement", secureElement.toString(), "Expected return of cmp.getElement()"
                 + " to be a SecureElement");
+    },
+
+    testGetElementsReturnsArrayOfSecureElements: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var elements = cmp.getElements();
+        elements.forEach(function(element) {
+                testUtils.assertStartsWith("SecureElement", element.toString(), "Expected return of cmp.getElements()"
+                    + " to be an array of SecureElements");
+        });
     },
 
     testGetEventReturnsSecureEvent: function(cmp) {
@@ -106,7 +114,32 @@
         var pressEvent = cmp.get("e.press");
         testUtils.assertStartsWith("SecureAuraEvent", pressEvent.toString(), "Expected to receive SecureAuraEvent" +
             "when requesting a event using component.get()");
+    },
 
+    testGet_InvalidAction: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        try {
+            cmp.get('c.unknownAction');
+            testUtils.fail("Expected error when executing SecureComponent.get('c.unknownAction')");
+        } catch (e) {
+            testUtils.assertEquals("Unable to find 'unknownAction' on 'compound://lockerTest.secureComponentTest'.", e.message);
+        }
+    },
+
+    testGet_InvalidAttr: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.expectAuraError("Access Check Failed!");
+        cmp.get('v.unknownAttribute');
+    },
+
+    testGet_InvalidEvent: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertNull(cmp.get('e.unknownEvent'), "Expected null when executing SecureComponent.get('c.unknownEvent')");
+    },
+
+    testGetEvent_InvalidEvent: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertNull(cmp.getEvent('v.unknownEvent'), "Expected null when executing SecureComponent.getEvent('c.unknownEvent')");
     },
 
     sayHello: function(cmp) {

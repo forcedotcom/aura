@@ -15,18 +15,28 @@
     limitations under the License.
 
 -->
-<aura:component implements="aura:requireLocker">
+<aura:component implements="aura:requireLocker" model="java://org.auraframework.components.test.java.model.TestJavaModel" controller="java://org.auraframework.impl.java.controller.TestController">
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
 	<aura:attribute name="cyclicObject" type="Object"/>
+    <aura:attribute name="attrString" type="String"/>
+    <aura:attribute name="attrList" type="List"/>
+    <aura:attribute name="attrMap" type="Map"/>
 	
     <aura:method name="testBlockedAPI" action="{!c.testBlockedAPI}"/>
     <aura:method name="testFindReturnsSecureComponent" action="{!c.testFindReturnsSecureComponent}"/>
+    <aura:method name="testFindOnInnerComponentsMarkup" action="{!c.testFindOnInnerComponentsMarkup}"/>
     <aura:method name="testGetElementReturnsSecureElement" action="{!c.testGetElementReturnsSecureElement}"/>
+    <aura:method name="testGetElementsReturnsSecureElements" action="{!c.testGetElementsReturnsSecureElements}"/>
+
     <aura:method name="testGetEventReturnsSecureEvent" action="{!c.testGetEventReturnsSecureEvent}"/>
     <aura:method name="testGetCThrowsError" action="{!c.testGetCThrowsError}"/>
     <aura:method name="testAddValueProviderExploit" action="{!c.testAddValueProviderExploit}"/>
     <aura:method name="testAuraMethod" action="{!c.testAuraMethod}"/>
    	<aura:method name="testCyclicObject" action="{!c.testCyclicObject}"/>
+    <aura:method name="testGet_AttributeValue" action="{!c.testGet_AttributeValue}"/>
+    <aura:method name="testGet_ModelMemberValue" action="{!c.testGet_ModelMemberValue}"/>
+    <aura:method name="testGet_ActionReturnsSecureAction" action="{!c.testGet_ActionReturnsSecureAction}"/>
+    <aura:method name="testGet_ComponentEventReturnsSecureAuraEvent" action="{!c.testGet_ComponentEventReturnsSecureAuraEvent}"/>
 
     <aura:registerevent name="press" type="ui:press"/>
     

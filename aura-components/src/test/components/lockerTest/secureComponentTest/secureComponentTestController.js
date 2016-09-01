@@ -12,6 +12,16 @@
                 + " to be a SecureComponent");
     },
 
+    testFindOnInnerComponentsMarkup: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var innerCmp = cmp.find("innerCmp");
+        // Reach for the component inside my facet
+        var deepInnerCmp = innerCmp.find("outputText");
+        testUtils.assertStartsWith("SecureComponentRef", deepInnerCmp.toString(), "Expected deep inner component found via find()"
+            + " to be a SecureComponentRef");
+
+    },
+
     testGetElementReturnsSecureElement: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var secureElement = cmp.getElement();
@@ -22,7 +32,7 @@
     testGetEventReturnsSecureEvent: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var secureEvent = cmp.getEvent("press");
-        testUtils.assertStartsWith("SecureAuraEvent", secureEvent.toString(), "Expected return of cmp.event()"
+        testUtils.assertStartsWith("SecureAuraEvent", secureEvent.toString(), "Expected return of cmp.getEvent()"
                 + " to be a SecureAuraEvent");
     },
 
@@ -63,7 +73,42 @@
                 
         cmp.get("v.cyclicObject");
     },  
-    
+
+    testGet_AttributeValue: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertEquals("Locker", cmp.get("v.attrString"), "Failed to get string attribute value");
+        testUtils.assertEquals(3, cmp.get("v.attrList").length, "Failed to get list attribute value");
+        var map = cmp.get("v.attrMap");
+        testUtils.assertTrue(map.hasOwnProperty("Key"), "Failed to get map attribute value");
+        testUtils.assertEquals("Value", cmp.get("v.attrMap").Key);
+    },
+
+    testGet_ModelMemberValue: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertEquals("Model", cmp.get("m.string"), "Failed to get simple model value");
+        var modelMap = cmp.get("m.map");
+        testUtils.assertEquals("apple", modelMap.fruit, "Failed to get map type model value");
+    },
+
+    testGet_ActionReturnsSecureAction: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var clientAction = cmp.get("c.sayHello");
+        testUtils.assertStartsWith("SecureAction", clientAction.toString(), "Expected to receive a SecureAction" +
+            "when requesting a client action using component.get()");
+
+        var serverAction = cmp.get("c.getNamedComponent")
+        testUtils.assertStartsWith("SecureAction", serverAction.toString(), "Expected to receive a SecureAction" +
+            "when requesting a server action using component.get()");
+    },
+
+    testGet_ComponentEventReturnsSecureAuraEvent: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var pressEvent = cmp.get("e.press");
+        testUtils.assertStartsWith("SecureAuraEvent", pressEvent.toString(), "Expected to receive SecureAuraEvent" +
+            "when requesting a event using component.get()");
+
+    },
+
     sayHello: function(cmp) {
 		cmp.find("message").textContent = "Hello from sayHello()";
 	}

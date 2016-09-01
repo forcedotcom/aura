@@ -44,4 +44,6 @@
     <ul aura:id="ul">
         <li aura:id="l1" id="l1">A</li>
     </ul>
+
+    <ui:outputText aura:id="outputText" value="Output Text here"/>
 </aura:component>

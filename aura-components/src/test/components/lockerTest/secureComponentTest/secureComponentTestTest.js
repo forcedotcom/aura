@@ -29,6 +29,12 @@
         }
     },
 
+    testGetElementsReturnsArrayOfSecureElement: {
+        test: function(cmp) {
+            cmp.testGetElementsReturnsArrayOfSecureElement();
+        }
+    },
+
     testGetEventReturnsSecureEvent: {
         test: function(cmp) {
             cmp.testGetEventReturnsSecureEvent();
@@ -57,5 +63,40 @@
         test: function(cmp) {
             cmp.testCyclicObject();
         }
-    }  
+    },
+
+    testFindOnInnerComponentsMarkupShouldGetSecureComponentRef: {
+        test: function(cmp) {
+            cmp.testFindOnInnerComponentsMarkup();
+        }
+    },
+
+    testGet_AttributeValue: {
+        attributes :{
+            attrList : ["A", "B", "C"],
+            attrString : "Locker",
+            attrMap : {"Key" : "Value"}
+        },
+        test: function(cmp) {
+            cmp.testGet_AttributeValue();
+        }
+    },
+
+    testGet_ModelMemberValue: {
+        test: function(cmp) {
+            cmp.testGet_ModelMemberValue();
+        }
+    },
+
+    testGet_ActionReturnsSecureAction: {
+        test: function(cmp) {
+            cmp.testGet_ActionReturnsSecureAction();
+        }
+    },
+
+    testGet_ComponentEventReturnsSecureAuraEvent: {
+        test: function(cmp){
+            cmp.testGet_ComponentEventReturnsSecureAuraEvent();
+        }
+    }
 })

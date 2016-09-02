@@ -263,7 +263,7 @@ public class RegistrySerializer {
         // Now filter the compiled set on the namespace.
         //
         Set<DefDescriptor<?>> empty = Sets.newHashSet();
-        filtered = mdr.filterRegistry(empty);
+        filtered = Aura.getContextService().getCurrentContext().filterLocalDefs(empty);
         logger.debug("******************************************* "+namespace+" ******************************");
         for (Map.Entry<DefDescriptor<?>,Definition> entry : filtered.entrySet()) {
             DefDescriptor<?> desc = entry.getKey();

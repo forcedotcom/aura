@@ -43,7 +43,6 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.http.RequestParam.BooleanParam;
 import org.auraframework.http.RequestParam.EnumParam;
 import org.auraframework.http.RequestParam.InvalidParamException;
 import org.auraframework.http.RequestParam.StringParam;
@@ -65,9 +64,6 @@ import com.google.common.collect.Maps;
 public class AuraContextFilter implements Filter {
     public static final EnumParam<AuraContext.Mode> mode = new EnumParam<>(AuraServlet.AURA_PREFIX
             + "mode", false, AuraContext.Mode.class);
-
-    public static final BooleanParam isDebugToolEnabled = new BooleanParam(AuraServlet.AURA_PREFIX
-            + "debugtool", false);
 
     private static final EnumParam<Format> format = new EnumParam<>(AuraServlet.AURA_PREFIX + "format", false,
             Format.class);
@@ -181,7 +177,6 @@ public class AuraContextFilter implements Filter {
 
         Map<String, Object> configMap = getConfigMap(request);
         Mode m = getMode(request, configMap);
-        boolean d = getDebugToolParam(request);
 
         DefDescriptor<? extends BaseComponentDef> appDesc = getAppParam(request, configMap);
 
@@ -210,7 +205,7 @@ public class AuraContextFilter implements Filter {
 		//
         localizationAdapter.setRequestedLocales(requestedLocales);
         
-        AuraContext context = contextService.startContext(m, f, a, appDesc, d);
+        AuraContext context = contextService.startContext(m, f, a, appDesc);
         
         //
         // Reset it after the context is started (created)
@@ -369,11 +364,6 @@ public class AuraContextFilter implements Filter {
 
     protected void endContext() {
         contextService.endContext();
-    }
-
-    protected Boolean getDebugToolParam(HttpServletRequest request) {
-        // Get Passed in aura.debugtool param
-        return isDebugToolEnabled.get(request);
     }
 
     @Override

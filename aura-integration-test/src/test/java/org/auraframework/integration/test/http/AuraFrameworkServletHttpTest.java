@@ -40,8 +40,6 @@ import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * Automation to verify the implementation of AuraFrameworkServlet. AuraFrameworkServlet responds to requests of pattern
  * /auraFW/* This config is stored in aura/dist/config/web.xml for aura running on jetty. In SFDC build, the config is

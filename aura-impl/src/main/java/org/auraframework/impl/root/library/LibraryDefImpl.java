@@ -36,7 +36,6 @@ import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -83,10 +82,9 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
 	        // Process Libraries with a lower granularity level, to prevent duplication of external includes.
 	        StringBuilder sb = new StringBuilder();
 	        AuraContext context = Aura.getContextService().getCurrentContext();
-	        MasterDefRegistry masterDefRegistry = context.getDefRegistry();
 	        boolean minify = context.getMode().minify();
 	        for (IncludeDefRef defRef : includes) {
-	            if(!masterDefRegistry.getClientClassLoaded(defRef.getDescriptor())) {
+	            if(!context.getClientClassLoaded(defRef.getDescriptor())) {
 	            	sb.append(defRef.getCode(minify));
 	            }
 	        }

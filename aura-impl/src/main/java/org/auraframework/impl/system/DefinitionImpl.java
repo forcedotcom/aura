@@ -144,6 +144,7 @@ public abstract class DefinitionImpl<T extends Definition> extends BaseXmlElemen
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public RefBuilderImpl<T, A> setDescriptor(String qualifiedName) {
             try {
                 return this.setDescriptor(Aura.getDefinitionService().getDefDescriptor(qualifiedName, (Class<T>)defClass));

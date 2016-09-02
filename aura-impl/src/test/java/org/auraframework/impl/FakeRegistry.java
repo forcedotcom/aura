@@ -69,10 +69,6 @@ public class FakeRegistry implements MasterDefRegistry {
     }
 
     @Override
-    public <D extends Definition> void addLocalDef(D def) {
-    }
-
-    @Override
     public <T extends Definition> Source<T> getSource(DefDescriptor<T> descriptor) {
         return null;
     }
@@ -86,11 +82,6 @@ public class FakeRegistry implements MasterDefRegistry {
     public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException {
     }
     
-    @Override
-    public Map<DefDescriptor<?>, Definition> filterRegistry(Set<DefDescriptor<?>> preloads) {
-        return null;
-    }
-
     @Override
     public <T extends Definition> String getUid(String uid, DefDescriptor<T> descriptor)
             throws ClientOutOfSyncException, QuickFixException {
@@ -139,16 +130,6 @@ public class FakeRegistry implements MasterDefRegistry {
 		return null;
 	}
 	
-	@Override
-    public void setClientClassLoaded(DefDescriptor<?> componentClass, Boolean isLoaded) {
-		
-    }
-    
-	@Override
-    public Boolean getClientClassLoaded(DefDescriptor<?> componentClass) {
-    	return false;
-    }
-
     @Override
     public <D extends Definition> void assertAccess(
             DefDescriptor<?> referencingDescriptor,

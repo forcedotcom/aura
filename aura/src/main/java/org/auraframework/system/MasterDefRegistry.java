@@ -17,7 +17,6 @@ package org.auraframework.system;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -86,14 +85,6 @@ public interface MasterDefRegistry {
     <D extends Definition> boolean exists(DefDescriptor<D> descriptor);
 
     /**
-     * Add a local definition to the registry.
-     *
-     * The definition to be added must have a descriptor that matches the
-     * definition.
-     */
-    <D extends Definition> void addLocalDef(D def);
-
-    /**
      * Get the source for a given descriptor.
      */
     <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor);
@@ -117,20 +108,6 @@ public interface MasterDefRegistry {
      * Returns null if the referencingDescriptor has access to the definition otherwise a specific access violation reason.
      */
     <D extends Definition> String hasAccess(DefDescriptor<?> referencingDescriptor, D def);
-
-    /**
-     * Filter our loaded set of dependencies on the preloads.
-     *
-     * This filters the set of definitions currently loaded in the master def
-     * registry on the set of preloads given. This allows for definitions to be
-     * loaded with {@link getDef(DefDescriptor)} then filtered here for
-     * preloads. The resulting map of definitions is the complete set that has
-     * not been preloaded.
-     *
-     * @param preloads The set of preloaded definitions.
-     * @return the full set of loaded definitions not included in the preload.
-     */
-    Map<DefDescriptor<? extends Definition>, Definition> filterRegistry(Set<DefDescriptor<?>> preloads);
 
     /**
      * Get the UID associated with a descriptor.
@@ -166,7 +143,7 @@ public interface MasterDefRegistry {
      */
     String getCachedString(String uid, DefDescriptor<?> descriptor, String key);
 
-	String getAltCachedString(String uid, DefDescriptor<?> descriptor, String key);
+    String getAltCachedString(String uid, DefDescriptor<?> descriptor, String key);
 
     /**
      * Get a named string from the cache for a cacheable definition.
@@ -198,23 +175,4 @@ public interface MasterDefRegistry {
      * @return list of client libraries for uid
      */
     List<ClientLibraryDef> getClientLibraries(String uid);
-    
-    /**
-     * Set that the current component was or was not loaded in the current context.
-     * Primarily for App.js. We'll include a component class for each component in 
-     * app.js, we don't want the JSON definition for each component in app.js to 
-     * also include the component class, this would be duplicate information.
-     * 
-     * @param componentClassDef The component to indicate we have loaded.
-     * @param isLoaded Was the class included in the current request or not. There is no reason to set this to false at this point.
-     */
-    void setClientClassLoaded(DefDescriptor<?> componentClassDef, Boolean isLoaded);
-    
-    /**
-     * Has the current component class already been output in the current request? 
-     * Prevents us from duplicating output of the component class definition in a single request.
-     * @param componentClassDef
-     * @return
-     */
-    Boolean getClientClassLoaded(DefDescriptor<?> componentClassDef);
 }

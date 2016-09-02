@@ -34,7 +34,6 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import java.util.HashMap;
@@ -107,8 +106,7 @@ public class ConcreteProvider implements ComponentConfigProvider {
             ComponentDef cmpDef = builder.build();
             AuraContext context = contextService.getCurrentContext();
             //add dynamic namespace to MasterDefRegistry so later we can getDef from it during the injectComponent();
-            MasterDefRegistry mdr = context.getDefRegistry();
-            mdr.addLocalDef(cmpDef);
+            context.addDynamicDef(cmpDef);
             config.setDescriptor(cmpDef.getDescriptor());
         }
         return config;

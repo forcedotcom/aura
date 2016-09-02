@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpHeaders;
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.http.resource.FileStaticResource;
 import org.auraframework.system.StaticResource;
 import org.auraframework.util.IOUtil;

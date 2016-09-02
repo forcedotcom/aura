@@ -73,7 +73,7 @@ public class AttributeDefRefTest extends AuraImplTestCase {
         TypeDef mockType = Mockito.mock(TypeDef.class);
         Mockito.doReturn(typeDesc).when(mockType).getDescriptor();
         Mockito.doReturn("fabulous").when(mockType).valueOf("parseable");
-        context.getDefRegistry().addLocalDef(mockType);
+        context.addDynamicDef(mockType);
         AttributeDefRefImpl adr = assertParsedValue("parseable", typeName, "fabulous");
         assertEquals("unparsed for toString()", "parseable", adr.toString());
     }

@@ -66,7 +66,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.test.Resettable;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
@@ -372,13 +371,12 @@ public class AuraTestFilter implements Filter {
         }
 
         boolean error = false;
-        MasterDefRegistry registry = context.getDefRegistry();
         for (Definition def : mocks) {
             try {
                 if (doReset && def instanceof Resettable) {
                     ((Resettable) def).reset();
                 }
-                registry.addLocalDef(def);
+                context.addDynamicDef(def);
             } catch (Throwable t) {
                 LOG.error("Failed to add mock " + def, t);
                 error = true;

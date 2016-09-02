@@ -125,32 +125,19 @@ public class AuraContextServiceImpl implements ContextService {
 
     @Override
     public AuraContext startContext(Mode mode, Format format, Authentication access,
-            DefDescriptor<? extends BaseComponentDef> appDesc) {
-        return startContext(mode, format, access, appDesc, false);
-    }
-    
-    @Override
-    public AuraContext startContext(Mode mode, Format format, Authentication access,
-                    DefDescriptor<? extends BaseComponentDef> appDesc,
-                    boolean isDebugToolEnabled) {
-        return startContext(mode, null, format, access, appDesc, isDebugToolEnabled);
+                    DefDescriptor<? extends BaseComponentDef> appDesc) {
+        return startContext(mode, null, format, access, appDesc);
     }
 
     @Override
     public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Authentication access,
             DefDescriptor<? extends BaseComponentDef> appDesc) {
-        return startContext(mode, loaders, format, access, appDesc, false);
-    }
-    
-    @Override
-    public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Authentication access,
-            DefDescriptor<? extends BaseComponentDef> appDesc, boolean isDebugToolEnabled) {
         // initialize logging context
         loggingService.establish();
         MasterDefRegistryImpl mdr = getDefRegistry(mode, access, loaders);
         AuraContext context = contextAdapter.establish(mode, mdr,
                 this.prefixDefaultsAdapter.getPrefixDefaults(mode), format, access,
-                AuraJsonContext.createContext(mode, true, jsonSerializerFactory), getGlobalProviders(), appDesc, isDebugToolEnabled);
+                AuraJsonContext.createContext(mode, true, jsonSerializerFactory), getGlobalProviders(), appDesc);
         mdr.setContext(context);
         return context;
     }

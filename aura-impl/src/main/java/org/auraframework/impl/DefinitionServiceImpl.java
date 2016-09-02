@@ -125,7 +125,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         return DefDescriptorImpl.getAssociateDescriptor(desc, defClass, prefix);
     }
 
-    @SuppressWarnings({"unchecked", "cast"})
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends Definition> T getDefinition(DefDescriptor<T> descriptor) throws QuickFixException {
         contextService.assertEstablished();

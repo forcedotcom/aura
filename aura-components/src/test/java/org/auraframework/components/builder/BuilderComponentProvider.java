@@ -29,6 +29,7 @@ import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.ComponentConfig;
 import org.auraframework.service.BuilderService;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -38,6 +39,9 @@ import com.google.common.collect.Lists;
 public class BuilderComponentProvider implements ComponentConfigProvider {
     @Inject
     private DefinitionService definitionService;
+
+    @Inject
+    private ContextService contextService;
 
     @Inject
     private BuilderService builderService;
@@ -61,7 +65,7 @@ public class BuilderComponentProvider implements ComponentConfigProvider {
         List<ComponentDefRef> body = Lists.newArrayList();
         body.add(contents.build());
         builder.setFacet("body", body);
-        definitionService.getDefRegistry().addLocalDef(builder.build());
+        contextService.getCurrentContext().addDynamicDef(builder.build());
         ComponentConfig cc = new ComponentConfig();
         cc.setDescriptor(newDesc);
         return cc;

@@ -120,7 +120,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         //
         Map<DefDescriptor<? extends Definition>, Definition> defMap;
 
-        defMap = ctx.getDefRegistry().filterRegistry(ctx.getPreloadedDefinitions());
+        defMap = ctx.filterLocalDefs(ctx.getPreloadedDefinitions());
 
         if (defMap.size() > 0) {
             List<Definition> componentDefs = Lists.newArrayList();

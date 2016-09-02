@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Inject;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
@@ -27,11 +28,6 @@ import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
-
-import javax.annotation.concurrent.ThreadSafe;
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.Collection;
 
 @ThreadSafe
 @ServiceComponent

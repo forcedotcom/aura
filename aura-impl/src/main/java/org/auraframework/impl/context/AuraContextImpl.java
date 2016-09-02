@@ -28,15 +28,20 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.cache.Cache;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
+import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.impl.css.token.StyleContextImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Action;
@@ -47,6 +52,7 @@ import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
+import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.test.TestContext;
@@ -59,7 +65,9 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
+import org.eclipse.jetty.util.ConcurrentHashSet;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -116,8 +124,6 @@ public class AuraContextImpl implements AuraContext {
 
     private String fwUID;
 
-    private final boolean isDebugToolEnabled;
-
     private InstanceStack fakeInstanceStack;
 
     private StyleContext styleContext;
@@ -134,11 +140,40 @@ public class AuraContextImpl implements AuraContext {
     private final ConfigAdapter configAdapter;
     private final TestContextAdapter testContextAdapter;
 
+    private final ConcurrentHashMap<DefDescriptor<? extends Definition>, Optional<Definition>> defs;
+    private final ConcurrentHashSet<DefDescriptor<? extends Definition>> defNotCacheable;
+    private final ConcurrentHashSet<DefDescriptor<? extends Definition>> dynamicDescs;
+
+    private final Map<String, Boolean> clientClassesLoaded;
+
+    private final Cache<String, String> accessCheckCache;
+
+    private final static int ACCESS_CHECK_CACHE_SIZE = 4096;
+
+    /**
+     * A local dependencies cache.
+     *
+     * We store both by descriptor and by uid. The descriptor keys must include the type, as the qualified name is not
+     * sufficient to distinguish it. In the case of the UID, we presume that we are safe.
+     *
+     * The two keys stored in the local cache are:
+     * <ul>
+     * <li>The UID, which should be sufficiently unique for a single request.</li>
+     * <li>The type+qualified name of the descriptor. We store this to avoid construction in the case where we don't
+     * have a UID. This is presumed safe because we assume that a single session will have a consistent set of
+     * permissions</li>
+     * </ul>
+     */
+    private final Map<String, DependencyEntry> localDependencies;
+
+    private final AuraContextImpl original;
+
+
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
-            Map<String, GlobalValueProvider> globalProviders, boolean isDebugToolEnabled,
-                           ConfigAdapter configAdapter, DefinitionService definitionService,
-                           TestContextAdapter testContextAdapter) {
+            Map<String, GlobalValueProvider> globalProviders,
+            ConfigAdapter configAdapter, DefinitionService definitionService,
+            TestContextAdapter testContextAdapter, AuraContext original) {
         this.mode = mode;
         this.masterRegistry = masterRegistry;
         this.defaultPrefixes = defaultPrefixes;
@@ -146,12 +181,122 @@ public class AuraContextImpl implements AuraContext {
         this.access = access;
         this.jsonContext = jsonContext;
         this.globalProviders = globalProviders;
-        this.isDebugToolEnabled = isDebugToolEnabled;
         this.configAdapter = configAdapter;
         this.definitionService = definitionService;
         this.testContextAdapter = testContextAdapter;
         this.globalValues = new HashMap<>();
+        this.defs = new ConcurrentHashMap<>();
+        this.defNotCacheable = new ConcurrentHashSet<>();
+        this.dynamicDescs = new ConcurrentHashSet<>();
+        this.original = (AuraContextImpl)original;
+        this.localDependencies = new ConcurrentHashMap<>();
+        this.clientClassesLoaded = new ConcurrentHashMap<>();
+        // Why is this a cache and not just a map?
+        this.accessCheckCache = new CacheImpl.Builder<String, String>()
+                .setInitialSize(ACCESS_CHECK_CACHE_SIZE)
+                .setMaximumSize(ACCESS_CHECK_CACHE_SIZE)
+                .setRecordStats(true)
+                .setSoftValues(true)
+                .build();
     }
+
+    /**
+     * Check to see if we have a def locally.
+     */
+    @Override
+    public boolean hasLocalDef(DefDescriptor<?> descriptor) {
+        return defs.containsKey(descriptor) || (original != null && original.defs.containsKey(descriptor));
+    }
+
+    @Override
+    public void setLocalDefNotCacheable(DefDescriptor<?> descriptor) {
+        if (original != null) {
+            original.defNotCacheable.add(descriptor);
+        } else {
+            this.defNotCacheable.add(descriptor);
+        }
+    }
+
+    @Override
+    public boolean isLocalDefNotCacheable(DefDescriptor<?> descriptor) {
+        if (original != null) {
+            return original.defNotCacheable.contains(descriptor);
+        } else {
+            return this.defNotCacheable.contains(descriptor);
+        }
+    }
+
+    @Override
+    public void addLocalDef(DefDescriptor<?> descriptor, Definition def) {
+        Optional<Definition> opt;
+        if (def == null) {
+            opt = Optional.absent();
+        } else {
+            opt = Optional.of(def);
+        }
+        defs.putIfAbsent(descriptor, opt);
+    }
+
+    @Override
+    public <D extends Definition> D getLocalDef(DefDescriptor<D> descriptor) {
+        Optional<Definition> opt = null;
+        if (original != null) {
+            opt = original.defs.get(descriptor);
+        }
+        if (opt == null) {
+            opt = defs.get(descriptor);
+        }
+        if (opt == null) {
+            return null;
+        }
+        @SuppressWarnings("unchecked")
+        D origDef = (D) opt.orNull();
+        return origDef;
+    }
+
+    /**
+     * Filter the entire set of current definitions by a set of preloads.
+     *
+     * This filtering is very simple, it just looks for local definitions that are not included in the preload set.
+     */
+    @Override
+    public Map<DefDescriptor<? extends Definition>, Definition> filterLocalDefs(Set<DefDescriptor<?>> preloads) {
+        Map<DefDescriptor<? extends Definition>, Definition> filtered;
+
+        filtered = Maps.newHashMapWithExpectedSize(defs.size());
+        if (preloads == null) {
+            preloads = Sets.newHashSet();
+        }
+        for (Map.Entry<DefDescriptor<? extends Definition>, Optional<Definition>> entry : defs.entrySet()) {
+            if (entry.getValue().isPresent() && !preloads.contains(entry.getKey())) {
+                filtered.put(entry.getKey(), entry.getValue().get());
+            }
+        }
+        return filtered;
+    }
+
+
+    @Override
+    public <D extends Definition> void addDynamicDef(D def) {
+        DefDescriptor<? extends Definition> desc = def.getDescriptor();
+
+        if (desc == null) {
+            throw new AuraRuntimeException("Invalid def has no descriptor");
+        }
+        defs.put(desc, Optional.of(def));
+        defNotCacheable.add(desc);
+        dynamicDescs.add(desc);
+    }
+
+    @Override
+    public void addDynamicMatches(Set<DefDescriptor<?>> matched, DescriptorFilter matcher) {
+        for (DefDescriptor<? extends Definition> desc : dynamicDescs) {
+            if (matcher.matchDescriptor(desc)) {
+                matched.add(desc);
+            }
+        }
+    }
+
 
     @Override
     public boolean isPreloaded(DefDescriptor<?> descriptor) {
@@ -429,11 +574,6 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public String getFrameworkUID() {
         return fwUID;
-    }
-
-    @Override
-    public boolean getIsDebugToolEnabled() {
-        return isDebugToolEnabled;
     }
 
     @Override
@@ -727,5 +867,52 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public String getAccessVersion() throws QuickFixException {
         return this.currentAction == null ? null : this.currentAction.getCallerVersion();
+    }
+
+    @Override
+    public void addLocalDependencyEntry(String key, DependencyEntry de) {
+        if (de.uid != null) {
+            localDependencies.put(de.uid, de);
+        }
+        localDependencies.put(key, de);
+    }
+
+    @Override
+    public DependencyEntry getLocalDependencyEntry(String key) {
+        return localDependencies.get(key);
+    }
+
+    @Override
+    public DependencyEntry findLocalDependencyEntry(DefDescriptor<?> descriptor) {
+        for (DependencyEntry det : localDependencies.values()) {
+            if (det.dependencies != null && det.dependencies.contains(descriptor)) {
+                return det;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Track if the client class was already added to the pay load for this request.
+     */
+    @Override
+    public void setClientClassLoaded(DefDescriptor<?> clientClass, Boolean isLoaded) {
+        clientClassesLoaded.put(clientClass.getQualifiedName(), isLoaded);
+    }
+
+    /**
+     * Check if the client class has already been added to the request pay load.
+     */
+    @Override
+    public Boolean getClientClassLoaded(DefDescriptor<?> clientClass) {
+        if(clientClassesLoaded.containsKey(clientClass.getQualifiedName())) {
+            return clientClassesLoaded.get(clientClass.getQualifiedName());
+        }
+        return false;
+    }
+
+    @Override
+    public Cache<String, String> getAccessCheckCache() {
+        return accessCheckCache;
     }
 }

@@ -25,7 +25,6 @@ import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.css.StyleContext;
@@ -349,8 +348,6 @@ public class ServerServiceImpl implements ServerService {
         AuraContext context = contextService.getCurrentContext();
         boolean minify = context.getMode().minify();
         
-        MasterDefRegistry masterDefRegistry = context.getDefRegistry();
-        
         JsonSerializationContext serializationContext = context.getJsonSerializationContext();
         serializationContext.pushFormatRootItems();
         // no ref support needed for defs
@@ -367,7 +364,7 @@ public class ServerServiceImpl implements ServerService {
                 sb.append(defRef.getCode(minify));
                 sb.append("*/});");
                 	
-                masterDefRegistry.setClientClassLoaded(defRef.getDescriptor(), true);
+                context.setClientClassLoaded(defRef.getDescriptor(), true);
             }
         }
         
@@ -377,7 +374,7 @@ public class ServerServiceImpl implements ServerService {
             sb.append("$A.componentService.addComponent(\"" + def.getDescriptor() + "\", function (){/*");
             
             	// Mark class as loaded in the client
-            	masterDefRegistry.setClientClassLoaded(def.getDescriptor(), true);
+            	context.setClientClassLoaded(def.getDescriptor(), true);
             	
             	// Component Class
             	sb.append(def.getCode(minify));

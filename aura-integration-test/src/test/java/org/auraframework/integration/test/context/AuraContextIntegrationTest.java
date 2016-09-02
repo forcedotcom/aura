@@ -67,12 +67,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class AuraContextImplTest extends AuraImplTestCase {
+public class AuraContextIntegrationTest extends AuraImplTestCase {
 
     @Inject
     private JsonSerializerFactory jsonSerializerFactory;
 
-    public AuraContextImplTest() {
+    public AuraContextIntegrationTest() {
     	this.setShouldSetupContext(false);
     }
 
@@ -338,7 +338,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
                 AttributeDef.SerializeToType.BOTH, null, new DefinitionAccessImpl(AuraContext.Access.PUBLIC)));
         EventDefImpl eventDef = vendor.makeEventDef(eventDesc, EventType.COMPONENT, atts, null, null, AuraContext.Access.INTERNAL);
 
-        context.getDefRegistry().addLocalDef(eventDef);
+        context.addDynamicDef(eventDef);
         String res = JsonEncoder.serialize(context, context.getJsonSerializationContext());
         assertTrue(res.contains("markup://fake:event"));
     }
@@ -703,7 +703,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         MasterDefRegistry mdr = Mockito.mock(MasterDefRegistry.class);
         AuraJsonContext serCtx = AuraJsonContext.createContext(mode, true, jsonSerializerFactory);
         AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
-                globalProviders, false, configAdapter, definitionService, testContextAdapter);
+                globalProviders, configAdapter, definitionService, testContextAdapter, null);
         ctx.setFrameworkUID("#FAKEUID#");
 
         String res = JsonEncoder.serialize(ctx, serCtx);
@@ -730,7 +730,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         MasterDefRegistry mdr = Mockito.mock(MasterDefRegistry.class);
         AuraJsonContext serCtx = AuraJsonContext.createContext(mode, true, jsonSerializerFactory);
         AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
-                globalProviders, false, configAdapter, definitionService, testContextAdapter);
+                globalProviders, configAdapter, definitionService, testContextAdapter, null);
         ctx.setFrameworkUID("#FAKEUID#");
 
         String res = JsonEncoder.serialize(ctx, serCtx);
@@ -757,7 +757,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         MasterDefRegistry mdr = Mockito.mock(MasterDefRegistry.class);
         AuraJsonContext serCtx = AuraJsonContext.createContext(mode, true, jsonSerializerFactory);
         AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
-                globalProviders, false, configAdapter, definitionService, testContextAdapter);
+                globalProviders, configAdapter, definitionService, testContextAdapter, null);
         ctx.setFrameworkUID("#FAKEUID#");
 
         String res = JsonEncoder.serialize(ctx, serCtx);
@@ -803,7 +803,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         MasterDefRegistry mdr = Mockito.mock(MasterDefRegistry.class);
         AuraJsonContext serCtx = AuraJsonContext.createContext(mode, true, jsonSerializerFactory);
         AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
-                globalProviders, false, configAdapter, definitionService, testContextAdapter);
+                globalProviders, configAdapter, definitionService, testContextAdapter, null);
         ctx.setFrameworkUID("#FAKEUID#");
 
         String res = JsonEncoder.serialize(ctx, serCtx);

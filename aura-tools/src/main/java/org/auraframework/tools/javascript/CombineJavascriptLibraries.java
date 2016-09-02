@@ -119,26 +119,6 @@ public class CombineJavascriptLibraries {
     }
 
     /**
-     * Reads file to String
-     * 
-     * @param file Path to file
-     * @return string contents
-     * @throws IOException
-     */
-    private String readFile(Path file) throws IOException {
-        StringBuilder buffer = new StringBuilder();
-        if (Files.exists(file)) {
-            try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line).append(System.lineSeparator());
-                }
-            }
-        }
-        return buffer.toString();
-    }
-
-    /**
      * Returns minified file name given non-minified file name
      * 
      * @param original file name
@@ -153,7 +133,6 @@ public class CombineJavascriptLibraries {
      * Class to represent JSON configuration
      */
     private class ResourcesConfig {
-        public List<String> files = Lists.newArrayList();
         public String walltimeLocaleDir;
     }
 }

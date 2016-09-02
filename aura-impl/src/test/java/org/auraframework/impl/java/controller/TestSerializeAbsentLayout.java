@@ -31,7 +31,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import javax.inject.Inject;
@@ -73,8 +72,7 @@ public class TestSerializeAbsentLayout implements Controller {
         ;
 
         // Add the dependency
-        MasterDefRegistry mdr = context.getDefRegistry();
-        mdr.addLocalDef(cmpDef);
+        context.addDynamicDef(cmpDef);
 
         // Return the component so our dependencies are included in the request.
         ComponentDefRefBuilder subbuilder = builderService.getComponentDefRefBuilder();
@@ -83,5 +81,4 @@ public class TestSerializeAbsentLayout implements Controller {
 
         return (ComponentDefRefImpl) subbuilder.build();
     }
-
 }

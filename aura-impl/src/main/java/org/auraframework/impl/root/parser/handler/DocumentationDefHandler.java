@@ -15,6 +15,12 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import java.util.Collections;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.RootDefinitionBuilder;
@@ -22,18 +28,11 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DescriptionDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ExampleDef;
-import org.auraframework.def.MetaDef;
 import org.auraframework.impl.documentation.DocumentationDefImpl;
-import org.auraframework.impl.root.MetaDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.Collections;
-import java.util.Set;
 
 public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
 

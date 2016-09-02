@@ -21,10 +21,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.cache.Cache;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
@@ -107,8 +110,6 @@ public interface AuraContext {
         }
     }
 
-    boolean isDebugToolEnabled = false;
-
     enum Format {
         MANIFEST, CSS, JS, JSON, HTML, SVG, ENCRYPTIONKEY
     }
@@ -137,19 +138,19 @@ public interface AuraContext {
         }
 
         public boolean isWritable() {
-        	return this.writable;
+            return this.writable;
         }
 
         public void setValue(Object value) {
-        	// We only want to do it the first time.
-        	// It's expected that this is the value that is on the client.
-        	// We'll serialize it down to the client so that when we do a merge
-        	// we say, is the current value the original that we had on the server?
-        	// If yes, then use this new value, otherwise the value was probably changed mid flight, don't reset.
-        	if(this.originalValue == null && this.value != value) {
-        		this.originalValue = this.value;
-        	}
-        	this.value = value;
+            // We only want to do it the first time.
+            // It's expected that this is the value that is on the client.
+            // We'll serialize it down to the client so that when we do a merge
+            // we say, is the current value the original that we had on the server?
+            // If yes, then use this new value, otherwise the value was probably changed mid flight, don't reset.
+            if(this.originalValue == null && this.value != value) {
+                this.originalValue = this.value;
+            }
+            this.value = value;
 
         }
 
@@ -158,7 +159,7 @@ public interface AuraContext {
          * @param defaultValue the value to specify for a global value if no value has been explicitly set.
          */
         public void setDefaultValue(Object defaultValue) {
-        	this.defaultValue = defaultValue;
+            this.defaultValue = defaultValue;
         }
 
         /**
@@ -167,10 +168,10 @@ public interface AuraContext {
          * @return
          */
         public Object getValue() {
-        	if(this.value != null) {
-        		return this.value;
-        	}
-        	return this.defaultValue;
+            if(this.value != null) {
+                return this.value;
+            }
+            return this.defaultValue;
         }
 
 
@@ -181,7 +182,7 @@ public interface AuraContext {
             json.writeMapEntry("defaultValue", this.defaultValue);
             json.writeMapEntry("value", this.value);
             if(this.originalValue != null) {
-            	json.writeMapEntry("originalValue", this.originalValue);
+                json.writeMapEntry("originalValue", this.originalValue);
             }
             json.writeMapEnd();
         }
@@ -481,11 +482,6 @@ public interface AuraContext {
     String getFrameworkUID();
 
     /**
-     * FIXME: This is busted!!!!
-     */
-    boolean getIsDebugToolEnabled();
-
-    /**
      * Get the instance stack currently in use.
      *
      * This could either be a 'local' instance stack for the context (deprecated behavior) or it could be from the
@@ -606,4 +602,114 @@ public interface AuraContext {
      * requiredVersionDef or no version is found.
      */
     String getAccessVersion() throws QuickFixException;
+
+    /**
+     * Check if a local def is not cacheable.
+     */
+    boolean isLocalDefNotCacheable(DefDescriptor<?> descriptor);
+
+    /**
+     * Mark a local def as not cacheable.
+     */
+    void setLocalDefNotCacheable(DefDescriptor<?> descriptor);
+
+    /**
+     * Get a locally cached def.
+     *
+     * @param descriptor The descriptor for which we want the definition
+     * @return the definition, or null if not found or does not exist.
+     */
+    <D extends Definition> D getLocalDef(DefDescriptor<D> descriptor);
+
+    /**
+     * Add a local def to the cache.
+     *
+     * @param descriptor the descriptor for the def to add.
+     * @param d the definition to add (can be null)
+     */
+    void addLocalDef(DefDescriptor<?> descriptor, Definition d);
+
+    /**
+     * Check to see if we have a locally cached def.
+     *
+     * @param descriptor the descriptor to check.
+     */
+    boolean hasLocalDef(DefDescriptor<?> descriptor);
+
+    /**
+     * Add a dynamically generated def to the context.
+     *
+     * @param def The definition to add.
+     */
+    <D extends Definition> void addDynamicDef(D def);
+
+    /**
+     * Match the dynamic definition descriptors against a DescriptorFilter.
+     *
+     * @param matched a set to populate with matches
+     * @param matcher the matcher to use.
+     */
+    void addDynamicMatches(Set<DefDescriptor<?>> matched, DescriptorFilter matcher);
+
+    /**
+     * Filter our loaded set of dependencies on the preloads.
+     *
+     * This filters the set of definitions currently loaded in the master def
+     * registry on the set of preloads given. This allows for definitions to be
+     * loaded with {@link getDef(DefDescriptor)} then filtered here for
+     * preloads. The resulting map of definitions is the complete set that has
+     * not been preloaded.
+     *
+     * @param preloads The set of preloaded definitions.
+     * @return the full set of loaded definitions not included in the preload.
+     */
+    Map<DefDescriptor<? extends Definition>, Definition> filterLocalDefs(Set<DefDescriptor<?>> preloads);
+
+    /**
+     * Put a dependency entry in the local map of dependency entries.
+     *
+     * @param key a global key to use to store the entry.
+     */
+    void addLocalDependencyEntry(String key, DependencyEntry de);
+
+    /**
+     * Put a dependency entry in the local map of dependency entries.
+     *
+     * @param key a global key or uid to find the entry.
+     */
+    DependencyEntry getLocalDependencyEntry(String key);
+
+    /**
+     * Find a local dependency entry for a def if one exists.
+     *
+     * This checks the local set of dependency entries to see if there is one that contains the descriptor.
+     * If so, it can be used to get the definition.
+     *
+     * @param descriptor the descriptor to find.
+     */
+    DependencyEntry findLocalDependencyEntry(DefDescriptor<?> descriptor);
+
+    /**
+     * Set that the current component was or was not loaded in the current context.
+     * Primarily for App.js. We'll include a component class for each component in 
+     * app.js, we don't want the JSON definition for each component in app.js to 
+     * also include the component class, this would be duplicate information.
+     * 
+     * @param componentClassDef The component to indicate we have loaded.
+     * @param isLoaded Was the class included in the current request or not. There is no reason to set this to false at this point.
+     */
+    void setClientClassLoaded(DefDescriptor<?> componentClassDef, Boolean isLoaded);
+    
+    /**
+     * Has the current component class already been output in the current request? 
+     * Prevents us from duplicating output of the component class definition in a single request.
+     * @param componentClassDef
+     * @return 
+     */
+    Boolean getClientClassLoaded(DefDescriptor<?> componentClassDef);
+
+    /**
+     * Get the access check cache.
+     */
+    Cache<String, String> getAccessCheckCache();
 }

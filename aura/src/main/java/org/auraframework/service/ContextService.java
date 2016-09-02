@@ -66,20 +66,6 @@ public interface ContextService extends AuraService {
             throws QuickFixException;
 
     /**
-     * Start a AuraContext and include debug tool usage
-     */
-    AuraContext startContext(Mode mode, Format format, Authentication access,
-                    DefDescriptor<? extends BaseComponentDef> appDesc, boolean isDebugToolEnabled);
-	
-    /**
-     * Start a AuraContext and include extra source loaders and debug tool usage
-     */
-    AuraContext startContext(Mode mode, Set<SourceLoader> loaders,
-                    Format format, Authentication access,
-                    DefDescriptor<? extends BaseComponentDef> appDesc,
-                    boolean isDebugToolEnabled);
-	
-    /**
      * Close the current AuraContext, no matter which type it is.
      */
     void endContext();

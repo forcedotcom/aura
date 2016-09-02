@@ -1099,7 +1099,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     json.writeMapEntry("dynamicallyFlavorable", dynamicallyFlavorable);
                 }
 
-                if(!context.getDefRegistry().getClientClassLoaded(descriptor)) {
+                if(!context.getClientClassLoaded(descriptor)) {
                     boolean minify = context.getMode().minify();
                     String code = getCode(minify);
                     if (!AuraTextUtil.isNullEmptyOrWhitespace(code)) {

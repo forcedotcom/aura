@@ -68,23 +68,13 @@ public class ContextAdapterImpl implements ContextAdapter {
     private static ThreadLocal<MutableInteger> systemDepth = new ThreadLocal<>();
 
     @Override
-    public AuraContext establish(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
-            Format format, Authentication access, JsonSerializationContext jsonContext,
-            Map<String, GlobalValueProvider> globalProviders,
-            DefDescriptor<? extends BaseComponentDef> appDesc) {
-        return establish(mode, masterRegistry, defaultPrefixes, format, access, jsonContext,
-                globalProviders, appDesc, false);
-    }
-
-    @Override
     public AuraContext establish(Mode mode, MasterDefRegistry masterRegistry,
                                  Map<DefType, String> defaultPrefixes, Format format, Authentication access,
                                  JsonSerializationContext jsonContext,
                                  Map<String, GlobalValueProvider> globalProviders,
-                                 DefDescriptor<? extends BaseComponentDef> appDesc,
-                                 boolean isDebugToolEnabled) {
+                                 DefDescriptor<? extends BaseComponentDef> appDesc) {
         AuraContext context = new AuraContextImpl(mode, masterRegistry, defaultPrefixes, format, access, jsonContext,
-                globalProviders, isDebugToolEnabled, configAdapter, definitionService, testContextAdapter);
+                globalProviders, configAdapter, definitionService, testContextAdapter, null);
         currentContext.set(context);
         context.setApplicationDescriptor(appDesc);
         
@@ -93,10 +83,10 @@ public class ContextAdapterImpl implements ContextAdapter {
 
     protected AuraContext buildSystemContext(AuraContext original) {
         MasterDefRegistryImpl mdr = new MasterDefRegistryImpl(configAdapter, definitionService, loggingService,
-                cachingService, (MasterDefRegistryImpl) original.getDefRegistry());
-        AuraContext context = new AuraContextImpl(original.getMode(), mdr, original.getDefaultPrefixes(), original.getFormat(), original.getAccess(),
-                original.getJsonSerializationContext(), original.getGlobalProviders(), false, configAdapter,
-                definitionService, testContextAdapter);
+                cachingService);
+        AuraContext context = new AuraContextImpl(original.getMode(), mdr, original.getDefaultPrefixes(),
+                original.getFormat(), original.getAccess(), original.getJsonSerializationContext(),
+                original.getGlobalProviders(), configAdapter, definitionService, testContextAdapter, original);
         mdr.setContext(context);
         return context;
     }

@@ -123,7 +123,7 @@ public class ComponentController implements Controller {
         Map<DefDescriptor<? extends Definition>, Definition> defMap;
 
         ctx.getDefRegistry().getDef(ctx.getApplicationDescriptor());
-        defMap = ctx.getDefRegistry().filterRegistry(null);
+        defMap = ctx.filterLocalDefs(null);
         for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defMap.entrySet()) {
             Definition def = entry.getValue();
             if (def != null) {

@@ -18,13 +18,11 @@ package org.auraframework.impl.system;
 import java.util.Map;
 import java.util.Set;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.parser.ParserFactory;
-import org.auraframework.system.AuraContext;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;

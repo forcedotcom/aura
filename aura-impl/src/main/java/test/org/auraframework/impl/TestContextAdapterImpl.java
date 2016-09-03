@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.test;
+package test.org.auraframework.impl;
 
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import org.auraframework.adapter.LocalizationAdapter;
+import org.auraframework.impl.test.TestContextImpl;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.test.TestableLocalizationAdapter;
@@ -37,6 +38,7 @@ import com.google.common.cache.CacheBuilder;
  */
 public class TestContextAdapterImpl implements TestContextAdapter {
 
+	
     @Configuration
     public static class TestConfiguration {
     	
@@ -53,6 +55,7 @@ public class TestContextAdapterImpl implements TestContextAdapter {
         	return testContextAdapter;
         }
     }
+    
     
     Cache<String, TestContext> allContexts = CacheBuilder.newBuilder().concurrencyLevel(8)
             .expireAfterAccess(30, TimeUnit.MINUTES).maximumSize(100).build();

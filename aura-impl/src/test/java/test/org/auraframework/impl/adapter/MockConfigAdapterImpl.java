@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.adapter;
+package test.org.auraframework.impl.adapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +32,7 @@ import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.http.CSP;
+import org.auraframework.impl.adapter.ConfigAdapterImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
@@ -54,11 +55,13 @@ import com.google.common.collect.Sets;
  * ConfigAdapter for Aura tests.
  */
 public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConfigAdapter {
-    @Configuration
+    
+	
+	@Configuration
     public static class TestConfiguration {
         private final static MockConfigAdapter mockConfigAdapter = new MockConfigAdapterImpl();
 
-    /**
+        /**
          * Use a true singleton MockConfigAdapter for tests, because integration tests may execute outside the server's
          * ApplicationContext.
          */

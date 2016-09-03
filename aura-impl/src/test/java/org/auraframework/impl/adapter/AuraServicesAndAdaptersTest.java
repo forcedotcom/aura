@@ -23,6 +23,8 @@ import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
+import test.org.auraframework.impl.adapter.MockConfigAdapterImpl;
+
 /**
  * Unit tests for various service and adapter registration.
  * 

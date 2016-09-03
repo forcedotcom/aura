@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.javascript.testsuite;
+package test.org.auraframework.impl.javascript;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -39,6 +39,9 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.impl.javascript.controller.JavascriptControllerDef.Builder;
+import org.auraframework.impl.javascript.testsuite.JavascriptMockHandler;
+import org.auraframework.impl.javascript.testsuite.JavascriptMockHandler.Returns;
+import org.auraframework.impl.javascript.testsuite.JavascriptMockHandler.ThrowsExceptionClass;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,13 +52,16 @@ import com.google.common.collect.ImmutableList;
  * Parse JSTEST mock Actions.
  */
 public class JavascriptMockActionHandler extends JavascriptMockHandler<ControllerDef> {
-    @Configuration
+    
+
+	@Configuration
     public static class ConfigureMockActionInstanceBuilder {
         @Bean(autowire = Autowire.BY_TYPE)
         public InstanceBuilder<Action, ?> mockActionInstanceBuilder() {
             return new MockActionInstanceBuilder();
         }
     }
+
 
     private static class MockActionHandler extends DelegatingHandler {
         private final Answer<?> answer;

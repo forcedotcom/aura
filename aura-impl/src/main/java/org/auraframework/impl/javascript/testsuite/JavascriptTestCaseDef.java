@@ -16,6 +16,10 @@
 package org.auraframework.impl.javascript.testsuite;
 
 import com.google.common.collect.Lists;
+
+import test.org.auraframework.impl.javascript.JavascriptMockActionHandler;
+import test.org.auraframework.impl.javascript.JavascriptMockProviderHandler;
+
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;

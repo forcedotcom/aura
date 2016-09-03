@@ -8,4 +8,8 @@
     default-lazy-init="true">
     
     <context:component-scan base-package="org.auraframework" />
+    
+    <context:component-scan base-package="test.org.auraframework" />
+    
+    
 </beans>

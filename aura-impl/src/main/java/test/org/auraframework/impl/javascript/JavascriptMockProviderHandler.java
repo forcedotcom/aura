@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.javascript.testsuite;
+package test.org.auraframework.impl.javascript;
 
 import java.lang.reflect.Proxy;
 import java.util.List;
@@ -27,6 +27,8 @@ import org.auraframework.def.Provider;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.impl.instance.ProviderInstanceBuilder;
 import org.auraframework.impl.javascript.provider.JavascriptProviderDef.Builder;
+import org.auraframework.impl.javascript.testsuite.JavascriptMockHandler;
+import org.auraframework.impl.javascript.testsuite.JavascriptMockHandler.Returns;
 import org.auraframework.instance.ComponentConfig;
 import org.auraframework.instance.InstanceBuilder;
 import org.auraframework.instance.ProviderInstance;
@@ -45,13 +47,16 @@ import org.springframework.context.annotation.Configuration;
  * Parse JSTEST mock Providers.
  */
 public class JavascriptMockProviderHandler extends JavascriptMockHandler<ProviderDef> {
-    @Configuration
+    
+	
+	@Configuration
     public static class ConfigureMockProviderInstanceBuilder {
         @Bean(autowire = Autowire.BY_TYPE)
         public InstanceBuilder<ProviderInstance, ?> mockProviderInstanceBuilder() {
             return new MockProviderInstanceBuilder();
         }
     }
+    
 
     private static class MockProviderInstanceBuilder extends ProviderInstanceBuilder {
         @Override

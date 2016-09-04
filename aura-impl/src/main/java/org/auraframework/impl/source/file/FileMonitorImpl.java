@@ -17,6 +17,7 @@ package org.auraframework.impl.source.file;
 
 import org.apache.log4j.Logger;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.impl.CachingServiceImpl;
 import org.auraframework.service.CachingService;
 import org.auraframework.system.SourceListener;
 import org.auraframework.util.FileChangeEvent;
@@ -69,6 +70,9 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
             synchronized (BeanConfiguration.class) {
                 INSTANCE = new FileMonitorImpl();
                 INSTANCE.start();
+                
+                //force side effects.
+                new CachingServiceImpl.BeanConfiguration();
             }
         }
         

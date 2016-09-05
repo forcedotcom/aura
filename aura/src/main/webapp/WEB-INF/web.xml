@@ -29,7 +29,7 @@
          specified for component-scanning -->
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>org.auraframework.AuraConfiguration</param-value>
+        <param-value>org.auraframework.AuraConfiguration,test.org.auraframework.AuraTestConfiguration</param-value>
     </context-param>
 
     <!-- Bootstrap the root application context as usual using ContextLoaderListener -->

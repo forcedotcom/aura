@@ -15,8 +15,10 @@
  */
 package org.auraframework.docs;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponentModelFactory;
 import org.auraframework.ds.servicecomponent.ModelFactory;
 import org.auraframework.ds.servicecomponent.ModelInitializationException;
@@ -27,6 +29,15 @@ public class ApiTopicModelFactory implements ModelFactory<ApiTopicModel> {
 
     @Inject
     private ContextService contextService;
+
+    @Inject
+    private ConfigAdapter configAdapter;
+
+    @PostConstruct
+    public void init() {
+        // This is messy, we should clean this up, but just converting it for the moment.
+        ApiContentsModel.refreshSymbols(configAdapter.getResourceLoader());
+    }
 
     @Override
     public ApiTopicModel modelInstance() throws ModelInitializationException {

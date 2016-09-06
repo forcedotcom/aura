@@ -7,7 +7,8 @@
     //                  value over OSS autobuilds
     labels : ["threadHostile", "UnAdaptableTest"],
 
-    testComponentDefsPersisted: {
+    // Disabling: flapper
+    _testComponentDefsPersisted: {
         test: [
             function loadIframe(cmp) {
                 var iframeSrc = "/auraStorageTest/componentDefStorage.app";

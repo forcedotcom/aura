@@ -111,8 +111,8 @@
             }
         ]
     },
-
-    testDisablesParallelBootstrapOnNextLoadWhenFailedToLoadCsrfTokenFromStorage: {
+    //flapper...
+    _testDisablesParallelBootstrapOnNextLoadWhenFailedToLoadCsrfTokenFromStorage: {
         labels : ["flapper"],
         test: [
             function loadApplication(cmp) {

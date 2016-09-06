@@ -42,7 +42,9 @@ public interface ModelDef extends Definition {
      * Create a new instance of this model.
      * 
      * @return an instance of this model type
+     * @deprecated use instance service
      */
+    @Deprecated
     Model newInstance();
 
     /**

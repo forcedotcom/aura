@@ -35,6 +35,7 @@ import org.auraframework.instance.Model;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Type;
 import org.auraframework.system.Location;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -87,9 +88,19 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
         return getMemberByName(s).getType();
     }
 
+    /**
+     * Do not use: Use InstanceService.getInstance() instead.
+     *
+     * @deprecated
+     */
     @Override
     public Model newInstance() {
-        throw new UnsupportedOperationException();
+        try {
+            return Aura.getInstanceService().getInstance(descriptor);
+        } catch (QuickFixException qfe) {
+            // whoops, this should be impossible
+            throw new AuraRuntimeException("Impossible condition, 'this' does not exist", qfe);
+        }
     }
 
     @Override

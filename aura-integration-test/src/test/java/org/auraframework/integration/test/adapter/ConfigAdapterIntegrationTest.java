@@ -26,7 +26,6 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.adapter.ConfigAdapterImpl;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.AuraContext;
 import org.auraframework.util.IOUtil;
@@ -36,6 +35,8 @@ import org.junit.Test;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import test.org.auraframework.impl.adapter.ConfigAdapterImpl;
 
 /**
  * Tests for ConfigAdapterImpl requiring Aura services to be available

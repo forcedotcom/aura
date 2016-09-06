@@ -15,15 +15,18 @@
  */
 package org.auraframework.tools.definition;
 
-import com.google.common.collect.Sets;
+import java.io.File;
+import java.util.Set;
+
 import org.auraframework.AuraConfiguration;
 import org.auraframework.AuraDeprecated;
 import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerException;
 import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerLogger;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.io.File;
-import java.util.Set;
+import com.google.common.collect.Sets;
+
+import test.org.auraframework.impl.adapter.ConfigAdapterImpl;
 
 public abstract class AuraCompiler {
     private static class CommandLineLogger implements RegistrySerializerLogger {
@@ -118,8 +121,8 @@ public abstract class AuraCompiler {
             ns.add(args[i]);
         }
 
-        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(AuraConfiguration.class);
-        
+        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(AuraConfiguration.class, ConfigAdapterImpl.class);
+
         try {
             applicationContext.getBean(AuraDeprecated.class);
             new RegistrySerializer(componentsDir, outputDir, ns.toArray(new String [ns.size()]), cll).execute();

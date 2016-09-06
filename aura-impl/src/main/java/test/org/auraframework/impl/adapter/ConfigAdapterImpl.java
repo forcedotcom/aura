@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.adapter;
+package test.org.auraframework.impl.adapter;
 
 import java.io.File;
 import java.io.FileFilter;

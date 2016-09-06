@@ -17,6 +17,8 @@ package org.auraframework.http;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.auraframework.AuraConfiguration;
@@ -28,6 +30,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -36,10 +39,10 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
-import org.springframework.test.context.TestContextManager;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.GenericWebApplicationContext;
 
-import javax.inject.Inject;
+import test.org.auraframework.impl.adapter.ConfigAdapterImpl;
 
 public class AuraServletTest extends UnitTestCase {
 
@@ -62,10 +65,10 @@ public class AuraServletTest extends UnitTestCase {
         MockServletContext servletContext = new MockServletContext();
         MockServletConfig servletConfig = new MockServletConfig(servletContext);
 
-        AnnotationConfigApplicationContext appContext = new AnnotationConfigApplicationContext(AuraConfiguration.class);
+        AnnotationConfigApplicationContext appContext = new AnnotationConfigApplicationContext(AuraConfiguration.class, ConfigAdapterImpl.class);
         DefaultListableBeanFactory dlbf = new DefaultListableBeanFactory(appContext.getBeanFactory());
         GenericWebApplicationContext gwac = new GenericWebApplicationContext(dlbf);
-        servletContext.setAttribute(GenericWebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, gwac);
+        servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, gwac);
         gwac.setServletContext(servletContext);
         gwac.refresh();
 
@@ -104,7 +107,7 @@ public class AuraServletTest extends UnitTestCase {
     @Test
     public void testDoGet_NoCacheStartsWithSlash() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
 
         MockHttpServletRequest request = getBaseAuraRequest();
         request.addParameter("nocache", "/path?q1=v1+&q2=+v2&q3=v1+v2#a");
@@ -120,7 +123,7 @@ public class AuraServletTest extends UnitTestCase {
     @Test
     public void testDoGet_NoCacheIsRoot() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
 
         MockHttpServletRequest request = getBaseAuraRequest();
         request.addParameter("nocache", "/");
@@ -140,7 +143,7 @@ public class AuraServletTest extends UnitTestCase {
     @Test
     public void testDoGet_NoCacheDoubleSlash() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
 
         MockHttpServletRequest request = getBaseAuraRequest();
         request.addParameter("nocache", "http://host//somepath");
@@ -156,7 +159,7 @@ public class AuraServletTest extends UnitTestCase {
     @Test
     public void testDoGet_NoCacheNoFragment() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
 
         MockHttpServletRequest request = getBaseAuraRequest();
         request.addParameter("nocache", "/?q");
@@ -172,7 +175,7 @@ public class AuraServletTest extends UnitTestCase {
     @Test
     public void testDoGet_NoCacheNoQuery() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
 
         MockHttpServletRequest request = getBaseAuraRequest();
         request.addParameter("nocache", "/#a");
@@ -188,7 +191,7 @@ public class AuraServletTest extends UnitTestCase {
     @Test
     public void testDoGet_NoCacheDoesNotStartWithSlash() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
 
         MockHttpServletRequest request = getBaseAuraRequest();
         request.addParameter("nocache", "urlisnotabsolute");
@@ -204,7 +207,7 @@ public class AuraServletTest extends UnitTestCase {
     @Test
     public void testDoGet_NoCacheUriExploit() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
 
         MockHttpServletRequest request = getBaseAuraRequest();
         request.addParameter("nocache", "@exploit/");
@@ -220,7 +223,7 @@ public class AuraServletTest extends UnitTestCase {
     @Test
     public void testDoGet_NoCacheInvalid() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
 
         MockHttpServletRequest request = getBaseAuraRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -236,7 +239,7 @@ public class AuraServletTest extends UnitTestCase {
     @Test
     public void testDoGet_NoCacheHttpsToHttp() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
 
         MockHttpServletRequest request = getBaseAuraRequest();
         request.setScheme("https");
@@ -254,7 +257,7 @@ public class AuraServletTest extends UnitTestCase {
     @Test
     public void testDoGet_NoCacheHttpToHttps() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
 
         MockHttpServletRequest request = getBaseAuraRequest();
         request.addParameter("nocache", "https://user:password@otherserver:otherport/path?q1=v1&q2=v2#a");
@@ -270,7 +273,7 @@ public class AuraServletTest extends UnitTestCase {
     @Test
     public void testDoGet_NoCacheHttpsToHttps() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
 
         MockHttpServletRequest request = getBaseAuraRequest();
         request.setScheme("https");
@@ -289,7 +292,7 @@ public class AuraServletTest extends UnitTestCase {
     @Ignore("W-3041937: of most concern when switching to https, if request or redirect are on non-standard ports")
     public void _testDoGet_NoCacheRetainsRequestAuthority() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
 
         MockHttpServletRequest request = getBaseAuraRequest();
         request.addParameter("nocache", "https://user:password@otherserver:otherport/path?q1=v1&q2=v2#a");
@@ -305,8 +308,8 @@ public class AuraServletTest extends UnitTestCase {
     @Test
     public void testDoGet_NoCacheEmpty() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
-        Mockito.when(servletUtilAdapter.isValidDefType(Mockito.any(), Mockito.any())).thenReturn(false); // trigger 404
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
+        Mockito.when(servletUtilAdapter.isValidDefType(Matchers.any(), Matchers.any())).thenReturn(false); // trigger 404
                                                                                                          // below
 
         MockHttpServletRequest request = getBaseAuraRequest();
@@ -316,14 +319,14 @@ public class AuraServletTest extends UnitTestCase {
         servlet.doGet(request, response);
 
         // def type check occurs after nocache processing
-        Mockito.verify(servletUtilAdapter).send404(Mockito.any(), Mockito.eq(request), Mockito.eq(response));
+        Mockito.verify(servletUtilAdapter).send404(Matchers.any(), Matchers.eq(request), Matchers.eq(response));
     }
 
     @Test
     public void testDoGet_NoCacheNull() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
-        Mockito.when(servletUtilAdapter.isValidDefType(Mockito.any(), Mockito.any())).thenReturn(false); // trigger 404
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
+        Mockito.when(servletUtilAdapter.isValidDefType(Matchers.any(), Matchers.any())).thenReturn(false); // trigger 404
                                                                                                          // below
 
         MockHttpServletRequest request = getBaseAuraRequest();
@@ -333,14 +336,14 @@ public class AuraServletTest extends UnitTestCase {
         servlet.doGet(request, response);
 
         // def type check occurs after nocache processing
-        Mockito.verify(servletUtilAdapter).send404(Mockito.any(), Mockito.eq(request), Mockito.eq(response));
+        Mockito.verify(servletUtilAdapter).send404(Matchers.any(), Matchers.eq(request), Matchers.eq(response));
     }
 
     @Test
     public void testDoGet_NoCacheNoPath() throws Exception {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        Mockito.when(servletUtilAdapter.actionServletGetPre(Mockito.any(), Mockito.any())).thenReturn(false);
-        Mockito.when(servletUtilAdapter.isValidDefType(Mockito.any(), Mockito.any())).thenReturn(false);
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
+        Mockito.when(servletUtilAdapter.isValidDefType(Matchers.any(), Matchers.any())).thenReturn(false);
 
         MockHttpServletRequest request = getBaseAuraRequest();
         request.addParameter("nocache", "mailto:java-net@java.sun.com");

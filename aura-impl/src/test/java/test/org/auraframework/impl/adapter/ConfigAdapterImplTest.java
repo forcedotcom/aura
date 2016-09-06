@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.adapter;
+package test.org.auraframework.impl.adapter;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.LocalizationAdapter;
@@ -31,6 +31,8 @@ import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.text.Hash;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import test.org.auraframework.impl.adapter.ConfigAdapterImpl;
 
 import javax.inject.Inject;
 

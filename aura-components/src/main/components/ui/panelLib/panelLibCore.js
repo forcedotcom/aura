@@ -81,7 +81,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
         /**
          * returns the key event handler function that do things based on the config
          * @param cmp
-         * @param config {closeOnEsc, trapFocus, closeOnTabOut}
+         * @param config {closeOnEsc, trapFocus, closeOnTabOut, shouldReturnFocus}
          * @param closeAction the caller defined close action
          * @returns {Function}
          */
@@ -102,7 +102,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                     if ($A.util.isFunction(closeAction)) {
                     	closeAction(cmp, "closeOnEsc");
                     } else {
-                        cmp.close();
+                        cmp.getConcreteComponent().close(null, config.shouldReturnFocus);
                     }
                 } else if (keyCode === 9) {
                     //close on tab out
@@ -124,12 +124,12 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                             focusables.last.focus();
                         }
                     } else if (focusables && config.closeOnTabOut) {
-                        if ((current === focusables.last && !shiftPressed) || (current === focusables.first && shiftPressed)) {
+                        if ((current === focusables.last && !shiftPressed) || ((current === focusables.first || current === cmp.getElement()) && shiftPressed)) {
                             $A.util.squash(event, true);
                             if ($A.util.isFunction(closeAction)) {
                             	closeAction(cmp, "closeOnTabOut");
                             } else {
-                                cmp.close();
+                                cmp.getConcreteComponent().close(null, config.shouldReturnFocus);
                             }
                         }
                     }
@@ -162,7 +162,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                     	if ($A.util.isFunction(closeAction)) {
                         	closeAction(panelCmp, "closeOnClickOut");
                         } else {
-                    	    panelCmp.close();
+                    	    panelCmp.getConcreteComponent().close();
                         }
                     }
                 }
@@ -388,7 +388,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
 	                break;
 	            case 'closePanel':
 	                event.stopPropagation();
-	                helper.close(cmp, params.payload ? params.payload.callback : null);
+	                helper.close(cmp, params.payload ? params.payload.callback : null, params.payload ? params.payload.shouldReturnFocus : null);
 	                break;
 	            case 'setFocus':
 	                if (cmp.get('v.autoFocus')) {
@@ -414,10 +414,25 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                     this.setFocus(cmp);
                 }
             } else if ($A.util.hasClass(panel, 'active')) {
-                cmp.returnFocus = document.activeElement;
+                cmp.returnFocus = this.getReturnFocusElement(cmp);
                 $A.util.removeClass(panel, 'active');
                 panel.setAttribute('aria-hidden', 'true');
             }
+        },
+        
+        /**
+         * returns the element to be focused when the panel is destroyed.
+         * @param cmp
+         * @private 
+         */
+        getReturnFocusElement: function(cmp) {
+        	var returnFocusElement = cmp.get('v.returnFocusElement');
+            
+            if ($A.util.isUndefinedOrNull(returnFocusElement)) {
+            	returnFocusElement = document.activeElement;
+            }
+            
+            return returnFocusElement;
         },
 
         /**

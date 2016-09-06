@@ -21,7 +21,8 @@
     <aura:attribute name="visible" type="Boolean" default="false" description="Whether or not the panel is visible (read only)"/>
     <aura:attribute name="header" type="Aura.Component[]" description="The header of the panel" />
     <aura:attribute name="footer" type="Aura.Component[]" description="The footer of the panel" />
-
+	<aura:attribute name="returnFocusElement" type="Object" description="If specified, the panel will focus to the specified HTMLElement when it is closed." />
+	
     <aura:method name="show" description="makes the panel visible (transitions can apply)">
         <aura:attribute name="callback" type="Object"/>
     </aura:method>
@@ -34,6 +35,7 @@
     </aura:method>
     <aura:method name="close" description="hides and fires destroy">
         <aura:attribute name="callback" type="Object"/>
+        <aura:attribute name="shouldReturnFocus" type="Boolean" default="true"/>
     </aura:method>
     <aura:method name="setActive" description="set panel active or not">
         <aura:attribute name="active" type="Boolean" />

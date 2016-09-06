@@ -38,7 +38,7 @@
     _getKeyHandler: function(cmp) {
         if (!cmp._keyHandler && cmp.isValid()) {
         	var closeAction = cmp.get("v.closeAction");
-            cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, closeOnTabOut:true}, closeAction);
+            cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, closeOnTabOut:true, shouldReturnFocus:true}, closeAction);
         }
         return cmp._keyHandler;
     },
@@ -181,9 +181,9 @@
         });
     },
 
-    close: function (cmp, callback) {
+    close: function (cmp, callback, shouldReturnFocus) {
         var self = this;
-        cmp.hide(function () {
+        cmp.getConcreteComponent().hide(function () {
             if (!cmp.isValid()) {
                 return;
             }
@@ -193,7 +193,7 @@
             cmp.getEvent('notify').setParams({
                 action: 'destroyPanel',
                 typeOf: 'ui:destroyPanel',
-                payload: {panelInstance: cmp.getGlobalId()}
+                payload: {panelInstance: cmp.getGlobalId(), shouldReturnFocus: shouldReturnFocus }
             }).fire();
             if ($A.util.isFunction(callback)) {
             	callback();

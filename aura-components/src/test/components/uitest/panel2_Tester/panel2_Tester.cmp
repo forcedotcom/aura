@@ -44,6 +44,7 @@
 	<aura:attribute name="closeActionCalled"  type="String"  default=""/>
 	<aura:attribute name="trapFocus"    type="Boolean"  default="true"/>
 	<aura:attribute name="closeOnLocationChange"    type="Boolean" default="false"/>
+	<aura:attribute name="returnFocusElement"	type="Object"/>
 	
 	<aura:dependency resource="markup://ui:createPanel" type="EVENT"/> 
 	<aura:dependency resource="markup://ui:block" type="COMPONENT"/>
@@ -87,6 +88,7 @@
 			<ui:inputCheckbox aura:id="inputCustomizeCloseAction"     label="Customize CloseAction"    value="{!v.customizeCloseAction}"  class="inputCustomizeCloseAction"/>
 			<ui:inputCheckbox aura:id="inputTrapFocus"          label="Trap Focus"  value="{!v.trapFocus}"           class="inputTrapFocus"/>
 			<ui:inputCheckbox aura:id="inputCloseOnLocationChange"    label="Close on Location Change" value="{!v.closeOnLocationChange}" class="inputCloseOnLocationChange"/>
+			<ui:inputText     aura:id="inputReturnFocusElement" label="Return Focus Element" value="{!v.returnFocusElement}" class="inputReturnFocusElement"/>
 			<ui:inputSelect label="inputSelectionOptions" useMenu="true" aura:id="inputSelectionOptions"/>
 			<ui:button aura:id="createPanelBtn" label="Create Panel" press="{!c.createPanel}" class="createPanelBtnClass"/>
 		</div>

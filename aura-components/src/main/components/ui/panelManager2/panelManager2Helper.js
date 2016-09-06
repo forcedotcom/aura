@@ -184,12 +184,8 @@
             panelObj   = this.PANELS_INSTANCE[panelId],
             panel      = panelObj.panel;
 
-        var activeElement = document.activeElement;
-
-        if (activeElement) {
-            cmp.returnFocus = activeElement;
-        }
-
+        cmp.returnFocus = this.getReturnFocusElement(panel);
+                
         $A.assert(panelObj, 'Couldnt find instance to show');
 
         // de-active all other panels except the one currently shown
@@ -201,12 +197,13 @@
     * @private
     */
     destroyPanel: function (cmp, config, doActivateNext) {
-        var stack      = this.PANELS_STACK,
-            panelParam = config.panelInstance,
-            panelId    = $A.util.isComponent(panelParam) ? panelParam.getGlobalId() : panelParam,
-            panelObj   = this.PANELS_INSTANCE[panelId],
-            panel      = panelObj.panel,
-            index      = stack.indexOf(panel);
+        var stack             = this.PANELS_STACK,
+            shouldReturnFocus = config.shouldReturnFocus,
+            panelParam        = config.panelInstance,
+            panelId           = $A.util.isComponent(panelParam) ? panelParam.getGlobalId() : panelParam,
+            panelObj          = this.PANELS_INSTANCE[panelId],
+            panel             = panelObj.panel,
+            index             = stack.indexOf(panel);
 
         $A.assert(panelObj, 'Couldnt find instance to destroy');
         $A.assert(index > -1, 'Couldnt find the reference in the stack');
@@ -218,7 +215,7 @@
         delete this.PANELS_OWNER[panelId];
         delete this.PANELS_INSTANCE[panelId];
         
-        if (cmp.returnFocus) {
+        if (shouldReturnFocus === true && cmp.returnFocus) {
             cmp.returnFocus.focus();
             cmp.returnFocus = null;
         }
@@ -362,5 +359,20 @@
         }
         
         return closeOnLocationChange;
+    },
+    
+    /**
+     * returns the element to be focused when the panel is destroyed.
+     * @param panel
+     * @private 
+     */
+    getReturnFocusElement: function(panelComponent) {
+    	var returnFocusElement = panelComponent.get('v.returnFocusElement');
+        
+        if ($A.util.isUndefinedOrNull(returnFocusElement)) {
+        	returnFocusElement = document.activeElement;
+        }
+        
+        return returnFocusElement;
     }
 })// eslint-disable-line semi

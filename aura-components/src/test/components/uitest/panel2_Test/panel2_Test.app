@@ -43,6 +43,7 @@
 	<aura:attribute name="testCustomizeCloseAction"     type="Boolean" default="false"/>
 	<aura:attribute name="testTrapFocus"    type="Boolean" default="true"/>
 	<aura:attribute name="testCloseOnLocationChange"    type="Boolean" default="false"/>
+	<aura:attribute name="testReturnFocusElement" type="Object"/>
 
 	<aura:dependency resource="markup://ui:block" type="COMPONENT"/>
 	
@@ -58,6 +59,9 @@
 	<ui:block aura:id="overflowVisible" overflow="true" tag="span">
 		<div id="overflowVisibleBody">div in block body</div>
 	</ui:block>
+	
+	<ui:button aura:id="inputFocusMe" label="Focus Me" class="inputFocusMeClass"/>
+	<ui:button aura:id="inputDoNotFocusMe" label="Do Not Focus Me" class="inputDoNotFocusMeClass"/>
 	
 	<uitest:panel2_Tester aura:id="tester"
 		panelType="{!v.testPanelType}"
@@ -86,6 +90,7 @@
 		customizeCloseAction="{!v.testCustomizeCloseAction}"
 		trapFocus="{!v.testTrapFocus}"
 		closeOnLocationChange="{!v.testCloseOnLocationChange}"
+		returnFocusElement="{!v.testReturnFocusElement}"/>
 	/>
 	
 	 <section class="managerContainers">

@@ -85,6 +85,7 @@
 		config["class"] = cmp.get("v.class");
 		config["flavor"] = cmp.get("v.flavor");
 		config["trapFocus"] = $A.util.getBooleanValue(cmp.get("v.trapFocus"));
+		config["returnFocusElement"] = cmp.get("v.returnFocusElement");
 		
 		// provide an option not to destroy the panel when closeOnClickOut is
 		// set to true.

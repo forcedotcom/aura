@@ -30,7 +30,8 @@
 
     close: function (cmp, event, helper) {
         var callback = event.getParam && event.getParam('arguments').callback;
-        helper.close(cmp, callback);
+        var shouldReturnFocus = event.getParam && event.getParam('arguments').shouldReturnFocus;
+        helper.close(cmp, callback, shouldReturnFocus);
     },
 
     update: function(cmp, event, helper) {

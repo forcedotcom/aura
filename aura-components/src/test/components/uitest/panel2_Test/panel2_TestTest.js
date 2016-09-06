@@ -138,7 +138,94 @@
             }, "Esc button should be focused for Modal");
         }]
     },
-  
+
+    /**
+     * Test to verify that the panel does focus the element specified by returnFocusElement when it is closed
+     * with shouldReturnFocus = true
+     */ 
+    testPanelReturnFocusElementDoesFocusOnClose: {
+        attributes : {"testPanelType" : "panel" },
+        test: [function(cmp) {
+        	cmp.set('v.testReturnFocusElement', $A.test.getElementByClass('inputFocusMeClass')[0]);
+            
+        	// Set the focus to a different element before opening the panel.
+        	$A.test.getElementByClass('inputDoNotFocusMeClass')[0].focus();
+        }, function(cmp) {
+            this.createPanel(cmp);
+        }, function(cmp) {
+            this.waitForPanelDialogOpen()
+        }, function(cmp) {	
+        	// We must programmatically close the panel and force it to return focus because we
+        	// cannot simulate an ESC or SHIFT+TAB key press which is the only
+        	// valid case for when focus should be returned.
+        	panelGlobalId = this.getGlobalIdForPanelModal(1);
+            panel = $A.getCmp(panelGlobalId);
+            panel.close(null, true);
+        }, function(cmp) {         
+            this.waitForPanelDialogClose();
+        }, function(cmp) {
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var activeElement = $A.test.getActiveElement();
+                return $A.util.hasClass(activeElement, "inputFocusMeClass");
+            }, "The focus me input should be focused after the panel is closed.");
+        }]
+    },
+    
+    /**
+     * Test to verify that the panel does NOT focus the element specified by returnFocusElement when it is closed
+     * with shouldReturnFocus = false
+     */ 
+    testPanelReturnFocusElementDoesNotFocusOnClose: {
+        attributes : {"testPanelType" : "panel" },
+        test: [function(cmp) {        	
+        	cmp.set('v.testReturnFocusElement', $A.test.getElementByClass('inputFocusMeClass')[0]);
+        }, function(cmp) {
+            this.createPanel(cmp);
+        }, function(cmp) {
+            this.waitForPanelDialogOpen()
+        }, function(cmp) {	        	
+        	panelGlobalId = this.getGlobalIdForPanelModal(1);
+            panel = $A.getCmp(panelGlobalId);
+            panel.close(null, false);
+        }, function(cmp) {         
+            this.waitForPanelDialogClose();
+        }, function(cmp) {
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var activeElement = $A.test.getActiveElement();
+                return !$A.util.hasClass(activeElement, "inputFocusMeClass");
+            }, "The focus me input should NOT be focused after the panel is closed.");
+        }]
+    },
+    
+    /**
+     * Test to verify that when the panel is closed it will return focus to the element that was previously focused.
+     */ 
+    testPanelReturnFocusDefaultBehaviorOnClose: {
+        attributes : {"testPanelType" : "panel", "testAutoFocus": true },
+        test: [function(cmp) {
+        	// Set the focus before opening the panel.
+        	$A.test.getElementByClass('inputFocusMeClass')[0].focus();
+        }, function(cmp) {
+            this.createPanel(cmp);
+        }, function(cmp) {
+            this.waitForPanelDialogOpen()
+        }, function(cmp) {	        	
+        	// We must programmatically close the panel and force it to return focus because we
+        	// cannot simulate an ESC or SHIFT+TAB key press which is the only
+        	// valid case for when focus should be returned.
+        	panelGlobalId = this.getGlobalIdForPanelModal(1);
+            panel = $A.getCmp(panelGlobalId);
+            panel.close(null, true);
+        }, function(cmp) {         
+            this.waitForPanelDialogClose();
+        }, function(cmp) {
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var activeElement = $A.test.getActiveElement();
+                return $A.util.hasClass(activeElement, "inputFocusMeClass");
+            }, "The focus me input should be focused after the panel is closed.");
+        }]
+    },
+    
     /**
      * Test close button is not displayed on modal
      */
@@ -1219,4 +1306,6 @@
     getGlobalIdForPanelModal : function(panelNumber){
         return $A.test.getText($A.test.select(".info .idCreated")[panelNumber-1]);
     }
+
+
 })

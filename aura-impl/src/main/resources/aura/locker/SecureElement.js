@@ -127,11 +127,13 @@ function SecureElement(el, key) {
                 return newNode;
             }
         },
+        
         querySelector: {
             value: function(selector) {
                 return SecureElement.secureQuerySelector(o, el, key, selector);
             }
         },
+        
         insertAdjacentHTML: {
             value: function(position, text) {
 
@@ -240,28 +242,6 @@ function SecureElement(el, key) {
         }
     });
 
-    [ "childNodes", "children", "nodeName", "nodeType", "ownerDocument"].forEach(function(name) {
-        SecureObject.addPropertyIfSupported(o, el, name, {
-            filterOpaque : true
-        });
-    });
-
-    [ "firstChild", "lastChild", "parentElement", "parentNode" ].forEach(function(name) {
-        SecureObject.addPropertyIfSupported(o, el, name, {
-            skipOpaque : true,
-            filterOpaque : true,
-            defaultValue : null
-        });
-    });
-
-    [ "compareDocumentPosition", "getElementsByClassName", "getElementsByTagName", "getElementsByTagNameNS", "querySelectorAll",
-            "getBoundingClientRect", "getClientRects", "blur", "click", "focus",
-            "getAttribute", "hasAttribute", "setAttribute", "removeAttribute", "getAttributeNS", "hasAttributeNS", "setAttributeNS", "removeAttributeNS" ].forEach(function(name) {
-        SecureObject.addMethodIfSupported(o, el, name, {
-            filterOpaque : true
-        });
-    });
-
     SecureObject.addPropertyIfSupported(o, el, "innerHTML", {
         afterGetCallback : function() {
             return getLockerSecret(o.cloneNode(true), "ref").innerHTML;
@@ -285,13 +265,16 @@ function SecureElement(el, key) {
     });
 
     // applying standard secure element properties
-    SecureElement.addSecureProperties(o, el);
-    SecureElement.addSecureGlobalEventHandlers(o, el, key);
+
     SecureElement.addEventTargetMethods(o, el, key);
 
-    SecureElement.addElementSpecificProperties(o, el);
-    SecureElement.addElementSpecificMethods(o, el);
-
+    SecureObject.addPrototypeMethodsAndProperties(SecureElement.metadata, o, el, key);
+    
+    // DCHASMAN TODO Remove this - needs to be into the shape metadata!!! Special handling for SVG elements
+    if (el.namespaceURI === "http://www.w3.org/2000/svg") {
+        SecureObject.addMethodIfSupported(o, el, "getBBox");
+    }
+    
     setLockerSecret(o, "key", key);
     setLockerSecret(o, "ref", el);
 
@@ -299,57 +282,6 @@ function SecureElement(el, key) {
 
     return o;
 }
-
-SecureElement.addSecureProperties = function(se, raw) {
-    [
-    // Standard Element interface represents an object of a Document.
-    // https://developer.mozilla.org/en-US/docs/Web/API/Element#Properties
-    "childElementCount", "classList", "className", "id", "tagName", "namespaceURI",
-            "scrollHeight", "scrollLeft", "scrollTop", "scrollWidth",
-
-    // Note: ignoring "firstElementChild", "lastElementChild",
-    // "nextElementSibling" and "previousElementSibling" from the list
-    // above.
-
-    // Standard HTMLElement interface represents any HTML element
-    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Properties
-    "accessKey", "accessKeyLabel", "contentEditable", "isContentEditable", "contextMenu", "dataset", "dir", "draggable", "dropzone", "hidden", "lang",
-            "spellcheck", "style", "tabIndex", "title",
-            "offsetHeight", "offsetLeft", "offsetParent", "offsetTop", "offsetWidth",
-            "clientHeight", "clientLeft", "clientTop", "clientWidth",
-            "nodeValue"
-
-    // DCHASMAN TODO This list needs to be revisited as it is missing a ton of
-    // valid attributes!
-    ].forEach(function(name) {
-        SecureObject.addPropertyIfSupported(se, raw, name, {
-            filterOpaque : true
-        });
-    });
-};
-
-SecureElement.addSecureGlobalEventHandlers = function(se, raw, key) {
-    [
-    // Standard Global Event handlers
-    // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers
-    "onabort", "onblur", "oncancel", "oncanplay", "oncanplaythrough", "onchange", "onclick", "onclose", "oncontextmenu", "oncuechange", "ondblclick", 
-    		"ondrag", "ondragend", "ondragenter", "ondragleave", "ondragover", "ondragstart", "ondrop",
-    		"onerror", "onfocus", "oninput", "onkeydown", "onkeypress",
-            "onkeyup", "onload", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onreset", "onresize", "onscroll", "onselect",
-            "onsubmit" ].forEach(function(name) {
-        Object.defineProperty(se, name, {
-        	get: function() {
-        		return SecureObject.filterEverything(se, raw[name]);
-        	},
-        	
-            set: function(callback) {
-                raw[name] = function(e) {
-                    callback.call(se, SecureDOMEvent(e, key));
-                };
-            }
-        });
-    });
-};
 
 SecureElement.addEventTargetMethods = function(se, raw, key) {
     Object.defineProperties(se, {
@@ -414,40 +346,753 @@ SecureElement.createAddEventListener = function(st, el, key) {
     };
 };
 
-SecureElement.addElementSpecificProperties = function(se, el) {
-    var tagName = el.tagName && el.tagName.toUpperCase();
-    if (tagName) {
-        var whitelist = SecureElement.elementSpecificAttributeWhitelists[tagName];
-        if (whitelist) {
-            whitelist.forEach(function(name) {
-            	name = $A.util.hyphensToCamelCase(name);
-            	if (!(name in se)) {
-	                SecureObject.addPropertyIfSupported(se, el, name, {
-	                    filterOpaque : true
-	                });
-            	}
-            });
-        }
+SecureElement.DEFAULT = {};
+SecureElement.FUNCTION = { type: "function" };
+SecureElement.EVENT = { type: "@event" };
+SecureElement.SKIP_OPAQUE = { skipOpaque : true};
 
-        // Special handling for SVG elements
-        if (el.namespaceURI === "http://www.w3.org/2000/svg") {
-            SecureObject.addMethodIfSupported(se, el, "getBBox");
-        }
-    }
+var DEFAULT = SecureElement.DEFAULT;
+var FUNCTION = SecureElement.FUNCTION;
+var EVENT = SecureElement.EVENT;
+var SKIP_OPAQUE = SecureElement.SKIP_OPAQUE;
+
+SecureElement.nodeMetadata = {
+    "ATTRIBUTE_NODE":                 DEFAULT,
+    "CDATA_SECTION_NODE":             DEFAULT,
+    "COMMENT_NODE":                   DEFAULT,
+    "DOCUMENT_FRAGMENT_NODE":         DEFAULT,
+    "DOCUMENT_NODE":                  DEFAULT,
+    "DOCUMENT_POSITION_CONTAINED_BY": DEFAULT,
+    "DOCUMENT_POSITION_CONTAINS":     DEFAULT,
+    "DOCUMENT_POSITION_DISCONNECTED": DEFAULT,
+    "DOCUMENT_POSITION_FOLLOWING":    DEFAULT,
+    "DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC": DEFAULT,
+    "DOCUMENT_POSITION_PRECEDING":    DEFAULT,
+    "DOCUMENT_TYPE_NODE":             DEFAULT,
+    "ELEMENT_NODE":                   DEFAULT,
+    "ENTITY_NODE":                    DEFAULT,
+    "ENTITY_REFERENCE_NODE":          DEFAULT,
+    "NOTATION_NODE":                  DEFAULT,
+    "PROCESSING_INSTRUCTION_NODE":    DEFAULT,
+    "TEXT_NODE":                      DEFAULT,
+    "appendChild":                    FUNCTION,
+    "baseURI":                        DEFAULT,
+    "childNodes":                     DEFAULT,
+    "cloneNode":                      FUNCTION,
+    "compareDocumentPosition":        FUNCTION,
+    "contains":                       FUNCTION,
+    "firstChild":                     SKIP_OPAQUE,
+    "insertBefore":                   FUNCTION,
+    "isConnected":                    DEFAULT,
+    "isDefaultNamespace":             FUNCTION,
+    "isEqualNode":                    FUNCTION,
+    "isSameNode":                     FUNCTION,
+    "lastChild":                      SKIP_OPAQUE,
+    "lookupNamespaceURI":             FUNCTION,
+    "lookupPrefix":                   FUNCTION,
+    "nextSibling":                    SKIP_OPAQUE,
+    "nodeName":                       DEFAULT,
+    "nodeType":                       DEFAULT,
+    "nodeValue":                      DEFAULT,
+    "normalize":                      FUNCTION,
+    "ownerDocument":                  DEFAULT,
+    "parentElement":                  SKIP_OPAQUE,
+    "parentNode":                     SKIP_OPAQUE,
+    "previousSibling":                SKIP_OPAQUE,
+    "removeChild":                    FUNCTION,
+    "replaceChild":                   FUNCTION,
+    "textContent":                    DEFAULT
 };
 
-SecureElement.addElementSpecificMethods = function(se, el) {
-    var tagName = el.tagName && el.tagName.toUpperCase();
-    if (tagName) {
-        var whitelist = SecureElement.elementSpecificMethodWhitelists[tagName];
-        if (whitelist) {
-            whitelist.forEach(function(name) {
-                SecureObject.addMethodIfSupported(se, el, name, {
-                    filterOpaque : true
-                });
-            });
-        }
-    }
+SecureElement.eventTargetMetadata = {
+    "addEventListener":               FUNCTION,
+    "dispatchEvent":                  FUNCTION,
+    "removeEventListener":            FUNCTION
+};
+
+SecureElement.metadata = {
+	"prototypes": {
+	    "HTMLAnchorElement": {
+	        "charset":                        DEFAULT,
+	        "coords":                         DEFAULT,
+	        "download":                       DEFAULT,
+	        "hash":                           DEFAULT,
+	        "host":                           DEFAULT,
+	        "hostname":                       DEFAULT,
+	        "href":                           DEFAULT,
+	        "hreflang":                       DEFAULT,
+	        "name":                           DEFAULT,
+	        "origin":                         DEFAULT,
+	        "password":                       DEFAULT,
+	        "pathname":                       DEFAULT,
+	        "ping":                           DEFAULT,
+	        "port":                           DEFAULT,
+	        "protocol":                       DEFAULT,
+	        "referrerPolicy":                 DEFAULT,
+	        "rel":                            DEFAULT,
+	        "rev":                            DEFAULT,
+	        "search":                         DEFAULT,
+	        "shape":                          DEFAULT,
+	        "target":                         DEFAULT,
+	        "text":                           DEFAULT,
+	        "type":                           DEFAULT,
+	        "username":                       DEFAULT
+	    },
+	    "HTMLAreaElement": {
+	        "alt":                            DEFAULT,
+	        "coords":                         DEFAULT,
+	        "hash":                           DEFAULT,
+	        "host":                           DEFAULT,
+	        "hostname":                       DEFAULT,
+	        "href":                           DEFAULT,
+	        "noHref":                         DEFAULT,
+	        "origin":                         DEFAULT,
+	        "password":                       DEFAULT,
+	        "pathname":                       DEFAULT,
+	        "ping":                           DEFAULT,
+	        "port":                           DEFAULT,
+	        "protocol":                       DEFAULT,
+	        "referrerPolicy":                 DEFAULT,
+	        "search":                         DEFAULT,
+	        "shape":                          DEFAULT,
+	        "target":                         DEFAULT,
+	        "username":                       DEFAULT
+	    },
+	    "HTMLAudioElement": {
+	    },
+	    "HTMLMediaElement": {
+	        "HAVE_CURRENT_DATA":              DEFAULT,
+	        "HAVE_ENOUGH_DATA":               DEFAULT,
+	        "HAVE_FUTURE_DATA":               DEFAULT,
+	        "HAVE_METADATA":                  DEFAULT,
+	        "HAVE_NOTHING":                   DEFAULT,
+	        "NETWORK_EMPTY":                  DEFAULT,
+	        "NETWORK_IDLE":                   DEFAULT,
+	        "NETWORK_LOADING":                DEFAULT,
+	        "NETWORK_NO_SOURCE":              DEFAULT,
+	        "addTextTrack":                   FUNCTION,
+	        "autoplay":                       DEFAULT,
+	        "buffered":                       DEFAULT,
+	        "canPlayType":                    FUNCTION,
+	        "controls":                       DEFAULT,
+	        "crossOrigin":                    DEFAULT,
+	        "currentSrc":                     DEFAULT,
+	        "currentTime":                    DEFAULT,
+	        "defaultMuted":                   DEFAULT,
+	        "defaultPlaybackRate":            DEFAULT,
+	        "disableRemotePlayback":          DEFAULT,
+	        "duration":                       DEFAULT,
+	        "ended":                          DEFAULT,
+	        "error":                          DEFAULT,
+	        "load":                           FUNCTION,
+	        "loop":                           DEFAULT,
+	        "mediaKeys":                      DEFAULT,
+	        "muted":                          DEFAULT,
+	        "networkState":                   DEFAULT,
+	        "onencrypted":                    EVENT,
+	        "pause":                          FUNCTION,
+	        "paused":                         DEFAULT,
+	        "play":                           FUNCTION,
+	        "playbackRate":                   DEFAULT,
+	        "played":                         DEFAULT,
+	        "preload":                        DEFAULT,
+	        "readyState":                     DEFAULT,
+	        "seekable":                       DEFAULT,
+	        "seeking":                        DEFAULT,
+	        "setMediaKeys":                   FUNCTION,
+	        "setSinkId":                      FUNCTION,
+	        "sinkId":                         DEFAULT,
+	        "src":                            DEFAULT,
+	        "textTracks":                     DEFAULT,
+	        "volume":                         DEFAULT,
+	        "webkitAudioDecodedByteCount":    DEFAULT,
+	        "webkitVideoDecodedByteCount":    DEFAULT
+	    },
+	    "HTMLBaseElement": {
+	        "href":                           DEFAULT,
+	        "target":                         DEFAULT
+	    },
+	    "HTMLButtonElement": {
+	        "autofocus":                      DEFAULT,
+	        "checkValidity":                  FUNCTION,
+	        "disabled":                       DEFAULT,
+	        "form":                           DEFAULT,
+	        "formAction":                     DEFAULT,
+	        "formEnctype":                    DEFAULT,
+	        "formMethod":                     DEFAULT,
+	        "formNoValidate":                 DEFAULT,
+	        "formTarget":                     DEFAULT,
+	        "labels":                         DEFAULT,
+	        "name":                           DEFAULT,
+	        "reportValidity":                 FUNCTION,
+	        "setCustomValidity":              FUNCTION,
+	        "type":                           DEFAULT,
+	        "validationMessage":              DEFAULT,
+	        "validity":                       DEFAULT,
+	        "value":                          DEFAULT,
+	        "willValidate":                   DEFAULT
+	    },
+	    "HTMLCanvasElement": {
+	        "captureStream":                  FUNCTION,
+	        "getContext":                     FUNCTION,
+	        "height":                         DEFAULT,
+	        "toBlob":                         FUNCTION,
+	        "toDataURL":                      FUNCTION,
+	        "width":                          DEFAULT
+	    },
+	    "HTMLTableColElement": {
+	        "align":                          DEFAULT,
+	        "ch":                             DEFAULT,
+	        "chOff":                          DEFAULT,
+	        "span":                           DEFAULT,
+	        "vAlign":                         DEFAULT,
+	        "width":                          DEFAULT
+	    },
+	    "HTMLUnknownElement": {
+	    },
+	    "HTMLModElement": {
+	        "cite":                           DEFAULT,
+	        "dateTime":                       DEFAULT
+	    },
+	    "HTMLDetailsElement": {
+	        "open":                           DEFAULT
+	    },
+	    "HTMLEmbedElement": {
+	        "align":                          DEFAULT,
+	        "getSVGDocument":                 FUNCTION,
+	        "height":                         DEFAULT,
+	        "name":                           DEFAULT,
+	        "src":                            DEFAULT,
+	        "type":                           DEFAULT,
+	        "width":                          DEFAULT
+	    },
+	    "HTMLFieldSetElement": {
+	        "checkValidity":                  FUNCTION,
+	        "disabled":                       DEFAULT,
+	        "elements":                       DEFAULT,
+	        "form":                           DEFAULT,
+	        "name":                           DEFAULT,
+	        "reportValidity":                 FUNCTION,
+	        "setCustomValidity":              FUNCTION,
+	        "type":                           DEFAULT,
+	        "validationMessage":              DEFAULT,
+	        "validity":                       DEFAULT,
+	        "willValidate":                   DEFAULT
+	    },
+	    "HTMLFormElement": {
+	        "acceptCharset":                  DEFAULT,
+	        "action":                         DEFAULT,
+	        "autocomplete":                   DEFAULT,
+	        "checkValidity":                  FUNCTION,
+	        "elements":                       DEFAULT,
+	        "encoding":                       DEFAULT,
+	        "enctype":                        DEFAULT,
+	        "length":                         DEFAULT,
+	        "method":                         DEFAULT,
+	        "name":                           DEFAULT,
+	        "noValidate":                     DEFAULT,
+	        "reportValidity":                 FUNCTION,
+	        "requestAutocomplete":            FUNCTION,
+	        "reset":                          FUNCTION,
+	        "submit":                         FUNCTION,
+	        "target":                         DEFAULT
+	    },
+	    "HTMLIFrameElement": {
+            "align":                          DEFAULT,
+            "allowFullscreen":                DEFAULT,
+            "frameBorder":                    DEFAULT,
+            "height":                         DEFAULT,
+            "longDesc":                       DEFAULT,
+            "marginHeight":                   DEFAULT,
+            "marginWidth":                    DEFAULT,
+            "name":                           DEFAULT,
+            "referrerPolicy":                 DEFAULT,
+            "scrolling":                      DEFAULT,
+            "src":                            DEFAULT,
+            "width":                          DEFAULT
+        },
+	    "HTMLImageElement": {
+	        "align":                          DEFAULT,
+	        "alt":                            DEFAULT,
+	        "border":                         DEFAULT,
+	        "complete":                       DEFAULT,
+	        "crossOrigin":                    DEFAULT,
+	        "currentSrc":                     DEFAULT,
+	        "height":                         DEFAULT,
+	        "hspace":                         DEFAULT,
+	        "isMap":                          DEFAULT,
+	        "longDesc":                       DEFAULT,
+	        "lowsrc":                         DEFAULT,
+	        "name":                           DEFAULT,
+	        "naturalHeight":                  DEFAULT,
+	        "naturalWidth":                   DEFAULT,
+	        "referrerPolicy":                 DEFAULT,
+	        "sizes":                          DEFAULT,
+	        "src":                            DEFAULT,
+	        "srcset":                         DEFAULT,
+	        "useMap":                         DEFAULT,
+	        "vspace":                         DEFAULT,
+	        "width":                          DEFAULT,
+	        "x":                              DEFAULT,
+	        "y":                              DEFAULT
+	    },
+	    "HTMLInputElement": {
+	        "accept":                         DEFAULT,
+	        "align":                          DEFAULT,
+	        "alt":                            DEFAULT,
+	        "autocapitalize":                 DEFAULT,
+	        "autocomplete":                   DEFAULT,
+	        "autofocus":                      DEFAULT,
+	        "checkValidity":                  FUNCTION,
+	        "checked":                        DEFAULT,
+	        "defaultChecked":                 DEFAULT,
+	        "defaultValue":                   DEFAULT,
+	        "dirName":                        DEFAULT,
+	        "disabled":                       DEFAULT,
+	        "files":                          DEFAULT,
+	        "form":                           DEFAULT,
+	        "formAction":                     DEFAULT,
+	        "formEnctype":                    DEFAULT,
+	        "formMethod":                     DEFAULT,
+	        "formNoValidate":                 DEFAULT,
+	        "formTarget":                     DEFAULT,
+	        "height":                         DEFAULT,
+	        "incremental":                    DEFAULT,
+	        "indeterminate":                  DEFAULT,
+	        "labels":                         DEFAULT,
+	        "list":                           DEFAULT,
+	        "max":                            DEFAULT,
+	        "maxLength":                      DEFAULT,
+	        "min":                            DEFAULT,
+	        "minLength":                      DEFAULT,
+	        "multiple":                       DEFAULT,
+	        "name":                           DEFAULT,
+	        "pattern":                        DEFAULT,
+	        "placeholder":                    DEFAULT,
+	        "readOnly":                       DEFAULT,
+	        "reportValidity":                 FUNCTION,
+	        "required":                       DEFAULT,
+	        "select":                         FUNCTION,
+	        "selectionDirection":             DEFAULT,
+	        "selectionEnd":                   DEFAULT,
+	        "selectionStart":                 DEFAULT,
+	        "setCustomValidity":              FUNCTION,
+	        "setRangeText":                   FUNCTION,
+	        "setSelectionRange":              FUNCTION,
+	        "size":                           DEFAULT,
+	        "src":                            DEFAULT,
+	        "step":                           DEFAULT,
+	        "stepDown":                       FUNCTION,
+	        "stepUp":                         FUNCTION,
+	        "type":                           DEFAULT,
+	        "useMap":                         DEFAULT,
+	        "validationMessage":              DEFAULT,
+	        "validity":                       DEFAULT,
+	        "value":                          DEFAULT,
+	        "valueAsDate":                    DEFAULT,
+	        "valueAsNumber":                  DEFAULT,
+	        "webkitEntries":                  DEFAULT,
+	        "webkitdirectory":                DEFAULT,
+	        "width":                          DEFAULT,
+	        "willValidate":                   DEFAULT
+	    },
+	    "HTMLLabelElement": {
+	        "control":                        DEFAULT,
+	        "form":                           DEFAULT,
+	        "htmlFor":                        DEFAULT
+	    },
+	    "HTMLLIElement": {
+	        "type":                           DEFAULT,
+	        "value":                          DEFAULT
+	    },
+	    "HTMLLinkElement": {
+	        "as":                             DEFAULT,
+	        "charset":                        DEFAULT,
+	        "crossOrigin":                    DEFAULT,
+	        "disabled":                       DEFAULT,
+	        "href":                           DEFAULT,
+	        "hreflang":                       DEFAULT,
+	        "import":                         DEFAULT,
+	        "integrity":                      DEFAULT,
+	        "media":                          DEFAULT,
+	        "rel":                            DEFAULT,
+	        "relList":                        DEFAULT,
+	        "rev":                            DEFAULT,
+	        "sheet":                          DEFAULT,
+	        "sizes":                          DEFAULT,
+	        "target":                         DEFAULT,
+	        "type":                           DEFAULT
+	    },
+	    "HTMLMapElement": {
+	        "areas":                          DEFAULT,
+	        "name":                           DEFAULT
+	    },
+	    "HTMLMetaElement": {
+	        "content":                        DEFAULT,
+	        "httpEquiv":                      DEFAULT,
+	        "name":                           DEFAULT,
+	        "scheme":                         DEFAULT
+	    },
+	    "HTMLMeterElement": {
+	        "high":                           DEFAULT,
+	        "labels":                         DEFAULT,
+	        "low":                            DEFAULT,
+	        "max":                            DEFAULT,
+	        "min":                            DEFAULT,
+	        "optimum":                        DEFAULT,
+	        "value":                          DEFAULT
+	    },
+	    "HTMLObjectElement": {
+	        "align":                          DEFAULT,
+	        "archive":                        DEFAULT,
+	        "border":                         DEFAULT,
+	        "checkValidity":                  FUNCTION,
+	        "code":                           DEFAULT,
+	        "codeBase":                       DEFAULT,
+	        "codeType":                       DEFAULT,
+	        "contentDocument":                DEFAULT,
+	        "data":                           DEFAULT,
+	        "declare":                        DEFAULT,
+	        "form":                           DEFAULT,
+	        "getSVGDocument":                 FUNCTION,
+	        "height":                         DEFAULT,
+	        "hspace":                         DEFAULT,
+	        "name":                           DEFAULT,
+	        "reportValidity":                 FUNCTION,
+	        "setCustomValidity":              FUNCTION,
+	        "standby":                        DEFAULT,
+	        "type":                           DEFAULT,
+	        "useMap":                         DEFAULT,
+	        "validationMessage":              DEFAULT,
+	        "validity":                       DEFAULT,
+	        "vspace":                         DEFAULT,
+	        "width":                          DEFAULT,
+	        "willValidate":                   DEFAULT
+	    },
+	    "HTMLOListElement": {
+	        "compact":                        DEFAULT,
+	        "reversed":                       DEFAULT,
+	        "start":                          DEFAULT,
+	        "type":                           DEFAULT
+	    },
+	    "HTMLOptGroupElement": {
+	        "disabled":                       DEFAULT,
+	        "label":                          DEFAULT
+	    },
+	    "HTMLOptionElement": {
+	        "defaultSelected":                DEFAULT,
+	        "disabled":                       DEFAULT,
+	        "form":                           DEFAULT,
+	        "index":                          DEFAULT,
+	        "label":                          DEFAULT,
+	        "selected":                       DEFAULT,
+	        "text":                           DEFAULT,
+	        "value":                          DEFAULT
+	    },
+	    "HTMLOutputElement": {
+	        "checkValidity":                  FUNCTION,
+	        "defaultValue":                   DEFAULT,
+	        "form":                           DEFAULT,
+	        "htmlFor":                        DEFAULT,
+	        "labels":                         DEFAULT,
+	        "name":                           DEFAULT,
+	        "reportValidity":                 FUNCTION,
+	        "setCustomValidity":              FUNCTION,
+	        "type":                           DEFAULT,
+	        "validationMessage":              DEFAULT,
+	        "validity":                       DEFAULT,
+	        "value":                          DEFAULT,
+	        "willValidate":                   DEFAULT
+	    },
+	    "HTMLParamElement": {
+	        "name":                           DEFAULT,
+	        "type":                           DEFAULT,
+	        "value":                          DEFAULT,
+	        "valueType":                      DEFAULT
+	    },
+	    "HTMLProgressElement": {
+	        "labels":                         DEFAULT,
+	        "max":                            DEFAULT,
+	        "position":                       DEFAULT,
+	        "value":                          DEFAULT
+	    },
+	    "HTMLQuoteElement": {
+	        "cite":                           DEFAULT
+	    },
+	    "HTMLSelectElement": {
+	        "add":                            FUNCTION,
+	        "autofocus":                      DEFAULT,
+	        "checkValidity":                  FUNCTION,
+	        "disabled":                       DEFAULT,
+	        "form":                           DEFAULT,
+	        "item":                           FUNCTION,
+	        "labels":                         DEFAULT,
+	        "length":                         DEFAULT,
+	        "multiple":                       DEFAULT,
+	        "name":                           DEFAULT,
+	        "namedItem":                      FUNCTION,
+	        "options":                        DEFAULT,
+	        "remove":                         FUNCTION,
+	        "reportValidity":                 FUNCTION,
+	        "required":                       DEFAULT,
+	        "selectedIndex":                  DEFAULT,
+	        "selectedOptions":                DEFAULT,
+	        "setCustomValidity":              FUNCTION,
+	        "size":                           DEFAULT,
+	        "type":                           DEFAULT,
+	        "validationMessage":              DEFAULT,
+	        "validity":                       DEFAULT,
+	        "value":                          DEFAULT,
+	        "willValidate":                   DEFAULT
+	    },
+	    "HTMLSourceElement": {
+	        "media":                          DEFAULT,
+	        "sizes":                          DEFAULT,
+	        "src":                            DEFAULT,
+	        "srcset":                         DEFAULT,
+	        "type":                           DEFAULT
+	    },
+	    "HTMLTableCellElement": {
+	        "abbr":                           DEFAULT,
+	        "align":                          DEFAULT,
+	        "axis":                           DEFAULT,
+	        "bgColor":                        DEFAULT,
+	        "cellIndex":                      DEFAULT,
+	        "ch":                             DEFAULT,
+	        "chOff":                          DEFAULT,
+	        "colSpan":                        DEFAULT,
+	        "headers":                        DEFAULT,
+	        "height":                         DEFAULT,
+	        "noWrap":                         DEFAULT,
+	        "rowSpan":                        DEFAULT,
+	        "scope":                          DEFAULT,
+	        "vAlign":                         DEFAULT,
+	        "width":                          DEFAULT
+	    },
+	    "HTMLTemplateElement": {
+	        "content":                        DEFAULT
+	    },
+	    "HTMLTextAreaElement": {
+	        "autocapitalize":                 DEFAULT,
+	        "autofocus":                      DEFAULT,
+	        "checkValidity":                  FUNCTION,
+	        "cols":                           DEFAULT,
+	        "defaultValue":                   DEFAULT,
+	        "dirName":                        DEFAULT,
+	        "disabled":                       DEFAULT,
+	        "form":                           DEFAULT,
+	        "labels":                         DEFAULT,
+	        "maxLength":                      DEFAULT,
+	        "minLength":                      DEFAULT,
+	        "name":                           DEFAULT,
+	        "placeholder":                    DEFAULT,
+	        "readOnly":                       DEFAULT,
+	        "reportValidity":                 FUNCTION,
+	        "required":                       DEFAULT,
+	        "rows":                           DEFAULT,
+	        "select":                         FUNCTION,
+	        "selectionDirection":             DEFAULT,
+	        "selectionEnd":                   DEFAULT,
+	        "selectionStart":                 DEFAULT,
+	        "setCustomValidity":              FUNCTION,
+	        "setRangeText":                   FUNCTION,
+	        "setSelectionRange":              FUNCTION,
+	        "textLength":                     DEFAULT,
+	        "type":                           DEFAULT,
+	        "validationMessage":              DEFAULT,
+	        "validity":                       DEFAULT,
+	        "value":                          DEFAULT,
+	        "willValidate":                   DEFAULT,
+	        "wrap":                           DEFAULT
+	    },
+	    "HTMLTrackElement": {
+	        "ERROR":                          DEFAULT,
+	        "LOADED":                         DEFAULT,
+	        "LOADING":                        DEFAULT,
+	        "NONE":                           DEFAULT,
+	        "default":                        DEFAULT,
+	        "kind":                           DEFAULT,
+	        "label":                          DEFAULT,
+	        "readyState":                     DEFAULT,
+	        "src":                            DEFAULT,
+	        "srclang":                        DEFAULT,
+	        "track":                          DEFAULT
+	    },
+	    "HTMLVideoElement": {
+	        "height":                         DEFAULT,
+	        "poster":                         DEFAULT,
+	        "videoHeight":                    DEFAULT,
+	        "videoWidth":                     DEFAULT,
+	        "webkitDecodedFrameCount":        DEFAULT,
+	        "webkitDisplayingFullscreen":     DEFAULT,
+	        "webkitDroppedFrameCount":        DEFAULT,
+	        "webkitEnterFullScreen":          FUNCTION,
+	        "webkitEnterFullscreen":          FUNCTION,
+	        "webkitExitFullScreen":           FUNCTION,
+	        "webkitExitFullscreen":           FUNCTION,
+	        "webkitSupportsFullscreen":       DEFAULT,
+	        "width":                          DEFAULT
+	    },
+	    "HTMLElement": {
+	        "accessKey":                      DEFAULT,
+	        "blur":                           FUNCTION,
+	        "click":                          FUNCTION,
+	        "contentEditable":                DEFAULT,
+	        "dataset":                        DEFAULT,
+	        "dir":                            DEFAULT,
+	        "draggable":                      DEFAULT,
+	        "focus":                          FUNCTION,
+	        "hidden":                         DEFAULT,
+	        "innerText":                      DEFAULT,
+	        "isContentEditable":              DEFAULT,
+	        "lang":                           DEFAULT,
+	        "offsetHeight":                   DEFAULT,
+	        "offsetLeft":                     DEFAULT,
+	        "offsetParent":                   DEFAULT,
+	        "offsetTop":                      DEFAULT,
+	        "offsetWidth":                    DEFAULT,
+	        "onabort":                        EVENT,
+	        "onautocomplete":                 EVENT,
+	        "onautocompleteerror":            EVENT,
+	        "onblur":                         EVENT,
+	        "oncancel":                       EVENT,
+	        "oncanplay":                      EVENT,
+	        "oncanplaythrough":               EVENT,
+	        "onchange":                       EVENT,
+	        "onclick":                        EVENT,
+	        "onclose":                        EVENT,
+	        "oncontextmenu":                  EVENT,
+	        "oncuechange":                    EVENT,
+	        "ondblclick":                     EVENT,
+	        "ondrag":                         EVENT,
+	        "ondragend":                      EVENT,
+	        "ondragenter":                    EVENT,
+	        "ondragleave":                    EVENT,
+	        "ondragover":                     EVENT,
+	        "ondragstart":                    EVENT,
+	        "ondrop":                         EVENT,
+	        "ondurationchange":               EVENT,
+	        "onemptied":                      EVENT,
+	        "onended":                        EVENT,
+	        "onerror":                        EVENT,
+	        "onfocus":                        EVENT,
+	        "oninput":                        EVENT,
+	        "oninvalid":                      EVENT,
+	        "onkeydown":                      EVENT,
+	        "onkeypress":                     EVENT,
+	        "onkeyup":                        EVENT,
+	        "onload":                         EVENT,
+	        "onloadeddata":                   EVENT,
+	        "onloadedmetadata":               EVENT,
+	        "onloadstart":                    EVENT,
+	        "onmousedown":                    EVENT,
+	        "onmouseenter":                   EVENT,
+	        "onmouseleave":                   EVENT,
+	        "onmousemove":                    EVENT,
+	        "onmouseout":                     EVENT,
+	        "onmouseover":                    EVENT,
+	        "onmouseup":                      EVENT,
+	        "onmousewheel":                   EVENT,
+	        "onpause":                        EVENT,
+	        "onplay":                         EVENT,
+	        "onplaying":                      EVENT,
+	        "onprogress":                     EVENT,
+	        "onratechange":                   EVENT,
+	        "onreset":                        EVENT,
+	        "onresize":                       EVENT,
+	        "onscroll":                       EVENT,
+	        "onseeked":                       EVENT,
+	        "onseeking":                      EVENT,
+	        "onselect":                       EVENT,
+	        "onshow":                         EVENT,
+	        "onstalled":                      EVENT,
+	        "onsubmit":                       EVENT,
+	        "onsuspend":                      EVENT,
+	        "ontimeupdate":                   EVENT,
+	        "ontoggle":                       EVENT,
+	        "ontouchcancel":               	  EVENT,
+	        "ontouchend":                	  EVENT,
+	        "ontouchmove":                	  EVENT,
+	        "ontouchstart":                	  EVENT,
+	        "onvolumechange":                 EVENT,
+	        "onwaiting":                      EVENT,
+	        "outerText":                      DEFAULT,
+	        "spellcheck":                     DEFAULT,
+	        "style":                          DEFAULT,
+	        "tabIndex":                       DEFAULT,
+	        "title":                          DEFAULT,
+	        "translate":                      DEFAULT,
+	        "webkitdropzone":                 DEFAULT
+	    },
+	    "Element": {
+	        "animate":                        FUNCTION,
+	        "attributes":                     DEFAULT,
+	        "children":                       DEFAULT,
+	        "classList":                      DEFAULT,
+	        "className":                      DEFAULT,
+	        "clientHeight":                   DEFAULT,
+	        "clientLeft":                     DEFAULT,
+	        "clientTop":                      DEFAULT,
+	        "clientWidth":                    DEFAULT,
+	        "closest":                        FUNCTION,
+	        "getAttribute":                   FUNCTION,
+	        "getAttributeNS":                 FUNCTION,
+	        "getAttributeNode":               FUNCTION,
+	        "getAttributeNodeNS":             FUNCTION,
+	        "getBoundingClientRect":          FUNCTION,
+	        "getClientRects":                 FUNCTION,
+	        "getDestinationInsertionPoints":  FUNCTION,
+	        "getElementsByClassName":         FUNCTION,
+	        "getElementsByTagName":           FUNCTION,
+	        "getElementsByTagNameNS":         FUNCTION,
+	        "hasAttribute":                   FUNCTION,
+	        "hasAttributeNS":                 FUNCTION,
+	        "hasAttributes":                  FUNCTION,
+	        "id":                             DEFAULT,
+	        "innerHTML":                      DEFAULT,
+	        "insertAdjacentElement":          FUNCTION,
+	        "insertAdjacentHTML":             FUNCTION,
+	        "insertAdjacentText":             FUNCTION,
+	        "localName":                      DEFAULT,
+	        "matches":                        FUNCTION,
+	        "namespaceURI":                   DEFAULT,
+	        "nextElementSibling":             SKIP_OPAQUE,
+	        "onbeforecopy":                   EVENT,
+	        "onbeforecut":                    EVENT,
+	        "onbeforepaste":                  EVENT,
+	        "oncopy":                         EVENT,
+	        "oncut":                          EVENT,
+	        "onpaste":                        EVENT,
+	        "onsearch":                       EVENT,
+	        "onselectstart":                  EVENT,
+	        "onwebkitfullscreenchange":       EVENT,
+	        "onwebkitfullscreenerror":        EVENT,
+	        "onwheel":                        EVENT,
+	        "outerHTML":                      DEFAULT,
+	        "prefix":                         DEFAULT,
+	        "previousElementSibling":         SKIP_OPAQUE,
+	        "querySelector":                  FUNCTION,
+	        "querySelectorAll":               FUNCTION,
+	        "remove":                         FUNCTION,
+	        "removeAttribute":                FUNCTION,
+	        "removeAttributeNS":              FUNCTION,
+	        "removeAttributeNode":            FUNCTION,
+	        "requestPointerLock":             FUNCTION,
+	        "scrollHeight":                   DEFAULT,
+	        "scrollIntoView":                 FUNCTION,
+	        "scrollIntoViewIfNeeded":         FUNCTION,
+	        "scrollLeft":                     DEFAULT,
+	        "scrollTop":                      DEFAULT,
+	        "scrollWidth":                    DEFAULT,
+	        "setAttribute":                   FUNCTION,
+	        "setAttributeNS":                 FUNCTION,
+	        "setAttributeNode":               FUNCTION,
+	        "setAttributeNodeNS":             FUNCTION,
+	        "tagName":                        DEFAULT
+	    },
+	    "Node": SecureElement.nodeMetadata,
+	    "EventTarget": SecureElement.eventTargetMetadata
+	}
 };
 
 SecureElement.secureQuerySelector = function(st, el, key, selector) {
@@ -471,65 +1116,7 @@ SecureElement.secureQuerySelector = function(st, el, key, selector) {
     return null;
 };
 
-SecureElement.elementSpecificAttributeWhitelists = {
-    "A" : [ "hash", "host", "hostname", "href", "origin", "pathname", "port", "protocol", "search" ],
-    "AREA" : [ "alt", "coords", "download", "href", "hreflang", "media", "rel", "shape", "target", "type" ],
-    "AUDIO" : [ "autoplay", "buffered", "controls", "loop", "muted", "played", "preload", "src", "volume" ],
-    "BASE" : [ "href", "target" ],
-    "BDO" : [ "dir" ],
-    "BUTTON" : [ "autofocus", "disabled", "form", "formAction", "formEnctype", "formMethod", "formNoValidate", "formTarget", "name", "type" ],
-    "CANVAS" : [ "height", "width" ],
-    "COL" : [ "span" ],
-    "COLGROUP" : [ "span", "width" ],
-    "DATA" : [ "value" ],
-    "DEL" : [ "cite", "dateTime" ],
-    "DETAILS" : [ "open" ],
-    "EMBED" : [ "height", "src", "type", "width" ],
-    "FIELDSET" : [ "disabled", "form", "name" ],
-    "FORM" : [ "acceptCharset", "action", "autocomplete", "enctype", "method", "name", "noValidate", "target" ],
-    "IMG" : [ "alt", "crossOrigin", "height", "isMap", "longDesc", "sizes", "src", "srcset", "width", "useMap" ],
-    "INPUT" : [ "type", "accept", "autocomplete", "autofocus", "autosave", "checked", "disabled", "files", "form", "formAction",
-                "formEnctype", "formMethod", "formNoValidate", "formTarget", "height", "inputMode", "list", "max", "maxLength",
-                "min", "minLength", "multiple", "name", "pattern", "placeholder", "readOnly", "required", "selectionDirection",
-                "size", "src", "step", "value", "width" ],
-    "INS" : [ "cite", "dateTime" ],
-    "LABEL" : [ "accesKey", "htmlFor", "form" ],
-    "LI" : [ "value" ],
-    "LINK" : [ "crossOrigin", "href", "hreflang", "media", "rel", "sizes", "type" ],
-    "MAP" : [ "name" ],
-
-    // DCHASMAN TODO Fix SecureElement.setAttribute() hole and whitelist values
-    // for http-equiv/httpEquiv
-    "META" : [ "content", "name" ],
-
-    "METER" : [ "value", "min", "max", "low", "high", "optimum", "form" ],
-    "OBJECT" : [ "data", "form", "height", "type", "typeMustMatch", "useMap", "width" ],
-    "OL" : [ "reversed", "start", "type" ],
-    "OPTGROUP" : [ "disabled", "label" ],
-    "OPTION" : [ "disabled", "label", "selected", "value" ],
-    "OUTPUT" : [ "form", "htmlFor", "name" ],
-    "PARAM" : [ "name", "value" ],
-    "PROGRESS" : [ "max", "value" ],
-    "Q" : [ "cite" ],
-    "SELECT" : [ "autofocus", "disabled", "form", "multiple", "name", "required", "size" ],
-    "SOURCE" : [ "src", "type" ],
-    "TD" : [ "colSpan", "headers", "rowSpan" ],
-    "TEMPLATE" : [ "content" ],
-    "TEXTAREA" : [ "autocomplete", "autofocus", "cols", "disabled", "form", "maxLength", "minLength", "name",
-                   "placeholder", "readOnly", "required", "rows", "selectionDirection", "selectionEnd", "selectionStart",
-                   "value", "wrap" ],
-    "TH" : [ "colSpan", "headers", "rowSpan", "scope" ],
-    "TIME" : [ "dateTime" ],
-    "TRACK" : [ "default", "kind", "label", "src", "srclang" ],
-    "VIDEO" : [ "autoplay", "buffered", "controls", "crossOrigin", "height", "loop", "muted", "played", "preload", "poster", "src", "width" ]
-};
-
-SecureElement.elementSpecificMethodWhitelists = {
-    "AUDIO" : [ "addTextTrack", "canPlayType", "fastSeek", "getStartDate", "load", "play", "pause" ],
-    "INPUT" : [ "setRangeText", "setSelectionRange" ],
-    "CANVAS" : [ "getContext", "toDataURL", "toBlob" ],
-    "SVG" : [ "createSVGRect" ],
-    "VIDEO" : [ "addTextTrack", "canPlayType", "load", "play", "pause" ]
-};
 
 Aura.Locker.SecureElement = SecureElement;
+
+

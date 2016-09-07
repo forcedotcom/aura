@@ -10,10 +10,10 @@
     // TODO(tbliss): make these lists on SecureElement accessible here for maintainablility
     ElementPropertiesWhitelist: [
         "attributes",
-        "childElementCount", "classList", "className", "id", "tagName", "innerHTML", "namespaceURI",
-        "scrollHeight", "scrollLeft", "scrollTop", "scrollWidth"
+        "classList", "className", "id", "tagName", "innerHTML", "namespaceURI",
+        "scrollHeight", "scrollLeft", "scrollTop", "scrollWidth", "nextElementSibling", "previousElementSibling"
     ],
-    ElementPropertiesBlacklist: ['firstElementChild', 'lastElementChild', 'nextElementSibling', 'previousElementSibling'],
+    ElementPropertiesBlacklist: ['childElementCount', 'firstElementChild', 'lastElementChild'],
 
     HTMLPropertiesWhitelist: ['accessKey', 'contentEditable', 'isContentEditable',
                               'dataset', 'dir', 'lang', 'spellcheck', 'style', 'tabIndex', 'title'],

@@ -63,13 +63,8 @@ function tester() {
 				var index = props.indexOf(prop);
 				if (index >= 0) {
 					executeTests(object, proto, prop, "locker");
-					props.splice(index, 1);
 				}
 			});
-		});
-		// Add all extra properties under "Object"
-		props.forEach(function(prop) {
-			executeTests(object, "Object", prop, "locker");
 		});
 	}
 
@@ -84,23 +79,27 @@ function tester() {
 		var opaque = {};
 
 		// Always test type
-		type.value = getType(object[prop]);
-		if (source === "system" && plan && plan.type) {
-			type.status = (type.value === plan.type ? 'pass' : 'fail');
-		} else if (source === "locker") {
-			if (plan && plan.type) {
-				if (type.value === toLockerType(plan.type)) {
-					type.status = 'pass';
-				} else {
-					if (plan.support === false) {
-						type.status = 'fail';
-						type.value = "Not To Be Supported";
-					} else if ($A.util.isString(plan.support)) {					
-						type.status = 'warn';
-						type.value = getExternalVersion(plan.support);
+		var value = object[prop];
+		type.value = getType(value);
+		
+		if (plan && plan.type) {
+			if (plan.support === false) {
+				type.status = "fail";
+				type.value = "Not To Be Supported";
+			} else {
+				var expected = plan.type === "@event" ? "Null" : plan.type;
+				if (source === "system") {
+					type.status = (type.value === expected ? "pass" : "fail");
+				} else if (source === "locker") {
+					if (type.value === toLockerType(expected)) {
+						type.status = "pass";
 					} else {
-						type.status = 'warn';
-						type.value = "WIP";
+						if ($A.util.isString(plan.support)) {					
+							type.status = "warn";
+							type.value = getExternalVersion(plan.support);
+						} else {
+							type.status = "warn";
+						}
 					}
 				}
 			}
@@ -109,13 +108,13 @@ function tester() {
 		// Result when empty set
 		if (plan && plan.empty) {
 			empty.value = callApi(object, prop, plan.empty.args);
-			empty.status = (empty.value === plan.empty.value ? 'pass' : 'fail');
+			empty.status = (empty.value === plan.empty.value ? "pass" : "fail");
 		}
 
 		// Result when opaque set
 		if (source === "locker" && plan && plan.opaque && plan.support) {
 			opaque.value = callApi(object, prop, plan.opaque.args);
-			opaque.status = (opaque.value === plan.opaque.value ? 'pass' : 'fail');
+			opaque.status = (opaque.value === plan.opaque.value ? "pass" : "fail");
 		}
 
 		addResults(proto, prop, source, {
@@ -204,18 +203,119 @@ function tester() {
 
 	function getType(object) {
 		var type = typeof object;
-		if (type === "object" || type === "undefined") {
+				
+		if (type === "object") {
+			switch (object) {
+				case Window.prototype:
+					return "Window";
+				case Document.prototype:
+					return "Document";
+				case HTMLDocument.prototype:
+					return "HTMLDocument";
+				case Element.prototype:
+					return "Element";
+				case Node.prototype:
+					return "Node";
+				case HTMLElement.prototype:
+					return "HTMLElement";
+				case HTMLAnchorElement.prototype:
+					return "HTMLAnchorElement";
+				case HTMLAreaElement.prototype:
+					return "HTMLAreaElement";
+				case HTMLAudioElement.prototype:
+					return "HTMLAudioElement";
+				case HTMLMediaElement.prototype:
+					return "HTMLMediaElement";
+				case HTMLBaseElement.prototype:
+					return "HTMLBaseElement";
+				case HTMLButtonElement.prototype:
+					return "HTMLButtonElement";
+				case HTMLCanvasElement.prototype:
+					return "HTMLCanvasElement";
+				case HTMLTableColElement.prototype:
+					return "HTMLTableColElement";
+				case HTMLModElement.prototype:
+					return "HTMLModElement";
+				case HTMLEmbedElement.prototype:
+					return "HTMLEmbedElement";
+				case HTMLFieldSetElement.prototype:
+					return "HTMLFieldSetElement";
+				case HTMLFormElement.prototype:
+					return "HTMLFormElement";
+				case HTMLIFrameElement.prototype:
+					return "HTMLIFrameElement";
+				case HTMLImageElement.prototype:
+					return "HTMLImageElement";
+				case HTMLInputElement.prototype:
+					return "HTMLInputElement";
+				case HTMLLabelElement.prototype:
+					return "HTMLLabelElement";
+				case HTMLLIElement.prototype:
+					return "HTMLLIElement";
+				case HTMLLinkElement.prototype:
+					return "HTMLLinkElement";
+				case HTMLMapElement.prototype:
+					return "HTMLMapElement";
+				case HTMLMetaElement.prototype:
+					return "HTMLMetaElement";
+				case HTMLObjectElement.prototype:
+					return "HTMLObjectElement";
+				case HTMLOListElement.prototype:
+					return "HTMLOListElement";
+				case HTMLOptGroupElement.prototype:
+					return "HTMLOptGroupElement";
+				case HTMLOptionElement.prototype:
+					return "HTMLOptionElement";
+				case HTMLOutputElement.prototype:
+					return "HTMLOutputElement";
+				case HTMLParamElement.prototype:
+					return "HTMLParamElement";
+				case HTMLProgressElement.prototype:
+					return "HTMLProgressElement";
+				case HTMLQuoteElement.prototype:
+					return "HTMLQuoteElement";
+				case HTMLSelectElement.prototype:
+					return "HTMLSelectElement";
+				case HTMLSourceElement.prototype:
+					return "HTMLSourceElement";
+				case HTMLTableCellElement.prototype:
+					return "HTMLTableCellElement";
+				case HTMLTemplateElement.prototype:
+					return "HTMLTemplateElement";
+				case HTMLTextAreaElement.prototype:
+					return "HTMLTextAreaElement";
+				case HTMLTrackElement.prototype:
+					return "HTMLTrackElement";
+				case HTMLVideoElement.prototype:
+					return "HTMLVideoElement";
+			}
+			
+			// These types have browser compatibility issues currently and have to be guarded
+			if (window.EventTarget && object === window.EventTarget.prototype) {
+				return "EventTarget";
+			} else if (window.HTMLDetailsElement && object === window.HTMLDetailsElement.prototype) {
+				return "HTMLDetailsElement";
+			} else if (window.HTMLMeterElement && object === window.HTMLMeterElement.prototype) {
+				return "HTMLMeterElement";
+			}
+
 			type = Object.prototype.toString.call(object);
+			
 			if (type.startsWith("[object ") && type.endsWith("]")) {
 				type = type.substring(8, type.length - 1);
 			}
 		}
+		
 		return type;
 	}
 
 	function toLockerType(type) {
+		
+		// DCHASMAN TODO Improve this to be LS SecureObject savvy!
+		
 		switch (type) {
-		case "Window":
+		case "Window".prototype:
+		case "HTMLDocument":
 		case "HTMLHeadElement":
 		case "HTMLBodyElement":
 		case "HTMLHtmlElement":
@@ -224,6 +324,7 @@ function tester() {
 		case "NodeList":
 			return "Array";
 		}
+		
 		return type;
 	}
 

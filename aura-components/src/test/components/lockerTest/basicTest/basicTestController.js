@@ -90,9 +90,9 @@
 
 		// eval attempts that return a SecureWindow object
 		helper.doTestEvalForSecureWindow(cmp, function() { return window }, testUtils);
+		helper.doTestEvalForSecureWindow(cmp, function() { return self }, testUtils);
 
 	    // eval attempts that return undefined
-		helper.doTestEvalForUndefined(cmp, function() { return self }, testUtils);
 		helper.doTestEvalForUndefined(cmp, function() { return top }, testUtils);
 		helper.doTestEvalForUndefined(cmp, function() { return parent }, testUtils);
 

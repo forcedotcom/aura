@@ -57,7 +57,7 @@ public class TestContextAdapterImpl implements TestContextAdapter {
     }
     
     
-    Cache<String, TestContext> allContexts = CacheBuilder.newBuilder().concurrencyLevel(8)
+    private static Cache<String, TestContext> allContexts = CacheBuilder.newBuilder().concurrencyLevel(8)
             .expireAfterAccess(30, TimeUnit.MINUTES).maximumSize(100).build();
 
     private final ThreadLocal<TestContext> testContext = new ThreadLocal<>();

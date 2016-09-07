@@ -72,7 +72,7 @@ public class JavascriptMockActionHandler extends JavascriptMockHandler<Controlle
         }
     }
 
-    private static class MockActionInstanceBuilder implements InstanceBuilder<Action, ActionDef> {
+    public static class MockActionInstanceBuilder implements InstanceBuilder<Action, ActionDef> {
         @Override
         public Class<?> getDefinitionClass() {
             return Proxy.getProxyClass(JavascriptMockActionHandler.class.getClassLoader(),

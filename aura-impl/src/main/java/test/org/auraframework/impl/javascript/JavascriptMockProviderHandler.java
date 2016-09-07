@@ -58,7 +58,7 @@ public class JavascriptMockProviderHandler extends JavascriptMockHandler<Provide
     }
     
 
-    private static class MockProviderInstanceBuilder extends ProviderInstanceBuilder {
+    public static class MockProviderInstanceBuilder extends ProviderInstanceBuilder {
         @Override
         public Class<?> getDefinitionClass() {
             return Proxy.getProxyClass(JavascriptMockProviderHandler.class.getClassLoader(), new Class<?>[] {

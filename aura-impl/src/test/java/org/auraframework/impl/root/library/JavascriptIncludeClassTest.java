@@ -153,7 +153,7 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
                 LibraryDef.class, null);
         DefDescriptor<IncludeDef> extImportDesc = getAuraTestingUtil().createStringSourceDescriptor("thirdimport",
                 IncludeDef.class, extLibDesc);
-        
+
         addSourceAutoCleanup(import1Desc, code);
         addSourceAutoCleanup(import2Desc, code);
         addSourceAutoCleanup(extImportDesc, code);
@@ -252,11 +252,10 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
         IncludeDefRef includeDefRef = builder.build();
         BaseJavascriptClass.Builder jsIncludeBuilder = new JavascriptIncludeClass.Builder().setDefinition(includeDefRef).setMinify(false);
         try {
-        	jsIncludeBuilder.build();
-        	fail("expected exception");
+            jsIncludeBuilder.build();
+            fail("expected exception");
         } catch (Exception e) {
-        	checkExceptionContains(e, AuraRuntimeException.class, "Parse error");
+            checkExceptionContains(e, AuraRuntimeException.class, "Parse error");
         }
-        
     }
 }

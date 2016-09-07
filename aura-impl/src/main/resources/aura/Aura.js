@@ -845,7 +845,9 @@ AuraInstance.prototype.finishInit = function(doNotInitializeServices) {
     for (var i in readyCallbacks) {
         readyCallbacks[i]();
     }
+
     delete Aura["afterAppReady"];
+    Aura["applicationReady"] = true;
 };
 
 /**

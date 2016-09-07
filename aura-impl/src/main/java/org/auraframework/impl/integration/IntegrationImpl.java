@@ -175,7 +175,7 @@ public class IntegrationImpl implements Integration {
                     String eventHandlers = jsonEventHandlers != null ? jsonEventHandlers.toString() : "undefined";
                     String def = String.format(COMPONENT_DEF_TEMPLATE, tag, jsonAttributes.toString(), localId);
                     
-                    String newComponentScript = String.format("window.Aura || (window.Aura = {}); window.Aura.afterAppReady = Aura.afterAppReady || []; window.Aura.afterAppReady.push(function () {\n   $A.__aisScopedCallback(function() { $A.clientService.injectComponentAsync(%s, '%s', %s); }); });", def, locatorDomId, eventHandlers);
+                    String newComponentScript = String.format("(function (w) {\n    w.Aura || (w.Aura = {});\n    w.Aura.afterAppReady = Aura.afterAppReady || [];\n\n    function ais() {\n        $A.__aisScopedCallback(function() { \n            $A.clientService.injectComponentAsync(%s, '%s', %s); \n        }); \n    } \n\n    if (Aura.applicationReady) {\n        ais();\n    } else {\n        window.Aura.afterAppReady.push(ais); \n    }\n}(window));", def, locatorDomId, eventHandlers);
 
                     init.append(newComponentScript);
 
@@ -225,7 +225,7 @@ public class IntegrationImpl implements Integration {
                         init.append(";\n");
                     }
 
-                    init.append(String.format("window.Aura || (window.Aura = {}); window.Aura.afterAppReady = Aura.afterAppReady || []; window.Aura.afterAppReady.push(function () {\n    $A.__aisScopedCallback(function() { $A.clientService.injectComponent(config, \"%s\", \"%s\"); }); });", locatorDomId, localId));
+                    init.append(String.format("(function (w) {\n    w.Aura || (w.Aura = {});\n    w.Aura.afterAppReady = Aura.afterAppReady || [];\n\n    function ais() {\n        $A.__aisScopedCallback(function() { \n            $A.clientService.injectComponent(config, \"%s\", \"%s\"); \n        }); \n    } \n\n    if (Aura.applicationReady) {\n        ais();\n    } else {\n        window.Aura.afterAppReady.push(ais); \n    }\n}(window));", locatorDomId, localId));
                 }
 
                 rc.pushScript();

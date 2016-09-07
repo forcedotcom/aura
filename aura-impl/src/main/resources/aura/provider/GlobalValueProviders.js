@@ -226,9 +226,10 @@ GlobalValueProviders.prototype.loadFromStorage = function(callback) {
                 }
             );
     } else {
-        setTimeout(function () { // Preserve asyncronizity
+        // @dval: One day, when AIS is gone...
+        //setTimeout(function () { // Preserve asyncronizity
             callback(false);
-        }, 0);
+        //}, 0);
     }
 };
 

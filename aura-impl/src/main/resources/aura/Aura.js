@@ -1515,7 +1515,9 @@ window['aura'] = window['$A'];
 
 Aura["frameworkJsReady"] = true;
 if (Aura["initConfig"]) {
-  $A.initAsync(Aura["initConfig"]);
+  setTimeout(function () {
+    $A.initAsync(Aura["initConfig"]);  
+  }, 0);
 }
 
 // External libraries (like moment.js) will be appended here

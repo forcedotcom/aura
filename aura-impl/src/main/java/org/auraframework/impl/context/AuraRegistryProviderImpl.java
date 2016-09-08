@@ -56,15 +56,12 @@ import org.auraframework.impl.source.resource.ResourceSourceLoader;
 import org.auraframework.impl.system.CacheableDefFactoryImpl;
 import org.auraframework.impl.system.CachingDefRegistryImpl;
 import org.auraframework.impl.system.CompilingDefRegistry;
-import org.auraframework.impl.system.NonCachingDefRegistryImpl;
 import org.auraframework.impl.system.PassThroughDefRegistry;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.CacheableDefFactory;
-import org.auraframework.system.DefFactory;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceLoader;
@@ -73,10 +70,9 @@ import org.auraframework.util.FileMonitor;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 @ServiceComponent
-public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener {
+public class AuraRegistryProviderImpl extends AbstractRegistryAdapterImpl implements SourceListener {
     @Inject
     private FileMonitor fileMonitor;
 
@@ -84,10 +80,10 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
     private DefinitionService definitionService;
 
     @Inject
-    protected ConfigAdapter configAdapter;
+    private ConfigAdapter configAdapter;
 
     @Inject
-    protected ParserFactory parserFactory;
+    private ParserFactory parserFactory;
 
     @Inject
     private List<ComponentLocationAdapter> locationAdapters;
@@ -375,20 +371,6 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
             ret.add(new ComponentLocationAdapter.Impl(new File(prop)));
         }
         return ret;
-    }
-
-    protected static <T extends Definition> DefRegistry<T> createDefRegistry(DefFactory<T> factory, DefType defType,
-            String prefix) {
-        return createDefRegistry(factory, EnumSet.of(defType), Sets.newHashSet(prefix));
-    }
-
-    protected static <T extends Definition> DefRegistry<T> createDefRegistry(DefFactory<T> factory,
-            Set<DefType> defTypes, Set<String> prefixes) {
-        if (factory instanceof CacheableDefFactory) {
-            return new CachingDefRegistryImpl<>((CacheableDefFactory<T>) factory, defTypes, prefixes);
-        } else {
-            return new NonCachingDefRegistryImpl<>(factory, defTypes, prefixes);
-        }
     }
 
     @Override

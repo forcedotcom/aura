@@ -15,10 +15,10 @@
  */
 package org.auraframework.integration.test.service;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
+
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -32,7 +32,7 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.DefinitionAccessImpl;
-import org.auraframework.impl.context.AuraRegistryProviderImpl;
+import org.auraframework.impl.context.AbstractRegistryAdapterImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefFactoryImpl;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -51,9 +51,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Tests for DefinitionServiceImpl.
@@ -846,7 +847,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 definitionService.find(new DescriptorFilter("css://*:doesntexist")).size());
     }
 
-    public static class AuraTestRegistryProviderWithNulls extends AuraRegistryProviderImpl {
+    public static class AuraTestRegistryProviderWithNulls extends AbstractRegistryAdapterImpl {
 
         @Override
         public DefRegistry<?>[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders) {

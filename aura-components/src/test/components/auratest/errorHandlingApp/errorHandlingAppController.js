@@ -105,6 +105,14 @@
         targetComponent.throwErrorFromFunctionWrappedInGetCallback();
     },
 
+    throwErrorFromInvalidComponent: function(cmp) {
+        $A.createComponent("auratest:errorHandling", null,function(targetComponent) {
+                // making the cmp invalid
+                targetComponent.destroy();
+                targetComponent.isInstanceOf();
+            });
+    },
+
     doServerAction: function(cmp) {
         var action = cmp.get("c.doSomething");
         action.setCallback(this, function() {

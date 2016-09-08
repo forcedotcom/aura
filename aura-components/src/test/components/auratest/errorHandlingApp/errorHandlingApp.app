@@ -137,6 +137,15 @@
                      aura:id="errorFromContainedCmpControllerButton"/>
         </td>
     </tr>
+    <tr>
+        <td>Error from invalid component: </td>
+        <td>
+          <ui:button label="Throw"
+                     press="{!c.throwErrorFromInvalidComponent}"
+                     class="errorFromInvalidComponentButton"
+                     aura:id="errorFromInvalidComponentButton"/>
+        </td>
+    </tr>
     </table>
 
     systemError Event is handled on App: <div id="eventHandledOnApp">{!v.eventHandled}</div>

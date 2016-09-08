@@ -15,19 +15,12 @@
  */
 package org.auraframework.util.test.util;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Modifier;
-import java.net.JarURLConnection;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Vector;
-import java.util.jar.JarEntry;
 
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
@@ -46,11 +39,9 @@ import org.auraframework.util.test.annotation.UnitTest;
 import org.auraframework.util.test.annotation.WebDriverTest;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 public class TestInventory implements AuraServiceProvider {
     public final static String TEST_CLASS_SUFFIX = "Test";
-    private final static String CLASS_SUFFIX = ".class";
     public static final EnumSet<Type> ALL_TESTS = EnumSet.allOf(Type.class);
     public static final EnumSet<Type> PERF_TESTS = EnumSet.of(Type.PERFSUITE, Type.PERFCMP, Type.PERFFRAMEWORK, Type.PERFCUSTOM);
     public static final EnumSet<Type> FUNC_TESTS = EnumSet.of(Type.UNIT, Type.JSTEST, Type.WEBDRIVER, Type.INTEGRATION);
@@ -65,20 +56,7 @@ public class TestInventory implements AuraServiceProvider {
 
     public TestInventory(Class<?> classInModule) {
         suites.put(Type.IGNORED, new TestSuite());
-        try {
-            String resourceName = classInModule.getName().replace('.', '/') + CLASS_SUFFIX;
-            URL url = classInModule.getClassLoader().getResource(resourceName);
-            String resPath = url.toString();
-            String root;
-            if ("jar".equals(url.getProtocol())) {
-                root = resPath.substring(0, resPath.indexOf("!/") + 2);
-            } else {
-                root = resPath.substring(0, resPath.length() - resourceName.length());
-            }
-            rootUri = new URI(root);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+    	rootUri = ModuleUtil.getRootUri(classInModule);
     }
 
     public TestSuite getTestSuite(Type type) {
@@ -97,7 +75,7 @@ public class TestInventory implements AuraServiceProvider {
     public void loadTestClasses(Type type) {
         TestFilter filter = ServiceLocator.get().get(TestFilter.class);
         Vector<Class<? extends Test>> vector = new Vector<>();
-        for (String className : getClassNames(rootUri)) {
+        for (String className : ModuleUtil.getClassNames(rootUri)) {
             Class<? extends Test> testClass = filter.applyTo(getTestClass(className));
             if (testClass != null) {
                 Type target = getAnnotationType(testClass);
@@ -116,7 +94,7 @@ public class TestInventory implements AuraServiceProvider {
 
         System.out.println(String.format("Loading %s tests from %s", type, rootUri));
 
-        for (String className : getClassNames(rootUri)) {
+        for (String className : ModuleUtil.getClassNames(rootUri)) {
             Class<? extends Test> testClass = filter.applyTo(getTestClass(className));
             if (testClass != null) {
                 Type target = getAnnotationType(testClass);
@@ -181,42 +159,6 @@ public class TestInventory implements AuraServiceProvider {
             TestSuite newSuite = new TestSuite(test.toString() + "JUnit4TestAdapterHack");
             newSuite.addTest(test);
             suite.addTest(newSuite);
-        }
-    }
-
-    private static Collection<String> getClassNames(URI rootUri) {
-        Collection<String> classNames = Sets.newHashSet();
-        try {
-            if ("jar".equals(rootUri.getScheme())) {
-                JarURLConnection jarConn = (JarURLConnection) rootUri.toURL().openConnection();
-                for (Enumeration<JarEntry> entries = jarConn.getJarFile().entries(); entries.hasMoreElements();) {
-                    JarEntry entry = entries.nextElement();
-                    String entryName = entry.getName();
-                    if (entryName.endsWith(CLASS_SUFFIX)) {
-                        entryName = entryName.substring(0, entryName.length() - CLASS_SUFFIX.length());
-                    }
-                    classNames.add(entryName.replace('/', '.'));
-                }
-            } else {
-                forEachFile(classNames, rootUri, new File(rootUri));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return classNames;
-    }
-
-    private static void forEachFile(Collection<String> names, URI root, File file) {
-        if (!file.isDirectory()) {
-            if (!file.getName().endsWith(CLASS_SUFFIX)) {
-                return;
-            }
-            String relative = root.relativize(file.toURI()).getPath();
-            names.add(relative.substring(0, relative.length() - CLASS_SUFFIX.length()).replace(File.separatorChar, '.'));
-        } else {
-            for (File child : file.listFiles()) {
-                forEachFile(names, root, child);
-            }
         }
     }
 

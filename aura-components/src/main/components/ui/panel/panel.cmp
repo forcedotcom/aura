@@ -71,8 +71,10 @@
                     <aura:if isTrue="{!!empty(v.title)}">
                         <h2 id="{!'title_' + globalId}" class="{!join(' ', v.titleDisplay ? 'title' : 'assistiveText', and(v.titleTruncate, v.titleDisplay) ? token('uiPanel.truncate') : '')}">{!v.title}</h2>
                     </aura:if>
-                     {!v.header}
-                     {!v.closeButton}
+                    {!v.header}
+                    <aura:if isTrue="{!v.showCloseButton}">
+                    {!v.closeButton}
+                    </aura:if>
                 </div>
             </aura:if>
 

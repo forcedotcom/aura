@@ -139,5 +139,36 @@ Test.Aura.Locker.SecureObjectTest = function() {
 
             Assert.True(expected === actual);
         }
+
+        [Fixture]
+        function testPassthroughValues() {
+            var CustomFileClass = function(){};
+            var CustomFileListClass = function(){};
+            // Mock the File and FileList class with a custom class
+            var mockClassTypes = Mocks.GetMocks(Object.Global(), {
+                File: CustomFileClass,
+                FileList: CustomFileListClass
+            });
+
+            [Fact]
+            [Data({clazz: CustomFileClass, msg: "File type value should passthrough unfiltered"})]
+            [Data({clazz: CustomFileListClass, msg: "FileList type value should passthrough unfiltered"})]
+            function PassThroughFileValue(data) {
+                // Arrange
+                var value = new data.clazz();
+                var expected = value;
+
+                // Act
+                var actual;
+                mockGlobals(function() {
+                    mockClassTypes(function () {
+                        actual = Aura.Locker.SecureObject.unfilterEverything({}, value)
+                    })
+                });
+
+                // Assert
+                Assert.True(expected === actual, data.msg);
+            }
+        }
     }
 }

@@ -65,7 +65,7 @@
         onblur="{!c.blur}"
     -->
 
-    <aura:locator target="button" description="Simple UI button"/>
+    <aura:locator target="button" isPrimitive="true" description="Simple UI button"/>
     
     <button type="{!v.buttonType}"
             aura:id="button"             

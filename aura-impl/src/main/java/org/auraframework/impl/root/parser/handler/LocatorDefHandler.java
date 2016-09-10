@@ -40,6 +40,7 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
     private static String ATTRIBUTE_DESCRIPTION = "description";
     private static String ATTRIBUTE_ALIAS = "alias";
     private static String ATTRIBUTE_ISPRIMITIVE = "isPrimitive";
+    private static String ANY_TARGET_SELECTOR = "*";
     private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_TARGET, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ALIAS, ATTRIBUTE_ISPRIMITIVE);
 
     private final LocatorDefImpl.Builder builder = new LocatorDefImpl.Builder();
@@ -102,6 +103,8 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
         
         if (!AuraTextUtil.isNullEmptyOrWhitespace(alias)) {
         	builder.setAlias(alias);
+        } else if (target.equals(ANY_TARGET_SELECTOR)) {
+            error (String.format("You must specify an alias when using the any target selector '%s' on '<%s>'", ANY_TARGET_SELECTOR, TAG));
         }
         
         if (!AuraTextUtil.isNullEmptyOrWhitespace(isPrimitive)) {

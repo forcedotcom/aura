@@ -18,25 +18,10 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-			A <code>ui:inputCurrency</code> component represents an input field for a number as a currency, which is rendered as an HTML <code>input</code> tag of type <code>text</code>.
-			The browser's locale is used by default. To render the output from a <code>ui:inputCurrency</code> component, use the <code>ui:outputCurrency</code> component.
+			An <code>ui:inputSmartNumber</code> component is the base component that's used by <code>ui:inputCurrency</code>, <code>ui:inputNumber</code>, and <code>ui:inputPercent</code>. This component is rendered as an HTML <code>input</code> element of type <code>text</code>.
 		</p>
-		<p>This is a basic set up of a <code>ui:inputCurrency</code> component, which renders an input field with the value <code>$50.00</code> when the browser's currency locale is <code>$</code>.</p>
-		<pre>&lt;ui:inputCurrency aura:id="amount" label="Amount" class="field" value="50"/></pre>
-		<p>This example results in the following HTML.</p>
-<pre>&lt;div class="uiInput uiInput--default uiInput--input">
-    &lt;label class="uiLabel-left form-element__label uiLabel">
-        &lt;span>Amount&lt;/span>
-    &lt;/label>
-    &lt;input class="field input" max="99999999999999" step="1" type="text" min="-99999999999999">
-&lt;/div></pre>
-		<p>To override the browser's locale, set the new format on the <code>v.format</code> attribute of the <code>ui:inputCurrency</code> component.
-		   This example renders an input field with the value <code>£50.00</code>.</p>
-<pre>var curr = component.find("amount");
-curr.set("v.format", '£#,###.00');</pre>
+		<p>By default, this component accepts numerical input. To convert a numerical input to a currency or percentage, use the <code>style</code> attribute.
+		This example displays <code>$50.00</code> as the input value.</p>
+		<pre>&lt;ui:inputSmartNumber label="Smart Amount" value="50" style="currency"/></pre>
 	</aura:description>	
-		<aura:example name="currency" ref="uiExamples:currency" label="Using ui:inputCurrency">
-    	<p>This example retrieves the value of a <code>ui:inputCurrency</code> component and displays it using <code>ui:outputCurrency</code>.</p>
-	</aura:example>
-	
 </aura:documentation>

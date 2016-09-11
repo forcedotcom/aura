@@ -18,18 +18,14 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-		    By default, <code>ui:inputRichText</code> renders a WYSIWYG editor for entering rich text. 
-		    Setting <code>isRichText="false"</code> uses the <code>ui:inputTextArea</code> component instead of a WYSIWYG editor.
-		    The <code>placeholder</code> attribute is supported only when you set <code>isRichText="false"</code>.
+		    <code>ui:inputRichText</code> renders a WYSIWYG editor for entering rich text, using the CKEditor library to provide formatting and accessibility features.
 		</p>
-		<pre>&lt;ui:inputRichText aura:id="inputRT" label="Rich text demo with basic toolbar" /></pre>
+		<p>This example displays a rich text editor.</p>
+		<pre>&lt;ui:inputRichText label="Enter Your Comments" /></pre>
 		
 		<p>
 			Tags such as <code>&lt;script&gt;</code> are removed from the component.
-			A list of supported HTML tags is available in the JavaScript helper of the <code>ui:outputRichText</code> component.
+			For a list of supported HTML tags, see <code>ui:outputRichText</code>.
     	</p>
 	</aura:description>	
-		<aura:example name="inputRichText" ref="auradocs:demoInputRT" label="Using ui:inputRichText">
-    	<p>This example retrieves the value of a <code>ui:inputRichText</code> component and displays it using <code>ui:outputRichText</code>.</p>
-	   </aura:example>	
 </aura:documentation>

@@ -15,11 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true">
+<aura:component extensible="true" description="Displays a list of selected file names and their sizes. This component is used in ui:inputFile.">
     <!-- Attributes -->
-    <aura:attribute name="files" type="Object" />
+    <aura:attribute name="files" type="Object" description="The files to be uploaded." />
         <!-- Private attribute -->
-        <aura:attribute name="filesArr" type="Object[]" default="[]"  access="PRIVATE" />
+        <aura:attribute name="filesArr" type="Object[]" default="[]"  access="PRIVATE" description="Private. Do not use. The list of files to be iterated over."/>
 
     <!-- Handlers -->
     <aura:handler name="change" value="{! v.files }" action="{! c.mapFilesToArray }" />

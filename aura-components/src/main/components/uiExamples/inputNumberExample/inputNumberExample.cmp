@@ -16,7 +16,7 @@
 
 -->
 <aura:component>	
-	<ui:inputNumber aura:id="inputCmp" label="Enter a number: "/> <br/>
-    <ui:button label="Submit" press="{!c.validate}"/>
-    <ui:outputNumber aura:id="outNum" value=""/>
+    <aura:attribute name="myNumber" type="integer" default="10"/>
+	<ui:inputNumber label="Enter a number: " value="{!v.myNumber}" updateOn="keyup"/> <br/>
+    <ui:outputNumber value="{!v.myNumber}"/>
 </aura:component>

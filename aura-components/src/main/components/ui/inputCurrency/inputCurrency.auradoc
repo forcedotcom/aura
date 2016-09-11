@@ -18,7 +18,7 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-			A <code>ui:inputCurrency</code> component represents an input field for a number as a currency, which is rendered as an HTML <code>input</code> tag of type <code>text</code>.
+			A <code>ui:inputCurrency</code> component represents an input field for a number as a currency, which is rendered as an HTML <code>input</code> element of type <code>text</code>.
 			The browser's locale is used by default. To render the output from a <code>ui:inputCurrency</code> component, use the <code>ui:outputCurrency</code> component.
 		</p>
 		<p>This is a basic set up of a <code>ui:inputCurrency</code> component, which renders an input field with the value <code>$50.00</code> when the browser's currency locale is <code>$</code>.</p>
@@ -36,7 +36,7 @@
 curr.set("v.format", '£#,###.00');</pre>
 	</aura:description>	
 		<aura:example name="currency" ref="uiExamples:currency" label="Using ui:inputCurrency">
-    	<p>This example retrieves the value of a <code>ui:inputCurrency</code> component and displays it using <code>ui:outputCurrency</code>.</p>
+    	<p>This example binds the value of a <code>ui:inputCurrency</code> component to <code>ui:outputCurrency</code>.</p>
 	</aura:example>
 	
 </aura:documentation>

@@ -33,7 +33,7 @@
 &lt;/div></pre>
 	</aura:description>	
 		<aura:example name="text" ref="uiExamples:text" label="Using ui:inputText">
-    	<p>This example retrieves the value of a <code>ui:inputText</code> component and displays it using <code>ui:outputText</code>.</p>
+    	<p>This example binds the value of a <code>ui:inputText</code> component to <code>ui:outputText</code>.</p>
 	</aura:example>
 	
 </aura:documentation>

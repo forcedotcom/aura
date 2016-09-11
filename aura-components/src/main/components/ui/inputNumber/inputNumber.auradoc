@@ -18,7 +18,7 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-			A <code>ui:inputNumber</code> component represents a number input field, which is rendered as an HTML <code>input</code> tag of type <code>text</code>.
+			A <code>ui:inputNumber</code> component represents a number input field, which is rendered as an HTML <code>input</code> element of type <code>text</code>.
 			This example shows a number field, which displays a value of <code>10</code>.
 			</p>
 			<pre>&lt;aura:attribute name="num" type="integer" default="10"/>
@@ -32,7 +32,7 @@
         min="-99999999999999" class="input">
 &lt;/div></pre>
 			
-			<p>To render the output from a <code>ui:inputNumber</code> component, use the <code>ui:inputNumber</code> component. When providing a number value with commas, use <code>type="integer"</code>. This example returns <code>100,000</code>.
+			<p>To render the output from a <code>ui:inputNumber</code> component, use the <code>ui:outputNumber</code> component. When providing a number value with commas, use <code>type="integer"</code>. This example returns <code>100,000</code>.
 <pre>&lt;aura:attribute name="number" type="integer" default="100,000"/>
 &lt;ui:inputNumber label="Number" value="{!v.number}"/></pre>
 		</p>
@@ -45,6 +45,6 @@
 		<pre>&lt;ui:inputNumber label="Cost" aura:id="costField" format="#,##0,000.00#" value="10000"/></pre>
 	</aura:description>		
 	<aura:example name="inputExample" ref="uiExamples:inputNumberExample" label="Using ui:inputNumber">
-    		This example retrieves the value of a <code>ui:inputNumber</code> component, validates the input, and displays it using <code>ui:outputNumber</code>.
+    		This example binds the value of a <code>ui:inputNumber</code> component to <code>ui:outputNumber</code>.
     </aura:example>
 </aura:documentation>

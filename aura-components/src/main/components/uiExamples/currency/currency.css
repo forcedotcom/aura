@@ -14,14 +14,6 @@
  * limitations under the License.
  */
  
- .THIS.hide {
- 	display: none;
- }
- 
- .THIS.btn {
- 	margin-bottom: 10px;
- }
-
 .THIS label.uiLabel {
     padding-right: 12px;
 }

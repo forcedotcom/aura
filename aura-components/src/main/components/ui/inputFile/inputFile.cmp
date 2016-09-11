@@ -16,23 +16,23 @@
 
 -->
 <aura:component support="PROTO" extensible="false"
-                description="A component for select files on your file system, support drag and drop, content type filter, and limit of bytes for file.">
+                description="A component for uploading files on your file system. Supports drag and drop, content type filter, and limit of bytes for file.">
 
     <!-- Attributes -->
-    <aura:attribute name="files"              type="Object" />
-    <aura:attribute name="name"               type="String" />
-    <aura:attribute name="disabled"           type="Boolean" default="false" />
-    <aura:attribute name="required"           type="Boolean" default="false" />
-    <aura:attribute name="includeFormElement" type="Boolean" default="true"  />
-    <aura:attribute name="accept"             type="String"  default="*/*"   />
-    <aura:attribute name="multiple"           type="Boolean" default="true"  />
-    <aura:attribute name="maxSizeAllowed"     type="Integer"                 />
-    <aura:attribute name="class"              type="String"  default=""      />
+    <aura:attribute name="files"              type="Object" description="The files to be uploaded." />
+    <aura:attribute name="name"               type="String" description="The name of the input element." />
+    <aura:attribute name="disabled"           type="Boolean" default="false" description="Specifies whether the drop zone is disabled. This value defaults to false." />
+    <aura:attribute name="required"           type="Boolean" default="false" description="Specifies whether the input is required. This value defaults to false." />
+    <aura:attribute name="includeFormElement" type="Boolean" default="true"  description="Specifies whether to nest the HTML input element in a form element. This value defaults to true." />
+    <aura:attribute name="accept"             type="String"  default="*/*"   description="The types of files that are allowed. This value defaults to */*." />
+    <aura:attribute name="multiple"           type="Boolean" default="true"  description="Specifies whether multiple file uploads is allowed. This value defaults to true." />
+    <aura:attribute name="maxSizeAllowed"     type="Integer"                 description="The maximum file size allowed for the upload." />
+    <aura:attribute name="class"              type="String"  default=""      description="The CSS class for the drop zone." />
         <!-- Private Attributes -->
-        <aura:attribute name="privateHelperCmpRefs"     type="Aura.Component[]"    access="PRIVATE" />
+        <aura:attribute name="privateHelperCmpRefs"     type="Aura.Component[]"    access="PRIVATE" description="Private. Do not use." />
 
     <!--Events -->
-    <aura:registerEvent name="change" type="ui:inputFileChangeEvent" />
+    <aura:registerEvent name="change" type="ui:inputFileChangeEvent" description="The event fired when the list of files to be uploaded changes." />
 
     <!--Methods -->
     <aura:method name="reset" action="{! c.reset }" />

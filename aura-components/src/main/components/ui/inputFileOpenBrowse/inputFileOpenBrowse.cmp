@@ -18,15 +18,15 @@
 <aura:component extensible="false">
 
     <!-- Attributes -->
-    <aura:attribute name="accept"         type="String"  default="*/*"   />
-    <aura:attribute name="multiple"       type="Boolean" default="true"  />
-    <aura:attribute name="maxSizeAllowed" type="Integer" />
-    <aura:attribute name="disabled"       type="Boolean" default="false" />
+    <aura:attribute name="accept"         type="String"  default="*/*" description="The types of files that are allowed. This value defaults to */*." />
+    <aura:attribute name="multiple"       type="Boolean" default="true" description="Specifies whether multiple file uploads is allowed. This value defaults to true." />
+    <aura:attribute name="maxSizeAllowed" type="Integer" description="The maximum file size allowed for the upload." />
+    <aura:attribute name="disabled"       type="Boolean" default="false" description="Specifies whether the file uploader is disabled. This value defaults to false." />
         <!-- Private attributes -->
-        <aura:attribute name="inputFileHtmlElement" type="Object" access="PRIVATE"/>
+        <aura:attribute name="inputFileHtmlElement" type="Object" access="PRIVATE" description="Private. Do not use. The HTML input element of type file."/>
 
     <!--Events -->
-    <aura:registerEvent name="change" type="ui:inputFileChangeEvent" />
+    <aura:registerEvent name="change" type="ui:inputFileChangeEvent" description="The event fired when the list of files to be uploaded changes."/>
 
     <aura:handler name="init"   value="{! this }"              action="{! c.init }" />
     <aura:handler name="change" value="{! v.accept }"          action="{! c.reCreateHTMLElement }" />

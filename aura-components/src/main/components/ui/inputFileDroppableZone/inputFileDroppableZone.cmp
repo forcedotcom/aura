@@ -22,18 +22,19 @@
     <aura:import library="ui:contentTypeLibrary" property="ct"  />
 
     <!-- Attributes -->
-    <aura:attribute name="accept"         type="String"  default="*/*"  />
-    <aura:attribute name="multiple"       type="Boolean" default="true" />
-    <aura:attribute name="maxSizeAllowed" type="Integer" />
-    <aura:attribute name="class"          type="String"  />
-    <aura:attribute name="classOver"      type="String"  />
-    <aura:attribute name="disabled"       type="Boolean" default="false"/>
+    <aura:attribute name="accept"         type="String"  default="*/*" description="The types of files that are allowed. This value defaults to */*." />
+    <aura:attribute name="multiple"       type="Boolean" default="true" description="Specifies whether multiple file uploads is allowed. This value defaults to true." />
+    <aura:attribute name="maxSizeAllowed" type="Integer" description="The maximum file size allowed for the upload." />
+    <aura:attribute name="class"          type="String"  description="The CSS class for the drop zone container." />
+    <aura:attribute name="classOver"      type="String"  description="The CSS class for the drop zone container when dragging is in progress." />
+    <aura:attribute name="disabled"       type="Boolean" default="false" description="Specifies whether the file uploader is disabled. This value defaults to false." />
+
 
         <!-- Private attributes -->
-        <aura:attribute name="dropZoneClassList" type="string" default="" access="private" />
+        <aura:attribute name="dropZoneClassList" type="string" default="" access="private" description="Private. Do not use. The list of classes for the drop zone container." />
 
     <!--Events -->
-    <aura:registerEvent name="change" type="ui:inputFileChangeEvent" />
+    <aura:registerEvent name="change" type="ui:inputFileChangeEvent" description="The event fired when the list of files to be uploaded changes."/>
 
     <!-- Handlers -->
     <aura:handler name="init" value="{! this}" action="{! c.init }" />

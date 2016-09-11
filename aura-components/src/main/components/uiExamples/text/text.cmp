@@ -16,10 +16,7 @@
 
 -->
 <aura:component>
-	<ui:inputText aura:id="name" label="Enter some text" class="field" value="My Text"/>
-    <ui:button class="btn" label="Submit" press="{!c.setOutput}"/>	
-
-	<div aura:id="msg" class="hide">
-		You entered: <ui:outputText aura:id="oName" value=""/>	
-	</div>
+    <aura:attribute name="myText" type="string" default="Hello there!"/>
+	<ui:inputText label="Enter some text" class="field" value="{!v.myText}" updateOn="click"/>
+	You entered: <ui:outputText value="{!v.myText}"/>	
 </aura:component>

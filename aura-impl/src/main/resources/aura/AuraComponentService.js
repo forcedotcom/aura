@@ -297,7 +297,7 @@ AuraComponentService.prototype.createInternalConfig = function (config) {
 
     return {
         "componentDef" : this.createDescriptorConfig(config["descriptor"]),
-        "localId"      : config["localId"],
+        "localId"      : config["localId"] || config["aura:id"],
         "flavor"       : config["flavor"],
         "attributes"   : {
             "values"        : config["attributes"],

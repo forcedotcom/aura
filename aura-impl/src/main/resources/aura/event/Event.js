@@ -43,8 +43,7 @@ Aura.Event.Event = function(config) {
 };
 
 /**
- * Gets the source component that fired this component event.
- * This method doesn't work for application events. It's only for component events.
+ * Gets the source component that fired this event.
  *
  * @returns {Object}
  * @platform

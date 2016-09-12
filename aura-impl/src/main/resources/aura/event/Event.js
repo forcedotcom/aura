@@ -45,7 +45,7 @@ Aura.Event.Event = function(config) {
 /**
  * Gets the source component that fired this event.
  *
- * @returns {Object}
+ * @returns {Object} The source component
  * @platform
  * @export
  */

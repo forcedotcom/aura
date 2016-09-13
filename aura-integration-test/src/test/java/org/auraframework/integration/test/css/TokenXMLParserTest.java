@@ -106,7 +106,7 @@ public class TokenXMLParserTest extends StyleTestCase {
 
     /** utility */
     private TokenDef source(CharSequence contents) throws QuickFixException {
-        TokensDef def = addSeparateTokens(String.format("<aura:tokens>%s</aura:tokens>", contents)).getDef();
+        TokensDef def = definitionService.getDefinition(addSeparateTokens(String.format("<aura:tokens>%s</aura:tokens>", contents)));
         return Iterables.getFirst(def.getDeclaredTokenDefs().values(), null);
     }
 }

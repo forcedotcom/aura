@@ -73,7 +73,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
             DefDescriptor<ComponentDef> dd = definitionService.getDefDescriptor(dummyDefs.get(i).getDescriptorName(),
                     ComponentDef.class);
             assertTrue(contextService.getCurrentContext().getDefRegistry().exists(dd));
-            assertNotNull("Failed to fetch def from caching def registry.", dd.getDef());
+            assertNotNull("Failed to fetch def from caching def registry.", definitionService.getDefinition(dd));
             assertEquals("Definition service failed to retrieve the correct definition", dummyDefs.get(i)
                     .getQualifiedName(), dd.getQualifiedName());
         }
@@ -85,7 +85,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
     public void _testForStaleCheckWhenRegistryPartiallyFull() throws Exception {
         String markup = "<aura:component> %s </aura:component>";
         DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(ComponentDef.class, String.format(markup, ""));
-        ComponentDef initialDef = dd.getDef();
+        ComponentDef initialDef = definitionService.getDefinition(dd);
         long initialTimeStamp = initialDef.getLocation().getLastModified();
 
         // Have to stop and start context because a given def is cached in MasterDefRegistry per request (context of the
@@ -100,7 +100,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
 
         // Fetch the def
         assertTrue(contextService.getCurrentContext().getDefRegistry().exists(dd));
-        ComponentDef updatedDef = dd.getDef();
+        ComponentDef updatedDef = definitionService.getDefinition(dd);
         // Verify that stale check has been performed
         long updatedTimeStamp = updatedDef.getLocation().getLastModified();
         assertTrue("Time stamp on def should have been updated", updatedTimeStamp > initialTimeStamp);
@@ -120,7 +120,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         String markup = "<aura:component> %s </aura:component>";
         DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(ComponentDef.class, String.format(markup, ""));
         ((StringSource<?>) getSource(dd)).setLastModified(startTimeStamp);
-        ComponentDef initialDef = dd.getDef();
+        ComponentDef initialDef = definitionService.getDefinition(dd);
         long initialTimeStamp = initialDef.getLocation().getLastModified();
         assertEquals(startTimeStamp, initialTimeStamp);
         fillCachingDefRegistryForComponents();
@@ -137,7 +137,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
 
         // Fetch the def
         assertTrue(contextService.getCurrentContext().getDefRegistry().exists(dd));
-        ComponentDef updatedDef = dd.getDef();
+        ComponentDef updatedDef = definitionService.getDefinition(dd);
         // Verify that stale check has been performed
         long updatedTimeStamp = updatedDef.getLocation().getLastModified();
         assertEquals("Time stamp on def should have been updated", startTimeStamp + 5, updatedTimeStamp);
@@ -178,7 +178,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         // Fill up twice the capacity to make sure the initial set of defs are thrown out
         for (int i = 0; i < CACHE_SIZE_MAX * 2; i++) {
             DefDescriptor<ComponentDef> dummyCmps = addSourceAutoCleanup(ComponentDef.class, String.format(markup, i));
-            dummyCmps.getDef();
+            definitionService.getDefinition(dummyCmps);
             dummyDefs.add(dummyCmps);
         }
         return dummyDefs;

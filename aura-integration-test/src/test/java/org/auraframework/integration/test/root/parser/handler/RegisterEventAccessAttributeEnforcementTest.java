@@ -52,7 +52,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     @Test
@@ -73,7 +73,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     
@@ -99,7 +99,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.OTHER_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     @Test
     public void testComponentWithSystemNamespaceIncludeComponentRegisterCustomEventWithOtherSystemNamespaceInMarkupAccessInternal() throws QuickFixException {
@@ -119,7 +119,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.OTHER_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -144,7 +144,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.CUSTOM);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
           	fail("component of custom namespace shouldn't be able to set handler of event registered in a system namespace component");
         } catch(Exception e) {
         	//expect 
@@ -173,7 +173,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.CUSTOM);
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
     }
     /**
      * Verify Default access enforcement
@@ -197,7 +197,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.CUSTOM);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
           	fail("component of custom namespace shouldn't be able to set handler of event registered in other custom namespace component");
         } catch(Exception e) {
         	//expect 
@@ -226,7 +226,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.INTERNAL);
-       descriptor.getDef();
+       definitionService.getDefinition(descriptor);
     }
 
     
@@ -252,7 +252,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     
@@ -274,7 +274,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.OTHER_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     
@@ -307,7 +307,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     /**
      * Verify Public access enforcement
@@ -332,7 +332,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.OTHER_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     /**
      * Verify Public access enforcement
@@ -358,7 +358,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.CUSTOM);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
           	fail("component of custom namespace shouldn't be able to set handler of event registered in a system namespace component");
         } catch(Exception e) {
         	//expect 
@@ -389,7 +389,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.CUSTOM);
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
     }
     /**
      * Verify Public access enforcement
@@ -417,7 +417,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.CUSTOM);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
           	fail("component of custom namespace shouldn't be able to set handler of event registered in other custom namespace component");
         } catch(Exception e) {
         	//expect 
@@ -448,7 +448,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.INTERNAL);
-       descriptor.getDef();
+       definitionService.getDefinition(descriptor);
     }
     
     
@@ -485,7 +485,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     /**
      * Verify Global access enforcement
@@ -510,7 +510,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.OTHER_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     /**
      * Verify Public access enforcement
@@ -535,7 +535,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.CUSTOM);
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
     }
     /**
      * Verify Global access enforcement
@@ -560,7 +560,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.CUSTOM);
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
     }
     /**
      * Verify Global access enforcement
@@ -587,7 +587,7 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.CUSTOM);
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
     }
     /**
      * Verify Global access enforcement
@@ -612,6 +612,6 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.INTERNAL);
-       descriptor.getDef();
+       definitionService.getDefinition(descriptor);
     }
 }

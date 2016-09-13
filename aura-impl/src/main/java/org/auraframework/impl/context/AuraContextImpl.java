@@ -644,7 +644,7 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public void setStyleContext() {
-        setStyleContext(StyleContextImpl.build(this));
+        setStyleContext(StyleContextImpl.build(definitionService, this));
     }
 
     @Override
@@ -658,7 +658,7 @@ public class AuraContextImpl implements AuraContext {
     public void setStyleContext(Map<String, Object> config) {
         // it's important that this is only set once, so that get returns a consistent value
         checkState(this.styleContext == null, "StyleContext should only be set once per request");
-        this.styleContext = StyleContextImpl.build(config);
+        this.styleContext = StyleContextImpl.build(definitionService, config);
     }
 
     @Override

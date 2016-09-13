@@ -252,7 +252,7 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
         IncludeDefRef includeDefRef = builder.build();
         BaseJavascriptClass.Builder jsIncludeBuilder = new JavascriptIncludeClass.Builder().setDefinition(includeDefRef).setMinify(false);
         try {
-        	BaseJavascriptClass javascriptClass = jsIncludeBuilder.build();
+        	jsIncludeBuilder.build();
         	fail("expected exception");
         } catch (Exception e) {
         	checkExceptionContains(e, AuraRuntimeException.class, "Parse error");

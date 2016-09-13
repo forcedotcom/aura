@@ -33,73 +33,73 @@ import org.junit.Test;
 
 public class DocumentationDefTest extends AuraImplTestCase {
 
-	@Test
-	public void testGetDocumentationDefViaComponentDef() throws Exception{
-		testLoadDocumentationDefViaRootDef("test:fakeComponent", ComponentDef.class, 2);
-	}
+    @Test
+    public void testGetDocumentationDefViaComponentDef() throws Exception{
+        testLoadDocumentationDefViaRootDef("test:fakeComponent", ComponentDef.class, 2);
+    }
 
-	@Test
-	public void testGetDocumentationDefViaApplicationDef() throws Exception{
-		testLoadDocumentationDefViaRootDef("test:fakeApplication", ApplicationDef.class, 2);
-	}
+    @Test
+    public void testGetDocumentationDefViaApplicationDef() throws Exception{
+        testLoadDocumentationDefViaRootDef("test:fakeApplication", ApplicationDef.class, 2);
+    }
 
-	@Ignore("W-2085286")
-	@Test
-	public void testGetDocumentationDefViaInterFaceDef() throws Exception {
-		testLoadDocumentationDefViaRootDef("test:fakeInterface", InterfaceDef.class, 2);
-	}
+    @Ignore("W-2085286")
+    @Test
+    public void testGetDocumentationDefViaInterFaceDef() throws Exception {
+        testLoadDocumentationDefViaRootDef("test:fakeInterface", InterfaceDef.class, 2);
+    }
 
-	@Ignore("W-2085286")
-	@Test
-	public void testGetDocumentationDefViaEventDef() throws Exception {
-		testLoadDocumentationDefViaRootDef("test:anevent", EventDef.class, 2);
-	}
+    @Ignore("W-2085286")
+    @Test
+    public void testGetDocumentationDefViaEventDef() throws Exception {
+        testLoadDocumentationDefViaRootDef("test:anevent", EventDef.class, 2);
+    }
 
-	@Ignore("W-2085286")
-	@Test
-	public void testGetDocumentationDefViaTokensFaceDef() throws Exception {
-		testLoadDocumentationDefViaRootDef("test:fakeTokens", TokensDef.class, 2);
-	}
+    @Ignore("W-2085286")
+    @Test
+    public void testGetDocumentationDefViaTokensFaceDef() throws Exception {
+        testLoadDocumentationDefViaRootDef("test:fakeTokens", TokensDef.class, 2);
+    }
 
-	@Test
-	public void testValidComponentRefForExample() throws Exception{
-		String exampleCmp = "test:fakeComponent";
-		String docDefSource = "<aura:documentation>" +
-				"<aura:description>random description</aura:description>" +
-				"<aura:example name='example' ref='"+exampleCmp+"' label='label1'>random example</aura:example>" +
-				"</aura:documentation>";
+    @Test
+    public void testValidComponentRefForExample() throws Exception{
+        String exampleCmp = "test:fakeComponent";
+        String docDefSource = "<aura:documentation>" +
+                "<aura:description>random description</aura:description>" +
+                "<aura:example name='example' ref='"+exampleCmp+"' label='label1'>random example</aura:example>" +
+                "</aura:documentation>";
 
-		DefDescriptor<DocumentationDef> dd= addSourceAutoCleanup(DocumentationDef.class, docDefSource);
-		ComponentDef cd = definitionService.getDefinition(definitionService.getDefinition(dd).getExampleDefs().get(0).getRef());
-		assertEquals("Unable to get to the ComponentDef referenced in example!", exampleCmp, cd.getDescriptor().getNamespace()+":"+cd.getName());
-	}
+        DefDescriptor<DocumentationDef> dd= addSourceAutoCleanup(DocumentationDef.class, docDefSource);
+        ComponentDef cd = definitionService.getDefinition(definitionService.getDefinition(dd).getExampleDefs().get(0).getRef());
+        assertEquals("Unable to get to the ComponentDef referenced in example!", exampleCmp, cd.getDescriptor().getNamespace()+":"+cd.getName());
+    }
 
-	/** Test to track that we only validate that an example ref is valid
-	 * when following the ref to load the definition.
-	 */
-	@Test
-	public void testInvalidComponentRefForExample() throws Exception{
-		String docDefSource = "<aura:documentation>" +
-				"<aura:description>random description</aura:description>" +
-				"<aura:example name='example' ref='foo:bar1' label='label1'>random example</aura:example>" +
-				"</aura:documentation>";
+    /** Test to track that we only validate that an example ref is valid
+     * when following the ref to load the definition.
+     */
+    @Test
+    public void testInvalidComponentRefForExample() throws Exception{
+        String docDefSource = "<aura:documentation>" +
+                "<aura:description>random description</aura:description>" +
+                "<aura:example name='example' ref='foo:bar1' label='label1'>random example</aura:example>" +
+                "</aura:documentation>";
 
-		DefDescriptor<DocumentationDef> dd= addSourceAutoCleanup(DocumentationDef.class, docDefSource);
+        DefDescriptor<DocumentationDef> dd= addSourceAutoCleanup(DocumentationDef.class, docDefSource);
 
-		try{
-			dd.getDef().getExampleDefs().get(0).getRef().getDef();
-			fail("Should have thrown DefinitionNotFoundException");
-		}
-		catch(DefinitionNotFoundException e){
-			assertEquals("No COMPONENT named markup://foo:bar1 found", e.getMessage());
-		}
-	}
+        try{
+            definitionService.getDefinition(definitionService.getDefinition(dd).getExampleDefs().get(0).getRef());
+            fail("Should have thrown DefinitionNotFoundException");
+        }
+        catch(DefinitionNotFoundException e){
+            assertEquals("No COMPONENT named markup://foo:bar1 found", e.getMessage());
+        }
+    }
 
-	private <T extends Definition> void testLoadDocumentationDefViaRootDef(String qualifiedName, Class<T> defType, int noOfDescs)
-			throws DefinitionNotFoundException, QuickFixException {
-		RootDefinition c = (RootDefinition) definitionService.getDefinition(qualifiedName, defType);
-		DocumentationDef docDef = c.getDocumentationDef();
-		assertNotNull("DocumentationDef not found!", docDef);
-		assertEquals("Number DescriptionDefs don't match the expected value!", noOfDescs, docDef.getDescriptionDefs().size());
-	}
+    private <T extends Definition> void testLoadDocumentationDefViaRootDef(String qualifiedName, Class<T> defType, int noOfDescs)
+            throws DefinitionNotFoundException, QuickFixException {
+        RootDefinition c = (RootDefinition) definitionService.getDefinition(qualifiedName, defType);
+        DocumentationDef docDef = c.getDocumentationDef();
+        assertNotNull("DocumentationDef not found!", docDef);
+        assertEquals("Number DescriptionDefs don't match the expected value!", noOfDescs, docDef.getDescriptionDefs().size());
+    }
 }

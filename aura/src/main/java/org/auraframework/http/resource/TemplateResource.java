@@ -141,7 +141,7 @@ public abstract class TemplateResource extends AuraResourceImpl {
 
         DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
         if (styleDefDesc != null) {
-            attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode());
+            attributes.put("auraInlineStyle", definitionService.getDefinition(styleDefDesc).getCode());
         }
 
         String contextPath = context.getContextPath();

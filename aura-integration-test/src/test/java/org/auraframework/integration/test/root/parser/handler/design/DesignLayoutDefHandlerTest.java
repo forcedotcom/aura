@@ -84,6 +84,6 @@ public class DesignLayoutDefHandlerTest extends AuraImplTestCase {
         getAuraTestingUtil().addSourceAutoCleanup(designDesc,
                 String.format("<design:component>%s</design:component>", markup), access);
 
-        return designDesc.getDef();
+        return definitionService.getDefinition(designDesc);
     }
 }

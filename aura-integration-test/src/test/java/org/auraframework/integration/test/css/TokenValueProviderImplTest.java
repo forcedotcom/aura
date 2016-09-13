@@ -297,6 +297,6 @@ public class TokenValueProviderImplTest extends StyleTestCase {
 
     private TokenValueProvider setupOverride(DefDescriptor<StyleDef> def, List<DefDescriptor<TokensDef>> overrides)
             throws QuickFixException {
-        return new TokenValueProviderImpl(def, new TokenCacheImpl(overrides), ResolveStrategy.RESOLVE_NORMAL);
+        return new TokenValueProviderImpl(def, new TokenCacheImpl(definitionService, overrides), ResolveStrategy.RESOLVE_NORMAL);
     }
 }

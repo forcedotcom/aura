@@ -127,14 +127,14 @@ public class ComponentXMLParserTest extends AuraImplTestCase {
     public void testInheritsFlavorableChildFalse() throws Exception {
         DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class, "<aura:component extensible='true'>{!v.body}</aura:component>");
         DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, String.format("<aura:component extends='%s'/>", parent.getDescriptorName()));
-        assertFalse(cmp.getDef().inheritsFlavorableChild());
+        assertFalse(definitionService.getDefinition(cmp).inheritsFlavorableChild());
     }
 
     @Test
     public void testInheritsFlavorableChildTrue() throws Exception {
         DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class, "<aura:component extensible='true'><div aura:flavorable='true'>{!v.body}</div></aura:component>");
         DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, String.format("<aura:component extends='%s'/>", parent.getDescriptorName()));
-        assertTrue(cmp.getDef().inheritsFlavorableChild());
+        assertTrue(definitionService.getDefinition(cmp).inheritsFlavorableChild());
     }
 
     @Test
@@ -142,7 +142,7 @@ public class ComponentXMLParserTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class, "<aura:component extensible='true'><div aura:flavorable='true'>{!v.body}</div></aura:component>");
         DefDescriptor<ComponentDef> parent2 = addSourceAutoCleanup(ComponentDef.class, String.format("<aura:component extends='%s' extensible='true'/>", parent.getDescriptorName()));
         DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, String.format("<aura:component extends='%s'/>", parent2.getDescriptorName()));
-        assertTrue(cmp.getDef().inheritsFlavorableChild());
+        assertTrue(definitionService.getDefinition(cmp).inheritsFlavorableChild());
     }
 
     @Test
@@ -168,6 +168,6 @@ public class ComponentXMLParserTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class, "<aura:component extensible='true' dynamicallyFlavorable='true'>{!v.body}</aura:component>");
         DefDescriptor<ComponentDef> parent2 = addSourceAutoCleanup(ComponentDef.class, String.format("<aura:component extends='%s' extensible='true'>{!v.body}</aura:component>", parent.getDescriptorName()));
         DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, String.format("<aura:component extends='%s'>zell</aura:component>", parent2.getDescriptorName()));
-        assertTrue(cmp.getDef().isDynamicallyFlavorable());
+        assertTrue(definitionService.getDefinition(cmp).isDynamicallyFlavorable());
     }
 }

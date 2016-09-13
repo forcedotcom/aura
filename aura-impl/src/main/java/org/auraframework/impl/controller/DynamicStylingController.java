@@ -193,7 +193,7 @@ public final class DynamicStylingController implements Controller {
 
         // custom style context to include our one-off token descriptors
         AuraContext context = contextService.getCurrentContext();
-        StyleContext styleContext = StyleContextImpl.build(context, tokens);
+        StyleContext styleContext = StyleContextImpl.build(definitionService, context, tokens);
         context.setStyleContext(styleContext);
 
         // figure out which token we will be utilizing
@@ -204,7 +204,7 @@ public final class DynamicStylingController implements Controller {
         // 2: skip any styles not using a relevant var (removed... todo?)
         List<BaseStyleDef> filtered = new ArrayList<>();
         for (DefDescriptor<? extends BaseStyleDef> style : styles) {
-            BaseStyleDef def = style.getDef();
+            BaseStyleDef def = definitionService.getDefinition(style);
             if (!def.getExpressions().isEmpty()) {
                 filtered.add(def);
             }

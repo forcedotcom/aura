@@ -36,7 +36,7 @@ public class OutputTextTest extends AuraImplTestCase {
         String cmpMarkup = String.format(baseComponentTag, "", "<ui:outputText value='" + scriptTags + "'/>");
         DefDescriptor<ComponentDef> testCmp = addSourceAutoCleanup(ComponentDef.class, cmpMarkup);
         try {
-            testCmp.getDef();
+            definitionService.getDefinition(testCmp);
             fail("XML should not be assigned as value.");
         } catch (InvalidDefinitionException e) {
             assertNotNull(e);

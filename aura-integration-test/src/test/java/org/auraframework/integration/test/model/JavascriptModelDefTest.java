@@ -60,7 +60,7 @@ public class JavascriptModelDefTest extends AuraImplTestCase {
                 DefDescriptor.JAVASCRIPT_PREFIX);
         addSourceAutoCleanup(modelDesc, "{\"badType\":function(){}}");
         try {
-            cmpDesc.getDef();
+            definitionService.getDefinition(cmpDesc);
             fail("Bad value in javascript model should throw Exception");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "Invalid value type in model definition.");
@@ -78,7 +78,7 @@ public class JavascriptModelDefTest extends AuraImplTestCase {
                 DefDescriptor.JAVASCRIPT_PREFIX);
         addSourceAutoCleanup(modelDesc, "{\"nullType\":null}");
         try {
-            cmpDesc.getDef();
+            definitionService.getDefinition(cmpDesc);
             fail("Null value in javascript model should throw Exception");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "Null value type in model definition.");

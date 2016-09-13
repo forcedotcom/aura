@@ -45,7 +45,7 @@ public class DesignLayoutAttributeDefHandlerTest extends AuraImplTestCase {
                 "<design:section><design:layoutItems>%s</design:layoutItems></design:section>" +
                 "</design:layout></design:component>", String.format(ATTRIBUTE, invalidAttr)));
         try {
-            designDesc.getDef();
+            definitionService.getDefinition(designDesc);
             fail("Attribute was accepted in a design layout");
         } catch (Exception e) {
             assertExceptionType(e, DefinitionNotFoundException.class);
@@ -106,7 +106,7 @@ public class DesignLayoutAttributeDefHandlerTest extends AuraImplTestCase {
                 "<design:section><design:layoutItems>%s</design:layoutItems></design:section>" +
                 "</design:layout></design:component>", builder.toString(), markup));
 
-        return designDesc.getDef().getDefaultDesignLayoutDef()
+        return definitionService.getDefinition(designDesc).getDefaultDesignLayoutDef()
                 .getSections().iterator().next().getItems().iterator().next().getItems();
     }
 }

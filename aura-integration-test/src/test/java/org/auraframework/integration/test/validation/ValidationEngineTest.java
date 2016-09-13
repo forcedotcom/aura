@@ -15,16 +15,15 @@
  */
 package org.auraframework.integration.test.validation;
 
+import java.util.List;
+
 import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.validation.AuraValidationTestCase;
 import org.auraframework.impl.validation.ValidationEngine;
 import org.auraframework.util.validation.ValidationError;
 import org.junit.Test;
-
-import java.util.List;
 
 public final class ValidationEngineTest extends AuraValidationTestCase {
 

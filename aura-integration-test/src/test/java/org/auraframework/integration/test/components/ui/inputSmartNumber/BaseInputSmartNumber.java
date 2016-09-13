@@ -172,7 +172,7 @@ public class BaseInputSmartNumber extends WebDriverTestCase {
 
         // get the actual events and lowercase their names just in case
         List<WebElement> eventListElm = findDomElements(eventListSel);
-        Set<String> eventsFired = new HashSet<String>();
+        Set<String> eventsFired = new HashSet<>();
         for (WebElement eventFired : eventListElm) {
             eventsFired.add(eventFired.getText().toLowerCase());
         }

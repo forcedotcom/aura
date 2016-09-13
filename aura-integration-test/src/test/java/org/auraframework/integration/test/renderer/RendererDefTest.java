@@ -50,7 +50,7 @@ public class RendererDefTest extends AuraImplTestCase {
     public void testComponentDefWhenRedererIsJava() throws Exception {
         DefDescriptor<ComponentDef> d = definitionService.getDefDescriptor("test:test_SimpleJavaRenderer",
                 ComponentDef.class);
-        ComponentDef def = d.getDef();
+        ComponentDef def = definitionService.getDefinition(d);
         // Convert the definition to a format that is used by the client
         String defInJson = JsonEncoder.serialize(def, false, true);
         // Convert back to the object, just like the client does in javascript

@@ -42,7 +42,7 @@ public class StyleContextImplTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> tokenDescriptor = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
         map.put("tokens", Lists.newArrayList(tokenDescriptor.getQualifiedName()));
 
-        StyleContext sc = StyleContextImpl.build(map);
+        StyleContext sc = StyleContextImpl.build(definitionService, map);
 
         // test client type
         assertEquals("webkit", sc.getClientType());

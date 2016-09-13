@@ -50,6 +50,7 @@ public final class StyleContextImpl implements StyleContext {
     private final String client;
     private final Set<String> extraTrueConditions;
     private final TokenCache tokens;
+    private final DefinitionService definitionService;
 
     /**
      * Creates a new instance of {@link StyleContext}. Note that client will be lower-cased for string comparison
@@ -59,9 +60,11 @@ public final class StyleContextImpl implements StyleContext {
      * @param extraTrueConditions Other unnamed true conditions, e.g., "isDesktop".
      * @param tokens The token overrides from the application.
      */
-    private StyleContextImpl(String client, Iterable<String> extraTrueConditions, TokenCache tokens) {
+    private StyleContextImpl(DefinitionService definitionService, 
+            String client, Iterable<String> extraTrueConditions, TokenCache tokens) {
         checkNotNull(client, "client cannot be null");
         this.client = client.toLowerCase();
+        this.definitionService = definitionService;
 
         this.extraTrueConditions = (extraTrueConditions != null)
                 ? ImmutableSortedSet.copyOf(extraTrueConditions) : ImmutableSet.<String>of();
@@ -123,8 +126,8 @@ public final class StyleContextImpl implements StyleContext {
     /**
      * Builds a new {@link StyleContext} based on the information in the given {@link AuraContext}.
      */
-    public static StyleContext build(AuraContext auraContext) {
-        return build(auraContext, Collections.<DefDescriptor<TokensDef>>emptyList());
+    public static StyleContext build(DefinitionService definitionService, AuraContext auraContext) {
+        return build(definitionService, auraContext, Collections.<DefDescriptor<TokensDef>>emptyList());
     }
 
     /**
@@ -133,7 +136,7 @@ public final class StyleContextImpl implements StyleContext {
      *
      * @param additionalTokens Append these tokens after the token overrides from the app.
      */
-    public static StyleContext build(AuraContext auraContext, Iterable<DefDescriptor<TokensDef>> additionalTokens) {
+    public static StyleContext build(DefinitionService definitionService, AuraContext auraContext, Iterable<DefDescriptor<TokensDef>> additionalTokens) {
         // browser
         String client = auraContext.getClient().getType().name();
 
@@ -145,18 +148,18 @@ public final class StyleContextImpl implements StyleContext {
         try {
             DefDescriptor<? extends BaseComponentDef> top = auraContext.getLoadingApplicationDescriptor();
             if (top != null) {
-                List<DefDescriptor<TokensDef>> appOverrides = top.getDef().getTokenOverrides();
-                tokens = new TokenCacheImpl(Iterables.concat(appOverrides, additionalTokens));
+                List<DefDescriptor<TokensDef>> appOverrides = definitionService.getDefinition(top).getTokenOverrides();
+                tokens = new TokenCacheImpl(definitionService, Iterables.concat(appOverrides, additionalTokens));
             }
         } catch (QuickFixException e) {
             // either the app or a dependency is invalid, this isn't the place to deal with it though,
             // we have to proceed here without app overrides
         }
 
-        return new StyleContextImpl(client, extra, tokens);
+        return new StyleContextImpl(definitionService, client, extra, tokens);
     }
 
-    public static StyleContext build(Map<String, Object> config) {
+    public static StyleContext build(DefinitionService definitionService, Map<String, Object> config) {
         // browser (must be present, must be string)
         String client = (String) config.get(CLIENT);
         if (client == null) {
@@ -173,17 +176,16 @@ public final class StyleContextImpl implements StyleContext {
         TokenCache tokens = null;
         if (tokensParam != null) {
             try {
-                DefinitionService ds = Aura.getDefinitionService();
                 List<DefDescriptor<TokensDef>> list = new ArrayList<>();
                 for (String desc : tokensParam) {
-                    list.add(ds.getDefDescriptor(desc, TokensDef.class));
+                    list.add(definitionService.getDefDescriptor(desc, TokensDef.class));
                 }
-                tokens = new TokenCacheImpl(list);
+                tokens = new TokenCacheImpl(definitionService, list);
             } catch (QuickFixException e) {
                 throw new AuraRuntimeException(e);
             }
         }
 
-        return new StyleContextImpl(client, extraTrueConditions, tokens);
+        return new StyleContextImpl(definitionService, client, extraTrueConditions, tokens);
     }
 }

@@ -283,7 +283,7 @@ public class AuraServlet extends AuraBaseServlet {
         try {
             DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getLoadingApplicationDescriptor();
             if (appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)) {
-                Boolean isOnePageApp = ((ApplicationDef) appDefDesc.getDef()).isOnePageApp();
+                Boolean isOnePageApp = ((ApplicationDef) definitionService.getDefinition(appDefDesc)).isOnePageApp();
                 if (isOnePageApp != null) {
                     return isOnePageApp;
                 }
@@ -474,7 +474,7 @@ public class AuraServlet extends AuraBaseServlet {
                 }
 
                 if (!context.isTestMode() && !context.isDevMode()) {
-                    assertAccess(applicationDescriptor.getDef());
+                    assertAccess(definitionService.getDefinition(applicationDescriptor));
                 }
             }
 

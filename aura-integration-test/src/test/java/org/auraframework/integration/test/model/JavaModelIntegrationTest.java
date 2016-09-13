@@ -73,7 +73,7 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
                 "java://org.auraframework.components.test.java.model.TestModelSubclass", ModelDef.class);
         ModelDef def = definitionService.getDefinition(javaModelDefDesc);
         assertNotNull(def);
-        Model model = def.newInstance();
+        Model model = instanceService.getInstance(def);
 
         ValueDef valueDef = def.getMemberByName("nextThing");
         assertNotNull("Unable to find value def for 'nextThing'", valueDef);
@@ -172,7 +172,7 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
                 "java://org.auraframework.impl.java.model.TestModel", ModelDef.class);
         ModelDef mDef = definitionService.getDefinition(javaModelDefDesc);
         assertNotNull(mDef);
-        Model model = mDef.newInstance();
+        Model model = instanceService.getInstance(mDef);
         try {
             model.getValue(new PropertyReferenceImpl("DoesNotExist", new Location("test", 0)));
             fail("Expected AuraExecutionException when getting value of a non existing property from Java model.");

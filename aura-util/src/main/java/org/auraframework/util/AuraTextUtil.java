@@ -20,7 +20,6 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -287,7 +286,7 @@ public class AuraTextUtil {
         if (str == null) {
             return null;
         }
-        List<String> result = (expectedSize == 0) ? new LinkedList<String>() : new ArrayList<String>(expectedSize);
+        List<String> result = (expectedSize == 0) ? new ArrayList<>() : new ArrayList<>(expectedSize);
 
         if (delimiter.length() == 0) {
             if (!ignoreTrailingEmpty) {

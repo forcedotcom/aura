@@ -60,7 +60,7 @@ public class TokenCacheImplTest extends StyleTestCase {
 
     @SafeVarargs
     private final TokenCache build(DefDescriptor<TokensDef>... defs) throws QuickFixException {
-        return new TokenCacheImpl(Lists.newArrayList(defs));
+        return new TokenCacheImpl(definitionService, Lists.newArrayList(defs));
     }
 
     @Test

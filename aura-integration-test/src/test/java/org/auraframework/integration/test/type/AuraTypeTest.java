@@ -62,7 +62,7 @@ public class AuraTypeTest extends AuraImplTestCase {
 
         cmp = instanceService.getInstance("test:testAuraTypes", ComponentDef.class, attributes);
         DefDescriptor<ComponentDef> desc = cmp.getDescriptor();
-        ComponentDef def = desc.getDef();
+        ComponentDef def = definitionService.getDefinition(desc);
         Map<DefDescriptor<AttributeDef>, AttributeDef> attrMap = def.getAttributeDefs();
         Set<DefDescriptor<AttributeDef>> keys = attrMap.keySet();
         Object[] keyArray = keys.toArray();

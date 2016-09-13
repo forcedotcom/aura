@@ -44,7 +44,7 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     			componentCource,
 				StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface",
                         NamespaceAccess.INTERNAL);
-    	componentDescriptor.getDef();
+    	definitionService.getDefinition(componentDescriptor);
     }
     
     @Test
@@ -54,7 +54,7 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     			componentCource,
 				StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface",
                         NamespaceAccess.CUSTOM);
-    	componentDescriptor.getDef();
+    	definitionService.getDefinition(componentDescriptor);
     }
     
     
@@ -65,7 +65,7 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     			componentCource,
 				StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface",
                         NamespaceAccess.INTERNAL);
-    	componentDescriptor.getDef();
+    	definitionService.getDefinition(componentDescriptor);
     }
     
     @Test
@@ -75,7 +75,7 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     			componentCource,
 				StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface",
                         NamespaceAccess.CUSTOM);
-    	componentDescriptor.getDef();
+    	definitionService.getDefinition(componentDescriptor);
     }
   
 
@@ -86,7 +86,7 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     			componentCource,
 				StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface",
                         NamespaceAccess.INTERNAL);
-    	componentDescriptor.getDef();
+    	definitionService.getDefinition(componentDescriptor);
     }
     
     @Test
@@ -96,7 +96,7 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     			componentCource,
 				StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface",
                         NamespaceAccess.CUSTOM);
-    	componentDescriptor.getDef();
+    	definitionService.getDefinition(componentDescriptor);
     }
     
     @Test
@@ -106,7 +106,7 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     			componentCource,
 				StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface",
                         NamespaceAccess.INTERNAL);
-    	componentDescriptor.getDef();
+    	definitionService.getDefinition(componentDescriptor);
     }
     
     @Test
@@ -116,7 +116,7 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     			componentCource,
 				StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface",
                         NamespaceAccess.CUSTOM);
-    	componentDescriptor.getDef();
+    	definitionService.getDefinition(componentDescriptor);
     }
     
     @Test
@@ -126,7 +126,7 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     			componentCource,
 				StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface",
                         NamespaceAccess.INTERNAL);
-    	componentDescriptor.getDef();
+    	definitionService.getDefinition(componentDescriptor);
     }
     
     @Test
@@ -136,7 +136,7 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     			componentCource,
 				StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface",
                         NamespaceAccess.CUSTOM);
-    	componentDescriptor.getDef();
+    	definitionService.getDefinition(componentDescriptor);
     }
     
     @Test
@@ -146,7 +146,7 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     			componentCource,
 				StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface",
                         NamespaceAccess.INTERNAL);
-    	componentDescriptor.getDef();
+    	definitionService.getDefinition(componentDescriptor);
     }
     
     @Test
@@ -156,7 +156,7 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     			componentCource,
 				StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface",
                         NamespaceAccess.CUSTOM);
-    	componentDescriptor.getDef();
+    	definitionService.getDefinition(componentDescriptor);
     }
     
     @Test
@@ -167,7 +167,7 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     			componentCource,
 				StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface",
                         NamespaceAccess.INTERNAL);
-    	componentDescriptor.getDef();
+    	definitionService.getDefinition(componentDescriptor);
     }
     
     @Test
@@ -178,7 +178,7 @@ public class AccessAttributeEnforcementTest extends AuraImplTestCase {
     			componentCource,
 				StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testinterface",
                         NamespaceAccess.CUSTOM);
-    	componentDescriptor.getDef();
+    	definitionService.getDefinition(componentDescriptor);
     }
 
 }

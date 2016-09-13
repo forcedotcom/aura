@@ -138,7 +138,7 @@ public class ComponentPerfTestSuite extends TestSuite {
                 Set<DefDescriptor<?>> descriptors = definitionService.find(matcher);
 
                 for (DefDescriptor<?> descriptor : descriptors) {
-                    if (((ComponentDef)descriptor.getDef()).isAbstract()
+                    if (((ComponentDef)definitionService.getDefinition(descriptor)).isAbstract()
                             || getBlacklistedComponents().contains(descriptor.getQualifiedName())) {
                         continue;
                     }

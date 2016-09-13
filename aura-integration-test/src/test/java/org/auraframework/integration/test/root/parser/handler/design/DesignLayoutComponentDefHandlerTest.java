@@ -91,7 +91,7 @@ public class DesignLayoutComponentDefHandlerTest extends AuraImplTestCase {
                 "<design:section><design:layoutItems>%s</design:layoutItems></design:section>" +
                 "</design:layout></design:component>", markup));
 
-        return designDesc.getDef().getDefaultDesignLayoutDef()
+        return definitionService.getDefinition(designDesc).getDefaultDesignLayoutDef()
                 .getSections().iterator().next().getItems().iterator().next().getItems();
     }
 }

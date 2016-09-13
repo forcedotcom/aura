@@ -15,8 +15,13 @@
  */
 package org.auraframework.impl.adapter.format.css;
 
-import com.google.common.collect.ImmutableList;
-import com.salesforce.omakase.plugin.Plugin;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+
+import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Inject;
+
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.css.FlavorOverrideLocator;
@@ -27,18 +32,19 @@ import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.css.parser.plugin.FlavorOverridePlugin;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import javax.annotation.concurrent.ThreadSafe;
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
+import com.google.common.collect.ImmutableList;
+import com.salesforce.omakase.plugin.Plugin;
 
 @ThreadSafe
 @ServiceComponent
 public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<BaseStyleDef> {
+    @Inject
+    private DefinitionService definitionService;
+
     @Inject
     private ContextService contextService;
 
@@ -82,9 +88,9 @@ public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<BaseStyleDef> {
         AuraContext ctx = contextService.getCurrentContext();
         DefDescriptor<? extends BaseComponentDef> top = ctx.getLoadingApplicationDescriptor();
         if (top != null) {
-            DefDescriptor<FlavorsDef> flavors = top.getDef().getFlavorOverrides();
+            DefDescriptor<FlavorsDef> flavors = definitionService.getDefinition(top).getFlavorOverrides();
             if (flavors != null) {
-                FlavorOverrideLocator overrides = flavors.getDef().computeOverrides();
+                FlavorOverrideLocator overrides = definitionService.getDefinition(flavors).computeOverrides();
                 if (!overrides.isEmpty()) {
                     return overrides;
                 }

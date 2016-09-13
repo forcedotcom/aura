@@ -103,7 +103,9 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
      *
      * @return the definition (compiles it if necessary)
      * @throws QuickFixException if the definition is not found
+     * @deprecated
      */
+    @Deprecated
     T getDef() throws QuickFixException;
 
     /**

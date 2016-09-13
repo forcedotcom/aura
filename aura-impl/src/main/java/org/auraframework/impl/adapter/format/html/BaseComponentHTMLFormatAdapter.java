@@ -28,9 +28,11 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
+import org.auraframework.impl.util.TemplateUtil.Script;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.service.SerializationService;
@@ -40,7 +42,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.JsonEncoder;
-import org.auraframework.impl.util.TemplateUtil.Script;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -50,6 +51,9 @@ import com.google.common.collect.Maps;
 public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, ?>> extends HTMLFormatAdapter<T> {
     @Inject
     private ContextService contextService;
+
+    @Inject
+    private DefinitionService definitionService;
 
     @Inject
     private InstanceService instanceService;
@@ -71,7 +75,7 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
         try {
 
             AuraContext context = contextService.getCurrentContext();
-            BaseComponentDef def = value.getDescriptor().getDef();
+            BaseComponentDef def = definitionService.getDefinition(value.getDescriptor());
 
             ComponentDef templateDef = def.getTemplateDef();
             Map<String, Object> attributes = Maps.newHashMap();
@@ -89,7 +93,7 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
             writeHtmlScripts(context, servletUtilAdapter.getScripts(context, true, false, componentAttributes), Script.SYNC, sb);
             DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
             if (styleDefDesc != null) {
-                attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode());
+                attributes.put("auraInlineStyle", definitionService.getDefinition(styleDefDesc).getCode());
             }
 
             String contextPath = context.getContextPath();

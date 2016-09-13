@@ -234,7 +234,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             return;
         }
 
-        BaseComponentDef appDef = appDesc.getDef();
+        BaseComponentDef appDef = definitionService.getDefinition(appDesc);
         List<DefDescriptor<ComponentDef>> trackedDefs = appDef.getTrackedDependencies();
         if (trackedDefs == null || trackedDefs.isEmpty()) {
             return;

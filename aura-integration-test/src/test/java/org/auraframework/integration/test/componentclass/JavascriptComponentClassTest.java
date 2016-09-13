@@ -76,7 +76,7 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
                 "    }\n" +
                 "})\n";
         DefDescriptor<ControllerDef> controllerDescriptor = addSourceAutoCleanup(ControllerDef.class, controllerCode);
-        builder.addControllerDef(controllerDescriptor.getDef());
+        builder.addControllerDef(definitionService.getDefinition(controllerDescriptor));
         ComponentDef componentDef = builder.build();
         BaseJavascriptClass javascriptClass = new JavascriptComponentClass.Builder().setDefinition(componentDef).setMinify(true).build();
 
@@ -101,7 +101,7 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
                 "    }\n" +
                 "})\n";
         DefDescriptor<ControllerDef> controllerDescriptor = addSourceAutoCleanup(ControllerDef.class, controllerCode);
-        builder.addControllerDef(controllerDescriptor.getDef());
+        builder.addControllerDef(definitionService.getDefinition(controllerDescriptor));
         ComponentDef componentDef = builder.build();
         BaseJavascriptClass javascriptClass = new JavascriptComponentClass.Builder().setDefinition(componentDef).setMinify(false).build();
 
@@ -120,7 +120,7 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
                 "})\n";
         DefDescriptor<ControllerDef> controllerDescriptor = addSourceAutoCleanup(ControllerDef.class, controllerCode);
 
-        builder.addControllerDef(controllerDescriptor.getDef());
+        builder.addControllerDef(definitionService.getDefinition(controllerDescriptor));
         ComponentDef componentDef = builder.build();
         JavascriptComponentClass javascriptClass = new JavascriptComponentClass.Builder().setDefinition(componentDef).build();
     	this.goldFileText(javascriptClass.getCode());
@@ -169,7 +169,7 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
                 "})\n";
         DefDescriptor<RendererDef> rendererDescriptor = addSourceAutoCleanup(RendererDef.class, rendererCode);
 
-        builder.addRendererDef(rendererDescriptor.getDef());
+        builder.addRendererDef(definitionService.getDefinition(rendererDescriptor));
         ComponentDef componentDef = builder.build();
         JavascriptComponentClass javascriptClass = new JavascriptComponentClass.Builder().setDefinition(componentDef).build();
     	this.goldFileText(javascriptClass.getCode());
@@ -180,7 +180,7 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
         String rendererCode = "({ })";
         DefDescriptor<RendererDef> rendererDescriptor = addSourceAutoCleanup(RendererDef.class, rendererCode);
 
-        builder.addRendererDef(rendererDescriptor.getDef());
+        builder.addRendererDef(definitionService.getDefinition(rendererDescriptor));
         ComponentDef componentDef = builder.build();
         JavascriptComponentClass javascriptClass = new JavascriptComponentClass.Builder().setDefinition(componentDef).build();
     	this.goldFileText(javascriptClass.getCode());
@@ -237,7 +237,7 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
                 "    }\n" +
                 "})\n";
         DefDescriptor<ControllerDef> controllerDescriptor = addSourceAutoCleanup(ControllerDef.class, controllerCode);
-        builder.addControllerDef(controllerDescriptor.getDef());
+        builder.addControllerDef(definitionService.getDefinition(controllerDescriptor));
         ComponentDef def = builder.build();
         JavascriptComponentClass javascriptClass = new JavascriptComponentClass.Builder().setDefinition(def).build();
         this.goldFileText(javascriptClass.getMinifiedCode());
@@ -256,7 +256,7 @@ public class JavascriptComponentClassTest extends AuraImplTestCase {
                 "    }\n" +
                 "})\n";
         DefDescriptor<ControllerDef> controllerDescriptor = addSourceAutoCleanup(ControllerDef.class, controllerCode);
-        builder.addControllerDef(controllerDescriptor.getDef());
+        builder.addControllerDef(definitionService.getDefinition(controllerDescriptor));
         ComponentDef def = builder.build();
         JavascriptComponentClass javascriptClass = new JavascriptComponentClass.Builder().setDefinition(def).build();
         this.goldFileText(javascriptClass.getCode());

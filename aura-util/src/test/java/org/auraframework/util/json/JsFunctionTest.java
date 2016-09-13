@@ -51,4 +51,15 @@ public class JsFunctionTest extends UnitTestCase {
         JsFunction f5 = new JsFunction(ImmutableList.of("arg1", "arg2"), "these are the contents");
         assertFalse(f1.equals(f5));
     }
+
+    @Test
+    public void testSanitizeForFunctionContentContainsRegExp() {
+        String content = "var a = new RegExp('a{0,}');";
+        JsFunction jsFunction = new JsFunction(ImmutableList.<String> of(), content);
+
+        String sanitizedJs = jsFunction.toString();
+
+        String expected = String.format("function() {%s}", content);
+        assertEquals(expected, sanitizedJs);
+    }
 }

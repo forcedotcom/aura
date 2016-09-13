@@ -18,7 +18,6 @@ package org.auraframework.util.json;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.auraframework.util.AuraTextUtil;
 
@@ -52,7 +51,7 @@ public class JsFunction implements JsonSerializable, Serializable {
 
         func.append(") {");
 
-        func.append(trailingCommaPattern.matcher(body).replaceAll("$1"));
+        func.append(body);
 
         func.append('}');
 
@@ -159,8 +158,6 @@ public class JsFunction implements JsonSerializable, Serializable {
     private final int line;
     private final int col;
     private String sanitized;
-
-    private static final Pattern trailingCommaPattern = Pattern.compile(",(\\s*})");
 
     private static final long serialVersionUID = 1186050562190474668L;
 }

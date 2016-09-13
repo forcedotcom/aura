@@ -514,7 +514,7 @@ AuraClientService.prototype.initializeClientLibraries = function () {
             if (script.getAttribute("data-src") && !script.getAttribute("src")) {
                 var source = script.getAttribute("data-src");
                 var name = source.split('/').pop().split('.').shift();
-                this.clientLibraries[name] = {
+                this.clientLibraries[name.toLowerCase()] = {
                     script : script,
                     loaded : false,
                     loading : []

@@ -80,35 +80,39 @@ DomHandlersPlugin.prototype.stringifyLocator = function (locator) {
 */
 
 DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, cmp) {
+    if (!(event.type in DomHandlersPlugin.WHITELISTEVENTS)) {
+        return;
+    }
+    
     var localCmpId = cmp.getLocalId();
-    if (localCmpId && event.type in DomHandlersPlugin.WHITELISTEVENTS) {
-        var ownerCmp = action.getComponent().getConcreteComponent();
-        var locator = ownerCmp.getLocator(localCmpId);
-        var ms = this.metricsService;
+    var ownerCmp = action.getComponent().getConcreteComponent();
+    var locator = ownerCmp.getLocator(localCmpId);
+    var ms = this.metricsService;
 
-        // Only if we have a unique, identifier send the interaction
-        if (locator) { 
-            var target = cmp["getElement"]();
-            var meta = target && target.getAttribute("data-refid"); // optional metadata
+    // Only if we have a unique, identifier send the interaction
+    if (locator) { 
+        var target = cmp["getElement"]();
+        var meta = target && target.getAttribute("data-refid"); // optional metadata
 
-            var context = {
-                "locator"     : locator,
-                "eventType"   : DomHandlersPlugin.DEFAULT_INTERACTION_TYPE,
-                "eventSource" : event.type, // type of event (click, hover, scroll)
-                "attributes"  : {
-                    "auraAction"  : action.getDef().getDescriptor().toString()    
-                }
-            };
-
-            if (meta) {
-                locator["context"] = locator["context"] || {};
-                if (!locator["context"][meta]) {
-                    locator["context"][meta] = target.getAttribute("data-" + meta);
-                }
+        var context = {
+            "locator"     : locator,
+            "eventType"   : DomHandlersPlugin.DEFAULT_INTERACTION_TYPE,
+            "eventSource" : event.type, // type of event (click, hover, scroll)
+            "attributes"  : {
+                "auraAction"  : action.getDef().getDescriptor().toString()    
             }
+        };
 
-            ms.transaction("aura", "interaction", { "context": context });
+        if (meta) {
+            locator["context"] = locator["context"] || {};
+            if (!locator["context"][meta]) {
+                locator["context"][meta] = target.getAttribute("data-" + meta);
+            }
         }
+
+        ms.transaction("aura", "interaction", { "context": context });
+    } else {
+        this.logUnInstrumentedClick(action, cmp);
     }
 };
 
@@ -117,6 +121,24 @@ DomHandlersPlugin.prototype.dispatchVirtualActionHook = function (action, event,
     if (event.type === "click") {
         this.dispatchActionHook(action, event, virtualCmp);
     }
+};
+
+DomHandlersPlugin.prototype.logUnInstrumentedClick = function (action, cmp) {
+    var localId = cmp.getLocalId() || "unknown";
+    var tag = cmp.get("v.tag") + "|" + localId;
+    var level1 = action.getComponent().getConcreteComponent();
+    var level2 = level1.getComponentValueProvider().getConcreteComponent();
+    var level3 = level2.getComponentValueProvider().getConcreteComponent();
+    var hierarchy = {
+            "htmlTagAndId" : tag,
+            "root": level1.getDef().toString(),
+            "parent": level2.getDef().toString(),
+            "grandparent": level3.getDef().toString()
+    };
+    $A.metricsService.transaction("ltng", "performance:missingLocator", { context: {
+        attributes: hierarchy
+    }});
+    $A.warning("Un-Instrumented click logged. Details: " + JSON.stringify(hierarchy));
 };
 
 DomHandlersPlugin.prototype.bind = function (metricsService) {

@@ -20,7 +20,9 @@
         var thisTest = this;
         thisTest.lastTransaction = undefined;
         $A.metricsService.onTransactionEnd(function (t) {
-            thisTest.lastTransaction = t;
+            if (t.id === 'aura:interaction') {
+                thisTest.lastTransaction = t;
+            }
         });
     },
     clickDivAndGetTransaction: function (classSelector) {

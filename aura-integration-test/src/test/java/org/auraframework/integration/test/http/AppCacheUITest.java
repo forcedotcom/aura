@@ -34,7 +34,11 @@ public class AppCacheUITest extends WebDriverTestCase {
         String url = getUrl(appDesc);
         open(url);
 
-        this.waitForCondition("return window.applicationCache.status !== window.applicationCache.UNCACHED");
+        String js = "var status = window.applicationCache.status;" +
+                    "return status !== window.applicationCache.UNCACHED &&" +
+                    "       status !== window.applicationCache.DOWNLOADING &&" +
+                    "       status !== window.applicationCache.CHECKING;";
+        this.waitForCondition(js);
 
         String script = "var htmlNode = document.body.parentNode;" +
                         "return htmlNode ? htmlNode.getAttribute('manifest') : 'null';";

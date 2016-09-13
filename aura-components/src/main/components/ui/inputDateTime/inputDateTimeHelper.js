@@ -455,5 +455,12 @@
         }
 
         return date;
+    },
+
+    /**
+     * Override ui:input.
+     */
+    shouldShowError : function () {
+        return true;
     }
 })// eslint-disable-line semi

@@ -309,6 +309,12 @@
      * Show or update the error messages.
      */
     updateError: function (cmp, errors) {
+        var helper = cmp.getConcreteComponent().getDef().getHelper();
+        // For compound fields, individual field components will display their own errors. See W-2855697
+        if (!helper.shouldShowError(cmp)) {
+            return;
+        }
+
         if (this._thereIsErrorComponent(cmp)) {
             this._updateErrorComponent(cmp,errors);
 
@@ -482,5 +488,11 @@
                 inputElement.setAttribute("aria-required", true);
             }
         }
+    },
+
+    shouldShowError : function (component) {
+        // For compound fields, individual field components will display their own errors. See W-2855697
+        // inputDateTime is a special case where the compound field is responsible for displaying the error.
+        return !$A.util.getBooleanValue(component.get("v.isCompound"));
     }
 })// eslint-disable-line semi

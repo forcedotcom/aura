@@ -18,6 +18,7 @@
 <aura:component access="GLOBAL" support="GA" implements="ui:visible" extensible="true" description="Displays a link to a URL as specified by the value attribute, rendered on a given text (label attribute) and image, if any.">
 
     <aura:import library="ui:eventLib" property="lib"/>
+    <aura:import library="ui:urlLib" property="urlLib"/>
 
     <aura:attribute access="GLOBAL" name="iconClass" type="String" description="The CSS style used to display the icon or image."/>
     <aura:attribute access="GLOBAL" name="title" type="String" default="" description="The text to display as a tooltip when the mouse pointer hovers over this component."/>

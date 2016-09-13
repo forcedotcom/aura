@@ -14,20 +14,6 @@
  * limitations under the License.
  */
 ({
-    makeAbsolute: function (url) {
-        var newUrl = url;
-
-        if (!$A.util.isEmpty(url)) {
-            var urlLower = url.toLowerCase();
-            if (urlLower.indexOf("http://") !== 0 && urlLower.indexOf("https://") !== 0 && urlLower.indexOf("ftp://") !== 0
-                && url.indexOf("/") !== 0 && url.indexOf(".") !== 0) {
-
-                newUrl = "http://" + url;
-            }
-        }
-        return newUrl;
-    },
-
     buildLinkBody: function (cmp) {
         var link = cmp.find("link");
 

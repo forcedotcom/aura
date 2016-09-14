@@ -339,10 +339,12 @@
     _createDefaultErrorComponent : function (cmp, errors) {
         $A.componentService.newComponentAsync(
             this,
-            function (errorCmp) {
-                cmp.set("v.errorComponent", errorCmp);
-                var concreteCmpHelper = cmp.getConcreteComponent().getDef().getHelper();
-                concreteCmpHelper.updateAriaDescribedBy(cmp, errorCmp.getGlobalId());
+            function (errorCmp, status) {
+            	if (status === "SUCCESS") {
+            	    cmp.set("v.errorComponent", errorCmp);
+                    var concreteCmpHelper = cmp.getConcreteComponent().getDef().getHelper();
+                    concreteCmpHelper.updateAriaDescribedBy(cmp, errorCmp.getGlobalId());
+                }
             },
             {
                 "componentDef": "markup://ui:inputDefaultError",

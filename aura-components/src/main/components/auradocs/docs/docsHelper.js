@@ -48,8 +48,10 @@
                     if(layout === "reference") {
                         var sidebar = cmp.find("sidebar");
                         if(sidebar.get("v.body").length === 0) {
-                            $A.createComponent("auradocs:referenceTree", {}, function(referenceTree) {
-                                sidebar.set("v.body", referenceTree);
+                            $A.createComponent("markup://auradocs:referenceTree", {}, function(referenceTree, status, messages) {
+                            	if (status === "SUCCESS") {
+                            		sidebar.set("v.body", referenceTree);
+                            	}
                             });
                         }
                     }

@@ -111,23 +111,25 @@
     },
 
     lazyLoadPanel: function(cmp) {
-        $A.componentService.createComponent('ui:spinner', null, function(spinner){
-            $A.get('e.ui:createPanel').setParams({
-                panelType   :'modal',
-                visible: true,
-                panelConfig : {
-                    title: 'Modal Header',
-                    body  : spinner
-                },
-                onCreate: function (panel) {
-                    //simulating panel content has server dependencies and updates panel after content is loaded
-                    setTimeout(function() {
-                        $A.componentService.createComponent('uiExamples:modalContent', null, function(body){
-                            panel.update({body:body});
-                        });
-                    }, 1000);
-                }
-            }).fire();
+        $A.componentService.createComponent('markup://ui:spinner', null, function(spinner, status){
+        	if (status === 'SUCCESS') {
+        		$A.get('e.ui:createPanel').setParams({
+                    panelType   :'modal',
+                    visible: true,
+                    panelConfig : {
+                        title: 'Modal Header',
+                        body  : spinner
+                    },
+                    onCreate: function (panel) {
+                        //simulating panel content has server dependencies and updates panel after content is loaded
+                        setTimeout(function() {
+                            $A.componentService.createComponent('markup://uiExamples:modalContent', null, function(body){
+                                panel.update({body:body});
+                            });
+                        }, 1000);
+                    }
+                }).fire();
+        	}
         });
     },
     
@@ -135,16 +137,18 @@
     	$A.componentService.createComponent(
             'ui:outputText', 
     		{value: 'This is a dynamically registered panel type'}, 
-            function(textCmp){
-    			$A.get('e.ui:createPanel').setParams({
-    	            panelType   :'customPanel',
-    	            visible: true,
-    	            panelConfig : {
-    	                title: 'Custom Panel',
-    	                body  : textCmp
-    	            }
-    	        }).fire();
-    	    }
+            function(textCmp, status){
+    			if (status === 'SUCCESS') {
+    				$A.get('e.ui:createPanel').setParams({
+        	            panelType   :'customPanel',
+        	            visible: true,
+        	            panelConfig : {
+        	                title: 'Custom Panel',
+        	                body  : textCmp
+        	            }
+        	        }).fire();
+    			}
+    		}
         );	
     }
 })

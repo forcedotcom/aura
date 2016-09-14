@@ -23,20 +23,22 @@
 			count = newMenuItems.length,
 			menuItemCache = this.getMenuItemCache(cmp);
 
-		var callback = function(newMenuItem) {
+		var callback = function(newMenuItem, status) {
 			if (!cmp.isValid()) {
 				return;
 			}
-			count--;
-			newMenuItem.autoDestroy(false);
-			newMenuItem.addHandler("click", cmp, "c.onMenuSelection");
-			newMenuItem.addHandler("mouseover", cmp, "c.onHover");
+			if (status === "SUCCESS") {
+				count--;
+				newMenuItem.autoDestroy(false);
+				newMenuItem.addHandler("click", cmp, "c.onMenuSelection");
+				newMenuItem.addHandler("mouseover", cmp, "c.onHover");
 
-			menuItems.push(newMenuItem);
-			menuItemCache[newMenuItem.get("v.id")] = newMenuItem;
+				menuItems.push(newMenuItem);
+				menuItemCache[newMenuItem.get("v.id")] = newMenuItem;
 
-			if (count === 0) {
-				self.updateMenuList(cmp, menuItems);
+				if (count === 0) {
+					self.updateMenuList(cmp, menuItems);
+				}
 			}
 		};
 

@@ -153,13 +153,26 @@
 			
 			panelCmp.show();
 		} else {*/
+		try{
 			$A.createComponent('markup://ui:inlineEditPanelBody',
-				panelBodyAttributes,
-				function(newPanelBody) {
-					cmp._panelBody = newPanelBody;
-					self.createEditPanel(cmp, newPanelBody, referenceElement);
-				});
-		//}
+					panelBodyAttributes,
+					function(newPanelBody, status) {
+						if (status === "SUCCESS") {
+							cmp._panelBody = newPanelBody;
+							self.createEditPanel(cmp, newPanelBody, referenceElement);
+						}
+					});
+		} catch (e) {
+			//added for trouble-shooting
+            var moreInfo = "when inlineEditGridHelper creates inlineEditPanelBody cmp"; 
+            
+            if(!e.message) {
+                e.message = moreInfo;
+            } else {
+                e.message +=  moreInfo;
+            }
+            throw e;
+		}
 	},
 	
 	getPanelBodyConfig: function(cmp, name) {

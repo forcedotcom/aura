@@ -17,15 +17,17 @@
     init: function(cmp) {   
         //create default close button
         if ($A.util.isEmpty(cmp.get('v.closeButton')) && cmp.get('v.showCloseButton')) {
-            $A.componentService.createComponent('ui:button', {
+            $A.componentService.createComponent('markup://ui:button', {
                 'body': $A.createComponentFromConfig({descriptor: 'markup://aura:unescapedHtml', attributes: {value: '&times;'}}),
             	'class': "closeBtn",
                 'press': cmp.getReference("c.onCloseBtnPressed"),
                 'label': cmp.get('v.closeDialogLabel'),
                 'buttonTitle': cmp.get('v.closeDialogLabel'),
                 'labelDisplay': "false"
-            }, function(button){
-                cmp.set('v.closeButton', button);
+            }, function(button, status){
+            	if (status === "SUCCESS") {
+            		cmp.set('v.closeButton', button);
+            	}
             });
         }
 

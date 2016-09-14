@@ -66,13 +66,15 @@
 	    var headers = [];
 	    
 	    for (var i = 0; i < 3; i++) {
-	        $A.createComponent("ui:dataTableHeader", {
+	        $A.createComponent("markup://ui:dataTableHeader", {
 	            name : "header" + i,
 	            label : "Header " + i,
 	            sortable: true,
 	            resizable: true
-	        }, function(header) {
-	            headers.push(header);
+	        }, function(header, status) {
+	        	if (status === "SUCCESS") {
+	        	    headers.push(header);
+	    	    }
 	        });
 	    }
 	    

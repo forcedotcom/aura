@@ -103,11 +103,13 @@
         var options = cmp.get("v.options");
         var menuItems = [];
 
-        var handleCreatedMenuItem = function(menuItem) {
-            menuItems.push(menuItem);
-            if (menuItems.length === options.length) {
-                cmp.find("options").set("v.body", menuItems);
-            }
+        var handleCreatedMenuItem = function(menuItem, status) {
+        	if (status === "SUCCESS") {
+        		menuItems.push(menuItem);
+                if (menuItems.length === options.length) {
+                    cmp.find("options").set("v.body", menuItems);
+                }
+        	}
         };
         var multiSelect = cmp.get("v.multiple");
         var menuItemComponentName = multiSelect ? "ui:checkboxMenuItem" : "ui:radioMenuItem";

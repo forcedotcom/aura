@@ -1066,6 +1066,25 @@ AuraEventService.prototype.removeHandler = function(config) {
     }
 };
 
+
+/**
+ * Adds an event handler that will trigger only once, and inmediately will be removed.
+ * @param {Object} config The data for the event handler
+ * @memberOf AuraEventService
+ * @public
+ * @export
+ */
+AuraEventService.prototype.addHandlerOnce = function(config) {
+    var handler = config["handler"];
+
+    config["handler"] = $A.getCallback(function () {
+        this.removeHandler(config);
+        handler();
+    }.bind(this));
+
+    this.addHandler(config);
+};
+
 /**
  * Returns the event definition.
  * Internal method to the framework. To get an event def from the API, use $A.get("e.prefix:name", function(def){});

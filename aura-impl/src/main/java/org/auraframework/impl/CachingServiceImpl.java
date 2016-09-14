@@ -162,10 +162,10 @@ public class CachingServiceImpl implements CachingService {
                 .setName("clientLibraryOutputCache")
                 .setRecordStats(true).build();
 
-        size = getCacheSize("aura.cache.defDescByNameCacheSize", 1024 * 20);
+        size = getCacheSize("aura.cache.defDescByNameCacheSize", DEFINITION_CACHE_SIZE);
         defDescriptorByNameCache =
                 this.<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> getCacheBuilder()
-                        .setInitialSize(512)
+                        .setInitialSize(size)
                         .setLoggingAdapter(loggingAdapter)
                         .setMaximumSize(size)
                         .setConcurrencyLevel(20)

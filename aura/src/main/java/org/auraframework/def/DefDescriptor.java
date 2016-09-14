@@ -16,6 +16,7 @@
 
 package org.auraframework.def;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignTemplateDef;
@@ -225,7 +226,7 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
 
         @Override
         public int hashCode() {
-            return name.hashCode() + clazz.hashCode() + (bundle != null ? bundle.hashCode() : 0);
+            return new HashCodeBuilder().append(name).append(clazz).append(bundle).build();
         }
 
         @Override

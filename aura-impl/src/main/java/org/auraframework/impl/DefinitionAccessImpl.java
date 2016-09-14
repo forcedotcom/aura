@@ -126,27 +126,27 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 
     @Override
     public boolean isGlobal() {
-        return getAccess() == Access.GLOBAL;
+        return getAccess().equals(Access.GLOBAL);
     }
 
     @Override
     public boolean isPublic() {
-        return getAccess() == Access.PUBLIC;
+        return getAccess().equals(Access.PUBLIC);
     }
 
     @Override
     public boolean isPrivate() {
-        return getAccess() == Access.PRIVATE;
+        return getAccess().equals(Access.PRIVATE);
     }
 
     @Override
     public boolean isPrivileged() {
-        return getAccess() == Access.PRIVILEGED;
+        return getAccess().equals(Access.PRIVILEGED);
     }
 
     @Override
     public boolean isInternal() {
-        return getAccess() == Access.INTERNAL;
+        return getAccess().equals(Access.INTERNAL);
     }
 
     @Override

@@ -1202,7 +1202,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         if (access.isGlobal() || !access.requiresAuthentication()) {
             return null;
         }
-
+        if (access.isPrivate()) {
+            // make sure private is really private.
+            if (def.getDescriptor().equals(referencingDescriptor)) {
+                return null;
+            }
+        }
         String referencingNamespace = null;
         if (referencingDescriptor != null) {
             String prefix = referencingDescriptor.getPrefix();
@@ -1214,11 +1219,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
             // The caller is in an internal namespace let them through
             if (configAdapter.isInternalNamespace(referencingNamespace)) {
-                return null;
-            }
-
-            // JBUCH: REMOVE in 206: The caller is in a privileged namespace treat as internal temporarily
-            if (configAdapter.isPrivilegedNamespace(referencingNamespace)) {
                 return null;
             }
 
@@ -1248,37 +1248,34 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 defType.ordinal());
         String status = accessCheckCache.getIfPresent(key);
         if (status == null) {
-            status = "";
-
-            // Protect against re-entry
-            accessCheckCache.put(key, status);
-
             // System.out.printf("** MDR.miss.assertAccess() cache miss for: %s\n", key);
+            // We may re-enter this code, but only in race conditions. We should generate the
+            // same string, and the only way to protect against this is to lock it.
 
             DefDescriptor<? extends Definition> descriptor = def.getDescriptor();
             if (!configAdapter.isUnsecuredNamespace(namespace)
                     && !configAdapter.isUnsecuredPrefix(descriptor.getPrefix())) {
                 if (referencingNamespace == null || referencingNamespace.isEmpty()) {
                     status = String
-                            .format("Access to %s '%s' disallowed by MasterDefRegistry.assertAccess(): referencing namespace was empty or null",
+                            .format("Access to %s '%s' is not allowed: referencing namespace was empty or null",
                                     defType, target);
                 } else if (!referencingNamespace.equals(namespace)) {
                     // The caller and the def are not in the same namespace
                     status = String
-                            .format("Access to %s '%s' from namespace '%s' in '%s(%s)' disallowed by MasterDefRegistry.assertAccess()",
+                            .format("Access to %s '%s' from namespace '%s' in '%s(%s)' is not allowed",
                                     defType.toString().toLowerCase(), target, referencingNamespace,
                                     referencingDescriptor, referencingDescriptor.getDefType());
                 } else if (access.isPrivate()) {
                     status = String
-                            .format("Access to %s '%s' with access PRIVATE from namespace '%s' in '%s(%s)' disallowed by MasterDefRegistry.assertAccess()",
+                            .format("Access to %s '%s' with access PRIVATE from namespace '%s' in '%s(%s)' is not allowed",
                                     defType.toString().toLowerCase(), target, referencingNamespace,
                                     referencingDescriptor, referencingDescriptor.getDefType());
                 }
             }
-
-            if (!status.isEmpty()) {
-                accessCheckCache.put(key, status);
+            if (status == null) {
+                status = "";
             }
+            accessCheckCache.put(key, status);
         } else {
             // System.out.printf("** MDR.hit.assertAccess() cache hit for: %s\n", key);
         }

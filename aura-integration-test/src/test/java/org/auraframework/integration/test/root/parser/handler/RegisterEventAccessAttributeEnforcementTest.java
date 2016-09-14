@@ -143,14 +143,16 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
         	definitionService.getDefinition(descriptor);
-          	fail("component of custom namespace shouldn't be able to set handler of event registered in a system namespace component");
         } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-    		//Access to event 'string:testevent1' from namespace 'cstring' in 'markup://cstring:testcomponent23(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to set handler of event registered in a system namespace component", caught);
+        //Access to event 'string:testevent1' from namespace 'cstring' in 'markup://cstring:testcomponent23(COMPONENT)' is not allowed
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     /**
      * Verify Default access enforcement
@@ -196,14 +198,16 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
         	definitionService.getDefinition(descriptor);
-          	fail("component of custom namespace shouldn't be able to set handler of event registered in other custom namespace component");
         } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-    		//Access to event 'cstring:testevent1' from namespace 'cstring1' in 'markup://cstring1:testcomponent23(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to set handler of event registered in another custom namespace component", caught);
+        //Access to event 'cstring:testevent1' from namespace 'cstring1' in 'markup://cstring1:testcomponent23(COMPONENT)' is not allowed
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     /**
      * Verify Default access enforcement
@@ -357,14 +361,16 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
         	definitionService.getDefinition(descriptor);
-          	fail("component of custom namespace shouldn't be able to set handler of event registered in a system namespace component");
         } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-    		//Access to event 'string:testevent1' from namespace 'cstring' in 'markup://cstring:testcomponent23(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to set handler of event registered in a system namespace component", caught);
+        //Access to event 'string:testevent1' from namespace 'cstring' in 'markup://cstring:testcomponent23(COMPONENT)' is not allowed
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     /**
      * Verify Public access enforcement
@@ -416,14 +422,16 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
         	definitionService.getDefinition(descriptor);
-          	fail("component of custom namespace shouldn't be able to set handler of event registered in other custom namespace component");
         } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-    		//Access to event 'cstring:testevent1' from namespace 'cstring1' in 'markup://cstring1:testcomponent23(COMPONENT)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to set handler of event registered in another custom namespace component", caught);
+        //Access to event 'cstring:testevent1' from namespace 'cstring1' in 'markup://cstring1:testcomponent23(COMPONENT)' is not allowed
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     /**
      * Verify Public access enforcement

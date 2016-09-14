@@ -25,7 +25,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase {
@@ -40,7 +39,6 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
      * tests around Privileged namespace start
      */
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceExtendsApplicationWithSystemNamespace() throws QuickFixException {
         //create application with system namespace
         String appSource = "<aura:application extensible='true'/>";
@@ -50,20 +48,21 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
-        	definitionService.getDefinition(descriptor);
-        	fail("application of privileged namespace shouldn't be able to extends application of system namespace");
-        } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-    		//Access to application 'string:testapplication1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplicationChild2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
-    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+            definitionService.getDefinition(descriptor);
+        } catch (Exception e) {
+            caught = e;
         }
+        assertNotNull("application of privileged namespace shouldn't be able to extend an application of system namespace", caught);
+        // missing message
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
+
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceExtendsApplicationWithSystemNamespaceAccessInternal() throws QuickFixException {
         //create application with system namespace
         String appSource = "<aura:application extensible='true' access='Internal'/>";
@@ -73,17 +72,18 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
-        	definitionService.getDefinition(descriptor);
-        	fail("application of privileged namespace shouldn't be able to extends application of system namespace");
-        } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-    		//Access to application 'string:testapplication1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplicationChild2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
-    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+            definitionService.getDefinition(descriptor);
+        } catch (Exception e) {
+            caught = e;
         }
+        assertNotNull("application of privileged namespace shouldn't be able to extend an application of system namespace", caught);
+        // missing message
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     @Test
@@ -96,13 +96,12 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.PRIVILEGED);
         definitionService.getDefinition(descriptor);
     }
     
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceExtendsApplicationWithOtherPrivilegedNamespace() throws QuickFixException {
         //create application with system namespace
         String appSource = "<aura:application extensible='true'/>";
@@ -112,21 +111,21 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
-        	definitionService.getDefinition(descriptor);
-        	fail("application of privileged namespace shouldn't be able to extends application of another privileged namespace");
-        } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-        	//Access to application 'privilegedNS1:testapplication1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplicationChild2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
-    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+            definitionService.getDefinition(descriptor);
+        } catch (Exception e) {
+            caught = e;
         }
+        assertNotNull("application of privileged namespace shouldn't be able to extend an application of another privileged namespace", caught);
+        // missing message
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceExtendsApplicationWithCustomNamespace() throws QuickFixException {
         //create application with system namespace
         String appSource = "<aura:application extensible='true'/>";
@@ -136,17 +135,18 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
-        	definitionService.getDefinition(descriptor);
-        	fail("application of privileged namespace shouldn't be able to extends application of custom namespace");
-        } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-        	//Access to application 'cstring:testapplication1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplicationChild2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
-    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+            definitionService.getDefinition(descriptor);
+        } catch (Exception e) {
+            caught = e;
         }
+        assertNotNull("application of privileged namespace shouldn't be able to extend an application of custom namespace", caught);
+        // missing message
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     @Test
@@ -159,7 +159,7 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.INTERNAL);
         definitionService.getDefinition(descriptor);
     }
@@ -174,17 +174,18 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
-        	definitionService.getDefinition(descriptor);
-        	fail("application of custom namespace shouldn't be able to extends application of privileged namespace");
-        } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-        	//Access to application 'privilegedNS:testapplication1' from namespace 'cstring' in 'markup://cstring:testapplicationChild2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
-    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+            definitionService.getDefinition(descriptor);
+        } catch (Exception e) {
+            caught = e;
         }
+        assertNotNull("application of custom namespace shouldn't be able to extend an application of privileged namespace", caught);
+        // missing message
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     
@@ -238,14 +239,16 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplicationChild",
                         NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-        	fail("application of custom namespace shouldn't be able to extends application of system namespace");
-        } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-    		//Access to application 'string:testapplication1' from namespace 'cstring' in 'markup://cstring:testapplicationChild2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+        } catch (Exception e) {
+            caught = e;
         }
+        assertNotNull("application of custom namespace shouldn't be able to extend an application of system namespace", caught);
+        // missing message
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     /**
@@ -307,14 +310,16 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplicationChild",
                         NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-        	fail("application of custom namespace shouldn't be able to extends application of another custom namespace");
-        } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-    		//Access to application 'string:testapplication1' from namespace 'cstring' in 'markup://cstring:testapplicationChild2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+        } catch (Exception e) {
+            caught = e;
         }
+        assertNotNull("application of custom namespace shouldn't be able to extend an application of another custom namespace", caught);
+        // missing message
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
 
@@ -326,7 +331,6 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
      * Tests around PrivilegedNamespace
      */
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceExtendsApplicationWithSystemNamespaceAccessPublic() throws QuickFixException {
         //create application with system namespace
         String appSource = "<aura:application extensible='true' access='Public'/>";
@@ -336,17 +340,18 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
-        	definitionService.getDefinition(descriptor);
-        	fail("application of privileged namespace shouldn't be able to extends application of system namespace");
-        } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-    		//Access to application 'string:testapplication1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplicationChild2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
-    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+            definitionService.getDefinition(descriptor);
+        } catch (Exception e) {
+            caught = e;
         }
+        assertNotNull("application of privileged namespace shouldn't be able to extend an application of system namespace", caught);
+        // missing message
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     @Test
@@ -359,13 +364,12 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.PRIVILEGED);
         definitionService.getDefinition(descriptor);
     }
     
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceExtendsApplicationWithOtherPrivilegedNamespaceAccessPublic() throws QuickFixException {
         //create application with system namespace
         String appSource = "<aura:application extensible='true' access='Public'/>";
@@ -375,21 +379,21 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
-        	definitionService.getDefinition(descriptor);
-        	fail("application of privileged namespace shouldn't be able to extends application of another privileged namespace");
-        } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-        	//Access to application 'privilegedNS1:testapplication1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplicationChild2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
-    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+            definitionService.getDefinition(descriptor);
+        } catch (Exception e) {
+            caught = e;
         }
+        assertNotNull("application of privileged namespace shouldn't be able to extend an application of another privileged namespace", caught);
+        // missing message
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceExtendsApplicationWithCustomNamespaceAccessPublic() throws QuickFixException {
         //create application with system namespace
         String appSource = "<aura:application extensible='true' access='Public'/>";
@@ -399,17 +403,18 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
-        	definitionService.getDefinition(descriptor);
-        	fail("application of privileged namespace shouldn't be able to extends application of custom namespace");
-        } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-        	//Access to application 'cstring:testapplication1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplicationChild2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
-    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+            definitionService.getDefinition(descriptor);
+        } catch (Exception e) {
+            caught = e;
         }
+        assertNotNull("application of privileged namespace shouldn't be able to extend an application of custom namespace", caught);
+        // missing message
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     @Test
@@ -422,7 +427,7 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.INTERNAL);
         definitionService.getDefinition(descriptor);
     }
@@ -437,17 +442,18 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
-        	definitionService.getDefinition(descriptor);
-        	fail("application of custom namespace shouldn't be able to extends application of privileged namespace");
-        } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-        	//Access to application 'privilegedNS:testapplication1' from namespace 'cstring' in 'markup://cstring:testapplicationChild2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
-    		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
+            definitionService.getDefinition(descriptor);
+        } catch (Exception e) {
+            caught = e;
         }
+        assertNotNull("application of custom namespace shouldn't be able to extend an application of privileged namespace", caught);
+        // missing message
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     
@@ -505,14 +511,16 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplicationChild",
                         NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-        	fail("application of custom namespace shouldn't be able to extends application of system namespace");
-        } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-    		//Access to application 'string:testapplication1' from namespace 'cstring' in 'markup://cstring:testapplicationChild2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+        } catch (Exception e) {
+            caught = e;
         }
+        assertNotNull("application of custom namespace shouldn't be able to extend an application of system namespace", caught);
+        // missing message
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     /**
@@ -574,14 +582,16 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplicationChild",
                         NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-        	fail("application of custom namespace shouldn't be able to extends application of another custom namespace");
-        } catch(Exception e) {
-        	//expect 
-    		//System.out.println(e.getMessage());
-    		//Access to application 'string:testapplication1' from namespace 'cstring' in 'markup://cstring:testapplicationChild2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+        } catch (Exception e) {
+            caught = e;
         }
+        assertNotNull("application of custom namespace shouldn't be able to extend an application of another custom namespace", caught);
+        // missing message
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
    
@@ -594,7 +604,6 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
      * Tests around PrivilegedNamespace
      */
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceExtendsApplicationWithSystemNamespaceAccessGlobal() throws QuickFixException {
         //create application with system namespace
         String appSource = "<aura:application extensible='true' access='GLOBAL'/>";
@@ -604,9 +613,9 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.PRIVILEGED);
-        	definitionService.getDefinition(descriptor);
+            definitionService.getDefinition(descriptor);
     }
     
     @Test
@@ -619,13 +628,12 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.PRIVILEGED);
         definitionService.getDefinition(descriptor);
     }
     
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceExtendsApplicationWithOtherPrivilegedNamespaceAccessGlobal() throws QuickFixException {
         //create application with system namespace
         String appSource = "<aura:application extensible='true' access='GLOBAL'/>";
@@ -635,9 +643,9 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.PRIVILEGED);
-        	definitionService.getDefinition(descriptor);
+            definitionService.getDefinition(descriptor);
     }
     
     @Test
@@ -650,9 +658,9 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.PRIVILEGED);
-        	definitionService.getDefinition(descriptor);
+            definitionService.getDefinition(descriptor);
     }
     
     @Test
@@ -665,7 +673,7 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.INTERNAL);
         definitionService.getDefinition(descriptor);
     }
@@ -680,9 +688,9 @@ public class ApplicationAccessAttributeEnforcementTest extends AuraImplTestCase 
         //create application extends the application
         String appSource2 = "<aura:application extends='" + appDescriptor.getNamespace() + ":" + appDescriptor.getName() + "' /> ";
         DefDescriptor<ApplicationDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, appSource2,
-        		StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplicationChild",
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplicationChild",
                         NamespaceAccess.CUSTOM);
-        	definitionService.getDefinition(descriptor);
+            definitionService.getDefinition(descriptor);
     }
     
     /**

@@ -86,12 +86,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("Template from a custom namespace cannot be used in another custom namespace because their default access is PUBLIC");
-        } catch (NoAccessException ignored) {
-            // catch NoAccessException only. Anything else fails test.
+        } catch (NoAccessException e) {
+            caught = e;
         }
+        assertNotNull("Template from a custom namespace cannot be used in another custom namespace because their default access is PUBLIC", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testApplicationWithCustomNamespaceImplementsTemplateWithOtherCustomNamespaceAccessPublic() throws QuickFixException {
@@ -103,12 +107,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("Template from a custom namespace cannot be used in another custom namespace because their default access is PUBLIC");
-        } catch (NoAccessException ignored) {
-            // catch NoAccessException only. Anything else fails test.
+        } catch (NoAccessException e) {
+            caught = e;
         }
+        assertNotNull("Template from a custom namespace cannot be used in another custom namespace because their default access is PUBLIC", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testApplicationWithCustomNamespaceImplementsTemplateWithOtherCustomNamespaceAccessGlobal() throws QuickFixException {
@@ -125,7 +133,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     
     
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithCustomNamespace() throws QuickFixException {
         //create component with custom namespace
         String cmpSource = "<aura:component isTemplate='true'/>";
@@ -135,16 +142,19 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("Template from a privileged namespace cannot be used in another custom namespace with default access");
-        } catch (NoAccessException ignored) {
-            // catch NoAccessException only. Anything else fails test.
+        } catch (NoAccessException e) {
+            caught = e;
         }
+        assertNotNull("Template from a privileged namespace cannot be used in another custom namespace with default access", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithCustomNamespaceAccessPublic() throws QuickFixException {
         //create component with custom namespace
         String cmpSource = "<aura:component isTemplate='true' access='Public'/>";
@@ -154,16 +164,19 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("Template from a privileged namespace cannot be used in another custom namespace with PUBLIC access");
-        } catch (NoAccessException ignored) {
-            // catch NoAccessException only. Anything else fails test.
+        } catch (NoAccessException e) {
+            caught = e;
         }
+        assertNotNull("Template from a privileged namespace cannot be used in another custom namespace with PUBLIC access", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithCustomNamespaceAccessGlobal() throws QuickFixException {
         //create component with custom namespace
         String cmpSource = "<aura:component isTemplate='true' access='Global'/>";
@@ -320,7 +333,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     
     
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithOtherPrivilegedNamespace() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component isTemplate='true'/>";
@@ -330,16 +342,19 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("Template from a privileged namespace cannot be used in another privileged namespace with default access");
-        } catch (NoAccessException ignored) {
-            // catch NoAccessException only. Anything else fails test.
+        } catch (NoAccessException e) {
+            caught = e;
         }
+        assertNotNull("Template from a privileged namespace cannot be used in another privileged namespace with default access", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithOtherPrivilegedNamespaceAccessPublic() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component isTemplate='true' access='Public'/>";
@@ -349,12 +364,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("Template from a privileged namespace cannot be used in another privileged namespace with default access");
-        } catch (NoAccessException ignored) {
-            // catch NoAccessException only. Anything else fails test.
+        } catch (NoAccessException e) {
+            caught = e;
         }
+        assertNotNull("Template from a privileged namespace cannot be used in another privileged namespace with default access", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithOtherPrivilegedNamespaceAccessGlobal() throws QuickFixException {
@@ -392,12 +411,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("Template from a privileged namespace cannot be used in custom namespace with default access");
-        } catch (NoAccessException ignored) {
-            // catch NoAccessException only. Anything else fails test.
+        } catch (NoAccessException e) {
+            caught = e;
         }
+        assertNotNull("Template from a privileged namespace cannot be used in custom namespace with default access", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testApplicationWithCustomNamespaceImplementsTemplateWithPrivilegedNamespaceAccessPublic() throws QuickFixException {
@@ -409,12 +432,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("Template from a privileged namespace cannot be used in custom namespace with Public access");
-        } catch (NoAccessException ignored) {
-            // catch NoAccessException only. Anything else fails test.
+        } catch (NoAccessException e) {
+            caught = e;
         }
+        assertNotNull("Template from a privileged namespace cannot be used in custom namespace with Public access", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testApplicationWithCustomNamespaceImplementsTemplateWithPrivilegedNamespaceAccessGlobal() throws QuickFixException {
@@ -438,12 +465,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("Template from a privileged namespace cannot be used in custom namespace with Privileged access");
-        } catch (NoAccessException ignored) {
-            // catch NoAccessException only. Anything else fails test.
+        } catch (NoAccessException e) {
+            caught = e;
         }
+        assertNotNull("Template from a privileged namespace cannot be used in custom namespace with Privileged access", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     
@@ -577,7 +608,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     }
     
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithSystemNamespace() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component isTemplate='true'/>";
@@ -587,16 +617,19 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("Template from a privileged namespace cannot be used in privileged namespace with default access");
-        } catch (NoAccessException ignored) {
-            // catch NoAccessException only. Anything else fails test.
+        } catch (NoAccessException e) {
+            caught = e;
         }
+        assertNotNull("Template from a privileged namespace cannot be used in privileged namespace with default access", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithSystemNamespaceAccessPublic() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component isTemplate='true' access='Public'/>";
@@ -606,12 +639,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("Template from a privileged namespace cannot be used in privileged namespace with public access");
-        } catch (NoAccessException ignored) {
-            // catch NoAccessException only. Anything else fails test.
+        } catch (NoAccessException e) {
+            caught = e;
         }
+        assertNotNull("Template from a privileged namespace cannot be used in privileged namespace with public access", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithSystemNamespaceAccessGlobal() throws QuickFixException {
@@ -627,7 +664,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithSystemNamespaceAccessInternal() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component isTemplate='true' access='Internal'/>";
@@ -637,12 +673,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("Template from a privileged namespace cannot be used in privileged namespace with internal access");
-        } catch (NoAccessException ignored) {
-            // catch NoAccessException only. Anything else fails test.
+        } catch (NoAccessException e) {
+            caught = e;
         }
+        assertNotNull("Template from a privileged namespace cannot be used in privileged namespace with internal access", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testApplicationWithPrivilegedNamespaceImplementsTemplateWithSystemNamespaceAccessPrivileged() throws QuickFixException {
@@ -668,12 +708,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("Template from a system namespace cannot be used in custom namespace with default access");
-        } catch (NoAccessException ignored) {
-            // catch NoAccessException only. Anything else fails test.
+        } catch (NoAccessException e) {
+            caught = e;
         }
+        assertNotNull("Template from a system namespace cannot be used in custom namespace with default access", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testApplicationWithCustomNamespaceImplementsTemplateWithSystemNamespaceAccessPublic() throws QuickFixException {
@@ -685,12 +729,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("Template from a system namespace cannot be used in custom namespace with Public access");
-        } catch (NoAccessException ignored) {
-            // catch NoAccessException only. Anything else fails test.
+        } catch (NoAccessException e) {
+            caught = e;
         }
+        assertNotNull("Template from a system namespace cannot be used in custom namespace with Public access", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testApplicationWithCustomNamespaceImplementsTemplateWithSystemNamespaceAccessGlobal() throws QuickFixException {
@@ -714,12 +762,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("Template from a system namespace cannot be used in custom namespace with internal access");
-        } catch (NoAccessException ignored) {
-            // catch NoAccessException only. Anything else fails test.
+        } catch (NoAccessException e) {
+            caught = e;
         }
+        assertNotNull("Template from a system namespace cannot be used in custom namespace with internal access", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testApplicationWithCustomNamespaceImplementsTemplateWithSystemNamespaceAccessPrivileged() throws QuickFixException {
@@ -731,12 +783,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application template='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("Template from a system namespace cannot be used in custom namespace with privileged access");
-        } catch (NoAccessException ignored) {
-            // catch NoAccessException only. Anything else fails test.
+        } catch (NoAccessException e) {
+            caught = e;
         }
+        assertNotNull("Template from a system namespace cannot be used in custom namespace with privileged access", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     
@@ -768,7 +824,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceIncludeComponentWithOtherPrivilegedNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true'/>";
@@ -778,18 +833,19 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of privileged namespace shouldn't be able to include component of another privileged namespace");
         } catch(Exception e) {
-            assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
-            //expect 
-            //System.out.println(e.getMessage());
+            caught = e;
         }
+        assertNotNull("component of a privileged namespace shouldn't be able to include component of another privileged namespace", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceIncludeComponentWithSystemNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true'/>";
@@ -799,19 +855,19 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of privileged namespace shouldn't be able to include component of system namespace");
         } catch(Exception e) {
-            assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'string:testcomponent1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a privileged namespace shouldn't be able to include component of a system namespace", caught);
+        //Access to component 'string:testcomponent1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceIncludeComponentWithSystemNamespaceInMarkupAccessInternal() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true' access='Internal'/>";
@@ -821,19 +877,19 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of privileged namespace shouldn't be able to include component of system namespace");
         } catch(Exception e) {
-            assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'string:testcomponent1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a privileged namespace shouldn't be able to include component of a system namespace", caught);
+        //Access to component 'string:testcomponent1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceIncludeComponentWithCustomNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true'/>";
@@ -843,15 +899,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of privileged namespace shouldn't be able to include component of custom namespace");
         } catch(Exception e) {
-            assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'cstring:testcomponent1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a privileged namespace shouldn't be able to include component of a custom namespace", caught);
+        //Access to component 'cstring:testcomponent1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     
@@ -914,14 +971,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of custom namespace shouldn't be able to include component of system namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'string1:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to include component of a system namespace", caught);
+        //Access to component 'string1:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testApplicationWithCustomNamespaceIncludeComponentWithSameCustomNamespaceInMarkup() throws QuickFixException {
@@ -945,14 +1004,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of custom namespace shouldn't be able to include componet of another custom namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to include component of another custom namespace", caught);
+        //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testApplicationWithCustomNamespaceIncludeComponentWithPrivilegedNamespaceInMarkup() throws QuickFixException {
@@ -964,15 +1025,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of custom namespace shouldn't be able to include component of privileged namespace");
         } catch(Exception e) {
-            assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'privilegedNS:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to include component of a privileged namespace", caught);
+        //Access to component 'privilegedNS:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     
@@ -993,7 +1055,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceIncludeComponentWithOtherPrivilegedNamespaceInMarkupAccessPublic() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true' access='Public'/>";
@@ -1003,18 +1064,19 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of privileged namespace shouldn't be able to include component of another privileged namespace");
         } catch(Exception e) {
-            assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
-            //expect 
-            //System.out.println(e.getMessage());
+            caught = e;
         }
+        assertNotNull("component of a privileged namespace shouldn't be able to include component of another privileged namespace", caught);
+        // missing message
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceIncludeComponentWithSystemNamespaceInMarkupAccessPublic() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true' access='Public'/>";
@@ -1024,19 +1086,19 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of privileged namespace shouldn't be able to include component of system namespace");
         } catch(Exception e) {
-            assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'string:testcomponent1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a privileged namespace shouldn't be able to include component of a system namespace", caught);
+        //Access to component 'string:testcomponent1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceIncludeComponentWithCustomNamespaceInMarkupAccessPublic() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true' access='Public'/>";
@@ -1046,15 +1108,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of privileged namespace shouldn't be able to include component of custom namespace");
         } catch(Exception e) {
-            assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'cstring:testcomponent1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a privileged namespace shouldn't be able to include component of a custom namespace", caught);
+        //Access to component 'cstring:testcomponent1' from namespace 'privilegedNS' in 'markup://privilegedNS:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     
@@ -1117,14 +1180,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of custom namespace shouldn't be able to include component of system namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'string1:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to include component of a system namespace", caught);
+        //Access to component 'string1:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testApplicationWithCustomNamespaceIncludeComponentWithSameCustomNamespaceInMarkupAccessPublic() throws QuickFixException {
@@ -1148,14 +1213,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of custom namespace shouldn't be able to include componet of another custom namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to include component of another custom namespace", caught);
+        //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testApplicationWithCustomNamespaceIncludeComponentWithPrivilegedNamespaceInMarkupAccessPublic() throws QuickFixException {
@@ -1167,15 +1234,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of custom namespace shouldn't be able to include component of privileged namespace");
         } catch(Exception e) {
-            assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'privilegedNS:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to include component of a privileged namespace", caught);
+        //Access to component 'privilegedNS:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     /**
@@ -1195,7 +1263,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceIncludeComponentWithOtherPrivilegedNamespaceInMarkupAccessPrivileged() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true' access='Privileged'/>";
@@ -1209,7 +1276,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceIncludeComponentWithSystemNamespaceInMarkupAccessPrivileged() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true' access='Privileged'/>";
@@ -1270,16 +1336,20 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of custom namespace shouldn't be able to include component of system namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'string1:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to include component of a system namespace", caught);
+        //Access to component 'string1:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
+
     @Test
+    @Ignore("this is not correct - PRIVILEGED is not allowed")
     public void testApplicationWithCustomNamespaceIncludeComponentWithAnotherCustomNamespaceInMarkupAccessPrivileged() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true' access='Privileged'/>";
@@ -1289,14 +1359,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of custom namespace shouldn't be able to include componet of another custom namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to include component of another custom namespace", caught);
+        //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testApplicationWithCustomNamespaceIncludeComponentWithPrivilegedNamespaceInMarkupAccessPrivileged() throws QuickFixException {
@@ -1308,15 +1380,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "/> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of custom namespace shouldn't be able to include component of privileged namespace");
         } catch(Exception e) {
-            assertTrue("get unexpected message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'privilegedNS:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to include component of a privileged namespace", caught);
+        //Access to component 'privilegedNS:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     /**
@@ -1336,7 +1409,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceIncludeComponentWithOtherPrivilegedNamespaceInMarkupAccessGlobal() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true' access='Global'/>";
@@ -1350,7 +1422,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceIncludeComponentWithSystemNamespaceInMarkupAccessGlobal() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true' access='Global'/>";
@@ -1508,14 +1579,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:component extends='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponentChild", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of custom namespace shouldn't be able to extend component of system namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'string1:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to extend a a component of a system namespace", caught);
+        //Access to component 'string1:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }   
     @Test
     public void testComponentWithCustomNamespaceExtendsComponentWithPrivilegedNamespaceInMarkup() throws QuickFixException {
@@ -1527,14 +1600,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:component extends='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponentChild", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of custom namespace shouldn't be able to extend component of privileged namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'string1:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to extend a a component of a privileged namespace", caught);
+        //Access to component 'string1:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     } 
     @Test
     public void testComponentWithCustomNamespaceExtendsComponentWithSameCustomNamespaceInMarkup() throws QuickFixException {
@@ -1558,19 +1633,20 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:component extends='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponentChild", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of custom namespace shouldn't be able to extend componet of another custom namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to extend a component of another custom namespace", caught);
+        //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testComponnetWithPrivilegedNamespaceExtendsComponentWithSystemNamespace() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true'/>";
@@ -1580,18 +1656,19 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:component extends='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponentChild", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of privileged namespace shouldn't be able to extend componet of system namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a privileged namespace shouldn't be able to extend a component of a system namespace", caught);
+        //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testComponnetWithPrivilegedNamespaceExtendsComponentWithSystemNamespaceAccessInternal() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true' access='Internal'/>";
@@ -1601,14 +1678,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:component extends='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponentChild", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of privileged namespace shouldn't be able to extend componet of system namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a privileged namespace shouldn't be able to extend a component of a system namespace", caught);
+        //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testComponnetWithPrivilegedNamespaceExtendsComponentWithSamePrivilegedNamespace() throws QuickFixException {
@@ -1624,7 +1703,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testComponnetWithPrivilegedNamespaceExtendsComponentWithOtherPrivilegedNamespace() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true'/>";
@@ -1634,18 +1712,19 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:component extends='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponentChild", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of privileged namespace shouldn't be able to extend componet of other privileged namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a privileged namespace shouldn't be able to extend a component of other privileged namespace", caught);
+        //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testComponnetWithPrivilegedNamespaceExtendsComponentWithCustomNamespace() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true'/>";
@@ -1655,14 +1734,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:component extends='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponentChild", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of privileged namespace shouldn't be able to extend componet of custom namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a privileged namespace shouldn't be able to extend a component of a custom namespace", caught);
+        //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
         
     
@@ -1728,14 +1809,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:component extends='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponentChild", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of custom namespace shouldn't be able to include component of system namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'string1:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to include component of a system namespace", caught);
+        //Access to component 'string1:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testComponentWithCustomNamespaceExtendsComponentWithPrivilegedNamespaceInMarkupAccessPublic() throws QuickFixException {
@@ -1747,14 +1830,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:component extends='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponentChild", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of custom namespace shouldn't be able to include component of privileged namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'string1:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to include component of a privileged namespace", caught);
+        //Access to component 'string1:testcomponent1' from namespace 'cstring' in 'markup://cstring:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     } 
     @Test
     public void testComponentWithCustomNamespaceExtendsComponentWithSameCustomNamespaceInMarkupAccessPublic() throws QuickFixException {
@@ -1778,18 +1863,19 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:component extends='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponentChild", NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of custom namespace shouldn't be able to include componet of another custom namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a custom namespace shouldn't be able to include component of another custom namespace", caught);
+        //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testComponnetWithPrivilegedNamespaceExtendsComponentWithSystemNamespaceAccessPublic() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true' access='PUBLIC'/>";
@@ -1799,14 +1885,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:component extends='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponentChild", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of privileged namespace shouldn't be able to extend componet of system namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a privileged namespace shouldn't be able to extend a component of a system namespace", caught);
+        //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     @Test
     public void testComponnetWithPrivilegedNamespaceExtendsComponentWithSamePrivilegedNamespaceAccessPublic() throws QuickFixException {
@@ -1822,7 +1910,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testComponnetWithPrivilegedNamespaceExtendsComponentWithOtherPrivilegedNamespaceAccessPublic() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true' access='PUBLIC'/>";
@@ -1832,18 +1919,19 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:component extends='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponentChild", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of privileged namespace shouldn't be able to extend componet of other privileged namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a privileged namespace shouldn't be able to extend a component of other privileged namespace", caught);
+        //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testComponnetWithPrivilegedNamespaceExtendsComponentWithCustomNamespaceAccessPublic() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true' access='PUBLIC'/>";
@@ -1853,14 +1941,16 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:component extends='" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + "'/>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponentChild", NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
         try {
             definitionService.getDefinition(descriptor);
-            fail("component of privileged namespace shouldn't be able to extend componet of custom namespace");
         } catch(Exception e) {
-            //expect 
-            //System.out.println(e.getMessage());
-            //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' disallowed by MasterDefRegistry.assertAccess()
+            caught = e;
         }
+        assertNotNull("component of a privileged namespace shouldn't be able to extend a component of a custom namespace", caught);
+        //Access to component 'cstring:testcomponent1' from namespace 'cstring1' in 'markup://cstring1:testapplication2(APPLICATION)' is not allowed
+        assertTrue("got unexpected error message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
     
     /**
@@ -1941,7 +2031,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     }
     
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testComponnetWithPrivilegedNamespaceExtendsComponentWithSystemNamespaceAccessGlobal() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true' access='Global'/>";
@@ -1967,7 +2056,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testComponnetWithPrivilegedNamespaceExtendsComponentWithOtherPrivilegedNamespaceAccessGlobal() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true' access='Global'/>";
@@ -1981,7 +2069,6 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
     }
 
     @Test
-    @Ignore("JBUCH: privileged hack")
     public void testComponnetWithPrivilegedNamespaceExtendsComponentWithCustomNamespaceAccessGlobal() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component extensible='true' access='Global'/>";

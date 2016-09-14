@@ -40,8 +40,7 @@ function lib() { //eslint-disable-line no-unused-vars
             var useStrictParsing = config.validateString === true;
             var hasTime = timeValue && timeValue !== '00:00:00.000Z';
 
-            // if dateValue doesn't have time we consider not UTC
-            var date = $A.localizationService.parseDateTime(dateValue, "YYYY-MM-DD", config.langLocale, useStrictParsing);
+            var date = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD", config.langLocale, useStrictParsing);
 
             if ($A.util.isEmpty(date)) {
                 callback(value);

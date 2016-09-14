@@ -46,7 +46,7 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
 
     protected T define(String source) throws QuickFixException {
         DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(), source);
-        return desc.getDef();
+        return definitionService.getDefinition(desc);
     }
 
     protected T define(String source, Object... replacements) throws QuickFixException {
@@ -287,7 +287,7 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
         DefDescriptor<T> childDesc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "extends='"
                 + parentDesc.getQualifiedName() + "' description='Child markup'", ""));
 
-        assertEquals("Description of parent def is wrong.", "Parent markup", parentDesc.getDef().getDescription());
-        assertEquals("Description of child def is wrong.", "Child markup", childDesc.getDef().getDescription());
+        assertEquals("Description of parent def is wrong.", "Parent markup", definitionService.getDefinition(parentDesc).getDescription());
+        assertEquals("Description of child def is wrong.", "Child markup", definitionService.getDefinition(childDesc).getDescription());
     }
 }

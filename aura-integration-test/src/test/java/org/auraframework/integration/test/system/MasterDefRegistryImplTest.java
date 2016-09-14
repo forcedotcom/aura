@@ -896,7 +896,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         for (DefType defType : map.keySet()) {
             DefDescriptor<?> dd = map.get(defType);
-            dd.getDef();
+            definitionService.getDefinition(dd);
         }
 
         return map;
@@ -1024,7 +1024,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         MasterDefRegistryImpl mdr = (MasterDefRegistryImpl) getAuraMDR();
         Throwable ex = null;
         try {
-            callAssertAccess(mdr, null, desc.getDef(), mockAccessCheckCache);
+            callAssertAccess(mdr, null, definitionService.getDefinition(desc), mockAccessCheckCache);
         } catch (InvocationTargetException ite) {
             ex = ite.getTargetException();
         } catch (Exception e) {
@@ -1048,7 +1048,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 String.format(baseComponentTag, "", ""));
         when(mockAccessCheckCache.getIfPresent(anyString())).thenReturn("");
         MasterDefRegistryImpl mdr = (MasterDefRegistryImpl) getAuraMDR();
-        callAssertAccess(mdr, null, desc.getDef(), mockAccessCheckCache);
+        callAssertAccess(mdr, null, definitionService.getDefinition(desc), mockAccessCheckCache);
 
         verify(mockAccessCheckCache).getIfPresent(anyString());
     }
@@ -1063,11 +1063,11 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         when(mockAccessCheckCache.getIfPresent(anyString())).thenReturn(null);
 
         MasterDefRegistryImpl mdr = (MasterDefRegistryImpl) getAuraMDR();
-        callAssertAccess(mdr, desc, desc.getDef(), mockAccessCheckCache);
+        callAssertAccess(mdr, desc, definitionService.getDefinition(desc), mockAccessCheckCache);
 
         verify(mockAccessCheckCache).put(anyString(), anyString());
 
-        callAssertAccess(mdr, desc, desc.getDef(), mockAccessCheckCache);
+        callAssertAccess(mdr, desc, definitionService.getDefinition(desc), mockAccessCheckCache);
         verify(mockAccessCheckCache, times(2)).getIfPresent(anyString());
     }
 
@@ -1470,7 +1470,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void testJavaProtocolIsCached() throws Exception {
         DefDescriptor<ControllerDef> controllerDef = definitionService.getDefDescriptor(
                 "java://org.auraframework.components.test.java.controller.TestController", ControllerDef.class);
-        controllerDef.getDef();
+        definitionService.getDefinition(controllerDef);
         String prefix = controllerDef.getPrefix();
         assertEquals(prefix, "java");
 
@@ -1550,7 +1550,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         for (DefType defType : map.keySet()) {
             DefDescriptor<?> dd = map.get(defType);
-            dd.getDef();
+            definitionService.getDefinition(dd);
         }
 
         return map;

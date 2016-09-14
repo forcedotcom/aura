@@ -269,7 +269,7 @@ public class EventDefTest extends AuraImplTestCase {
                 "<aura:event type=\"component\" extends=\"test:applicationEvent\"></aura:event>");
 
         try {
-            dd.getDef();
+            definitionService.getDefinition(dd);
             fail("Should not be able to create event with null type");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "Event " + dd.getQualifiedName()

@@ -30,8 +30,10 @@
 			};	
 
 			// Create component and inject it. 
-			$A.componentService.newComponentAsync(this, function (outputComponent) {
-				priv_outputComponent.setValue([outputComponent]);
+			$A.componentService.newComponentAsync(this, function (outputComponent, status) {
+				if (status === "SUCCESS") {
+					priv_outputComponent.setValue([outputComponent]);
+				}
 			}, outputComponentDefRef);
 		}
 	},

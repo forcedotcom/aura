@@ -79,6 +79,6 @@ public class DesignSectionDefHandlerTest extends AuraImplTestCase {
                 DesignDef.class);
         addSourceAutoCleanup(designDesc, String.format("<design:component><design:layout>%s</design:layout></design:component>", markup));
 
-        return designDesc.getDef().getDefaultDesignLayoutDef().getSections();
+        return definitionService.getDefinition(designDesc).getDefaultDesignLayoutDef().getSections();
     }
 }

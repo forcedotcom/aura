@@ -78,6 +78,6 @@ public class DesignAttributeDefaultDefHandlerTest extends AuraImplTestCase {
                 DesignDef.class);
         getAuraTestingUtil().addSourceAutoCleanup(desc, String.format(DESIGN_TEMPLATE, attr, body), NamespaceAccess.INTERNAL);
 
-        return desc.getDef().getAttributeDesignDef(attr);
+        return definitionService.getDefinition(desc).getAttributeDesignDef(attr);
     }
 }

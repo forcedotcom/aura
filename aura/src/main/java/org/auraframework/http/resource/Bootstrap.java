@@ -26,9 +26,9 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
+import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -48,6 +48,8 @@ import org.auraframework.util.json.JsonSerializationContext;
 public class Bootstrap extends AuraResourceImpl {
 
     private ContextService contextService;
+
+    private ExceptionAdapter exceptionAdapter;
 
     public Bootstrap() {
         super("bootstrap.js", Format.JS);
@@ -90,7 +92,7 @@ public class Bootstrap extends AuraResourceImpl {
         Integer cacheExpiration = null;
         if (appDesc.getDefType() == DefType.APPLICATION) {
             // only app has bootstrap cache capability
-            ApplicationDef appDef = (ApplicationDef) appDesc.getDef();
+            ApplicationDef appDef = (ApplicationDef) definitionService.getDefinition(appDesc);
             cacheExpiration = appDef.getBootstrapPublicCacheExpiration();
         }
         if (cacheExpiration != null && cacheExpiration > 0) {
@@ -142,7 +144,7 @@ public class Bootstrap extends AuraResourceImpl {
             out.append(APPEND_JS);
         } catch (Throwable t) {
             if (gackOnException) {
-                t = Aura.getExceptionAdapter().handleException(t);                
+                t = exceptionAdapter.handleException(t);                
             }
             writeError(t, response, context);
         }
@@ -210,5 +212,15 @@ public class Bootstrap extends AuraResourceImpl {
     @Inject
     public void setContextService(ContextService contextService) {
         this.contextService = contextService;
+    }
+
+    /**
+     * Injection override.
+     *
+     * @param exceptionAdapter the ExceptionAdapter to set
+     */
+    @Inject
+    public void setExceptionAdapter(ExceptionAdapter exceptionAdapter) {
+        this.exceptionAdapter = exceptionAdapter;
     }
 }

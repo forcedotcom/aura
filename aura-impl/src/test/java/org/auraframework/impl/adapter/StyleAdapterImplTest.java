@@ -46,7 +46,7 @@ public class StyleAdapterImplTest extends StyleTestCase {
 //
 //        DefDescriptor<StyleDef> desc = addStyleDef(".THIS{color:red}");
 //
-//        StyleDef def = desc.getDef();
+//        StyleDef def = definitionService.getDefinition(desc);
 //        assertEquals("expected plugin to run at compilation", 1, observer.count);
 //
 //        def.getCode();
@@ -60,7 +60,7 @@ public class StyleAdapterImplTest extends StyleTestCase {
 //
 //        DefDescriptor<StyleDef> desc = addStyleDef(".THIS{color:red}");
 //
-//        StyleDef def = desc.getDef();
+//        StyleDef def = definitionService.getDefinition(desc);
 //        assertEquals("expected plugin to run at compilation", 1, observer.count);
 //
 //        def.getCode();
@@ -77,12 +77,12 @@ public class StyleAdapterImplTest extends StyleTestCase {
         DefDescriptor<StyleDef> desc2 = addStyleDef(".THIS{color:red}");
         DefDescriptor<StyleDef> desc3 = addStyleDef(".THIS{color:red}");
 
-        desc1.getDef();
-        desc2.getDef();
-        desc3.getDef();
+        definitionService.getDefinition(desc1);
+        definitionService.getDefinition(desc2);
+        definitionService.getDefinition(desc3);
         assertEquals("did not expect plugin to run at runtime", 0, observer.count);
 
-        ArrayList<StyleDef> list = Lists.newArrayList(desc1.getDef(), desc2.getDef(), desc3.getDef());
+        ArrayList<StyleDef> list = Lists.newArrayList(definitionService.getDefinition(desc1), definitionService.getDefinition(desc2), definitionService.getDefinition(desc3));
         format.writeCollection(list, new StringBuilder());
         assertEquals("expected the same plugin instance to once for each styledef", 3, observer.count);
     }

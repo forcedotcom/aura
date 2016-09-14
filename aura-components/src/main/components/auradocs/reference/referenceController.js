@@ -20,8 +20,10 @@
         var sidebar = cmp.find("sidebar");
         var sidebarBody = sidebar.get("v.body");
         if(sidebarBody.length === 0) {
-            $A.createComponent("auradocs:referenceTree", {}, function(referenceTreeCmp){
-                sidebar.set("v.body", referenceTreeCmp);
+            $A.createComponent("markup://auradocs:referenceTree", {}, function(referenceTreeCmp, status){
+            	if (status === "SUCCESS") {
+            	    sidebar.set("v.body", referenceTreeCmp);
+                }
             });
         }
 

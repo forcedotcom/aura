@@ -54,6 +54,7 @@ public interface GlobalValueProvider extends ValueProvider {
     /**
      * @deprecated GVPs no longer uses reference serialization
      */
+    @Deprecated
     boolean refSupport();
 
     /**

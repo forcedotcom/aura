@@ -34,6 +34,7 @@ import org.auraframework.impl.util.TemplateUtil.Script;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
@@ -64,6 +65,9 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
     @Inject
     private ServletUtilAdapter servletUtilAdapter;
 
+    @Inject
+    private DefinitionService definitionService;
+
     private ManifestUtil manifestUtil;
 
     @PostConstruct
@@ -89,7 +93,7 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
 
             DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
             if (styleDefDesc != null) {
-                attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode());
+                attributes.put("auraInlineStyle", definitionService.getDefinition(styleDefDesc).getCode());
             }
 
             String contextPath = context.getContextPath();

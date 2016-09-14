@@ -116,7 +116,7 @@ public class PerfExecutorTestCase extends WebDriverTestCase {
         File moduleDir;
         String componentsDir = null;
         try {
-            fileName = def.getDef().getLocation().getFileName();
+            fileName = definitionService.getDefinition(def).getLocation().getFileName();
             moduleDir = new File(fileName).getCanonicalFile().getParentFile().getParentFile().getParentFile();
             if(fileName.contains("/core/")){
                 componentsDir = moduleDir.toString();

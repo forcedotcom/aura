@@ -83,6 +83,6 @@ public class DesignTemplateRegionDefHandlerTest extends AuraImplTestCase {
         addSourceAutoCleanup(designDesc,
                 String.format("<design:component><design:template>%s</design:template></design:component>", markup));
 
-        return designDesc.getDef().getDesignTemplateDef().getDesignTemplateRegionDef(name);
+        return definitionService.getDefinition(designDesc).getDesignTemplateDef().getDesignTemplateRegionDef(name);
     }
 }

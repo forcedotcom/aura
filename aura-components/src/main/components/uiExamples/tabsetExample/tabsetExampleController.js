@@ -40,8 +40,10 @@
     
     loadContent: function(cmp, evt) {
         var tab = evt.getParam("tab");
-        $A.componentService.newComponentAsync(this, function(newCmp){
-            tab.set("v.body", [newCmp]);
+        $A.componentService.newComponentAsync(this, function(newCmp, status){
+        	if (status === "SUCCESS") {
+        	    tab.set("v.body", [newCmp]);
+            }
         }, {"componentDef": "markup://aura:text", "attributes":{"values": {"value":"New tab content"}}});
     },
     

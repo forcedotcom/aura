@@ -171,7 +171,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpWithoutHelperDescriptor =
                 addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
         // make sure it doesn't has helper
-        assertNull(cmpWithoutHelperDescriptor.getDef().getHelperDef());
+        assertNull(definitionService.getDefinition(cmpWithoutHelperDescriptor).getHelperDef());
 
         String helperAttribute = String.format("helper='js://%s.%s'",
                 cmpWithoutHelperDescriptor.getNamespace(), cmpWithoutHelperDescriptor.getName());

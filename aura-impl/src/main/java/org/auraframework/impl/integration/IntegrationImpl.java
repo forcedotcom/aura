@@ -296,7 +296,7 @@ public class IntegrationImpl implements Integration {
         // ensure that we have a context.
         AuraContext context = getContext(null);
         try {
-            ApplicationDef appDef = getApplicationDescriptor(application).getDef();
+            ApplicationDef appDef = definitionService.getDefinition(getApplicationDescriptor(application));
 
             ComponentDef templateDef = appDef.getTemplateDef();
 
@@ -312,7 +312,7 @@ public class IntegrationImpl implements Integration {
 
             DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
             if (styleDefDesc != null) {
-                attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode());
+                attributes.put("auraInlineStyle", definitionService.getDefinition(styleDefDesc).getCode());
             }
 
             Map<String, Object> auraInit = Maps.newHashMap();

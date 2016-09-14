@@ -27,15 +27,17 @@
             var closeBtn = cmp.get('v.closeButton');
             if ($A.util.isEmpty(closeBtn)) {
                 //create default close button
-                $A.componentService.createComponent('ui:button', {
+                $A.componentService.createComponent('markup://ui:button', {
                     'aura:id' : 'modal-close',
                     'body': $A.createComponentFromConfig({descriptor: 'markup://aura:unescapedHtml', attributes: {value: '&times;'}}),
                     'class': "closeBtn",
                     'press': cmp.getReference("c.onCloseBtnPressed"),
                     'label': cmp.get('v.closeDialogLabel'),
                     'labelDisplay': "false"
-                }, function(button){
-                    cmp.set('v.closeButton', button);
+                }, function(button, status){
+                	if (status === "SUCCESS") {
+                		cmp.set('v.closeButton', button);
+                	}
                 });
             } else if ($A.util.isComponent(closeBtn[0]) && closeBtn[0].isInstanceOf('ui:button') && !closeBtn[0].getHandledEvents()['press']) {
                 closeBtn[0].setAttributeValueProvider(cmp);

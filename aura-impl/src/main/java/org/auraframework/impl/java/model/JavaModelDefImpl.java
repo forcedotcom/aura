@@ -94,6 +94,7 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
      * @deprecated
      */
     @Override
+    @Deprecated
     public Model newInstance() {
         try {
             return Aura.getInstanceService().getInstance(descriptor);

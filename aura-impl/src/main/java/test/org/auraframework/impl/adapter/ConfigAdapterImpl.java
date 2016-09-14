@@ -88,9 +88,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private static final String VERSION_PROPERTY = "aura.build.version";
     private static final String VALIDATE_CSS_CONFIG = "aura.css.validate";
 
-    private final Map<String, Boolean> SYSTEM_NAMESPACES = new ConcurrentHashMap<String,Boolean>();
-    private final Map<String, Boolean> CANONICAL_NAMESPACES = new ConcurrentHashMap<String,Boolean>();
-    private final Map<String, Boolean> PRIVILEGED_NAMESPACES = new ConcurrentHashMap<String,Boolean>();
+    private final Map<String, Boolean> SYSTEM_NAMESPACES = new ConcurrentHashMap<>();
+    private final Map<String, Boolean> CANONICAL_NAMESPACES = new ConcurrentHashMap<>();
+    private final Map<String, Boolean> PRIVILEGED_NAMESPACES = new ConcurrentHashMap<>();
 
     private volatile Set<String> CANONICAL_IMMUTABLE = Sets.newTreeSet();
     private volatile Set<String> PRIVILEGED_IMMUTABLE = Sets.newTreeSet();
@@ -336,9 +336,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         String uid = context.getFrameworkUID();
         String resetCss = "resetCSS.css";
         try {
-            DefDescriptor<?> appDesc = context.getApplicationDescriptor();
+            DefDescriptor<? extends BaseComponentDef> appDesc = context.getApplicationDescriptor();
             if (appDesc != null) {
-                BaseComponentDef templateDef = ((BaseComponentDef) appDesc.getDef()).getTemplateDef();
+                BaseComponentDef templateDef = definitionService.getDefinition(appDesc).getTemplateDef();
                 if (templateDef.isTemplate()) {
                     BaseComponent<?, ?> template = (BaseComponent<?, ?>) instanceService.getInstance(templateDef);
                     String auraResetStyle=getTemplateValue(template,"auraResetStyle");
@@ -373,7 +373,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
      */
     private String getTemplateValue(BaseComponent<?, ?> template, String attribute) throws QuickFixException {
         Object attributeValue;
-        if (template.getSuper() != null && template.getSuper().getDescriptor().getDef().isTemplate()) {
+        if (template.getSuper() != null && definitionService.getDefinition(template.getSuper().getDescriptor()).isTemplate()) {
             template = template.getSuper();
             attributeValue=template.getAttributes().getRawValue(attribute);
         }else{

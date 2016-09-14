@@ -2608,8 +2608,8 @@ Component.prototype.associateRenderedBy = function(cmp, element) {
  * 
  * @returns The locator object which contains the target & scope IDs and locator context resolved
  */
-Component.prototype.getLocator = function(localId) {
-    return $A.expressionService.resolveLocator(this, localId);
+Component.prototype.getLocator = function(localId, includeMetadata) {
+    return $A.expressionService.resolveLocator(this, localId, includeMetadata);
 };
 
 Aura.Component.Component = Component;

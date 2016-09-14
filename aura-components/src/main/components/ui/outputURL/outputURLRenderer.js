@@ -17,7 +17,7 @@
     render: function (cmp, helper) {
         var url = cmp.get("v.value");
         if ($A.util.getBooleanValue(cmp.get("v.fixURL"))) {
-            url = helper.makeAbsolute(url);
+            url = helper.urlLib.urlUtil.makeAbsolute(url);
         }
 
         cmp.set("v.absoluteURL", url);
@@ -39,7 +39,7 @@
     rerender: function (cmp, helper) {
         var url = cmp.get("v.value");
         if (cmp.isDirty("v.value") && $A.util.getBooleanValue(cmp.get("v.fixURL"))) {
-            url = helper.makeAbsolute(url);
+            url = helper.urlLib.urlUtil.makeAbsolute(url);
         }
 
         cmp.set("v.absoluteURL", url);

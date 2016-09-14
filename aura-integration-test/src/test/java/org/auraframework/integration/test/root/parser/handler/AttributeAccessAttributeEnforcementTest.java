@@ -24,6 +24,7 @@ import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
@@ -31,7 +32,9 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
      * Privileged access tests start.
      * for component inside custom namespace, we do not allow to have attribute with access='Privileged'
      */
-//JBUCH:    @Test
+
+    @Test
+    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceHasComponentWithSystemNamespaceInMarkupAccessPrivileged() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Privileged'/></aura:component>";
@@ -41,7 +44,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     @Test
     public void testApplicationWithPrivilegedNamespaceHasComponentWithSamePrivilegedNamespaceInMarkupAccessPrivileged() throws QuickFixException {
@@ -53,9 +56,11 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
-//JBUCH:    @Test
+
+    @Test
+    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceHasComponentWithOtherPrivilegedNamespaceInMarkupAccessPrivileged() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Privileged'/></aura:component>";
@@ -65,7 +70,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication", NamespaceAccess.PRIVILEGED);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     @Test
@@ -78,7 +83,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication", NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     @Test
     public void testApplicationWithSystemNamespaceHasComponentWithOtherSystemNamespaceInMarkupAccessPrivileged() throws QuickFixException {
@@ -90,7 +95,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_NAMESPACE + ":testapplication", NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     @Test
     public void testApplicationWithSystemNamespaceHasComponentWithPrivilegedNamespaceInMarkupAccessPrivileged() throws QuickFixException {
@@ -102,7 +107,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         String source = "<aura:application> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testattribute='' /> </aura:application>";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_NAMESPACE + ":testapplication", NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     @Test
@@ -116,7 +121,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
          	fail("application of custom namespace shouldn't be able to access attribute of system namespace with privileged");
         } catch(Exception e) {
         	//expect 
@@ -136,7 +141,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication", NamespaceAccess.CUSTOM);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
          	fail("application of custom namespace shouldn't be able to access attribute of privileged namespace with privileged");
         } catch(Exception e) {
         	//expect 
@@ -165,9 +170,11 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication",
                         NamespaceAccess.PRIVILEGED);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
-//JBUCH:    @Test
+
+    @Test
+    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceHasComponentWithOtherPrivilegedNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
@@ -180,7 +187,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
                         NamespaceAccess.PRIVILEGED);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
          	fail("application of privileged namespace shouldn't be able to access attribute of another privileged namespace");
         } catch(Exception e) {
         	//expect 
@@ -189,7 +196,9 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
         }
     }
-//JBUCH:     @Test
+
+    @Test
+    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceHasComponentWithSystemNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
@@ -202,7 +211,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
                         NamespaceAccess.PRIVILEGED);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
          	fail("application of privileged namespace shouldn't be able to access attribute of system application namespace");
         } catch(Exception e) {
         	//expect 
@@ -211,7 +220,9 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
         }
     }
-//JBUCH:    @Test
+
+    @Test
+    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceHasComponentWithSystemNamespaceInMarkupAccessInternal() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Internal'/></aura:component>";
@@ -224,7 +235,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
                         NamespaceAccess.PRIVILEGED);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
          	fail("application of privileged namespace shouldn't be able to access attribute of system application namespace");
         } catch(Exception e) {
         	//expect 
@@ -233,7 +244,9 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
         }
     }
-//JBUCH:    @Test
+
+    @Test
+    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceHasComponentWithCustomNamespaceInMarkup() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String'/></aura:component>";
@@ -246,7 +259,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
                         NamespaceAccess.PRIVILEGED);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
         	fail("application of privileged namespace shouldn't be able to access attribute of custom application namespace");
         } catch(Exception e) {
         	//expect 
@@ -268,7 +281,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
                         NamespaceAccess.CUSTOM);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
         	fail("application of custom namespace shouldn't be able to access attribute of privileged application namespace");
         } catch(Exception e) {
         	//expect 
@@ -289,7 +302,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
 
     /**
@@ -307,7 +320,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     @Test
     public void testApplicationWithSystemNamespaceHasComponentWithSameSystemNamespaceInMarkupInternal() throws QuickFixException {
@@ -321,7 +334,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -339,7 +352,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     @Test
     public void testApplicationWithSystemNamespaceHasComponentWithOtherSystemNamespaceInMarkupInternal() throws QuickFixException {
@@ -353,7 +366,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -372,7 +385,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
                         NamespaceAccess.CUSTOM);
         try{
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
         	fail("application of custom namespace shouldn't be able to set attribute of component with system namespace");
         } catch(Exception e) {
         	//expect 
@@ -393,7 +406,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
                         NamespaceAccess.CUSTOM);
         try{
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
         	fail("application of custom namespace shouldn't be able to set attribute of component with system namespace");
         } catch(Exception e) {
         	//expect 
@@ -417,7 +430,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
                         NamespaceAccess.CUSTOM);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -436,7 +449,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication",
                         NamespaceAccess.CUSTOM);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
         	fail("application of custom namespace shouldn't be able to set attribute of component with other custom namespace");
         } catch(Exception e) {
         	//expect 
@@ -460,7 +473,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     
@@ -479,7 +492,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     @Test
     public void testComponentWithSystemNamespaceHasComponentWithSameSystemNamespaceInMarkupInternal() throws QuickFixException {
@@ -493,7 +506,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     
@@ -512,7 +525,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -531,7 +544,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.CUSTOM);
         try{
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
         	fail("component of custom namespace shouldn't be able to set attribute of component with system namespace");
         } catch(Exception e) {
         	//expect 
@@ -555,7 +568,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.CUSTOM);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -574,7 +587,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.CUSTOM);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
         	fail("component of custom namespace shouldn't be able to set attribute of component with other custom namespace");
         } catch(Exception e) {
         	//expect 
@@ -598,7 +611,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     
@@ -633,9 +646,11 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication",
                         NamespaceAccess.PRIVILEGED);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
-//JBUCH:    @Test
+
+    @Test
+    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceHasComponentWithOtherPrivilegedNamespaceInMarkupAccessPublic() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
@@ -648,7 +663,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
                         NamespaceAccess.PRIVILEGED);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
          	fail("application of privileged namespace shouldn't be able to access attribute of another privileged namespace");
         } catch(Exception e) {
         	//expect 
@@ -657,7 +672,9 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
         }
     }
-//JBUCH:    @Test
+
+    @Test
+    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceHasComponentWithSystemNamespaceInMarkupAccessPublic() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
@@ -670,7 +687,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
                         NamespaceAccess.PRIVILEGED);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
          	fail("application of privileged namespace shouldn't be able to access attribute of system application namespace");
         } catch(Exception e) {
         	//expect 
@@ -679,7 +696,9 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
         }
     }
-//JBUCH:    @Test
+
+    @Test
+    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceHasComponentWithCustomNamespaceInMarkupAccessPublic() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
@@ -692,7 +711,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
                         NamespaceAccess.PRIVILEGED);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
         	fail("application of privileged namespace shouldn't be able to access attribute of custom application namespace");
         } catch(Exception e) {
         	//expect 
@@ -714,7 +733,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
                         NamespaceAccess.CUSTOM);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
         	fail("application of custom namespace shouldn't be able to access attribute of privileged application namespace");
         } catch(Exception e) {
         	//expect 
@@ -735,7 +754,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -753,7 +772,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -771,7 +790,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -790,7 +809,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
                         NamespaceAccess.CUSTOM);
         try{
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
         	fail("application of custom namespace shouldn't be able to set attribute of component with system namespace");
         } catch(Exception e) {
         	//expect 
@@ -814,7 +833,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
                         NamespaceAccess.CUSTOM);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -833,7 +852,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication",
                         NamespaceAccess.CUSTOM);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
         	fail("application of custom namespace shouldn't be able to set attribute of component with other custom namespace");
         } catch(Exception e) {
         	//expect 
@@ -857,7 +876,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     
@@ -876,7 +895,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -894,7 +913,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -913,7 +932,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.CUSTOM);
         try{
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
         	fail("component of custom namespace shouldn't be able to set attribute of component with system namespace");
         } catch(Exception e) {
         	//expect 
@@ -937,7 +956,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.CUSTOM);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -956,7 +975,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.CUSTOM);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
         	fail("component of custom namespace shouldn't be able to set attribute of component with other custom namespace");
         } catch(Exception e) {
         	//expect 
@@ -980,7 +999,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     
@@ -1006,9 +1025,11 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication",
                         NamespaceAccess.PRIVILEGED);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
-//JBUCH:    @Test
+
+    @Test
+    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceHasComponentWithOtherPrivilegedNamespaceInMarkupAccessGLOBAL() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
@@ -1020,9 +1041,11 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
                         NamespaceAccess.PRIVILEGED);
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
     }
-//JBUCH:    @Test
+
+    @Test
+    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceHasComponentWithSystemNamespaceInMarkupAccessGLOBAL() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
@@ -1034,7 +1057,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
                         NamespaceAccess.PRIVILEGED);
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
     }
     @Test
     public void testApplicationWithPrivilegedNamespaceHasComponentWithCustomNamespaceInMarkupAccessGLOBAL() throws QuickFixException {
@@ -1048,7 +1071,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
                         NamespaceAccess.PRIVILEGED);
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
     }
     @Test
     public void testApplicationWithCustomNamespaceHasComponentWithPrivilegedNamespaceInMarkupAccessGLOBAL() throws QuickFixException {
@@ -1062,7 +1085,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
                         NamespaceAccess.CUSTOM);
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
     }
     @Test
     public void testApplicationWithSystemNamespaceHasComponentWithPrivilegedNamespaceInMarkupAccessGLOBAL() throws QuickFixException {
@@ -1076,7 +1099,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     
@@ -1095,7 +1118,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -1113,7 +1136,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -1131,7 +1154,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
                         NamespaceAccess.CUSTOM);
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -1149,7 +1172,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
                         NamespaceAccess.CUSTOM);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -1167,7 +1190,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication",
                         NamespaceAccess.CUSTOM);
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -1185,7 +1208,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     
@@ -1204,7 +1227,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -1222,7 +1245,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -1240,7 +1263,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.CUSTOM);
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -1258,7 +1281,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.CUSTOM);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -1276,7 +1299,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.CUSTOM);
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -1294,7 +1317,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponnet2",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -1303,7 +1326,9 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     /**
      * tests around privileged namespace
      */
-//JBUCH:    @Test
+
+    @Test
+    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceHasComponentWithSamePrivilegedNamespaceInMarkupAccessPrivate() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Private'/></aura:component>";
@@ -1316,14 +1341,16 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testapplication",
                         NamespaceAccess.PRIVILEGED);
         try {
-            descriptor.getDef();
+            definitionService.getDefinition(descriptor);
             fail("Attribute marked as PRIVATE cannot be accessed even in the same privileged namespace");
         } catch(NoAccessException e) {
             String msg = e.getMessage();
             assertTrue("get un-expected error message: " + msg, msg.contains("with access PRIVATE"));
         }
     }
-//JBUCH:    @Test
+
+    @Test
+    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceHasComponentWithOtherPrivilegedNamespaceInMarkupAccessPrivate() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Private'/></aura:component>";
@@ -1336,7 +1363,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
                         NamespaceAccess.PRIVILEGED);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
          	fail("application of privileged namespace shouldn't be able to access attribute of another privileged namespace");
         } catch(Exception e) {
         	//expect 
@@ -1345,7 +1372,9 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
         }
     }
-//JBUCH:    @Test
+
+    @Test
+    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceHasComponentWithSystemNamespaceInMarkupAccessPrivate() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Private'/></aura:component>";
@@ -1358,7 +1387,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
                         NamespaceAccess.PRIVILEGED);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
          	fail("application of privileged namespace shouldn't be able to access attribute of system application namespace");
         } catch(Exception e) {
         	//expect 
@@ -1367,7 +1396,9 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
     		assertTrue("get un-expected error message:"+e.getMessage(), e.getMessage().contains("disallowed by MasterDefRegistry.assertAccess()"));
         }
     }
-//JBUCH:    @Test
+
+    @Test
+    @Ignore("JBUCH: privileged hack")
     public void testApplicationWithPrivilegedNamespaceHasComponentWithCustomNamespaceInMarkupAccessPrivate() throws QuickFixException {
         //create component with system namespace
         String cmpSource = "<aura:component access='GLOBAL'><aura:attribute name='testattribute' type='String' access='Private'/></aura:component>";
@@ -1380,7 +1411,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testapplication",
                         NamespaceAccess.PRIVILEGED);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
         	fail("application of privileged namespace shouldn't be able to access attribute of custom application namespace");
         } catch(Exception e) {
         	//expect 
@@ -1402,7 +1433,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
                         NamespaceAccess.CUSTOM);
         try {
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
         	fail("application of custom namespace shouldn't be able to access attribute of privileged application namespace");
         } catch(Exception e) {
         	//expect 
@@ -1423,7 +1454,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -1441,7 +1472,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     /**
@@ -1459,7 +1490,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     @Test
@@ -1474,7 +1505,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class, source,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testapplication",
                         NamespaceAccess.INTERNAL);
-        descriptor.getDef();
+        definitionService.getDefinition(descriptor);
     }
     
     @Test
@@ -1490,7 +1521,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
                         NamespaceAccess.CUSTOM);
         try {
-            descriptor.getDef();
+            definitionService.getDefinition(descriptor);
             fail("Attribute marked as PRIVATE cannot be accessed even in the same custom namespace");
         } catch(NoAccessException e) {
             String msg = e.getMessage();
@@ -1514,7 +1545,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testapplication",
                         NamespaceAccess.CUSTOM);
         try {
-            descriptor.getDef();
+            definitionService.getDefinition(descriptor);
             fail("application of custom namespace shouldn't be able to set attribute of component with other custom namespace with access='Private'");
         } catch (NoAccessException expected) {
             //expect
@@ -1536,7 +1567,7 @@ public class AttributeAccessAttributeEnforcementTest extends AuraImplTestCase {
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testapplication",
                         NamespaceAccess.CUSTOM);
         try{
-        	descriptor.getDef();
+        	definitionService.getDefinition(descriptor);
         	fail("application of custom namespace shouldn't be able to set attribute of component with system namespace");
         } catch(Exception e) {
         	//expect 

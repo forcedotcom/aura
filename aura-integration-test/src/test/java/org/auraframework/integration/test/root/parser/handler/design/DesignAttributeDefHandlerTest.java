@@ -100,7 +100,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDesc = createAuraDefinitionWithDesignFile(cmp, design);
 
         try {
-            cmpDesc.getDef();
+            definitionService.getDefinition(cmpDesc);
             fail("String[] attribute should not be allowed to be exposed in the design file.");
         } catch (Exception t) {
             assertExceptionMessageStartsWith(t, InvalidDefinitionException.class,
@@ -214,7 +214,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
                 DesignDef.class);
         addSourceAutoCleanup(designDesc, String.format("<design:component>%s</design:component>", markup));
 
-        return designDesc.getDef().getAttributeDesignDef(name);
+        return definitionService.getDefinition(designDesc).getAttributeDesignDef(name);
     }
 
     private DefDescriptor<ComponentDef> createAuraDefinitionWithDesignFile(String cmpAttributes, String designSource) {

@@ -19,7 +19,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.auraframework.def.*;
+import org.auraframework.def.ActionDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
@@ -48,7 +50,7 @@ public class LabelControllerTest extends AuraImplTestCase {
     public void testLabelController() throws Exception {
         DefDescriptor<ControllerDef> labelCntrDesc = definitionService.getDefDescriptor(
                 "java://org.auraframework.impl.controller.LabelController", ControllerDef.class);
-        ControllerDef def = labelCntrDesc.getDef();
+        ControllerDef def = definitionService.getDefinition(labelCntrDesc);
         assertNotNull("Failed to fetch the definition of the Label Controller.", def);
         runLabelAction("Related_Lists", "task_mode_today", State.SUCCESS, "Today");
     }

@@ -231,7 +231,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
         source.addOrUpdate(String.format("<aura:interface extends='%s'> </aura:interface>",
                 extendsSelf.getDescriptorName()));
         try {
-            InterfaceDef def = extendsSelf.getDef();
+            InterfaceDef def = definitionService.getDefinition(extendsSelf);
             def.validateReferences();
             fail("An interface should not be able to extend itself.");
         } catch (InvalidDefinitionException expected) {
@@ -244,7 +244,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> cmpDesc = addSourceAutoCleanup(InterfaceDef.class,
                 "<aura:interface extends='aura:iDontExist'></aura:interface>");
         try {
-            InterfaceDef def = cmpDesc.getDef();
+            InterfaceDef def = definitionService.getDefinition(cmpDesc);
             def.validateReferences();
             fail("Did not get expected exception: " + DefinitionNotFoundException.class.getName());
         } catch (Exception e) {
@@ -259,7 +259,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> d = addSourceAutoCleanup(InterfaceDef.class,
                 "<aura:interface implements='test:fakeInterface'> </aura:interface>");
         try {
-            d.getDef();
+            definitionService.getDefinition(d);
             fail("An interface cannot implement another interface, it can only extend it.");
         } catch (InvalidDefinitionException ignored) {
         }

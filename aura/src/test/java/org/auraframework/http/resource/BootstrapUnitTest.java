@@ -21,6 +21,7 @@ import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
@@ -64,12 +65,14 @@ public class BootstrapUnitTest extends UnitTestCase {
         ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         ApplicationDef appDef = Mockito.mock(ApplicationDef.class);
+        DefinitionService definitionService = Mockito.mock(DefinitionService.class);
 
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.setServletUtilAdapter(servletUtilAdapter);
+        bootstrap.setDefinitionService(definitionService);
 
         Mockito.when(appDefDesc.getDefType()).thenReturn(DefType.APPLICATION);
-        Mockito.when(appDefDesc.getDef()).thenReturn(appDef);
+        Mockito.when(definitionService.getDefinition(appDefDesc)).thenReturn(appDef);
 
         // Public cache expiration not set, should be no cache
         Mockito.when(appDef.getBootstrapPublicCacheExpiration()).thenReturn(expirationSetting);

@@ -153,7 +153,7 @@ Aura.Services.MetricsService.prototype.initializePlugin = function (pluginName, 
 **/
 Aura.Services.MetricsService.prototype.applicationReady = function () {
     Aura.bootstrapMark("bootstrapEPT");
-    this.applicationReady = this.time();
+    this.applicationReadyTime = this.time();
 
     this.emitBootstrapTransaction();
 
@@ -171,13 +171,13 @@ Aura.Services.MetricsService.prototype.applicationReady = function () {
 
 Aura.Services.MetricsService.prototype.emitBootstrapTransaction = function () {
     var domReady = window.document && window.document.readyState;
-    if (!this._emittedBootstrap && this.applicationReady && domReady === "complete") {
+    if (!this._emittedBootstrap && this.applicationReadyTime && domReady === "complete") {
         this._emittedBootstrap = true;
 
         // We need a timeout because appCache events only fire after onload event
         setTimeout(function () {
             var bootstrap = this.getBootstrapMetrics();
-            var appReady = this.applicationReady;
+            var appReady = this.applicationReadyTime;
 
             this.transactionEnd('aura','bootstrap', function (transaction) {
                 // We need to override manually the duration to add the time before aura was initialized
@@ -816,9 +816,8 @@ Aura.Services.MetricsService.prototype.registerBeacon = function (beacon) {
     this.beaconProviders[beacon["name"] || Aura.Services.MetricsService.DEFAULT] = beacon["beacon"] || beacon;
 };
 
-Aura.Services.MetricsService.prototype.summarizeResourcePerfInfo = function (r, name) {
+Aura.Services.MetricsService.prototype.summarizeResourcePerfInfo = function (r) {
     return {
-        "name"         : name || r.name,
         "duration"     : parseInt(r.responseEnd - r.startTime, 10),
         "startTime"    : parseInt(r.startTime, 10),
         "fetchStart"   : parseInt(r.fetchStart, 10),
@@ -841,7 +840,7 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
     var pageStartTime = bootstrap["pageStartTime"];
 
     // We cache it after the first call
-    if (!pageStartTime) {
+    if (!this._cachedBootstrap) {
         for (var m in Aura["bootstrap"]) {
             bootstrap[m] = parseInt(Aura["bootstrap"][m], 10);
         }
@@ -885,34 +884,27 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
 
             if (performance.getEntries) {
                 var frameworkRequests = {
-                    "requestEncryptionKeyJs" : "app.encryptionkey.js",
                     "requestBootstrapJs"     : "bootstrap.js",
                     "requestInlineJs"        : "inline.js",
                     "requestAppCss"          : "app.css",
                     "requestAppJs"           : "app.js",
-                    "requestAuraJs"          : "/aura_",
-                    "requestAuraLibsJs"      : "/libs_" 
+                    "requestAuraJs"          : "/aura_"
                 };
-
-                var bootstrapRequests = ($A.util.filter(performance.getEntries(),
-                    function (resource) {
-                        return resource.responseEnd < bootstrap["bootstrapEPT"];
-                    })
-                ).map(this.summarizeResourcePerfInfo);
 
                frameworkRequests = $A.util.reduce(window.performance.getEntries(), function (r, item) { 
                     for (var i in frameworkRequests) {
                         if (item.name.indexOf(frameworkRequests[i]) !== -1) {
-                            bootstrap[i] = this.summarizeResourcePerfInfo(item, i);
+                            bootstrap[i] = this.summarizeResourcePerfInfo(item);
                             return r;       
                         }
                     }
                     return r;
                 }.bind(this), {});
-
-                bootstrap["allRequests"] = bootstrapRequests;
             }
         }
+
+        this._cachedBootstrap = bootstrap;
     }
-    return bootstrap;
+
+    return this._cachedBootstrap;
 };

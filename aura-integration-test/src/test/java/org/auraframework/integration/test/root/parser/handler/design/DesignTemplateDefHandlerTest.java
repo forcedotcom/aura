@@ -67,6 +67,6 @@ public class DesignTemplateDefHandlerTest extends AuraImplTestCase {
                 DesignDef.class);
         addSourceAutoCleanup(designDesc, String.format("<design:component>%s</design:component>", markup));
 
-        return designDesc.getDef().getDesignTemplateDef();
+        return definitionService.getDefinition(designDesc).getDesignTemplateDef();
     }
 }

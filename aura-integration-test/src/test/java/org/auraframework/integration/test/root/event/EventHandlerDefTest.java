@@ -39,7 +39,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> componentDefDescriptor = definitionService.getDefDescriptor(
                 "handleEventTest:handlerWithoutNameOrEvent", ComponentDef.class);
         try {
-            componentDefDescriptor.getDef();
+            definitionService.getDefinition(componentDefDescriptor);
             fail("Expected InvalidDefinitionException");
         } catch (InvalidDefinitionException e) {
             assertEquals("Incorrect exception message",
@@ -56,7 +56,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> componentDefDescriptor = definitionService.getDefDescriptor(
                 "handleEventTest:handlerWithEventForComponentEvent", ComponentDef.class);
         try {
-            componentDefDescriptor.getDef();
+            definitionService.getDefinition(componentDefDescriptor);
             fail("Expected InvalidReferenceException");
         } catch (InvalidReferenceException e) {
             assertEquals(
@@ -75,7 +75,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> componentDefDescriptor = definitionService.getDefDescriptor(
                 "handleEventTest:handlerWithNameForApplicationEvent", ComponentDef.class);
         try {
-            componentDefDescriptor.getDef();
+            definitionService.getDefinition(componentDefDescriptor);
             fail("Expected InvalidReferenceException");
         } catch (InvalidReferenceException e) {
             assertEquals(
@@ -90,7 +90,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> componentDefDescriptor = definitionService.getDefDescriptor(
                 "handleEventTest:handlerWithUnregisteredName", ComponentDef.class);
         try {
-            componentDefDescriptor.getDef();
+            definitionService.getDefinition(componentDefDescriptor);
             fail("Expected InvalidReferenceException");
         } catch (InvalidReferenceException e) {
             assertEquals("Incorrect exception message",
@@ -103,7 +103,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> componentDefDescriptor = definitionService.getDefDescriptor(
                 "handleEventTest:handlerWithInvalidEvent", ComponentDef.class);
         try {
-            componentDefDescriptor.getDef();
+            definitionService.getDefinition(componentDefDescriptor);
             fail("Expected DefinitionNotFoundException");
         } catch (DefinitionNotFoundException e) {
             assertEquals(
@@ -118,7 +118,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> componentDefDescriptor = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:handler name='' action='{!c.handleIt}'/></aura:component>");
         try {
-            componentDefDescriptor.getDef();
+            definitionService.getDefinition(componentDefDescriptor);
             fail("Expected InvalidReferenceException");
         } catch (InvalidReferenceException e) {
             assertEquals("Incorrect exception message", "aura:handler has invalid name attribute value: ",
@@ -131,7 +131,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> componentDefDescriptor = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:handler event='' action='{!c.handleIt}'/></aura:component>");
         try {
-            componentDefDescriptor.getDef();
+            definitionService.getDefinition(componentDefDescriptor);
             fail("Expected InvalidDefinitionException");
         } catch (InvalidDefinitionException e) {
             assertEquals("Incorrect exception message",
@@ -148,7 +148,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
                 "<aura:component><aura:registerevent name='somename' type='handleEventTest:event'/>"
                         + "<aura:handler name='somename' /></aura:component>");
         try {
-            componentDefDescriptor.getDef();
+            definitionService.getDefinition(componentDefDescriptor);
             fail("Expected InvalidDefinitionException");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "aura:handler missing attribute: action=\"…\"",
@@ -163,7 +163,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
                 .format(cmpMarkup,
                         "<aura:handler event='aura:applicationEvent' description='Describe the event handler' action='{!c.dummy}'/>");
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
-        assertEquals("Description of registerevent not processed", "Describe the event handler", cmpDesc.getDef()
-                .getHandlerDefs().iterator().next().getDescription());
+        assertEquals("Description of registerevent not processed", "Describe the event handler",
+                definitionService.getDefinition(cmpDesc).getHandlerDefs().iterator().next().getDescription());
     }
 }

@@ -42,7 +42,7 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
     private FlavorIncludeDef source(String flavorIncludeSource) throws QuickFixException {
         String fmt = String.format("<aura:flavors>%s</aura:flavors>", flavorIncludeSource);
         DefDescriptor<FlavorsDef> parent = addFlavorAssortment(fmt);
-        return parent.getDef().getFlavorIncludeDefs().get(0);
+        return definitionService.getDefinition(parent).getFlavorIncludeDefs().get(0);
     }
 
     @Test

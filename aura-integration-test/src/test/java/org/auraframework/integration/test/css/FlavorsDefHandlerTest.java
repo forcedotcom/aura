@@ -23,7 +23,7 @@ public class FlavorsDefHandlerTest extends StyleTestCase {
     @Test
     public void testInvalidChild() throws Exception {
         try {
-            addFlavorAssortment("<aura:flavors><aura:foo/></aura:flavors>").getDef();
+            definitionService.getDefinition(addFlavorAssortment("<aura:flavors><aura:foo/></aura:flavors>"));
             fail("Should have thrown AuraException aura:foo isn't a valid child tag for aura:flaors");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "Found unexpected tag");

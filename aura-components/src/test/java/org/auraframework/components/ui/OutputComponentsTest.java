@@ -74,7 +74,7 @@ public class OutputComponentsTest extends AuraTestCase {
         Set<ComponentDef> ret = Sets.newHashSet();
         for (DefDescriptor<?> def : definitionService.find(matcher)) {
             if (def.getName().startsWith("output")) {
-                ret.add((ComponentDef) def.getDef());
+                ret.add((ComponentDef) definitionService.getDefinition(def));
             }
         }
         return ret;
@@ -121,8 +121,9 @@ public class OutputComponentsTest extends AuraTestCase {
                     + "\"", events.get(eventName), registeredEvent.getDescriptor().getQualifiedName());
             assertEquals("Expected " + registeredEvent.getDescriptor().getQualifiedName()
                     + " event to be a component event but it is of type "
-                    + registeredEvent.getDescriptor().getDef().getEventType(), EventType.COMPONENT, registeredEvent
-                    .getDescriptor().getDef().getEventType());
+                    + definitionService.getDefinition(registeredEvent.getDescriptor()).getEventType(),
+                    EventType.COMPONENT,
+                    definitionService.getDefinition(registeredEvent.getDescriptor()).getEventType());
         }
     }
 

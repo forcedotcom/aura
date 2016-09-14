@@ -633,15 +633,17 @@
 
         var resolved = 0;
 
-        function setupComponent(out) {
-            components.push(out);
+        function setupComponent(out, status) {
+        	if (status === "SUCCESS") {
+        		components.push(out);
 
-            $A.render(out, element);	// Most of the performance hits here
-            $A.afterRender(out);
+                $A.render(out, element);	// Most of the performance hits here
+                $A.afterRender(out);
 
-            if (callback && (++resolved === cdrs.length)) {
-                callback();
-            }
+                if (callback && (++resolved === cdrs.length)) {
+                    callback();
+                }
+        	}
         }
 
 		for (var cdrIndex = 0; cdrIndex < cdrs.length; cdrIndex++) {

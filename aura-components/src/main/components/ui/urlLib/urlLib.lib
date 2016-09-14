@@ -17,4 +17,5 @@
 -->
 <aura:library description="Helper functions for turning urls, email addresses, etc. in a text into clickable links.">
     <aura:include name="linkify"/>
+    <aura:include name="urlUtil"/>
 </aura:library>

@@ -98,7 +98,7 @@ public class JavaProviderIntegrationTest extends AuraImplTestCase {
     public void testComponentConfigProvider() throws Exception{
         String targetProvider = "java://org.auraframework.impl.java.provider.TestComponentConfigProvider";
         DefDescriptor<ProviderDef> javaProviderDefDesc = definitionService.getDefDescriptor(targetProvider, ProviderDef.class);
-        ProviderDef actual = javaProviderDefDesc.getDef();
+        ProviderDef actual = definitionService.getDefinition(javaProviderDefDesc);
         assertNotNull(actual);
         assertEquals(targetProvider, actual.getDescriptor().getQualifiedName());
     }
@@ -107,7 +107,7 @@ public class JavaProviderIntegrationTest extends AuraImplTestCase {
     public void testComponentDescriptorProvider() throws Exception{
         String targetProvider = "java://org.auraframework.impl.java.provider.TestComponentDescriptorProvider";
         DefDescriptor<ProviderDef> javaProviderDefDesc = definitionService.getDefDescriptor(targetProvider, ProviderDef.class);
-        ProviderDef actual = javaProviderDefDesc.getDef();
+        ProviderDef actual = definitionService.getDefinition(javaProviderDefDesc);
         assertNotNull(actual);
         assertEquals(targetProvider, actual.getDescriptor().getQualifiedName());
     }
@@ -120,7 +120,7 @@ public class JavaProviderIntegrationTest extends AuraImplTestCase {
         DefDescriptor<ProviderDef> javaPrvdrDefDesc = definitionService.getDefDescriptor(
                 "java://org.auraframework.impl.java.provider.TestProviderWithoutAnnotation", ProviderDef.class);
         try {
-            javaPrvdrDefDesc.getDef();
+            definitionService.getDefinition(javaPrvdrDefDesc);
             fail("Expected a InvalidDefinitionException when Java provider doesn't use Provider annotation");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "@Provider annotation is required on all Providers.");
@@ -135,7 +135,7 @@ public class JavaProviderIntegrationTest extends AuraImplTestCase {
         String targetProvider = "java://org.auraframework.impl.java.provider.TestProviderWithoutImplementingInterface";
         DefDescriptor<ProviderDef> javaProviderDefDesc = definitionService.getDefDescriptor(targetProvider, ProviderDef.class);
         try {
-            javaProviderDefDesc.getDef();
+            definitionService.getDefinition(javaProviderDefDesc);
             fail("Expected a InvalidDefinitionException when Java provider doesn't implement Provider interface.");
         } catch (Exception e) {
             checkExceptionContains(e, InvalidDefinitionException.class, "@Provider must have a provider interface.");

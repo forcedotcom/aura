@@ -25,9 +25,11 @@
         
        $A.componentService.newComponentAsync(
           this,
-          function(topicPanel) {  
+          function(topicPanel, status) {  
               try {
-                  cmp.set('v.topicPanel', [topicPanel]);
+	            	  if (status === "SUCCESS") {
+	            		  cmp.set('v.topicPanel', [topicPanel]);
+	                  }
                   } catch (e) {
                   // Handle the catch-all scenario.
                       if(topic !== 'welcome') {

@@ -104,7 +104,7 @@ public class ComponentJSUITest extends TestSuite {
                         DefDescriptor<TestSuiteDef> descriptor = (DefDescriptor<TestSuiteDef>) qd;
                         Test test;
                         try {
-                            test = new ComponentTestSuite(descriptor.getDef());
+                            test = new ComponentTestSuite(definitionService.getDefinition(descriptor));
                         } catch (Throwable t) {
                             test = new FailTestCase(descriptor.getQualifiedName(), t);
                         }

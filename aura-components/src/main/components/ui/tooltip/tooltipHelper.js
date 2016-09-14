@@ -68,10 +68,12 @@
 			
 			compDef.target = component.getGlobalId();
 
-			$A.createComponent('ui:tooltipAdvanced', compDef, function(tt){
-                cmLib.containerManager.getSharedInstance().renderContainer(tt);
-                component._tooltip = tt;
-                cb(tt);
+			$A.createComponent('markup://ui:tooltipAdvanced', compDef, function(tt, status){
+				if (status === "SUCCESS") {
+					cmLib.containerManager.getSharedInstance().renderContainer(tt);
+	                component._tooltip = tt;
+	                cb(tt);
+				}
             });
 		}
 		

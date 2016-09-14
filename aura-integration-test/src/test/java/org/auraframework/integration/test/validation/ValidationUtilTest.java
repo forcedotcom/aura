@@ -70,12 +70,12 @@ public final class ValidationUtilTest extends AuraValidationTestCase {
         DefDescriptor<StyleDef> styleDesc = definitionService.getDefDescriptor("ui.button", StyleDef.class);
         assertEquals("css://ui.button", styleDesc.toString());
 
-        StyleDef styleDef = styleDesc.getDef();
+        StyleDef styleDef = definitionService.getDefinition(styleDesc);
         assertEquals("css://ui.button", styleDef.toString());
 
         DefDescriptor<ComponentDef> cmpDesc = definitionService.getDefDescriptor("ui:button", ComponentDef.class);
         assertEquals("markup://ui:button", cmpDesc.toString());
-        ComponentDef componentDef = cmpDesc.getDef();
+        ComponentDef componentDef = definitionService.getDefinition(cmpDesc);
         assertEquals("markup://ui:button", componentDef.toString());
 
         // we can get all definitions the button depends on
@@ -83,7 +83,7 @@ public final class ValidationUtilTest extends AuraValidationTestCase {
         assertEquals(1, controllerDescs.size());
         DefDescriptor<ControllerDef> controllerDesc = controllerDescs.get(0);
         assertEquals("js://ui.button", controllerDesc.toString());
-        JavascriptControllerDef controllerDef = (JavascriptControllerDef) controllerDesc.getDef();
+        JavascriptControllerDef controllerDef = (JavascriptControllerDef) definitionService.getDefinition(controllerDesc);
         String controllerDefFileName = controllerDef.getLocation().getFileName();
         assertTrue(controllerDefFileName, controllerDefFileName.endsWith("/ui/button/buttonController.js"));
         // we can use getBundle to get all descriptors in the bundle
@@ -94,7 +94,7 @@ public final class ValidationUtilTest extends AuraValidationTestCase {
         // finding java definitions
         DefDescriptor<TypeDef> javaDescriptor = definitionService.getDefDescriptor(
                 "java://org.auraframework.components.test.java.controller.TestController", TypeDef.class);
-        TypeDef javaDef = javaDescriptor.getDef();
+        TypeDef javaDef = definitionService.getDefinition(javaDescriptor);
         assertEquals("TestController", javaDef.getName());
     }
 }

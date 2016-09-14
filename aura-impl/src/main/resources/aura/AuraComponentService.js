@@ -120,9 +120,9 @@ AuraComponentService.prototype.countComponents = function() {
  * @public
  * @export
  */
-AuraComponentService.prototype.getComponentLocator = function(cmp, localId) {
+AuraComponentService.prototype.getComponentLocator = function(cmp, localId, includeMetadata) {
     $A.assert(cmp && localId, 'No component or id provided');
-    return cmp.getLocator(localId);
+    return cmp.getLocator(localId, includeMetadata);
 };
 
 /**

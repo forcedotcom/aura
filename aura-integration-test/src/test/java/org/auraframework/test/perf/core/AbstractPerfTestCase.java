@@ -171,7 +171,7 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
     private Map<String, Object> getComponentAttributeValues(DefDescriptor<ComponentDef> componentDefDefDescriptor)
             throws QuickFixException {
         Map<String, Object> params = Maps.newHashMap();
-        Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = componentDefDefDescriptor.getDef().getAttributeDefs();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = definitionService.getDefinition(componentDefDefDescriptor).getAttributeDefs();
 
         for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> attr : attrs.entrySet()) {
             Object attributeValue = getMockAttributeValueProvider().getAttributeValue(componentDefDefDescriptor,

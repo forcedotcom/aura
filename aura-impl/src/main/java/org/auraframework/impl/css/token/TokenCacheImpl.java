@@ -15,6 +15,27 @@
  */
 package org.auraframework.impl.css.token;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import org.auraframework.Aura;
+import org.auraframework.css.TokenCache;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.TokenDef;
+import org.auraframework.def.TokenMapProviderDef;
+import org.auraframework.def.TokensDef;
+import org.auraframework.impl.java.provider.TokenMapProviderInstance;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.text.Hash;
+
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -25,34 +46,18 @@ import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import org.auraframework.Aura;
-import org.auraframework.css.TokenCache;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.TokenDef;
-import org.auraframework.def.TokenMapProviderDef;
-import org.auraframework.def.TokensDef;
-import org.auraframework.impl.java.provider.TokenMapProviderInstance;
-import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.text.Hash;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class TokenCacheImpl implements TokenCache {
     private final Multimap<DefDescriptor<TokensDef>, DefDescriptor<TokensDef>> originals;
     private final ImmutableList<DefDescriptor<TokensDef>> descriptors;
     private final ImmutableList<DefDescriptor<TokensDef>> reversed;
     private final ImmutableTable<String, DefDescriptor<TokensDef>, String> dynamicTokens;
+    private final DefinitionService definitionService;
 
-    public TokenCacheImpl(Iterable<DefDescriptor<TokensDef>> descriptors) throws QuickFixException {
+    public TokenCacheImpl(DefinitionService definitionService, Iterable<DefDescriptor<TokensDef>> descriptors)
+            throws QuickFixException {
         checkNotNull(descriptors, "descriptors cannot be null, see EmptyTokenCache instead");
+        this.definitionService = definitionService;
 
         // we want a unique list of the concrete descs. Since last one wins, there's no need to include duplicate
         // entries; just the last one. duplicate entries could come from descriptor providers that resolve to the
@@ -63,7 +68,7 @@ public final class TokenCacheImpl implements TokenCache {
         ImmutableMultimap.Builder<DefDescriptor<TokensDef>, DefDescriptor<TokensDef>> origs = ImmutableMultimap.builder();
 
         for (DefDescriptor<TokensDef> descriptor : descriptors) {
-            DefDescriptor<TokensDef> concrete = descriptor.getDef().getConcreteDescriptor();
+            DefDescriptor<TokensDef> concrete = definitionService.getDefinition(descriptor).getConcreteDescriptor();
             unique.remove(concrete); // unlike the normal behavior, we want to move the position of duplicate entries
             unique.add(concrete);
             if (descriptor != concrete) {
@@ -77,9 +82,9 @@ public final class TokenCacheImpl implements TokenCache {
 
         ImmutableTable.Builder<String, DefDescriptor<TokensDef>, String> table = ImmutableTable.builder();
         for (DefDescriptor<TokensDef> descriptor : this.descriptors) { // iterate through the unique list
-            TokensDef def = descriptor.getDef();
+            TokensDef def = definitionService.getDefinition(descriptor);
             if (def.getMapProvider() != null) {
-                TokenMapProviderDef tokenMapProviderDef = def.getMapProvider().getDef();
+                TokenMapProviderDef tokenMapProviderDef = definitionService.getDefinition(def.getMapProvider());
                 TokenMapProviderInstance instance = Aura.getInstanceService().getInstance(tokenMapProviderDef);
                 Map<String, String> map = instance.provide();
                 for (Entry<String, String> entry : map.entrySet()) {
@@ -113,7 +118,7 @@ public final class TokenCacheImpl implements TokenCache {
     @Override
     public Optional<Object> getToken(String name) throws QuickFixException {
         for (DefDescriptor<TokensDef> descriptor : reversed) { // reverse order; last one wins
-            TokensDef def = descriptor.getDef();
+            TokensDef def = definitionService.getDefinition(descriptor);
 
             Optional<Object> value = def.getToken(name);
             if (value.isPresent()) {
@@ -133,7 +138,7 @@ public final class TokenCacheImpl implements TokenCache {
     @Override
     public Optional<TokenDef> getRelevantTokenDef(String name) throws QuickFixException {
         for (DefDescriptor<TokensDef> descriptor : reversed) { // reverse order; last one wins
-            Optional<TokenDef> def = descriptor.getDef().getTokenDef(name);
+            Optional<TokenDef> def = definitionService.getDefinition(descriptor).getTokenDef(name);
             if (def.isPresent()) {
                 return def;
             }
@@ -172,7 +177,7 @@ public final class TokenCacheImpl implements TokenCache {
 
         for (DefDescriptor<TokensDef> descriptor : descriptors) {
             if (filter == null || (filter.contains(descriptor) || Iterables.any(originals.get(descriptor), predicate))) {
-                Iterables.addAll(names, descriptor.getDef().getAllNames());
+                Iterables.addAll(names, definitionService.getDefinition(descriptor).getAllNames());
                 names.addAll(dynamicTokens.column(descriptor).keySet());
             }
         }

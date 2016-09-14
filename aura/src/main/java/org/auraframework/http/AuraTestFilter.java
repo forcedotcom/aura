@@ -333,7 +333,7 @@ public class AuraTestFilter implements Filter {
     private TestSuiteDef getTestSuite(DefDescriptor<?> targetDescriptor) throws QuickFixException {
         DefDescriptor<TestSuiteDef> suiteDesc = definitionService.getDefDescriptor(targetDescriptor,
                 DefDescriptor.JAVASCRIPT_PREFIX, TestSuiteDef.class);
-        return suiteDesc.getDef();
+        return definitionService.getDefinition(suiteDesc);
     }
 
     private TestCaseDef getTestCase(TestSuiteDef suiteDef, String testCaseName) throws QuickFixException {
@@ -422,7 +422,7 @@ public class AuraTestFilter implements Filter {
             // Free-form tests will load only the target component's template.
             // TODO: Allow specifying the template on the test.
             // TODO: Load proxy app for cmps, apps must loadApplication.
-            final BaseComponentDef originalDef = (BaseComponentDef) targetDescriptor.getDef();
+            final BaseComponentDef originalDef = (BaseComponentDef) definitionService.getDefinition(targetDescriptor);
             final ComponentDef targetTemplate = originalDef.getTemplateDef();
             String newDescriptorString = String
                     .format("%s$%s", targetDescriptor.getDescriptorName(), testDef.getName());

@@ -18,4 +18,5 @@
 <aura:library description="Test cases and test data common to all storage adapters">
     <aura:include name="storageTest"/>
     <aura:include name="storageContents"/>
+    <aura:include name="adapters"/>
 </aura:library>

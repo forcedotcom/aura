@@ -254,10 +254,9 @@ CryptoAdapter.prototype.initializeInternal = function() {
             function verifySentinel() {
 
                 function handleInvalidSentinel() {
-                    // decryption failed so clear the store. do not re-throw to remain using crypto with new key.
+                    // decryption failed so clear the store
                     that.log(CryptoAdapter.LOG_LEVEL.INFO, "initialize(): encryption key is different so clearing storage");
                     $A.metricsService.transaction("aura", "performance:cryptoStorage-keymismatch");
-                    // note the use of clearInternal() to bypass the queue.
                     return that.clear();
                 }
 

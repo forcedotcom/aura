@@ -1,9 +1,11 @@
 ({
     /**
-     * CryptoAdapter delegates its storage operations to an underlying adapter, IndexedDB by default and MemoryAdapter
-     * as a fallback. This class stubs in an underlying adapter that fails on all operations.
+     * CryptoAdapter delegates its storage operations to an underlying adapter: IndexedDB. If
+     * IndexedDB successfully initializes but then fails all operations, CryptoAdapter will fail
+     * all operations.
      *
-     * A real world scenario that this emulates is Firefox in private browsing mode.
+     * Note that this is different than IndexedDB failing all operations including initialization.
+     * That scenario results in AuraStorage performing a fallback from CryptoAdapter to MemoryAdapter.
      */
 
     // IndexedDB has problems in Safari and is not supported in older IE
@@ -21,49 +23,14 @@
     setUp: function(cmp) {
         var that = this;
 
-        // a storage adapter that fails on all operations
-        var MockStorageAdapter = function MockStorageAdapter() {};
-        MockStorageAdapter.NAME = "mock";
-        MockStorageAdapter.prototype.getName = function() { return MockStorageAdapter.NAME; };
-
-        MockStorageAdapter.prototype.getSize = function() {
-            return Promise.reject(new Error("getSize(): mock always fails"));
-        };
-
-        MockStorageAdapter.prototype.getItems = function(keys) {
-            return Promise.reject(new Error("getItems(): mock always fails"));
-        };
-
-        MockStorageAdapter.prototype.getAll = function(keys) {
-            return Promise.reject(new Error("getAll(): mock always fails"));
-        };
-
-        MockStorageAdapter.prototype.setItems = function(tuples) {
-            return Promise.reject(new Error("setItems(): mock always fails"));
-        };
-
-        MockStorageAdapter.prototype.removeItems = function(keys) {
-            return Promise.reject(new Error("removeItems(): mock always fails"));
-        };
-
-        MockStorageAdapter.prototype.clear = function() {
-            return Promise.reject(new Error("clear(): mock always fails"));
-        };
-
-        MockStorageAdapter.prototype.clearOnInit = function() {
-            return Promise.reject(new Error("clearOnInit(): mock always fails"));
-        };
-
-        MockStorageAdapter.prototype.deleteStorage = function() {
-            return Promise.reject(new Error("deleteStorage(): mock always fails"));
-        };
-
-        // Override IndexedDB adapter at the StorageService layer so CryptoAdapter uses our test mock storage instead
-        // of the real IndexedDBAdapter.
-        $A.storageService.getAdapterConfig("indexeddb").adapterClass = MockStorageAdapter;
-        $A.storageService.getAdapterConfig("memory").adapterClass = MockStorageAdapter;
-
+        // override IndexedDBAdapter with a mock that:
+        // a. lets CryptoAdapter complete its initialization
+        // b. then fails for all operations
+        this.operationCount = 4;
+        var FailingAdapter = cmp.helper.lib.adapters.getAdapterThatFailsAfterNOperations("mock", false, false, this.operationCount);
+        $A.storageService.getAdapterConfig("indexeddb").adapterClass = FailingAdapter;
         $A.installOverride("StorageService.selectAdapter", function(){ return "crypto" }, this);
+
         this.storage = $A.storageService.initStorage({
             name: this.storageName,
             maxSize: 32768,
@@ -89,10 +56,10 @@
            function doFailedStorageOperationAndVerifyError(cmp) {
                var storage = $A.storageService.getStorage(this.storageName);
                var promise = storage.set("hi", "bye");
-               this.doFailedActionAndVerifyError(promise, "Error: CryptoAdapter '" + this.storageName + "' adapter failed to initialize");
+               this.doFailedActionAndVerifyError(promise, "Error: setItems(): mock fails after " + this.operationCount + " operations");
            },
            function verifyExpectedLogs(cmp) {
-               this.verifyLogs("set");
+               this.verifyLogs("setAll");
            }
         ]
     },
@@ -102,7 +69,7 @@
            function doFailedStorageOperationAndVerifyError(cmp) {
                var storage = $A.storageService.getStorage(this.storageName);
                var promise = storage.get("hi");
-               this.doFailedActionAndVerifyError(promise, "Error: CryptoAdapter '" + this.storageName + "' adapter failed to initialize");
+               this.doFailedActionAndVerifyError(promise, "Error: getItems(): mock fails after " + this.operationCount + " operations");
            },
            function verifyExpectedLogs(cmp) {
                this.verifyLogs("getAll");
@@ -115,7 +82,7 @@
            function doFailedStorageOperationAndVerifyError(cmp) {
                var storage = $A.storageService.getStorage(this.storageName);
                var promise = storage.getAll();
-               this.doFailedActionAndVerifyError(promise, "Error: CryptoAdapter '" + this.storageName + "' adapter failed to initialize");
+               this.doFailedActionAndVerifyError(promise, "Error: getItems(): mock fails after " + this.operationCount + " operations");
            },
            function verifyExpectedLogs(cmp) {
                this.verifyLogs("getAll");
@@ -128,7 +95,7 @@
            function doFailedStorageOperationAndVerifyError(cmp) {
                var storage = $A.storageService.getStorage(this.storageName);
                var promise = storage.clear();
-               this.doFailedActionAndVerifyError(promise, "Error: CryptoAdapter '" + this.storageName + "' adapter failed to initialize");
+               this.doFailedActionAndVerifyError(promise, "Error: clear(): mock fails after " + this.operationCount + " operations");
            },
            function verifyExpectedLogs(cmp) {
                this.verifyLogs("clear");
@@ -141,10 +108,10 @@
            function doFailedStorageOperationAndVerifyError(cmp) {
                var storage = $A.storageService.getStorage(this.storageName);
                var promise = storage.remove("key");
-               this.doFailedActionAndVerifyError(promise, "Error: CryptoAdapter '" + this.storageName + "' adapter failed to initialize");
+               this.doFailedActionAndVerifyError(promise, "Error: removeItems(): mock fails after " + this.operationCount + " operations");
            },
            function verifyExpectedLogs(cmp) {
-               this.verifyLogs("remove");
+               this.verifyLogs("removeAll");
            }
         ]
     },
@@ -175,7 +142,7 @@
     },
 
     /**
-     * AuraStorage.js will log errors in it's promise reject handler for operations delegated to the underlying adapter.
+     * AuraStorage.js will log errors in its promise reject handler for operations delegated to the underlying adapter.
      * We override the MetricsService API to capture the logs and verify them here. We check the 'name' and 'operation'
      * parameters of the transaction log since we can identify where the error is coming from with those 2 pieces of info.
      *

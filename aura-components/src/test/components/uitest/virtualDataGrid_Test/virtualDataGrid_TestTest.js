@@ -196,6 +196,15 @@
         }
     },
     
+    /**
+     * Test to make sure table cells each have exactly one <td> or <th> element
+     */
+    testCustomTableCell: {
+        test: function(cmp) {
+            this.validateTableCells(4);
+        }
+    },
+    
     setValue : function(cmp, cmpName, value){
         cmp.find(cmpName).set("v.value", value);
     },
@@ -290,5 +299,20 @@
             + expectedPhone + ', ' +
             + expectedBalance + ', ' + '}' 
         );
-    }
+    },
+    
+    validateTableCells : function(colCount){
+        var tbody = document.getElementsByTagName("tbody")[0];
+        var trs = this.getOnlyTrs(tbody.children);
+        
+        for (var i = 0; i < trs.length; i++) {
+            var cells = trs[i].children;
+            $A.test.assertEquals(colCount, cells.length, "Row " + (i+1) + " has an incorrect number of columns");
+            for (var j = 0; j < cells.length; j++) {
+                var cell = cells[j]
+                $A.test.assertEquals('TD', cell.tagName, "Table cell should be a <td> element");
+                $A.test.assertNotEquals('TD', cell.firstChild.tagName, "Table cell should not be double-wrapped in <td> elements");
+            }
+        }
+    },
 })

@@ -38,12 +38,14 @@
             <ui:dataGridColumn name="Name"    label="Name"/>
             <ui:dataGridColumn name="Phone"   label="Phone"/>
             <ui:dataGridColumn name="Balance" label="Balance"/>
+            <ui:dataGridColumn name="Custom" label="Custom"/>
         </aura:set>
 
         <aura:set attribute="columns">
             <uitest:virtualDataGridItem value="{!item.name}"/>
             <ui:outputText value="{!item.phone}"/>
             <ui:outputText value="{!item.balance}"/>
+            <uitest:tableCell />
         </aura:set>
 
         <aura:set attribute="dataModel">

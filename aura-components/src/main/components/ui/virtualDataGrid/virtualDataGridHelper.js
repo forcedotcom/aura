@@ -125,19 +125,35 @@
     },
     _initializeRowTemplate: function (templates, rowHeaderIndex) {
         var row = document.createElement(this.DEFAULT_TEMPLATES.row),
-        	startIndex = 0,
-        	column;
+            startIndex = 0,
+            column;
         
         for (var i = startIndex; i < templates.length; i++) {
-        	if (i === rowHeaderIndex) {
-        		column = this._createColumn(this.DEFAULT_TEMPLATES.header, templates[i]);
-        		column.setAttribute("scope", "row");
-        	} else {
-        		column = this._createColumn(this.DEFAULT_TEMPLATES.column, templates[i]);
-        	}
+            var isRowHeader = (i === rowHeaderIndex);
+            if (templates[i].isInstanceOf("ui:tableCell")) {
+                if (isRowHeader) {
+                    templates[i].set("v.rowHeader", true);
+                }
+                column = $A.render(templates[i])[0];
+            } else {
+                column = this._wrapColumn(templates[i], isRowHeader);
+            }
             row.appendChild(column);
         }
         return row;
+    },
+    
+    _wrapColumn: function(template, isRowHeader) {
+        var column;
+        
+        if (isRowHeader) {
+            column = this._createColumn(this.DEFAULT_TEMPLATES.header, template);
+            column.setAttribute("scope", "row");
+        } else {
+            column = this._createColumn(this.DEFAULT_TEMPLATES.column, template);
+        }
+        
+        return column;
     },
     
     _createColumn: function (elementTemplate, columnTemplate) {

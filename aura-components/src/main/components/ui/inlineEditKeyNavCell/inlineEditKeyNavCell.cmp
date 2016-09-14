@@ -15,9 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component description="Component used to wrap a non-focusable component with one that can be focused. This will allow the focus to be set by the keyNav plugin (used by the Inline Edit Grid)">
+<aura:component implements="ui:tableCell" description="Component used to wrap a non-focusable component with one that can be focused. This will allow the focus to be set by the keyNav plugin (used by the Inline Edit Grid)">
     <aura:attribute name="class" type="String" default="" description="A CSS style to be attached to the cell. This style is added in addition to base styles output by the component."/>
+    <!-- <td> or <th> depending on the value of v.rowHeader -->
     <span class="{! 'slds-grid cellContainer ' + v.class}" tabindex="-1">
         {!v.body}
     </span>
+    <!-- </td> or </th> -->
 </aura:component>

@@ -24,7 +24,7 @@
     <aura:attribute name="lastEdited" type="Object" access="PRIVATE" />
     
     <aura:attribute name="columnDefs" type="Aura.ComponentDefRef[]" description="Columns to be added into the grid lazily">
-        <ui:inlineEditCell name="id" isPsuedoInput="true">
+        <ui:inlineEditCell name="id">
             <ui:outputText value="{!row.data.id}" />
         </ui:inlineEditCell>
         <ui:inlineEditCell name="name">

@@ -79,13 +79,21 @@ GlobalValueProviders.prototype.MUTEX_KEY = "GlobalValueProviders";
 GlobalValueProviders.prototype.mutexUnlock = undefined;
 
 /**
+ * Set to true while GVP persistence is async acquiring the lock, enabling
+ * concurrent GVP updates to skip their own persistence calls.
+ */
+GlobalValueProviders.prototype.persistenceQueued = false;
+
+/**
  * True if GVPs were loaded from persistent storage. */
 GlobalValueProviders.prototype.LOADED_FROM_PERSISTENT_STORAGE = false;
+
 
 /**
  * Merges new GVPs with existing and saves to storage
  *
- * @param {Object} gvps
+ * @param {Array} gvps The new GVPs to merge. Provided as an array of objects,
+ *  where each object has two keys: "type" and "values".
  * @param {Boolean} doNotPersist
  * @protected
  */
@@ -93,9 +101,9 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
     if (!gvps) {
         return;
     }
-    var valueProvider, i, storage, type, newGvp, values;
+    var valueProvider, i, type, newGvp, values;
 
-    for ( i = 0; i < gvps.length; i++) {
+    for (i = 0; i < gvps.length; i++) {
         newGvp = gvps[i];
         type = newGvp["type"];
         if (!this.valueProviders[type]) {
@@ -110,74 +118,90 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
         }
         $A.expressionService.updateGlobalReferences(type,newGvp["values"]);
     }
+
     if (doNotPersist) {
         return;
     }
 
-    // persist our set of valueProviders in storage
-    storage = this.getStorage();
-    if (storage) {
-        var toStore = [];
-        for (type in this.valueProviders) {
-            if (this.valueProviders.hasOwnProperty(type)) {
-                valueProvider = this.valueProviders[type];
-                values = valueProvider.getStorableValues ? valueProvider.getStorableValues() : (valueProvider.getValues ? valueProvider.getValues() : valueProvider);
-                toStore.push({
-                    "type" : type,
-                    "values" : values
-                });
-            }
-        }
-
-        // for multi-tab support a single persistent store is shared so it's possible other tabs have updated
-        // the persisted GVP value. therefore lock, load, merge, save, and unlock.
-
-        var that = this;
-        $A.util.Mutex.lock(that.MUTEX_KEY , function (unlock) {
-            that.mutexUnlock = unlock;
-            storage.get(that.STORAGE_KEY, true)
-                .then(function(value) {
-                    if (value) {
-                        // NOTE: we merge into the value from storage to avoid modifying toStore, which may hold
-                        // references to mutable objects from the live GVPs (due to getValues() etc above). this means
-                        // the live GVPs don't see the additional values from storage.
-
-                        try {
-                            var j;
-                            var map = {};
-                            for (j in value) {
-                                map[value[j]["type"]] = value[j]["values"];
-                            }
-
-
-                            for (j in toStore) {
-                                type = toStore[j]["type"];
-                                if (!map[type]) {
-                                    map[type] = {};
-                                    value.push({"type":type, "values":map[type]});
-                                }
-                                $A.util.apply(map[type], toStore[j]["values"], true, true);
-                            }
-
-                            toStore = value;
-                        } catch (err) {
-                            $A.warning("GlobalValueProvider.merge(), merging from storage failed, overwriting, error:" + err);
-                        }
-                    }
-                    return storage.set(that.STORAGE_KEY, toStore);
-                })
-                .then(
-                    function() {
-                        that.mutexUnlock();
-                    },
-                    function(err) {
-                        $A.warning("GlobalValueProvider.merge(), failed to put, error:" + err);
-                        that.mutexUnlock();
-                    }
-                );
-        });
+    var storage = this.getStorage();
+    if (!storage) {
+        return;
     }
+
+    // if another task is already queued to persist then rely on it to
+    // include values just merged.
+    if (this.persistenceQueued) {
+        return;
+    }
+
+    this.persistenceQueued = true;
+
+    // for multi-tab support a single persistent store is shared so it's possible other tabs have updated
+    // the persisted GVP value. therefore lock, load, merge, save, and unlock.
+    var that = this;
+    $A.util.Mutex.lock(that.MUTEX_KEY, function (unlock) {
+        that.mutexUnlock = unlock;
+        storage.get(that.STORAGE_KEY, true)
+            .then(
+                undefined,
+                function(e) {
+                    $A.warning("GlobalValueProvider.merge(), failed to load GVP values from storage, will overwrite storage with in-memory values, error:" + e);
+                    // do not rethrow
+                }
+            )
+            .then(function(value) {
+                // collect GVP values to persist. this includes updates to the GVPs
+                // incurred while waiting for the mutex, etc.
+                that.persistenceQueued = false;
+                var toStore = [];
+                for (type in that.valueProviders) {
+                    if (that.valueProviders.hasOwnProperty(type)) {
+                        valueProvider = that.valueProviders[type];
+                        values = valueProvider.getStorableValues ? valueProvider.getStorableValues() : (valueProvider.getValues ? valueProvider.getValues() : valueProvider);
+                        toStore.push({ "type" : type, "values" : values });
+                    }
+                }
+
+                if (value) {
+                    // NOTE: we merge into the value from storage to avoid modifying toStore, which may hold
+                    // references to mutable objects from the live GVPs (due to getValues() etc above). this means
+                    // the live GVPs don't see the additional values from storage.
+                    try {
+                        var j;
+                        var map = {};
+                        for (j in value) {
+                            map[value[j]["type"]] = value[j]["values"];
+                        }
+
+
+                        for (j in toStore) {
+                            type = toStore[j]["type"];
+                            if (!map[type]) {
+                                map[type] = {};
+                                value.push({"type":type, "values":map[type]});
+                            }
+                            $A.util.apply(map[type], toStore[j]["values"], true, true);
+                        }
+
+                        toStore = value;
+                    } catch (err) {
+                        $A.warning("GlobalValueProvider.merge(), merging from storage failed, overwriting with in-memory values, error:" + err);
+                    }
+                }
+                return storage.set(that.STORAGE_KEY, toStore);
+            })
+            .then(
+                function() {
+                    that.mutexUnlock();
+                },
+                function(err) {
+                    $A.warning("GlobalValueProvider.merge(), failed to put, error:" + err);
+                    that.mutexUnlock();
+                }
+            );
+    });
 };
+
 
 /**
  * Wrapper to get storage.
@@ -199,38 +223,36 @@ GlobalValueProviders.prototype.getStorage = function () {
  * @private
  */
 GlobalValueProviders.prototype.loadFromStorage = function(callback) {
-	// If persistent storage is active then write through for disconnected support
+    // If persistent storage is active then write through for disconnected support
     var storage = this.getStorage();
-    var that = this;
-    if (storage) {
-        storage.get(this.STORAGE_KEY, true)
-            .then(function (value) {
-                    $A.run(function() {
-                        if (value) {
-                            that.merge(value, true);
-
-                            // some GVP values were loaded from storage
-                            that.LOADED_FROM_PERSISTENT_STORAGE = true;
-                        }
-
-                        callback(!!value);
-                    });
-            })
-            .then(
-                undefined,
-                function() {
-                    $A.run(function() {
-                        // error retrieving from storage
-                        callback(false);
-                    });
-                }
-            );
-    } else {
-        // @dval: One day, when AIS is gone...
-        //setTimeout(function () { // Preserve asyncronizity
-            callback(false);
-        //}, 0);
+    if (!storage) {
+        callback();
+        return;
     }
+
+    var that = this;
+    storage.get(this.STORAGE_KEY, true)
+        .then(function (value) {
+                $A.run(function() {
+                    if (value) {
+                        that.merge(value, true);
+
+                        // some GVP values were loaded from storage
+                        that.LOADED_FROM_PERSISTENT_STORAGE = true;
+                    }
+
+                    callback();
+                });
+        })
+        .then(
+            undefined,
+            function() {
+                $A.run(function() {
+                    // error retrieving from storage
+                    callback();
+                });
+            }
+        );
 };
 
 /**

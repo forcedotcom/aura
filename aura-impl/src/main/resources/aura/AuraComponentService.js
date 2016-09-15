@@ -114,7 +114,7 @@ AuraComponentService.prototype.countComponents = function() {
 
 /**
  * Calculates the locator for a given component and target localId
- * 
+ *
  * @param {Component} cmp The component that contains the localId
  * @param {String} localId This localId must exist inside the component
  * @public
@@ -163,9 +163,9 @@ AuraComponentService.prototype.getAttributeProviderForElement = function(element
 
 /**
  * Determines if the container contains cmp. The return value is an object
- * with two properties. 
+ * with two properties.
  *      - {Boolean} "result" true if container contains cmp; false otherwise
- *      - {Boolean} "isOwner" true if the containment is within the owner hierarchy; 
+ *      - {Boolean} "isOwner" true if the containment is within the owner hierarchy;
  *          false if the containment is only by transclusion
  * @param {Component} container the container
  * @param {Component} cmp cmp to check
@@ -1435,7 +1435,7 @@ AuraComponentService.prototype.clearDefsFromStorage = function (metricsPayload) 
  * @param {Object} config the config bag from which defs are to be stored.
  * @param {Object} context the context (already merged)
  * @return {Promise} promise which resolves when storing is complete. If errors occur during
- *  the process they are handled (and logged) so the returned promise always resolves.
+ *  the process error recovery occurs. If error recovery fails then the promise rejects.
  */
 AuraComponentService.prototype.saveDefsToStorage = function (config, context) {
     var cmpConfigs = config["componentDefs"] || [];
@@ -1456,30 +1456,27 @@ AuraComponentService.prototype.saveDefsToStorage = function (config, context) {
     var libSizeKb = $A.util.estimateSize(libConfigs) / 1024;
     var evtSizeKb = $A.util.estimateSize(evtConfigs) / 1024;
 
-    // use enqueue() to prevent concurrent get/analyze/prune/save operations
-    return this.componentDefStorage.enqueue(function(resolve, reject) {
-        self.pruneDefsFromStorage(defSizeKb + libSizeKb + evtSizeKb)
-            .then(
-                function() {
-                    return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs, evtConfigs, context);
-                }
-            )
-            .then(
-                undefined, // noop
-                function(e) {
-                    // there was an error during analysis, pruning, or saving defs. the persistent components and actions
-                    // may now be in an inconsistent state: dependencies may not be available. therefore clear the actions
-                    // and cmp def storages.
-                    var metricsPayload = {
-                        "cause": "saveDefsToStorage",
-                        "defsRequiredSize" : defSizeKb + libSizeKb + evtSizeKb,
-                        "error" : e
-                    };
-                    return self.clearDefsFromStorage(metricsPayload);
-                }
-            )
-            .then(resolve, reject);
-    });
+    // def AuraStorage mutual exclusion is not required to
+    return self.pruneDefsFromStorage(defSizeKb + libSizeKb + evtSizeKb)
+        .then(
+            function() {
+                return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs, evtConfigs, context);
+            }
+        )
+        .then(
+            undefined, // noop
+            function(e) {
+                // there was an error during analysis, pruning, or saving defs. the persistent components and actions
+                // may now be in an inconsistent state: dependencies may not be available. therefore clear the actions
+                // and cmp def storages.
+                var metricsPayload = {
+                    "cause": "saveDefsToStorage",
+                    "defsRequiredSize" : defSizeKb + libSizeKb + evtSizeKb,
+                    "error" : e
+                };
+                return self.clearDefsFromStorage(metricsPayload);
+            }
+        );
 };
 
 
@@ -1891,14 +1888,14 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
                 // If we arrive here, some eviction is required...
 
                 /*
-                * NOTE @dval: Commenting this algorithm since is incorrect right now:
-                * The server does not return all the necessary dependencies to the client.
-                * Missing dependencies that we known of:
+                * NOTE @dval: disabling this algorithm because it is currently incorrect:
+                * the server does not return all the necessary dependencies to the client.
+                * Missing dependencies that we know of:
                 *   - The ones declared on markup via <aura:dependency/>
                 *   - The ones spidered from JS (helpers, controllers, etc)
                 *
                 * For now (202), if we need to evict, we just clear everything.
-                * TODO W-3037639 - fix def serialization + persistence in 204
+                * TODO W-3037639 - fix def serialization + persistence
                 */
 
                 var metricsPayload = {
@@ -1920,6 +1917,10 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
                 //
                 // as items are evicted from the store it's important that getSize() continues returning
                 // a value that is close to accurate.
+                //
+                // TODO - if this is re-enabled must do self.componentDefStorage.enqueue() to acquire
+                // def AuraStorage mutex
+
                 return self.buildDependencyGraph()
                     .then(function(graph) {
                         var keysToEvict = self.sortDependencyGraph(graph);

@@ -33,7 +33,7 @@ ComponentDefStorage.prototype.EVICTION_HEADROOM = 0.1;
 
 /**
  * Storage key used to track transactional bounds.
- * TODO W-3314745 - replace this with bulk remove + put
+ * TODO W-3314745 - remove sentinel key now that bulk AuraStorage APIs are used
  */
 ComponentDefStorage.prototype.TRANSACTION_SENTINEL_KEY = "sentinel_key";
 
@@ -53,6 +53,11 @@ ComponentDefStorage.prototype.mutexUnlock = undefined;
  * when an operation is in-flight.
  */
 ComponentDefStorage.prototype.queue = undefined;
+
+/**
+ * Map of defs to store. To improve performance defs are batched while the mutex around def AuraStorage is acquired.
+ */
+ComponentDefStorage.prototype.defsToStore = undefined;
 
 /**
  * Whether defs are backed up to persistent storage. Evaluated to a boolean
@@ -133,7 +138,7 @@ ComponentDefStorage.prototype.getStorage = function () {
 };
 
 /**
- * Stores component and library definitions into storage. Should always be called from within a call to #enqueue().
+ * Stores component and library definitions into storage.
  * @param {Array} cmpConfigs The component definitions to store.
  * @param {Array} libConfigs The library definitions to store.
  * @param {Array} evtConfigs The event definitions to store.
@@ -145,34 +150,48 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, evtCo
         return Promise["resolve"]();
     }
 
+    // build the payload to store
+    var toStore = {};
+    var descriptor, encodedConfig, i;
+
+    for (i = 0; i < cmpConfigs.length; i++) {
+        descriptor = cmpConfigs[i]["descriptor"];
+        cmpConfigs[i]["uuid"] = context.findLoaded(descriptor);
+        encodedConfig = $A.util.json.encode(cmpConfigs[i]);
+        toStore[descriptor] = encodedConfig;
+    }
+
+    for (i = 0; i < libConfigs.length; i++) {
+        descriptor = libConfigs[i]["descriptor"];
+        encodedConfig = $A.util.json.encode(libConfigs[i]);
+        toStore[descriptor] = encodedConfig;
+    }
+
+    for (i = 0; i < evtConfigs.length; i++) {
+        descriptor = evtConfigs[i]["descriptor"];
+        encodedConfig = $A.util.json.encode(evtConfigs[i]);
+        toStore[descriptor] = encodedConfig;
+    }
+
+    // if there's already a queue of defs to store then push this set
+    // onto it and rely on the previous thread to do the persistence.
+    if (this.defsToStore) {
+        $A.util.apply(this.defsToStore, toStore, false, false);
+        return Promise["resolve"]();
+    }
+
+    // this thread is responsible to store the defs so acquire the mutex then persist
+    this.defsToStore = toStore;
     var that = this;
-    return this.storage.set(this.TRANSACTION_SENTINEL_KEY, true)
-        .then(function() {
-            var toStore = {};
-            var descriptor, encodedConfig, i;
-
-            for (i = 0; i < cmpConfigs.length; i++) {
-                descriptor = cmpConfigs[i]["descriptor"];
-                cmpConfigs[i]["uuid"] = context.findLoaded(descriptor);
-                encodedConfig = $A.util.json.encode(cmpConfigs[i]);
-                toStore[descriptor] = encodedConfig;
-            }
-
-            for (i = 0; i < libConfigs.length; i++) {
-                descriptor = libConfigs[i]["descriptor"];
-                encodedConfig = $A.util.json.encode(libConfigs[i]);
-                toStore[descriptor] = encodedConfig;
-            }
-
-            for (i = 0; i < evtConfigs.length; i++) {
-                descriptor = evtConfigs[i]["descriptor"];
-                encodedConfig = $A.util.json.encode(evtConfigs[i]);
-                toStore[descriptor] = encodedConfig;
-            }
-
-            return that.storage.setAll(toStore).then(
-                function () {
-                    $A.log("ComponentDefStorage: Successfully stored " + cmpConfigs.length + " components, " + libConfigs.length + " libraries, " + evtConfigs.length + " events");
+    return this.enqueue(function(resolve, reject) {
+        that.storage.set(that.TRANSACTION_SENTINEL_KEY, true)
+            .then(function() {
+                // store this thread's defs + any that came in since acquiring the mutex + storing the sentinel key
+                var values = that.defsToStore;
+                that.defsToStore = undefined;
+                return that.storage.setAll(values).then(
+                    function resolve() {
+                        $A.log("ComponentDefStorage: successfully stored " + Object.keys(toStore).length + " defs");
                         return that.storage.remove(that.TRANSACTION_SENTINEL_KEY)
                             .then(
                                 undefined,
@@ -181,22 +200,24 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, evtCo
                                     // W-3314745 removes the need for a sentinel which eliminates this possibility.
                                 }
                             );
-                },
-                function (e) {
-                    $A.warning("ComponentDefStorage: Error storing  " + cmpConfigs.length + " components, " + libConfigs.length + " libraries, " + evtConfigs.length + " events", e);
-                        // error storing defs so the persisted def graph is broken. do not remove the sentinel:
-                        // 1. reject this promise so the caller, AuraComponentService.saveDefsToStorage(), will
-                        //    clear the def + action stores which removes the sentinel.
-                        // 2. if the page reloads before the stores are cleared the sentinel prevents getAll()
-                        //    from restoring any defs.
-                    throw e;
-                }
-            );
+                    },
+                    function reject(e) {
+                        $A.warning("ComponentDefStorage: error storing " + Object.keys(toStore).length + " defs", e);
+                            // error storing defs so the persisted def graph is broken. do not remove the sentinel:
+                            // 1. reject this promise so the caller, AuraComponentService.saveDefsToStorage(), will
+                            //    clear the def + action stores which removes the sentinel.
+                            // 2. if the page reloads before the stores are cleared the sentinel prevents getAll()
+                            //    from restoring any defs.
+                        throw e;
+                    }
+                );
+            })
+            .then(resolve, reject);
         });
 };
 
 /**
- * Removes definitions from storage. Should always be called from within a call to #enqueue().
+ * Removes definitions from storage.
  * @param {String[]} descriptors The descriptors identifying the definitions to remove.
  * @return {Promise} A promise that resolves when the definitions are removed.
  */
@@ -236,7 +257,7 @@ ComponentDefStorage.prototype.removeDefs = function(descriptors) {
 
 
 /**
- * Gets all definitions from storage. Should always be called from within a call to #enqueue().
+ * Gets all definitions from storage.
  * @return {Promise} A promise that resolves with a map of descriptor name to definitions. If
  *  the underlying storage fails or is disabled then the promise resolves to an empty map.
  */
@@ -248,6 +269,8 @@ ComponentDefStorage.prototype.getAll = function () {
     var that = this;
     var actions = Action.getStorage();
 
+    // note: def AuraStorage mutex is not acquired to improve performance. this does allow for
+    // writes from another tab to overlap def loading, resulting in this tab dumping caches.
     return this.storage.getAll([], true).then(
         function(items) {
             function clearActionsCache() {
@@ -291,8 +314,7 @@ ComponentDefStorage.prototype.getAll = function () {
  */
 ComponentDefStorage.prototype.restoreAll = function(context) {
     var that = this;
-    return this.enqueue(function(resolve, reject) {
-        that.getAll()
+    return this.getAll()
         .then(
             function(items) {
                 var libCount = 0;
@@ -326,18 +348,16 @@ ComponentDefStorage.prototype.restoreAll = function(context) {
                         cmpCount++;
                     }
                 }
-
                 $A.log("ComponentDefStorage: restored " + cmpCount + " components, " + libCount + " libraries, " + evtCount + " events from storage into registry");
-                resolve();
             }
-        ).then(
+        )
+        .then(
             undefined, // noop
             function(e) {
                 $A.log("ComponentDefStorage: error during restore from storage, no component, library or event defs restored", e);
-                reject(e);
+                throw e;
             }
         );
-    });
 };
 
 
@@ -359,7 +379,7 @@ ComponentDefStorage.prototype.enqueue = function(execute) {
         var next = that.queue.pop();
         if (next) {
             $A.log("ComponentDefStorage.enqueue: " + (that.queue.length+1) + " items in queue, running next");
-            $A.util.Mutex.lock(that.MUTEX_KEY , function (unlock) {
+            $A.util.Mutex.lock(that.MUTEX_KEY, function(unlock) {
                 // next["execute"] is run within a promise so may do async things (eg return other promises,
                 // use setTimeout) before calling resolve/reject. the mutex must be held until the promise
                 // resolves/rejects.
@@ -411,7 +431,7 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
     }
 
     var that = this;
-    return new Promise(function(resolve) {
+    return new Promise(function(resolve, reject) {
         // aura has an optimization whereby the client reports (on every XHR) to the server the
         // dynamic defs it has and the server doesn't resend those defs. this is managed in
         // aura.context.loaded.
@@ -424,13 +444,14 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
         // carefully orchestrated:
         // 1. wait until no XHRs are in flight
         // 2. synchronously clear aura.context.loaded
-        // 3. async clear the actions store
-        // 4. async clear the def store
+        // 3. async acquire the def AuraStorage mutex
+        // 4. async clear the actions store
+        // 5. async clear the def store
         //
         // 1 & 2 ensures all future XHRs have a context.loaded value that matches the cleared def store.
-        // because 3 and 4 are async it's possible that XHRs may be sent and received after 2 but
-        // before 3 or 4 completes; that's ok because ComponentDefStorage#enqueue provides mutual exclusion
-        // to persistent def store manipulation.
+        // because 3-5 are async it's possible that XHRs may be sent and received after 2 but
+        // before 3-5 completes; that's ok because ComponentDefStorage#enqueue provides mutual exclusion
+        // to def AuraStorage.
 
         // log that we're starting the clear
         metricsPayload = $A.util.apply({}, metricsPayload);
@@ -441,39 +462,43 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
             $A.warning("ComponentDefStorage.clear: clearing all defs and actions");
 
             // clear aura.context.loaded
+            // TODO W-3375904 broadcast this to other tabs
             $A.context.resetLoaded();
 
-            var actionClear;
-            var actionStorage = Action.getStorage();
-            if (actionStorage && actionStorage.isPersistent()) {
-                actionClear = actionStorage.clear().then(
-                    undefined, // noop on success
-                    function(e) {
-                        $A.warning("ComponentDefStorage.clear: failure clearing actions store", e);
-                        metricsPayload["actionsError"] = true;
-                        // do not rethrow to return to resolve state
+            that.enqueue(function(enqueueResolve) {
+                    var actionClear;
+                    var actionStorage = Action.getStorage();
+                    if (actionStorage && actionStorage.isPersistent()) {
+                        actionClear = actionStorage.clear().then(
+                            undefined, // noop on success
+                            function(e) {
+                                $A.warning("ComponentDefStorage.clear: failure clearing actions store", e);
+                                metricsPayload["actionsError"] = true;
+                                // do not rethrow to return to resolve state
+                            }
+                        );
+                    } else {
+                        actionClear = Promise["resolve"]();
                     }
-                );
-            } else {
-                actionClear = Promise["resolve"]();
-            }
 
-            var defClear = that.storage.clear().then(
-                undefined, // noop on success
-                function(e) {
-                    $A.warning("ComponentDefStorage.clear: failure clearing cmp def store", e);
-                    metricsPayload["componentDefStorageError"] = true;
-                    // do not rethrow to return to resolve state
-                }
-            );
+                    var defClear = that.storage.clear().then(
+                        undefined, // noop on success
+                        function(e) {
+                            $A.warning("ComponentDefStorage.clear: failure clearing cmp def store", e);
+                            metricsPayload["componentDefStorageError"] = true;
+                            // do not rethrow to return to resolve state
+                        }
+                    );
 
-            var promise = Promise.all([actionClear, defClear]).then(
-                function() {
-                    // done the clearing. metricsPayload is updated with any errors
-                    $A.metricsService.transactionEnd("aura", "performance:evictedDefs");
-                }
-            );
-            resolve(promise);
+                    var promise = Promise.all([actionClear, defClear]).then(
+                        function() {
+                            // done the clearing. metricsPayload is updated with any errors
+                            $A.metricsService.transactionEnd("aura", "performance:evictedDefs");
+                        }
+                    );
+                    enqueueResolve(promise);
+                })
+            .then(resolve, reject);
         });
     });
 };

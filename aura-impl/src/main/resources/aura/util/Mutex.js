@@ -15,7 +15,7 @@
  */
 /**
  *
- * This class allows code to be executed atomically (critical regions)
+ * This class provides mutual exclusion within and across browser tabs.
  *
  * Implemented based on "A Fast Mutual Exclusion Algorithm" (Leslie Lamport 1985)
  * http://research.microsoft.com/en-us/um/people/lamport/pubs/fast-mutex.pdf
@@ -40,14 +40,20 @@
  * 7. The lock was won, or there was no sign of contention, so now we can do our work.
  * 8. Clear Y to allow another client to take the lock.
  *
+ * Note the use of window.requestAnimationFrame(). All modern browsers do not invoke the callback when
+ * the tab is not active. This results in preferential treatment to the in-focus tab.
+ *
  * @constructor
  * @export
  */
 
-Aura.Utils.Mutex = function Mutex() {};
+Aura.Utils.Mutex = function Mutex() {
+    this.queue = [];
+    this.lockAvailable = true;
+};
 
-Aura.Utils.Mutex.SET_MUTEX_WAIT = 50;
-Aura.Utils.Mutex.RETRY_WAIT     = 50;
+Aura.Utils.Mutex.SET_MUTEX_WAIT = 15;
+Aura.Utils.Mutex.RETRY_WAIT     = 15;
 Aura.Utils.Mutex.MAX_LOCK_TIME  = 8000;
 Aura.Utils.Mutex.CLIENT_ID      = Aura.Context.AuraContext.CLIENT_SESSION_ID;
 Aura.Utils.Mutex.GLOBAL_KEY     = 'global';
@@ -77,7 +83,14 @@ Aura.Utils.Mutex.prototype.lock = function (/* [key], callback, [timeout] */) {
     var timeout  = xargs.shift() || Aura.Utils.Mutex.MAX_LOCK_TIME;
 
     $A.assert(typeof callback === 'function', 'Mutex needs a function to execute');
-    this._lockPriv(key, callback, timeout);
+
+    if (this.lockAvailable && !this.queue.length) {
+        this.lockAvailable = false;
+        window.requestAnimationFrame(this._lockPriv.bind(this, key, callback, timeout));
+    } else {
+        this.queue.push({ key: key, callback: callback, timeout: timeout });
+    }
+
 };
 
 Aura.Utils.Mutex.prototype._lockPriv = function (key, callback, timeout) {
@@ -115,6 +128,12 @@ Aura.Utils.Mutex.prototype._execute = function (key, callback) {
 
 Aura.Utils.Mutex.prototype._clearLock = function (key) {
     window.localStorage.removeItem(key + Aura.Utils.Mutex.MUTEX_Y_KEY);
+    var lockTask = this.queue.shift();
+    if (lockTask) {
+        window.requestAnimationFrame(this._lockPriv.bind(this, lockTask.key, lockTask.callback, lockTask.timeout));
+    } else {
+        this.lockAvailable = true;
+    }
 };
 
 Aura.Utils.Mutex.prototype._retry = function (key, callback, timeout) {

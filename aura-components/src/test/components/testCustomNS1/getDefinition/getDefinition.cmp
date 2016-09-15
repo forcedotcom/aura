@@ -1,0 +1,42 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:dependency resource="markup://aura:text" type="COMPONENT"/>
+    <aura:dependency resource="markup://aura:label" type="COMPONENT"/>
+    <aura:dependency resource="markup://aura:valueChange" type="EVENT"/>
+    <aura:dependency resource="markup://aura:titleChange" type="EVENT"/>
+
+    <aura:attribute name="definitionNames" type="String[]" default=""/>
+    <aura:attribute name="complete" type="Boolean" default="false"/>
+
+    <ui:button label="Get Event Definition without Access" press="{!c.getEventDefinitionWithoutAccess}"
+            class="getEventDefinitionWithoutAccessButton"/>
+    <ui:button label="Get Component Definition without Access" press="{!c.getComponentDefinitionWithoutAccess}"
+            class="getComponentDefinitionWithoutAccessButton"/>
+    <ui:button label="Get Multiple Definitions without Access" press="{!c.getDefinitionsWithoutAccess}"
+            class="getDefinitionsWithoutAccessButton"/>
+
+    <br/>
+    Complete: <div id="complete">{!v.complete}</div>
+    <br/>
+    <div class="definitionNameOutput">
+        <aura:iteration items="{!v.definitionNames}" var="name" indexVar="index">
+            <div class="{!'element'+index}">{!name}</div>
+        </aura:iteration>
+    </div>
+</aura:component>

@@ -191,8 +191,6 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     private Boolean validateCss = null;
     private ContentSecurityPolicy csp;
     private String csrfToken = null;
-    private final Set<String> nonInternalNamespaces = new HashSet<>();
-    private final Set<String> unprivilegedNamespaces = new HashSet<>();
     private Boolean isLockerServiceEnabledGlobally;
 
     public MockConfigAdapterImpl() {
@@ -210,8 +208,6 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         isAuraJSStatic = null;
         validateCss = null;
         csrfToken = null;
-        unprivilegedNamespaces.clear();
-        nonInternalNamespaces.clear();
         isLockerServiceEnabledGlobally = null;
     }
 
@@ -270,24 +266,14 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     }
 
     @Override
-    public void setUnPrivilegedNamespace(String namespace) {
-        unprivilegedNamespaces.add(namespace);
-    }
-
-    @Override
     public Set<String> getPrivilegedNamespaces() {
         Set<String> namespaces = Sets.newTreeSet(super.getPrivilegedNamespaces());
-        namespaces.removeAll(unprivilegedNamespaces);
         namespaces.addAll(SYSTEM_TEST_PRIVILEGED_NAMESPACES);
         return namespaces;
     }
 
     @Override
     public boolean isPrivilegedNamespace(String namespace) {
-        if (unprivilegedNamespaces.contains(namespace)) {
-            return false;
-        }
-
         if(stringLoader.isPrivilegedNamespace(namespace) || SYSTEM_TEST_PRIVILEGED_NAMESPACES.contains(namespace)) {
             return true;
         }
@@ -298,15 +284,10 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 
         return false;
     }
-    @Override
-    public void setNonInternalNamespace(String namespace) {
-        nonInternalNamespaces.add(namespace);
-    }
 
     @Override
     public Set<String> getInternalNamespaces() {
         Set<String> namespaces = Sets.newTreeSet(super.getInternalNamespaces());
-        namespaces.removeAll(nonInternalNamespaces);
         namespaces.removeAll(SYSTEM_TEST_PRIVILEGED_NAMESPACES);
         namespaces.removeAll(SYSTEM_TEST_CUSTOM_NAMESPACES);
         return namespaces;
@@ -314,12 +295,8 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 
     @Override
     public boolean isInternalNamespace(String namespace) {
-        if (nonInternalNamespaces.contains(namespace)) {
-            return false;
-        }
-
         if(SYSTEM_TEST_CUSTOM_NAMESPACES.contains(namespace) || SYSTEM_TEST_PRIVILEGED_NAMESPACES.contains(namespace)) {
-        	return false;
+            return false;
         }
 
         if (stringLoader.isInternalNamespace(namespace)

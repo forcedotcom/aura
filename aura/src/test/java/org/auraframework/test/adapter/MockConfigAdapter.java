@@ -37,18 +37,5 @@ public interface MockConfigAdapter extends ConfigAdapter, MockBean {
 
     void setCSRFToken(String token);
 
-    void setUnPrivilegedNamespace(String namespace);
-
-    /**
-     * Create flappers and broken tests by breaking our contract on file based namespaces.
-     *
-     * FIXME: This will not work correctly.
-     *
-     * @param namespace the namespace to use to create flappers.
-     * @deprecated
-     */
-    @Deprecated
-    void setNonInternalNamespace(String namespace);
-
     void setLockerServiceEnabled(boolean isLockerServiceEnabled);
 }

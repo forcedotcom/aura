@@ -343,11 +343,11 @@ AuraExpressionService.prototype.resolveLocator = function (component, localId, i
         primitiveFound["target"] = rootLocatorDef["alias"] || localId;
         primitiveFound["resolvedContext"] = this.resolveLocatorContext(currentCmp, rootLocatorDef);
         localId = currentCmp.getLocalId();
-        currentCmp = currentCmp.getComponentValueProvider();
+        currentCmp = currentCmp.getComponentValueProvider().getConcreteComponent();
         return this.resolveLocator(currentCmp, localId, includeMetadata, primitiveFound);
     }
     
-    var ownerCmp = component.getComponentValueProvider();
+    var ownerCmp = component.getComponentValueProvider().getConcreteComponent();
 
     if (ownerCmp.isInstanceOf('ui:virtualComponent')) {
         ownerCmp = ownerCmp.getConcreteComponent().getComponentValueProvider();

@@ -135,8 +135,8 @@ DomHandlersPlugin.prototype.logUnInstrumentedClick = function (action, cmp) {
             "parent": level2.getDef().toString(),
             "grandparent": level3.getDef().toString()
     };
-    $A.metricsService.transaction("ltng", "performance:missingLocator", { context: {
-        attributes: hierarchy
+    $A.metricsService.transaction("ltng", "performance:missingLocator", { "context": {
+        "attributes": hierarchy
     }});
     $A.warning("Un-Instrumented click logged. Details: " + JSON.stringify(hierarchy));
 };

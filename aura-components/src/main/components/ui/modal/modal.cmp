@@ -48,6 +48,11 @@
         <aura:locatorContext key="devNameOrId" value="{!v.devNameOrId}"/>
     </aura:locator>
 
+    <!-- Targets anything else that doesn't have an explicit locator -->
+    <aura:locator target="*" alias="modal-content" description="Content inside modal">
+        <aura:locatorContext key="devNameOrId" value="{!v.devNameOrId}"/>
+    </aura:locator>
+
     <div aura:flavorable="true" class="{!join(' ', v.class, $Browser.formFactor)}">
         <div aura:id='modal-glass' class="{!join(' ', 'modal-glass hidden', token('uiModal.backdrop'))}"  tabindex="-1"></div>
         

@@ -40,8 +40,11 @@
                 	}
                 });
             } else if ($A.util.isComponent(closeBtn[0]) && closeBtn[0].isInstanceOf('ui:button') && !closeBtn[0].getHandledEvents()['press']) {
-                closeBtn[0].setAttributeValueProvider(cmp);
-                closeBtn[0].addHandler('press', cmp, 'c.onCloseBtnPressed');
+                var closeBtnCmp = closeBtn[0];
+                // wire up closeBtn to ui:modal (needs to be avp and included in ui:modal index)
+                closeBtnCmp.setAttributeValueProvider(cmp);
+                cmp.index(closeBtnCmp.getLocalId(), closeBtnCmp.getGlobalId());
+                closeBtnCmp.addHandler('press', cmp, 'c.onCloseBtnPressed');
             }
         }
     },

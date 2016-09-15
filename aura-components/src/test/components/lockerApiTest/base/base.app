@@ -74,32 +74,7 @@
                         <td colspan="9" class="proto">Proto {!proto.name} (extends {!proto.proto})</td>
                     </tr>
                     <aura:iteration items="{!proto.props}" var="prop">
-                        <tr>
-                            <td>{!prop.name}</td>
-
-                            <td>{!prop.plan.type}</td>
-                            <td>{!prop.plan.empty.value}</td>
-                            <td>{!prop.plan.opaque.value}</td>
-
-                            <!-- ENSURE OUR TEST PLAN MEETS SYSTEM (to monitor browser API change) -->
-                            <td class="{!prop.system.type.status}">
-                                {!prop.system.type.value}
-                            </td>
-                            <td class="{!prop.system.empty.status}">
-                                {!prop.system.empty.value}
-                            </td>
-
-                            <!-- ENSURE LOCKER MEETS PLANS (to monitor support) -->
-                            <td class="{!prop.locker.type.status}">
-                                {!prop.locker.type.value}
-                            </td>
-                            <td class="{!prop.locker.empty.status}">
-                                {!prop.locker.empty.value}
-                            </td>
-                            <td class="{!prop.locker.opaque.status}">
-                                {!prop.locker.opaque.value}
-                            </td>
-                        </tr>
+                    	<lockerApiTest:propertyRow prop="{!prop}"/>
                     </aura:iteration>
                 </aura:iteration>
             </tbody>

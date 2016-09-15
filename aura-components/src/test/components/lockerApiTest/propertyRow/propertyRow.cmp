@@ -1,0 +1,4 @@
+<aura:component>
+	<aura:attribute name="prop" type="Object"/>
+	<tr aura:id="tr"/>
+</aura:component>

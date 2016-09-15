@@ -15,13 +15,20 @@
  */
 package org.auraframework.test.http;
 
-import java.util.List;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.util.AuraTextUtil;
+import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -34,118 +41,165 @@ public class ManifestUtilTest extends UnitTestCase {
     @Mock
     ContextService contextService;
 
-    private long checkManifestCookieValue(String cookie, int count, long time) {
-        List<String> parts = AuraTextUtil.splitSimple(":", cookie, 2);
-        int ccount = Integer.parseInt(parts.get(0));
-        long ctime = Long.parseLong(parts.get(1));
+    @Mock
+    AuraContext auraContext;
 
-        assertEquals("Count mismatch for " + cookie, count, ccount);
-        if (time != 0) {
-            assertEquals("Time mismatch for " + cookie, time, ctime);
-        } else {
-            long now = System.currentTimeMillis();
+    @Mock
+    MasterDefRegistry mdr;
 
-            assertTrue("Too much time for " + cookie, now - ctime < 60 * 1000);
-        }
-        return ctime;
+    @Mock
+    @SuppressWarnings("rawtypes")
+    DefDescriptor descriptor;
+
+    @Mock
+    HttpServletRequest request;
+
+    @Mock
+    HttpServletResponse response;
+
+    //public boolean isManifestEnabled()
+    @Test
+    public void testIsManifestEnabledWhenClientAppcacheDisabled() {
+        Mockito.when(configAdapter.isClientAppcacheEnabled()).thenReturn(false);
+
+        boolean value = new ManifestUtil(contextService, configAdapter).isManifestEnabled();
+        assertFalse(value);
     }
 
-    /**
-     * Null cookie value returns "start" cookie.
-     */
+    @SuppressWarnings("unchecked")
     @Test
-    public void testUpdateManifestCookieNull() {
-        AuraContext context = Mockito.mock(AuraContext.class);
-        Mockito.when(contextService.getCurrentContext()).thenReturn(context);
+    public void testIsManifestEnabledWhenApplicationEnabled() throws Exception {
+        ApplicationDef def = Mockito.mock(ApplicationDef.class);
 
-        String value = new ManifestUtil(contextService, configAdapter).updateManifestCookieValue(null);
-        checkManifestCookieValue(value, 1, 0);
+        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContext);
+        Mockito.when(configAdapter.isClientAppcacheEnabled()).thenReturn(true);
+        Mockito.when(descriptor.getDefType()).thenReturn(DefType.APPLICATION);
+        Mockito.when(def.isAppcacheEnabled()).thenReturn(Boolean.TRUE);
+        Mockito.when(mdr.getRawDef((DefDescriptor<ApplicationDef>)descriptor)).thenReturn(def);
+        Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
+        Mockito.when(auraContext.getDefRegistry()).thenReturn(mdr);
+
+        boolean value = new ManifestUtil(contextService, configAdapter).isManifestEnabled();
+        assertTrue(value);
     }
 
-    /**
-     * Empty cookie value returns "start" cookie.
-     */
+    @SuppressWarnings("unchecked")
     @Test
-    public void testUpdateManifestCookieEmpty() {
-        AuraContext context = Mockito.mock(AuraContext.class);
-        Mockito.when(contextService.getCurrentContext()).thenReturn(context);
-        String value = new ManifestUtil(contextService, configAdapter).updateManifestCookieValue("");
-        checkManifestCookieValue(value, 1, 0);
+    public void testIsManifestEnabledWhenApplicationDisabled() throws Exception {
+        ApplicationDef def = Mockito.mock(ApplicationDef.class);
+
+        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContext);
+        Mockito.when(configAdapter.isClientAppcacheEnabled()).thenReturn(true);
+        Mockito.when(descriptor.getDefType()).thenReturn(DefType.APPLICATION);
+        Mockito.when(def.isAppcacheEnabled()).thenReturn(Boolean.FALSE);
+        Mockito.when(mdr.getRawDef((DefDescriptor<ApplicationDef>)descriptor)).thenReturn(def);
+        Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
+        Mockito.when(auraContext.getDefRegistry()).thenReturn(mdr);
+
+        boolean value = new ManifestUtil(contextService, configAdapter).isManifestEnabled();
+        assertFalse(value);
     }
 
-    /**
-     * Unexpected cookie format (colon-delimited) returns "start" cookie.
-     */
+    @SuppressWarnings("unchecked")
     @Test
-    public void testUpdateManifestCookieInvalidFormat() {
-        AuraContext context = Mockito.mock(AuraContext.class);
-        Mockito.when(contextService.getCurrentContext()).thenReturn(context);
-        ManifestUtil manifestUtil = new ManifestUtil(contextService, configAdapter);
-        String value = manifestUtil.updateManifestCookieValue("12345678");
-        checkManifestCookieValue(value, 1, 0);
+    public void testIsManifestEnabledWhenApplicationFlagNull() throws Exception {
+        ApplicationDef def = Mockito.mock(ApplicationDef.class);
 
-        value = manifestUtil.updateManifestCookieValue("stringy");
-        checkManifestCookieValue(value, 1, 0);
+        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContext);
+        Mockito.when(configAdapter.isClientAppcacheEnabled()).thenReturn(true);
+        Mockito.when(descriptor.getDefType()).thenReturn(DefType.APPLICATION);
+        Mockito.when(def.isAppcacheEnabled()).thenReturn(null);
+        Mockito.when(mdr.getRawDef((DefDescriptor<ApplicationDef>)descriptor)).thenReturn(def);
+        Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
+        Mockito.when(auraContext.getDefRegistry()).thenReturn(mdr);
+
+        boolean value = new ManifestUtil(contextService, configAdapter).isManifestEnabled();
+        assertFalse(value);
     }
 
-    /**
-     * Error cookie value returns null.
-     */
+    @SuppressWarnings("unchecked")
     @Test
-    public void testUpdateManifestCookieError() {
-        AuraContext context = Mockito.mock(AuraContext.class);
-        Mockito.when(contextService.getCurrentContext()).thenReturn(context);
-        assertNull(new ManifestUtil(contextService, configAdapter).updateManifestCookieValue("error"));
+    public void testIsManifestEnabledWhenApplicationNull() throws Exception {
+        ApplicationDef def = Mockito.mock(ApplicationDef.class);
+
+        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContext);
+        Mockito.when(configAdapter.isClientAppcacheEnabled()).thenReturn(true);
+        Mockito.when(descriptor.getDefType()).thenReturn(DefType.APPLICATION);
+        Mockito.when(def.isAppcacheEnabled()).thenReturn(Boolean.TRUE);
+        Mockito.when(mdr.getRawDef((DefDescriptor<ApplicationDef>)descriptor)).thenReturn(def);
+        Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(null);
+        Mockito.when(auraContext.getDefRegistry()).thenReturn(mdr);
+
+        boolean value = new ManifestUtil(contextService, configAdapter).isManifestEnabled();
+        assertFalse(value);
     }
 
-    /**
-     * Invalid count cookie value returns null.
-     */
+    @SuppressWarnings("unchecked")
     @Test
-    public void testUpdateManifestCookieBadCount() {
-        AuraContext context = Mockito.mock(AuraContext.class);
-        Mockito.when(contextService.getCurrentContext()).thenReturn(context);
-        assertNull(new ManifestUtil(contextService, configAdapter).updateManifestCookieValue("one:123456789"));
+    public void testIsManifestEnabledWhenComponent() throws Exception {
+        ComponentDef def = Mockito.mock(ComponentDef.class);
+
+        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContext);
+        Mockito.when(configAdapter.isClientAppcacheEnabled()).thenReturn(true);
+        Mockito.when(descriptor.getDefType()).thenReturn(DefType.COMPONENT);
+        Mockito.when(mdr.getRawDef((DefDescriptor<ComponentDef>)descriptor)).thenReturn(def);
+        Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
+        Mockito.when(auraContext.getDefRegistry()).thenReturn(mdr);
+
+        boolean value = new ManifestUtil(contextService, configAdapter).isManifestEnabled();
+        assertFalse(value);
     }
 
-    /**
-     * Invalid time cookie value returns null.
-     */
     @Test
-    public void testUpdateManifestCookieBadTime() {
-        AuraContext context = Mockito.mock(AuraContext.class);
-        Mockito.when(contextService.getCurrentContext()).thenReturn(context);
-        assertNull(new ManifestUtil(contextService, configAdapter).updateManifestCookieValue("1:jan 6 2013"));
+    @SuppressWarnings("unchecked")
+    public void testCheckManifestCookie() {
+        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContext);
+        Mockito.when(descriptor.getNamespace()).thenReturn("ns");
+        Mockito.when(descriptor.getName()).thenReturn("name");
+        Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
+        Mockito.when(auraContext.getMode()).thenReturn(Mode.PROD);
+
+        boolean value = new ManifestUtil(contextService, configAdapter).checkManifestCookie(request, response);
+        assertTrue(value);
     }
 
-    /**
-     * Age check before count check.
-     */
     @Test
-    public void testUpdateManifestCookieExpired() {
-        AuraContext context = Mockito.mock(AuraContext.class);
-        Mockito.when(contextService.getCurrentContext()).thenReturn(context);
-        String value = new ManifestUtil(contextService, configAdapter).updateManifestCookieValue("99:0");
-        checkManifestCookieValue(value, 1, 0);
+    @SuppressWarnings("unchecked")
+    public void testCheckManifestCookieWithErrorParam() {
+        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContext);
+        Mockito.when(descriptor.getNamespace()).thenReturn("ns");
+        Mockito.when(descriptor.getName()).thenReturn("name");
+        Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
+        Mockito.when(auraContext.getMode()).thenReturn(Mode.PROD);
+
+        Mockito.when(request.getParameter("aura.error")).thenReturn("error");
+
+        boolean value = new ManifestUtil(contextService, configAdapter).checkManifestCookie(request, response);
+        assertFalse(value);
+
+        // FIXME: verify that the cookie is added
+        Mockito.verify(response, Mockito.times(1)).addCookie(Mockito.any());
     }
 
-    /**
-     * Cookie count overflow.
-     */
     @Test
-    public void testUpdateManifestCookieOverCount() {
-        AuraContext context = Mockito.mock(AuraContext.class);
-        Mockito.when(contextService.getCurrentContext()).thenReturn(context);
-        ManifestUtil manifestUtil = new ManifestUtil(contextService, configAdapter);
-        String value = "";
-        long time = 0;
-        int i;
+    @SuppressWarnings("unchecked")
+    public void testCheckManifestCookieWithErrorCookie() {
+        Mockito.when(contextService.getCurrentContext()).thenReturn(auraContext);
+        Mockito.when(descriptor.getNamespace()).thenReturn("ns");
+        Mockito.when(descriptor.getName()).thenReturn("name");
+        Mockito.when(auraContext.getApplicationDescriptor()).thenReturn(descriptor);
+        Mockito.when(auraContext.getMode()).thenReturn(Mode.PROD);
 
-        for (i = 1; i < 17; i++) {
-            value = manifestUtil.updateManifestCookieValue(value);
-            time = checkManifestCookieValue(value, i, time);
-        }
-        value = manifestUtil.updateManifestCookieValue(value);
-        assertNull("Did not expire cookie " + value, value);
+        Cookie cookie = new Cookie("ns_name_lm", "error");
+        Cookie [] cookies = new Cookie[1];
+        cookies[0] = cookie;
+
+        Mockito.when(request.getCookies()).thenReturn(cookies);
+
+        boolean value = new ManifestUtil(contextService, configAdapter).checkManifestCookie(request, response);
+        assertFalse(value);
+
+        // FIXME: verify that the cookie is deleted
+        Mockito.verify(response, Mockito.times(1)).addCookie(Mockito.any());
     }
 }

@@ -193,7 +193,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         assertAppCacheStatus(Status.IDLE);
         // There may be a varying number of requests, depending on when the initial manifest response is received.
         Cookie cookie = getDriver().manage().getCookieNamed(cookieName);
-        assertFalse("Manifest cookie was not changed " + cookie.getValue(), "error".equals(cookie.getValue()));
+        assertNull("Cookie was not deleted", cookie);
     }
 
     /**
@@ -231,49 +231,6 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         // There may be a varying number of requests, depending on when the initial manifest response is received.
         Cookie cookie = getDriver().manage().getCookieNamed(cookieName);
         assertNull("No manifest cookie should be present", cookie);
-    }
-
-    /**
-     * Manifest request limit exceeded for the time period should result in reset.
-     *
-     * BrowserType.SAFARI is disabled: W-2367702
-     */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
-    // TODO(W-2701964): Flapping in autobuilds, needs to be revisited
-    @Flapper
-    @Test
-    public void testManifestRequestLimitExceeded() throws Exception {
-        AppDescription app = new AppDescription();
-        List<Request> logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN, false);
-        assertRequests(getExpectedInitialRequests(app), logs);
-        assertAppCacheStatus(Status.IDLE);
-
-        Date expiry = new Date(System.currentTimeMillis() + 60000);
-        String cookieName = getManifestCookieName(app);
-        Cookie cookie = getDriver().manage().getCookieNamed(cookieName);
-        String timeVal = cookie.getValue().split(":")[1];
-        updateCookie(cookieName, "16:" + timeVal, expiry, "/");
-        logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN, false);
-        List<Request> expectedChange = Lists.newArrayList();
-
-        expectedChange.add(new Request("/auraResource", "manifest", 404)); // reset
-        expectedChange.add(new Request(getUrl(app), null, 302)); // hard refresh
-        expectedChange.add(new Request(4, "/auraResource", "js", 200));
-        switch (getBrowserType()) {
-        case GOOGLECHROME:
-            expectedChange.add(new Request(3, "/auraResource", "manifest", 200));
-            expectedChange.add(new Request(2, getUrl(app), null, 200));
-            break;
-        default:
-            expectedChange.add(new Request("/auraResource", "manifest", 200));
-            expectedChange.add(new Request(getUrl(app), null, 200));
-            expectedChange.add(new Request("/auraResource", "css", 200));
-            // FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
-            // expectedChange.add(new Request("/auraResource", "js", 200), there should be an app.js and an
-            // inline.js here.
-        }
-        assertRequests(expectedChange, logs);
-        assertAppCacheStatus(Status.IDLE);
     }
 
     /**

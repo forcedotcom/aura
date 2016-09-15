@@ -3197,9 +3197,7 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
                     }
                 }
 
-                // JBUCH: TEMPORARY REPRIEVE FOR PRIVILEGED ORGS. RESET TO:
-                //var effectiveAccess=definition.access||(isInternal?'I':'P');
-                var effectiveAccess=definition.access||(isInternal||isPrivileged?'I':'P');
+                var effectiveAccess=definition.access||(isInternal?'I':'P');
                 if(effectiveAccess==='P') {
                     // PUBLIC means "same namespace only"
                     var targetNamespace = definition.getDescriptor().getNamespace();
@@ -3208,11 +3206,10 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
                     }
                 }
 
-                // JBUCH: TEMPORARY REPRIEVE FOR PRIVILEGED ORGS. RESET TO:
-                //if(effectiveAccess==="I"){
-                //    // Internal Namespace
-                //    return isInternal;
-                //}
+                if(effectiveAccess==="I"){
+                    // Internal Namespace
+                    return isInternal;
+                }
 
                 // INTERNAL / DEFAULT means namespaces marked INTERNAL by the host
                 if(effectiveAccess==="I"||effectiveAccess==="PP"){

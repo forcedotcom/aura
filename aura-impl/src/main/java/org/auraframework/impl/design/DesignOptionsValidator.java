@@ -17,6 +17,8 @@
 package org.auraframework.impl.design;
 
 import com.google.common.collect.Sets;
+
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.genericxml.RootLevelGenericXmlValidator;
 
@@ -26,6 +28,7 @@ import java.util.Set;
 /**
  * Uses GenericXmlHandler to add design:options into the design def.
  */
+@ServiceComponent
 public final class DesignOptionsValidator extends RootLevelGenericXmlValidator {
     public static final String TAG = "design:option";
     private static final Set<String> ATTRIBUTES = Sets.newHashSet("name", "value", "access");

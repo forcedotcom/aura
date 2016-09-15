@@ -22,13 +22,17 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.root.parser.handler.design.DesignDefHandler;
+import org.auraframework.impl.root.parser.handler.genericxml.GenericXmlElementHandlerProvider;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 
+import javax.inject.Inject;
 import javax.xml.stream.XMLStreamReader;
 
 @ServiceComponent
 public class DesignXMLParser extends XMLParser<DesignDef> {
+    @Inject
+    private GenericXmlElementHandlerProvider genericHandlerProvider;
 
     @Override
     public Format getFormat() {
@@ -46,6 +50,6 @@ public class DesignXMLParser extends XMLParser<DesignDef> {
                                           boolean isInInternalNamespace, DefinitionService definitionService,
                                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         return new DesignDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
-                configAdapter, definitionParserAdapter);
+                configAdapter, definitionParserAdapter, genericHandlerProvider);
     }
 }

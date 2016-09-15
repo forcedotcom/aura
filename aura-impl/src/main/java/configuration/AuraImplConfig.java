@@ -33,9 +33,4 @@ public class AuraImplConfig {
     public static JsonSerializerAdapter auraImplJsonSerializationAdapter() {
         return new JsonSerializerAdapterImpl();
     }
-
-    @Impl
-    public static RootLevelGenericXmlValidator designOptionsValidator() {
-        return new DesignOptionsValidator();
-    }
 }

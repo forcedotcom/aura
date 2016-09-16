@@ -20,6 +20,10 @@
 			throw new Error("Undefined tag attribute for " + component.getGlobalId());
 		}
 
+		if(!helper.ALLOWED_TAGS.hasOwnProperty(tag)){
+			throw new Error("The HTML tag '"+tag+"' is not allowed.");
+		}
+
 		var HTMLAttributes = component.get("v.HTMLAttributes");
 				
 		var element = document.createElement(tag);

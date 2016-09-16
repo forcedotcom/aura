@@ -17,6 +17,7 @@
 package org.auraframework.impl.root.parser.handler.design;
 
 import com.google.common.collect.ImmutableSet;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.RootDefinitionBuilder;
@@ -37,6 +38,7 @@ import org.auraframework.util.AuraTextUtil;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
 import java.util.Set;
 
 public class DesignDefHandler extends RootTagHandler<DesignDef> {
@@ -46,6 +48,7 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_LABEL);
 
     private final DesignDefImpl.Builder builder;
+    private final GenericXmlElementHandlerProvider genericHandlerProvider;
 
     // counter used to index child defs without an explicit id
     private int idCounter = 0;
@@ -53,12 +56,16 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
     public DesignDefHandler() {
         super();
         builder = new DesignDefImpl.Builder();
+        //This is only called to fetch the getAllowedAttributes
+        genericHandlerProvider = null;
     }
 
     public DesignDefHandler(DefDescriptor<DesignDef> defDescriptor, Source<DesignDef> source, XMLStreamReader xmlReader,
                             boolean isInInternalNamespace, DefinitionService definitionService,
-                            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+                            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter,
+                            GenericXmlElementHandlerProvider genericHandlerProvider) {
         super(defDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+        this.genericHandlerProvider = genericHandlerProvider;
         builder = new DesignDefImpl.Builder();
         builder.setDescriptor(getDefDescriptor());
         builder.setLocation(getLocation());
@@ -110,8 +117,8 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
         } else if (isInInternalNamespace && (DesignLayoutDefHandler.TAG.equalsIgnoreCase(tag))) {
             DesignLayoutDef layoutDesign = new DesignLayoutDefHandler(xmlReader, source, isInInternalNamespace).createElement();
             builder.addLayoutDesign(layoutDesign.getName(), layoutDesign);
-        } else if (GenericXmlElementHandlerProvider.get().handlesTag(DesignDef.class, tag, isInInternalNamespace)) {
-            GenericXmlElement xmlDef = GenericXmlElementHandlerProvider.get().getHandler(
+        } else if (genericHandlerProvider.handlesTag(DesignDef.class, tag, isInInternalNamespace)) {
+            GenericXmlElement xmlDef = genericHandlerProvider.getHandler(
                     xmlReader, source, DesignDef.class, tag, isInInternalNamespace).createElement();
             builder.addGenericElement((GenericXmlElementImpl) xmlDef);
         } else {

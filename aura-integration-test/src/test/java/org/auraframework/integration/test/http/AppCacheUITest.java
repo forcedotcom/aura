@@ -46,6 +46,7 @@ public class AppCacheUITest extends WebDriverTestCase {
         assertNotEquals("Appcache is not enabled", "null", manifestUrl);
 
         openNoAura(manifestUrl);
+        getAuraUITestingUtil().waitForDocumentReady();
 
         String manifestContent = getText(By.cssSelector("body"));
         // we used to have hack by using empty manifest to disable manifest,

@@ -113,7 +113,7 @@
             $A.test.assertEquals("#bottom", href, "href attribute not correct");
         }]
     },
-    
+
     testIconClassMissing: {
         attributes: {label: 'link', value: 'www.salesforce.com'},
         test: function (component) {
@@ -280,7 +280,6 @@
         }
     },
 
-    
     // testValueOnlyFragment: { // for layouts
     //     attributes: {label: 'link', value: '#top'},
     //     test: function (component) {
@@ -302,6 +301,17 @@
         browsers : ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPAD", "-IPHONE"],
         test: function (component) {
             $A.test.assertEquals("http://www.salesforce.com", component.find("link").getElement().getAttribute("href"), "href attribute not correct");
+        }
+    },
+
+    testUnrender: {
+        attributes: {label: 'link', value: 'www.salesforce.com'},
+        test: function (component) {
+            component.unrender();
+
+            var elements = document.getElementsByClassName("uiOutputURL");
+
+            $A.test.assertEquals(0, elements.length, "outputURL should be unrendered from DOM");
         }
     }
 /*eslint-disable semi*/

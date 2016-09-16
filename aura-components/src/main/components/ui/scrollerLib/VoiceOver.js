@@ -17,14 +17,14 @@
 function lib(w) { //eslint-disable-line no-unused-vars
     'use strict';
     w || (w = window);
-    
+
     // NAMESPACES
     var SCROLLER = w.__S || (w.__S = {}),
         HELPERS  = SCROLLER.helpers,
         PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {});
-    
+
     function VoiceOver() {}
-    
+
     VoiceOver.prototype = {
         init: function () {
             this.on('_initialize', this._initializeVoiceOver);
@@ -33,7 +33,11 @@ function lib(w) { //eslint-disable-line no-unused-vars
             var config = this.opts.voiceOverConfig;
             if (config.enable) {
                 this._createVoiceOverMarkup(config);
+                // hide buttons at the end of scroll
                 this.on('scrollEnd', this._toggleButtons);
+                // "Pull To Load More" might extend the height on scrollEnd, so
+                // display button on refresh if size is changed
+                this.on('_refresh', this._toggleButtons);
             }
         },
         _createVoiceOverMarkup: function (config) {

@@ -39,6 +39,8 @@
                 children.push(child);
             } else if (child.isInstanceOf("aura:iteration") || child.isInstanceOf("aura:if")) {
                 this.setHandlersOnMenuItems(component, child.get("v.body"), children, existingChildren);
+            } else if (child.isInstanceOf("aura:expression")) {
+                this.setHandlersOnMenuItems(component, child.get("v.value"), children, existingChildren);
             }
         }
     },

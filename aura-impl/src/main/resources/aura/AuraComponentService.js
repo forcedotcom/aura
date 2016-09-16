@@ -269,6 +269,14 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
     $A.assert(!attributes || $A.util.isObject(attributes), "ComponentService.createComponent(): 'attributes' must be a valid Object.");
     $A.assert($A.util.isFunction(callback), "ComponentService.createComponent(): 'callback' must be a Function pointer.");
 
+    if(type.indexOf(':')<0){
+        attributes={
+            "tag":type,
+            "HTMLAttributes":attributes
+        };
+        type="aura:html";
+    }
+
     var config = {
         "componentDef" : this.createDescriptorConfig(type),
         "attributes"   : { "values" : attributes },

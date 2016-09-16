@@ -144,7 +144,6 @@ SecureObject.filterEverything = function(st, raw, options) {
 		} else {
 			var hasAccess = $A.lockerService.util.hasAccess(st, raw);
 			$A.assert(key, "A secure object should always have a key.");
-
 			if ($A.util.isAction(raw)) {
 				swallowed = hasAccess ? SecureAction(raw, key) : SecureObject(raw, key);
 				mutated = raw !== swallowed;
@@ -394,8 +393,9 @@ function getSupportedInterfaces(o) {
 		if (o instanceof HTMLDocument) {
 			interfaces.push("HTMLDocument");
 		}
-		
 		interfaces.push("Document", "Node", "EventTarget");
+	} else if(o instanceof DocumentFragment){
+		interfaces.push("Node", "EventTarget");
 	} else if (o instanceof Element) {
 		if (o instanceof HTMLElement) {
 			// Look for all HTMLElement subtypes

@@ -45,6 +45,7 @@
     "ControllerDefRegistry": true,
     "CSSStyleDeclaration": true,
     "DefDescriptor": true,
+    "DocumentFragment": true,
     "EventDefRegistry": true,
     "ExpressionFunctions": true,
     "exp": true,

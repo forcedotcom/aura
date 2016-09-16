@@ -412,6 +412,15 @@ SecureElement.eventTargetMetadata = {
 
 SecureElement.metadata = {
 	"prototypes": {
+        "DocumentFragment" : {
+            "childElementCount":              DEFAULT,
+            "children":                       DEFAULT,
+            "firstElementChild":              SKIP_OPAQUE,
+            "getElementById":                 FUNCTION,
+            "lastElementChild":               SKIP_OPAQUE,
+            "querySelector":                  FUNCTION,
+            "querySelectorAll":               FUNCTION
+        },
 	    "HTMLAnchorElement": {
 	        "charset":                        DEFAULT,
 	        "coords":                         DEFAULT,

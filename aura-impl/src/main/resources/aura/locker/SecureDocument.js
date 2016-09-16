@@ -103,7 +103,7 @@ function SecureDocument(doc, key) {
             value: doc[name]
         });
     });
-    
+
     SecureObject.addPrototypeMethodsAndProperties(SecureDocument.metadata, o, doc, key);
 
     setLockerSecret(o, "key", key);
@@ -285,14 +285,8 @@ SecureDocument.metadata = {
             "queryCommandState":                FUNCTION,
             "queryCommandSupported":            FUNCTION,
             "queryCommandValue":                FUNCTION,
-            "querySelector":                    {type: "function",
-                                                 empty: {args: "#none", value: "null"},
-                                                 opaque: {args: "#tic", value: "null"}
-                                                },
-            "querySelectorAll":                 {type: "function",
-                                                 empty: {args: "#none", value: "{}"},
-                                                 opaque: {args: "#tic", value: "{}"}
-                                                },
+            "querySelector":                    FUNCTION,
+            "querySelectorAll":                 FUNCTION,
             "readyState":                       DEFAULT,
             "referrer":                         DEFAULT,
             "registerElement":                  FUNCTION,

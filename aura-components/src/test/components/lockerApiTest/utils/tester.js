@@ -165,6 +165,10 @@ function tester() {
 				};
 			})
 		};
+		
+		// Export the results for LockerAPIShapeTest to consume
+		window.__lsTesterReport = report;
+		
 		return report;
 	}
 
@@ -266,8 +270,6 @@ function tester() {
 					return "HTMLOptGroupElement";
 				case HTMLOptionElement.prototype:
 					return "HTMLOptionElement";
-				case HTMLOutputElement.prototype:
-					return "HTMLOutputElement";
 				case HTMLParamElement.prototype:
 					return "HTMLParamElement";
 				case HTMLProgressElement.prototype:
@@ -280,8 +282,6 @@ function tester() {
 					return "HTMLSourceElement";
 				case HTMLTableCellElement.prototype:
 					return "HTMLTableCellElement";
-				case HTMLTemplateElement.prototype:
-					return "HTMLTemplateElement";
 				case HTMLTextAreaElement.prototype:
 					return "HTMLTextAreaElement";
 				case HTMLTrackElement.prototype:
@@ -297,12 +297,23 @@ function tester() {
 				return "HTMLDetailsElement";
 			} else if (window.HTMLMeterElement && object === window.HTMLMeterElement.prototype) {
 				return "HTMLMeterElement";
+			} else if (window.HTMLOutputElement && object === window.HTMLOutputElement.prototype) {
+				return "HTMLOutputElement";
+			} else if (window.HTMLTemplateElement && object === window.HTMLTemplateElement.prototype) {
+				return "HTMLTemplateElement";
 			}
 
 			type = Object.prototype.toString.call(object);
 			
 			if (type.startsWith("[object ") && type.endsWith("]")) {
 				type = type.substring(8, type.length - 1);
+			}
+			
+			// Re-map for older versions of Chrome
+			if (type === "global") {
+				type = "Window";
+			} else if (type === "Console") {
+				type = "Object";
 			}
 		}
 		

@@ -386,6 +386,11 @@ SecureObject.addMethodIfSupported = function(st, raw, name, options) {
 
 function getSupportedInterfaces(o) {
 	// Return the set of interfaces supported by the object in order of most specific to least specific
+	function safeInstanceOf(obj, className) {
+		var cls = window[className];
+		return cls && obj instanceof cls;
+	}
+	
 	var interfaces = [];
 	if (o instanceof Window) {
 		interfaces.push("Window", "EventTarget");
@@ -403,9 +408,13 @@ function getSupportedInterfaces(o) {
 				interfaces.push("HTMLAnchorElement");
 			} else if (o instanceof HTMLAreaElement) {
 				interfaces.push("HTMLAreaElement");
-			} else if (o instanceof HTMLAudioElement) {
-				interfaces.push("HTMLAudioElement");
 			} else if (o instanceof HTMLMediaElement) {
+				if (o instanceof HTMLAudioElement) {
+					interfaces.push("HTMLAudioElement");
+				} else if (o instanceof HTMLVideoElement) {
+					interfaces.push("HTMLVideoElement");
+				}
+				
 				interfaces.push("HTMLMediaElement");
 			} else if (o instanceof HTMLBaseElement) {
 				interfaces.push("HTMLBaseElement");
@@ -417,13 +426,12 @@ function getSupportedInterfaces(o) {
 				interfaces.push("HTMLTableColElement");
 			} else if (o instanceof HTMLModElement) {
 				interfaces.push("HTMLModElement");
-			// This type has browser compatibility issues currently and have to be guarded
-			} else if (window.HTMLDetailsElement && o instanceof window.HTMLDetailsElement) {
+			} else if (safeInstanceOf(o, "HTMLDetailsElement")) {
 				interfaces.push("HTMLDetailsElement");
 			} else if (o instanceof HTMLEmbedElement) {
 				interfaces.push("HTMLEmbedElement");
 			} else if (o instanceof HTMLFieldSetElement) {
-				interfaces.push("HTMLFieldSetElement");
+ 				interfaces.push("HTMLFieldSetElement");
 			} else if (o instanceof HTMLFormElement) {
 				interfaces.push("HTMLFormElement");
 			} else if (o instanceof HTMLIFrameElement) {
@@ -442,8 +450,7 @@ function getSupportedInterfaces(o) {
 				interfaces.push("HTMLMapElement");
 			} else if (o instanceof HTMLMetaElement) {
 				interfaces.push("HTMLMetaElement");
-			// This type has browser compatibility issues currently and have to be guarded
-			} else if (window.HTMLMeterElement && o instanceof window.HTMLMeterElement) {
+			} else if (safeInstanceOf(o, "HTMLMeterElement")) {
 				interfaces.push("HTMLMeterElement");
 			} else if (o instanceof HTMLObjectElement) {
 				interfaces.push("HTMLObjectElement");
@@ -467,15 +474,13 @@ function getSupportedInterfaces(o) {
 				interfaces.push("HTMLSourceElement");
 			} else if (o instanceof HTMLTableCellElement) {
 				interfaces.push("HTMLTableCellElement");
-			} else if (o instanceof HTMLTemplateElement) {
+			} else if (safeInstanceOf(o, "HTMLTemplateElement")) {
 				interfaces.push("HTMLTemplateElement");
 			} else if (o instanceof HTMLTextAreaElement) {
 				interfaces.push("HTMLTextAreaElement");
 			} else if (o instanceof HTMLTrackElement) {
 				interfaces.push("HTMLTrackElement");
-			} else if (o instanceof HTMLVideoElement) {
-				interfaces.push("HTMLVideoElement");
-			}
+			} 
 			
 			interfaces.push("HTMLElement");
 		}
@@ -486,13 +491,13 @@ function getSupportedInterfaces(o) {
 	return interfaces;
 }
 
-SecureObject.addPrototypeMethodsAndProperties = function(metadata, se, raw, key) {
+SecureObject.addPrototypeMethodsAndProperties = function(metadata, so, raw, key) {
 	var prototype;
 
 	function worker(name) {
 		var item = prototype[name];
 		
-		if (!(name in se) && (name in raw)) {
+		if (!(name in so) && (name in raw)) {
 			var options = {
                 filterOpaque : item.filterOpaque || true,
 	            skipOpaque : item.skipOpaque || false,
@@ -500,25 +505,40 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata, se, raw, key)
             };
 			
 			if (item.type === "function") {
-				SecureObject.addMethodIfSupported(se, raw, name, options);						
-			} else if (item.type === "@event") {
-				Object.defineProperty(se, name, {
+				SecureObject.addMethodIfSupported(so, raw, name, options);						
+			} else if (item.type === "@raw") {
+				Object.defineProperty(so, name, {
+        			// Does not currently secure proxy the actual class
 		        	get: function() {
-		        		return SecureObject.filterEverything(se, raw[name]);
+		        		return raw[name];
+		        	}
+		        });
+			} else if (item.type === "@ctor") {
+				Object.defineProperty(so, name, {
+		        	get: function() {
+		        		return function() {
+		        			return SecureObject.filterEverything(so, new raw[name](arguments));
+		        		};
+		        	}
+		        });
+			} else if (item.type === "@event") {
+				Object.defineProperty(so, name, {
+		        	get: function() {
+		        		return SecureObject.filterEverything(so, raw[name]);
 		        	},
 		        	
 		            set: function(callback) {
 		                raw[name] = function(e) {
-		                    callback.call(se, SecureDOMEvent(e, key));
+		                    callback.call(so, SecureDOMEvent(e, key));
 		                };
 		            }
 		        });
 			} else {
 				// Properties
-				var descriptor = SecureObject.createFilteredProperty(se, raw, name, options);
+				var descriptor = SecureObject.createFilteredProperty(so, raw, name, options);
 				
 				if (descriptor) {
-					Object.defineProperty(se, name, descriptor);
+					Object.defineProperty(so, name, descriptor);
 				}
 			}
 		}

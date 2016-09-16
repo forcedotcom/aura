@@ -383,7 +383,6 @@ SecureElement.nodeMetadata = {
     "contains":                       FUNCTION,
     "firstChild":                     SKIP_OPAQUE,
     "insertBefore":                   FUNCTION,
-    "isConnected":                    DEFAULT,
     "isDefaultNamespace":             FUNCTION,
     "isEqualNode":                    FUNCTION,
     "isSameNode":                     FUNCTION,
@@ -932,14 +931,6 @@ SecureElement.metadata = {
 	        "poster":                         DEFAULT,
 	        "videoHeight":                    DEFAULT,
 	        "videoWidth":                     DEFAULT,
-	        "webkitDecodedFrameCount":        DEFAULT,
-	        "webkitDisplayingFullscreen":     DEFAULT,
-	        "webkitDroppedFrameCount":        DEFAULT,
-	        "webkitEnterFullScreen":          FUNCTION,
-	        "webkitEnterFullscreen":          FUNCTION,
-	        "webkitExitFullScreen":           FUNCTION,
-	        "webkitExitFullscreen":           FUNCTION,
-	        "webkitSupportsFullscreen":       DEFAULT,
 	        "width":                          DEFAULT
 	    },
 	    "HTMLElement": {

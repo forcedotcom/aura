@@ -30,12 +30,6 @@
 function SecureWindow(win, key, globalAttributeWhitelist) {
 	"use strict";
 
-    var hostedDefinedGlobals = [
-            "alert", "clearInterval", "clearTimeout", "confirm", "console", "DOMParser",
-            "File", "FileList", "FileReader",
-            "history", "location", "Node", "requestAnimationFrame", "cancelAnimationFrame", "atob", "btoa", "screen", "TimeRanges", "ValidityState"
-        ];
-
 	var o = Object.create(null, {
 		document: {
 			enumerable: true,
@@ -111,17 +105,6 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
 		});
 	});
 
-	hostedDefinedGlobals.forEach(function(name) {
-		if (!(name in o) && (name in win)) {
-			// These are direct passthrough's and should never be wrapped in a SecureObject
-			var value = win[name];
-			Object.defineProperty(o, name, {
-				enumerable: true,
-				value: value.bind ? value.bind(win) : value
-			});
-		}
-	});
-	
     SecureObject.addPrototypeMethodsAndProperties(SecureWindow.metadata, o, win, key);
 
 	return o;

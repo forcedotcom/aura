@@ -55,6 +55,10 @@
     <aura:attribute name="closeButton" type="Aura.Component[]" description="Replaces the default close button with a custom one" />
 
     <aura:dependency resource="markup://aura:unescapedHtml"  type="COMPONENT"/>
+    
+    <aura:locator target="*" alias="panel-content" description="Content in panel">
+        <aura:locatorContext key="devNameOrId" value="{!v.devNameOrId}"/>
+    </aura:locator>
 
     <div aura:id='panel'
          tabindex="-1"

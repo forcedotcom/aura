@@ -36,7 +36,7 @@
 
     testSizeInitial: {
         test: function(cmp) {
-            cmp._storageLib.testSizeInitial(this.storage);
+            return cmp._storageLib.testSizeInitial(this.storage);
         }
     },
 
@@ -54,106 +54,102 @@
 
     testEmptyStringKey: {
         test: function(cmp) {
-            cmp._storageLib.testEmptyStringKey(cmp, this.storage);
+            return cmp._storageLib.testEmptyStringKey(cmp, this.storage);
         }
     },
 
     testGetNullValue: {
         test: function(cmp) {
-            cmp._storageLib.testGetNullValue(cmp, this.storage);
+            return cmp._storageLib.testGetNullValue(cmp, this.storage);
         }
     },
 
     testGetUndefinedValue: {
         test: function(cmp) {
-            cmp._storageLib.testGetUndefinedValue(cmp, this.storage);
+            return cmp._storageLib.testGetUndefinedValue(cmp, this.storage);
         }
     },
 
     testGetBooleanTrueValue: {
         test: function(cmp) {
-            cmp._storageLib.testGetBooleanTrueValue(cmp, this.storage);
+            return cmp._storageLib.testGetBooleanTrueValue(cmp, this.storage);
         }
     },
 
     testGetZeroValue: {
         test: function(cmp) {
-            cmp._storageLib.testGetZeroValue(cmp, this.storage);
+            return cmp._storageLib.testGetZeroValue(cmp, this.storage);
         }
     },
 
     testGetSimpleStringValue: {
         test: function(cmp) {
-            cmp._storageLib.testGetSimpleStringValue(cmp, this.storage);
+            return cmp._storageLib.testGetSimpleStringValue(cmp, this.storage);
         }
     },
 
     testGetEmptyObjectValue: {
         test: function(cmp) {
-            cmp._storageLib.testGetEmptyObjectValue(cmp, this.storage);
+            return cmp._storageLib.testGetEmptyObjectValue(cmp, this.storage);
         }
     },
 
     testGetBasicObjectValue: {
         test: function(cmp) {
-            cmp._storageLib.testGetBasicObjectValue(cmp, this.storage);
+            return cmp._storageLib.testGetBasicObjectValue(cmp, this.storage);
         }
     },
 
     testGetEmptyArrayValue: {
         test: function(cmp) {
-            cmp._storageLib.testGetEmptyArrayValue(cmp, this.storage);
+            return cmp._storageLib.testGetEmptyArrayValue(cmp, this.storage);
         }
     },
 
     testGetBasicArrayValue: {
         test: function(cmp) {
-            cmp._storageLib.testGetBasicArrayValue(cmp, this.storage);
+            return cmp._storageLib.testGetBasicArrayValue(cmp, this.storage);
         }
     },
 
     testGetBigArrayValue: {
         test: function(cmp) {
-            cmp._storageLib.testGetBigArrayValue(cmp, this.storage);
+            return cmp._storageLib.testGetBigArrayValue(cmp, this.storage);
         }
     },
 
     testGetMultiByteStringValue: {
         test: function(cmp) {
-            cmp._storageLib.testGetMultiByteStringValue(cmp, this.storage);
+            return cmp._storageLib.testGetMultiByteStringValue(cmp, this.storage);
         }
     },
 
     testCacheMiss: {
         test: function(cmp) {
-            cmp._storageLib.testCacheMiss(cmp, this.storage);
+            return cmp._storageLib.testCacheMiss(cmp, this.storage);
         }
     },
 
     testSetItemUnderMaxSize : {
         test : [function(cmp) {
-            cmp._storageLib.testSetItemUnderMaxSize(cmp, this.storage, "Item smaller than size limit");
+            return cmp._storageLib.testSetItemUnderMaxSize(cmp, this.storage, "Item smaller than size limit");
         }]
     },
 
     testSetItemOverMaxSize : {
-        test : [function(cmp) {
-            cmp._storageLib.testSetItemOverMaxSize_stage1(cmp, this.storage, "Item larger than size limit");
-        },
-        function(cmp) {
-            cmp._storageLib.testSetItemOverMaxSize_stage2(cmp, this.storage);
-        }]
+        test : function(cmp) {
+            return cmp._storageLib.testSetItemOverMaxSize(cmp, this.storage, "Item larger than size limit");
+        }
     },
 
     testGetAll: {
         test: function(cmp) {
-            cmp._storageLib.testGetAll(cmp, this.storage);
+            return cmp._storageLib.testGetAll(cmp, this.storage);
         }
     },
 
     testReplaceExistingWithEntryTooLarge: {
-        test: [
-        function putItemThenReplaceWithEntryTooLarge(cmp) {
+        test: function(cmp) {
             var maxSize = 5120;
             cmp._storage = $A.storageService.initStorage({
                 name: "browserdb-testReplaceExistingWithEntryTooLarge",
@@ -163,16 +159,13 @@
             });
             $A.test.addCleanup(function(){ this.deleteStorage("browserdb-testReplaceExistingWithEntryTooLarge"); }.bind(this));
 
-            cmp._storageLib.testReplaceExistingWithEntryTooLarge_stage1(cmp, cmp._storage);
-        },
-        function getItem(cmp) {
-            cmp._storageLib.testReplaceExistingWithEntryTooLarge_stage2(cmp, cmp._storage);
-        }]
+            return cmp._storageLib.testReplaceExistingWithEntryTooLarge(cmp, cmp._storage);
+        }
     },
 
     testStorageInfo: {
         test: function(cmp) {
-            cmp._storageLib.testStorageInfo(this.storage, true, false);
+            return cmp._storageLib.testStorageInfo(this.storage, true, false);
         }
     },
 
@@ -201,19 +194,19 @@
 
     testModifyObject:{
         test:function(cmp){
-            cmp._storageLib.testModifyObject(cmp, this.storage);
+            return cmp._storageLib.testModifyObject(cmp, this.storage);
         }
     },
 
     testModifyGetAllObject:{
         test:function(cmp){
-            cmp._storageLib.testModifyGetAllObject(cmp, this.storage);
+            return cmp._storageLib.testModifyGetAllObject(cmp, this.storage);
         }
     },
 
     testUpdate: {
         test:function(cmp){
-            cmp._storageLib.testUpdate(cmp, this.storage);
+            return cmp._storageLib.testUpdate(cmp, this.storage);
         }
     },
 
@@ -229,34 +222,31 @@
             });
             $A.test.addCleanup(function(){ this.deleteStorage("browserdb-testOverflow"); }.bind(this));
 
-            cmp._storageLib.testOverflow(cmp, cmp._storage);
+            return cmp._storageLib.testOverflow(cmp, cmp._storage);
         }
     },
 
     testClear:{
-        test:[function(cmp){
-            cmp._storageLib.testClear_stage1(cmp, this.storage);
-        },
-        function(cmp){
-            cmp._storageLib.testClear_stage2(cmp, this.storage);
-        }]
+        test:function(cmp){
+            return cmp._storageLib.testClear(cmp, this.storage);
+        }
     },
 
     testBulkGetInnerItemNotInStorage: {
         test: function(cmp) {
-            cmp._storageLib.testBulkGetInnerItemNotInStorage(cmp, this.storage);
+            return cmp._storageLib.testBulkGetInnerItemNotInStorage(cmp, this.storage);
         }
     },
 
     testBulkGetOuterItemsNotInStorage: {
         test: function(cmp) {
-            cmp._storageLib.testBulkGetOuterItemsNotInStorage(cmp, this.storage);
+            return cmp._storageLib.testBulkGetOuterItemsNotInStorage(cmp, this.storage);
         }
     },
 
     testBulkSet: {
         test: function(cmp) {
-            cmp._storageLib.testBulkSet(cmp, this.storage);
+            return cmp._storageLib.testBulkSet(cmp, this.storage);
         }
     },
 
@@ -271,19 +261,19 @@
                 debugLogging: true
             });
             $A.test.addCleanup(function(){ this.deleteStorage("browserdb-testBulkSetLargerThanMaxSize"); }.bind(this));
-            cmp._storageLib.testBulkSetLargerThanMaxSize(cmp, storage);
+            return cmp._storageLib.testBulkSetLargerThanMaxSize(cmp, storage);
         }
     },
 
     testBulkRemoveInnerItemNotInStorage: {
         test: function(cmp) {
-            cmp._storageLib.testBulkRemoveInnerItemNotInStorage(cmp, this.storage);
+            return cmp._storageLib.testBulkRemoveInnerItemNotInStorage(cmp, this.storage);
         }
     },
 
     testBulkRemoveOuterItemsNotInStorage: {
         test: function(cmp) {
-            cmp._storageLib.testBulkRemoveOuterItemsNotInStorage(cmp, this.storage);
+            return cmp._storageLib.testBulkRemoveOuterItemsNotInStorage(cmp, this.storage);
         }
     },
 
@@ -297,11 +287,8 @@
     testSetErrorValueFails: {
         test: function(cmp) {
             var that = this;
-            var completed = false;
-            var failTest = function(cmp, error) { cmp._storageLib.failTest(cmp, error); }
-            this.storage.set("testErrorValue", new Error("hello, error"))
+            return this.storage.set("testErrorValue", new Error("hello, error"))
                 .then(function() {
-                    completed = true;
                     $A.test.fail("Expected set() to fail but it succeeded");
                 }, function(e) {
                     cmp._storageLib.appendLine(cmp, e.message);
@@ -310,23 +297,18 @@
                 .then(
                     function(value){
                         $A.test.assertUndefined(value, "Expected undefined because set() failed");
-                        completed = true;
-                    },
-                    function(err) { failTest(cmp, err); }
+                    }
                 );
-            $A.test.addWaitFor(true, function(){ return completed; });
         }
     },
 
     // function values are not supported by IndexedDB adapter unlike all other adapters
     testSetFunctionValueFails: {
         test: function(cmp) {
-            var completed = false;
             var that = this;
-            this.storage.set("testFunctionValue", function(x){})
+            return this.storage.set("testFunctionValue", function(x){})
                 .then(
                     function() {
-                        completed = true;
                         $A.test.fail("Expected set() to fail but it succeeded");
                     },
                     function(e) {
@@ -337,19 +319,13 @@
                 .then(
                     function(value){
                         $A.test.assertUndefined(value, "Expected undefined because set() failed");
-                        completed = true;
-                    },
-                    function(e) {
-                        completed = true;
-                        $A.test.fail("Function value get failed: " + e.message);
                     }
                 );
-            $A.test.addWaitFor(true, function(){ return completed; });
         }
     },
 
     testGetSize:{
-        test:[function (cmp) {
+        test:[function(cmp) {
             cmp._storage = $A.storageService.initStorage({
                 name: "browserdb-testGetSize",
                 maxSize: 32768,
@@ -360,54 +336,35 @@
             cmp._failTest = function(error) { cmp._storageLib.failTest(cmp, error); };
             cmp._append = function(string) { cmp._storageLib.appendLine(cmp, string); };
         }, function(cmp){
-            var completed = false;
-
-            cmp._storage.set("testGetSize.key1", new Array(1024).join("x"))  // 1kb
+            return cmp._storage.set("testGetSize.key1", new Array(1024).join("x"))  // 1kb
                 .then(function() { return cmp._storage.get("testGetSize.key1"); })
                 .then(function(value) { $A.test.assertDefined(value, "Fail item."); })
                 .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
                 .then(function(result) { cmp._append("result length = "+Object.keys(result).length); return cmp._storage.getSize(); })
                 .then(function(size) {
                     $A.test.assertTrue(size >= 2 && size < 2.2, "testGetSize: Expected size of 2, but got " + size);
-                    completed = true;
-                }, cmp._failTest);
-
-            // Allow this promise chain to complete before starting the next test.
-            // If we don't wait, the chains are interleaved.
-            $A.test.addWaitFor(true, function() { return completed; });
-
+                });
         }, function(cmp){
-            var completed = false;
-
             //Two value to see that size is recalculated
-            cmp._storage.set("testGetSize.key2" , new Array(3072).join("y")) //5kb
+            return cmp._storage.set("testGetSize.key2" , new Array(3072).join("y")) //5kb
                 .then(function() { return cmp._storage.get("testGetSize.key2"); })
                 .then(function(value) { $A.test.assertDefined(value, "testGetSize: Fail - item undefined."); })
                 .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
                 .then(function() { return cmp._storage.getSize(); })
                 .then(function(size) {
                     $A.test.assertTrue(size >= 8 && size < 8.3, "testGetSize: Expected size of 8, but got " + size);
-                    completed = true;
-                }, cmp._failTest);
-
-            $A.test.addWaitFor(true, function() { return completed; });
-
+                });
         }, function(cmp){
-            var completed = false;
-
             // Overwrite previous key2
             // Careful... this does not calculate size correctly.
-            cmp._storage.set("testGetSize.key2" , new Array(1024).join("z")) //1kb
+            return cmp._storage.set("testGetSize.key2" , new Array(1024).join("z")) //1kb
                 .then(function() { return cmp._storage.get("testGetSize.key2"); })
                 .then(function(value) { $A.test.assertDefined(value); })
                 .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
                 .then(function() { return cmp._storage.getSize(); })
                 .then(function(size) {
                     $A.test.assertTrue(size >= 4 && size < 4.3, "testGetSize: Expected size of 4, but got " + size);
-                    completed = true;
-                }, cmp._failTest);
-
-            $A.test.addWaitFor(true, function() { return completed; });
+                });
         } ]
     },
 
@@ -451,30 +408,20 @@
                         "iframeContainer", "first load");
             },
             function addItemToStorage(cmp) {
-                var completed = false;
                 var targetStorage = cmp._iframeLib.getIframeRootCmp()._storage;
 
-                targetStorage.set("key1", cmp._expected)
-                    .then(function(){ completed = true; })
-                    .catch(function(e){ $A.test.fail(e.toString()); });
-
-                $A.test.addWaitFor(true, function() {return completed;});
+                return targetStorage.set("key1", cmp._expected);
             },
             function reloadIframe(cmp) {
                 cmp._iframeLib.reloadIframe(cmp, false, "first reload");
             },
             function getItemFromStorage(cmp) {
-                var completed = false;
                 var targetStorage = cmp._iframeLib.getIframeRootCmp()._storage;
 
-                targetStorage.get("key1").
+                return targetStorage.get("key1").
                     then(function(value) {
                         $A.test.assertEquals(cmp._expected, value, "Found unexpected item from storage after page reload");
-                        completed = true;
-                    })
-                    .catch(function(e){ $A.test.fail(e.toString()); });
-
-                $A.test.addWaitFor(true, function() {return completed;});
+                    });
             }
         ]
     },
@@ -517,32 +464,25 @@
     testDeleteDatabaseTwice: {
         test: [
         function deleteDatabaseTwice(cmp) {
-            var failTest = function(error) { completed=true; cmp._storageLib.failTest(cmp, error); };
-            var completed = false;
             var dbName = "browserdb";
 
-            $A.storageService.deleteStorage(dbName)
+            return $A.storageService.deleteStorage(dbName)
                 .then(function() {
                     $A.test.assertUndefined($A.storageService.getStorage(dbName));
                     return $A.storageService.deleteStorage(dbName);
                 })
                 .then(function() {
                     $A.test.assertUndefined($A.storageService.getStorage(dbName));
-                    completed = true;
-                })["catch"](failTest);
-
-            $A.test.addWaitFor(true, function(){ return completed; });
+                });
         }]
     },
 
     testDeleteAndRecreateDatabase: {
         test: [
         function deleteAndRecreateDatabase(cmp) {
-            var failTest = function(error) { completed=true; cmp._storageLib.failTest(cmp, error); };
-            var completed = false;
             cmp._dbName = "browserdb";
 
-            $A.storageService.deleteStorage(cmp._dbName)
+            return $A.storageService.deleteStorage(cmp._dbName)
                 .then(function() {
                     $A.test.assertUndefined($A.storageService.getStorage(cmp._dbName));
                     $A.storageService.initStorage({
@@ -554,10 +494,7 @@
                 })
                 .then(function() {
                     $A.test.assertDefined($A.storageService.getStorage(cmp._dbName));
-                    completed = true;
-                })["catch"](failTest);
-
-            $A.test.addWaitFor(true, function(){ return completed; });
+                });
         },
         function verifyRecreationOfDatabase(cmp) {
             var completed = false;
@@ -601,7 +538,6 @@
                                          "$AuraClientService.bootstrap$"];   /* AuraClientService.js */
            },
            function storeBlacklistedItems(cmp) {
-                var completed = false;
                 cmp._expected = "blacklistedItem";
 
                 var values = {};
@@ -609,7 +545,7 @@
                     values[key] = cmp._expected;
                 });
 
-                cmp._storage.setAll(values)
+                return cmp._storage.setAll(values)
                     .then(function() {
                         var evictedItem = [
                             "evictedItemKey",
@@ -622,18 +558,12 @@
                         // Store a normal item to guarantee expired item gets evicted so that we
                         // don't have false positive result.
                         // Setting item through adapter to avoid calling sweep() when setting items.
-                        $A.test.storageAdapterSetItems(cmp._storage.adapter, [evictedItem]);
-                    })
-                    .then(function() { completed = true; })
-                    .catch(function(e) { $A.test.fail(e.toString()); });
-
-                $A.test.addWaitFor(true, function(){ return completed; });
+                        return $A.test.storageAdapterSetItems(cmp._storage.adapter, [evictedItem]);
+                    });
             },
             function sweepAndVerify(cmp) {
-                var completed = false;
-
                 // sweep() gets run asyncly in API, so explicitly call it.
-                $A.test.storageSweep(cmp._storage)
+                return $A.test.storageSweep(cmp._storage)
                     .then(function() {
                         return cmp._storage.getAll([], true);
                     })
@@ -648,11 +578,7 @@
                             $A.test.assertEquals(cmp._expected, value,
                                     "Blacklisted entry '" + key + "' has wrong value");
                         });
-                    })
-                    .then(function() { completed = true; })
-                    .catch(function(e) { $A.test.fail(e.toString()); });
-
-                $A.test.addWaitFor(true, function(){ return completed; });
+                    });
            }
        ]
     },
@@ -665,7 +591,6 @@
     testGetItemsExcludesItemsWithDifferentKeyPrefix: {
         test: [
             function createStorageAndSetDiffPrefixedItem(cmp) {
-                var completed = false;
                 var targetStorageName = "keyPrefixTestDB";
                 $A.test.addCleanup(function(){ this.deleteStorage(targetStorageName); }.bind(this));
 
@@ -688,26 +613,16 @@
                     },
                     15];
 
-                $A.test.storageAdapterSetItems(cmp._storage.adapter, [diffPrefixedKeyItem])
-                    .then(function() { completed = true; } )
-                    .catch(function(e) { $A.test.fail(e.toString()); });
-
-                $A.test.addWaitFor(true, function() {return completed;});
-            },
-            function verifyGetItemsNotReturnDiffPrefixedItem(cmp) {
-                var completed = false;
-
-                // TODO: add a case for getItems with explicitly given keys when W-2531907 is done.
-                // Currently only getting all items excludes different prefix keyed item.
-                cmp._storage.adapter.getItems([])
+                return $A.test.storageAdapterSetItems(cmp._storage.adapter, [diffPrefixedKeyItem])
+                    .then(function() {
+                        // TODO: add a case for getItems with explicitly given keys when W-2531907 is done.
+                        // Currently only getting all items excludes different prefix keyed item.
+                        return cmp._storage.adapter.getItems([]);
+                    })
                     .then(function(items) {
                         $A.test.assertEquals(0, Object.keys(items).length,
                                 "getItems() should not include items with different prefixed key");
-                        completed = true;
-                    })
-                    .catch(function(e) { $A.test.fail(e.toString()); });
-
-                $A.test.addWaitFor(true, function() {return completed;});
+                    });
             }
         ]
     },
@@ -715,7 +630,6 @@
     testGetSizeIncludesSizeOfItemsWithDifferentPrefixKey: {
         test: [
             function createStorageAndSetDiffPrefixedItem(cmp) {
-                var completed = false;
                 var targetStorageName = "keyPrefixTestDB";
                 $A.test.addCleanup(function(){ this.deleteStorage(targetStorageName); }.bind(this));
 
@@ -739,31 +653,21 @@
                     },
                     cmp._expectedSize];
 
-                $A.test.storageAdapterSetItems(cmp._storage.adapter, [diffPrefixedKeyItem])
-                    .then(function() { completed = true; } )
-                    .catch(function(e) { $A.test.fail(e.toString()); });
-
-                $A.test.addWaitFor(true, function() {return completed;});
-            },
-            function verifyGetSizeBeforeDiffPrefixedItemGetEvicted(cmp) {
-                var completed = false;
-
-                // storage.getSize() uses KB as unit, so getting size through adapter (Byte as unit)
-                // for more accurate comparison.
-                // Note: getSize() normally gives estimated size. Calling after getAll() can force it
-                // to scan entire table to get actual size. More details in IndexedDBAdapter.js docs.
-                cmp._storage.getAll().
-                    then(function() {
+                return $A.test.storageAdapterSetItems(cmp._storage.adapter, [diffPrefixedKeyItem])
+                    .then(function() {
+                        // storage.getSize() uses KB as unit, so getting size through adapter (Byte as unit)
+                        // for more accurate comparison.
+                        // Note: getSize() normally gives estimated size. Calling after getAll() can force it
+                        // to scan entire table to get actual size. More details in IndexedDBAdapter.js docs.
+                        return cmp._storage.getAll();
+                    })
+                    .then(function() {
                         return cmp._storage.adapter.getSize();
                     })
                     .then(function(size) {
                         $A.test.assertEquals(cmp._expectedSize, size,
                                "getSize() should include size of items with different prefixed key");
-                        completed = true;
-                    })
-                    .catch(function(e) { $A.test.fail(e.toString()); });
-
-                $A.test.addWaitFor(true, function() {return completed;});
+                    });
             }
         ]
     },
@@ -771,7 +675,6 @@
     testSweepEvictsItemsWithDifferentKeyPrefix: {
         test: [
             function createStorageAndSetDiffPrefixedItem(cmp) {
-                var completed = false;
                 var targetStorageName = "keyPrefixTestDB";
                 $A.test.addCleanup(function(){ this.deleteStorage(targetStorageName); }.bind(this));
 
@@ -794,26 +697,16 @@
                     },
                     15];
 
-                $A.test.storageAdapterSetItems(cmp._storage.adapter, [diffPrefixedKeyItem])
-                    .then(function() { completed = true; } )
-                    .catch(function(e) { $A.test.fail(e.toString()); });
-
-                $A.test.addWaitFor(true, function() {return completed;});
-            },
-            function sweepAndVerifyStorageSize(cmp) {
-                var completed = false;
-
-                $A.test.storageSweep(cmp._storage)
+                return $A.test.storageAdapterSetItems(cmp._storage.adapter, [diffPrefixedKeyItem])
+                    .then(function() {
+                        return $A.test.storageSweep(cmp._storage);
+                    })
                     .then(function() {
                         return cmp._storage.getSize();
                     })
                     .then(function(size) {
                         $A.test.assertEquals(0, size, "Item with different key prefix should be swept");
-                        completed = true;
-                    })
-                    .catch(function(e) { $A.test.fail(e.toString()); });
-
-                $A.test.addWaitFor(true, function() {return completed;});
+                    });
             }
         ]
     }

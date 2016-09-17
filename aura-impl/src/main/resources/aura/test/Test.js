@@ -32,8 +32,10 @@ function TestInstance() {
     this.expectedWarnings = [];
     this.failOnWarning = false;
     this.initTime = new Date().getTime();
-    this.timeoutTime = 0;
     this.elapsedTime = 0;
+    this.timeoutTime = 0;
+    this.timedOut = false;
+    this.timer = undefined;
     this.suite = undefined;
     this.stages = undefined;
     this.cmp = undefined;
@@ -504,16 +506,18 @@ TestInstance.prototype.runAfterIf = function(conditionFunction, callback, interv
 };
 
 /**
- * Set test to timeout in a period of milliseconds from now.
+ * Set test to timeout in a period of milliseconds from now, clearing the existing timeout.
  *
  * @param {Number}
  *            timeoutMsec The number of milliseconds from the current time when the test should timeout
  * @export
  * @function Test#setTestTimeout
  */
-TestInstance.prototype.setTestTimeout = function(timeoutMsec) {
-    this.timeoutTime = new Date().getTime() + timeoutMsec;
+TestInstance.prototype.setTestTimeout = function(timeoutMs) {
+    this.timeoutTime = timeoutMs;
+    this.startTimer();
 };
+
 /**
  * Return whether the test is finished.
  *
@@ -642,7 +646,7 @@ TestInstance.prototype.expectAuraWarning = function(w) {
  * @function Test#assertAccessible
  */
 TestInstance.prototype.assertAccessible = function() {
-    var res = aura.devToolService.checkAccessibility();
+    var res = $A.devToolService.checkAccessibility();
     if (res !== "") {
         this.fail(res);
     }
@@ -1204,7 +1208,7 @@ TestInstance.prototype.isNodeDeleted = function(node) {
     }
     var div = document.createElement("div");
     document.documentElement.appendChild(div);
-    aura.util.removeElement(div);
+    $A.util.removeElement(div);
     return node.parentNode === div.parentNode;
 };
 
@@ -1993,13 +1997,11 @@ TestInstance.prototype.run = function(name, code, timeoutOverride, quickFixExcep
         return;
     }
 
-    if (!timeoutOverride) {
-        timeoutOverride = 10;
-    }
-    this.timeoutTime = this.initTime + 1000 * timeoutOverride;
+    timeoutOverride = timeoutOverride || 10;
+    this.timeoutTime = timeoutOverride * 1000;
 
     if (typeof code === "string") {
-        this.suite = aura.util.json.decode(code);
+        this.suite = $A.util.json.decode(code);
     } else {
         this.suite = code;
     }
@@ -2083,6 +2085,7 @@ TestInstance.prototype.runInternal = function(name) {
         this.doTearDown();
     }
 
+    this.startTimer();
     this.continueWhenReady();
 };
 

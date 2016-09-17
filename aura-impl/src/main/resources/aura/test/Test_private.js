@@ -201,9 +201,6 @@ TestInstance.prototype.continueWhenReady = function() {
         return;
     }
     try {
-        if ((this.inProgress > 1) && (new Date().getTime() > this.timeoutTime)) {
-			throw new Error("Test timed out");
-        }
         if (this.inProgress > 2) {
             setTimeout(internalCWR, 50);
             return;
@@ -253,22 +250,62 @@ TestInstance.prototype.continueWhenReady = function() {
                 this.lastStage = this.stages.shift();
                 if (this.doNotWrapInAuraRun) {
                     this.lastStage.call(that.suite, that.cmp);
+                    setTimeout(internalCWR, 1);
                 } else {
                     $A.run(function() {
-                        that.lastStage.call(that.suite, that.cmp);
+                        var result = that.lastStage.call(that.suite, that.cmp);
+                        if (result && typeof result.then === 'function') {
+                            result.then(function() {
+                                setTimeout(internalCWR, 1);
+                            },
+                            function(err) {
+                                that.logError("Test error", err);
+                                setTimeout(internalCWR, 1);
+                            });
+                        } else {
+                            setTimeout(internalCWR, 1);
+                        }
+                        
                     });
                 }
-                setTimeout(internalCWR, 1);
             }
         }
     } catch (e) {
-    	if (e instanceof $A.auraError) {
-    		throw e;
-    	} else {
-    		this.logError("Test error", e);
-    		this.doTearDown();
-    	}
+        if (e instanceof $A.auraError) {
+            throw e;
+        } else {
+            this.logError("Test error", e);
+            this.doTearDown();
+        }
     }
+};
+
+/**
+ * Times out the test with an error.
+ * 
+ * @private
+ */
+TestInstance.prototype.timeoutTest = function() {
+    if (this.timedOut || this.inProgress < 2) {
+        return;
+    }
+    this.timedOut = true;
+
+    this.logError("Test timed out");
+    this.doTearDown();
+};
+
+/**
+ * Attempts to time out the test after the previously set timeout period.
+ * 
+ * @private
+ */
+TestInstance.prototype.startTimer = function() {
+    var that = this;
+    clearTimeout(this.timer);
+    this.timer = setTimeout(function() {
+        that.timeoutTest();
+    }, this.timeoutTime);
 };
 
 /**

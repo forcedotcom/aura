@@ -43,7 +43,7 @@
 
     testSizeInitial : {
         test : function(cmp) {
-            cmp.helper.lib.storageTest.testSizeInitial(this.storage);
+            return cmp.helper.lib.storageTest.testSizeInitial(this.storage);
         }
     },
 
@@ -61,123 +61,116 @@
 
     testEmptyStringKey: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testEmptyStringKey(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testEmptyStringKey(cmp, this.storage);
         }
     },
 
     testGetNullValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetNullValue(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testGetNullValue(cmp, this.storage);
         }
     },
 
     testGetUndefinedValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetUndefinedValue(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testGetUndefinedValue(cmp, this.storage);
         }
     },
 
     testGetBooleanTrueValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetBooleanTrueValue(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testGetBooleanTrueValue(cmp, this.storage);
         }
     },
 
     testGetZeroValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetZeroValue(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testGetZeroValue(cmp, this.storage);
         }
     },
 
     testGetSimpleStringValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetSimpleStringValue(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testGetSimpleStringValue(cmp, this.storage);
         }
     },
 
     testGetEmptyObjectValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetEmptyObjectValue(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testGetEmptyObjectValue(cmp, this.storage);
         }
     },
 
     testGetBasicObjectValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetBasicObjectValue(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testGetBasicObjectValue(cmp, this.storage);
         }
     },
 
     testGetEmptyArrayValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetEmptyArrayValue(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testGetEmptyArrayValue(cmp, this.storage);
         }
     },
 
     testGetBasicArrayValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetBasicArrayValue(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testGetBasicArrayValue(cmp, this.storage);
         }
     },
 
     testGetBigArrayValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetBigArrayValue(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testGetBigArrayValue(cmp, this.storage);
         }
     },
 
     testGetMultiByteStringValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetMultiByteStringValue(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testGetMultiByteStringValue(cmp, this.storage);
         }
     },
 
     testGetFunctionValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetFunctionValue(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testGetFunctionValue(cmp, this.storage);
         }
     },
 
     testGetErrorValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetErrorValue(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testGetErrorValue(cmp, this.storage);
         }
     },
 
     testCacheMiss: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testCacheMiss(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testCacheMiss(cmp, this.storage);
         }
     },
 
     testSetItemUnderMaxSize : {
         test : [function(cmp) {
-            cmp.helper.lib.storageTest.testSetItemUnderMaxSize(cmp, this.storage, "Item smaller than size limit");
+            return cmp.helper.lib.storageTest.testSetItemUnderMaxSize(cmp, this.storage, "Item smaller than size limit");
         }]
     },
 
     testSetItemOverMaxSize : {
-        test : [function(cmp) {
-            cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage1(cmp, this.storage, "cannot store an item over the maxSize");
-        },
-        function(cmp) {
-            cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage2(cmp, this.storage);
-        }]
+        test : function(cmp) {
+            return cmp.helper.lib.storageTest.testSetItemOverMaxSize(cmp, this.storage, "cannot store an item over the maxSize");
+        }
     },
 
     testGetAll: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetAll(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testGetAll(cmp, this.storage);
         }
     },
 
     testReplaceExistingWithEntryTooLarge: {
-        test: [
-        function putItemThenReplaceWithEntryTooLarge(cmp) {
-            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage1(cmp, this.storage);
-        },
-        function getItem(cmp) {
-            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage2(cmp, this.storage);
-        }]
+        test: function(cmp) {
+            return cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge(cmp, this.storage);
+        }
     },
 
     testStorageInfo: {
@@ -188,25 +181,25 @@
 
     testCyclicObjectFails: {
         test: function(cmp){
-            cmp.helper.lib.storageTest.testCyclicObjectFails(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testCyclicObjectFails(cmp, this.storage);
         }
     },
 
     testModifyObject: {
         test:function(cmp){
-            cmp.helper.lib.storageTest.testModifyObject(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testModifyObject(cmp, this.storage);
         }
     },
 
     testModifyGetAllObject: {
         test:function(cmp){
-            cmp.helper.lib.storageTest.testModifyGetAllObject(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testModifyGetAllObject(cmp, this.storage);
         }
     },
 
     testUpdate: {
         test:function(cmp){
-            cmp.helper.lib.storageTest.testUpdate(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testUpdate(cmp, this.storage);
         }
     },
 
@@ -222,34 +215,31 @@
 
             $A.test.addCleanup(function(){ $A.storageService.deleteStorage("memory-testOverflow"); });
 
-            cmp.helper.lib.storageTest.testOverflow(cmp, cmp._storage);
+            return cmp.helper.lib.storageTest.testOverflow(cmp, cmp._storage);
         }
     },
 
     testClear: {
-        test:[function(cmp){
-            cmp.helper.lib.storageTest.testClear_stage1(cmp, this.storage);
-        },
-        function(cmp){
-            cmp.helper.lib.storageTest.testClear_stage2(cmp, this.storage);
-        }]
+        test:function(cmp){
+            return cmp.helper.lib.storageTest.testClear(cmp, this.storage);
+        }
     },
 
     testBulkGetInnerItemNotInStorage: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testBulkGetInnerItemNotInStorage(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testBulkGetInnerItemNotInStorage(cmp, this.storage);
         }
     },
 
     testBulkGetOuterItemsNotInStorage: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testBulkGetOuterItemsNotInStorage(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testBulkGetOuterItemsNotInStorage(cmp, this.storage);
         }
     },
 
     testBulkSet: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testBulkSet(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testBulkSet(cmp, this.storage);
         }
     },
 
@@ -264,19 +254,19 @@
             });
 
             $A.test.addCleanup(function(){ $A.storageService.deleteStorage("memory-testOverflow"); });
-            cmp.helper.lib.storageTest.testBulkSetLargerThanMaxSize(cmp, storage);
+            return cmp.helper.lib.storageTest.testBulkSetLargerThanMaxSize(cmp, storage);
         }
     },
 
     testBulkRemoveInnerItemNotInStorage: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testBulkRemoveInnerItemNotInStorage(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testBulkRemoveInnerItemNotInStorage(cmp, this.storage);
         }
     },
 
     testBulkRemoveOuterItemsNotInStorage: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testBulkRemoveOuterItemsNotInStorage(cmp, this.storage);
+            return cmp.helper.lib.storageTest.testBulkRemoveOuterItemsNotInStorage(cmp, this.storage);
         }
     },
 
@@ -287,14 +277,9 @@
     testSizeOneObject : {
         test : function(cmp) {
             var that = this;
-            var completed = false;
-            that.storage.set("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } })
+            return that.storage.set("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } })
                 .then(function() { return that.storage.getSize(); })
-                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(50, size*1024); })
-                .then( function() { completed = true; })
-                ["catch"](function(error) { $A.test.fail(error.toString()); });
-
-            $A.test.addWaitFor(true, function() { return completed; });
+                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(50, size*1024); });
         }
     },
 
@@ -304,8 +289,7 @@
             var size1 = NaN;
             var size2 = NaN;
             var size3 = NaN;
-            var completed = false;
-            this.storage.set("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" }})
+            return this.storage.set("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" }})
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { size1 = size; })
                 .then(function() { return that.storage.getSize(); })
@@ -321,13 +305,8 @@
                         // add another object to trigger a recalculation of size
                         // size should be the original + key2's object
                         cmp.helper.lib.storageTest.assertSimilarSize(size1*1024 + 10, size3*1024);
-
-                        completed = true;
                     }
-                )
-                ["catch"](function(error) { $A.test.fail(error.toString()); });
-
-            $A.test.addWaitFor(true, function() { return completed; });
+                );
         }
     },
 
@@ -335,44 +314,32 @@
         test : function(cmp) {
             var that = this;
             var originalSize = NaN;
-            var completed = false;
-            this.storage.set("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } })
+            return this.storage.set("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } })
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { originalSize = size; })
                 .then(function() { return that.storage.set("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } }); })
                 // the size should not have changed
                 .then(function() { return that.storage.getSize(); })
-                .then(function(size) { $A.test.assertEquals(originalSize, size); })
-                .then(function() { completed = true; })
-                ["catch"](function(error) { $A.test.fail(error.toString()); });
-
-
-            $A.test.addWaitFor(true, function() { return completed; });
+                .then(function(size) { $A.test.assertEquals(originalSize, size); });
         }
     },
 
     testSizeSameKeyDifferentObject : {
         test : function(cmp) {
             var that = this;
-            var completed = false;
-            this.storage.set("key1", {"value" : {"alpha":"beta", "gamma":"delta" } })
+            return this.storage.set("key1", {"value" : {"alpha":"beta", "gamma":"delta" } })
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(50, size*1024); })
                 .then(function() { return that.storage.set("key1", {"value" : {"alpha":"epsilon", "gamma":"zeta", "now" : true }}); })
                 .then(function() { return that.storage.getSize(); })
-                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(63, size*1024); })
-                .then(function() { completed = true; })
-                ["catch"](function(error) { $A.test.fail(error.toString()); });
-
-            $A.test.addWaitFor(true, function() { return completed; });
+                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(63, size*1024); });
         }
     },
 
     testSizeMultipleObjects : {
         test : function(cmp) {
             var that = this;
-            var completed = false;
-            Promise.all([
+            return Promise.all([
                     that.storage.set("key1", {
                             "value" : {
                                 "alpha" : "beta",
@@ -399,19 +366,14 @@
                     })
                 ])
                 .then(function() { return that.storage.getSize(); })
-                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(201, size*1024); })
-                .then(function() { completed = true; })
-                ["catch"](function(error) { $A.test.fail(error.toString()); });
-
-            $A.test.addWaitFor(true, function() { return completed; });
+                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(201, size*1024); });
         }
     },
 
     testSizeAfterRemoveKey : {
         test : function(cmp) {
             var that = this;
-            var completed = false;
-            Promise.all([
+            return Promise.all([
                 that.storage.set("key1", {"value" : {"alpha" : "beta","gamma" : "delta"}}),
                 that.storage.set("key2", {"value" : {"alpha" : "iota","gamma" : "kappa"}})
             ])
@@ -424,11 +386,7 @@
                 // put a new item with same key, different object
                 .then(function() { return that.storage.set("key1", {"value" : {"alpha" : "epsilon", "gamma" : "zeta"}}); })
                 .then(function() { return that.storage.getSize(); })
-                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(102, size*1024); })
-                .then(function() { completed = true; })
-                ["catch"](function(error) { $A.test.fail(error.toString()); });
-
-            $A.test.addWaitFor(true, function() { return completed; });
+                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(102, size*1024); });
         }
     },
 
@@ -448,8 +406,7 @@
             }
 
             var that = this;
-            var completed = false;
-            this.storage.set("key1", {"value" : {"foo" : new Array(256).join("x")}})
+            return this.storage.set("key1", {"value" : {"foo" : new Array(256).join("x")}})
                 .then(function() { return that.adapter.getMRU(); })
                 .then(function(mru) { $A.test.assertEquals(":key1", mru.toString()); })
                 .then(function() { return that.storage.getSize(); })
@@ -482,11 +439,7 @@
                 .then(function() { return that.adapter.getMRU(); })
                 .then(function(mru) { $A.test.assertEquals(generateRawAdapterKeys(["key4"]), mru.toString()); } )
                 .then(function() { return that.storage.getSize(); })
-                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(4027, size*1024); })
-                .then(function() { completed = true; })
-                ["catch"](function(error) { $A.test.fail(error.toString()); });
-
-            $A.test.addWaitFor(true, function() { return completed; });
+                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(4027, size*1024); });
         }
     },
 
@@ -498,7 +451,6 @@
         // Since evict is not part of the setItem chain, we rely on there not being a warning
         failOnWarning: true,
         test: function(cmp) {
-            var completed = false;
             var that = this;
             var key1 = "key1";
 
@@ -512,7 +464,7 @@
             var almostMaxSizeChunk = Math.floor((maxSize-.1)/2*1024);
 
             var chunk = new Array(quarterMaxSizeChunk).join("x");
-            this.storage.set(key1, chunk)
+            return this.storage.set(key1, chunk)
             .then(function() {
                 // Use same key to verify MRU in adapter updates existing entry
                 var value = new Array(halfMaxSizeChunk).join("x");
@@ -533,11 +485,7 @@
             })
             .then(function(items) {
                 $A.test.assertFalse(items.hasOwnProperty(key1), "Original key not evicted from storage");
-                completed = true;
-            })
-            ["catch"](function(error) { $A.test.fail(error.toString()); });
-
-            $A.test.addWaitFor(true, function(){ return completed; });
+            });
         }
     },
 
@@ -547,7 +495,6 @@
      */
     testDeleteStorage: {
         test: function(cmp) {
-            var completed = false;
             var name = "memoryTest";
             $A.storageService.initStorage({
                 name: name,
@@ -555,18 +502,10 @@
             });
             $A.test.assertDefined($A.storageService.getStorage(name));
 
-            $A.storageService.deleteStorage(name)
-                .then(
-                    function() {
-                        $A.test.assertUndefined($A.storageService.getStorage(name));
-                        completed = true;
-                    },
-                    function(){
-                        $A.test.fail("Failed to delete storage");
-                    }
-                );
-
-            $A.test.addWaitFor(true, function(){ return completed; });
+            return $A.storageService.deleteStorage(name)
+                .then(function() {
+                    $A.test.assertUndefined($A.storageService.getStorage(name));
+                });
         }
     },
 

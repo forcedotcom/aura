@@ -29,8 +29,7 @@
         }
     },
 
-    // W-3329556: There is a bug around here. The element created by the inner component's facet is returning a SecureObject
-    _testGetElementsReturnsArrayOfSecureElements: {
+    testGetElementsReturnsArrayOfSecureElements: {
         test: function(cmp) {
             cmp.testGetElementsReturnsArrayOfSecureElements();
         }

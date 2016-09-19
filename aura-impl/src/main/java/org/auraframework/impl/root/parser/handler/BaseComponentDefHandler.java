@@ -310,15 +310,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             DefDescriptor<ControllerDef> controllerDescriptor = null;
             if (controllerName != null) {
                 controllerDescriptor = getDefDescriptor(controllerName, ControllerDef.class);
-            } else {
-                String apexControllerName = String.format("apex://%s.%sController",
-                        defDescriptor.getNamespace(),
-                        AuraTextUtil.initCap(defDescriptor.getName()));
-                DefDescriptor<ControllerDef> apexDescriptor = definitionService
-                        .getDefDescriptor(apexControllerName, ControllerDef.class);
-                if (mdr.exists(apexDescriptor)) {
-                    controllerDescriptor = apexDescriptor;
-                }
             }
 
             if (controllerDescriptor != null) {
@@ -336,15 +327,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                         .getDefDescriptor(jsModelName, ModelDef.class);
                 if (mdr.exists(jsDescriptor)) {
                     builder.modelDefDescriptor = jsDescriptor;
-                } else {
-                    String apexModelName = String.format("apex://%s.%sModel",
-                            defDescriptor.getNamespace(),
-                            AuraTextUtil.initCap(defDescriptor.getName()));
-                    DefDescriptor<ModelDef> apexDescriptor = definitionService
-                            .getDefDescriptor(apexModelName, ModelDef.class);
-                    if (mdr.exists(apexDescriptor)) {
-                        builder.modelDefDescriptor = apexDescriptor;
-                    }
                 }
             }
 
@@ -454,15 +436,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                         providerName, ",", 0);
                 for (String provider : providerNames) {
                     builder.addProvider(provider);
-                }
-            } else {
-                String apexProviderName = String.format("apex://%s.%sProvider",
-                        defDescriptor.getNamespace(),
-                        AuraTextUtil.initCap(defDescriptor.getName()));
-                DefDescriptor<ProviderDef> apexDescriptor = definitionService
-                        .getDefDescriptor(apexProviderName, ProviderDef.class);
-                if (mdr.exists(apexDescriptor)) {
-                    builder.addProvider(apexDescriptor.getQualifiedName());
                 }
             }
 

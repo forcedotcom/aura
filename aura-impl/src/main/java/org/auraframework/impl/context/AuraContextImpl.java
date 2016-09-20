@@ -168,7 +168,6 @@ public class AuraContextImpl implements AuraContext {
 
     private final AuraContextImpl original;
 
-
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
             Map<String, GlobalValueProvider> globalProviders,

@@ -15,10 +15,14 @@
  */
 package org.auraframework.integration.test.context;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
@@ -60,12 +64,10 @@ import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class AuraContextIntegrationTest extends AuraImplTestCase {
 

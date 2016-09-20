@@ -15,10 +15,8 @@
  */
 package org.auraframework.system;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
@@ -133,40 +131,6 @@ public interface MasterDefRegistry {
      * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
      */
     Set<DefDescriptor<?>> getDependencies(String uid);
-
-    /**
-     * Get a named string from the cache for a def.
-     *
-     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
-     * @param descriptor the descriptor.
-     * @param key the key.
-     */
-    String getCachedString(String uid, DefDescriptor<?> descriptor, String key);
-
-    String getAltCachedString(String uid, DefDescriptor<?> descriptor, String key);
-
-    /**
-     * Get a named string from the cache for a cacheable definition.
-     *
-     * @param definition the definition.
-     * @throws QuickFixException
-     * @throws IOException 
-     */
-    String getCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader) 
-    		throws QuickFixException, IOException;
-
-	String getAltCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader)
-			throws QuickFixException, IOException;
-
-    /**
-     * Put a named string in the cache for a def.
-     *
-     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
-     * @param descriptor the descriptor.
-     * @param key the key (must be unique).
-     * @param key the value to store.
-     */
-    void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value);
 
     /**
      * Returns list of client libraries for given uid

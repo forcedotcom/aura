@@ -222,6 +222,31 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         }
     }
 
+    /**
+     * Checks if the current test is marked with the flapper annotation.
+     */
+    private boolean needsFreshBrowser() {
+        Class<?> testClass = getClass();
+
+        if (testClass.getAnnotation(FreshBrowserInstance.class) != null) {
+            return true;
+        }
+        try {
+            if (testClass.getMethod(getName()).getAnnotation(FreshBrowserInstance.class) != null) {
+                return true;
+            }
+        } catch (NoSuchMethodException e) {
+            // ignore
+        }
+        if (getTestLabels().contains("freshBrowserInstance")) {
+            return true;
+        }
+        if (isPerfTest()) {
+            return true;
+        }
+        return false;
+    }
+
     @SuppressWarnings("serial")
     private static class AggregateFailure extends AssertionFailedError {
         private final Collection<Throwable> failures;
@@ -797,17 +822,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 capabilities = currentBrowserType.getCapability();
             }
 
-            boolean reuseBrowser = true;
-            try {
-                Class<?> clazz = getClass();
-                reuseBrowser = clazz.getAnnotation(FreshBrowserInstance.class) == null
-                        && clazz.getMethod(getName()).getAnnotation(FreshBrowserInstance.class) == null;
-            } catch (NoSuchMethodException e) {
-                // happens for dynamic tests
-            }
-            if (isPerfTest()) {
-                reuseBrowser = false;
-            }
+            boolean reuseBrowser = !needsFreshBrowser();
             capabilities.setCapability(WebDriverProvider.REUSE_BROWSER_PROPERTY, reuseBrowser);
             addPerfCapabilities(capabilities);
 

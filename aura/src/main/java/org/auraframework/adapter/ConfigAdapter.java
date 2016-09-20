@@ -19,8 +19,11 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.DefRegistry;
 import org.auraframework.util.resource.ResourceLoader;
 
 public interface ConfigAdapter extends AuraAdapter {
@@ -123,31 +126,53 @@ public interface ConfigAdapter extends AuraAdapter {
     void removePrivilegedNamespace(String namespace);
 
     String getDefaultNamespace();
-	boolean isUnsecuredPrefix(String prefix);
 
-	@Deprecated
-	boolean isUnsecuredNamespace(String namespace);
+    boolean isUnsecuredPrefix(String prefix);
 
+    @Deprecated
+    boolean isUnsecuredNamespace(String namespace);
 
-	boolean isDocumentedNamespace(String namespace);
+    boolean isDocumentedNamespace(String namespace);
 
-	boolean isCacheablePrefix(String prefix);
+    /**
+     * check if a prefix is cacheable.
+     *
+     * @deprecated use one of the other cacheable calls.
+     */
+    boolean isCacheablePrefix(String prefix);
 
-	/**
-	 * Gets the Content-Security-Policy and X-FRAME-OPTION whitelist for a
-	 * given app.  The returned object describes most of what could go into
-	 * a Content-Security-Policy header, although at time of writing only
-	 * {@code frame-src} is used.
-	 *
-	 * @param app the fully-qualified descriptor string for the app
-	 * @param request the HTTP request, for checking URI, authenticated user, etc.
-	 * @return {@code null} to avoid using Content-Security-Policy and X-FRAME-OPTIONS
-	 *    headers entirely.  Or a {@link ContentSecurityPolicy} object describing the
-	 *    actual policy desired.
-	 */
-	ContentSecurityPolicy getContentSecurityPolicy(String app, HttpServletRequest request);
+    /**
+     * Check if a descriptor filter should be cached.
+     *
+     * @param filter the filter to check.
+     * @return true if the filter can be cached.
+     */
+    boolean isCacheable(DescriptorFilter filter);
 
-	boolean isLockerServiceEnabled();
-	boolean requireLocker(RootDefinition def);
-	String getLockerServiceCacheBuster();
+    /**
+     * Check if a descriptor is cacheable.
+     *
+     * @param registry the registry for the descriptor.
+     * @param descriptor the descriptor to check.
+     * @return true if the descriptor is cacheable.
+     */
+    boolean isCacheable(DefRegistry<?> registry, DefDescriptor<?> descriptor);
+
+    /**
+     * Gets the Content-Security-Policy and X-FRAME-OPTION whitelist for a
+     * given app.  The returned object describes most of what could go into
+     * a Content-Security-Policy header, although at time of writing only
+     * {@code frame-src} is used.
+     *
+     * @param app the fully-qualified descriptor string for the app
+     * @param request the HTTP request, for checking URI, authenticated user, etc.
+     * @return {@code null} to avoid using Content-Security-Policy and X-FRAME-OPTIONS
+     *    headers entirely.  Or a {@link ContentSecurityPolicy} object describing the
+     *    actual policy desired.
+     */
+    ContentSecurityPolicy getContentSecurityPolicy(String app, HttpServletRequest request);
+
+    boolean isLockerServiceEnabled();
+    boolean requireLocker(RootDefinition def);
+    String getLockerServiceCacheBuster();
 }

@@ -1,0 +1,41 @@
+.THIS {
+}
+
+.THIS.controls {
+    background-color: #f0f0f0;
+    white-space: nowrap;
+    width: 100%;
+    padding-bottom: 10px;
+}
+
+.THIS .cachemenu {
+    display: inline-block;
+    white-space: normal;
+}
+
+.THIS .search {
+    display: inline-block;
+    white-space: normal;
+    padding-left: 10em;
+}
+
+.THIS.header {
+    background-color: #c0c0c0;
+    padding: 5px;
+}
+
+.THIS.data {
+    background-color: #e0e0e0;
+}
+
+.THIS.data th {
+    font-weight : bold;
+    text-align: center;
+    padding: 5px;
+}
+
+.THIS.data td {
+    text-align: left;
+    padding-right: 5px;
+    padding-bottom: 2px;
+}

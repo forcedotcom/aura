@@ -15,13 +15,10 @@
  */
 package org.auraframework.impl.system;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
 
 import javax.annotation.CheckForNull;
@@ -59,8 +56,6 @@ import org.auraframework.util.text.GlobMatcher;
 import org.auraframework.util.text.Hash;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -76,49 +71,6 @@ import com.google.common.collect.Sets;
 public class MasterDefRegistryImpl implements MasterDefRegistry {
     private static final Logger logger = Logger.getLogger(MasterDefRegistryImpl.class);
 
-    private static final ImmutableSortedSet<String> cacheDependencyExceptions = ImmutableSortedSet.of(
-            //
-            // FIXME: these following 16 lines (applauncher) should be removed ASAP. They are here because
-            // we do not detect file backed apex, and we probably don't really want to.
-            //
-            "apex://applauncher.accountsettingscontroller",
-            "apex://applauncher.applauncherapexcontroller",
-            "apex://applauncher.applauncherdesktopcontroller",
-            "apex://applauncher.applauncherheadercontroller",
-            "apex://applauncher.applaunchersetupdesktopcontroller",
-            "apex://applauncher.applaunchersetupreorderercontroller",
-            "apex://applauncher.applaunchersetuptilecontroller",
-            "apex://applauncher.appmenu",
-            "apex://applauncher.changepasswordcontroller",
-            "apex://applauncher.communitylogocontroller",
-            "apex://applauncher.employeeloginlinkcontroller",
-            "apex://applauncher.forgotpasswordcontroller",
-            "apex://applauncher.identityheadercontroller",
-            "apex://applauncher.loginformcontroller",
-            "apex://applauncher.selfregistercontroller",
-            "apex://applauncher.sociallogincontroller",
-
-            "apex://array",
-            "apex://aura.component",
-            "apex://blob",
-            "apex://boolean",
-            "apex://date",
-            "apex://datetime",
-            "apex://decimal",
-            "apex://double",
-            "apex://event",
-            "apex://id",
-            "apex://integer",
-            "apex://list",
-            "apex://long",
-            "apex://map",
-            "apex://object",
-            "apex://set",
-            "apex://string",
-            "apex://sobject",
-            "apex://time"
-            );
-
     private final Lock rLock;
 
     private final ConfigAdapter configAdapter;
@@ -127,8 +79,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private final Cache<DefDescriptor<?>, Boolean> existsCache;
     private final Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache;
     private final Cache<String, DependencyEntry> depsCache;
-    private final Cache<String, String> stringsCache;
-    private final Cache<String, String> altStringsCache;
     private final Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache;
 
     private final RegistryTrie delegateRegistries;
@@ -155,29 +105,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         this.existsCache = cachingService.getExistsCache();
         this.defsCache = cachingService.getDefsCache();
         this.depsCache = cachingService.getDepsCache();
-        this.stringsCache = cachingService.getStringsCache();
-        this.altStringsCache = cachingService.getAltStringsCache();
         this.descriptorFilterCache = cachingService.getDescriptorFilterCache();
         this.currentCC = null;
-    }
-
-    private boolean isOkForDependencyCaching(DefDescriptor<?> descriptor) {
-        // if compound, OK as these tests are also conducted on the compound's target
-        if (descriptor.getPrefix().equals("compound")) {
-            return true;
-        }
-
-        // test cacheDependencyExceptions (like static types in Apex)
-        String descriptorName = descriptor.getQualifiedName().toLowerCase();
-
-        // truncate array markers
-        if (descriptorName.endsWith("[]")) {
-            descriptorName = descriptorName.substring(0, descriptorName.length() - 2);
-        }
-        if (cacheDependencyExceptions.contains(descriptorName)) {
-            return true;
-        }
-        return false;
     }
 
     @Override
@@ -220,7 +149,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 // We _never_ cache non-constant namespaces. We'd like to make them illegal, but for the moment
                 // we will make them undesirable.
                 //
-                boolean cacheable = shouldCache(matcher) && namespaceMatcher.isConstant();
+                boolean cacheable = configAdapter.isCacheable(matcher) && namespaceMatcher.isConstant();
                 for (DefRegistry<?> reg : delegateRegistries.getRegistries(matcher)) {
                     if (reg.hasFind()) {
                         //
@@ -486,18 +415,11 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         // If we can cache, look it up in the cache. If we find it, we have a built definition.
         // Currently, static registries are neither cached, nor do they affect dependency caching
         //
-        if (registry.isCacheable() && shouldCache(compiling.descriptor)) {
+        if (configAdapter.isCacheable(registry, compiling.descriptor)) {
             compiling.cacheable = true;
-        } else if (!registry.isStatic()) {
-            // if not a cacheable registry or not shouldCache, test other exceptions that might still
-            // allow dependency caching (if it's from static registry, it can't affect our decision on
-            // depsCaching) test for special cases: compounds and static apex types
-            boolean qualified = isOkForDependencyCaching(compiling.descriptor);
-
-            currentCC.shouldCacheDependencies = qualified;
-            if (!qualified) {
-                context.setLocalDefNotCacheable(compiling.descriptor);
-            }
+        } else {
+            currentCC.shouldCacheDependencies = false;
+            context.setLocalDefNotCacheable(compiling.descriptor);
         }
 
         //
@@ -818,8 +740,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 deps.add(cd.descriptor);
             }
 
+            CompilingDef<T> cd = cc.getCompiling(descriptor);
+
             de = new DependencyEntry(uid, Collections.unmodifiableSet(deps), clientLibs);
-            if (shouldCache(descriptor)) {
+            if (cd.cacheable) {
                 // put UID-qualified descriptor key for dependency
                 depsCache.put(makeGlobalKey(de.uid, descriptor), de);
 
@@ -864,18 +788,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             if (de != null) {
                 return de;
             }
-            if (shouldCache(descriptor)) {
-                de = depsCache.getIfPresent(makeGlobalKey(uid, descriptor));
-            }
+            de = depsCache.getIfPresent(makeGlobalKey(uid, descriptor));
         } else {
             // See localDependencies comment
             de = context.getLocalDependencyEntry(key);
             if (de != null) {
                 return de;
             }
-            if (shouldCache(descriptor)) {
-                de = depsCache.getIfPresent(makeNonUidGlobalKey(descriptor));
-            }
+            de = depsCache.getIfPresent(makeNonUidGlobalKey(descriptor));
         }
         if (de != null) {
             // See localDependencies comment
@@ -1071,13 +991,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         //
         // If we think that we can cache the def, check the cache.
         //
-        if (!registry.isStatic() && registry.isCacheable() && shouldCache(descriptor)) {
-            @SuppressWarnings("unchecked")
-            Optional<D> opt = (Optional<D>) defsCache.getIfPresent(descriptor);
-            if (opt != null) {
-                return opt.orNull();
-            }
+        @SuppressWarnings("unchecked")
+        Optional<D> opt = (Optional<D>) defsCache.getIfPresent(descriptor);
+        if (opt != null) {
+            return opt.orNull();
         }
+
         D def = registry.getDef(descriptor);
         if (def != null) {
             def.validateDefinition();
@@ -1119,7 +1038,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 return false;
             }
             regExists = reg.exists(descriptor);
-            if (reg.isCacheable() && shouldCache(descriptor)) {
+            if (configAdapter.isCacheable(reg, descriptor)) {
                 Boolean cacheVal = Boolean.valueOf(regExists);
                 existsCache.put(descriptor, cacheVal);
             }
@@ -1294,83 +1213,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         return delegateRegistries.getAllRegistries();
     }
 
-    private String getKey(DependencyEntry de, DefDescriptor<?> descriptor, String key) {
-        return String.format("%s@%s@%s", de.uid, descriptor.getQualifiedName().toLowerCase(), key);
-    }
-
-    @Override
-    public String getCachedString(String uid, DefDescriptor<?> descriptor, String key) {
-        return getCachedString(stringsCache, uid, descriptor, key);
-    }
-
-    @Override
-    public String getAltCachedString(String uid, DefDescriptor<?> descriptor, String key) {
-        return getCachedString(altStringsCache, uid, descriptor, key);
-    }
-
-    private String getCachedString(Cache<String, String> cache, String uid, DefDescriptor<?> descriptor, String key) {
-        if (uid != null && shouldCache(descriptor)) {
-            DependencyEntry de = context.getLocalDependencyEntry(uid);
-
-            if (de != null) {
-                return cache.getIfPresent(getKey(de, descriptor, key));
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public String getCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader) throws QuickFixException, IOException {
-        return getCachedString(stringsCache, uid, descriptor, key, loader);
-    }
-
-    @Override
-    public String getAltCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader) throws QuickFixException, IOException {
-        return getCachedString(altStringsCache, uid, descriptor, key, loader);
-    }
-
-    private String getCachedString(Cache<String, String> cache, String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader) throws QuickFixException, IOException {
-        if (uid != null && shouldCache(descriptor)) {
-            DependencyEntry de = context.getLocalDependencyEntry(uid);
-
-            if (de != null) {
-                try {
-                    return cache.get(getKey(de, descriptor, key), loader);
-                } catch (ExecutionException e) {
-                    // Don't interfere if the callable caused these exceptions.
-                    Throwables.propagateIfInstanceOf(e.getCause(), IOException.class);
-                    Throwables.propagateIfInstanceOf(e.getCause(), QuickFixException.class);
-                    // Propagates as-is if RuntimeException, or wraps with a RuntimeException.
-                    Throwables.propagate(e);
-                }
-            }
-        }
-
-        // When caching is bypassed, execute the loader directly.
-        try {
-            return loader.call();
-        } catch (Exception e) {
-            // Don't interfere if the call caused these exceptions.
-            Throwables.propagateIfInstanceOf(e, IOException.class);
-            Throwables.propagateIfInstanceOf(e, QuickFixException.class);
-            // Propagates as-is if RuntimeException, or wraps with a RuntimeException.
-            Throwables.propagate(e);
-        }
-
-        return null;
-    }
-
-    @Override
-    public void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value) {
-        if (uid != null && shouldCache(descriptor)) {
-            DependencyEntry de = context.getLocalDependencyEntry(uid);
-
-            if (de != null) {
-                stringsCache.put(getKey(de, descriptor, key), value);
-            }
-        }
-    }
-
     /**
      * Get the UID.
      *
@@ -1444,49 +1286,5 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      */
     private String makeNonUidGlobalKey(@Nonnull DefDescriptor<?> descriptor) {
         return makeLocalKey(descriptor);
-    }
-
-    /**
-     * Return true if the namespace of the provided descriptor supports caching.
-     */
-    private boolean shouldCache(DefDescriptor<?> descriptor) {
-        if (descriptor == null) {
-            return false;
-        }
-        String prefix = descriptor.getPrefix();
-        String namespace = descriptor.getNamespace();
-        return shouldCache(prefix, namespace);
-    }
-
-    /**
-     * Return true if the descriptor filter meets all requirements for the result of find to be cached
-     */
-    private boolean shouldCache(DescriptorFilter filter) {
-        GlobMatcher p = filter.getPrefixMatch();
-        String prefix = ((p.isConstant()) ? p.toString() : null);
-
-        GlobMatcher ns = filter.getNamespaceMatch();
-        String namespace = ((ns.isConstant()) ? ns.toString() : null);
-
-        return (prefix != null || namespace != null) && shouldCache(prefix, namespace);
-    }
-
-    /**
-     * Return true if the namespace supports cacheing
-     */
-    private boolean shouldCache(String prefix, String namespace) {
-        boolean cacheable = false;
-        if (namespace == null) {
-            if (prefix == null) {
-                cacheable = false;
-            } else {
-                cacheable = configAdapter.isCacheablePrefix(prefix);
-            }
-        } else if (prefix == null) {
-            cacheable = configAdapter.isInternalNamespace(namespace);
-        } else {
-            cacheable = configAdapter.isCacheablePrefix(prefix) || configAdapter.isInternalNamespace(namespace);
-        }
-        return cacheable;
     }
 }

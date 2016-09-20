@@ -17,9 +17,7 @@
 package configuration;
 
 import org.auraframework.adapter.JsonSerializerAdapter;
-import org.auraframework.def.genericxml.RootLevelGenericXmlValidator;
 import org.auraframework.impl.adapter.JsonSerializerAdapterImpl;
-import org.auraframework.impl.design.DesignOptionsValidator;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
 

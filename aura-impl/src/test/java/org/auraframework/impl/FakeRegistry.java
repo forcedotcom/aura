@@ -15,7 +15,10 @@
  */
 package org.auraframework.impl;
 
-import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -25,11 +28,7 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
+import com.google.common.collect.Maps;
 
 /**
  * This is a fake registry (both master and standard) for testing purposes only.
@@ -93,43 +92,17 @@ public class FakeRegistry implements MasterDefRegistry {
         return null;
     }
 
-	@Override
-    public String getCachedString(String uid, DefDescriptor<?> descriptor, String key) {
-        return null;
-    }
-
-	@Override
-    public String getAltCachedString(String uid, DefDescriptor<?> descriptor, String key) {
-        return null;
-    }
-
-	@Override
-	public String getCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader)
-			throws QuickFixException, IOException {
-		return null;
-	}    
-
-	@Override
-	public String getAltCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader)
-			throws QuickFixException, IOException {
-		return null;
-	}    
-
-    @Override
-    public void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value) {
-    }
-
     @Override
     public List<ClientLibraryDef> getClientLibraries(String uid) {
         return null;
     }
 
-	@Override
-	public <D extends Definition> String hasAccess(
-			DefDescriptor<?> referencingDescriptor, D def) {
-		return null;
-	}
-	
+    @Override
+    public <D extends Definition> String hasAccess(
+            DefDescriptor<?> referencingDescriptor, D def) {
+        return null;
+    }
+    
     @Override
     public <D extends Definition> void assertAccess(
             DefDescriptor<?> referencingDescriptor,

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -30,6 +31,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.cache.Cache;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseStyleDef;
@@ -61,6 +63,7 @@ import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Message;
@@ -72,6 +75,7 @@ import org.auraframework.util.json.JsonSerializationContext;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -84,7 +88,7 @@ public class ServerServiceImpl implements ServerService {
 
     @Inject
     private MetricsService metricsService;
-    
+
     @Inject
     private ConfigAdapter configAdapter;
 
@@ -102,7 +106,7 @@ public class ServerServiceImpl implements ServerService {
 
     @Inject
     private DefinitionService definitionService;
-    
+
     @Inject
     private ServletUtilAdapter servletUtilAdapter;
     
@@ -117,6 +121,16 @@ public class ServerServiceImpl implements ServerService {
     }
 
     private static final long serialVersionUID = -2779745160285710414L;
+
+    private Cache<String, String> stringsCache;
+
+    private Cache<String, String> altStringsCache;
+
+    @PostConstruct
+    private void setCaches() {
+        this.stringsCache = cachingService.getStringsCache();
+        this.altStringsCache = cachingService.getAltStringsCache();
+    }
 
     @Override
     public void run(Message message, AuraContext context, Writer out, Map<?,?> extras) throws IOException {
@@ -276,7 +290,7 @@ public class ServerServiceImpl implements ServerService {
         if (skipCache) {
             cached = getAppCssString(dependencies);
         } else {
-            cached = context.getDefRegistry().getAltCachedString(uid, appDesc, key,
+            cached = getAltCachedString(uid, appDesc, key,
                 new Callable<String>() {
                     @Override
                     public String call() throws Exception {
@@ -325,7 +339,7 @@ public class ServerServiceImpl implements ServerService {
         final String key = keyBuilder.toString();
         context.setPreloading(true);
 
-        String cached = context.getDefRegistry().getCachedString(uid, appDesc, key,
+        String cached = getCachedString(uid, appDesc, key,
             new Callable<String>() {
                 @Override
                 public String call() throws Exception {
@@ -356,7 +370,7 @@ public class ServerServiceImpl implements ServerService {
         final String uid = context.getUid(appDesc);
         final String key = "JS:" + mKey + uid;
 
-        String cached = context.getDefRegistry().getAltCachedString(uid, appDesc, key,
+        String cached = getAltCachedString(uid, appDesc, key,
                new Callable<String>() {
                    @Override
                    public String call() throws Exception {
@@ -371,7 +385,7 @@ public class ServerServiceImpl implements ServerService {
            out.append(cached);
         }
     }
-    
+
 
     private String getDefinitionsString (Set<DefDescriptor<?>> dependencies, String key)
             throws QuickFixException, IOException {
@@ -499,7 +513,73 @@ public class ServerServiceImpl implements ServerService {
         }
         return out;
     }
-    
+
+    /**
+     * Get a named string from the cache for a cacheable definition.
+     *
+     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
+     * @param descriptor the descriptor.
+     * @param key the key.
+     * @param loader the loader for the string
+     * @throws QuickFixException
+     * @throws IOException 
+     */
+    private String getCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader)
+            throws QuickFixException, IOException {
+        return getCachedString(stringsCache, uid, descriptor, key, loader);
+    }
+
+    /**
+     * Get a named string from the alternate cache for a cacheable definition.
+     *
+     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
+     * @param descriptor the descriptor.
+     * @param key the key.
+     * @param loader the loader for the string
+     * @throws QuickFixException
+     * @throws IOException 
+     */
+    private String getAltCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader)
+            throws QuickFixException, IOException {
+        return getCachedString(altStringsCache, uid, descriptor, key, loader);
+    }
+
+    private String getCachedString(Cache<String, String> cache, String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader) throws QuickFixException, IOException {
+        if (uid != null) {
+            AuraContext context = contextService.getCurrentContext();
+            DependencyEntry de = context.getLocalDependencyEntry(uid);
+
+            if (de != null) {
+                try {
+                    return cache.get(getKey(de, descriptor, key), loader);
+                } catch (ExecutionException e) {
+                    // Don't interfere if the callable caused these exceptions.
+                    Throwables.propagateIfInstanceOf(e.getCause(), IOException.class);
+                    Throwables.propagateIfInstanceOf(e.getCause(), QuickFixException.class);
+                    // Propagates as-is if RuntimeException, or wraps with a RuntimeException.
+                    Throwables.propagate(e);
+                }
+            }
+        }
+
+        // When caching is bypassed, execute the loader directly.
+        try {
+            return loader.call();
+        } catch (Exception e) {
+            // Don't interfere if the call caused these exceptions.
+            Throwables.propagateIfInstanceOf(e, IOException.class);
+            Throwables.propagateIfInstanceOf(e, QuickFixException.class);
+            // Propagates as-is if RuntimeException, or wraps with a RuntimeException.
+            Throwables.propagate(e);
+        }
+
+        return null;
+    }
+
+    private String getKey(DependencyEntry de, DefDescriptor<?> descriptor, String key) {
+        return String.format("%s@%s@%s", de.uid, descriptor.getQualifiedName().toLowerCase(), key);
+    }
+
     private TemplateUtil templateUtil = new TemplateUtil();
     
     @Override

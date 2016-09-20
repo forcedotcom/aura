@@ -24,14 +24,11 @@ import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
-import org.auraframework.def.ModelDef;
 import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestCaseDef;
 import org.auraframework.instance.Action;
-import org.auraframework.instance.Model;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;

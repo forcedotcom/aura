@@ -15,7 +15,17 @@
  */
 package org.auraframework.impl;
 
-import com.google.common.base.Optional;
+import java.lang.ref.WeakReference;
+import java.util.Collection;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.builder.CacheBuilder;
@@ -33,16 +43,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import java.lang.ref.WeakReference;
-import java.util.Collection;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+import com.google.common.base.Optional;
 
 public class CachingServiceImpl implements CachingService {
     private static final long serialVersionUID = -3311707270226573084L;

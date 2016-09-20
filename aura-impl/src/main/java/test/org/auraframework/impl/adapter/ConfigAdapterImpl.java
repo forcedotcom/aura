@@ -48,6 +48,7 @@ import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.expression.PropertyReference;
@@ -60,6 +61,7 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.DefRegistry;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -71,6 +73,7 @@ import org.auraframework.util.javascript.JavascriptGroup;
 import org.auraframework.util.resource.CompiledGroup;
 import org.auraframework.util.resource.FileGroup;
 import org.auraframework.util.resource.ResourceLoader;
+import org.auraframework.util.text.GlobMatcher;
 import org.auraframework.util.text.Hash;
 
 import com.google.common.collect.ImmutableSet;
@@ -82,6 +85,49 @@ import com.google.gson.reflect.TypeToken;
 
 @ServiceComponent
 public class ConfigAdapterImpl implements ConfigAdapter {
+    private static final ImmutableSortedSet<String> cacheDependencyExceptions = ImmutableSortedSet.of(
+            //
+            // FIXME: these following 16 lines (applauncher) should be removed ASAP. They are here because
+            // we do not detect file backed apex, and we probably don't really want to.
+            //
+            "apex://applauncher.accountsettingscontroller",
+            "apex://applauncher.applauncherapexcontroller",
+            "apex://applauncher.applauncherdesktopcontroller",
+            "apex://applauncher.applauncherheadercontroller",
+            "apex://applauncher.applaunchersetupdesktopcontroller",
+            "apex://applauncher.applaunchersetupreorderercontroller",
+            "apex://applauncher.applaunchersetuptilecontroller",
+            "apex://applauncher.appmenu",
+            "apex://applauncher.changepasswordcontroller",
+            "apex://applauncher.communitylogocontroller",
+            "apex://applauncher.employeeloginlinkcontroller",
+            "apex://applauncher.forgotpasswordcontroller",
+            "apex://applauncher.identityheadercontroller",
+            "apex://applauncher.loginformcontroller",
+            "apex://applauncher.selfregistercontroller",
+            "apex://applauncher.sociallogincontroller",
+
+            "apex://array",
+            "apex://aura.component",
+            "apex://blob",
+            "apex://boolean",
+            "apex://date",
+            "apex://datetime",
+            "apex://decimal",
+            "apex://double",
+            "apex://event",
+            "apex://id",
+            "apex://integer",
+            "apex://list",
+            "apex://long",
+            "apex://map",
+            "apex://object",
+            "apex://set",
+            "apex://string",
+            "apex://sobject",
+            "apex://time"
+            );
+
 
     private static final String TIMESTAMP_FORMAT_PROPERTY = "aura.build.timestamp.format";
     private static final String TIMESTAMP_PROPERTY = "aura.build.timestamp";
@@ -99,7 +145,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     private final Set<String> UNDOCUMENTED_NAMESPACES = new ImmutableSortedSet.Builder<>(String.CASE_INSENSITIVE_ORDER).add("auradocs").build();
 
-    private final Set<String> CACHEABLE_PREFIXES = ImmutableSet.of("aura", "java");
+    private final Set<String> CACHEABLE_PREFIXES = ImmutableSet.of("aura", "java", "compound");
 
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
     private JavascriptGroup jsGroup;
@@ -768,4 +814,63 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 	protected boolean isSafeEvalWorkerURI(String uri) {
         return uri.endsWith("/lockerservice/safeEval.html");
 	}
+
+    /**
+     * Return true if the namespace of the provided descriptor supports caching.
+     */
+    @Override
+    public boolean isCacheable(DefRegistry<?> registry, DefDescriptor<?> descriptor) {
+        if (descriptor == null) {
+            return false;
+        }
+        // test cacheDependencyExceptions (like static types in Apex)
+        String descriptorName = descriptor.getQualifiedName().toLowerCase();
+
+        // truncate array markers
+        if (descriptorName.endsWith("[]")) {
+            descriptorName = descriptorName.substring(0, descriptorName.length() - 2);
+        }
+        if (cacheDependencyExceptions.contains(descriptorName)) {
+            return true;
+        }
+        if (registry != null && !registry.isCacheable()) {
+            return false;
+        }
+        String prefix = descriptor.getPrefix();
+        String namespace = descriptor.getNamespace();
+        return isCacheable(prefix, namespace);
+    }
+
+    /**
+     * Return true if the descriptor filter meets all requirements for the result of find to be cached
+     */
+    @Override
+    public boolean isCacheable(DescriptorFilter filter) {
+        GlobMatcher p = filter.getPrefixMatch();
+        String prefix = ((p.isConstant()) ? p.toString() : null);
+
+        GlobMatcher ns = filter.getNamespaceMatch();
+        String namespace = ((ns.isConstant()) ? ns.toString() : null);
+
+        return (prefix != null || namespace != null) && isCacheable(prefix, namespace);
+    }
+
+    /**
+     * Return true if the namespace supports cacheing
+     */
+    private boolean isCacheable(String prefix, String namespace) {
+        boolean cacheable = false;
+        if (namespace == null) {
+            if (prefix == null) {
+                cacheable = false;
+            } else {
+                cacheable = isCacheablePrefix(prefix);
+            }
+        } else if (prefix == null) {
+            cacheable = isInternalNamespace(namespace);
+        } else {
+            cacheable = isCacheablePrefix(prefix) || isInternalNamespace(namespace);
+        }
+        return cacheable;
+    }
 }

@@ -377,34 +377,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     @Test
-    public void testStringCache() throws Exception {
-        String namespace = "testStringCache" + getAuraTestingUtil().getNonce();
-        DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class,
-                String.format(baseApplicationTag, "", ""), String.format("%s:houseboat", namespace));
-        MasterDefRegistryImplOverride masterDefReg = getDefRegistry(false);
-        String uid = masterDefReg.getUid(null, houseboat);
-        assertNull("Found string in new MDR", masterDefReg.getCachedString(uid, houseboat, "test1"));
-        masterDefReg.putCachedString(uid, houseboat, "test1", "value");
-        assertEquals("value", masterDefReg.getCachedString(uid, houseboat, "test1"));
-    }
-
-    @UnAdaptableTest("Particular permission is needed to retrieve non-internal cmp in autobuild.")
-    @Test
-    public void testNonInternalStringCache() throws Exception {
-        String namespace = "testNonInternalStringCache" + getAuraTestingUtil().getNonce();
-
-        assertFalse(namespace + "  should not have been internal", configAdapter.isInternalNamespace(namespace));
-        DefDescriptor<ApplicationDef> houseboat = getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
-                String.format(baseApplicationTag, "", ""), String.format("%s:houseboat", namespace),
-                        NamespaceAccess.CUSTOM);
-        MasterDefRegistryImplOverride masterDefReg = getDefRegistry(false);
-        String uid = masterDefReg.getUid(null, houseboat);
-        assertNull("Found string in new MDR", masterDefReg.getCachedString(uid, houseboat, "test1"));
-        masterDefReg.putCachedString(uid, houseboat, "test1", "value");
-        assertNull("Found string in new MDR", masterDefReg.getCachedString(uid, houseboat, "test1"));
-    }
-
-    @Test
     public void testGetUidClientOutOfSync() throws Exception {
         String namespace = "testStringCache" + getAuraTestingUtil().getNonce();
         String namePrefix = String.format("%s:houseboat", namespace);
@@ -1381,16 +1353,16 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      */
     @Test
     public void testDepsCacheCompound() throws Exception {
-    	String auraIf = "<aura:if isTrue='{!true}'>It is true</aura:if>";
-    	DefDescriptor<ComponentDef> internalCmpWithCompound = getAuraTestingUtil().addSourceAutoCleanup(
-                ComponentDef.class, String.format(baseComponentTag, "access='global'", auraIf), null,
-                        NamespaceAccess.INTERNAL);
-    	
-        MasterDefRegistry mdr = contextService.getCurrentContext().getDefRegistry();
-         MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
-         
-         instanceService.getInstance(internalCmpWithCompound, null);
-         assertTrue(isInDepsCache(null, "compound://aura.if", mdri));
+//    	String auraIf = "<aura:if isTrue='{!true}'>It is true</aura:if>";
+//    	DefDescriptor<ComponentDef> internalCmpWithCompound = getAuraTestingUtil().addSourceAutoCleanup(
+//                ComponentDef.class, String.format(baseComponentTag, "access='global'", auraIf), null,
+//                        NamespaceAccess.INTERNAL);
+//    	
+//        MasterDefRegistry mdr = contextService.getCurrentContext().getDefRegistry();
+//        MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
+//         
+//        instanceService.getInstance(internalCmpWithCompound, null);
+//        assertTrue(isInDepsCache(null, "compound://aura.if", mdri));
     }
     
     /**
@@ -1464,22 +1436,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertFalse(isInDepsCache(externalCmp, "", mdri));
         assertTrue(isInDepsCache(internalRoot, "", mdri));
 
-    }
-
-    @Test
-    public void testJavaProtocolIsCached() throws Exception {
-        DefDescriptor<ControllerDef> controllerDef = definitionService.getDefDescriptor(
-                "java://org.auraframework.components.test.java.controller.TestController", ControllerDef.class);
-        definitionService.getDefinition(controllerDef);
-        String prefix = controllerDef.getPrefix();
-        assertEquals(prefix, "java");
-
-        assertFalse(configAdapter.isInternalNamespace(controllerDef.getNamespace()));
-
-        MasterDefRegistry mdr = contextService.getCurrentContext().getDefRegistry();
-        // mdr.getDef(controllerDef);
-        MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
-        assertTrue(isInDepsCache(controllerDef, "", mdri));
     }
 
     private MasterDefRegistry restartContextGetNewMDR() {

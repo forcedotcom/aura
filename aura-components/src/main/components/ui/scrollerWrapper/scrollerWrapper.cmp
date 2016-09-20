@@ -24,6 +24,6 @@
     <div class="{! join(' ', 'scrollable', $Browser.isIOS ? 'scrollingOnIOS' : '', v.class) }"
          ontouchstart="{! c.handleTouchstart }"
          ontouchmove="{! c.handleTouchmove }">
-         {! v.body }
+        {! v.body }
     </div>
 </aura:component>

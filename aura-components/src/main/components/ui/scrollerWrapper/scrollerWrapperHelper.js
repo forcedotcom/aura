@@ -16,7 +16,7 @@
 ({
     canScroll : function (el) {
         var canScrollY = el.scrollHeight > el.offsetHeight;
-        var canScrollX = el.scrollerWidth > el.offsetWidth;
+        var canScrollX = el.scrollWidth > el.offsetWidth;
         return canScrollY || canScrollX;
     },
     isElementThatScrollAlways : function (target) {
@@ -26,6 +26,9 @@
     isElementWithNativeScroll : function (target) {
         var isTextarea = target.tagName === 'TEXTAREA';
         return isTextarea;
+    },
+    isAtTop : function (el) {
+        return el.scrollTop === 0;
     },
     isAtBottom : function (el) {
         return el.scrollHeight - el.scrollTop === el.offsetHeight

@@ -43,19 +43,25 @@
         canScrollTarget  = helper.isElementWithNativeScroll(target) && helper.canScroll(target);
 
         if (canScrollTarget || canScrollCurrent) {
-            el =  canScrollTarget && !event.preventBounce ? target : el;
 
             var curY = event.touches ? event.touches[0].screenY : event.screenY;
 
             // Determine if the user is trying to scroll past the top or bottom
-            var isAtTop = (startY <= curY && el.scrollTop === 0);
-            var isAtBottom = (startY >= curY && helper.isAtBottom(el));
+            var isAtTop = (startY < curY && helper.isAtTop(el));
+            var isAtBottom = (startY > curY && helper.isAtBottom(el));
+
+            // when target is scrollable, we also need to check if the user is
+            // trying to scroll past the edge of target
+            if (canScrollTarget && !event.preventBounce) {
+                isAtTop = (isAtTop && helper.isAtTop(target));
+                isAtBottom = (isAtBottom && helper.isAtBottom(target));
+            }
 
             if (!isAtTop && !isAtBottom) {
                 helper.skipUIScroller(event);
-                return;
+            } else {
+                helper.enableUIScroller(event);
             }
-            helper.enableUIScroller(event);
         }
     }
 }) // eslint-disable-line semi

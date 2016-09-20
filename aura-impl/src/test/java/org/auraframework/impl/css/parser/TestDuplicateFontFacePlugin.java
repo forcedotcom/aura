@@ -15,7 +15,10 @@
  */
 package org.auraframework.impl.css.parser;
 
+import javax.inject.Inject;
+
 import com.google.common.collect.Lists;
+
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
@@ -30,6 +33,9 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
     private DuplicateFontFacePlugin fontFamilyPlugin;
     private StringBuilder out;
 
+    @Inject
+    private StyleDefCSSFormatAdapter styleDefCssFormatAdapter;
+    
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -49,9 +55,8 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: Custom2; src: url(Custom2.woff)}");
 
-        StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-        cssFormatAdapter.setStyleAdapter(adapter);
-        cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), definitionService.getDefinition(desc2)), out);
+        styleDefCssFormatAdapter.setStyleAdapter(adapter);
+        styleDefCssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), definitionService.getDefinition(desc2)), out);
         // no error
     }
 
@@ -61,10 +66,9 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         String s = "@font-face {font-family: Custom1; src: url(Custom1.woff)}";
         DefDescriptor<StyleDef> desc = addStyleDef(s + "\n" + s);
 
-        StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-        cssFormatAdapter.setStyleAdapter(adapter);
+        styleDefCssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc)), out);
+            styleDefCssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc)), out);
             fail("expected to get exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "was already declared");
@@ -78,10 +82,9 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: Custom2; src: url(Custom2.woff)}");
         DefDescriptor<StyleDef> desc3 = addStyleDef("@font-face {font-family: Custom1; src: url(Custom1.woff)}");
 
-        StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-        cssFormatAdapter.setStyleAdapter(adapter);
+        styleDefCssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
+            styleDefCssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
             		definitionService.getDefinition(desc2), 
             		definitionService.getDefinition(desc3)), out);
             fail("expected to get exception");
@@ -96,10 +99,9 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: \"Custom1\"; src: url(Custom1.woff)}");
 
-        StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-        cssFormatAdapter.setStyleAdapter(adapter);
+        styleDefCssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1),
+            styleDefCssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1),
             		definitionService.getDefinition(desc2)), out);
             fail("expected to get exception");
         } catch (Exception e) {
@@ -113,10 +115,9 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: 'Custom1'; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: \"Custom1\"; src: url(Custom1.woff)}");
 
-        StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-        cssFormatAdapter.setStyleAdapter(adapter);
+        styleDefCssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
+            styleDefCssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
             		definitionService.getDefinition(desc2)), out);
             fail("expected to get exception");
         } catch (Exception e) {
@@ -130,10 +131,9 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
 
-        StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-        cssFormatAdapter.setStyleAdapter(adapter);
+        styleDefCssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
+            styleDefCssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
             		definitionService.getDefinition(desc2)), out);
             fail("expected to get exception");
         } catch (Exception e) {
@@ -147,10 +147,9 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
 
-        StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-        cssFormatAdapter.setStyleAdapter(adapter);
+        styleDefCssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
+            styleDefCssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
             		definitionService.getDefinition(desc2)), out);
             fail("expected to get exception");
         } catch (Exception e) {
@@ -164,9 +163,8 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: Custom1; font-style:italic; src: url(Custom1.woff)}");
 
-        StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-        cssFormatAdapter.setStyleAdapter(adapter);
-        cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
+        styleDefCssFormatAdapter.setStyleAdapter(adapter);
+        styleDefCssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
         		definitionService.getDefinition(desc2)), out);
         // no error
     }
@@ -177,10 +175,9 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: Custom1; font-style:italic; src: url(Custom1.woff)}");
 
-        StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-        cssFormatAdapter.setStyleAdapter(adapter);
+        styleDefCssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
+            styleDefCssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
             		definitionService.getDefinition(desc2)), out);
             fail("expected to get exception");
         } catch (Exception e) {
@@ -194,9 +191,8 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {/* @allowDuplicate */ font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {/* @allowDuplicate */ font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
 
-        StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-        cssFormatAdapter.setStyleAdapter(adapter);
-        cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
+        styleDefCssFormatAdapter.setStyleAdapter(adapter);
+        styleDefCssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
         		definitionService.getDefinition(desc2)), out);
         // no error
     }
@@ -207,10 +203,9 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {/* @allowDuplicate */ font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
 
-        StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-        cssFormatAdapter.setStyleAdapter(adapter);
+        styleDefCssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
+            styleDefCssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), 
             		definitionService.getDefinition(desc2)), out);
             fail("expected to get exception");
         } catch (Exception e) {
@@ -224,10 +219,9 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {/* @allowDuplicate */ font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
 
-        StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-        cssFormatAdapter.setStyleAdapter(adapter);
+        styleDefCssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), definitionService.getDefinition(desc2)), out);
+            styleDefCssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), definitionService.getDefinition(desc2)), out);
             fail("expected to get exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "was already declared");
@@ -240,10 +234,9 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {/* @allowDuplicate */ font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {/* @allowDuplicate */ font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
 
-        StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-        cssFormatAdapter.setStyleAdapter(adapter);
+        styleDefCssFormatAdapter.setStyleAdapter(adapter);
         try {
-            cssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), definitionService.getDefinition(desc2)), out);
+            styleDefCssFormatAdapter.writeCollection(Lists.newArrayList(definitionService.getDefinition(desc1), definitionService.getDefinition(desc2)), out);
             fail("expected to get exception");
         } catch (Exception e) {
             checkExceptionContains(e, AuraRuntimeException.class, "was already declared");

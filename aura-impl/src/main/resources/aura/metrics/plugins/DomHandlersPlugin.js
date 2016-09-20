@@ -138,7 +138,7 @@ DomHandlersPlugin.prototype.logUnInstrumentedClick = function (action, cmp) {
     $A.metricsService.transaction("ltng", "performance:missingLocator", { "context": {
         "attributes": hierarchy
     }});
-    $A.warning("Un-Instrumented click logged. Details: " + JSON.stringify(hierarchy));
+    $A.log("WARNING: **** Un-Instrumented click logged. Details: " + JSON.stringify(hierarchy));
 };
 
 DomHandlersPlugin.prototype.bind = function (metricsService) {

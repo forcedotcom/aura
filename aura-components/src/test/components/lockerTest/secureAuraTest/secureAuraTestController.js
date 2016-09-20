@@ -86,7 +86,7 @@
              }
         );
     },
-    
+
     testDynamicallyCreatedComponentSameNamespaceIsSecureComponent: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         $A.createComponent("lockerTest:secureWindowTest", {},
@@ -94,6 +94,24 @@
                     testUtils.assertEquals("SUCCESS", status, "$A.createComponent call did not return SUCCESS");
                     testUtils.assertStartsWith("SecureComponent", newCmp.toString(), "Created component (via $A.createComponent) should be of type SecureComponent");
                     cmp.set("v.testComplete", true);
+                }
+        );
+    },
+
+    testGetReferenceOnDynamicLabel: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        // use string concatenation so framework does not parse the source and pre-fetch the label
+        var labelRef = $A.getReference("$Label.test." + "task_mode_today");
+        cmp.set("v.labelAttr", labelRef);
+        // framework will make a network request for the label so need to wait
+        testUtils.addWaitForWithFailureMessage(
+                "Today",
+                function() {
+                    return cmp.get("v.labelAttr");
+                },
+                "Label reference never returns expected label",
+                function() {
+                    testUtils.assertEquals("Today", document.getElementById("labelOutput").innerText);
                 }
         );
     }

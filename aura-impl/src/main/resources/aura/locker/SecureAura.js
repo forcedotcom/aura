@@ -44,7 +44,7 @@ function SecureAura(AuraInstance, key) {
 	});
 
 	// SecureAura methods and properties
-	[ "createComponent", "createComponents", "enqueueAction", "reportError", "get", "getCallback", "getComponent", "getRoot", "log", "warning" ]
+	[ "createComponent", "createComponents", "enqueueAction", "reportError", "get", "getCallback", "getComponent", "getReference", "getRoot", "log", "warning" ]
 			.forEach(function(name) {
 				Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, AuraInstance, name));
 			});

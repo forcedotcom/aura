@@ -97,4 +97,10 @@
             cmp.testUtilHasClassAPI();
         }
     },
+
+    testGetReferenceOnDynamicLabel: {
+        test: function(cmp) {
+            cmp.testGetReferenceOnDynamicLabel();
+        }
+    }
 })

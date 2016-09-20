@@ -19,6 +19,7 @@
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
     <aura:attribute name="dynamicCmps" type="Object"/>
     <aura:attribute name="testComplete" type="Boolean" default="false" description="Flag to set to signal async operations are complete and test can complete"/>
+    <aura:attribute name="labelAttr" type="String" default="Default value"/>
 
     <aura:method name="testStorageServiceNotDefined" action="{!c.testStorageServiceNotDefined}"/>
     <aura:method name="testPlatformExposedAPIs" action="{!c.testPlatformExposedAPIs}">
@@ -33,8 +34,10 @@
     <aura:method name="testUtilHasClassAPI" action="{!c.testUtilHasClassAPI}"/>
     <aura:method name="testDynamicallyCreatedComponentDifferentNamespaceIsSecureComponentRef" action="{!c.testDynamicallyCreatedComponentDifferentNamespaceIsSecureComponentRef}"/>
     <aura:method name="testDynamicallyCreatedComponentSameNamespaceIsSecureComponent" action="{!c.testDynamicallyCreatedComponentSameNamespaceIsSecureComponent}"/>
+    <aura:method name="testGetReferenceOnDynamicLabel" action="{!c.testGetReferenceOnDynamicLabel}"/>
 
     <div>SecureAura test</div>
+    <div id="labelOutput">{!v.labelAttr}</div>
     <aura:text value="Differnet namespace component" aura:id="textCmp"/>
     <lockerTest:basicTest aura:id="lockerCmp"/>
 </aura:component>

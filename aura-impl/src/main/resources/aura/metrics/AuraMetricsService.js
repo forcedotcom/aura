@@ -818,6 +818,7 @@ Aura.Services.MetricsService.prototype.registerBeacon = function (beacon) {
 
 Aura.Services.MetricsService.prototype.summarizeResourcePerfInfo = function (r) {
     return {
+        "name"         : r.name,
         "duration"     : parseInt(r.responseEnd - r.startTime, 10),
         "startTime"    : parseInt(r.startTime, 10),
         "fetchStart"   : parseInt(r.fetchStart, 10),
@@ -882,24 +883,31 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
                 "appCache": bootstrap["timing"]["appCache"] === 0 && $A.clientService.appCache
             };
 
-            if (performance.getEntries) {
-                var frameworkRequests = {
-                    "requestBootstrapJs"     : "bootstrap.js",
-                    "requestInlineJs"        : "inline.js",
-                    "requestAppCss"          : "app.css",
-                    "requestAppJs"           : "app.js",
-                    "requestAuraJs"          : "/aura_"
-                };
+            var frameworkRequests = {
+                "requestBootstrapJs"     : "bootstrap.js",
+                "requestInlineJs"        : "inline.js",
+                "requestAppCss"          : "app.css",
+                "requestAppJs"           : "app.js",
+                "requestAuraJs"          : "/aura_"
+            };
 
-               frameworkRequests = $A.util.reduce(window.performance.getEntries(), function (r, item) { 
-                    for (var i in frameworkRequests) {
-                        if (item.name.indexOf(frameworkRequests[i]) !== -1) {
-                            bootstrap[i] = this.summarizeResourcePerfInfo(item);
-                            return r;       
+            bootstrap["allRequests"] = [];
+
+            if (performance.getEntries) {
+                $A.util.forEach(performance.getEntries(), function (resource) {
+                    if (resource.responseEnd < bootstrap["bootstrapEPT"]) {
+                        var summaryRequest = this.summarizeResourcePerfInfo(resource);
+                        bootstrap["allRequests"].push(summaryRequest);
+
+                        for (var i in frameworkRequests) {
+                            if (resource.name.indexOf(frameworkRequests[i]) !== -1) {
+                                summaryRequest.name = frameworkRequests[i]; // mutate the proccessed resource
+                                bootstrap[i] = summaryRequest;
+                                continue;
+                            }
                         }
                     }
-                    return r;
-                }.bind(this), {});
+                }, this);
             }
         }
 

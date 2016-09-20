@@ -109,10 +109,6 @@ TransportMetricsPlugin.prototype.receiveOverride = function(/* config, auraXHR *
                 "ttfb"         : parseInt(r.responseStart - r.startTime, 10),
                 "transfer"     : parseInt(r.responseEnd - r.responseStart, 10)
             });
-
-            if (window.performance.clearResourceTimings) {
-                window.performance.clearResourceTimings();
-            }
         }
     }
 

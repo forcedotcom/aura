@@ -15,39 +15,21 @@
  */
 package org.auraframework.test.perf.util;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
 import javax.inject.Inject;
 
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.service.ContextService;
-import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.system.AuraContext.Format;
-import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.util.AuraFiles;
-import org.auraframework.util.test.annotation.PerfTestSuite;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
-import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
-
-import com.google.common.collect.ImmutableList;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestContextManager;
 
 @UnAdaptableTest
-@PerfTestSuite
-public class PerfEngineUITest extends TestSuite implements PerfTestFramework {
-
-    private PerfConfigUtil perfConfigUtil;
-    private static String DB_INSTANCE = System.getProperty("dbURI");
-    private static final Logger LOG = Logger.getLogger(PerfEngineUITest.class.getSimpleName());
+@ContextConfiguration(locations = {"/applicationContext.xml"})
+public class PerfEngineUITest extends PerfEngineBaseTestSuite {
 
     @Inject
-    private ContextService contextService;
+    private ApplicationContext applicationContext; // used for handling manual bean injections 
 
     public static TestSuite suite() throws Exception {
         return new PerfEngineUITest();
@@ -58,90 +40,14 @@ public class PerfEngineUITest extends TestSuite implements PerfTestFramework {
     }
 
     public PerfEngineUITest(String name) throws Exception {
-        LOG.info("ComponentPerfTestEngine: " + name);
-        setName(name);
-        init();
-    }
-
-    private void init() throws Exception {
-        perfConfigUtil = new PerfConfigUtil();
-        Map<DefDescriptor<BaseComponentDef>, PerfConfig> tests = discoverTests();
-        runTests(tests);
+        super(name);
     }
 
     @Override
-    public void runTests(Map<DefDescriptor<BaseComponentDef>, PerfConfig> tests) throws Exception {
-        // Map component def to component config options.
-        for (Map.Entry<DefDescriptor<BaseComponentDef>, PerfConfig> entry : tests.entrySet()) {
-            addTest(new ComponentTestSuite(entry.getKey(), entry.getValue()));
+    protected void initializeBeans() throws Exception {
+        if (applicationContext == null) {
+            TestContextManager testContextManager = new TestContextManager(getClass());
+            testContextManager.prepareTestInstance(this);
         }
     }
-
-    @Override
-    public Map<DefDescriptor<BaseComponentDef>, PerfConfig> discoverTests() {
-        return perfConfigUtil.getComponentTestsToRun(getNamespaces());
-    }
-    
-    public List<DefDescriptor<BaseComponentDef>> getComponentDefs(Map<DefDescriptor<BaseComponentDef>, PerfConfig> configMap) {
-        List<DefDescriptor<BaseComponentDef>> defs = new ArrayList<>();
-        for (DefDescriptor<BaseComponentDef> def : configMap.keySet())
-            defs.add(def);
-        return defs;
-    }
-
-	private class ComponentTestSuite extends TestSuite {
-        ComponentTestSuite(DefDescriptor<BaseComponentDef> defDescriptor, final PerfConfig config) throws Exception {
-            super(defDescriptor.getName());
-            boolean doEndContext = false;
-            if (!contextService.isEstablished()) {
-                contextService.startContext(Mode.PTEST, Format.JSON, Authentication.AUTHENTICATED);
-                doEndContext = true;
-            }
-            try {
-
-                PerfExecutorTestCase test = new PerfExecutorTestCase(defDescriptor, config, DB_INSTANCE);
-                test.setPerfMetricsComparator(new PerfMetricsComparator() {
-                    @Override
-                    protected int getAllowedVariability(String metricName) {
-                        if (config.getVariability(metricName) != null) { return config.getVariability(metricName); }
-                        // Use default variability, if variability is
-                        // not set in config
-                        return super.getAllowedVariability(metricName);
-                    }
-                });
-                addTest(patchPerfComponentTestCase(test, defDescriptor));
-            } finally {
-                if (doEndContext) {
-                    contextService.endContext();
-                }
-            }
-        }
-	}
-
-    /**
-     * @return the list of namespaces to create tests for
-     */
-    public List<String> getNamespaces() {
-        return ImmutableList.of("PerformanceTest");
-    }
-    
-    private String resolveGoldFilePath(PerfExecutorTestCase test) {
-        String path = AuraFiles.Core.getPath() + "/aura-components/src/test/components/";
-        String componentPath = test.getComponentDef().getNamespace() + "/" + test.getComponentDef().getName();
-        String fullPath = path + componentPath;
-        return fullPath;
-    }
-    
-    /**
-     * Sfdc specific tweaks can be made here to tests running in core.
-     * @param test
-     * @param descriptor
-     * @return return test
-     */
-	protected TestCase patchPerfComponentTestCase(PerfExecutorTestCase test,
-			DefDescriptor<BaseComponentDef> descriptor) throws Exception {
-		test.setExplicitGoldResultsFolder(resolveGoldFilePath(test));
-		return test;
-	}
-
 }

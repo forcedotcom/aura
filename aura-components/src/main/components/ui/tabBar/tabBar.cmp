@@ -24,7 +24,7 @@
     <aura:attribute name="overflowLabel" type="String" default="More" description="Label to use for the overflow menu trigger."/>
     <aura:attribute name="overflowIcon" type="Aura.Component[]"  description="Icon to use for the overflow menu trigger."/>
 
-    <aura:attribute name="overflowData" type="Map" default="{}" access="PRIVATE" description="Internal object used to store overflow information"/>
+    <aura:attribute name="overflowData" type="Map" access="PRIVATE" description="Internal object used to store overflow information"/>
     <aura:attribute name="tabHeaders" type="Aura.Component[]" access="PRIVATE" />
 
     <aura:registerevent name="setActive" type="ui:tabsetEvent" description="This event is fired from the parent component to activate a tab item."/>

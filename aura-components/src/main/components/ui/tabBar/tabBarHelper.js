@@ -201,9 +201,9 @@
      * @private
      */
     createComponents: function (cmp, tabValues, callback) {
-        var items = [],
-            len = tabValues.length,
-            counter = len;
+        var items = [];
+        var len = tabValues.length;
+        var counter = len;
 
         var fn = function (newCmp) {
             counter--;
@@ -212,6 +212,12 @@
             newCmp.addHandler("onTabHover", cmp, "c.onTabHover");
             newCmp.addHandler("onTabUnhover", cmp, "c.onTabUnhover");
             items.push(newCmp);
+            
+            if(newCmp.get("v.active")) {
+                cmp._activeTabIndex = items.length-1;
+                cmp._activeTab = newCmp;
+            }
+            
             if (counter === 0 && callback) {
                 callback(items);
             }
@@ -220,7 +226,9 @@
         for (var i = 0; i < len; i++) {
             var config = tabValues.get ? tabValues.get(i) : tabValues[i];
             $A.componentService.newComponentAsync(this, fn, config, config.valueProvider || cmp);
+            
         }
+        
     },
 
     /**
@@ -234,7 +242,7 @@
      * If the tab bar contains more tabs, those will go into the overflow
      */
     calculateMaxTabs : function(cmp) {
-        var overflowData = cmp.get("v.overflowData");
+        var overflowData = this.getOverflowData(cmp);
         var barWidth = this.getBarWidth(cmp);
         var tabItems = cmp.get("v.tabHeaders");
         var tabsFitting = 0;
@@ -384,7 +392,7 @@
     },
 
     onResize: function(cmp) {
-        var overflowData = cmp.get("v.overflowData");
+        var overflowData = this.getOverflowData(cmp);
         var barWidth = this.getBarWidth(cmp);
         if (barWidth > 0 && overflowData.barWidth !== barWidth) {
             var helper = this;
@@ -515,7 +523,12 @@
     },
 
     getOverflowData : function(cmp) {
-        return cmp.get("v.overflowData");
+        var data = cmp.get("v.overflowData");
+        if(!data) {
+            data = {};
+            cmp.set("v.overflowData", data);
+        }
+        return data;
     },
 
     createMenuItemFromTab: function(tab, tabIndex) {

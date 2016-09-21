@@ -23,26 +23,37 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseStyleDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.impl.util.TemplateUtil;
+import org.auraframework.impl.util.TemplateUtil.Script;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.SVGDef;
+import org.auraframework.def.StyleDef;
+import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.Action;
+import org.auraframework.instance.BaseComponent;
+import org.auraframework.instance.Component;
 import org.auraframework.instance.Event;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.service.InstanceService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.service.MetricsService;
 import org.auraframework.service.SerializationService;
@@ -55,11 +66,14 @@ import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 @ServiceComponent
@@ -70,6 +84,9 @@ public class ServerServiceImpl implements ServerService {
 
     @Inject
     private MetricsService metricsService;
+    
+    @Inject
+    private ConfigAdapter configAdapter;
 
     @Inject
     private ContextService contextService;
@@ -85,6 +102,19 @@ public class ServerServiceImpl implements ServerService {
 
     @Inject
     private DefinitionService definitionService;
+    
+    @Inject
+    private ServletUtilAdapter servletUtilAdapter;
+    
+    @Inject
+    private InstanceService instanceService;
+    
+    private ManifestUtil manifestUtil;
+
+    @PostConstruct
+    public void createManifestUtil() {
+        manifestUtil = new ManifestUtil(contextService, configAdapter);
+    }
 
     private static final long serialVersionUID = -2779745160285710414L;
 
@@ -341,6 +371,7 @@ public class ServerServiceImpl implements ServerService {
            out.append(cached);
         }
     }
+    
 
     private String getDefinitionsString (Set<DefDescriptor<?>> dependencies, String key)
             throws QuickFixException, IOException {
@@ -467,5 +498,78 @@ public class ServerServiceImpl implements ServerService {
             throw new IllegalStateException("Illegal state, QFE during write", qfe);
         }
         return out;
+    }
+    
+    private TemplateUtil templateUtil = new TemplateUtil();
+    
+    @Override
+    public <T extends BaseComponentDef> Component writeTemplate(AuraContext context,
+            T value, Map<String, Object> componentAttributes, Appendable out)
+            throws IOException, QuickFixException {
+        
+        ComponentDef templateDef = value.getTemplateDef();
+        Map<String, Object> attributes = Maps.newHashMap();
+        Mode mode = context.getMode();
+        
+        StringBuilder sb = new StringBuilder();
+        templateUtil.writeHtmlStyle(configAdapter.getResetCssURL(), sb);
+        attributes.put("auraResetTags", sb.toString());
+        sb.setLength(0);
+        
+        templateUtil.writeHtmlStyles(servletUtilAdapter.getStyles(context), sb);
+        attributes.put("auraStyleTags", sb.toString());
+        sb.setLength(0);
+        
+        DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
+        if (styleDefDesc != null) {
+            attributes.put("auraInlineStyle", definitionService.getDefinition(styleDefDesc).getCode());
+        }
+        
+        if (mode.allowLocalRendering() && value.isLocallyRenderable()) {
+            BaseComponent<?, ?> cmp = (BaseComponent<?, ?>) instanceService.getInstance(value, componentAttributes);
+
+            attributes.put("body", Lists.<BaseComponent<?, ?>> newArrayList(cmp));
+            attributes.put("bodyClass", "");
+            attributes.put("defaultBodyClass", "");
+            attributes.put("autoInitialize", "false");
+        } else {
+            if (manifestUtil.isManifestEnabled()) {
+                attributes.put("manifest", servletUtilAdapter.getManifestUrl(context, componentAttributes));
+            }
+            
+            templateUtil.writeHtmlScripts(context, servletUtilAdapter.getJsClientLibraryUrls(context), Script.LAZY, sb);
+            templateUtil.writeHtmlScript(context, servletUtilAdapter.getInlineJsUrl(context, componentAttributes), Script.SYNC, sb);
+            templateUtil.writeHtmlScript(context, servletUtilAdapter.getFrameworkUrl(), Script.SYNC, sb);
+            templateUtil.writeHtmlScript(context, servletUtilAdapter.getAppJsUrl(context, null), Script.SYNC, sb);
+            templateUtil.writeHtmlScript(context, servletUtilAdapter.getBootstrapUrl(context, componentAttributes), Script.SYNC, sb);
+            
+            attributes.put("auraNamespacesScriptTags", sb.toString());
+            
+            Map<String, Object> auraInit = Maps.newHashMap();
+            if (componentAttributes != null && !componentAttributes.isEmpty()) {
+                auraInit.put("attributes", componentAttributes);
+            }
+            
+            Map<String, Object> namespaces = Maps.newHashMap();
+            namespaces.put("internal", configAdapter.getInternalNamespaces());
+            namespaces.put("privileged", configAdapter.getPrivilegedNamespaces());
+            auraInit.put("ns", namespaces);
+            
+            auraInit.put("descriptor", value.getDescriptor());
+            auraInit.put("deftype", value.getDescriptor().getDefType());
+            auraInit.put("host", context.getContextPath());
+            
+            String lockerWorkerURL = configAdapter.getLockerWorkerURL();
+            if (lockerWorkerURL != null) {
+                auraInit.put("safeEvalWorker", lockerWorkerURL);
+            }
+            
+            auraInit.put("context", new Literal(context.serialize(AuraContext.EncodingStyle.Full)));
+            attributes.put("auraInit", JsonEncoder.serialize(auraInit));
+        }
+        
+        Component template = instanceService.getInstance(templateDef.getDescriptor(), attributes);
+        return template;
+        
     }
 }

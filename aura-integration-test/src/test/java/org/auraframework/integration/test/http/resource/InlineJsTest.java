@@ -49,9 +49,6 @@ public class InlineJsTest extends AuraImplTestCase {
     private DefinitionService definitionService;
 
     @Inject
-    private LoggingService loggingService;
-
-    @Inject
     private RenderingService renderingService;
 
     @Inject
@@ -67,7 +64,6 @@ public class InlineJsTest extends AuraImplTestCase {
         InlineJs inlineJs = new InlineJs();
         inlineJs.setServletUtilAdapter(servletUtilAdapter);
         inlineJs.setConfigAdapter(configAdapter);
-        inlineJs.setLoggingService(loggingService);
         inlineJs.setDefinitionService(definitionService);
         inlineJs.setInstanceService(instanceService);
         inlineJs.setContextService(contextService);

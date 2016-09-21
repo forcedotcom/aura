@@ -21,8 +21,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.SVGDef;
+import org.auraframework.instance.Component;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -67,6 +69,8 @@ public interface ServerService extends AuraService {
      * @throws QuickFixException if the definitions could not be compiled.
      */
     void writeAppCss(Set<DefDescriptor<?>> dependencies, Writer out) throws IOException, QuickFixException;
+    
+    <T extends BaseComponentDef> Component writeTemplate(AuraContext context, T value, Map<String, Object> componentAttributes, Appendable out) throws IOException, QuickFixException;
 
     /**
      * write out SVG.

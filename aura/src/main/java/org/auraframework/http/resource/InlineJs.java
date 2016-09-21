@@ -19,14 +19,23 @@ package org.auraframework.http.resource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.Component;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -35,7 +44,7 @@ import org.auraframework.util.resource.ResourceLoader;
 import com.google.common.collect.Maps;
 
 @ServiceComponent
-public class InlineJs extends TemplateResource {
+public class InlineJs extends AuraResourceImpl {
 
     private static final String WALLTIME_FILE_PATH = "/aura/resources/walltime-js/olson/walltime-data_";
     private static final Map<String, String> WALLTIME_TZ_CONTENT = Maps.newConcurrentMap();
@@ -43,9 +52,27 @@ public class InlineJs extends TemplateResource {
     public InlineJs() {
         super("inline.js", Format.JS);
     }
-
-    @Override
-    protected void doRender(Component template, Appendable out) throws IOException, QuickFixException {
+    
+    private ContextService contextService;
+    private RenderingService renderingService;
+    private ManifestUtil manifestUtil;
+    
+    @Inject
+    public void setContextService(ContextService contextService) {
+        this.contextService = contextService;
+    }
+    
+    @Inject
+    public void setRenderingService(RenderingService renderingService) {
+        this.renderingService = renderingService;
+    }
+    
+    @PostConstruct
+    public void initManifest() {
+        this.manifestUtil = new ManifestUtil(contextService, configAdapter);
+    }
+    
+    private void appendInlineJS(Component template, Appendable out) throws IOException, QuickFixException {
 
         // write walltime tz data
         String tz = configAdapter.getCurrentTimezone();
@@ -78,14 +105,70 @@ public class InlineJs extends TemplateResource {
                 }
             }
         }
+    }
+    
+    
+    private <T extends BaseComponentDef> void internalWrite(HttpServletRequest request,
+            HttpServletResponse response, DefDescriptor<T> defDescriptor, AuraContext context)
+            throws IOException, QuickFixException {
+        // Knowing the app, we can do the HTTP headers, so of which depend on
+        // the app in play, so we couldn't do this earlier.
+        T def;
 
-        // write inline scripts from template
+        servletUtilAdapter.setCSPHeaders(defDescriptor, request, response);
+
+        context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
+
+        context.setApplicationDescriptor(defDescriptor);
+        definitionService.updateLoaded(defDescriptor);
+        def = definitionService.getDefinition(defDescriptor);
+
+        if (!context.isTestMode() && !context.isDevMode()) {
+            String defaultNamespace = configAdapter.getDefaultNamespace();
+            DefDescriptor<?> referencingDescriptor = (defaultNamespace != null && !defaultNamespace.isEmpty())
+                    ? definitionService.getDefDescriptor(String.format("%s:servletAccess", defaultNamespace),
+                            ApplicationDef.class)
+                    : null;
+            definitionService.getDefRegistry().assertAccess(referencingDescriptor, def);
+        }
+
+        if (shouldCacheHTMLTemplate(defDescriptor, request, context)) {
+            servletUtilAdapter.setLongCache(response);
+        } else {
+            servletUtilAdapter.setNoCache(response);
+        }
+        
+        // Prevents Mhtml Xss exploit:
+        PrintWriter out = response.getWriter();
+        out.write("\n    ");
+        
+        
+        Component template = serverService.writeTemplate(context, def, getComponentAttributes(request), out);
+        appendInlineJS(template, out);
         renderingService.render(template, null, out);
+
+    }
+    
+    private boolean shouldCacheHTMLTemplate(DefDescriptor<? extends BaseComponentDef> appDefDesc,
+            HttpServletRequest request, AuraContext context) throws QuickFixException {
+        if (appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)) {
+            Boolean isOnePageApp = ((ApplicationDef)definitionService.getDefinition(appDefDesc)).isOnePageApp();
+            if (isOnePageApp != null) {
+                return isOnePageApp.booleanValue();
+            }
+        }
+        return !manifestUtil.isManifestEnabled(request);
     }
 
     @Override
-    protected boolean shouldCacheHTMLTemplate(DefDescriptor<? extends BaseComponentDef> appDefDesc,
-            HttpServletRequest request, AuraContext context) throws QuickFixException {
-        return false;
+    public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context)
+            throws IOException {
+        try {
+            DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getLoadingApplicationDescriptor();
+            internalWrite(request, response, appDefDesc, context);
+        } catch (Throwable t) {
+            servletUtilAdapter.handleServletException(t, false, context, request, response, false);
+        }
     }
+
 }

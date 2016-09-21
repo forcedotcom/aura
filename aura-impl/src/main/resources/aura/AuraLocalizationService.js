@@ -40,7 +40,7 @@ function AuraLocalizationService() {
  * @param {Number} number - The number to be formatted.
  * @return {Number} The formatted number
  * @memberOf AuraLocalizationService
- * @example 
+ * @example
  * var num = 10000;
  * // Returns 10,000
  * var formatted = $A.localizationService.formatNumber(num);
@@ -93,7 +93,7 @@ AuraLocalizationService.prototype.formatCurrency = function(number) {
  * @param {String} symbols
  * @return {Number} The number format
  * @memberOf AuraLocalizationService
- * @example 
+ * @example
  * var f = $A.get("$Locale.numberFormat");
  * var num = 10000
  * var nf = $A.localizationService.getNumberFormat(f);
@@ -151,7 +151,7 @@ AuraLocalizationService.prototype.getDefaultPercentFormat = function() {
  * @memberOf AuraLocalizationService
  * @example
  * // Returns $20,000.00
- * $A.localizationService.getDefaultCurrencyFormat().format(20000); 
+ * $A.localizationService.getDefaultCurrencyFormat().format(20000);
  * @public
  * @export
  * @platform
@@ -203,7 +203,7 @@ AuraLocalizationService.prototype.displayDurationInDays = function(d) {
  * @param {Duration} d - The duration object returned by localizationService.duration
  * @return {Number} The length of time in hours.
  * @memberOf AuraLocalizationService
- * @example 
+ * @example
  * var dur = $A.localizationService.duration(2, 'day');
  * // Returns 48
  * var length = $A.localizationService.displayDurationInHours(dur);
@@ -288,7 +288,7 @@ AuraLocalizationService.prototype.displayDurationInSeconds = function(d) {
  * @param {Duration} d - The duration object returned by localizationService.duration
  * @return {Number} The length of time in years.
  * @memberOf AuraLocalizationService
- * example 
+ * example
  * var dur = $A.localizationService.duration(6, 'month');
  * // Returns 0.5
  * var length = $A.localizationService.displayDurationInYears(dur);
@@ -680,7 +680,7 @@ AuraLocalizationService.prototype.getYearsInDuration = function(d) {
  * @param {String} pattern - datetime pattern string
  * @return {Boolean} Returns true if it uses period time view.
  * @memberOf AuraLocalizationService
- * @example 
+ * @example
  * var d = new Date();
  * // Returns false
  * $A.localizationService.isPeriodTimeView(d);
@@ -871,7 +871,7 @@ AuraLocalizationService.prototype.startOf = function(date, unit) {
  * @param {Date} date - a Date object
  * @return {String} An ISO8601 string to represent passed in Date object.
  * @memberOf AuraLocalizationService
- * @example 
+ * @example
  * var d = new Date();
  * // Returns "2015-10-09T20:47:17.590Z"
  * $A.localizationService.toISOString(d);
@@ -1008,7 +1008,7 @@ AuraLocalizationService.prototype.translateToOtherCalendar = function(date) {
  * var timezone = $A.get("$Locale.timezone");
  * var d = new Date();
  * $A.localizationService.UTCToWallTime(d, timezone, function(walltime) {
- *    // Returns the local time without the seconds, for example, 9:00 PM 
+ *    // Returns the local time without the seconds, for example, 9:00 PM
  *    displayValue = $A.localizationService.formatDateTimeUTC(walltime, format, langLocale);
  * })
  * @public
@@ -1235,9 +1235,10 @@ AuraLocalizationService.prototype.getTimeZoneInfo = function(timezone, callback)
                     WallTime["init"](WallTime["data"]["rules"], WallTime["data"]["zones"]);
                     }
                 }
-        	} else if(state === "INCOMPLETE" || state === "ERROR") {
-        		throw new Error("Failed to get Time Zone Info from server: "+action.getError());
-        	}
+            } else if(state === "INCOMPLETE" || state === "ERROR") {
+                var errors = action.getError().map(function(e){return e.message;}).toString();
+                $A.warning("Failed to get Time Zone Info from server: " + errors);
+            }
             callback();
         });
         $A.enqueueAction(a);

@@ -124,16 +124,18 @@ DomHandlersPlugin.prototype.dispatchVirtualActionHook = function (action, event,
 };
 
 DomHandlersPlugin.prototype.logUnInstrumentedClick = function (action, cmp) {
-    var localId = cmp.getLocalId() || "unknown";
-    var tag = cmp.get("v.tag") + "|" + localId;
-    var level1 = action.getComponent().getConcreteComponent();
-    var level2 = level1.getComponentValueProvider().getConcreteComponent();
-    var level3 = level2.getComponentValueProvider().getConcreteComponent();
+    var parent = action.getComponent().getConcreteComponent();
+    var grandparent = parent.getComponentValueProvider().getConcreteComponent();
+    var grandparentContainer = grandparent.getComponentValueProvider().getConcreteComponent();
+    // cmp will always be an aura:html component. It's the root of all our click handlers
     var hierarchy = {
-            "htmlTagAndId" : tag,
-            "root": level1.getDef().toString(),
-            "parent": level2.getDef().toString(),
-            "grandparent": level3.getDef().toString()
+            "rootHtmlTag": cmp.get("v.tag"),
+            "rootId" : cmp.getLocalId(),
+            "parent": parent.getDef().toString(),
+            "parentId": parent.getLocalId(),
+            "grandparent": grandparent.getDef().toString(),
+            "grandparentId": grandparent.getLocalId(),
+            "grandparentContainer": grandparentContainer.getDef().toString()
     };
     $A.metricsService.transaction("ltng", "performance:missingLocator", { "context": {
         "attributes": hierarchy

@@ -395,8 +395,11 @@ AuraExpressionService.prototype.resolveLocator = function (component, localId, i
     
     if (includeMetadata) {
         locator["metadata"] = {
-                "targetDescriptor" : currentCmp.getDef().toString(),
-                "scopeDescriptor" : ownerCmp.getDef().toString()
+                "root" : link.getDef().toString(),
+                "rootId" : link.getLocalId(),
+                "parent" : currentCmp.getDef().toString(),
+                "parentId" : currentCmp.getLocalId(),
+                "grandparent" : ownerCmp.getDef().toString()
         };
     }
     return locator;

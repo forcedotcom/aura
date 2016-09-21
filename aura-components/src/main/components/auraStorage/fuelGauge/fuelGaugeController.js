@@ -21,7 +21,7 @@
             $A.eventService.addHandler({
                 "event": "markup://auraStorage:modified",
                 "globalId": cmp.getGlobalId(),
-                "handler": function(e) {
+                "handler": $A.getCallback(function(e) {
                     if (!cmp.isValid()) {
                         return;
                     }
@@ -31,7 +31,7 @@
                         return;
                     }
                     helper.update(cmp);
-                }
+                })
             });
         }
     },

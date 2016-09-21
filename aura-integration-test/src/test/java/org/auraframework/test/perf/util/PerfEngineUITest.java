@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.auraframework.AuraDeprecated;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.service.ContextService;
@@ -35,20 +36,33 @@ import org.auraframework.util.AuraFiles;
 import org.auraframework.util.test.annotation.PerfTestSuite;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestContextManager;
 
 import com.google.common.collect.ImmutableList;
 
 @UnAdaptableTest
 @PerfTestSuite
+@ContextConfiguration(locations = {"/applicationContext.xml"})
 public class PerfEngineUITest extends TestSuite implements PerfTestFramework {
 
-    private PerfConfigUtil perfConfigUtil;
     private static String DB_INSTANCE = System.getProperty("dbURI");
     private static final Logger LOG = Logger.getLogger(PerfEngineUITest.class.getSimpleName());
 
     @Inject
+    private ApplicationContext applicationContext; // used for handling manual bean injections 
+
+    @SuppressWarnings("unused")
+    @Inject
+    private AuraDeprecated auraDeprecated; // used to boot Aura services from command-line execution of these tests
+    
+    @Inject
     private ContextService contextService;
 
+    @Inject
+    private PerfConfigUtil perfConfigUtil;
+    
     public static TestSuite suite() throws Exception {
         return new PerfEngineUITest();
     }
@@ -64,7 +78,10 @@ public class PerfEngineUITest extends TestSuite implements PerfTestFramework {
     }
 
     private void init() throws Exception {
-        perfConfigUtil = new PerfConfigUtil();
+        if (applicationContext == null) {
+            TestContextManager testContextManager = new TestContextManager(getClass());
+            testContextManager.prepareTestInstance(this);
+        }
         Map<DefDescriptor<BaseComponentDef>, PerfConfig> tests = discoverTests();
         runTests(tests);
     }

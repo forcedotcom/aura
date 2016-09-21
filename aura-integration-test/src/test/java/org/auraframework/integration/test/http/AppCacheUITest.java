@@ -45,7 +45,11 @@ public class AppCacheUITest extends WebDriverTestCase {
         String manifestUrl = getAuraUITestingUtil().getEval(script).toString();
         assertNotEquals("Appcache is not enabled", "null", manifestUrl);
 
-        openNoAura(manifestUrl);
+        script = "return location.hostname + (location.port? ':' + location.port : '')";
+        String domain = getAuraUITestingUtil().getEval(script).toString();
+        manifestUrl = domain + manifestUrl;
+
+        this.getDriver().get(manifestUrl);
         getAuraUITestingUtil().waitForDocumentReady();
 
         String manifestContent = getText(By.cssSelector("body"));

@@ -37,6 +37,7 @@
     <aura:method name="testCreateEvent" action="{!c.testCreateEvent}"/>
     <aura:method name="testDefaultView" action="{!c.testDefaultView}"/>
     <aura:method name="testDocumentImplementationHTMLDocumentCreation" action="{!c.testDocumentImplementationHTMLDocumentCreation}" />
+    <aura:method name="testDocumentElementHasNonZeroPropertyValues" action="{!c.testDocumentElementHasNonZeroPropertyValues}"/>
 
     <div id="title">SecureDocument test</div>
 

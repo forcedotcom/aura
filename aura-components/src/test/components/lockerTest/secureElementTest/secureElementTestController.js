@@ -236,10 +236,10 @@
         var testUtils = cmp.get("v.testUtils");
 
         var title = document.getElementById("title");
-        // go up 2 levels since we will have access to the direct parent
-        var parentParentNode = title.parentNode.parentNode;
+        // go up 3 levels since we will have access to first 2 levels
+        var greatGrandParentNode = title.parentNode.parentNode.parentNode;
 
-        testUtils.assertEquals(null, parentParentNode, "Element.parentNode should return null when it is not accessible");
+        testUtils.assertEquals(null, greatGrandParentNode, "Element.parentNode should return null when it is not accessible");
     },
 
     testParentNodeInsideOpaqueObject: function(cmp) {

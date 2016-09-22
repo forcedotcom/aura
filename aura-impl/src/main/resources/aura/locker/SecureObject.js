@@ -151,7 +151,7 @@ SecureObject.filterEverything = function(st, raw, options) {
 				swallowed = hasAccess ? SecureComponent(raw, key) : SecureComponentRef(raw, key);
 				mutated = raw !== swallowed;
 			} else if (SecureObject.isDOMElementOrNode(raw)) {
-				if (hasAccess || raw === document.body || raw === document.head) {
+				if (hasAccess || raw === document.body || raw === document.head || raw === document.documentElement) {
 					swallowed = SecureElement(raw, key);
 				} else if (!options || options.filterOpaque !== true) {
 					swallowed = SecureObject(raw, key);
@@ -334,7 +334,7 @@ SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
 		if (options && options.skipOpaque === true) {
 			while (value) {
 				var hasAccess = $A.lockerService.util.hasAccess(st, value);
-				if (hasAccess || value === document.body || value === document.head) {
+				if (hasAccess || value === document.body || value === document.head || value === document.documentElement) {
 					break;
 				}
 				value = value[propertyName];

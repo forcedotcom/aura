@@ -117,5 +117,15 @@
         test: function(cmp) {
             cmp.testDocumentImplementationHTMLDocumentCreation();
         }
+    },
+
+    /**
+     * Previously, documentElement was a clone of the raw value. This caused issues when trying to read values off of
+     * the cloned object since they will all be reset. Verify we get a real value back as a basic test.
+     */
+    testDocumentElementHasNonZeroPropertyValues: {
+        test: function(cmp) {
+            cmp.testDocumentElementHasNonZeroPropertyValues();
+        }
     }
 })

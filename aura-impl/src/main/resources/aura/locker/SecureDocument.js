@@ -75,12 +75,6 @@ function SecureDocument(doc, key) {
                 return trust(o, doc.createComment(data));
             }
         },
-        documentElement: {
-        	enumerable: true,
-    		get : function() {
-                return trust(o, doc.documentElement.cloneNode());
-            }
-        },
         querySelector: {
             value: function(selector) {
                 return SecureElement.secureQuerySelector(o, doc, key, selector);

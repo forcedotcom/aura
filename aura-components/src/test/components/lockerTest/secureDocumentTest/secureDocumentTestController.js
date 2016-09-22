@@ -75,7 +75,7 @@
         var result = document.querySelectorAll('*');
 
         var i = 0;
-        ["HEAD", "BODY", "DIV", "DIV"].forEach(function(tagName) {
+        ["HTML", "HEAD", "BODY", "DIV", "DIV"].forEach(function(tagName) {
 	        testUtils.assertEquals(tagName, result[i++].nodeName, "Expected document.querySelectorAll('*') to return " + tagName + " element");
         });
     },
@@ -139,5 +139,12 @@
         var actual = body.childNodes.length;
 
         testUtils.assertEquals(2, actual, "Expected created HTML document body to have 2 nodes after modifying innerHTML");
+    },
+
+    testDocumentElementHasNonZeroPropertyValues: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var documentElement = document.documentElement;
+        testUtils.assertStartsWith("SecureElement", documentElement.toString(), "Unexpected object type from document.documentElement");
+        testUtils.assertTrue(documentElement.clientHeight > 0, "Expected non-zero value for documentElement.clientHeight");
     }
 })

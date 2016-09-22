@@ -84,10 +84,7 @@ public abstract class UnitTestCase extends TestCase {
      */
     @Before
     public void legacySetUp() throws Exception {
-        if (applicationContext == null) {
-            TestContextManager testContextManager = new TestContextManager(getClass());
-            testContextManager.prepareTestInstance(this);
-        }
+    	injectBeans(); // for JUnit4 runners
         setUp();
     }
 
@@ -100,6 +97,7 @@ public abstract class UnitTestCase extends TestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
+    	injectBeans(); // for custom legacy runners
         MockitoAnnotations.initMocks(this);
     }
 
@@ -125,11 +123,7 @@ public abstract class UnitTestCase extends TestCase {
 
     @Override
     public void runBare() throws Throwable {
-        if (applicationContext == null) {
-            TestContextManager testContextManager = new TestContextManager(getClass());
-            testContextManager.prepareTestInstance(this);
-        }
-        
+    	injectBeans(); // for standard legacy runners
         logger.info(String.format("Running: %s.%s", getClass().getName(), getName()));
         super.runBare();
     }
@@ -398,5 +392,12 @@ public abstract class UnitTestCase extends TestCase {
             // dynamic tests should override this function
         }
         return labels;
+    }
+    
+    private void injectBeans() throws Exception {
+        if (applicationContext == null) {
+            TestContextManager testContextManager = new TestContextManager(getClass());
+            testContextManager.prepareTestInstance(this);
+        }
     }
 }

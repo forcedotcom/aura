@@ -126,54 +126,64 @@
     testValidTimeFormat: {
         browsers: ['DESKTOP'],
         attributes: {value: '2015-10-23T16:30:00.000Z', dateFormat: 'MM-dd-yyyy', timeFormat: 'HH:mm', timezone: 'GMT'},
-        test: [function (cmp) {
+        test: function (cmp) {
             this.checkInputTimeValue(cmp, '16:30');
-        }]
+        }
     },
 
     testInvalidDateTimeInput: {
         browsers: ['DESKTOP'],
         attributes: {value: '2015-10-23T16:30:00.000Z', dateFormat: 'MM-dd-yyyy', timeFormat: 'HH:mm', timezone: 'GMT'},
-        test: function (cmp) {
-            var inputDateTimeCmp = cmp.find("dateTimePickerTest");
-            var inputDateElement = inputDateTimeCmp.find("inputDate").getElement();
-            var inputTimeElement = inputDateTimeCmp.find("inputTime").getElement();
-            var date = "10-23-2015";
-            var time = "16:30";
+        test: [
+            // Walltime is loaded asyncly
+            function setup(cmp) {
+                this.waitForInputTimeIsSet();
+            },
+            function verifyInvalidDatesAndTime(cmp) {
+                var inputDateTimeCmp = cmp.find("dateTimePickerTest");
 
-            var invalidDates = [
-                "15-10-2015",
-                "10-40-2015",
-                "1/6/2015",
-                "01-02-20a5",
-                "10102015",
-                "Sep 10th, 2015",
-                "abcefghijklm"];
+                var inputElements = $A.test.getElementByClass("date_input_box input");
+                var inputDateElement = inputElements[0];
+                var inputTimeElement = inputElements[1];
+                var date = "10-23-2015";
+                var time = "16:30";
 
-            for (var i = 0; i < invalidDates.length; i++) {
-                inputDateElement.value = invalidDates[i];
-                $A.test.fireDomEvent(inputDateElement, "change");
-                var expectedValue = invalidDates[i] + " " + time;
-                aura.test.assertEquals(expectedValue, inputDateTimeCmp.get("v.value"), "value should not change when input is invalid");
-                aura.test.assertEquals(invalidDates[i], inputDateElement.value, "input value doesn't change on invalid input");
+                var invalidDates = [
+                    "15-10-2015",
+                    "10-40-2015",
+                    "1/6/2015",
+                    "01-02-20a5",
+                    "10102015",
+                    "Sep 10th, 2015",
+                    "abcefghijklm"];
+
+                for (var i = 0; i < invalidDates.length; i++) {
+                    inputDateElement.value = invalidDates[i];
+                    $A.test.fireDomEvent(inputDateElement, "change");
+
+                    var expectedValue = invalidDates[i] + " " + time;
+
+                    $A.test.assertEquals(expectedValue, inputDateTimeCmp.get("v.value"), "value should not change when input is invalid");
+                    $A.test.assertEquals(invalidDates[i], inputDateElement.value, "input value doesn't change on invalid input");
+                }
+
+                inputDateElement.value = date;
+                var invalidTimes = [
+                    "10:60 PM",
+                    "25:30",
+                    "12.32 AM",
+                    "20:45 PM",
+                    "abcefghijklm"];
+
+                for (var i = 0; i < invalidTimes.length; i++) {
+                    inputTimeElement.value = invalidTimes[i];
+                    $A.test.fireDomEvent(inputTimeElement, "change");
+                    expectedValue = date + " " + invalidTimes[i];
+                    $A.test.assertEquals(expectedValue, inputDateTimeCmp.get("v.value"), "value should change even when input is invalid");
+                    $A.test.assertEquals(invalidTimes[i], inputTimeElement.value, "input value doesn't change on invalid input");
+                }
             }
-
-            inputDateElement.value = date;
-            var invalidTimes = [
-                "10:60 PM",
-                "25:30",
-                "12.32 AM",
-                "20:45 PM",
-                "abcefghijklm"];
-
-            for (var i = 0; i < invalidTimes.length; i++) {
-                inputTimeElement.value = invalidTimes[i];
-                $A.test.fireDomEvent(inputTimeElement, "change");
-                expectedValue = date + " " + invalidTimes[i];
-                aura.test.assertEquals(expectedValue, inputDateTimeCmp.get("v.value"), "value should change even when input is invalid");
-                aura.test.assertEquals(invalidTimes[i], inputTimeElement.value, "input value doesn't change on invalid input");
-            }
-        }
+        ]
     },
 
     testValidDateTimeInput: {
@@ -184,45 +194,50 @@
             timeFormat: 'hh:mm a',
             timezone: 'GMT'
         },
-        test: function (cmp) {
-            var inputDateTimeCmp = cmp.find("dateTimePickerTest");
-            var inputDateElement = inputDateTimeCmp.find("inputDate").getElement();
-            var inputTimeElement = inputDateTimeCmp.find("inputTime").getElement();
+        test: [
+            function setup() {
+                this.waitForInputTimeIsSet();
+            },
+            function verifyValidDatesAndTime(cmp) {
+                var inputDateTimeCmp = cmp.find("dateTimePickerTest");
+                var inputElements = $A.test.getElementByClass("date_input_box input");
+                var inputDateElement = inputElements[0];
+                var inputTimeElement = inputElements[1];
 
+                var validTimes = {
+                    "12:30 pm": "2015-10-23T12:30:00.000Z",
+                    "12:30PM": "2015-10-23T12:30:00.000Z",
+                    "12:30 PM": "2015-10-23T12:30:00.000Z",
+                };
 
-            var validTimes = {
-                "12:30 pm": "2015-10-23T12:30:00.000Z",
-                "12:30PM": "2015-10-23T12:30:00.000Z",
-                "12:30 PM": "2015-10-23T12:30:00.000Z",
-            };
+                for (var key in validTimes) {
+                    if (validTimes.hasOwnProperty(key)) {
+                        var validTime = key;
+                        var expectedValue = validTimes[key];
+                        inputTimeElement.value = validTime;
+                        $A.test.fireDomEvent(inputTimeElement, "change");
+                        $A.test.assertEquals(expectedValue, cmp.get("v.value"), "value should change when input is valid");
+                    }
+                }
 
-            for (var key in validTimes) {
-                if (validTimes.hasOwnProperty(key)) {
-                    var validTime = key;
-                    var expectedValue = validTimes[key];
-                    inputTimeElement.value = validTime;
-                    $A.test.fireDomEvent(inputTimeElement, "change");
-                    aura.test.assertEquals(expectedValue, cmp.get("v.value"), "value should change when input is valid");
+                var validDates = {
+                    "11-15-2015": "2015-11-15T12:30:00.000Z",
+                    "8-23-2015": "2015-08-23T12:30:00.000Z",
+                    "8-8-2015": "2015-08-08T12:30:00.000Z",
+                    "01-02-2015": "2015-01-02T12:30:00.000Z"
+                };
+
+                for (var key in validDates) {
+                    if (validDates.hasOwnProperty(key)) {
+                        var validDate = key;
+                        var expectedValue = validDates[key];
+                        inputDateElement.value = validDate;
+                        $A.test.fireDomEvent(inputDateElement, "change");
+                        $A.test.assertEquals(expectedValue, cmp.get("v.value"), "value should change when input is valid");
+                    }
                 }
             }
-
-            var validDates = {
-                "11-15-2015": "2015-11-15T12:30:00.000Z",
-                "8-23-2015": "2015-08-23T12:30:00.000Z",
-                "8-8-2015": "2015-08-08T12:30:00.000Z",
-                "01-02-2015": "2015-01-02T12:30:00.000Z"
-            };
-
-            for (var key in validDates) {
-                if (validDates.hasOwnProperty(key)) {
-                    var validDate = key;
-                    var expectedValue = validDates[key];
-                    inputDateElement.value = validDate;
-                    $A.test.fireDomEvent(inputDateElement, "change");
-                    aura.test.assertEquals(expectedValue, cmp.get("v.value"), "value should change when input is valid");
-                }
-            }
-        }
+        ]
     },
 
     testSingleDateTimeInput: {
@@ -233,13 +248,18 @@
             format: "MM-dd-yyyy hh:mm A",
             timezone: 'GMT'
         },
-        test: function (cmp) {
-            var inputDateTimeCmp = cmp.find("dateTimePickerTest");
-            var inputDateTimeElement = inputDateTimeCmp.find("inputDate").getElement();
-            inputDateTimeElement.value = "10-24-2015 04:35 PM";
-            $A.test.fireDomEvent(inputDateTimeElement, "change");
-            aura.test.assertEquals('2015-10-24T16:35:00.000Z', cmp.get("v.value"), "value should update when input is changed");
-        }
+        test: [
+            function() {
+                this.waitForInputTimeIsSet();
+            },
+            function(cmp) {
+                var inputDateTimeCmp = cmp.find("dateTimePickerTest");
+                var inputDateTimeElement = $A.test.getElementByClass("date_input_box input")[0];
+                inputDateTimeElement.value = "10-24-2015 04:35 PM";
+                $A.test.fireDomEvent(inputDateTimeElement, "change");
+                $A.test.assertEquals('2015-10-24T16:35:00.000Z', cmp.get("v.value"), "value should update when input is changed");
+            }
+        ]
     },
 
     /**
@@ -253,14 +273,19 @@
             timeFormat: 'hh:mm a',
             timezone: 'GMT'
         },
-        test: function (cmp) {
-            var inputDateTimeCmp = cmp.find("dateTimePickerTest");
-            var inputDateElement = inputDateTimeCmp.find("inputDate").getElement();
+        test: [
+            function() {
+                this.waitForInputTimeIsSet();
+            },
+            function(cmp) {
+                var inputDateTimeCmp = cmp.find("dateTimePickerTest");
+                var inputDateElement = inputDateTimeCmp.find("inputDate").getElement();
 
-            inputDateElement.value = "";
-            $A.test.fireDomEvent(inputDateElement, "change");
-            aura.test.assertEquals("2015-10-23T16:30:00.000Z", cmp.get("v.value"), "Date and time should not be reset");
-        }
+                inputDateElement.value = "";
+                $A.test.fireDomEvent(inputDateElement, "change");
+                $A.test.assertEquals("2015-10-23T16:30:00.000Z", cmp.get("v.value"), "Date and time should not be reset");
+            }
+        ]
     },
 
     /**
@@ -274,14 +299,19 @@
             timeFormat: 'hh:mm a',
             timezone: 'GMT'
         },
-        test: function (cmp) {
-            var inputDateTimeCmp = cmp.find("dateTimePickerTest");
-            var inputTimeElement = inputDateTimeCmp.find("inputTime").getElement();
+        test: [
+            function() {
+                this.waitForInputTimeIsSet();
+            },
+            function (cmp) {
+                var inputDateTimeCmp = cmp.find("dateTimePickerTest");
+                var inputTimeElement = inputDateTimeCmp.find("inputTime").getElement();
 
-            inputTimeElement.value = "";
-            $A.test.fireDomEvent(inputTimeElement, "change");
-            aura.test.assertEquals("2015-10-23T12:00:00.000Z", cmp.get("v.value"), "Time should be reset");
-        }
+                inputTimeElement.value = "";
+                $A.test.fireDomEvent(inputTimeElement, "change");
+                $A.test.assertEquals("2015-10-23T12:00:00.000Z", cmp.get("v.value"), "Time should be reset");
+            }
+        ]
     },
 
     /**
@@ -295,16 +325,21 @@
             timeFormat: 'hh:mm a',
             timezone: 'GMT'
         },
-        test: function (cmp) {
-            var inputDateTimeCmp = cmp.find("dateTimePickerTest");
-            var inputDateElement = inputDateTimeCmp.find("inputDate").getElement();
-            var inputTimeElement = inputDateTimeCmp.find("inputTime").getElement();
+        test: [
+            function() {
+                this.waitForInputTimeIsSet();
+            },
+            function (cmp) {
+                var inputDateTimeCmp = cmp.find("dateTimePickerTest");
+                var inputDateElement = inputDateTimeCmp.find("inputDate").getElement();
+                var inputTimeElement = inputDateTimeCmp.find("inputTime").getElement();
 
-            inputDateElement.value = "";
-            inputTimeElement.value = "";
-            $A.test.fireDomEvent(inputDateElement, "change");
-            aura.test.assertEquals("", cmp.get("v.value"), "value should be empty");
-        }
+                inputDateElement.value = "";
+                inputTimeElement.value = "";
+                $A.test.fireDomEvent(inputDateElement, "change");
+                $A.test.assertEquals("", cmp.get("v.value"), "value should be empty");
+            }
+        ]
     },
 
     /**
@@ -335,6 +370,22 @@
                 var actualValue = $A.util.getElementAttributeValue(inputTimeElement, "value");
                 $A.test.assertEquals(expectedValue, actualValue, "Time value is not as expected!");
             });
+    },
+
+    /**
+     * Wait for input time value is set in input filed.
+     * Since Walltime is loaded asynchronously, it needs to wait for the given value is ready
+     * before testing.
+     */
+    waitForInputTimeIsSet: function() {
+        var inputElements = $A.test.getElementByClass("date_input_box input");
+        var inputDateElement = inputElements[0];
+        var inputTimeElement = inputElements[1];
+        $A.test.addWaitFor(true, function() {
+            // if the element exists, wait for the value is set
+            return (!inputDateElement || !!inputDateElement.value) &&
+                   (!inputTimeElement || !!inputTimeElement.value);
+        });
     }
 })
 

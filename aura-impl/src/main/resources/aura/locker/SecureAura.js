@@ -25,9 +25,14 @@
 function SecureAura(AuraInstance, key) {
 	"use strict";
 
+    var o = ls_getFromCache(AuraInstance, key);
+    if (o) {
+        return o;
+    }
+
 	var su = Object.create(null);
 	var sls = Object.create(null);
-	var o = Object.create(null, {
+	o = Object.create(null, {
 		"util" : {
 			enumerable : true,
 			value : su
@@ -75,5 +80,6 @@ function SecureAura(AuraInstance, key) {
     ls_setRef(sls, AuraInstance["localizationService"], key);
 	Object.seal(sls);
 
+    ls_addToCache(AuraInstance, o, key);
 	return o;
 }

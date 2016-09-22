@@ -17,7 +17,12 @@
 function SecureAction(action, key) {
     "use strict";
 
-    var o = Object.create(null, {
+    var o = ls_getFromCache(action, key);
+    if (o) {
+        return o;
+    }
+
+    o = Object.create(null, {
         "toString": {
             value: function() {
                 return "SecureAction: " + action + "{ key: " + JSON.stringify(key) + " }";
@@ -42,6 +47,7 @@ function SecureAction(action, key) {
     });
 
     ls_setRef(o, action, key);
+    ls_addToCache(action, o, key);
 
     return Object.seal(o);
 }

@@ -30,7 +30,12 @@
 function SecureNavigator(navigator, key) {
 	"use strict";
 
-	var o = Object.create(null, {
+    var o = ls_getFromCache(navigator, key);
+    if (o) {
+        return o;
+    }
+
+	o = Object.create(null, {
 		toString: {
 			value: function() {
 				return "SecureNavigator: " + navigator + "{ key: " + JSON.stringify(key) + " }";
@@ -44,6 +49,7 @@ function SecureNavigator(navigator, key) {
     });
 
     ls_setRef(o, navigator, key);
+    ls_addToCache(navigator, o, key);
 
 	return o;
 }

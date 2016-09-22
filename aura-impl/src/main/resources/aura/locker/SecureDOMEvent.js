@@ -17,7 +17,12 @@
 function SecureDOMEvent(event, key) {
     "use strict";
 
-    var o = Object.create(null, {
+    var o = ls_getFromCache(event, key);
+    if (o) {
+        return o;
+    }
+
+    o = Object.create(null, {
         toString: {
             value: function() {
                 return "SecureDOMEvent: " + event + "{ key: " + JSON.stringify(key) + " }";
@@ -64,6 +69,7 @@ function SecureDOMEvent(event, key) {
     }
 
     ls_setRef(o, event, key);
+    ls_addToCache(event, o, key);
 
     return o;
 }

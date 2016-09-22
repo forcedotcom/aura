@@ -34,7 +34,12 @@ function SecureXMLHttpRequest(key) {
 	return function() {
 		var xhr = new XMLHttpRequest();
 
-		var o = Object.create(null, {
+        var o = ls_getFromCache(xhr, key);
+        if (o) {
+            return o;
+        }
+
+		o = Object.create(null, {
 			toString: {
 				value: function() {
 					return "SecureXMLHttpRequest: " + xhr + " { key: " + JSON.stringify(key) + " }";
@@ -86,6 +91,7 @@ function SecureXMLHttpRequest(key) {
 		});
 
         ls_setRef(o, xhr, key);
+        ls_addToCache(xhr, o, key);
 
 		return Object.freeze(o);
 	};

@@ -161,10 +161,22 @@
             cmp.testThisVariableNotLeakedFromMarkup();
         }
     },
-    
+
     testCtorAannotation: {
         test: function(cmp) {
             cmp.testCtorAannotation();
+        }
+    },
+
+    testUpdateElementDoesNotReturnCachedItem: {
+        test: function(cmp) {
+            cmp.testUpdateElementDoesNotReturnCachedItem();
+        }
+    },
+
+    testAddExpandoToCachedItem: {
+        test: function(cmp) {
+            cmp.testAddExpandoToCachedItem();
         }
     }
 })

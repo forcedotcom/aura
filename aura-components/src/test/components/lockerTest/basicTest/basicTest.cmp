@@ -37,12 +37,14 @@
     <aura:method name="testValueProviderOnDynamicallyCreatedComponents" action="{!c.testValueProviderOnDynamicallyCreatedComponents}"/>
     <aura:method name="testThisVariableNotLeakedFromMarkup" action="{!c.testThisVariableNotLeakedFromMarkup}"/>
     <aura:method name="testCtorAannotation" action="{!c.testCtorAannotation}"/>  
+    <aura:method name="testUpdateElementDoesNotReturnCachedItem" action="{!c.testUpdateElementDoesNotReturnCachedItem}"/>
+    <aura:method name="testAddExpandoToCachedItem" action="{!c.testAddExpandoToCachedItem}"/>
 
     <div>LockerService test</div>
     <div aura:id="content"/>
     <lockerTest:facet aura:id="innerCmp"/>
 
-    <ul aura:id="ul">
+    <ul aura:id="ul" id="ul1">
         <li aura:id="l1" id="l1">A</li>
     </ul>
 

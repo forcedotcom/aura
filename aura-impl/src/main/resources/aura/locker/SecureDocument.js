@@ -27,6 +27,11 @@
 function SecureDocument(doc, key) {
     "use strict";
 
+    var o = ls_getFromCache(doc, key);
+    if (o) {
+        return o;
+    }
+
     function trust(st, el) {
         $A.lockerService.trust(st, el);
         return SecureElement(el, key);
@@ -44,7 +49,7 @@ function SecureDocument(doc, key) {
         }
     }
 
-    var o = Object.create(null, {
+    o = Object.create(null, {
         toString: {
             value: function() {
                 return "SecureDocument: " + doc + "{ key: " + JSON.stringify(key) + " }";
@@ -101,6 +106,7 @@ function SecureDocument(doc, key) {
     SecureObject.addPrototypeMethodsAndProperties(SecureDocument.metadata, o, doc, key);
 
     ls_setRef(o, doc, key);
+    ls_addToCache(doc, o, key);
 
     return o;
 }

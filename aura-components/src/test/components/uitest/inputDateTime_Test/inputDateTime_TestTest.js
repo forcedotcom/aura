@@ -330,8 +330,11 @@
 
     checkInputTimeValue: function (cmp, expectedValue) {
         var inputTimeElement = cmp.find("dateTimePickerTest").find("inputTime").getElement();
-        var actualValue = $A.util.getElementAttributeValue(inputTimeElement, "value");
-        $A.test.assertEquals(expectedValue, actualValue, "Time value is not as expected!");
+        $A.test.addWaitFor(true, function(){ return !!$A.util.getElementAttributeValue(inputTimeElement, "value")},
+            function() {
+                var actualValue = $A.util.getElementAttributeValue(inputTimeElement, "value");
+                $A.test.assertEquals(expectedValue, actualValue, "Time value is not as expected!");
+            });
     }
 })
 

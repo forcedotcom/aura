@@ -43,8 +43,7 @@ function SecureNavigator(navigator, key) {
         SecureObject.addPropertyIfSupported(o, navigator, name);
     });
 
-	setLockerSecret(o, "key", key);
-	setLockerSecret(o, "ref", navigator);
+    ls_setRef(o, navigator, key);
 
 	return o;
 }

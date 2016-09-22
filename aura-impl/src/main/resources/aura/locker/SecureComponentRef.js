@@ -40,12 +40,12 @@ function SecureComponentRef(component, key) {
                 if (typeof name !== "string" || name.length < 3 || (name.indexOf("v.") !== 0 && name.indexOf("e.") !== 0)) {
                     throw new SyntaxError('Invalid key '+ name);
                 }
-   
+
                 return SecureObject.filterEverything(o, component["get"](name));
             }
         }
     });
-    
+
     // The shape of the component depends on the methods exposed in the definitions:
     var defs = component.getDef().methodDefs;
     if (defs) {
@@ -54,13 +54,13 @@ function SecureComponentRef(component, key) {
     		SecureObject.addMethodIfSupported(o, component, descriptor.getName());
         }, o);
     }
-    
+
     // DCHASMAN TODO Workaround for ui:button redfining addHandler using aura:method!!!
     if (!("addHandler" in o)) {
 		SecureObject.addMethodIfSupported(o, component, "addHandler");
     }
 
-    setLockerSecret(o, "key", key);
-    setLockerSecret(o, "ref", component);
+    ls_setRef(o, component, key);
+
     return Object.seal(o);
 }

@@ -46,7 +46,12 @@ Test.Aura.Controller.ActionTest = function() {
     function newAction(def, suffix, method, paramDefs, background, cmp, caboose) {
         var action;
         Mocks.GetMocks(Object.Global(), {
-            "$A": { getContext: function() {} },
+            "$A": {
+                getContext: function() {},
+                lockerService: {
+                    trust: function() {}
+                }
+            },
             "Action": Aura.Controller.Action
         })(function(){
             action = new Action(def, suffix, method, paramDefs, background, cmp, caboose);
@@ -57,6 +62,9 @@ Test.Aura.Controller.ActionTest = function() {
     var mockActionDependencies = Mocks.GetMocks(Object.Global(), {
             "$A": {
                 getContext: function() { return null; },
+                lockerService: {
+                    trust: function() {}
+                },
                 util: {
                     isFunction: function(value) {
                         return typeof value === "function";

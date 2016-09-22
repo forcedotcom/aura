@@ -16,7 +16,7 @@
 
 /**
  * Factory for SecureAura objects.
- * 
+ *
  * @param {Object}
  *            AuraInstance - the Aura Instance to be secured
  * @param {Object}
@@ -49,8 +49,7 @@ function SecureAura(AuraInstance, key) {
 				Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, AuraInstance, name));
 			});
 
-	setLockerSecret(o, "key", key);
-	setLockerSecret(o, "ref", AuraInstance);
+    ls_setRef(o, AuraInstance, key);
 	Object.seal(o);
 
 	// SecureUtil: creating a proxy for $A.util
@@ -58,8 +57,7 @@ function SecureAura(AuraInstance, key) {
 		Object.defineProperty(su, name, SecureObject.createFilteredMethod(su, AuraInstance["util"], name));
 	});
 
-	setLockerSecret(su, "key", key);
-	setLockerSecret(su, "ref", AuraInstance["util"]);
+    ls_setRef(su, AuraInstance["util"], key);
 	Object.seal(su);
 
 	// SecureLocalizationService: creating a proxy for $A.localizationService
@@ -74,8 +72,7 @@ function SecureAura(AuraInstance, key) {
 		Object.defineProperty(sls, name, SecureObject.createFilteredMethod(sls, AuraInstance["localizationService"], name));
 	});
 
-	setLockerSecret(sls, "key", key);
-	setLockerSecret(sls, "ref", AuraInstance["localizationService"]);
+    ls_setRef(sls, AuraInstance["localizationService"], key);
 	Object.seal(sls);
 
 	return o;

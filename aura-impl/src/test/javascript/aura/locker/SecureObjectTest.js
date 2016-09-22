@@ -20,52 +20,36 @@ Test.Aura.Locker.SecureObjectTest = function() {
 
     Function.RegisterNamespace("Aura.Locker");
     [Import("aura-impl/src/main/resources/aura/locker/SecureObject.js")]
+
+    var mockGlobals = Mocks.GetMocks(Object.Global(), {
+
+        ls_getKey: function() {},
+        ls_getRef: function() {},
+
+        SecureObject: SecureObject,
+
+        document: {},
+        window: {},
+        File: function(){},
+        FileList: function(){}
+    });
+
     // remove globals
     delete SecureObject;
-    delete newWeakMap;
-    delete rawToSecureObjectCaches;
 
     [Fixture]
     function unfilterEverything() {
-        var validLockSet = new WeakSet();
-        var newWeakMap;
-
-        var mockGlobals = Mocks.GetMocks(Object.Global(), {
-            getLockerSecret: function (st, type) {
-                if (typeof st !== "object" && typeof st !== "function") {
-                    throw new TypeError("Secrets can only be stored in Objects and Functions.");
-                }
-                var lock = st["$ls" + type];
-
-                if (lock && validLockSet["has"](lock)) {
-                    return lock(masterKey);
-                } else if (lock) {
-                    throw new ReferenceError('Invalid Secure Object');
-                }
-            },
-
-            newWeakMap: function() {
-                return newWeakMap;
-            },
-
-            SecureObject: Aura.Locker.SecureObject,
-            
-            document: {},
-            window: {},
-            File: function(){},
-            FileList: function(){}
-        });
 
         [Fact]
         function ValueExistsInVisited() {
             var value = {};
+            var visited = new WeakMap();
 
-            newWeakMap = new WeakMap();
             mockGlobals(function() {
-                Aura.Locker.SecureObject.unfilterEverything({}, value);
+               SecureObject.unfilterEverything({}, value, visited);
             });
 
-            Assert.True(newWeakMap.has(value));
+            Assert.True(visited.has(value));
         }
 
         [Fact]
@@ -75,9 +59,8 @@ Test.Aura.Locker.SecureObjectTest = function() {
             };
 
             var actual;
-            newWeakMap = new WeakMap();
             mockGlobals(function() {
-                actual = Aura.Locker.SecureObject.unfilterEverything({}, value);
+                actual =SecureObject.unfilterEverything({}, value);
             });
 
             Assert.Equal(1, Object.getOwnPropertyNames(actual).length);
@@ -91,9 +74,8 @@ Test.Aura.Locker.SecureObjectTest = function() {
             };
 
             var actual;
-            newWeakMap = new WeakMap();
             mockGlobals(function() {
-                actual = Aura.Locker.SecureObject.unfilterEverything({}, value);
+                actual =SecureObject.unfilterEverything({}, value);
             });
 
             Assert.Equal(actual["test"], "test string");
@@ -104,9 +86,8 @@ Test.Aura.Locker.SecureObjectTest = function() {
             var value = [value];
 
             var actual;
-            newWeakMap = new WeakMap();
             mockGlobals(function() {
-                actual = Aura.Locker.SecureObject.unfilterEverything({}, value);
+                actual =SecureObject.unfilterEverything({}, value);
             });
 
             Assert.Equal(1, actual.length);
@@ -117,9 +98,8 @@ Test.Aura.Locker.SecureObjectTest = function() {
             var value = [value, "v"];
 
             var actual;
-            newWeakMap = new WeakMap();
             mockGlobals(function() {
-                actual = Aura.Locker.SecureObject.unfilterEverything({}, value);
+                actual =SecureObject.unfilterEverything({}, value);
             });
 
             Assert.Equal(2, actual.length);
@@ -134,7 +114,7 @@ Test.Aura.Locker.SecureObjectTest = function() {
             var visited = new WeakMap();
             visited.set(value, expected);
             mockGlobals(function() {
-                actual = Aura.Locker.SecureObject.unfilterEverything({}, value, visited);
+                actual = SecureObject.unfilterEverything({}, value, visited);
             });
 
             Assert.True(expected === actual);
@@ -162,8 +142,8 @@ Test.Aura.Locker.SecureObjectTest = function() {
                 var actual;
                 mockGlobals(function() {
                     mockClassTypes(function () {
-                        actual = Aura.Locker.SecureObject.unfilterEverything({}, value)
-                    })
+                        actual = SecureObject.unfilterEverything({}, value);
+                    });
                 });
 
                 // Assert

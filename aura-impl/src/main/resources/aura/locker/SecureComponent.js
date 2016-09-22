@@ -17,14 +17,13 @@
 function SecureComponent(component, key) {
     "use strict";
 
-    // Storing a reusable reference to the corresponding secure component into
-    // the original component via the locker secret mechanism.
-    var sc = getLockerSecret(component, "secure");
-    if (sc) {
-        return sc;
+    var o = ls_getFromCache(component, key);
+    if (o) {
+        return o;
     }
+
     // special methods that require some extra work
-    var o = Object.create(null, {
+    o = Object.create(null, {
         "get": {
             enumerable: true,
             value: function(name) {
@@ -60,18 +59,18 @@ function SecureComponent(component, key) {
             }
         }
     });
-    
-    var filterOpaque = {	
+
+    var filterOpaque = {
     	filterOpaque : true
 	};
-    
+
     Object.defineProperties(o, {
         // these four super* methods are exposed as a temporary solution until we figure how to re-arrange the render flow
         "superRender": SecureObject.createFilteredMethod(o, component, "superRender"),
         "superAfterRender": SecureObject.createFilteredMethod(o, component, "superAfterRender"),
         "superRerender": SecureObject.createFilteredMethod(o, component, "superRerender"),
         "superUnrender": SecureObject.createFilteredMethod(o, component, "superUnrender"),
-        
+
         // component @platform methods
         "isValid": SecureObject.createFilteredMethod(o, component, "isValid"),
         "isInstanceOf": SecureObject.createFilteredMethod(o, component, "isInstanceOf"),
@@ -94,7 +93,7 @@ function SecureComponent(component, key) {
         "getElement": SecureObject.createFilteredMethod(o, component, "getElement", filterOpaque),
         "getElements": SecureObject.createFilteredMethod(o, component, "getElements", filterOpaque)
     });
-    
+
     // The shape of the component depends on the methods exposed in the definitions:
     var defs = component.getDef().methodDefs;
     if (defs) {
@@ -104,9 +103,8 @@ function SecureComponent(component, key) {
         }, o);
     }
 
-    setLockerSecret(component, "secure", o); // backpointer
-    setLockerSecret(o, "key", key);
-    setLockerSecret(o, "ref", component);
-    
+    ls_setRef(o, component, key);
+    ls_addToCache(component, o, key); // backpointer
+
     return o;
 }

@@ -24,6 +24,7 @@ function SecureAction(action, key) {
             }
         }
     });
+
     Object.defineProperties(o, {
         "setCallback": SecureObject.createFilteredMethod(o, action, "setCallback"),
         "setParams": SecureObject.createFilteredMethod(o, action, "setParams"),
@@ -40,7 +41,7 @@ function SecureAction(action, key) {
         "setStorable": SecureObject.createFilteredMethod(o, action, "setStorable")
     });
 
-    setLockerSecret(o, "key", key);
-    setLockerSecret(o, "ref", action);
+    ls_setRef(o, action, key);
+
     return Object.seal(o);
 }

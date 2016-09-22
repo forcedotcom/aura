@@ -591,9 +591,11 @@ Test.Aura.Controller.ActionDefTest = function() {
 	[ Fixture ]
 	function NewInstance() {
 		var mockAuraContext = Mocks.GetMocks(Object.Global(),  {
-			"getLockerSecret": function () {},
 			"$A": {
-				getContext : function() {return null;}
+				getContext : function() {return null;},
+                lockerService: {
+                    trust: function() {}
+                }
 			},
 			"Action": Aura.Controller.Action
 		});

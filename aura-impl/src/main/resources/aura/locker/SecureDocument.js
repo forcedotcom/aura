@@ -37,7 +37,7 @@ function SecureDocument(doc, key) {
         tag = tag + "";
         switch (tag.toLowerCase()) {
             case "script":
-                return SecureScriptElement(key);
+                return SecureScriptElement(null, key);
 
             default:
                 return trust(o, namespace ? doc.createElementNS(namespace, tag) : doc.createElement(tag));
@@ -77,7 +77,7 @@ function SecureDocument(doc, key) {
         },
         querySelector: {
             value: function(selector) {
-                return SecureElement.secureQuerySelector(o, doc, key, selector);
+                return SecureElement.secureQuerySelector(doc, key, selector);
             }
         }
     });
@@ -100,8 +100,7 @@ function SecureDocument(doc, key) {
 
     SecureObject.addPrototypeMethodsAndProperties(SecureDocument.metadata, o, doc, key);
 
-    setLockerSecret(o, "key", key);
-    setLockerSecret(o, "ref", doc);
+    ls_setRef(o, doc, key);
 
     return o;
 }

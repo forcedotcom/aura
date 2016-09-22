@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-var getLockerSecret, setLockerSecret;
-
 // DCHASMAN TODO Revert this after we clear issues with CKEditor and unsafe inline from W-3028925
 function lazyInitInlinedSafeEvalWorkaround() {
 	if (!window['$$safe-eval$$']) {
@@ -45,14 +43,14 @@ function lazyInitInlinedSafeEvalWorkaround() {
 	          if (match) {
 	        	  src = src.replace(match[1], 'return ');
 	          }
-	          
+
 	          if (options.useStrict) {
 		          // forcing strict mode
 		          src = '"use strict";\n' + src;
 		      }
-		        	
+
 		  	  src = 'return (function(window){\n' + src + '\n}).call(arguments[0], arguments[0])';
-		  	  
+
 	          for (var i = 0; i < options.levels; i++) {
 	              src = 'with(arguments[' + i + ']||{}){' + src + '}';
 	          }

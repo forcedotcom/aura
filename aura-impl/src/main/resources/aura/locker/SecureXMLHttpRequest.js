@@ -31,9 +31,9 @@ function SecureXMLHttpRequest(key) {
 	"use strict";
 
 	// Create a new closure constructor for new XHMLHttpRequest() syntax support that captures the key
-	return function() { 
+	return function() {
 		var xhr = new XMLHttpRequest();
-		
+
 		var o = Object.create(null, {
 			toString: {
 				value: function() {
@@ -43,11 +43,11 @@ function SecureXMLHttpRequest(key) {
 		});
 
 		// Properties
-		["readyState", "status", "statusText", "response", "responseType", "responseText", 
+		["readyState", "status", "statusText", "response", "responseType", "responseText",
 		 "responseXML", "responseURL", "timeout", "withCredentials"].forEach(function (name) {
 			SecureObject.addPropertyIfSupported(o, xhr, name);
 		});
-			
+
 		// Event handlers
 		["onloadstart", "onprogress", "onabort", "onerror", "onload", "ontimeout", "onloadend", "onreadystatechange"].forEach(function (name) {
 			Object.defineProperty(o, name, {
@@ -58,13 +58,13 @@ function SecureXMLHttpRequest(key) {
 				}
 			});
 		});
-		
+
 		Object.defineProperties(o, {
-			abort: SecureObject.createFilteredMethod(o, xhr, "abort"),		
+			abort: SecureObject.createFilteredMethod(o, xhr, "abort"),
 
 			addEventListener: SecureElement.createAddEventListenerDescriptor(o, xhr, key),
 
-			open: SecureObject.createFilteredMethod(o, xhr, "open", { 
+			open: SecureObject.createFilteredMethod(o, xhr, "open", {
 	        	beforeCallback: function(method, url) {
 	        		// Block attempts to directly invoke /aura end points
 	        		var normalizer = document.createElement("a");
@@ -74,22 +74,19 @@ function SecureXMLHttpRequest(key) {
 	        		if (urlLower.indexOf("/aura") >= 0) {
 			            throw new $A.auraError("SecureXMLHttpRequest.open cannot be used with Aura framework internal API endpoints " + url + "!");
 	        		}
-	        	}	
+	        	}
 	    	}),
-	    	
+
 			send: SecureObject.createFilteredMethod(o, xhr, "send"),
-			
-			getAllResponseHeaders: SecureObject.createFilteredMethod(o, xhr, "getAllResponseHeaders"),	
-			getResponseHeader: SecureObject.createFilteredMethod(o, xhr, "getResponseHeader"),		
-			
+
+			getAllResponseHeaders: SecureObject.createFilteredMethod(o, xhr, "getAllResponseHeaders"),
+			getResponseHeader: SecureObject.createFilteredMethod(o, xhr, "getResponseHeader"),
+
 			setRequestHeader: SecureObject.createFilteredMethod(o, xhr, "setRequestHeader")
 		});
 
-		setLockerSecret(o, "key", key);
-		setLockerSecret(o, "ref", xhr);
-		
-		Object.freeze(o);
-		
-		return o;
+        ls_setRef(o, xhr, key);
+
+		return Object.freeze(o);
 	};
 }

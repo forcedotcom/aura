@@ -130,7 +130,7 @@ function Component(config, localCreation) {
 
     //JBUCH: HALO: FIXME: THIS IS A DIRTY FILTHY HACK AND I HAVE BROUGHT SHAME ON MY FAMILY
     this.attributeValueProvider = configAttributes["valueProvider"];
-    this.facetValueProvider = configAttributes["facetValueProvider"];    
+    this.facetValueProvider = configAttributes["facetValueProvider"];
 
     // initialize attributes
     this.setupAttributes(this, configAttributes);
@@ -1113,7 +1113,7 @@ Component.prototype.getElement = function() {
  *         // Do something with the new button
  *     }
  * );
- * 
+ *
  * @param {String}
  *            key - The data key for which to return a reference.
  * @return {PropertyReferenceValue}
@@ -1416,10 +1416,10 @@ Component.prototype.getOwner = function() {
 
 /**
  * Returns the container component of the component.
- * The container is the component that owns the facet attribute for 
- * which this component is a value. This may be different than the 
+ * The container is the component that owns the facet attribute for
+ * which this component is a value. This may be different than the
  * result from getComponentValueProvider(), particularly if this
- * component was transcluded into its container and not created 
+ * component was transcluded into its container and not created
  * directly by its container.
  *
  * @return {Object} component
@@ -1469,7 +1469,7 @@ Component.prototype.getModel = function() {
 /**
  * Returns a new event instance of the named component event.
  * @example
- * // evtName matches the name attribute in aura:registerEvent 
+ * // evtName matches the name attribute in aura:registerEvent
  * cmp.getEvent("evtName")
  *
  * @param {String}
@@ -1720,7 +1720,7 @@ Component.prototype.render = function() {
         // it should unwrap them before using them. For regular components, this is
         // a non-opt:
         if (secureThis !== this) {
-            result = $A.lockerService.unwrap(result);
+            result = $A.lockerService.unwrap(this, result);
         }
         context.releaseCurrentAccess();
 
@@ -1764,7 +1764,7 @@ Component.prototype.rerender = function() {
         // it should unwrap them before using them. For regular components, this is
         // a non-opt:
         if (secureThis !== this) {
-            result = $A.lockerService.unwrap(result);
+            result = $A.lockerService.unwrap(this, result);
         }
         context.releaseCurrentAccess();
         return result;
@@ -1917,10 +1917,8 @@ Component.prototype.setupComponentDef = function(config) {
         this.replaceComponentClass(componentDef.getDescriptor().getQualifiedName());
     }
 
-    var key = getLockerSecret(this.componentDef, "key");
-    if (key) {
-        setLockerSecret(this, "key", key);
-    }
+    // propagating locker key when possible
+    $A.lockerService.trust(this.componentDef, this);
 };
 
 Component.prototype.createComponentStack = function(facets, valueProvider){
@@ -2128,7 +2126,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
                 value=[$A.componentService.createComponentPriv({ "componentDef": { "descriptor" :"markup://aura:text" }, "attributes": {"values": { "value":value } }})];
             }
             var facetStack = this.createComponentStack([{"descriptor": attribute, value: value}], attributeValueProvider, localCreation);
-            
+
             // JBUCH: HALO: TODO: DEDUPE THIS AGAINST lines 462 - 467 AFTER CONFIRMING IT WORKS
             if (attribute === "body") {
                 attributes[attribute]=(this.concreteComponentId&&cmp.getConcreteComponent().attributeSet.values["body"])||{};
@@ -2605,7 +2603,7 @@ Component.prototype.associateRenderedBy = function(cmp, element) {
 
 /**
  * Finds a locator definition by id from the locator definitions.
- * 
+ *
  * @returns The locator object which contains the target & scope IDs and locator context resolved
  */
 Component.prototype.getLocator = function(localId, includeMetadata) {

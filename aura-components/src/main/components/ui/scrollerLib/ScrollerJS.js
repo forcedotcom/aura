@@ -1691,8 +1691,8 @@ function lib(w) { //eslint-disable-line no-unused-vars
             var self = this;
             if (!this._rafRefresh) {
                 this._rafRefresh = RAF(function () { // debounce the refresh
-                    self._fire('_refresh');
                     self._setSize();
+                    self._fire('_refresh');
                     self._rafRefresh = null;
                 });
             }

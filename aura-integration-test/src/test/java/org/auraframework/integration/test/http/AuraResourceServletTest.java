@@ -99,7 +99,7 @@ public class AuraResourceServletTest extends AuraTestCase {
                 return cookie != null && cookie.getName().equals(name) ? cookie : null;
             }
         };
-        new ManifestUtil(contextService, configAdapter).checkManifestCookie(request, response);
+        new ManifestUtil(definitionService, contextService, configAdapter).checkManifestCookie(request, response);
         String expectedName = Mode.UTEST + "_" + nopreload.getNamespace() + "_" + nopreload.getName() + "_lm";
         Cookie cookie = response.getCookie(expectedName);
         assertEquals(expectedName, cookie.getName());

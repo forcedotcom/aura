@@ -25,6 +25,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -45,11 +46,13 @@ public final class ValidationEngine {
 
     private static final List<ValidationError> NO_ERRORS = ImmutableList.of();
 
+    private DefinitionService definitionService = Aura.getDefinitionService();
+
     /**
      * Validates definition denoted by descriptor
      */
     public List<ValidationError> validate(DefDescriptor<? extends Definition> descriptor) {
-        Source<?> source = Aura.getContextService().getCurrentContext().getDefRegistry().getSource(descriptor);
+        Source<?> source = definitionService.getSource(descriptor);
 
         if (source == null) {
             LOG.warn("cannot find source for " + descriptor);
@@ -93,7 +96,7 @@ public final class ValidationEngine {
         String prefix = descriptor.getPrefix();
         try {
             // getDef() invokes the validate methods
-            descriptor.getDef();
+            definitionService.getDefinition(descriptor);
         } catch (StyleParserException e) {
             if (prefix.equals(DefDescriptor.CSS_PREFIX)) {
                 // report css parser errors only when directly validating a .css def

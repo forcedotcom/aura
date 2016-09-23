@@ -181,6 +181,21 @@ public class DefinitionServiceImpl implements DefinitionService {
         throw new DefinitionNotFoundException(desc);
     }
 
+    @Override
+    public <D extends Definition> D getUnlinkedDefinition(DefDescriptor<D> descriptor) throws QuickFixException {
+        return getDefRegistry().getRawDef(descriptor);
+    }
+
+    @Override
+    public <D extends Definition> boolean exists(DefDescriptor<D> descriptor) {
+        return getDefRegistry().exists(descriptor);
+    }
+
+    @Override
+    public <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
+        return getDefRegistry().getSource(descriptor);
+    }
+
     /**
      * Get the def registry currently in use.
      *

@@ -39,40 +39,40 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import com.google.common.base.Function;
 
 public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
-	private final String testAppName = "testMarkupCaseSensitivityApp";
-	private final String testAppNamespace = "auratest";
-	private final String outputDivClass = "div_output";
-	private final String testLibButtonClass = "button_tryOutLibs";
-	
+    private final String testAppName = "testMarkupCaseSensitivityApp";
+    private final String testAppNamespace = "auratest";
+    private final String outputDivClass = "div_output";
+    private final String testLibButtonClass = "button_tryOutLibs";
+    
     @Test
-	public void testDummy() {
-		return;
-	}
-	
-	/**
-	 * we have library imported in testMarkupCaseSensitivityApp.app like this:
-	 *  <aura:import library="test:test_Library" property="importED" /> 
-    	<aura:import library="test:TEST_Library" property="importedWithWrongCase" /> 
+    public void testDummy() {
+        return;
+    }
+    
+    /**
+     * we have library imported in testMarkupCaseSensitivityApp.app like this:
+     *  <aura:import library="test:test_Library" property="importED" /> 
+        <aura:import library="test:TEST_Library" property="importedWithWrongCase" /> 
      * test_Library.lib include a list of JS files (for example: 'basicFirst.js' by: <aura:include name="basicFirst" />) 
      * This verify after first loading the testApp (it loads fine)
      * we modify test_Library.lib, change all basicFirst to BASICFirst (wrong case, BASICFirst.js doesn't exist)
      * then reload the testApp, it still loads fine, and what we changed is updated in lib too (verify through helper).
-         fix it and enable plz: W-2984818	
-	 */
-	@UnAdaptableTest("SFDC chrome autobuild doesn't pick up source change, not sure why.")
-	@ThreadHostileTest("We are messing up with source during the test, if you load other cmp/app at the same time, it might get wrong source")
+         fix it and enable plz: W-2984818   
+     */
+    @UnAdaptableTest("SFDC chrome autobuild doesn't pick up source change, not sure why.")
+    @ThreadHostileTest("We are messing up with source during the test, if you load other cmp/app at the same time, it might get wrong source")
         @Ignore("W-2984848")
-	@Test
-	public void testLibFileChangeAfterCached() throws Exception {
-		//load the test app, and verify the lib loads fine
-		String url = "/"+testAppNamespace+"/"+testAppName+".app";
+    @Test
+    public void testLibFileChangeAfterCached() throws Exception {
+        //load the test app, and verify the lib loads fine
+        String url = "/"+testAppNamespace+"/"+testAppName+".app";
         open(url, Mode.DEV);
         waitForElementAppear(By.className(testLibButtonClass));
         findDomElement(By.className(testLibButtonClass)).click();
         //change lib source
-		AuraContext context = contextService.getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         if (context == null) {
-			context = contextService.startContext(Mode.SELENIUM, Format.HTML,
+            context = contextService.startContext(Mode.SELENIUM, Format.HTML,
                     Authentication.AUTHENTICATED);
         }
         ApplicationDef ad = definitionService.getDefinition(
@@ -82,8 +82,8 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
         Source<?> source = null;
         String newSource = null; 
         for(LibraryDefRef id : aid) {
-        	idd = id.getDescriptor();
-        	source = context.getDefRegistry().getSource(idd);
+            idd = id.getDescriptor();
+            source = definitionService.getSource(idd);
             String originalContent = source.getContents();
             //System.out.println("originalContent of "+idd.getName()+" is: "+originalContent);
             //Notice two things:
@@ -92,49 +92,49 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
             //even TEST_Library.lib doesn't exist in file system, we still hook it up with what's inside test_Library.lib 
             //then why later in helper, importedWithWrongCase (that's what we import TEST_Library as) has nothing ?
             if(idd.getName().indexOf("test_Library") >= 0) {
-            	newSource = originalContent.replace("basicFirst", "BASICFirst");
-            	break;
+                newSource = originalContent.replace("basicFirst", "BASICFirst");
+                break;
             }
         }
         if(source != null && newSource != null) {
-        	//update the test_Library.lib source, then refresh
-        	source.addOrUpdate(newSource);
-        	//refresh the testApp, until it pick up the source change in test_Library.lib
-        	getAuraUITestingUtil().waitUntilWithCallback(
+            //update the test_Library.lib source, then refresh
+            source.addOrUpdate(newSource);
+            //refresh the testApp, until it pick up the source change in test_Library.lib
+            getAuraUITestingUtil().waitUntilWithCallback(
                     new Function<WebDriver, Integer>() {
                         @Override
                         public Integer apply(WebDriver driver) {
                             driver.navigate().refresh();
                             //click the button
                             waitForElementAppear(By.className(testLibButtonClass));
-                        	findDomElement(By.className(testLibButtonClass)).click();
-                        	//get the text from output div
-                        	waitForElementAppear(By.className(testLibButtonClass));
-                        	String text = findDomElement(By.className(outputDivClass)).getText();
-                        	if(text.contains("BASICFirst")) {
-                        		return 1;
-                        	} else {
-                        		return null;
-                        	}
+                            findDomElement(By.className(testLibButtonClass)).click();
+                            //get the text from output div
+                            waitForElementAppear(By.className(testLibButtonClass));
+                            String text = findDomElement(By.className(outputDivClass)).getText();
+                            if(text.contains("BASICFirst")) {
+                                return 1;
+                            } else {
+                                return null;
+                            }
                         }
                     },
                     new ExpectedCondition<String>() {
                         @Override
                         public String apply(WebDriver d) {
                             return "outputDiv doesn't contain 'BASICFirst'"
-                            		+findDomElement(By.className(outputDivClass)).getText();
+                                    +findDomElement(By.className(outputDivClass)).getText();
                         }
                     },
                     30,
                     "fail waiting on test app pick up new source in test_Library.lib");
         } else {
-        	Assert.fail("expect to find 'test:test_Library' in auratest:testMarkupCaseSensitivityApp's import libs");
+            Assert.fail("expect to find 'test:test_Library' in auratest:testMarkupCaseSensitivityApp's import libs");
         }
         
         //now let's change test_Library.lib back anyway
-    	if(newSource != null) {
-    		newSource = newSource.replace("BASICFirst", "basicFirst");
-    		source.addOrUpdate(newSource);
-    	}
-	}
+        if(newSource != null) {
+            newSource = newSource.replace("BASICFirst", "basicFirst");
+            source.addOrUpdate(newSource);
+        }
+    }
 }

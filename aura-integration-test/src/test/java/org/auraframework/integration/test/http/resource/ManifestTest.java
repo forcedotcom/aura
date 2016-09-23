@@ -85,7 +85,7 @@ public class ManifestTest extends AuraImplTestCase {
         manifest.setServerService(serverService);
         manifest.setRenderingService(renderingService);
         manifest.setExceptionAdapter(exceptionAdapter);
-        manifest.setManifestUtil(new ManifestUtil(contextService, configAdapter));
+        manifest.setManifestUtil(new ManifestUtil(definitionService, contextService, configAdapter));
         return manifest;
     }
 

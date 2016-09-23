@@ -26,6 +26,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -52,8 +53,10 @@ public class ManifestUtil {
 
     private final ContextService contextService;
     private final ConfigAdapter configAdapter;
+    private final DefinitionService definitionService;
 
-    public ManifestUtil(ContextService contextService, ConfigAdapter configAdapter) {
+    public ManifestUtil(DefinitionService definitionService, ContextService contextService, ConfigAdapter configAdapter) {
+        this.definitionService = definitionService;
         this.contextService = contextService;
         this.configAdapter = configAdapter;
     }
@@ -80,7 +83,7 @@ public class ManifestUtil {
             @SuppressWarnings("unchecked")
             DefDescriptor<ApplicationDef> appDefDesc = (DefDescriptor<ApplicationDef>)desc;
             try {
-                Boolean useAppcache = context.getDefRegistry().getRawDef(appDefDesc).isAppcacheEnabled();
+                Boolean useAppcache = definitionService.getUnlinkedDefinition(appDefDesc).isAppcacheEnabled();
                 if (useAppcache != null) {
                     return useAppcache.booleanValue();
                 }

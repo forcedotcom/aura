@@ -23,6 +23,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.system.Source;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -122,7 +123,34 @@ public interface DefinitionService extends AuraService {
      * @throws QuickFixException
      */
     Definition getDefinition(String qualifiedName, DefType... defTypes) throws DefinitionNotFoundException,
-    QuickFixException;
+            QuickFixException;
+
+    /**
+     * Return the definition for this descriptor, or null if it does not exist.
+     *
+     * If the definition was not already compiled, this method will cause it to
+     * be compiled before it is returned. The difference with getDefinition is that it will not
+     * load all of the dependent defs, and thus will _not_ load the def into the request local cache.
+     *
+     * Use with care.
+     *
+     * @param descriptor the descriptor to find.
+     * @return the corresponding definition, or null if it doesn't exist.
+     * @throws QuickFixException if there is a compile time error.
+     */
+    <D extends Definition> D getUnlinkedDefinition(DefDescriptor<D> descriptor) throws QuickFixException;
+
+    /**
+     * Returns true if the source related to the descriptor exists. Does not
+     * compile the definition if it was not already compiled, and does not
+     * guarantee that it can compile.
+     */
+    <D extends Definition> boolean exists(DefDescriptor<D> descriptor);
+
+    /**
+     * Get the source for a given descriptor.
+     */
+    <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor);
 
     /**
      * Get the master def registry.

@@ -132,7 +132,7 @@ public class AuraServlet extends AuraBaseServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        manifestUtil = new ManifestUtil(contextService, configAdapter);
+        manifestUtil = new ManifestUtil(definitionService, contextService, configAdapter);
     }
 
     /**

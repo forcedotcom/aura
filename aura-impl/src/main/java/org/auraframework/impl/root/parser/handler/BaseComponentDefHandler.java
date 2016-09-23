@@ -37,7 +37,6 @@ import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LocatorDef;
 import org.auraframework.def.MethodDef;
 import org.auraframework.def.ModelDef;
-import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.ResourceDef;
@@ -58,7 +57,6 @@ import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -301,7 +299,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
     @SuppressWarnings("unchecked")
     @Override
     protected void readAttributes() throws QuickFixException {
-        MasterDefRegistry mdr = definitionService.getDefRegistry();
         AuraContext context = contextService.getCurrentContext();
         context.pushCallingDescriptor(builder.getDescriptor());
         try {
@@ -325,7 +322,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                         defDescriptor.getNamespace(), defDescriptor.getName());
                 DefDescriptor<ModelDef> jsDescriptor = definitionService
                         .getDefDescriptor(jsModelName, ModelDef.class);
-                if (mdr.exists(jsDescriptor)) {
+                if (definitionService.exists(jsDescriptor)) {
                     builder.modelDefDescriptor = jsDescriptor;
                 }
             }
@@ -335,7 +332,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                     defDescriptor.getNamespace(), defDescriptor.getName());
             DefDescriptor<ControllerDef> jsDescriptor = definitionService
                     .getDefDescriptor(jsDescriptorName, ControllerDef.class);
-            if (mdr.exists(jsDescriptor)) {
+            if (definitionService.exists(jsDescriptor)) {
                 builder.controllerDescriptors.add(jsDescriptor);
             }
 
@@ -355,7 +352,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                 // See if there is a clientRenderer that has the same qname.
                 DefDescriptor<RendererDef> jsRendererDescriptor = definitionService
                         .getDefDescriptor(jsDescriptorName, RendererDef.class);
-                if (mdr.exists(jsRendererDescriptor)) {
+                if (definitionService.exists(jsRendererDescriptor)) {
                     builder.addRenderer(jsRendererDescriptor.getQualifiedName());
                 }
             }
@@ -372,14 +369,14 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                 // See if there is a helper that has the same qname.
                 DefDescriptor<HelperDef> jsHelperDescriptor = definitionService
                         .getDefDescriptor(jsDescriptorName, HelperDef.class);
-                if (mdr.exists(jsHelperDescriptor)) {
+                if (definitionService.exists(jsHelperDescriptor)) {
                     builder.addHelper(jsHelperDescriptor.getQualifiedName());
                 }
             }
 
             DefDescriptor<ResourceDef> jsResourceDescriptor = definitionService
                     .getDefDescriptor(jsDescriptorName, ResourceDef.class);
-            if (mdr.exists(jsResourceDescriptor)) {
+            if (definitionService.exists(jsResourceDescriptor)) {
                 builder.addResource(jsResourceDescriptor.getQualifiedName());
             }
 
@@ -391,19 +388,19 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             }
             DefDescriptor<StyleDef> cssDescriptor = definitionService.getDefDescriptor(
                     styleName, StyleDef.class);
-            if (mdr.exists(cssDescriptor)) {
+            if (definitionService.exists(cssDescriptor)) {
                 builder.styleDescriptor = cssDescriptor;
             }
 
             DefDescriptor<ResourceDef> cssResourceDescriptor = definitionService.getDefDescriptor(styleName,
                     ResourceDef.class);
-            if (mdr.exists(cssResourceDescriptor)) {
+            if (definitionService.exists(cssResourceDescriptor)) {
                 builder.addResource(cssResourceDescriptor.getQualifiedName());
             }
 
             // see if there is a flavored style def that has the same qname
             DefDescriptor<FlavoredStyleDef> flavorDesc = Flavors.standardFlavorDescriptor(defDescriptor);
-            if (mdr.exists(flavorDesc)) {
+            if (definitionService.exists(flavorDesc)) {
                 builder.flavoredStyleDescriptor = flavorDesc;
             }
 
@@ -448,21 +445,21 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             DefDescriptor<DocumentationDef> documentationDescriptor = DefDescriptorImpl.getAssociateDescriptor(
                     builder.getDescriptor(), DocumentationDef.class, DefDescriptor.MARKUP_PREFIX);
 
-            if (mdr.exists(documentationDescriptor)) {
+            if (definitionService.exists(documentationDescriptor)) {
                 builder.setDocumentation(documentationDescriptor.getQualifiedName());
             }
 
             DefDescriptor<DesignDef> designDescriptor = DefDescriptorImpl.getAssociateDescriptor(
                     builder.getDescriptor(), DesignDef.class, DefDescriptor.MARKUP_PREFIX);
 
-            if (mdr.exists(designDescriptor)) {
+            if (definitionService.exists(designDescriptor)) {
                 builder.designDefDescriptor = designDescriptor;
             }
 
             DefDescriptor<SVGDef> svgDescriptor = DefDescriptorImpl.getAssociateDescriptor(builder.getDescriptor(),
                     SVGDef.class, DefDescriptor.MARKUP_PREFIX);
 
-            if (mdr.exists(svgDescriptor)) {
+            if (definitionService.exists(svgDescriptor)) {
                 builder.svgDefDescriptor = svgDescriptor;
             }
 

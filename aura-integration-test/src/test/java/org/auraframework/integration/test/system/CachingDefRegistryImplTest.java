@@ -72,7 +72,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         for (int i = 0; i < CACHE_SIZE_MAX / 2; i++) {
             DefDescriptor<ComponentDef> dd = definitionService.getDefDescriptor(dummyDefs.get(i).getDescriptorName(),
                     ComponentDef.class);
-            assertTrue(contextService.getCurrentContext().getDefRegistry().exists(dd));
+            assertTrue(definitionService.exists(dd));
             assertNotNull("Failed to fetch def from caching def registry.", definitionService.getDefinition(dd));
             assertEquals("Definition service failed to retrieve the correct definition", dummyDefs.get(i)
                     .getQualifiedName(), dd.getQualifiedName());
@@ -99,7 +99,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         assertEquals(initialTimeStamp, initialDef.getLocation().getLastModified());
 
         // Fetch the def
-        assertTrue(contextService.getCurrentContext().getDefRegistry().exists(dd));
+        assertTrue(definitionService.exists(dd));
         ComponentDef updatedDef = definitionService.getDefinition(dd);
         // Verify that stale check has been performed
         long updatedTimeStamp = updatedDef.getLocation().getLastModified();
@@ -136,7 +136,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         assertEquals(initialTimeStamp, initialDef.getLocation().getLastModified());
 
         // Fetch the def
-        assertTrue(contextService.getCurrentContext().getDefRegistry().exists(dd));
+        assertTrue(definitionService.exists(dd));
         ComponentDef updatedDef = definitionService.getDefinition(dd);
         // Verify that stale check has been performed
         long updatedTimeStamp = updatedDef.getLocation().getLastModified();

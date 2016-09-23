@@ -51,7 +51,7 @@ public class ServletUtilAdapterImplTest extends IntegrationTestCase {
         DefDescriptor<ApplicationDef> desc =
                 definitionService.getDefDescriptor("appCache:nopreload", ApplicationDef.class);
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED, desc);
-        assertTrue("The application needs to enable appcache", new ManifestUtil(contextService, configAdapter).isManifestEnabled());
+        assertTrue("The application needs to enable appcache", new ManifestUtil(definitionService, contextService, configAdapter).isManifestEnabled());
 
         ServletUtilAdapter servletUtilAdapter = new ServletUtilAdapterImpl();
         String url = servletUtilAdapter.getManifestUrl(Aura.getContextService().getCurrentContext(), null);

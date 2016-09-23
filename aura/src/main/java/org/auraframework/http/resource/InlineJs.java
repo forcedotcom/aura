@@ -69,7 +69,7 @@ public class InlineJs extends AuraResourceImpl {
     
     @PostConstruct
     public void initManifest() {
-        this.manifestUtil = new ManifestUtil(contextService, configAdapter);
+        this.manifestUtil = new ManifestUtil(definitionService, contextService, configAdapter);
     }
     
     private void appendInlineJS(Component template, Appendable out) throws IOException, QuickFixException {

@@ -339,7 +339,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
      */
     @Override
     public boolean exists() {
-        return Aura.getContextService().getCurrentContext().getDefRegistry().exists(this);
+        return Aura.getDefinitionService().exists(this);
     }
 
     /**

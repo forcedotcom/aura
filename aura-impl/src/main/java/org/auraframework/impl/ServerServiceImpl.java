@@ -113,7 +113,7 @@ public class ServerServiceImpl implements ServerService {
 
     @PostConstruct
     public void createManifestUtil() {
-        manifestUtil = new ManifestUtil(contextService, configAdapter);
+        manifestUtil = new ManifestUtil(definitionService, contextService, configAdapter);
     }
 
     private static final long serialVersionUID = -2779745160285710414L;

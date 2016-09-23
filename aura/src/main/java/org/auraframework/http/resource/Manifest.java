@@ -63,7 +63,7 @@ public class Manifest extends AuraResourceImpl {
 
     @PostConstruct
     public void createManifestUtil() {
-        this.manifestUtil = new ManifestUtil(contextService, configAdapter);
+        this.manifestUtil = new ManifestUtil(definitionService, contextService, configAdapter);
     }
 
     /**

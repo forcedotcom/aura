@@ -42,7 +42,7 @@ public class ResourceDefImpl extends DefinitionImpl<ResourceDef> implements Reso
     @Override
     @Deprecated
     public Source<ResourceDef> getSource() {
-        return Aura.getDefinitionService().getDefRegistry().getSource(getDescriptor());
+        return Aura.getDefinitionService().getSource(getDescriptor());
     }
 
     @Override

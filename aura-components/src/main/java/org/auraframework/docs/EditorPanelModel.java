@@ -36,7 +36,7 @@ public class EditorPanelModel implements ModelInstance {
     private final String code;
     private final String format;
 
-    public EditorPanelModel(ContextService contextService, DefinitionService defintionService) throws QuickFixException {
+    public EditorPanelModel(ContextService contextService, DefinitionService definitionService) throws QuickFixException {
 
         AuraContext context = contextService.getCurrentContext();
         BaseComponent<?, ?> component = context.getCurrentComponent();
@@ -50,8 +50,8 @@ public class EditorPanelModel implements ModelInstance {
             format = null;
         } else {
             // Nominal case:
-            DefDescriptor<? extends Definition> descriptor = defintionService.getDefDescriptor(desc, defType.getPrimaryInterface());
-            Source<?> source = context.getDefRegistry().getSource(descriptor);
+            DefDescriptor<? extends Definition> descriptor = definitionService.getDefDescriptor(desc, defType.getPrimaryInterface());
+            Source<?> source = definitionService.getSource(descriptor);
             if (source != null && source.exists()) {
                 code = source.getContents();
                 format = String.valueOf(source.getFormat());

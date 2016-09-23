@@ -71,7 +71,52 @@ Aura.Utils.Util.prototype.isLocalStorageEnabled = function () {
     }
 
     return this.localStorageEnabled;
+};
 
+
+/**
+ * Sets a cookie.
+ * @param {String} key The name of the cookie.
+ * @param {String} value The value of the cookie.
+ * @param {Number} duration The duration of the cookie (milliseconds)
+ */
+Aura.Utils.Util.prototype.setCookie = function(key, value, duration) {
+    $A.assert(typeof key === "string", "key must be a string");
+    $A.assert(typeof value === "string", "value must be a string");
+    $A.assert(duration === undefined || typeof duration === "number", "duration must be a number");
+
+    duration = duration || 1000*60*60*24*7; // + 1 week
+    var expiration = new Date(new Date().getTime() + duration);
+    document.cookie = key + "=" + value + "; expires=" + expiration.toUTCString();
+};
+
+/**
+ * Gets a cookie.
+ * @param {String} key The name of the cookie.
+ * @return {String} the value of the cookie if it exists, undefined otherwise.
+ * @export
+ */
+Aura.Utils.Util.prototype.getCookie = function(key) {
+    $A.assert(typeof key === "string", "key must be a string");
+
+    var cookies = "; " + document.cookie + ";";
+    key = "; " + key + "=";
+    var begin = cookies.indexOf(key);
+    if (begin === -1) {
+        return undefined;
+    }
+    var end = cookies.indexOf(";", begin + key.length);
+    var value = cookies.substring(begin + key.length, end);
+    return value;
+};
+
+/**
+ * Clears a cookie.
+ * @param {String} key The name of the cookie.
+ */
+Aura.Utils.Util.prototype.clearCookie = function(key) {
+    $A.assert(typeof key === "string", "key must be a string");
+    document.cookie = key + "=true; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 };
 
 /**

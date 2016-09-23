@@ -65,7 +65,8 @@ Test.Aura.AuraClientServiceTest = function() {
                 },
                 isFiniteNumber: function(n) {
                     return typeof n === 'number' && isFinite(n);
-                }
+                },
+                clearCookie: function() {}
             },
             mark : function() {},
             getContext : function() {
@@ -1414,24 +1415,33 @@ Test.Aura.AuraClientServiceTest = function() {
 
         [Fact]
         function EnablesParallelBootstrapWhenBootstrapIsLoadedFromServerForParallelLoading() {
-            var actual;
-            mockGlobal(function() {
-                var target = new Aura.Services.AuraClientService();
-                document.cookie = undefined;
-                Aura["appBootstrapStatus"] = "loaded";
-
-                try {
-                    target.setParallelBootstrapLoad(true);
-                    target.getAppBootstrap();
-
-                    // Since we expire cookie to remove auraDisableBootstrapCache, verifying cookie string
-                    // here VS. calling getParallelBootstrapLoad().
-                    var expected = "auraDisableBootstrapCache=true; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-                    Assert.Equal(expected, document.cookie);
-                } finally {
-                    delete Aura["appBootstrapStatus"];
-                    delete document.cookie;
+            var actual = false;
+            var mockUtil = Mocks.GetMocks(Object.Global(), {
+                "$A": {
+                    util: {
+                        clearCookie: function(key) {
+                            if (key === "auraDisableBootstrapCache") {
+                                actual = true;
+                            }
+                        }
+                    }
                 }
+            });
+            mockGlobal(function() {
+                mockUtil(function() {
+                    var target = new Aura.Services.AuraClientService();
+
+                    Aura["appBootstrapStatus"] = "loaded";
+
+                    try {
+                        target.setParallelBootstrapLoad(true);
+                        target.getAppBootstrap();
+
+                        Assert.True(actual);
+                    } finally {
+                        delete Aura["appBootstrapStatus"];
+                    }
+                });
             });
         }
 

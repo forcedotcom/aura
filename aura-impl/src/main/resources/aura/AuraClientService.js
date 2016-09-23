@@ -505,7 +505,7 @@ AuraClientService.prototype.tearDown = function() {
 
 /**
  * Initializes the clientLibraries sent as part of the lazy HTML scripts
- * This will be called before instanciating the app 
+ * This will be called before instanciating the app
  * @private
 */
 AuraClientService.prototype.initializeClientLibraries = function () {
@@ -3256,8 +3256,8 @@ AuraClientService.prototype.disableParallelBootstrapLoadOnNextLoad = function() 
     // can only get a cache hit on bootstrap.js with persistent storage
     var storage = Action.getStorage();
     if (storage && storage.isPersistent()) {
-        var expire = new Date(new Date().getTime() + 1000*60*60*24*7); // + 1 week
-        document.cookie = this._disableBootstrapCacheCookie + '=true; expires=' + expire.toUTCString();
+        var duration = 1000*60*60*24*7; // 1 week
+        $A.util.setCookie(this._disableBootstrapCacheCookie, "true", duration);
     }
 };
 
@@ -3266,7 +3266,7 @@ AuraClientService.prototype.disableParallelBootstrapLoadOnNextLoad = function() 
  * @private
  */
 AuraClientService.prototype.clearDisableParallelBootstrapLoadOnNextLoad = function() {
-    document.cookie = this._disableBootstrapCacheCookie + '=true; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    $A.util.clearCookie(this._disableBootstrapCacheCookie);
 };
 
 /**
@@ -3279,16 +3279,8 @@ AuraClientService.prototype.getParallelBootstrapLoad = function() {
     }
 
     // check for cookie indicating disablement
-    var cookies = '; ' + document.cookie;
-    var key = '; ' + this._disableBootstrapCacheCookie + '=';
-    var begin = cookies.indexOf(key);
-    if (begin === -1) {
-        return true;
-    }
-    var end = cookies.indexOf(';', begin + key.length);
-    var value = cookies.substring(begin + key.length, end);
-    // stored value is string true; see disableParallelBootstrapLoadOnNextLoad()
-    return value !== 'true';
+    var cookie = $A.util.getCookie(this._disableBootstrapCacheCookie);
+    return cookie !== "true";
 };
 
 /**

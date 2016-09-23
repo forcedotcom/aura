@@ -32,10 +32,9 @@ ComponentDefStorage.prototype.EVICTION_TARGET_LOAD = 0.75;
 ComponentDefStorage.prototype.EVICTION_HEADROOM = 0.1;
 
 /**
- * Storage key used to track transactional bounds.
- * TODO W-3314745 - remove sentinel key now that bulk AuraStorage APIs are used
+ * Cookie used to track when persistent def storage is known to contain a broken graph.
  */
-ComponentDefStorage.prototype.TRANSACTION_SENTINEL_KEY = "sentinel_key";
+ComponentDefStorage.prototype.BROKEN_GRAPH_COOKIE = "auraBrokenDefGraph";
 
 /**
  * Key to use of the MutexLocker to guarantee atomic execution across tabs.
@@ -180,44 +179,43 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, evtCo
         return Promise["resolve"]();
     }
 
-    // this thread is responsible to store the defs so acquire the mutex then persist
+    // this task is responsible to store the defs so acquire the mutex then persist
     this.defsToStore = toStore;
     var that = this;
     return this.enqueue(function(resolve, reject) {
-        that.storage.set(that.TRANSACTION_SENTINEL_KEY, true)
-            .then(function() {
-                // store this thread's defs + any that came in since acquiring the mutex + storing the sentinel key
-                var values = that.defsToStore;
-                that.defsToStore = undefined;
-                return that.storage.setAll(values).then(
-                    function resolve() {
-                        $A.log("ComponentDefStorage: successfully stored " + Object.keys(toStore).length + " defs");
-                        return that.storage.remove(that.TRANSACTION_SENTINEL_KEY)
-                            .then(
-                                undefined,
-                                function() {
-                                    // we can't recover: the defs were properly stored but the sentinel is still there.
-                                    // W-3314745 removes the need for a sentinel which eliminates this possibility.
-                                }
-                            );
-                    },
-                    function reject(e) {
-                        $A.warning("ComponentDefStorage: error storing " + Object.keys(toStore).length + " defs", e);
-                            // error storing defs so the persisted def graph is broken. do not remove the sentinel:
-                            // 1. reject this promise so the caller, AuraComponentService.saveDefsToStorage(), will
-                            //    clear the def + action stores which removes the sentinel.
-                            // 2. if the page reloads before the stores are cleared the sentinel prevents getAll()
-                            //    from restoring any defs.
-                        throw e;
-                    }
-                );
-            })
+        // store this task's defs + any that came in since acquiring the mutex
+        var values = that.defsToStore;
+        that.defsToStore = undefined;
+        return that.storage.setAll(values)
+            .then(
+                function resolve() {
+                    $A.log("ComponentDefStorage: successfully stored " + Object.keys(toStore).length + " defs");
+                },
+                function reject(e) {
+                    $A.warning("ComponentDefStorage: error storing " + Object.keys(toStore).length + " defs", e);
+                    // error storing defs so the persisted def graph doesn't match what's in aura.context.loaded.
+                    // when the server subsequently returns defs it will prune those in aura.context.loaded so
+                    // the persistent def graph becomes broken.
+                    // 1. set the cookie indicating the persistent graph is broken.
+                    // 2. reject this promise so the caller, AuraComponentService.saveDefsToStorage(), will
+                    //    clear the def + action stores which removes the sentinel cookie.
+                    // 3. if the page reloads before the stores are cleared the sentinel cookie prevents getAll()
+                    //    from restoring any defs.
+                    that.setBrokenGraphCookie();
+                    throw e;
+                }
+            )
             .then(resolve, reject);
         });
 };
 
 /**
  * Removes definitions from storage.
+ *
+ * Must be called from within ComponentDefStorage.enqueue() for mutex. The mutex
+ * is not acquired within this function because the entire selective eviction flow
+ * (load, analyze, evict, repeat) must be atomic.
+ *
  * @param {String[]} descriptors The descriptors identifying the definitions to remove.
  * @return {Promise} A promise that resolves when the definitions are removed.
  */
@@ -227,32 +225,27 @@ ComponentDefStorage.prototype.removeDefs = function(descriptors) {
     }
 
     var that = this;
-    return this.storage.set(this.TRANSACTION_SENTINEL_KEY, true)
-        .then(function() {
-            return that.storage.removeAll(descriptors)
-                .then(
-                    function () {
-                        $A.log("ComponentDefStorage: Successfully removed " + descriptors.length + " descriptors");
-                        return that.storage.remove(that.TRANSACTION_SENTINEL_KEY)
-                        .then(
-                            undefined,
-                            function() {
-                                // we can't recover: the defs were properly removed but the sentinel is still there.
-                                // W-3314745 removes the need for a sentinel which eliminates this possibility.
-                            }
-                        );
-                    },
-                    function (e) {
-                        $A.log("ComponentDefStorage: Error removing  " + descriptors.length + " descriptors", e);
-                        // error removing defs so the persisted def graph is broken. do not remove the sentinel:
-                        // 1. reject this promise so the caller, AuraComponentService.evictDefsFromStorage(), will
-                        //    clear the def + action stores which removes the sentinel.
-                        // 2. if the page reloads before the stores are cleared the sentinel prevents getAll()
-                        //    from restoring any defs.
-                        throw e;
-                    }
-                );
-        });
+    return this.storage.removeAll(descriptors)
+        .then(
+            function () {
+                $A.log("ComponentDefStorage: Successfully removed " + descriptors.length + " descriptors");
+                // TODO W-3375904 need to prune removed defs aura.context.loaded in a way that's safe with
+                // in-flight XHRs that are returning pruned def graphs.
+            },
+            function (e) {
+                $A.log("ComponentDefStorage: Error removing  " + descriptors.length + " descriptors", e);
+                // error removing defs so the persisted def graph doesn't match what's in aura.context.loaded.
+                // when the server subsequently returns defs it will prune those in aura.context.loaded so
+                // the persistent def graph becomes broken.
+                // 1. set the cookie indicating the persistent graph is broken.
+                // 2. reject this promise so the caller, AuraComponentService.saveDefsToStorage(), will
+                //    clear the def + action stores which removes the sentinel cookie.
+                // 3. if the page reloads before the stores are cleared the sentinel cookie prevents getAll()
+                //    from restoring any defs.
+                that.setBrokenGraphCookie();
+                throw e;
+            }
+        );
 };
 
 
@@ -266,32 +259,20 @@ ComponentDefStorage.prototype.getAll = function () {
         return Promise["resolve"]({});
     }
 
-    var that = this;
-    var actions = Action.getStorage();
+    // if broken def graph cookie is present do not restore any defs. instead
+    // clear the stores so subsequently retrieved defs can be persisted.
+    if (this.getBrokenGraphCookie()) {
+        var metricsPayload = {
+            "cause": "getAll",
+            "error" : "broken def graph cookie"
+        };
+        return this.clear(metricsPayload);
+    }
 
     // note: def AuraStorage mutex is not acquired to improve performance. this does allow for
     // writes from another tab to overlap def loading, resulting in this tab dumping caches.
     return this.storage.getAll([], true).then(
         function(items) {
-            function clearActionsCache() {
-                if (actions && actions.isPersistent()) {
-                    return actions.clear();
-                }
-                return Promise["resolve"]();
-            }
-
-            function throwSentinelError() {
-                throw new $A.auraError("Sentinel value found in def storage indicating a corrupt def graph", null, $A.severity.QUIET);
-            }
-
-            // if sentinel key is found then the persisted graph is corrupt. clear it and
-            // cause the parent promise to error.
-            if (items[that.TRANSACTION_SENTINEL_KEY] === true) {
-                return that.storage.clear()
-                    .then(clearActionsCache, clearActionsCache)
-                    .then(throwSentinelError, throwSentinelError);
-            }
-
             var result = {};
             for (var key in items) {
                 var config = $A.util.json.decode(items[key]);
@@ -301,10 +282,8 @@ ComponentDefStorage.prototype.getAll = function () {
                 result[key] = config;
             }
             return result;
-        },
-        function() {
-            return {};
         }
+        // intentionally let the error propagate to the caller
     );
 };
 
@@ -313,7 +292,6 @@ ComponentDefStorage.prototype.getAll = function () {
  * @return {Promise} A promise that resolves when definitions are restored.
  */
 ComponentDefStorage.prototype.restoreAll = function(context) {
-    var that = this;
     return this.getAll()
         .then(
             function(items) {
@@ -322,8 +300,8 @@ ComponentDefStorage.prototype.restoreAll = function(context) {
                 var evtCount = 0;
 
                 // Decode all items
-                // @dval: The following type checking is REALLY loose and flaky.
-                // All this code needs to go as part of the epic caching refactor.
+                // TODO W-3037639 the following type checking is REALLY loose and flaky.
+                // it needs to be replaced with actual type declaration values.
                 for (var key in items) {
                     var config = items[key];
 
@@ -354,7 +332,7 @@ ComponentDefStorage.prototype.restoreAll = function(context) {
         .then(
             undefined, // noop
             function(e) {
-                $A.log("ComponentDefStorage: error during restore from storage, no component, library or event defs restored", e);
+                $A.warning("ComponentDefStorage: error during restore from storage, no component, library or event defs restored", e);
                 throw e;
             }
         );
@@ -362,7 +340,7 @@ ComponentDefStorage.prototype.restoreAll = function(context) {
 
 
 /**
- * Enqueues a function that requires isolated access to the underlying AuraStorage.
+ * Enqueues a function that requires isolated access (including across tabs) to the underlying AuraStorage.
  * @param {Function} execute The function to execute.
  * @return {Promise} A promise that resolves when the provided function executes.
  */
@@ -427,6 +405,7 @@ ComponentDefStorage.prototype.enqueue = function(execute) {
 ComponentDefStorage.prototype.clear = function(metricsPayload) {
     // if def storage isn't in use then nothing to do
     if (!this.useDefinitionStorage()) {
+        this.clearBrokenGraphCookie();
         return Promise["resolve"]();
     }
 
@@ -456,7 +435,7 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
         // log that we're starting the clear
         metricsPayload = $A.util.apply({}, metricsPayload);
         metricsPayload["evicted"] = "all";
-         $A.metricsService.transactionStart("aura", "performance:evictedDefs", { "context": { "attributes" : metricsPayload } });
+        $A.metricsService.transactionStart("aura", "performance:evictedDefs", { "context": { "attributes" : metricsPayload } });
 
         $A.clientService.runWhenXHRIdle(function() {
             $A.warning("ComponentDefStorage.clear: clearing all defs and actions");
@@ -465,15 +444,21 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
             // TODO W-3375904 broadcast this to other tabs
             $A.context.resetLoaded();
 
+
+            // mutex across tabs
             that.enqueue(function(enqueueResolve) {
+                    var errorDuringClear = false;
+
                     var actionClear;
                     var actionStorage = Action.getStorage();
                     if (actionStorage && actionStorage.isPersistent()) {
+                        // TODO W-3375904 need to reset the persistent actions filter
                         actionClear = actionStorage.clear().then(
                             undefined, // noop on success
                             function(e) {
                                 $A.warning("ComponentDefStorage.clear: failure clearing actions store", e);
                                 metricsPayload["actionsError"] = true;
+                                errorDuringClear = true;
                                 // do not rethrow to return to resolve state
                             }
                         );
@@ -486,6 +471,7 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
                         function(e) {
                             $A.warning("ComponentDefStorage.clear: failure clearing cmp def store", e);
                             metricsPayload["componentDefStorageError"] = true;
+                            errorDuringClear = true;
                             // do not rethrow to return to resolve state
                         }
                     );
@@ -494,6 +480,10 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
                         function() {
                             // done the clearing. metricsPayload is updated with any errors
                             $A.metricsService.transactionEnd("aura", "performance:evictedDefs");
+                            // only clear the cookie if def + action stores were successfully cleared
+                            if (!errorDuringClear) {
+                                that.clearBrokenGraphCookie();
+                            }
                         }
                     );
                     enqueueResolve(promise);
@@ -502,5 +492,23 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
         });
     });
 };
+
+
+ComponentDefStorage.prototype.getBrokenGraphCookie = function() {
+    var cookie = $A.util.getCookie(this.BROKEN_GRAPH_COOKIE);
+    return cookie === "true";
+};
+
+ComponentDefStorage.prototype.setBrokenGraphCookie = function() {
+    var duration = 1000*60*60*24*7; // 1 week
+    $A.util.setCookie(this.BROKEN_GRAPH_COOKIE, "true", duration);
+};
+
+ComponentDefStorage.prototype.clearBrokenGraphCookie = function() {
+    $A.util.clearCookie(this.BROKEN_GRAPH_COOKIE);
+};
+
+
+
 
 Aura.Component.ComponentDefStorage = ComponentDefStorage;

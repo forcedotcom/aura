@@ -51,44 +51,18 @@
             return;
         }
 
-        /**
-         * ComponentDefStorage manipulation is done across transactions so first check
-         * for the transaction key. If it's found then loop until it's gone.
-         *
-         * Must match ComponentDefStorage.prototype.TRANSACTION_SENTINEL_KEY;
-         * TODO W-3314745 - eliminate this and its checks, rely on bulk storage apis
-         */
-        var TRANSACTION_SENTINEL_KEY = "sentinel_key";
-        var MAX_ITERATIONS = 20;
-        var iterationCount = 0;
+        this.log(cmp, "ComponentDefStorage changed, fetching contents");
+        defs.getAll([], true).then($A.getCallback(function(items) {
 
-        function queryDefStorage() {
-            if (iterationCount > MAX_ITERATIONS) {
-                that.log(cmp, "ComponentDefStorage: exceeded max iterations trying to get contents");
-                return;
+            // collect the defs
+            var content = Object.keys(items).sort().join(", ");
+
+            // only log if the value has changed
+            if (cmp._ComponentDefStorage !== content) {
+                that.log(cmp, "ComponentDefStorage content: " + content);
+                cmp._ComponentDefStorage = content;
             }
-            iterationCount++;
-
-            defs.getAll([], true).then(function(items) {
-                // recurse if transaction key is found
-                if (items[TRANSACTION_SENTINEL_KEY]) {
-                    queryDefStorage();
-                    return;
-                }
-
-                // collect the defs
-                var content = Object.keys(items).sort().join(", ");
-
-                // only log if the value has changed
-                if (cmp._ComponentDefStorage !== content) {
-                    that.log(cmp, "ComponentDefStorage content: " + content);
-                    cmp._ComponentDefStorage = content;
-                }
-            });
-        }
-
-        // and go!
-        queryDefStorage();
+        }));
     },
 
     clearActionAndDefStorage: function(cmp) {

@@ -15,10 +15,10 @@
  */
 function storageContents() {
     /**
-     * Must match ComponentDefStorage.prototype.TRANSACTION_SENTINEL_KEY;
-     * TODO W-3314745 - eliminate this
+     * ComponentDefStorage sets this when the persisted def graph is broken. This must stay
+     * in sync with ComponentDefStorage.prototype.BROKEN_GRAPH_COOKIE.
      */
-    var TRANSACTION_SENTINEL_KEY = "sentinel_key";
+    var BROKEN_GRAPH_COOKIE = "auraBrokenDefGraph";
 
     /**
      * Delay between storage queries to avoid saturating the service/browser.
@@ -46,6 +46,13 @@ function storageContents() {
                 }
             }, delay);
         });
+    }
+
+    /**
+     * Verifies absence of the flag indicating the persisted def graph is broken.
+     */
+    function verifyBrokenDefGraphMarkerIsAbsent() {
+        $A.test.assertUndefined($A.util.getCookie(BROKEN_GRAPH_COOKIE), "broken persisted def graph cookie found indicating storage errored");
     }
 
 
@@ -160,7 +167,6 @@ function storageContents() {
             $A.assert(storage, "storage must be an an Aura Storage instance");
             $A.assert(typeof desc === "string", "desc must be a string in form namespace:name");
 
-            var that = this;
             return storage.getAll([], true)
             .then(
                 function(items) {
@@ -208,12 +214,8 @@ function storageContents() {
             return this.waitForStorageByPredicate(
                 storage,
                 function defInStoragePredicate(items) {
-                    // note: must return undefined to indicate the predicate is not satisfied
-                    if (items[TRANSACTION_SENTINEL_KEY]) {
-                        // storage is in the middle of an operation
-                        return undefined;
-                    }
-                    // if not found then not satisfied
+                    verifyBrokenDefGraphMarkerIsAbsent();
+                    // if not found then return undefined to indicate the predicate is not satisfied
                     return (desc in items) ? true : undefined;
                 }
             );
@@ -235,12 +237,8 @@ function storageContents() {
             return this.waitForStorageByPredicate(
                 storage,
                 function defNotInStoragePredicate(items) {
-                    // note: must return undefined to indicate the predicate is not satisfied
-                    if (items[TRANSACTION_SENTINEL_KEY]) {
-                        // storage is in the middle of an operation
-                        return undefined;
-                    }
-                    // if found then not satisfied
+                    verifyBrokenDefGraphMarkerIsAbsent();
+                    // if found then return undefined to indicate the predicate is not satisfied
                     return !(desc in items) ? false : undefined;
                 }
             );
@@ -265,10 +263,7 @@ function storageContents() {
                 return storage.getAll([], true)
                     .then(
                         function(items) {
-                            if (items[TRANSACTION_SENTINEL_KEY]) {
-                                // storage is in the middle of an operation so recurse
-                                return getDelayPromise(checkDefInStorage);
-                            }
+                            verifyBrokenDefGraphMarkerIsAbsent();
                             return !!(items[desc]);
                         }
                     );
@@ -329,8 +324,6 @@ function storageContents() {
         waitForStorageByPredicate: function(storage, predicate) {
             $A.assert(storage, "storage must be an an Aura Storage instance");
             $A.assert(typeof predicate === "function", "predicate must be a function");
-
-            var that = this;
 
             function checkEntryInStorage() {
                 // short-circuit recursion if test is complete

@@ -27,8 +27,8 @@ Aura.time = window.performance && window.performance.now ? window.performance.no
 Aura["bootstrap"] = Aura["bootstrap"] || {};
 Aura.bootstrapMark = function (mark, value) {
     //#if {"excludeModes" : ["PRODUCTION"]}
-    if (console.timeStamp) {
-        console.timeStamp(mark);
+    if (window.console.timeStamp) {
+        window.console.timeStamp(mark);
     }
     //#end
     this["bootstrap"][mark] = value || this.time();

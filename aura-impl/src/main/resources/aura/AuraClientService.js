@@ -1297,9 +1297,6 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
         }
     }
 
-    this._token = boot["token"];
-    this.saveTokenToStorage(); // async fire-and-forget
-
     if (bootstrap.source === "network") {
         // must "clean" the network payload
         $A.util.json.resolveRefsObject(boot["data"]);
@@ -1460,50 +1457,22 @@ AuraClientService.prototype.loadBootstrapFromStorage = function() {
 };
 
 /**
- * Load a component.
+ * Initializes app
  *
- * This function does a very complex dance to try to bring up the app as fast as possible. This is really
- * important in the case of persistent storage.
- *
- * @param {DefDescriptor} descriptor The key for a definition with a qualified name of the format prefix://namespace:name
- * @param {Object} attributes The configuration data to use. If specified, attributes are used as a key value pair.
- * @param {function} callback The callback function to run
- * @param {String} defType Sets the defType to "COMPONENT"
- *
+ * Waits for all the pieces (app.js, bootststrap.js) to init the application
  * @memberOf AuraClientService
  * @private
  */
-AuraClientService.prototype.loadComponent = function(descriptor, attributes, callback /*,defType*/) {
-    var acs = this;
+AuraClientService.prototype.initializeApplication = function() {
+    Aura.bootstrapMark("runAfterContextCreated");
+    var self = this;
 
-    this.loadTokenFromStorage().then(
-        function (value) {
-            if (value && value["token"]) {
-                acs._token = value["token"];
-                $A.log("AuraClientService.loadComponent(): token found in storage");
-            } else {
-                $A.log("AuraClientService.loadComponent(): no token found in storage");
-                // on next reload fetch bootstrap from network to get a new token. if
-                // network load fails (eg due to offline) then fallback to cached version,
-                // allowing the app to still boot.
-                acs.disableParallelBootstrapLoadOnNextLoad();
-            }
-        },
-        function(err) {
-            $A.log("AuraClientService.loadComponent(): failed to load token from storage: " + err);
-            // on next reload force server trip to get new token
-            acs.disableParallelBootstrapLoadOnNextLoad();
-        }
-    );
-
-    this.runAfterInitDefs(function () {
-        Aura.bootstrapMark("runAfterInitDefsReady");
-
-        acs.runAfterBootstrapReady(function (bootConfig) {
-            Aura.bootstrapMark("runAfterBootstrapReady");
-
-            $A.run(function() {
-                callback(bootConfig);
+    return new Promise(function (resolve) {
+        self.runAfterInitDefs(function () {
+            Aura.bootstrapMark("runAfterInitDefsReady");
+            self.runAfterBootstrapReady(function (bootConfig) {
+                Aura.bootstrapMark("runAfterBootstrapReady");
+                resolve(bootConfig);
             });
         });
     });
@@ -2690,18 +2659,18 @@ AuraClientService.prototype.parseAndFireEvent = function(evtObj) {
 };
 
 /**
- * Reset the token.
+ * Set the token.
  *
- * Used by plugins.
- *
- * @param {Object}
- *            newToken Refresh the current token with a new one.
+ * @param {String} token
+ * @param {Boolean} saveToStorage
  * @memberOf AuraClientService
  * @export
  */
-AuraClientService.prototype.resetToken = function(newToken) {
+AuraClientService.prototype.setToken = function(newToken, saveToStorage) {
     this._token = newToken;
-    this.saveTokenToStorage();
+    if (saveToStorage) {
+       this.saveTokenToStorage(); 
+    }
 };
 
 /**
@@ -3374,6 +3343,11 @@ AuraClientService.prototype.populatePersistedActionsFilter = function() {
         });
 };
 
+
+AuraClientService.prototype.clearPersistedActionsFilter = function () {
+    this.persistedActionFilter = undefined;
+    this.setupPersistedActionsFilter();
+};
 /**
  * Setup the persisted actions filter.
  *

@@ -870,7 +870,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 targetService = new Aura.Services.AuraClientService();
                 targetService.saveTokenToStorage = function(){};
 
-                targetService.resetToken(expected);
+                targetService.setToken(expected, true);
             });
 
             var actual = targetService._token;
@@ -903,7 +903,7 @@ Test.Aura.AuraClientServiceTest = function() {
             mockGlobal(function() {
                 mockAction(function() {
                     var targetService = new Aura.Services.AuraClientService();
-                    targetService.resetToken(expected);
+                    targetService.setToken(expected, true);
                 });
             });
 
@@ -938,7 +938,7 @@ Test.Aura.AuraClientServiceTest = function() {
             mockGlobal(function() {
                 mockAction(function() {
                     var targetService = new Aura.Services.AuraClientService();
-                    targetService.resetToken(expected);
+                    targetService.setToken(expected, true);
                 });
             });
 

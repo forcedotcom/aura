@@ -138,7 +138,6 @@ public class Bootstrap extends AuraResourceImpl {
             serializationContext.pushRefSupport(false);
             json.writeMapEntry("md5", out.getMD5());
             json.writeMapEntry("context", context);
-            json.writeMapEntry("token", configAdapter.getCSRFToken());
             serializationContext.popRefSupport();
             json.writeMapEnd();
             out.append(APPEND_JS);

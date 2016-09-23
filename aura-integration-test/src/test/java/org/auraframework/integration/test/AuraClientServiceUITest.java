@@ -26,16 +26,18 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
 
     // CSRF is only stored in persistent storage. indexedDB is not supported on Safari,
     // so persistent storage is not able to be created on Safari.
-    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
-    @ThreadHostileTest("ConfigAdapter modified, can't tolerate other tests.")
-    @Test
-    public void testCsrfTokenSavedOnBootstrap() throws Exception {
-        String expectedToken = "expectedTestToken";
+    // @dval: Test disabled since we move the token to inline.js
+    //
+    // @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    // @ThreadHostileTest("ConfigAdapter modified, can't tolerate other tests.")
+    // @Test
+    // public void testCsrfTokenSavedOnBootstrap() throws Exception {
+    //     String expectedToken = "expectedTestToken";
 
-        getMockConfigAdapter().setCSRFToken(expectedToken);
-        open("/clientServiceTest/csrfTokenStorage.app");
-        WebElement actual = getDriver().findElement(By.className("output"));
+    //     getMockConfigAdapter().setCSRFToken(expectedToken);
+    //     open("/clientServiceTest/csrfTokenStorage.app");
+    //     WebElement actual = getDriver().findElement(By.className("output"));
 
-        waitForElementTextPresent(actual, expectedToken);
-    }
+    //     waitForElementTextPresent(actual, expectedToken);
+    // }
 }

@@ -676,53 +676,48 @@ AuraInstance.prototype.initAsync = function(config) {
         }
 
         $A.clientService.initHost(config["host"]);
+        $A.clientService.setToken(config["token"]);
         $A.metricsService.initialize();
 
-
-        // the final step in initAsync: trigger the getApplication action
-        function getApplication() {
-            Aura.bootstrapMark("runAfterContextCreated");
-            $A.clientService.loadComponent(config["descriptor"], config["attributes"], $A.initPriv, config["deftype"]);
-        }
-        function reportError(e) {
-            $A.reportError("getApplication threw error", e);
+        function reportError (e) { 
+            $A.reportError("Error initializing the application", e); 
         }
 
-        $A.executeExternalLibraries();
+        function initializeApp () {
+            return $A.clientService.initializeApplication().then(function (bootConfig) {
+                $A.run(function () {
+                    $A.initPriv(bootConfig);
+                });
+            }, reportError);
+        }
 
-        // actions depend on defs depend on GVP (labels). so load them in dependency order and skip
+        // Actions depend on defs depend on GVP (labels). so load them in dependency order and skip
         // loading depending items if anything fails to load.
 
-        // start by enabling the actions filter if relevant. populatePersistedActionsFilter() populates it,
+        // Start by enabling the actions filter if relevant. populatePersistedActionsFilter() populates it,
         // called only if GVP + defs are loaded.
         $A.clientService.setupPersistedActionsFilter();
 
         if (!context.globalValueProviders.LOADED_FROM_PERSISTENT_STORAGE) {
             $A.log("Aura.initAsync: GVP not loaded from storage so not loading defs or actions either");
-            $A.clientService.loadBootstrapFromStorage()
-                .then(getApplication, getApplication)
-                .then(undefined, reportError);
+            initializeApp().then(undefined, reportError);
         } else {
-            $A.clientService.loadBootstrapFromStorage()
-                .then(function() {
-                    return $A.componentService.restoreDefsFromStorage(context);
-                })
-                .then(function() {
-                    return $A.clientService.populatePersistedActionsFilter();
-                })
-                .then(
-                    undefined, /* noop */
-                    function(e) {
-                        $A.log("Aura.initAsync: failed to load defs or actions from storage", e);
-                        // do not rethrow
-                    }
-                )
-                .then(getApplication, getApplication)
-                .then(undefined, reportError);
+            Promise["all"]([
+                $A.clientService.loadBootstrapFromStorage(),
+                $A.componentService.restoreDefsFromStorage(context), 
+                $A.clientService.populatePersistedActionsFilter()
+            ])
+            .then(initializeApp, function (err) {
+                $A.log("Aura.initAsync: failed to load defs, get bootstrap or actions from storage", err);
+                $A.clientService.clearPersistedActionsFilter();
+                return initializeApp();
+            })
+            .then(undefined, reportError);
         }
     });
 
     this.clientService.initDefs();
+    $A.executeExternalLibraries();
 };
 
 /**
@@ -1489,8 +1484,8 @@ AuraInstance.prototype.Perf = window['Perf'] || PerfShim;
      * @borrows AuraInstance#util as util
      * @borrows AuraInstance#reportError as $A.reportError
      */
-    window['$A'] = new AuraInstance();
     Aura.bootstrapMark("execAuraJs");
+    window['$A'] = new AuraInstance();
 })();
 
 // TODO: Remove the legacy 'aura' top-level name.

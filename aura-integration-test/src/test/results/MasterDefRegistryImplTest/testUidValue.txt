@@ -59,7 +59,7 @@ markup://ui:mouseup : b5t6ukooCQ-rdCAwKuxJqA
 aura://Decimal : null
 css://ui.outputNumber : 8bm_8b0q-ftoIJVkYGSIMA
 js://ui.outputNumber : oNQyEbZLKfdLztY5_VsQoA
-markup://aura:component : uT8zLp3kK7luNWqFFpbbSA
+markup://aura:component : 3J6lQik581cQI6iP0sa4lw
 markup://ui:visible : DPLf9lQCtsMPmaNubOEAEw
 aura://ComponentController : null
 aura://DynamicStylingController : null

@@ -985,7 +985,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         // 1 from clientLibraryTest:testDependencies
         // Update this number when you add new aura:clientLibrary tags to these components
-        assertEquals(4, libDefs.size());
+        assertEquals(5, libDefs.size());
     }
 
     @Test

@@ -15,7 +15,7 @@
  */
 ({
     owner:"ctatlah",
-    
+
     CSS_SELECTOR:{
         todayButton : '.calToday.uiButton',
         uiDatePicker : '.uiDatePicker'
@@ -26,81 +26,92 @@
     //clicking on the today button should populate the datepicker to today date
     testShowTodayDatepickerFlag: {
         attributes : {"renderItem" : "testShowTodayDatepickerFlag"},
-        test: function(cmp) {
-            var el = cmp.getElement();
-            var uiDatepicker = $A.test.select(this.CSS_SELECTOR.uiDatePicker)[0];
+        test: [
+            function waitForTodayIsSet(cmp) {
+                var datepickerCmp = cmp.find('datePicker');
+                $A.test.addWaitFor(true, function() { return !!datepickerCmp.get('v._today'); });
+            },
+            function(cmp) {
+                var el = cmp.getElement();
+                var uiDatepicker = $A.test.select(this.CSS_SELECTOR.uiDatePicker)[0];
 
-            //should be visible
-            this.verifyContainClass(
-                uiDatepicker,
-                'visible'
-            );
-            
+                //should be visible
+                this.verifyContainClass(
+                    uiDatepicker,
+                    'visible'
+                );
 
-            //at first selected date should be empty
-            $A.test.assertUndefinedOrNull(
-                cmp.get('v.selectedDate.value'),
-                'At first : selected date value should be undefined'
-            );
+                //at first selected date should be empty
+                $A.test.assertUndefinedOrNull(
+                    cmp.get('v.selectedDate.value'),
+                    'At first : selected date value should be undefined'
+                );
 
-            //verify that today button is visible
-            this.verifyTodayButtonVisible(true);
+                //verify that today button is visible
+                this.verifyTodayButtonVisible(true);
 
-            //verify today date based on timezone
-            this.verifyDatepickerTodayAttr(cmp);
+                //verify today date based on timezone
+                this.verifyDatepickerTodayAttr(cmp);
 
-            //click on today button
-            $A.test.clickOrTouch(
-                $A.test.select(this.CSS_SELECTOR.todayButton)[0]
-            );
+                //click on today button
+                $A.test.clickOrTouch(
+                    $A.test.select(this.CSS_SELECTOR.todayButton)[0]
+                );
 
-            //assert the today date
-            this.verifySelectedDateDefined(cmp);
+                //assert the today date
+                this.verifySelectedDateDefined(cmp);
 
-            //date picker should not visible after clicking on the today button
-            this.verifyNotContainClass(
-                el,
-                'visible'
-            );
-        }
+                //date picker should not visible after clicking on the today button
+                this.verifyNotContainClass(
+                    el,
+                    'visible'
+                );
+            }
+        ]
     },
 
 
     //test to check if the Today Button is not visible (showToday=false)
     testHideTodayDatepickerFlag: {
         attributes : {"renderItem" : "testHideTodayDatepickerFlag"},
-        test: function(cmp) {
-            var el = cmp.getElement();
-            var uiDatepicker = $A.test.select(this.CSS_SELECTOR.uiDatePicker)[0];
+        test: [
+            function waitForTodayIsSet(cmp) {
+                var datepickerCmp = cmp.find('datePicker');
+                $A.test.addWaitFor(true, function() { return !!datepickerCmp.get('v._today'); });
+            },
+            function(cmp) {
+                var el = cmp.getElement();
+                var uiDatepicker = $A.test.select(this.CSS_SELECTOR.uiDatePicker)[0];
 
-            this.verifyTodayButtonVisible(false);//verify that today button is not visible
-            this.verifySelectedDateUndefined(cmp);
-            this.verifyDatepickerTodayAttr(cmp);
-        }
+                this.verifyTodayButtonVisible(false);//verify that today button is not visible
+                this.verifySelectedDateUndefined(cmp);
+                this.verifyDatepickerTodayAttr(cmp);
+            }
+        ]
     },
-
-
 
     testDefaultValueOfDatePicker: {
         attributes : {"renderItem" : "testDefaultValueOfDatePicker"},
-        test: function(cmp) {
-            var el = cmp.getElement();
-            var uiDatepicker = $A.test.select(this.CSS_SELECTOR.uiDatePicker)[0];
+        test: [
+            function waitForTodayIsSet(cmp) {
+                var datepickerCmp = cmp.find('datePicker');
+                $A.test.addWaitFor(true, function() { return !!datepickerCmp.get('v._today'); });
+            },
+            function(cmp) {
+                var el = cmp.getElement();
+                var uiDatepicker = $A.test.select(this.CSS_SELECTOR.uiDatePicker)[0];
 
-            this.verifyTodayButtonVisible(true);//verify that today button is not visible
-            this.verifySelectedDateUndefined(cmp);
-            this.verifyDatepickerTodayAttr(
-                cmp,
-                15,//day
-                6,//month start from 0 instead of 1, this is JULY
-                2015//year
-            );
-        }
+                this.verifyTodayButtonVisible(true);//verify that today button is not visible
+                this.verifySelectedDateUndefined(cmp);
+                this.verifyDatepickerTodayAttr(
+                    cmp,
+                    15,//day
+                    6,//month start from 0 instead of 1, this is JULY
+                    2015//year
+                );
+            }
+        ]
     },
-
-    
-
-
 
     //test localized service
     //SAME YEAR, MONTH, DAY
@@ -406,7 +417,7 @@
 
         if (todayDateObj1.day !== todayDateObj2.day){
             //timezone provides different dates, needs further date
-            
+
             if (todayDateObj1.day < todayDateObj2.day){
                 //next day same month
                 cmp.set('v.timeDiffCase', 'NEXT DAY SAME MONTH: todayDate2.day = todayDate1.day + 1');
@@ -452,12 +463,10 @@
         }
     },
 
-
     verifyDatepickerTodayAttr: function(cmp, expectedDay, expectedMonth_StartFromZero, expectedYear){
         var datepickerCmp = cmp.find('datePicker');
         var todayStr = datepickerCmp.get('v._today');//yyyy-MM-dd
         var todayObj = this.verifyValidDateString(todayStr);
-
 
         $A.test.assertEquals(
             expectedDay || todayObj.day,

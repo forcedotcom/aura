@@ -26,6 +26,11 @@ if (typeof Aura === "undefined") {//eslint-disable-line no-use-before-define
 Aura.time = window.performance && window.performance.now ? window.performance.now.bind(performance) : function(){return Date.now();};
 Aura["bootstrap"] = Aura["bootstrap"] || {};
 Aura.bootstrapMark = function (mark, value) {
+    //#if {"excludeModes" : ["PRODUCTION"]}
+    if (console.timeStamp) {
+        console.timeStamp(mark);
+    }
+    //#end
     this["bootstrap"][mark] = value || this.time();
 };
 

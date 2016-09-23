@@ -106,10 +106,13 @@ var pageStartTime = (new Date()).getTime();</script>
 
     <script>
 (function () {
-    var evalFinish;
-    var auraConfig = {!v.auraInit};
     var time = window.performance &amp;&amp; window.performance.now ? window.performance.now.bind(performance) : function(){return Date.now();};
+    window.Aura || (window.Aura = {});
+    window.Aura.bootstrap || (window.Aura.bootstrap = {});
+    window.Aura.bootstrap.execInlineJs = time();
 
+    var auraConfig = {!v.auraInit};
+    
     function initLocker () {
         if (auraConfig["safeEvalWorker"] &amp;&amp; !window['$$safe-eval$$'] &amp;&amp; !/^(.*?:)?\/\//.test(auraConfig["host"])) {
             var props = {
@@ -140,24 +143,19 @@ var pageStartTime = (new Date()).getTime();</script>
     }
 
     function initFramework () {
-        if (typeof Aura === "undefined" || !Aura.frameworkJsReady) {
-            window.Aura || (window.Aura = {});
-            window.Aura.bootstrap || (window.Aura.bootstrap = {});
+        window.Aura.beforeFrameworkInit = Aura.beforeFrameworkInit || [];
+        window.Aura.beforeFrameworkInit.push(auraPreInitBlock);
+        window.Aura.inlineJsReady = time();
+
+        if (!window.Aura.frameworkJsReady) {
             window.Aura.initConfig = auraConfig;
-            window.Aura.beforeFrameworkInit = Aura.beforeFrameworkInit || [];
-            window.Aura.beforeFrameworkInit.push(auraPreInitBlock);
-            window.Aura.bootstrap.execInlineJs = evalFinish;
-            window.Aura.inlineJsReady = time();
         } else {
-            window.Aura.bootstrap.execInlineJs = time();
-            auraPreInitBlock();
             if ({!v.autoInitialize}) {
                 $A.initAsync(auraConfig);
-            } else if ({!v.autoInitializeSync}){
+            } else if ({!v.autoInitializeSync}) {
                 $A.initConfig(auraConfig);
             }
         }
-        
     }
 
     // Error msg
@@ -172,8 +170,6 @@ var pageStartTime = (new Date()).getTime();</script>
             }
         });
     }
-
-    evalFinish = time();
 
     initLocker();
     

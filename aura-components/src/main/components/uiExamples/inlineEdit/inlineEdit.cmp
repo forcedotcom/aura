@@ -44,7 +44,7 @@
 			
 			<aura:set attribute="columns">
 				<ui:inlineEditKeyNavCell>
-					<ui:outputText label="Row Number" value="Row Number" />
+					<ui:outputText value="Row Number" />
 				</ui:inlineEditKeyNavCell>
 				<uiExamples:gridActionCell />
 				<ui:inlineEditCell name="id" triggerLabel="Edit Id">

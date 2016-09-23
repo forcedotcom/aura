@@ -23,5 +23,5 @@
 
     <ui:inputSelect aura:id="inputSelectMenu" label="inputSelectMenu" useMenu="true" options="{!v.options}" />
 
-    <ui:outputText aura:id="changeCounter" label="changeCounter" value="0" />
+    changeCounter: <ui:outputText aura:id="changeCounter"  value="0" />
 </aura:component>

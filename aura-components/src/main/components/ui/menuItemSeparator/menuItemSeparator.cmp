@@ -16,5 +16,7 @@
 
 -->
 <aura:component access="GLOBAL" support="GA" extensible="true" implements="ui:visible" description="A menu separator to divide menu items, such as ui:radioMenuItem, and used in a ui:menuList component.">
+    <aura:attribute name="label" type="String"/>
+
     <li role="separator" class="{!v.class}"/>
 </aura:component>

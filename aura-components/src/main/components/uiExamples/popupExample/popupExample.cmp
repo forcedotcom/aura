@@ -16,14 +16,14 @@
 
 -->
 <aura:component>
-    <ui:popup label="trigger">
+    <ui:popup>
     	<ui:popupTrigger>Click this trigger to open popup with default settings</ui:popupTrigger>
     	<ui:popupTarget>
     		This displays in a popup, which closes when you click outside it.
     	</ui:popupTarget>
     </ui:popup>
     <br/>
-     <ui:popup label="trigger">
+     <ui:popup>
     	<ui:popupTrigger>Click this trigger to open popup with custom settings</ui:popupTrigger>
     	<ui:popupTarget attachToBody="true" closeOnClickInside="true">
     		This popup closes when you click inside it.<br/>
@@ -31,7 +31,7 @@
     	</ui:popupTarget>
     </ui:popup>
     <br/>
-     <ui:popup label="trigger">
+     <ui:popup>
         <ui:popupTrigger>Click this trigger to open popup as an overlay</ui:popupTrigger>
         <ui:popupTarget attachToBody="true" curtain="true">
             <div style="width:150px;height:200px;">

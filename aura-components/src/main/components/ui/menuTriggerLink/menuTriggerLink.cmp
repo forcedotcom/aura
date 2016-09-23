@@ -17,7 +17,6 @@
 -->
 <aura:component access="GLOBAL" support="GA" extensible="true" extends="ui:popupTrigger" description="A link that triggers a dropdown menu.">
     
-    <aura:attribute access="GLOBAL" name="label" type="String" description="The text displayed on the component."/>
     <aura:attribute name="ariaLabel" type="String"/>
 
     <aura:registerEvent access="GLOBAL" name="menuTriggerPress" type="ui:menuTriggerPress" description="The event that is fired when the trigger is clicked."/>

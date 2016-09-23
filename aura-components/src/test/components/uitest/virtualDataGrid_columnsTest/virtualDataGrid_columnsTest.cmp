@@ -39,8 +39,8 @@
 			<ui:button class="kitchenButton" label="Re-fire datagrid's provide" press="{!c.replaceData}"/>
 		    <ui:button class="kitchenButton" label="Fire Data Provider With Empty Data" press="{!c.emptyData}"/>         
 			<br/>
-			<ui:inputCheckbox label="Provide no data" value="{!v.provideNoData}"/> 
-			<ui:outputText label="Sorting By:" value="{!v.sortBy}"/>
+			<ui:inputCheckbox label="Provide no data" value="{!v.provideNoData}"/>
+			Sorting By: <ui:outputText  value="{!v.sortBy}"/>
 		</div>
 		<ui:virtualDataGrid aura:id="grid" onsort="{!c.onsort}" fixedHeader="true" rowHeaderIndex="{!v.rowHeaderIndex}">
 			<aura:set attribute="headerColumns">

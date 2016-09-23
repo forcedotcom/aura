@@ -43,7 +43,7 @@
 			<br/>
 			<ui:button class="kitchenButton" label="Focus Next" press="{!c.focusNext}"/>
 			<ui:inputCheckbox label="Provide no data" value="{!v.provideNoData}"/> 
-			<ui:outputText label="Sorting By:" value="{!v.sortBy}"/>
+			<ui:outputText value="{!v.sortBy}"/>
 
 		</div>
 	

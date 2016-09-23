@@ -26,7 +26,7 @@
 	<aura:attribute name="myURL" type="String" default="http://www.google.com"/>
 
 	<ui:button label="Change" press="{!c.change}" />
-	<div class="row"><ui:outputText value="{!v.myText}" label="outputText"/> </div>  
+	<div class="row"><ui:outputText value="{!v.myText}"/> </div>
 	<div class="row"><ui:outputNumber value="{!v.myNum}" format=".00"/></div>
 	<div class="row"><ui:outputCurrency aura:id="curr" value="{!v.myCurr}"/></div>
 	<div class="row"><ui:outputCheckbox value="{!v.myBool}"/></div>
@@ -34,6 +34,6 @@
 	<div class="row"><ui:outputDateTime value="{!v.myDateTime}"/></div>
 	<div class="row"><ui:outputEmail value="abc@email.com" label="abc@email.com"/></div>
 	<div class="row"><ui:outputPhone value="415-123-4567"/></div>
-	<div class="row"><ui:outputTextArea value="{!v.myTextArea}" label="my output"/></div>
+	<div class="row"><ui:outputTextArea value="{!v.myTextArea}"/></div>
 	<div class="row"><ui:outputURL value="{!v.myURL}" label="{!v.myURL}"/></div>
 </aura:component>

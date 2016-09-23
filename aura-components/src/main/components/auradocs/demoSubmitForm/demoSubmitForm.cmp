@@ -82,7 +82,7 @@
          	<ui:block class="output">
 	        	<ui:message title="Success" severity="confirm" closable="true"/>
 	            Name: <ui:outputText aura:id="outName" value="" class="outText"/><br/>
-	            Email: <ui:outputEmail label="" aura:id="outEmail" value="Email" class="outText"/><br/>
+	            Email: <ui:outputEmail aura:id="outEmail" value="Email" class="outText"/><br/>
 	            Password: <ui:outputText aura:id="outPW" value="" class="outText"/><br/>
 	            Website: <ui:outputURL label="Invalid URL" aura:id="outURL" value="" class="outText"/><br/>
 	            D.O.B.: <ui:outputDate aura:id="outDOB" value="" class="outText"/><br/>

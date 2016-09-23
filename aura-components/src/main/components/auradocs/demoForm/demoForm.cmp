@@ -32,7 +32,7 @@
         <ui:inputDate aura:id="dateInput" value="{!v.myDate}" mouseup="{!c.getDate}" displayDatePicker="true" labelPosition="top" />
         <ui:inputNumber label="ui:inputNumber" value="42"/>
         <ui:inputTextArea label="ui:inputTextArea" cols="10" value="This is a String." />
-        <ui:outputRichText label="ui:outputRichText" value="&lt;p&gt;This is a paragraph rendered by &lt;span style=&quot;color:red;&quot; &gt;ui:outputRichText&lt;/span&gt;.&lt;/p&gt;" />
+        <ui:outputRichText value="&lt;p&gt;This is a paragraph rendered by &lt;span style=&quot;color:red;&quot; &gt;ui:outputRichText&lt;/span&gt;.&lt;/p&gt;" />
     </span>
     
 </aura:component>

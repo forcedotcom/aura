@@ -20,7 +20,8 @@
 
     <aura:import library="ui:eventLib" property="lib"/>
 
-    <aura:attribute name="value" type="String" required="true" access="GLOBAL" description="The output value of the email"/>
+    <aura:attribute access="GLOBAL" name="value" type="String" required="true" description="The output value of the email"/>
+    <aura:attribute name="label" type="String" description="The text displayed on the component instead of the email."/>
 
     <span aura:id="body" class="{!v.class}"></span>
 

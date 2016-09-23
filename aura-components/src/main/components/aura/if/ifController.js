@@ -31,13 +31,7 @@
     handleTheTruth: function(cmp, evt, helper) {
         var isTrue = $A.util.getBooleanValue(cmp.get("v.isTrue"));
         if (cmp._truth !== isTrue) {
-            var currentBody = cmp.get('v.body');
-            for (var i = 0 ; i < currentBody.length; i++) {
-                var child = currentBody[i];
-                if (!child.isRendered()) {
-                    child.destroy();
-                }
-            }
+            helper.clearUnrenderedBody(cmp);
 
             cmp.set("v.body", helper.createBody(cmp, isTrue, true));
             cmp._truth = isTrue;

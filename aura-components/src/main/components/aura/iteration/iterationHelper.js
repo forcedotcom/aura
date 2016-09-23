@@ -45,12 +45,15 @@
                     cleanedCmps++;
                 }
             }
-            if (cleanedCmps) {
+            
+            if (cleanedCmps && $A.getContext().getMode() !== 'PROD') {
+                var owner = component.getOwner();
                 $A.warning([
-                    'Performance degradation: ',
-                    'Multiple items were set in iteration',
-                     '[id:' + component.getGlobalId() + ']',
-                    'in the same Aura cycle.'
+                    '[Performance degradation] ',
+                    'markup://aura:iteration [id:' + component.getGlobalId() + '] ',
+                    'in ', owner.getName() + ' ["' + owner.getGlobalId() + '"] ',
+                    'had multiple items set in the same Aura cycle.\n',
+                    'More info: https://sfdc.co/performance-aura-iteration'
                 ].join(''));
             }
         }

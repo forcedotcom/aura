@@ -1231,6 +1231,13 @@ Component.prototype.set = function(key, value, ignoreChanges) {
 
     var oldValue=valueProvider.get(subPath,this);
 
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    // Check if the previous value contains components
+    if ($A.util.isArray(oldValue) && oldValue.length && $A.util.isComponent(oldValue[0])) {
+        this.trackComponentReplacement(oldValue, key);
+    }
+    //#end
+
     var returnValue=valueProvider.set(subPath, value, this);
     if($A.util.isExpression(value)){
         value.addChangeHandler(this,key);
@@ -1247,6 +1254,54 @@ Component.prototype.set = function(key, value, ignoreChanges) {
     }
     return returnValue;
 };
+
+//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+/**
+ * Add a warning in the console if a list of components is not rendered by the end
+ * of the current event loop. This pattern usually lead to memory leaks.
+ * 
+ * @param {Component[]} prevComp The list of component that has been replaced
+ * @param {string} key The attribute key
+ */
+Component.prototype.trackComponentReplacement = function(prevCmps, key) {
+    // Filter valid and not rendered components 
+    var potentialLeak = []; 
+    for (var i = 0; i < prevCmps.length; i++) {
+        if (prevCmps[i].isValid() && !prevCmps[i].isRendered()) {
+            potentialLeak.push(prevCmps[i]);
+        }
+    }
+    
+    if (potentialLeak.length) {
+        var owner = this;
+        var handler = function() {
+            // Compute again if the some components are still not rendered 
+            var actualLeak = [];
+            for (var j = 0; j < potentialLeak.length; j++) {
+                if (potentialLeak[j].isValid() && !potentialLeak[j].isRendered()) {
+                    actualLeak.push(potentialLeak[j]);
+                }
+            }
+            
+            if (actualLeak.length) {
+                $A.warning([
+                    '[Performance degradation] ',
+                    actualLeak.length + ' component(s) in ' + owner.getName() + ' ["' + owner.getGlobalId() + '"] ',
+                    'have been created and removed before being rendered when calling cmp.set("' + key + '").\n',
+                    'More info: https://sfdc.co/performance-aura-component-set' 
+                ].join(''));
+            }
+        };
+        
+        // This event is triggered by the renderingService.rerenderDirty method
+        $A.eventService.addHandlerOnce({
+            'event': 'aura:doneRendering', 
+            'globaId': 'componentService', 
+            'handler': handler
+        });
+    }
+};
+//#end
 
 /**
  * Sets a shadow attribute. Used for programmatically adding values after FCVs.

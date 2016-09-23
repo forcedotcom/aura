@@ -51,6 +51,4 @@
 
     <aura:attribute name="body" type="Aura.Component[]" access="GLOBAL" description="The body of the component. In markup, this is everything in the body of the tag."/>
 
-    <aura:clientLibrary name="Walltime" type="JS" />
-
 </aura:component>

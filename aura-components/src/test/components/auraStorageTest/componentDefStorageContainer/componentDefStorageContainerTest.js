@@ -7,8 +7,9 @@
     //                  value over OSS autobuilds
     labels : ["threadHostile", "UnAdaptableTest"],
 
-    // Disabling: flapper
-    _testComponentDefsPersisted: {
+    testComponentDefsPersisted: {
+        // TODO(kevinv 9/24/2016): re-enabled tests so marking as a flapper to get some non-blocking jenkins runs
+        labels : ["flapper"],
         test: [
             function loadIframe(cmp) {
                 var iframeSrc = "/auraStorageTest/componentDefStorage.app";

@@ -265,7 +265,7 @@ function iframeTest(storageContents) {
          * @param {String} key action descriptor.
          * @param {String=} msg error message.
          */
-        waitForActionInStorage : function(key, msg) {
+        waitForActionInStorage: function(key, msg) {
             var iframe = this.getIframe();
             var found = false;
             storageContents.waitForActionInStorage(key, false, iframe)

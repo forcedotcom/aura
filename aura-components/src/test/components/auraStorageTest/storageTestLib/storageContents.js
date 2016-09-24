@@ -71,7 +71,7 @@ function storageContents() {
                 promises.push(checkInFlightOperations(storages[i]));
             }
 
-            return Promise["resolve"](promises);
+            return Promise["all"](promises);
         },
 
 
@@ -88,11 +88,11 @@ function storageContents() {
 
             return this.waitForStorageByPredicate(
                 storage,
-                function(items) {
+                function keyInStoragePredicate(items) {
                     // exact match
                     if (!prefix) {
                         if (key in items) {
-                            return items[key]
+                            return items[key];
                         }
                         return undefined;
                     }
@@ -122,7 +122,7 @@ function storageContents() {
 
             return this.waitForStorageByPredicate(
                 storage,
-                function(items) {
+                function keyNotInStoragePredicate(items) {
                     // exact match
                     if (!prefix) {
                         if (key in items) {
@@ -207,12 +207,14 @@ function storageContents() {
             var storage = global.$A.storageService.getStorage("ComponentDefStorage");
             return this.waitForStorageByPredicate(
                 storage,
-                function(items) {
+                function defInStoragePredicate(items) {
+                    // note: must return undefined to indicate the predicate is not satisfied
                     if (items[TRANSACTION_SENTINEL_KEY]) {
-                        // storage is in the middle of an operation so recurse
+                        // storage is in the middle of an operation
                         return undefined;
                     }
-                    return (desc in items);
+                    // if not found then not satisfied
+                    return (desc in items) ? true : undefined;
                 }
             );
         },
@@ -232,12 +234,14 @@ function storageContents() {
             var storage = global.$A.storageService.getStorage("ComponentDefStorage");
             return this.waitForStorageByPredicate(
                 storage,
-                function(items) {
+                function defNotInStoragePredicate(items) {
+                    // note: must return undefined to indicate the predicate is not satisfied
                     if (items[TRANSACTION_SENTINEL_KEY]) {
-                        // storage is in the middle of an operation so recurse
+                        // storage is in the middle of an operation
                         return undefined;
                     }
-                    return !(desc in items);
+                    // if found then not satisfied
+                    return !(desc in items) ? false : undefined;
                 }
             );
         },
@@ -348,7 +352,7 @@ function storageContents() {
             }
 
             return checkEntryInStorage();
-        },
+        }
 
 
     };

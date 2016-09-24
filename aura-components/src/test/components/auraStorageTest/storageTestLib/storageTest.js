@@ -34,7 +34,8 @@ function storageTest () {
             configs[0] = ["aura:text", { "value": text }];
             configs[1] = ["aura:html", { "tag": "br" }];
             $A.createComponents(configs,
-                function(newCmps, overallStatus) {
+                function(newCmps, status, statusMessagesList) {
+                    $A.test.assertEquals("SUCCESS", status, "$A.createComponents() failed: " + JSON.stringify(statusMessagesList));
                     if (content.isValid() && newCmps) {
                         body = content.get("v.body");
                         for (var i = 0; i < newCmps.length; i++) {
@@ -148,7 +149,7 @@ function storageTest () {
         },
 
         testGetFunctionValue: function(cmp, storage) {
-            return runFullCycle(cmp, storage, "testValues_Function", function(x){});
+            return runFullCycle(cmp, storage, "testValues_Function", function(){});
         },
 
         /**
@@ -166,9 +167,7 @@ function storageTest () {
         },
 
         testSetItemUnderMaxSize: function(cmp, storage) {
-            var result = "";
             var sizeTooBig = (storage.getMaxSize() - 1) * 1024;
-
             return storage.set("overSize", { "value" : { "LittleMac" : new Array(sizeTooBig).join("x") } });
         },
 
@@ -187,7 +186,7 @@ function storageTest () {
                     }
                 )
                 .then(function() {
-                    return storage.get("overSize")
+                    return storage.get("overSize");
                 })
                 .then(function (value) {
                    $A.test.assertUndefinedOrNull(value, "Value too large should not be stored.");
@@ -383,7 +382,7 @@ function storageTest () {
                         append(cmp, "complete");
                 })
                 .then(function() {
-                    return storage.set("key1" , value);
+                    return storage.set("key1", value);
                 })
                 .then(function() {
                     append(cmp, "added item");
@@ -471,7 +470,6 @@ function storageTest () {
             // size that will be added to storage we multiple 2 by the length of the chunk and key, times the number
             // of rows (5) , divided by 1024 to convert to KB.
             var totalSizeAdded = (chunk.length + keyLength) * 2 * 5 / 1024;
-            var storageMax = storage.getMaxSize();
             $A.test.assertTrue(storage.getMaxSize() < totalSizeAdded, "Test setup failure: storage being tested is too"
                     + " large to properly test overflow");
 

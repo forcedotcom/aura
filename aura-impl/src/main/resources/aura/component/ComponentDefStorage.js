@@ -208,7 +208,7 @@ ComponentDefStorage.prototype.removeDefs = function(descriptors) {
     var that = this;
     return this.storage.set(this.TRANSACTION_SENTINEL_KEY, true)
         .then(function() {
-            return that.storage.removeAll(descriptors, true)
+            return that.storage.removeAll(descriptors)
                 .then(
                     function () {
                         $A.log("ComponentDefStorage: Successfully removed " + descriptors.length + " descriptors");

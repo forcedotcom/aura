@@ -210,7 +210,7 @@
         function recurse(inStorage) {
             if (!inStorage) {
                 // end recursion
-                return Promise["resolve"]();
+                return;
             }
             // still present so keep recursing
             return fetchAnotherCmp().then(checkInStorage).then(recurse);

@@ -113,6 +113,7 @@ AuraStorage.prototype.clear = function() {
         .then(
             function() {
                 that.operationsInFlight -= 1;
+                that.fireModified();
             },
             function(e) {
                 that.operationsInFlight -= 1;

@@ -17,7 +17,7 @@
                 helper.log(cmp, "Action.isFromStorage() = " + action.isFromStorage());
                 helper.logDefs(cmp);
             } else {
-                helper.setStatus(cmp, "Error: " + action.getError().toString());
+                helper.setStatus(cmp, "Error: " + JSON.stringify(action.getError()));
             }
         });
 
@@ -33,7 +33,7 @@
                 helper.setStatus(cmp, "Created: " + load);
             }
         } catch (e) {
-            helper.setStatus(cmp, "Error: " + e);
+            helper.setStatus(cmp, "Error: " + JSON.stringify(e));
         }
     },
 
@@ -47,7 +47,7 @@
                 }
             });
         } catch (e) {
-            helper.setStatus(cmp, "Error: " + e);
+            helper.setStatus(cmp, "Error: " + JSON.stringify(e));
         }
     },
 
@@ -58,7 +58,7 @@
                     helper.setStatus(cmp, "Cleared Action and Def Storage");
             })
             ["catch"](function(e) {
-                helper.setStatus(cmp, "Error: " + e);
+                helper.setStatus(cmp, "Error: " + JSON.stringify(e));
             })
     },
 
@@ -69,7 +69,7 @@
                 helper.setStatus(cmp, "Cleared Caches and Logs");
             })
             ["catch"](function(e) {
-                helper.setStatus(cmp, "Error: " + e);
+                helper.setStatus(cmp, "Error: " + JSON.stringify(e));
         })
     },
 
@@ -92,8 +92,8 @@
                     helper.setStatus(cmp, "Defs Not Restored");
                 }
             })
-            ["catch"](function(error) {
-                helper.setStatus(cmp, "Error: " + error.toString());
+            ["catch"](function(e) {
+                helper.setStatus(cmp, "Error: " + JSON.stringify(e));
             });
     },
 

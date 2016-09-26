@@ -509,7 +509,7 @@ TestInstance.prototype.runAfterIf = function(conditionFunction, callback, interv
  * Set test to timeout in a period of milliseconds from now, clearing the existing timeout.
  *
  * @param {Number}
- *            timeoutMsec The number of milliseconds from the current time when the test should timeout
+ *            timeoutMs The number of milliseconds from now in which the test should timeout
  * @export
  * @function Test#setTestTimeout
  */

@@ -57,11 +57,11 @@ public class Stub<T> {
 	/**
 	 * Get the answer for the current method invocation. This Stub will provide
 	 * each Answer in the initial list of Answers sequentially until the last
-	 * answer is reached. Thereafter, the last answer will be provided for every
-	 * subsequent call.
+	 * answer is reached. Thereafter, an Exception will be thrown.
 	 * 
-	 * @return the Answer for the current method invocation
-	 * @throws Throwable 
+	 * @return Answer the response value for the current method invocation
+	 * @throws AuraRuntimeException if this method is invoked after all Answers have already been used
+	 * @throws Throwable if there is an issue getting the current answer
 	 */
     public Answer<T> getNextAnswer() throws Throwable {
         if (answerIndex <= answers.size() - 1) {

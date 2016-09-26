@@ -68,7 +68,7 @@ function AuraError() {
                 if (remove !== 0) {
                     ret.splice(0,remove);
                 }
-                return ret;
+                return ret.join('\n');
             }
             return null;
         }

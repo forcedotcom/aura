@@ -29,6 +29,7 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.test.util.DummyHttpServletResponse;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -53,7 +54,7 @@ public class ManifestUtilTest extends UnitTestCase {
 
     @Mock
     HttpServletResponse response;
-
+   
     @Mock
     DefinitionService definitionService;
 
@@ -168,12 +169,27 @@ public class ManifestUtilTest extends UnitTestCase {
         Mockito.when(auraContext.getMode()).thenReturn(Mode.PROD);
 
         Mockito.when(request.getParameter("aura.error")).thenReturn("error");
+        
+        DummyHttpServletResponse dummyResponse = new DummyHttpServletResponse() {
+            Cookie cookie;
 
-        boolean value = new ManifestUtil(definitionService, contextService, configAdapter).checkManifestCookie(request, response);
+            @Override
+            public void addCookie(Cookie newCookie) {
+                this.cookie = newCookie;
+            }
+
+            @Override
+            public Cookie getCookie(String name) {
+                return cookie != null && cookie.getName().equals(name) ? cookie : null;
+            }
+        };
+        
+        ManifestUtil manifestUtil = new ManifestUtil(definitionService, contextService, configAdapter);
+        boolean value = manifestUtil.checkManifestCookie(request, dummyResponse);
         assertFalse(value);
 
-        // FIXME: verify that the cookie is added
-        Mockito.verify(response, Mockito.times(1)).addCookie(Mockito.any());
+        Cookie cookie = dummyResponse.getCookie("ns_name_lm");
+        assertEquals(cookie.getValue(), "error");
     }
 
     @Test
@@ -190,11 +206,24 @@ public class ManifestUtilTest extends UnitTestCase {
         cookies[0] = cookie;
 
         Mockito.when(request.getCookies()).thenReturn(cookies);
+        
+        DummyHttpServletResponse dummyResponse = new DummyHttpServletResponse() {
+            Cookie cookie;
 
-        boolean value = new ManifestUtil(definitionService, contextService, configAdapter).checkManifestCookie(request, response);
+            @Override
+            public void addCookie(Cookie newCookie) {
+                this.cookie = newCookie;
+            }
+
+            @Override
+            public Cookie getCookie(String name) {
+                return cookie != null && cookie.getName().equals(name) ? cookie : null;
+            }
+        };
+
+        boolean value = new ManifestUtil(definitionService, contextService, configAdapter).checkManifestCookie(request, dummyResponse);
         assertFalse(value);
 
-        // FIXME: verify that the cookie is deleted
-        Mockito.verify(response, Mockito.times(1)).addCookie(Mockito.any());
+        assertEquals(dummyResponse.getCookie("ns_name_lm").getValue(), "");
     }
 }

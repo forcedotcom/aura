@@ -86,7 +86,8 @@ DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, cmp) {
     
     var localCmpId = cmp.getLocalId();
     var ownerCmp = action.getComponent().getConcreteComponent();
-    var locator = ownerCmp.getLocator(localCmpId);
+    // TODO: remove includeMetadata param before 206 release freeze: W-3378426
+    var locator = ownerCmp.getLocator(localCmpId, true /*includeMetadata*/);
     var ms = this.metricsService;
 
     // Only if we have a unique, identifier send the interaction
@@ -102,7 +103,7 @@ DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, cmp) {
                 "auraAction"  : action.getDef().getDescriptor().toString()    
             }
         };
-
+        
         if (meta) {
             locator["context"] = locator["context"] || {};
             if (!locator["context"][meta]) {

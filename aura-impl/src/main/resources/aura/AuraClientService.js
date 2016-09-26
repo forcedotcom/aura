@@ -2315,6 +2315,10 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
 
 /**
  * Send beacon
+ * 
+ * @returns true if payload was successfully sent to the server. 
+ * sendBeacon will return false if the payload is too large for the browser to queue
+ * At the time of this comment, the limit was 64kB, but that can change
  * @export
  */
 AuraClientService.prototype.sendBeacon = function(action) {
@@ -2328,13 +2332,14 @@ AuraClientService.prototype.sendBeacon = function(action) {
             var blobObj = new Blob([this.buildParams(params)], {
                 "type" : "application/x-www-form-urlencoded; charset=ISO-8859-13"
             });
-            window.navigator["sendBeacon"](this._host + "/auraAnalytics", blobObj);
-
+            return window.navigator["sendBeacon"](this._host + "/auraAnalytics", blobObj);
         } catch (e) {
             $A.warning('Unable to parse action payload');
         }
     } else {
         $A.enqueueAction(action);
+        // enqueueAction doesn't have the sendBeacon size limit. so this just succeeds
+        return true;
     }
 };
 

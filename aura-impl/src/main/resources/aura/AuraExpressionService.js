@@ -393,14 +393,19 @@ AuraExpressionService.prototype.resolveLocator = function (component, localId, i
         locator["target"] = locator["target"] + this.PRIMITIVE_SEPARATOR + primitiveFound["target"];
     }
     
+    // TODO - W-3378426 - put this in javascript directive to block out the if{} block in PROD mode
     if (includeMetadata) {
         locator["metadata"] = {
                 "root" : link.getDef().toString(),
                 "rootId" : link.getLocalId(),
-                "parent" : currentCmp.getDef().toString(),
-                "parentId" : currentCmp.getLocalId(),
+                "parent" : component.getDef().toString(),
+                "parentId" : ownerLocalId,
                 "grandparent" : ownerCmp.getDef().toString()
         };
+        if (rootLocatorDef["description"]) {
+            locator["metadata"]["targetDescription"] = rootLocatorDef["description"];
+            locator["metadata"]["scopeDescription"] =  ownerLocatorDef["description"];
+        }
     }
     return locator;
 };

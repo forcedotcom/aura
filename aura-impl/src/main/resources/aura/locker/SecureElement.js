@@ -42,6 +42,22 @@ function SecureElement(el, key) {
             trustNodes(child, child.childNodes);
         }
     }
+    
+    function copyKeys(from, to) {
+    	// Copy keys from the original to the cloned tree
+        var fromKey = getLockerSecret(from, "key");
+        if (fromKey) {
+        	setLockerSecret(to, "key", fromKey);
+        }
+        
+        var originalChildren = from.childNodes;
+        if (originalChildren.length > 0) {
+            var clonedChildren = to.childNodes;
+            for (var i = 0; i < originalChildren.length; i++) {                    
+                copyKeys(originalChildren[i], clonedChildren[i]);
+            }
+        }
+    }
 
     var o = SecureObject.getCached(el, key);
     if (o) {
@@ -178,29 +194,11 @@ function SecureElement(el, key) {
 
         cloneNode : {
             value : function(deep) {
-                // We need to clone only nodes that can be accessed to and prune
-                // the rest
-                var root = el.cloneNode(false);
-
-                function cloneChildren(parent, parentClone) {
-                    var childNodes = parent.childNodes;
-                    for (var i = 0; i < childNodes.length; i++) {
-                        var child = childNodes[i];
-                        if ($A.lockerService.util.hasAccess(o, child, {
-                            verifyNotOpaque : true
-                        })) {
-                            var childClone = child.cloneNode(false);
-                            parentClone.appendChild(childClone);
-                            $A.lockerService.trust(o, childClone);
-                            cloneChildren(child, childClone);
-                        }
-                    }
-                }
-
-                if (deep) {
-                    cloneChildren(el, root);
-                }
-
+                var root = el.cloneNode(deep);
+                
+                // Maintain the same ownership in the cloned subtree
+                copyKeys(el, root);
+                
                 return SecureElement(root, key);
             }
         },

@@ -22,40 +22,24 @@
                     });
             },
             function verifyLabelSavedToStorage(cmp) {
-                var found = false;
+                var that = this;
                 var storage = $A.storageService.getStorage("actions");
-
-                function getGvpFromStorage() {
-                    if ($A.test.isComplete()) {
-                        return;
-                    }
-                    storage.get("globalValueProviders", true)
-                    .then(function(gvps) {
-                        if (gvps) {
-                            for(var i = 0; i < gvps.length; i++) {
-                                if (gvps[i]["type"] === "$Label") {
-                                    var values = gvps[i]["values"];
-                                    var actual = values["Related_Lists"] && values["Related_Lists"]["task_mode_today"];
-                                    if (actual === "Today") {
-                                        found = true;
-                                        return;
-                                    }
-                                }
+                return cmp.helper.storage.storageContents.waitForStorageByPredicate(
+                        storage,
+                        function labelFoundPredicate(items) {
+                            var labels = that.getLabelGvp(items);
+                            if (!labels) {
+                                return undefined;
                             }
+
+                            var actual = labels["Related_Lists"] && labels["Related_Lists"]["task_mode_today"];
+                            if (actual === "Today") {
+                                return true;
+                            }
+
+                            return undefined;
                         }
-
-                        getGvpFromStorage();
-                    })
-                    .catch(function(e) {
-                        $A.test.fail(e.toString());
-                    })
-
-                }
-
-                getGvpFromStorage();
-
-                $A.test.addWaitForWithFailureMessage(true, function() { return found; },
-                    "Failed to find label in storage.");
+                );
             }
         ]
     },
@@ -65,7 +49,6 @@
         labels : ["flapper"],
         test: [
             function setLabelToStorage(cmp) {
-                var completed = false;
                 var storage = $A.storageService.getStorage("actions");
                 var item = {
                     "type": "$Label",
@@ -76,41 +59,25 @@
                     }
                 };
 
-                storage.set("globalValueProviders", [item]).then(
-                    function() { completed = true; },
-                    function(e) {
-                        $A.test.fail("Failed to save label to storage: " + e.toString());
-                    }
-                );
-                $A.test.addWaitFor(true, function() { return completed; });
+                return storage.set("globalValueProviders", [item])
             },
             // for debugging only. remove it if found the flapping cause.
             function verifyLabelInStorage(cmp) {
-                var completed = false;
-                var gvpKey = "globalValueProviders";
+                var that = this;
                 var storage = $A.storageService.getStorage("actions");
-
-                $A.test.assertTrue(storage.isPersistent(), "The test expects a persistent storage.");
-
-                storage.get("globalValueProviders").then(
-                    function(gvps) {
-                        var labels;
-                        for(var i = 0, len = gvps.length; i < len ;i++) {
-                            if("$Label" === gvps[i]["type"]) {
-                                labels = gvps[i]["values"];
-                                break;
+                return cmp.helper.storage.storageContents.waitForStorageByPredicate(
+                        storage,
+                        function labelFoundPredicate(items) {
+                            var labels = that.getLabelGvp(items);
+                            if (!labels) {
+                                return undefined;
                             }
-                        }
 
-                        $A.test.assertDefined(labels["section"]);
-                        $A.test.assertEquals("expected", labels["section"]["name"]);
-                        completed = true;
-                    },
-                    function(e) {
-                        $A.test.fail("Failed to find stored label from storage: " + e.toString());
-                    }
+                            $A.test.assertDefined(labels["section"]);
+                            $A.test.assertEquals("expected", labels["section"]["name"]);
+                            return true;
+                        }
                 );
-                $A.test.addWaitFor(true, function() { return completed; });
             },
             function initGvpsWhileOffline(cmp) {
                 var completed = false;
@@ -127,5 +94,22 @@
                 $A.test.addWaitFor(true, function(){ return completed; });
             }
         ]
+    },
+
+    /**
+     * Gets the $Label GVP value. This utility is useful because of the unusual persistence shape
+     * of GVPs.
+     * @param {Object} items the contents of storage (eg return value from storage.getAll()).
+     */
+    getLabelGvp: function(items) {
+        var gvps = items["globalValueProviders"];
+        if (!gvps) {
+            return undefined;
+        }
+        for (var i = 0; i < gvps.length; i++) {
+            if (gvps[i]["type"] === "$Label") {
+                return gvps[i]["values"];
+            }
+        }
     }
 })

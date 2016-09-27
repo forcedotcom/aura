@@ -23,21 +23,17 @@
 		this.superAfterRender();
 	},
 
-	rerender: function (cmp, helper) {
-		if (cmp.getConcreteComponent()._updatingValue) {
-			//don't rerender when updating value
+	rerender: function (cmp) {
+		if (cmp.isDirty("v.value")) {
+			//don't rerender on any value change
 			return;
 		}
 		var shouldRender = false;
 		var attributes = cmp.getDef().getAttributeDefs();
 		attributes.each(function (attributeDef) {
 			var name = attributeDef.getDescriptor().getName();
-			if (name !== "value" && cmp.isDirty("v." + name)) {
+			if (cmp.isDirty("v." + name)) {
 				shouldRender = true;
-			} else if (name === "value" && cmp.isDirty("v.value")) {
-				//Cannot listen to v.value change event to update content
-				//since the parent component inputTextArea also listens v.value change event and update v.value again
-				helper.setContent(cmp, cmp.get("v.value"));
 			}
 		});
 		if (shouldRender) {

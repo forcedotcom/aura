@@ -32,7 +32,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.DefRegistry;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -83,9 +82,12 @@ public class ContextAdapterImpl implements ContextAdapter {
     }
 
     protected AuraContext buildSystemContext(AuraContext original) {
-        AuraContext context = new AuraContextImpl(original.getMode(), original.getDefRegistry(), original.getDefaultPrefixes(),
+        MasterDefRegistryImpl mdr = new MasterDefRegistryImpl(configAdapter, definitionService, loggingService,
+                cachingService);
+        AuraContext context = new AuraContextImpl(original.getMode(), mdr, original.getDefaultPrefixes(),
                 original.getFormat(), original.getAccess(), original.getJsonSerializationContext(),
                 original.getGlobalProviders(), configAdapter, definitionService, testContextAdapter, original);
+        mdr.setContext(context);
         return context;
     }
     

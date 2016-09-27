@@ -27,11 +27,12 @@ function iframeTest(storageContents) {
         },
 
         /**
-         * Creates, inserts and waits for an iframe to load.
+         * Creates and inserts an iframe to load.
          * @param {Component} cmp the component that will host the iframe.
          * @param {String} url the URL to load in the iframe.
          * @param {String} iframeAuraId the aura:id in cmp in which the iframe is inserted.
          * @param {String} errorMsg message prefix displayed when an error occurs.
+         * @return {Promise} a Promise that resolves once Aura has finished initializing inside the iframe.
          */
         loadIframe: function(cmp, url, iframeAuraId, errorMsg) {
             cmp._frameLoaded = false;
@@ -46,7 +47,7 @@ function iframeTest(storageContents) {
             });
             var content = cmp.find(iframeAuraId);
             $A.util.insertFirst(frame, content.getElement());
-            this.waitForIframeLoad(cmp, errorMsg);
+            return this.waitForIframeLoad(cmp, errorMsg);
         },
 
         /**
@@ -54,6 +55,7 @@ function iframeTest(storageContents) {
          * @param {Component} cmp the component that will host the iframe.
          * @param {Boolean} saveLogs true to save the logs before reload so they're store after load.
          * @param {String} errorMsg message prefix displayed when an error occurs.
+         * @return {Promise} a Promise that resolves once Aura has finished initializing inside the iframe.
          */
         reloadIframe: function(cmp, saveLogs, errorMsg) {
             cmp._frameLoaded = false;
@@ -61,36 +63,47 @@ function iframeTest(storageContents) {
                 this.getIframeRootCmp().saveLog();
             }
             this.getIframe().location.reload();
-            this.waitForIframeLoad(cmp, errorMsg);
+            return this.waitForIframeLoad(cmp, errorMsg);
         },
 
         /**
          * Waits for an iframe and Aura within it to load.
          * @param {Component} cmp the component that will host the iframe.
          * @param {String} errorMsg message prefix displayed when an error occurs.
+         * @return {Promise} a Promise that resolves once Aura has finished initializing inside the iframe.
          */
         waitForIframeLoad: function(cmp, errorMsg) {
-            var iframe = this.getIframe();
-            $A.test.addWaitFor(true,
-                function() {
-                    return cmp._frameLoaded &&
-                        iframe.$A &&
-                        iframe.$A.finishedInit === true;
-                },
-                function() {
-                    if (iframe.$A.util.hasClass(iframe.document.body, "auraError")) {
-                        var error = iframe.$A.util.getText(iframe.$A.util.getElement("auraErrorMessage"));
-                        $A.test.fail("Error during iframe load: " + errorMsg + "\n" + error);
+            var that = this;
+            return new Promise(function(resolve, reject) {
+                function checkIframeLoaded() {
+                    var iframe = that.getIframe();
+                    if ($A.test.isComplete()) {
+                        reject(new Error("Test timed out"));
                     }
+
+                    if (iframe.$A && iframe.$A.util && iframe.$A.util.hasClass(iframe.document.body, "auraError")) {
+                        var error = iframe.$A.util.getText(iframe.$A.util.getElement("auraErrorMessage"));
+                        reject("Error during iframe load: " + errorMsg + "\n" + error);
+                    }
+
+                    if (cmp._frameLoaded && iframe.$A && iframe.$A.finishedInit === true) {
+                        resolve();
+                        return;
+                    }
+
+                    // pause then recurse
+                    window.setTimeout(function() { checkIframeLoaded(); }, 250);
                 }
-            );
+
+                checkIframeLoaded();
+            });
         },
 
         /** Clears caches and logs. */
         clearCachesAndLogAndWait: function() {
             var iframeCmp = this.getIframeRootCmp();
             iframeCmp.clearCachesAndLog();
-            this.waitForStatus("Clearing Caches and Logs", "Cleared Caches and Logs");
+            return this.waitForStatus("Clearing Caches and Logs");
         },
 
         /**
@@ -108,11 +121,12 @@ function iframeTest(storageContents) {
          * Fetches a component and waits for the client to receive it. Does not wait for the
          * component def to be stored.
          * @param {String} desc Component name, in format namespace:name.
+         * @return {Promise} a Promise that resolves once client receives fetched component.
          */
         fetchCmpAndWait: function(desc) {
             $A.assert(typeof desc === "string", "desc must be a string in form namespace:name");
             this.fetchCmp(desc);
-            this.waitForStatus("Fetching: " + desc, "Fetched: " + desc);
+            return this.waitForStatus("Fetching: " + desc);
         },
 
         /**
@@ -149,78 +163,58 @@ function iframeTest(storageContents) {
         /**
          * Creates a component using $A.createComponentFromConfig.
          * @param {String} desc Component name, in format namespace:name.
+         * @return {Promise} a promise that resolves when iframe reports component has been created
          */
         createComponentFromConfig: function(desc) {
             var iframeCmp = this.getIframeRootCmp();
             iframeCmp.set("v.load", desc);
             iframeCmp.createComponentFromConfig();
-            this.waitForStatus("Creating: " + desc, "Created: " + desc);
+            return this.waitForStatus("Creating: " + desc);
         },
 
         /**
          * Waits for a def to be in storage.
          * @param {String} desc Component name, in format namespace:name.
-         * @param {String=} msg error message.
+         * @return {Promise} a promise that resolves when the def is in storage
          */
-        waitForDefInStorage : function(desc, msg) {
+        waitForDefInStorage : function(desc) {
             var iframe = this.getIframe();
-            var found = false;
-            storageContents.waitForDefInStorage(desc, iframe)
-                .then(
-                    function() {
-                        found = true;
-                    },
-                    function(e) {
-                        $A.test.fail("waitForDefInStorage(" + desc + ") failed: " + e);
-                    }
-                );
-
-            $A.test.addWaitForWithFailureMessage(
-                true,
-                function() { return found; },
-                msg || "Def " + desc + " never present in ComponentDefStorage"
-            );
+            return storageContents.waitForDefInStorage(desc, iframe);
         },
 
         /**
          * Waits for a def to be absent from storage.
          * @param {String} desc Component name, in format namespace:name.
-         * @param {String=} msg error message.
+         * @return {Promise} a promise that resolves when the def is in removed from storage
          */
-        waitForDefRemovedFromStorage : function(desc, msg) {
+        waitForDefRemovedFromStorage : function(desc) {
             var iframe = this.getIframe();
-            var removed = false;
-            storageContents.waitForDefNotInStorage(desc, iframe)
-                .then(
-                    function() {
-                        removed = true;
-                    },
-                    function(e) {
-                        $A.test.fail("waitForDefInStorage(" + desc + ") failed: " + e);
-                    }
-                );
-
-            $A.test.addWaitForWithFailureMessage(
-                true,
-                function() { return removed; },
-                msg || "Def " + desc + " never removed from ComponentDefStorage"
-            );
+            return storageContents.waitForDefNotInStorage(desc, iframe);
         },
 
         /**
-         * Waits for the iframe component to update its status. First wait for the initial message to not be present
-         * anymore, then verify the expected new status is present. This pattern, as opposed to simply waiting for the
-         * final message, is used to fail fast and prevent long timeouts.
+         * Waits for the iframe component to update its status.
          * @param {String} initialMessage initial message to wait for removal.
-         * @param {String} finalMessage expected message after initial message is removed.
+         * @return {Promise} a promise that resolves when the iframe's status has changed
          */
-        waitForStatus: function(initialMessage, finalMessage) {
+        waitForStatus: function(initialMessage) {
             var iframeCmp = this.getIframeRootCmp();
-            $A.test.addWaitFor(true, function() {
-                return iframeCmp.get("v.status") !== initialMessage;
-            }, function() {
-                var actual = iframeCmp.get("v.status");
-                $A.test.assertEquals(finalMessage, actual, "Expected (" + finalMessage + ") !== Actual (" + actual + ").\n" + iframeCmp.get("v.log"));
+            return new Promise(function(resolve, reject) {
+                function checkStatus() {
+                    if ($A.test.isComplete()) {
+                        reject(new Error("Test timed out"));
+                    }
+
+                    if (iframeCmp.get("v.status") !== initialMessage) {
+                        resolve();
+                        return;
+                    }
+
+                    // pause then recurse
+                    window.setTimeout(function() { checkStatus(); }, 250);
+                }
+
+                checkStatus();
             });
         },
 
@@ -238,51 +232,22 @@ function iframeTest(storageContents) {
          * Global value providers (GVP) are stored in the actions storage. On bootstrap we only load component defs from
          * storage if we find GVPs in storage. Thus, it may be necessary to wait for GVPs to be stored before reloading
          * if we are counting on defs being restored from storage on load.
+         * @return {Promise} a promise that resolves when GVPs are present in storage
          */
         waitForGvpsInStorage: function() {
             var iframe = this.getIframe();
             var storage = iframe.$A.storageService.getStorage("actions");
-            var found = false;
-            storageContents.waitForKeyInStorage(storage, "globalValueProviders")
-                .then(
-                    function() {
-                        found = true;
-                    },
-                    function(e) {
-                        $A.test.fail("waitForGvpsInStorage() failed: " + e);
-                    }
-                );
-
-            $A.test.addWaitForWithFailureMessage(
-                true,
-                function() { return found; },
-                "GVPs never persisted to actions store"
-            );
+            return storageContents.waitForKeyInStorage(storage, "globalValueProviders");
         },
 
         /**
          * Waits for an action to be present in the actions store.
          * @param {String} key action descriptor.
-         * @param {String=} msg error message.
+         * @return {Promise} a promise that resolves when action is present in storage
          */
-        waitForActionInStorage: function(key, msg) {
+        waitForActionInStorage: function(key) {
             var iframe = this.getIframe();
-            var found = false;
-            storageContents.waitForActionInStorage(key, false, iframe)
-                .then(
-                    function() {
-                        found = true;
-                    },
-                    function(e) {
-                        $A.test.fail("waitForActionInStorage(" + key + ") failed: " + e);
-                    }
-                );
-
-            $A.test.addWaitForWithFailureMessage(
-                true,
-                function() { return found; },
-                msg || "Action " + key + " never present in action store"
-            );
+            return storageContents.waitForActionInStorage(key, false, iframe);
         }
     };
 }

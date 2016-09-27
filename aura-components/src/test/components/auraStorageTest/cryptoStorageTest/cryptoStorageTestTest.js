@@ -230,7 +230,7 @@
         test: [
            function loadComponentInIframe(cmp) {
                 $A.test.addCleanup(function(){ this.deleteStorage("persistentStorageCmp"); }.bind(this));
-                cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true",
+                return cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true",
                         "iframeContainer", "first load");
            },
            function setKeyAndClearStorage(cmp) {
@@ -255,7 +255,7 @@
                 $A.test.addWaitFor(true, function() {return completed;});
            },
            function reloadIframe(cmp) {
-               cmp._iframeLib.reloadIframe(cmp, false, "first reload");
+               return cmp._iframeLib.reloadIframe(cmp, false, "first reload");
            },
            function changeKeyAndGetItemFromStorage(cmp) {
                 var completed = false;
@@ -383,7 +383,7 @@
             function loadComponentInIframe(cmp) {
                 $A.test.addCleanup(function(){ this.deleteStorage("persistentStorageCmp"); }.bind(this));
                 cmp._expected = "expected";
-                cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true",
+                return cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true",
                         "iframeContainer", "first load");
             },
             function addItemToStorage(cmp) {
@@ -399,7 +399,7 @@
                 $A.test.addWaitFor(true, function() {return completed;});
             },
             function reloadIframe(cmp) {
-                cmp._iframeLib.reloadIframe(cmp, false, "first reload");
+                return cmp._iframeLib.reloadIframe(cmp, false, "first reload");
             },
             function getItemFromStorage(cmp) {
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();
@@ -422,7 +422,7 @@
         test: [
             function loadComponentInIframe(cmp) {
                 $A.test.addCleanup(function(){ this.deleteStorage("persistentStorageCmp"); }.bind(this));
-                cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true",
+                return cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true",
                         "iframeContainer", "first load");
             },
             function clearStorageAndAddItem(cmp) {
@@ -439,7 +439,7 @@
                     });
             },
             function reloadFrame(cmp) {
-                cmp._iframeLib.reloadIframe(cmp, false, "first reload");
+                return cmp._iframeLib.reloadIframe(cmp, false, "first reload");
             },
             function verifyNoItemWithDifferentKeyAndStorageCleared(cmp) {
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();

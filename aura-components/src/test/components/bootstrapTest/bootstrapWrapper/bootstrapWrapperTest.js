@@ -15,16 +15,16 @@
         test: [
             function loadIframe(cmp) {
                 var iframeSrc = "/bootstrapTest/bootTest.app";
-                cmp.helper.lib.iframeTest.loadIframe(cmp, iframeSrc, "iframeContainer", "first load");
+                return cmp.helper.lib.iframeTest.loadIframe(cmp, iframeSrc, "iframeContainer", "first load");
             },
             function clearStorages(cmp) {
-                cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
+                return cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
             },
             function reloadPage(cmp) {
-                cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
+                return cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
             },
             function waitForBootstrapActionInStorage(cmp) {
-                cmp.helper.lib.iframeTest.waitForActionInStorage(this.BOOTSTRAP_KEY, "Bootstrap action never present in storage (first reload)");
+                return cmp.helper.lib.iframeTest.waitForActionInStorage(this.BOOTSTRAP_KEY, "Bootstrap action never present in storage (first reload)");
             },
             function captureCachedBootstrapAction(cmp) {
                 var iframe = cmp.helper.lib.iframeTest.getIframe();
@@ -42,13 +42,13 @@
                 $A.test.addWaitFor(true, function(){ return completed });
             },
             function clearStorages(cmp) {
-                cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
+                return cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
             },
             function reloadPage(cmp) {
-                cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "second reload");
+                return cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "second reload");
             },
             function waitForBootstrapActionInStorage(cmp) {
-                cmp.helper.lib.iframeTest.waitForActionInStorage(this.BOOTSTRAP_KEY, "Bootstrap action never present in storage (second reload)");
+                return cmp.helper.lib.iframeTest.waitForActionInStorage(this.BOOTSTRAP_KEY, "Bootstrap action never present in storage (second reload)");
             },
             function captureCachedBootstrapActionAgain(cmp) {
                 var iframe = cmp.helper.lib.iframeTest.getIframe();
@@ -76,16 +76,16 @@
         test: [
             function loadIframe(cmp) {
                 var iframeSrc = "/bootstrapTest/bootTest.app";
-                cmp.helper.lib.iframeTest.loadIframe(cmp, iframeSrc, "iframeContainer", "first load");
+                return cmp.helper.lib.iframeTest.loadIframe(cmp, iframeSrc, "iframeContainer", "first load");
             },
             function clearStorages(cmp) {
-                cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
+                return cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
             },
             function reloadPage(cmp) {
-                cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
+                return cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
             },
             function waitForBootstrapActionInStorage(cmp) {
-                cmp.helper.lib.iframeTest.waitForActionInStorage(this.BOOTSTRAP_KEY, "Bootstrap action never present in storage (first reload)");
+                return cmp.helper.lib.iframeTest.waitForActionInStorage(this.BOOTSTRAP_KEY, "Bootstrap action never present in storage (first reload)");
             },
             function modifyCachedBootstrapAction(cmp) {
                 var that = this;
@@ -104,10 +104,10 @@
                 $A.test.addWaitFor(true, function(){ return completed });
             },
             function reloadPage(cmp) {
-                cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "second reload");
+                return cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "second reload");
             },
             function waitForBootstrapActionInStorage(cmp) {
-                cmp.helper.lib.iframeTest.waitForActionInStorage(this.BOOTSTRAP_KEY, "Bootstrap action never present in storage (second reload)");
+                return cmp.helper.lib.iframeTest.waitForActionInStorage(this.BOOTSTRAP_KEY, "Bootstrap action never present in storage (second reload)");
             }
         ]
     },

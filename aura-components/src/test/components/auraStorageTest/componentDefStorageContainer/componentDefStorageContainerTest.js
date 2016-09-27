@@ -13,38 +13,46 @@
         test: [
             function loadIframe(cmp) {
                 var iframeSrc = "/auraStorageTest/componentDefStorage.app";
-                cmp.helper.lib.iframeTest.loadIframe(cmp, iframeSrc, "iframeContainer", "first load");
+                return cmp.helper.lib.iframeTest.loadIframe(cmp, iframeSrc, "iframeContainer", "first load");
             },
             function clearStorages(cmp) {
-                cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
+                return cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
             },
             function reloadPage(cmp) {
                 // Need to reload the page here to clear any items that may have been restored on initial load and are
                 // now in memory
-                cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
+                return cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
             },
             function fetchTargetCmpFromServer(cmp) {
-                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:scroller");
+                return cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:scroller");
             },
             function createTargetCmpOnClient(cmp) {
-                cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
+                return cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
             },
             function waitForAllDefsStored(cmp) {
-                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
-                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:resizeObserver");
-                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scrollerLib");
-                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scopedScroll");
-                cmp.helper.lib.iframeTest.waitForGvpsInStorage();
+                return cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller")
+                    .then(function() {
+                        return cmp.helper.lib.iframeTest.waitForDefInStorage("ui:resizeObserver");
+                    })
+                    .then(function() {
+                        return cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scrollerLib");
+                    })
+                    .then(function() {
+                        return cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scopedScroll");
+                    })
+                    .then(function() {
+                        return cmp.helper.lib.iframeTest.waitForGvpsInStorage();
+                    });
             },
             function reloadIframe(cmp) {
-                cmp.helper.lib.iframeTest.reloadIframe(cmp, true, "second reload");
+                return cmp.helper.lib.iframeTest.reloadIframe(cmp, true, "second reload");
             },
             function createTargetCmpAndVerify(cmp) {
                 // avoid any server trip to prove that ui:scroller is on the client
-                cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
+                return cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
             },
             function cleanup(cmp) {
-                cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
+                return cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
             }
         ]
     },
@@ -54,24 +62,24 @@
         labels : ["flapper"],
         test: [
             function loadIframe(cmp) {
-                cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/componentDefStorage.app?overrideStorage=true", "iframeContainer", "first load");
+                return cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/componentDefStorage.app?overrideStorage=true", "iframeContainer", "first load");
             },
             function clearStorages(cmp) {
-                cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
+                return cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
             },
             function reloadPage(cmp) {
                 // Need to reload the page here to clear any items that may have been restored on initial load and are
                 // now in memory
-                cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
+                return cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
             },
             function fetchTargetCmpFromServer(cmp) {
-                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:scroller");
+                return cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:scroller");
             },
             function createTargetCmpOnClient(cmp) {
-                cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
+                return cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
             },
             function verifyTargetCmpStored(cmp) {
-                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
+                return cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
             },
             function fetchCmpsUntilEvictTargetCmp(cmp) {
                 var complete = false;
@@ -88,16 +96,16 @@
             },
             function reloadPage(cmp) {
                 // Reload page to clear anything saved in javascript memory
-                cmp.helper.lib.iframeTest.reloadIframe(cmp, true, "second reload");
+                return cmp.helper.lib.iframeTest.reloadIframe(cmp, true, "second reload");
             },
             function fetchTargetCmpAgain(cmp) {
-                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:scroller");
+                return cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:scroller");
             },
             function createTargetCmpOnClient(cmp) {
-                cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
+                return cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
             },
             function cleanup(cmp) {
-                cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
+                return cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
             }
         ]
     },
@@ -113,21 +121,21 @@
         labels : ["flapper"],
         test: [
             function loadIframe(cmp) {
-                cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/componentDefStorage.app?overrideStorage=true", "iframeContainer", "first load");
+                return cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/componentDefStorage.app?overrideStorage=true", "iframeContainer", "first load");
             },
             function clearStorages(cmp) {
-                cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
+                return cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
             },
             function reloadPage(cmp) {
                 // Need to reload the page here to clear any items that may have been restored on initial load and are
                 // now in memory
-                cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
+                return cmp.helper.lib.iframeTest.reloadIframe(cmp, false, "first reload");
             },
             function fetchTargetCmpFromServer(cmp) {
-                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:scroller");
+                return cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:scroller");
             },
             function verifyTargetCmpStored(cmp) {
-                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
+                return cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
             },
             function fetchCmpsUntilEvictTargetCmp(cmp) {
                 var complete = false;
@@ -149,32 +157,32 @@
                 // ui:carousel contains ui:scroller. if aura.context.loaded reports that it still has
                 // ui:scroller then the server won't send it, resulting in a broken def graph being persisted
                 // on the client. doing a reload then cmp create would fail.
-                cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:carousel");
+                return cmp.helper.lib.iframeTest.fetchCmpAndWait("ui:carousel");
             },
             function verifyTargetDependentCmpInStorage(cmp) {
-                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:carousel");
+                return cmp.helper.lib.iframeTest.waitForDefInStorage("ui:carousel");
             },
             function verifyTargetCmpInStorage(cmp) {
-                cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
+                return cmp.helper.lib.iframeTest.waitForDefInStorage("ui:scroller");
             },
             function waitForGvpsStored(cmp) {
                 // must wait for gvps to be stored otherwise we may not load defs from storage on boot after reload
-                cmp.helper.lib.iframeTest.waitForGvpsInStorage();
+                return cmp.helper.lib.iframeTest.waitForGvpsInStorage();
             },
             function reloadPage(cmp) {
                 // Reload page to clear anything saved in javascript memory
-                cmp.helper.lib.iframeTest.reloadIframe(cmp, true, "second reload");
+                return cmp.helper.lib.iframeTest.reloadIframe(cmp, true, "second reload");
             },
             function createTargetDependentCmpOnClient(cmp) {
                 // avoid any server trip to prove that ui:scroller is on the client
-                cmp.helper.lib.iframeTest.createComponentFromConfig("ui:carousel");
+                return cmp.helper.lib.iframeTest.createComponentFromConfig("ui:carousel");
             },
             function createTargetCmpOnClient(cmp) {
                 // avoid any server trip to prove that ui:scroller is on the client
-                cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
+                return cmp.helper.lib.iframeTest.createComponentFromConfig("ui:scroller");
             },
             function cleanup(cmp) {
-                cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
+                return cmp.helper.lib.iframeTest.clearCachesAndLogAndWait();
             }
         ]
     },

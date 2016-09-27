@@ -404,7 +404,7 @@
                 $A.test.addCleanup(function(){ this.deleteStorage("persistentStorageCmp"); }.bind(this));
 
                 cmp._expected = "expected value";
-                cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=false",
+                return cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=false",
                         "iframeContainer", "first load");
             },
             function addItemToStorage(cmp) {
@@ -413,7 +413,7 @@
                 return targetStorage.set("key1", cmp._expected);
             },
             function reloadIframe(cmp) {
-                cmp._iframeLib.reloadIframe(cmp, false, "first reload");
+                return cmp._iframeLib.reloadIframe(cmp, false, "first reload");
             },
             function getItemFromStorage(cmp) {
                 var targetStorage = cmp._iframeLib.getIframeRootCmp()._storage;

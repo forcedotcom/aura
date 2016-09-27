@@ -74,21 +74,21 @@
         test: [
         function loadCmpInIframe(cmp) {
             var frameSrc = "/auraStorageTest/isolationTest.cmp?isolationKey=isolationA&storageItemValue=valueA";
-            cmp._iframeLib.loadIframe(cmp, frameSrc, "iframeContainer", "first load");
+            return cmp._iframeLib.loadIframe(cmp, frameSrc, "iframeContainer", "first load");
         },
         function addItemToStorageWithIsolation(cmp) {
             cmp._iframeLib.getIframeRootCmp().addItemToStorage();
-            cmp._iframeLib.waitForStatus("Adding", "Done Adding");
+            return cmp._iframeLib.waitForStatus("Adding");
         },
         function reloadIframe(cmp) {
-            cmp._iframeLib.reloadIframe(cmp, false, "first reload");
+            return cmp._iframeLib.reloadIframe(cmp, false, "first reload");
         },
         function addItemToStorageWithNewIsolation(cmp) {
             var iframeCmp = cmp._iframeLib.getIframeRootCmp();
             iframeCmp.set("v.isolationKey", "isolationB");
             iframeCmp.set("v.storageItemValue", "valueB");
             iframeCmp.addItemToStorage();
-            cmp._iframeLib.waitForStatus("Adding", "Done Adding");
+            return cmp._iframeLib.waitForStatus("Adding");
         },
         function getAllFromStorage(cmp) {
             var iframeCmp = cmp._iframeLib.getIframeRootCmp();

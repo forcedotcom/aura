@@ -87,7 +87,7 @@ DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, cmp) {
     var localCmpId = cmp.getLocalId();
     var ownerCmp = action.getComponent().getConcreteComponent();
     // TODO: remove includeMetadata param before 206 release freeze: W-3378426
-    var locator = ownerCmp.getLocator(localCmpId, true /*includeMetadata*/);
+    var locator = ownerCmp.getLocator(localCmpId, false /*includeMetadata*/);
     var ms = this.metricsService;
 
     // Only if we have a unique, identifier send the interaction

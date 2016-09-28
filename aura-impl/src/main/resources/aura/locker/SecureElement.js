@@ -50,11 +50,12 @@ function SecureElement(el, key) {
         	setLockerSecret(to, "key", fromKey);
         }
         
-        var originalChildren = from.childNodes;
-        if (originalChildren.length > 0) {
-            var clonedChildren = to.childNodes;
-            for (var i = 0; i < originalChildren.length; i++) {                    
-                copyKeys(originalChildren[i], clonedChildren[i]);
+        var toChildren = to.childNodes;
+        var length = toChildren.length;
+        if (length > 0) {
+            var fromChildren = from.childNodes;
+            for (var i = 0; i < length; i++) {                    
+                copyKeys(fromChildren[i], toChildren[i]);
             }
         }
     }

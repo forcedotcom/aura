@@ -257,5 +257,15 @@
         testUtils.assertDefined(link.title, "property 'title' is not defined");
         testUtils.assertStartsWith("SecureElement", link.toString(),
             "Link element should be SecureElement")
+    },
+
+    testCloneNodeShallow: function(cmp) {
+        debugger;
+        var testUtils = cmp.get("v.testUtils");
+        var table = cmp.find("table").getElement();
+        var tableClone = table.cloneNode();
+        testUtils.assertNotUndefinedOrNull(tableClone);
+        testUtils.assertEquals(table.tagName, tableClone.tagName);
+        testUtils.assertEquals(0, tableClone.children.length, "Shallow cloned node should have zero children");
     }
 })

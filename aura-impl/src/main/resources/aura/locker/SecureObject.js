@@ -384,8 +384,8 @@ SecureObject.addMethodIfSupported = function(st, raw, name, options) {
 	SecureObject.addIfSupported(SecureObject.createFilteredMethod, st, raw, name, options);
 };
 
+// Return the set of interfaces supported by the object in order of most specific to least specific
 function getSupportedInterfaces(o) {
-	// Return the set of interfaces supported by the object in order of most specific to least specific
 	function safeInstanceOf(obj, className) {
 		var cls = window[className];
 		return cls && obj instanceof cls;

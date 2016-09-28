@@ -33,12 +33,50 @@ function AuraError() {
     // the action that errors out
     this.action = null;
 
-    // client side error id
-    this.id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = Math.random() * 16 | 0;//eslint-disable-line no-bitwise
-            var v = c === 'x' ? r : (r & 0x3 | 0x8);//eslint-disable-line no-bitwise
-            return v.toString(16);
-        });
+    /* port murmur32 from guava */
+    var MurmurHash3 = {
+        mul32: function(m, n) {
+            var nlo = n & 0xffff;
+            var nhi = n - nlo;
+            return ((nhi * m | 0) + (nlo * m | 0)) | 0;
+        },
+
+        hashString: function(data) {
+            var c1 = 0xcc9e2d51, c2 = 0x1b873593;
+            var h1 = 0;
+            var len = data.length;
+            for (var i = 1; i < len; i += 2) {
+                var k1 = data.charCodeAt(i - 1) | (data.charCodeAt(i) << 16);
+                k1 = this.mul32(k1, c1);
+                k1 = ((k1 & 0x1ffff) << 15) | (k1 >>> 17);  // ROTL32(k1,15);
+                k1 = this.mul32(k1, c2);
+
+                h1 ^= k1;
+                h1 = ((h1 & 0x7ffff) << 13) | (h1 >>> 19);  // ROTL32(h1,13);
+                h1 = (h1 * 5 + 0xe6546b64) | 0;
+            }
+
+            if((len % 2) === 1) {
+                k1 = data.charCodeAt(len - 1);
+                k1 = this.mul32(k1, c1);
+                k1 = ((k1 & 0x1ffff) << 15) | (k1 >>> 17);  // ROTL32(k1,15);
+                k1 = this.mul32(k1, c2);
+                h1 ^= k1;
+            }
+
+            // finalization
+            h1 ^= (len << 1);
+
+            // fmix(h1);
+            h1 ^= h1 >>> 16;
+            h1  = this.mul32(h1, 0x85ebca6b);
+            h1 ^= h1 >>> 13;
+            h1  = this.mul32(h1, 0xc2b2ae35);
+            h1 ^= h1 >>> 16;
+
+            return h1;
+        }
+    };
 
     function AuraErrorInternal(message, innerError, severity) {
         function getStackTrace(e) {
@@ -80,6 +118,7 @@ function AuraError() {
         this.name = innerError ? innerError.name : this.name;
         this.message = message + (innerError ? " [" + (innerError.message || innerError.toString()) + "]" : "");
         this.stackTrace = getStackTrace(innerError);
+        this.id = MurmurHash3.hashString(this.stackTrace.replace(/https?:\/\/[^\/]*\//gi, ""));
         this.severity = innerError ? (innerError.severity || severity) : severity;
     }
 

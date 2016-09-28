@@ -174,7 +174,7 @@ Logger.prototype.reportError = function(e, action){
     reportAction.setCaboose();
     reportAction.setParams({
         "failedAction": action || actionName || e.component,
-        "failedId": e.id,
+        "failedId": e.id && e.id.toString(),
         "clientError": e.toString(),
         // Note that stack is non-standard, and even if present, may be obfuscated
         // Also we only take the first 25k characters because stacks can get very large

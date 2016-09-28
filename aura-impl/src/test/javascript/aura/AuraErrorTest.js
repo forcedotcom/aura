@@ -96,8 +96,32 @@ Test.Aura.AuraErrorTest = function() {
                 actual = new Aura.Errors.AuraError().id;
             });
 
-            // error id length is 36, e.g: 10fdb86c-6868-43ba-b464-347057f3b316
-            Assert.Equal(36, actual.length);
+            Assert.True(actual != 0);
+        }
+
+        [Fact]
+        function ReturnsIdTheSameAsGackStackTraceId() {
+            var actual;
+            var innerError = new Error();
+            innerError.message = "Error from app client controller";
+            innerError.stack = "Error: Error from app client controller\n\
+    at throwErrorFromClientController (http://localhost:9090/components/auratest/errorHandlingApp.js:42:15)\n\
+    at Action.$runDeprecated$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8469:36)\n\
+    at Object.Component$getActionCaller [as $handler$] (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:6695:20)\n\
+    at Aura.$Event$.$Event$.$executeHandlerIterator$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8100:15)\n\
+    at Aura.$Event$.$Event$.$executeHandlers$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8078:8)\n\
+    at http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8130:10\n\
+    at AuraInstance.$run$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:18350:12)\n\
+    at Aura.$Event$.$Event$.$fire$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8128:6)\n\
+    at Object.catchAndFireEvent (http://localhost:9090/components/ui/button.js:90:33)\n\
+    at press (http://localhost:9090/components/ui/button.js:34:16)";
+            var expected = -811461341;
+
+            windowMock(function() {
+                actual = new Aura.Errors.AuraError(null, innerError).id;
+            });
+
+            Assert.Equal(expected, actual);
         }
 
         [Fact]

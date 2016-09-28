@@ -60,9 +60,8 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         String log = logs.get(0);
 
         String errorIdHeader = "Client error id: ";
-        int errorIdStart = log.indexOf(errorIdHeader) + errorIdHeader.length();
-        // error id's length is 36
-        String loggedErrorId = log.substring(errorIdStart, errorIdStart + 36);
+        String errorIdLine = log.substring(log.indexOf(errorIdHeader)).split("\n")[0];
+        String loggedErrorId = errorIdLine.substring(errorIdHeader.length());
         assertEquals(clientErrorId, loggedErrorId);
     }
 
@@ -299,8 +298,10 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         assertThat("Missing expected message in the log.", log, CoreMatchers.containsString(expectedMessage));
         assertThat("Missing failing descriptpr in the log." + log, log, CoreMatchers.containsString("Failing descriptor: " + failingDescriptor));
         if(requireErrorId) {
-            // error Id is generated when AuraError constructs on the client side. e.g Client error id: 10fdb86c-6868-43ba-b464-347057f3b316
-            assertTrue("Missing client error id in the log: " + log, log.matches("(?s).*Client error id: \\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}.*"));
+            // error Id is generated when AuraError constructs on the client side. e.g Client error id: 1889813782
+
+            assertTrue("Missing client error id in the log: " + log,
+                    log.matches("(?s).*Client error id: [-]?\\d+(?s).*"));
         }
     }
 

@@ -23,7 +23,7 @@
 			To display text, you can use an attribute value and bind it to the <code>ui:outputText</code> component.
 		</p>
 		<pre>&lt;aura:attribute name="myText" type="String" default="some string"/>
-&lt;ui:outputText value="{!v.myText}" label="my output"/></pre>
+&lt;ui:outputText value="{!v.myText}" /></pre>
 		<p>The previous example renders the following HTML.</p>
 		<pre>&lt;span dir="ltr" class="uiOutputText">
     some string

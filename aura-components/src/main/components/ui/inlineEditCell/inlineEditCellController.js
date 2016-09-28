@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 ({
+    init : function(cmp, evt, helper) {
+        helper.updateDisabled(cmp);
+    },
 	trigger : function(cmp) {
 		// TODO: Checks to make sure we can retrieve a value here.
 		var outputCmp = cmp.get("v.body")[0];

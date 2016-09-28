@@ -79,9 +79,34 @@
     	cellWrapper.setAttribute('tabIndex', '-1');
     },
     
+    updateDisabled: function(cmp) {
+        var disabled = cmp.get("v.disabled");
+        
+        if (disabled !== cmp._prevDisabled) {
+            var buttonCmp = cmp.find("editTrigger");
+            buttonCmp.set("v.disabled", disabled);
+            
+            var buttonClass = buttonCmp.get("v.class");
+            
+            if (disabled) {
+                buttonClass += ' disabled';
+            } else {
+                buttonClass = buttonClass.replace('disabled', '');
+            }
+            
+            buttonCmp.set("v.class", buttonClass);
+            
+            cmp._prevDisabled = disabled;
+        }
+    },
+    
     updateClass: function(element, className, condition) {
         var operation = condition ? 'add' : 'remove';
         element.classList[operation](className);
+    },
+    
+    getWrapper: function(cmp) {
+        return cmp.getElement().parentNode;
     }
     
 })// eslint-disable-line semi

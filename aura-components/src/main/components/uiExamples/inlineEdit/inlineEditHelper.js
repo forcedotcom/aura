@@ -74,17 +74,20 @@
 	generateItems : function() {
 		var items = [];
 		
-		for (var i = 0; i < 10; i++) {
+		for (var i = 0; i < 100; i++) {
 			items.push({
 				record : {
 					id : i,
 					name : "Name" + i,
 					bloodtype : this.BLOOD_TYPES[Math.floor(Math.random() * 3)],
-					phone : '3' + i + '2-4' + i + '6' + i
+					phone : '3' + i + '2-4' + i + '6' + i,
+					longName : "This is a very long name " + i,
+					priority : i,
+					status : "Status " + i
 				},
 				status : { 
 					name : {
-						disabled : (i % 2 == 0)
+						disabled : (i % 3 === 0)
 					}
 				},
 			});

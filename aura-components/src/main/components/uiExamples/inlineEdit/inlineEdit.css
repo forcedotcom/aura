@@ -105,17 +105,17 @@
 	flex-grow: 1;
 } 
  
-.THIS .cellContainer {
+.THIS .slds-grid {
 	display:flex;
 	position: relative;
 	padding: 0.5rem;
 }
 
-.THIS .cellContainer.edited {
+.THIS .slds-cell-edit.edited {
 	background-color: #faffbd;
 }
 
-.THIS .cellContainer.errors {
+.THIS .slds-cell-edit.errors {
 	border: 1px solid red;
 }
 
@@ -157,7 +157,7 @@
 	visibility: hidden;
 }
 
-.THIS .cellContainer:hover .iconCmp {
+.THIS .slds-cell-edit:hover .iconCmp {
 	visibility: visible;
 }
 

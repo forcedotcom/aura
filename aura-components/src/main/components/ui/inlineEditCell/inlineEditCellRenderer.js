@@ -17,16 +17,21 @@
      render: function(cmp, helper) {
          var elements = this.superRender();
          var cell = helper.createWrapper(cmp.get("v.rowHeader"));
+         
          helper.applyStyles(cmp, cell);
          helper.applyKeyboardAttributes(cmp, cell);
+         
          cell.appendChild(elements[0]);
          
          return cell;
      },
      
      rerender: function(cmp, helper) {
+         helper.updateDisabled(cmp);
+     
          this.superRerender();
-         var cell = cmp.getElement().parentNode;
+         
+         var cell = helper.getWrapper(cmp);
          helper.applyStyles(cmp, cell);
          helper.applyKeyboardAttributes(cmp, cell);
      }

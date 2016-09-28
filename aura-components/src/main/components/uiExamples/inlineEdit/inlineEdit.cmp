@@ -34,12 +34,15 @@
 		<ui:inlineEditGrid aura:id="grid" class="inline-edit-example" items="{!v.items}" onEdit="{!c.onEdit}" editable="{!v.editable}" dataVar="record"
 			rowHeaderIndex="2" enableResizableColumns="true" onKeyboardModeEnter="{!c.onKeyboardModeEnter}"  onKeyboardModeExit="{!c.onKeyboardModeExit}">
 			<aura:set attribute="headerColumns">
-				<ui:dataTableHeader name="number"	 label="number" sortable="true"/>
-                <ui:dataTableHeader name="action"    label="Action"/>
-				<ui:dataTableHeader name="id"	     label="Id" sortable="true"/>
-				<ui:dataTableHeader name="name"	     label="Name" resizable="true"/>
-				<ui:dataTableHeader name="bloodtype"  label="Blood Type" resizable="true"/>
-				<ui:dataTableHeader name="phone"      label="Phone"/>
+				<ui:dataTableHeader name="number"       label="number" sortable="true"/>
+                <ui:dataTableHeader name="action"       label="Action"/>
+				<ui:dataTableHeader name="id"           label="Id" sortable="true"/>
+				<ui:dataTableHeader name="name"         label="Name" resizable="true"/>
+				<ui:dataTableHeader name="bloodtype"    label="Blood Type" resizable="true"/>
+				<ui:dataTableHeader name="phone"        label="Phone"/>
+                <ui:dataTableHeader name="priority"     label="Priority"/>
+                <ui:dataTableHeader name="longName"     label="Long Name"/>
+                <ui:dataTableHeader name="status"       label="Status"/>
 			</aura:set>
 			
 			<aura:set attribute="columns">
@@ -65,9 +68,18 @@
 						<uiExamples:iconCmp key="{! item.status.phone.disabled ? 'L' : 'P'}" />
 					</aura:set>
 				</ui:inlineEditCell>
+                <ui:inlineEditCell name="priority">
+                    <ui:outputText class="truncate" value="{!item.record.priority}"/>
+                </ui:inlineEditCell>
+                <ui:inlineEditCell name="longName">
+                    <ui:outputText class="truncate" value="{!item.record.longName}"/>
+                </ui:inlineEditCell>
+                <ui:inlineEditCell name="status">
+                    <ui:outputText class="truncate" value="{!item.record.status}"/>
+                </ui:inlineEditCell>
 			</aura:set>
 		</ui:inlineEditGrid>
-		
+
 		<div class="manager">
 	        <ui:panelManager2 aura:id="pm">
 	            <aura:set attribute="registeredPanels">

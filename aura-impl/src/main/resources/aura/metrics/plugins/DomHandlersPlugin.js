@@ -79,20 +79,19 @@ DomHandlersPlugin.prototype.stringifyLocator = function (locator) {
 };
 */
 
-DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, cmp) {
+DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, root) {
     if (!(event.type in DomHandlersPlugin.WHITELISTEVENTS)) {
         return;
     }
     
-    var localCmpId = cmp.getLocalId();
-    var ownerCmp = action.getComponent().getConcreteComponent();
+    var parent = action.getComponent().getConcreteComponent();
     // TODO: remove includeMetadata param before 206 release freeze: W-3378426
-    var locator = ownerCmp.getLocator(localCmpId, false /*includeMetadata*/);
+    var locator = parent.getLocator(root, true /*includeMetadata*/);
     var ms = this.metricsService;
 
     // Only if we have a unique, identifier send the interaction
     if (locator) { 
-        var target = cmp["getElement"]();
+        var target = root["getElement"]();
         var meta = target && target.getAttribute("data-refid"); // optional metadata
 
         var context = {
@@ -113,7 +112,7 @@ DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, cmp) {
 
         ms.transaction("aura", "interaction", { "context": context });
     } else {
-        this.logUnInstrumentedClick(action, cmp);
+        this.logUnInstrumentedClick(action, root);
     }
 };
 
@@ -124,14 +123,14 @@ DomHandlersPlugin.prototype.dispatchVirtualActionHook = function (action, event,
     }
 };
 
-DomHandlersPlugin.prototype.logUnInstrumentedClick = function (action, cmp) {
+DomHandlersPlugin.prototype.logUnInstrumentedClick = function (action, root) {
     var parent = action.getComponent().getConcreteComponent();
     var grandparent = parent.getComponentValueProvider().getConcreteComponent();
     var grandparentContainer = grandparent.getComponentValueProvider().getConcreteComponent();
-    // cmp will always be an aura:html component. It's the root of all our click handlers
+    // root will always be an aura:html component. It's the root of all our click handlers
     var hierarchy = {
-            "rootHtmlTag": cmp.get("v.tag"),
-            "rootId" : cmp.getLocalId(),
+            "rootHtmlTag": root.get("v.tag"),
+            "rootId" : root.getLocalId(),
             "parent": parent.getDef().toString(),
             "parentId": parent.getLocalId(),
             "grandparent": grandparent.getDef().toString(),

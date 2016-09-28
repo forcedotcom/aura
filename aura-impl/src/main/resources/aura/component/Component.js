@@ -2602,12 +2602,14 @@ Component.prototype.associateRenderedBy = function(cmp, element) {
 };
 
 /**
- * Finds a locator definition by id from the locator definitions.
- *
+ * Resolves a locator that targets targetCmp from within this component
+ * @param targetCmp
+ * @param includeMetadata
+ * 
  * @returns The locator object which contains the target & scope IDs and locator context resolved
  */
-Component.prototype.getLocator = function(localId, includeMetadata) {
-    return $A.expressionService.resolveLocator(this, localId, includeMetadata);
+Component.prototype.getLocator = function(targetCmp, includeMetadata) {
+    return $A.expressionService.resolveLocator(this, targetCmp, includeMetadata);
 };
 
 Aura.Component.Component = Component;

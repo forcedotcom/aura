@@ -113,16 +113,17 @@ AuraComponentService.prototype.countComponents = function() {
 };
 
 /**
- * Calculates the locator for a given component and target localId
+ * Calculates the locator for a given component and target
  *
- * @param {Component} cmp The component that contains the localId
- * @param {String} localId This localId must exist inside the component
+ * @returns A fully resolved locator rooted at targetCmp
+ * @param {Component} cmp The component that contains a locator targeting targetCmp
+ * @param {String} targetCmp The component inside cmp that is targeted by a locator in cmp
  * @public
  * @export
  */
-AuraComponentService.prototype.getComponentLocator = function(cmp, localId, includeMetadata) {
-    $A.assert(cmp && localId, 'No component or id provided');
-    return cmp.getLocator(localId, includeMetadata);
+AuraComponentService.prototype.getComponentLocator = function(cmp, targetCmp, includeMetadata) {
+    $A.assert(cmp, 'No component provided');
+    return cmp.getLocator(targetCmp, includeMetadata);
 };
 
 /**

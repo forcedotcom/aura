@@ -303,30 +303,31 @@ AuraExpressionService.prototype.resolveLocatorContext = function (cmp, locatorDe
 
 
 /**
- * @param component The component that contains the locator defining localId
- * @param localId The ID of the locator that needs resolving
+ * @param component The component that contains the locator targeting root
+ * @param root Starting point of component hierarchy that requires resolving
  * @param includeMetadata Log additional metadata about the component name
  * @param primitiveFound The ID of the primitive if any that's been found
- * @returns This will produce a locator object giving the localId of the component that the locator 
- * refers to, along with the localId of the lexical scope owner of 'component'
+ * @returns This will produce a locator that combines information as such:
+ *          + root localId as target with context provided by parent->root locator
+ *          + parent localId as scope with context provided by grandparent->parent locator
  */
-AuraExpressionService.prototype.resolveLocator = function (component, localId, includeMetadata, primitiveFound) {
-    var ownerLocalId = component.getLocalId();
+AuraExpressionService.prototype.resolveLocator = function (parent, root, includeMetadata, primitiveFound) {
+    var parentId = parent.getLocalId();
     var locator;
-    
+    var rootId = root && root.getLocalId();
 
-    if (!localId) {
+    if (!rootId) {
         return locator;
     }
 
-    // We need to look at the linkage via super-chain in case the component is extended
-    var currentCmp = component;
-    var link = component.find(localId);
+    // We need to look at the linkage via super-chain in case the parent is extended
+    var currentCmp = parent;
+    var link = parent.find(rootId);
 
     while (!link && currentCmp) {
         currentCmp = currentCmp.getSuper();
         if (currentCmp) {
-            link = currentCmp.find(localId);
+            link = currentCmp.find(rootId);
         }
     }
 
@@ -335,49 +336,49 @@ AuraExpressionService.prototype.resolveLocator = function (component, localId, i
     }
 
     var rootLocatorDefs = currentCmp.getDef().getLocatorDefs();
-    var rootLocatorDef = rootLocatorDefs && rootLocatorDefs[localId];
+    var rootLocatorDef = rootLocatorDefs && rootLocatorDefs[rootId];
 
     // figure out if we need to jump another level for locators marked as primitive
     if (!primitiveFound && rootLocatorDef && rootLocatorDef["isPrimitive"]) {
         primitiveFound =  {};
-        primitiveFound["target"] = rootLocatorDef["alias"] || localId;
+        primitiveFound["target"] = rootLocatorDef["alias"] || rootId;
         primitiveFound["resolvedContext"] = this.resolveLocatorContext(currentCmp, rootLocatorDef);
-        localId = currentCmp.getLocalId();
+        root = currentCmp;
         currentCmp = currentCmp.getComponentValueProvider().getConcreteComponent();
-        return this.resolveLocator(currentCmp, localId, includeMetadata, primitiveFound);
+        return this.resolveLocator(currentCmp, root, includeMetadata, primitiveFound);
     }
     
-    var ownerCmp = component.getComponentValueProvider().getConcreteComponent();
+    var grandparent = parent.getComponentValueProvider().getConcreteComponent();
 
-    if (ownerCmp.isInstanceOf('ui:virtualComponent')) {
-        ownerCmp = ownerCmp.getConcreteComponent().getComponentValueProvider();
+    if (grandparent.isInstanceOf('ui:virtualComponent')) {
+        grandparent = grandparent.getConcreteComponent().getComponentValueProvider();
     }
     
-    var ownerLocatorDefs;
-    var ownerLocatorDef;
+    var parentLocatorDefs;
+    var parentLocatorDef;
     
-    // walk up the super chain for ownerCmp until you find a matching locator or a '*' locator
-    while (!ownerLocatorDef && ownerCmp) {
-        if (ownerCmp) {
-            ownerLocatorDefs = ownerCmp.getDef().getLocatorDefs();
-            ownerLocatorDef = ownerLocatorDefs && (ownerLocatorDefs[ownerLocalId] || ownerLocatorDefs["*"]);
+    // walk up the super chain for grandparent until you find a matching locator or a '*' locator
+    while (!parentLocatorDef && grandparent) {
+        if (grandparent) {
+            parentLocatorDefs = grandparent.getDef().getLocatorDefs();
+            parentLocatorDef = parentLocatorDefs && (parentLocatorDefs[parentId] || parentLocatorDefs["*"]);
         }
-        if (!ownerLocatorDef) {
-            ownerCmp = ownerCmp.getSuper();
+        if (!parentLocatorDef) {
+            grandparent = grandparent.getSuper();
         }
     }
     
-    if (!rootLocatorDef || !ownerLocatorDef) {
+    if (!rootLocatorDef || !parentLocatorDef) {
         return locator;
     }
 
     locator = {};
 
     var rootContext = this.resolveLocatorContext(currentCmp, rootLocatorDef);
-    var ownerContext = this.resolveLocatorContext(ownerCmp, ownerLocatorDef);
+    var parentContext = this.resolveLocatorContext(grandparent, parentLocatorDef);
     var primitiveContext = primitiveFound && primitiveFound["resolvedContext"];
     
-    var context = $A.util.apply(ownerContext || {}, rootContext);
+    var context = $A.util.apply(parentContext || {}, rootContext);
     // any keys in primitiveContext will get overridden by higher levels
     context = $A.util.apply(context, primitiveContext);
     
@@ -386,8 +387,8 @@ AuraExpressionService.prototype.resolveLocator = function (component, localId, i
     }
     
     // Apply aliases from target and scope as needed
-    locator["target"] = rootLocatorDef["alias"] || localId;
-    locator["scope"] = ownerLocatorDef["alias"] || ownerLocalId;
+    locator["target"] = rootLocatorDef["alias"] || rootId;
+    locator["scope"] = parentLocatorDef["alias"] || parentId;
     
     if (primitiveFound) {
         locator["target"] = locator["target"] + this.PRIMITIVE_SEPARATOR + primitiveFound["target"];
@@ -396,15 +397,15 @@ AuraExpressionService.prototype.resolveLocator = function (component, localId, i
     // TODO - W-3378426 - put this in javascript directive to block out the if{} block in PROD mode
     if (includeMetadata) {
         locator["metadata"] = {
-                "root" : link.getDef().toString(),
-                "rootId" : link.getLocalId(),
-                "parent" : component.getDef().toString(),
-                "parentId" : ownerLocalId,
-                "grandparent" : ownerCmp.getDef().toString()
+                "root" : root.getDef().toString(),
+                "rootId" : rootId,
+                "parent" : parent.getDef().toString(),
+                "parentId" : parentId,
+                "grandparent" : grandparent.getDef().toString()
         };
         if (rootLocatorDef["description"]) {
             locator["metadata"]["targetDescription"] = rootLocatorDef["description"];
-            locator["metadata"]["scopeDescription"] =  ownerLocatorDef["description"];
+            locator["metadata"]["scopeDescription"] =  parentLocatorDef["description"];
         }
     }
     return locator;

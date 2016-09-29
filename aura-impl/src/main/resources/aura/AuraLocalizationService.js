@@ -1047,7 +1047,7 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
  * @memberOf AuraLocalizationService
  * @example
  * $A.localizationService.WallTimeToUTC(d, timezone, function(walltime) {
- *     displayDate = $A.localizationService.formatDateTimeUTC(walltime, format, langLocale);
+ *     displayDate = $A.localizationService.formatDateTime(walltime, format, langLocale);
  * })
  * @public
  * @export

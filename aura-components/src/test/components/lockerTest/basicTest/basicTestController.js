@@ -86,7 +86,7 @@
     },
 
 	testEvalBlocking : function(cmp, event, helper) {
-		var testUtils = cmp.get("v.testUtils");
+		var testUtils = cmp.get("v.testUtils");		
 
 		// eval attempts that return a SecureWindow object
 		helper.doTestEvalForSecureWindow(cmp, function() { return window }, testUtils);
@@ -155,5 +155,14 @@
                 " should be a SecureComponent");
         testUtils.assertUndefined(cmp._thisFromInit, "'this' in init handler should be undefined");
         testUtils.assertUndefined(this, "'this' in controller method should be undefined");
+    },
+    
+    testCtorAannotation: function(cmp) {
+    	var message = "Hi from LS";
+    	var text = new Text(message);
+
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertStartsWith("SecureElement", text.toString(), "Expected result of new Text() to be a SecureElement");
+        testUtils.assertEquals(message, text.textContent);
     }
 })

@@ -36,6 +36,7 @@
     <aura:method name="testLocationExposed" action="{!c.testLocationExposed}"/>
     <aura:method name="testValueProviderOnDynamicallyCreatedComponents" action="{!c.testValueProviderOnDynamicallyCreatedComponents}"/>
     <aura:method name="testThisVariableNotLeakedFromMarkup" action="{!c.testThisVariableNotLeakedFromMarkup}"/>
+    <aura:method name="testCtorAannotation" action="{!c.testCtorAannotation}"/>  
 
     <div>LockerService test</div>
     <div aura:id="content"/>

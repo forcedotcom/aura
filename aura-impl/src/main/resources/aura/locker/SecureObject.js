@@ -517,7 +517,13 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata, so, raw, key)
 				Object.defineProperty(so, name, {
 		        	get: function() {
 		        		return function() {
-		        			return SecureObject.filterEverything(so, new raw[name](arguments));
+		        			var cls = raw[name];
+		        					        			
+		        			// TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
+		        			var result = new (Function.prototype.bind.apply(cls, [null].concat(Array.prototype.slice.call(arguments))));
+		        			$A.lockerService.trust(so, result);
+		        			
+		        			return SecureObject.filterEverything(so, result);
 		        		};
 		        	}
 		        });

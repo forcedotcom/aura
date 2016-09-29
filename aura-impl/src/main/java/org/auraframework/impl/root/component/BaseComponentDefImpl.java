@@ -76,9 +76,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
@@ -370,17 +368,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
     }
 
-    private <X extends Definition> void checkAccess(DefDescriptor<X> descToCheck, MasterDefRegistry mdr)
-            throws QuickFixException {
-        // We should be able to do this, but tests are dependent on overrides here.
-        //X definition = mdr.getDef(descToCheck);
-        X definition = descToCheck.getDef();
-        if (definition == null) {
-            throw new DefinitionNotFoundException(descToCheck, getLocation());
-        }
-        mdr.assertAccess(descriptor, definition);
-    }
-
     @Override
     public void validateReferences(boolean minify) throws QuickFixException {
         validateReferences();
@@ -390,24 +377,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     @SuppressWarnings("unchecked")
     @Override
     public void validateReferences() throws QuickFixException {
-        DefinitionService definitionService = Aura.getDefinitionService();
-        MasterDefRegistry mdr = definitionService.getDefRegistry();
-
         super.validateReferences();
         for (DependencyDef def : dependencies) {
             def.validateReferences();
-        }
-
-        for (DefDescriptor<InterfaceDef> intf : interfaces) {
-            checkAccess(intf, mdr);
-        }
-
-        if (modelDefDescriptor != null) {
-            checkAccess(modelDefDescriptor, mdr);
-        }
-
-        for (DefDescriptor<ControllerDef> d : controllerDescriptors) {
-            checkAccess(d, mdr);
         }
 
         for (AttributeDef att : this.attributeDefs.values()) {
@@ -436,7 +408,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         if (templateDefDescriptor != null) {
-            // FIXME: this should be mdr.getDef(templateDefDescriptor);
             BaseComponentDef template = templateDefDescriptor.getDef();
             if (!template.isTemplate()) {
                 throw new InvalidDefinitionException(String.format(
@@ -446,8 +417,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 throw new InvalidDefinitionException(String.format(
                         "Template %s must not be abstract", templateDefDescriptor), getLocation());
             }
-
-            checkAccess(templateDefDescriptor, mdr);
         }
 
         if (extendsDescriptor != null) {
@@ -485,8 +454,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                         extendsDescriptor), getLocation());
             }
 
-            mdr.assertAccess(descriptor, parentDef);
-
             SupportLevel support = getSupport();
             DefDescriptor<T> extDesc = extendsDescriptor;
             while (extDesc != null) {
@@ -520,7 +487,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
         for (ClientLibraryDef def : this.clientLibraries) {
             def.validateReferences();
-            mdr.assertAccess(descriptor, def);
         }
 
         if (defaultFlavor != null) {

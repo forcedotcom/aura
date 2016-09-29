@@ -194,7 +194,7 @@ BaseComponent<D, I> {
         instanceStack.pushInstance(this, descriptor);
 
         if (def == null) {
-            def = descriptor.getDef();
+            def = definitionService.getDefinition(descriptor);
             if (extender == null && def.isAbstract() && def.getProviderDescriptor() == null) {
                 throw new InvalidDefinitionException(String.format("%s cannot be instantiated directly.",
                         descriptor), def.getLocation());
@@ -211,7 +211,7 @@ BaseComponent<D, I> {
         MasterDefRegistry defRegistry = definitionService.getDefRegistry();
         if (accessParent != null) {
             // Insure that the access 'Parent' is allowed to create an instance of this component
-            defRegistry.assertAccess(accessParent.getDescriptor(), desc.getDef());
+            defRegistry.assertAccess(accessParent.getDescriptor(), definitionService.getDefinition(desc));
         }
 
         loggingService.startTimer(LoggingService.TIMER_COMPONENT_CREATION);
@@ -231,6 +231,7 @@ BaseComponent<D, I> {
                 ControllerDef cd = def.getLocalControllerDef();
                 if (cd != null) {
                     // Insure that this def is allowed to create an instance of the controller
+                    // This can't possibly be disallowed, but not removing for the moment.
                     defRegistry.assertAccess(descriptor, cd);
 
                     this.valueProviders.put(AuraValueProviderType.CONTROLLER.getPrefix(), cd);

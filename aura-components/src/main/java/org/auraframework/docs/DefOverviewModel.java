@@ -51,20 +51,20 @@ public class DefOverviewModel implements ModelInstance {
     private final ConfigAdapter configAdapter;
 
     public DefOverviewModel(ContextService contextService, DefinitionService definitionService, ConfigAdapter configAdapter) throws QuickFixException {
-    	this.definitionService = definitionService;
-    	this.configAdapter = configAdapter;
-    	
+        this.definitionService = definitionService;
+        this.configAdapter = configAdapter;
+        
         AuraContext context = contextService.getCurrentContext();
         BaseComponent<?, ?> component = context.getCurrentComponent();
 
         String desc = (String) component.getAttributes().getValue("descriptor");
 
         DefType defType = DefType.valueOf(((String) component.getAttributes().getValue("defType")).toUpperCase());
-		DefDescriptor<?> descriptor = definitionService.getDefDescriptor(desc, defType.getPrimaryInterface());
+        DefDescriptor<?> descriptor = definitionService.getDefDescriptor(desc, defType.getPrimaryInterface());
 
         Definition def = definitionService.getDefinition(descriptor);
-		assertAccess(def);
-		
+        assertAccess(def);
+        
         Map<DefType, List<DefModel>> depsMap = Maps.newEnumMap(DefType.class);
 
         Set<DefDescriptor<?>> deps = Sets.newHashSet();
@@ -109,7 +109,7 @@ public class DefOverviewModel implements ModelInstance {
         return definitionService.getDefDescriptor(String.format("%s:application", defaultNamespace),
                 ApplicationDef.class);
     }
-	
+    
     public boolean hasAccess(Definition def) throws QuickFixException {
         MasterDefRegistry registry = definitionService.getDefRegistry();
         return registry.hasAccess(getReferencingDescriptor(), def) == null;

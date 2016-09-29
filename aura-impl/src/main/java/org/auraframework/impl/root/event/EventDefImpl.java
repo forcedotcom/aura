@@ -33,7 +33,6 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -103,7 +102,7 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
                 json.writeMapEntry("type", eventType);
                 json.writeValue(getAccess());
                 if (extendsDescriptor != null) {
-                    json.writeMapEntry("superDef", extendsDescriptor.getDef());
+                    json.writeMapEntry("superDef", Aura.getDefinitionService().getDefinition(extendsDescriptor));
                 }
                 Map<DefDescriptor<AttributeDef>, AttributeDef> attrDefs = getAttributeDefs();
                 if (attrDefs.size() > 0) {
@@ -124,7 +123,7 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
     private EventDef getSuperDef() throws QuickFixException {
         EventDef ret = null;
         if (getExtendsDescriptor() != null) {
-            ret = getExtendsDescriptor().getDef();
+            ret = Aura.getDefinitionService().getDefinition(extendsDescriptor);
         }
         return ret;
     }
@@ -145,7 +144,7 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
     @Override
     public void validateReferences() throws QuickFixException {
         if (extendsDescriptor != null) {
-            EventDef extended = getExtendsDescriptor().getDef();
+            EventDef extended = Aura.getDefinitionService().getDefinition(extendsDescriptor);
             if (extended == null) {
                 throw new InvalidDefinitionException(String.format("Event %s cannot extend %s", getDescriptor(),
                         getExtendsDescriptor()), getLocation());
@@ -155,10 +154,6 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
                 throw new InvalidDefinitionException(String.format("Event %s cannot extend %s", getDescriptor(),
                         getExtendsDescriptor()), getLocation());
             }
-
-            MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
-            registry.assertAccess(descriptor, extended);
-
             // need to resolve duplicated attributes from supers
         }
 

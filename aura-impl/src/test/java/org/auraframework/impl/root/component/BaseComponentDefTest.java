@@ -1940,28 +1940,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Test method for {@link Definition#validateReferences()}.
-     */
-    @Test
-    public void testValidateReferencesWithNonExistentInterface() throws Exception {
-        DefDescriptor<InterfaceDef> idd = vendor.makeInterfaceDefDescriptor("say:what");
-        Set<DefDescriptor<InterfaceDef>> interfaces = new HashSet<>();
-        interfaces.add(idd);
-        BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                getAuraTestingUtil().getNonce("test:cmp"), null, null, null, null, null,
-                null, null, interfaces, null, null, null, false, false, AuraContext.Access.INTERNAL);
-        try {
-            bcd.validateReferences();
-            fail("Should have thrown AuraException because the parent isn't extensible.");
-        } catch (DefinitionNotFoundException e) {
-            checkExceptionFull(
-                    e,
-                    DefinitionNotFoundException.class,
-                    String.format("No INTERFACE named %s found", idd.getQualifiedName()));
-        }
-    }
-
-    /**
      * Verify getHelper returns null when no HelperDef
      */
     @Test

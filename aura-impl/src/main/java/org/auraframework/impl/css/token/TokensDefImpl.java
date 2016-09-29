@@ -15,14 +15,12 @@
  */
 package org.auraframework.impl.css.token;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.auraframework.Aura;
 import org.auraframework.builder.TokensDefBuilder;
 import org.auraframework.def.AttributeDef;
@@ -40,18 +38,21 @@ import org.auraframework.impl.css.util.Tokens;
 import org.auraframework.impl.java.provider.TokenDescriptorProviderInstance;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.TokenValueNotFoundException;
 import org.auraframework.util.json.Json;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.base.Objects;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Implementation for {@link TokensDef}.
@@ -247,20 +248,16 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
 
-        MasterDefRegistry mdr = Aura.getDefinitionService().getDefRegistry();
+        DefinitionService definitionService = Aura.getDefinitionService();
 
         // extends
         if (extendsDescriptor != null) {
-            TokensDef parentDef = extendsDescriptor.getDef();
+            TokensDef parentDef = definitionService.getDefinition(extendsDescriptor);
 
             // check if it exists
             if (parentDef == null) {
                 throw new DefinitionNotFoundException(extendsDescriptor, getLocation());
             }
-
-            // check access
-            mdr.assertAccess(descriptor, parentDef);
-
 
             // can't extend itself
             if (extendsDescriptor.equals(descriptor)) {
@@ -275,7 +272,7 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
                     String msg = String.format("%s must not through its parent eventually extend itself", descriptor);
                     throw new InvalidDefinitionException(msg, getLocation());
                 }
-                current = current.getDef().getExtendsDescriptor();
+                current = definitionService.getDefinition(current).getExtendsDescriptor();
             }
 
             // it would be a mistake to extend an imported def
@@ -287,7 +284,7 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
 
         for (DefDescriptor<TokensDef> imp : imports) {
             // TODO: mdr access checks
-            TokensDef def = imp.getDef();
+            TokensDef def = definitionService.getDefinition(imp);
 
             // can't import a def with a parent. This is an arbitrary restriction to enforce a level of token lookup
             // simplicity and prevent misuse of imports.
@@ -315,8 +312,6 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
                 throw new TokenValueNotFoundException(ref.toString(), descriptor, getLocation());
             }
         }
-
-        // TODO mdr access checks for providers
     }
 
     @Override

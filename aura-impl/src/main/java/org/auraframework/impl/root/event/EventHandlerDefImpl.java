@@ -15,19 +15,25 @@
  */
 package org.auraframework.impl.root.event;
 
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
+
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.EventHandlerDef;
+import org.auraframework.def.EventType;
+import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Definition of an event handler.
@@ -77,8 +83,9 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
     @Override
     public void validateReferences() throws QuickFixException {
     	EventDef event = null;
+        DefinitionService definitionService = Aura.getDefinitionService();
         if (name == null && descriptor != null) {
-            event = descriptor.getDef();
+            event = definitionService.getDefinition(descriptor);
             if (event == null) {
                 throw new InvalidReferenceException(String.format("aura:handler has invalid event attribute value: %s",
                         descriptor), getLocation());
@@ -90,7 +97,7 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
                         getLocation());
             }
         } else if (name != null && descriptor == null && value == null) {
-            RootDefinition parentDef = parentDescriptor.getDef();
+            RootDefinition parentDef = definitionService.getDefinition(parentDescriptor);
             Map<String, RegisterEventDef> events = parentDef.getRegisterEventDefs();
             RegisterEventDef registerEvent = events.get(name);
             if (registerEvent == null) {
@@ -98,16 +105,12 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
                         name), getLocation());
             }
             
-            event = registerEvent.getDescriptor().getDef();
+            event = definitionService.getDefinition(registerEvent.getDescriptor());
             if (!event.getEventType().equals(EventType.COMPONENT)) {
                 throw new InvalidReferenceException(
                         "A aura:handler that specifies a name=\"\" attribute must handle a component event. Either change the aura:event to have type=\"COMPONENT\" or alternately change the aura:handler to specify an event=\"\" attribute.",
                         getLocation());
             }
-        }
-        
-        if (event != null) {
-        	Aura.getDefinitionService().getDefRegistry().assertAccess(parentDescriptor, event);
         }
         
         // TODO(W-1508416): validate action attribute
@@ -118,7 +121,7 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
         try {
             json.writeMapBegin();
             if (descriptor != null) {
-                json.writeMapEntry("eventDef", descriptor.getDef());
+                json.writeMapEntry("eventDef", Aura.getDefinitionService().getDefinition(descriptor));
             }
             json.writeMapEntry("action", action);
             json.writeMapEntry("value", value);

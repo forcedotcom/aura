@@ -455,56 +455,59 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             @Nonnull CompileContext cc, @Nonnull Set<DefDescriptor<?>> stack,
             @CheckForNull Definition parent) throws QuickFixException {
         currentCC.loggingService.incrementNum(LoggingService.DEF_VISIT_COUNT);
-        if (stack.contains(descriptor)) {
-            // System.out.println("cycle at "+stack+" "+descriptor);
-            return null;
-        }
         CompilingDef<D> cd = cc.getCompiling(descriptor);
-        if (cc.level > cd.level) {
-            cd.level = cc.level;
-            if (cd.def != null) {
-                // System.out.println("recalculating at "+stack+" "+descriptor);
-            }
-        } else {
-            if (cd.def != null) {
-                return cd.def;
-            }
-        }
-        cc.level += 1;
-        stack.add(descriptor);
         try {
-            //
-            // careful here. We don't just return with the non-null def because that breaks our levels.
-            // We need to walk the whole tree, which is unfortunate perf-wise.
-            //
-            if (cd.def == null) {
-                if (!fillCompilingDef(cd, cc.context)) {
-                    // No def. Blow up.
-                    Location l = null;
-                    if (parent != null) {
-                        l = parent.getLocation();
+            if (stack.contains(descriptor)) {
+                // System.out.println("cycle at "+stack+" "+descriptor);
+                return null;
+            }
+            if (cc.level > cd.level) {
+                cd.level = cc.level;
+            } else {
+                if (cd.def != null) {
+                    return cd.def;
+                }
+            }
+            cc.level += 1;
+            stack.add(descriptor);
+            try {
+                //
+                // careful here. We don't just return with the non-null def because that breaks our levels.
+                // We need to walk the whole tree, which is unfortunate perf-wise.
+                //
+                if (cd.def == null) {
+                    if (!fillCompilingDef(cd, cc.context)) {
+                        // No def. Blow up.
+                        Location l = null;
+                        if (parent != null) {
+                            l = parent.getLocation();
+                        }
+                        stack.remove(descriptor);
+                        throw new DefinitionNotFoundException(descriptor, l, stack.toString());
                     }
-                    stack.remove(descriptor);
-                    throw new DefinitionNotFoundException(descriptor, l, stack.toString());
+                    // get client libs
+                    if (cc.clientLibs != null && cd.def instanceof BaseComponentDef) {
+                        BaseComponentDef baseComponent = (BaseComponentDef) cd.def;
+                        baseComponent.addClientLibs(cc.clientLibs);
+                    }
                 }
-                // get client libs
-                if (cc.clientLibs != null && cd.def instanceof BaseComponentDef) {
-                    BaseComponentDef baseComponent = (BaseComponentDef) cd.def;
-                    baseComponent.addClientLibs(cc.clientLibs);
+
+                Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
+                cd.def.appendDependencies(newDeps);
+
+                for (DefDescriptor<?> dep : newDeps) {
+                    getHelper(dep, cc, stack, cd.def);
                 }
+
+                return cd.def;
+            } finally {
+                cc.level -= 1;
+                stack.remove(descriptor);
             }
-
-            Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
-            cd.def.appendDependencies(newDeps);
-
-            for (DefDescriptor<?> dep : newDeps) {
-                getHelper(dep, cc, stack, cd.def);
-            }
-
-            return cd.def;
         } finally {
-            cc.level -= 1;
-            stack.remove(descriptor);
+            if (parent != null && cd.def != null) {
+                assertAccess(parent.getDescriptor(), cd.def);
+            }
         }
     }
 
@@ -1116,7 +1119,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         // If the def is access="global" or does not require authentication then anyone can see it
         DefinitionAccess access = def.getAccess();
         if (access == null) {
-            throw new RuntimeException("Missing access declaration for " + def.getDescriptor());
+            throw new RuntimeException("Missing access declaration for " + def.getDescriptor()
+                    + " of type "+def.getClass().getSimpleName());
         }
         if (access.isGlobal() || !access.requiresAuthentication()) {
             return null;

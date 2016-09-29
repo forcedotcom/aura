@@ -26,7 +26,6 @@ import org.auraframework.impl.root.parser.handler.TokensImportDefHandler;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSource;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.junit.Test;
 
 import javax.inject.Inject;
@@ -73,16 +72,5 @@ public class TokensImportImplTest extends StyleTestCase {
         Set<DefDescriptor<?>> deps = Sets.newHashSet();
         def.appendDependencies(deps);
         assertTrue(deps.contains(desc));
-    }
-
-    @Test
-    public void testInvalidReference() throws Exception {
-        try {
-            TokensImportDef def = source("<aura:import name='blah:blah'/>");
-            def.validateReferences();
-            fail("expected to get an exception");
-        } catch (Exception e) {
-            checkExceptionContains(e, DefinitionNotFoundException.class, "No TOKENS");
-        }
     }
 }

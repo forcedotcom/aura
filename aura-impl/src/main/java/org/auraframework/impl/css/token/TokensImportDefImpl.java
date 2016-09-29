@@ -59,7 +59,6 @@ public class TokensImportDefImpl extends DefinitionImpl<TokensImportDef> impleme
     @Override
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
-        importDescriptor.getDef().validateReferences();
     }
 
     @Override

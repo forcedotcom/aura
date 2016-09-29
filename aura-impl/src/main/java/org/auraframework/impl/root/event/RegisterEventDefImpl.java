@@ -24,8 +24,6 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -71,7 +69,7 @@ public final class RegisterEventDefImpl extends DefinitionImpl<EventDef> impleme
     @Override
     public void serialize(Json json) throws IOException {
         try {
-            EventDef eventDef = descriptor.getDef();
+            EventDef eventDef = Aura.getDefinitionService().getDefinition(descriptor);
             json.writeMapBegin();
             json.writeMapEntry("eventDef", eventDef);
             json.writeMapEntry("attributeName", attName);
@@ -102,21 +100,13 @@ public final class RegisterEventDefImpl extends DefinitionImpl<EventDef> impleme
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
         
-        EventDef event = getEventDescriptor().getDef();
+        EventDef event = Aura.getDefinitionService().getDefinition(descriptor);
         if (event == null) {
-            throw new InvalidDefinitionException("Cannot register event of type " + getEventDescriptor(), getLocation());
+            throw new InvalidDefinitionException("Cannot register event of type " + descriptor, getLocation());
         }
-        
         if (!event.getEventType().canBeFired()) {
-            throw new InvalidDefinitionException("Cannot fire event of type: " + getEventDescriptor(), getLocation());
+            throw new InvalidDefinitionException("Cannot fire event of type: " + descriptor, getLocation());
         }
-        
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        DefDescriptor<?> referencingDesc = context.getCurrentCallingDescriptor();
-    	if (referencingDesc != null) {
-	        MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
-	    	registry.assertAccess(referencingDesc, event);
-    	}        
     }
 
     @Override

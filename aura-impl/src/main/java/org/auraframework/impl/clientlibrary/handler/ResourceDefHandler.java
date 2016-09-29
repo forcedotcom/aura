@@ -17,7 +17,9 @@ package org.auraframework.impl.clientlibrary.handler;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ResourceDef;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.clientlibrary.ResourceDefImpl;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -35,6 +37,7 @@ public class ResourceDefHandler {
         this.builder.setOwnHash(source.getHash());
 
         this.builder.setSource(source);
+        this.builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
     }
 
     public ResourceDef createDefinition() throws QuickFixException {

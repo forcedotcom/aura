@@ -28,7 +28,6 @@ import org.auraframework.builder.design.DesignDefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
@@ -40,14 +39,12 @@ import org.auraframework.def.design.DesignLayoutItemDef;
 import org.auraframework.def.design.DesignOptionDef;
 import org.auraframework.def.design.DesignSectionDef;
 import org.auraframework.def.design.DesignTemplateDef;
-import org.auraframework.def.design.DesignTemplateRegionDef;
 import org.auraframework.def.genericxml.GenericXmlElement;
 import org.auraframework.def.genericxml.GenericXmlValidator;
 import org.auraframework.impl.root.GenericXmlElementImpl;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -93,28 +90,7 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
 
-        // Validate that any referenced interfaces exist as accessible definitions.
-        // If the definition does not exist or isn't accessible, the template definition
-        // will be considered invalid.
-        if (template != null) {
-            Map<DefDescriptor<DesignTemplateRegionDef>, DesignTemplateRegionDef> regions = template
-                    .getDesignTemplateRegionDefs();
-            MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
-            for (DesignTemplateRegionDef region : regions.values()) {
-                Set<DefDescriptor<InterfaceDef>> allowedInterfaces = region.getAllowedInterfaces();
-                if (allowedInterfaces == null || allowedInterfaces.isEmpty()) {
-                    continue;
-                }
-                for (DefDescriptor<InterfaceDef> intf : allowedInterfaces) {
-                    InterfaceDef interfaze = intf.getDef();
-                    if (interfaze == null) {
-                        throw new DefinitionNotFoundException(intf, getLocation());
-                    }
-                    registry.assertAccess(descriptor, interfaze);
-                }
-            }
-        }
-
+        // I'm guessing that this should be in validateDefinition
         if (layoutDesignDefs != null) {
             //Ensure that only one item with the same name is defined in a layout.
             for (DesignLayoutDef layout : layoutDesignDefs.values()) {

@@ -169,11 +169,13 @@ public class InstanceAccessTest extends AuraImplTestCase {
 
     private void assertNoAccess(DefDescriptor<?> desc) throws Exception {
         DefDescriptor<ApplicationDef> appDesc = buildApp(DEFAULT, "", String.format("<%s/>", desc.getDescriptorName()));
+        NoAccessException expected = null;
         try {
             instanceService.getInstance(appDesc);
-            fail("Expected NoAccessException");
         } catch (NoAccessException e) {
+            expected = e;
         }
+        assertNotNull("Expected NoAccessException", expected);
     }
 
     private void assertAccess(DefDescriptor<?> desc) throws Exception {

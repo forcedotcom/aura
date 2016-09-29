@@ -32,7 +32,6 @@ import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -95,9 +94,8 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
 
-        MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
         for (DefDescriptor<InterfaceDef> extended : extendsDescriptors) {
-            InterfaceDef def = extended.getDef();
+            InterfaceDef def = Aura.getDefinitionService().getDefinition(extended);
             if (def == null) {
                 throw new DefinitionNotFoundException(extended, getLocation());
             }
@@ -106,8 +104,6 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
                 throw new InvalidDefinitionException(String.format("%s cannot extend itself", getDescriptor()),
                         getLocation());
             }
-
-            registry.assertAccess(descriptor, def);
         }
 
         // make sure the registered events actually exist

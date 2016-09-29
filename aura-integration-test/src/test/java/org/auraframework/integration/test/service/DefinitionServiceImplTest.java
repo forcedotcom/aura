@@ -98,14 +98,16 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     @Test
     public void testGetDefinitionOfApplicationWithAuthenicatedAccessInPublicContext() throws QuickFixException {
         DefDescriptor<? extends BaseComponentDef> desc = addSourceAutoCleanup(
-                ApplicationDef.class, String.format(baseApplicationTag,
-                        "", ""));
+                ApplicationDef.class, String.format(baseApplicationTag, "", ""));
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.UNAUTHENTICATED, desc);
+        DefinitionNotFoundException expected = null;
         try {
             definitionService.getDefinition(desc);
-            fail("Expected DefinitionNotFoundException from assertAccess");
         } catch (DefinitionNotFoundException e) {
+            expected = e;
         }
+
+        assertNotNull("Expected DefinitionNotFoundException from assertAccess", expected);
     }
 
     @Test
@@ -177,15 +179,18 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 cmpWithoutHelperDescriptor.getNamespace(), cmpWithoutHelperDescriptor.getName());
         String cmpMarkup = String.format(baseComponentTag, helperAttribute, "");
         DefDescriptor<ComponentDef> cmpDescriptor = addSourceAutoCleanup(ComponentDef.class, cmpMarkup);
+        Exception expected = null;
 
         try {
             definitionService.getDefinition(cmpDescriptor.getQualifiedName(), ComponentDef.class);
-            fail("DefinitionNotFoundException should be thrown when getting a definition of component using descriptor of a component without helper.");
         } catch (Exception e) {
-            String errorMessage = String.format("No HELPER named js://%s.%s found",
-                    cmpWithoutHelperDescriptor.getNamespace(), cmpWithoutHelperDescriptor.getName());
-            this.checkExceptionContains(e, DefinitionNotFoundException.class, errorMessage);
+            expected = e;
         }
+
+        assertNotNull("DefinitionNotFoundException should be thrown when getting a definition of component using descriptor of a component without helper.", expected);
+        String errorMessage = String.format("No HELPER named js://%s.%s found",
+                cmpWithoutHelperDescriptor.getNamespace(), cmpWithoutHelperDescriptor.getName());
+        this.checkExceptionContains(expected, DefinitionNotFoundException.class, errorMessage);
     }
 
     /**
@@ -196,12 +201,14 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(
                 DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
+        NoAccessException expected = null;
+        Definition def = definitionService.getDefinition(desc);
         try {
-            Definition def = definitionService.getDefinition(desc);
             definitionService.getDefRegistry().assertAccess(null, def);
-            fail("Expected NoAccessException from assertAccess");
         } catch (NoAccessException e) {
+            expected = e;
         }
+        assertNotNull("Expected NoAccessException from assertAccess", expected);
     }
 
     /**
@@ -212,12 +219,15 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(
                 DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
+        NoAccessException expected = null;
+        Definition def = definitionService.getDefinition(desc.getQualifiedName(), ComponentDef.class);
+
         try {
-            Definition def = definitionService.getDefinition(desc.getQualifiedName(), ComponentDef.class);
             definitionService.getDefRegistry().assertAccess(null, def);
-            fail("Expected NoAccessException from assertAccess");
         } catch (NoAccessException e) {
+            expected = e;
         }
+        assertNotNull("Expected NoAccessException from assertAccess", expected);
     }
 
     /**
@@ -228,12 +238,14 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(
                 DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
+        NoAccessException expected = null;
+        Definition def = definitionService.getDefinition(desc.getQualifiedName(), DefType.COMPONENT);
         try {
-            Definition def = definitionService.getDefinition(desc.getQualifiedName(), DefType.COMPONENT);
             definitionService.getDefRegistry().assertAccess(null, def);
-            fail("Expected NoAccessException from assertAccess");
         } catch (NoAccessException e) {
+            expected = e;
         }
+        assertNotNull("Expected NoAccessException from assertAccess", expected);
     }
 
     @Test

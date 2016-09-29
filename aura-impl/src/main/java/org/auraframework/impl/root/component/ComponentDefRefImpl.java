@@ -108,7 +108,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
-        dependencies.add(descriptor);
+            dependencies.add(descriptor);
         for (AttributeDefRef attributeDefRef : attributeValues.values()) {
             attributeDefRef.appendDependencies(dependencies);
         }
@@ -124,21 +124,15 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
             throw new InvalidDefinitionException("Cannot directly instantiate "+descriptor, location);
         }
 
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        DefDescriptor<?> referencingDesc = context.getCurrentCallingDescriptor();
-        if (referencingDesc != null) {
-            MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
-            registry.assertAccess(referencingDesc, def);
-        }
-
         if (flavor != null) {
             // component must be flavorable (and by implication can't be an interface then)
-            if (!def.hasFlavorableChild() && !def.inheritsFlavorableChild() && !def.isDynamicallyFlavorable()) {
-                throw new InvalidDefinitionException(String.format("%s is not flavorable", descriptor), location);
-            }
+                if (!def.hasFlavorableChild() && !def.inheritsFlavorableChild() && !def.isDynamicallyFlavorable()) {
+                    throw new InvalidDefinitionException(String.format("%s is not flavorable", descriptor), location);
+                }
         }
 
-        validateAttributesValues(referencingDesc);
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        validateAttributesValues(context.getCurrentCallingDescriptor());
 
         // validateMissingAttributes();
 
@@ -161,8 +155,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
             DefDescriptor<AttributeDef> attributeDefDesc = entry.getKey();
             AttributeDef attributeDef = atts.get(attributeDefDesc);
             if (attributeDef == null) {
-                // didn't find an attribute by that name, check if there's an
-                // event
+                // didn't find an attribute by that name, check if there's an event
                 RegisterEventDef registeredEvent = registeredEvents.get(attributeDefDesc.getName());
                 if (registeredEvent == null) {
                     throw new AttributeNotFoundException(def.getDescriptor(), attributeDefDesc.getName(),

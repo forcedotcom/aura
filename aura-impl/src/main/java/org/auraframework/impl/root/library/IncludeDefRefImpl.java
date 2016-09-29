@@ -134,14 +134,7 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
 
     @Override
     public void validateReferences() throws QuickFixException {
-        IncludeDef includeDef = descriptor.getDef();
-        includeDef.validateDefinition();
-        if (imports != null) {
-            for (DefDescriptor<IncludeDef> imported : imports) {
-                imported.getDef().validateDefinition();
-                imported.getDef().validateReferences();
-            }
-        }
+        super.validateReferences();
     }
 
     @Override

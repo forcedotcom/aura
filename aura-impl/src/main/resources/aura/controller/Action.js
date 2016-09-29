@@ -119,7 +119,7 @@ Action.prototype.getId = function() {
 
  Action.prototype.setId = function (id) {
     this.id = id;
- }
+ };
 
 /**
  * Gets the next action scoped Id.

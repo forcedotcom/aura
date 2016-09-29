@@ -37,6 +37,7 @@
 
     <aura:attribute name="autoInitialize"           type="String" default="true" description="Denotes whether Aura should auto-initialize (true) or not (false)."/>
     <aura:attribute name="autoInitializeSync"       type="String" default="false" />
+    <aura:attribute name="bootstrapInlineJs"           type="String" description="Allow inlineJS execution within the context of bootsttrap script"/>
 
     <aura:attribute name="doctype"                  type="String" access="GLOBAL" default="&lt;!DOCTYPE html&gt;"         description="The DOCTYPE declaration for the template."/>
     <aura:attribute name="loadingText"              type="String" access="GLOBAL" default="Loading"                       description="Loading text"/>
@@ -67,8 +68,6 @@
 <html manifest="{!v.manifest}">
 <head>
     <title>{!v.title}</title>
-    <script>
-var pageStartTime = (new Date()).getTime();</script>
     {!v.extraMetaTags}
 
     <!-- ====== Styles ====== -->
@@ -106,9 +105,11 @@ var pageStartTime = (new Date()).getTime();</script>
 
     <script>
 (function () {
-    var time = window.performance &amp;&amp; window.performance.now ? window.performance.now.bind(performance) : function(){return Date.now();};
+    window.pageStartTime = (new Date()).getTime();
     window.Aura || (window.Aura = {});
     window.Aura.bootstrap || (window.Aura.bootstrap = {});
+
+    var time = window.performance &amp;&amp; window.performance.now ? window.performance.now.bind(performance) : function(){return Date.now();};
     window.Aura.bootstrap.execInlineJs = time();
 
     var auraConfig = {!v.auraInit};
@@ -172,7 +173,9 @@ var pageStartTime = (new Date()).getTime();</script>
     }
 
     initLocker();
-    
+
+    {!v.bootstrapInlineJs}
+
 }());
 
     </script>

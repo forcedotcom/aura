@@ -1230,6 +1230,8 @@ AuraClientService.prototype.initDefs = function() {
     if (Aura["afterAppDefsReady"]) {
         Aura["afterAppDefsReady"].forEach(function (fn) { fn();});
     }
+
+    Aura["afterDefsReady"] = true;
     delete Aura["afterAppDefsReady"];
 };
 
@@ -2450,6 +2452,28 @@ AuraClientService.prototype.buildActionNameList = function(actions) {
     }
 
     return this.buildParams(map);
+};
+
+
+/**
+ * This function is only meant to be used for the corner case of preloading actions before Aura its available
+ * It gets the actions that were preloaded ahead of time, a map with actionIds, and the prelaod XHR response object
+ * Basically is like a regular server action but re-wiring the server results manually
+ * @export
+ */
+AuraClientService.prototype.hydrateActions = function(actions, preloadMapId, response) {
+    var xhr = new Aura.Services.AuraClientService$AuraXHR();
+    xhr.request = response;
+
+    actions.forEach(function (action) {
+        var id = preloadMapId[action.getId()];
+        if (id) {
+            action.setId(id);
+        }
+        xhr.addAction(action);
+    });
+
+    this.receive(xhr);
 };
 
 /**

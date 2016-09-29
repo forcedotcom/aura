@@ -111,6 +111,17 @@ Action.prototype.getId = function() {
 };
 
 /**
+ * Sets the action id
+ *
+ * @returns {string}
+ * @private
+ */
+
+ Action.prototype.setId = function (id) {
+    this.id = id;
+ }
+
+/**
  * Gets the next action scoped Id.
  *
  * @returns {string}

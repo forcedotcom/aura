@@ -1,0 +1,177 @@
+<aura:component description="Preload actions">
+    Aura.PreloadLayout = (function (config) {
+        function buildParams(o) {
+            return Object.keys(o).reduce(function (r, k) {
+                r.push(k + '=' + encodeURIComponent(o[k]));
+                return r;
+            }, []).join('&#38;');
+        }
+
+
+        function prefetchAuraActions(actions, callback) {
+            var ctx = config.context; 
+            var contextToSend = { mode : ctx.mode, fwuid : ctx.fwuid, loaded : ctx.loaded, app : ctx.app };
+            var payload = {
+                "aura.token": config.token, 
+                "aura.context": JSON.stringify(contextToSend), 
+                message: JSON.stringify({ actions: actions }) 
+            };
+
+            function onPrefetchError(e) { callback(e); }
+            var params = buildParams(payload);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/aura?preloadActions");
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.timeout = 10000;
+
+            xhr.addEventListener('error', onPrefetchError);
+            xhr.addEventListener('timeout', onPrefetchError);
+            xhr.addEventListener('load', function (e) {
+                if (this.status === 200) {
+                    callback(null, this);
+                } else {
+                    onPrefetchError(e);
+                }
+            });
+
+            xhr.send(params);
+        }
+
+        function hookAfterDefsReady(callback) {
+            if (Aura.afterAppDefsReady) {
+                callback();
+            } else {
+                Aura.afterAppDefsReady = Aura.afterAppDefsReady || [];
+                Aura.afterAppDefsReady.push(callback);
+            }
+        }
+
+        function preloadActionMap(actions, actionsToPreload) {
+            var map = {};
+
+            for (var i in actions) {
+                var action = actions[i];
+                var key = action.getStorageKey();
+
+                if (!actionsToPreload[key]) {
+                    return;
+                }
+
+                map[action.getId()] = actionsToPreload[key].id;
+            }
+
+            return map;
+        }
+
+        function enqueueActions (actions) {
+            actions.forEach(function (action) {
+                $A.enqueueAction(action);
+            });
+        }
+
+        return {
+            // state
+            actionsKeys: {},
+            actionsToPreload: {},
+            actionsPrefetched: false,
+            actionsStorageChecked: false,
+            actionsOnStorage: false,
+            actionsDispatched: false,
+            queueActionHydration : null,
+
+            preload: function (actions) {
+                // Setup
+                actions.forEach(function (action, i) {
+                    var key = action.descriptor + ":" + JSON.stringify(action.params);
+                    action.id = i + ";p";
+                    this.actionsKeys[key] = true;
+                    this.actionsToPreload[key] = action;
+                }.bind(this));
+
+                prefetchAuraActions(actions, this._afterPrefetch.bind(this));
+                hookAfterDefsReady(this._afterDefsReady.bind(this));
+            },
+            _afterPrefetch: function (error, xhr) {
+                this.actionsPrefetched = true;
+                this.xhrResponse = xhr;
+
+                console.log('>>> Actions prefetched!');
+
+                if (!this.actionsDispatched &#38;&#38; this.queueActionsHydration) {
+                    this.queueActionsHydration();
+                }
+            },
+            _afterDefsReady: function () {
+                var actionStorage = $A.storageService.getStorage('actions');
+                var actionKeys = this.actionsKeys;
+
+                if (actionStorage) {
+                    actionStorage.getAll([]).then(function (storedActions) {
+                        this.actionsStorageChecked = true;
+                        for (var key in actionKeys) {
+                            if (!storedActions[key]) {
+                                return;
+                            }
+                        }
+
+                        console.log('>>> Storage checked!');
+                        this.actionsOnStorage = true;
+                        if (!this.actionsDispatched &#38;&#38; this.queueActions) {
+                            this.queueActions();
+                        }
+
+                    }.bind(this));
+                } else {
+                    this.actionsStorageChecked = true;
+                }
+            },
+            enqueue: function (actions) {
+                var actionsToPreload = this.actionsToPreload;
+                var preloadMapId = preloadActionMap(actions, actionsToPreload);
+                
+                var hydrate = function () {
+                    console.log('>>> Lazy execute hydration');
+                    this.actionsDispatched = true;
+                    $A.clientService.hydrateActions(actions, preloadMapId, this.xhrResponse);
+                }.bind(this);
+
+                var enqueue = function () {
+                    console.log('>>> Lazy execute enqueue');
+                    this.actionsDispatched = true;
+                    enqueueActions(actions);
+                }.bind(this);
+
+                console.log('>>> Enqueue!');
+
+                if (preloadMapId) {
+                    // If we already got the results from the server, just hydrate
+                    if (this.actionsPrefetched) {
+                        hydrate();
+                        return;
+                    } else {
+                        this.queueActionsHydration = hydrate;
+                    }
+
+                    // If we have them from storage
+                    if (this.actionsStorageChecked) {
+                        if (this.actionsOnStorage) {
+                            enqueue();
+                            return;
+                        }
+                    } else {
+                        this.queueActions = enqueue;
+                    }
+
+                } else {
+                    $A.log('Preloads not found for the give actions, doing regular enqueing');
+                    this.actionsDispatched = true;
+                    enqueueActions(actions);
+                }
+            }
+        };
+
+    })(auraConfig);
+
+    {!v.body} 
+</aura:component>    

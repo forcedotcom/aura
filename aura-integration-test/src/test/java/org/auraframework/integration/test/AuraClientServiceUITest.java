@@ -19,15 +19,13 @@ import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 
 public class AuraClientServiceUITest extends WebDriverTestCase {
 
     // CSRF is only stored in persistent storage. indexedDB is not supported on Safari,
     // so persistent storage is not able to be created on Safari.
 	
-	// @dval: Refactor this tests to be within InlineJS suite 
+    // @dval: Refactor this tests to be within InlineJS suite 
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     @ThreadHostileTest("ConfigAdapter modified, can't tolerate other tests.")
     @Test

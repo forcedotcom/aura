@@ -98,7 +98,7 @@ public abstract class IntegrationTestCase extends AuraImplTestCase {
             throws QuickFixException {
         AuraContext ctxt = contextService.startContext(mode, format, Authentication.AUTHENTICATED, desc);
         ctxt.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
-        String uid = ctxt.getDefRegistry().getUid(null, desc);
+        String uid = definitionService.getUid(null, desc);
         ctxt.addLoaded(desc, uid);
         return ctxt;
     }

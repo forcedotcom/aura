@@ -194,13 +194,16 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
         this.extendsDescriptor = null;
         this.modelDefDescriptor = null;
         setupTemplate(false);
+        Throwable expected = null;
         try {
             buildDefinition().validateReferences();
-            fail("Expected an exception when using a template that is not a template");
-        } catch (Throwable t) {
-            assertExceptionMessageStartsWith(t, InvalidDefinitionException.class,
-                    String.format("Template %s must be marked as a template", templateDefDescriptor));
+        } catch (QuickFixException qfe) {
+            expected = qfe;
         }
+        assertNotNull("should have gotten an exception when using a non-template as template", expected);
+        assertExceptionMessageStartsWith(expected, InvalidDefinitionException.class,
+                String.format("Template %s must be marked as a template", templateDefDescriptor));
+        
     }
 
     @Override
@@ -239,5 +242,6 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
         Mockito.doReturn(this.templateDefDescriptor).when(this.templateDef).getDescriptor();
         Mockito.doReturn(isTemplate).when(this.templateDef).isTemplate();
         Mockito.doReturn(GLOBAL_ACCESS).when(this.templateDef).getAccess();
+        contextService.getCurrentContext().addDynamicDef(templateDef);
     }
 }

@@ -510,10 +510,10 @@ public class ServerServiceImplTest extends AuraImplTestCase {
                 .getDefDescriptor("preloadTest:test_SimpleApplication", ApplicationDef.class);
         AuraContext context = contextService
                 .startContext(Mode.DEV, AuraContext.Format.CSS, AuraContext.Authentication.AUTHENTICATED, appDesc);
-        final String uid = context.getDefRegistry().getUid(null, appDesc);
+        final String uid = definitionService.getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
 
-        Set<DefDescriptor<?>> dependencies = context.getDefRegistry().getDependencies(uid);
+        Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
 
         StringWriter output = new StringWriter();
         ss.writeAppCss(dependencies, output);
@@ -578,10 +578,10 @@ public class ServerServiceImplTest extends AuraImplTestCase {
                 .getDefDescriptor("clientApiTest:cssStyleTest", ComponentDef.class);
         AuraContext context = contextService.startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
                 AuraContext.Authentication.AUTHENTICATED, appDesc);
-        final String uid = context.getDefRegistry().getUid(null, appDesc);
+        final String uid = definitionService.getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
 
-        Set<DefDescriptor<?>> dependencies = context.getDefRegistry().getDependencies(uid);
+        Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
 
         StringWriter output = new StringWriter();
         ss.writeAppCss(dependencies, output);
@@ -603,10 +603,10 @@ public class ServerServiceImplTest extends AuraImplTestCase {
                 .getDefDescriptor("appCache:withpreload", ApplicationDef.class);
         AuraContext context = contextService
                 .startContext(Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
-        final String uid = context.getDefRegistry().getUid(null, appDesc);
+        final String uid = definitionService.getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
 
-        Set<DefDescriptor<?>> dependencies = context.getDefRegistry().getDependencies(uid);
+        Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
 
         // prime def cache
         StringWriter output = new StringWriter();
@@ -633,10 +633,11 @@ public class ServerServiceImplTest extends AuraImplTestCase {
                 .getDefDescriptor("clientApiTest:cssStyleTest", ComponentDef.class);
         AuraContext context = contextService.startContext(AuraContext.Mode.DEV, AuraContext.Format.JS,
                 AuraContext.Authentication.AUTHENTICATED, appDesc);
-        final String uid = context.getDefRegistry().getUid(null, appDesc);
+        final String uid = definitionService.getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
 
-        Set<DefDescriptor<?>> dependencies = context.getDefRegistry().getDependencies(uid);
+        Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
+        definitionService.getDefinition(appDesc);
 
         StringWriter output = new StringWriter();
         ss.writeDefinitions(dependencies, output);
@@ -743,10 +744,9 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         AuraContext context = contextService.startContext(mode,
                 AuraContext.Format.JS,
                 AuraContext.Authentication.AUTHENTICATED, appDesc);
-        final String uid = context.getDefRegistry().getUid(null, appDesc);
+        final String uid = definitionService.getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
-        Set<DefDescriptor<?>> dependencies = context.getDefRegistry()
-                .getDependencies(uid);
+        Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
 
         ServerService ss = serverService;
         StringWriter output = new StringWriter();

@@ -43,7 +43,6 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.StyleService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.base.Optional;
@@ -70,7 +69,7 @@ public class StyleServiceImpl implements StyleService {
 
     @Inject
     private DefinitionService definitionService;
-
+    
     @Override
     public String applyTokens(DefDescriptor<TokensDef> tokens, DefDescriptor<? extends BaseStyleDef> style) throws QuickFixException {
         return applyTokens(ImmutableList.of(tokens), ImmutableList.of(style));
@@ -93,7 +92,7 @@ public class StyleServiceImpl implements StyleService {
     public String applyTokensContextual(DefDescriptor<TokensDef> tokens, Iterable<DefDescriptor<? extends BaseStyleDef>> extraStyles)
             throws QuickFixException {
         return applyTokensContextual(ImmutableList.of(tokens), extraStyles);
-    }
+        }
 
     @Override
     public String applyTokensContextual(Iterable<DefDescriptor<TokensDef>> tokens, Iterable<DefDescriptor<? extends BaseStyleDef>> extraStyles)
@@ -101,21 +100,21 @@ public class StyleServiceImpl implements StyleService {
         AuraContext context = contextService.getCurrentContext();
         Set<DefDescriptor<? extends BaseStyleDef>> clientLoaded = new LinkedHashSet<>();
 
-        // attempt to automatically detect client-loaded styles
-        for (DefDescriptor<?> desc : context.getClientLoaded().keySet()) {
-            // include inner deps
-            clientLoaded.addAll(getStyleDependencies(desc));
+            // attempt to automatically detect client-loaded styles
+            for (DefDescriptor<?> desc : context.getClientLoaded().keySet()) {
+                // include inner deps
+                clientLoaded.addAll(getStyleDependencies(desc));
 
-            // add the client loaded style def itself, (purposely done after!)
-            DefDescriptor<StyleDef> style = definitionService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX, StyleDef.class);
-            if (style.exists()) {
-                clientLoaded.add(style);
-            }
+                // add the client loaded style def itself, (purposely done after!)
+                DefDescriptor<StyleDef> style = definitionService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX, StyleDef.class);
+                if (style.exists()) {
+                    clientLoaded.add(style);
+                }
             DefDescriptor<FlavoredStyleDef> flavor = definitionService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX, FlavoredStyleDef.class);
-            if (flavor.exists()) {
-                clientLoaded.add(flavor);
+                if (flavor.exists()) {
+                    clientLoaded.add(flavor);
+                }
             }
-        }
 
         return applyTokensContextual(tokens, extraStyles, clientLoaded);
     }
@@ -130,7 +129,7 @@ public class StyleServiceImpl implements StyleService {
 
         // add style def descriptors based on app dependencies
         String uid = context.getUid(context.getLoadingApplicationDescriptor());
-        for (DefDescriptor<?> dependency : context.getDefRegistry().getDependencies(uid)) {
+        for (DefDescriptor<?> dependency : definitionService.getDependencies(uid)) {
             if (dependency.getDefType() == DefType.STYLE || dependency.getDefType() == DefType.FLAVORED_STYLE) {
                 @SuppressWarnings("unchecked")
                 DefDescriptor<? extends BaseStyleDef> desc = ((DefDescriptor<? extends BaseStyleDef>)dependency);
@@ -153,12 +152,11 @@ public class StyleServiceImpl implements StyleService {
 
     /** gets all style dependencies for the given component */
     private Set<DefDescriptor<? extends BaseStyleDef>> getStyleDependencies(DefDescriptor<?> defDescriptor) throws QuickFixException {
-        MasterDefRegistry mdr = contextService.getCurrentContext().getDefRegistry();
         Set<DefDescriptor<? extends BaseStyleDef>> styles = new LinkedHashSet<>();
 
-        String descUid = mdr.getUid(null, defDescriptor);
+        String descUid = definitionService.getUid(null, defDescriptor);
         if (descUid != null) {
-            for (DefDescriptor<?> dep : mdr.getDependencies(descUid)) {
+            for (DefDescriptor<?> dep : definitionService.getDependencies(descUid)) {
                 DefDescriptor<StyleDef> style = definitionService.getDefDescriptor(dep, DefDescriptor.CSS_PREFIX, StyleDef.class);
                 if (style.exists()) {
                     styles.add(style);

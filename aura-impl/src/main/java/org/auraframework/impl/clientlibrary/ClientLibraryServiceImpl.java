@@ -19,12 +19,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.clientlibrary.ClientLibraryResolver;
 import org.auraframework.clientlibrary.ClientLibraryResolverRegistry;
 import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.ClientLibraryDef;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.NoContextException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -37,6 +40,9 @@ import com.google.common.collect.Sets;
  */
 @ServiceComponent
 public class ClientLibraryServiceImpl implements ClientLibraryService {
+
+    @Inject
+    DefinitionService definitionService;
 
     public ClientLibraryServiceImpl() {
     }
@@ -119,11 +125,11 @@ public class ClientLibraryServiceImpl implements ClientLibraryService {
      * @param type CSS or JS
      * @return list
      */
-    private static List<ClientLibraryDef> getClientLibraries(AuraContext context, ClientLibraryDef.Type type) {
+    private List<ClientLibraryDef> getClientLibraries(AuraContext context, ClientLibraryDef.Type type) {
         AuraContext.Mode mode = context.getMode();
         String uid = context.getUid(context.getApplicationDescriptor());
         // get all client libraries specified for current app (cmp).
-        List<ClientLibraryDef> clientLibs = context.getDefRegistry().getClientLibraries(uid);
+        List<ClientLibraryDef> clientLibs = definitionService.getClientLibraries(uid);
         List<ClientLibraryDef> ret = Lists.newArrayList();
 
         if (clientLibs != null) {

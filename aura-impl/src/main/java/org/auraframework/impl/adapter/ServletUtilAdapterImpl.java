@@ -51,7 +51,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.AuraResource;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
@@ -609,7 +608,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     public Set<DefDescriptor<?>> verifyTopLevel(HttpServletRequest request, HttpServletResponse response,
             AuraContext context) throws IOException {
         DefDescriptor<? extends BaseComponentDef> appDesc = context.getApplicationDescriptor();
-        MasterDefRegistry mdr = context.getDefRegistry();
 
         context.setPreloading(true);
         if (appDesc == null) {
@@ -644,8 +642,8 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 // set of stuff to make the client re-try.
                 //
                 this.setNoCache(response);
-                String oosUid = mdr.getUid(null, appDesc);
-                return mdr.getDependencies(oosUid);
+                String oosUid = definitionService.getUid(null, appDesc);
+                return definitionService.getDependencies(oosUid);
             }
         } catch (QuickFixException qfe) {
             //
@@ -661,7 +659,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         if (uid == null) {
             uid = context.getUid(appDesc);
         }
-        return mdr.getDependencies(uid);
+        return definitionService.getDependencies(uid);
     }
 
     /**

@@ -26,15 +26,16 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -238,18 +239,18 @@ public class RegistrySerializer {
         Set<DefType> types = Sets.newHashSet();
         Set<DefDescriptor<?>> descriptors;
         List<Definition> defs = Lists.newArrayList();
-        MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
+        DefinitionService definitionService = Aura.getDefinitionService();
         DescriptorFilter root_nsf = new DescriptorFilter(namespace, "*");
         Map<DefDescriptor<?>, Definition> filtered;
         Set<String> namespaces = Sets.newHashSet(namespace);
         //
         // Fetch all matching descriptors for our 'root' definitions.
         //
-        descriptors = mdr.find(root_nsf);
+        descriptors = definitionService.find(root_nsf);
         for (DefDescriptor<?> desc : descriptors) {
             Definition def = null;
             try {
-                def = mdr.getDef(desc);
+                def = definitionService.getDefinition(desc);
                 if (def == null) {
                     logger.error("Unable to find "+desc+"@"+desc.getDefType());
                     error = true;

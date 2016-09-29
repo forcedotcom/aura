@@ -168,6 +168,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
         contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
 
         Set<DefDescriptor<?>> descs = ImmutableSet.<DefDescriptor<?>> of(libDesc);
+        definitionService.getDefinition(libDesc);
         Writer writer = new StringWriter();
         serverService.writeDefinitions(descs, writer);
         String actual = writer.toString();

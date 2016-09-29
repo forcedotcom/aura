@@ -308,10 +308,11 @@ public class StyleParserTest extends AuraImplTestCase {
     public void _testPerformance() throws Exception {
         /*
          * List<Long> oldTimes = Lists.newArrayList(); List<Long> newTimes = Lists.newArrayList(); List<Integer>
-         * lineCount = Lists.newArrayList(); DefDescriptor<StyleDef> desc =
-         * definitionService.getDefDescriptor("ui.button", StyleDef.class); Source<StyleDef> source =
-         * contextService.getCurrentContext().getDefRegistry().getSource(desc); String code =
-         * source.getContents(); StyleParserResultHolder holder = null; for(int k=0;k<1;k++){ if(k>0){ code = code +
+         * lineCount = Lists.newArrayList();
+         * DefDescriptor<StyleDef> desc = definitionService.getDefDescriptor("ui.button", StyleDef.class);
+         * Source<StyleDef> source = definitionService.getSource(desc);
+         * String code = source.getContents();
+         * StyleParserResultHolder holder = null; for(int k=0;k<1;k++){ if(k>0){ code = code +
          * code; } int count = 2; long old = 0l; long newer = 0l; for(int i=0;i<count;i++){ long start =
          * System.currentTimeMillis(); holder = new CSSParser2("ui", true, ".uiButton", code,
          * StyleParser.allowedConditions).parse(); long one = System.currentTimeMillis(); new CSSParser("ui", true,
@@ -352,7 +353,7 @@ public class StyleParserTest extends AuraImplTestCase {
         String coolContext = "/cool";
         context.setContextPath(coolContext);
         context.setApplicationDescriptor(desc);
-        final String uid = context.getDefRegistry().getUid(null, desc);
+        final String uid = definitionService.getUid(null, desc);
         context.addLoaded(desc, uid);
         StyleDef styleDef = definitionService.getDefinition(desc).getStyleDef();
         String styleStr = toJson(styleDef);

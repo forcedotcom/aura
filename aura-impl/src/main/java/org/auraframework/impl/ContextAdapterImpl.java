@@ -23,11 +23,8 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.context.AuraContextImpl;
-import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.instance.GlobalValueProvider;
-import org.auraframework.service.CachingService;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -50,13 +47,7 @@ public class ContextAdapterImpl implements ContextAdapter {
     private ConfigAdapter configAdapter;
 
     @Inject
-    private CachingService cachingService;
-
-    @Inject
     private DefinitionService definitionService;
-
-    @Inject
-    private LoggingService loggingService;
 
     @Autowired(required=false)
     private TestContextAdapter testContextAdapter;
@@ -82,12 +73,9 @@ public class ContextAdapterImpl implements ContextAdapter {
     }
 
     protected AuraContext buildSystemContext(AuraContext original) {
-        MasterDefRegistryImpl mdr = new MasterDefRegistryImpl(configAdapter, definitionService, loggingService,
-                cachingService);
-        AuraContext context = new AuraContextImpl(original.getMode(), mdr, original.getDefaultPrefixes(),
+        AuraContext context = new AuraContextImpl(original.getMode(), original.getDefRegistry(), original.getDefaultPrefixes(),
                 original.getFormat(), original.getAccess(), original.getJsonSerializationContext(),
                 original.getGlobalProviders(), configAdapter, definitionService, testContextAdapter, original);
-        mdr.setContext(context);
         return context;
     }
     

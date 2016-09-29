@@ -31,8 +31,8 @@ import org.auraframework.impl.css.parser.CssPreprocessor;
 import org.auraframework.impl.expression.AuraExpressionBuilder;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -113,7 +113,7 @@ public abstract class AbstractStyleDef<D extends BaseStyleDef> extends Definitio
         if (!expressions.isEmpty()) {
             StyleAdapter adapter = Aura.getStyleAdapter();
             TokenValueProvider vp = adapter.getTokenValueProvider(descriptor, ResolveStrategy.RESOLVE_DEFAULTS);
-            MasterDefRegistry mdr = Aura.getDefinitionService().getDefRegistry();
+            DefinitionService definitionService = Aura.getDefinitionService();
 
             for (String reference : expressions) {
                 // getValue will validate it's a valid expression/variable
@@ -123,7 +123,7 @@ public abstract class AbstractStyleDef<D extends BaseStyleDef> extends Definitio
                 // can be bypassed via cross references, among other issues.
                 for (List<TokenDef> tokenDefs : vp.extractTokenDefs(reference)) {
                     for (TokenDef tokenDef : tokenDefs) {
-                        mdr.assertAccess(descriptor, tokenDef);
+                        definitionService.assertAccess(descriptor, tokenDef);
                     }
                 }
             }

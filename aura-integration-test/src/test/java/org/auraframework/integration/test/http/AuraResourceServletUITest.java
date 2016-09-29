@@ -18,6 +18,7 @@ package org.auraframework.integration.test.http;
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.CheckAccessibility;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -75,24 +76,35 @@ public class AuraResourceServletUITest extends WebDriverTestCase {
         return "";
     }
 
+    private void checkCount(String message, String expected) throws Exception {
+        String actual = getCount();
+        WebElement el = getDriver().findElement(By.className("header"));
+        String text = el.getText();
+        assertEquals(message+". full text='" + text + "'", expected, actual);
+    }
+
     @Test
     @ThreadHostileTest
+    @Ignore("W-3413126: Sendkeys fails for certain combinations before 2.24")
     public void testDepsCacheContainsApp() throws Exception {
         openCachesAppWithRefresh("depsCache", "APPLICATION:markup://performance:caches");
-        assertEquals("There should be 2 entries in the deps cache", "2", getCount());
+        //assertEquals("There should be 2 entries in the deps cache", "2", getCount());
+        checkCount("There should be 2 entries in the deps cache", "2");
     }
 
     @Test
     @ThreadHostileTest
     public void testAltStringsCacheContainsAppJs() throws Exception {
         openCachesAppWithRefresh("altStringsCache", "markup://performance:caches@JS");
-        assertEquals("There should be 1 entry in the alt strings cache for JS", "1", getCount());
+        //assertEquals("There should be 1 entry in the alt strings cache for JS", "1", getCount());
+        checkCount("There should be 1 entry in the alt strings cache for JS", "1");
     }
 
     @Test
     @ThreadHostileTest
     public void testAltStringsCacheContainsAppCss() throws Exception {
         openCachesAppWithRefresh("altStringsCache", "markup://performance:caches@CSS");
-        assertEquals("There should be 1 entry in the alt strings cache for CSS", "1", getCount());
+        //assertEquals("There should be 1 entry in the alt strings cache for CSS", "1", getCount());
+        checkCount("There should be 1 entry in the alt strings cache for CSS", "1");
     }
 }

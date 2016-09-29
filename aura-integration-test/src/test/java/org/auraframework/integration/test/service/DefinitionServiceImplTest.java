@@ -188,10 +188,10 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         }
 
         assertNotNull("DefinitionNotFoundException should be thrown when getting a definition of component using descriptor of a component without helper.", expected);
-        String errorMessage = String.format("No HELPER named js://%s.%s found",
-                cmpWithoutHelperDescriptor.getNamespace(), cmpWithoutHelperDescriptor.getName());
+            String errorMessage = String.format("No HELPER named js://%s.%s found",
+                    cmpWithoutHelperDescriptor.getNamespace(), cmpWithoutHelperDescriptor.getName());
         this.checkExceptionContains(expected, DefinitionNotFoundException.class, errorMessage);
-    }
+        }
 
     /**
      * ContextService.assertAccess is called during getDefinition(DefDescriptor).
@@ -265,7 +265,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 Authentication.AUTHENTICATED);
         DefDescriptor<?> dummyDesc = definitionService.getDefDescriptor("uh:oh", ComponentDef.class);
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
-        String clientUid = context.getDefRegistry().getUid(null, clientDesc);
+        String clientUid = definitionService.getUid(null, clientDesc);
         context.setClientLoaded(ImmutableMap.<DefDescriptor<?>, String> of(clientDesc, clientUid));
 
         assertNull("No preloads initially", context.getPreloadedDefinitions());
@@ -296,7 +296,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      * Update test according what I learned from W-2176923. ApexPagesAuraContext.java doesn't have the source for app,
      * but it go ahead and create app definition with its own (fake) builder, then add it to localDef: ComponentDef
      * cmpDef = (ComponentDef) definitionService.getDefinition(cmpDesc);
-     * context.getDefRegistry().addLocalDef(cmpDef); this will make context.ClientLoaded associate appDefDesc with wrong
+     * definitionService.addDynamicDef(cmpDef); this will make context.ClientLoaded associate appDefDesc with wrong
      * UID, later when the request hit the server, server build the appDef with the correct source, this will give us a
      * different uid, which trigger the ClientOutOfSyncException.
      */
@@ -383,10 +383,10 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 laxSecurityApp);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
-        String uid = context.getDefRegistry().getUid(null, cmpDesc);
+        String uid = definitionService.getUid(null, cmpDesc);
 
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
-        String clientUid = context.getDefRegistry().getUid(null, clientDesc);
+        String clientUid = definitionService.getUid(null, clientDesc);
         context.setClientLoaded(ImmutableMap.<DefDescriptor<?>, String> of(clientDesc, clientUid));
 
         Map<DefDescriptor<?>, String> loaded = context.getLoaded();
@@ -410,7 +410,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 Authentication.AUTHENTICATED,
                 laxSecurityApp);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
-        String uid = context.getDefRegistry().getUid(null, cmpDesc);
+        String uid = definitionService.getUid(null, cmpDesc);
 
         Map<DefDescriptor<?>, String> loaded = context.getLoaded();
         assertNull("Parent should not be loaded initially", loaded.get(cmpDesc));
@@ -439,8 +439,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 String.format(baseComponentTag, "", ""));
         DefDescriptor<?> nextDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
-        String uid = context.getDefRegistry().getUid(null, cmpDesc);
-        String nextUid = context.getDefRegistry().getUid(null, nextDesc);
+        String uid = definitionService.getUid(null, cmpDesc);
+        String nextUid = definitionService.getUid(null, nextDesc);
         definitionService.updateLoaded(cmpDesc);
 
         Map<DefDescriptor<?>, String> loaded = context.getLoaded();
@@ -466,7 +466,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 String.format(baseComponentTag, "", ""));
         DefDescriptor<?> nextDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
-        String nextUid = context.getDefRegistry().getUid(null, nextDesc);
+        String nextUid = definitionService.getUid(null, nextDesc);
         context.setPreloadedDefinitions(ImmutableSet.<DefDescriptor<?>> of(cmpDesc));
 
         Map<DefDescriptor<?>, String> loaded = context.getLoaded();
@@ -501,7 +501,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", String.format("<%s/>", depDesc.getDescriptorName())));
-        String uid = context.getDefRegistry().getUid(null, clientDesc);
+        String uid = definitionService.getUid(null, clientDesc);
 
         context.setClientLoaded(ImmutableMap.<DefDescriptor<?>, String> of(clientDesc, uid));
         assertNull("Preloads shouldn't be set until update", context.getPreloadedDefinitions());
@@ -545,8 +545,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", String.format("<%s/>", depDesc.getDescriptorName())));
-        String depUid = context.getDefRegistry().getUid(null, depDesc);
-        String clientUid = context.getDefRegistry().getUid(null, clientDesc);
+        String depUid = definitionService.getUid(null, depDesc);
+        String clientUid = definitionService.getUid(null, clientDesc);
 
         // client has both parent and dependency loaded
         // in dependency last order
@@ -584,8 +584,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", String.format("<%s/>", depDesc.getDescriptorName())));
-        String depUid = context.getDefRegistry().getUid(null, depDesc);
-        String clientUid = context.getDefRegistry().getUid(null, clientDesc);
+        String depUid = definitionService.getUid(null, depDesc);
+        String clientUid = definitionService.getUid(null, clientDesc);
 
         // client has both parent and dependency loaded
         // in dependency first order
@@ -622,16 +622,16 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 laxSecurityApp);
         DefDescriptor<?> compDesc = definitionService.getDefDescriptor("markup://aura:component", ComponentDef.class);
         DefDescriptor<?> tempDesc = definitionService.getDefDescriptor("markup://aura:template", ComponentDef.class);
-        String compUid = context.getDefRegistry().getUid(null, compDesc);
-        String tempUid = context.getDefRegistry().getUid(null, tempDesc);
+        String compUid = definitionService.getUid(null, compDesc);
+        String tempUid = definitionService.getUid(null, tempDesc);
 
         //
         // Now make sure we have truly circular references.
         //
         assertTrue("Component should have template in dependencies",
-                context.getDefRegistry().getDependencies(compUid).contains(tempDesc));
+                definitionService.getDependencies(compUid).contains(tempDesc));
         assertTrue("Template should have component in dependencies",
-                context.getDefRegistry().getDependencies(tempUid).contains(compDesc));
+                definitionService.getDependencies(tempUid).contains(compDesc));
 
         // client has both component and templage
         Map<DefDescriptor<?>, String> clientLoaded = Maps.newLinkedHashMap();
@@ -667,16 +667,16 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 laxSecurityApp);
         DefDescriptor<?> compDesc = definitionService.getDefDescriptor("markup://aura:component", ComponentDef.class);
         DefDescriptor<?> tempDesc = definitionService.getDefDescriptor("markup://aura:template", ComponentDef.class);
-        String compUid = context.getDefRegistry().getUid(null, compDesc);
-        String tempUid = context.getDefRegistry().getUid(null, tempDesc);
+        String compUid = definitionService.getUid(null, compDesc);
+        String tempUid = definitionService.getUid(null, tempDesc);
 
         //
         // Now make sure we have truly circular references.
         //
         assertTrue("Component should have template in dependencies",
-                context.getDefRegistry().getDependencies(compUid).contains(tempDesc));
+                definitionService.getDependencies(compUid).contains(tempDesc));
         assertTrue("Template should have component in dependencies",
-                context.getDefRegistry().getDependencies(tempUid).contains(compDesc));
+                definitionService.getDependencies(tempUid).contains(compDesc));
 
         // client has both component and templage
         Map<DefDescriptor<?>, String> clientLoaded = Maps.newLinkedHashMap();
@@ -712,8 +712,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", String.format("<%s/>", depDesc.getDescriptorName())));
-        String uid = context.getDefRegistry().getUid(null, cmpDesc);
-        String depUid = context.getDefRegistry().getUid(null, depDesc);
+        String uid = definitionService.getUid(null, cmpDesc);
+        String depUid = definitionService.getUid(null, depDesc);
 
         Map<DefDescriptor<?>, String> loaded = context.getLoaded();
         assertNull("Parent should not be loaded initially", loaded.get(cmpDesc));

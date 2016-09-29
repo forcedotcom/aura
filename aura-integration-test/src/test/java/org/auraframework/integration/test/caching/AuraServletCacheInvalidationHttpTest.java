@@ -22,12 +22,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.integration.test.util.AuraHttpTestCase;
-import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -117,9 +115,10 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
         params.put("aura.token", getCsrfToken());
 
         String serContext;
-        AuraContext ctx = startContext(name, ComponentDef.class);
+        contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
+            definitionService.getDefDescriptor(name, ComponentDef.class));
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(name, ComponentDef.class);
-        String uid = ctx.getDefRegistry().getUid(null, desc);
+        String uid = definitionService.getUid(null, desc);
         if (modified) {
             uid = getAuraTestingUtil().modifyUID(uid);
         }
@@ -128,11 +127,6 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
         params.put("aura.context", serContext);
 
         return obtainPostMethod("/aura", params);
-    }
-
-    private AuraContext startContext(String qualifiedName, Class<? extends BaseComponentDef> clazz) {
-        return contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,
-                definitionService.getDefDescriptor(qualifiedName, clazz));
     }
 
     @SuppressWarnings("unchecked")

@@ -35,7 +35,6 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -82,9 +81,8 @@ public class TopicExampleModel implements ModelInstance {
             Collection<LibraryDefRef> importDefs = ((ComponentDef) def).getImports();
 
             for (LibraryDefRef importDef : importDefs) {
-                LibraryDef libraryDef = definitionService.getDefinition(importDef.getReferenceDescriptor());
-                MasterDefRegistry mdr = definitionService.getDefRegistry();
-                if (mdr.hasAccess(getReferencingDescriptor(), libraryDef) == null) {
+                if (definitionService.hasAccess(getReferencingDescriptor(), importDef.getReferenceDescriptor())) {
+                    LibraryDef libraryDef = definitionService.getDefinition(importDef.getReferenceDescriptor());
                     defs.add(new DefModel(libraryDef.getDescriptor()));
                     // Treat the included js files specially because they load source differently:
                     for (IncludeDefRef includeDef : libraryDef.getIncludes()) {
@@ -116,7 +114,6 @@ public class TopicExampleModel implements ModelInstance {
     }
 	
     public boolean hasAccess(Definition def) throws QuickFixException {
-        MasterDefRegistry registry = definitionService.getDefRegistry();
-        return registry.hasAccess(getReferencingDescriptor(), def) == null;
+        return definitionService.hasAccess(getReferencingDescriptor(), def);
     }
 }

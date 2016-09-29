@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,6 +23,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.cache.Cache;
 import org.auraframework.def.*;
@@ -35,6 +37,7 @@ import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
+import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -56,6 +59,9 @@ public class DefinitionServiceImpl implements DefinitionService {
 
     @Inject
     private CachingService cachingService;
+    
+    @Inject
+    private ConfigAdapter configAdapter;
     
     @Override
     public <T extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName, Class<T> defClass) {
@@ -210,10 +216,7 @@ public class DefinitionServiceImpl implements DefinitionService {
 
     @Override
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
-        contextService.assertEstablished();
-
-        AuraContext context = contextService.getCurrentContext();
-        return context.getDefRegistry().find(matcher);
+        return getDefRegistry().find(matcher);
     }
 
     /**
@@ -243,14 +246,12 @@ public class DefinitionServiceImpl implements DefinitionService {
     @Override
     public void updateLoaded(DefDescriptor<?> loading) throws QuickFixException, ClientOutOfSyncException {
         AuraContext context;
-        MasterDefRegistry mdr;
         Set<DefDescriptor<?>> loaded = Sets.newHashSet();
         Set<DefDescriptor<?>> prev = Sets.newHashSet();
         Set<DefDescriptor<?>> remove = null;
 
         contextService.assertEstablished();
         context = contextService.getCurrentContext();
-        mdr = context.getDefRegistry();
         if (context.getPreloadedDefinitions() == null) {
             //
             // TODO (optimize): we could reverse this set randomly to try
@@ -272,7 +273,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                         throw new ClientOutOfSyncException(descriptor + ": missing UID ");
                     }
                     try {
-                        tuid = mdr.getUid(uid, descriptor);
+                        tuid = getUid(uid, descriptor);
                     } catch (QuickFixException broke) {
                         //
                         // See note above. This is how we enforce precedence of ClientOutOfSyncException
@@ -285,7 +286,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                     if (qfe != null) {
                         throw qfe;
                     }
-                    Set<DefDescriptor<?>> deps = mdr.getDependencies(uid);
+                    Set<DefDescriptor<?>> deps = getDependencies(uid);
                     loaded.addAll(deps);
                     for (DefDescriptor<?> x : prev) {
                         if (deps.contains(x)) {
@@ -313,7 +314,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         // well.
         //
         if (loading != null && !loaded.contains(loading) && !context.getLoaded().containsKey(loading)) {
-            String uid = mdr.getUid(null, loading);
+            String uid = getUid(null, loading);
 
             if (uid == null) {
                 throw new DefinitionNotFoundException(loading, null);
@@ -347,5 +348,89 @@ public class DefinitionServiceImpl implements DefinitionService {
         }
         sb.append(name);
         return getDefDescriptor(sb.toString(), defType.getPrimaryInterface(), null);
+    }
+
+    /**
+     * Get the UID associated with a descriptor.
+     *
+     * This call must be made before any of the other UID based functions.
+     * Failing to do so will give incorrect results (null).
+     *
+     * @param uid the old uid (or null if none).
+     * @param descriptor the top level descriptor for which we need the UID.
+     * @return Either the uid passed in, or if that was null, the correct UID
+     * @throws ClientOutOfSyncException if the UID is not null, and was a mismatch
+     * @throws QuickFixException if the definition cannot be compiled.
+     */
+    @Override
+    public <T extends Definition> String getUid(String uid, DefDescriptor<T> descriptor)
+            throws ClientOutOfSyncException, QuickFixException {
+        return getDefRegistry().getUid(uid, descriptor);
+    }
+
+    /**
+     * Get the dependencies for a descriptor.
+     *
+     * This set is guaranteed to be in order of 'use' in that a component should come before
+     * all components that use it or depend on it.
+     *
+     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
+     */
+    @Override
+    public Set<DefDescriptor<?>> getDependencies(String uid) {
+        return getDefRegistry().getDependencies(uid);
+    }
+
+    /**
+     * Returns list of client libraries for given uid
+     *
+     * @param uid uid of app or cmp
+     * @return list of client libraries for uid
+     */
+    @Override
+    public List<ClientLibraryDef> getClientLibraries(String uid) {
+        return getDefRegistry().getClientLibraries(uid);
+    }
+
+    /**
+     * assert that the referencingDescriptor has access to the definition.
+     */
+    @Override
+    public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def)
+            throws QuickFixException {
+        String status = getDefRegistry().hasAccess(referencingDescriptor, def);
+        if (status != null) {
+            DefDescriptor<? extends Definition> descriptor = def.getDescriptor();
+            String message = configAdapter.isProduction() ? DefinitionNotFoundException.getMessage(
+                    descriptor.getDefType(), descriptor.getName()) : status;
+                    throw new NoAccessException(message);
+        }
+    }
+
+    /**
+     * assert that the referencingDescriptor has access to the definition.
+     */
+    @Override
+    public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, DefDescriptor<?> accessDescriptor)
+            throws QuickFixException {
+        assertAccess(referencingDescriptor, getDefinition(accessDescriptor));
+    }
+
+    /**
+     * assert that the referencingDescriptor has access to the definition.
+     */
+    @Override
+    public boolean hasAccess(DefDescriptor<?> referencingDescriptor, DefDescriptor<?> accessDescriptor)
+            throws QuickFixException {
+        return getDefRegistry().hasAccess(referencingDescriptor, getDefinition(accessDescriptor)) == null;
+    }
+
+    /**
+     * assert that the referencingDescriptor has access to the definition.
+     */
+    @Override
+    public <D extends Definition> boolean hasAccess(DefDescriptor<?> referencingDescriptor, D def)
+            throws QuickFixException {
+        return getDefRegistry().hasAccess(referencingDescriptor, def) == null;
     }
 }

@@ -62,7 +62,7 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
         if (!remoteProvider) {
             DefDescriptor<ComponentDef> superDefDescriptor = def.getExtendsDescriptor();
             if (superDefDescriptor != null) {
-            	Aura.getDefinitionService().getDefRegistry().assertAccess(descriptor, superDefDescriptor.getDef());
+            	Aura.getDefinitionService().assertAccess(descriptor, superDefDescriptor);
             	
                 Component concrete = concreteComponent == null ? this : concreteComponent;
                 superComponent = new ComponentImpl(superDefDescriptor, this, this, concrete);

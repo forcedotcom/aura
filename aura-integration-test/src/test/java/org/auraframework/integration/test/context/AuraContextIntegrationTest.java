@@ -99,7 +99,7 @@ public class AuraContextIntegrationTest extends AuraImplTestCase {
                 Authentication.AUTHENTICATED, appDesc);
         ApplicationDef appDef = definitionService.getDefinition("preloadTest:dependenciesApp", ApplicationDef.class);
         Map<DefDescriptor<?>, String> clientLoaded = Maps.newHashMap();
-        clientLoaded.put(appDesc, context.getDefRegistry().getUid(null, appDesc));
+        clientLoaded.put(appDesc, definitionService.getUid(null, appDesc));
         context.setClientLoaded(clientLoaded);
         definitionService.updateLoaded(null);
 

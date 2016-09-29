@@ -15,8 +15,13 @@
  */
 package org.auraframework.impl.root.component;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.auraframework.Aura;
 import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.def.AttributeDef;
@@ -30,8 +35,8 @@ import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -42,12 +47,8 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Serialization;
 import org.auraframework.util.json.Serialization.ReferenceType;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * An immutable reference to a ComponentDef, containing only instance-specific properties, like the Attributes and body.
@@ -108,7 +109,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
-            dependencies.add(descriptor);
+        dependencies.add(descriptor);
         for (AttributeDefRef attributeDefRef : attributeValues.values()) {
             attributeDefRef.appendDependencies(dependencies);
         }
@@ -126,9 +127,9 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
 
         if (flavor != null) {
             // component must be flavorable (and by implication can't be an interface then)
-                if (!def.hasFlavorableChild() && !def.inheritsFlavorableChild() && !def.isDynamicallyFlavorable()) {
-                    throw new InvalidDefinitionException(String.format("%s is not flavorable", descriptor), location);
-                }
+            if (!def.hasFlavorableChild() && !def.inheritsFlavorableChild() && !def.isDynamicallyFlavorable()) {
+                throw new InvalidDefinitionException(String.format("%s is not flavorable", descriptor), location);
+            }
         }
 
         AuraContext context = Aura.getContextService().getCurrentContext();
@@ -150,7 +151,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
         ComponentDef def = descriptor.getDef();
         Map<DefDescriptor<AttributeDef>, AttributeDef> atts = def.getAttributeDefs();
         Map<String, RegisterEventDef> registeredEvents = def.getRegisterEventDefs();
-        MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
+        DefinitionService definitionService = Aura.getDefinitionService();
         for (Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : getAttributeValues().entrySet()) {
             DefDescriptor<AttributeDef> attributeDefDesc = entry.getKey();
             AttributeDef attributeDef = atts.get(attributeDefDesc);
@@ -162,11 +163,11 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
                             getLocation());
                 }
 
-                registry.assertAccess(referencingDesc, registeredEvent);
+                definitionService.assertAccess(referencingDesc, registeredEvent);
             } else {
                 if (referencingDesc != null) {
                     // Validate that the referencing component has access to the attribute
-                    registry.assertAccess(referencingDesc, attributeDef);
+                    definitionService.assertAccess(referencingDesc, attributeDef);
                 }
 
                 // so it was an attribute, make sure to parse it

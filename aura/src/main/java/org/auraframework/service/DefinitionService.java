@@ -15,9 +15,11 @@
  */
 package org.auraframework.service;
 
+import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
@@ -177,4 +179,54 @@ public interface DefinitionService extends AuraService {
      * @throws QuickFixException if a definition can't be compiled.
      */
     void updateLoaded(DefDescriptor<?> loading) throws QuickFixException, ClientOutOfSyncException;
+
+    /**
+     * Get the UID associated with a descriptor.
+     *
+     * This call must be made before any of the other UID based functions.
+     * Failing to do so will give incorrect results (null).
+     *
+     * @param uid the old uid (or null if none).
+     * @param descriptor the top level descriptor for which we need the UID.
+     * @return Either the uid passed in, or if that was null, the correct UID
+     * @throws ClientOutOfSyncException if the UID is not null, and was a mismatch
+     * @throws QuickFixException if the definition cannot be compiled.
+     */
+    <T extends Definition> String getUid(String uid, DefDescriptor<T> descriptor) throws ClientOutOfSyncException,
+            QuickFixException;
+
+    /**
+     * Get the dependencies for a descriptor.
+     *
+     * This set is guaranteed to be in order of 'use' in that a component should come before
+     * all components that use it or depend on it.
+     *
+     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
+     */
+    Set<DefDescriptor<?>> getDependencies(String uid);
+
+    /**
+     * Returns list of client libraries for given uid
+     *
+     * @param uid uid of app or cmp
+     * @return list of client libraries for uid
+     */
+    List<ClientLibraryDef> getClientLibraries(String uid);
+
+    /**
+     * assert that the referencingDescriptor has access to the definition.
+     */
+    <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException;
+
+    /**
+     * assert that the referencingDescriptor has access to the definition.
+     */
+    <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, DefDescriptor<?> accessDescriptor) throws QuickFixException;
+
+    /**
+     * Returns null if the referencingDescriptor has access to the definition otherwise a specific access violation reason.
+     */
+    boolean hasAccess(DefDescriptor<?> referencingDescriptor, DefDescriptor<?> accessDescriptor) throws QuickFixException;
+
+    <D extends Definition> boolean hasAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException;
 }

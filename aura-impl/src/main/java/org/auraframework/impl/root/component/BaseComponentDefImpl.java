@@ -76,6 +76,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -407,8 +408,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             facet.validateReferences();
         }
 
+        DefinitionService definitionService = Aura.getDefinitionService();
         if (templateDefDescriptor != null) {
-            BaseComponentDef template = templateDefDescriptor.getDef();
+            BaseComponentDef template = definitionService.getDefinition(templateDefDescriptor);
             if (!template.isTemplate()) {
                 throw new InvalidDefinitionException(String.format(
                         "Template %s must be marked as a template", templateDefDescriptor), getLocation());
@@ -420,7 +422,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         if (extendsDescriptor != null) {
-            T parentDef = extendsDescriptor.getDef();
+            T parentDef = definitionService.getDefinition(extendsDescriptor);
 
             // This should never happen.
             if (parentDef == null) {
@@ -457,7 +459,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             SupportLevel support = getSupport();
             DefDescriptor<T> extDesc = extendsDescriptor;
             while (extDesc != null) {
-                T extDef = extDesc.getDef();
+                T extDef = definitionService.getDefinition(extDesc);
                 if (support.ordinal() > extDef.getSupport().ordinal()) {
                     throw new InvalidDefinitionException(
                             String.format("%s cannot widen the support level to %s from %s's level of %s",
@@ -616,7 +618,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
         if (imports != null && !imports.isEmpty()) {
             for (LibraryDefRef imported : imports) {
-                dependencies.add(imported.getDescriptor());
+                imported.appendDependencies(dependencies);
             }
         }
 

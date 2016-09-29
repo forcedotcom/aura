@@ -139,6 +139,7 @@ public interface ConfigAdapter extends AuraAdapter {
      *
      * @deprecated use one of the other cacheable calls.
      */
+    @Deprecated
     boolean isCacheablePrefix(String prefix);
 
     /**

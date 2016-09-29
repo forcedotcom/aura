@@ -34,8 +34,7 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -87,12 +86,11 @@ public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> imple
 
     @SuppressWarnings("unchecked")
     private List<DefDescriptor<FlavoredStyleDef>> getDefs() {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        MasterDefRegistry mdr = context.getDefRegistry();
+        DefinitionService definitionService = Aura.getDefinitionService();
 
         List<DefDescriptor<FlavoredStyleDef>> defs = new ArrayList<>();
 
-        for (DefDescriptor<?> dd : mdr.find(filter)) {
+        for (DefDescriptor<?> dd : definitionService.find(filter)) {
             // currently getBundle will only work with file-based, unless the other loaders also set the bundle
             if (dd.getDefType() == DefType.FLAVORED_STYLE && dd.getBundle().getName().equals(bundle)) {
                 defs.add((DefDescriptor<FlavoredStyleDef>) dd);

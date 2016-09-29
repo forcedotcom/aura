@@ -59,7 +59,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application useAppcache='true' render='client'></aura:application>");
         context.setApplicationDescriptor(desc);
-        context.addLoaded(desc, context.getDefRegistry().getUid(null, desc));
+        context.addLoaded(desc, definitionService.getUid(null, desc));
         String body = doWrite(definitionService.getDefinition(desc));
         int start = body.indexOf("<html");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
@@ -77,7 +77,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application render='client' useAppcache='false'></aura:application>");
         context.setApplicationDescriptor(desc);
-        context.addLoaded(desc, context.getDefRegistry().getUid(null, desc));
+        context.addLoaded(desc, definitionService.getUid(null, desc));
         String body = doWrite(definitionService.getDefinition(desc));
         int start = body.indexOf("<html");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
@@ -95,7 +95,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application render='client'></aura:application>");
         context.setApplicationDescriptor(desc);
-        context.addLoaded(desc, context.getDefRegistry().getUid(null, desc));
+        context.addLoaded(desc, definitionService.getUid(null, desc));
         String body = doWrite(definitionService.getDefinition(desc));
         int start = body.indexOf("<html");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
@@ -113,7 +113,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application render='client' useAppcache='true'></aura:application>");
         context.setApplicationDescriptor(desc);
-        final String uid = context.getDefRegistry().getUid(null, desc);
+        final String uid = definitionService.getUid(null, desc);
         context.addLoaded(desc, uid);
         String body = doWrite(definitionService.getDefinition(desc));
         int start = body.indexOf("<html");
@@ -140,7 +140,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application render='client' useAppcache='true'></aura:application>");
         context.setApplicationDescriptor(desc);
-        final String uid = context.getDefRegistry().getUid(null, desc);
+        final String uid = definitionService.getUid(null, desc);
         context.addLoaded(desc, uid);
         String body = doWrite(definitionService.getDefinition(desc));
         Pattern pattern = Pattern.compile("/auraFW|/l/");

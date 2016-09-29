@@ -267,9 +267,9 @@ public class IntegrationImpl implements Integration {
         }
 
         String cuid = context.getLoaded().get(applicationDescriptor);
-        String uid = context.getDefRegistry().getUid(cuid, applicationDescriptor);
+        String uid = definitionService.getUid(cuid, applicationDescriptor);
         context.addLoaded(applicationDescriptor, uid);
-        context.setPreloadedDefinitions(context.getDefRegistry().getDependencies(uid));
+        context.setPreloadedDefinitions(definitionService.getDependencies(uid));
 
         if (!DEFAULT_APPLICATION.equals(application)) {
             // Check to insure that the app extends aura:integrationServiceApp

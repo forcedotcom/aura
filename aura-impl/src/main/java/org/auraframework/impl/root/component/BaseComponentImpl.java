@@ -56,7 +56,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -208,10 +207,9 @@ BaseComponent<D, I> {
             desc = descriptor;
         }
 
-        MasterDefRegistry defRegistry = definitionService.getDefRegistry();
         if (accessParent != null) {
             // Insure that the access 'Parent' is allowed to create an instance of this component
-            defRegistry.assertAccess(accessParent.getDescriptor(), definitionService.getDefinition(desc));
+            definitionService.assertAccess(accessParent.getDescriptor(), desc);
         }
 
         loggingService.startTimer(LoggingService.TIMER_COMPONENT_CREATION);
@@ -231,8 +229,7 @@ BaseComponent<D, I> {
                 ControllerDef cd = def.getLocalControllerDef();
                 if (cd != null) {
                     // Insure that this def is allowed to create an instance of the controller
-                    // This can't possibly be disallowed, but not removing for the moment.
-                    defRegistry.assertAccess(descriptor, cd);
+                    definitionService.assertAccess(descriptor, cd);
 
                     this.valueProviders.put(AuraValueProviderType.CONTROLLER.getPrefix(), cd);
                 }
@@ -407,7 +404,7 @@ BaseComponent<D, I> {
         try {
             ModelDef modelDef = getComponentDef().getModelDef();
             if (modelDef != null) {
-                definitionService.getDefRegistry().assertAccess(descriptor, modelDef);
+                definitionService.assertAccess(descriptor, modelDef);
 
                 if (modelDef instanceof JavaModelDef) {
                     model = instanceService.getInstance(modelDef);

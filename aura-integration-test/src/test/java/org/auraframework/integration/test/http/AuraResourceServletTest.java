@@ -95,7 +95,7 @@ public class AuraResourceServletTest extends AuraTestCase {
                 .startContext(Mode.DEV, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
 
         DefDescriptor<SVGDef> svgDesc = definitionService.getDefinition(appDesc).getSVGDefDescriptor();
-        final String uid = context.getDefRegistry().getUid(null, svgDesc);
+        final String uid = definitionService.getUid(null, svgDesc);
         context.addLoaded(appDesc, uid);
 
         DummyHttpServletRequest request = new DummyHttpServletRequest("resources.svg") {
@@ -134,7 +134,7 @@ public class AuraResourceServletTest extends AuraTestCase {
 
         DefDescriptor<SVGDef> svgDesc = definitionService.getDefinition(appDesc).getSVGDefDescriptor();
         String etag = definitionService.getDefinition(svgDesc).getOwnHash();
-        String uid = context.getDefRegistry().getUid(null, svgDesc);
+        String uid = definitionService.getUid(null, svgDesc);
         context.addLoaded(appDesc, uid);
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest(null, "resources.svg");
@@ -173,7 +173,7 @@ public class AuraResourceServletTest extends AuraTestCase {
 
         DefDescriptor<SVGDef> svgDesc = definitionService.getDefinition(appDesc).getSVGDefDescriptor();
         String etag = definitionService.getDefinition(svgDesc).getOwnHash();
-        String uid = context.getDefRegistry().getUid(null, svgDesc);
+        String uid = definitionService.getUid(null, svgDesc);
         context.addLoaded(appDesc, uid);
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest(null, "resources.svg");
@@ -203,7 +203,7 @@ public class AuraResourceServletTest extends AuraTestCase {
                 Mode.PROD, AuraContext.Format.SVG, AuraContext.Authentication.AUTHENTICATED, appDesc);
 
         DefDescriptor<SVGDef> svgDesc = definitionService.getDefinition(appDesc).getSVGDefDescriptor();
-        String uid = context.getDefRegistry().getUid(null, svgDesc);
+        String uid = definitionService.getUid(null, svgDesc);
         context.addLoaded(appDesc, uid);
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest(null, "resources.svg");

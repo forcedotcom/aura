@@ -24,7 +24,6 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -89,8 +88,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
 
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        MasterDefRegistry mdf = Aura.getContextService().getCurrentContext().getDefRegistry();
-        Set<DefDescriptor<?>> found = mdf.find(this.dependency);
+        Set<DefDescriptor<?>> found = Aura.getDefinitionService().find(this.dependency);
         if (found.size() == 0) {
             // TODO: QuickFix for broken dependency.
             if (error == null) {

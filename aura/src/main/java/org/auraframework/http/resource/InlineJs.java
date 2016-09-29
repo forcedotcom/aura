@@ -129,7 +129,7 @@ public class InlineJs extends AuraResourceImpl {
                     ? definitionService.getDefDescriptor(String.format("%s:servletAccess", defaultNamespace),
                             ApplicationDef.class)
                     : null;
-            definitionService.getDefRegistry().assertAccess(referencingDescriptor, def);
+            definitionService.assertAccess(referencingDescriptor, def);
         }
 
         if (shouldCacheHTMLTemplate(defDescriptor, request, context)) {

@@ -52,7 +52,7 @@ public class ApplicationImpl extends BaseComponentImpl<ApplicationDef, Applicati
         if (!remoteProvider) {
             DefDescriptor<ApplicationDef> superDefDescriptor = def.getExtendsDescriptor();
             if (superDefDescriptor != null) {
-                Aura.getDefinitionService().getDefRegistry().assertAccess(descriptor, superDefDescriptor);
+                Aura.getDefinitionService().assertAccess(descriptor, superDefDescriptor);
 
             	Application concrete = concreteComponent == null ? this : concreteComponent;
                 superComponent = new ApplicationImpl(superDefDescriptor, this, this, concrete);

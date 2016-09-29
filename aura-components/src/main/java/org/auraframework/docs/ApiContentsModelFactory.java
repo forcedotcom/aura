@@ -25,18 +25,18 @@ import org.auraframework.ds.servicecomponent.ModelInitializationException;
 
 @ServiceComponentModelFactory
 public class ApiContentsModelFactory  implements ModelFactory<ApiContentsModel> {
-	
-	@Inject
-	ConfigAdapter configAdapter;
-	
-	@Override
-	public ApiContentsModel modelInstance() throws ModelInitializationException {
-		return new ApiContentsModel();
-	}
-	
-	@PostConstruct
-	public void init() {
-		// This is messy, we should clean this up, but just converting it for the moment.
-		ApiContentsModel.refreshSymbols(configAdapter.getResourceLoader());
-	}
+
+    @Inject
+    ConfigAdapter configAdapter;
+
+    @Override
+    public ApiContentsModel modelInstance() throws ModelInitializationException {
+        return new ApiContentsModel();
+    }
+
+    @PostConstruct
+    public void init() {
+        // This is messy, we should clean this up, but just converting it for the moment.
+        ApiContentsModel.refreshSymbols(configAdapter.getResourceLoader());
+    }
 }

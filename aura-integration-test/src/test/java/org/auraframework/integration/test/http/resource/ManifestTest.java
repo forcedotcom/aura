@@ -139,7 +139,7 @@ public class ManifestTest extends AuraImplTestCase {
 
         AuraContext context = contextService.startContext(AuraContext.Mode.PROD,
                 AuraContext.Format.MANIFEST, AuraContext.Authentication.AUTHENTICATED, appDesc);
-        String uid = context.getDefRegistry().getUid(null, appDesc);
+        String uid = definitionService.getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
@@ -177,7 +177,7 @@ public class ManifestTest extends AuraImplTestCase {
         context.setApplicationDescriptor(appDesc);
         String expectedContextName = "/cool";
         context.setContextPath(expectedContextName);
-        String uid = context.getDefRegistry().getUid(null, appDesc);
+        String uid = definitionService.getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
@@ -215,7 +215,7 @@ public class ManifestTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor("appCache:testApp", ApplicationDef.class);
         AuraContext context = contextService.startContext(AuraContext.Mode.PROD,
                 AuraContext.Format.MANIFEST, AuraContext.Authentication.AUTHENTICATED, appDesc);
-        String uid = context.getDefRegistry().getUid(null, appDesc);
+        String uid = definitionService.getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
@@ -255,7 +255,7 @@ public class ManifestTest extends AuraImplTestCase {
         AuraContext context = contextService.startContext(AuraContext.Mode.PROD, AuraContext.Format.MANIFEST,
                 AuraContext.Authentication.AUTHENTICATED, appDesc);
         context.setApplicationDescriptor(appDesc);
-        String uid = context.getDefRegistry().getUid(null, appDesc);
+        String uid = definitionService.getUid(null, appDesc);
         context.addLoaded(appDesc, uid);
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();

@@ -95,6 +95,7 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
         return parentDescriptor;
     }
 
+    // FIXME: needs to go on a service.
     @Override
     public Map<DefDescriptor<ComponentDef>, String> computeFilterMatches(FlavorOverrideLocator mapping) throws QuickFixException {
         if (singleComponent != null) {
@@ -104,7 +105,6 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
         }
 
         AuraContext context = Aura.getContextService().getCurrentContext();
-        MasterDefRegistry mdr = context.getDefRegistry();
         Map<DefDescriptor<ComponentDef>, String> map = new HashMap<>();
 
         // first check the components in the overrides list
@@ -122,7 +122,7 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
         DefDescriptor<? extends BaseComponentDef> top = context.getApplicationDescriptor();
         if (top != null && top.getDefType() == DefType.APPLICATION) {
             String uid = context.getUid(top);
-            Set<DefDescriptor<?>> dependencies = mdr.getDependencies(uid);
+            Set<DefDescriptor<?>> dependencies = Aura.getDefinitionService().getDependencies(uid);
             if (dependencies != null) {
                 for (DefDescriptor<?> dep : dependencies) {
                     if (Flavors.isStandardFlavor(dep)) {

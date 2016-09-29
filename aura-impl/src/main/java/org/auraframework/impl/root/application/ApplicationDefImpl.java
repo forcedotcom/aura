@@ -160,10 +160,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             return isAppcacheEnabled;
         }
         if (getExtendsDescriptor() != null) {
-            AuraContext context = Aura.getContextService().getCurrentContext();
-            if (context != null) {
-                return context.getDefRegistry().getRawDef(getExtendsDescriptor()).isAppcacheEnabled();
-            }
+            return Aura.getDefinitionService().getUnlinkedDefinition(getExtendsDescriptor()).isAppcacheEnabled();
         }
         return Boolean.FALSE;
     }
@@ -265,8 +262,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
 
-        // MasterDefRegistry reg =
-        // Aura.getContextService().getCurrentContext().getDefRegistry();
         EventDef locationChangeDef = getLocationChangeEventDescriptor().getDef();
         if (!locationChangeDef.isInstanceOf(Aura.getDefinitionService().getDefDescriptor("aura:locationChange",
                 EventDef.class))) {

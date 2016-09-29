@@ -251,7 +251,7 @@ public class AuraTestingUtil {
             throws QuickFixException {
         AuraContext ctxt = contextService.startContext(mode, format, Authentication.AUTHENTICATED, desc);
         ctxt.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
-        String uid = ctxt.getDefRegistry().getUid(null, desc);
+        String uid = definitionService.getUid(null, desc);
         ctxt.addLoaded(desc, uid);
         return ctxt;
     }
@@ -347,7 +347,7 @@ public class AuraTestingUtil {
             if (!contextService.isEstablished()) {
                 ctx = contextService.startContext(mode, Format.JSON, Authentication.AUTHENTICATED, app);
             }
-            appUid = definitionService.getDefRegistry().getUid(null, app);
+            appUid = definitionService.getUid(null, app);
             if (ctx != null) {
                 contextService.endContext();
             }

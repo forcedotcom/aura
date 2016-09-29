@@ -226,7 +226,7 @@ public class Manifest extends AuraResourceImpl {
 
         if (app != null) {
             try {
-                return definitionService.getDefRegistry().getUid(null, app);
+                return definitionService.getUid(null, app);
             } catch (QuickFixException e) {
                 // This is perfectly possible, but the error is handled in more
                 // contextually-sensible places. For here, we know there's no

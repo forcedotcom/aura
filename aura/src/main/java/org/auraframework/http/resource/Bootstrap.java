@@ -76,7 +76,7 @@ public class Bootstrap extends AuraResourceImpl {
         AuraContext ctx = contextService.getCurrentContext();
         Map<DefDescriptor<? extends Definition>, Definition> defMap;
 
-        ctx.getDefRegistry().getDef(ctx.getApplicationDescriptor());
+        definitionService.getDefinition(ctx.getApplicationDescriptor());
         defMap = ctx.filterLocalDefs(null);
         for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defMap.entrySet()) {
             Definition def = entry.getValue();
@@ -150,46 +150,46 @@ public class Bootstrap extends AuraResourceImpl {
     }
 
     private static class WrappedPrintWriter implements Appendable {
-    	private final PrintWriter inner;
-    	private final MessageDigest m;
+        private final PrintWriter inner;
+        private final MessageDigest m;
 
-    	WrappedPrintWriter(PrintWriter inner) {
-			try {
-				m = MessageDigest.getInstance("MD5");
-			} catch (NoSuchAlgorithmException e) {
-				throw new RuntimeException(e);
-			}
+        WrappedPrintWriter(PrintWriter inner) {
+            try {
+                m = MessageDigest.getInstance("MD5");
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
 
-    		this.inner = inner;
-    	}
+            this.inner = inner;
+        }
 
-		@Override
-		public Appendable append(CharSequence csq) throws IOException {
-			updateMD5(csq, 0, csq.length());
-			return inner.append(csq);
-		}
+        @Override
+        public Appendable append(CharSequence csq) throws IOException {
+            updateMD5(csq, 0, csq.length());
+            return inner.append(csq);
+        }
 
-		@Override
-		public Appendable append(CharSequence csq, int start, int end) throws IOException {
-			updateMD5(csq, start, end);
-			return inner.append(csq, start, end);
-		}
+        @Override
+        public Appendable append(CharSequence csq, int start, int end) throws IOException {
+            updateMD5(csq, start, end);
+            return inner.append(csq, start, end);
+        }
 
-		@Override
-		public Appendable append(char c) throws IOException {
-			updateMD5(String.valueOf(c), 0, 1);
-			return inner.append(c);
-		}
+        @Override
+        public Appendable append(char c) throws IOException {
+            updateMD5(String.valueOf(c), 0, 1);
+            return inner.append(c);
+        }
 
-		public void updateMD5(CharSequence csq, int start, int end) {
-			byte[] data = csq.toString().getBytes();
-			m.update(data, 0, data.length);
-		}
+        public void updateMD5(CharSequence csq, int start, int end) {
+            byte[] data = csq.toString().getBytes();
+            m.update(data, 0, data.length);
+        }
 
-		public String getMD5() {
-			BigInteger i = new BigInteger(1, m.digest());
-			return String.format("%1$032X", i);
-		}
+        public String getMD5() {
+            BigInteger i = new BigInteger(1, m.digest());
+            return String.format("%1$032X", i);
+        }
     }
 
     private void writeError(Throwable t, HttpServletResponse response, AuraContext context) throws IOException {

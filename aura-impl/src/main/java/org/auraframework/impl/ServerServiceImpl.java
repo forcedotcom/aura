@@ -65,7 +65,6 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -330,10 +329,10 @@ public class ServerServiceImpl implements ServerService {
 
         // verify the app has access to the svg
         final SVGDef svgDef = definitionService.getDefinition(svg);
-        context.getDefRegistry().assertAccess(appDesc, svgDef);
+        definitionService.assertAccess(appDesc, svgDef);
 
         // svg uid
-        final String uid = context.getDefRegistry().getUid(null, svg);
+        final String uid = definitionService.getUid(null, svg);
         keyBuilder.append(uid);
 
         final String key = keyBuilder.toString();
@@ -493,24 +492,31 @@ public class ServerServiceImpl implements ServerService {
             Set<DefDescriptor<?>> dependencies, TempFilter extraFilter) {
 
         Set<D> out = Sets.newLinkedHashSet();
-        MasterDefRegistry mdr = contextService.getCurrentContext().getDefRegistry();
+        AuraContext context = contextService.getCurrentContext();
 
-        try {
-            if(dependencies != null) {
-                for (DefDescriptor<?> descriptor : dependencies) {
-                    if (defType.isAssignableFrom(descriptor.getDefType().getPrimaryInterface())
-                            && (extraFilter == null || extraFilter.apply(descriptor))) {
-                        @SuppressWarnings("unchecked")
-                        DefDescriptor<D> dd = (DefDescriptor<D>) descriptor;
-                        out.add(mdr.getDef(dd));
+        if(dependencies != null) {
+            for (DefDescriptor<?> descriptor : dependencies) {
+                if (defType.isAssignableFrom(descriptor.getDefType().getPrimaryInterface())
+                        && (extraFilter == null || extraFilter.apply(descriptor))) {
+                    @SuppressWarnings("unchecked")
+                    DefDescriptor<D> dd = (DefDescriptor<D>) descriptor;
+                    //D def = context.getLocalDef(dd);
+                    D def = null;
+                    try {
+                        def = definitionService.getDefinition(dd);
+                    } catch (QuickFixException qfe) {
+                        //
+                        // completely ignore this here, we should have already failed,
+                        // actually, we should be able to use 'getLocalDef', but for some
+                        // reason that fails in a few spots, will have to dig in to that.
+                        //
                     }
+                    if (def == null) {
+                        throw new IllegalStateException("Illegal state, missing def for "+dd);
+                    }
+                    out.add(def);
                 }
             }
-
-        } catch (QuickFixException qfe) {
-            // This should never happen here, by the time we are filtering our set, all dependencies
-            // MUST be loaded. If not, we have a serious bug that must be addressed.
-            throw new IllegalStateException("Illegal state, QFE during write", qfe);
         }
         return out;
     }

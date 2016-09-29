@@ -33,7 +33,6 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -111,12 +110,10 @@ public class DefOverviewModel implements ModelInstance {
     }
     
     public boolean hasAccess(Definition def) throws QuickFixException {
-        MasterDefRegistry registry = definitionService.getDefRegistry();
-        return registry.hasAccess(getReferencingDescriptor(), def) == null;
+        return definitionService.hasAccess(getReferencingDescriptor(), def);
     }
 
     public void assertAccess(Definition def) throws QuickFixException {
-        MasterDefRegistry registry = definitionService.getDefRegistry();
-        registry.assertAccess(getReferencingDescriptor(), def);
+        definitionService.assertAccess(getReferencingDescriptor(), def);
     }
 }

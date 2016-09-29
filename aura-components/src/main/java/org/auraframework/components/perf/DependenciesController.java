@@ -35,8 +35,6 @@ import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.util.AuraFiles;
 
 import com.google.common.collect.Lists;
@@ -47,7 +45,7 @@ import com.google.gson.Gson;
 @ServiceComponent
 public class DependenciesController implements Controller {
     @Inject
-    DefinitionService definitionService;
+    private DefinitionService definitionService;
 
     @AuraEnabled
     public Set<String> getAllDescriptors() {
@@ -71,10 +69,8 @@ public class DependenciesController implements Controller {
     
     @AuraEnabled
     public Map<String, Object> getDependencies(@Key("component")String component) {
-        AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<?> descriptor;
         SortedSet<DefDescriptor<?>> sorted;
-        MasterDefRegistry mdr = context.getDefRegistry();
         Map<String, Object> dependencies = Maps.newHashMap();
         ArrayList<String> list = Lists.newArrayList();
         String uid;
@@ -92,11 +88,11 @@ public class DependenciesController implements Controller {
             }
             
             descriptor = def.getDescriptor();
-            uid = mdr.getUid(null, descriptor);
-            sorted = Sets.newTreeSet(mdr.getDependencies(uid));
+            uid = definitionService.getUid(null, descriptor);
+            sorted = Sets.newTreeSet(definitionService.getDependencies(uid));
             
             for (DefDescriptor<?> dep : sorted) {
-                def = mdr.getDef(dep);
+                def = definitionService.getDefinition(dep);
                 DefType type = dep.getDefType();
                 
                 if (type != DefType.EVENT && type != DefType.COMPONENT && type != DefType.INTERFACE && type != DefType.LIBRARY || 

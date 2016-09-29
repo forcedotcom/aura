@@ -122,7 +122,7 @@ public class ComponentController implements Controller {
         AuraContext ctx = contextService.getCurrentContext();
         Map<DefDescriptor<? extends Definition>, Definition> defMap;
 
-        ctx.getDefRegistry().getDef(ctx.getApplicationDescriptor());
+        definitionService.getDefinition(ctx.getApplicationDescriptor());
         defMap = ctx.filterLocalDefs(null);
         for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defMap.entrySet()) {
             Definition def = entry.getValue();

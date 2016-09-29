@@ -47,8 +47,8 @@ SecureObject.filterEverything = function(st, raw, options) {
 
 	var t = typeof raw;
 	if (t === "object") {
-		if (raw instanceof File || raw instanceof FileList || raw instanceof CSSStyleDeclaration || raw instanceof TimeRanges ||
-				(window.ValidityState && raw instanceof ValidityState)) {
+		if (raw instanceof File || raw instanceof FileList || raw instanceof CSSStyleDeclaration || raw instanceof TimeRanges || 
+				raw instanceof Date || (window.ValidityState && raw instanceof ValidityState)) {
 			// Pass thru for objects without privileges.
 			return raw;
 		}
@@ -178,7 +178,7 @@ SecureObject.unfilterEverything = function(st, value, visited) {
 
 	var t = typeof value;
 
-	if (!value || (t !== "object" && t !== "function") || value === window || value === document || value instanceof File || value instanceof FileList) {
+	if (!value || (t !== "object" && t !== "function") || value === window || value === document || value instanceof File || value instanceof FileList || value instanceof Date) {
 		// ignoring falsy, nully references, non-objects and non-functions, global window/document, and any passthroughs
 		// from filterEverything
 		return value;

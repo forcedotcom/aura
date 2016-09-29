@@ -38,12 +38,12 @@
     <aura:attribute name="stateful" type="Boolean" default="false" description="A stateful button can be selected."/>
     <aura:attribute name="selected" type="Boolean" default="false" description="If a button is stateful this value toggles selected"/>
 
-    <aura:registerevent name="press"     type="ui:press"     access="GLOBAL"/>
-    <aura:registerevent name="keydown"   type="ui:keydown"   access="INTERNAL"/>
-    <aura:registerevent name="mouseover" type="ui:mouseover" access="INTERNAL"/>
-    <aura:registerevent name="mouseout"  type="ui:mouseout"  access="INTERNAL"/>
-    <aura:registerevent name="focus"     type="ui:focus"     access="INTERNAL"/>
-    <aura:registerevent name="blur"      type="ui:blur"      access="INTERNAL"/>
+    <aura:registerevent name="press"     type="ui:press"     access="GLOBAL" description="The event fired when the button is clicked."/>
+    <aura:registerevent name="keydown"   type="ui:keydown"   access="INTERNAL" description="The event fired when a key is pressed down on the button."/>
+    <aura:registerevent name="mouseover" type="ui:mouseover" access="INTERNAL" description="The event fired when the mouse hovers over the button."/>
+    <aura:registerevent name="mouseout"  type="ui:mouseout"  access="INTERNAL" description="The event fired when the mouse moves off the button"/>
+    <aura:registerevent name="focus"     type="ui:focus"     access="INTERNAL" description="The event fired when the button receives focus."/>
+    <aura:registerevent name="blur"      type="ui:blur"      access="INTERNAL" description="The event fired the button loses focus."/>
 
     <aura:method name="addHandler" description="Adds a binding for DOM->Action handler">
         <aura:attribute name="eventName"  type="String" />

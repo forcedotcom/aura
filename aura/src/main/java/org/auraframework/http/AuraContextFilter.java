@@ -96,16 +96,28 @@ public class AuraContextFilter implements Filter {
         contextService = service;
     }
 
+    protected ContextService getContextService() {
+    	return contextService;
+    }
+    
     @Inject
     public void setLoggingService(LoggingService service) {
         loggingService = service;
     }
 
+    protected LoggingService getLoggingService() {
+    	return loggingService;
+    }
+    
     @Inject
     public void setDefinitionService(DefinitionService service) {
         definitionService = service;
     }
 
+    protected DefinitionService getDefinitionService() {
+    	return definitionService;
+    }
+    
     @Inject
     public void setConfigAdapter(ConfigAdapter adapter) {
         configAdapter = adapter;

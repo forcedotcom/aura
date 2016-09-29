@@ -528,6 +528,10 @@ public class AuraServlet extends AuraBaseServlet {
         this.configAdapter = configAdapter;
     }
 
+    protected ConfigAdapter getConfigAdapter() {
+    	return configAdapter;
+    }
+    
     @Inject
     public void setSerializationService(SerializationService serializationService) {
         this.serializationService = serializationService;

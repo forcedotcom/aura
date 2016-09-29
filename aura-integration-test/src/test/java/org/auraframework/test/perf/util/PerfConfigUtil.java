@@ -16,9 +16,7 @@
 package org.auraframework.test.perf.util;
 
 import com.google.gson.Gson;
-
-import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -43,22 +41,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.inject.Inject;
-
-@ServiceComponent
 public final class PerfConfigUtil {
 
     private static final Logger LOG = Logger.getLogger(PerfConfigUtil.class.getSimpleName());
     private static final String CONFIG_FILE = "/config.json";
-    
-    @Inject
-    private DefinitionService definitionService;
-
-    @Inject
-    private ConfigAdapter configAdapter;
-
-    @Inject
-    private ContextService contextService;
     
     public Map<DefDescriptor<BaseComponentDef>, PerfConfig> getComponentTestsToRun(List<String> namespaces) {
         // Establish Aura Context before fetching all component defs
@@ -69,14 +55,9 @@ public final class PerfConfigUtil {
         Map<DefDescriptor<BaseComponentDef>, PerfConfig> configMap = new HashMap<>();
 
         for(DefDescriptor<BaseComponentDef> def : defs){
-            try {
-                PerfConfig componentConfig = loadConfigMapping(def);
-                if(componentConfig!=null) {
-                    configMap.put(def, componentConfig);
-                }
-            } catch(Throwable t) {
-                System.err.println("Error loading configs");
-                t.printStackTrace(System.err);
+            PerfConfig componentConfig = loadConfigMapping(def);
+            if(componentConfig!=null) {
+            	configMap.put(def, componentConfig);
             }
         }
 
@@ -111,7 +92,7 @@ public final class PerfConfigUtil {
         File moduleDir;
         String componentsDir = null;
         try {
-            fileName = definitionService.getDefinition(def).getLocation().getFileName();            
+            fileName = Aura.getDefinitionService().getDefinition(def).getLocation().getFileName();            
             moduleDir = new File(fileName).getCanonicalFile().getParentFile().getParentFile().getParentFile();
             if(fileName.contains("/core/")){
                 componentsDir = moduleDir.toString();
@@ -131,13 +112,13 @@ public final class PerfConfigUtil {
     	String componentDirPath = null;   	
     	
     	try {
-            String fileName = definitionService.getDefinition(def).getLocation().getFileName();
+            String fileName = Aura.getDefinitionService().getDefinition(def).getLocation().getFileName();
             componentPath = def.getNamespace() + "/" + def.getName();
 	    	
 	    	// If file is read from a jar, then need to handle it differently.
 	        if(fileName.contains("jar:")){        	
 	        	componentDirPath = "components_aura_components_test/" + componentPath + CONFIG_FILE;
-	        	br = new BufferedReader(new InputStreamReader(configAdapter.getResourceLoader().getResourceAsStream(componentDirPath)));
+	        	br = new BufferedReader(new InputStreamReader(Aura.getConfigAdapter().getResourceLoader().getResourceAsStream(componentDirPath)));
 	        }   	
 	        else {
 	    		componentDirPath = resolveComponentDirPath(def) + "/";
@@ -154,6 +135,7 @@ public final class PerfConfigUtil {
     }
 
     private ContextService establishAuraContext() {
+        ContextService contextService = Aura.getContextService();
         if (!contextService.isEstablished()) {
             contextService.startContext(Mode.PTEST, Format.JSON, Authentication.AUTHENTICATED);
         }
@@ -167,6 +149,7 @@ public final class PerfConfigUtil {
     @SuppressWarnings("unchecked")
     private Set<DefDescriptor<BaseComponentDef>> getComponentDefsInNamespace(String namespace) throws QuickFixException {
         Set<DefDescriptor<BaseComponentDef>> defs = new HashSet<>();
+        DefinitionService definitionService = Aura.getDefinitionService();
 
         Set<DefDescriptor<?>> descriptorsCmp; 
         Set<DefDescriptor<?>> descriptorsApp;

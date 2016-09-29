@@ -189,9 +189,7 @@ public class TestSetRunnerState {
 
                 if (t instanceof PerfExecutorTestCase) {
                 	List<String> urls = ((PerfExecutorTestCase) t).generateUrl();
-                    if (urls.size() > 0) {
-                        url = urls.get(0);
-                    }
+                	url = urls.get(0);
                 }
 
                 testWithProps.put("jsConsole", url);

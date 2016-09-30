@@ -25,9 +25,7 @@ import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RegisterEventDef;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -60,7 +58,6 @@ import java.util.Set;
 public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements ComponentDefRef {
     private static final long serialVersionUID = 4650210933042431716L;
     protected final Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeValues;
-    private final DefDescriptor<InterfaceDef> intfDescriptor;
     private final int hashCode;
     private final String localId;
     protected final Load load;
@@ -71,7 +68,6 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     protected ComponentDefRefImpl(Builder builder) {
         super(builder);
         this.attributeValues = AuraUtil.immutableMap(builder.attributeValues);
-        this.intfDescriptor = builder.intfDescriptor;
         this.hashCode = AuraUtil.hashCode(descriptor, location);
         this.localId = builder.localId;
         this.load = builder.load;
@@ -81,11 +77,6 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     }
 
 
-//    @Override
-//    public Component newInstance(BaseComponent<?, ?> valueProvider) throws QuickFixException {
-//        return new ComponentImpl(getDescriptor(), getAttributeValueList(), valueProvider, localId, Aura.getContextService(), Aura.getDefinitionService(), null, Aura.getLoggingService());
-//    }
-    
     @Override
     public Map<DefDescriptor<AttributeDef>, AttributeDefRef> getAttributeValues() {
         return attributeValues;
@@ -93,7 +84,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
 
     @Override
     public List<AttributeDefRef> getAttributeValueList() throws QuickFixException {
-        RootDefinition def = getComponentDef();
+        ComponentDef def = descriptor.getDef();
         Collection<AttributeDef> defs = def.getAttributeDefs().values();
         List<AttributeDefRef> ret = Lists.newArrayList();
         for (AttributeDef at : defs) {
@@ -117,11 +108,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
-        if (intfDescriptor != null) {
-            dependencies.add(intfDescriptor);
-        } else {
-            dependencies.add(descriptor);
-        }
+        dependencies.add(descriptor);
         for (AttributeDefRef attributeDefRef : attributeValues.values()) {
             attributeDefRef.appendDependencies(dependencies);
         }
@@ -129,28 +116,25 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
 
     @Override
     public void validateReferences() throws QuickFixException {
-        RootDefinition rootDef = getComponentDef();
-        if (rootDef == null) {
+        ComponentDef def = descriptor.getDef();
+        if (def == null) {
             throw new DefinitionNotFoundException(descriptor);
+        }
+        if (def.isAbstract() && def.getProviderDescriptor() == null) {
+            throw new InvalidDefinitionException("Cannot directly instantiate "+descriptor, location);
         }
 
         AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<?> referencingDesc = context.getCurrentCallingDescriptor();
         if (referencingDesc != null) {
             MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
-            registry.assertAccess(referencingDesc, rootDef);
+            registry.assertAccess(referencingDesc, def);
         }
 
         if (flavor != null) {
             // component must be flavorable (and by implication can't be an interface then)
-            if (intfDescriptor == null) {
-                ComponentDef def = descriptor.getDef();
-                if (!def.hasFlavorableChild() && !def.inheritsFlavorableChild() && !def.isDynamicallyFlavorable()) {
-                    throw new InvalidDefinitionException(String.format("%s is not flavorable", descriptor), location);
-                }
-            } else {
-                throw new InvalidDefinitionException(String.format(
-                        "the aura:flavor attribute cannot be specified on an interface", descriptor), location);
+            if (!def.hasFlavorableChild() && !def.inheritsFlavorableChild() && !def.isDynamicallyFlavorable()) {
+                throw new InvalidDefinitionException(String.format("%s is not flavorable", descriptor), location);
             }
         }
 
@@ -169,9 +153,9 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
      * @param referencingDesc referencing descriptor
      */
     private void validateAttributesValues(DefDescriptor<?> referencingDesc) throws QuickFixException, AttributeNotFoundException {
-        RootDefinition rootDef = getComponentDef();
-        Map<DefDescriptor<AttributeDef>, AttributeDef> atts = rootDef.getAttributeDefs();
-        Map<String, RegisterEventDef> registeredEvents = rootDef.getRegisterEventDefs();
+        ComponentDef def = descriptor.getDef();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> atts = def.getAttributeDefs();
+        Map<String, RegisterEventDef> registeredEvents = def.getRegisterEventDefs();
         MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
         for (Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : getAttributeValues().entrySet()) {
             DefDescriptor<AttributeDef> attributeDefDesc = entry.getKey();
@@ -181,7 +165,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
                 // event
                 RegisterEventDef registeredEvent = registeredEvents.get(attributeDefDesc.getName());
                 if (registeredEvent == null) {
-                    throw new AttributeNotFoundException(rootDef.getDescriptor(), attributeDefDesc.getName(),
+                    throw new AttributeNotFoundException(def.getDescriptor(), attributeDefDesc.getName(),
                             getLocation());
                 }
 
@@ -218,22 +202,16 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
         return hashCode;
     }
 
-    protected RootDefinition getComponentDef() throws QuickFixException {
-        if (intfDescriptor != null) {
-            return intfDescriptor.getDef();
-        } else {
-            return descriptor.getDef();
-        }
-    }
-
     /**
      * Used by Json.serialize()
      */
     @Override
     public void serialize(Json json) throws IOException {
         try {
+            ComponentDef def = descriptor.getDef();
+
             json.writeMapBegin();
-            json.writeMapEntry("componentDef", getComponentDef());
+            json.writeMapEntry("componentDef", def);
             json.writeMapEntry("localId", localId);
 
             if (load != Load.DEFAULT) {
@@ -254,7 +232,6 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
                 json.writeMapBegin();
                 json.writeMapKey("values");
 
-                RootDefinition def = this.getComponentDef();
                 json.writeMapBegin();
                 for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : attributeValues.entrySet()) {
                     AttributeDef attributeDef = def.getAttributeDef(entry.getKey().getName());
@@ -308,7 +285,6 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
 
         private Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeValues;
         private String localId;
-        private DefDescriptor<InterfaceDef> intfDescriptor;
         private Load load = Load.DEFAULT;
         private boolean isFlavorable;
         private boolean hasFlavorableChild;
@@ -383,16 +359,6 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
          */
         public String getLocalId() {
             return this.localId;
-        }
-
-        /**
-         * Sets the intfDescriptor for this instance.
-         *
-         * @param intfDescriptor The intfDescriptor.
-         */
-        public ComponentDefRefBuilder setIntfDescriptor(DefDescriptor<InterfaceDef> intfDescriptor) {
-            this.intfDescriptor = intfDescriptor;
-            return this;
         }
 
         @Override

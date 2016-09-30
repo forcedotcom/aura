@@ -23,7 +23,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ComponentDefRef.Load;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
@@ -153,14 +152,6 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
         if (!body.isEmpty()) {
             setBody(body);
         }
-
-        // hacky. if there is an interface, grab that descriptor too
-        DefDescriptor<InterfaceDef> id = definitionService.getDefDescriptor(builder.getDescriptor().getQualifiedName(),
-                InterfaceDef.class);
-        if (id.exists()) {
-            builder.setIntfDescriptor(id);
-        }
-
         return builder.build();
     }
 

@@ -41,6 +41,7 @@ public class ComponentDefRefImplUnitTest extends
     protected void setupValidateReferences() throws Exception {
         super.setupValidateReferences();
         ComponentDef def = Mockito.mock(ComponentDef.class);
+        Mockito.doReturn(false).when(def).isAbstract();
         Mockito.doReturn(def).when(this.descriptor).getDef();
     }
 
@@ -51,7 +52,6 @@ public class ComponentDefRefImplUnitTest extends
 
     @Override
     protected ComponentDefRef buildDefinition(Builder builder) throws Exception {
-        builder.setIntfDescriptor(this.intfDescriptor);
         builder.setLocalId(this.localId);
         builder.setLoad(this.load);
         if (this.attributeValues != null) {

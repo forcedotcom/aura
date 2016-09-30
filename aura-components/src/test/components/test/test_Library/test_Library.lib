@@ -16,6 +16,11 @@
 
 -->
 <aura:library>
+    <!-- 
+    	name is non case sensitive in the way that, if we say name="BASICFirst", it will still load basicFirst.js. 
+        just when we call it, we have to say cmp.getDef().getHelper().importED.BASICFirst as well 
+        see test around testMarkupCaseSentiveApp.app 
+    -->
     <aura:include name="basicFirst" />
     <aura:include name="basicSecond" />
     <aura:include name="expectsImport" imports="basicFirst" />

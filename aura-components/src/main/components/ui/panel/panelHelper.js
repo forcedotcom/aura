@@ -70,6 +70,17 @@
         return referenceEl;
     },
 
+    _getRootPanelCmp: function(cmp) {
+        if ($A.util.isUndefinedOrNull(cmp) || !cmp.isValid()) {
+            return undefined;
+        }
+        
+        if (cmp.getDef().getDescriptor().getQualifiedName() === 'markup://ui:panel') {
+            return cmp;
+        } else {
+            return this._getRootPanelCmp(cmp.getSuper());
+        }        
+    },
 
     show: function (cmp, callback) {
         var autoFocus = cmp.get('v.autoFocus');
@@ -231,7 +242,7 @@
 
         
         if(showPointer) {
-            pointer = cmp.find('pointer').getElement();
+            pointer = this._getRootPanelCmp(cmp).find('pointer').getElement();
         }
 
         boundingElement = cmp.get('v.boundingElement');

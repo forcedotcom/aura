@@ -185,5 +185,44 @@
         var testUtils = cmp.get("v.testUtils");
         testUtils.assertStartsWith("SecureElement", text.toString(), "Expected result of new Text() to be a SecureElement");
         testUtils.assertEquals(message, text.textContent);
+    },
+    
+    testSecureElementPrototypeCounterMeasures: function(cmp) {
+    	function testSpoof(f, expectedMessage) {
+	        try {
+	        	f();
+	        	testUtils.fail("Call to fake instance of SecureElement should have been blocked");
+	    	} catch (e) {
+	    		testUtils.assertTrue(testUtils.contains(e.toString(), expectedMessage));
+	    	}
+    	}
+
+        var testUtils = cmp.get("v.testUtils");
+
+        var el = cmp.find("content").getElement();
+        var prototype = Object.getPrototypeOf(el);
+        var descriptor = Object.getOwnPropertyDescriptor(prototype, "parentNode");
+        
+        // Try to spoof with correct prototype and newly created object
+        testSpoof(function() {
+        	var fakeEl = Object.create(prototype); 
+        	fakeEl.parentNode;
+    	}, "Blocked attempt to invoke secure method with altered this!");
+        
+        // Try to spoof with borrowed method
+        testSpoof(function() {
+	        descriptor.get.call(Object.create(null));
+        }, "Blocked attempt to invoke secure method with altered prototype!");
+        
+        // Try to spoof with borrowed method and correct prototype
+        testSpoof(function() {
+	        descriptor.get.call(Object.create(prototype));
+        }, "Blocked attempt to invoke secure method with altered this!");        
+
+        // Try to spoof with prototype from a different SecureElement tag name and existing object
+        testSpoof(function() {
+	        var otherEl = cmp.find("ul").getElement();
+	        descriptor.get.call(otherEl);
+        }, "Blocked attempt to invoke secure method with altered prototype!");           
     }
 })

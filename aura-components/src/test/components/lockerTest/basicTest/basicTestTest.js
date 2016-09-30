@@ -178,5 +178,11 @@
         test: function(cmp) {
             cmp.testAddExpandoToCachedItem();
         }
+    },
+    
+    testSecureElementPrototypeCounterMeasures: {
+    	test: function(cmp) {
+            cmp.testSecureElementPrototypeCounterMeasures();
+        }
     }
 })

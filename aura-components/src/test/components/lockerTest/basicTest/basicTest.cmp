@@ -39,6 +39,7 @@
     <aura:method name="testCtorAannotation" action="{!c.testCtorAannotation}"/>  
     <aura:method name="testUpdateElementDoesNotReturnCachedItem" action="{!c.testUpdateElementDoesNotReturnCachedItem}"/>
     <aura:method name="testAddExpandoToCachedItem" action="{!c.testAddExpandoToCachedItem}"/>
+    <aura:method name="testSecureElementPrototypeCounterMeasures" action="{!c.testSecureElementPrototypeCounterMeasures}"/>
 
     <div>LockerService test</div>
     <div aura:id="content"/>

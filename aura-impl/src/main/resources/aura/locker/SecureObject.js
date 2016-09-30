@@ -36,6 +36,20 @@ function SecureObject(thing, key) {
 	return Object.seal(o);
 }
 
+SecureObject.getRaw = function(so, prototype) {
+	if (Object.getPrototypeOf(so) !== prototype) {
+		throw new Error("Blocked attempt to invoke secure method with altered prototype!");
+	}
+	
+	var raw = ls_getRef(so, ls_getKey(so));
+	
+	if (!raw) {
+		throw new Error("Blocked attempt to invoke secure method with altered this!");
+	}
+	
+	return raw;
+};
+
 SecureObject.isDOMElementOrNode = function(el) {
 	"use strict";
 
@@ -280,6 +294,39 @@ SecureObject.createFilteredMethod = function(st, raw, methodName, options) {
 	};
 };
 
+
+SecureObject.createFilteredMethodStateless = function(methodName, prototype, options) {
+	"use strict";
+	
+	if (!prototype) {
+		throw new Error("SecureObject.createFilteredMethodStateless() called without prototype");
+	}
+
+	return {
+		enumerable : true,
+		value : function() {
+			var st = this;
+			var raw = SecureObject.getRaw(st, prototype);
+						
+			var args = SecureObject.ArrayPrototypeSlice.call(arguments);
+
+			if (options && options.beforeCallback) {
+				options.beforeCallback.apply(st, args);
+			}
+
+			var unfilteredArgs = SecureObject.unfilterEverything(st, args);
+			var fnReturnedValue = raw[methodName].apply(raw, unfilteredArgs);
+
+			if (options && options.afterCallback) {
+				fnReturnedValue = options.afterCallback.call(st, fnReturnedValue);
+			}
+
+			return SecureObject.filterEverything(st, fnReturnedValue, options);
+		}
+	};
+};
+
+
 SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
 	"use strict";
 
@@ -334,6 +381,66 @@ SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
 
 	return descriptor;
 };
+
+
+SecureObject.createFilteredPropertyStateless = function(propertyName, prototype, options) {
+	"use strict";
+
+	if (!prototype) {
+		throw new Error("SecureObject.createFilteredPropertyStateless() called without prototype");
+	}
+	
+	var descriptor = {
+		enumerable : true
+	};
+
+	descriptor.get = function() {
+		var st = this;
+		var raw = SecureObject.getRaw(st, prototype);
+		
+		var value = raw[propertyName];
+
+		// Continue from the current object until we find an acessible object.
+		if (options && options.skipOpaque === true) {
+			while (value) {
+                var hasAccess = ls_hasAccess(st, value);
+				if (hasAccess || value === document.body || value === document.head || value === document.documentElement) {
+					break;
+				}
+				value = value[propertyName];
+			}
+		}
+
+		if (options && options.afterGetCallback) {
+			// The caller wants to handle the property value
+			return options.afterGetCallback.call(st, value);
+		} else {
+			return SecureObject.filterEverything(st, value, options);
+		}
+	};
+
+	if (!options || options.writable !== false) {
+		descriptor.set = function(value) {
+			var st = this;
+			var key = ls_getKey(st);
+			var raw = ls_getRef(st, key);
+			
+			if (options && options.beforeSetCallback) {
+				value = options.beforeSetCallback.call(st, value);
+			}
+			
+			raw[propertyName] = SecureObject.unfilterEverything(st, value);
+
+			if (options && options.afterSetCallback) {
+				options.afterSetCallback.call(st);
+			}
+		};
+	}
+
+	return descriptor;
+};
+
+
 
 SecureObject.addIfSupported = function(behavior, st, element, name, options) {
 	options = options || {};
@@ -503,7 +610,7 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata, so, raw, key)
 		        	},
 
 		            set: function(callback) {
-		                raw[name] = function(e) {
+		            	raw[name] = function(e) {
 		                    callback.call(so, SecureDOMEvent(e, key));
 		                };
 		            }
@@ -511,7 +618,6 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata, so, raw, key)
 			} else {
 				// Properties
 				var descriptor = SecureObject.createFilteredProperty(so, raw, name, options);
-
 				if (descriptor) {
 					Object.defineProperty(so, name, descriptor);
 				}
@@ -527,6 +633,84 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata, so, raw, key)
 		Object.keys(prototype).forEach(worker);
 	});
 };
+
+
+SecureObject.addPrototypeMethodsAndPropertiesStateless = function(metadata, prototypicalInstance, prototypeForValidation) {
+	var rawPrototypicalInstance = SecureObject.getRaw(prototypicalInstance, prototypeForValidation);
+	var prototype;
+	var config = {};
+
+	function worker(name) {
+		var descriptor;
+		var item = prototype[name];
+
+		if (!(name in prototypicalInstance) && (name in rawPrototypicalInstance)) {
+			var options = {
+                filterOpaque : item.filterOpaque || true,
+	            skipOpaque : item.skipOpaque || false,
+	            defaultValue : item.defaultValue || null
+            };
+			
+			if (item.type === "function") {
+				descriptor = SecureObject.createFilteredMethodStateless(name, prototypeForValidation, options);
+			} else if (item.type === "@raw") {
+				descriptor = {
+        			// Does not currently secure proxy the actual class
+		        	get: function() {
+	        			var raw = SecureObject.getRaw(this, prototypeForValidation);
+		        		return raw[name];
+		        	}
+		        };
+			} else if (item.type === "@ctor") {
+				descriptor = {
+		        	get: function() {
+		        		return function() {
+		        			var so = this;
+		        			var raw = SecureObject.getRaw(so, prototypeForValidation);
+		        			var cls = raw[name];
+		        					        			
+		        			// TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
+		        			var result = new (Function.prototype.bind.apply(cls, [null].concat(Array.prototype.slice.call(arguments))));
+		        			$A.lockerService.trust(so, result);
+		        			
+		        			return SecureObject.filterEverything(so, result);
+		        		};
+		        	}
+		        };
+			} else if (item.type === "@event") {
+				descriptor = {
+		        	get: function() {
+		        		return SecureObject.filterEverything(this, SecureObject.getRaw(this, prototypeForValidation)[name]);
+		        	},
+
+		            set: function(callback) {
+		            	SecureObject.getRaw(this, prototypeForValidation)[name] = function(e) {
+		                    callback.call(this, SecureDOMEvent(e, ls_getKey(this)));
+		                };
+		            }
+		        };
+			} else {
+				// Properties
+				descriptor = SecureObject.createFilteredPropertyStateless(name, prototypeForValidation, options);
+			}
+		}
+		
+		if (descriptor) {
+			config[name] = descriptor;
+		}
+	}
+
+	var supportedInterfaces = getSupportedInterfaces(rawPrototypicalInstance);
+
+	var prototypes = metadata["prototypes"];
+	supportedInterfaces.forEach(function(name) {
+		prototype = prototypes[name];
+		Object.keys(prototype).forEach(worker);
+	});
+	
+	return config;
+};
+
 
 SecureObject.FunctionPrototypeBind = Function.prototype.bind;
 SecureObject.ArrayPrototypeSlice = Array.prototype.slice;

@@ -89,7 +89,7 @@ var ls_created,
 
     /**
      * LockerService internal API.
-     * The trust opertion propagtes the key to the thing being trusted.
+     * The trust operation propagates the key to the thing being trusted.
      * This method is used when the key is not known.
      * Moved from $A.lockerService.trust().
      */
@@ -199,14 +199,17 @@ var ls_created,
         if (!raw) {
             throw new Error("Caching an empty reference is prohibited.");
         }
+        
         if (!key) {
             throw new Error("Caching with an empty key is prohibited.");
         }
+        
         var rawToSecure = rawToSecureByKey.get(key);
         if (!rawToSecure) {
             rawToSecure = new WeakMap();
             rawToSecureByKey.set(key, rawToSecure);
         }
+        
         rawToSecure.set(raw, st);
     };
 

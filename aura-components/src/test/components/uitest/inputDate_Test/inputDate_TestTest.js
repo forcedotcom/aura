@@ -340,7 +340,11 @@
      * 3. Click on a date and check if attribute value of aria-selected is true
      */
     RANDOM_GRID_ELEM : 9,
-    testAriaSelected : {
+    
+    _testAriaSelected : {
+    	// TODO http://jenkins-sfdc.auraframework.org/job/02a-aura-integration-tests/7186/
+        labels : ["flapper"],
+
     	test : [function(cmp) {
     		this.openDatePicker(cmp);
     	}, function(cmp) {

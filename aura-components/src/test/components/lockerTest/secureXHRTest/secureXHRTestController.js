@@ -5,6 +5,7 @@
         ["/aura", "/\nau\nra", "/%61ura", "/aur%61", "/A/..%2Faura"].forEach(function(url) {
 	        try {
 	            var xhr = new XMLHttpRequest();
+	            	            
 	            xhr.open("POST", url, true);
 	            xhr.send();
 	            testUtils.fail("Should not be able to access " + url);

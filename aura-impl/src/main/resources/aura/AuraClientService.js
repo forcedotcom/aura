@@ -1544,7 +1544,6 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
     }
 
     // bootstrap is available but unprocessed. process it!
-    var context = $A.getContext();
     var boot = bootstrap.value;
 
     if (boot["error"]) {
@@ -1558,21 +1557,9 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
     }
 
     if (bootstrap.source === "network") {
-        // must "clean" the network payload
+        // must clean and save the network payload
         $A.util.json.resolveRefsObject(boot["data"]);
-        $A.componentService.saveDefsToStorage(boot["context"], context);
-
-        // persist bootstrap.js to storage
-        var actionStorage = Action.getStorage();
-        if (actionStorage && actionStorage.isPersistent()) {
-            actionStorage.set(AuraClientService.BOOTSTRAP_KEY, boot)
-                .then(
-                    undefined, // noop
-                    function(err) {
-                        $A.warning("AuraClientService.runAfterBootstrapReady(): failed to persist bootstrap.js: " + err);
-                    }
-                );
-        }
+        this.saveBootstrapToStorage(boot);
     }
 
     try {
@@ -1581,7 +1568,7 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
             // need to use the resolvedRefs for AuraContext components (componentConfigs aka partialConfigs)
             boot["context"]["components"] = boot["data"]["components"];
         }
-        context["merge"](boot["context"]);
+        $A.getContext()["merge"](boot["context"]);
     } catch(e) {
         if (bootstrap.source === "cache" && this.getParallelBootstrapLoad() && Aura["appBootstrapStatus"] !== "failed") {
             $A.warning("Bootstrap cache merge failed, waiting for bootstrap.js from network");
@@ -1625,6 +1612,10 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
  * @private
  */
 AuraClientService.prototype.checkBootstrapUpgrade = function() {
+    function fireApplicationRefreshed() {
+        $A.eventService.getNewEvent("markup://aura:applicationRefreshed").fire();
+    }
+
     // finishedInit and bootstrapUpgrade are set in async processes: former waits on libs_*.js
     // to arrive, latter waits on network bootstrap.js to arrive. thus global meeting point
     // pattern is required.
@@ -1634,7 +1625,13 @@ AuraClientService.prototype.checkBootstrapUpgrade = function() {
     }
     $A.log("Checking bootstrap signature: network returned " + (Aura["bootstrapUpgrade"] ? "new" : "same") + " version");
     if ($A["finishedInit"] && Aura["bootstrapUpgrade"]) {
-        $A.eventService.getNewEvent("markup://aura:applicationRefreshed").fire();
+        // must "clean" the payload prior to storing or using it
+        $A.util.json.resolveRefsObject(Aura["appBootstrap"]["data"]);
+
+        // save the new version of bootstrap to storage BEFORE notifying the app so that if the app chooses
+        // to reload the app then cache contains the latest bootstrap value.
+        this.saveBootstrapToStorage(Aura["appBootstrap"])
+            .then(fireApplicationRefreshed, fireApplicationRefreshed);
     }
 };
 
@@ -1714,6 +1711,42 @@ AuraClientService.prototype.loadBootstrapFromStorage = function() {
                 // do not rethrow
             }
         );
+};
+
+/**
+ * Save bootstrap.js to storage.
+ *
+ * @param {Object} boot The bootstrap.js payload
+ * @return {Promise} promise that resolves when bootstrap is saved to storage.
+ *  If a storage error occurs then a flag is set to force bootstrap.js from
+ *  network on next app load.
+ */
+AuraClientService.prototype.saveBootstrapToStorage = function(boot) {
+    var actionStorage = Action.getStorage();
+    if (!actionStorage || !actionStorage.isPersistent()) {
+        return Promise["resolve"]();
+    }
+
+    var that = this;
+    var defsPromise = $A.componentService.saveDefsToStorage(boot["context"], $A.getContext())
+        .then(
+            undefined,
+            function(e) {
+                $A.warning("AuraClientService.saveBootstrapToStorage(): failed to persist bootstrap.js defs: " + e);
+                that.disableParallelBootstrapLoadOnNextLoad();
+            }
+        );
+
+    var bootstrapPromise = actionStorage.set(AuraClientService.BOOTSTRAP_KEY, boot)
+        .then(
+            undefined,
+            function(e) {
+                $A.warning("AuraClientService.saveBootstrapToStorage(): failed to persist bootstrap.js: " + e);
+                that.disableParallelBootstrapLoadOnNextLoad();
+            }
+        );
+
+    return Promise["all"]([defsPromise, bootstrapPromise]);
 };
 
 /**

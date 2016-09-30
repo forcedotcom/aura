@@ -56,7 +56,7 @@
 						<uiExamples:iconCmp key="{! item.status.name.disabled ? 'L' : 'P'}" />
 					</aura:set>					
 				</ui:inlineEditCell>
-				<ui:inlineEditCell name="bloodtype"  triggerLabel="Edit Blood Type">
+				<ui:inlineEditCell name="bloodtype"  triggerLabel="Edit Blood Type" class="{!item.record.bloodtype}">
 					<ui:outputText class="truncate" value="{!item.record.bloodtype}"/>
 				</ui:inlineEditCell>
 				<ui:inlineEditCell name="phone" triggerLabel="Edit Phone">

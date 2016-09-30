@@ -30,14 +30,13 @@
 	<aura:attribute name="hasErrors" type="Boolean" default="false"/>
 	<aura:attribute name="errors"    type="Object[]"  description="The list of errors to be displayed."/>
 
-	<!-- <td> or <th> depending on the value of v.rowHeader -->
-	<span class="{! 'slds-grid slds-grid--align-spread slds-cell-edit cellContainer ' + v.class + (v.edited ? ' slds-is-edited' : '') + (v.hasErrors ? ' slds-has-error' : '')}" tabindex="-1">
+	<!-- <td> or <th> depending on the value of v.rowHeader. Classes and attributes are dynamically attached -->
+    <span class="slds-grid slds-grid--align-spread">
 	   {!v.body}
 		<span class="triggerContainer">
 			<ui:button aura:id="editTrigger" class="{! ' trigger' + (v.disabled ? ' disabled' : '')}" press="{!c.trigger}" variant="slds-button slds-button--icon slds-cell-edit__button slds-m-left--x-small" disabled="{!v.disabled}"
                         label="{!v.triggerLabel}" buttonTitle="{!v.triggerLabel}" labelDisplay="false">	
 				{!v.triggerIcon}
-
 			</ui:button>
 		</span>
 	</span>

@@ -58,10 +58,10 @@
 	  */
 	 testInlineEditCellDynamicallySetAndClearError : {
 		 test : [function(cmp) {
-			 this.verifyCellErrorState(cmp, false);
+		 	 this.verifyCellErrorState(cmp, false);
 			 cmp.find('cell1ErrorBtn').get('e.press').fire();
 		 }, function(cmp) {
-			 this.waitForCellErrorState(cmp, true);
+		 	 this.waitForCellErrorState(cmp, true);
 		 }, function(cmp) {
 			 cmp.find('cell1ErrorClearBtn').get('e.press').fire();
 		 }, function(cmp) {
@@ -136,7 +136,7 @@
 	 },
 	 
 	 getCellErrorState : function(cmp) {
-		 var cellElem = cmp.find('cell1').getElement();
+	 	 var cellElem = document.getElementsByTagName("td")[0];
 		 return $A.util.hasClass(cellElem, 'slds-has-error');
 	 },
 	 
@@ -149,7 +149,7 @@
 		 var that = this;
 		 var actual = '';
 		 $A.test.addWaitForWithFailureMessage(expected, function() {
-			 actual = that.getCellErrorState(cmp);
+		 	 actual = that.getCellErrorState(cmp);
 			 return actual;
 		 }, 'Expected error state "' + expected + '" but was "' + actual + '"');
 	 }

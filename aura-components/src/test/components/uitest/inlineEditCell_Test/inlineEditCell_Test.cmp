@@ -39,43 +39,43 @@
             <aura:set attribute="triggerIcon">
             	<uiExamples:iconCmp aura:id="myCmp1" key="{! v.isCell1Disabled ? 'Y' : 'N'}" />
             </aura:set>
-    	</ui:inlineEditCell>
-    	<ui:inlineEditCell aura:id="cell2" name="Cell-2" edited="true" disabled="{!v.isCell2Disabled}">
+    </ui:inlineEditCell>
+    <ui:inlineEditCell aura:id="cell2" name="Cell-2" edited="true" disabled="{!v.isCell2Disabled}">
             <ui:outputText aura:id="cell2Output" value="{!v.cell2Data}"/>
             <aura:set attribute="triggerIcon">
         	<uiExamples:iconCmp aura:id="myCmp2" key="{! v.isCell2Disabled ? 'Y' : 'N'}" />
             </aura:set>
-    	</ui:inlineEditCell>
-    	<ui:inlineEditCell aura:id="cell3" name="phone">
+    </ui:inlineEditCell>
+    <ui:inlineEditCell aura:id="cell3" name="phone">
     	     <ui:outputPhone value="{!v.phoneNumber}"/>
     	     <aura:set attribute="triggerIcon">
     	        <uiExamples:iconCmp aura:id="myCmp3" key="{! v.phoneNumber == '555-555-5555' ? 'Y' : 'N'}" />
     	     </aura:set>
-    	</ui:inlineEditCell>
-    	<ui:inlineEditCell aura:id="cell4" name="checkBox">
+    </ui:inlineEditCell>
+    <ui:inlineEditCell aura:id="cell4" name="checkBox">
     	    <ui:outputCheckbox value="{!v.checkbox}"/>
     	    <aura:set attribute="triggerIcon">
     	        <uiExamples:iconCmp aura:id="myCmp4" key="{! v.checkbox ? 'Y' : 'N'}" />
     	    </aura:set>
-    	</ui:inlineEditCell>
-    	<ui:inlineEditCell aura:id="cell5" name="textArea">
+    </ui:inlineEditCell>
+    <ui:inlineEditCell aura:id="cell5" name="textArea">
     	    <ui:outputTextArea value="{!v.textarea}"/>
     	    <aura:set attribute="triggerIcon">
     	        <uiExamples:iconCmp aura:id="myCmp5" key="{! v.textarea }" />
     	    </aura:set>
-    	</ui:inlineEditCell>
-    	<ui:inlineEditCell aura:id="cell6" name="url">
+    </ui:inlineEditCell>
+    <ui:inlineEditCell aura:id="cell6" name="url">
     	    <ui:outputURL value="{!v.url}"/>
     	    <aura:set attribute="triggerIcon">
     	        <uiExamples:iconCmp aura:id="myCmp6" key="{! v.url }" />
     	    </aura:set>
-    	</ui:inlineEditCell>
-    	<ui:inlineEditCell aura:id="cell7" name="date">
+    </ui:inlineEditCell>
+    <ui:inlineEditCell aura:id="cell7" name="date">
     	    <ui:outputDate value="{!v.date}"/>
     	    <aura:set attribute="triggerIcon">
     	        <uiExamples:iconCmp aura:id="myCmp7" key="{! v.date }" />
     	    </aura:set>
-    	</ui:inlineEditCell>
+    </ui:inlineEditCell>
 	
 	<div class="manager">
         <ui:panelManager2 aura:id="pm">

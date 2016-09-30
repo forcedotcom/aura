@@ -425,7 +425,7 @@
          var tbody = document.getElementsByTagName('tbody')[0];
          var rows = this.getOnlyTrs(tbody.children);
          var col = rows[rowIndex].children[colIndex];
-         return col;
+         return col.firstChild;
      },
      
      getCmpFromElement : function(elem) {
@@ -436,14 +436,13 @@
      verifyCellContent : function(cmp, rowIndex, colIndex, expected) {
          var cell = this.getCellElem(cmp, rowIndex, colIndex);
          var cellCmp = this.getCmpFromElement(cell.children[0]);
-         var outputCmp = cellCmp.get('v.body')[0];
          var actual = '';
          
-         if (outputCmp.getDef().getDescriptor().getQualifiedName() === 'markup://ui:outputCheckbox') {
-             actual = outputCmp.get('v.value');
-             actual = actual ? actual : false;
+         if ($A.util.hasClass(cellCmp.getElement(), "uiOutputCheckbox")) {
+        	 var actualElem = cellCmp.getElement().getElementsByTagName("img")[0];
+             actual = $A.util.hasClass(actualElem, "checked") ? true : false;
          } else {
-             actual = $A.test.getText(cell.querySelector('.cellContainer').firstChild);
+             actual = $A.test.getText(cell.firstChild);
          }
          $A.test.assertEquals(expected, actual, 'Cell value is incorrect');
      },
@@ -453,14 +452,14 @@
          var actual = '';
          $A.test.addWaitForWithFailureMessage(expected, function() {
              var cell = that.getCellElem(cmp, rowIndex, colIndex);
-             actual = $A.test.getText(cell.querySelector('.cellContainer').firstChild);
+             actual = $A.test.getText(cell.firstChild);
              return actual;
          }, 'Cell value was not updated expecting "' + expected + '" but was "' + actual + '"');
      },
      
      verifyCellEditStatus : function(cmp, rowIndex, colIndex, isEdited) {
          var cell = this.getCellElem(cmp, rowIndex, colIndex);
-         var cellCmp = this.getCmpFromElement(cell.children[0]);
+         var cellCmp = this.getCmpFromElement(cell);
          var actual = cellCmp.get('v.edited');
          actual = actual ? actual : false;
          $A.test.assertEquals(isEdited, actual, 'Cell\'s editied status is incorrect');

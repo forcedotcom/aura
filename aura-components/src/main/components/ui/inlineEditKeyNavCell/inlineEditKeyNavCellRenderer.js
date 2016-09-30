@@ -14,25 +14,23 @@
  * limitations under the License.
  */
  ({
-     render: function(cmp) {
+     render: function(cmp, helper) {
          var elements = this.superRender();
-         var cellWrapper;
+         var cell = helper.createWrapper(cmp.get("v.rowHeader"));
          
-         var isRowHeader = cmp.get("v.rowHeader");
-
-         if (isRowHeader) {
-             cellWrapper = document.createElement('TH');
-             cellWrapper.setAttribute('scope', 'row');
-         } else {
-             cellWrapper = document.createElement('TD');
-         }
+         helper.applyStyles(cmp, cell);
+         helper.applyKeyboardAttributes(cmp, cell);
          
-         cellWrapper.appendChild(elements[0]);
+         cell.appendChild(elements[0]);
          
-         return cellWrapper;
+         return cell;
      },
      
-     rerender: function() {
+     rerender: function(cmp, helper) {
          this.superRerender();
+         
+         var cell = cmp.getElement().parentNode;
+         helper.applyStyles(cmp, cell);
+         helper.applyKeyboardAttributes(cmp, cell);
      }
  })// eslint-disable-line semi

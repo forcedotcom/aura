@@ -159,7 +159,6 @@ function lib(w) { //eslint-disable-line no-unused-vars
             this.isGridEditable = cmp.get("v.editable");
 
             cmp.set('v.inKeyboardMode', true);
-
             if (!skipCellHandling) {
                 if (clearActiveCell) {
                     this._resetActiveCell();
@@ -455,8 +454,8 @@ function lib(w) { //eslint-disable-line no-unused-vars
                         return this._focusElement(focusableElements[0]);
                     }
                 } else {
-                    // if there is no visible, focusable element, simply select the first one (which should be the inner span)
-                    return this._focusElement(this.activeCell.firstChild);
+                    // if there is no visible, focusable element, simply select the first one (which should be the td/th)
+                    return this._focusElement(this.activeCell);
                 }
             }
             return false;

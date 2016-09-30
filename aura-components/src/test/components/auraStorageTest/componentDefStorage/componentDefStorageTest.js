@@ -14,109 +14,62 @@
      */
     testNoExcessivePruning: {
         test: [
-             function clearPersistentStorages(cmp) {
-                 this.clearCaches(cmp);
-             },
-             function addToDefStorage(cmp) {
-                 var desc = "ui:tab";
-                 cmp.set("v.load", desc);
-                 cmp.fetchCmp();
-                 this.waitForDefInStorage(desc);
-             },
-             function addToDefStorage(cmp) {
-                 var desc = "ui:tree"
-                 cmp.set("v.load", desc);
-                 cmp.fetchCmp();
-                 this.waitForDefInStorage(desc);
-             },
-             function addToDefStorage(cmp) {
-                 var desc = "ui:scroller";
-                 cmp.set("v.load", desc);
-                 cmp.fetchCmp();
-                 this.waitForDefInStorage(desc);
-             },
-             function verifyDefsNotEvicted(cmp) {
-                 // This test assumes pruning is done before inserting defs into the persistent def storage. By waiting
-                 // for each def to be put in persistent storage before continuing on, we know pruning has already
-                 // completed at this point so we can simply check what's currently in storage and verify no defs got
-                 // removed.
+            function clearPersistentStorages(cmp) {
+                cmp._storageContents = cmp.helper.storageTestLib.storageContents;
+                $A.test.addCleanup(function() {
+                        $A.storageService.deleteStorage("ComponentDefStorage");
+                    });
 
-                 // If defs are being pruned because the defs have gone over the storage maxSize we need to tweak the
-                 // size of ComponentDefStorage in the test template.
-                 var defs = undefined;
-                 var storage = $A.storageService.getStorage("ComponentDefStorage");
-                 if (!storage) {
-                     $A.test.fail("ComponentDefStorage store does not exist");
-                 }
-                 storage.getAll([], true)
-                     .then(function(items) {
-                         defs = Object.keys(items);
-                     });
-                 $A.test.addWaitForWithFailureMessage(true,
-                     function() { return defs !== undefined; },
-                     "Failed to get contents of ComponentDefStorage",
-                     function() {
-                         var expectedDefs = ["markup://ui:scroller", "markup://ui:tab", "markup://ui:tree"];
+                return cmp.helper.clearActionAndDefStorage(cmp)
+                    .catch(function(e) {
+                        $A.test.fail("Error clearing actions or ComponentDefStorage stores: " + e);
+                    });
+            },
+            function addFirstCmpToDefStorage(cmp) {
+                var desc = "ui:tab";
+                cmp.set("v.load", desc);
+                cmp.fetchCmp();
+
+                // def storage may not exist until the XHR is back and the def is stored
+                $A.test.addWaitForWithFailureMessage(true, function() {
+                        return !!$A.storageService.getStorage("ComponentDefStorage");
+                    },
+                    "ComponentDefStorage is not initialized.");
+            },
+            function waitForDefInStorage(cmp) {
+                var desc = "ui:tab";
+                return cmp._storageContents.waitForDefInStorage(desc);
+            },
+            function addToDefStorage(cmp) {
+                var desc = "ui:tree"
+                cmp.set("v.load", desc);
+                cmp.fetchCmp();
+                return cmp._storageContents.waitForDefInStorage(desc);
+            },
+            function addToDefStorage(cmp) {
+                var desc = "ui:scroller";
+                cmp.set("v.load", desc);
+                cmp.fetchCmp();
+                return cmp._storageContents.waitForDefInStorage(desc);
+            },
+            function verifyDefsNotEvicted(cmp) {
+               // This test assumes pruning is done before inserting defs into the persistent def storage. By waiting
+               // for each def to be put in persistent storage before continuing on, we know pruning has already
+                // completed at this point so we can simply check what's currently in storage and verify no defs got
+                // removed.
+
+                // If defs are being pruned because the defs have gone over the storage maxSize we need to tweak the
+                // size of ComponentDefStorage in the test template.
+                var storage = $A.storageService.getStorage("ComponentDefStorage");
+                return storage.getAll([], true)
+                    .then(function(items) {
+                        var defs = Object.keys(items);
+                        var expectedDefs = ["markup://ui:scroller", "markup://ui:tab", "markup://ui:tree"];
                          expectedDefs.forEach(function(expected) {
                              $A.test.assertTrue(defs.indexOf(expected) > -1, expected + " not found in ComponentDefStorage");
                          });
-                     });
-             },
-             function cleanup(cmp) {
-                 this.clearCaches(cmp);
-             }
-        ]
-    },
-
-    waitForDefInStorage: function(desc, msg) {
-        var found = false;
-
-        function checkDefStorage(desc) {
-            var storage = $A.storageService.getStorage("ComponentDefStorage");
-
-            // def storage may not exist until the XHR is back and the def is stored
-            if (!storage) {
-                window.setTimeout(function() { checkDefStorage(desc); }, 100);
-                return;
+                    });
             }
-
-            storage.getAll([], true)
-                .then(function(items) {
-                    if (items["markup://" + desc]) {
-                        found = true;
-                        return;
-                    }
-                    checkDefStorage(desc);
-                });
-        }
-
-        checkDefStorage(desc);
-
-        msg = msg || "Def " + desc + " never present in ComponentDefStorage";
-        $A.test.addWaitForWithFailureMessage(true,
-            function() { return found; },
-            msg
-        );
-    },
-
-    /**
-     * Empty the caches.
-     */
-    clearCaches: function(cmp) {
-        var done = false;
-        cmp.helper.clearActionAndDefStorage(cmp)
-            .then(
-                function() {
-                    done = true;
-                },
-                function(e) {
-                    $A.test.fail("Error clearing actions or ComponentDefStorage stores: " + e);
-                }
-            );
-
-        $A.test.addWaitForWithFailureMessage(true,
-                function() { return done; },
-                "Clearing ComponentDefStorage and actions store didn't complete");
-    },
-
+        ]
+    }
 })

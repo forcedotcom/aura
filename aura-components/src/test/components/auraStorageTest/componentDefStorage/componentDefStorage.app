@@ -21,6 +21,8 @@
     <aura:attribute name="log" type="String" default="" description="Log catcher" />
     <aura:attribute name="output" type="Aura.Component" description="Last created component" />
 
+    <aura:import library="auraStorageTest:storageTestLib" property="storageTestLib" />
+
     <aura:method name="saveLog" action="c.saveLog" />
     <aura:method name="clearCachesAndLog" action="c.clearCachesAndLog" />
     <aura:method name="fetchCmp" action="c.fetchCmp" />

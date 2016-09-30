@@ -45,7 +45,9 @@
 
     <aura:dependency resource="markup://ui:tabItem" />
     <aura:dependency resource="markup://ui:tabOverflowMenuItem" />
-
+    
+    <aura:locator target="*" alias="tab-bar-content" description="Content inside tabs"/>
+    
     <aura:if isTrue="{!v.useOverflowMenu}">
         <ui:resizeObserver onresize="{!c.onResize}"/>
     </aura:if>

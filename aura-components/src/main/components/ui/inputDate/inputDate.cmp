@@ -29,7 +29,7 @@
     <aura:import library="ui:dateTimeLib" property="dateTimeLib"/>
 
     <aura:if isTrue="{!$Browser.isPhone || $Browser.isTablet}">
-        <input aura:id="inputText" id="{!v.domId}" class="{!v.class + ' input'}" type="text" placeholder="{!v.placeholder}" readonly="true" onclick="{!c.click}" aria-describedby="{!v.ariaDescribedBy}"/>
+        <input aura:id="inputText" id="{!v.domId}" class="{!v.class + ' input'}" type="text" placeholder="{!v.placeholder}" readonly="true" onclick="{!c.click}" aria-describedby="{!v.ariaDescribedBy}" disabled="{!v.disabled}"/>
 
         <aura:if isTrue="{!v.displayDatePicker}">
             <a aura:id="datePickerOpener" class="datePicker-openIcon display" aria-haspopup="true" onclick="{!c.openDatePicker}">

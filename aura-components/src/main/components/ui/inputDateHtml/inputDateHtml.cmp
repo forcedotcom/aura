@@ -29,6 +29,8 @@
            id="{!v.domId}"
            class="{!v.class + ' input'}"
            type="date"
+           required="{!v.required}"
+           disabled="{!v.disabled}"
            aria-describedby="{!v.ariaDescribedBy}"/>
 
 </aura:component>

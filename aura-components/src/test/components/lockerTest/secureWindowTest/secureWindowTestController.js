@@ -79,5 +79,52 @@
         testUtils.assertTrue(typeof setTimeoutReturn === "number", "setInterval did not return a number");
         clearInterval(setIntervalReturn);
         clearTimeout(setTimeoutReturn);
+    },
+
+    testOpen_HttpsUrl: function(cmp){
+        var testUtils = cmp.get("v.testUtils");
+        var url = "https://google.com";
+        var gsWin = window.open(url);
+        testUtils.assertNotNull(gsWin);
+        var opener = gsWin.opener;
+        gsWin.close();
+        // Verify that what we get back is a SecureWindow
+        testUtils.assertEquals(window, opener, "Expected child window to have access to only SecureWindow");
+    },
+
+    testOpen_HttpUrl: function(cmp){
+        var testUtils = cmp.get("v.testUtils");
+        var url = "http://google.com";
+        var gWin = window.open(url);
+        var opener = gWin.opener;
+        gWin.close();
+        testUtils.assertEquals(window, opener, "Expected child window to have access to only SecureWindow");
+    },
+
+    testOpen_RelativeUrl : function(cmp){
+        var testUtils = cmp.get("v.testUtils");
+        var url = "/lockerApiTest/index.app?aura.mode=DEV";
+        var apiViewer = window.open(url);
+        var opener = apiViewer.opener;
+        apiViewer.close();
+        testUtils.assertEquals(window, opener, "Expected child window to have access to only SecureWindow");
+    },
+
+    testOpen_JavascriptIsBlocked: function(cmp){
+        var testUtils = cmp.get("v.testUtils");
+        var scripts = [
+            "javascript:window.opener.console.log(\'owned your dom \' + window.opener.document)",
+            "  javascript:window.opener.console.log(\'owned your dom \' + window.opener.document)",
+            "\n\tjavascript:window.opener.console.log(\'owned your dom \' + window.opener.document)",
+            "\bjavascript:window.opener.console.log(\'owned your dom \' + window.opener.document)"
+        ];
+        scripts.forEach(function(script){
+            try {
+                window.open(script);
+                testUtils.fail("Expect to block javascript execution using window.open():" +  script);
+            } catch (e) {
+                testUtils.assertEquals("SecureWindow.open supports http://, https:// schemes and relative urls. It does not support javascript: scheme!", e.message);
+            }
+        });
     }
 })

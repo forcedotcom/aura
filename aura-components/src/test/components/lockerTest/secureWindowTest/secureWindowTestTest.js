@@ -78,5 +78,29 @@
         test: function(cmp) {
             cmp.testTimerReturns();
         }
+    },
+
+    testOpen_HttpsUrl: {
+        test: function(cmp) {
+            cmp.testOpen_HttpsUrl();
+        }
+    },
+
+    testOpen_HttpUrl: {
+        test: function(cmp) {
+            cmp.testOpen_HttpUrl();
+        }
+    },
+
+    testOpen_RelativeUrl:{
+        test: function(cmp) {
+            cmp.testOpen_RelativeUrl();
+        }
+    },
+
+    testOpen_JavascriptIsBlocked: {
+        test: function(cmp) {
+            cmp.testOpen_JavascriptIsBlocked();
+        }
     }
 })

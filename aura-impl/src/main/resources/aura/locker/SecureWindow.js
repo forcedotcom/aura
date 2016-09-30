@@ -84,11 +84,27 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
 		});
 	});
 
-	[ "getComputedStyle", "open", "scroll", "scrollBy", "scrollTo" ].forEach(function(name) {
+	[ "getComputedStyle", "scroll", "scrollBy", "scrollTo" ].forEach(function(name) {
 		SecureObject.addMethodIfSupported(o, win, name, {
 			filterOpaque : true
 		});
 	});
+
+    [ "open"].forEach(function(name) {
+        SecureObject.addMethodIfSupported(o, win, name, {
+            filterOpaque : true,
+            beforeCallback  : function(url){
+                // If an url was provided to window.open()
+                if (url && typeof url === "string" && url.length > 1) {
+                    // Only allow http|https|relative urls.
+                    var schemeRegex = /[\s]*(http:\/\/|https:\/\/|\/)/i;
+                    if (!schemeRegex.test(url)){
+                        throw new $A.auraError("SecureWindow.open supports http://, https:// schemes and relative urls. It does not support javascript: scheme!");
+                    }
+                }
+            }
+        });
+    });
 
 	SecureElement.addEventTargetMethods(o, win, key);
 

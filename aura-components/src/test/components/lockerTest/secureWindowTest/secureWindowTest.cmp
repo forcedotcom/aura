@@ -31,5 +31,10 @@
     <aura:method name="testObjectExposedOnWindow" action="{!c.testObjectExposedOnWindow}"/>
     <aura:method name="testTimerReturns" action="{!c.testTimerReturns}"/>
 
+    <aura:method name="testOpen_HttpsUrl" action="{!c.testOpen_HttpsUrl}"/>
+    <aura:method name="testOpen_HttpUrl" action="{!c.testOpen_HttpUrl}"/>
+    <aura:method name="testOpen_RelativeUrl" action="{!c.testOpen_RelativeUrl}"/>
+    <aura:method name="testOpen_JavascriptIsBlocked" action="{!c.testOpen_JavascriptIsBlocked}"/>
+
     <div>SecureWindow test</div>
 </aura:component>

@@ -59,33 +59,22 @@
             script.textContent = script.text = `
                 /**  Aura Inspector Script, ties into $A.initAsync and $A.initConfig to initialize the inspector as soon as possible. **/
                 (function(){
-                    function wrap(obj, original, before, after) {
-                        return function() {
-                            if(before) before.apply(obj, arguments);
-                            var returnValue = original.apply(obj, arguments);
-                            if(after) after.apply(obj, arguments);
-                            return returnValue;
-                        }
-                    }
                     function notifyDevTools() {
                         window.postMessage({
                             action  : "AuraInspector:publish",
                             key: "AuraInspector:OnAuraInitialized"
                         }, window.location.href);
                     }
-                    var _$A;
-                    Object.defineProperty(window, "$A", {
+                    var _Aura;
+                    Object.defineProperty(window, "Aura", {
                         enumerable: true,
                         configurable: true,
-                        get: function() { return _$A; },
+                        get: function() { return _Aura; },
                         set: function(val) {
-                            if(val && val.initAsync) {
-                                val.initAsync = wrap(val, val.initAsync, notifyDevTools);
-                            }
-                            if(val && val.initConfig) {
-                                val.initConfig = wrap(val, val.initConfig, notifyDevTools);
-                            }
-                            _$A = val;
+                            val.beforeFrameworkInit = val.beforeFrameworkInit || [];
+                            val.beforeFrameworkInit.push(notifyDevTools);
+        
+                            _Aura = val;
                         }
                     });
                 })();

@@ -137,6 +137,9 @@ Test.Aura.AuraExpressionServiceTest = function(){
         function ReturnsUndefinedWhenComponentHasNoLocatorLocalIdNorSuper(){
             var targetService = new Aura.Services.AuraExpressionService();
             var locatorLocalId = "locatorLocalId";
+            var root = { 
+                getLocalId: function() { return locatorLocalId;}
+            };
             var component = {
                 find: function(localId) {
                     if(localId === locatorLocalId) {
@@ -147,7 +150,7 @@ Test.Aura.AuraExpressionServiceTest = function(){
                 getLocalId: function() { return "ownerLocalId" }
             };
 
-            var actual = targetService.resolveLocator(component, locatorLocalId);
+            var actual = targetService.resolveLocator(component, root);
 
             Assert.Undefined(actual);
         }

@@ -67,8 +67,8 @@ SecureObject.filterEverything = function(st, raw, options) {
 
 	var t = typeof raw;
 	if (t === "object") {
-		if (raw instanceof File || raw instanceof FileList || raw instanceof CSSStyleDeclaration || raw instanceof TimeRanges || 
-				raw instanceof Date || (window.ValidityState && raw instanceof ValidityState)) {
+		if (raw instanceof File || raw instanceof FileList || raw instanceof CSSStyleDeclaration || raw instanceof TimeRanges ||
+				raw instanceof Date || (typeof ValidityState !== "undefined" && raw instanceof ValidityState)) {
 			// Pass thru for objects without privileges.
 			return raw;
 		}
@@ -138,7 +138,7 @@ SecureObject.filterEverything = function(st, raw, options) {
 				swallowed = hasAccess ? SecureComponent(raw, key) : SecureComponentRef(raw, key);
 				mutated = raw !== swallowed;
 			} else if (SecureObject.isDOMElementOrNode(raw)) {
-				if (hasAccess || raw === document.body || raw === document.head || raw === document.documentElement) {
+				if (hasAccess || SecureElement.isSharedElement(raw)) {
 					swallowed = SecureElement(raw, key);
 				} else if (!options || options.filterOpaque !== true) {
 					swallowed = SecureObject(raw, key);
@@ -350,7 +350,7 @@ SecureObject.createFilteredProperty = function(st, raw, propertyName, options) {
 		if (options && options.skipOpaque === true) {
 			while (value) {
                 var hasAccess = ls_hasAccess(st, value);
-				if (hasAccess || value === document.body || value === document.head || value === document.documentElement) {
+				if (hasAccess || SecureElement.isSharedElement(value)) {
 					break;
 				}
 				value = value[propertyName];
@@ -462,10 +462,6 @@ SecureObject.addMethodIfSupported = function(st, raw, name, options) {
 
 // Return the set of interfaces supported by the object in order of most specific to least specific
 function getSupportedInterfaces(o) {
-	function safeInstanceOf(obj, className) {
-		var cls = window[className];
-		return cls && obj instanceof cls;
-	}
 
 	var interfaces = [];
 	if (o instanceof Window) {
@@ -502,7 +498,7 @@ function getSupportedInterfaces(o) {
 				interfaces.push("HTMLTableColElement");
 			} else if (o instanceof HTMLModElement) {
 				interfaces.push("HTMLModElement");
-			} else if (safeInstanceOf(o, "HTMLDetailsElement")) {
+			} else if (typeof HTMLDetailsElement !== "undefined" && o instanceof HTMLDetailsElement) {
 				interfaces.push("HTMLDetailsElement");
 			} else if (o instanceof HTMLEmbedElement) {
 				interfaces.push("HTMLEmbedElement");
@@ -526,7 +522,7 @@ function getSupportedInterfaces(o) {
 				interfaces.push("HTMLMapElement");
 			} else if (o instanceof HTMLMetaElement) {
 				interfaces.push("HTMLMetaElement");
-			} else if (safeInstanceOf(o, "HTMLMeterElement")) {
+			} else if (typeof HTMLMeterElement !== "undefined" && o instanceof HTMLMeterElement) {
 				interfaces.push("HTMLMeterElement");
 			} else if (o instanceof HTMLObjectElement) {
 				interfaces.push("HTMLObjectElement");
@@ -550,7 +546,7 @@ function getSupportedInterfaces(o) {
 				interfaces.push("HTMLSourceElement");
 			} else if (o instanceof HTMLTableCellElement) {
 				interfaces.push("HTMLTableCellElement");
-			} else if (safeInstanceOf(o, "HTMLTemplateElement")) {
+			} else if (typeof HTMLTemplateElement !== "undefined" && o instanceof HTMLTemplateElement) {
 				interfaces.push("HTMLTemplateElement");
 			} else if (o instanceof HTMLTextAreaElement) {
 				interfaces.push("HTMLTextAreaElement");
@@ -594,11 +590,11 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata, so, raw, key)
 		        	get: function() {
 		        		return function() {
 		        			var cls = raw[name];
-		        					        			
+
 		        			// TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
 		        			var result = new (Function.prototype.bind.apply(cls, [null].concat(Array.prototype.slice.call(arguments))));
 		        			$A.lockerService.trust(so, result);
-		        			
+
 		        			return SecureObject.filterEverything(so, result);
 		        		};
 		        	}

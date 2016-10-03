@@ -103,6 +103,8 @@
     "HTMLAreaElement": true,
     "HTMLAudioElement": true,
     "HTMLMediaElement": true,
+    "HTMLMeterElement": true,
+    "HTMLDetailsElement": true,
     "HTMLEmbedElement": true,
     "HTMLOutputElement": true,
     "HTMLProgressElement": true,

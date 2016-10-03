@@ -30,7 +30,7 @@ function SecureScriptElement(el, key) {
 	var eventListeners = {};
 
 	// Create a placeholder script element in the doc
-	el = el || document.createElement("script");
+	el = el || document.createElement("SCRIPT");
 
 	o = Object.create(null, {
 		src : {

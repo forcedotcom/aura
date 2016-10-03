@@ -24,10 +24,6 @@ function runIfRunnable(st) {
     return isRunnable;
 }
 
-function isSharedElement(element) {
-    return element === document.body || element === document.head || element === document.documentElement;
-}
-
 function trustChildNodes(node) {
 	var key = ls_getKey(node);
 
@@ -64,29 +60,29 @@ function SecureElement(el, key) {
     }
 
     // SecureElement is it then!
-        
+
     // Lazily create and cache tag name specific prototype
     switch (el.nodeType) {
     	case Node.TEXT_NODE:
     		tagName = "#text";
     		break;
-    		
+
     	case Node.DOCUMENT_FRAGMENT_NODE:
     		tagName = "#fragment";
     		break;
     }
-    
+
     // Segregate prototypes by their locker
     var prototypes = KEY_TO_PROTOTYPES.get(key);
     if (!prototypes) {
     	prototypes = new Map();
     	KEY_TO_PROTOTYPES.set(key, prototypes);
     }
-    
+
     var prototype = prototypes.get(tagName);
     if (!prototype) {
     	prototype = Object.create(null);
-    	
+
     	Object.defineProperties(prototype, {
 			toString: {
 				value: function() {
@@ -94,7 +90,7 @@ function SecureElement(el, key) {
 		            return "SecureElement: " + e + "{ key: " + JSON.stringify(ls_getKey(this)) + " }";
 				}
 			},
-			
+
 			appendChild : {
 		        value : function(child) {
 		            if (!runIfRunnable(child)) {
@@ -136,16 +132,16 @@ function SecureElement(el, key) {
 		            return SecureElement.secureQuerySelector(e, ls_getKey(this), selector);
 		        }
 		    },
-		    
+
 		    insertAdjacentHTML: {
 		        value: function(position, text) {
 					var e = SecureObject.getRaw(this, prototype);
 
 		            // Do not allow insertAdjacentHTML on shared elements (body/head)
-		            if (isSharedElement(e)) {
+                    if (SecureElement.isSharedElement(el)) {
 		                throw new $A.auraError("SecureElement.insertAdjacentHTML cannot be used with " + e.tagName + " elements!");
 		            }
-		            
+
 		            var parent;
 		            if (position === "afterbegin" || position === "beforeend") {
 		                // We have access to el, nothing else to check.
@@ -169,7 +165,7 @@ function SecureElement(el, key) {
 		            }
 		        }
 		    },
-		    
+
 		    removeChild : SecureObject.createFilteredMethodStateless("removeChild", prototype, {
 		        beforeCallback : function(child) {
 		            // Verify that the passed in child is not opaque!
@@ -195,10 +191,10 @@ function SecureElement(el, key) {
 		                    }
 		                }
 		            }
-		            
+
 					var e = SecureObject.getRaw(this, prototype);
 		            var root = e.cloneNode(deep);
-		            
+
 		            // Maintain the same ownership in the cloned subtree
 		            copyKeys(e, root);
 
@@ -218,14 +214,14 @@ function SecureElement(el, key) {
 		        }
 		    })
     	});
-    	
+
     	prototypes.set(tagName, prototype);
-    	
+
         var prototypicalInstance = Object.create(prototype);
         ls_setRef(prototypicalInstance, el, key);
-        
+
         var tagNameSpecificConfig = SecureObject.addPrototypeMethodsAndPropertiesStateless(SecureElement.metadata, prototypicalInstance, prototype);
-        
+
         // Conditionally add things that not all Node types support
         if ("attributes" in el) {
 	        tagNameSpecificConfig["attributes"] = SecureObject.createFilteredPropertyStateless("attributes", prototype, {
@@ -240,7 +236,7 @@ function SecureElement(el, key) {
 	                        value : SecureObject.filterEverything(this, attribute.value)
 	                    });
 	                }
-	
+
 	                return secureAttributes;
 	            }
 	        });
@@ -267,15 +263,15 @@ function SecureElement(el, key) {
 	            beforeSetCallback : function(value) {
 	                // Do not allow innerHTML on shared elements (body/head)
 	            	var raw = SecureObject.getRaw(this, prototype);
-	                if (isSharedElement(raw)) {
+                    if (SecureElement.isSharedElement(el)) {
 	                    throw new $A.auraError("SecureElement.innerHTML cannot be used with " + raw.tagName + " elements!");
 	                }
-	
+
 	                // Allow SVG <use> element
 	                var config = {
 	                    "ADD_TAGS" : [ "use" ]
 	                };
-	
+
 	                return DOMPurify["sanitize"](value, config);
 	            },
 	            afterSetCallback : function() {
@@ -286,19 +282,19 @@ function SecureElement(el, key) {
 	            }
 	        });
         }
-               
+
         SecureElement.createEventTargetMethodsStateless(tagNameSpecificConfig, prototype);
 
         // DCHASMAN TODO Remove this - needs to be into the shape metadata!!! Special handling for SVG elements
         if ("getBBox" in el && el.namespaceURI === "http://www.w3.org/2000/svg") {
         	tagNameSpecificConfig["getBBox"] = SecureObject.createFilteredMethodStateless("getBBox", prototype);
         }
-      	
+
         Object.defineProperties(prototype, tagNameSpecificConfig);
-        
+
         Object.freeze(prototype);
     }
-    
+
     //o = Object.create(null, SECURE_ELEMENT_CONFIG);
     o = Object.create(prototype);
 
@@ -327,7 +323,7 @@ SecureElement.addEventTargetMethods = function(se, raw, key) {
 
 SecureElement.createEventTargetMethodsStateless = function(config, prototype) {
 	config["addEventListener"] = SecureElement.createAddEventListenerDescriptorStateless(prototype);
-	
+
 	config["dispatchEvent"] = SecureObject.createFilteredMethodStateless("dispatchEvent", prototype);
 
     // removeEventListener() is special in that we do not want to
@@ -1162,12 +1158,18 @@ SecureElement.metadata = {
 	}
 };
 
+SecureElement.isSharedElement = function(el) {
+    return el === document.body ||
+        el === document.head ||
+        el === document.documentElement;
+};
+
 SecureElement.secureQuerySelector = function(el, key, selector) {
     var rawAll = el.querySelectorAll(selector);
     for (var n = 0; n < rawAll.length; n++) {
         var raw = rawAll[n];
         var rawKey = ls_getKey(raw);
-        if (rawKey === key || raw === document.body || raw === document.head || raw === document.documentElement) {
+        if (rawKey === key || SecureElement.isSharedElement(raw)) {
             return SecureElement(raw, key);
         }
     }

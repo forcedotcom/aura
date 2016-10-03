@@ -58,7 +58,8 @@ public final class WebDriverUtil {
         TABLET("deviceType", "tablet"),
         LANDSCAPE("deviceOrientation", "landscape"),
         PORTRAIT("deviceOrientation", "portrait"),
-        DISABLE_NATIVE_EVENTS("webdriverEnableNativeEvents", "false");
+        DISABLE_NATIVE_EVENTS("webdriverEnableNativeEvents", "false"),
+        DISABLE_POPUP_BLOCKING("disable-popup-blocking", "true");
 
         private final String value;
         private final String name;
@@ -84,7 +85,7 @@ public final class WebDriverUtil {
         IE9(DesiredCapabilities.internetExplorer(), "9", "Windows 7"),
         IE8(DesiredCapabilities.internetExplorer(), "8", Platform.WINDOWS),
         IE7(DesiredCapabilities.internetExplorer(), "7", Platform.WINDOWS),
-        GOOGLECHROME(DesiredCapabilities.chrome(), "34", Platform.ANY),
+        GOOGLECHROME(DesiredCapabilities.chrome(), "34", Platform.ANY, ExtraCapability.DISABLE_POPUP_BLOCKING),
         SAFARI(DesiredCapabilities.safari(), "7", "OS X 10.9"),
         ANDROID_PHONE(DesiredCapabilities.android(), "4", "Linux", ExtraCapability.PHONE, ExtraCapability.PORTRAIT),
         ANDROID_TABLET(DesiredCapabilities.android(), "4", "Linux", ExtraCapability.TABLET, ExtraCapability.LANDSCAPE),
@@ -148,6 +149,14 @@ public final class WebDriverUtil {
                     FirefoxProfile firefoxProfile = new FirefoxProfile();
                     firefoxProfile.setEnableNativeEvents(Boolean.parseBoolean(extra.getValue()));
                     this.capability.setCapability("firefox_profile", firefoxProfile);
+                } else if (extra.equals(ExtraCapability.DISABLE_POPUP_BLOCKING)
+                        && this.capability.getBrowserName().equals("chrome")
+                        && extra.getValue().equals("true")) {
+                    // Disable pop-up blocking in google chrome
+                    // Chromedriver v21+ has this feature by default https://bugs.chromium.org/p/chromedriver/issues/detail?id=1291
+                    ChromeOptions options = new ChromeOptions();
+                    options.addArguments(extra.getCapabilityName());
+                    this.capability.setCapability(ChromeOptions.CAPABILITY, options);
                 } else {
                     this.capability.setCapability(extra.getCapabilityName(), extra.getValue());
                 }

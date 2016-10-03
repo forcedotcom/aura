@@ -19,7 +19,7 @@
     top: 0;
     position: absolute;
     font: 100%/1.5 "Salesforce Sans",Arial,sans-serif;
-    z-index: 7000;
+    z-index: 9999;
 }
 
 .THIS ol,

@@ -331,6 +331,66 @@
             $A.test.assertEquals("21", $A.util.getText(curDate), "Date picker did not open to the correct day");
         }]
     },
+    
+    /**
+     * Test Flow:
+     * 
+     * 1. Hover over a date and check if attribute value of aria-selected is false
+     * 2. Set focus on a date and check if attribute value of aria-selected is false
+     * 3. Click on a date and check if attribute value of aria-selected is true
+     */
+    RANDOM_GRID_ELEM : 9,
+    testAriaSelected : {
+    	test : [function(cmp) {
+    		this.openDatePicker(cmp);
+    	}, function(cmp) {
+    		//check that hover does not set aria-selected to true
+    		$A.test.fireDomEvent(cmp.find("datePickerTestCmp").find("datePicker").find("grid").find(this.RANDOM_GRID_ELEM).getElement(), "mouseover");
+    	}, function(cmp) {
+    		$A.test.assertTrue($A.util.getElementAttributeValue(cmp.find("datePickerTestCmp").find("datePicker").find("grid").find(this.RANDOM_GRID_ELEM).getElement(), "aria-selected") === "false",
+    				"Aria-selected should be false when we hover over a date");
+    		
+    		//check that focus does not set aria-selected to true
+    		$A.test.fireDomEvent(cmp.find("datePickerTestCmp").find("datePicker").find("grid").find(this.RANDOM_GRID_ELEM).getElement(), "focus");
+    	}, function(cmp) {
+    		$A.test.assertTrue($A.util.getElementAttributeValue(cmp.find("datePickerTestCmp").find("datePicker").find("grid").find(this.RANDOM_GRID_ELEM).getElement(), "aria-selected") === "false",
+    				"Aria-selected should be false when focus is set on a date");
+    		
+    		//click on a date and check that aria-selected is true
+    		var newDate = cmp.find("datePickerTestCmp").find("datePicker").find("grid").find(this.RANDOM_GRID_ELEM).getElement();
+    		$A.test.clickOrTouch(newDate);
+    	}, function(cmp) {
+    		this.openDatePicker(cmp);
+    		var self = this;
+    		$A.test.addWaitForWithFailureMessage(true, function () {
+    			return ($A.util.getElementAttributeValue(cmp.find("datePickerTestCmp").find("datePicker").find("grid").find(self.RANDOM_GRID_ELEM).getElement(), "aria-selected") === "true");
+    		}, "Aria-selected should be true after clicking on a date");
+    	}]
+    },
+    
+    /**
+     * Test Flow:
+     * 
+     * 1. Open datePicker with a date already selected (25th Sept 2013)
+     * 2. Go to next month and check that aria-selected=false for the same day of this month (25th Oct 2013)
+     * 3. Go to next year and check that aria-selected=false for the same day of this year and month (25th Oct 2014)
+     * 4. Go back to the originally selected date and check that aria-selected=true (25th Sept 2013)
+     */
+    testAriaSelectedMonthYear : {
+    	attributes: {value: "2013-09-25"},
+    	test : [ function(cmp) {
+    		this.openDatePicker(cmp);
+    	},function(cmp) {
+    		this.verifyAriaSelAndMove(cmp, "true", 1, 0, "aria-selected should be true for Sept 25, 2013");
+    	}, function(cmp) {
+    		this.verifyAriaSelAndMove(cmp, "false", 0, 1, "aria-selected should be false for Oct 25, 2013");
+    	}, function(cmp) {
+    		this.verifyAriaSelAndMove(cmp, "false", -1, -1,"aria-selected should be false for Oct 25, 2014");
+    	}, function(cmp) {
+    		this.verifyAriaSelAndMove(cmp, "true", 0, 0,"aria-selected should be true for Sept 25, 2013");
+    	}]
+    },
+
 
     iterateCal: function (monthIter, yearIter, monthButton, yearButton) {
         var i;
@@ -386,5 +446,35 @@
                        "August", "September", "October", "November", "December" ];
 
         return months[intMonth];
+    },
+    
+    /**
+     * Find the grid location of a specific date on the datePicker
+     */
+    findDateOnGrid : function(grid, dayOfMonth){
+    	for(var i = 0; i < 31; i++) {
+    		var currentDay = $A.test.getText(grid.find(i.toString()).getElement());
+    		if(dayOfMonth == currentDay) {
+    			return i;
+    		}
+    	}
+    },
+    
+    /**
+     * Verify the aria-selected value and then move calendar by specified month and year
+     */
+    verifyAriaSelAndMove : function(cmp, expectedAriaSelected, moveMonthBy, moveYearBy, errorMsg) {
+    	var grid = cmp.find("datePickerTestCmp").find("datePicker").find("grid");
+    	var gridLoc = this.findDateOnGrid(grid, "25").toString();
+		
+		$A.test.addWaitForWithFailureMessage(true, function () {
+			return ($A.util.getElementAttributeValue(grid.find(gridLoc).getElement(), "aria-selected") === expectedAriaSelected);
+		}, errorMsg, function() {
+			var e = grid.get("e.updateCalendar");
+	        if (e) {
+	            e.setParams({monthChange: moveMonthBy, yearChange: moveYearBy, setFocus: false});
+	            e.fire();
+	        }
+		});    
     }
 })//eslint-disable-line semi

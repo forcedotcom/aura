@@ -29,8 +29,14 @@ function lib(w) { //eslint-disable-line no-unused-vars
             threshold    : 0
         },
         CLASS_LOADING = 'loading',
-        CLASS_IDLE    = 'il';
-    
+        CLASS_IDLE    = 'il',
+
+        // when zoomed, values become fractional and precision
+        // is lost depending on how browsers handle it.
+        // In this case, number of pixles left to scroll can be off a bit.
+        // The offset is mostly less than 5.
+        MIN_LOADING_THRESHOLD = 5;
+
     function InfiniteLoading () {}
     
 	var LOAD_MORE_TIMEOUT = 1000,
@@ -200,6 +206,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             // Make sure that the provided thershold is never bigger
             // than the scrollable pixels to avoid extra provider calls
             var threshold = config.threshold < scrollable ? config.threshold : 0;
+            threshold = Math.max(threshold, MIN_LOADING_THRESHOLD);
 
             Logger.log('left: ', left, 'tr: ', threshold);
 

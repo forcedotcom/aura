@@ -163,7 +163,7 @@ AuraStyleService.prototype.applyAllTokens = function(descriptors, config) {
             }
         }
 
-        var action = $A.get("c.aura://DynamicStylingController.applyTokens");
+        var action = $A.get("c.aura://StyleController.applyTokens");
 
         action.setParams({
             "descriptors": descriptors,

@@ -45,7 +45,7 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Defin
     public static final String COMPONENT_CONTROLLER = "aura://ComponentController";
     public static final String LABEL_CONTROLLER = "aura://LabelController";
     public static final String TIMEZONEINFO_CONTROLLER = "aura://TimeZoneInfoController";
-    public static final String DYNAMIC_STYLING_CONTROLLER = "aura://DynamicStylingController";
+    public static final String STYLE_CONTROLLER = "aura://StyleController";
 
     private static final Set<String> prefixes = Sets.newHashSet(PREFIX);
     private static final Set<DefType> defTypes = Sets.immutableEnumSet(DefType.CONTROLLER);
@@ -85,8 +85,8 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Defin
                 cd = jcdf.getDef_DONOTUSE(descriptor, TimeZoneInfoController.class);
                 builder.put(cd.getDescriptor(), cd);
 
-                descriptor = new DefDescriptorImpl<>(DYNAMIC_STYLING_CONTROLLER, ControllerDef.class, null);
-                cd = jcdf.getDef_DONOTUSE(descriptor, DynamicStylingController.class);
+                descriptor = new DefDescriptorImpl<>(STYLE_CONTROLLER, ControllerDef.class, null);
+                cd = jcdf.getDef_DONOTUSE(descriptor, StyleController.class);
                 builder.put(cd.getDescriptor(), cd);
 
                 allMap = builder.build();

@@ -21,7 +21,7 @@ import org.auraframework.def.ActionDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TokensDef;
-import org.auraframework.impl.controller.DynamicStylingController;
+import org.auraframework.impl.controller.StyleController;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
@@ -33,12 +33,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Basic tests for {@link DynamicStylingController}.
+ * Basic tests for {@link StyleController}.
  * <p>
  * More tests in test/components/dynamicStylingTest
  */
-public class DynamicStylingControllerTest extends StyleTestCase {
-    private static final String ACTION = "java://org.auraframework.impl.controller.DynamicStylingController/ACTION$applyTokens";
+public class StyleControllerTest extends StyleTestCase {
+    private static final String ACTION = "java://org.auraframework.impl.controller.StyleController/ACTION$applyTokens";
 
     @Inject
     private InstanceService instanceService;

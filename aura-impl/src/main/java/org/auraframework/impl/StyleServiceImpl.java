@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.controller;
+package org.auraframework.impl;
 
-import com.google.common.base.Optional;
-import com.salesforce.omakase.ast.CssAnnotation;
-import com.salesforce.omakase.ast.atrule.AtRule;
-import com.salesforce.omakase.ast.declaration.Declaration;
-import com.salesforce.omakase.broadcast.annotation.Rework;
-import com.salesforce.omakase.plugin.Plugin;
-import com.salesforce.omakase.plugin.conditionals.ConditionalsValidator;
-import com.salesforce.omakase.util.Args;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.css.StyleContext;
@@ -33,151 +35,136 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TokensDef;
-import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.impl.css.parser.CssPreprocessor;
 import org.auraframework.impl.css.parser.plugin.TokenExpression;
 import org.auraframework.impl.css.parser.plugin.TokenFunction;
 import org.auraframework.impl.css.token.StyleContextImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Key;
+import org.auraframework.service.StyleService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.salesforce.omakase.ast.CssAnnotation;
+import com.salesforce.omakase.ast.atrule.AtRule;
+import com.salesforce.omakase.ast.declaration.Declaration;
+import com.salesforce.omakase.broadcast.annotation.Observe;
+import com.salesforce.omakase.broadcast.annotation.Rework;
+import com.salesforce.omakase.plugin.Plugin;
+import com.salesforce.omakase.plugin.conditionals.ConditionalsValidator;
+import com.salesforce.omakase.util.Args;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-/**
- * Applies {@link TokensDef}s to an application's CSS. The CSS is filtered to things that reference an applicable token.
- * This allows for clients to dynamically re-apply tokenized CSS without having to reload the page or reload the entire
- * app.css file. See AuraStyleService.js for more details.
- */
 @ServiceComponent
-public final class DynamicStylingController implements Controller {
+public class StyleServiceImpl implements StyleService {
+    private static final long serialVersionUID = 6191198613596129606L;
 
     @Inject
-    private DefinitionService definitionService;
+    private StyleAdapter styleAdapter;
 
     @Inject
     private ContextService contextService;
 
     @Inject
-    private StyleAdapter styleAdapter;
-    
-    /**
-     * Main endpoint. This applies the given token descriptors to the current application's CSS.
-     * <p>
-     * This includes all styles in the app's dependency graph, and also automatically includes client-loaded styles (or
-     * the explicit list of client-loaded styles if given), as well as any specified extra styles.
-     *
-     * @param tokenDescriptors Apply these descriptors.
-     * @param clientLoaded Optional list of client-loaded style defs to be included. If null or empty, an attempt will
-     *            be made to automatically detect this via the framework. This param might be specified when the usage
-     *            of providers results in the framework alone not being able to determine this server-side (as
-     *            determined by a config option in the AuraStyleService call).
-     * @param extraStyles Optional extra style defs to include. These are applied last.
-     * @return The CSS string with the tokens applied. Only the CSS that directly references one of the tokens is
-     *         returned.
-     */
-    @AuraEnabled
-    public String applyTokens(@Key("descriptors") List<String> tokenDescriptors,
-                              @Key("clientLoaded") List<String> clientLoaded, @Key("extraStyles") List<String> extraStyles)
+    private DefinitionService definitionService;
+
+    @Override
+    public String applyTokens(DefDescriptor<TokensDef> tokens, DefDescriptor<? extends BaseStyleDef> style) throws QuickFixException {
+        return applyTokens(ImmutableList.of(tokens), ImmutableList.of(style));
+    }
+
+    @Override
+    public String applyTokens(DefDescriptor<TokensDef> tokens, Iterable<DefDescriptor<? extends BaseStyleDef>> styles) throws QuickFixException {
+        return applyTokens(ImmutableList.of(tokens), styles);
+    }
+
+    @Override
+    public String applyTokens(Iterable<DefDescriptor<TokensDef>> tokens, Iterable<DefDescriptor<? extends BaseStyleDef>> styles)
             throws QuickFixException {
+        checkNotNull(tokens, "the 'tokens' arg cannot be null");
+        checkNotNull(tokens, "the 'styles' arg cannot be null");
+        return extractStyles(tokens, styles);
+    }
 
-        checkNotNull(tokenDescriptors, "The 'tokenDescriptors' argument cannot be null");
+    @Override
+    public String applyTokensContextual(DefDescriptor<TokensDef> tokens, Iterable<DefDescriptor<? extends BaseStyleDef>> extraStyles)
+            throws QuickFixException {
+        return applyTokensContextual(ImmutableList.of(tokens), extraStyles);
+    }
 
-        DefinitionService defService = definitionService;
+    @Override
+    public String applyTokensContextual(Iterable<DefDescriptor<TokensDef>> tokens, Iterable<DefDescriptor<? extends BaseStyleDef>> extraStyles)
+            throws QuickFixException {
         AuraContext context = contextService.getCurrentContext();
+        Set<DefDescriptor<? extends BaseStyleDef>> clientLoaded = new LinkedHashSet<>();
 
-        // convert the string descriptors to real descriptors
-        List<DefDescriptor<TokensDef>> tokens = new ArrayList<>(tokenDescriptors.size());
-        for (String desc : tokenDescriptors) {
-            tokens.add(defService.getDefDescriptor(desc, TokensDef.class));
+        // attempt to automatically detect client-loaded styles
+        for (DefDescriptor<?> desc : context.getClientLoaded().keySet()) {
+            // include inner deps
+            clientLoaded.addAll(getStyleDependencies(desc));
+
+            // add the client loaded style def itself, (purposely done after!)
+            DefDescriptor<StyleDef> style = definitionService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX, StyleDef.class);
+            if (style.exists()) {
+                clientLoaded.add(style);
+            }
+            DefDescriptor<FlavoredStyleDef> flavor = definitionService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX, FlavoredStyleDef.class);
+            if (flavor.exists()) {
+                clientLoaded.add(flavor);
+            }
         }
 
-        // add style def descriptors based on app dependencies
-        Set<DefDescriptor<? extends BaseStyleDef>> styles = new LinkedHashSet<>(512);
-        String uid = context.getUid(context.getLoadingApplicationDescriptor());
+        return applyTokensContextual(tokens, extraStyles, clientLoaded);
+    }
 
+    @Override
+    public String applyTokensContextual(Iterable<DefDescriptor<TokensDef>> tokens, Iterable<DefDescriptor<? extends BaseStyleDef>> extraStyles,
+            Iterable<DefDescriptor<? extends BaseStyleDef>> clientLoaded) throws QuickFixException {
+        checkNotNull(tokens, "the 'tokens' arg cannot be null");
+
+        AuraContext context = contextService.getCurrentContext();
+        Set<DefDescriptor<? extends BaseStyleDef>> styles = new LinkedHashSet<>(256);
+
+        // add style def descriptors based on app dependencies
+        String uid = context.getUid(context.getLoadingApplicationDescriptor());
         for (DefDescriptor<?> dependency : context.getDefRegistry().getDependencies(uid)) {
             if (dependency.getDefType() == DefType.STYLE || dependency.getDefType() == DefType.FLAVORED_STYLE) {
                 @SuppressWarnings("unchecked")
-                DefDescriptor<? extends BaseStyleDef> desc = ((DefDescriptor<? extends BaseStyleDef>) dependency);
+                DefDescriptor<? extends BaseStyleDef> desc = ((DefDescriptor<? extends BaseStyleDef>)dependency);
                 styles.add(desc);
             }
         }
 
-        if (clientLoaded == null || clientLoaded.isEmpty()) {
-            // attempt to automatically detect client-loaded styles
-            for (DefDescriptor<?> desc : context.getClientLoaded().keySet()) {
-                // include inner deps
-                styles.addAll(getAllStyleDependencies(desc));
-
-                // add the client loaded style def itself, (purposely done after!)
-                DefDescriptor<StyleDef> style = defService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX, StyleDef.class);
-                if (style.exists()) {
-                    styles.add(style);
-                }
-                DefDescriptor<FlavoredStyleDef> flavor = defService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX,
-                        FlavoredStyleDef.class);
-                if (flavor.exists()) {
-                    styles.add(flavor);
-                }
-            }
-        } else {
-            for (String name : clientLoaded) {
-                DefDescriptor<StyleDef> styleDef = defService.getDefDescriptor(name, StyleDef.class);
-                if (styleDef.exists()) {
-                    styles.add(styleDef);
-                }
-                DefDescriptor<FlavoredStyleDef> flavorDef = defService.getDefDescriptor(name, FlavoredStyleDef.class);
-                if (flavorDef.exists()) {
-                    styles.add(flavorDef);
-                }
-            }
+        // add clientLoaded styles
+        if (clientLoaded != null) {
+            Iterables.addAll(styles, clientLoaded);
         }
 
-        // add extra style def descriptors
+        // add extra styles
         if (extraStyles != null) {
-            for (String style : extraStyles) {
-                styles.add(defService.getDefDescriptor(style, StyleDef.class));
-            }
+            Iterables.addAll(styles, extraStyles);
         }
 
         return extractStyles(tokens, styles);
     }
 
-    /**
-     * Gets all {@link StyleDef} dependencies of the given descriptor (includes inner dependencies recursively).
-     *
-     * @param defDescriptor Find style dependencies of this def.
-     * @return The list of style dependencies.
-     */
-    protected Set<DefDescriptor<? extends BaseStyleDef>> getAllStyleDependencies(DefDescriptor<?> defDescriptor)
-            throws QuickFixException {
+    /** gets all style dependencies for the given component */
+    private Set<DefDescriptor<? extends BaseStyleDef>> getStyleDependencies(DefDescriptor<?> defDescriptor) throws QuickFixException {
+        MasterDefRegistry mdr = contextService.getCurrentContext().getDefRegistry();
         Set<DefDescriptor<? extends BaseStyleDef>> styles = new LinkedHashSet<>();
-
-        DefinitionService defService = definitionService;
-        AuraContext context = contextService.getCurrentContext();
-        MasterDefRegistry mdr = context.getDefRegistry();
 
         String descUid = mdr.getUid(null, defDescriptor);
         if (descUid != null) {
             for (DefDescriptor<?> dep : mdr.getDependencies(descUid)) {
-                DefDescriptor<StyleDef> style = defService.getDefDescriptor(dep, DefDescriptor.CSS_PREFIX, StyleDef.class);
+                DefDescriptor<StyleDef> style = definitionService.getDefDescriptor(dep, DefDescriptor.CSS_PREFIX, StyleDef.class);
                 if (style.exists()) {
                     styles.add(style);
                 }
 
-                DefDescriptor<FlavoredStyleDef> flavor = defService.getDefDescriptor(dep, DefDescriptor.CSS_PREFIX, FlavoredStyleDef.class);
+                DefDescriptor<FlavoredStyleDef> flavor = definitionService.getDefDescriptor(dep, DefDescriptor.CSS_PREFIX, FlavoredStyleDef.class);
                 if (flavor.exists()) {
                     styles.add(flavor);
                 }
@@ -187,7 +174,7 @@ public final class DynamicStylingController implements Controller {
         return styles;
     }
 
-    /** utility that actual does the css processing */
+    /** here's the good stuff */
     private String extractStyles(Iterable<DefDescriptor<TokensDef>> tokens, Iterable<DefDescriptor<? extends BaseStyleDef>> styles)
             throws QuickFixException {
 
@@ -196,7 +183,7 @@ public final class DynamicStylingController implements Controller {
         StyleContext styleContext = StyleContextImpl.build(definitionService, context, tokens);
         context.setStyleContext(styleContext);
 
-        // figure out which token we will be utilizing
+        // figure out which tokens we will be utilizing
         Set<String> tokenNames = styleContext.getTokens().getNames(tokens);
 
         // pre-filter style defs
@@ -226,7 +213,6 @@ public final class DynamicStylingController implements Controller {
             // we run this in a separate pass so that our MagicEraser plugin gets TokenFunctions delivered
             // with the args unevaluated (otherwise it will just be replaced with the value). In other words,
             // so that we can use the token plugin in passthrough mode.
-            // XXXNM: add plugin that combines rulesets
             String css = CssPreprocessor.raw()
                     .source(style.getRawCode())
                     .tokens(style.getDescriptor())
@@ -251,8 +237,9 @@ public final class DynamicStylingController implements Controller {
     }
 
     /**
-     * Custom CSS plugin that handles reducing the CSS to only the stuff that utilizes relevant tokens. Specifically,
-     * any declaration not using a relevant token is removed. Any at-rule that doesn't contain a declaration using a
+     * CSS plugin that eliminates unnecessary CSS.
+     * <p>
+     * Any declaration not using a relevant token is removed. Any at-rule that doesn't contain a declaration using a
      * relevant token is removed, except for media queries using a relevant token in the expression. In the case of the
      * latter, the entire block of the media query is then included irrespective of token usage.
      */
@@ -261,7 +248,6 @@ public final class DynamicStylingController implements Controller {
         private final Set<String> tokens;
         private final TokenValueProvider tvp;
 
-        /** creates a new instance scoped to the specified set of token names */
         public MagicEraser(Set<String> tokens, DefDescriptor<? extends BaseStyleDef> style) {
             this.tokens = tokens;
             this.tvp = styleAdapter.getTokenValueProvider(style);
@@ -269,15 +255,11 @@ public final class DynamicStylingController implements Controller {
 
         /** determines if the given string contains reference to one of the specified tokens */
         private boolean hasMatchingToken(String expression) throws QuickFixException {
-            Set<String> references = tvp.extractTokenNames(expression, true);
-            return !Collections.disjoint(tokens, references);
+            return !Collections.disjoint(tokens, tvp.extractTokenNames(expression, true));
         }
 
-        /**
-         * If the token function references one of the specified token names, add a special annotation to the containing
-         * declaration, indicating that it should not be removed.
-         */
-        @Rework
+        /** if the function references one of our tokens then add an annotation indicating we should keep it */
+        @Observe
         public void annotate(TokenFunction function) throws QuickFixException {
             Declaration declaration = function.declaration();
             if (hasMatchingToken(function.args())) {
@@ -291,16 +273,15 @@ public final class DynamicStylingController implements Controller {
             }
         }
 
-        @Rework
+        /** if the media query references on of our tokens then annotate it */
+        @Observe
         public void annotate(TokenExpression expression) throws QuickFixException {
             if (hasMatchingToken(Args.extract(expression.expression()))) {
                 expression.parent().annotateUnlessPresent(ANNOTATION);
             }
         }
 
-        /**
-         * Removes all declarations that weren't given the special annotation.
-         */
+        /** remove all declarations that weren't given the special annotation */
         @Rework
         public void sift(Declaration declaration) {
             if (!declaration.hasAnnotation(ANNOTATION)) {
@@ -312,9 +293,7 @@ public final class DynamicStylingController implements Controller {
             }
         }
 
-        /**
-         * Removes all at-rules that weren't given the special annotation
-         */
+        /** remove all at-rules that weren't given the special annotation */
         @Rework
         public void sift(AtRule atRule) {
             atRule.refine();

@@ -50,7 +50,6 @@ public final class StyleContextImpl implements StyleContext {
     private final String client;
     private final Set<String> extraTrueConditions;
     private final TokenCache tokens;
-    private final DefinitionService definitionService;
 
     /**
      * Creates a new instance of {@link StyleContext}. Note that client will be lower-cased for string comparison
@@ -60,11 +59,9 @@ public final class StyleContextImpl implements StyleContext {
      * @param extraTrueConditions Other unnamed true conditions, e.g., "isDesktop".
      * @param tokens The token overrides from the application.
      */
-    private StyleContextImpl(DefinitionService definitionService, 
-            String client, Iterable<String> extraTrueConditions, TokenCache tokens) {
+    private StyleContextImpl(String client, Iterable<String> extraTrueConditions, TokenCache tokens) {
         checkNotNull(client, "client cannot be null");
         this.client = client.toLowerCase();
-        this.definitionService = definitionService;
 
         this.extraTrueConditions = (extraTrueConditions != null)
                 ? ImmutableSortedSet.copyOf(extraTrueConditions) : ImmutableSet.<String>of();
@@ -127,7 +124,7 @@ public final class StyleContextImpl implements StyleContext {
      * Builds a new {@link StyleContext} based on the information in the given {@link AuraContext}.
      */
     public static StyleContext build(DefinitionService definitionService, AuraContext auraContext) {
-        return build(definitionService, auraContext, Collections.<DefDescriptor<TokensDef>>emptyList());
+        return build(definitionService, auraContext, Collections.emptyList());
     }
 
     /**
@@ -156,7 +153,7 @@ public final class StyleContextImpl implements StyleContext {
             // we have to proceed here without app overrides
         }
 
-        return new StyleContextImpl(definitionService, client, extra, tokens);
+        return new StyleContextImpl(client, extra, tokens);
     }
 
     public static StyleContext build(DefinitionService definitionService, Map<String, Object> config) {
@@ -186,6 +183,6 @@ public final class StyleContextImpl implements StyleContext {
             }
         }
 
-        return new StyleContextImpl(definitionService, client, extraTrueConditions, tokens);
+        return new StyleContextImpl(client, extraTrueConditions, tokens);
     }
 }

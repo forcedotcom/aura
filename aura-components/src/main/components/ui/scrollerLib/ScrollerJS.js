@@ -758,6 +758,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 case 'transitionend':
                 case SUPPORT.prefix + 'TransitionEnd':
                     this._transitionEnd(e);
+                    this._checkScrollerSize();
                     break;
                 case 'wheel':
                 case 'DOMMouseScroll':
@@ -1644,6 +1645,20 @@ function lib(w) { //eslint-disable-line no-unused-vars
         _wrapperScrollTo: function(x, y) {
            this.wrapper.scrollTop = this.scrollVertical ? Math.abs(y) : this.wrapper.scrollTop;
            this.wrapper.scrollLeft = this.scrollVertical ? this.wrapper.scrollLeft : Math.abs(x);
+        },
+
+        /**
+         * Updates scroller size and fires _refresh event if the size has changed
+         */
+        _checkScrollerSize: function() {
+            if (this._isScrollSizeChanged()) {
+                this.refresh(ACION_DOM_MUTATION);
+            }
+        },
+
+        _isScrollSizeChanged: function() {
+            return (this.scrollerWidth !== this.scroller.offsetWidth) ||
+                   (this.scrollerHeight !== this.scroller.offsetHeight);
         },
 
         /**

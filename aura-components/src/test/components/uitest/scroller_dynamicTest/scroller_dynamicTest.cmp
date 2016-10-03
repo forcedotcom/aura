@@ -1,0 +1,76 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+
+    <aura:attribute name="content" type="String[]" default="['Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 'Donec sed arcu vulputate, dictum eros non, consectetur ex. Duis ultrices, nisl ut sodales aliquam, nulla eros sollicitudin elit, ac aliquam ipsum justo at sem. Sed in vulputate nisi, et congue odio. Sed semper lobortis tellus non fermentum. Praesent sagittis eros eleifend felis volutpat suscipit.']" />
+
+    <aura:attribute name="showContent0" type="Boolean" default="true" />
+    <aura:attribute name="heightClass" type="String" default="smallHeight" />
+    <aura:attribute name="widthClass" type="String" default="smallWidth" />
+
+    <ui:scroller aura:id="uiScroller">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <h3>Top</h3>
+        <h3>dynmaicScrollerWrapperTest</h3>
+
+        <ui:button label="insert/delete node" press="{!c.insertDeleteNode}" />
+        <div aura:id="insertDeleteDiv">
+        </div>
+
+        <ui:button label="show/hide node" press="{!c.showHideNode}" />
+        <div>
+            <div aura:id="showHideDiv" class="hidden">
+                {!v.content[0]}
+            </div>
+        </div>
+
+        <ui:button label="change content" press="{!c.changeContent}" />
+        <div>
+            Content to change
+            <br />
+            <aura:if isTrue="{!v.showContent0}">
+                {!v.content[0]}
+            <aura:set attribute="else">
+                {!v.content[1]}
+            </aura:set>
+            </aura:if>
+        </div>
+
+        <ui:button label="change height" press="{!c.changeHeight}" />
+        <ui:button label="change width" press="{!c.changeWidth}" />
+        <div class="{!v.heightClass + ' ' + v.widthClass}">
+            <h3>Top</h3>
+            {!v.content[0]}
+            <h3>Bottom</h3>
+        </div>
+
+        <h3>Bottom</h3>
+    </ui:scroller>
+</aura:component>

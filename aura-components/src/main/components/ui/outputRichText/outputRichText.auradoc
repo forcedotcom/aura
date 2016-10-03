@@ -26,7 +26,7 @@
 <pre>&lt;div class="uiOutputRichText">
     &lt;b>Aura&lt;/b>, &lt;span style="color:red">input rich text demo&lt;/span>
 &lt;/div></pre>
-        <p>This component supports the following HTML tags: <code>a</code>, <code>b</code>, <code>br</code>, <code>big</code>, <code>blockquote</code>, <code>caption</code>, <code>cite</code>, <code>code</code>,
+        <p>This component supports the following HTML tags: <code>a</code>, <code>b</code>, <code>br</code>, <code>big</code>, <code>blockquote</code>, <code>caption</code>, <code>cite</code>, <code>code</code>, <code>col</code>, <code>colgroup</code>,
          <code>del</code>, <code>div</code>, <code>em</code>, <code>h1</code>, <code>h2</code>, <code>h3</code>, <code>hr</code>, <code>i</code>, <code>img</code>, <code>ins</code>,
          <code>kbd</code>, <code>li</code>, <code>ol</code>, <code>p</code>, <code>param</code>, <code>pre</code>, <code>q</code>, <code>s</code>, <code>samp</code>, <code>small</code>,
          <code>span</code>, <code>strong</code>, <code>sub</code>, <code>sup</code>, <code>table</code>, <code>tbody</code>, <code>td</code>, <code>tfoot</code>, <code>th</code>,

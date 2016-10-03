@@ -42,8 +42,5 @@
          <code>rowspan</code>, <code>spellcheck</code>, <code>scope</code>, <code>selected</code>, <code>shape</code>, <code>size</code>, <code>span</code>,
          <code>srclang</code>, <code>start</code>, <code>src</code>, <code>step</code>, <code>style</code>, <code>summary</code>, <code>tabindex</code>, <code>target</code>, <code>title</code>,
          <code>type</code>, <code>usemap</code>, <code>valign</code>, <code>value</code>, <code>width</code>, <code>xmlns</code>.</p>
-	</aura:description>	
-		<aura:example name="richtext" ref="auradocs:demoInputRT" label="Using ui:outputRichText">
-    	<p>This example shows how you can bind data from a <code>ui:inputRichText</code> component.</p>
-	   </aura:example>
+	</aura:description>
 </aura:documentation>

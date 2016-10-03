@@ -266,5 +266,60 @@
         testUtils.assertNotUndefinedOrNull(tableClone);
         testUtils.assertEquals(table.tagName, tableClone.tagName);
         testUtils.assertEquals(0, tableClone.children.length, "Shallow cloned node should have zero children");
+    },
+
+    testCloneNodeDeep: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var table = cmp.find("table").getElement();
+        var tableClone = table.cloneNode(true);
+        testUtils.assertNotUndefinedOrNull(tableClone);
+        testUtils.assertEquals(table.tagName, tableClone.tagName);
+        // Verify the <tr/> elements inside the <table/>
+        testUtils.assertEquals(2, tableClone.children.length, "Deep cloned node should have same no of children");
+        // Verify the <td/> elements inside the <tr/>
+        testUtils.assertEquals(1, tableClone.children[0].children.length, "Deep clone should clone inner nodes too");
+        // Verify the contents of the child nodes
+        testUtils.assertEquals("th", tableClone.children[0].innerText);
+        testUtils.assertEquals("td", tableClone.children[1].innerText);
+    },
+
+    /**
+     * Verify that a cloned node is locked with the same key as its twin and verify it can be accessed by the owner
+     * @param cmp
+     */
+    testCloneNodeDeep_VerifyAccess: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        // Before clone : Query for the elements, this verifies that current component has access to these elements
+        testUtils.assertEquals(1, document.querySelectorAll("#table").length, "My facet elements should be visible");
+        testUtils.assertEquals(2, document.querySelectorAll("#table > tr").length);
+        testUtils.assertEquals(1, document.querySelectorAll("#table th").length);
+
+        var table = cmp.find("table").getElement();
+        var tableClone = table.cloneNode(true);
+        table.parentNode.appendChild(tableClone);
+        //After clone : Query for the elements, this verifies that current component has access to the cloned elements
+        testUtils.assertEquals(2, document.querySelectorAll("#table").length, "Cloned facet elements should be visible");
+        testUtils.assertEquals(4, document.querySelectorAll("#table > tr").length);
+        testUtils.assertEquals(2, document.querySelectorAll("#table th").length);
+    },
+
+    /**
+     * Verify that when a facet's node is cloned and the facet is from a different namespace,
+     * its is locked with a same key as twin. Verify it cannot be accessed by the owner.
+     * @param cmp
+     */
+    testCloneNodeDeep_VerifyBlockedAccess: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        // Before clone : Look for text from facet. Verifying that facet was rendered
+        testUtils.assertEquals(1, document.querySelector("#toBeClonedFacet").innerText.match(/body_toBeClonedFacet/g).length);
+        testUtils.assertEquals(0, document.querySelectorAll("#table_facetLocked").length, "Facet content should not be accessible from other namespace");
+
+        var lockedFacet = cmp.find("toBeClonedFacet");
+        lockedFacet.cloneNode();
+        // After clone : Look for text from facet, there should be two copies
+        testUtils.assertEquals(2, document.querySelector("#toBeClonedFacet").innerText.match(/body_toBeClonedFacet/g).length,
+            "Node of facet not cloned");
+        testUtils.assertEquals(0, document.querySelectorAll("#table_facetLocked").length,
+            "Cloned nodes should not be accessible from other namespace");
     }
 })

@@ -61,6 +61,9 @@
     <aura:method name="testLinkElement" action="{!c.testLinkElement}"/>
 
     <aura:method name="testCloneNodeShallow" action="{!c.testCloneNodeShallow}"/>
+    <aura:method name="testCloneNodeDeep" action="{!c.testCloneNodeDeep}"/>
+    <aura:method name="testCloneNodeDeep_VerifyAccess" action="{!c.testCloneNodeDeep_VerifyAccess}"/>
+    <aura:method name="testCloneNodeDeep_VerifyBlockedAccess" action="{!c.testCloneNodeDeep_VerifyBlockedAccess}"/>
 
     <lockerTest:facet/>
 
@@ -90,8 +93,12 @@
   	<div aura:id="cacheTestB" id="cacheTestB"></div>
 
     <div id="outsideFacet">
-        <lockerTestOtherNamespace:facetLocked>
+        <lockerTestOtherNamespace:facetLocked aura:id="facetLocked">
            <div id="insideFacet">Inside facet</div>
         </lockerTestOtherNamespace:facetLocked>
+    </div>
+
+    <div id="toBeClonedFacet">
+        <lockerTestOtherNamespace:toBeClonedFacet aura:id="toBeClonedFacet"/>
     </div>
 </aura:component>

@@ -364,10 +364,9 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     public List<String> getFrameworkFallbackScripts(AuraContext context, boolean safeInlineJs, Map<String,Object> attributes)
         throws QuickFixException {
         List<String> ret = Lists.newArrayList();
-        // TODO W-3269340 use fallback url for all required files to boot aura: inline.js, app.js, aura_*.js, libs_*.js
+        // appcache fallback can only use for items NOT listed in the CACHE section of the manifest
         ret.add(getBootstrapUrl(context, attributes) + " " + getBootstrapFallbackUrl(context, attributes));
         ret.add(configAdapter.getEncryptionKeyURL(true) + " " + configAdapter.getEncryptionKeyFallbackURL(true));
-
         return ret;
     }
 

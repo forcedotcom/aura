@@ -114,7 +114,7 @@
             var previousBody = null;
         	if (this.PANELS_STACK.length > 0) {
                 var previousPanel = this.PANELS_STACK[this.PANELS_STACK.length - 1];
-                previousBody = previousPanel && previousPanel.get('v.body');
+                previousBody = previousPanel.isValid() ? previousPanel.get('v.body') : previousBody;
         	}
             owner = $A.util.isEmpty(previousBody) ? panel.getGlobalId() : previousBody[0].getGlobalId();
         }

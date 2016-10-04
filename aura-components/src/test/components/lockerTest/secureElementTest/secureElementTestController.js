@@ -201,6 +201,27 @@
 
         testUtils.assertEquals("A scalar expression", element.innerHTML);
     },
+    
+    testTableAPI: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        
+		// Call addRow() with the ID of a table
+		var table = document.createElement("table");
+		
+		// Insert a row in the table at row index 0
+		var newRow = table.insertRow(0);
+		testUtils.assertEquals("TR", newRow.tagName);
+
+		// Insert a cell in the row at index 0
+		var newCell = newRow.insertCell(0);
+		testUtils.assertEquals("TD", newCell.tagName);
+
+		// Append a text node to the cell
+		var newText = document.createTextNode('New top row');
+		newCell.appendChild(newText);
+		
+		testUtils.assertEquals("<tbody><tr><td>New top row</td></tr></tbody>", table.innerHTML);
+    },
 
     testElementCache: function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");

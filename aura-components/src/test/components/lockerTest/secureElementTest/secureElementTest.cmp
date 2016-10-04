@@ -44,7 +44,8 @@
     <aura:method name="testAddEventListenerMultipleCalls" action="{!c.testAddEventListenerMultipleCalls}"/>
     <aura:method name="testSvgGetBBox" action="{!c.testSvgGetBBox}"/>r
     <aura:method name="testScalarExpression" action="{!c.testScalarExpression}"/>
-
+    <aura:method name="testTableAPI" action="{!c.testTableAPI}"/>
+ 
     <aura:method name="testElementCache" action="{!c.testElementCache}"/>
 
     <aura:method name="getDiv" action="{!c.getDiv}"/>

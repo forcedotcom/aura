@@ -11,6 +11,7 @@
         "BDO",
         "BUTTON",
         "CANVAS",
+        "CAPTION",
         "COL",
         "COLGROUP",
         "DATA",
@@ -40,11 +41,16 @@
         "SELECT",
         "SOURCE",
         "SVG",
+        "TABLE",
+        "TBODY",
         "TD",
+        "TFOOT",
         "TEMPLATE",
         "TEXTAREA",
         "TH",
+        "THEAD",
         "TIME",
+        "TR",
         "TRACK",
         "VIDEO"
     ],
@@ -184,6 +190,33 @@
 	        "span":                           { type: "number" },
 	        "vAlign":                         { type: "string" },
 	        "width":                          { type: "string" }
+	    },
+	    "HTMLTableElement": {
+	        "caption":                        { type: "string" },
+	        "tHead":                          { type: "Null", skipOpaque : true },
+	        "tFoot":                          { type: "Null", skipOpaque : true },
+	        "tBodies":                        { type: "HTMLCollection" },
+	        "createTHead":                    { type: "function" },
+	        "deleteTHead":                    { type: "function" },
+	        "createTFoot":                    { type: "function" },
+	        "deleteTFoot":                    { type: "function" },
+	        "createCaption":                  { type: "function" },
+	        "deleteCaption":                  { type: "function" },
+	        "rows":                           { type: "HTMLCollection" },
+	        "insertRow":                      { type: "function" },
+	        "deleteRow":                      { type: "function" }
+	    },
+	    "HTMLTableRowElement": {
+	        "cells":                          { type: "HTMLCollection" },
+	        "rowIndex":                       { type: "number" },
+	        "sectionRowIndex":                { type: "number" },
+		    "insertCell":                     { type: "function" },
+	        "deleteCell":                     { type: "function" }        
+	    },
+	    "HTMLTableSectionElement": {
+	        "rows":                           { type: "HTMLCollection" },
+	        "insertRow":                      { type: "function" },
+	        "deleteRow":                      { type: "function" }
 	    },
 	    "HTMLUnknownElement": {
 	    },

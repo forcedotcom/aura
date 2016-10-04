@@ -317,10 +317,16 @@ SecureObject.createFilteredMethodStateless = function(methodName, prototype, opt
 			var unfilteredArgs = SecureObject.unfilterEverything(st, args);
 			var fnReturnedValue = raw[methodName].apply(raw, unfilteredArgs);
 
-			if (options && options.afterCallback) {
-				fnReturnedValue = options.afterCallback.call(st, fnReturnedValue);
+			if (options) {
+				if (options.afterCallback) {
+					fnReturnedValue = options.afterCallback.call(st, fnReturnedValue);
+				}
+				
+				if (options.trustReturnValue) {
+        			$A.lockerService.trust(st, fnReturnedValue);
+				}
 			}
-
+		
 			return SecureObject.filterEverything(st, fnReturnedValue, options);
 		}
 	};
@@ -496,6 +502,8 @@ function getSupportedInterfaces(o) {
 				interfaces.push("HTMLCanvasElement");
 			} else if (o instanceof HTMLTableColElement) {
 				interfaces.push("HTMLTableColElement");
+			} else if (o instanceof HTMLTableRowElement) {
+				interfaces.push("HTMLTableRowElement");
 			} else if (o instanceof HTMLModElement) {
 				interfaces.push("HTMLModElement");
 			} else if (typeof HTMLDetailsElement !== "undefined" && o instanceof HTMLDetailsElement) {
@@ -546,12 +554,18 @@ function getSupportedInterfaces(o) {
 				interfaces.push("HTMLSourceElement");
 			} else if (o instanceof HTMLTableCellElement) {
 				interfaces.push("HTMLTableCellElement");
+			} else if (o instanceof HTMLTableElement) {
+				interfaces.push("HTMLTableElement");
 			} else if (typeof HTMLTemplateElement !== "undefined" && o instanceof HTMLTemplateElement) {
 				interfaces.push("HTMLTemplateElement");
 			} else if (o instanceof HTMLTextAreaElement) {
 				interfaces.push("HTMLTextAreaElement");
 			} else if (o instanceof HTMLTrackElement) {
 				interfaces.push("HTMLTrackElement");
+			}
+			
+			if (o instanceof HTMLTableSectionElement) {
+				interfaces.push("HTMLTableSectionElement");
 			}
 
 			interfaces.push("HTMLElement");
@@ -571,9 +585,10 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata, so, raw, key)
 
 		if (!(name in so) && (name in raw)) {
 			var options = {
-                filterOpaque : item.filterOpaque || true,
-	            skipOpaque : item.skipOpaque || false,
-	            defaultValue : item.defaultValue || null
+                filterOpaque: item.filterOpaque || true,
+	            skipOpaque: item.skipOpaque || false,
+	            defaultValue: item.defaultValue || null,
+	            trustReturnValue: item.trustReturnValue || false
             };
 
 			if (item.type === "function") {
@@ -642,9 +657,10 @@ SecureObject.addPrototypeMethodsAndPropertiesStateless = function(metadata, prot
 
 		if (!(name in prototypicalInstance) && (name in rawPrototypicalInstance)) {
 			var options = {
-                filterOpaque : item.filterOpaque || true,
-	            skipOpaque : item.skipOpaque || false,
-	            defaultValue : item.defaultValue || null
+                filterOpaque: item.filterOpaque || true,
+	            skipOpaque: item.skipOpaque || false,
+	            defaultValue: item.defaultValue || null,
+	            trustReturnValue: item.trustReturnValue || false
             };
 			
 			if (item.type === "function") {

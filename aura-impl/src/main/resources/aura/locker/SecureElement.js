@@ -411,11 +411,13 @@ SecureElement.createAddEventListener = function(st, el, key) {
 
 SecureElement.DEFAULT = {};
 SecureElement.FUNCTION = { type: "function" };
+SecureElement.FUNCTION_TRUST_RETURN_VALUE = { type: "function", trustReturnValue: true };
 SecureElement.EVENT = { type: "@event" };
-SecureElement.SKIP_OPAQUE = { skipOpaque : true};
+SecureElement.SKIP_OPAQUE = { skipOpaque: true};
 
 var DEFAULT = SecureElement.DEFAULT;
 var FUNCTION = SecureElement.FUNCTION;
+var FUNCTION_TRUST_RETURN_VALUE = SecureElement.FUNCTION_TRUST_RETURN_VALUE;
 var EVENT = SecureElement.EVENT;
 var SKIP_OPAQUE = SecureElement.SKIP_OPAQUE;
 
@@ -939,6 +941,33 @@ SecureElement.metadata = {
 	        "scope":                          DEFAULT,
 	        "vAlign":                         DEFAULT,
 	        "width":                          DEFAULT
+	    },
+	    "HTMLTableElement": {
+	    	"caption":                        DEFAULT,
+	        "tHead":                          SKIP_OPAQUE,
+	        "tFoot":                          SKIP_OPAQUE,
+	        "tBodies":                        DEFAULT,
+	        "createTHead":                    FUNCTION_TRUST_RETURN_VALUE,
+	        "deleteTHead":                    FUNCTION,
+	        "createTFoot":                    FUNCTION_TRUST_RETURN_VALUE,
+	        "deleteTFoot":                    FUNCTION,
+	        "createCaption":                  FUNCTION_TRUST_RETURN_VALUE,
+	        "deleteCaption":                  FUNCTION,
+	        "rows":                           DEFAULT,
+	        "insertRow":                      FUNCTION_TRUST_RETURN_VALUE,
+	        "deleteRow":                      FUNCTION  
+        },
+	    "HTMLTableRowElement": {
+	        "cells":                          DEFAULT,
+	        "rowIndex":                       DEFAULT,
+	        "sectionRowIndex":                DEFAULT,
+		    "insertCell":                     FUNCTION_TRUST_RETURN_VALUE,
+	        "deleteCell":                     FUNCTION        
+	    },
+	    "HTMLTableSectionElement": {
+	        "rows":                           DEFAULT,
+	        "insertRow":                      FUNCTION_TRUST_RETURN_VALUE,
+	        "deleteRow":                      FUNCTION     
 	    },
 	    "HTMLTemplateElement": {
 	        "content":                        DEFAULT

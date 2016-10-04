@@ -15,8 +15,6 @@
     limitations under the License.
 
 -->
-<aura:application access="global" useAppcache="true" render="client">
-    <div>This should appear after the appcache has been populated.</div>
+<aura:application access="global" useAppcache="true" render="client" template="appCache:appCacheEventsTemplate">
+    <div>Hello, world.</div>
 </aura:application>
-<!-- This app is used by appCacheEventsTest.js to test AppCache events and should not be used by any other tests to
-     avoid messing up the test by caching the manifest before the test begins! -->

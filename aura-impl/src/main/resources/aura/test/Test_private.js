@@ -59,10 +59,10 @@ TestInstance.prototype.expectMessage = function(pre, expected, msg) {
 
 /**
  * Set any common entries in the two arrays to undefined.
- * 
+ *
  * This is used to compare two arrays of error messages, leaving only unexpected errors received (in the pre array) and
  * expected errors not received (in the expected array).
- * 
+ *
  * @private
  * @function Test#clearExpected
  */
@@ -80,7 +80,7 @@ TestInstance.prototype.clearExpected = function(pre, expected) {
 
 /**
  * Used to keep track of errors happening in test modes.
- * 
+ *
  * @private
  * @function Test#logError
  */
@@ -92,17 +92,17 @@ TestInstance.prototype.logError = function(msg, e) {
     err = {
             "message" : msg
     };
-    
+
     if (e) {
         err["message"] += ": " + e.toString();
-        
+
         for (p in e) {
             if (p === "message") {
-                continue;   
+                continue;
             }
             err[p] = "" + e[p];
         }
-    } 
+    }
 
     // Don't add duplicate entries
     for (i = 0; i < errors.length; i++) {
@@ -121,7 +121,7 @@ TestInstance.prototype.logError = function(msg, e) {
 
 /**
  * Tear down a test.
- * 
+ *
  * @private
  * @function Test#doTearDown
  */
@@ -183,7 +183,7 @@ TestInstance.prototype.logErrors = function(error, label, errorArray) {
 
 /**
  * Periodic callback to handle continuing operations.
- * 
+ *
  * @private
  * @function Test#continueWhenReady
  */
@@ -310,16 +310,16 @@ TestInstance.prototype.startTimer = function() {
 
 /**
  * Provide some information about the current state of the test.
- * 
+ *
  * This is used by webdriver to get information to display.
- * 
+ *
  * @export
  * @function Test#getDump
  */
 TestInstance.prototype.getDump = function() {
 	try {
 		var status = "URL: " + window.location +  "\n";
-		
+
 		status += "Test status: ";
 		if (this.inProgress === -1) {
 			status += "did not start\n";
@@ -371,41 +371,27 @@ TestInstance.prototype.getDump = function() {
 };
 
 /**
- * Set up AppCache event listeners. Not a complete set of events, but all the
- * ones we care about in our current tests.
- * 
+ * Set up AppCache event listeners.
+ *
  * @private
  * @function Test#appCacheEvents
  */
 TestInstance.prototype.appCacheEvents = (function() {
     var appCacheEvents = [];
 
-    var handleAppcacheChecking = function() {
-        appCacheEvents.push("checking");
-    };
-
-    var handleAppcacheProgress = function() {
-        appCacheEvents.push("progress");
-    };
-
-    var handleAppcacheDownloading = function() {
-        appCacheEvents.push("downloading");
-    };
-
-    var handleAppcacheCached = function() {
-        appCacheEvents.push("cached");
-    };
-
-    var handleAppcacheError = function() {
-        appCacheEvents.push("error");
-    };
+    function push(value) {
+        appCacheEvents.push(value);
+    }
 
     if (window.applicationCache && window.applicationCache.addEventListener) {
-        window.applicationCache.addEventListener("checking", handleAppcacheChecking, false);
-        window.applicationCache.addEventListener("progress", handleAppcacheProgress, false);
-        window.applicationCache.addEventListener("downloading", handleAppcacheDownloading, false);
-        window.applicationCache.addEventListener("cached", handleAppcacheCached, false);
-        window.applicationCache.addEventListener("error", handleAppcacheError, false);
+        window.applicationCache.addEventListener("checking", push.bind(this, "checking"), false);
+        window.applicationCache.addEventListener("downloading", push.bind(this, "downloading"), false);
+        window.applicationCache.addEventListener("updateready", push.bind(this, "updateready"), false);
+        window.applicationCache.addEventListener("error", push.bind(this, "error"), false);
+        window.applicationCache.addEventListener("progress", push.bind(this, "progress"), false);
+        window.applicationCache.addEventListener("noupdate", push.bind(this, "noupdate"), false);
+        window.applicationCache.addEventListener("cached", push.bind(this, "cached"), false);
+        window.applicationCache.addEventListener("obsolete", push.bind(this, "obsolete"), false);
     }
 
     return appCacheEvents;

@@ -1,38 +1,48 @@
 ({
     /**
-     * Verify the correct AppCache events are received and are in the right order, without an error event. This case
-     * covers when we have not seen the page before and must download resources.
-     *
-     * TODO(W-1708575): Android AppCache tests fail when running on SauceLabs
+     * Verify the correct AppCache events are received and are in the right order, without an error event.
      */
-    _testAppCacheEvents : {
-        // AppCache only supported on WebKit browsers
-        browsers : [ "-FIREFOX", "-IE7", "-IE8", "-IE9", "-IE10", "-IE11", "-ANDROID_PHONE", "-ANDROID_TABLET" ],
+    testAppCacheEvents : {
+        browsers : [ "-FIREFOX" ],
         test : [
-                function(component) {
-                    var appCacheEvents = $A.test.getAppCacheEvents();
-                    $A.test.addWaitFor("cached", function() {
-                        return appCacheEvents[appCacheEvents.length - 1];
-                    });
+                function waitForAppCacheToPopulate(component) {
+                    var that = this;
+                    $A.test.addWaitForWithFailureMessage(
+                            true,
+                            function() {
+                                return that.getIndexOfAppCacheEvent("cached") > -1;
+                            },
+                            "appcache cached event was never received, events: " + JSON.stringify(window.appCacheEvents));
                 },
-                function(component) {
-                    var appCacheEvents = $A.test.getAppCacheEvents();
-                    var lastEvent = appCacheEvents.length - 1;
+                function verifyAppCacheEvents(component) {
+                    $A.test.assertEquals(-1, this.getIndexOfAppCacheEvent("error"), "Test prerequisite failed: appcache must not be populated when the test is started; received noupdate appcache event indicating it was");
+                    $A.test.assertEquals(-1, this.getIndexOfAppCacheEvent("error"), "appcache error event received, events: " + JSON.stringify(window.appCacheEvents));
 
-                    // Error event is always the last event in the sequence
-                    $A.test.assertNotEquals("error", appCacheEvents[lastEvent], "AppCache returned with an error.");
+                    var checking = this.getIndexOfAppCacheEvent("checking");
+                    var downloading = this.getIndexOfAppCacheEvent("downloading");
+                    var cached = this.getIndexOfAppCacheEvent("cached");
 
-                    // Verify we received the events in the right order
-                    $A.test.assertEquals("checking", appCacheEvents[0], "AppCache should begin with checking event.");
-                    $A.test.assertEquals("downloading", appCacheEvents[1],
-                            "AppCache did not start downloading resources.");
+                    $A.test.assertNotEquals(-1, checking, "appcache checking event not received, events: " + JSON.stringify(window.appCacheEvents));
+                    $A.test.assertNotEquals(-1, downloading, "appcache downloading event not received, events: " + JSON.stringify(window.appCacheEvents));
+                    $A.test.assertNotEquals(-1, cached, "appcache cached event not received, events: " + JSON.stringify(window.appCacheEvents));
+                    $A.test.assertTrue(checking < downloading, "appcache checking event not received before downloading, events: " + JSON.stringify(window.appCacheEvents));
+                    $A.test.assertTrue(downloading < cached, "appcache checking event not received before downloading, events: " + JSON.stringify(window.appCacheEvents));
+                    $A.test.assertEquals(window.appCacheEvents.length -1, cached, "appcache cached event not the last received event, events: " + JSON.stringify(window.appCacheEvents));
 
-                    // A progress event is fired for each file that is successfully downloaded. Only check that at least
-                    // one
-                    // file has been downloaded then check that AppCache completed.
-                    $A.test.assertEquals("progress", appCacheEvents[2], "No files successfully downloaded.");
-                    $A.test.assertEquals("cached", appCacheEvents[lastEvent],
-                            "Cached event to signal all files downloaded never fired");
                 } ]
+    },
+
+    /**
+     * Gets the index of the specified appcache event type.
+     * @param {String} type the type of appcache event to find.
+     * @return {Number} index of the event, -1 if not found.
+     */
+    getIndexOfAppCacheEvent: function(type) {
+        for (var i = 0; i < window.appCacheEvents.length; i++) {
+            if (window.appCacheEvents[i].type === type) {
+                return i;
+            }
+        }
+        return -1;
     }
 })

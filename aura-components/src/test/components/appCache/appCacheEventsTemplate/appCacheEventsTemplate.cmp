@@ -1,0 +1,42 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component isTemplate="true" extends="aura:template">
+    <aura:set attribute="auraPreInitBlock">
+        <script>
+            window.appCacheEvents = [];
+
+            function push(type, event) {
+                window.appCacheEvents.push({
+                    "type": type,
+                    "event": JSON.stringify(event)
+                });
+            }
+
+            if (window.applicationCache &amp;&amp; window.applicationCache.addEventListener) {
+                window.applicationCache.addEventListener("checking", push.bind(this, "checking"), false);
+                window.applicationCache.addEventListener("downloading", push.bind(this, "downloading"), false);
+                window.applicationCache.addEventListener("updateready", push.bind(this, "updateready"), false);
+                window.applicationCache.addEventListener("error", push.bind(this, "error"), false);
+                window.applicationCache.addEventListener("progress", push.bind(this, "progress"), false);
+                window.applicationCache.addEventListener("noupdate", push.bind(this, "noupdate"), false);
+                window.applicationCache.addEventListener("cached", push.bind(this, "cached"), false);
+                window.applicationCache.addEventListener("obsolete", push.bind(this, "obsolete"), false);
+            }
+        </script>
+    </aura:set>
+</aura:component>

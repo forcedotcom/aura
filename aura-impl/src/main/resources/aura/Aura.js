@@ -891,9 +891,9 @@ AuraInstance.prototype.handleError = function(message, e) {
             e.severity = e.severity || this.severity.QUIET;
             evtArgs = {"message":e["message"],"error":e["name"],"auraError":e};
         } else if (e instanceof $A.auraError) {
-            var format = "Something has gone wrong. {0}\n";
-            var displayMessage = e.message || e.name;
+            var format = "This page has an error. You might just need to refresh it.\n{0}";
             e.severity = e.severity || this.severity["ALERT"];
+            var displayMessage = e.message || e.name;
             displayMessage += "\n" + (e.component ? "Failing descriptor: {" + e.component + "}" : "");
             dispMsg = $A.util.format(format, displayMessage);
             // use null error string to specify non auraFriendlyError type.
@@ -983,7 +983,17 @@ AuraInstance.prototype.message = function(msg, error, showReload) {
     if (error && error.stackTrace) {
         var auraErrorStack = $A.util.getElement("auraErrorStack");
         auraErrorStack.innerHTML = "";
-        auraErrorStack.appendChild(document.createTextNode(error.stackTrace));
+        var stack = error.stackTrace;
+
+        if (stack.trim) {
+            stack = stack.trim();
+        } else if ($A.util.isArray(stack)) {
+            for (var i = 0; i < stack.length; i++) {
+                stack[i] = stack[i].trim();
+            }
+            stack = stack.join("\n");
+        }
+        auraErrorStack.appendChild(document.createTextNode(stack));
     }
     //#end
 

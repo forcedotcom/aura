@@ -1635,7 +1635,8 @@ Test.Aura.AuraClientServiceTest = function() {
                         parentNode: {
                             getAttribute: function() {return true;}
                         }
-                    }
+                    },
+                    getElementById: function() {return undefined;}
                 },
                 navigator: {
                     userAgent: ""
@@ -1652,14 +1653,11 @@ Test.Aura.AuraClientServiceTest = function() {
             });
 
             expected = "runner.app?nocache=http%3A%2F%2Flocalhost%3A9090%2Ftest%2Frunner.app%3Ffoo%3Dbar%2bbar";
-            mockGlobal(function() {
+            mockGlobal(function() { mockDeps(function() {
                 target = new Aura.Services.AuraClientService();
-            });
-
-            mockDeps(function() {
                 target.shouldPreventReload = function() { return false; };
                 target.hardRefresh();
-            });
+            }); });
 
             Assert.Equal(expected, actual);
         }

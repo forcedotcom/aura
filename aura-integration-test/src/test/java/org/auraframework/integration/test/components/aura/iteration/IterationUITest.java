@@ -32,11 +32,11 @@ public class IterationUITest extends WebDriverTestCase {
 
         // check out some actions linked up since they don't show up in DOM
         List<WebElement> buttons = getDriver().findElements(By.cssSelector("button"));
-        assertEquals(5, buttons.size());
-        buttons.get(1).click(); // button class=.button6
+        assertEquals(4, buttons.size());
+        buttons.get(0).click(); // button class=.button6
         WebElement e = findDomElement(By.cssSelector(".outputText"));
         assertEquals("action run by button6", e.getText());
-        buttons.get(4).click(); // button class=.button9
+        buttons.get(3).click(); // button class=.button9
         assertEquals("action run by button9", e.getText());
 
         WebElement root = findDomElement(By.cssSelector(".testRoot"));

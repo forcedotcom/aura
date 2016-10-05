@@ -219,9 +219,9 @@ function AuraClientService () {
     this.persistedActionFilterEnabled = true;
 
     this.handleAppCache();
-
+    this.setupBootstrapErrorReloadButton();
 }
-
+    
 /**
  * Storage key for CSRF token.
  * TODO W-2531907 - Get/set done directly against the adapter because pre-200 non-Aura clients modified this value
@@ -238,6 +238,27 @@ AuraClientService.TOKEN_KEY = "$AuraClientService.token$";
  * in every adapter.
  */
 AuraClientService.BOOTSTRAP_KEY = "$AuraClientService.bootstrap$";
+
+/**
+ * Duration (in milliseconds) to check for boot progress. If progress is not seen after
+ * this duration then reload the page.
+ */
+AuraClientService.BOOT_TIMER_DURATION = 9800;
+
+/**
+ * Number of consecutive reloads without fwk + app finishing the boot sequence. When this is exceeded
+ * the user is notified of an error and prompted to reload.
+ */
+AuraClientService.INCOMPLETE_BOOT_THRESHOLD = 5;
+
+/**
+ * Query parameter to ensure a server trip even with appcache enabled. Servlet performs
+ * prerequisite check (eg valid sid) then redirects back to app on success or elsewhere
+ * on failure.
+ */
+AuraClientService.CACHE_BUST_QUERY_PARAM = "nocache";
+
+
 
 /**
  * set the queue size.
@@ -693,6 +714,56 @@ AuraClientService.prototype.releaseXHR = function(auraXHR) {
     }
 };
 
+/**
+ * Sets up the bootstrap error reload button.
+ * @private
+ */
+AuraClientService.prototype.setupBootstrapErrorReloadButton = function() {
+    var reloadButton = document.getElementById("auraErrorReload");
+    if (!reloadButton) {
+        return;
+    }
+    reloadButton.href = this.getHardRefreshURL();
+};
+
+/**
+ * Gets a URL that will trigger a server trip, even with appcache enabled.
+ * See important appcahce note on AuraClientService#hardRefresh.
+ * @return {String} URL that will trigger a server trip.
+ * @private
+ */
+AuraClientService.prototype.getHardRefreshURL  = function() {
+    var url = location.href;
+
+    // if BB10 and using application cache
+    if (this.isBB10() && window.applicationCache && window.applicationCache.status !== window.applicationCache.UNCACHED) {
+        url = location.protocol + "//" + location.host + location.pathname + "?b=" + Date.now();
+    }
+
+    // replace encoding of spaces (%20) with encoding of '+' (%2b) so that when request.getParameter is called on the server, it will decode back to '+'
+    var params = "?" + AuraClientService.CACHE_BUST_QUERY_PARAM + "=" + encodeURIComponent(url).replace(/\%20/g,"%2b");
+
+    // cut up the url to remove # and ?
+    var hIndex = url.indexOf("#");
+    var qIndex = url.indexOf("?");
+    var cutIndex = -1;
+    if (hIndex > -1 && qIndex > -1) {
+        cutIndex = (hIndex < qIndex) ? hIndex : qIndex;
+    } else if (hIndex > -1) {
+        cutIndex = hIndex;
+    } else if (qIndex > -1) {
+        cutIndex = qIndex;
+    }
+    if (cutIndex > -1) {
+        url = url.substring(0, cutIndex);
+    }
+    // cut the appname
+    var sIndex = url.lastIndexOf("/");
+    var appName = url.substring(sIndex+1, url.length);
+
+    var newUrl = appName + params;
+    return newUrl;
+};
 
 /**
  * Perform hard refresh
@@ -706,59 +777,23 @@ AuraClientService.prototype.releaseXHR = function(auraXHR) {
  * @export
  */
 AuraClientService.prototype.hardRefresh = function() {
-    var url = location.href;
+    var cacheBustKey = "?" + AuraClientService.CACHE_BUST_QUERY_PARAM + "=";
 
     if (this.shouldPreventReload()) {
-        this.showErrorDialogWithReload(new AuraError("There was a problem loading the page. Please reload the page by clicking 'Reload Now'"));
+        this.showErrorDialogWithReload(new AuraError("We got stuck in a loop while loading the page. Please click Refresh."));
         return;
     }
 
-    if (!this.isManifestPresent() || url.indexOf("?nocache=") > -1) {
-        location.reload(true);
+    if (!this.isManifestPresent() || location.href.indexOf(cacheBustKey) > -1) {
+        window.location.reload(true);
         return;
     }
 
-    // if BB10 and using application cache
-    if (this.isBB10() && window.applicationCache
-        && window.applicationCache.status !== window.applicationCache.UNCACHED) {
-        url = location.protocol + "//" + location.host + location.pathname + "?b=" + Date.now();
-    }
+    var url = this.getHardRefreshURL();
 
-    // replace encoding of spaces (%20) with encoding of '+' (%2b) so that when request.getParameter is called in the server, it will decode back to '+'.
-    var params = "?nocache=" + encodeURIComponent(url).replace(/\%20/g,"%2b");
-    // insert nocache param here for hard refresh
-    var hIndex = url.indexOf("#");
-    var qIndex = url.indexOf("?");
-    var cutIndex = -1;
-    if (hIndex > -1 && qIndex > -1) {
-        cutIndex = (hIndex < qIndex) ? hIndex : qIndex;
-    } else if (hIndex > -1) {
-        cutIndex = hIndex;
-    } else if (qIndex > -1) {
-        cutIndex = qIndex;
-    }
-
-    if (cutIndex > -1) {
-        url = url.substring(0, cutIndex);
-    }
-
-
-    var sIndex = url.lastIndexOf("/");
-    var appName = url.substring(sIndex+1,url.length);
-    var newUrl = appName + params;
-    //use history.pushState to change the url of current page without actually loading it.
-    //AuraServlet will force the reload when GET request with current url contains '?nocache=someUrl'
-    //after reload, someUrl will become the current url.
-    //state is null: don't need to track the state with popstate
-    //title is null: don't want to set the page title.
-    history.pushState(null,null,newUrl);
-
-    //fallback to old way : set location.href will trigger the reload right away
-    //we need this because when AuraResourceServlet's GET request with a 'error' cookie,
-    //AuraServlet doesn't get to do the GET reqeust
-    if( (location.href).indexOf("?nocache=") > -1 ) {
-        location.href = (url + params);
-    }
+    // TODO why do we use pushState() then location.href?
+    history.pushState(null /* state */, null /* title */, url);
+    location.href = url;
 };
 
 AuraClientService.prototype.isDevMode = function() {
@@ -791,7 +826,7 @@ AuraClientService.prototype.dumpCachesAndReload = function() {
 
     if (this.reloadPointPassed) {
         if (this.shouldPreventReload()) {
-            this.showErrorDialogWithReload(new AuraError("There was a problem loading the page. Please reload the page by clicking 'Reload Now'"));
+            this.showErrorDialogWithReload(new AuraError("We got stuck in a loop while loading the page. Please click Refresh."));
             return;
         }
         this.reloadFunction();
@@ -853,8 +888,10 @@ AuraClientService.prototype.showErrorDialogWithReload = function(e) {
     }
 };
 
+/**
+ * Sets up listeners for appcache.
+ */
 AuraClientService.prototype.handleAppCache = function() {
-
     var acs = this;
 
     function showProgress(progress) {

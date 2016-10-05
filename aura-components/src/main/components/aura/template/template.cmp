@@ -41,7 +41,7 @@
 
     <aura:attribute name="doctype"                  type="String" access="GLOBAL" default="&lt;!DOCTYPE html&gt;"         description="The DOCTYPE declaration for the template."/>
     <aura:attribute name="loadingText"              type="String" access="GLOBAL" default="Loading"                       description="Loading text"/>
-    <aura:attribute name="errorTitle"               type="String" access="GLOBAL" default="Looks like there's a problem:" description="Error title when an error has occured."/>
+    <aura:attribute name="errorTitle"               type="String" access="GLOBAL" default="Sorry to interrupt"            description="Error title when an error has occured."/>
     <aura:attribute name="errorMessage"             type="String" access="GLOBAL" default="CSS Error"                     description="Error loading text"/>
     <aura:attribute name="defaultBodyClass"         type="String" access="GLOBAL" default="loading"                       description="Default body CSS styles."/>
     <aura:attribute name="bodyClass"                type="String" access="GLOBAL"                                         description="Extra body CSS styles"/>
@@ -56,7 +56,7 @@
 
     <!-- Default initial CSS -->
     <aura:attribute name="inlineStyle" type="Aura.Component[]" description="The CSS style used to display inline elements">
-        .auraMsgMask{position:absolute;top:0;bottom:0;left:0;right:0;background:-webkit-radial-gradient(circle,rgba(0,0,0,.2),#000);z-index:1000;display:none}.auraMsgBox{display:none;width:100%;margin:120px auto 0;background-color:#708090;z-index:1002;border-radius:5px;box-shadow:0 20px 40px rgba(0,0,0,.8),inset 0 1px 1px rgba(255,255,255,.3);overflow:hidden}.auraMsgBox h2{font-weight:700;font-size:1.2em;line-height:1.5em;margin:0;padding:10px;overflow:hidden}.auraErrorBox h2{text-shadow:1px 1px 1px rgba(0,0,0,.5);color:#fff}.auraMsgBox a.close{float:right;font-weight:700;font-size:20px;line-height:1em;color:#fff;background-color:transparent;border:1px solid #666;box-shadow:inset 0 1px 1px rgba(255,255,255,.2),0 1px 1px rgba(0,0,0,.4);border-radius:4px;padding:0 6px 4px;margin:0}.auraLoadingBox{text-align:center;width:200px;line-height:80px}#auraErrorMask.auraForcedErrorBox,body.loading .auraLoadingBox,body.auraError #auraErrorMask{display:block}.assistiveText{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)}.visible{display:block}.invisible{display:none}#auraErrorMask{width:100%;height:100%;position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(126,140,153,0.8);z-index:8000;visibility:visible;opacity:1;display:none}.auraErrorBox{position:relative;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;margin:0 2rem;height:100%;padding:0;border-radius:.25rem;z-index:8001}@media (min-width: 48em){.auraErrorBox{margin:0 auto;width:60%;max-width:40rem;min-width:20rem}}.auraErrorBox h2{-webkit-flex-shrink:0;-ms-flex-negative:0;flex-shrink:0;position:relative;border-top-right-radius:.25rem;border-top-left-radius:.25rem;border-bottom:0;padding:1rem;text-align:center;font-weight:300;font-size:1.25rem;line-height:1.25;color:#fff;background:#54698d;background-image:-webkit-linear-gradient(45deg,rgba(0,0,0,0.025) 25%,transparent 25%,transparent 50%,rgba(0,0,0,0.025) 50%,rgba(0,0,0,0.025) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(0,0,0,0.025) 25%,transparent 25%,transparent 50%,rgba(0,0,0,0.025) 50%,rgba(0,0,0,0.025) 75%,transparent 75%,transparent);background-size:64px 64px}.auraErrorBox a.close{display:inline-block;padding:0;background:transparent;background-clip:border-box;border:1px solid transparent;border-radius:.25rem;font-weight:700;font-size:2rem;line-height:1em;color:#fff;text-decoration:none;width:2rem;height:2rem;position:absolute;top:-2.5rem;right:-.5rem;cursor:pointer}#auraErrorMessage{padding:1rem 2rem;overflow:hidden;overflow-y:auto;background:#FFF}#auraErrorStack{margin:0;padding:0 2rem;font-family:monospace;font-size:.6rem;max-height:15rem;line-height:1.5;white-space:pre-wrap;background:#FFF;overflow:auto}.auraErrorFooter{border-bottom-right-radius:.25rem;border-bottom-left-radius:.25rem;padding:.75rem 1rem;background:#FFF;box-shadow:0 2px 3px 0 rgba(0,0,0,.16);border-top:0;text-align:center}#auraErrorReload{position:relative;padding:0 2rem;text-align:center;vertical-align:middle;border:1px solid #d8dde6;background-color:#fff;background-clip:border-box;border-radius:.25rem;font-size:.75rem;line-height:1.875rem;text-decoration:none;color:#0070d2;white-space:normal;cursor:pointer;display:none}#auraErrorReload:hover{background-color:#f4f6f9}#auraErrorReload.show{display:inline-block}
+        .auraMsgMask{position:absolute;top:0;bottom:0;left:0;right:0;background:-webkit-radial-gradient(circle,rgba(0,0,0,.2),#000);z-index:1000;display:none}.auraMsgBox{display:none;width:100%;margin:120px auto 0;background-color:#708090;z-index:1002;border-radius:5px;box-shadow:0 20px 40px rgba(0,0,0,.8),inset 0 1px 1px rgba(255,255,255,.3);overflow:hidden}.auraMsgBox h2{font-weight:700;font-size:1.2em;line-height:1.5em;margin:0;padding:10px;overflow:hidden}.auraErrorBox h2{color:#fff}.auraMsgBox a.close{float:right;font-weight:700;font-size:20px;line-height:1em;color:#fff;background-color:transparent;border:1px solid #666;box-shadow:inset 0 1px 1px rgba(255,255,255,.2),0 1px 1px rgba(0,0,0,.4);border-radius:4px;padding:0 6px 4px;margin:0}.auraLoadingBox{text-align:center;width:200px;line-height:80px}#auraErrorMask.auraForcedErrorBox,body.loading .auraLoadingBox,body.auraError #auraErrorMask{display:block}.assistiveText{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)}.visible{display:block}.invisible{display:none}#auraErrorMask{width:100%;height:100%;position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(126,140,153,0.8);z-index:8000;visibility:visible;opacity:1;display:none}.auraErrorBox{position:relative;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;margin:0 2rem;height:100%;padding:0;border-radius:.25rem;z-index:8001}@media (min-width: 48em){.auraErrorBox{margin:0 auto;width:60%;max-width:40rem;min-width:20rem}}.auraErrorBox h2{-webkit-flex-shrink:0;-ms-flex-negative:0;flex-shrink:0;position:relative;border-top-right-radius:.25rem;border-top-left-radius:.25rem;border-bottom:0;padding:1rem;text-align:center;font-weight:300;font-size:1.25rem;line-height:1.25;color:#fff;background:#54698d;background-image:-webkit-linear-gradient(45deg,rgba(0,0,0,0.025) 25%,transparent 25%,transparent 50%,rgba(0,0,0,0.025) 50%,rgba(0,0,0,0.025) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(0,0,0,0.025) 25%,transparent 25%,transparent 50%,rgba(0,0,0,0.025) 50%,rgba(0,0,0,0.025) 75%,transparent 75%,transparent);background-size:64px 64px}.auraErrorBox a.close{display:inline-block;padding:0;background:transparent;background-clip:border-box;border:1px solid transparent;border-radius:.25rem;font-weight:700;font-size:2rem;line-height:1em;color:#fff;text-decoration:none;width:2rem;height:2rem;position:absolute;top:-2.5rem;right:-.5rem;cursor:pointer}#auraErrorMessage{padding:1rem 2rem;overflow:hidden;overflow-y:auto;background:#FFF;font-size:13px;line-height:19.5px;white-space:pre-wrap}#auraErrorStack{margin:0;padding:0 2rem;font-family:monospace;font-size:.7rem;max-height:15rem;line-height:1.5;white-space:pre;background:#FFF;overflow:auto}.auraErrorFooter{border-bottom-right-radius:.25rem;border-bottom-left-radius:.25rem;padding:.75rem 1rem;background:#FFF;box-shadow:0 2px 3px 0 rgba(0,0,0,.16);border-top:0;text-align:center}#auraErrorReload{position:relative;padding:0 2rem;text-align:center;vertical-align:middle;border:1px solid #d8dde6;background-color:#fff;background-clip:border-box;border-radius:.25rem;font-size:.75rem;line-height:1.875rem;text-decoration:none;color:#0070d2;white-space:normal;cursor:pointer;display:none}#auraErrorReload:hover{background-color:#f4f6f9}#auraErrorReload.show{display:inline-block}
     </aura:attribute>
 
     <!-- appcache progressbar proto -->
@@ -99,7 +99,7 @@
             <div id="auraErrorMessage">{!v.errorMessage}</div>
             <div id="auraErrorStack"></div>
             <div class="auraErrorFooter">
-                <button id="auraErrorReload">Reload Now</button>
+                <a href="?" id="auraErrorReload">Refresh</a>
             </div>
         </div>
     </div>
@@ -121,7 +121,7 @@
     function initLocker () {
         if (auraConfig["safeEvalWorker"] &amp;&amp; !window['$$safe-eval$$'] &amp;&amp; !/^(.*?:)?\/\//.test(auraConfig["host"])) {
             var props = {
-                src: auraConfig.safeEvalWorker, 
+                src: auraConfig.safeEvalWorker,
                 id: "safeEvalWorker", width: "0", height: "0", tabIndex: "-1", "aura-hidden": "true", title:"sctipts"
             };
 
@@ -173,16 +173,6 @@
                 $A.util.removeClass($A.util.getElement('auraErrorReload'), 'show');
             } else {
                 document.body.removeChild(auraErrorMask);
-            }
-        });
-    }
-    var reloadButton = document.getElementById('auraErrorReload');
-    if (reloadButton) {
-        reloadButton.addEventListener('click', function() {
-            try {
-                $A.clientService.hardRefresh();
-            } catch(e) {
-                window.location.reload(true);
             }
         });
     }

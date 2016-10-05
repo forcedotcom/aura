@@ -475,7 +475,7 @@ function getSupportedInterfaces(o) {
 			interfaces.push("HTMLDocument");
 		}
 		interfaces.push("Document", "Node", "EventTarget");
-	} else if(o instanceof DocumentFragment){
+	} else if (o instanceof DocumentFragment) {
 		interfaces.push("Node", "EventTarget");
 	} else if (o instanceof Element) {
 		if (o instanceof HTMLElement) {

@@ -30,7 +30,7 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
             "/uitest/inputMultiSelect_NestedOptionsTest.cmp" };
     private final By outputLocator = By.xpath("//span[@class='uiOutputText']");
     private final By selectLocator = By.xpath("//select[1]");
-    private final By submitLocator = By.xpath("//button");
+    private final By submitLocator = By.cssSelector("button.uiButton");
     private final String optionLocatorString = "//select[1]/option[text()='%s']";
 
     private void openTestPage(int i) throws Exception {

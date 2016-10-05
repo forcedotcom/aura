@@ -202,7 +202,7 @@ public class MockingUtilUITest extends WebDriverTestCase {
                 ComponentDef.class,
                 String.format(baseComponentTag,
                         String.format("controller='%s'", controllerDefDescriptor.getQualifiedName()),
-                        "<ui:button press='{!c.clicked}' label='act'/><div class='result' aura:id='result'></div>"));
+                        "<ui:button class='button' press='{!c.clicked}' label='act'/><div class='result' aura:id='result'></div>"));
         DefDescriptor<ControllerDef> clientControllerDefDescriptor = definitionService.getDefDescriptor(
                 String.format("js://%s.%s", cmpDefDescriptor.getNamespace(), cmpDefDescriptor.getName()),
                 ControllerDef.class);
@@ -213,7 +213,7 @@ public class MockingUtilUITest extends WebDriverTestCase {
         // sanity without mocks
         open(cmpDefDescriptor);
         assertEquals("", getText(By.cssSelector("div.result")));
-        findDomElement(By.cssSelector("button")).click();
+        findDomElement(By.cssSelector("button.button")).click();
         waitForElementTextPresent(findDomElement(By.cssSelector("div.result")), "not so interesting");
     }
 

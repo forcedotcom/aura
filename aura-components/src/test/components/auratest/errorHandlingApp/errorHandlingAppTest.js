@@ -194,7 +194,7 @@
     waitForErrorModal: function() {
         $A.test.addWaitForWithFailureMessage(true,
             function(){
-                var element = document.getElementById('auraError');
+                var element = document.getElementById('auraErrorMask');
                 var style = $A.test.getStyle(element, 'display');
                 return style === 'block';
             },

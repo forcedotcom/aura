@@ -25,7 +25,7 @@ public class BaseInputMultiSelect extends WebDriverTestCase {
     private final String URL;
     private final By outputLocator = By.xpath("//span[@class='uiOutputText']");
     private final By selectLocator = By.xpath("//select[1]");
-    private final By submitLocator = By.xpath("//button");
+    private final By submitLocator = By.cssSelector("button.uiButton");
     private final String optionLocatorString = "//select[1]/option[text()='%s']";
 
     public BaseInputMultiSelect(String urlPath) {

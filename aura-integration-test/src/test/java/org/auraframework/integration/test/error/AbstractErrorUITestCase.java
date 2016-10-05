@@ -29,6 +29,7 @@ public class AbstractErrorUITestCase extends WebDriverTestCase {
     protected final By ERROR_MASK_LOCATOR = By.cssSelector("div[id='auraErrorMask']");
     protected final By ERROR_CLOSE_LOCATOR = By.cssSelector("a[class~='close']");
     protected final By ERROR_MSG_LOCATOR = By.cssSelector("div[id='auraErrorMessage']");
+    protected final By ERROR_STACKTRACE_LOCATOR = By.cssSelector("div[id='auraErrorStack']");
 
     /**
      * Find error message on error modal when the error model is displayed.
@@ -38,7 +39,7 @@ public class AbstractErrorUITestCase extends WebDriverTestCase {
      */
     protected String findErrorMessage() {
         waitForElement("Error mask is not visible.", findDomElement(ERROR_MASK_LOCATOR), true);
-        return getText(ERROR_MSG_LOCATOR);
+        return getText(ERROR_MSG_LOCATOR) + getText(ERROR_STACKTRACE_LOCATOR);
     }
 
     /**

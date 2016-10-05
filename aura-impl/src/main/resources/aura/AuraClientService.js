@@ -150,8 +150,9 @@ function AuraClientService () {
         "ckeditor" : { resourceUrl : "/auraFW/resources/{fwuid}/ckeditor/ckeditor-4.x/rel/ckeditor.js" }
     };
 
-    // for instrumentation reporting
+    // TODO - remove this, used by instrumentation reporting
     this.appCache = false;
+
     // whether an appcache error event has been received
     this.appCacheError = false;
 
@@ -169,7 +170,11 @@ function AuraClientService () {
     // can set this flag if ever required.
     this._disableBootstrapCacheCookie = "auraDisableBootstrapCache";
 
+    // cookie name counting consecutive reloads without fwk + app finishing boot
     this._reloadCountKey = "auraReloadCount";
+
+    // appcache progress. is 0 if appcache is not in use; otherwise ranges from 0 to 100.
+    this.appCacheProgress = 0;
 
     this.NOOP = function() {};
 
@@ -221,7 +226,7 @@ function AuraClientService () {
     this.handleAppCache();
     this.setupBootstrapErrorReloadButton();
 }
-    
+
 /**
  * Storage key for CSRF token.
  * TODO W-2531907 - Get/set done directly against the adapter because pre-200 non-Aura clients modified this value
@@ -257,7 +262,6 @@ AuraClientService.INCOMPLETE_BOOT_THRESHOLD = 5;
  * on failure.
  */
 AuraClientService.CACHE_BUST_QUERY_PARAM = "nocache";
-
 
 
 /**
@@ -412,14 +416,12 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
 
             // in case stale application cache, handling old exception code
             var appCache = window.applicationCache;
-            if (appCache && (appCache.status === appCache.IDLE || appCache.status > appCache.DOWNLOADING)) {
+            if (appCache && (appCache.status === appCache.IDLE || appCache.status === appCache.UPDATEREADY || appCache.status === appCache.OBSOLETE)) {
                 try {
                     appCache.update();
                 } catch (ignore) {
-                    //
-                    // not sure what we should do here. but since this seems to only happen in corner cases
-                    // we'll ignore this one for now.
-                    //
+                    // appcache quirk: calling update() throws in some environments. we have no recovery
+                    // so ignore it.
                 }
             }
             return ret;
@@ -766,12 +768,20 @@ AuraClientService.prototype.getHardRefreshURL  = function() {
 };
 
 /**
- * Perform hard refresh
+ * Perform "hard refresh" by forcing a request for the .app to the server.
  *
- * This is part of the appcache refresh, forcing a reload while
- * avoiding the appcache which is important for system such as
- * Android such doesn't adhere to window.location.reload(true)
- * and still uses appcache.
+ * IMPORTANT APPCACHE NOTE: if the .app is requested it'll be served from appcache. To
+ * force a trip to the server a cache-busting URL parameter is used. This server trip
+ * allows for an HTTP 302 redirect to:
+ * 1. An alternate endpoint, like an auth page if the session is invalid.
+ * 2. Back to the .app if the session, etc is valid.
+ * Redirecting back to the .app will cause the browser to load the .app from appcache.
+ * The browser will then start the appcache refresh cycle (by fetching the manifest; see
+ * https://www.w3.org/TR/2011/WD-html5-20110525/offline.html#appcacheevents), and we rely
+ * on the appcache event handlers (AuraClientService#handleAppCache) to respond.
+ *
+ * Other reload techniques, like window.location.reload(true), do not force a request to
+ * the server.
  *
  * @memberOf AuraClientService
  * @export
@@ -802,20 +812,32 @@ AuraClientService.prototype.isDevMode = function() {
 };
 
 /**
- * the code to
+ * Clears caches (actions/GVP, ComponentDefStorage) then requests the .app
+ * from the server.
  * @private
  */
 AuraClientService.prototype.actualDumpCachesAndReload = function() {
-    // reload after clearing the persistent caches
-    $A.componentService.clearDefsFromStorage({"cause": "appcache"}).then(
-        function() {
-            window.location.reload(true);
-        }
-    );
+    var that = this;
+    function reload() {
+        // must use hardRefresh() to force .app request (with cache-busting query param)
+        // to the server. window.location.reload(true) does not hit the server if appcache
+        // is enabled.
+        that.hardRefresh();
+    }
+
+    $A.componentService.clearDefsFromStorage({"cause": "appcache"})
+        .then(reload, reload);
 };
 
 /**
- * Clears actions and ComponentDefStorage stores then reloads the page.
+ * Queues a request to clear caches (actions/GVP, ComponentDefStorage) then
+ * reload the .app from the server.
+ *
+ * IMPORTANT APPCACHE NOTE: the .app is always requested from the server
+ * by using AuraClientService#hardRefresh() . This ensures the server can do
+ * a server-side redirect to an auth endpoint, etc. If it redirects back to
+ * the .app then the .app is pulled from appcache and the browser performs
+ * the appcache refresh cycle.
  */
 AuraClientService.prototype.dumpCachesAndReload = function() {
     if (this.reloadFunction) {
@@ -834,45 +856,42 @@ AuraClientService.prototype.dumpCachesAndReload = function() {
 };
 
 /**
- * Tracks reloads issued by hardRefresh and dumpCachesAndReload.
- * If 5 occur consecutively, we halt, clear client storages,
- * and return true for the consumer to handle.
+ * Tracks consecutive reloads that do not reach $A.finishInit to prevent infinite reloads.
  *
- * $A.finishInit clears counter
+ * AuraClientService#hardRefresh() relies in this function to indicate when too many
+ * consecutive reloads have occurred. In that case the caches are cleared and the user
+ * is given a prompt indicating the app can't boot.
  *
- * @returns {boolean} true if reloaded 5 consecutive times
+ * @returns {boolean} true if too many consecutive reloads without the fwk + app booting.
  */
 AuraClientService.prototype.shouldPreventReload = function() {
-    var cookies = document.cookie;
-    var reloadCountKey = this._reloadCountKey + "=";
-    var begin = cookies.indexOf(reloadCountKey);
-    var count = 0;
-    if (begin !== -1) {
-        var afterKeyIndex = begin + reloadCountKey.length;
-        var end = cookies.indexOf(";", afterKeyIndex);
-        count = +cookies.substring(afterKeyIndex, end);
-        count = !isNaN(count) ? count : 0;
-        if (count > 4) {
-            // more than 5 consecutive reloads without successful init
-            var idb = window.indexedDB;
-            if (idb) {
-                // if inline.js fails, none of the storages are initialized
-                // so must brute force as methods in ComponentDefStorage won't work.
-                idb.deleteDatabase(Action.STORAGE_NAME);
-                idb.deleteDatabase($A.componentService.getComponentDefStorageName());
-            }
-            return true;
+    var count = $A.util.getCookie(this._reloadCountKey);
+    count = +count; // coerce to number
+    count = isFinite(count) ? count : 0;
+
+    if (count >= AuraClientService.INCOMPLETE_BOOT_THRESHOLD) {
+        // too many consecutive reloads without successful fwk + app init
+        var idb = window.indexedDB;
+        if (idb) {
+            // if inline.js fails then none of the storages are initialized
+            // so must brute force as methods in ComponentDefStorage won't work.
+            idb.deleteDatabase(Action.STORAGE_NAME);
+            idb.deleteDatabase($A.componentService.getComponentDefStorageName());
         }
+
+        // reset the counter so if user chooses to reload we allow multiple reloads again
+        $A.util.setCookie(this._reloadCountKey, "0");
+        return true;
     }
-    document.cookie = reloadCountKey + (count + 1);
+    $A.util.setCookie(this._reloadCountKey, "" + (count+1));
     return false;
 };
 
 /**
- * Clears reload count cookie
+ * Clears reload count cookie.
  */
 AuraClientService.prototype.clearReloadCount = function() {
-    document.cookie = this._reloadCountKey + "=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    $A.util.clearCookie(this._reloadCountKey);
 };
 
 /**
@@ -892,9 +911,27 @@ AuraClientService.prototype.showErrorDialogWithReload = function(e) {
  * Sets up listeners for appcache.
  */
 AuraClientService.prototype.handleAppCache = function() {
+    /* You've found dragons.
+     *
+     * This code is very sensitive due to appcache's specification and browser quirks. It's highly
+     * recommended that you:
+     * 1. Read the appcache event summary to understand when which events are fired and
+     *    in which sequence. https://www.w3.org/TR/2011/WD-html5-20110525/offline.html#appcacheevents
+     * 2. Review the history of these functions.
+     * 3. Test very, very thoroughly. Browser quirks change with every new release.
+     */
+
     var acs = this;
 
+    /**
+     * Update UI appcache progress indicator.
+     * @param {Number} progress Percent complete. If < 0 the considered an error;
+     *  if >=100 then considered done.
+     */
     function showProgress(progress) {
+        if (!acs.isDevMode()) {
+            return;
+        }
         var progressContEl = document.getElementById("auraAppcacheProgress");
         if (progressContEl) {
             if (progress > 0 && progress < 100) {
@@ -910,20 +947,19 @@ AuraClientService.prototype.handleAppCache = function() {
     }
 
     function handleAppcacheChecking() {
-        acs.appCache = true;
-        document._appcacheChecking = true;
+        this.appcacheDownloadingEventFired = false;
     }
 
     function handleAppcacheUpdateReady() {
-        acs.appCache = false;
-        var appCache = window.applicationCache;
-        if (appCache.swapCache && appCache.status === appCache.UPDATEREADY) {
+        if (window.applicationCache.swapCache && window.applicationCache.status === window.applicationCache.UPDATEREADY) {
             try {
-                appCache.swapCache();
+                // request the new appcache version be used. change isn't realized until the page is reloaded.
+                window.applicationCache.swapCache();
             } catch(ignore) {
-                // protect against InvalidStateError with swapCache even when UPDATEREADY (weird)
+                // quirk: some browser's incorrectly throw InvalidStateError
             }
         }
+        // dump caches due to change in fwk and/or app.
         acs.dumpCachesAndReload();
     }
 
@@ -932,66 +968,78 @@ AuraClientService.prototype.handleAppCache = function() {
         if (e.stopImmediatePropagation) {
             e.stopImmediatePropagation();
         }
-        if (window.applicationCache
-            && (window.applicationCache.status === window.applicationCache.UNCACHED ||
-                window.applicationCache.status === window.applicationCache.OBSOLETE)) {
+
+        // if appcache is in use but obsolete (eg manifest returned 4xx) then ignore all errors. when the
+        // obsolete handler is fired it will request the .app from the server.
+        // quirk: error events may be fired before and after obsolete event/state fired/set.
+        if (window.applicationCache.status === window.applicationCache.OBSOLETE) {
             return;
         }
 
-        /**
+        // quirk: obsolete appcaches sometimes aren't deleted; instead they're un-obsoleted and used.
+        // this happens if obsolete then reload is very quick. it causes stale urls to be used from
+        // the obsolete manifest, which fail to download, so the fallback files are used. obsolete
+        // event/state may not be fired/set.
+
+        /*
          * BB10 triggers appcache ERROR when the current manifest is a 404.
-         * Other browsers triggers OBSOLETE and we refresh the page to get
-         * the new manifest.
+         * Other browsers triggers OBSOLETE which we handle by hard-refreshing the
+         * page to get the new manifest url.
          *
          * For BB10, we append cache busting param to url to force BB10 browser
          * not to use cached HTML via hardRefresh
          */
         if (acs.isBB10()) {
-            acs.hardRefresh();
+            handleAppcacheObsolete();
+            return;
         }
 
-        if (acs.isDevMode()) {
-            showProgress(-1);
-        }
-
-        if (acs.appcacheDownloadingEventFired && acs.isOutdated) {
-            acs.appCache = false;
-            // Hard reload if we error out trying to download new appcache
-            $A.log("Outdated.");
+        // appcache must be in one of these states: UNCACHED, IDLE, CHECKING, DOWNLOADING, UPDATEREADY
+        //
+        // if app calls $A.clientService.setOutdated() (isOutdated===true) then fwk triggers the
+        // appcache refresh cycle. when files start downloading the download event is fired
+        // (appcacheDownloadingEventFired===true). if we now receive an error event it's because:
+        // 1. browser has failed to fetch >=1 files. likely causes:
+        // 1a. invalid session so server returns 500
+        // 1b. rate limiting or other temporary error returns 500
+        // 1c. server is unavailable for extended period
+        // 2. browser failed to install, activate, etc the new version of appcache.
+        // recovery in both is to dump caches and request .app?t from server. server will either
+        // redirect elsewhere (eg to auth) or or back to .app then appcache refresh cycle runs.
+        //
+        // quirk: spec says if manifest changed during download sequence that it'll fire error event
+        // then retry. i've never seen the retry happen.
+        if (acs.isOutdated && acs.appcacheDownloadingEventFired) {
             acs.dumpCachesAndReload();
             return;
         }
 
-        // if bootstrap has failed then the app is stuck. if appcache has also errored then
-        // force a server trip to allow for a server-side redirect or get a new manifest.
-        if (Aura["appBootstrapStatus"] === "failed" && Aura["appBootstrapCacheStatus"] === "failed") {
-            acs.hardRefresh();
-        }
+        showProgress(-1);
 
+        // some type of appcache error has occurred. many possible causes:
+        // a. the error is caused by incognito mode. this environment will fire error events even though
+        //    the file was successfully downloaded + executed. no harm starting the bootup timers.
+        // b. the error indicates a file in the manifest can't be downloaded (server returned a 4xx, 5xx,
+        //    network blip, etc), which means the fwk/app won't boot. so start/continue the bootup timers.
+        acs.startBootTimers();
     }
 
     function handleAppcacheDownloading(e) {
-        acs.appCache = false;
-
-        if (acs.isDevMode()) {
-            var progress = Math.round(100 * e.loaded / e.total);
-            showProgress(progress + 1);
-        }
-
         acs.appcacheDownloadingEventFired = true;
+        var progress = Math.round(100 * e.loaded / e.total);
+        showProgress(progress + 1);
     }
 
     function handleAppcacheProgress(e) {
-        if (acs.isDevMode()) {
-            var progress = Math.round(100 * e.loaded / e.total);
-            showProgress(progress);
-        }
+        var progress = Math.round(100 * e.loaded / e.total);
+        showProgress(progress);
     }
 
     function handleAppcacheNoUpdate() {
-        if (acs.isDevMode()) {
-            showProgress(100);
-        }
+        showProgress(100);
+
+        // appcache refresh indicates all files are up to date but the app has indicated the app/fwk
+        // is out of date. thus caches must be cleared and .app?t loaded from server.
         if (acs.isOutdated) {
             acs.dumpCachesAndReload();
         }
@@ -999,23 +1047,15 @@ AuraClientService.prototype.handleAppCache = function() {
 
     function handleAppcacheCached() {
         showProgress(100);
-        // workaround appcache wonkiness: when a user logs in that already has a populated appcache,
-        // the browser's appcache update cycle finds a 404 on the manifest until the new sid is
-        // established via various redirects. upon return to the app's url the old appcache is
-        // still active (despite being marked obsolete) so fallback directives take effect. when the
-        // new appcache is ready the page is refreshed so the non-fallback values are used.
-        //
-        // if the boot sequence is beyond bootstrap.js and fallback directives have been used then
-        // reload the page to get the non-fallback values. must do only location.reload();
-        // appcache.swapCache() nor hardRefresh() create the desired behavior.
-        if (Aura["appBootstrapStatus"] === "failed" && Aura["appBootstrapCacheStatus"] === "failed" ) {
-            location.reload();
-        }
     }
 
     function handleAppcacheObsolete() {
-        acs.appCache = false;
-        acs.hardRefresh();
+        // appcache is in use but obsolete (eg manifest returned 4xx), must request the .app?t from server
+        // to allow for auth, etc redirect. if server redirects back to .app then browser starts appcache
+        // refresh cycle and fires relevant events.
+        // note: error events may be fired before and after obsolete is fired so error handler explicitly
+        // noops when obsolete with errors.
+        acs.dumpCachesAndReload();
     }
 
     if (window.applicationCache && window.applicationCache.addEventListener) {
@@ -1031,7 +1071,66 @@ AuraClientService.prototype.handleAppCache = function() {
 };
 
 /**
+ * Start or extend the boot timers that monitor for progress of the bootup sequence.
+ */
+AuraClientService.prototype.startBootTimers = function() {
+    var that = this;
+
+    // captures current boot state
+    function getBootState() {
+        return {
+            "framework": !!Aura["frameworkJsReady"],
+            "app.js": !!Aura["bootstrap"]["execAppJs"],
+            "bootstrap.js": !!Aura["appBootstrap"] || !!Aura["appBootstrapCache"] || !!that.appBootstrap,
+            "inline.js": !!Aura["inlineJsReady"] || !!Aura["bootstrap"]["execInlineJs"],
+            "libs.js": !!Aura["frameworkLibrariesReady"]
+        };
+    }
+
+    // determines if progress has been made in booting fwk + app
+    function getBootProgressed(state1, state2) {
+        var change = Object.keys(state1).reduce(function(prev, curr) {
+            return prev || state1[curr] !== state2[curr];
+        }, false);
+        return change;
+    }
+
+    // if a timer is already present then cancel it so we can set a new, extended timer
+    if (this._bootTimerId) {
+        window.clearTimeout(this._bootTimerId);
+    }
+
+    // capture current state
+    var oldState = getBootState();
+
+    // start the timer.
+    // note: start the timer even if all files are loaded. by then measuring success as the app+fwk
+    // finishing boot we catch any issues caused during the boot sequence.
+    this._bootTimerId = window.setTimeout(function() {
+        // if fwk + app have booted then no more checks required
+        if ($A["finishedInit"]) {
+            return;
+        }
+
+        var newState = getBootState();
+        var progress = getBootProgressed(oldState, newState);
+
+        // if progress made then start a new timer to check again
+        if (progress) {
+            that.startBootTimers();
+            return;
+        }
+
+        // no progress made so reload the page
+        that.hardRefresh();
+    }, AuraClientService.BOOT_TIMER_DURATION);
+};
+
+/**
  * Marks the application as outdated.
+ *
+ * Applications should call this when they require appcache to be refreshed. This
+ * will result in the page being reloaded.
  *
  * @memberOf AuraClientService
  * @export
@@ -1039,23 +1138,48 @@ AuraClientService.prototype.handleAppCache = function() {
 AuraClientService.prototype.setOutdated = function() {
     this.isOutdated = true;
     var appCache = window.applicationCache;
-    if (!appCache || (appCache && (appCache.status === appCache.UNCACHED || appCache.status === appCache.OBSOLETE))) {
+
+    // note: read jsdoc on dumpCachesAndReload() and hardReload() to understand this code and
+    // appcache's quirks.
+
+    // if appcache isn't supported then dump caches and reload. the browser will request .app?t then
+    // .app from the the server.
+    if (!appCache) {
         this.dumpCachesAndReload();
-    } else if (appCache.status === appCache.IDLE || appCache.status > appCache.DOWNLOADING) {
-        // call update when there is a cache ie IDLE (status = 1) or cache is not being checked (status = 2)
-        // or downloaded (status = 3) But have a care, as there are cases (e.g. chrome) where it claims you have
-        // an appcache, but appcache.update() will fail (The only known way to reproduce is to use chrome dev
-        // tools and disable caching.
+    }
+
+    // if appcache isn't activated (eg hasn't successfully downloaded all files, not enabled in the app)
+    // then dump caches and reload. the browser will request .app?t then .app from the the server.
+    else if (appCache.status === appCache.UNCACHED) {
+        this.dumpCachesAndReload();
+    }
+
+    // appcache is obsolete (eg manifest returned 4xx) so dump caches and reload. the browser will
+    // request .app?t then .app from the the server.
+    // NOTE: it has been observed (in chrome) that the .app request may be incorrectly served from
+    // appcache. the browser will start the refresh cycle, get a 4xx on the manifest marking it
+    // obsolete again, and handleAppCache() is invoked.
+    else if (appCache.status === appCache.OBSOLETE) {
+        this.dumpCachesAndReload();
+    }
+
+    // appcache is in use. it's idle (eg not checking for an update) so request the browser start the
+    // refresh cycle (fetch the manifest). this will trigger appcache events / invoke handleAppCache().
+    else if (appCache.status === appCache.IDLE) {
         try {
             appCache.update();
         } catch (e) {
-            //
-            // whoops. something is inconsistent, but we don't really want to hard fail.
-            // so, instead, try a different route.
-            //
+            // appcache quirk: calling update() throws in some environments. take a more extreme
+            // recovery of dumping caches and reloading .app from server to trigger appcache
+            // population cycle.
             this.dumpCachesAndReload();
         }
     }
+
+    // other appcache states:
+    // - CHECKING: manifest is being (re)fetched. appcache events will trigger handleAppCache().
+    // - DOWNLOADING: appcache contents are being fetched. appcache events will trigger handleAppCache().
+    // - UPDATEREADY: a new version of appcache is ready. handleAppCache() will apply the new version and reload.
 };
 
 /**
@@ -1362,7 +1486,7 @@ AuraClientService.prototype.initDefs = function() {
 AuraClientService.prototype.getAppBootstrap = function() {
     //  network &&  cache -> network
     //  network && !cache -> network
-    // ?network && cache ->
+    // ?network &&  cache ->
     //   parallel -> cache
     //   serial   -> wait for network
     // ?network && !cache -> wait for network
@@ -1381,15 +1505,14 @@ AuraClientService.prototype.getAppBootstrap = function() {
         return {source:"cache", value:Aura["appBootstrapCache"]};
     }
     else if (Aura["appBootstrapStatus"] === "failed" && Aura["appBootstrapCacheStatus"] === "failed") {
-        // if appcache has an error and bootstrap isn't available then we're stuck. we need
-        // to hard refresh in order to allow for a server-side redirect or get a new manifest url
-        if (this.appCacheError) {
-            this.hardRefresh();
-        }
-        // if appcache is disabled or is idle then there's no recovery in place. other appcache states have
-        // event handlers that recover automatically (typically by reload the page).
-        else if (!window.applicationCache || window.applicationCache.status === window.applicationCache.UNCACHED || window.applicationCache.status === window.applicationCache.IDLE) {
-            throw new $A.auraError("AuraClientService.getAppBootstrap: bootstrap.js failed to load from network or cache");
+        // if bootstrap.js has failed to load from network and storage then the app won't boot.
+        // note: bootstrap.js fallback is used if the server fetch failed even if appcache is in the
+        // process of fetching a new version. if we reload while appcache is updating/downloading
+        // then the current version (which may be stale) gets reused. bootstrap.js' fallback will
+        // again be used, and we loop infinitely. therefore only reload the .app?t when appcache
+        // is idle or not in use.
+        if (!window.applicationCache || window.applicationCache.status === window.applicationCache.UNCACHED || window.applicationCache.status === window.applicationCache.IDLE) {
+            this.dumpCachesAndReload();
         }
     }
 
@@ -2441,8 +2564,8 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
 
 /**
  * Send beacon
- * 
- * @returns true if payload was successfully sent to the server. 
+ *
+ * @returns true if payload was successfully sent to the server.
  * sendBeacon will return false if the payload is too large for the browser to queue
  * At the time of this comment, the limit was 64kB, but that can change
  * @export
@@ -2824,7 +2947,7 @@ AuraClientService.prototype.parseAndFireEvent = function(evtObj) {
 AuraClientService.prototype.setToken = function(newToken, saveToStorage) {
     this._token = newToken;
     if (saveToStorage) {
-       this.saveTokenToStorage(); 
+       this.saveTokenToStorage();
     }
 };
 

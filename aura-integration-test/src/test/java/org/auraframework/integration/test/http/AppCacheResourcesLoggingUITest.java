@@ -719,8 +719,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
              * css only once, but it's not stable, do see some test get them twice sometimes.
              */
             return ImmutableList.of(
-                    // The manifest change causes the correct fetch, eliminating our 302 and 404
-                    // new Request(getUrl(), null, 302), // hard refresh
+                    // new Request(getUrl(app), null, 302), // hard refresh
                     // new Request("/auraResource", "manifest", 404), // manifest out of date
                     new Request(5, "/auraResource", "manifest", 200),
                     new Request(2, getUrl(app), null, 200), // rest are cache updates
@@ -738,8 +737,7 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
              * initial page twice
              */
             return ImmutableList.of(
-                    // The manifest change causes the correct fetch, eliminating our 302
-                    // new Request(getUrl(), null, 302), // hard refresh
+                    // new Request(getUrl(app), null, 302), // hard refresh
                     // new Request("/auraResource", "manifest", 404), // manifest out of date
                     new Request("/auraResource", "manifest", 200),
                     new Request(2, getUrl(app), null, 200), // rest are cache updates

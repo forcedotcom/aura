@@ -55,14 +55,14 @@
         if(!this.domEventMap[elementId]) {
         	this.domEventMap[elementId] = {};
         }
-        
+
         // Already present, so we'll need to remove it before adding it.
         var existing = this.domEventMap[elementId][event];
         if(existing) {
         	// If we've already added a handler for this component / event combo, remove it first.
         	$A.util.removeOn(element, event, existing);
         }
-        
+
         this.domEventMap[elementId][event] = handler;
     },
 
@@ -142,8 +142,8 @@
         if (helper.fireEvent) {
             helper.fireEvent(component, event, helper);
         }
-// JBUCH: HACK: FIXME: EXTRACT disableDoubleClicks TO AN INTERFACE WE CAN CHECK
-        if (event.type === "click" && component.getDef().getAttributeDefs().getDef("disableDoubleClicks") && component.get("v.disableDoubleClicks")) {
+
+        if (event.type === "click" && component.isInstanceOf("ui:doubleClicks") && component.get("v.disableDoubleClicks")) {
         	component._recentlyClicked = true;
         	window.setTimeout(function() { component._recentlyClicked = false; }, 350);
         }

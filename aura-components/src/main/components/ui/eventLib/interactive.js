@@ -16,8 +16,8 @@
 function lib() { //eslint-disable-line no-unused-vars
 
     var lib = { //eslint-disable-line no-shadow, no-unused-vars
-        
-        /** 
+
+        /**
          * Store a unique id on the element to track for event deduping.
          * This key is different than the one in interactiveHelper since the unique id counts
          * NEED to be different. Otherwise you could end up with 2 #1's for example.
@@ -39,7 +39,7 @@ function lib() { //eslint-disable-line no-unused-vars
          * @type {Number}
          */
         interactiveUid: 1,
-        
+
         /**
          * Adds an event handler for every DOM event for which this input has a Aura-equivalent handler
          */
@@ -94,7 +94,7 @@ function lib() { //eslint-disable-line no-unused-vars
                 // If we've already added a handler for this component / event combo, remove it first.
                 $A.util.removeOn(element, event, existing);
             }
-            
+
             this.domEventMap[elementId][event] = handler;
         },
 
@@ -162,7 +162,7 @@ function lib() { //eslint-disable-line no-unused-vars
             var element = event.target;
             var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
 
-            // cmp might be destroyed, just ignore this event. 
+            // cmp might be destroyed, just ignore this event.
             if (!htmlCmp) {
                 return;
             }
@@ -188,8 +188,8 @@ function lib() { //eslint-disable-line no-unused-vars
             } else {
                 lib.fireEvent(component, event, helper);
             }
-            
-            if (event.type === "click" && component.get("v.disableDoubleClicks")) {
+
+            if (event.type === "click" && component.isInstanceOf("ui:doubleClicks") && component.get("v.disableDoubleClicks")) {
                 component._recentlyClicked = true;
                 window.setTimeout(function() { component._recentlyClicked = false; }, 350);
             }

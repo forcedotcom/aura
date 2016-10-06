@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component access="PRIVILEGED" extensible="true" abstract="true" implements="ui:visible, ui:uiEvents"
+<aura:component access="PRIVILEGED" extensible="true" abstract="true" implements="ui:visible, ui:uiEvents, ui:doubleClicks"
     description="An abstract class that is extended by input components such as ui:inputCheckbox and ui:inputText." support="GA" dynamicallyFlavorable="true">
 
     <!-- Library which holds the Aura events registration -->
@@ -24,14 +24,13 @@
     <aura:dependency resource="markup://ui:label"             type="COMPONENT"/>
     <aura:dependency resource="markup://ui:inputDefaultError" type="COMPONENT"/>
 
-    <aura:attribute name="disableDoubleClicks"    type="Boolean"          default="false"                       description="Disables double clicking the component within 350ms"/>
     <aura:attribute name="showErrors"             type="Boolean"          default="true"    access="PRIVILEGED" description="Shows the error component in compound fields. If set to true and errors exist, displays the errors using inputCmp.set(&quot;v.errors&quot;, errors)."/>
     <aura:attribute name="errors"                 type="Object[]"                           access="GLOBAL"     description="The list of errors to be displayed."/>
     <aura:attribute name="errorComponent"         type="Aura.Component[]"                                       description="A component that displays any error messages, such as validation errors, associated with the input field."/>
     <aura:attribute name="fieldHelpComponent"     type="Aura.Component[]"                                       description="A component that is attached next to the label to display field help for this input item. Must be an instance of ui:tooltip"/>
     <aura:attribute name="type"                   type="String"                             access="PRIVILEGED" description="Specifies the input type. Possible values: button, checkbox, file, hidden, image, password, radio, reset, submit, text, textarea. Corresponds to the type attribute of the rendered HTML input element. Override type in a component that extends this component to set it to a different HTML input type."/>
     <aura:attribute name="isCompound"             type="Boolean"           default="false"                      description="Specifies if the input is compound. Examples include address, name, and date-time fields."/>
-    
+
     <aura:attribute name="required"               type="Boolean"           default="false"  access="GLOBAL"     description="Specifies whether the input is required. Default value is &quot;false&quot;."/>
     <aura:attribute name="updateOn"               type="String"            default="change" access="GLOBAL"     description="Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is &quot;change&quot;."/>
     <aura:attribute name="updateOnDisabled"       type="Boolean"           default="false"                      description="If you want to handle update value by yourself. Default value is &quot;false&quot;"/>

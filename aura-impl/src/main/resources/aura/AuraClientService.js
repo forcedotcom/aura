@@ -142,7 +142,13 @@ function AuraClientService () {
     this.protocols={"layout":true};
     this.namespaces={internal:{},privileged:{}};
     this.lastSendTime = Date.now();
-    this.clientLibraries = {};
+
+    // TODO: @dval We should send this from the server, but for LithgnigoutOut apps is a non-trivial change,
+    // so for the time being I hardcoded the resource path here to ensure we can lazu fetch them.
+    this.clientLibraries = {
+        "walltime" : { resourceUrl : "/auraFW/resources/{fwuid}/walltime-js/walltime.min.js" },
+        "ckeditor" : { resourceUrl : "/auraFW/resources/{fwuid}/ckeditor/ckeditor-4.x/rel/ckeditor.js" }
+    };
 
     // TODO - what is this used for?
     this.appCache = true;
@@ -516,12 +522,13 @@ AuraClientService.prototype.initializeClientLibraries = function () {
             var script = scripts[i];
             if (script.getAttribute("data-src") && !script.getAttribute("src")) {
                 var source = script.getAttribute("data-src");
-                var name = source.split('/').pop().split('.').shift();
-                this.clientLibraries[name.toLowerCase()] = {
+                var name = source.split('/').pop().split('.').shift().toLowerCase();
+
+                this.clientLibraries[name] = $A.util.apply(this.clientLibraries[name] || {}, {
                     script : script,
                     loaded : false,
                     loading : []
-                };
+                });
             }
         }
     }
@@ -547,6 +554,13 @@ AuraClientService.prototype.loadClientLibrary = function(name, callback) {
             lib.loading[i]();
         }
         lib.loading = [];
+    }
+
+    if (!lib.script) {
+        var script = window.document.createElement('script');
+        script.setAttribute('data-src', lib.resourceUrl.replace('{fwuid}', $A.getContext().fwuid));
+        window.document.body.appendChild(script);
+        lib.script = script;
     }
 
     lib.script.onload = afterLoad;

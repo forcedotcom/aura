@@ -248,26 +248,57 @@
 
     function ChaosManager(config) {
         //Keep a list of element class we know gonna make the element clickable
-        var clicableClassList = [
-            'a:link',
-            'actionCardAnchor',
-            'cuf-feedItemActionTrigger',
+        /*var clicableClassList = [
+            'changeOwnerLink',
             'forceActionLink',
-            'forceEntityIcon',//left navigation
+            'forceHeaderButton',
             'forceIcon',
-            'header-label',
-            'likeIconAnchor',
-            //'inputTextArea',
-            'menuTriggerLink',
+            'globalCreateTrigger',
+            'inputIcon',
+            'lookup__item',
+            'moreLabel',
+            'overflowTrigger',
             'outputLookupLink',
-            'select',
-            'triggerLinkText',
+            'slds-context-bar__label-action',
+            'slds-context-bar__icon-action',
+            //'slds-text-link--reset',
+            'slds-checkbox--faux',
+            //'slds-dropdown__item',
             'tabHeader',
-            'uiButton',
-            //'uiInput',
-            'uiPill'
-        ];
-        this.getClicableClassList = function() { return clicableClassList; };
+            'rowLink',
+            'uiLabel',
+            'uiInput',
+            'uiMenuItem',
+            'viewAllLabel'
+        ];*/
+        var clicableParameter = "[data-aura-rendered-by]";
+        var clicableElementAndTheirClass = {
+            'a': [
+                'changeOwnerLink',
+                'forceActionLink',
+                //'overflowTrigger',
+                'outputLookupLink',
+                'rowLink',
+                'rowActionsPlaceHolder',
+                'slds-context-bar__label-action',
+                //'slds-context-bar__icon-action',
+                'tabHeader',
+                'uiLabel',
+                'viewAllLabel'
+            ],
+            'button':[
+                'forceHeaderButton',
+                'uiButton'
+
+            ],
+            'li':[
+                'uiMenuItem',
+            ]
+        };
+        //this.getClicableClassList = function() { return clicableClassList; };
+        this.getClicableParameter = function() { return clicableParameter; };
+        this.getClicableElementList = function() { return Object.getOwnPropertyNames(clicableElementAndTheirClass); };
+        this.getClicableElementAndTheirClass = function() { return clicableElementAndTheirClass; };
 
 //Error Handling session
         var errorsToIgnore = []; //not in use yet
@@ -542,10 +573,6 @@
         this.pleaseStopNewChaosRun = true;
 
         this.resetActionDropAndErrorPercentage();
-
-            //clearInterval(this.waitForAnyAuraRenderedElementInterval);
-            //this.waitForAnyAuraRenderedElementInterval = undefined;
-            //this.count_waitAnyAuraRenderedElementPresent = 0;
 
             this.removeCircleElement();
             this.currentChaosRun['chaosRunEndsWith'] = chaosRunEndsWith;
@@ -989,7 +1016,7 @@
         var that = this;
         this.waitForAnyAuraRenderedElementToPresent(samplingInterval, count).then(
             function() {
-                that.clickRandomClickableElement(/*that.defaultErrorHandlingFunction.bind(that)*/);
+                that.clickRandomClickableElement(/*that.stopAtAnyError.bind(that)*/);
             },
             function(count) {
                 if(count == -1) {//someone push the stop chaos run button
@@ -1062,6 +1089,21 @@
         
     }
     
+    ChaosManager.prototype.stopAtAnyError = function() {
+        var allErrorTextAreas = document.querySelectorAll(this.getErrorMsgSelector());
+        if(allErrorTextAreas.length > 0) {
+            var errMsg = "";
+            for(var idx = 0; idx < allErrorTextAreas.length; idx++ ){
+                errMsg += "Error#"+idx+":"+allErrorTextAreas[idx].innerHTML+";";
+            }
+            console.warn("We Stop the new Chaos Run running into following error:", errMsg);
+            //ask chaos tab to create a chaos card, this will call stopChaosRun in InspectorPanelSfdcChaos
+            $Aura.Inspector.publish("AuraInspector:OnStopNewChaosRunWithError", {'error': errMsg});
+            //above will end up calling "AuraDevToolService.StopChaosRun" here 
+
+            return true;
+        }
+    }
     /*
         Example : 
         get the error message (if any), return true if we see an error we care, false other wise.
@@ -1085,7 +1127,7 @@
                                 console.warn(errMsg);
                                 //ask chaos tab to create a chaos card, this will call stopChaosRun in InspectorPanelSfdcChaos
                                 $Aura.Inspector.publish("AuraInspector:OnStopNewChaosRunWithError", {'error': errMsg});
-                                //above will end up calling "AuraDevToolService.StopChaosRun" here to clear up waitForAnyAuraRenderedElementInterval
+                                //above will end up calling "AuraDevToolService.StopChaosRun" here
 
                                 return true;//get out of this error handling
                             }
@@ -1129,37 +1171,38 @@
         var res = {};
         var resLocator = {};
         var elementNodeList; var elements = [];
-        var randomClickableClassIndex;
-        var randomElementsIndex;
+        var randomIdx1, randomIdx2, randomIdx3;
         var elementObj, element;
         var renderingComponent;
         var idx;
 
         var tryCount = 0;
         do {
-            tryCount = tryCount + 1;
-            var clickableClassList = this.getClicableClassList();
-            randomClickableClassIndex = Math.floor( Math.random() * clickableClassList.length );
-            selector = '.'+ clickableClassList[randomClickableClassIndex] +'[data-aura-rendered-by] ';
+            tryCount ++;
+            randomIdx1 = Math.floor( Math.random() * this.getClicableElementList().length );
+            clicableClasses = this.getClicableElementAndTheirClass()[ this.getClicableElementList()[randomIdx1] ];
+            randomIdx2 = Math.floor( Math.random() * clicableClasses.length);
+            selector = this.getClicableElementList()[randomIdx1] + '.' + clicableClasses[randomIdx2] + this.getClicableParameter();
             elementNodeList = document.querySelectorAll(selector);
             for (idx = 0; idx < elementNodeList.length; idx++) {
                 var elementNode = elementNodeList.item(idx);
                 if( this.isElementVisible(elementNode) ) {
+                    console.log("selector:"+selector);
                     var cssPath = this.getCssPath(elementNode);
                     if(cssPath) {
                         elements.push( { 'element': elementNode, 'cssPath': cssPath } );
                     }
                 }
             }
-            //console.log("try selector#"+randomClickableClassIndex+":"+selector);
-        } while(elements.length === 0 && tryCount < this.getDefaultMaxTry()*5)
+        } while( !elements.length && tryCount < this.getDefaultMaxTry()*5)
 
-        if(tryCount >= this.getDefaultMaxTry()*5) {
+        if(!elements.length) {
             return null;
         }
 
-        randomElementsIndex = Math.floor( Math.random() * elements.length );
-        elementObj = elements[randomElementsIndex];
+        randomIdx3 = Math.floor( Math.random() * elements.length );
+        elementObj = elements[randomIdx3];
+        
         res = elementObj;
         element = elementObj.element;
         renderingComponent = $A.componentService.getRenderingComponentForElement(element);
@@ -1236,8 +1279,17 @@
         } else {
             //var centerLeft = getCenterPositionLeftOfElement(element);
             //var centerTop = getCenterPositionTopOfElement(element);
-            var topElement = document.elementFromPoint(element.getBoundingClientRect().left, element.getBoundingClientRect().top);
+            var topElement = document.elementFromPoint(
+                element.getBoundingClientRect().left,//(element.getBoundingClientRect().left+element.getBoundingClientRect().right)/2, 
+                element.getBoundingClientRect().top//(element.getBoundingClientRect().top+element.getBoundingClientRect().bottom)/2
+            );
+            var centerElement = document.elementFromPoint(
+                (element.getBoundingClientRect().left+element.getBoundingClientRect().right)/2, 
+                (element.getBoundingClientRect().top+element.getBoundingClientRect().bottom)/2
+            ); 
             if(topElement && topElement === element) {
+                return true;
+            } else if ( centerElement && centerElement === element) {
                 return true;
             } else {
                 return false;

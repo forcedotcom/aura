@@ -546,6 +546,7 @@ AuraClientService.prototype.loadClientLibrary = function(name, callback) {
         return callback();
     }
 
+    lib.loading = lib.loading || [];
     lib.loading.push($A.getCallback(callback));
 
     function afterLoad() {

@@ -84,12 +84,14 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
 
 // Static methods:
 
+Action.STORAGE_NAME = "actions";
+
 Action.getStorageKey = function(descriptor, params) {
     return descriptor + ":" + $A.util["json"].orderedEncode(params);
 };
 
 Action.getStorage = function() {
-    return $A.storageService.getStorage("actions");
+    return $A.storageService.getStorage(Action.STORAGE_NAME);
 };
 
 // Instance methods:

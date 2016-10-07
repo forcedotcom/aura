@@ -1586,6 +1586,7 @@ Test.Aura.AuraClientServiceTest = function() {
 
             mockDeps(function() {
                 var targetService = new Aura.Services.AuraClientService();
+                targetService.shouldPreventReload = function() { return false; };
                 targetService.reloadPointPassed = true;
                 evtCallbacks["updateready"]();
             });
@@ -1600,6 +1601,7 @@ Test.Aura.AuraClientServiceTest = function() {
 
             mockDeps(function() {
                 var targetService = new Aura.Services.AuraClientService();
+                targetService.shouldPreventReload = function() { return false; };
                 targetService.reloadPointPassed = true;
                 evtCallbacks["updateready"]();
             });
@@ -1613,6 +1615,7 @@ Test.Aura.AuraClientServiceTest = function() {
            componentDefsClearCalled = false;
            mockDeps(function() {
                 var targetService = new Aura.Services.AuraClientService();
+                targetService.shouldPreventReload = function() { return false; };
                 targetService.reloadPointPassed = true;
                 evtCallbacks["updateready"]();
            });
@@ -1654,6 +1657,7 @@ Test.Aura.AuraClientServiceTest = function() {
             });
 
             mockDeps(function() {
+                target.shouldPreventReload = function() { return false; };
                 target.hardRefresh();
             });
 
@@ -2116,6 +2120,7 @@ Test.Aura.AuraClientServiceTest = function() {
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
             });
+            target.shouldPreventReload = function() { return false; };
             target.actualDumpCachesAndReload = function() { actual = expected; };
             target.reloadFunction = undefined;
             target.reloadPointPassed = true;

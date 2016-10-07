@@ -819,6 +819,7 @@ AuraInstance.prototype.finishInit = function(doNotInitializeServices) {
 
         $A.eventService.getNewEvent("markup://aura:initialized").fire();
         $A.clientService.checkBootstrapUpgrade();
+        $A.clientService.clearReloadCount();
     }
 
     // Unless we are in IntegrationServices, dispatch location hash change.

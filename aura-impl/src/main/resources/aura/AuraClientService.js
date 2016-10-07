@@ -169,6 +169,8 @@ function AuraClientService () {
     // can set this flag if ever required.
     this._disableBootstrapCacheCookie = "auraDisableBootstrapCache";
 
+    this._reloadCountKey = "auraReloadCount";
+
     this.NOOP = function() {};
 
     var auraXHR = new Aura.Services.AuraClientService$AuraXHR();
@@ -705,6 +707,12 @@ AuraClientService.prototype.releaseXHR = function(auraXHR) {
  */
 AuraClientService.prototype.hardRefresh = function() {
     var url = location.href;
+
+    if (this.shouldPreventReload()) {
+        this.showErrorDialogWithReload(new AuraError("There was a problem loading the page. Please reload the page by clicking 'Reload Now'"));
+        return;
+    }
+
     if (!this.isManifestPresent() || url.indexOf("?nocache=") > -1) {
         location.reload(true);
         return;
@@ -782,7 +790,66 @@ AuraClientService.prototype.dumpCachesAndReload = function() {
     this.reloadFunction = this.actualDumpCachesAndReload.bind(this);
 
     if (this.reloadPointPassed) {
+        if (this.shouldPreventReload()) {
+            this.showErrorDialogWithReload(new AuraError("There was a problem loading the page. Please reload the page by clicking 'Reload Now'"));
+            return;
+        }
         this.reloadFunction();
+    }
+};
+
+/**
+ * Tracks reloads issued by hardRefresh and dumpCachesAndReload.
+ * If 5 occur consecutively, we halt, clear client storages,
+ * and return true for the consumer to handle.
+ *
+ * $A.finishInit clears counter
+ *
+ * @returns {boolean} true if reloaded 5 consecutive times
+ */
+AuraClientService.prototype.shouldPreventReload = function() {
+    var cookies = document.cookie;
+    var reloadCountKey = this._reloadCountKey + "=";
+    var begin = cookies.indexOf(reloadCountKey);
+    var count = 0;
+    if (begin !== -1) {
+        var afterKeyIndex = begin + reloadCountKey.length;
+        var end = cookies.indexOf(";", afterKeyIndex);
+        count = +cookies.substring(afterKeyIndex, end);
+        count = !isNaN(count) ? count : 0;
+        if (count > 4) {
+            // more than 5 consecutive reloads without successful init
+            var idb = window.indexedDB;
+            if (idb) {
+                // if inline.js fails, none of the storages are initialized
+                // so must brute force as methods in ComponentDefStorage won't work.
+                idb.deleteDatabase(Action.STORAGE_NAME);
+                idb.deleteDatabase($A.componentService.getComponentDefStorageName());
+            }
+            return true;
+        }
+    }
+    document.cookie = reloadCountKey + (count + 1);
+    return false;
+};
+
+/**
+ * Clears reload count cookie
+ */
+AuraClientService.prototype.clearReloadCount = function() {
+    document.cookie = this._reloadCountKey + "=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+};
+
+/**
+ * Shows error dialog with reload button
+ *
+ * @param {AuraError} e error object
+ * @private
+ */
+AuraClientService.prototype.showErrorDialogWithReload = function(e) {
+    if (e && e.message) {
+        $A.message(e.message, e, true);
+        $A.logger.reportError(e);
     }
 };
 

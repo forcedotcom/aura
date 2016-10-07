@@ -1432,6 +1432,14 @@ AuraComponentService.prototype.clearDefsFromStorage = function (metricsPayload) 
 };
 
 /**
+ * Returns name of ComponentDefStorage
+ * @returns {String} name of ComponentDefStorage
+ */
+AuraComponentService.prototype.getComponentDefStorageName = function() {
+    return this.componentDefStorage.STORAGE_NAME;
+};
+
+/**
  * Saves component and library defs to persistent storage.
  * @param {Object} config the config bag from which defs are to be stored.
  * @param {Object} context the context (already merged)

@@ -22,8 +22,7 @@
   * getLockerSecret and setLockerSecret use in previous iterations of LockerService.
   */
 
-var ls_created,
-    ls_getKey,
+var ls_getKey,
     ls_setKey,
     ls_trust,
     ls_hasAccess,
@@ -36,13 +35,6 @@ var ls_created,
     ls_getFromCache;
 
 (function LockerKeyManager() {
-
-    // Prevent reinitialization (design limitation).
-    if (ls_created) {
-        throw new Error("Only one instance of Locker Service can be created");
-    }
-    ls_created = true;
-
     // Keyed objects can only have one owner. We prevent "null" and "undefined"
     // keys by guarding all set operations.
     var keychain = new WeakMap();      // Replaces $lskey

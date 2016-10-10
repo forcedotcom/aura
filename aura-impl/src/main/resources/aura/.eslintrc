@@ -128,7 +128,6 @@
     "TimeRanges": true,
     "ValidityState": true,
     "DOMPurify": true,
-    "ls_created": true,
     "ls_getKey": true,
     "ls_setKey": true,
     "ls_trust": true,

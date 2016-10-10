@@ -26,22 +26,6 @@ import org.openqa.selenium.WebElement;
 
 public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     /**
-     * In prod mode, the error message has three lines:<br>
-     * Something has gone wrong. [MESSAGES]<br>
-     * Failing descriptor: [DESCRIPTOR]<br>
-     * Please try again.
-     */
-    private static int NUM_OF_MSG_LINES_PROD_MODE = 3;
-    /**
-     * In non-prod mode, the error message has three lines, excluding stack trace:<br>
-     * Something has gone wrong. [MESSAGES]<br>
-     * Failing descriptor: [DESCRIPTOR]<br>
-     * [STACKTRACE]<br>
-     * Please try again.
-     */
-    private static int NUM_OF_MSG_LINES_NON_PROD_MODE = 3;
-
-    /**
      * Verify that error message box displays in the auraErrorMask div and can be dismissed using the close button.
      * Automation for W-1091838.
      */
@@ -101,7 +85,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
         String expectedMsg = "Error from app client controller";
         assertThat("Error modal doesn't contain expected message", actualMsg, containsString(expectedMsg));
-        assertClientErrorContainsStacktrace(actualMsg, NUM_OF_MSG_LINES_NON_PROD_MODE);
+        assertClientErrorContainsStacktrace(actualMsg);
     }
 
     @Test
@@ -113,7 +97,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
         String expectedMsg = "Error from app client controller";
         assertThat("Error modal doesn't contain expected message", actualMsg, containsString(expectedMsg));
-        assertClientErrorNotContainsStacktrace(actualMsg, NUM_OF_MSG_LINES_PROD_MODE);
+        assertClientErrorNotContainsStacktrace(actualMsg);
     }
 
     @Test
@@ -125,7 +109,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         String actualMsg = findErrorMessage();
         String expectedMsg = "Assert failed in app client controller";
         assertThat("Error modal doesn't contain expected message", actualMsg, containsString(expectedMsg));
-        assertClientErrorContainsStacktrace(actualMsg, NUM_OF_MSG_LINES_NON_PROD_MODE);
+        assertClientErrorContainsStacktrace(actualMsg);
     }
 
     @Test
@@ -137,7 +121,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         String actualMsg = findErrorMessage();
         String expectedMsg = "Assert failed in app client controller";
         assertThat("Error modal doesn't contain expected message", actualMsg, containsString(expectedMsg));
-        assertClientErrorNotContainsStacktrace(actualMsg, NUM_OF_MSG_LINES_PROD_MODE);
+        assertClientErrorNotContainsStacktrace(actualMsg);
     }
 
     @Test
@@ -148,7 +132,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         String actualMsg = findErrorMessage();
         String expectedMsg = "AuraFriendlyError from app client controller";
         assertThat("Error modal doesn't contain expected message", actualMsg, containsString(expectedMsg));
-        assertClientErrorNotContainsStacktrace(actualMsg, NUM_OF_MSG_LINES_PROD_MODE);
+        assertClientErrorNotContainsStacktrace(actualMsg);
     }
 
     /**

@@ -732,11 +732,9 @@ Test.Aura.Controller.ActionTest = function() {
                     getContext: function () {
                         return Test.Stubs.Aura.GetContext();
                     },
-                    assert: function (param) {
-                    },
-                    auraError:Aura.Errors.AuraError,
-                    warning: function () {
-                    },
+                    assert: function (param) {},
+                    auraError:function() {},
+                    warning: function () {},
                     get: function (actDesc) {
                         return {
                             setStorable: function () {

@@ -17,28 +17,39 @@ Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
 Test.Aura.AuraFriendlyErrorTest = function() {
-    var Aura = {Errors: {}};
+    var _AuraError;
+    var _AuraFriendlyError;
+    var _StackFrame;
+    var _ErrorStackParser;
 
     Mocks.GetMocks(Object.Global(), {
-        "Aura": Aura,
-        "AuraError": function(){},
-        "AuraFriendlyError": function(){},
-        "window": {}
+        "Aura": {Errors: {}},
     })(function() {
-        [Import("aura-impl/src/main/resources/aura/AuraError.js"),
-         Import("aura-impl/src/main/resources/aura/AuraFriendlyError.js")]
+        Import("aura-impl/src/main/resources/aura/polyfill/stackframe.js");
+        Import("aura-impl/src/main/resources/aura/polyfill/error-stack-parser.js");
+        Import("aura-impl/src/main/resources/aura/AuraError.js");
+        Import("aura-impl/src/main/resources/aura/AuraFriendlyError.js");
+        _StackFrame = StackFrame;
+        _ErrorStackParser = ErrorStackParser;
+        _AuraError = AuraError;
+        _AuraFriendlyError = Aura.Errors.AuraFriendlyError;
+        delete StackFrame;
+        delete ErrorStackParser;
+        delete AuraError;
+        delete Aura.Errors.AuraFriendlyError;
     });
 
-    function mockFramework(during) {
-        var mock = {
-            "Aura": {
-                "Errors": {
-                    "AuraError": Aura.Errors.AuraError
+    function getAuraMock(during) {
+        return Mocks.GetMocks(Object.Global(), {
+            Aura: {
+                Errors: {
+                    AuraError: _AuraError,
+                    AuraFriendlyError: _AuraFriendlyError,
+                    StackFrame: _StackFrame,
+                    StackParser: _ErrorStackParser
                 }
-            },
-            "window": {}
-        };
-        return Mocks.GetMocks(Object.Global(),mock)(during);
+            }
+        })(during);
     }
 
     [Fixture]
@@ -48,7 +59,7 @@ Test.Aura.AuraFriendlyErrorTest = function() {
             var expected = "AuraFriendlyError";
             var actual;
 
-            mockFramework(function(){
+            getAuraMock(function(){
                 actual = new Aura.Errors.AuraFriendlyError().name;
             });
 
@@ -59,18 +70,17 @@ Test.Aura.AuraFriendlyErrorTest = function() {
         function IsInstanceAuraError() {
             var actual;
 
-            mockFramework(function(){
+            getAuraMock(function(){
                 actual = new Aura.Errors.AuraFriendlyError();
+                Assert.True(actual instanceof Aura.Errors.AuraError);
             });
-
-            Assert.True(actual instanceof Aura.Errors.AuraError);
         }
 
         [Fact]
         function MessageIsEmptyWhenConstructorHasNoArgument() {
             var actual;
 
-            mockFramework(function(){
+            getAuraMock(function(){
                 actual = new Aura.Errors.AuraFriendlyError().message;
             });
 
@@ -82,7 +92,7 @@ Test.Aura.AuraFriendlyErrorTest = function() {
             var expected = "test message";
             var actual;
 
-            mockFramework(function(){
+            getAuraMock(function(){
                 actual = new Aura.Errors.AuraFriendlyError(expected).message;
             });
 
@@ -97,7 +107,7 @@ Test.Aura.AuraFriendlyErrorTest = function() {
             var expected = "test message";
             var target;
 
-            mockFramework(function(){
+            getAuraMock(function(){
                 target = new Aura.Errors.AuraFriendlyError(expected);
             });
 
@@ -111,7 +121,7 @@ Test.Aura.AuraFriendlyErrorTest = function() {
             var expected = errorMsg + "\n\t" +
                     "[custom data: {\"friendly message\":\"test friendly message\"}]";
 
-            mockFramework(function(){
+            getAuraMock(function(){
                 target = new Aura.Errors.AuraFriendlyError(errorMsg);
             });
             target.data = {
@@ -128,7 +138,7 @@ Test.Aura.AuraFriendlyErrorTest = function() {
             var expected = errorMsg + "\n\t" +
                     "[custom data: {\"friendly message\":\"$A.bla@# = function(){[&|]}\"}]";
 
-            mockFramework(function(){
+            getAuraMock(function(){
                 target = new Aura.Errors.AuraFriendlyError(errorMsg);
             });
             target.data = {
@@ -146,7 +156,7 @@ Test.Aura.AuraFriendlyErrorTest = function() {
                     "[custom data: \"friendly message\"]";
             var target;
 
-            mockFramework(function(){
+            getAuraMock(function(){
                 target = new Aura.Errors.AuraFriendlyError(errorMsg);
             });
             target.data = "friendly message";
@@ -160,7 +170,7 @@ Test.Aura.AuraFriendlyErrorTest = function() {
             var expected = errorMsg + "\n\t[custom data: {}]";
             var target;
 
-            mockFramework(function(){
+            getAuraMock(function(){
                 target = new Aura.Errors.AuraFriendlyError(errorMsg);
             });
             target.data = {};
@@ -173,7 +183,7 @@ Test.Aura.AuraFriendlyErrorTest = function() {
             var expected = "\n\t[custom data: \"friendly message\"]";
             var target;
 
-            mockFramework(function(){
+            getAuraMock(function(){
                 target = new Aura.Errors.AuraFriendlyError();
             });
             target.data = "friendly message";

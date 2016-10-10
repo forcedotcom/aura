@@ -56,15 +56,10 @@ public class AbstractErrorUITestCase extends WebDriverTestCase {
     /**
      * Asserts that error message contains stacktrace.
      *
-     * Stacktraces vary greatly across browsers. We assume that if error message contains more lines
-     * than the expected message lines, then the message contains stacktrace.
-     *
      * @param message - the actual message to check if containing stacktrace.
-     * @param numOfMsgLines - the expected number of plain error message lines.
      */
-    protected void assertClientErrorContainsStacktrace(String message, int numOfMsgLines) {
-        List<String> lines = Arrays.asList(message.split("\\n"));
-        if(lines.size() <= numOfMsgLines) {
+    protected void assertClientErrorContainsStacktrace(String message) {
+        if (getText(ERROR_STACKTRACE_LOCATOR).isEmpty()) {
             fail("Error message does not contain stacktrace: " + message);
         }
     }
@@ -72,16 +67,11 @@ public class AbstractErrorUITestCase extends WebDriverTestCase {
     /**
      * Asserts that error message does not contains stacktrace.
      *
-     * Stacktraces vary greatly across browsers. We assume that if error message contains more lines
-     * than the expected message lines, then the message contains stacktrace.
-     *
      * @param message - the actual message to check if containing stacktrace.
-     * @param numOfMsgLines - the expected number of plain error message lines.
      */
-    protected void assertClientErrorNotContainsStacktrace(String message, int numOfMsgLines) {
-        List<String> lines = Arrays.asList(message.split("\\n"));
-        if(lines.size() > numOfMsgLines) {
+    protected void assertClientErrorNotContainsStacktrace(String message) {
+        if (!getText(ERROR_STACKTRACE_LOCATOR).isEmpty()) {
             fail("Error message contains stacktrace: " + message);
-    }
+        }
     }
 }

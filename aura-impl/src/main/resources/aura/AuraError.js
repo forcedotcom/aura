@@ -25,6 +25,7 @@ function AuraError() {
     this.name       = "AuraError";
     this.message    = "";
     this.stackTrace = "";
+    this.stackFrames = null;
     this.severity   = "";
 
     // the component that throws the error
@@ -79,8 +80,8 @@ function AuraError() {
     };
 
     function AuraErrorInternal(message, innerError, severity) {
-        function getStackTrace(e) {
-            var stack;
+        /* parse error to create stack frames */
+        function getStackFrames(e) {
             var remove = 0;
             if (!e || !e.stack) {
                 try {
@@ -90,25 +91,18 @@ function AuraError() {
                     remove += 3;
                 }
             }
-            if (e) {
-                stack = e.stack;
-            }
 
-            // Chrome adds the error message to the beginning of the stacktrace. Strip that we only want the the actual stack.
-            var chromeStart = e.name + ": " + e.message;
-            if (stack && stack.indexOf(chromeStart) === 0) {
-                stack = stack.substring(chromeStart.length + 1);
-            }
-            if (stack) {
-                var ret = stack.replace(/(?:\n@:0)?\s+$/m, '');
-                ret = ret.replace(new RegExp('^\\(', 'gm'), '{anonymous}(');
-                ret = ret.split("\n");
-                if (remove !== 0) {
-                    ret.splice(0,remove);
-                }
-                return ret.join('\n');
-            }
-            return null;
+            return Aura.Errors.StackParser.parse(e).slice(remove);
+        }
+
+        /* analyze stack frames to create meaningful trace */
+        function getStackTrace(frames) {
+            var filtered = frames.filter(function(frame) {
+                return !frame.fileName || frame.fileName.match(/aura_[^\.]+\.js$/gi) === null;
+            });
+
+            // if all stack frames are from framework, we still want to keep the trace.
+            return filtered.length > 0 ? filtered.join('\n') : frames.join('\n');
         }
 
         if (message == null) {
@@ -117,7 +111,8 @@ function AuraError() {
 
         this.name = innerError ? innerError.name : this.name;
         this.message = message + (innerError ? " [" + (innerError.message || innerError.toString()) + "]" : "");
-        this.stackTrace = getStackTrace(innerError);
+        this.stackFrames = getStackFrames(innerError);
+        this.stackTrace = getStackTrace(this.stackFrames);
         this.id = MurmurHash3.hashString(this.stackTrace.replace(/https?:\/\/[^\/]*\//gi, ""));
         this.severity = innerError ? (innerError.severity || severity) : severity;
     }

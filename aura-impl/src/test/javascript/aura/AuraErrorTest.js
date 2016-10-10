@@ -17,17 +17,36 @@ Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
 Test.Aura.AuraErrorTest = function() {
-    var Aura = {Errors: {}};
+    var _AuraError;
+    var _StackFrame;
+    var _ErrorStackParser;
 
     Mocks.GetMocks(Object.Global(), {
-        "Aura": Aura,
-        "AuraError": function(){}
+        "Aura": {Errors: {}},
     })(function() {
-        [Import("aura-impl/src/main/resources/aura/AuraError.js")]
+        Import("aura-impl/src/main/resources/aura/polyfill/stackframe.js");
+        Import("aura-impl/src/main/resources/aura/polyfill/error-stack-parser.js");
+        Import("aura-impl/src/main/resources/aura/AuraError.js");
+        _StackFrame = StackFrame;
+        _ErrorStackParser = ErrorStackParser;
+        _AuraError = AuraError;
+        delete StackFrame;
+        delete ErrorStackParser;
+        delete AuraError;
     });
 
-    var windowMock=Test.Mocks.NeededMocks.getWindowMock();
-    
+    function getAuraMock(during) {
+        return Mocks.GetMocks(Object.Global(), {
+            Aura: {
+                Errors: {
+                    AuraError: _AuraError,
+                    StackFrame: _StackFrame,
+                    StackParser: _ErrorStackParser
+                }
+            }
+        })(during);
+    }
+
     [Fixture]
     function Construct() {
         [Fact]
@@ -35,7 +54,7 @@ Test.Aura.AuraErrorTest = function() {
             var actual;
             var expected = "AuraError";
 
-            windowMock(function() {
+            getAuraMock(function() {
                 actual = new Aura.Errors.AuraError().name;
             });
 
@@ -48,7 +67,7 @@ Test.Aura.AuraErrorTest = function() {
             var innerError = new TypeError();
             var expected = innerError.name;
 
-            windowMock(function() {
+            getAuraMock(function() {
                 actual = new Aura.Errors.AuraError(null, innerError).name;
             });
 
@@ -59,7 +78,7 @@ Test.Aura.AuraErrorTest = function() {
         function ReturnsEmptyMessageDefault() {//when pass in no message nor innerError, we set message to empty
             var actual;
 
-            windowMock(function() {
+            getAuraMock(function() {
                 actual = new Aura.Errors.AuraError().message;
             });
 
@@ -71,7 +90,7 @@ Test.Aura.AuraErrorTest = function() {
             var actual;
             var expected = "test message";
 
-            windowMock(function() {
+            getAuraMock(function() {
                 actual = new Aura.Errors.AuraError(expected).message;
             });
 
@@ -85,7 +104,7 @@ Test.Aura.AuraErrorTest = function() {
             var message = "from ctor";
             var expected = message + " [" + innerError.toString() + "]";
 
-            windowMock(function() {
+            getAuraMock(function() {
                 actual = new Aura.Errors.AuraError(message, innerError).message;
             });
 
@@ -96,29 +115,11 @@ Test.Aura.AuraErrorTest = function() {
         function ReturnsStackTraceDefault() {//no innerError, we create a new Error("foo"), and use its stackTrace
             var actual;
 
-            windowMock(function() {
+            getAuraMock(function() {
                 actual = new Aura.Errors.AuraError();
             });
 
             Assert.NotNull(actual.stackTrace);//make sure stackTrace is not null
-        }
-        
-        [Fact]
-        function ReturnsStackTraceChromeStartGetStripOff() {//make sure we strip off the name:message Chrome would add to the stackTrace
-        	var actual;
-            var innerError = new Error();
-            innerError.message = "Error from app client controller";
-            innerError.stack = "Error: Error from app client controller\n\
-    at throwErrorFromClientController (http://localhost:9090/components/auratest/errorHandlingApp.js:42:15)\n\
-    at Action.$runDeprecated$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8469:36)";
-            var expected = "    at throwErrorFromClientController (http://localhost:9090/components/auratest/errorHandlingApp.js:42:15)\n\
-    at Action.$runDeprecated$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8469:36)";
-            
-            windowMock(function() {
-                actual = new Aura.Errors.AuraError(null, innerError).stackTrace;
-            });
-
-            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -126,7 +127,7 @@ Test.Aura.AuraErrorTest = function() {
             var actual;
             var expected = "FATAL";
 
-            windowMock(function() {
+            getAuraMock(function() {
                 actual = new Aura.Errors.AuraError(null, null, expected).severity;
             });
 
@@ -137,7 +138,7 @@ Test.Aura.AuraErrorTest = function() {
         function ReturnsId() {
             var actual;
 
-            windowMock(function() {
+            getAuraMock(function() {
                 actual = new Aura.Errors.AuraError().id;
             });
 
@@ -153,7 +154,7 @@ Test.Aura.AuraErrorTest = function() {
             //innerError.message = "innerErrorMessage";
             var expected = "SomeMessage";
             
-            windowMock(function() {
+            getAuraMock(function() {
                 actual = new Aura.Errors.AuraError("SomeMessage", innerError).message;
             });
 
@@ -176,15 +177,41 @@ Test.Aura.AuraErrorTest = function() {
     at Aura.$Event$.$Event$.$fire$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8128:6)\n\
     at Object.catchAndFireEvent (http://localhost:9090/components/ui/button.js:90:33)\n\
     at press (http://localhost:9090/components/ui/button.js:34:16)";
-            var expected = -811461341;
+            var expected = 68189688;
 
-            windowMock(function() {
+            getAuraMock(function() {
                 actual = new Aura.Errors.AuraError(null, innerError).id;
             });
 
             Assert.Equal(expected, actual);
         }
 
+        [Fact]
+        function ReturnsNoFrameworkStackTrace() {
+            var actual;
+            var innerError = new Error();
+            innerError.message = "Error from app client controller";
+            innerError.stack = "Error: Error from app client controller\n\
+    at throwErrorFromClientController (http://localhost:9090/components/auratest/errorHandlingApp.js:42:15)\n\
+    at Action.$runDeprecated$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8469:36)\n\
+    at Object.Component$getActionCaller [as $handler$] (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:6695:20)\n\
+    at Aura.$Event$.$Event$.$executeHandlerIterator$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8100:15)\n\
+    at Aura.$Event$.$Event$.$executeHandlers$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8078:8)\n\
+    at http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8130:10\n\
+    at AuraInstance.$run$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:18350:12)\n\
+    at Aura.$Event$.$Event$.$fire$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8128:6)\n\
+    at Object.catchAndFireEvent (http://localhost:9090/components/ui/button.js:90:33)\n\
+    at press (http://localhost:9090/components/ui/button.js:34:16)";
+            var expected = "throwErrorFromClientController()@http://localhost:9090/components/auratest/errorHandlingApp.js:42:15\n\
+Object.catchAndFireEvent()@http://localhost:9090/components/ui/button.js:90:33\n\
+press()@http://localhost:9090/components/ui/button.js:34:16";
+
+            getAuraMock(function() {
+                actual = new Aura.Errors.AuraError(null, innerError).stackTrace;
+            });
+
+            Assert.Equal(expected, actual);
+        }
 
         [Fact]
         function ReturnsInnerErrorSeverity() {
@@ -193,19 +220,19 @@ Test.Aura.AuraErrorTest = function() {
             innerError.severity = "TEST";
             var expected = innerError.severity;
 
-            windowMock(function() {
+            getAuraMock(function() {
                 actual = new Aura.Errors.AuraError(null, innerError).severity;
             });
 
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         function ReturnsHandled() {//handled is set to false
             var actual;
             var expected = false;
 
-            windowMock(function() {
+            getAuraMock(function() {
                 actual = new Aura.Errors.AuraError().handled;
             });
 
@@ -217,7 +244,7 @@ Test.Aura.AuraErrorTest = function() {
             var actual;
             var expected = false;
 
-            windowMock(function() {
+            getAuraMock(function() {
                 actual = new Aura.Errors.AuraError().reported;
             });
 
@@ -232,7 +259,7 @@ Test.Aura.AuraErrorTest = function() {
             var expected = "test message";
             var target;
 
-            windowMock(function(){
+            getAuraMock(function(){
                 target = new Aura.Errors.AuraError(expected);
             });
 
@@ -243,7 +270,7 @@ Test.Aura.AuraErrorTest = function() {
         [Fact]
         function ReturnsEmptyStringWhenMessageIsUndefined() {
             var target;
-            windowMock(function(){
+            getAuraMock(function(){
                 target = new Aura.Errors.AuraError();
             });
 			Assert.Equal('', target.toString());

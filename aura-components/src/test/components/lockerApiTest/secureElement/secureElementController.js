@@ -5,10 +5,13 @@
         var locker = $A.lockerService.create(null, "the secret is silence");
         var secureWindow = locker["$envRec"];
 
-        helper.tagNames.forEach(function(tagName) {
-            helper.utils.tester.testSystem(window.document.createElement(tagName));
+        function test(tagName) {
+        	var ns = this && this.namespace;
+        	var raw = ns ? document.createElementNS(ns, tagName) : document.createElement(tagName);
+            helper.utils.tester.testSystem(raw);
             
-            var se = secureWindow.document.createElement(tagName);
+            var sdoc = secureWindow.document;
+            var se = ns ? sdoc.createElementNS(ns, tagName) : sdoc.createElement(tagName);
             
             // We need to insure that iframe is added to the document because contentWindow is null for iframe elements not in a live document
             if (tagName === "IFRAME") {
@@ -16,8 +19,11 @@
 	            secureWindow.document.body.appendChild(se);
             }
             
-            helper.utils.tester.testSecure(se);
-        });
+            helper.utils.tester.testSecure(se, raw);
+        }
+        
+        helper.tagNames.forEach(test);
+        helper.svgTagNames.forEach(test, { namespace: "http://www.w3.org/2000/svg" });
 
         helper.utils.tester.showResults(cmp);
     }

@@ -284,12 +284,7 @@ function SecureElement(el, key) {
         }
 
         SecureElement.createEventTargetMethodsStateless(tagNameSpecificConfig, prototype);
-
-        // DCHASMAN TODO Remove this - needs to be into the shape metadata!!! Special handling for SVG elements
-        if ("getBBox" in el && el.namespaceURI === "http://www.w3.org/2000/svg") {
-        	tagNameSpecificConfig["getBBox"] = SecureObject.createFilteredMethodStateless("getBBox", prototype);
-        }
-
+        
         Object.defineProperties(prototype, tagNameSpecificConfig);
 
         Object.freeze(prototype);
@@ -1116,6 +1111,74 @@ SecureElement.metadata = {
 	        "translate":                      DEFAULT,
 	        "webkitdropzone":                 DEFAULT
 	    },
+	    "SVGElement": {
+	    	"blur":							  FUNCTION,
+	    	"focus": 					      FUNCTION,
+	    	"getBBox": 					      FUNCTION,
+	    	"ownerSVGElement": 				  SKIP_OPAQUE,
+	    	"onabort":                     	  EVENT,
+	    	"onblur":                         EVENT,
+	    	"oncancel":                       EVENT,
+	    	"oncanplay":                      EVENT,
+	    	"oncanplaythrough":               EVENT,
+	    	"onchange":                       EVENT,
+	    	"onclick":                        EVENT,
+	    	"onclose":                        EVENT,
+	    	"oncontextmenu":                  EVENT,
+	    	"oncuechange":                    EVENT,
+	    	"ondblclick":                     EVENT,
+	    	"ondrag":                         EVENT,
+	    	"ondragend":                      EVENT,
+	    	"ondragenter":                    EVENT,
+	    	"ondragleave":                    EVENT,
+	    	"ondragover":                     EVENT,
+	    	"ondragstart":                    EVENT,
+	    	"ondrop":                         EVENT,
+	    	"ondurationchange":               EVENT,
+	    	"onemptied":                      EVENT,
+	    	"onended":                        EVENT,
+	    	"onerror":                        EVENT,
+	    	"onfocus":                        EVENT,
+	    	"oninput":                        EVENT,
+	    	"oninvalid":                      EVENT,
+	    	"onkeydown":                      EVENT,
+	    	"onkeypress":                     EVENT,
+	    	"onkeyup":                        EVENT,
+	    	"onload":                         EVENT,
+	    	"onloadeddata":                   EVENT,
+	    	"onloadedmetadata":               EVENT,
+	    	"onloadstart":                    EVENT,
+	    	"onmousedown":                    EVENT,
+	    	"onmouseenter":                   EVENT,
+	    	"onmouseleave":                   EVENT,
+	    	"onmousemove":                    EVENT,
+	    	"onmouseout":                     EVENT,
+	    	"onmouseover":                    EVENT,
+	    	"onmouseup":                      EVENT,
+	    	"onmousewheel":                   EVENT,
+	    	"onpause":                        EVENT,
+	    	"onplay":                         EVENT,
+	    	"onplaying":                      EVENT,
+	    	"onprogress":                     EVENT,
+	    	"onratechange":                   EVENT,
+	    	"onreset":                        EVENT,
+	    	"onresize":                       EVENT,
+	    	"onscroll":                       EVENT,
+	    	"onseeked":                       EVENT,
+	    	"onseeking":                      EVENT,
+	    	"onselect":                       EVENT,
+	    	"onshow":                         EVENT,
+	    	"onstalled":                      EVENT,
+	    	"onsubmit":                       EVENT,
+	    	"onsuspend":                      EVENT,
+	    	"ontimeupdate":                   EVENT,
+	    	"ontoggle":                       EVENT,
+	    	"onvolumechange":                 EVENT,
+	    	"onwaiting":                      EVENT,
+	    	"style":						  DEFAULT,
+	    	"tabIndex": 				      DEFAULT,
+	    	"viewportElement":        		  SKIP_OPAQUE
+    	},
 	    "Element": {
 	        "animate":                        FUNCTION,
 	        "attributes":                     DEFAULT,

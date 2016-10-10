@@ -569,6 +569,10 @@ function getSupportedInterfaces(o) {
 			}
 
 			interfaces.push("HTMLElement");
+		} else if (o instanceof SVGElement) {
+			interfaces.push("SVGElement");
+			
+			// DCHASMAN TODO Add all of the remaining SVG name space elements
 		}
 
 		interfaces.push("Element", "Node", "EventTarget");

@@ -6,7 +6,7 @@
         var secureWindow = locker["$envRec"];
 
         helper.utils.tester.testSystem(window);
-        helper.utils.tester.testSecure(secureWindow);
+        helper.utils.tester.testSecure(secureWindow, window);
 
         helper.utils.tester.showResults(cmp);
     }

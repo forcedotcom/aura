@@ -59,6 +59,14 @@
             script.textContent = script.text = `
                 /**  Aura Inspector Script, ties into $A.initAsync and $A.initConfig to initialize the inspector as soon as possible. **/
                 (function(){
+                    function wrap(obj, original, before, after) {/*from 204 and beyond, we no longer need this wrap*/
+                        return function() {
+                            if(before) before.apply(obj, arguments);
+                            var returnValue = original.apply(obj, arguments);
+                            if(after) after.apply(obj, arguments);
+                            return returnValue;
+                        }
+                    }
                     function notifyDevTools() {
                         window.postMessage({
                             action  : "AuraInspector:publish",
@@ -73,10 +81,27 @@
                         set: function(val) {
                             val.beforeFrameworkInit = val.beforeFrameworkInit || [];
                             val.beforeFrameworkInit.push(notifyDevTools);
-        
                             _Aura = val;
                         }
                     });
+                    var _$A;
+                    Object.defineProperty(window, "$A", {/*from 204 and beyond, we no longer need this set*/
+                        enumerable: true,
+                        configurable: true,
+                        get: function() { return _$A; },
+                        set: function(val) {
+                            if(val && val.initAsync) {
+                                val.initAsync = wrap(val, val.initAsync, notifyDevTools);
+                            }
+                            if(val && val.initConfig) {
+                                val.initConfig = wrap(val, val.initConfig, notifyDevTools);
+                            }
+                            
+                            _$A = val;
+                            
+                        }
+                    });
+                    
                 })();
             `;
             document.documentElement.appendChild(script);

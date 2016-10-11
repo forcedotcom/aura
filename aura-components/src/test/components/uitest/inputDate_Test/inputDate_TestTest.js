@@ -382,13 +382,22 @@
     	test : [ function(cmp) {
     		this.openDatePicker(cmp);
     	},function(cmp) {
-    		this.verifyAriaSelAndMove(cmp, "true", 1, 0, "aria-selected should be true for Sept 25, 2013");
+    		this.verifyAriaSelected(cmp, "true", "aria-selected should be true for Sept 25, 2013");
     	}, function(cmp) {
-    		this.verifyAriaSelAndMove(cmp, "false", 0, 1, "aria-selected should be false for Oct 25, 2013");
+    		var datePicker = cmp.find("datePickerTestCmp").find("datePicker");
+    		this.iterateCal(1, 0, datePicker.get('c.goToNextMonth'), null);
     	}, function(cmp) {
-    		this.verifyAriaSelAndMove(cmp, "false", -1, -1,"aria-selected should be false for Oct 25, 2014");
+    		this.verifyAriaSelected(cmp, "false", "aria-selected should be false for Oct 25, 2013");
     	}, function(cmp) {
-    		this.verifyAriaSelAndMove(cmp, "true", 0, 0,"aria-selected should be true for Sept 25, 2013");
+    		var datePicker = cmp.find("datePickerTestCmp").find("datePicker");
+    		this.iterateCal(0, 1, null, datePicker.get('c.goToNextYear'));
+    	}, function(cmp) {
+    		this.verifyAriaSelected(cmp, "false", "aria-selected should be false for Oct 25, 2014");
+    	}, function(cmp) {
+    		var datePicker = cmp.find("datePickerTestCmp").find("datePicker");
+    		this.iterateCal(1, 1, datePicker.get('c.goToPrevMonth'), datePicker.get('c.goToPrevYear'));
+    	}, function(cmp) {
+    		this.verifyAriaSelected(cmp, "true", "aria-selected should be true for Sept 25, 2013");
     	}]
     },
 
@@ -464,18 +473,12 @@
     /**
      * Verify the aria-selected value and then move calendar by specified month and year
      */
-    verifyAriaSelAndMove : function(cmp, expectedAriaSelected, moveMonthBy, moveYearBy, errorMsg) {
+    verifyAriaSelected : function(cmp, expectedAriaSelected, errorMsg) {
     	var grid = cmp.find("datePickerTestCmp").find("datePicker").find("grid");
     	var gridLoc = this.findDateOnGrid(grid, "25").toString();
 		
 		$A.test.addWaitForWithFailureMessage(true, function () {
 			return ($A.util.getElementAttributeValue(grid.find(gridLoc).getElement(), "aria-selected") === expectedAriaSelected);
-		}, errorMsg, function() {
-			var e = grid.get("e.updateCalendar");
-	        if (e) {
-	            e.setParams({monthChange: moveMonthBy, yearChange: moveYearBy, setFocus: false});
-	            e.fire();
-	        }
-		});    
+		}, errorMsg);    
     }
 })//eslint-disable-line semi

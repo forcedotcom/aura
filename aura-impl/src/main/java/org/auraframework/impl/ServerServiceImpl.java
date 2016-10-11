@@ -368,8 +368,9 @@ public class ServerServiceImpl implements ServerService {
 
         final String mKey = minify ? "MIN:" : "DEV:";
         final String uid = context.getUid(appDesc);
-        final String key = "JS:" + mKey + uid;
-
+        final String lockerServiceCacheBuster  = configAdapter.getLockerServiceCacheBuster();
+        final String key = "JS:" + mKey + uid + ":" + lockerServiceCacheBuster;
+                
         String cached = getAltCachedString(uid, appDesc, key,
                new Callable<String>() {
                    @Override

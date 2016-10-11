@@ -127,7 +127,15 @@
         }, function (cmp) {
             var expected = "February";
             var actual = this.getTextFromElm(datePicker);
-            $A.test.assertEquals(expected, actual, "Month year combo incorrect");
+            var self = this;
+            $A.test.addWaitForWithFailureMessage(true, function () {
+            	actual = self.getTextFromElm(datePicker);
+            	if(expected !== actual) {
+            		self.iterateCal(7, 5, datePicker.get('c.goToPrevMonth'), datePicker.get('c.goToNextYear'));
+            		return false;
+            	}
+            	return true;
+            },"Month year combo incorrect");
         }]
     },
 

@@ -683,8 +683,9 @@ AuraInstance.prototype.initAsync = function(config) {
         // Start by enabling the actions filter if relevant. populatePersistedActionsFilter() populates it,
         // called only if GVP + defs are loaded.
         $A.clientService.setupPersistedActionsFilter();
+        $A.clientService.gvpsFromStorage = context.globalValueProviders.LOADED_FROM_PERSISTENT_STORAGE; // Do not remove, used for instrumentation
 
-        if (!context.globalValueProviders.LOADED_FROM_PERSISTENT_STORAGE) {
+        if (!$A.clientService.gvpsFromStorage) {
             $A.log("Aura.initAsync: GVP not loaded from storage so not loading defs or actions either");
             initializeApp().then(undefined, reportError);
         } else {
@@ -768,10 +769,8 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
         $A.clientService.initializeClientLibraries();
         $A.localizationService.init();
 
-        Aura.bootstrapMark("createAndRenderAppInit");
         var app = $A.clientService["init"](config, token, $A.util.getElement(container));
         $A.setRoot(app);
-        Aura.bootstrapMark("createAndRenderAppReady");
 
         if (!$A.initialized) {
             $A.initialized = true;

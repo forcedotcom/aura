@@ -150,8 +150,8 @@ function AuraClientService () {
         "ckeditor" : { resourceUrl : "/auraFW/resources/{fwuid}/ckeditor/ckeditor-4.x/rel/ckeditor.js" }
     };
 
-    // TODO - what is this used for?
-    this.appCache = true;
+    // for instrumentation reporting
+    this.appCache = false;
     // whether an appcache error event has been received
     this.appCacheError = false;
 
@@ -873,6 +873,7 @@ AuraClientService.prototype.handleAppCache = function() {
     }
 
     function handleAppcacheChecking() {
+        acs.appCache = true;
         document._appcacheChecking = true;
     }
 
@@ -1159,11 +1160,15 @@ AuraClientService.prototype.init = function(config, token, container) {
         context.setTokens(rootDef.tokens);
 
         // Create Root (Application) Component
+        Aura.bootstrapMark("appCreationStart");
         var component = $A.componentService.createComponentPriv(config);
+        Aura.bootstrapMark("appCreationEnd");
 
         context.setCurrentAccess(component);
+        Aura.bootstrapMark("appRenderingStart");
         $A.renderingService.render(component, container || document.body);
         $A.renderingService.afterRender(component);
+        Aura.bootstrapMark("appRenderingEnd");
         context.releaseCurrentAccess();
 
         return component;

@@ -23,7 +23,7 @@
 Aura.Services.MetricsService = function MetricsService() {
     this.collector                 = { "default": [] };
     this.globalHandlers            = { "transactionEnd": [], "transactionsKilled": [] };
-    this.bootstrap                 = {};
+    this.bootstrap                 = { "cache" : {} };
     this.registeredPlugins         = {};
     this.pluginInstances           = {};
     this.beaconProviders           = {};
@@ -531,7 +531,7 @@ Aura.Services.MetricsService.prototype.defaultPostProcessing = function (customM
         } else if (phase === 'end' && queue[id]) {
             var mark = queue[id];
             mark["context"]  = $A.util.apply(mark["context"] || {}, customMarks[i]["context"] || {});
-            mark["duration"] = Math.floor((customMarks[i]["ts"] - mark["ts"]) * 100) / 100;
+            mark["duration"] = parseInt(customMarks[i]["ts"] - mark["ts"]);
             procesedMarks.push(mark);
             delete mark["phase"];
             delete queue[id];
@@ -815,7 +815,10 @@ Aura.Services.MetricsService.prototype.registerPlugin = function (pluginConfig) 
 Aura.Services.MetricsService.prototype.registerBeacon = function (beacon) {
     this.beaconProviders[beacon["name"] || Aura.Services.MetricsService.DEFAULT] = beacon["beacon"] || beacon;
 };
-
+/** 
+ * Summarizes perf timming request info
+ * @export 
+*/
 Aura.Services.MetricsService.prototype.summarizeResourcePerfInfo = function (r) {
     return {
         "name"         : r.name,
@@ -838,22 +841,21 @@ Aura.Services.MetricsService.prototype.summarizeResourcePerfInfo = function (r) 
 **/
 Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
     var bootstrap = this.bootstrap;
-    var pageStartTime = bootstrap["pageStartTime"];
+    var pageStartTime = this.getPageStartTime();
 
-    // We cache it after the first call
-    if (!this._cachedBootstrap) {
-        for (var m in Aura["bootstrap"]) {
-            bootstrap[m] = parseInt(Aura["bootstrap"][m], 10);
-        }
+    for (var m in Aura["bootstrap"]) {
+        bootstrap[m] = parseInt(Aura["bootstrap"][m], 10);
+    }
+    
+    bootstrap["pageStartTime"] = pageStartTime;
 
-        pageStartTime = this.getPageStartTime();
-        bootstrap["pageStartTime"] = pageStartTime;
+    if (window.performance && performance.timing && performance.navigation) {
+        // TODO: Eventually make this strings smaller to reduce payload
+        var p  = window.performance;
+        var pn = p.navigation;
+        var pt = p.timing;
 
-        if (window.performance && performance.timing && performance.navigation) {
-            // TODO: Eventually make this strings smaller to reduce payload
-            var pn = performance.navigation;
-            var pt = performance.timing;
-
+        if (!bootstrap["timming"]) {
             bootstrap["timing"] = {
                 "redirects"       : pn.redirectCount,
                 "type"            : pn.type,
@@ -878,41 +880,38 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
                 "appCache"        : pt.domainLookupStart - pt.fetchStart,
                 "redirectTime"    : pt.redirectEnd - pt.redirectStart
             };
-
-            bootstrap["cache"] = {
-                "appCache": bootstrap["timing"]["appCache"] === 0 && $A.clientService.appCache
-            };
-
-            var frameworkRequests = {
-                "requestBootstrapJs"     : "bootstrap.js",
-                "requestInlineJs"        : "inline.js",
-                "requestAppCss"          : "app.css",
-                "requestAppJs"           : "app.js",
-                "requestAuraJs"          : "/aura_"
-            };
-
-            bootstrap["allRequests"] = [];
-
-            if (performance.getEntries) {
-                $A.util.forEach(performance.getEntries(), function (resource) {
-                    if (resource.responseEnd < bootstrap["bootstrapEPT"]) {
-                        var summaryRequest = this.summarizeResourcePerfInfo(resource);
-                        bootstrap["allRequests"].push(summaryRequest);
-
-                        for (var i in frameworkRequests) {
-                            if (resource.name.indexOf(frameworkRequests[i]) !== -1) {
-                                summaryRequest.name = frameworkRequests[i]; // mutate the proccessed resource
-                                bootstrap[i] = summaryRequest;
-                                continue;
-                            }
-                        }
-                    }
-                }, this);
-            }
         }
 
-        this._cachedBootstrap = bootstrap;
-    }
+        bootstrap["cache"]["appCache"] = bootstrap["timing"]["appCache"] === 0 && $A.clientService.appCache;
+        bootstrap["cache"]["gvps"] = $A.clientService.gvpsFromStorage;
 
-    return this._cachedBootstrap;
+        var frameworkRequests = {
+            "requestBootstrapJs" : "bootstrap.js",
+            "requestInlineJs"    : "inline.js",
+            "requestAppCss"      : "app.css",
+            "requestAppJs"       : "app.js",
+            "requestAuraJs"      : "/aura_"
+        };
+
+
+        if (p.getEntries && (!bootstrap["allRequests"] || !bootstrap["allRequests"].length)) {
+            bootstrap["allRequests"] = [];
+            $A.util.forEach(p.getEntries(), function (resource) {
+                if (resource.responseEnd < bootstrap["bootstrapEPT"]) {
+                    var summaryRequest = this.summarizeResourcePerfInfo(resource);
+                    bootstrap["allRequests"].push(summaryRequest);
+
+                    for (var i in frameworkRequests) {
+                        if (resource.name.indexOf(frameworkRequests[i]) !== -1) {
+                            summaryRequest.name = frameworkRequests[i]; // mutate the proccessed resource
+                            bootstrap[i] = summaryRequest;
+                            continue;
+                        }
+                    }
+                }
+            }, this);
+        }
+    }
+       
+    return bootstrap;
 };

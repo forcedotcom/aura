@@ -172,6 +172,9 @@ function AuraClientService () {
 
     // cookie name counting consecutive reloads without fwk + app finishing boot
     this._reloadCountKey = "auraReloadCount";
+    
+    // appcache progress. is 0 if appcache is not in use; otherwise ranges from 0 to 100.
+    this.appCacheProgress = 0;
 
     // appcache progress. is 0 if appcache is not in use; otherwise ranges from 0 to 100.
     this.appCacheProgress = 0;
@@ -929,6 +932,11 @@ AuraClientService.prototype.handleAppCache = function() {
      *  if >=100 then considered done.
      */
     function showProgress(progress) {
+        if (!isFinite(progress)) {
+            return;
+        }
+
+        acs.appCacheProgress = progress;
         if (!acs.isDevMode()) {
             return;
         }
@@ -1072,6 +1080,8 @@ AuraClientService.prototype.handleAppCache = function() {
 
 /**
  * Start or extend the boot timers that monitor for progress of the bootup sequence.
+ * This is exclusively used in appcache scenarios: when an appcache error is triggered
+ * the timer is started.
  */
 AuraClientService.prototype.startBootTimers = function() {
     var that = this;
@@ -1083,7 +1093,8 @@ AuraClientService.prototype.startBootTimers = function() {
             "app.js": !!Aura["bootstrap"]["execAppJs"],
             "bootstrap.js": !!Aura["appBootstrap"] || !!Aura["appBootstrapCache"] || !!that.appBootstrap,
             "inline.js": !!Aura["inlineJsReady"] || !!Aura["bootstrap"]["execInlineJs"],
-            "libs.js": !!Aura["frameworkLibrariesReady"]
+            "libs.js": !!Aura["frameworkLibrariesReady"],
+            "appcache": that.appCacheProgress
         };
     }
 

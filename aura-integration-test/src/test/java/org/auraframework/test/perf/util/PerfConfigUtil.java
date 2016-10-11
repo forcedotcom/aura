@@ -26,7 +26,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraFiles;
 
 import java.io.BufferedReader;
@@ -147,7 +146,7 @@ public final class PerfConfigUtil {
     }
 
     @SuppressWarnings("unchecked")
-    private Set<DefDescriptor<BaseComponentDef>> getComponentDefsInNamespace(String namespace) throws QuickFixException {
+    private Set<DefDescriptor<BaseComponentDef>> getComponentDefsInNamespace(String namespace) {
         Set<DefDescriptor<BaseComponentDef>> defs = new HashSet<>();
         DefinitionService definitionService = Aura.getDefinitionService();
 

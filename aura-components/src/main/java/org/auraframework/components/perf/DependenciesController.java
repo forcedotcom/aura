@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
+import javax.inject.Inject;
+
 import org.auraframework.Aura;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
@@ -35,7 +37,6 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraFiles;
 
 import com.google.common.collect.Lists;
@@ -45,103 +46,99 @@ import com.google.gson.Gson;
 
 @ServiceComponent
 public class DependenciesController implements Controller {
+    @Inject
+    DefinitionService definitionService;
 
     @AuraEnabled
     public Set<String> getAllDescriptors() {
-    	try {
-    		DefinitionService definitionService = Aura.getDefinitionService();
-    		
-			// Note: DescriptorFilter with all DefTypes does not seem to work, so doing all separate
-    		DescriptorFilter matcher = new DescriptorFilter("markup://*:*", DefType.COMPONENT);
-			Set<DefDescriptor<?>> descriptors = definitionService.find(matcher);
+        // Note: DescriptorFilter with all DefTypes does not seem to work, so doing all separate
+        DescriptorFilter matcher = new DescriptorFilter("markup://*:*", DefType.COMPONENT);
+        Set<DefDescriptor<?>> descriptors = definitionService.find(matcher);
 
-			matcher = new DescriptorFilter("markup://*:*", DefType.APPLICATION);
-			descriptors.addAll(definitionService.find(matcher));
-			
-			matcher = new DescriptorFilter("markup://*:*", DefType.LIBRARY);
-			descriptors.addAll(definitionService.find(matcher));
-			
-			Set<String> list = new HashSet<>();
-			for (DefDescriptor<?> descriptor : descriptors) {
-				list.add(descriptor.toString() + "@" + descriptor.getDefType());
-			}
-			
-			return list;
-		} catch (QuickFixException e) {
-			return null;
-		}
+        matcher = new DescriptorFilter("markup://*:*", DefType.APPLICATION);
+        descriptors.addAll(definitionService.find(matcher));
+        
+        matcher = new DescriptorFilter("markup://*:*", DefType.LIBRARY);
+        descriptors.addAll(definitionService.find(matcher));
+        
+        Set<String> list = new HashSet<>();
+        for (DefDescriptor<?> descriptor : descriptors) {
+            list.add(descriptor.toString() + "@" + descriptor.getDefType());
+        }
+        
+        return list;
     }
     
     @AuraEnabled
     public Map<String, Object> getDependencies(@Key("component")String component) {
-    	AuraContext context = Aura.getContextService().getCurrentContext();
-		DefDescriptor<?> descriptor;
-		SortedSet<DefDescriptor<?>> sorted;
-		MasterDefRegistry mdr = context.getDefRegistry();
-		Map<String, Object> dependencies = Maps.newHashMap();
-		ArrayList<String> list = Lists.newArrayList();
-		String uid;
-		
-		int pos = component.indexOf("@");
-		
-		if (pos != -1) {
-			component = component.substring(0, pos);
-		}
-		
-    	try {
-			Definition def = Aura.getDefinitionService().getDefinition(component, DefType.LIBRARY, DefType.COMPONENT, DefType.APPLICATION);
-			if (def == null) {
-				return null;
-			}
-			
-			descriptor = def.getDescriptor();
-			uid = mdr.getUid(null, descriptor);
-			sorted = Sets.newTreeSet(mdr.getDependencies(uid));
-			
-			for (DefDescriptor<?> dep : sorted) {
-				def = mdr.getDef(dep);
-				DefType type = dep.getDefType();
-				
-				if (type != DefType.EVENT && type != DefType.COMPONENT && type != DefType.INTERFACE && type != DefType.LIBRARY || 
-				    (def.getDescriptor().getNamespace().equals("aura") || def.getDescriptor().getNamespace().equals("auradev"))) {
-					continue;
-				}
-				
-				list.add(dep.toString() + "@" + dep.getDefType());
-			}
-			
-		dependencies.put("dependencies", list);
-		dependencies.put("def", component);
-		
-		return dependencies;	
-			
-		} catch (Throwable t) {
-			return null;
-		}
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        DefDescriptor<?> descriptor;
+        SortedSet<DefDescriptor<?>> sorted;
+        MasterDefRegistry mdr = context.getDefRegistry();
+        Map<String, Object> dependencies = Maps.newHashMap();
+        ArrayList<String> list = Lists.newArrayList();
+        String uid;
+        
+        int pos = component.indexOf("@");
+        
+        if (pos != -1) {
+            component = component.substring(0, pos);
+        }
+        
+        try {
+            Definition def = definitionService.getDefinition(component, DefType.LIBRARY, DefType.COMPONENT, DefType.APPLICATION);
+            if (def == null) {
+                return null;
+            }
+            
+            descriptor = def.getDescriptor();
+            uid = mdr.getUid(null, descriptor);
+            sorted = Sets.newTreeSet(mdr.getDependencies(uid));
+            
+            for (DefDescriptor<?> dep : sorted) {
+                def = mdr.getDef(dep);
+                DefType type = dep.getDefType();
+                
+                if (type != DefType.EVENT && type != DefType.COMPONENT && type != DefType.INTERFACE && type != DefType.LIBRARY || 
+                    (def.getDescriptor().getNamespace().equals("aura") || def.getDescriptor().getNamespace().equals("auradev"))) {
+                    continue;
+                }
+                
+                list.add(dep.toString() + "@" + dep.getDefType());
+            }
+            
+        dependencies.put("dependencies", list);
+        dependencies.put("def", component);
+        
+        return dependencies;    
+            
+        } catch (Throwable t) {
+            return null;
+        }
     }
     @AuraEnabled
     public Boolean writeAllDependencies(@Key("file")String file) {
-    	Set<String> descriptors = getAllDescriptors();
-    	Map<String, Object> dependencies = Maps.newHashMap();
+        Set<String> descriptors = getAllDescriptors();
+        Map<String, Object> dependencies = Maps.newHashMap();
    
-	    	for (String rawDescriptor : descriptors) {
-	    		Map<String, Object> list = getDependencies(rawDescriptor);
-	    		if (list != null) {
-	    			list.remove("def");
-	    		}
-	    		dependencies.put(rawDescriptor, list);
-	    	}
+            for (String rawDescriptor : descriptors) {
+                Map<String, Object> list = getDependencies(rawDescriptor);
+                if (list != null) {
+                    list.remove("def");
+                }
+                dependencies.put(rawDescriptor, list);
+            }
 
-	    	Gson gson = new Gson(); 
-	    	String json = gson.toJson(dependencies);
-	    	String path = AuraFiles.Core.getPath() + "/aura-resources/src/main/resources/aura/resources/";
-	    	try(PrintWriter out = new PrintWriter( path + file )) {
-	    	    out.println(json);
-	    	} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+            Gson gson = new Gson(); 
+            String json = gson.toJson(dependencies);
+            String path = AuraFiles.Core.getPath() + "/aura-resources/src/main/resources/aura/resources/";
+            try(PrintWriter out = new PrintWriter( path + file )) {
+                out.println(json);
+            } catch (FileNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 
-    	return true;
+        return true;
     }
 }

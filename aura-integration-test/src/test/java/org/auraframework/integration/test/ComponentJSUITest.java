@@ -117,13 +117,13 @@ public class ComponentJSUITest extends TestSuite {
                                 subSuite = new TestSuite(testNamespace);
                                 subSuites.put(testNamespace, subSuite);
                                 addTest(subSuite);
-                    }
+                            }
                             subSuite.addTest(test);
-                }
-            }
+                        }
+                    }
                 } catch (Throwable t) {
                     addTest(new FailTestCase("Failed to generate tests for namespace: " + namespace, t));
-        }
+                }
             }
         } finally {
             if (contextStarted) {

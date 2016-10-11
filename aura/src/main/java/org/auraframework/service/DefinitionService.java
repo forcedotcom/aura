@@ -165,9 +165,9 @@ public interface DefinitionService extends AuraService {
      * Does not compile the definitions if they were not already compiled, and
      * does not guarantee that they can compile.
      *
-     * @throws QuickFixException
+     * @param matcher the matcher to find descriptors
      */
-    Set<DefDescriptor<?>> find(DescriptorFilter matcher) throws QuickFixException;
+    Set<DefDescriptor<?>> find(DescriptorFilter matcher);
 
     /**
      * update the set of loaded descriptors, and validate.

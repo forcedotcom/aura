@@ -60,8 +60,7 @@ public class DocsTopicsModel implements ModelInstance {
         tests = makeNodes("js", DefType.TESTSUITE);
     }
 
-    private <E extends Definition> List<Node> makeNodes(String prefix, DefType type) throws QuickFixException {
-        // if (!Config.isProduction()) {
+    private <E extends Definition> List<Node> makeNodes(String prefix, DefType type) {
         List<Node> ret = Lists.newArrayList();
 
         Map<String, Node> namespaceNodes = Maps.newHashMap();
@@ -80,9 +79,6 @@ public class DocsTopicsModel implements ModelInstance {
         }
         Collections.sort(ret);
         return ret;
-        // } else {
-        // return null;
-        // }
     }
 
     @AuraEnabled

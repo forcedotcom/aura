@@ -81,18 +81,27 @@
     },
 
     testOpen_HttpsUrl: {
+        // TODO(W-3407050): IE11 returns custom objects for window.open and similar APIs and should be
+        //                  conditionally disabled on the client.
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
         test: function(cmp) {
             cmp.testOpen_HttpsUrl();
         }
     },
 
     testOpen_HttpUrl: {
+        // TODO(W-3407050): IE11 returns custom objects for window.open and similar APIs and should be
+        //                  conditionally disabled on the client.
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
         test: function(cmp) {
             cmp.testOpen_HttpUrl();
         }
     },
 
     testOpen_RelativeUrl:{
+        // TODO(W-3407050): IE11 returns custom objects for window.open and similar APIs and should be
+        //                  conditionally disabled on the client.
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
         test: function(cmp) {
             cmp.testOpen_RelativeUrl();
         }

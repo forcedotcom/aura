@@ -106,7 +106,10 @@ function LockerService() {
 	    "Promise",
 
 	    // Misc
-	    "Intl"
+	    "Intl",
+
+	    // passthroughs on document also available on window
+	    "location"
 	];
 
 	var nsKeys = {};

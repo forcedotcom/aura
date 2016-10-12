@@ -86,10 +86,12 @@ var ls_getKey,
      * Moved from $A.lockerService.trust().
      */
     ls_trust = function(from, thing) {
-        var key = keychain.get(from);
-        if (key) {
-            ls_setKey(thing, key);
-        }
+    	if (from) {
+	        var key = keychain.get(from);
+	        if (key) {
+	            ls_setKey(thing, key);
+	        }
+    	}
     };
 
     /**

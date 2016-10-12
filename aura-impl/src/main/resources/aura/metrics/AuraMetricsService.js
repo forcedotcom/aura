@@ -380,7 +380,8 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
                 }
 
                 if (parsedMarks && parsedMarks.length) {
-                    parsedTransaction["marks"][pluginName] = parsedMarks;
+                    parsedTransaction["marks"][pluginName] = parsedTransaction["marks"][pluginName] || [];
+                    parsedTransaction["marks"][pluginName].push.apply(parsedTransaction["marks"][pluginName], parsedMarks);
                 }
             }
         }

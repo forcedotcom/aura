@@ -492,7 +492,6 @@ function getSupportedInterfaces(o) {
 				} else if (o instanceof HTMLVideoElement) {
 					interfaces.push("HTMLVideoElement");
 				}
-
 				interfaces.push("HTMLMediaElement");
 			} else if (o instanceof HTMLBaseElement) {
 				interfaces.push("HTMLBaseElement");
@@ -540,7 +539,7 @@ function getSupportedInterfaces(o) {
 				interfaces.push("HTMLOptGroupElement");
 			} else if (o instanceof HTMLOptionElement) {
 				interfaces.push("HTMLOptionElement");
-			} else if (o instanceof HTMLOutputElement) {
+			} else if (typeof HTMLOutputElement !== "undefined" && o instanceof HTMLOutputElement) {
 				interfaces.push("HTMLOutputElement");
 			} else if (o instanceof HTMLParamElement) {
 				interfaces.push("HTMLParamElement");

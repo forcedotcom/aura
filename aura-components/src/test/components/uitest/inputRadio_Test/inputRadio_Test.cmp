@@ -39,5 +39,4 @@
 
     myValueString: {!v.myValueString}<br/>
     myValueBoolean: {!v.myValueBoolean}<br/>
-
  </aura:component>

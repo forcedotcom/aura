@@ -28,7 +28,8 @@
     	   value="{!v.text}"
     	   checked="{!v.value}"
     	   disabled="{!v.disabled}"
-    	   aria-describedby="{!v.ariaDescribedBy}"/>
+    	   aria-describedby="{!v.ariaDescribedBy}"
+    	   onblur="{!c.handleOnBlur}"/>
 
 </aura:component>
 

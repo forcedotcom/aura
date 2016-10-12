@@ -178,7 +178,7 @@
         testUtils.assertUndefined(this, "'this' in controller method should be undefined");
     },
     
-    testCtorAannotation: function(cmp) {
+    testCtorAnnotation: function(cmp) {
     	var message = "Hi from LS";
     	var text = new Text(message);
 

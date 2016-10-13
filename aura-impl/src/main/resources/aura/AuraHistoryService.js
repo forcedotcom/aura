@@ -136,7 +136,7 @@ AuraHistoryService.prototype.get = function() {
     // Windows phone doesn't save the hash after navigating backwards.
     // So get it from the history state.
     //
-    var token = this.getLocationHash() || (window.history["state"] && window.history["state"]["hash"]) || "";
+    var token = this.getLocationHash() || this.getHistoryState() || "";
     return this.parseLocation(token);
 };
 
@@ -288,7 +288,8 @@ AuraHistoryService.prototype.getEvent = function(){
  * @private
  */
 AuraHistoryService.prototype.changeHandler = function(){
-    var loc = this.getLocationHash() || (history["state"] && history["state"]["hash"]);
+	
+	var loc = this.getLocationHash() || this.getHistoryState();
     var context = $A.getContext();
 
     // The event should be accessible in the context of the application.
@@ -384,6 +385,19 @@ AuraHistoryService.prototype.getLocationHash = function() {
     }
 
     return href.substr(hashPosition);
+};
+
+/**
+ * @private
+ */
+AuraHistoryService.prototype.getHistoryState = function(){
+	var historyState = null;
+	try {
+		historyState = window.history["state"] && window.history["state"]["hash"];
+	} catch (e) {
+		// continue regardless of error
+	}
+	return historyState;
 };
 
 Aura.Services.AuraHistoryService = AuraHistoryService;

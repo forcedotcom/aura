@@ -733,11 +733,10 @@ Component.prototype.destroy = function(async) {
         var globalId = this.globalId;
 
         // Track some useful debugging information for InvalidComponent's use
-        // #if {"excludeModes" : ["PRODUCTION"]}
         this._globalId = globalId;
         this._componentDef = componentDef;
         if(!this._description){this.toString();}
-        // #end
+
         if (this.attributeSet) {
             var expressions=this.attributeSet.destroy(async);
             for(var x in expressions){

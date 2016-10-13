@@ -51,6 +51,14 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
 				return o;
 			}
 		},
+		localStorage: {
+			enumerable: true,
+			value: SecureStorage(win.localStorage, "LOCAL", key)
+		},
+		sessionStorage: {
+			enumerable: true,
+			value: SecureStorage(win.sessionStorage, "SESSION", key)
+		},
 		navigator: {
 			enumerable: true,
 			value: SecureNavigator(win.navigator, key)
@@ -542,7 +550,7 @@ SecureWindow.metadata = {
             "TextTrackCue":                         FUNCTION,
             "TextTrackCueList":                     FUNCTION,
             "TextTrackList":                        FUNCTION,
-            "TimeRanges":                           FUNCTION,
+            "TimeRanges":                           RAW,
             "Touch":                                FUNCTION,
             "TouchEvent":                           FUNCTION,
             "TouchList":                            FUNCTION,
@@ -632,6 +640,7 @@ SecureWindow.metadata = {
             "isNaN":                                FUNCTION,
             "isSecureContext":                      DEFAULT,
             "length":                               DEFAULT,
+            "localStorage":                         DEFAULT,
             "location":                             DEFAULT,
             "locationbar":                          DEFAULT,
             "matchMedia":                           FUNCTION,
@@ -672,7 +681,7 @@ SecureWindow.metadata = {
             "ondurationchange":                     EVENT,
             "onemptied":                            EVENT,
             "onended":                              EVENT,
-            "onerror":                              FUNCTION,
+            "onerror":                              EVENT,
             "onfocus":                              EVENT,
             "onhashchange":                         EVENT,
             "oninput":                              EVENT,
@@ -758,6 +767,7 @@ SecureWindow.metadata = {
             "scrollX":                              DEFAULT,
             "scrollY":                              DEFAULT,
             "scrollbars":                           DEFAULT,
+            "sessionStorage":                       DEFAULT,
             "self":                                 DEFAULT,
             "setInterval":                          FUNCTION,
             "setTimeout":                           FUNCTION,

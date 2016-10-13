@@ -31,7 +31,9 @@ Test.Aura.Locker.SecureObjectTest = function() {
         document: {},
         window: {},
         File: function(){},
-        FileList: function(){}
+        FileList: function(){},
+        CSSStyleDeclaration: function(){},
+        TimeRanges: function(){}
     });
 
     // remove globals

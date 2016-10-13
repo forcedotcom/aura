@@ -27,6 +27,7 @@ function LockerService() {
     //#include aura.locker.SecureScriptElement
     //#include aura.locker.SecureDocument
     //#include aura.locker.SecureAura
+    //#include aura.locker.SecureStorage
     //#include aura.locker.SecureNavigator
     //#include aura.locker.SecureXMLHttpRequest
     //#include aura.locker.SecureWindow
@@ -147,7 +148,7 @@ function LockerService() {
             var key = nsKeys[namespace];
             if (!key) {
                 key = nsKeys[namespace] = Object.freeze({
-                    namespace: namespace
+                    "namespace": namespace
                 });
             }
 

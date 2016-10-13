@@ -73,8 +73,10 @@
     	}
     	params.index = index;
     	
-    	// This is necessary to continue bubbling because events stop bubbling
-    	// if a handler is directly attached to the source component by a parent component.
+    	// Prevent old event from firing
+    	event.stopPropagation();
+    	
+    	// Pass new event with updated parameters
     	cmp.getEvent("gridAction").setParams(params).fire();
     },
 

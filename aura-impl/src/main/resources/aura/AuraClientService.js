@@ -150,9 +150,6 @@ function AuraClientService () {
         "ckeditor" : { resourceUrl : "/auraFW/resources/{fwuid}/ckeditor/ckeditor-4.x/rel/ckeditor.js" }
     };
 
-    // TODO - remove this, used by instrumentation reporting
-    this.appCache = false;
-
     // whether an appcache error event has been received
     this.appCacheError = false;
 
@@ -172,7 +169,7 @@ function AuraClientService () {
 
     // cookie name counting consecutive reloads without fwk + app finishing boot
     this._reloadCountKey = "auraReloadCount";
-    
+
     // appcache progress. is 0 if appcache is not in use; otherwise ranges from 0 to 100.
     this.appCacheProgress = 0;
 

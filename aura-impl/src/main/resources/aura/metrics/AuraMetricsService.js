@@ -186,7 +186,7 @@ Aura.Services.MetricsService.prototype.emitBootstrapTransaction = function () {
                 transaction["context"] = {
                     "eventType"   : "bootstrap",
                     "eventSource" : "framework",
-                    "attributes"  : bootstrap 
+                    "attributes"  : bootstrap
                 };
 
                 transaction["ts"] = bootstrapStart;
@@ -361,8 +361,8 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
                 "context"       : transactionCfg["context"] || {},
                 "unixTS"        : !Aura.Services.MetricsService.PERFTIME // If the browser does not support performance API, all transactions will be Unix Timestamps
             };
-        
-        // Walk over the collected marks to scope the ones relevant for this transaction 
+
+        // Walk over the collected marks to scope the ones relevant for this transaction
         // (Between time tart and end)
         for (var plugin in this.collector) {
             var instance = this.pluginInstances[plugin];
@@ -816,9 +816,9 @@ Aura.Services.MetricsService.prototype.registerPlugin = function (pluginConfig) 
 Aura.Services.MetricsService.prototype.registerBeacon = function (beacon) {
     this.beaconProviders[beacon["name"] || Aura.Services.MetricsService.DEFAULT] = beacon["beacon"] || beacon;
 };
-/** 
+/**
  * Summarizes perf timming request info
- * @export 
+ * @export
 */
 Aura.Services.MetricsService.prototype.summarizeResourcePerfInfo = function (r) {
     return {
@@ -847,7 +847,7 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
     for (var m in Aura["bootstrap"]) {
         bootstrap[m] = parseInt(Aura["bootstrap"][m], 10);
     }
-    
+
     bootstrap["pageStartTime"] = pageStartTime;
 
     if (window.performance && performance.timing && performance.navigation) {
@@ -883,7 +883,7 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
             };
         }
 
-        bootstrap["cache"]["appCache"] = bootstrap["timing"]["appCache"] === 0 && $A.clientService.appCache;
+        bootstrap["cache"]["appCache"] = bootstrap["timing"]["appCache"] === 0 && window.applicationCache && window.applicationCache.status !== window.applicationCache.UNCACHED;
         bootstrap["cache"]["gvps"] = $A.clientService.gvpsFromStorage;
 
         var frameworkRequests = {
@@ -913,6 +913,6 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
             }, this);
         }
     }
-       
+
     return bootstrap;
 };

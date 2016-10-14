@@ -822,19 +822,23 @@ AuraComponentService.prototype.requestComponent = function(callback, config, avp
                 status = "ERROR";
                 statusMessage = e.message;
             }
+            if ( $A.util.isFunction(callback) ) {
+                callback(newComp, status, statusMessage, index);
+            }
         }else{
             var errors = a.getError();
             statusMessage=errors?errors[0].message:"Unknown Error.";
-            if(!returnNullOnError) {
-                newComp = self.createComponentPriv({
-                    "componentDef": { "descriptor": "markup://aura:text" },
-                    "attributes": { "values": { "value" : statusMessage } }
-                });
+            if (statusMessage !== "Event fired") {
+	            if(!returnNullOnError) {
+	                newComp = self.createComponentPriv({
+	                    "componentDef": { "descriptor": "markup://aura:text" },
+	                    "attributes": { "values": { "value" : statusMessage } }
+	                });
+	            }
+	            if ( $A.util.isFunction(callback) ) {
+	                callback(newComp, status, statusMessage, index);
+	            }
             }
-        }
-
-        if ( $A.util.isFunction(callback) ) {
-            callback(newComp, status, statusMessage, index);
         }
     });
     action.setParams({

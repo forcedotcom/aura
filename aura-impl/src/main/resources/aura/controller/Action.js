@@ -819,7 +819,7 @@ Action.prototype.updateFromResponse = function(response) {
         }
         if (fired === true && newErrors.length === 0) {
             newErrors.push({
-                "message" : "Event fired"
+                "message" : "Event fired" // DO NOT CHANGE: Event fired message carries special meaning and will bypass client callback to display this error
             });
         }
         this.error = newErrors;

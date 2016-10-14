@@ -300,8 +300,8 @@
         // Verify the <td/> elements inside the <tr/>
         testUtils.assertEquals(1, tableClone.children[0].children.length, "Deep clone should clone inner nodes too");
         // Verify the contents of the child nodes
-        testUtils.assertEquals("th", tableClone.children[0].innerText);
-        testUtils.assertEquals("td", tableClone.children[1].innerText);
+        testUtils.assertEquals("th", tableClone.children[0].textContent);
+        testUtils.assertEquals("td", tableClone.children[1].textContent);
     },
 
     /**
@@ -332,13 +332,13 @@
     testCloneNodeDeep_VerifyBlockedAccess: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         // Before clone : Look for text from facet. Verifying that facet was rendered
-        testUtils.assertEquals(1, document.querySelector("#toBeClonedFacet").innerText.match(/body_toBeClonedFacet/g).length);
+        testUtils.assertEquals(1, document.querySelector("#toBeClonedFacet").textContent.match(/body_toBeClonedFacet/g).length);
         testUtils.assertEquals(0, document.querySelectorAll("#table_facetLocked").length, "Facet content should not be accessible from other namespace");
 
         var lockedFacet = cmp.find("toBeClonedFacet");
         lockedFacet.cloneNode();
         // After clone : Look for text from facet, there should be two copies
-        testUtils.assertEquals(2, document.querySelector("#toBeClonedFacet").innerText.match(/body_toBeClonedFacet/g).length,
+        testUtils.assertEquals(2, document.querySelector("#toBeClonedFacet").textContent.match(/body_toBeClonedFacet/g).length,
             "Node of facet not cloned");
         testUtils.assertEquals(0, document.querySelectorAll("#table_facetLocked").length,
             "Cloned nodes should not be accessible from other namespace");

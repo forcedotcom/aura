@@ -105,13 +105,16 @@
         cmp.set("v.labelAttr", labelRef);
         // framework will make a network request for the label so need to wait
         testUtils.addWaitForWithFailureMessage(
-                "Today",
+                true,
                 function() {
-                    return cmp.get("v.labelAttr");
+                    // wait for placeholder to be replaced
+                    return cmp.get("v.labelAttr") !== "[test.task_mode_today]";
                 },
-                "Label reference never returns expected label",
+                "Label reference never replaced original value",
                 function() {
-                    testUtils.assertEquals("Today", document.getElementById("labelOutput").innerText);
+                    var labelText = document.getElementById("labelOutput").textContent;
+                    // if server does not have label we get back 'does not exist' message
+                    testUtils.assertTrue(labelText === "Today" || labelText === "$Label.test.task_mode_today does not exist.");
                 }
         );
     }

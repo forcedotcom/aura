@@ -94,7 +94,8 @@
             } else if (error.stack) {
                 return this.parseFFOrSafari(error);
             } else {
-                throw new Error('Cannot parse given Error object');
+                //Cannot parse given Error object
+                return [];
             }
         },
 

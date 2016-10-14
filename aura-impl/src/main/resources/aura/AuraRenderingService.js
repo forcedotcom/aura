@@ -134,10 +134,14 @@ AuraRenderingService.prototype.rerender = function(components) {
                     rerenderedElements=cmp["rerender"]();
                     context.releaseCurrentAccess();
                 } catch (e) {
-                    var ae = new $A.auraError("rerender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
-                    ae.component = cmp.getDef().getDescriptor().toString();
-                    $A.lastKnownError = ae;
-                    throw ae;
+                    if (e instanceof $A.auraError && e.component) {
+                        throw e;
+                    } else {
+                        var ae = new $A.auraError("rerender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
+                        ae.component = cmp.getDef().getDescriptor().toString();
+                        $A.lastKnownError = ae;
+                        throw ae;
+                    }
                 } finally {
                     if(rerenderedElements!=undefined){//eslint-disable-line eqeqeq
                         renderedElements=renderedElements.concat(rerenderedElements);
@@ -200,10 +204,14 @@ AuraRenderingService.prototype.afterRender = function(components) {
             } catch (e) {
                 // The after render routine threw an error, so we should
                 //  (a) log the error
-                var ae = new $A.auraError("afterRender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
-                ae.component = cmp.getDef().getDescriptor().toString();
-                $A.lastKnownError = ae;
-                throw ae;
+                if (e instanceof $A.auraError && e.component) {
+                        throw e;
+                } else {
+                    var ae = new $A.auraError("afterRender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
+                    ae.component = cmp.getDef().getDescriptor().toString();
+                    $A.lastKnownError = ae;
+                    throw ae;
+                }
                 //  (b) mark the component as possibly broken.
                 //  FIXME: keep track of component stability
             }
@@ -254,10 +262,14 @@ AuraRenderingService.prototype.unrender = function(components) {
                         cmp["unrender"]();
                         context.releaseCurrentAccess(cmp);
                     } catch (e) {
-                        var ae = new $A.auraError("unrender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
-                        ae.component = cmp.getDef().getDescriptor().toString();
-                        $A.lastKnownError = ae;
-                        throw ae;
+                        if (e instanceof $A.auraError && e.component) {
+                            throw e;
+                        } else {
+                            var ae = new $A.auraError("unrender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
+                            ae.component = cmp.getDef().getDescriptor().toString();
+                            $A.lastKnownError = ae;
+                            throw ae;
+                        }
                     } finally {
                         cmp.setRendered(false);
                         if (visited) {

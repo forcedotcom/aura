@@ -35,12 +35,34 @@ var ls_getKey,
     ls_getFromCache;
 
 (function LockerKeyManager() {
+    function newWeakMap() {
+        return typeof WeakMap !== "undefined" ? new WeakMap() : {
+            /* WeakMap dummy polyfill */
+            "get" : function() {
+                return undefined;
+            },
+            "set" : function() {
+            }
+        };
+    }
+
+    function newMap() {
+        return typeof Map !== "undefined" ? new Map() : {
+            /* Map dummy polyfill */
+            "get" : function() {
+                return undefined;
+            },
+            "set" : function() {
+            }
+        };
+    }
+
     // Keyed objects can only have one owner. We prevent "null" and "undefined"
     // keys by guarding all set operations.
-    var keychain = new WeakMap();      // Replaces $lskey
-    var rawToSecureByKey = new Map();  // Replaces rawToSecureObjectCaches
-    var secureToRaw = new WeakMap();   // Replaces $lsref
-    var opaqueSecure = new WeakMap();  // Replaces $lsopaque
+    var keychain = newWeakMap();      // Replaces $lskey
+    var rawToSecureByKey = newMap();  // Replaces rawToSecureObjectCaches
+    var secureToRaw = newWeakMap();   // Replaces $lsref
+    var opaqueSecure = newWeakMap();  // Replaces $lsopaque
 
     // ALL METHODS BELOW USE KEY ONLY
 

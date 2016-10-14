@@ -74,17 +74,6 @@
         if (menuItem && menuItem.isValid() && menuItem.getElement()) {
             menuItem.setFocus();
             this.fireMenuFocusChangeEvent(component, null, menuItem);
-            component._focusOnRender = false;
-        }
-    },
-
-    setFocus: function(component) {
-    	var concreteCmp = component.getConcreteComponent();
-        var visible = concreteCmp.get("v.visible");
-        if (visible === true && component.getElement()) {
-            if (component._focusOnRender === true) {
-                this.setMenuItemFocus(component, 0);
-            }
         }
     },
 

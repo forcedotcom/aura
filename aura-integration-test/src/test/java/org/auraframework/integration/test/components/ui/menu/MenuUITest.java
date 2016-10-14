@@ -236,7 +236,7 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement expectedItemElement = getAnchor(expectedItem);
           
         // opening menu using keyboard return or space - focus would remain on the trigger
-        if(focusAfterOpen == "trigger") {
+        if("trigger".equals(focusAfterOpen)) {
         	focusAfterOpenElement = menuLabel;
         	openMenu(menuLabel, actionMenu, openKey);
         	assertEquals("Focus should be on the trigger", menuLabel.getText(), getAuraUITestingUtil().getActiveElementText());

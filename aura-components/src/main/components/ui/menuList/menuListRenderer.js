@@ -18,22 +18,15 @@
     	helper.setKeyboardEventHandlers(component);
         helper.setEventHandlersOnChildren(component);
 
-        var ret = this.superAfterRender();
-
-        helper.setFocus(component);
-
-        return ret;
+        return this.superAfterRender();
     },
 
     rerender: function(component, helper) {
         if (!component.isDirty("v.childMenuItems")) {
             helper.setEventHandlersOnChildren(component);
         }
-
         helper.handleVisible(component);
-        var ret = this.superRerender();
-        helper.setFocus(component);
-        return ret;
+        return this.superRerender();
     },
 
     unrender: function(component, helper) {

@@ -27,11 +27,12 @@
             var keyCode = originalEvent.keyCode;
             if (keyCode === downArrowKeyCode || keyCode === upArrowKeyCode) {
                 originalEvent.preventDefault();
-
                 if (component.get("v.visible")) {
                     helper.setMenuItemFocus(component, 0);
                 } else {
-                    component._focusOnRender = true;
+                    window.requestAnimationFrame($A.getCallback(function () {
+                        helper.setMenuItemFocus(component, 0);
+                    }));
                 }
             }
         }

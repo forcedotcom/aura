@@ -48,8 +48,9 @@
             <ui:menuTriggerLink aura:id="selectTrigger" class="select" disabled="{!v.disabled}" ariaLabel="{!v.label}"
                                 label="{!v.selectedLabel}"/>
             <ui:menuList aura:id="options" class="select-options" attachToBody="true" aura:flavor="default,left,short"
-                         menuExpand="{!c.menuOpened}"
-                         menuSelect="{!c.menuOptionSelected}"/>
+                triggerTypeAhead="true"
+                menuExpand="{!c.menuOpened}"
+                menuSelect="{!c.menuOptionSelected}"/>
         </ui:menu>
         <aura:set attribute="else">
             <select aura:id="select"

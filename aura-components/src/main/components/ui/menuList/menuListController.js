@@ -19,21 +19,32 @@
     },
 
     onKeyboardEvent: function (component, event, helper) {
-        // If this was a keyboard event from the down arrow click then we need to focus on the first item
         var originalEvent = event.getParam("event");
-        if (originalEvent && originalEvent.type === "keydown") {
-            var downArrowKeyCode = 40;
-            var upArrowKeyCode = 38;
-            var keyCode = originalEvent.keyCode;
-            if (keyCode === downArrowKeyCode || keyCode === upArrowKeyCode) {
-                originalEvent.preventDefault();
-                if (component.get("v.visible")) {
-                    helper.setMenuItemFocus(component, 0);
-                } else {
-                    window.requestAnimationFrame($A.getCallback(function () {
-                        helper.setMenuItemFocus(component, 0);
-                    }));
+
+        if (originalEvent.type !== "keydown") {
+            return;
+        }
+
+        var downArrowKeyCode = 40;
+        var upArrowKeyCode = 38;
+        var keyCode = originalEvent.keyCode;
+        if (keyCode === downArrowKeyCode || keyCode === upArrowKeyCode) {
+            originalEvent.preventDefault();
+            window.requestAnimationFrame($A.getCallback(function() {
+                helper.setMenuItemFocus(component, 0);
+            }));
+        } else {
+            var isPrintableCharacter =
+                (keyCode >= 48 && keyCode <= 57)
+                || (keyCode >= 65 && keyCode <= 90);
+            if (component.get("v.triggerTypeAhead") && isPrintableCharacter) {
+                $A.util.squash(originalEvent, true);
+                if (!component.get("v.visible")) {
+                    component.set("v.visible", true);
                 }
+                window.requestAnimationFrame($A.getCallback(function() {
+                    helper.setFocusToTypingChars(component, originalEvent);
+                }));
             }
         }
     },

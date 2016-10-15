@@ -25,7 +25,6 @@
             cmp._createMenuItems = true;
         }
     },
-
     setFocus: function (cmp) {
         if (cmp.get("v.useMenu")) {
             var menuTrigger = cmp.find("selectTrigger");

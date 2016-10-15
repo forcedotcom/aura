@@ -144,12 +144,12 @@ public class MenuUITest extends WebDriverTestCase {
 
     @Test
     public void testOpenMenuViaKeyboardDownKey() throws Exception {
-    	openMenuViaKeyboardAndTestActionMenu(MENUTEST_APP, Keys.DOWN, "actionItem1", "actionItem3");
+    	openMenuViaKeyboardAndTestActionMenu(MENUTEST_APP, Keys.DOWN, "actionItem1", "actionItem2");
     }
     
     @Test
-    public void testOpenMenuViaKeyboardReturn() throws Exception {
-    	openMenuViaKeyboardAndTestActionMenu(MENUTEST_APP, Keys.RETURN, "trigger", "actionItem2");
+    public void testOpenMenuViaKeyboardSpace() throws Exception {
+    	openMenuViaKeyboardAndTestActionMenu(MENUTEST_APP, Keys.SPACE, "trigger", "actionItem1");
     }
     
     // TODO: W-2406307: remaining Halo test failure
@@ -223,7 +223,8 @@ public class MenuUITest extends WebDriverTestCase {
         waitForMenuClose(actionMenu);
     }
     
-    private void openMenuViaKeyboardAndTestActionMenu(String appName, Keys openKey, String focusAfterOpen, String itemExpected) throws Exception{
+    private void openMenuViaKeyboardAndTestActionMenu(String appName, Keys openKey, String focusAfterOpen,
+        String itemExpected) throws Exception{
 	     
     	open(appName);
     	
@@ -248,8 +249,8 @@ public class MenuUITest extends WebDriverTestCase {
             openMenu(menuLabel, actionMenu, openKey);
             waitForFocusOnElement(focusAfterOpenElement);
         }
-          
-        focusAfterOpenElement.sendKeys(Keys.DOWN, Keys.DOWN);
+
+        focusAfterOpenElement.sendKeys(Keys.DOWN);
         waitForFocusOnElement(expectedItemElement);
     }
 
@@ -732,7 +733,7 @@ public class MenuUITest extends WebDriverTestCase {
      */
     private void openMenu(WebElement menuLabel, WebElement actionMenu, Keys openKey) {    	
     	menuLabel.sendKeys("");
-        menuLabel.sendKeys(openKey); 	
+        menuLabel.sendKeys(openKey);
         waitForMenuOpen(actionMenu);
     }
 

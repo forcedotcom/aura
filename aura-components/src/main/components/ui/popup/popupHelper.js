@@ -64,7 +64,7 @@
     },
 
     handleKeyboardEvent: function (component, event) {
-        this.delegateEventToTarget(component, event, 'e.popupKeyboardEvent');
+        this.delegateEventToTarget(component, event.getParam("event"), 'e.popupKeyboardEvent');
     },
 
     setTargetVisibility: function (component, visible) {

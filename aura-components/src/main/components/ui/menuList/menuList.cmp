@@ -28,6 +28,7 @@
     <aura:attribute name="childMenuItems" type="Aura.Component[]" description="a read-only attribute pointing to child components."/>
 
     <aura:attribute name="role" type="String" default="menu" description="Defines the accessibility role of the menu. Defaults to 'menu'."/>
+    <aura:attribute name="triggerTypeAhead" type="Boolean" default="false" description="If true when closed and a character is typed on the trigger, opens the menu and focuses on the first match."/>
 
     <aura:registerEvent access="GLOBAL" name="menuCollapse" type="ui:collapse" description="The event fired when the menu list collapses."/>
     <aura:registerEvent access="GLOBAL" name="menuExpand" type="ui:expand" description="The event fired when the menu list displays."/>
@@ -35,8 +36,8 @@
     <aura:registerEvent access="GLOBAL" name="menuFocusChange" type="ui:menuFocusChange" description="The event fired when the menu list focus changed from one menuItem to another menuItem."/>
     <aura:registerEvent name="refresh" type="ui:refresh" description="Fire this event to refresh the menuList."/>
 
-    <aura:registerEvent name="keydown" type="ui:popupKeyboardEvent" description="The event fired when the user presses a keyboard key on the component."/>
-    <aura:handler name="keydown" action="{!c.onKeyboardEvent}"/>
+    <aura:registerEvent name="popupKeyboardEvent" type="ui:popupKeyboardEvent" description="The event fired when the user presses a keyboard key on the component."/>
+    <aura:handler name="popupKeyboardEvent" action="{!c.onKeyboardEvent}"/>
 
     <aura:handler name="refresh" action="{!c.update}"/>
     <aura:handler name="change" value="{!v.body}" action="{!c.update}"/>

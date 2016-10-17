@@ -187,6 +187,32 @@ Logger.prototype.reportError = function(e, action){
     e["reported"] = true;
 };
 
+Logger.prototype.isExternalError = function(e) {
+    if (!e) {
+        return false;
+    }
+
+    var frames;
+    var count = 0;
+    if (e instanceof $A.auraError) {
+        frames = e.stackFrames;
+    } else {
+        frames = Aura.Errors.StackParser.parse(e);
+    }
+
+    frames.forEach(function(frame) {
+        var fileName = frame.fileName;
+        if (fileName &&
+            fileName.match(/aura_[^\.]+\.js$/gi) === null &&
+            fileName.match("app.js") === null) {
+            count += 1;
+        }
+    });
+
+    // external means every stackframe isn't from framework
+    return frames.length === count;
+};
+
 /**
  * Checks for subscribers and notifies
  *

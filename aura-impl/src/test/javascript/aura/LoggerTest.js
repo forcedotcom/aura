@@ -467,4 +467,121 @@ Test.Aura.LoggerTest = function() {
             Assert.True(clientStackLength === 25000);
         }
     }
+
+    [Fixture]
+    function isExternalError() {
+
+        var logger = new Aura.Utils.Logger();
+
+        var _AuraError;
+        var _StackFrame;
+        var _ErrorStackParser;
+
+        Mocks.GetMocks(Object.Global(), {
+            "Aura": {Errors: {}},
+        })(function() {
+            Import("aura-impl/src/main/resources/aura/polyfill/stackframe.js");
+            Import("aura-impl/src/main/resources/aura/polyfill/error-stack-parser.js");
+            Import("aura-impl/src/main/resources/aura/AuraError.js");
+            _StackFrame = StackFrame;
+            _ErrorStackParser = ErrorStackParser;
+            _AuraError = AuraError;
+            delete StackFrame;
+            delete ErrorStackParser;
+            delete AuraError;
+        });
+
+        function getAuraMock(during) {
+            return Mocks.GetMocks(Object.Global(), {
+                Aura: {
+                    Errors: {
+                        AuraError: _AuraError,
+                        StackFrame: _StackFrame,
+                        StackParser: _ErrorStackParser
+                    }
+                },
+                $A: {
+                    auraError: _AuraError
+                }
+            })(during);
+        }
+
+        [Fact]
+        function ReturnFalseIfNoArgument() {
+            Assert.False(logger.isExternalError());
+        }
+
+        [Fact]
+        function ReturnTrueIfErrorIsFromExternalScript() {
+            var e = new TypeError("Cannot read property tasks of undefined");
+            e.stack = "throws at https://firstdata--prodcopy.cs42.my.salesforce.com/EXT/ext-3.3.3/ext.js:84:4150\n\
+                at Object.removeAll (https://firstdata--prodcopy.cs42.my.salesforce.com/EXT/ext-3.3.3/ext.js:84:4150)\n\
+                at Object._unload (https://firstdata--prodcopy.cs42.my.salesforce.com/EXT/ext-3.3.3/ext.js:84:5058)\n\
+                at Object._unload (https://firstdata--prodcopy.cs42.my.salesforce.com/EXT/ext-3.3.3/ext.js:114:420)\n\
+                at _unload (https://firstdata--prodcopy.cs42.my.salesforce.com/EXT/ext-3.3.3/ext.js:21:3823)";
+
+            var expected;
+            getAuraMock(function() {
+                expected = logger.isExternalError(e);
+            });
+            Assert.True(expected);
+        }
+
+        [Fact]
+        function ReturnTrueIfErrorIsFromExternalResource() {
+            var e = new TypeError("Cannot read property zoomLevel of undefined");
+            e.stack = "throws at https://adminlightningbsodf16.lightning.force.com/resource/infografx__ammap_3_14_1_sfdc:203:454\n\
+                at b.update (https://adminlightningbsodf16.lightning.force.com/resource/infografx__ammap_3_14_1_sfdc:203:454)\n\
+                at b.update (https://adminlightningbsodf16.lightning.force.com/resource/infografx__ammap_3_14_1_sfdc:142:267)\n\
+                at Object.d.update (https://adminlightningbsodf16.lightning.force.com/resource/infografx__ammap_3_14_1_sfdc:11:190)\n\
+                at https://adminlightningbsodf16.lightning.force.com/resource/infografx__ammap_3_14_1_sfdc:3:167";
+
+            var expected;
+            getAuraMock(function() {
+                expected = logger.isExternalError(e);
+            });
+            Assert.True(expected);
+        }
+
+        [Fact]
+        function ReturnTrueIfAuraErrorIsFromExternalScript() {
+            var e = new TypeError("Cannot read property tasks of undefined");
+            e.stack = "throws at https://firstdata--prodcopy.cs42.my.salesforce.com/EXT/ext-3.3.3/ext.js:84:4150\n\
+                at Object.removeAll (https://firstdata--prodcopy.cs42.my.salesforce.com/EXT/ext-3.3.3/ext.js:84:4150)\n\
+                at Object._unload (https://firstdata--prodcopy.cs42.my.salesforce.com/EXT/ext-3.3.3/ext.js:84:5058)\n\
+                at Object._unload (https://firstdata--prodcopy.cs42.my.salesforce.com/EXT/ext-3.3.3/ext.js:114:420)\n\
+                at _unload (https://firstdata--prodcopy.cs42.my.salesforce.com/EXT/ext-3.3.3/ext.js:21:3823)";
+
+            var expected;
+            getAuraMock(function() {
+                var ae = new $A.auraError(null, e);
+                expected = logger.isExternalError(ae);
+            });
+            Assert.True(expected);
+        }
+
+        [Fact]
+        function ReturnFalseIfAuraErrorIsNotFromExternalScript() {
+            var e = new Error();
+            e.message = "Error from app client controller";
+            e.stack = "Error: Error from app client controller\n\
+    at throwErrorFromClientController (http://localhost:9090/components/auratest/errorHandlingApp.js:42:15)\n\
+    at Action.$runDeprecated$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8469:36)\n\
+    at Object.Component$getActionCaller [as $handler$] (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:6695:20)\n\
+    at Aura.$Event$.$Event$.$executeHandlerIterator$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8100:15)\n\
+    at Aura.$Event$.$Event$.$executeHandlers$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8078:8)\n\
+    at http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8130:10\n\
+    at AuraInstance.$run$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:18350:12)\n\
+    at Aura.$Event$.$Event$.$fire$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8128:6)\n\
+    at Object.catchAndFireEvent (http://localhost:9090/components/ui/button.js:90:33)\n\
+    at press (http://localhost:9090/components/ui/button.js:34:16)";
+
+            var expected;
+            getAuraMock(function() {
+                var ae = new $A.auraError(null, e);
+                expected = logger.isExternalError(ae);
+            });
+            Assert.False(expected);
+        }
+    }
 };

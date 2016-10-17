@@ -923,6 +923,11 @@ AuraInstance.prototype.handleError = function(message, e) {
  * @platform
  */
 AuraInstance.prototype.reportError = function(message, error) {
+    // ignore external errors
+    if ($A.logger.isExternalError(error)) {
+        return;
+    }
+
     // for browsers that doesn't have 5th argument (error object) passed in the onerror handler,
     // we use our bookkeeping object this.lastKnownError
     // when there is still no error object, we create a dummy to have client error id.

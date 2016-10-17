@@ -56,7 +56,6 @@ import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.service.InstanceService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
@@ -103,9 +102,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     @Inject
     private LoggingService loggingService;
-
-    @Inject
-    private InstanceService instanceService;
 
     @Inject
     private Collection<RegistryAdapter> providers;
@@ -835,7 +831,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void testInvalidateCacheCmpFile() throws Exception {
         MasterDefRegistryImplOverride mdr = getDefRegistry(false);
 
-        Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdr);
+        Map<DefType, DefDescriptor<?>> defs = addDefsToCaches();
         DefDescriptor<?> cmpDef = defs.get(DefType.COMPONENT);
         cachingService.notifyDependentSourceChange(Collections.<WeakReference<SourceListener>>emptySet(),
                 cmpDef, SourceListener.SourceMonitorEvent.CHANGED, null);
@@ -846,11 +842,11 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Create a set of DefDescriptors and add them to the MDR caches by calling getDef() on them.
+     * Add one of each following def to cache: a component, controller, renderer and application
      *
-     * @return List of DefDescriptors that have been added to the mdr caches.
+     * @return List of DefDescriptors that have been added to caches.
      */
-    private Map<DefType, DefDescriptor<?>> addDefsToCaches(MasterDefRegistryImpl mdr) throws Exception {
+    private Map<DefType, DefDescriptor<?>> addDefsToCaches() throws Exception {
         DefDescriptor<ComponentDef> cmpDef = definitionService.getDefDescriptor("test:test_button",
                 ComponentDef.class);
         DefDescriptor<ControllerDef> cmpControllerDef = definitionService.getDefDescriptor(
@@ -900,22 +896,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         return true;
     }
 
-    private boolean isInDepsCache(DefDescriptor<?> dd, String cacheKey, MasterDefRegistryImpl mdr) throws Exception {
-        Cache<String, ?> cache = AuraPrivateAccessor.get(mdr, "depsCache");
-        String ddKey;
-        if(dd != null) {
-        	ddKey = dd.getDescriptorName().toLowerCase();
-        } else {
-        	ddKey = cacheKey;
-        }
-        for (String key : cache.getKeySet()) {
-            if (key.endsWith(ddKey)) {
-                return cache.getIfPresent(key) != null;
-            }
-        }
-        return false;
-    }
-
     private boolean isInDefsCache(DefDescriptor<?> dd, MasterDefRegistryImpl mdr) throws Exception {
         Cache<DefDescriptor<?>, Optional<? extends Definition>> cache = AuraPrivateAccessor.get(mdr, "defsCache");
         return null != cache.getIfPresent(dd);
@@ -925,7 +905,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Cache<DefDescriptor<?>, Boolean> cache = AuraPrivateAccessor.get(mdr, "existsCache");
         return Boolean.TRUE == cache.getIfPresent(dd);
     }
-
+    
     private <D extends Definition> void callAssertAccess(MasterDefRegistryImpl mdr,
             DefDescriptor<?> referencingDescriptor, D def, Cache<String, String> accessCheckCache)
             throws Exception {
@@ -1045,167 +1025,126 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     @Test
     public void testExistsCache() throws Exception {
-        MasterDefRegistry mdr = getAuraMDR();
-        MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
-        Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdri);
-        Map<DefType, DefDescriptor<?>> nonPrivDefs = addNonInternalDefsToMDR(mdri);
-        for (DefDescriptor<?> dd : defs.values()) {
-            assertTrue(dd + " should exist.", dd.exists());
-        }
-        for (DefDescriptor<?> dd : nonPrivDefs.values()) {
-            assertTrue(dd + " should exist.", dd.exists());
-        }
-
+    	//add couple def to caches
+        Map<DefType, DefDescriptor<?>> defs = addDefsToCaches();
+        Map<DefType, DefDescriptor<?>> nonPrivDefs = addNonInternalDefsToCache();
+        //now get two of them out
         DefDescriptor<?> rendererDef = defs.get(DefType.RENDERER);
-        DefDescriptor<?> appDef = defs.get(DefType.APPLICATION);
-        DefDescriptor<?> controllerDef = defs.get(DefType.CONTROLLER);
-        DefDescriptor<?> cmpDef = defs.get(DefType.COMPONENT);
-
         DefDescriptor<?> npRendererDef = nonPrivDefs.get(DefType.RENDERER);
-        DefDescriptor<?> nsAppDef = nonPrivDefs.get(DefType.APPLICATION);
-        DefDescriptor<?> nsControllerDef = nonPrivDefs.get(DefType.CONTROLLER);
-        DefDescriptor<?> nsCmpDef = nonPrivDefs.get(DefType.COMPONENT);
+        //make sure they are store as localDef in current context (we do that during getDef-->finishValidation
+        AuraContext currentContext = contextService.getCurrentContext();
+        assertTrue("rendererDef should be in current context's localDef", currentContext.hasLocalDef(rendererDef) );
+        assertTrue("npRendererDef should be in current context's localDef", currentContext.hasLocalDef(npRendererDef) );
+        //they do exist in currentContex's localDef
+        assertTrue("rendererDef should exist", rendererDef.exists());
+        assertTrue("npRendererDef should exist", npRendererDef.exists());
+        //note calling exist like above won't put these def in existCache, as they already exist in currentContext's localDef
+        MasterDefRegistry mdr = getAuraMDR();
+        assertFalse("npRendererDef is in current context's localDef already, calling exist() won't add it to exist cache", 
+        		isInExistsCache(rendererDef, (MasterDefRegistryImpl) mdr));
+        assertFalse("npRendererDef is in current context's localDef already, calling exist() won't add it to exist cache", 
+        		isInExistsCache(npRendererDef, (MasterDefRegistryImpl) mdr));
 
-        // only picking 3 defs to test the ns as they are mostly dupes
-        assertTrue(rendererDef.getNamespace() + "  should have been internal",
-                configAdapter.isInternalNamespace(rendererDef.getNamespace()));
-
-        assertFalse(npRendererDef.getNamespace() + "  should not have been internal",
-                configAdapter.isInternalNamespace(npRendererDef.getNamespace()));
-
+        //now restart the context with a new MDR
         MasterDefRegistry mdr2 = restartContextGetNewMDR();
-        MasterDefRegistryImpl mdri2 = (MasterDefRegistryImpl) mdr2;
-
-        // objects wont be in eists cache yet, just defsCache, need to call exists to prime exists cache
-
-        for (DefDescriptor<?> dd : defs.values()) {
-            assertTrue(dd + " should exist.", dd.exists());
-        }
-        //assertTrue("RendererDef is in cache", isInExistsCache(rendererDef, mdri2));
-        //assertTrue("app is in cache", isInExistsCache(appDef, mdri2));
-        //assertTrue("controller is in cache", isInExistsCache(controllerDef, mdri2));
-        //assertTrue("cmp is in cache", isInExistsCache(cmpDef, mdri2));
-
-        assertFalse("npRendererDef is notin cache", isInExistsCache(npRendererDef, mdri2));
-        assertFalse("nsApp is not in cache", isInExistsCache(nsAppDef, mdri2));
-        assertFalse("nsController is not in cache", isInExistsCache(nsControllerDef, mdri2));
-        assertFalse("nsCmp is not in cache", isInExistsCache(nsCmpDef, mdri2));
-
-        MasterDefRegistry mdr3 = restartContextGetNewMDR();
-        MasterDefRegistryImpl mdri3 = (MasterDefRegistryImpl) mdr3;
-
-        //assertTrue("RendererDef is in cache", isInExistsCache(rendererDef, mdri3));
-        //assertTrue("app is in cache", isInExistsCache(appDef, mdri3));
-        //assertTrue("controller is in cache", isInExistsCache(controllerDef, mdri3));
-        //assertTrue("cmp is in cache", isInExistsCache(cmpDef, mdri3));
-
-        assertFalse("npRendererDef is notin cache", isInExistsCache(npRendererDef, mdri3));
-        assertFalse("nsApp is not in cache", isInExistsCache(nsAppDef, mdri3));
-        assertFalse("nsController is not in cache", isInExistsCache(nsControllerDef, mdri3));
-        assertFalse("nsCmp is not in cache", isInExistsCache(nsCmpDef, mdri3));
+        //get currentContext again, note defs are not in the new context's localDef
+        currentContext = contextService.getCurrentContext();
+        assertFalse("rendererDef should not be in current context's localDef", currentContext.hasLocalDef(rendererDef) );
+        assertFalse("npRendererDef should not be in current context's localDef", currentContext.hasLocalDef(npRendererDef) );
+        
+        assertFalse("npRendererDef should not be in exist cache yet", isInExistsCache(rendererDef, (MasterDefRegistryImpl) mdr2));
+        assertFalse("npRendererDef should not be in exist cache", isInExistsCache(npRendererDef, (MasterDefRegistryImpl) mdr2));
+ 
+        assertFalse("rendererDef should be in current context's localDef", currentContext.hasLocalDef(rendererDef) );
+        assertFalse("npRendererDef should be in current context's localDef", currentContext.hasLocalDef(npRendererDef) );
+        //calling exist now will touch existCache, if the def is in defsCache, it will store as TRUE, if not, FALSE
+        rendererDef.exists();
+        npRendererDef.exists();
+        //make sure defs are still not in currentContext's localDef
+        assertFalse("rendererDef should not be in current context's localDef", currentContext.hasLocalDef(rendererDef) );
+        assertFalse("npRendererDef should not be in current context's localDef", currentContext.hasLocalDef(npRendererDef) );
+        
+        assertTrue("rendererDef should be in existCache", 
+        		this.isInExistsCache(rendererDef, (MasterDefRegistryImpl) mdr2));
+        //non-system namespace is not in defsCache, hence store as FALSE in existCache
+        assertFalse("npRendererDef should store as FALSE in existCache", 
+        		this.isInExistsCache(npRendererDef, (MasterDefRegistryImpl) mdr2));
     }
 
     @UnAdaptableTest("namespace start with 'c' means something special in core")
     @Test
     public void testDefsCache() throws Exception {
-        MasterDefRegistry mdr = getAuraMDR();
-        MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
-        Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdri);
-        Map<DefType, DefDescriptor<?>> nonPrivDefs = addNonInternalDefsToMDR(mdri);
+        //add couple defs
+        Map<DefType, DefDescriptor<?>> defs = addDefsToCaches();
+        Map<DefType, DefDescriptor<?>> nonPrivDefs = addNonInternalDefsToCache();
 
         DefDescriptor<?> rendererDef = defs.get(DefType.RENDERER);
-        DefDescriptor<?> appDef = defs.get(DefType.APPLICATION);
-        //DefDescriptor<?> controllerDef = defs.get(DefType.CONTROLLER);
-        //DefDescriptor<?> cmpDef = defs.get(DefType.COMPONENT);
-
         DefDescriptor<?> npRendererDef = nonPrivDefs.get(DefType.RENDERER);
-        DefDescriptor<?> nsAppDef = nonPrivDefs.get(DefType.APPLICATION);
-        DefDescriptor<?> nsControllerDef = nonPrivDefs.get(DefType.CONTROLLER);
-        DefDescriptor<?> nsCmpDef = nonPrivDefs.get(DefType.COMPONENT);
 
-        // only picking 3 defs to test the ns as they are mostly dupes
-        assertTrue(appDef.getNamespace() + "  should have been internal",
-                configAdapter.isInternalNamespace(appDef.getNamespace()));
-        assertTrue(rendererDef.getNamespace() + "  should have been internal",
-                configAdapter.isInternalNamespace(rendererDef.getNamespace()));
-
-        assertFalse(nsAppDef.getNamespace() + "  should not have been internal",
-                configAdapter.isInternalNamespace(nsAppDef.getNamespace()));
-        assertFalse(npRendererDef.getNamespace() + "  should not have been internal",
-                configAdapter.isInternalNamespace(npRendererDef.getNamespace()));
-
-        //assertTrue("RendererDef is in cache", isInDefsCache(rendererDef, mdri));
-        //assertTrue("app is in cache", isInDefsCache(appDef, mdri));
-        //assertTrue("controller is in cache", isInDefsCache(controllerDef, mdri));
-        //assertTrue("cmp is in cache", isInDefsCache(cmpDef, mdri));
-
-        assertFalse("npRendererDef is not in cache", isInDefsCache(npRendererDef, mdri));
-        assertFalse("nsApp is not in cache", isInDefsCache(nsAppDef, mdri));
-        assertFalse("nsController is not in cache", isInDefsCache(nsControllerDef, mdri));
-        assertFalse("nsCmp is not in cache", isInDefsCache(nsCmpDef, mdri));
+        MasterDefRegistry mdr = getAuraMDR();
+        assertTrue("rendererDef should be in defsCache", isInDefsCache(rendererDef, (MasterDefRegistryImpl) mdr));
+        //we don't put non-system namespace in defsCache
+        assertFalse("npRendererDef should not be in defsCache", isInDefsCache(npRendererDef, (MasterDefRegistryImpl) mdr));
 
         MasterDefRegistry mdr2 = restartContextGetNewMDR();
-        MasterDefRegistryImpl mdri2 = (MasterDefRegistryImpl) mdr2;
-
-        //assertTrue("RendererDef is in cache", isInDefsCache(rendererDef, mdri2));
-        //assertTrue("app is in cache", isInDefsCache(appDef, mdri2));
-        //assertTrue("controller is in cache", isInDefsCache(controllerDef, mdri2));
-        //assertTrue("cmp is in cache", isInDefsCache(cmpDef, mdri2));
-
-        assertFalse("npRendererDef is notin cache", isInDefsCache(npRendererDef, mdri2));
-        assertFalse("nsApp is not in cache", isInDefsCache(nsAppDef, mdri2));
-        assertFalse("nsController is not in cache", isInDefsCache(nsControllerDef, mdri2));
-        assertFalse("nsCmp is not in cache", isInDefsCache(nsCmpDef, mdri2));
+        assertTrue("rendererDef should be in defsCache", isInDefsCache(rendererDef, (MasterDefRegistryImpl) mdr2));
+        assertFalse("npRendererDef shouldn't be in defsCache", isInDefsCache(npRendererDef, (MasterDefRegistryImpl) mdr2));
     }
 
-    @UnAdaptableTest("namesapce start with c means something special in core")
+    @SuppressWarnings("unused")
+	@UnAdaptableTest("namesapce start with c means something special in core")
     @Test
     public void testDescriptorFilterCache() throws Exception {
         MasterDefRegistry mdr = getAuraMDR();
         MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
-        Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdri);
-        Map<DefType, DefDescriptor<?>> nonPrivDefs = addNonInternalDefsToMDR(mdri);
-
-        DefDescriptor<?> rendererDef = defs.get(DefType.RENDERER);
-
-        DefDescriptor<?> npRendererDef = nonPrivDefs.get(DefType.RENDERER);
-
-        // only picking 3 defs to test the ns as they are mostly dupes
-        assertTrue(rendererDef.getNamespace() + "  should have been isPriveleged",
-                configAdapter.isInternalNamespace(rendererDef.getNamespace()));
-
-        assertFalse(npRendererDef.getNamespace() + "  should not have been isPriveleged",
-                configAdapter.isInternalNamespace(npRendererDef.getNamespace()));
-
-        //DescriptorFilter filter = new DescriptorFilter("*://test:*");
-        //Set<DefDescriptor<?>> results = mdr.find(filter);
-        //assertTrue("results should be cached", isInDescriptorFilterCache(filter, results, mdri));
-        //DescriptorFilter filter2 = new DescriptorFilter("*://gvpTest:*");
-        //Set<DefDescriptor<?>> results2 = mdr.find(filter2);
-        //assertTrue("results2 should be cached", isInDescriptorFilterCache(filter2, results2, mdri));
-
-        DescriptorFilter filter3 = new DescriptorFilter("*://cstring:*");
-        Set<DefDescriptor<?>> results3 = mdr.find(filter3);
-        assertFalse("results3 should not be cached", isInDescriptorFilterCache(filter3, results3, mdri));
-        DescriptorFilter filter4 = new DescriptorFilter("*://cstring1:*");
-        Set<DefDescriptor<?>> results4 = mdr.find(filter4);
-        assertFalse("results4 should be cached", isInDescriptorFilterCache(filter4, results4, mdri));
-
-        DescriptorFilter filter5 = new DescriptorFilter("*://*:*");
-        Set<DefDescriptor<?>> results5 = mdr.find(filter5);
-        assertFalse("results5 should not be cached", isInDescriptorFilterCache(filter5, results5, mdri));
-        // DescriptorFilter filter6 = new DescriptorFilter("*://*test:*");
-        // Set<DefDescriptor<?>> results6 = mdr.find(filter6);
-        // assertFalse("results6 should be cached", isInDescriptorFilterCache(filter6, results6, mdri));
-
-        MasterDefRegistry mdr2 = restartContextGetNewMDR();
-        MasterDefRegistryImpl mdri2 = (MasterDefRegistryImpl) mdr2;
-        //assertTrue("results should still be cached", isInDescriptorFilterCache(filter, results, mdri2));
-        //assertTrue("results2 should still be cached", isInDescriptorFilterCache(filter2, results2, mdri2));
-        assertFalse("results3 should not be cached", isInDescriptorFilterCache(filter3, results3, mdri2));
-        assertFalse("results4 should not be cached", isInDescriptorFilterCache(filter4, results4, mdri2));
-        assertFalse("results5 should not be cached", isInDescriptorFilterCache(filter5, results5, mdri2));
-        // assertFalse("results6 should not be cached", isInDescriptorFilterCache(filter6, results6, mdri2));
+        //now add couple defs to caches
+        Map<DefType, DefDescriptor<?>> defs = addDefsToCaches();
+        Map<DefType, DefDescriptor<?>> nonPrivDefs = addNonInternalDefsToCache();
+        //internal namespace
+        DescriptorFilter filter = new DescriptorFilter("markup://test:test_button");
+        Set<DefDescriptor<?>> results = mdr.find(filter);
+        assertTrue("markup://test:test_button should be cached", isInDescriptorFilterCache(filter, results, mdri));
+        filter = new DescriptorFilter("js://test:test_button");
+        results = mdr.find(filter);
+        assertTrue("js://test:test_button should be cached", isInDescriptorFilterCache(filter, results, mdri));
+        //internal namespace with wild-card matcher, notice we do cache namespace:*
+        filter = new DescriptorFilter("markup://test:*");
+        results = mdr.find(filter);
+        assertTrue("markup://test:* should be cached", isInDescriptorFilterCache(filter, results, mdri));
+        filter = new DescriptorFilter("markup://*:test_button");
+        results = mdr.find(filter);
+        assertFalse("markup://*:test_button should not be cached", isInDescriptorFilterCache(filter, results, mdri));
+        /*filter = new DescriptorFilter("*://test:test_button");
+        results = mdr.find(filter);
+        assertFalse("*://test:test_button should not be cached", isInDescriptorFilterCache(filter, results, mdri));
+        */
+        //custom namespace
+        filter = new DescriptorFilter("js://cstring1:labelProvider");
+        results = mdr.find(filter);
+        assertFalse("js://cstring1:labelProvider shouldn't be cached", isInDescriptorFilterCache(filter, results, mdri));
+        //custom namespace with wild-card matcher
+        filter = new DescriptorFilter("js://cstring1:*");
+        results = mdr.find(filter);
+        assertFalse("js://cstring1:* shouldn't be cached", isInDescriptorFilterCache(filter, results, mdri));
+        filter = new DescriptorFilter("js://*:*");
+        results = mdr.find(filter);
+        assertFalse("js://*:* shouldn't be cached", isInDescriptorFilterCache(filter, results, mdri));
+        filter = new DescriptorFilter("*://cstring1:*");
+        results = mdr.find(filter);
+        assertFalse("*://*:* shouldn't be cached", isInDescriptorFilterCache(filter, results, mdri));
+        
+        //MAGIC: apex prefix, see cacheDependencyExceptions in ConfigAdapterImpl.java
+        filter = new DescriptorFilter("apex://applauncher:appmenu");
+        results = mdr.find(filter);
+        assertFalse("apex://applauncher:appmenu shouldn't be cached", isInDescriptorFilterCache(filter, results, mdri));
+        //apex prefix with wild-card matcher
+        filter = new DescriptorFilter("apex://applauncher:*");
+        results = mdr.find(filter);
+        assertFalse("apex://applauncher:* shouldn't be cached", isInDescriptorFilterCache(filter, results, mdri));
+        filter = new DescriptorFilter("apex://*:*");
+        results = mdr.find(filter);
+        assertFalse("apex://*:* shouldn't be cached", isInDescriptorFilterCache(filter, results, mdri));
+       
     }
 
     /**
@@ -1344,99 +1283,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Mockito.verify(mockedRegistry).find(Mockito.eq(df));
         assertTrue("No caching for wildcard namespaces", notInDescriptorFilterCache(df, mdr));
     }
-
-    /**
-     * verify we cache dependency for descriptor start with compound
-     * notice that we actually cache dependency for it twice, once with Uid, once not.
-     * other special case includes apex, I won't test it here.
-     * @throws Exception 
-     */
-    @Test
-    public void testDepsCacheCompound() throws Exception {
-//    	String auraIf = "<aura:if isTrue='{!true}'>It is true</aura:if>";
-//    	DefDescriptor<ComponentDef> internalCmpWithCompound = getAuraTestingUtil().addSourceAutoCleanup(
-//                ComponentDef.class, String.format(baseComponentTag, "access='global'", auraIf), null,
-//                        NamespaceAccess.INTERNAL);
-//    	
-//        MasterDefRegistry mdr = contextService.getCurrentContext().getDefRegistry();
-//        MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
-//         
-//        instanceService.getInstance(internalCmpWithCompound, null);
-//        assertTrue(isInDepsCache(null, "compound://aura.if", mdri));
-    }
     
-    /**
-     * Bad Test.
-     *
-     * Original:
-     * we have a component in non-internal NameSpace , it depends on some component on a internal NameSpace
-     * test verify getting def of non-internal one won't add itself, or the internal component into dependency cache
-     * also verify getting def of internal one will add itself to dependency cache
-     * 
-     * we also have a component in internal NameSpace which depends on a component on a non-internal NameSpace
-     * test verify getting def of the internal one will throw error, and it won't add itself or non-internal component
-     * into dependency cache.
-     *
-     * Actual:
-     * The access checks are not enforced that way, in fact, there is no such check, and thus the test would allow
-     * the component to be loaded if the namespaces in the MDR were not frozen before we added the new alien 
-     * namespace.
-     *
-     * @throws Exception
-     */
-    @Test
-    @Ignore("FIXME: this test fails because the alien namespace is added after the MDR is created")
-    public void testDepsCacheInternalAndExternalNamespace() throws Exception {
-        String externalNamespace = getAuraTestingUtil().getNonce("alien");
-
-        // in internal namespace
-        DefDescriptor<ComponentDef> internalCmp = getAuraTestingUtil().addSourceAutoCleanup(
-                ComponentDef.class, String.format(baseComponentTag, "access='global'", ""), null,
-                        NamespaceAccess.INTERNAL);
-        // in external namespace depending on internal cmp
-        DefDescriptor<ComponentDef> externalCmp = getAuraTestingUtil().addSourceAutoCleanup(
-                definitionService.getDefDescriptor(String.format("markup://%s:cmp", externalNamespace),
-                        ComponentDef.class),
-                String.format(baseComponentTag, "access='global'",
-                        String.format("<%s/>", internalCmp.getDescriptorName())),
-                        NamespaceAccess.CUSTOM);
-
-        // in internal namespace depending on external cmp
-        DefDescriptor<ComponentDef> internalRoot = getAuraTestingUtil().addSourceAutoCleanup(
-                ComponentDef.class,
-                String.format(baseComponentTag, "access='global'",
-                        String.format("<%s/>", externalCmp.getDescriptorName())), null,
-                        NamespaceAccess.INTERNAL);
-
-        assertTrue(configAdapter.isInternalNamespace(internalCmp.getNamespace()));
-        assertFalse(configAdapter.isInternalNamespace(externalCmp.getNamespace()));
-        assertTrue(configAdapter.isInternalNamespace(internalRoot.getNamespace()));
-
-        MasterDefRegistry mdr = contextService.getCurrentContext().getDefRegistry();
-        MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
-
-        //try {
-            mdr.getDef(internalRoot);
-            //fail("Shouldn't be able to have an internal cmp depend on an external cmp");
-        //} catch (QuickFixException t) {
-        //    this.assertExceptionMessageStartsWith(t,
-        //            DefinitionNotFoundException.class, String.format(
-        //                    "No COMPONENT named %s found",
-        //                    externalCmp.getQualifiedName()));
-        //}
-
-        mdr.getDef(externalCmp);
-        assertFalse(isInDepsCache(internalCmp, "", mdri));
-        assertFalse(isInDepsCache(externalCmp, "", mdri));
-        assertTrue(isInDepsCache(internalRoot, "", mdri));
-
-
-        mdr.getDef(internalCmp);
-        assertFalse(isInDepsCache(internalCmp, "", mdri));
-        assertFalse(isInDepsCache(externalCmp, "", mdri));
-        assertTrue(isInDepsCache(internalRoot, "", mdri));
-
-    }
 
     private MasterDefRegistry restartContextGetNewMDR() {
         // simulate new request
@@ -1454,12 +1301,12 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Create a set of DefDescriptors and add them to the MDR caches by calling getDef() on them.
+     * add one of each to cache: component, controller, renderer, application. all in custom namespace
      *
-     * @return List of DefDescriptors that have been added to the mdr caches.
+     * @return List of DefDescriptors that have been added to the caches.
      */
     @UnAdaptableTest("namesapce start with c means something special in core")
-    private Map<DefType, DefDescriptor<?>> addNonInternalDefsToMDR(MasterDefRegistryImpl mdr) throws Exception {
+    private Map<DefType, DefDescriptor<?>> addNonInternalDefsToCache() throws Exception {
         DefDescriptor<ComponentDef> cmpDef = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component>"
                         + "<aura:attribute name='label' type='String'/>"

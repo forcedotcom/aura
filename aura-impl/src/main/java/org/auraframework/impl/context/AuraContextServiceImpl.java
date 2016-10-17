@@ -132,12 +132,33 @@ public class AuraContextServiceImpl implements ContextService {
     @Override
     public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Authentication access,
             DefDescriptor<? extends BaseComponentDef> appDesc) {
+        return startContext(mode, loaders, format, access, getGlobalProviders(), appDesc);
+    }
+
+    /**
+     * Allows complete control of whats included or not included in AuraContext.
+     *
+     * Handy in situations where SourceLoaders or GlobalValueProviders are unneeded as they may be
+     * costly to initialize.
+     *
+     * @param mode AuraContext.Mode
+     * @param loaders SourceLoaders
+     * @param format Format of output
+     * @param access Access
+     * @param globalValueProviders GlobalValueProviders
+     * @param appDesc app or component descriptor
+     * @return AuraContext
+     */
+    @Override
+    public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Authentication access,
+                                    Map<String, GlobalValueProvider> globalValueProviders,
+                                    DefDescriptor<? extends BaseComponentDef> appDesc) {
         // initialize logging context
         loggingService.establish();
         MasterDefRegistryImpl mdr = getDefRegistry(mode, access, loaders);
         AuraContext context = contextAdapter.establish(mode, mdr,
                 this.prefixDefaultsAdapter.getPrefixDefaults(mode), format, access,
-                AuraJsonContext.createContext(mode, true, jsonSerializerFactory), getGlobalProviders(), appDesc);
+                AuraJsonContext.createContext(mode, true, jsonSerializerFactory), globalValueProviders, appDesc);
         mdr.setContext(context);
         return context;
     }
@@ -180,8 +201,8 @@ public class AuraContextServiceImpl implements ContextService {
             DefRegistry<?>[] registries = provider.getRegistries(mode, access, loaders);
             if (registries != null) {
                 Collections.addAll(ret, registries);
-                }
             }
+        }
         return ret;
     }
     

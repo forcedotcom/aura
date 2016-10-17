@@ -15,11 +15,13 @@
  */
 package org.auraframework.service;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -64,6 +66,13 @@ public interface ContextService extends AuraService {
      */
     AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Authentication access)
             throws QuickFixException;
+
+    /**
+     * Start a AuraContext with the given Mode, SourceLoaders, Format, and Access, GlobalValueProviders, Descriptor
+     */
+    AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Authentication access,
+                             Map<String, GlobalValueProvider> globalValueProviders,
+                             DefDescriptor<? extends BaseComponentDef> appDesc);
 
     /**
      * Close the current AuraContext, no matter which type it is.

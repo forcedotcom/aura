@@ -14,20 +14,37 @@
  * limitations under the License.
  */
 ({
-    init: function(cmp) {   
+    init: function(cmp) {
+        var closeAction = cmp.get("v.closeAction");
+        //handler for tab key to trap the focus within the modal
+        var trapFocus = $A.util.getBooleanValue(cmp.get('v.trapFocus'));
+        cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {
+            closeOnEsc: true,
+            trapFocus: trapFocus
+        }, closeAction);
+
+        this.initCloseBtn(cmp);
+    },
+
+    initCloseBtn: function (cmp) {
         //create default close button
         if ($A.util.isEmpty(cmp.get('v.closeButton')) && cmp.get('v.showCloseButton')) {
             $A.componentService.createComponent('markup://ui:button', {
-                'body': $A.createComponentFromConfig({descriptor: 'markup://aura:unescapedHtml', attributes: {value: '&times;'}}),
-            	'class': "closeBtn",
+                'body': $A.createComponentFromConfig({
+                            descriptor: 'markup://aura:unescapedHtml',
+                            attributes: {
+                                value: '&times;'
+                            }
+                        }),
+                'class': "closeBtn",
                 'press': cmp.getReference("c.onCloseBtnPressed"),
                 'label': cmp.get('v.closeDialogLabel'),
                 'buttonTitle': cmp.get('v.closeDialogLabel'),
                 'labelDisplay': "false"
             }, function(button, status){
-            	if (status === "SUCCESS") {
-            		cmp.set('v.closeButton', button);
-            	}
+                if (status === "SUCCESS") {
+                    cmp.set('v.closeButton', button);
+                }
             });
         }
 
@@ -36,11 +53,17 @@
             cmp.set('v.showPointer', false);
         }
     },
-     
+
     _getKeyHandler: function(cmp) {
         if (!cmp._keyHandler && cmp.isValid()) {
         	var closeAction = cmp.get("v.closeAction");
-            cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, closeOnTabOut:true, shouldReturnFocus:true}, closeAction);
+            var trapFocus = $A.util.getBooleanValue(cmp.get('v.trapFocus'));
+            cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {
+                closeOnEsc: true,
+                closeOnTabOut:true,
+                shouldReturnFocus:true,
+                trapFocus: trapFocus
+            }, closeAction);
         }
         return cmp._keyHandler;
     },

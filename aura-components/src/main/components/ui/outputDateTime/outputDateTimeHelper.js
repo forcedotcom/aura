@@ -18,6 +18,10 @@
      * This can be overridden by extended component.
      */
     displayDateTime: function(component, displayValue) {
+        // component could be invalid since this is inside an async call
+        if (!component.isValid()) {
+            return;
+        }
         var outputCmp = component.find("span");
         var elem = outputCmp ? outputCmp.getElement() : null;
         if (elem) {

@@ -18,74 +18,80 @@ Function.RegisterNamespace("Test.Components.Ui.OutputDateTime");
 
 [Fixture]
 Test.Components.Ui.OutputDateTime.HelperTest = function(){
-	var targetHelper;	
+	var targetHelper;
 	var message;
-	
+
 	// Aura Files need to be loaded as Json, to catch the object they contain
 	ImportJson("aura-components/src/main/components/ui/outputDateTime/outputDateTimeHelper.js",function(path,result){
 		targetHelper=result;
 	});
-	
+
     [Fixture]
-    function displayDateTime(){    	    	    	        
-    	
+    function displayDateTime(){
+
         [Fact]
         function elementExists(){
         	// Arrange
-        	var targetElement={	
+        	var targetElement={
     			textContent:'',
     			innerText:''
-    		};	
-        	
+    		};
+
         	var outputComponent={
 				getElement:function(){
 					return targetElement;
-				}								
+				}
 			};
-        	
+
 			var targetComponent={
 				find:function(component){
 					if(component=="span")return outputComponent;
-				}								
-			};		
-			
-			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
-				localizationService: {   
-					translateToLocalizedDigits: function(value) { return value; }	            	
+				},
+				isValid:function(){
+					return true;
+				}
+			};
+
+			var mockContext = Mocks.GetMock(Object.Global(), "$A", {
+				localizationService: {
+					translateToLocalizedDigits: function(value) { return value; }
 	            }
-	        });												
-			
+	        });
+
 			var displayTime = "9/23/04 4:30 PM";
 
             // Act
-            mockContext(function(){					
+            mockContext(function(){
 				targetHelper.displayDateTime(targetComponent, displayTime);
-			});	
+			});
 
             // Assert
             Assert.Equal(displayTime, targetElement.textContent);
         }
-        
+
         [Fact]
         function elementDoesntExist(){
-        	// Arrange					
-        	var targetElement={	
+        	// Arrange
+        	var targetElement={
     			textContent:'',
     			innerText:''
-    		};	
-        	
+    		};
+
 			var outputComponent={
 				getElement:function(){
 					return null;
-				}								
-			};					
-			
+				}
+			};
+
 			var targetComponent={
 				find:function(component){
 					if(component=="span")return outputComponent;
-				}								
+				},
+				isValid:function(){
+					return true;
+				}
 			};
-			
+
 			var displayTime = "9/23/04 4:30 PM";
 
             // Act
@@ -93,69 +99,21 @@ Test.Components.Ui.OutputDateTime.HelperTest = function(){
 
             // Assert
             Assert.Equal("", targetElement.textContent);
-        }        
+        }
     }
-    
+
     [Fixture]
-    function formatDateTime(){			
-			    	
+    function formatDateTime(){
+
         [Fact]
         function emptyValue(){
         	// Arrange
         	var expected = "";
         	var actual;
 
-			var helper={	
+			var helper={
 				displayDateTime:function(component, displayValue){
-					actual = displayValue;					
-				},
-                getFormat:function(component){
-                    return component.get("v.format");
-                },
-                getTimeZone:function(component) {
-                    return component.get("v.timezone");
-                } 				
-			};	
-			
-			var concreteComponent={
-				getDef:function(){
-					return {
-						getHelper:function(){					
-							return helper;
-						}
-					};
-				}					
-			};
-
-			var targetComponent={
-				get:function(expression){
-					if(expression=="v.value")return expected;				
-				},								
-		
-				getConcreteComponent:function(component){
-					return concreteComponent;
-				}								
-			};																																				
-			
-            // Act
-			targetHelper.formatDateTime(targetComponent);
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-        
-        [Fact]
-        function DateValue(){
-        	// Arrange        	
-        	var expectedDate = "Date";
-        	var expectedFormat = "YYYY-MM-DD 00:00";
-        	var expectedLang = "en";
-        	var expected = "DateYYYY-MM-DD 00:00en";        	
-        	var actual;	
-			
-			var helper={	
-				displayDateTime:function(component, displayValue){
-					actual = displayValue;					
+					actual = displayValue;
 				},
                 getFormat:function(component){
                     return component.get("v.format");
@@ -163,116 +121,164 @@ Test.Components.Ui.OutputDateTime.HelperTest = function(){
                 getTimeZone:function(component) {
                     return component.get("v.timezone");
                 }
-			};	
-			
+			};
+
 			var concreteComponent={
 				getDef:function(){
 					return {
-						getHelper:function(){					
+						getHelper:function(){
+							return helper;
+						}
+					};
+				}
+			};
+
+			var targetComponent={
+				get:function(expression){
+					if(expression=="v.value")return expected;
+				},
+
+				getConcreteComponent:function(component){
+					return concreteComponent;
+				}
+			};
+
+            // Act
+			targetHelper.formatDateTime(targetComponent);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function DateValue(){
+        	// Arrange
+        	var expectedDate = "Date";
+        	var expectedFormat = "YYYY-MM-DD 00:00";
+        	var expectedLang = "en";
+        	var expected = "DateYYYY-MM-DD 00:00en";
+        	var actual;
+
+			var helper={
+				displayDateTime:function(component, displayValue){
+					actual = displayValue;
+				},
+                getFormat:function(component){
+                    return component.get("v.format");
+                },
+                getTimeZone:function(component) {
+                    return component.get("v.timezone");
+                }
+			};
+
+			var concreteComponent={
+				getDef:function(){
+					return {
+						getHelper:function(){
 							return helper;
 						}
 					};
 				},
 				get:function(expression){
-					if(expression=="v.format")return expectedFormat;	
+					if(expression=="v.format")return expectedFormat;
 					if(expression=="v.langLocale")return expectedLang;
 					if(expression=="v.timezone")return "GMT";
 				}
 			};
-			        	
+
 			var targetComponent={
 				get:function(expression){
-					if(expression=="v.value")return "2004-09-23T16:30:00.000Z";									
-				},								
-		
+					if(expression=="v.value")return "2004-09-23T16:30:00.000Z";
+				},
+
 				getConcreteComponent:function(component){
 					return concreteComponent;
-				}								
-			};				
-						
-			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
-				localizationService: {   
+				}
+			};
+
+			var mockContext = Mocks.GetMock(Object.Global(), "$A", {
+				localizationService: {
 					UTCToWallTime: function(dateObj,timezone, callback ) { callback(dateObj); },
 					formatDateTimeUTC: function(walltime, format, langLocale) { return expectedDate+format+langLocale; },
                     parseDateTimeISO8601: function(datetimeString) { return new Date(datetimeString); },
                     translateToOtherCalendar: function(date) { return date; }
 	            }
-	        });												
-			 
+	        });
+
             // Act
-									
-			mockContext(function(){					
+
+			mockContext(function(){
 				targetHelper.formatDateTime(targetComponent);
-			});			
+			});
 
             // Assert
             Assert.Equal(expected, actual);
         }
-        
-        
+
+
         [Fact]
         function ThrowsException(){
         	// Arrange
         	var expected = "Invalid date time value";
         	var actual;
-        	
-			var helper={	
+
+			var helper={
 				displayDateTime:function(component, displayValue){
-					actual = displayValue;					
+					actual = displayValue;
 				},
 				getFormat:function(component){
 				    return component.get("v.format");
 				},
 				getTimeZone:function(component) {
                     return component.get("v.timezone");
-                }		
-			};	
+                }
+			};
 
-			
+
 			var concreteComponent={
 				getDef:function(){
 					return {
-						getHelper:function(){					
+						getHelper:function(){
 							return helper;
 						}
 					};
 				},
 				get:function(expression){
-					if(expression=="v.format")return "YYYY-MM-DD 00:00";	
+					if(expression=="v.format")return "YYYY-MM-DD 00:00";
 					if(expression=="v.langLocale")return "en";
 					if(expression=="v.timezone")return "GMT";
 				}
 			};
-			        	
+
 			var targetComponent={
 				get:function(expression){
-					if(expression=="v.value")return "2004-09-23T16:30:00.000Z";									
-				},								
-		
+					if(expression=="v.value")return "2004-09-23T16:30:00.000Z";
+				},
+
 				getConcreteComponent:function(component){
 					return concreteComponent;
-				}								
-			};				
-									
-			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
-				localizationService: {   
-					UTCToWallTime: function(dateObj,timezone, callback) { callback(dateObj); },			
+				}
+			};
+
+			var mockContext = Mocks.GetMock(Object.Global(), "$A", {
+				localizationService: {
+					UTCToWallTime: function(dateObj,timezone, callback) { callback(dateObj); },
 					formatDateTimeUTC: function(walltime, format, langLocale) { throw {"message": expected}; },
 
 					parseDateTimeISO8601: function(datetimeString) { return new Date(datetimeString); },
-                    translateToOtherCalendar: function(date) { return date; }           	
+                    translateToOtherCalendar: function(date) { return date; }
 	            }
-	        });												
-			 
+	        });
+
             // Act
-									
-			mockContext(function(){					
+
+			mockContext(function(){
 				targetHelper.formatDateTime(targetComponent);
-			});			
+			});
 
             // Assert
             Assert.Equal(expected, actual);
-        }   
-         
-    }                
+        }
+
+    }
 }

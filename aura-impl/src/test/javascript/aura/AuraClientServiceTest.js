@@ -46,6 +46,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 }
             },
             util : {
+                apply: function() {},
                 estimateSize: function() {
                     return 0;
                 },
@@ -1062,7 +1063,84 @@ Test.Aura.AuraClientServiceTest = function() {
                 });
             });
         }
+    }
 
+    [Fixture]
+    function initializeClientLibraries() {
+
+        var mockGlobals = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                util: {
+                    apply: function(target, source) {
+                        return source;
+                    }
+                }
+            },
+            window: {},
+            Aura: Aura
+        });
+
+        [Fact]
+        function MakesLibNamesAsLowerCase() {
+            var libName = "libName";
+            var script = {
+                getAttribute: function(attribute) {
+                    if(attribute === "data-src") {
+                        return "path/" + libName + ".js";
+                    }
+                }
+            }
+
+            var mockDocument = Mocks.GetMocks(Object.Global(), {
+                document: {
+                    getElementById: function() {},
+                    getElementsByTagName: function(tagName) {
+                        if(tagName === "script") {
+                            return [script];
+                        }
+                    }
+                },
+            });
+
+            var actual;
+            mockGlobals(function() {
+                mockDocument(function() {
+                    var target = new Aura.Services.AuraClientService();
+                    target.initializeClientLibraries();
+                    // the lib should be retrievable with lowser case name
+                    actual = target.clientLibraries[libName.toLowerCase()];
+                })
+            });
+
+            Assert.Equal(script, actual.script);
+        }
+    }
+
+    [Fixture]
+    function loadClientLibrary() {
+
+        [Fact]
+        function LoadsLibWithLowerCaseName() {
+            var libName = "LIBNAME";
+            var lib = {
+                // when lib is loaded, the callback will be called
+                // syncly if the lib is registered.
+                loaded: true
+            };
+
+            var callback = Stubs.GetMethod();
+            mockGlobal(function() {
+                var target = new Aura.Services.AuraClientService();
+                // all client libraries should be store as lower case
+                target.clientLibraries[libName.toLowerCase()] = lib;
+
+                // Act
+                target.loadClientLibrary(libName, callback);
+            });
+
+            // callback gets called when lib is found and loaded
+            Assert.Equal(1, callback.Calls.length);
+        }
     }
 
     [Fixture]

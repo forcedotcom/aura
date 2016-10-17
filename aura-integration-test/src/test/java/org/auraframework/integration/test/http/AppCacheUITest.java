@@ -32,13 +32,8 @@ public class AppCacheUITest extends WebDriverTestCase {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application useAppcache='true' render='client'></aura:application>");
         String url = getUrl(appDesc);
+        // this includes waitForAppCacheReady
         open(url);
-
-        String js = "var status = window.applicationCache.status;" +
-                    "return status !== window.applicationCache.UNCACHED &&" +
-                    "       status !== window.applicationCache.DOWNLOADING &&" +
-                    "       status !== window.applicationCache.CHECKING;";
-        this.waitForCondition(js);
 
         String script = "var htmlNode = document.body.parentNode;" +
                         "return htmlNode ? htmlNode.getAttribute('manifest') : 'null';";

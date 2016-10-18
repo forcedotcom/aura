@@ -15,7 +15,9 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.components.test.java.controller.TestController">
+<aura:component extensible="true"
+                controller="java://org.auraframework.components.test.java.controller.TestController">
+
     <aura:attribute name="requiredAttribute" type="String" required="true"/>
     <aura:attribute name="message" type="String"/>
     <aura:attribute name="error" type="String"/>

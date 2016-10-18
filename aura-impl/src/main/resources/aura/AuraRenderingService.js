@@ -69,11 +69,22 @@ AuraRenderingService.prototype.render = function(components, parent) {
         // JBUCH: HALO: TODO: END REMOVE ME
 
         if (cmp.isValid()) {
-            $A.getContext().setCurrentAccess(cmp);
-            var renderedElements = cmp["render"]();
-            $A.getContext().releaseCurrentAccess();
-            renderedElements=this.finishRender(cmp, renderedElements);
-            elements = elements.concat(renderedElements);
+            try {
+                $A.getContext().setCurrentAccess(cmp);
+                var renderedElements = cmp["render"]();
+                $A.getContext().releaseCurrentAccess();
+                renderedElements=this.finishRender(cmp, renderedElements);
+                elements = elements.concat(renderedElements);
+            } catch (e) {
+                if (e instanceof $A.auraError && e.component) {
+                    throw e;
+                } else {
+                    var ae = new $A.auraError("render threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
+                    ae.component = cmp.getDef().getDescriptor().toString();
+                    $A.lastKnownError = ae;
+                    throw ae;
+                }
+            }
         }
     }
 

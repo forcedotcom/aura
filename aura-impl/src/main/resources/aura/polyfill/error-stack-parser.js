@@ -23,16 +23,8 @@
 /* eslint-disable */
 (function(root, factory) {
     'use strict';
-    // Universal Module Definition (UMD) to support AMD, CommonJS/Node.js, Rhino, and browsers.
 
-    /* istanbul ignore next */
-    if (typeof define === 'function' && define.amd) {
-        define('error-stack-parser', ['stackframe'], factory);
-    } else if (typeof exports === 'object') {
-        module.exports = factory(require('stackframe'));
-    } else {
-        root['ErrorStackParser'] = factory(root['StackFrame']);
-    }
+    root['ErrorStackParser'] = factory(root['StackFrame']);
 }(this, function ErrorStackParser(StackFrame) {
     'use strict';
 

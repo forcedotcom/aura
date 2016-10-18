@@ -23,16 +23,8 @@
 /* eslint-disable */
 (function(root, factory) {
     'use strict';
-    // Universal Module Definition (UMD) to support AMD, CommonJS/Node.js, Rhino, and browsers.
 
-    /* istanbul ignore next */
-    if (typeof define === 'function' && define.amd) {
-        define('stackframe', [], factory);
-    } else if (typeof exports === 'object') {
-        module.exports = factory();
-    } else {
-        root['StackFrame'] = factory();
-    }
+    root['StackFrame'] = factory();
 }(this, function() {
     'use strict';
     function _isNumber(n) {

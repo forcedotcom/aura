@@ -67,26 +67,59 @@
                 "attributes on text nodes");
         }
     },
-    
+
     /**
      * Verify $A.util.isComponent() API
      */
-    testIsComponent : {
-	test:[
-	      function(cmp){
-		  $A.test.assertTrue($A.util.isComponent(cmp));
-		  $A.test.assertTrue($A.util.isComponent(cmp.find("aDiv")));
-		  $A.test.assertFalse($A.util.isComponent(cmp.getDef()));
-		  $A.test.assertFalse($A.util.isComponent(cmp.getElement()));
-		  var valueObj = $A.expressionService.create(null, "literal");
-		  $A.test.assertFalse($A.util.isComponent(valueObj));
-	      },
-	      function(cmp){
-		  $A.test.assertFalse($A.util.isComponent(""));
-		  $A.test.assertFalse($A.util.isComponent(undefined));
-		  $A.test.assertFalse($A.util.isComponent(null));
-		  $A.test.assertFalse($A.util.isComponent());
-	      }
-	      ]
+    testIsComponent: {
+        test:[
+            function(cmp){
+                $A.test.assertTrue($A.util.isComponent(cmp));
+                $A.test.assertTrue($A.util.isComponent(cmp.find("aDiv")));
+                $A.test.assertFalse($A.util.isComponent(cmp.getDef()));
+                $A.test.assertFalse($A.util.isComponent(cmp.getElement()));
+                var valueObj = $A.expressionService.create(null, "literal");
+                $A.test.assertFalse($A.util.isComponent(valueObj));
+            },
+            function(cmp){
+                $A.test.assertFalse($A.util.isComponent(""));
+                $A.test.assertFalse($A.util.isComponent(undefined));
+                $A.test.assertFalse($A.util.isComponent(null));
+                $A.test.assertFalse($A.util.isComponent());
+            }
+        ]
+    },
+
+    testGetCookieForNonExistedCookie: {
+        test: function() {
+            $A.test.assertUndefined($A.util.getCookie("nonexistentCookie"),
+                    "'undefined' should be returned when cookie does not exist");
+        }
+    },
+
+    testGetCookieForExpiredCookie: {
+        test: function() {
+            var cookieKey = "myCookieKey";
+            var cookieValue = "myCookieValue";
+            var expiredCookie = cookieKey + "=" + cookieValue + ";expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            document.cookie = expiredCookie;
+
+            $A.test.assertUndefined($A.util.getCookie(cookieKey),
+                    "'undefined' should be returned when cookie is expired");
+        }
+    },
+
+    testGetCookieForExistedCookie: {
+        test: function() {
+            var cookieKey = "myCookieKey";
+            var cookieValue = "myCookieValue";
+
+            var expiration = new Date(new Date().getTime() + 1000*60*60); //1h
+            var existedCookie = cookieKey + "=" + cookieValue + ";expires=" + expiration.toUTCString();
+            document.cookie = existedCookie;
+
+            $A.test.assertEquals(cookieValue, $A.util.getCookie(cookieKey),
+                    "Failed to get right cookie value");
+        }
     }
 })

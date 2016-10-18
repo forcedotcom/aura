@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component description="file">
+<aura:component extensible="true" description="file">
     <aura:attribute name="innerTextValue" type="String"/>
     <aura:attribute name="addText" default="someText" type="String"/>
     

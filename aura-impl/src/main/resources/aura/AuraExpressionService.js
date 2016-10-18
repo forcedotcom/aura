@@ -22,8 +22,11 @@
  */
 function AuraExpressionService() {
     this.references={};
-    this.PRIMITIVE_SEPARATOR = "__";
 }
+
+AuraExpressionService.PRIMITIVE_SEPARATOR = "__";
+AuraExpressionService.AURA_IF = "aura$if";
+AuraExpressionService.AURA_ITERATION = "aura$iteration";
 
 AuraExpressionService.prototype.getReference = function (expression, valueProvider) {
     expression = $A.expressionService.normalize(expression);
@@ -301,6 +304,52 @@ AuraExpressionService.prototype.resolveLocatorContext = function (cmp, locatorDe
     return context;
 };
 
+/**
+ * Returns the component that cmp is contained in
+ * @param cmp - component
+ * 
+ * @returns The component that contains cmp, bypassing if/iteration in the chain
+ * @private
+ */
+AuraExpressionService.prototype.getContainer = function (cmp) {
+    if (!cmp) {
+        return undefined;
+    }
+    
+    // TODO mrafique: Manually checking for aura:iteration or aura:if is a hack. Ideally, getOwner() 
+    //    or another API would always return the proper container. 
+    //    based on advice from jbuch
+    var owner = cmp.getOwner();
+    var ownerName = owner.getName();
+    while ( ownerName === AuraExpressionService.AURA_ITERATION || 
+            ownerName === AuraExpressionService.AURA_IF) {
+        owner = owner.getOwner();
+        ownerName = owner.getName();
+    }
+
+    return owner;
+};
+
+/**
+ * Returns a locatorDef targeting targetId inside cmp or it's super chain
+ * @param cmp - component
+ * @param targetId - targetId of locator def
+ * 
+ * @returns Any locator definition found in the super chain of a component
+ * @private
+ */
+AuraExpressionService.prototype.findLocatorDefInSuperChain = function (cmp, targetId) {
+    var locatorDefs;
+    var locatorDef;
+    while (!locatorDef && cmp) {
+        locatorDefs = cmp.getDef().getLocatorDefs();
+        locatorDef = locatorDefs && (locatorDefs[targetId] || locatorDefs["*"]);
+        if (!locatorDef) {
+            cmp = cmp.getSuper();
+        }
+    }
+    return locatorDef;
+};
 
 /**
  * @param component The component that contains the locator targeting root
@@ -312,8 +361,8 @@ AuraExpressionService.prototype.resolveLocatorContext = function (cmp, locatorDe
  *          + parent localId as scope with context provided by grandparent->parent locator
  */
 AuraExpressionService.prototype.resolveLocator = function (parent, root, includeMetadata, primitiveFound) {
-    var parentId = parent.getLocalId();
     var locator;
+    var parentId = parent && parent.getLocalId();
     var rootId = root && root.getLocalId();
 
     if (!rootId) {
@@ -321,52 +370,25 @@ AuraExpressionService.prototype.resolveLocator = function (parent, root, include
     }
 
     // We need to look at the linkage via super-chain in case the parent is extended
-    var currentCmp = parent;
-    var link = parent.find(rootId);
-
-    while (!link && currentCmp) {
-        currentCmp = currentCmp.getSuper();
-        if (currentCmp) {
-            link = currentCmp.find(rootId);
-        }
-    }
-
-    if (!link) {
-        return locator;
-    }
-
-    var rootLocatorDefs = currentCmp.getDef().getLocatorDefs();
-    var rootLocatorDef = rootLocatorDefs && rootLocatorDefs[rootId];
-
+    var rootLocatorDef = this.findLocatorDefInSuperChain(parent, rootId);
+    
     // figure out if we need to jump another level for locators marked as primitive
     if (!primitiveFound && rootLocatorDef && rootLocatorDef["isPrimitive"]) {
         primitiveFound =  {};
         primitiveFound["target"] = rootLocatorDef["alias"] || rootId;
-        primitiveFound["resolvedContext"] = this.resolveLocatorContext(currentCmp, rootLocatorDef);
-        root = currentCmp;
-        currentCmp = currentCmp.getComponentValueProvider().getConcreteComponent();
-        return this.resolveLocator(currentCmp, root, includeMetadata, primitiveFound);
+        primitiveFound["resolvedContext"] = this.resolveLocatorContext(parent, rootLocatorDef);
+        root = parent;
+        parent = this.getContainer(parent).getConcreteComponent();
+        return this.resolveLocator(parent, root, includeMetadata, primitiveFound);
     }
     
-    var grandparent = parent.getComponentValueProvider().getConcreteComponent();
+    var grandparent = this.getContainer(parent).getConcreteComponent();
 
     if (grandparent.isInstanceOf('ui:virtualComponent')) {
-        grandparent = grandparent.getConcreteComponent().getComponentValueProvider();
+        grandparent = this.getContainer(grandparent).getConcreteComponent();
     }
     
-    var parentLocatorDefs;
-    var parentLocatorDef;
-    
-    // walk up the super chain for grandparent until you find a matching locator or a '*' locator
-    while (!parentLocatorDef && grandparent) {
-        if (grandparent) {
-            parentLocatorDefs = grandparent.getDef().getLocatorDefs();
-            parentLocatorDef = parentLocatorDefs && (parentLocatorDefs[parentId] || parentLocatorDefs["*"]);
-        }
-        if (!parentLocatorDef) {
-            grandparent = grandparent.getSuper();
-        }
-    }
+    var parentLocatorDef = this.findLocatorDefInSuperChain(grandparent, parentId);
     
     if (!rootLocatorDef || !parentLocatorDef) {
         return locator;
@@ -374,7 +396,7 @@ AuraExpressionService.prototype.resolveLocator = function (parent, root, include
 
     locator = {};
 
-    var rootContext = this.resolveLocatorContext(currentCmp, rootLocatorDef);
+    var rootContext = this.resolveLocatorContext(parent, rootLocatorDef);
     var parentContext = this.resolveLocatorContext(grandparent, parentLocatorDef);
     var primitiveContext = primitiveFound && primitiveFound["resolvedContext"];
     
@@ -391,7 +413,7 @@ AuraExpressionService.prototype.resolveLocator = function (parent, root, include
     locator["scope"] = parentLocatorDef["alias"] || parentId;
     
     if (primitiveFound) {
-        locator["target"] = locator["target"] + this.PRIMITIVE_SEPARATOR + primitiveFound["target"];
+        locator["target"] = locator["target"] + AuraExpressionService.PRIMITIVE_SEPARATOR + primitiveFound["target"];
     }
     
     // TODO - W-3378426 - put this in javascript directive to block out the if{} block in PROD mode

@@ -25,11 +25,13 @@
             target="locatorWrapperIdWithDefActual" 
             alias="locatorWrapperIdWithDefAlias" 
             description="Locator defined on wrapper"/>
+            
+    <aura:locator target="locatorWrapperExtended" description="targetting extended component"/>
     
     <aura:locator target="locatorWrapperIdWithDef" description="Locator defined on wrapper">
         <aura:locatorContext key="parentKey" value="{!v.wrapperText}"/>
     </aura:locator>
-    
+
     <div class="locatorWrapperIdNoDef">
         <locatorTest:innerWithLocator aura:id="locatorWrapperIdNoDef" innerTextValue="{!v.wrapperText + ' | Parent has auraid without locator def'}"/>
     </div>
@@ -39,7 +41,9 @@
     </div>
 
     <div class="locatorWrapperIdWithDef">
+    <aura:if isTrue="{!true}">
         <locatorTest:innerWithLocator aura:id="locatorWrapperIdWithDef" innerTextValue="{!v.wrapperText + ' | Parent has auraid with locator def'}"/>
+    </aura:if>
     </div>
 
     <div class="locatorWrapperIdWithDefAlias">
@@ -48,4 +52,9 @@
         </aura:if>
     </div>
     
+    <div class="locatorWrapperExtended">
+    <aura:if isTrue="{!v.alwaysTrue}">
+        <locatorTest:innerWithLocatorExtended aura:id="locatorWrapperExtended" innerTextValue="{!v.wrapperText + ' | Parent is using extended innerWithLocator'}"/>
+    </aura:if>
+    </div>
 </aura:component>

@@ -37,7 +37,7 @@
         <aura:attribute name="callback" type="Object" description="Callback function"/>
     </aura:method>
     
-    <aura:locator target="tabItemAnchor" alias="tabitem-link" description="UI Tab item link">
+    <aura:locator target="tabItemAnchor" alias="tab" isPrimitive="true" description="Tab">
     	<aura:locatorContext key="tabName" value="{!v.name}" />
     </aura:locator>
     

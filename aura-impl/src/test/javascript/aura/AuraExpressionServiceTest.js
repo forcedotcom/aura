@@ -18,7 +18,6 @@ Function.RegisterNamespace("Test.Aura");
 [Fixture]
 Test.Aura.AuraExpressionServiceTest = function(){
     var Aura = { Services:{} };
-
     Mocks.GetMocks(Object.Global(), {
         "Aura": Aura,
         "AuraExpressionService": function(){}
@@ -140,6 +139,10 @@ Test.Aura.AuraExpressionServiceTest = function(){
             var root = { 
                 getLocalId: function() { return locatorLocalId;}
             };
+            var mockStaticExpressionService = Mocks.GetMocks(Object.Global(), {
+                "AuraExpressionService": {}
+            });
+
             var component = {
                 find: function(localId) {
                     if(localId === locatorLocalId) {
@@ -147,10 +150,19 @@ Test.Aura.AuraExpressionServiceTest = function(){
                     }
                 },
                 getSuper: function() { return undefined; },
+                isInstanceOf: function() {return false},
+                getDef: function() { return { getLocatorDefs: function() {return undefined}}},
+                getOwner: function() { return {
+                    getName: function () {return "";},
+                    getConcreteComponent: function () {return component}
+                }},
                 getLocalId: function() { return "ownerLocalId" }
             };
 
-            var actual = targetService.resolveLocator(component, root);
+            var actual = mockStaticExpressionService(function () {
+                return targetService.resolveLocator(component, root);
+            });
+            
 
             Assert.Undefined(actual);
         }

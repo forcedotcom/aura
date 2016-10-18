@@ -32,6 +32,8 @@ var DomHandlersPlugin = function DomHandlersPlugin(config) {
 
 DomHandlersPlugin.NAME = "domHandlers";
 DomHandlersPlugin.DEFAULT_INTERACTION_TYPE = "user";
+DomHandlersPlugin.AURA_IF = "aura$if";
+DomHandlersPlugin.AURA_ITERATION = "aura$iteration";
 DomHandlersPlugin.WHITELISTEVENTS = { 
     "click" : true // only click for now
 };
@@ -123,10 +125,26 @@ DomHandlersPlugin.prototype.dispatchVirtualActionHook = function (action, event,
     }
 };
 
+DomHandlersPlugin.prototype.getOwner = function (cmp) {
+    if (!cmp) {
+        return undefined;
+    }
+    // TODO mrafique: Manually checking for aura:iteration or aura:if is a hack. Ideally, getOwner() 
+    //    or another API would always return the proper container. 
+    //    based on advice from jbuch
+    var owner = cmp.getOwner();
+    var ownerName = owner.getName();
+    while (ownerName === DomHandlersPlugin.AURA_ITERATION || ownerName === DomHandlersPlugin.AURA_IF) {
+        owner = owner.getOwner();
+        ownerName = owner.getName();
+    }
+    return owner;
+};
+
 DomHandlersPlugin.prototype.logUnInstrumentedClick = function (action, root) {
     var parent = action.getComponent().getConcreteComponent();
-    var grandparent = parent.getComponentValueProvider().getConcreteComponent();
-    var grandparentContainer = grandparent.getComponentValueProvider().getConcreteComponent();
+    var grandparent = this.getOwner(parent).getConcreteComponent();
+    var grandparentContainer = this.getOwner(grandparent).getConcreteComponent();
     // root will always be an aura:html component. It's the root of all our click handlers
     var hierarchy = {
             "rootHtmlTag": root.get("v.tag"),

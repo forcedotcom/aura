@@ -105,6 +105,14 @@
                         "primitiveKey": "primitiveValue"
                     });
         }
+    },
+    testParentWithAuraIdLocatorChildExtended: {
+        test: function (cmp) {
+            var innerCmp = cmp.find('locatorWrapperExtended');
+            this.doClickAndValidateTransaction("innerWithAuraIdLocator", "locatorWrapperExtended", {
+                    "innerTextValue": innerCmp.get("v.innerTextValue") + innerCmp.get("v.addText")
+                });
+        }
     }
     
 })

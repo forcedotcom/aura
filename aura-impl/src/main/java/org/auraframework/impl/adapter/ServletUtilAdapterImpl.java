@@ -18,11 +18,7 @@ package org.auraframework.impl.adapter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
@@ -32,28 +28,20 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
-import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.ContentSecurityPolicy;
-import org.auraframework.adapter.ExceptionAdapter;
-import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.adapter.*;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.clientlibrary.ClientLibraryService;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ClientLibraryDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.CSP;
+import org.auraframework.impl.util.BrowserUserAgent;
+import org.auraframework.impl.util.UserAgent;
 import org.auraframework.instance.InstanceStack;
-import org.auraframework.service.ContextService;
-import org.auraframework.service.DefinitionService;
-import org.auraframework.service.SerializationService;
-import org.auraframework.system.AuraContext;
+import org.auraframework.service.*;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.AuraResource;
-import org.auraframework.throwable.AuraUnhandledException;
-import org.auraframework.throwable.ClientOutOfSyncException;
-import org.auraframework.throwable.NoAccessException;
+import org.auraframework.throwable.*;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -468,6 +456,11 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      */
     @Override
     public void setCSPHeaders(DefDescriptor<?> top, HttpServletRequest req, HttpServletResponse rsp) {
+        
+        if(canSkipCSPHeader(top, req)) {
+            return;
+        }
+        
         ContentSecurityPolicy csp = configAdapter.getContentSecurityPolicy(
                 top == null ? null : top.getQualifiedName(), req);
 
@@ -496,6 +489,61 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 }
             }
         }
+    }
+    
+    /**
+     * Check if CSP Header setting is already inherited from one.app (top level context) 
+     * See https://www.w3.org/TR/CSP2/#which-policy-applies
+     * @param defDesc
+     * @param req
+     * @return true if CSP header setting can be skipped
+     */
+    private boolean canSkipCSPHeader(final DefDescriptor<?> defDesc, final HttpServletRequest req) {
+        if(defDesc == null | req == null) {
+            return false;
+        }
+        
+        // CSP inheritance is supported starting from CSP2
+        if(!isCSP2Supported(req)) {
+            return false;
+        }
+        
+        final String descriptorName = defDesc.getDescriptorName();
+        if(!descriptorName.equals("one:one")) { // only skip while loading one.app 
+            return false;
+        }
+        
+        final String auraFormat = req.getParameter("aura.format");
+        if(auraFormat != null && auraFormat.equals("HTML")) {
+            return false;
+        }
+        
+        // Skip one.app requests for non HTML content with already established aura context
+        final String auraContext = req.getParameter("aura.context");
+        if(auraContext != null) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Check if Content Security Policy Level 2 is supported by the browser
+     * Currently, IE, Edge and Opera Mini browsers don't support CSP2 as per http://caniuse.com/#feat=contentsecuritypolicy2
+     * @return true if user agent used in req supports CSP2
+     */
+    private boolean isCSP2Supported(final HttpServletRequest req) {
+        final String userAgent = req.getHeader("User-Agent");
+        if(userAgent == null) {
+            return false;
+        }
+        
+        final int browser = BrowserUserAgent.parseBrowser(userAgent);
+        if(UserAgent.IE.match(browser)) { // UserAgent.IE is used for IE11 and IE12 (Edge)
+            return false;
+        }
+        
+        return true;
     }
 
     /**

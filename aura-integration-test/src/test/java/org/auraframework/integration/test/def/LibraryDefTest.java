@@ -15,11 +15,12 @@
  */
 package org.auraframework.integration.test.def;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
+import java.io.ByteArrayOutputStream;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.List;
+import java.util.Set;
+
 import javax.inject.Inject;
 
 import org.auraframework.def.DefDescriptor;
@@ -40,11 +41,11 @@ import org.auraframework.util.json.JsonEncoder;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.io.ByteArrayOutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.List;
-import java.util.Set;
+import com.google.common.base.Charsets;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 public class LibraryDefTest extends DefinitionTest<LibraryDef> {
 
@@ -172,6 +173,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
         Writer writer = new StringWriter();
         serverService.writeDefinitions(descs, writer);
         String actual = writer.toString();
+        actual = actual.replaceFirst("//# sourceURL=libraries/string/thing[0-9]+\\.js\n", "");
         String expected = "function(){var a=\"truth\";window.blah&&(a+=\" hurts\");return a}";
         if (!actual.contains(expected)) {
             fail(String.format("library code was not compressed - expected <%s> but got <%s>", expected, actual));

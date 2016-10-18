@@ -29,32 +29,33 @@ import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptWriter;
 
 public abstract class BaseJavascriptClass implements Serializable {
-	private static final long serialVersionUID = 7445974179103021929L;
+    private static final long serialVersionUID = 7445974179103021929L;
 
-	private final String code;
-	private final String minifiedCode;
+    private final String code;
+    private final String minifiedCode;
 
-	public BaseJavascriptClass(Builder builder) {
-		code = builder.code;
-		minifiedCode = builder.minifiedCode;
-	}
+    public BaseJavascriptClass(Builder builder) {
+        code = builder.code;
+        minifiedCode = builder.minifiedCode;
+    }
 
     public String getCode() {
-    	return code;
+        return code;
     }
 
     public String getMinifiedCode() {
-    	return minifiedCode;
+        return minifiedCode;
     }
 
     public static abstract class Builder {
 
-    	private boolean minify = true;
-    	private String code;
-    	private String minifiedCode;
+        private boolean minify = true;
+        private String code;
+        private String minifiedCode;
 
         /**
          * Turn minfication on/off (on by default).
+         *
          * @param minify true if class needs to be compiled.
          */
         public Builder setMinify(boolean minify) {
@@ -65,65 +66,82 @@ public abstract class BaseJavascriptClass implements Serializable {
         public abstract BaseJavascriptClass build() throws QuickFixException;
 
         /**
-         * Return true is the class has JS code.
-         * Instances should implement it to avoid unecessary extra calls to the compiler.
+         * Return true is the class has JS code. Instances should implement it to avoid unecessary extra calls to the
+         * compiler.
+         *
          * @return true if class needs to be compiled.
          */
         protected abstract boolean hasCode();
 
-	    /**
-	     * Get file location.
-	     * @return the Location for referencing errors
-	     */
-	    protected abstract Location getLocation();
+        /**
+         * Get file location.
+         *
+         * @return the Location for referencing errors
+         */
+        protected abstract Location getLocation();
 
-	    /**
-	     * Get filename.
-	     * @return the Location for referencing errors
-	     */
-	    protected abstract String getFilename();
+        /**
+         * Get filename.
+         *
+         * @return the Location for referencing errors
+         */
+        protected abstract String getFilename();
 
-	    /**
-	     * Generates the JavaScript class.
-	     * @return the JavaScript class.
-	     * @throws QuickFixException
-	     */
-	    protected abstract String generate() throws QuickFixException;
+        /**
+         * Generates the JavaScript class.
+         *
+         * @return the JavaScript class.
+         * @throws QuickFixException
+         */
+        protected abstract String generate() throws QuickFixException;
+
+        protected abstract String getSourceUrl();
 
         protected void finish() throws QuickFixException {
-        	code = generate();
+            code = generate();
+            if (minify && hasCode()) {
+                try {
+                    StringWriter sw = new StringWriter();
+                    List<JavascriptProcessingError> codeErrors = JavascriptWriter.CLOSURE_SIMPLE.compress(code, sw,
+                            getFilename());
+                    validateCodeErrors(codeErrors);
+                    minifiedCode = sw.toString();
+                    // only do this for PROD as other modes would be taken care of in the client
+                    minifiedCode = writeSourceUrl(minifiedCode);
+                } catch (IOException e) {
+                    // There is no IO in this scenario. The JavascriptWriter API requires
+                    // this catch, even if it's never called when reading from a string.
+                    throw new AuraRuntimeException(e.getMessage());
+                }
+            }
+        }
 
-        	if (minify && hasCode()) {
-			    try {
-			    	StringWriter sw = new StringWriter();
-			    	List<JavascriptProcessingError> codeErrors = JavascriptWriter.CLOSURE_SIMPLE.compress(code, sw, getFilename());
-			    	validateCodeErrors(codeErrors);
-			    	minifiedCode = sw.toString();
-			    } catch (IOException e) {
-			    	// There is no IO in this scenario. The JavascriptWriter API requires
-			    	// this catch, even if it's never called when reading from a string.
-			    	throw new AuraRuntimeException(e.getMessage());
-			    }
-			}
-	    }
+        protected String writeSourceUrl(String codeToWrite) {
+            StringBuilder sb = new StringBuilder();
+            int lastCurlyPos = codeToWrite.lastIndexOf('}');
+            sb.append(codeToWrite.substring(0, lastCurlyPos));
+            sb.append(getSourceUrl());
+            sb.append(codeToWrite.substring(lastCurlyPos));
+            return sb.toString();
+        }
 
-        protected void validateCodeErrors(List<JavascriptProcessingError> codeErrors) throws InvalidDefinitionException {
-	    	if (codeErrors != null && !codeErrors.isEmpty()) {
-	            StringBuilder sb = new StringBuilder();
-	            boolean first = true;
-	            for (JavascriptProcessingError error : codeErrors) {
-	            	if (first) {
-	            		first = false;
-	            	} else {
-	            		sb.append("\n");
-	            	}
-	            	sb.append(error.toString());
-	            }
-	            if (sb.length() > 0) {
-	            	throw new InvalidDefinitionException(sb.toString(), getLocation());
-	            }
-	        }
-         }
+        protected void validateCodeErrors(List<JavascriptProcessingError> codeErrors)
+                throws InvalidDefinitionException {
+            if (codeErrors != null && !codeErrors.isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+                boolean first = true;
+                for (JavascriptProcessingError error : codeErrors) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        sb.append("\n");
+                    }
+                    sb.append(error.toString());
+                }
+                if (sb.length() > 0) {
+                    throw new InvalidDefinitionException(sb.toString(), getLocation());
+                }
+            }
+        }
     }
- }
-
+}

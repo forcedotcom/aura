@@ -51,6 +51,7 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
 
         private BaseComponentDef componentDef;
         private boolean hasCode = false;
+        private String jsDescriptor;
 
         public Builder setDefinition(BaseComponentDef componentDef) throws QuickFixException {
             this.componentDef = componentDef;
@@ -75,7 +76,7 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
         @Override
         protected String generate() throws QuickFixException {
 
-            String jsDescriptor = componentDef.getDescriptor().getQualifiedName();
+            jsDescriptor = componentDef.getDescriptor().getQualifiedName();
             if (AuraTextUtil.isNullEmptyOrWhitespace(jsDescriptor)) {
                 throw new InvalidDefinitionException("Component classes require a non empty fully qualified name",
                         null);
@@ -96,6 +97,13 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
         public JavascriptComponentClass build() throws QuickFixException {
             finish();
             return new JavascriptComponentClass(this);
+        }
+
+        @Override
+        public String getSourceUrl() {
+            String desc = jsDescriptor.split("://")[1];
+            String[] parts = desc.split(":");
+            return "//# sourceURL=components/" + parts[0] + '/' + parts[1] + ".js\n";
         }
 
         private void writeExporter(StringBuilder out) throws QuickFixException {

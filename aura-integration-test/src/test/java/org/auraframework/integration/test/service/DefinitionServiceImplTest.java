@@ -204,7 +204,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         NoAccessException expected = null;
         Definition def = definitionService.getDefinition(desc);
         try {
-            definitionService.getDefRegistry().assertAccess(null, def);
+            definitionService.assertAccess(null, def);
         } catch (NoAccessException e) {
             expected = e;
         }
@@ -223,7 +223,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         Definition def = definitionService.getDefinition(desc.getQualifiedName(), ComponentDef.class);
 
         try {
-            definitionService.getDefRegistry().assertAccess(null, def);
+            definitionService.assertAccess(null, def);
         } catch (NoAccessException e) {
             expected = e;
         }
@@ -241,7 +241,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         NoAccessException expected = null;
         Definition def = definitionService.getDefinition(desc.getQualifiedName(), ComponentDef.class);
         try {
-            definitionService.getDefRegistry().assertAccess(null, def);
+            definitionService.assertAccess(null, def);
         } catch (NoAccessException e) {
             expected = e;
         }

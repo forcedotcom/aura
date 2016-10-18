@@ -18,6 +18,7 @@ package org.auraframework.system;
 import java.util.Collection;
 
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 
 /**
@@ -52,5 +53,5 @@ public interface RegistrySet {
      * @param descriptor the descriptor for which we need a registry.
      * @return the registry corresponding to the descriptor.
      */
-    public DefRegistry<?> getRegistryFor(DefDescriptor<?> descriptor);
+    public <T extends Definition> DefRegistry<T> getRegistryFor(DefDescriptor<T> descriptor);
 }

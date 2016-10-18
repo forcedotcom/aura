@@ -27,6 +27,7 @@ import javax.annotation.Nonnull;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.RegistrySet;
@@ -168,7 +169,8 @@ public class RegistryTrie implements RegistrySet {
     }
 
     @Override
-    public DefRegistry<?> getRegistryFor(DefDescriptor<?> descriptor) {
+    @SuppressWarnings("unchecked")
+    public <T extends Definition> DefRegistry<T> getRegistryFor(DefDescriptor<T> descriptor) {
         if (descriptor == null) {
             return null;
         }
@@ -186,9 +188,8 @@ public class RegistryTrie implements RegistrySet {
             return null;
         }
         if (top instanceof DefRegistry) {
-            return (DefRegistry<?>)top;
+            return (DefRegistry<T>)top;
         }
-        @SuppressWarnings("unchecked")
         Map<String,Object> namespaceMap = (Map<String,Object>)top;
 
         Object nsObj = namespaceMap.get(ns);
@@ -200,11 +201,10 @@ public class RegistryTrie implements RegistrySet {
             return null;
         }
         if (nsObj instanceof DefRegistry) {
-            return (DefRegistry<?>) nsObj;
+            return (DefRegistry<T>) nsObj;
         }
 
-        @SuppressWarnings("unchecked")
         Map<DefType,DefRegistry<?>> defTypeMap = (Map<DefType,DefRegistry<?>>)nsObj;
-        return defTypeMap.get(descriptor.getDefType());
+        return (DefRegistry<T>)defTypeMap.get(descriptor.getDefType());
     }
 }

@@ -43,21 +43,17 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
 import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.impl.css.token.StyleContextImpl;
-import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.InstanceStack;
-import org.auraframework.service.CachingService;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.RegistrySet;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
@@ -88,8 +84,6 @@ public class AuraContextImpl implements AuraContext {
     private final Mode mode;
 
     private final Authentication access;
-
-    private final MasterDefRegistry masterRegistry;
 
     private final JsonSerializationContext jsonContext;
 
@@ -199,9 +193,7 @@ public class AuraContextImpl implements AuraContext {
             Format format, Authentication access, JsonSerializationContext jsonContext,
             Map<String, GlobalValueProvider> globalProviders,
             ConfigAdapter configAdapter, DefinitionService definitionService,
-            TestContextAdapter testContextAdapter, LoggingService loggingService,
-            CachingService cachingService) {
-
+            TestContextAdapter testContextAdapter) {
         this.mode = mode;
         this.registries = registries;
         this.defaultPrefixes = defaultPrefixes;
@@ -224,7 +216,6 @@ public class AuraContextImpl implements AuraContext {
                 .setRecordStats(true)
                 .setSoftValues(true)
                 .build();
-        this.masterRegistry = new MasterDefRegistryImpl(configAdapter, definitionService, loggingService, cachingService, this);
     }
 
     /**
@@ -400,11 +391,6 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public Map<DefType, String> getDefaultPrefixes() {
         return defaultPrefixes;
-    }
-
-    @Override
-    public MasterDefRegistry getDefRegistry() {
-        return masterRegistry;
     }
 
     @Override

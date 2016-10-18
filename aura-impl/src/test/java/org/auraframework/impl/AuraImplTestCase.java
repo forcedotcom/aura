@@ -133,10 +133,6 @@ public abstract class AuraImplTestCase extends AuraTestCase {
         return getAuraTestingUtil().getSource(descriptor);
     }
 
-    protected FakeRegistry createFakeRegistry() {
-        return new FakeRegistry();
-    }
-
     protected XMLStreamWriter createXMLStreamWriter(Writer w) throws Exception {
         return xmlOutputFactory.createXMLStreamWriter(w);
     }

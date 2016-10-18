@@ -189,11 +189,6 @@ public interface AuraContext {
     }
 
     /**
-     * @return the master def registry
-     */
-    MasterDefRegistry getDefRegistry();
-
-    /**
      * TODO: should have serialization contexts for any format, this shouldn't be tied to json
      *
      * @return the json serialization context to use

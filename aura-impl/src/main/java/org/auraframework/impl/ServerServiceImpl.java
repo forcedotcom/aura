@@ -492,24 +492,25 @@ public class ServerServiceImpl implements ServerService {
             Set<DefDescriptor<?>> dependencies, TempFilter extraFilter) {
 
         Set<D> out = Sets.newLinkedHashSet();
-        AuraContext context = contextService.getCurrentContext();
-
         if(dependencies != null) {
+        	AuraContext context = contextService.getCurrentContext();
             for (DefDescriptor<?> descriptor : dependencies) {
                 if (defType.isAssignableFrom(descriptor.getDefType().getPrimaryInterface())
                         && (extraFilter == null || extraFilter.apply(descriptor))) {
                     @SuppressWarnings("unchecked")
                     DefDescriptor<D> dd = (DefDescriptor<D>) descriptor;
-                    //D def = context.getLocalDef(dd);
-                    D def = null;
-                    try {
-                        def = definitionService.getDefinition(dd);
-                    } catch (QuickFixException qfe) {
-                        //
-                        // completely ignore this here, we should have already failed,
-                        // actually, we should be able to use 'getLocalDef', but for some
-                        // reason that fails in a few spots, will have to dig in to that.
-                        //
+                    D def = context.getLocalDef(dd);
+                    if (def == null) {
+                        try {
+                            def = definitionService.getDefinition(dd);
+                        } catch (QuickFixException qfe) {
+                            //
+                            // completely ignore this here, we should have already failed,
+                            // actually, we should be able to use 'getLocalDef', but for some
+                            // reason that fails in a few spots, will have to dig in to that.
+                            //
+                            throw new IllegalStateException("Illegal state, missing def for "+dd, qfe);
+                        }
                     }
                     if (def == null) {
                         throw new IllegalStateException("Illegal state, missing def for "+dd);

@@ -24,7 +24,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -140,13 +139,6 @@ public interface DefinitionService extends AuraService {
      * Get the source for a given descriptor.
      */
     <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor);
-
-    /**
-     * Get the master def registry.
-     *
-     * @return the master def registry.
-     */
-    MasterDefRegistry getDefRegistry();
 
     /**
      * Given a string that contains search patterns or wildcards, return a set

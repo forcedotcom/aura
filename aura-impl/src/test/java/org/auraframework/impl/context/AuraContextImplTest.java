@@ -43,7 +43,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     @Test
     public void testModeSetToPROD() {
         Mode m = Mode.PROD;
-        AuraContextImpl impl = new AuraContextImpl(m, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(m, null, null, null, null, null, null, null, null, null);
 
         assertEquals(impl.getMode(), m);
     }
@@ -51,22 +51,21 @@ public class AuraContextImplTest extends AuraImplTestCase {
     @Test
     public void testModeSetToDEV() {
         Mode m = Mode.DEV;
-        AuraContextImpl impl = new AuraContextImpl(m, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(m, null, null, null, null, null, null, null, null, null);
 
         assertEquals(impl.getMode(), m);
     }
     @Test
     public void testRegistries() {
         RegistryTrie rt = Mockito.mock(RegistryTrie.class);
-        AuraContextImpl impl = new AuraContextImpl(null, rt, null, null, null, null, null, null, null, null, null,
-                null);
+        AuraContextImpl impl = new AuraContextImpl(null, rt, null, null, null, null, null, null, null, null);
         assertEquals(impl.getRegistries(), rt);
     }
 
     @Test
     public void testDefaultPrefixesSet() {
         Map<DefType, String> p = Maps.newHashMap();
-        AuraContextImpl impl = new AuraContextImpl(null, null, p, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, p, null, null, null, null, null, null, null);
 
         assertEquals(impl.getDefaultPrefixes(), p);
     }
@@ -75,7 +74,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     public void testDefaultPrefixesConsulted() {
         Map<DefType, String> p = Maps.newHashMap();
         p.put(DefType.APPLICATION, "expected");
-        AuraContextImpl impl = new AuraContextImpl(null, null, p, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, p, null, null, null, null, null, null, null);
 
         assertEquals(impl.getDefaultPrefix(DefType.APPLICATION), "expected");
         assertEquals(impl.getDefaultPrefix(DefType.COMPONENT), null);
@@ -84,7 +83,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     @Test
     public void testFormatSet() {
         Format x = Format.HTML;
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, x, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, x, null, null, null, null, null, null);
 
         assertEquals(impl.getFormat(), x);
     }
@@ -92,7 +91,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     @Test
     public void testAuthenticationSetToAuthenticated() {
         Authentication a = Authentication.AUTHENTICATED;
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, a, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, a, null, null, null, null, null);
 
         assertEquals(impl.getAccess(), a);
     }
@@ -100,7 +99,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     @Test
     public void testAuthenticationSetToUnAuthenticated() {
         Authentication a = Authentication.UNAUTHENTICATED;
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, a, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, a, null, null, null, null, null);
 
         assertEquals(impl.getAccess(), a);
     }
@@ -281,21 +280,21 @@ public class AuraContextImplTest extends AuraImplTestCase {
     @Test
     public void testHasLocalDefFalse() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         assertFalse(impl.hasLocalDef(desc));
     }
 
     @Test
     public void testGetLocalDefNull() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         assertNull(impl.getLocalDef(desc));
     }
 
     @Test
     public void testHasLocalDefTrueAfterAddOfNull() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.addLocalDef(desc, null);
         assertTrue(impl.hasLocalDef(desc));
     }
@@ -304,7 +303,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     public void testHasLocalDefTrueAfterAddOfNonNull() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
         Definition definition = Mockito.mock(Definition.class);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.addLocalDef(desc, definition);
         assertTrue(impl.hasLocalDef(desc));
     }
@@ -312,7 +311,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     @Test
     public void testGetLocalDefAfterAddOfNull() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.addLocalDef(desc, null);
         assertNull(impl.getLocalDef(desc));
     }
@@ -321,7 +320,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     public void testGetLocalDefAfterAddOfNonNull() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
         Definition definition = Mockito.mock(Definition.class);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.addLocalDef(desc, definition);
         assertEquals(impl.getLocalDef(desc), definition);
     }
@@ -329,14 +328,14 @@ public class AuraContextImplTest extends AuraImplTestCase {
     @Test
     public void testIsLocalDefNotCacheableFalse() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         assertFalse(impl.isLocalDefNotCacheable(desc));
     }
 
     @Test
     public void testSetLocalDefNotCacheable() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.setLocalDefNotCacheable(desc);
         assertTrue(impl.isLocalDefNotCacheable(desc));
     }
@@ -344,7 +343,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     @Test
     public void testHasLocalDefTrueIfSystemMode() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.addLocalDef(desc, null);
         impl.setSystemMode(true);
         assertTrue(impl.hasLocalDef(desc));
@@ -354,7 +353,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     public void testAddLocalDefInSystemModeStaysInSystemMode() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
         Definition definition = Mockito.mock(Definition.class);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.setSystemMode(true);
         impl.addLocalDef(desc, definition);
         impl.setSystemMode(false);
@@ -368,7 +367,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     public void testGetLocalDefFromNonSystemModeInSystemMode() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
         Definition definition = Mockito.mock(Definition.class);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.addLocalDef(desc, definition);
         impl.setSystemMode(true);
         assertTrue(impl.hasLocalDef(desc));
@@ -380,7 +379,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
         Definition definition = Mockito.mock(Definition.class);
         Definition definition2 = Mockito.mock(Definition.class);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.addLocalDef(desc, definition);
         impl.setSystemMode(true);
         impl.addLocalDef(desc, definition2);
@@ -391,7 +390,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     @Test
     public void testIsLocalDefNotCacheableStaysInSystemMode() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.setLocalDefNotCacheable(desc);
         impl.setSystemMode(true);
         assertTrue(impl.isLocalDefNotCacheable(desc));
@@ -400,7 +399,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     @Test
     public void testSetLocalDefNotCacheableSetsFromSystemModeToNormal() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.setSystemMode(true);
         impl.setLocalDefNotCacheable(desc);
         assertTrue(impl.isLocalDefNotCacheable(desc));
@@ -411,7 +410,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     @Test
     public void testFilterWithNoDefs() {
         Set<DefDescriptor<?>> preloaded = Sets.newHashSet();
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         Map<DefDescriptor<?>,Definition> result;
 
         result = impl.filterLocalDefs(preloaded);
@@ -423,7 +422,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
         Definition definition = Mockito.mock(Definition.class);
         Set<DefDescriptor<?>> preloaded = Sets.newHashSet();
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.addLocalDef(desc, definition);
         Map<DefDescriptor<?>,Definition> result;
 
@@ -437,7 +436,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     public void testFilterWithNull() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
         Definition definition = Mockito.mock(Definition.class);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.addLocalDef(desc, definition);
         Map<DefDescriptor<?>,Definition> result;
 
@@ -453,7 +452,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         Definition definition = Mockito.mock(Definition.class);
         Set<DefDescriptor<?>> preloaded = Sets.newHashSet();
         preloaded.add(desc);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.addLocalDef(desc, definition);
         Map<DefDescriptor<?>,Definition> result;
 
@@ -465,7 +464,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     public void testAddDynamicDefAddsDef() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
         Definition definition = new FakeDefinition(desc);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.addDynamicDef(definition);
         assertTrue(impl.hasLocalDef(desc));
         assertEquals(impl.getLocalDef(desc), definition);
@@ -475,7 +474,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     public void testAddDynamicDefAddsNotCacheable() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
         Definition definition = new FakeDefinition(desc);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.addDynamicDef(definition);
         assertTrue(impl.isLocalDefNotCacheable(desc));
     }
@@ -483,7 +482,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     @Test
     public void testAddDynamicMatchesOnEmpty() {
         DescriptorFilter everything = new DescriptorFilter("*");
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         Set<DefDescriptor<?>> result = Sets.newHashSet();
         impl.addDynamicMatches(result, everything);
         assertEquals(0, result.size());
@@ -494,7 +493,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
         Definition definition = new FakeDefinition(desc);
         DescriptorFilter everything = new DescriptorFilter("*");
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.addDynamicDef(definition);
 
         Set<DefDescriptor<?>> result = Sets.newHashSet();
@@ -507,7 +506,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     public void testAddDynamicDefInSystemModeDoesNotChangeNonSystemMode() {
         FakeDescriptor desc = new FakeDescriptor("a", "b", "c", DefType.APPLICATION);
         Definition definition = new FakeDefinition(desc);
-        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null, null, null);
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
         impl.setSystemMode(true);
         impl.addDynamicDef(definition);
         assertTrue(impl.hasLocalDef(desc));

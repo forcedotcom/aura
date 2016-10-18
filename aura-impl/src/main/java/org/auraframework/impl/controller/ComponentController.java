@@ -16,10 +16,8 @@
 package org.auraframework.impl.controller;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -123,7 +121,6 @@ public class ComponentController implements Controller {
             }
 
             // parsing stacktrace to figure out whether the error is from external script 
-            Set<String> filenames = new HashSet<String>();
             if (jsStack != null && !jsStack.isEmpty()) {
                 String[] traces = jsStack.split("\n");
                 for (String trace : traces) {

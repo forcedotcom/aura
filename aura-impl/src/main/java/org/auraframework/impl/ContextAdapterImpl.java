@@ -28,9 +28,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.context.AuraContextImpl;
 import org.auraframework.instance.GlobalValueProvider;
-import org.auraframework.service.CachingService;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -51,12 +49,6 @@ public class ContextAdapterImpl implements ContextAdapter {
     @Inject
     private DefinitionService definitionService;
     
-    @Inject
-    private CachingService cachingService;
-    
-    @Inject
-    private LoggingService loggingService;
-
     @Autowired(required=false)
     private TestContextAdapter testContextAdapter;
 
@@ -73,8 +65,7 @@ public class ContextAdapterImpl implements ContextAdapter {
                                  Map<String, GlobalValueProvider> globalProviders,
                                  DefDescriptor<? extends BaseComponentDef> appDesc) {
         AuraContext context = new AuraContextImpl(mode, registries, defaultPrefixes, format, access, jsonContext,
-                globalProviders, configAdapter, definitionService, testContextAdapter, loggingService,
-                cachingService);
+                globalProviders, configAdapter, definitionService, testContextAdapter);
         currentContext.set(context);
         context.setApplicationDescriptor(appDesc);
         

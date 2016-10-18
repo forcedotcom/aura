@@ -28,7 +28,6 @@ import org.auraframework.def.ProviderDef;
 import org.auraframework.impl.instance.ProviderInstanceBuilder;
 import org.auraframework.impl.javascript.provider.JavascriptProviderDef.Builder;
 import org.auraframework.impl.javascript.testsuite.JavascriptMockHandler;
-import org.auraframework.impl.javascript.testsuite.JavascriptMockHandler.Returns;
 import org.auraframework.instance.ComponentConfig;
 import org.auraframework.instance.InstanceBuilder;
 import org.auraframework.instance.ProviderInstance;

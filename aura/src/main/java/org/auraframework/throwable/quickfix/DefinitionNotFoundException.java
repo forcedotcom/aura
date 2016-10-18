@@ -36,7 +36,7 @@ public class DefinitionNotFoundException extends AuraValidationException {
     }
 
     public DefinitionNotFoundException(DefDescriptor<?> descriptor, Location l, String usedAt) {
-        super(getMessage(descriptor.getDefType(), descriptor.getQualifiedName()) + " : " + usedAt, l);
+        super(getMessage(descriptor.getDefType(), descriptor.getQualifiedName(), usedAt), l);
         this.descriptor = descriptor;
     }
 
@@ -46,6 +46,14 @@ public class DefinitionNotFoundException extends AuraValidationException {
 
     public DefDescriptor<?> getDescriptor() {
         return descriptor;
+    }
+
+    public static String getMessage(DefType defType, String defName, String usedAt) {
+        if (usedAt == null || usedAt.length() == 0) {
+            return String.format(messageFormat, defType, defName);
+        } else {
+            return String.format(messageFormat, defType, defName) + " : " + usedAt;
+        }
     }
 
     public static String getMessage(DefType defType, String defName) {

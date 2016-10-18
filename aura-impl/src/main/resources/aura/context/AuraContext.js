@@ -49,7 +49,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.allowedGlobals = config["allowedGlobals"];
     this.globals = config["globals"];
     this.enableAccessChecks=true;
-    this.isLockerServiceEnabled=this["isLockerServiceEnabled"]=false;
+    this.isLockerServiceEnabled = this["isLockerServiceEnabled"] = false;
 
     // JBUCH: TOGGLE LOGGING OFF BY DEFAULT IN PROD MODE
     this.logAccessFailures= true
@@ -289,8 +289,7 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
     }
 
     this.enableAccessChecks=otherContext["enableAccessChecks"];
-
-    this.isLockerServiceEnabled = this["isLockerServiceEnabled"] = otherContext["lockerEnabled"];
+    this.isLockerServiceEnabled = this["isLockerServiceEnabled"] = $A.lockerService.containerSupportsRequiredFeatures() && otherContext["lockerEnabled"];
 
     this.globalValueProviders.merge(otherContext["globalValueProviders"]);
 

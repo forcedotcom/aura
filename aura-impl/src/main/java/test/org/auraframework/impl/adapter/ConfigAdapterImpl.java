@@ -85,7 +85,9 @@ import com.google.gson.reflect.TypeToken;
 
 @ServiceComponent
 public class ConfigAdapterImpl implements ConfigAdapter {
-    private static final ImmutableSortedSet<String> cacheDependencyExceptions = ImmutableSortedSet.of(
+    private static final String LOCKERSERVICE_SAFE_EVAL_HTML = "/lockerservice/safeEval.html";
+
+	private static final ImmutableSortedSet<String> cacheDependencyExceptions = ImmutableSortedSet.of(
             //
             // FIXME: these following 16 lines (applauncher) should be removed ASAP. They are here because
             // we do not detect file backed apex, and we probably don't really want to.
@@ -492,7 +494,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         AuraContext context = contextService.getCurrentContext();
         String contextPath = context.getContextPath();
         String nonce = context.getFrameworkUID();
-        return String.format("%s/auraFW/resources/%s/lockerservice/safeEval.html", contextPath, nonce);
+        return String.format("%s/auraFW/resources/%s" + LOCKERSERVICE_SAFE_EVAL_HTML, contextPath, nonce);
     }
 
     /**
@@ -812,7 +814,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 	}
 
 	protected boolean isSafeEvalWorkerURI(String uri) {
-        return uri.endsWith("/lockerservice/safeEval.html");
+        return uri.endsWith(LOCKERSERVICE_SAFE_EVAL_HTML);
 	}
 
     /**

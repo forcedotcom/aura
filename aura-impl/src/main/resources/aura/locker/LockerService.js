@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-//#include aura.locker.InlineSafeEval
-
 function LockerService() {
 	"use strict";
-
+	
+	//#include aura.locker.InlineSafeEval
     //#include aura.locker.LockerKeyManager
     //#include aura.locker.SecureObject
     //#include aura.locker.SecureDOMEvent
@@ -114,13 +112,19 @@ function LockerService() {
 	];
 
 	var nsKeys = {};
-
+    
 	// defining LockerService as a service
 	var service = {
 		isEnabled : function() {
 			return $A.getContext().isLockerServiceEnabled;
 		},
 
+		containerSupportsRequiredFeatures : function() {
+			// Sniff for basic ES5 and strict mode support for Locker
+			var isStrictModeAvailable = $A.util.globalEval("(function() { \"use strict\"; return this === undefined; })()");
+			return isStrictModeAvailable && typeof Map !== "undefined" && Map.prototype["keys"] !== undefined && Map.prototype["values"] !== undefined && Map.prototype["entries"] !== undefined;
+	    },
+		
 		createForDef : function(code, def) {
 			var descriptor = def.getDescriptor();
 			var namespace = descriptor.getNamespace();
@@ -130,6 +134,7 @@ function LockerService() {
 
 			// Key this def so we can transfer the key to component instances
 			ls_setKey(def, key);
+			
 			return this.create(code, key, descriptorDebuggableURL);
 		},
 
@@ -161,32 +166,45 @@ function LockerService() {
 		},
 
 		create : function(code, key, optionalSourceURL) {
-			var envRec = this.getEnv(key);
-			var locker;
+			var envRec;
+
 			if (!lockerShadows) {
 				lazyInitInlinedSafeEvalWorkaround();
-
-				// one time operation to lazily create this giant object with
-				// the value of `undefined` to shadow every global binding in
-				// `window`, except for those with no authority defined in the
-				// `whitelist`. this object will be used as the base lexical
-				// scope when evaluating all non-privilege components.
-				lockerShadows = {};
-				Object.getOwnPropertyNames(window).forEach(function (name) {
-					// apply whitelisting to the lockerShadows
-					// TODO: recursive to cover WindowPrototype properties as well
-					var value = whitelist.indexOf(name) >= 0 ? window[name] : undefined;
-					lockerShadows[name] = value;
-				});
 			}
-
-			locker = {
+			
+			if (this.isEnabled()) {
+				envRec = this.getEnv(key);
+				if (!lockerShadows) {
+					// one time operation to lazily create this giant object with
+					// the value of `undefined` to shadow every global binding in
+					// `window`, except for those with no authority defined in the
+					// `whitelist`. this object will be used as the base lexical
+					// scope when evaluating all non-privilege components.
+					lockerShadows = {};
+					Object.getOwnPropertyNames(window).forEach(function (name) {
+						// apply whitelisting to the lockerShadows
+						// TODO: recursive to cover WindowPrototype properties as well
+						var value = whitelist.indexOf(name) >= 0 ? window[name] : undefined;
+						lockerShadows[name] = value;
+					});
+				}
+			} else {
+				// Degrade gracefully back to global window, no shadows, etc
+				envRec = window;
+				
+				if (!lockerShadows) {
+					lockerShadows = {};
+				}
+			}
+			
+			var locker = {
 				"$envRec": envRec,
 				"$result": window['$$safe-eval$$'](code, optionalSourceURL, envRec, lockerShadows)
 			};
 
 			Object.freeze(locker);
 			lockers.push(locker);
+			
 			return locker;
 		},
 

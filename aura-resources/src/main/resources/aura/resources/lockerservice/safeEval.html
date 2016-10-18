@@ -6,7 +6,6 @@
   (function (window, placeholder, parent) {
       'use strict';
 
-      var isStrictModeAvailable = (function () { return !this; })();
       // TODO: improve returnable detection. `function (...` is a trick used today
       //       to return arbitrary code from actions, it should be legacy in the future.
       var returnableEx = /^(\s*)([{(["']|function\s*\()/;
@@ -62,9 +61,6 @@
       Object.defineProperties(parent, {
           '$$safe-eval$$': {
               value: function(src, optionalSourceURL) {
-                  if (!isStrictModeAvailable) {
-                      throw new Error("$$safe-eval$$ is only supported in strict mode capable browsers!");
-                  }
                   if (!src) return undefined;
                   var args = Array.prototype.slice.call(arguments, 1);
                   optionalSourceURL = typeof optionalSourceURL === "string" ? args.shift() : undefined;
@@ -93,10 +89,6 @@
 
       // locking down the environment
       try {
-          // In case the break out of the lock, they might encounter a broken env with
-          // no access to `window.parent`.
-          window.parent = undefined;
-
           // @W-2961201: fixing properties of Object to comply with strict mode
           // and ES2016 semantics, we do this by redefining them while in 'use strict'
           // https://tc39.github.io/ecma262/#sec-object.prototype.__defineGetter__

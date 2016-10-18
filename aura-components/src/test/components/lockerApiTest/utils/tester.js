@@ -298,6 +298,8 @@ function tester() {
 					return "HTMLTrackElement";
 				case HTMLVideoElement.prototype:
 					return "HTMLVideoElement";
+				case SVGSVGElement.prototype:
+					return "SVGSVGElement";
 				case SVGElement.prototype:
 					return "SVGElement";
 			}

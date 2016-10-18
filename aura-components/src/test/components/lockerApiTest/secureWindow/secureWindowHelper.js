@@ -534,7 +534,6 @@
             "encodeURIComponent":                   { type: "function" },
             "escape":                               { type: "function" },
             "eval":                                 { type: "function", support: false },
-            "external":                             { type: "Object" },
             "fetch":                                { type: "function" },
             "find":                                 { type: "function" },
             "focus":                                { type: "function" },

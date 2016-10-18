@@ -624,7 +624,6 @@ SecureWindow.metadata = {
             "encodeURI":                            FUNCTION,
             "encodeURIComponent":                   FUNCTION,
             "escape":                               FUNCTION,
-            "external":                             DEFAULT,
             "fetch":                                FUNCTION,
             "find":                                 FUNCTION,
             "focus":                                FUNCTION,

@@ -88,11 +88,6 @@ public interface MasterDefRegistry {
     <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor);
 
     /**
-     * Check to see if a namespace exists.
-     */
-    boolean namespaceExists(String ns);
-
-    /**
      * assert that the referencingDescriptor has access to the definition.
      */
     <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException;

@@ -17,7 +17,6 @@ package org.auraframework.service;
 
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Instance;
@@ -97,33 +96,6 @@ public interface InstanceService extends AuraService {
      */
     <T extends Instance<D>, D extends Definition> T getInstance(String qualifiedName, Class<D> defClass,
             Map<String, Object> attributes) throws DefinitionNotFoundException, QuickFixException;
-
-    /**
-     * Creates a {@link DefDescriptor} from the qualified name passed in,
-     * retrieves the named Definition and then returns an instance of it. This
-     * method should only be used if the caller doesn't know or care what type
-     * is returned.
-     * 
-     * @param defTypes a list of DefTypes to check
-     * @return The named definition
-     * @throws DefinitionNotFoundException if definition does not exist
-     */
-    Instance<?> getInstance(String qualifiedName, DefType... defTypes) throws DefinitionNotFoundException,
-            QuickFixException;
-
-    /**
-     * Creates a {@link DefDescriptor} from the qualified name passed in,
-     * retrieves the named Definition and then returns an instance of it. This
-     * method should only be used if the caller doesn't know or care what type
-     * is returned. Uses the supplied map of attributes to initialize the
-     * Instance.
-     * 
-     * @param defTypes a list of DefTypes to check
-     * @return The named definition
-     * @throws DefinitionNotFoundException if definition does not exist
-     */
-    Instance<?> getInstance(String qualifiedName, Map<String, Object> attributes, DefType... defTypes)
-            throws DefinitionNotFoundException, QuickFixException;
 
     /**
      * Create a new instance of a component using a passed in Component Definition Reference.

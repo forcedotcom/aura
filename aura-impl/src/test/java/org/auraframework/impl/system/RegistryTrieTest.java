@@ -15,15 +15,17 @@
  */
 package org.auraframework.impl.system;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Set;
 
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.test.util.AuraTestCase;
@@ -120,9 +122,9 @@ public class RegistryTrieTest extends AuraTestCase {
     @Test
     public void testInitEmpty() {
         RegistryTrie trie = new RegistryTrie();
-        DefRegistry<?>[] actual = trie.getAllRegistries();
+        Collection<DefRegistry<?>> actual = trie.getAllRegistries();
         assertNotNull(actual);
-        assertEquals(0, actual.length);
+        assertEquals(0, actual.size());
     }
 
     @Test
@@ -189,23 +191,8 @@ public class RegistryTrieTest extends AuraTestCase {
         DefRegistry<?>[] registries = new DefRegistry<?>[] { reg1, reg2 };
         RegistryTrie trie = new RegistryTrie(registries);
 
-        DefRegistry<?>[] actual = trie.getAllRegistries();
-        assertSame(registries, actual);
-    }
-
-    @Test
-    public void testGetAllNamespaces() {
-        MockRegistry<?> reg1 = new MockRegistry<>().setNamespaces("testNamespace").setPrefixes("markup");
-        MockRegistry<?> reg2 = new MockRegistry<>().setNamespaces("TESTNAMESPACE").setPrefixes("js");
-        MockRegistry<?> reg3 = new MockRegistry<>().setNamespaces("anotherNamespace").setPrefixes("markup", "js");
-        MockRegistry<?> reg4 = new MockRegistry<>().setNamespaces("AnotherNamespace").setDefTypes(DefType.LIBRARY);
-        MockRegistry<?> reg5 = new MockRegistry<>().setNamespaces("*").setDefTypes(DefType.TESTSUITE);
-        RegistryTrie trie = new RegistryTrie(reg1, reg2, reg3, reg4, reg5);
-
-        Set<String> actual = trie.getAllNamespaces();
-        assertEquals(2, actual.size());
-        assertEquals(true, actual.contains("testnamespace"));
-        assertEquals(true, actual.contains("anothernamespace"));
+        Collection<DefRegistry<?>> actual = trie.getAllRegistries();
+        assertEquals(Arrays.asList(registries), actual);
     }
 
     @Test
@@ -213,7 +200,7 @@ public class RegistryTrieTest extends AuraTestCase {
         MockRegistry<?> reg1 = new MockRegistry<>().setNamespaces("testNamespace");
         RegistryTrie trie = new RegistryTrie(reg1);
 
-        Set<DefRegistry<?>> actual = trie.getRegistries(new DescriptorFilter("otherNamepsace"));
+        Collection<DefRegistry<?>> actual = trie.getRegistries(new DescriptorFilter("otherNamepsace"));
         assertEquals(0, actual.size());
     }
 
@@ -393,7 +380,7 @@ public class RegistryTrieTest extends AuraTestCase {
         RegistryTrie trie = new RegistryTrie(reg1);
 
         DescriptorFilter matcher = new DescriptorFilter("otherNamespace");
-        Set<DefRegistry<?>> actual = trie.getRegistries(matcher);
+        Collection<DefRegistry<?>> actual = trie.getRegistries(matcher);
         assertEquals(0, actual.size());
     }
 
@@ -403,7 +390,7 @@ public class RegistryTrieTest extends AuraTestCase {
         RegistryTrie trie = new RegistryTrie(reg1);
 
         DescriptorFilter matcher = new DescriptorFilter("js://testNamespace:*");
-        Set<DefRegistry<?>> actual = trie.getRegistries(matcher);
+        Collection<DefRegistry<?>> actual = trie.getRegistries(matcher);
         assertEquals(0, actual.size());
     }
 
@@ -414,7 +401,7 @@ public class RegistryTrieTest extends AuraTestCase {
         RegistryTrie trie = new RegistryTrie(reg1, reg2);
 
         DescriptorFilter matcher = new DescriptorFilter("testNamespace:*");
-        Set<DefRegistry<?>> actual = trie.getRegistries(matcher);
+        Collection<DefRegistry<?>> actual = trie.getRegistries(matcher);
         assertEquals(1, actual.size());
         assertEquals(true, actual.contains(reg1));
     }
@@ -427,7 +414,7 @@ public class RegistryTrieTest extends AuraTestCase {
         RegistryTrie trie = new RegistryTrie(reg1, reg2, reg3);
 
         DescriptorFilter matcher = new DescriptorFilter("*Namespace:*");
-        Set<DefRegistry<?>> actual = trie.getRegistries(matcher);
+        Collection<DefRegistry<?>> actual = trie.getRegistries(matcher);
         assertEquals(2, actual.size());
         assertEquals(true, actual.contains(reg1));
         assertEquals(true, actual.contains(reg2));
@@ -441,7 +428,7 @@ public class RegistryTrieTest extends AuraTestCase {
         RegistryTrie trie = new RegistryTrie(reg1, reg2, reg3);
 
         DescriptorFilter matcher = new DescriptorFilter("*:*");
-        Set<DefRegistry<?>> actual = trie.getRegistries(matcher);
+        Collection<DefRegistry<?>> actual = trie.getRegistries(matcher);
         assertEquals(3, actual.size());
         assertEquals(true, actual.contains(reg1));
         assertEquals(true, actual.contains(reg2));
@@ -456,7 +443,7 @@ public class RegistryTrieTest extends AuraTestCase {
         RegistryTrie trie = new RegistryTrie(reg1, reg2, reg3);
 
         DescriptorFilter matcher = new DescriptorFilter("testNamespace:*");
-        Set<DefRegistry<?>> actual = trie.getRegistries(matcher);
+        Collection<DefRegistry<?>> actual = trie.getRegistries(matcher);
         assertEquals(2, actual.size());
         assertEquals(true, actual.contains(reg1));
         assertEquals(true, actual.contains(reg3));
@@ -470,7 +457,7 @@ public class RegistryTrieTest extends AuraTestCase {
         RegistryTrie trie = new RegistryTrie(reg1, reg2, reg3);
 
         DescriptorFilter matcher = new DescriptorFilter("js://testNamespace:*");
-        Set<DefRegistry<?>> actual = trie.getRegistries(matcher);
+        Collection<DefRegistry<?>> actual = trie.getRegistries(matcher);
         assertEquals(1, actual.size());
         assertEquals(true, actual.contains(reg2));
     }
@@ -485,7 +472,7 @@ public class RegistryTrieTest extends AuraTestCase {
         RegistryTrie trie = new RegistryTrie(reg1, reg2, reg3, reg4,reg5);
 
         DescriptorFilter matcher = new DescriptorFilter("js://testNamespace:*", DefType.COMPONENT);
-        Set<DefRegistry<?>> actual = trie.getRegistries(matcher);
+        Collection<DefRegistry<?>> actual = trie.getRegistries(matcher);
         assertEquals(3, actual.size());
         assertEquals(true, actual.contains(reg2));
         assertEquals(true, actual.contains(reg3));
@@ -499,7 +486,7 @@ public class RegistryTrieTest extends AuraTestCase {
         RegistryTrie trie = new RegistryTrie(reg1, reg2);
 
         DescriptorFilter matcher = new DescriptorFilter("TESTNAMESPACE:*");
-        Set<DefRegistry<?>> actual = trie.getRegistries(matcher);
+        Collection<DefRegistry<?>> actual = trie.getRegistries(matcher);
         assertEquals(1, actual.size());
         assertEquals(true, actual.contains(reg1));
     }
@@ -512,7 +499,7 @@ public class RegistryTrieTest extends AuraTestCase {
         RegistryTrie trie = new RegistryTrie(reg1, reg2, reg3);
 
         DescriptorFilter matcher = new DescriptorFilter("JS://testNamespace:*");
-        Set<DefRegistry<?>> actual = trie.getRegistries(matcher);
+        Collection<DefRegistry<?>> actual = trie.getRegistries(matcher);
         assertEquals(1, actual.size());
         assertEquals(true, actual.contains(reg2));
     }

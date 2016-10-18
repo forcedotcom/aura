@@ -25,7 +25,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.system.RegistrySet;
 import org.auraframework.util.json.JsonSerializationContext;
 
 /**
@@ -42,7 +42,7 @@ public interface ContextAdapter extends AuraAdapter {
      * Establish a new context.
      *
      * @param mode the mode for the context.
-     * @param masterRegistry the master def registry.
+     * @param registries the set of registries to use.
      * @param defaultPrefixes
      * @param format the format expected as a result.
      * @param access the access mode for the context.
@@ -50,7 +50,7 @@ public interface ContextAdapter extends AuraAdapter {
      * @param globalProviders global value providers.
      * @param appDesc the controlling application descriptor.
      */
-    AuraContext establish(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
+    AuraContext establish(Mode mode, RegistrySet registries, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
             Map<String, GlobalValueProvider> globalProviders,
             DefDescriptor<? extends BaseComponentDef> appDesc);

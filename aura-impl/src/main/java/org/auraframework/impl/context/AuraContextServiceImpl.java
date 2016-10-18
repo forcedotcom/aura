@@ -25,7 +25,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContextAdapter;
 import org.auraframework.adapter.GlobalValueProviderAdapter;
 import org.auraframework.adapter.PrefixDefaultsAdapter;
@@ -33,13 +32,11 @@ import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.impl.system.MasterDefRegistryImpl;
+import org.auraframework.impl.system.RegistryTrie;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.json.AuraJsonContext;
 import org.auraframework.instance.GlobalValueProvider;
-import org.auraframework.service.CachingService;
 import org.auraframework.service.ContextService;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
@@ -63,12 +60,6 @@ public class AuraContextServiceImpl implements ContextService {
     private List<GlobalValueProviderAdapter> globalValueProviderAdapters;
 
     @Inject
-    private ConfigAdapter configAdapter;
-
-    @Inject
-    private DefinitionService definitionService;
-
-    @Inject
     private LoggingService loggingService;
 
     @Inject
@@ -82,13 +73,6 @@ public class AuraContextServiceImpl implements ContextService {
 
     @Inject
     private JsonSerializerFactory jsonSerializerFactory;
-
-    private CachingService cachingService;
-
-    @Inject
-    public void setCachingService(CachingService service) {
-        cachingService = service;
-    }
 
     private static final long serialVersionUID = 2204785781318401371L;
 
@@ -112,15 +96,7 @@ public class AuraContextServiceImpl implements ContextService {
 
     @Override
     public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Authentication access) {
-        // initialize logging context
-        loggingService.establish();
-        MasterDefRegistryImpl mdr = getDefRegistry(mode, access, loaders);
-        AuraContext context = contextAdapter.establish(mode, mdr,
-                this.prefixDefaultsAdapter.getPrefixDefaults(mode), format, access,
-                AuraJsonContext.createContext(mode, true, jsonSerializerFactory),
-                getGlobalProviders(), null);
-        mdr.setContext(context);
-        return context;
+        return startContext(mode, loaders, format, access, null);
     }
 
     @Override
@@ -155,11 +131,10 @@ public class AuraContextServiceImpl implements ContextService {
                                     DefDescriptor<? extends BaseComponentDef> appDesc) {
         // initialize logging context
         loggingService.establish();
-        MasterDefRegistryImpl mdr = getDefRegistry(mode, access, loaders);
-        AuraContext context = contextAdapter.establish(mode, mdr,
+        RegistryTrie registries = new RegistryTrie(getRegistries(mode, access, loaders));
+        AuraContext context = contextAdapter.establish(mode, registries,
                 this.prefixDefaultsAdapter.getPrefixDefaults(mode), format, access,
                 AuraJsonContext.createContext(mode, true, jsonSerializerFactory), globalValueProviders, appDesc);
-        mdr.setContext(context);
         return context;
     }
 
@@ -183,11 +158,6 @@ public class AuraContextServiceImpl implements ContextService {
         contextAdapter.popSystemContext();
     }
 
-    private MasterDefRegistryImpl getDefRegistry(Mode mode, Authentication access, Set<SourceLoader> loaders) {
-        return new MasterDefRegistryImpl(configAdapter, definitionService, loggingService, cachingService,
-                getRegistries(mode, access, loaders));
-    }
-
     private DefRegistry<?>[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> loaders) {
         List<DefRegistry<?>> ret = new ArrayList<>();
         ret.addAll(addRegistriesFromProviders(providers, mode, access, loaders));
@@ -201,8 +171,8 @@ public class AuraContextServiceImpl implements ContextService {
             DefRegistry<?>[] registries = provider.getRegistries(mode, access, loaders);
             if (registries != null) {
                 Collections.addAll(ret, registries);
+                }
             }
-        }
         return ret;
     }
     

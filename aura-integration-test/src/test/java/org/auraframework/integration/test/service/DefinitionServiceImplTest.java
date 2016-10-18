@@ -239,7 +239,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(
                 DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
         NoAccessException expected = null;
-        Definition def = definitionService.getDefinition(desc.getQualifiedName(), DefType.COMPONENT);
+        Definition def = definitionService.getDefinition(desc.getQualifiedName(), ComponentDef.class);
         try {
             definitionService.getDefRegistry().assertAccess(null, def);
         } catch (NoAccessException e) {

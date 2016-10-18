@@ -81,8 +81,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private final Cache<String, DependencyEntry> depsCache;
     private final Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache;
 
-    private final RegistryTrie delegateRegistries;
-
     private CompileContext currentCC;
 
     private AuraContext context;
@@ -95,17 +93,24 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * @param registries the registries to use in the mdr.
      */
     public MasterDefRegistryImpl(ConfigAdapter configAdapter, DefinitionService definitionService,
-                                 LoggingService loggingService, CachingService cachingService,
-                                 @Nonnull DefRegistry<?>... registries) {
+                                 LoggingService loggingService, CachingService cachingService, AuraContext context) {
         this.configAdapter = configAdapter;
         this.definitionService = definitionService;
         this.loggingService = loggingService;
-        this.delegateRegistries = new RegistryTrie(registries);
-        this.rLock = cachingService.getReadLock();
-        this.existsCache = cachingService.getExistsCache();
-        this.defsCache = cachingService.getDefsCache();
-        this.depsCache = cachingService.getDepsCache();
-        this.descriptorFilterCache = cachingService.getDescriptorFilterCache();
+        if (cachingService != null) {
+        	this.rLock = cachingService.getReadLock();
+        	this.existsCache = cachingService.getExistsCache();
+        	this.defsCache = cachingService.getDefsCache();
+        	this.depsCache = cachingService.getDepsCache();
+        	this.descriptorFilterCache = cachingService.getDescriptorFilterCache();
+        } else {
+        	this.rLock = null;
+        	this.existsCache = null;
+        	this.defsCache = null;
+        	this.depsCache = null;
+        	this.descriptorFilterCache = null;
+        }
+        this.context = context;
         this.currentCC = null;
     }
 
@@ -150,7 +155,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 // we will make them undesirable.
                 //
                 boolean cacheable = configAdapter.isCacheable(matcher) && namespaceMatcher.isConstant();
-                for (DefRegistry<?> reg : delegateRegistries.getRegistries(matcher)) {
+                for (DefRegistry<?> reg : context.getRegistries().getRegistries(matcher)) {
                     if (reg.hasFind()) {
                         //
                         // Now we walk then entire set of registries, and check to see if our namespace
@@ -1063,7 +1068,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      */
     private <T extends Definition> DefRegistry<T> getRegistryFor(@Nonnull DefDescriptor<T> descriptor) {
         @SuppressWarnings("unchecked")
-        DefRegistry<T> reg = (DefRegistry<T>) delegateRegistries.getRegistryFor(descriptor);
+        DefRegistry<T> reg = (DefRegistry<T>) context.getRegistries().getRegistryFor(descriptor);
         return reg;
     }
 
@@ -1074,11 +1079,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             return reg.getSource(descriptor);
         }
         return null;
-    }
-
-    @Override
-    public boolean namespaceExists(String ns) {
-        return delegateRegistries.getAllNamespaces().contains(ns.toLowerCase());
     }
 
     @Override
@@ -1204,17 +1204,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         }
 
         return status.isEmpty() ? null : status;
-    }
-
-    public void setContext(AuraContext context) {
-        this.context = context;
-    }
-    
-    /**
-     * only used by admin tools to view all registries
-     */
-    public DefRegistry<?>[] getAllRegistries() {
-        return delegateRegistries.getAllRegistries();
     }
 
     /**

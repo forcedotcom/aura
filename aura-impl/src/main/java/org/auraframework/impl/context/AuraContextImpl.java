@@ -43,18 +43,22 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
 import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.impl.css.token.StyleContextImpl;
+import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.InstanceStack;
+import org.auraframework.service.CachingService;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.system.RegistrySet;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -140,41 +144,66 @@ public class AuraContextImpl implements AuraContext {
     private final ConfigAdapter configAdapter;
     private final TestContextAdapter testContextAdapter;
 
-    private final ConcurrentHashMap<DefDescriptor<? extends Definition>, Optional<Definition>> defs;
-    private final ConcurrentHashSet<DefDescriptor<? extends Definition>> defNotCacheable;
-    private final ConcurrentHashSet<DefDescriptor<? extends Definition>> dynamicDescs;
+    private boolean isSystem = false;
+
+
+    /**
+     * The set of defs that are thread local.
+     *
+     * We have two copies of this class, one for 'user' mode, and one for 'system' mode. The only difference
+     * is that system mode defs are not sent to the client.
+     */
+    private static class LocalDefs {
+        LocalDefs() {
+            this.defs = new ConcurrentHashMap<>();
+            this.dynamicDescs = new ConcurrentHashSet<>();
+            this.localDependencies = new ConcurrentHashMap<>();
+            this.defNotCacheable = new ConcurrentHashSet<>();
+        }
+
+        final ConcurrentHashMap<DefDescriptor<? extends Definition>, Optional<Definition>> defs;
+        final ConcurrentHashSet<DefDescriptor<? extends Definition>> dynamicDescs;
+        final ConcurrentHashSet<DefDescriptor<? extends Definition>> defNotCacheable;
+
+        /**
+         * A local dependencies cache.
+         *
+         * We store both by descriptor and by uid. The descriptor keys must include the type, as the qualified name
+         * is not sufficient to distinguish it. In the case of the UID, we presume that we are safe.
+         *
+         * The two keys stored in the local cache are:
+         * <ul>
+         * <li>The UID, which should be sufficiently unique for a single request.</li>
+         * <li>The type+qualified name of the descriptor. We store this to avoid construction in the case where we don't
+         * have a UID. This is presumed safe because we assume that a single session will have a consistent set of
+         * permissions</li>
+         * </ul>
+         */
+        private final Map<String, DependencyEntry> localDependencies;
+    }
+
+    private final LocalDefs userDefs;
+    private final LocalDefs systemDefs;
+    private LocalDefs currentDefs;
 
     private final Map<String, Boolean> clientClassesLoaded;
 
     private final Cache<String, String> accessCheckCache;
 
+    private final RegistrySet registries;
+
     private final static int ACCESS_CHECK_CACHE_SIZE = 4096;
 
-    /**
-     * A local dependencies cache.
-     *
-     * We store both by descriptor and by uid. The descriptor keys must include the type, as the qualified name is not
-     * sufficient to distinguish it. In the case of the UID, we presume that we are safe.
-     *
-     * The two keys stored in the local cache are:
-     * <ul>
-     * <li>The UID, which should be sufficiently unique for a single request.</li>
-     * <li>The type+qualified name of the descriptor. We store this to avoid construction in the case where we don't
-     * have a UID. This is presumed safe because we assume that a single session will have a consistent set of
-     * permissions</li>
-     * </ul>
-     */
-    private final Map<String, DependencyEntry> localDependencies;
 
-    private final AuraContextImpl original;
-
-    public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
+    public AuraContextImpl(Mode mode, RegistrySet registries, Map<DefType, String> defaultPrefixes,
             Format format, Authentication access, JsonSerializationContext jsonContext,
             Map<String, GlobalValueProvider> globalProviders,
             ConfigAdapter configAdapter, DefinitionService definitionService,
-            TestContextAdapter testContextAdapter, AuraContext original) {
+            TestContextAdapter testContextAdapter, LoggingService loggingService,
+            CachingService cachingService) {
+
         this.mode = mode;
-        this.masterRegistry = masterRegistry;
+        this.registries = registries;
         this.defaultPrefixes = defaultPrefixes;
         this.format = format;
         this.access = access;
@@ -184,11 +213,9 @@ public class AuraContextImpl implements AuraContext {
         this.definitionService = definitionService;
         this.testContextAdapter = testContextAdapter;
         this.globalValues = new HashMap<>();
-        this.defs = new ConcurrentHashMap<>();
-        this.defNotCacheable = new ConcurrentHashSet<>();
-        this.dynamicDescs = new ConcurrentHashSet<>();
-        this.original = (AuraContextImpl)original;
-        this.localDependencies = new ConcurrentHashMap<>();
+        this.userDefs = new LocalDefs();
+        this.systemDefs = new LocalDefs();
+        this.currentDefs = userDefs;
         this.clientClassesLoaded = new ConcurrentHashMap<>();
         // Why is this a cache and not just a map?
         this.accessCheckCache = new CacheImpl.Builder<String, String>()
@@ -197,6 +224,7 @@ public class AuraContextImpl implements AuraContext {
                 .setRecordStats(true)
                 .setSoftValues(true)
                 .build();
+        this.masterRegistry = new MasterDefRegistryImpl(configAdapter, definitionService, loggingService, cachingService, this);
     }
 
     /**
@@ -204,25 +232,28 @@ public class AuraContextImpl implements AuraContext {
      */
     @Override
     public boolean hasLocalDef(DefDescriptor<?> descriptor) {
-        return defs.containsKey(descriptor) || (original != null && original.defs.containsKey(descriptor));
+        return userDefs.defs.containsKey(descriptor) || (isSystem && systemDefs.defs.containsKey(descriptor));
+    }
+
+    @Override
+    public void setSystemMode(boolean systemMode) {
+        isSystem = systemMode;
+        if (isSystem) {
+            this.currentDefs = systemDefs;
+        } else {
+            this.currentDefs = userDefs;
+        }
     }
 
     @Override
     public void setLocalDefNotCacheable(DefDescriptor<?> descriptor) {
-        if (original != null) {
-            original.defNotCacheable.add(descriptor);
-        } else {
-            this.defNotCacheable.add(descriptor);
-        }
+        currentDefs.defNotCacheable.add(descriptor);
     }
 
     @Override
     public boolean isLocalDefNotCacheable(DefDescriptor<?> descriptor) {
-        if (original != null) {
-            return original.defNotCacheable.contains(descriptor);
-        } else {
-            return this.defNotCacheable.contains(descriptor);
-        }
+        return userDefs.defNotCacheable.contains(descriptor)
+            || (isSystem && systemDefs.defNotCacheable.contains(descriptor));
     }
 
     @Override
@@ -233,17 +264,15 @@ public class AuraContextImpl implements AuraContext {
         } else {
             opt = Optional.of(def);
         }
-        defs.putIfAbsent(descriptor, opt);
+        currentDefs.defs.putIfAbsent(descriptor, opt);
     }
 
     @Override
     public <D extends Definition> D getLocalDef(DefDescriptor<D> descriptor) {
         Optional<Definition> opt = null;
-        if (original != null) {
-            opt = original.defs.get(descriptor);
-        }
-        if (opt == null) {
-            opt = defs.get(descriptor);
+        opt = userDefs.defs.get(descriptor);
+        if (opt == null && isSystem) {
+            opt = systemDefs.defs.get(descriptor);
         }
         if (opt == null) {
             return null;
@@ -262,18 +291,17 @@ public class AuraContextImpl implements AuraContext {
     public Map<DefDescriptor<? extends Definition>, Definition> filterLocalDefs(Set<DefDescriptor<?>> preloads) {
         Map<DefDescriptor<? extends Definition>, Definition> filtered;
 
-        filtered = Maps.newHashMapWithExpectedSize(defs.size());
+        filtered = Maps.newHashMapWithExpectedSize(userDefs.defs.size());
         if (preloads == null) {
             preloads = Sets.newHashSet();
         }
-        for (Map.Entry<DefDescriptor<? extends Definition>, Optional<Definition>> entry : defs.entrySet()) {
+        for (Map.Entry<DefDescriptor<? extends Definition>, Optional<Definition>> entry : userDefs.defs.entrySet()) {
             if (entry.getValue().isPresent() && !preloads.contains(entry.getKey())) {
                 filtered.put(entry.getKey(), entry.getValue().get());
             }
         }
         return filtered;
     }
-
 
     @Override
     public <D extends Definition> void addDynamicDef(D def) {
@@ -282,16 +310,23 @@ public class AuraContextImpl implements AuraContext {
         if (desc == null) {
             throw new AuraRuntimeException("Invalid def has no descriptor");
         }
-        defs.put(desc, Optional.of(def));
-        defNotCacheable.add(desc);
-        dynamicDescs.add(desc);
+        currentDefs.defs.put(desc, Optional.of(def));
+        currentDefs.defNotCacheable.add(desc);
+        currentDefs.dynamicDescs.add(desc);
     }
 
     @Override
     public void addDynamicMatches(Set<DefDescriptor<?>> matched, DescriptorFilter matcher) {
-        for (DefDescriptor<? extends Definition> desc : dynamicDescs) {
+        for (DefDescriptor<? extends Definition> desc : userDefs.dynamicDescs) {
             if (matcher.matchDescriptor(desc)) {
                 matched.add(desc);
+            }
+        }
+        if (isSystem) {
+            for (DefDescriptor<? extends Definition> desc : systemDefs.dynamicDescs) {
+                if (matcher.matchDescriptor(desc)) {
+                    matched.add(desc);
+                }
             }
         }
     }
@@ -706,7 +741,7 @@ public class AuraContextImpl implements AuraContext {
             throw new AuraRuntimeException("Attempt to retrieve unknown $Global variable: " + approvedName);
         }
         if (globalValues.containsKey(approvedName)) {
-        	return globalValues.get(approvedName).getValue();
+            return globalValues.get(approvedName).getValue();
         }
         return allowedGlobalValues.get(approvedName).getValue();
     }
@@ -871,21 +906,34 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public void addLocalDependencyEntry(String key, DependencyEntry de) {
         if (de.uid != null) {
-            localDependencies.put(de.uid, de);
+            currentDefs.localDependencies.put(de.uid, de);
         }
-        localDependencies.put(key, de);
+        currentDefs.localDependencies.put(key, de);
     }
 
     @Override
     public DependencyEntry getLocalDependencyEntry(String key) {
-        return localDependencies.get(key);
+        DependencyEntry entry;
+
+        entry = userDefs.localDependencies.get(key);
+        if (entry == null && isSystem) {
+            entry = systemDefs.localDependencies.get(key);
+        }
+        return entry;
     }
 
     @Override
     public DependencyEntry findLocalDependencyEntry(DefDescriptor<?> descriptor) {
-        for (DependencyEntry det : localDependencies.values()) {
+        for (DependencyEntry det : userDefs.localDependencies.values()) {
             if (det.dependencies != null && det.dependencies.contains(descriptor)) {
                 return det;
+            }
+        }
+        if (isSystem) {
+            for (DependencyEntry det : systemDefs.localDependencies.values()) {
+                if (det.dependencies != null && det.dependencies.contains(descriptor)) {
+                    return det;
+                }
             }
         }
         return null;
@@ -913,5 +961,10 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public Cache<String, String> getAccessCheckCache() {
         return accessCheckCache;
+    }
+
+    @Override
+    public RegistrySet getRegistries() {
+        return this.registries;
     }
 }

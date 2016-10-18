@@ -41,6 +41,7 @@ public class CompilingDefRegistry implements DefRegistry<Definition> {
     private final Set<String> namespaces;
     private final Map<DefDescriptor<?>, DefHolder> registry;
     private final ParserFactory parserFactory;
+    private String name;
 
     private static class DefHolder {
         public DefHolder(DefDescriptor<?> descriptor) {
@@ -79,6 +80,7 @@ public class CompilingDefRegistry implements DefRegistry<Definition> {
         for (DefDescriptor<?> descriptor : descriptors) {
             registry.put(descriptor, new DefHolder(descriptor));
         }
+        this.name = getClass().getSimpleName()+defTypes+prefixes+namespaces;
     }
 
 
@@ -163,5 +165,10 @@ public class CompilingDefRegistry implements DefRegistry<Definition> {
     @Override
     public boolean isStatic() {
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

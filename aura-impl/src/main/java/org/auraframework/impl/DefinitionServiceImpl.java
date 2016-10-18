@@ -54,10 +54,8 @@ import com.google.common.collect.Sets;
 public class DefinitionServiceImpl implements DefinitionService {
     private static final long serialVersionUID = -2488984746420077688L;
 
-    @Inject
     private ContextService contextService;
 
-    @Inject
     private CachingService cachingService;
     
     @Inject
@@ -161,30 +159,6 @@ public class DefinitionServiceImpl implements DefinitionService {
     @Override
     public <T extends Definition> T getDefinition(String qualifiedName, Class<T> defClass) throws QuickFixException {
         return getDefinition(getDefDescriptor(qualifiedName, defClass));
-    }
-
-    @Override
-    public Definition getDefinition(String qualifiedName, DefType... defTypes) throws QuickFixException {
-        contextService.assertEstablished();
-
-        if (defTypes == null || defTypes.length == 0) {
-            throw new AuraRuntimeException("defType is required");
-        }
-
-        DefDescriptor<?> desc = null;
-        for (DefType defType : defTypes) {
-            desc = getDefDescriptor(qualifiedName, defType.getPrimaryInterface());
-            Definition ret = null;
-            try {
-                ret = getDefinition(desc);
-            } catch (DefinitionNotFoundException e) {
-                // ignore
-            }
-            if (ret != null) {
-                return ret;
-            }
-        }
-        throw new DefinitionNotFoundException(desc);
     }
 
     @Override
@@ -351,6 +325,36 @@ public class DefinitionServiceImpl implements DefinitionService {
     }
 
     /**
+     * @return the contextService
+     */
+    public ContextService getContextService() {
+        return contextService;
+    }
+
+    /**
+     * @param contextService the contextService to set
+     */
+    @Inject
+    public void setContextService(ContextService contextService) {
+        this.contextService = contextService;
+    }
+
+    /**
+     * @return the cachingService
+     */
+    public CachingService getCachingService() {
+        return cachingService;
+    }
+
+    /**
+     * @param cachingService the cachingService to set
+     */
+    @Inject
+    public void setCachingService(CachingService cachingService) {
+        this.cachingService = cachingService;
+    }
+
+    /*
      * Get the UID associated with a descriptor.
      *
      * This call must be made before any of the other UID based functions.

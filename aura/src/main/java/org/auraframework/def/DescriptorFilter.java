@@ -40,11 +40,7 @@ public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializa
         this(matcher, "*");
     }
 
-    public DescriptorFilter(String matcher, DefType defType) {
-        this(matcher, defType.toString());
-    }
-
-    public DescriptorFilter(String matcher, String typeStr) {
+    public DescriptorFilter(String matcher, List<DefType> defTypes) {
         String prefix = "*", namespace = "*", name = "*";
         String remainder = matcher;
 
@@ -75,8 +71,16 @@ public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializa
         } catch (IllegalArgumentException iae) {
             throw new IllegalArgumentException("Illegal name in " + matcher);
         }
+        this.defTypes = defTypes;
+    }
+
+    public DescriptorFilter(String matcher, DefType defType) {
+        this(matcher, Lists.newArrayList(defType));
+    }
+
+    private static List<DefType> parseDefTypes(String typeStr) {
         if ("*".equals(typeStr)) {
-            this.defTypes = null;
+            return null;
         } else if (typeStr != null) {
             List<String> types = AuraTextUtil.splitSimpleAndTrim(typeStr, ",", 0);
             List<DefType> accum = Lists.newArrayList();
@@ -84,10 +88,14 @@ public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializa
             for (String t : types) {
                 accum.add(DefType.valueOf(t));
             }
-            this.defTypes = Collections.unmodifiableList(accum);
+            return Collections.unmodifiableList(accum);
         } else {
-            this.defTypes = componentType;
+            return componentType;
         }
+    }
+
+    public DescriptorFilter(String matcher, String typeStr) {
+        this(matcher, parseDefTypes(typeStr));
     }
 
     public boolean matchPrefix(String prefix) {

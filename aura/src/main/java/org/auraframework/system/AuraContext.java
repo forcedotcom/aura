@@ -712,4 +712,18 @@ public interface AuraContext {
      * Get the access check cache.
      */
     Cache<String, String> getAccessCheckCache();
+
+    /**
+     * Get the set of registries associated with this context.
+     *
+     * @return the set of registries that should be used to get definitions.
+     */
+    RegistrySet getRegistries();
+
+    /**
+     * Set this context in 'system mode'.
+     *
+     * This is really a semi-private method used by the context adapter... Wish I had a better way to do it.
+     */
+    void setSystemMode(boolean systemMode);
 }

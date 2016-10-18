@@ -15,6 +15,10 @@
  */
 package org.auraframework.impl;
 
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.antlr.misc.MutableInteger;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContextAdapter;
@@ -24,20 +28,18 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.context.AuraContextImpl;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.service.CachingService;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.system.RegistrySet;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.JsonSerializationContext;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.inject.Inject;
-
-import java.util.Map;
 
 /**
  */
@@ -48,6 +50,12 @@ public class ContextAdapterImpl implements ContextAdapter {
 
     @Inject
     private DefinitionService definitionService;
+    
+    @Inject
+    private CachingService cachingService;
+    
+    @Inject
+    private LoggingService loggingService;
 
     @Autowired(required=false)
     private TestContextAdapter testContextAdapter;
@@ -59,30 +67,24 @@ public class ContextAdapterImpl implements ContextAdapter {
     private static ThreadLocal<MutableInteger> systemDepth = new ThreadLocal<>();
 
     @Override
-    public AuraContext establish(Mode mode, MasterDefRegistry masterRegistry,
+    public AuraContext establish(Mode mode, RegistrySet registries,
                                  Map<DefType, String> defaultPrefixes, Format format, Authentication access,
                                  JsonSerializationContext jsonContext,
                                  Map<String, GlobalValueProvider> globalProviders,
                                  DefDescriptor<? extends BaseComponentDef> appDesc) {
-        AuraContext context = new AuraContextImpl(mode, masterRegistry, defaultPrefixes, format, access, jsonContext,
-                globalProviders, configAdapter, definitionService, testContextAdapter, null);
+        AuraContext context = new AuraContextImpl(mode, registries, defaultPrefixes, format, access, jsonContext,
+                globalProviders, configAdapter, definitionService, testContextAdapter, loggingService,
+                cachingService);
         currentContext.set(context);
         context.setApplicationDescriptor(appDesc);
         
         return context;
     }
 
-    protected AuraContext buildSystemContext(AuraContext original) {
-        AuraContext context = new AuraContextImpl(original.getMode(), original.getDefRegistry(), original.getDefaultPrefixes(),
-                original.getFormat(), original.getAccess(), original.getJsonSerializationContext(),
-                original.getGlobalProviders(), configAdapter, definitionService, testContextAdapter, original);
-        return context;
-    }
-    
     @Override
     public AuraContext pushSystemContext() {
-        AuraContext context = systemContext.get();
         MutableInteger count = systemDepth.get();
+        AuraContext context = currentContext.get();
         
         if (count == null) {
             count = new MutableInteger(1);
@@ -90,30 +92,28 @@ public class ContextAdapterImpl implements ContextAdapter {
         } else {
             count.value += 1;
         }
-        if (context == null) {
-            context = buildSystemContext(currentContext.get());
-            systemContext.set(context);
+        if (count.value == 1) {
+            context.setSystemMode(true);
         }
         return context;
     }
 
     @Override
     public void popSystemContext() {
+        AuraContext context = currentContext.get();
         MutableInteger count = systemDepth.get();
 
         if (count == null || count.value == 0) {
             throw new AuraRuntimeException("unmatched pop");
         }
         count.value -= 1;
+        if (count.value == 0) {
+            context.setSystemMode(false);
+    }
     }
     
     @Override
     public AuraContext getCurrentContext() {
-        MutableInteger count = systemDepth.get();
-
-        if (count != null && count.value > 0) {
-            return systemContext.get();
-        }
         return currentContext.get();
     }
 

@@ -15,6 +15,8 @@
  */
 package org.auraframework.impl.system;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,19 +29,16 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.system.RegistrySet;
 import org.auraframework.throwable.AuraError;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
- * A specialized trie-ish structure for storing which registry gurgles which
- * defs
- * 
- * 
- * @since 0.0.162
+ * A specialized trie-ish structure for storing which registry gurgles which defs
  */
-public class RegistryTrie {
+public class RegistryTrie implements RegistrySet {
 
     private final DefRegistry<?>[] allRegistries;
     private final Set<String> allNamespaces = new HashSet<>();
@@ -130,12 +129,9 @@ public class RegistryTrie {
         initializeHashes();
     }
 
-    public Set<String> getAllNamespaces() {
-        return this.allNamespaces;
-    }
-
-    public DefRegistry<?>[] getAllRegistries() {
-        return this.allRegistries;
+    @Override
+    public Collection<DefRegistry<?>> getAllRegistries() {
+        return Arrays.asList(allRegistries);
     }
 
     /**
@@ -144,7 +140,8 @@ public class RegistryTrie {
      * Note that this ignores the type of the registry, and uses only the prefix
      * and namespace.
      */
-    public Set<DefRegistry<?>> getRegistries(DescriptorFilter matcher) {
+    @Override
+    public Collection<DefRegistry<?>> getRegistries(DescriptorFilter matcher) {
         Set<DefRegistry<?>> matched;
 
         matched = Sets.newHashSet();
@@ -170,6 +167,7 @@ public class RegistryTrie {
         return matched;
     }
 
+    @Override
     public DefRegistry<?> getRegistryFor(DefDescriptor<?> descriptor) {
         if (descriptor == null) {
             return null;

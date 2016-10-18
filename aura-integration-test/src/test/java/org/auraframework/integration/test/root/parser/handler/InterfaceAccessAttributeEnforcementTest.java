@@ -26,7 +26,6 @@ import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
-import org.junit.Ignore;
 import org.junit.Test;
 
 @UnAdaptableTest("namespace start with c means something special in core")

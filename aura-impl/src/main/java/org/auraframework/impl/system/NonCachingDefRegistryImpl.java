@@ -34,6 +34,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 public class NonCachingDefRegistryImpl<T extends Definition> extends DefRegistryImpl<T> {
     private static final long serialVersionUID = 5781588775451737960L;
     private final DefFactory<T> factory;
+    private String name;
 
     public NonCachingDefRegistryImpl(DefFactory<T> factory, Set<DefType> defTypes, Set<String> prefixes) {
         this(factory, defTypes, prefixes, null);
@@ -43,6 +44,7 @@ public class NonCachingDefRegistryImpl<T extends Definition> extends DefRegistry
             Set<String> namespace) {
         super(defTypes, prefixes, namespace);
         this.factory = factory;
+        this.name = getClass().getSimpleName() + defTypes + prefixes + namespace;
     }
 
     @Override
@@ -77,5 +79,10 @@ public class NonCachingDefRegistryImpl<T extends Definition> extends DefRegistry
 
     @Override
     public void reset() {
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

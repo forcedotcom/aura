@@ -145,22 +145,6 @@ public class InstanceServiceImpl implements InstanceService {
     }
 
     @Override
-    public Instance<?> getInstance(String qualifiedName, DefType... defTypes) throws QuickFixException {
-        contextService.assertEstablished();
-
-        return getInstance(qualifiedName, null, defTypes);
-    }
-
-    @Override
-    public Instance<?> getInstance(String qualifiedName, Map<String, Object> attributes, DefType... defTypes)
-            throws QuickFixException {
-        contextService.assertEstablished();
-
-        Definition d = definitionService.getDefinition(qualifiedName, defTypes);
-        return this.<Instance<Definition>, Definition>getInstance(d, attributes);
-    }
-
-    @Override
     public Instance<?> getInstance(ComponentDefRef defRef, BaseComponent<?, ?> valueProvider) throws QuickFixException {
         return new ComponentImpl(defRef.getDescriptor(), defRef.getAttributeValueList(), valueProvider, defRef.getLocalId());
     }

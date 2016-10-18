@@ -115,19 +115,6 @@ public interface DefinitionService extends AuraService {
     QuickFixException;
 
     /**
-     * Creates a {@link DefDescriptor} from the qualified name passed in,
-     * retrieves the named Definition and then returns it. This method should
-     * only be used if the caller doesn't know or care what type is returned.
-     *
-     * @param defTypes a list of DefTypes to check
-     * @return The named definition
-     * @throws DefinitionNotFoundException if definition does not exist
-     * @throws QuickFixException
-     */
-    Definition getDefinition(String qualifiedName, DefType... defTypes) throws DefinitionNotFoundException,
-            QuickFixException;
-
-    /**
      * Return the definition for this descriptor, or null if it does not exist.
      *
      * If the definition was not already compiled, this method will cause it to

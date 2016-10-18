@@ -19,6 +19,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
 import javax.inject.Inject;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
@@ -29,7 +30,6 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
-import org.auraframework.service.LoggingService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;

@@ -44,12 +44,14 @@ import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
+import org.auraframework.service.CachingService;
+import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.GlobalValue;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.system.RegistrySet;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -73,6 +75,12 @@ public class AuraContextIntegrationTest extends AuraImplTestCase {
 
     @Inject
     private JsonSerializerFactory jsonSerializerFactory;
+
+    @Inject
+    private LoggingService loggingService;
+
+    @Inject
+    private CachingService cachingService;
 
     public AuraContextIntegrationTest() {
     	this.setShouldSetupContext(false);
@@ -702,10 +710,10 @@ public class AuraContextIntegrationTest extends AuraImplTestCase {
         globalProviders.put(provider.prefix, provider);
 
         Mode mode = Mode.PROD;
-        MasterDefRegistry mdr = Mockito.mock(MasterDefRegistry.class);
+        RegistrySet rs = Mockito.mock(RegistrySet.class);
         AuraJsonContext serCtx = AuraJsonContext.createContext(mode, true, jsonSerializerFactory);
-        AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
-                globalProviders, configAdapter, definitionService, testContextAdapter, null);
+        AuraContext ctx = new AuraContextImpl(mode, rs, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
+                globalProviders, configAdapter, definitionService, testContextAdapter, loggingService, cachingService);
         ctx.setFrameworkUID("#FAKEUID#");
 
         String res = JsonEncoder.serialize(ctx, serCtx);
@@ -729,10 +737,10 @@ public class AuraContextIntegrationTest extends AuraImplTestCase {
         globalProviders.put(provider.prefix, provider);
 
         Mode mode = Mode.PROD;
-        MasterDefRegistry mdr = Mockito.mock(MasterDefRegistry.class);
+        RegistrySet rs = Mockito.mock(RegistrySet.class);
         AuraJsonContext serCtx = AuraJsonContext.createContext(mode, true, jsonSerializerFactory);
-        AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
-                globalProviders, configAdapter, definitionService, testContextAdapter, null);
+        AuraContext ctx = new AuraContextImpl(mode, rs, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
+                globalProviders, configAdapter, definitionService, testContextAdapter, loggingService, cachingService);
         ctx.setFrameworkUID("#FAKEUID#");
 
         String res = JsonEncoder.serialize(ctx, serCtx);
@@ -756,10 +764,10 @@ public class AuraContextIntegrationTest extends AuraImplTestCase {
         globalProviders.put(provider.prefix, provider);
 
         Mode mode = Mode.PROD;
-        MasterDefRegistry mdr = Mockito.mock(MasterDefRegistry.class);
+        RegistrySet rs = Mockito.mock(RegistrySet.class);
         AuraJsonContext serCtx = AuraJsonContext.createContext(mode, true, jsonSerializerFactory);
-        AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
-                globalProviders, configAdapter, definitionService, testContextAdapter, null);
+        AuraContext ctx = new AuraContextImpl(mode, rs, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
+                globalProviders, configAdapter, definitionService, testContextAdapter, loggingService, cachingService);
         ctx.setFrameworkUID("#FAKEUID#");
 
         String res = JsonEncoder.serialize(ctx, serCtx);
@@ -802,10 +810,10 @@ public class AuraContextIntegrationTest extends AuraImplTestCase {
         globalProviders.put(provider4.prefix, provider4);
 
         Mode mode = Mode.PROD;
-        MasterDefRegistry mdr = Mockito.mock(MasterDefRegistry.class);
+        RegistrySet rs = Mockito.mock(RegistrySet.class);
         AuraJsonContext serCtx = AuraJsonContext.createContext(mode, true, jsonSerializerFactory);
-        AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
-                globalProviders, configAdapter, definitionService, testContextAdapter, null);
+        AuraContext ctx = new AuraContextImpl(mode, rs, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
+                globalProviders, configAdapter, definitionService, testContextAdapter, loggingService, cachingService);
         ctx.setFrameworkUID("#FAKEUID#");
 
         String res = JsonEncoder.serialize(ctx, serCtx);

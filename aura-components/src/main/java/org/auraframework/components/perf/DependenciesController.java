@@ -25,7 +25,6 @@ import java.util.SortedSet;
 
 import javax.inject.Inject;
 
-import org.auraframework.Aura;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -80,9 +79,17 @@ public class DependenciesController implements Controller {
         if (pos != -1) {
             component = component.substring(0, pos);
         }
+
+        DescriptorFilter filter = new DescriptorFilter(component,
+                Lists.newArrayList(DefType.LIBRARY,DefType.COMPONENT,DefType.APPLICATION));
+        Set<DefDescriptor<?>> descriptors = definitionService.find(filter);
+        if (descriptors.size() != 1) {
+            return null;
+        }
+        descriptor = descriptors.iterator().next();
         
         try {
-            Definition def = definitionService.getDefinition(component, DefType.LIBRARY, DefType.COMPONENT, DefType.APPLICATION);
+            Definition def = definitionService.getDefinition(descriptor);
             if (def == null) {
                 return null;
             }

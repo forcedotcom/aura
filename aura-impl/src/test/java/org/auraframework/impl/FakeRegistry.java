@@ -73,11 +73,6 @@ public class FakeRegistry implements MasterDefRegistry {
     }
 
     @Override
-    public boolean namespaceExists(String ns) {
-        return false;
-    }
-
-    @Override
     public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException {
     }
     

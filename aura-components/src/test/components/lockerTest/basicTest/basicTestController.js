@@ -215,12 +215,22 @@
         // Try to spoof with borrowed method and correct prototype
         testSpoof(function() {
 	        descriptor.get.call(Object.create(prototype));
-        }, "Blocked attempt to invoke secure method with altered this!");        
+        }, "Blocked attempt to invoke secure method with altered this!");
 
         // Try to spoof with prototype from a different SecureElement tag name and existing object
         testSpoof(function() {
 	        var otherEl = cmp.find("ul").getElement();
 	        descriptor.get.call(otherEl);
-        }, "Blocked attempt to invoke secure method with altered prototype!");           
+        }, "Blocked attempt to invoke secure method with altered prototype!");
+    },
+
+    // this should only be run on browsers where Locker is not supported
+    testLockerDisabledForUnsupportedBrowser: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertStartsWith("[object Window]", window.toString(), 
+                "Unsupported browsers should not have Locker enabled and should return raw window object");
+        // do some minor operation to prove Aura is booted and functional
+        var text = cmp.find("outputText").get("v.value");
+        testUtils.assertEquals("Output Text here", text, "Unexpected value of output text");
     }
 })

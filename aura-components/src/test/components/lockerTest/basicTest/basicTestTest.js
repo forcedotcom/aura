@@ -181,8 +181,16 @@
     },
     
     testSecureElementPrototypeCounterMeasures: {
-    	test: function(cmp) {
+        test: function(cmp) {
             cmp.testSecureElementPrototypeCounterMeasures();
+        }
+    },
+
+    testLockerDisabledForUnsupportedBrowser: {
+        // only run in unsupported browsers where we fallback to non-Locker mode
+        browsers: ["IE8", "IE9", "IE10", "IE11"],
+        test: function(cmp) {
+            cmp.testLockerDisabledForUnsupportedBrowser();
         }
     }
 })

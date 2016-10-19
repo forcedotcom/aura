@@ -51,6 +51,10 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 if (this.opts.pullToRefresh) {
                     this._ptrBtn  = this._createButton(this.opts.pullToRefreshConfig.labelPull, 'top ptrButton', function(){self.triggerPTR();});
                 }
+                if (this.opts.pullToLoadMore) {
+                    //using page down label for ptl button according to accessibility spec
+                	this._ptlBtn  = this._createButton(config.labelDown, 'bottom downButton', function(){self.triggerPTL();});
+                }
             } else {
                 prevBtn = this._createButton(config.labelLeft, 'leftButton', function(){self._pageLeft();});
                 nextBtn = this._createButton(config.labelRight, 'rightButton', function(){self._pageRight();});
@@ -63,6 +67,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             this._ptrBtn && target.insertBefore(this._ptrBtn, target.firstChild);
             target.insertBefore(this._prevBtn, target.firstChild);
             target.appendChild(this._nextBtn);
+            this._ptlBtn && target.appendChild(this._ptlBtn);
             this._voInited = true;
         },
         _createButton: function(label, cls, clickListener) {
@@ -95,6 +100,9 @@ function lib(w) { //eslint-disable-line no-unused-vars
             }
             //hide page down button when at the bottom
             this._toggleBtn(this._nextBtn, this.y !== this.maxScrollY);
+            
+            //hide pull to load more when at bottom and no more content to load
+            this._toggleBtn(this._ptlBtn, (this.y === this.maxScrollY) && this.opts.pullToLoadMore && this._ptlIsEnabled());
         },
         _toggleHorizontalButtons: function() {
             this._toggleBtn(this._prevBtn, this.x !== 0);
@@ -104,6 +112,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             this._toggleBtn(this._prevBtn, false);
             this._toggleBtn(this._nextBtn, false);
             this._toggleBtn(this._ptrBtn, false);
+            this._toggleBtn(this._ptlBtn, false);
         },
         _toggleBtn: function(btn, display) {
             btn && (btn.style.display = display === true ? 'block' : 'none');

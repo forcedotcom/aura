@@ -23,10 +23,10 @@
             trapFocus: trapFocus
         }, closeAction);
 
-        this.initCloseBtn(cmp);
+        this._initCloseBtn(cmp);
     },
 
-    initCloseBtn: function (cmp) {
+    _initCloseBtn: function (cmp) {
         //create default close button
         if ($A.util.isEmpty(cmp.get('v.closeButton')) && cmp.get('v.showCloseButton')) {
             $A.componentService.createComponent('markup://ui:button', {

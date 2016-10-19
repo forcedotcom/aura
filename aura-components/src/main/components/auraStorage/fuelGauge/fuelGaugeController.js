@@ -36,6 +36,15 @@
         }
     },
 
+    destroy: function(cmp) {
+        if (cmp.get("v.enabled")) {
+            $A.eventService.removeHandler({
+                "event": "markup://auraStorage:modified",
+                "globalId": cmp.getGlobalId()
+            });
+        }
+    },
+
     showStats : function(cmp){
         var storage = $A.storageService.getStorage(cmp.get("v.storageName"));
 

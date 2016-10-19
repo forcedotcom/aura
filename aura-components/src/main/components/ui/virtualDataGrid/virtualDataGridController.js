@@ -67,6 +67,10 @@
     	
     	switch (params.action) {
     	case "select":
+    	    if (index < 0) {
+    	        // Invalid selection index
+    	        return;
+    	    }
     		helper.selectRow(cmp, index, payload.value);
     		payload.selectedItem = cmp.get("v.items")[index];
     		break;

@@ -90,6 +90,11 @@ function SecureScriptElement(el, key) {
 				};
 
 				xhr.open("GET", src, true);
+				
+				//for relative urls enable sending credentials
+				if(src.indexOf("/") === 0){
+					xhr.withCredentials = true;
+				}
 				xhr.send();
 			}
 		},

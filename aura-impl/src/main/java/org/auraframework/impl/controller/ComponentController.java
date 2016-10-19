@@ -16,8 +16,10 @@
 package org.auraframework.impl.controller;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -34,6 +36,8 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.impl.java.controller.JavaAction;
 import org.auraframework.impl.javascript.controller.JavascriptPseudoAction;
+import org.auraframework.impl.util.TypeParser;
+import org.auraframework.impl.util.TypeParser.Type;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.BaseComponent;
@@ -69,6 +73,9 @@ public class ComponentController implements Controller {
         private final String jsStack;
         private String causeDescriptor;
         private String errorId;
+        private String namespace;
+        private String componentName;
+        private String methodName;
 
         public AuraClientException(String desc, String id, String message, String jsStack,
                                    InstanceService instanceService, ExceptionAdapter exceptionAdapter) {
@@ -92,8 +99,48 @@ public class ComponentController implements Controller {
             }
 
             // use cause to track failing component markup if action is not sent.
-            if (this.causeDescriptor == null && desc != null && desc.startsWith("markup://")) {
+            if (this.causeDescriptor == null && desc != null && desc.contains("markup://")) {
                 this.causeDescriptor = desc;
+            }
+
+            if (this.causeDescriptor != null && !this.causeDescriptor.isEmpty()) {
+                // "markup://foo:bar" or "InvalidComponent markup://foo:bar {10:149;a}"
+                int markupIndex = this.causeDescriptor.indexOf("markup://");
+                if (markupIndex > -1) {
+                    String markup = this.causeDescriptor.substring(markupIndex).split(" ")[0];
+                    Type t = TypeParser.parseTag(markup);
+                    this.namespace = t.namespace;
+                    this.componentName = t.name;
+                } else {
+                    // foo$bar$controller$method
+                    String[] parts = this.causeDescriptor.split("[$]");
+                    if (parts.length > 1) {
+                        this.namespace = parts[0];
+                        this.componentName = parts[1];
+                        this.methodName = parts[parts.length-1];
+                    }
+                }
+            }
+
+            // parsing stacktrace to figure out whether the error is from external script 
+            Set<String> filenames = new HashSet<String>();
+            if (jsStack != null && !jsStack.isEmpty()) {
+                String[] traces = jsStack.split("\n");
+                for (String trace : traces) {
+                    // extract filename
+                    int i = trace.indexOf(".js:");
+                    if (i > -1) {
+                        String filepath = trace.substring(0, i);
+                        String[] pathparts = filepath.split("/");
+                        // we don't care about aura script file path
+                        if (pathparts.length > 1 && !pathparts[pathparts.length-1].matches("aura_.+")) {
+                            if (this.componentName == null) {
+                                this.componentName = pathparts[pathparts.length-1];
+                                this.namespace = pathparts[pathparts.length-2];
+                            }
+                        }
+                    }
+                }
             }
 
             this.action = action;
@@ -114,6 +161,18 @@ public class ComponentController implements Controller {
 
         public String getClientErrorId() {
             return errorId;
+        }
+
+        public String getFailedComponentNamespace() {
+            return this.namespace;
+        }
+
+        public String getFailedComponent() {
+            return this.componentName;
+        }
+
+        public String getFailedComponentMethod() {
+            return this.methodName;
         }
     }
 

@@ -165,7 +165,7 @@ function LockerService() {
 			return key ? this.getEnv(key, doNotCreate) : undefined;
 		},
 
-		create : function(code, key, optionalSourceURL) {
+		create : function(code, key, sourceURL, skipPreprocessing) {
 			var envRec;
 
 			if (!lockerShadows) {
@@ -199,7 +199,7 @@ function LockerService() {
 			
 			var locker = {
 				"$envRec": envRec,
-				"$result": window['$$safe-eval$$'](code, optionalSourceURL, envRec, lockerShadows)
+				"$result": window['$$safe-eval$$'](code, sourceURL, skipPreprocessing, envRec, lockerShadows)
 			};
 
 			Object.freeze(locker);

@@ -75,7 +75,7 @@ function SecureScriptElement(el, key) {
 
 				xhr.onreadystatechange = function() {
 					if (xhr.readyState === 4 && xhr.status === 200) {
-						$A.lockerService.create(xhr.responseText, key, src);
+						$A.lockerService.create(xhr.responseText, key, src, true);
 
 						// Fire onload event
 						var listeners = eventListeners["load"];

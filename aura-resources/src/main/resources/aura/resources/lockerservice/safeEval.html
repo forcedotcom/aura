@@ -20,13 +20,15 @@
       // additionally, when specified, strict mode will be enforced to avoid leaking
       // global variables into the worker.
       function addLexicalScopesToSource(src, options) {
-          // removing first line CSFR protection and other comments to facilitate
-          // the detection of returnable code
-          src = src.replace(trimFirstMultilineCommentEx, '');
-          src = src.replace(trimFirstLineCommentEx, '');
-          // only add return statement if source it starts with [, {, or (
-          var match = src.match(returnableEx);
-          if (match) src = src.replace(match[1], 'return ');
+	      if (options.skipPreprocessing !== true) {
+	          // removing first line CSFR protection and other comments to facilitate
+	          // the detection of returnable code
+	          src = src.replace(trimFirstMultilineCommentEx, '');
+	          src = src.replace(trimFirstLineCommentEx, '');
+	          // only add return statement if source it starts with [, {, or (
+	          var match = src.match(returnableEx);
+	          if (match) src = src.replace(match[1], 'return ');
+          }
           
           if (options.useStrict) {
 	          // forcing strict mode
@@ -60,27 +62,33 @@
       // adding non-configurable hooks into parent window.
       Object.defineProperties(parent, {
           '$$safe-eval$$': {
-              value: function(src, optionalSourceURL) {
-                  if (!src) return undefined;
-                  var args = Array.prototype.slice.call(arguments, 1);
-                  optionalSourceURL = typeof optionalSourceURL === "string" ? args.shift() : undefined;
+              value: function(src, sourceURL, skipPreprocessing) {
+                  if (!src) {
+                	  return undefined;
+                  }
+                  
+                  var args = Array.prototype.slice.call(arguments, 3);
+                  
                   var fn = evalAndReturn(addLexicalScopesToSource(src, {
                       levels: args.length,
                       useStrict: true,
-                      sourceURL: optionalSourceURL
+                      sourceURL: sourceURL, 
+                      skipPreprocessing: skipPreprocessing
                   }));
                   return fn.apply(undefined, args);
               }
           },
           '$$safe-eval-compat$$': {
-              value: function(src, optionalSourceURL) {
+              value: function(src, sourceURL, skipPreprocessing) {
                   if (!src) return undefined;
-                  var args = Array.prototype.slice.call(arguments, 1);
-                  optionalSourceURL = typeof optionalSourceURL === "string" ? args.shift() : undefined;
+
+                  var args = Array.prototype.slice.call(arguments, 3);
+
                   var fn = evalAndReturn(addLexicalScopesToSource(src, {
                       levels: args.length,
                       useStrict: false,
-                      sourceURL: optionalSourceURL
+                      sourceURL: sourceURL,
+                      skipPreprocessing: skipPreprocessing
                   }));
                   return fn.apply(args[0], args);
               }

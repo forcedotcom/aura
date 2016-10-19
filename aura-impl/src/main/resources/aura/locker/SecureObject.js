@@ -730,7 +730,7 @@ SecureObject.addPrototypeMethodsAndPropertiesStateless = function(metadata, prot
 
 SecureObject.isUnfilteredType = function(raw) {
 	return (raw instanceof File || raw instanceof FileList || raw instanceof CSSStyleDeclaration || raw instanceof TimeRanges ||
-			raw instanceof Date || (typeof ValidityState !== "undefined" && raw instanceof ValidityState));
+			raw instanceof Date || (typeof ValidityState !== "undefined" && raw instanceof ValidityState) || raw instanceof Promise);
 };
 
 

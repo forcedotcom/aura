@@ -78,12 +78,18 @@
         // Set owner
         this.setPanelOwner(panel, config.owner);
 
+        // onPreCreate
+        if (config.onPreCreate) {
+            config.onPreCreate(panel);
+        }
+
         // Render
         this.renderPanelInstance(cmp, panel, config);
 
         // Stack panel
         this.stackPanel(panel);
 
+        // onCreate
         if (config.onCreate) {
             config.onCreate(panel);
         }

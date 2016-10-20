@@ -29,6 +29,15 @@
             throw new Error("The autocomplete list must implement ui:autocompleteListInterface: " + listCmp);
         }
 
+        if (listCmp && listCmp.isInstanceOf("ui:autocompleteList")) {
+            // check for required fields if we're not using a custom autocomplete list
+            ["dataProvider", "optionVar", "listOption"].forEach(function(attribute) {
+                if (!component.get("v." + attribute)) {
+                    throw new Error("Missing required attribute '" + attribute + "'");
+                }
+            });
+        }
+
         // This calls a function (callback) in a delayed manner and it can be cancelled.
         component._delay = (function(){
             var timer = 0;

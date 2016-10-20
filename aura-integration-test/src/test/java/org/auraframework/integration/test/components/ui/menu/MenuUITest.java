@@ -151,6 +151,51 @@ public class MenuUITest extends WebDriverTestCase {
     public void testOpenMenuViaKeyboardSpace() throws Exception {
     	openMenuViaKeyboardAndTestActionMenu(MENUTEST_APP, Keys.SPACE, "trigger", "actionItem1");
     }
+
+    /**
+     * Test type ahead by typing a single letter
+     */
+    @Test
+    public void testFocusAfterTypeAheadSingleChar() throws Exception {
+        testFocusAfterKeysPressed(MENUTEST_APP, "a", "typeAheadMenu", "menuItem2");
+    }
+
+    /**
+     * Test type ahead allows using multiple characters to jump to more specific item
+     */
+    @Test
+    public void testFocusAfterTypeAheadMultipleChars() throws Exception {
+        testFocusAfterKeysPressed(MENUTEST_APP, "se", "typeAheadMenu", "menuItem4");
+    }
+
+    /**
+     * Test type ahead should also jump to disabled item
+     */
+    @Test
+    public void testFocusAfterTypeAheadToDisabledItem() throws Exception {
+        testFocusAfterKeysPressed(MENUTEST_APP, "l", "typeAheadMenu", "menuItem3");
+    }
+    
+    /**
+     * Test type ahead only opens menu when there's no matched item
+     */
+    @Test
+    public void testFocusAfterTypeAheadOnNonexistentItem() throws Exception {
+        testFocusAfterKeysPressed(MENUTEST_APP, "b", "typeAheadMenu", "menuTrigger");
+    }
+
+    private void testFocusAfterKeysPressed(String appName, CharSequence keys,
+            String menuClassName, String expectedFocusedItemClassName) throws Exception {
+        open(appName);
+        WebDriver driver = this.getDriver();
+        WebElement menu = driver.findElement(By.className(menuClassName));
+        WebElement menuLabel = menu.findElement(By.className("menuTrigger"));
+        WebElement menuList = menu.findElement(By.className("menuList"));
+        WebElement expectedFocusedItem = menu.findElement(By.className(expectedFocusedItemClassName));
+
+        openMenu(menuLabel, menuList, keys);
+        waitForFocusOnElement(expectedFocusedItem);
+    }
     
     // TODO: W-2406307: remaining Halo test failure
     @ExcludeBrowsers({BrowserType.IE11})
@@ -731,7 +776,7 @@ public class MenuUITest extends WebDriverTestCase {
      * @param actionMenu The WebElement on which to wait for the visible class to be present
      * @param openKey    The WebDriver key to use that opens the menu
      */
-    private void openMenu(WebElement menuLabel, WebElement actionMenu, Keys openKey) {    	
+    private void openMenu(WebElement menuLabel, WebElement actionMenu, CharSequence openKey) {    	
     	menuLabel.sendKeys("");
         menuLabel.sendKeys(openKey);
         waitForMenuOpen(actionMenu);

@@ -24,8 +24,8 @@
     <aura:attribute name="blur_counter" type="Integer" default="0"/>
     <aura:attribute name="hideMenuAfterSelected" type="Boolean" default="false"/>
 
-    <div style="margin:20px;">
-        <div style="display:inline-block;width:50%;vertical-align:top;">
+    <div class="testcase">
+        <div>
             <h2>Check Menu Position Test</h2>
             <ui:menu aura:id="uiMenu" class="checkPositionMenu">
                 <ui:menuTriggerLink class="triggercheckPosition" aura:id="triggercheckPosition" label="Please pick your favorite soccer club"/>
@@ -39,9 +39,8 @@
         </div>
     </div>
     <hr/>
-    <p/>
-    <div style="margin:20px;">
-        <div style="display:inline-block;width:50%;vertical-align:top;">
+    <div class="testcase">
+        <div>
             <h2>Your favorite soccer club</h2>
             <ui:menu aura:id="uiMenu" class="clubMenu">
                 <ui:menuTriggerLink class="trigger" aura:id="trigger" label="Please pick your favorite soccer club"/>
@@ -53,7 +52,7 @@
                 </ui:menuList>
             </ui:menu>
         </div>
-        <div style="display:inline-block;width:50%;">
+        <code>
             <h2>Action menu source codes:</h2>
             <ui:outputText value='&#60;ui:menu&#62;'/>
             <br/>
@@ -72,12 +71,11 @@
             <ui:outputText value='&#160;&#160;&#60;/ui:menuList&#62;'/>
             <br/>
             <ui:outputText value='&#60;/ui:menu&#62;'/>
-        </div>
+        </code>
     </div>
     <hr/>
-    <p/>
-    <div style="margin:20px;">
-        <div style="display:inline-block;width:50%;vertical-align:top;">
+    <div class="testcase">
+        <div>
             <h2>Your favorite football teams</h2>
             <ui:menu>
                 <ui:menuTriggerLink class="checkboxMenuLabel" aura:id="checkboxMenuLabel" label="NFC West Teams"/>
@@ -93,7 +91,7 @@
             <p/>
             <ui:outputText class="checkboxMenuResult" aura:id="checkboxMenuResult" value="Which items get selected"/>
         </div>
-        <div style="display:inline-block;width:50%;">
+        <code>
             <h2>Checkbox menu source codes:</h2>
             <ui:outputText value='&#60;ui:menu&#62;'/>
             <br/>
@@ -116,12 +114,11 @@
             <ui:outputText value='&#60;ui:button aura:id="checkboxButton" press="{&#160;!c.getMenuSelected}" label="Check the selected menu items"/&#62;'/>
             <br/>
             <ui:outputText value='&#60;ui:outputText aura:id="result" value="Which items get selected"/&#62;'/>
-        </div>
+        </code>
     </div>
     <hr/>
-    <p/>
-    <div style="margin:20px;">
-        <div style="display:inline-block;width:50%;vertical-align:top;">
+    <div class="testcase">
+        <div>
             <h2>Your favorite baseball teams</h2>
             <ui:menu>
                 <ui:menuTriggerLink class="radioMenuLabel" aura:id="radioMenuLabel" label="National League West"/>
@@ -138,7 +135,7 @@
             <p/>
             <ui:outputText class="radioMenuResult" aura:id="radioMenuResult" value="Which items get selected"/>
         </div>
-        <div style="display:inline-block;width:50%;">
+        <code>
             <h2>Radio menu source codes:</h2>
             <ui:outputText value='&#60;ui:menu&#62;'/>
             <br/>
@@ -163,12 +160,11 @@
             <ui:outputText value='&#60;ui:button aura:id="radioButton" press="{&#160;!c.getRadioMenuSelected}" label="Check the selected menu items"/&#62;'/>
             <br/>
             <ui:outputText value='&#60;ui:outputText aura:id="radioResult" value="Which items get selected"/&#62;'/>
-        </div>
+        </code>
     </div>
     <hr/>
-    <p/>
-    <div style="margin:20px;">
-        <div style="display:inline-block;width:50%;vertical-align:top;">
+    <div class="testcase">
+        <div>
             <h2>Example: Menu Item using Iteration</h2>
             <ui:menu>
               <ui:menuTriggerLink aura:id="iterationTrigger" label="iterationTrigger"/>
@@ -183,7 +179,7 @@
             <p/>
             <ui:outputText class="iterationRadioMenuResult" aura:id="iterationRadioMenuResult" value="Which items get selected"/>
         </div>
-        <div style="display:inline-block;width:50%;">
+        <code>
             <h2>Radio menu using Iteration source codes:</h2>
             <ui:outputText value='&#60;ui:menu&#62;'/>
             <br/>
@@ -204,12 +200,11 @@
             <ui:outputText value='&#60;ui:button aura:id="radioIterationButton" press="{&#160;!c.getRadioIterationMenuSelected}" label="Check the selected menu items"/&#62;'/>
             <br/>
             <ui:outputText value='&#60;ui:outputText aura:id="radioIterationResult" value="Which items get selected"/&#62;'/>
-        </div>
+        </code>
     </div>
     <hr/>
-    <p/>
-    <div style="margin:20px;">
-        <div style="display:inline-block;width:50%;vertical-align:top;">
+    <div class="testcase">
+        <div>
             <h2>Example: Menu Item using Condition</h2>
             <ui:menu>
                 <ui:menuTriggerLink aura:id="conditionTrigger" label="conditionTrigger"/>
@@ -231,9 +226,8 @@
         </div>
     </div>
     <hr/>
-    <p/>
-    <div style="margin:20px;">
-        <div style="display:inline-block;width:50%;vertical-align:top;">
+    <div class="testcase">
+        <div>
             <h2>Example: Menu Item using Condition and Iteration</h2>
             <ui:menu>
                 <ui:menuTriggerLink aura:id="conditionIterationTrigger" label="conditionIterationTrigger"/>
@@ -259,9 +253,8 @@
         </div>
     </div>
     <hr/>
-    <p/>
-    <div style="margin:20px;">
-        <div style="display:inline-block;width:50%;vertical-align:top;">
+    <div class="testcase">
+        <div>
             <h2>Example: Nested Menu Items keyboard interaction</h2>
             <ui:menu aura:id="uiMenu" class="clubMenu">
                 <ui:menuTriggerLink class="triggerNested" aura:id="triggerNested" label="Please pick your favorite soccer club"/>
@@ -281,9 +274,23 @@
         </div>
     </div>
     <hr/>
-    <p/>
-    <div style="margin:20px;">
-        <div style="display:inline-block;width:50%;vertical-align:top;">
+    <div class="testcase">
+        <div>
+            <h2>Example: Type Ahead Menu</h2>
+            <ui:menu class="typeAheadMenu">
+                <ui:menuTriggerLink class="menuTrigger" label="Focus here to try type ahead"/>
+                <ui:menuList class="menuList" triggerTypeAhead="true">
+                    <ui:radioMenuItem class="menuItem1" label="San Francisco"/>
+                    <ui:radioMenuItem class="menuItem2" label="Arizona"/>
+                    <ui:radioMenuItem class="menuItem3" label="Los Angelos" disabled="true"/>
+                    <ui:radioMenuItem class="menuItem4" label="Seattle"/>
+                </ui:menuList>
+            </ui:menu>
+        </div>
+    </div>
+    <hr/>
+    <div class="testcase">
+        <div>
             <h2>All together</h2>
             <ui:menu>
                 <ui:menuTriggerLink aura:id="mytrigger" label="All teams"/>
@@ -306,7 +313,7 @@
                 </ui:menuList>
             </ui:menu>
         </div>
-        <div style="display:inline-block;width:50%;">
+        <code>
             <h2>Mixed menu source codes:</h2>
             <ui:outputText value='&#60;ui:menu&#62;'/>
             <br/>
@@ -345,52 +352,60 @@
             <ui:outputText value='&#160;&#160;&#60;/ui:menuList&#62;'/>
             <br/>
             <ui:outputText value='&#60;/ui:menu&#62;'/>
+        </code>
+    </div>
+    <hr/>
+    <div class="testcase">
+        <div>
+            <h2>Extending MenuList Example</h2>
+            <ui:menu aura:id="uiMenu" class="extendPositionMenu">
+                <ui:menuTriggerLink class="triggerLink" aura:id="triggerLink" label="Pick your favorite soccer club"/>
+                <uitest:menuList_Extend aura:id="extendMenuList" class="extendMenuList">
+                    <ui:actionMenuItem class="extendList1" aura:id="extendList1" label="Bayern München"/>
+                    <ui:actionMenuItem class="extendList2" aura:id="extendList2" label="FC Barcelona" disabled="true"/>
+                    <ui:actionMenuItem class="extendList3" aura:id="extendList3" label="Inter Milan"/>
+                    <ui:actionMenuItem class="extendList4" aura:id="extendList4" label="Manchester United"/>
+                    </uitest:menuList_Extend>
+            </ui:menu>
         </div>
     </div>
-    <div style="display:inline-block;width:50%;vertical-align:top;">
-        <h2>Extending MenuList Example</h2>
-        <ui:menu aura:id="uiMenu" class="extendPositionMenu">
-            <ui:menuTriggerLink class="triggerLink" aura:id="triggerLink" label="Pick your favorite soccer club"/>
-            <uitest:menuList_Extend aura:id="extendMenuList" class="extendMenuList">
-                <ui:actionMenuItem class="extendList1" aura:id="extendList1" label="Bayern München"/>
-                <ui:actionMenuItem class="extendList2" aura:id="extendList2" label="FC Barcelona" disabled="true"/>
-                <ui:actionMenuItem class="extendList3" aura:id="extendList3" label="Inter Milan"/>
-                <ui:actionMenuItem class="extendList4" aura:id="extendList4" label="Manchester United"/>
-                </uitest:menuList_Extend>
-        </ui:menu>
+    <hr/>
+    <div class="testcase">
+        <div>
+            <h2>ui:Image as menuTrigger</h2>
+            <ui:menu aura:id="uiMenuImage" class="uiMenuImage">
+                <ui:menuTriggerLink class="triggerImage" aura:id="triggerImage">
+                    <ui:image aura:id="image" src="/auraFW/resources/aura/auralogo.png" imageType="decorative"/>
+                </ui:menuTriggerLink>
+                <ui:menuList class="actionMenuImage" aura:id="actionMenuImage">
+                    <ui:actionMenuItem class="actionItem1Image" aura:id="actionItem1Image" label="Bayern München" click="{!c.updateTriggerLabel}" />
+                    <ui:actionMenuItem class="actionItem2Image" aura:id="actionItem2Image" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
+                    <ui:actionMenuItem class="actionItem3Image" aura:id="actionItem3Image" label="Inter Milan" click="{!c.updateTriggerLabel}" />
+                    <ui:actionMenuItem class="actionItem4Image" aura:id="actionItem4Image" label="Manchester United" click="{!c.updateTriggerLabel}"/>
+                </ui:menuList>
+            </ui:menu>
+        </div>
     </div>
     <hr/>
-    <div style="display:inline-block;width:50%;vertical-align:top;">
-        <h2>ui:Image as menuTrigger</h2>
-        <ui:menu aura:id="uiMenuImage" class="uiMenuImage">
-            <ui:menuTriggerLink class="triggerImage" aura:id="triggerImage">
-            	<ui:image aura:id="image" src="/auraFW/resources/aura/auralogo.png" imageType="decorative"/>
-            </ui:menuTriggerLink>
-            <ui:menuList class="actionMenuImage" aura:id="actionMenuImage">
-                <ui:actionMenuItem class="actionItem1Image" aura:id="actionItem1Image" label="Bayern München" click="{!c.updateTriggerLabel}" />
-                <ui:actionMenuItem class="actionItem2Image" aura:id="actionItem2Image" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
-                <ui:actionMenuItem class="actionItem3Image" aura:id="actionItem3Image" label="Inter Milan" click="{!c.updateTriggerLabel}" />
-                <ui:actionMenuItem class="actionItem4Image" aura:id="actionItem4Image" label="Manchester United" click="{!c.updateTriggerLabel}"/>
-            </ui:menuList>
-        </ui:menu>
+    <div class="testcase">
+        <div>
+            <h2>Disable double clicks</h2>
+            <ui:menu>
+                <ui:menuTriggerLink class="doubleClick" aura:id="doubleClick" label="Trigger (double-click disabled)" disableDoubleClicks="true"/>
+                <ui:menuList class="doubleClickDisabledMenuList">
+                    <ui:actionMenuItem label="Menu item"/>
+                </ui:menuList>
+            </ui:menu>
+        </div>
     </div>
     <hr/>
-    <div>
-      <h2>Disable double clicks</h2>
-      <ui:menu>
-          <ui:menuTriggerLink class="doubleClick" aura:id="doubleClick" label="Trigger (double-click disabled)" disableDoubleClicks="true"/>
-          <ui:menuList class="doubleClickDisabledMenuList">
-            <ui:actionMenuItem label="Menu item"/>
-          </ui:menuList>
-      </ui:menu>
-    </div>
-    <hr/>
-    <div>
-        <h2>MenuTriggerLink focus and blur</h2>
-        <ui:menuTriggerLink aura:id="menuLink" label="MenuTriggerLink" focus="{!c.countFocus}" blur="{!c.countBlur}"/>
+    <div class="testcase">
+        <div>
+            <h2>MenuTriggerLink focus and blur</h2>
+            <ui:menuTriggerLink aura:id="menuLink" label="MenuTriggerLink" focus="{!c.countFocus}" blur="{!c.countBlur}"/>
 
-        <p>Focus Counter: {!v.focus_counter}</p>
-        <p>Blur Counter: {!v.blur_counter}</p>
+            <p>Focus Counter: {!v.focus_counter}</p>
+            <p>Blur Counter: {!v.blur_counter}</p>
+        </div>
     </div>
-    <hr/>
 </aura:application>

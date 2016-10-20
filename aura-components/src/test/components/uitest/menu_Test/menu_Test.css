@@ -23,3 +23,18 @@
     font-size: 14px;
     font-weight: bold;
 }
+
+.THIS.testcase {
+    margin: 20px;
+}
+
+.THIS.testcase > div {
+    display: inline-block;
+    width: 30%;
+    vertical-align: top;
+}
+
+.THIS.testcase > code {
+    display: inline-block;
+    width: 70%;
+}

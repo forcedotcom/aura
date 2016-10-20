@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:interface support="GA">
+<aura:interface access="PRIVILEGED" support="GA">
     <aura:registerEvent name="notify" type="ui:notify" />
 </aura:interface>

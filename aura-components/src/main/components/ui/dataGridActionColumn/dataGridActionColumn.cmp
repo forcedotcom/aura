@@ -17,7 +17,7 @@
 -->
 <aura:component access="PRIVILEGED" extensible="true" support="PROTO" description="A column of actionable buttons or links in ui:dataGrid">
 	<aura:attribute name="name" access="PRIVILEGED" type="String"/>
-	<aura:attribute name="label" type="String"/>
+	<aura:attribute name="label" access="PRIVILEGED" type="String"/>
 	<aura:attribute name="assistiveLabel" type="String" default="Actions" description="Hidden assistive text for the header."/>
 	<aura:attribute name="class" access="PRIVILEGED" type="String"/>
 	<aura:attribute name="scope" type="String" default="col" description="{ col, row, colgroup, rowgroup }"/>

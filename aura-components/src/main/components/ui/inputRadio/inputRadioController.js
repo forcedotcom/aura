@@ -15,7 +15,8 @@
  */
 ({
     handleOnBlur: function(cmp, event) {
-        var checked = event.srcElement.checked;
+        var elem = event.target || event.srcElement;
+        var checked = elem.checked;
         cmp.set('v.value', checked);
     }
 })// eslint-disable-line semi

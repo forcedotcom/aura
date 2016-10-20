@@ -28,6 +28,51 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
         [Import("aura-impl/src/main/resources/aura/component/ComponentDefStorage.js")]
     });
 
+    // promise mocks
+    var ResolvePromise = function ResolvePromise(value) {
+        return {
+            then: function(resolve, reject) {
+                if(!resolve) {
+                    return ResolvePromise(value);
+                }
+
+                try {
+                    var newValue = resolve(value);
+                    while (newValue && newValue["then"]) {
+                        newValue.then(function(v) {
+                            newValue = v;
+                        });
+                    }
+                    return ResolvePromise(newValue);
+                } catch (e) {
+                    return RejectPromise(e);
+                }
+            }
+        };
+    };
+
+    var RejectPromise = function RejectPromise(error) {
+        return {
+            then: function(resolve, reject) {
+                if(!reject) {
+                    return RejectPromise(error);
+                }
+
+                try {
+                    var value = reject(error);
+                    while (value && value["then"]) {
+                        value.then(function(v) {
+                            value = v;
+                        });
+                    }
+                    return ResolvePromise(value);
+                } catch (newError) {
+                    return RejectPromise(newError);
+                }
+            }
+        };
+    };
+
     var mockAuraUtil = Mocks.GetMocks(Object.Global(),{
         "$A": {
             util: {
@@ -36,8 +81,10 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
                 },
                 isUndefinedOrNull: function (obj) {
                     return obj === undefined || obj === null;
-                }
+                },
+                setCookie: Stubs.GetMethod()
             },
+            log: function() {},
             warning: function (message, error) {},
             assert: function (condition, message) {
                 if (!condition) {
@@ -56,14 +103,14 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
 
 
     [Fixture]
-    function SetupDefinitionStorage() {
-    	var initStorageCalled = false; //we set this to true in storageService.initStorage() below
+    function setupDefinitionStorage() {
+        var initStorageCalled = false; //we set this to true in storageService.initStorage() below
         var mockStorageService = function (persistent, secure, withComponentDefStorage, actionStorageIsPersistent) {
             return Mocks.GetMocks(Object.Global(), {
                 "$A": {
                     storageService: {
                         initStorage: function() {
-                        	initStorageCalled = true;
+                            initStorageCalled = true;
                             return {
                                 isPersistent: function() {
                                     return persistent;
@@ -76,14 +123,14 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
                         },
                         deleteStorage: function() {},
                         getStorage: function(name) {
-                        	if(withComponentDefStorage == true) {
-                        		if (name === "ComponentDefStorage") {
+                            if(withComponentDefStorage == true) {
+                                if (name === "ComponentDefStorage") {
                                     return {
                                         isPersistent: function() { return persistent; },
                                         suspendSweeping: function() {}
                                     }
                                 }
-                        	}
+                            }
                         }
                     },
                     getContext: function() {
@@ -130,7 +177,7 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
 
         [Fact]
         function DoNotCreateComponentDefStorageIfAlreadyPresent() {
-        	initStorageCalled = false;
+            initStorageCalled = false;
             var target = new Aura.Component.ComponentDefStorage();
             target.useDefStore = undefined;
             mockStorageService(true, false, true, true)(function () {
@@ -150,7 +197,28 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
 
             Assert.False(target.useDefStore);
         }
-
     }
 
+    [Fixture]
+    function removeDefs() {
+
+        [Fact]
+        function SetsBrokenGraphCookieWhenStorageFailsToRemove() {
+            var target = new Aura.Component.ComponentDefStorage();
+            target.useDefStore = true;
+            target.storage = {
+                removeAll: function() {
+                    return RejectPromise(new Error("intended storage error"));
+                }
+            };
+
+            var setCookie;
+            mockAuraUtil(function() {
+                target.removeDefs(["descriptor"]);
+
+                Assert.Equal(1, $A.util.setCookie.Calls.length);
+            });
+
+        }
+    }
 };

@@ -79,6 +79,7 @@ Aura.Utils.Util.prototype.isLocalStorageEnabled = function () {
  * @param {String} key The name of the cookie.
  * @param {String} value The value of the cookie.
  * @param {Number} duration The duration of the cookie (milliseconds)
+ * @private
  */
 Aura.Utils.Util.prototype.setCookie = function(key, value, duration) {
     $A.assert(typeof key === "string", "key must be a string");

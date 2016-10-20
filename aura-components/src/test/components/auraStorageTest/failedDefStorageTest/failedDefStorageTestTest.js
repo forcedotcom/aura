@@ -5,6 +5,9 @@
     // Test modifies/deletes the persistent database
     labels : [ "threadHostile" ],
 
+    // This must stay sync with ComponentDefStorage.prototype.BROKEN_GRAPH_COOKIE
+    BROKEN_GRAPH_COOKIE: "auraBrokenDefGraph",
+
     /**
      * These tests verify components are still successfully created when the component def storage is in a state of
      * permanent failure (i.e. all operations on it error out). The app should be smart enough to catch and handle the
@@ -146,5 +149,98 @@
                     }
             );
         }
+    },
+
+    testBrokenGraphCookieGetsRemovedWhenStorageIsCleared: {
+        test: function(cmp) {
+            $A.test.addCleanup(this.clearBrokenGraphCookie);
+
+            window.mockComponentDefStorage.failAll = false;
+            // Broken graph cookie is set when failing to store defs to componentDefStorage.
+            // When storeDefs() fails, clear() will be called.
+            window.mockComponentDefStorage.failSetItems = true;
+            $A.createComponent("test:text", {}, function(newCmp){
+                    $A.test.assertEquals("test$text", newCmp.getName(),
+                            "Unexpected component returned from createComponent()");
+                });
+
+            var that = this;
+            $A.test.addWaitForWithFailureMessage(
+                    true,
+                    function() {
+                        // make sure clear() gets called
+                        return window.mockComponentDefStorage.clearCallCount > 0;
+                    },
+                    "Component def storage never called clear() when the adapter's setItems() fails",
+                    function() {
+                        // This must stay sync with ComponentDefStorage.prototype.BROKEN_GRAPH_COOKIE
+                        var actual = $A.util.getCookie(that.BROKEN_GRAPH_COOKIE);
+                        $A.test.assertUndefined(actual);
+                    }
+            );
+        }
+    },
+
+    testBrokenGraphCookieIsNotRemovedWhenStorageFailsToClear: {
+        test: function(cmp) {
+            $A.test.addCleanup(this.clearBrokenGraphCookie);
+
+            window.mockComponentDefStorage.failAll = false;
+            // Broken graph cookie is set when failing to store defs to componentDefStorage
+            window.mockComponentDefStorage.failSetItems = true;
+            window.mockComponentDefStorage.failClear = true;
+
+            $A.createComponent("test:text", {}, function(newCmp){
+                    $A.test.assertEquals("test$text", newCmp.getName(),
+                            "Unexpected component returned from createComponent()");
+                });
+
+            var that = this;
+            $A.test.addWaitForWithFailureMessage(
+                    true,
+                    function() {
+                        return window.mockComponentDefStorage.clearCallCount > 0;
+                    },
+                    "Component def storage never called clear() when the adapter's setItems() fails",
+                    function() {
+                        var actual = $A.util.getCookie(that.BROKEN_GRAPH_COOKIE);
+                        $A.test.assertEquals("true", actual);
+                    }
+            );
+        }
+    },
+
+    testDefStorageClearedWhenBrokenGraphCookieIsSet: {
+        test: function(cmp) {
+            $A.test.addCleanup(this.clearBrokenGraphCookie);
+
+            window.mockComponentDefStorage.failAll = false;
+
+            $A.createComponent("test:text", {}, function(newCmp){
+                    $A.test.assertEquals("test$text", newCmp.getName(),
+                            "Unexpected component returned from createComponent()");
+                });
+
+            var expiration = new Date(new Date().getTime() + 1000*60*60); //1h
+            var existedCookie = this.BROKEN_GRAPH_COOKIE + "= true; expires=" + expiration.toUTCString();
+            document.cookie = existedCookie;
+
+            var that = this;
+            return $A.test.getAllComponentDefsFromStorage()
+                .then(function() {
+                    $A.test.assertEquals(1, window.mockComponentDefStorage.clearCallCount,
+                            "ComponentDefStorage never called clear() when broken graph cookie is set");
+                    $A.test.assertUndefined($A.util.getCookie(that.BROKEN_GRAPH_COOKIE),
+                            "Broken graph cookie should be cleared");
+                });
+        }
+    },
+
+    /**
+     * Expire broken graph cookie. Register this function as cleanup if a test keeps broken graph cookie
+     * at the end.
+     */
+    clearBrokenGraphCookie: function() {
+        document.cookie = this.BROKEN_GRAPH_COOKIE + "= true; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     }
 })

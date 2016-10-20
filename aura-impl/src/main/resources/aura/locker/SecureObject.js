@@ -611,8 +611,18 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata, so, raw, key)
 		        		return function() {
 		        			var cls = raw[name];
 
-		        			// TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
-		        			var result = new (Function.prototype.bind.apply(cls, [null].concat(Array.prototype.slice.call(arguments))));
+							var result,
+								args = Array.prototype.slice.call(arguments);
+							if (typeof cls === "function") {
+								//  Function.prototype.bind.apply is being used to invoke the constructor and to pass all the arguments provided by the caller
+								// TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
+								result = new (Function.prototype.bind.apply(cls, [null].concat(args)));
+							} else {
+								// For browsers that use a constructor that's not a function, invoke the constructor directly.
+								// For example, on Mobile Safari window["Audio"] returns an object called AudioConstructor
+								// Passing the args as an array is the closest we got to passing the arguments.
+								result = new cls(args);
+							}
 		        			$A.lockerService.trust(so, result);
 
 		        			return SecureObject.filterEverything(so, result);

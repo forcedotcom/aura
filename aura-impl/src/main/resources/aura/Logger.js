@@ -85,14 +85,10 @@ Logger.prototype.assert = function(condition, assertMessage) {
  */
 Logger.prototype.error = function(msg, e){
     var logMsg = msg || "";
-    if (!$A.util.isString(msg)) {
-        e = msg;
-        logMsg = "";
-        msg = "Unknown Error";
-    }
+
     if (!e) {
         e = undefined;
-    } else if (!$A.util.isError(e)) {
+    } else if (!(e instanceof Error) && !$A.util.isError(e)) {
         // Somebody has thrown something bogus, or we're on IE (else block, old IE does not implement .message),
         // but either way we should do what we can...
         if ($A.util.isObject(e) && e.message) {
@@ -105,34 +101,12 @@ Logger.prototype.error = function(msg, e){
             e = new Error("caught " + $A.util.json.encode(e));
         }
     }
-    if (!logMsg.length) {
-        logMsg = "Unknown Error";
-    }
-    if (e && !$A.util.isUndefinedOrNull(e.message)) {
-        logMsg = logMsg + " : " + e.message;
-    }
 
-    // Error objects in older versions of IE are represented as maps with multiple entries containing the error message
-    // string. Checking that the object here is not an Error object prevents the error message from being displayed
-    // multiple times.
-    //
-    if ($A.util.isObject(e) && !$A.util.isError(e)) {
-        for(var k in e) {
-            try {
-                var val = e[k];
-
-                if ($A.util.isString(val)) {
-                    if (logMsg === "Unknown Error") {
-                        logMsg = val;
-                    } else {
-                        logMsg = logMsg + '\n' + val;
-                    }
-                    msg = logMsg;
-                }
-            } catch (e2) {
-                // Ignore serialization errors
-                // We are in an error already, so we really don't want to publish this.
-            }
+    if (e && !$A.util.isUndefinedOrNull(e.message) && e.message !== "") {
+        if (logMsg.length) {
+            logMsg = logMsg + " : " + e.message;
+        } else {
+            logMsg = e.message;
         }
     }
 

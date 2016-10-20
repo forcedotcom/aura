@@ -94,10 +94,13 @@ AttributeSet.prototype.get = function(key, component) {
     var defs=AttributeSet.getDef(attribute,component);
     if(!$A.clientService.allowAccess(defs[0], defs[1])){
         var context=$A.getContext();
-        var message="Access Check Failed! AttributeSet.get(): attribute '"+attribute+"' of component '"+component+"' is not visible to '"+context.getCurrentAccess()+"'.";
+        var contextCmp = context && context.getCurrentAccess()+"";
+        var message="Access Check Failed! AttributeSet.get(): attribute '"+attribute+"' of component '"+component+"' is not visible to '"+contextCmp+"'.";
+        var ae = new $A.auraError(message);
+        ae.component = contextCmp;
         if(context.enableAccessChecks){
             if(context.logAccessFailures){
-                $A.error(message);
+                $A.error(null, ae);
             }
             return undefined;
         }else{
@@ -182,10 +185,13 @@ AttributeSet.prototype.set = function(key, value, component) {
     var defs=AttributeSet.getDef(attribute,component);
     if(!$A.clientService.allowAccess(defs[0],defs[1])){
         var context=$A.getContext();
-        var message="Access Check Failed! AttributeSet.set(): '"+attribute+"' of component '"+component+"' is not visible to '"+context.getCurrentAccess()+"'.";
+        var contextCmp = context && context.getCurrentAccess()+"";
+        var message="Access Check Failed! AttributeSet.set(): '"+attribute+"' of component '"+component+"' is not visible to '"+contextCmp+"'.";
+        var ae = new $A.auraError(message);
+        ae.component = contextCmp;
         if(context.enableAccessChecks){
             if(context.logAccessFailures){
-                $A.error(message);
+                $A.error(null, ae);
             }
             return;
         }else{

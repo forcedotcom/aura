@@ -1464,7 +1464,7 @@ var AuraDevToolService = function() {
     Statement.prototype.query = function(){
         var auraError=$A.error;
         $A.error=function(message,error){
-            if(message.indexOf("Access Check Failed!")<0){
+            if(error.message.indexOf("Access Check Failed!")<0){
                 auraError.call($A,message,error);
             }
         };

@@ -493,12 +493,15 @@ AuraComponentService.prototype.newComponentDeprecated = function(config, attribu
         // Server should handle the case of an unknown def fetched "lazily"
         if(!$A.clientService.allowAccess(def) /* && currentAccess  */) {
             var context=$A.getContext();
+            var contextCmp = context && context.getCurrentAccess()+"";
             var message="Access Check Failed! AuraComponentService.newComponentDeprecated(): '" +
                     (def && def.getDescriptor().getQualifiedName()) + "' is not visible to '" +
-                    context.getCurrentAccess() + "'.";
+                    contextCmp + "'.";
+            var ae = new $A.auraError(message);
+            ae.component = contextCmp;
             if(context.enableAccessChecks) {
                 if(context.logAccessFailures){
-                    $A.error(message);
+                    $A.error(null, ae);
                 }
                 return null;
             }else{
@@ -732,10 +735,13 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
                     collectComponent(this["newComponentDeprecated"](configItem, attributeValueProvider, localCreation, doForce),"SUCCESS","",i);
                 }else{
                     var context=$A.getContext();
-                    var message="Access Check Failed! AuraComponentService.newComponentAsync(): '" + def.getDescriptor().getQualifiedName() + "' is not visible to '" + context.getCurrentAccess() + "'.";
+                    var contextCmp = context && context.getCurrentAccess()+"";
+                    var message="Access Check Failed! AuraComponentService.newComponentAsync(): '" + def.getDescriptor().getQualifiedName() + "' is not visible to '" + contextCmp + "'.";
+                    var ae = new $A.auraError(message);
+                    ae.component = contextCmp;
                     if(context.enableAccessChecks) {
                         if(context.logAccessFailures){
-                            $A.error(message);
+                            $A.error(null, ae);
                         }
                         collectComponent(null, "ERROR", "Unknown component '" + desc + "'.", i);
                     }else{
@@ -977,10 +983,13 @@ AuraComponentService.prototype.getDefinition = function(descriptor, callback) {
     if (def) {
         if(!$A.clientService.allowAccess(def)) {
             var context=$A.getContext();
-            var message="Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + (context&&context.getCurrentAccess()) + "'.";
+            var contextCmp = context&&context.getCurrentAccess()+"";
+            var message="Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + contextCmp + "'.";
+            var ae = new $A.auraError(message);
+            ae.component = contextCmp;
             if(context.enableAccessChecks) {
                 if(context.logAccessFailures){
-                    $A.error(message);
+                    $A.error(null, ae);
                 }
                 callback(null);
                 return;
@@ -1056,10 +1065,13 @@ AuraComponentService.prototype.getDef = function(descriptor) {
 
     if (def && !$A.clientService.allowAccess(def)) {
         var context=$A.getContext();
-        var message="Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + (context&&context.getCurrentAccess()) + "'.";
+        var contextCmp = context&&context.getCurrentAccess()+"";
+        var message="Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + contextCmp + "'.";
+        var ae = new $A.auraError(message);
+        ae.component = contextCmp;
         if(context.enableAccessChecks){
             if(context.logAccessFailures){
-                $A.error(message);
+                $A.error(null, ae);
             }
             return null;
         }else{
@@ -1509,10 +1521,13 @@ AuraComponentService.prototype.createComponentPrivAsync = function (config, call
             callback(new classConstructor(config, forceClientCreation), 'SUCCESS');
         }else{
             var context=$A.getContext();
-            var message="Access Check Failed! AuraComponentService.createComponent(): '" + descriptor + "' is not visible to '" + context.getCurrentAccess() + "'.";
+            var contextCmp = context && context.getCurrentAccess()+"";
+            var message="Access Check Failed! AuraComponentService.createComponent(): '" + descriptor + "' is not visible to '" + contextCmp + "'.";
+            var ae = new $A.auraError(message);
+            ae.component = contextCmp;
             if(context.enableAccessChecks) {
                 if(context.logAccessFailures){
-                    $A.error(message);
+                    $A.error(null, ae);
                 }
                 callback(null, "ERROR", "Unknown component '" + descriptor + "'.");
             }else{
@@ -1539,10 +1554,13 @@ AuraComponentService.prototype.createComponentPriv = function (config) {
         return new classConstructor(config);
     }else{
         var context=$A.getContext();
-        var message="Access Check Failed! AuraComponentService.createComponentFromConfig(): '" + descriptor + "' is not visible to '" + context.getCurrentAccess() + "'.";
+        var contextCmp = context && context.getCurrentAccess()+"";
+        var message="Access Check Failed! AuraComponentService.createComponentFromConfig(): '" + descriptor + "' is not visible to '" + contextCmp + "'.";
+        var ae = new $A.auraError(message);
+        ae.component = contextCmp;
         if(context.enableAccessChecks) {
             if(context.logAccessFailures){
-                $A.error(message);
+                $A.error(null, ae);
             }
         }else{
             if(context.logAccessFailures){

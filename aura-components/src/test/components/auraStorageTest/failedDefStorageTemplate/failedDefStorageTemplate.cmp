@@ -20,7 +20,7 @@
                 name: "actions",
                 persistent: true,
                 secure: false,
-                maxSize: 4096,
+                maxSize: 8192,
                 expiration: 200,
                 autoRefreshInterval: 300
             });
@@ -30,7 +30,7 @@
                 name: "ComponentDefStorageReal",
                 persistent: true,
                 secure: false,
-                maxSize: 4096,
+                maxSize: 8192,
                 expiration: 200
             });
 
@@ -66,11 +66,11 @@
                 return realStorage.adapter.getAll.apply(realStorage.adapter, arguments);
             };
 
-            MockStorageAdapter.prototype.setItems = function() {
+            MockStorageAdapter.prototype.setItems = function(tuples) {
                 if (window.mockComponentDefStorage.failAll || window.mockComponentDefStorage.failSetItems) {
                     return Promise.reject(new Error("setItems(): mock always fails"));
                 }
-                return realStorage.adapter.setItems.apply(realStorage.adapter, arguments);
+                return $A.test.storageAdapterSetItems(realStorage, tuples);
             };
 
             MockStorageAdapter.prototype.removeItems = function() {
@@ -81,11 +81,18 @@
             };
 
             MockStorageAdapter.prototype.clear = function() {
-                window.mockComponentDefStorage.clearCallCount++;
                 if (window.mockComponentDefStorage.failAll  || window.mockComponentDefStorage.failClear) {
+                    window.mockComponentDefStorage.clearCallCount++;
                     return Promise.reject(new Error("clear(): mock always fails"));
                 }
-                return realStorage.adapter.clear.apply(realStorage.adapter, arguments);
+                return realStorage.adapter.clear.apply(realStorage.adapter, arguments).then(
+                    function() {
+                        window.mockComponentDefStorage.clearCallCount++;
+                    },
+                    function(e) {
+                        window.mockComponentDefStorage.clearCallCount++;
+                        throw e;
+                    });
             };
 
             MockStorageAdapter.prototype.sweep = function() {
@@ -110,7 +117,7 @@
                 name: "ComponentDefStorage",
                 persistent: true,
                 secure: true,
-                maxSize: 4096,
+                maxSize: 8192,
                 expiration: 200,
                 debugLogging: true,
                 clearOnInit: false

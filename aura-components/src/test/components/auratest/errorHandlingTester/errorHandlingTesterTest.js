@@ -12,7 +12,7 @@
                 var originalErrorMsg = "Error from component render";
                 $A.test.assertTrue($A.test.contains(errorMsg, originalErrorMsg),
                         "Failed to find original error message. Expected message: " + originalErrorMsg + "; Actual: " + errorMsg);
-                debugger;
+
                 var failingDescriptor = "Failing descriptor: {markup://auratest:errorHandling}";
                 $A.test.assertTrue($A.test.contains(errorMsg, failingDescriptor),
                         "The error message has incorrect failing descriptor. Expected descriptor: " + failingDescriptor + "; Actual: " + errorMsg);
@@ -147,15 +147,21 @@
     },
 
     waitForErrorMaskVisibleInIframe: function(iframe, callback) {
-        $A.test.addWaitFor(true, function() {
+        $A.test.addWaitForWithFailureMessage(true, function() {
                 var errorMaskElement = iframe.document.getElementById("auraErrorMask");
                 return $A.util.hasClass(errorMaskElement, "auraForcedErrorBox");
-            }, callback);
+            },
+            "Error mask never showed up in given iframe",
+            callback);
     },
 
+    /**
+     * Do NOT use this method, if expecting an error in renderers.
+     */
     waitForAuraReadyInIframe: function(iframe) {
-        $A.test.addWaitFor(true, function() {
+        $A.test.addWaitForWithFailureMessage(true, function() {
                 return iframe.$A && iframe.$A.finishedInit === true;
-            });
+            },
+            "Failed to initialize.");
     }
 })

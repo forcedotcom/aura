@@ -2173,6 +2173,16 @@ TestInstance.prototype.storageAdapterSetItems = function(storage, tuples) {
 };
 
 /**
+ * Gets all definitions from ComponentDefStorage.
+ *
+ * @export
+ * @function Test#getAllComponentDefFromStorage
+ */
+TestInstance.prototype.getAllComponentDefsFromStorage = function() {
+    return $A.componentService.componentDefStorage.getAll();
+};
+
+/**
  * @export
  * @function Test#getCreationPath
  */

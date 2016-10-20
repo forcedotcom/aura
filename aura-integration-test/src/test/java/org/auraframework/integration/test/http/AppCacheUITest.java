@@ -22,11 +22,13 @@ import static org.junit.Assert.assertThat;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
 import org.openqa.selenium.By;
 
 public class AppCacheUITest extends WebDriverTestCase {
 
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IE10, BrowserType.IE11})
     @Test
     public void testAppcacheIsEnabled() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,

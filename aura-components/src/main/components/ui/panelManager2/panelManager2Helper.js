@@ -78,9 +78,9 @@
         // Set owner
         this.setPanelOwner(panel, config.owner);
 
-        // onPreCreate
-        if (config.onPreCreate) {
-            config.onPreCreate(panel);
+        // onInit
+        if (config.onInit) {
+            config.onInit(panel);
         }
 
         // Render

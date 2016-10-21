@@ -22,7 +22,6 @@
             closeOnEsc: true,
             trapFocus: trapFocus
         }, closeAction);
-
         this._initCloseBtn(cmp);
     },
 

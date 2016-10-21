@@ -49,7 +49,11 @@ ControllerDef.prototype.getDescriptor = function(){
 ControllerDef.prototype.getActionDef = function(key){
     var action = this.actionDefs[key];
     if (!action) {
-        throw new $A.auraError("Unable to find '"+key+"' on '"+this.descriptor+"'.", null, $A.severity.QUIET);
+        var ae = new $A.auraError("Unable to find '"+key+"' on '"+this.descriptor+"'.", null, $A.severity.QUIET);
+        // ControllerDef config descriptor uses compound:// so that it can find the right thing,
+        // but error reporting only cares about the component name so replacing it with markup:// here.
+        ae.component = this.descriptor.replace("compound://", "markup://");
+        throw ae;
     }
     return action;
 };

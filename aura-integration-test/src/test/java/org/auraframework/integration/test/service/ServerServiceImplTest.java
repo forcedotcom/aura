@@ -626,6 +626,36 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         }
     }
 
+    /**
+     * Verify that toggling whether LockerService is enabled or not returns a different result from writeDefinitions
+     */
+    @Test
+    public void testWriteDefinitionsLockerServiceCacheBuster() throws Exception {
+        ServerService ss = serverService;
+        DefDescriptor<ComponentDef> cmpDesc = definitionService
+                .getDefDescriptor("lockerTest:basicTest", ComponentDef.class);
+        AuraContext context = contextService
+                .startContext(Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, cmpDesc);
+        final String uid = definitionService.getUid(null, cmpDesc);
+        context.addLoaded(cmpDesc, uid);
+        Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
+
+        // get defs with LockerService enabled
+        getMockConfigAdapter().setLockerServiceEnabled(true);
+        StringWriter output = new StringWriter();
+        ss.writeDefinitions(dependencies, output);
+        String firstOutput = output.toString();
+
+        // now get defs with LockerService disabled
+        getMockConfigAdapter().setLockerServiceEnabled(false);
+        output = new StringWriter();
+        ss.writeDefinitions(dependencies, output);
+        String secondOutput = output.toString();
+
+        assertFalse("Expected writeDefinitions output to change after modifying LockerService cache buster",
+                firstOutput.equals(secondOutput));
+    }
+    
     @Test
     public void testPreloadJSDependencies() throws Exception {
         ServerService ss = serverService;

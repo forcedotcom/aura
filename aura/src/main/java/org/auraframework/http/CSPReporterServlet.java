@@ -84,7 +84,7 @@ public class CSPReporterServlet extends HttpServlet {
         }
 
         // make sure we actually received a csp-report
-        if (report.containsKey(JSON_NAME)) {
+        if (report != null&& report.containsKey(JSON_NAME)) {
             report.put(HttpHeaders.USER_AGENT, req.getHeader(HttpHeaders.USER_AGENT));
 
             loggingService.establish();

@@ -15,10 +15,10 @@
  */
 ({
     /**
-     * automation for default CSP in stand-alone-aura like following -- as Nov.19.2014
+     * automation for default CSP in OSS -- as Oct.21.2016
      * Content-Security-Policy:
         default-src 'self'; 
-        script-src 'self' chrome-extension: 'unsafe-eval' 'unsafe-inline'; 
+        script-src 'self' chrome-extension:; 
         object-src 'self'; 
         style-src 'self' chrome-extension: 'unsafe-inline'; 
         img-src *; 
@@ -26,13 +26,13 @@
         frame-ancestors 'self'; 
         frame-src 'self'; 
         font-src *; 
-        connect-src 'self' http://invalid.salesforce.com; 
+        connect-src 'self' http://invalid.salesforce.com http://offline https://offline; 
         report-uri /_/csp
         
-       Note: these are all positive tests, negative ones are in CSPReportLoggingUITest.java
+        Note: these are all positive tests, negative ones are in CSPReportLoggingUITest.java
      */
     
-    labels : ["UnAdaptableTest"],//mark as unadaptable as csp is different between aura-stand-alone and the core
+    labels : ["UnAdaptableTest"],//mark as unadaptable as csp is different in OSS
     
 	//test for [frame-ancestors 'self'] and [frame-src 'self'] 
     testChildCmpInsideIframe:{
@@ -47,7 +47,7 @@
          ]
     },
     
-    //test for [script-src 'self' chrome-extension: 'unsafe-eval' 'unsafe-inline';]
+    //test for [script-src 'self' chrome-extension: 'unsafe-inline';]
     testScriptSource : {
         browsers : [ "-IE8", "-IE7" ],
         attributes: { testScriptSource: true },
@@ -82,7 +82,7 @@
         ]
     },
     
-    //test for the whitelist url: [connect-src 'self' http://invalid.salesforce.com] 
+    //test for the whitelist url: [connect-src self' http://invalid.salesforce.com http://offline https://offline] 
     testConnectionSource : {
         browsers : [ "-IE8", "-IE9" ],
         attributes: { testConnectionSource: true },

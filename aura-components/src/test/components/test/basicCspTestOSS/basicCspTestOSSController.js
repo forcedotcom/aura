@@ -20,7 +20,7 @@
 			//IE7 doesn't like sending HTTP request to url that doesn't exist
 			h.request(c, "/test/basicCspTest.app");
 		} else {
-			h.request(c, "http://invalid.salesforce.com");
+			h.request(c, "http://offline");
 		}
 		
 	}

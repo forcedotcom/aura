@@ -64,7 +64,7 @@
         </video>
     </aura:if>
     
-    <!-- connect-src : 'self' http://invalid.salesforce.com , not used in js test, here for easy trying-out -->
+    <!-- connect-src : 'self' http://invalid.salesforce.com http://invalid.salesforce.com http://offline https://offline -->
     <aura:if isTrue='{!v.testConnectionSource}'>
         <ui:button aura:id='uiButton_sendXHR' press='{!c.post}' label='Send XHR' class='button'/>
         xmlHttpRequestDebug = {!v.xmlHttpRequestDebug} <br/>

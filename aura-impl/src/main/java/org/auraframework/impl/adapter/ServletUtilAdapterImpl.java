@@ -379,7 +379,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         //
         if (attributes != null && !attributes.isEmpty()) {
             builder.append("?aura.attributes=");
-            builder.append(AuraTextUtil.urlencode(JsonEncoder.serialize(attributes, false, false)));
+            builder.append(AuraTextUtil.urlencode(JsonEncoder.serialize(attributes, false)));
         }
     }
     /**

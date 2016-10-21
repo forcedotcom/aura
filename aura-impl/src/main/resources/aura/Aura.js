@@ -733,7 +733,7 @@ AuraInstance.prototype.executeExternalLibraries = function () {
  * @public
  */
 AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializeServices) {
-    config = $A.util.json.resolveRefsObject(config);
+
     this.clientService.setNamespacePrivileges(config["ns"]);
     this.beforeInitHooks();
 

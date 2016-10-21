@@ -763,8 +763,7 @@ Action.prototype.runAfter = function(action) {
 /**
  * Updates the fields from a response.
  *
- * @param {Object}
- *            response The response from the server.
+ * @param {Object} response The response from the server.
  * @return {Boolean} Returns true if the response differs from the original response
  * @private
  */
@@ -783,10 +782,6 @@ Action.prototype.updateFromResponse = function(response) {
         } else {
             this.returnValueClone = this.returnValue;
         }
-
-        // TODO W-3233036 - must deep copy response["components"], and store the clone, to prevent
-        // userland code from modifying partial configs
-
     }
 
     this.error = response["error"];
@@ -856,7 +851,7 @@ Action.prototype.getStored = function() {
     if (this.storable && this.responseState === "SUCCESS") {
         return {
             "returnValue" : this.returnValueClone,
-            "components" : this.components, // TODO W-3233036 use this.componentClone
+            "components" : this.components,
             "state" : "SUCCESS",
             "storage" : {
                 "created" : new Date().getTime()

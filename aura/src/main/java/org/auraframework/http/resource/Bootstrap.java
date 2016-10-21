@@ -135,10 +135,8 @@ public class Bootstrap extends AuraResourceImpl {
             json.writeMapEntry("app", appInstance);
             context.getInstanceStack().serializeAsPart(json);
             json.writeMapEnd();
-            serializationContext.pushRefSupport(false);
             json.writeMapEntry("md5", out.getMD5());
             json.writeMapEntry("context", context);
-            serializationContext.popRefSupport();
             json.writeMapEnd();
             out.append(APPEND_JS);
         } catch (Throwable t) {

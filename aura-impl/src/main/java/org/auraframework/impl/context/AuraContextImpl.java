@@ -798,7 +798,7 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public String serialize(EncodingStyle style) {
         StringBuffer sb = new StringBuffer();
-        JsonEncoder json = new JsonEncoder(sb, false, false);
+        JsonEncoder json = new JsonEncoder(sb, false);
 
         try {
             json.writeMapBegin();

@@ -581,7 +581,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
             assertEquals(12345.6, ((BigDecimal) outerMap.get("otherOtherNum")).doubleValue());
             assertTrue(outerMap.get("func") instanceof JsFunction);
             
-            assertEquals(AuraTextUtil.replaceSimple(func, "/*comment\n\n\n*/", "\n"), JsonEncoder.serialize(outerMap.get("func"), true, false));
+            assertEquals(AuraTextUtil.replaceSimple(func, "/*comment\n\n\n*/", "\n"), JsonEncoder.serialize(outerMap.get("func"), true));
             
             assertEquals("whose's son?", outerMap.get("jsean"));
             assertEquals("за", outerMap.get("Фокс"));

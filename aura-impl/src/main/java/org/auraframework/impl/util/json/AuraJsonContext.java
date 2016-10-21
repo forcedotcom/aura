@@ -27,12 +27,19 @@ import org.auraframework.util.json.JsonSerializers;
  */
 public class AuraJsonContext extends ClassMapJsonSerializationContext {
 
+    /**
+     * @deprecated refSupport no longer supported
+     */
     public static AuraJsonContext createContext(Mode mode, boolean refSupport, JsonSerializerFactory factory) {
-        return new AuraJsonContext(mode.prettyPrint(), refSupport, factory);
+        return new AuraJsonContext(mode.prettyPrint(), factory);
     }
 
-    private AuraJsonContext(boolean format, boolean refSupport, JsonSerializerFactory factory) {
-        super(factory, format, refSupport, -1, -1);
+    public static AuraJsonContext createContext(Mode mode, JsonSerializerFactory factory) {
+        return new AuraJsonContext(mode.prettyPrint(), factory);
+    }
+
+    private AuraJsonContext(boolean format, JsonSerializerFactory factory) {
+        super(factory, format, -1, -1);
     }
 
     @Override

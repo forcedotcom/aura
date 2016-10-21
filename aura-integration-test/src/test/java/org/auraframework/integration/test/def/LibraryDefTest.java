@@ -99,7 +99,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
         assertNotNull(libDef);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
+        JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false);
         libDef.serialize(json);
         json.close();
 

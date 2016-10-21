@@ -156,13 +156,11 @@ public class ServerServiceImpl implements ServerService {
             loggingService.startTimer(LoggingService.TIMER_SERIALIZATION);
             loggingService.startTimer(LoggingService.TIMER_SERIALIZATION_AURA);
             try {
-                serializationContext.pushRefSupport(false);
                 json.writeMapEntry("context", context);
                 List<Event> clientEvents = contextService.getCurrentContext().getClientEvents();
                 if (clientEvents != null && !clientEvents.isEmpty()) {
                     json.writeMapEntry("events", clientEvents);
                 }
-                serializationContext.popRefSupport();
             } finally {
                 loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION_AURA);
                 loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION);
@@ -202,13 +200,6 @@ public class ServerServiceImpl implements ServerService {
             loggingService.startAction(aap);
             Action oldAction = context.setCurrentAction(action);
             try {
-                //
-                // We clear out action centric references here.
-                //
-                json.clearReferences();
-                // DCHASMAN TODO Look into a common base for Action
-                // implementations that we can move the call to
-                // context.setCurrentAction() into!
                 action.run();
             } catch (AuraExecutionException x) {
                 exceptionAdapter.handleException(x, action);
@@ -395,8 +386,6 @@ public class ServerServiceImpl implements ServerService {
         
         JsonSerializationContext serializationContext = context.getJsonSerializationContext();
         serializationContext.pushFormatRootItems();
-        // no ref support needed for defs
-        serializationContext.pushRefSupport(false);
         
         StringBuilder sb = new StringBuilder();
         
@@ -451,8 +440,6 @@ public class ServerServiceImpl implements ServerService {
         Collection<ControllerDef> controllers = filterAndLoad(ControllerDef.class, dependencies, ACF);
         serializationService.writeCollection(controllers, ControllerDef.class, sb, "JSON");
         sb.append(");\n");
-
-        serializationContext.popRefSupport();
 
         return sb.toString();
     }

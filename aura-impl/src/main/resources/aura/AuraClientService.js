@@ -402,7 +402,7 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
             //
             text = "//" + text;
         }
-        var resp = $A.util.json.decode(text, true);
+        var resp = $A.util.json.decode(text);
 
         // if the error on the server is meant to trigger a client-side event...
         if ($A.util.isUndefinedOrNull(resp)) {
@@ -473,10 +473,6 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
         // #end
         ret["status"] = "ERROR";
         return ret;
-    }
-
-    if ("actions" in responseMessage) {
-        $A.util.json.resolveRefsObject(responseMessage["actions"]);
     }
 
     ret["status"] = "SUCCESS";

@@ -24,8 +24,8 @@ import org.auraframework.util.ServiceLocator;
  */
 public class DefaultJsonSerializationContext extends BaseJsonSerializationContext {
 
-    public DefaultJsonSerializationContext(boolean format, boolean refSupport, boolean nullValues) {
-        super(format, refSupport, -1, -1, nullValues);
+    public DefaultJsonSerializationContext(boolean format, boolean nullValues) {
+        super(format, -1, -1, nullValues);
     }
 
     @Override

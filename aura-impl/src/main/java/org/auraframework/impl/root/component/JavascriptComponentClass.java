@@ -132,7 +132,7 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
 
         private void writeObjectLiteral(StringBuilder out) throws IOException, QuickFixException {
 
-            JsonEncoder json = new JsonEncoder(out, true, false);
+            JsonEncoder json = new JsonEncoder(out, true);
             json.writeMapBegin();
 
             // Metadata

@@ -52,7 +52,7 @@ public class RendererDefTest extends AuraImplTestCase {
                 ComponentDef.class);
         ComponentDef def = definitionService.getDefinition(d);
         // Convert the definition to a format that is used by the client
-        String defInJson = JsonEncoder.serialize(def, false, true);
+        String defInJson = JsonEncoder.serialize(def, false);
         // Convert back to the object, just like the client does in javascript
         Object defObj = new JsonReader().read(defInJson);
         assertTrue(defObj instanceof Map);
@@ -72,14 +72,15 @@ public class RendererDefTest extends AuraImplTestCase {
         Component component = instanceService.getInstance("test:test_SimpleJavaRenderer", ComponentDef.class,
                 null);
         // Convert the instance to a format that is used by the client
-        String defInJson = JsonEncoder.serialize(component, false, true);
+        String defInJson = JsonEncoder.serialize(component, false);
         // Convert back to the object, just like the client does in javascript
         Object defObj = new JsonReader().read(defInJson);
         assertTrue(defObj instanceof Map);
+        String html = (String) ((Map<?, ?>) defObj).get("rendering");
         assertNotNull("Component Instance of components which use java renderers should have a rendering section",
-                ((Map<?, ?>) ((Map<?, ?>) defObj).get(Json.ApplicationKey.VALUE.toString())).get("rendering"));
+                html);
         assertEquals("Component markup seen in Component instance does not match the markup in Java Renderer",
-                TestSimpleRenderer.htmlOutput, ((Map<?, ?>) ((Map<?, ?>) defObj).get(Json.ApplicationKey.VALUE.toString())).get("rendering"));
+                TestSimpleRenderer.htmlOutput, html);
     }
 
     /**

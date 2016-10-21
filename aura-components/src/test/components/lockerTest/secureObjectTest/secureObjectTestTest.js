@@ -79,5 +79,11 @@
         test: function(cmp) {
             cmp.testMethodWithParams();
         }
+    },
+
+    testRawObjectsConstructorAndProperties: {
+        test: function(cmp) {
+            cmp.testRawObjectsConstructorAndProperties();
+        }
     }
 })

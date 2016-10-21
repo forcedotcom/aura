@@ -57,5 +57,21 @@
         facet.executeCallback();
 
         testUtils.assertTrue(callbackCalled, "Function passed to facet via aura:method not successfully called");
+    },
+
+    testRawObjectsConstructorAndProperties: function(component) {
+        var testUtils = component.get("v.testUtils");
+        var href = "http://www.google.com/";
+        var url = new URL(href);
+        testUtils.assertDefined(url, "Could not construct RAW object (URL)");
+        testUtils.assertEquals(href, url.href, "Expected property to exist on constructed RAW object (URL)");
+
+        var blob = new Blob([]);
+        var blobUrl = URL.createObjectURL(blob);
+        testUtils.assertStartsWith("blob", blobUrl, "Static function URL.createObjectURL did not return expected value for blob");
+
+        var textEncoder = new TextEncoder("UTF-8");
+        testUtils.assertEquals("utf-8", textEncoder.encoding, "Unexpected encoding property from constructed TextEncoder");
+        testUtils.assertDefined(textEncoder.encode, "Expected static method 'encode' to be defined on constructed TextEncoder");
     }
 })

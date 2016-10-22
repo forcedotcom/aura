@@ -2055,38 +2055,78 @@ TestInstance.prototype.runInternal = function(name) {
     var auraErrorsExpectedDuringInit = this.suite[name]["auraErrorsExpectedDuringInit"] || [];
     var auraWarningsExpectedDuringInit = this.suite[name]["auraWarningsExpectedDuringInit"] || [];
 
-    try {
-        if (this.suite["setUp"]) {
-            if (this.doNotWrapInAuraRun) {
-                this.suite["setUp"].call(this.suite, this.cmp);
-            } else {
-                $A.run(function() {
-                    that.suite["setUp"].call(that.suite, that.cmp);
-                });
-            }
-        }
+    function checkErrors() {
+      try {
+          // Fail now if we got any unexpected errors or warnings during test initialization/setup
+          this.clearExpected(this.preErrors, auraErrorsExpectedDuringInit);
 
-        // Fail now if we got any unexpected errors or warnings during test initialization/setup
-        this.clearExpected(this.preErrors, auraErrorsExpectedDuringInit);
+          this.logErrors(true, "Received unexpected error: ", this.preErrors);
+          this.logErrors(true, "Did not receive expected error during init: ", auraErrorsExpectedDuringInit);
+          this.preErrors = null;
 
-        this.logErrors(true, "Received unexpected error: ", this.preErrors);
-        this.logErrors(true, "Did not receive expected error during init: ", auraErrorsExpectedDuringInit);
-        this.preErrors = null;
+          this.clearExpected(this.preWarnings, auraWarningsExpectedDuringInit);
 
-        this.clearExpected(this.preWarnings, auraWarningsExpectedDuringInit);
-
-        this.logErrors(this.failOnWarning, "Received unexpected warning: ", this.preWarnings);
-        this.logErrors(this.failOnWarning, "Did not receive expected warning during init: ",
-                auraWarningsExpectedDuringInit);
-        this.preWarnings = null;
-
-    } catch (e) {
-        this.logError("Error during setUp", e);
-        this.doTearDown();
+          this.logErrors(this.failOnWarning, "Received unexpected warning: ", this.preWarnings);
+          this.logErrors(this.failOnWarning, "Did not receive expected warning during init: ",
+                  auraWarningsExpectedDuringInit);
+          this.preWarnings = null;
+      } catch (e) {
+          this.logError("Error during setUp", e);
+          this.doTearDown();
+      }
     }
 
+    function startTest() {
+        checkErrors.call(this);
+        // restart timer before running actual test case
+        this.startTimer();
+        this.continueWhenReady();
+    }
+
+    // start timer to fail tests that hang in setUp
     this.startTimer();
-    this.continueWhenReady();
+    this.callSetUp(startTest.bind(this));
+};
+
+/**
+ * Calls user-defined setUp method. Accepts a Promise as a return value and waits for promise to resolve or reject
+ * before continuing.
+ * 
+ * @private
+ * @function Test#callSetUp
+ */
+TestInstance.prototype.callSetUp = function(callback) {
+    var that = this;
+
+    if (this.suite["setUp"]) {
+        if (this.doNotWrapInAuraRun) {
+            this.suite["setUp"].call(this.suite, this.cmp);
+            callback();
+        } else {
+            $A.run(function() {
+                var result;
+                try {
+                    result = that.suite["setUp"].call(that.suite, that.cmp);
+                } catch (e) {
+                    that.logError("Error calling setUp", e);
+                    that.doTearDown();
+                }
+                if (result && typeof result.then === 'function') {
+                    result.then(function() {
+                        setTimeout(callback, 1);
+                    },
+                    function(err) {
+                        that.logError("Error during setUp", err);
+                        setTimeout(callback, 1);
+                    });
+                } else {
+                    callback();
+                }
+            });
+        }
+    } else {
+        callback();
+    }
 };
 
 /**
@@ -2289,8 +2329,8 @@ window.onerror = (function() {
     var origHandler = window.onerror;
     /** @inner */
     var newHandler = function(msg, url, line, col, e) {
-    	//not all browsers call winodw.onerror with e, IEs and safari don't
-    	if ((e && e["name"] === "AuraError") || msg) {
+        //not all browsers call window.onerror with e, IEs and safari don't
+        if ((e && e["name"] === "AuraError") || msg) {
                 try {
                     $A["test"].auraError.call($A["test"], "ERROR", msg);
                 } catch(err) {

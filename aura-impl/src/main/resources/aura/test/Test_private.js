@@ -133,6 +133,12 @@ TestInstance.prototype.doTearDown = function() {
     if (this.inProgress > 1) {
         this.inProgress = 1;
     } else {
+        /*
+         * We may be here because tearDown is failing to complete and the global error handler tries to tearDown
+         * again. Err on the safe side and make sure the test completes so the whole suite isn't hung.
+         */
+        $A.warning("Test tried calling tearDown multiple times, please verify no errors thrown in tearDown method");
+        endTest();
         return;
     }
     try {
@@ -142,23 +148,42 @@ TestInstance.prototype.doTearDown = function() {
     } catch (ce) {
         this.logError("Error during cleanup", ce);
     }
+
+    function endTest() {
+        setTimeout(function() {
+            that.inProgress = 0;
+            that.elapsedTime = new Date().getTime() - that.initTime;
+        }, 100);
+    }
+
     try {
         if (this.suite && this.suite["tearDown"]) {
             if (this.doNotWrapInAuraRun) {
                 this.suite["tearDown"].call(this.suite, this.cmp);
+                endTest();
             } else {
                 $A.run(function() {
-                    that.suite["tearDown"].call(that.suite, that.cmp);
+                    var result = that.suite["tearDown"].call(that.suite, that.cmp);
+                    if (result && typeof result.then === 'function') {
+                        result.then(function() {
+                            endTest();
+                        },
+                        function(err) {
+                            that.logError("Error during teardown", err);
+                            endTest();
+                        });
+                    } else {
+                        endTest();
+                    }
                 });
             }
+        } else {
+            endTest();
         }
     } catch (e) {
         this.logError("Error during tearDown", e);
+        endTest();
     }
-    setTimeout(function() {
-        that.inProgress = 0;
-    	that.elapsedTime = new Date().getTime() - that.initTime;
-    }, 100);
 };
 
 /**
@@ -265,7 +290,6 @@ TestInstance.prototype.continueWhenReady = function() {
                         } else {
                             setTimeout(internalCWR, 1);
                         }
-                        
                     });
                 }
             }

@@ -59,6 +59,8 @@
         <ui:outputText/>
     </aura:attribute>
     
+    <aura:attribute name="icon" type="Aura.ComponentDefRef[]" description="A visual icon that goes before the header label" />
+    
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="change" value="{!v.disabled}" action="{!c.handleDisabledChange}"/>
     
@@ -72,6 +74,7 @@
             <aura:if isTrue="{!v.sortable}">
                 <a class="{! 'toggle slds-th__action slds-text-link--reset ' + (v.disabled ? 'disabled' : '')}" onclick="{!c.handleClick}">
                     <span class="slds-assistive-text">{! (v.disabled ? '' : v.assistiveSortText) } </span>
+                    {!v.icon}
                     <span class="slds-truncate" title="{!v.label}">{!(!v.hideLabel) ? v.label : ''}</span>
                     <span class="slds-assistive-text">{! v.disabled ? ''
                                                         : ((v.direction == 'ascending') ? v.ascLabel 
@@ -79,8 +82,11 @@
                 </a>
                 
                 <aura:set attribute="else">
-                    <div class="slds-truncate slds-th__action">{! (v.hideLabel ? '' : v.label) }</div>
-                    <span class="assistiveText">{! (v.hideLabel ? v.label : '') }</span>
+                    <div class="slds-th__action">
+                        {!v.icon}
+                        <span class="slds-truncate">{! (v.hideLabel ? '' : v.label) }</span>
+                        <span class="assistiveText">{! (v.hideLabel ? v.label : '') }</span>
+                    </div>
                 </aura:set>
             </aura:if>
         </aura:if>

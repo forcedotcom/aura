@@ -30,6 +30,7 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.SubDefDescriptor;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -78,8 +79,14 @@ public class JavaActionInstanceBuilder implements InstanceBuilder<Action, Action
             DefDescriptor<ControllerDef> controllerDesc = actionDesc.getParentDescriptor();
 
             JavaControllerDef controllerDef = (JavaControllerDef) definitionService.getDefinition(controllerDesc);
-
-            Object controllerBean = applicationContext.getBean(controllerDef.getJavaType());
+            Class<?> controllerClass = controllerDef.getJavaType();
+            Object controllerBean;
+            try {
+                controllerBean = applicationContext.getBean(controllerClass);
+            } catch (Throwable t) {
+                throw new AuraRuntimeException(
+                        "Failed to retreive controller instance for " + controllerDef.getDescriptor(), t);
+            }
 
             return new JavaAction(controllerDesc, (JavaActionDef) def, controllerBean, attributes,
                     exceptionAdapter, loggingService);

@@ -23,6 +23,7 @@ import org.auraframework.impl.java.provider.JavaProviderInstance;
 import org.auraframework.instance.InstanceBuilder;
 import org.auraframework.instance.ProviderInstance;
 import org.auraframework.service.LoggingService;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -46,7 +47,14 @@ public class ProviderInstanceBuilder implements InstanceBuilder<ProviderInstance
 
     @Override
     public ProviderInstance getInstance(ProviderDef providerDef, Map<String, Object> attributes) throws QuickFixException {
-        Object instance = applicationContext.getBean(providerDef.getJavaType());
+        Object instance;
+        try {
+            instance = applicationContext.getBean(providerDef.getJavaType());
+        } catch (Throwable t) {
+            throw new AuraRuntimeException(
+                    "Failed to retreive provider instance for " + providerDef.getDescriptor(), t);
+        }
+
         if (instance instanceof Provider) {
             return new JavaProviderInstance(providerDef, (Provider) instance, loggingService);
         }

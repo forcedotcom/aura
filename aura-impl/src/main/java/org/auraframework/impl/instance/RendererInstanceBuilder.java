@@ -23,6 +23,7 @@ import org.auraframework.impl.java.renderer.JavaRendererInstance;
 import org.auraframework.instance.InstanceBuilder;
 import org.auraframework.instance.RendererInstance;
 import org.auraframework.service.LoggingService;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -46,7 +47,14 @@ public class RendererInstanceBuilder implements InstanceBuilder<RendererInstance
 
     @Override
     public RendererInstance getInstance(RendererDef rendererDef, Map<String, Object> attributes) throws QuickFixException {
-        Object instance = applicationContext.getBean(((JavaRendererDef)rendererDef).getJavaType());
+        Object instance;
+        try {
+            instance = applicationContext.getBean(((JavaRendererDef)rendererDef).getJavaType());
+        } catch (Throwable t) {
+            throw new AuraRuntimeException(
+                    "Failed to retreive renderer instance for " + rendererDef.getDescriptor(), t);
+        }
+        
         if (instance instanceof Renderer) {
             return new JavaRendererInstance(rendererDef, (Renderer) instance, loggingService);
         }

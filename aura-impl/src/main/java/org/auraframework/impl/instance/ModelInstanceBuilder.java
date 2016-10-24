@@ -66,7 +66,13 @@ public class ModelInstanceBuilder implements InstanceBuilder<Model, ModelDef>, A
                 @SuppressWarnings("unchecked")
                 Class<? extends ModelFactory> modelFactoryClass = (Class<? extends ModelFactory>) Class
                         .forName(modelFactoryClassName);
-                Object instance = applicationContext.getBean(modelFactoryClass);
+                Object instance;
+                try {
+                    instance = applicationContext.getBean(modelFactoryClass);
+                } catch (Throwable t) {
+                    throw new AuraRuntimeException(
+                            "Failed to retreive model instance for " + modelDef.getDescriptor(), t);
+                }
                 if (instance instanceof ModelFactory) {
                     bean = ((ModelFactory) instance).modelInstance();
                 }

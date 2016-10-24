@@ -67,6 +67,7 @@
                     existing.apply(this, arguments);
                 } catch (e) {
                     // ignore errors from external onerror handler
+                    $A.warning("error from external onerror handler!", e);
                 }
             }
 

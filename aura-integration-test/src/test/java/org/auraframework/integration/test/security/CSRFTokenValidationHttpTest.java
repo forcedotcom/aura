@@ -15,6 +15,11 @@
  */
 package org.auraframework.integration.test.security;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
@@ -29,11 +34,6 @@ import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import javax.inject.Inject;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This test verifies that the aura servlet checks for CSRF token before
@@ -96,7 +96,9 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
                         .get(Json.ApplicationKey.VALUE.toString())).get("values")).get("message"));
         Object f = json.get("defaultHandler");
         assertEquals(JsFunction.class, f.getClass());
-        assertEquals("throw new $A.auraError('unknown error');", ((JsFunction) f).getBody());
+        assertEquals("var e=new Error('[SystemErrorException from server] unknown error');" +
+                "e.reported=true;" +
+                "throw e;", ((JsFunction) f).getBody());
     }
 
     /**

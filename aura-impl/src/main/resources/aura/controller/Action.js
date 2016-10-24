@@ -952,7 +952,7 @@ Action.prototype.finishAction = function(context) {
         if ($A.clientService.inAuraLoop() || error instanceof $A.auraFriendlyError) {
             throw error;
         } else {
-            throw new $A.auraError("Error ", error);
+            throw new $A.auraError("Action.prototype.finishAction Error ", error);
         }
     }
 };

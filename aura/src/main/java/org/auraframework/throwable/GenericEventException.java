@@ -85,7 +85,10 @@ public class GenericEventException extends ClientSideEventException {
 
     @Override
     public JsFunction getDefaultHandler() {
-        return new JsFunction(ImmutableList.<String> of(), "throw new $A.auraError('Unable to process event');");
+        return new JsFunction(ImmutableList.<String> of(), 
+                "var e=new Error('[GenericEventException from server] Unable to process event');" +
+                "e.reported=true;" +
+                "throw e;");
     }
 
     @Override

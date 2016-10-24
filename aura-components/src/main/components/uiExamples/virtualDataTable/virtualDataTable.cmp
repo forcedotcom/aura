@@ -38,9 +38,23 @@
                          infiniteLoadingDataProvider="{!c.loadMore}">
                 <ui:virtualDataTable aura:id="grid" onsort="{!c.sort}" enableResizableColumns="true">
                     <aura:set attribute="headerColumns">
-                        <ui:dataTableHeader name="id"       label="Id" sortable="true"/>
-                        <ui:dataTableHeader name="name"     label="Name" sortable="true" resizable="true"/>
-                        <ui:dataTableHeader name="longName" label="Long Name" resizable="true"/>
+                        <ui:dataTableHeader name="id"           label="Id" sortable="true"/>
+                        <ui:dataTableHeader name="name"         label="Name" sortable="true" resizable="true"/>
+                        <ui:dataTableHeader name="longName"     label="Long Name" resizable="true"/>
+                        <ui:dataTableHeader name="smartSortableData"    label="Smart Data" sortable="true">
+                            <aura:set attribute="icon">
+                                <div class="iconContainer">
+                                    <div class="icon"></div>
+                                </div>
+                            </aura:set>
+                        </ui:dataTableHeader>
+                        <ui:dataTableHeader name="smartData" label="Smart Data">
+                            <aura:set attribute="icon">
+                                <div class="iconContainer">
+                                    <div class="icon"></div>
+                                </div>
+                            </aura:set>
+                        </ui:dataTableHeader>
                     </aura:set>
                     
                     <aura:set attribute="columns">

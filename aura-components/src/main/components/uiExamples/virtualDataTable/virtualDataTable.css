@@ -62,6 +62,12 @@
     background: #CFCFCF;
 }
 
+.THIS .icon {
+    width: 16px;
+    height:16px;
+    background-color:blue;
+}
+
 /** Sorting styles **/
 .THIS .descending {
     background: red;

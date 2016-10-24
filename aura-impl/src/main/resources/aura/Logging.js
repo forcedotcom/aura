@@ -63,11 +63,15 @@
 
         return function() {
             if (existing) {
-                existing.apply(this, arguments);
+                try {
+                    existing.apply(this, arguments);
+                } catch (e) {
+                    // ignore errors from external onerror handler
+                }
             }
 
             return newHandler.apply(this, arguments);
         };
     })();
-    
+
 })();

@@ -644,7 +644,6 @@ SecureWindow.metadata = {
             "locationbar":                          DEFAULT,
             "matchMedia":                           FUNCTION,
             "menubar":                              DEFAULT,
-            "moment":                               FUNCTION,
             "moveBy":                               FUNCTION,
             "moveTo":                               FUNCTION,
             "name":                                 DEFAULT,

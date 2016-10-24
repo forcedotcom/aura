@@ -555,7 +555,6 @@
             "locationbar":                          { type: "BarProp" },
             "matchMedia":                           { type: "function" },
             "menubar":                              { type: "BarProp" },
-            "moment":                               { type: "function" },
             "moveBy":                               { type: "function" },
             "moveTo":                               { type: "function" },
             "name":                                 { type: "string" },

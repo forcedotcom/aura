@@ -52,7 +52,7 @@ function ActionDef(config) {
         try {
             this.meth = $A.util.json.decodeString(config["code"]);
         } catch (e) {
-            throw new $A.auraError(config["code"], e, $A.severity.QUIET);
+            throw new $A.auraError("ActionDef ctor decode error: " + config["code"], e, $A.severity.QUIET);
         }
     }
 }

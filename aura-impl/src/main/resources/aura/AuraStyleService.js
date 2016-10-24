@@ -203,11 +203,15 @@ AuraStyleService.prototype.applyAllTokens = function(descriptors, config) {
             	}
             } else if (state === "ERROR") {
                 var errors = a.getError();
+                var e;
                 if (errors && errors[0] && errors[0].message) {
-                    throw new $A.auraError(errors[0].message);
+                    e = new Error(errors[0].message);
                 } else {
-                    throw new $A.auraError("Unable to apply tokens, action state = " + a.getState());
+                    e = new Error("Unable to apply tokens, action state = " + a.getState());
                 }
+
+                e["reported"] = true;
+                throw e;
             }
 
              

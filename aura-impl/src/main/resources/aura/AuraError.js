@@ -27,6 +27,8 @@ function AuraError() {
     this.stackTrace = "";
     this.stackFrames = null;
     this.severity   = "";
+    this["handled"] = false;
+    this["reported"] = false;
 
     // the component that throws the error
     this.component = "";
@@ -115,6 +117,8 @@ function AuraError() {
         this.stackTrace = getStackTrace(this.stackFrames);
         this.id = MurmurHash3.hashString(this.stackTrace.replace(/https?:\/\/[^\/]*\//gi, ""));
         this.severity = innerError ? (innerError.severity || severity) : severity;
+        this["handled"] = innerError ? (innerError["handled"] || false) : false;
+        this["reported"] = innerError ? (innerError["reported"] || false) : false;
     }
 
     AuraErrorInternal.apply(this,arguments);
@@ -123,8 +127,6 @@ function AuraError() {
     this["message"] = this.message;
     this["stackTrace"] = this.stackTrace;
     this["severity"] = this.severity;
-    this["handled"] = false;
-    this["reported"] = false;
     this["data"] = null;
     this["id"] = this.id;
 }

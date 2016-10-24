@@ -375,12 +375,13 @@ Test.Aura.Controller.ActionDefTest = function() {
 				[Fact]
 				function LogsDecodeAndSpecifySourceFunction() {
 					// Arrange
-					var expected = "function logic(){}";
+					var expected = "ActionDef ctor decode error: function logic(){}";
+					var code = "function logic(){}"
 					var config = {
 						actionType : "CLIENT",
-						code : expected
+						code : code
 					};
-					var error = new Error(expected);
+					var error = new Error(code);
 					var actual;
 					var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
 						util : {

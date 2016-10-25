@@ -22,7 +22,7 @@
         var wrapperTag;
         var wrapperComponent;
 
-        if (!$A.util.isEmpty(labelAttribute) || isCompound === true) {
+        if (!$A.util.isEmpty(labelAttribute) || isCompound) {
             if (isCompound) {
                 wrapperTag = 'fieldset';
                 innerBody = this.addLegendToBody(component, labelAttribute);

@@ -906,7 +906,9 @@ Action.prototype.finishAction = function(context) {
                     try {
                         this.parseAndFireEvent(this.events[x]);
                     } catch (e) {
-                        $A.warning("Events failed: "+(this.def?this.def.toString():""), e);
+                        var eventFailedMessage = "Events failed: "+(this.def?this.def.toString():"");
+                        $A.warning(eventFailedMessage, e);
+                        e.message = e.message ? (e.message + '\n' + eventFailedMessage) : eventFailedMessage; 
                         error = e;
                     }
                 }
@@ -920,10 +922,12 @@ Action.prototype.finishAction = function(context) {
                     cb["fn"].call(cb["s"], this, this.cmp);
                 }
             } catch (e) {
+                var callbackFailedMessage = "Callback failed: " + (this.def?this.def.toString():"");
+                $A.warning(callbackFailedMessage, e);
+                e.message = e.message ? (e.message + '\n' + callbackFailedMessage) : callbackFailedMessage;
                 if (!error) {
                     error = e;
                 }
-                $A.warning("Callback failed: " + (this.def?this.def.toString():""), e);
             }
             this.complete();
             if (this.components && (cb || !this.storable || !this.getStorage())) {
@@ -934,10 +938,13 @@ Action.prototype.finishAction = function(context) {
             this.abort();
         }
     } catch (e) {
+        var actionFailedMessage = "Action failed: " + (this.def?this.def.toString():"");
+        $A.warning(actionFailedMessage, e);
+        e.message = e.message ? (e.message + '\n' + actionFailedMessage) : actionFailedMessage;
         if (!error) {
             error = e;
         }
-        $A.warning("Action failed: " + (this.def?this.def.toString():""), e);
+
         clearComponents = true;
     }
     context.releaseCurrentAccess();

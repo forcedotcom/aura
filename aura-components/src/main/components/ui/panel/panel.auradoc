@@ -20,13 +20,18 @@
     <aura:description>
         <p><code>ui:​panel</code>​ represents a panel that's modal or non-modal. A modal panel doesn't allow any other interaction on the screen when the panel is opened.
         Panels can be full screen or non-full screen. You can control the positioning of the panel relative to an element.
-        In non full screen mode, the panel aligns to the center of a parent DOM container and closes when you click outside the boundaries of the panel.
+        In non-full screen mode, the panel aligns to the center of a parent DOM container and closes when you click outside the boundaries of the panel.
         </p>
         <p>Include one instance of <code>ui:panelManager2</code> to handle and control visibility of all panels in your component or app.
          You can customize a panel's styling, header, body, footer. You can also customize the close button with your own logic.
          You must register your panels using <code>ui:panelManager2</code> before you can create them.
         </p>
-        <p>To create a modal, set the <code>panelType</code> attribute to <code>modal</code>.</p>
+        <h4>Creating the Panel</h4>
+        <p>To create a panel, fire the <code>ui:createPanel</code> event with your attributes and callback functions.
+        You can provide panel customizations such as custom styling in the <code>onInit</code> function, which applies the styles during panel initialization.
+        Otherwise, you can access the panel instance after it's created in the <code>onCreate</code> function. See the <code>ui:createPanel</code> event for more information.
+        </p>
+        <p>To create a panel of modal type, set the <code>panelType</code> attribute to <code>modal</code>.</p>
         <pre>$A.get('e.ui:createPanel').setParams({
     panelType: 'modal',
     visible: true,

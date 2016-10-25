@@ -127,9 +127,11 @@ function lib() { //eslint-disable-line no-unused-vars
 
             var elementId = this.getUid(element);
             if (!elementId) {
-                // component.getElement() doesn't return an input element
-                // need to find the input element in childNodes
-                var inputElement = element.getElementsByTagName('input')[0] || element.getElementsByTagName('textarea')[0];
+                // component.getElement() doesn't return an input|textarea|select element
+                // need to find the input|textarea|select element in childNodes
+                var inputElement = element.getElementsByTagName('input')[0] ||
+                                   element.getElementsByTagName('textarea')[0] ||
+                                   element.getElementsByTagName('select')[0]; 
                 if (inputElement) {
                     elementId = this.getUid(inputElement);
                     element = inputElement;

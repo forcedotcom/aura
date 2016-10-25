@@ -2947,10 +2947,10 @@ AuraClientService.prototype.parseAndFireEvent = function(evtObj) {
 /**
  * Set the token.
  *
- * @param {String} token
- * @param {Boolean} saveToStorage
+ * @param {String} token The new token.
+ * @param {Boolean} saveToStorage True to save the token to storage, false to not save.
  * @memberOf AuraClientService
- * @export
+ * @private
  */
 AuraClientService.prototype.setToken = function(newToken, saveToStorage) {
     this._token = newToken;
@@ -2958,6 +2958,18 @@ AuraClientService.prototype.setToken = function(newToken, saveToStorage) {
        this.saveTokenToStorage();
     }
 };
+
+/**
+ * Set the token.
+ *
+ * @param {String} token the new token.
+ * @memberOf AuraClientService
+ * @export
+ */
+AuraClientService.prototype.resetToken = function(newToken) {
+    this.setToken(newToken, true);
+};
+
 
 /**
  * [DEPRECATED] Run the actions.

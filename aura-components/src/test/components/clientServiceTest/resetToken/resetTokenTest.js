@@ -28,7 +28,7 @@
             $A.test.assertTrue(storage.isPersistent(), "CSRF token is only stored into persistent storage");
 
             // Act
-            $A.clientService.setToken(expected, true);
+            $A.clientService.resetToken(expected);
 
             // Assert
             // Key from AuraClientService.TOKEN_KEY

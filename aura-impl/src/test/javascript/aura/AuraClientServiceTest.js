@@ -862,7 +862,7 @@ Test.Aura.AuraClientServiceTest = function() {
     }
 
     [Fixture]
-    function resetToken() {
+    function setToken() {
 
         [Fact]
         function RepectsTokenParam() {
@@ -947,8 +947,46 @@ Test.Aura.AuraClientServiceTest = function() {
             var actual = tuple[0];
             Assert.Equal(expected, actual);
         }
-
     }
+
+
+    [Fixture]
+    function resetToken() {
+
+        [Fact]
+        function ResetTokenCallsSetToken() {
+            var expected = "myToken";
+            var actual;
+            var targetService;
+            mockGlobal(function() {
+                targetService = new Aura.Services.AuraClientService();
+                targetService.setToken = function(newToken) {
+                    actual = newToken;
+                };
+
+                targetService.resetToken(expected);
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ResetTokenStoresToken() {
+            var targetService;
+            var actual;
+            mockGlobal(function() {
+                targetService = new Aura.Services.AuraClientService();
+                targetService.setToken = function(newToken, store) {
+                    actual = store;
+                };
+
+                targetService.resetToken("anything");
+            });
+
+            Assert.True(actual);
+        }
+    }
+
 
     [Fixture]
     function saveTokenToStorage() {

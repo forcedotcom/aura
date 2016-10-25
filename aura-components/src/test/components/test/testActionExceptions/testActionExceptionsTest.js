@@ -134,7 +134,7 @@
         test: [
             function(cmp){
                 // set an invalid token to trigger an XHR-level exception event
-                $A.clientService.setToken("invalid");
+                $A.clientService.resetToken("invalid");
 
                 cmp.find("trigger").get("e.press").fire();
                 $A.test.addWaitForWithFailureMessage(true, function(){ return !!cmp.get("v.response");},

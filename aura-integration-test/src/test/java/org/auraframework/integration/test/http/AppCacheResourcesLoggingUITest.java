@@ -174,20 +174,18 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
         logs = loadMonitorAndValidateApp(app, TOKEN, TOKEN, "", TOKEN, false);
         List<Request> expectedChange = Lists.newArrayList();
         expectedChange.add(new Request("/auraResource", "manifest", 404)); // reset
-        expectedChange.add(new Request(getUrl(app), null, 302)); // hard refresh
         expectedChange.add(new Request(4, "/auraResource", "js", 200)); // JS
+        expectedChange.add(new Request(2, getUrl(app), null, 200));
+        expectedChange.add(new Request("/auraResource", "js", 304)); // JS
+        expectedChange.add(new Request("/auraResource", "css", 304)); // CSS
+        expectedChange.add(new Request("/auraResource", "manifest", 200));
         switch (getBrowserType()) {
         case GOOGLECHROME:
-            expectedChange.add(new Request(3, "/auraResource", "manifest", 200));
-            expectedChange.add(new Request(2, getUrl(app), null, 200));
+            expectedChange.add(new Request(2, "/auraResource", "manifest", 200));
             break;
         default:
             expectedChange.add(new Request("/auraResource", "manifest", 200));
-            expectedChange.add(new Request(getUrl(app), null, 200));
             expectedChange.add(new Request("/auraResource", "css", 200));
-            // FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
-            // there should be an app.js and an inline.js here.
-            // expectedChange.add(new Request("/auraResource", "js", 200));
         }
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.IDLE);
@@ -719,10 +717,9 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
              * css only once, but it's not stable, do see some test get them twice sometimes.
              */
             return ImmutableList.of(
-                    // new Request(getUrl(app), null, 302), // hard refresh
+                    new Request(2, getUrl(app), null, 200), // reload
                     // new Request("/auraResource", "manifest", 404), // manifest out of date
                     new Request(5, "/auraResource", "manifest", 200),
-                    new Request(2, getUrl(app), null, 200), // rest are cache updates
                     new Request(2, "/auraResource", "css", 200),
                     // FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
                     // there should be an app.js and an inline.js here.
@@ -737,10 +734,9 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
              * initial page twice
              */
             return ImmutableList.of(
-                    // new Request(getUrl(app), null, 302), // hard refresh
+                    new Request(getUrl(app), null, 200), // reload
                     // new Request("/auraResource", "manifest", 404), // manifest out of date
                     new Request("/auraResource", "manifest", 200),
-                    new Request(2, getUrl(app), null, 200), // rest are cache updates
                     new Request(2, "/auraResource", "css", 200),
                     // FIXME: we need to differentiate here... our test mechanism hasn't kept up with our implementation
                     // there should be an app.js and an inline.js here.

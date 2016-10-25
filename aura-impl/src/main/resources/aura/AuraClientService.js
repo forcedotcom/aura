@@ -248,13 +248,13 @@ AuraClientService.BOOTSTRAP_KEY = "$AuraClientService.bootstrap$";
  * Duration (in milliseconds) to check for boot progress. If progress is not seen after
  * this duration then reload the page.
  */
-AuraClientService.BOOT_TIMER_DURATION = 9800;
+AuraClientService.BOOT_TIMER_DURATION = 30000;
 
 /**
  * Number of consecutive reloads without fwk + app finishing the boot sequence. When this is exceeded
  * the user is notified of an error and prompted to reload.
  */
-AuraClientService.INCOMPLETE_BOOT_THRESHOLD = 5;
+AuraClientService.INCOMPLETE_BOOT_THRESHOLD = 10;
 
 /**
  * Query parameter to ensure a server trip even with appcache enabled. Servlet performs
@@ -813,12 +813,10 @@ AuraClientService.prototype.isDevMode = function() {
  * @private
  */
 AuraClientService.prototype.actualDumpCachesAndReload = function() {
-    var that = this;
     function reload() {
-        // must use hardRefresh() to force .app request (with cache-busting query param)
-        // to the server. window.location.reload(true) does not hit the server if appcache
-        // is enabled.
-        that.hardRefresh();
+        // use location.reload(true) to clear browser cache.
+        // Using hardRefresh() made browser use old versions even though appCache was updated
+        window.location.reload(true);
     }
 
     $A.componentService.clearDefsFromStorage({"cause": "appcache"})
@@ -1023,6 +1021,15 @@ AuraClientService.prototype.handleAppCache = function() {
         // b. the error indicates a file in the manifest can't be downloaded (server returned a 4xx, 5xx,
         //    network blip, etc), which means the fwk/app won't boot. so start/continue the bootup timers.
         acs.startBootTimers();
+
+        if (window.applicationCache.status === window.applicationCache.IDLE) {
+            try {
+                // force browser to keep trying to get updated js resources as manifest should be updated at this point
+                window.applicationCache.update();
+            } catch (ignore) {
+                // ignore
+            }
+        }
     }
 
     function handleAppcacheDownloading(e) {
@@ -1120,13 +1127,15 @@ AuraClientService.prototype.startBootTimers = function() {
         var progress = getBootProgressed(oldState, newState);
 
         // if progress made then start a new timer to check again
-        if (progress) {
+        if (progress || (window.applicationCache &&
+            (window.applicationCache.status === window.applicationCache.CHECKING ||
+            window.applicationCache.status === window.applicationCache.DOWNLOADING))) {
             that.startBootTimers();
             return;
         }
 
         // no progress made so reload the page
-        that.hardRefresh();
+        window.location.reload(true);
     }, AuraClientService.BOOT_TIMER_DURATION);
 };
 

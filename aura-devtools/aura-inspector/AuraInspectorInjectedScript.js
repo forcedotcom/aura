@@ -248,30 +248,7 @@
 
     function ChaosManager(config) {
         //Keep a list of element class we know gonna make the element clickable
-        /*var clicableClassList = [
-            'changeOwnerLink',
-            'forceActionLink',
-            'forceHeaderButton',
-            'forceIcon',
-            'globalCreateTrigger',
-            'inputIcon',
-            'lookup__item',
-            'moreLabel',
-            'overflowTrigger',
-            'outputLookupLink',
-            'slds-context-bar__label-action',
-            'slds-context-bar__icon-action',
-            //'slds-text-link--reset',
-            'slds-checkbox--faux',
-            //'slds-dropdown__item',
-            'tabHeader',
-            'rowLink',
-            'uiLabel',
-            'uiInput',
-            'uiMenuItem',
-            'viewAllLabel'
-        ];*/
-        var clicableParameter = "[data-aura-rendered-by]";
+        var dataAuraRenderedBy = "[data-aura-rendered-by]";
         var clicableElementAndTheirClass = {
             'a': [
                 'changeOwnerLink',
@@ -296,7 +273,7 @@
             ]
         };
         //this.getClicableClassList = function() { return clicableClassList; };
-        this.getClicableParameter = function() { return clicableParameter; };
+        this.getDataAuraRenderedBy = function() { return dataAuraRenderedBy; };
         this.getClicableElementList = function() { return Object.getOwnPropertyNames(clicableElementAndTheirClass); };
         this.getClicableElementAndTheirClass = function() { return clicableElementAndTheirClass; };
 
@@ -574,16 +551,16 @@
 
         this.resetActionDropAndErrorPercentage();
 
-            this.removeCircleElement();
-            this.currentChaosRun['chaosRunEndsWith'] = chaosRunEndsWith;
-            //console.log("ChaosRun Stopped");
+        this.removeCircleElement();
+        this.currentChaosRun['chaosRunEndsWith'] = chaosRunEndsWith;
+        //console.log("ChaosRun Stopped");
     };
     
     //event handler for AuraInspector:stopAllChaosRun, called by InspectorPanelSfdcChaos.StopAllChaosRun_OnClick
     ChaosManager.prototype.stopAllChaosRun = function(data) {
-            this.cleanUp();
-            this.removeCircleElement();
-            console.warn("Any previous ongoing chaos runs, including replaying, will be stopped");
+        this.cleanUp();
+        this.removeCircleElement();
+        //console.warn("Any previous ongoing chaos runs, including replaying, will be stopped");
     };
 
     /*
@@ -761,7 +738,8 @@
                     //this will call AuraInspectorChaosView_OnReplayChaosRunNewStatus in InspectorPanelSfdcChaos.js
                     $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': message});
 
-                    this.resolveWaitForElementFromAStepToAppear(samplingInterval, 0);
+                    this.resolveWaitForElementFromAStepToAppear(samplingInterval, 0, 0);
+                   
                 } else {
                     console.error("We would like to continue with chaos run, but there is no valid chaosRunToReplay in local storage");
                 }
@@ -786,8 +764,8 @@
         }
     }
 
-    ChaosManager.prototype.scheduleActionOperationForNextStep = function() {
-        var nextStepIndex = this.chaosRunToReplay.indexOfStep + 1;
+    ChaosManager.prototype.scheduleActionOperationForNextStep = function(stepIndex) {
+        var nextStepIndex = stepIndex + 1;
         //it's possible we drop more than one action right after a click, let's schedule them all
         while(nextStepIndex <= (this.chaosRunToReplay["currentChaosRunSteps"].length - 1) &&
             this.chaosRunToReplay["currentChaosRunSteps"][nextStepIndex] &&
@@ -822,47 +800,55 @@
         }
     }
 
-    ChaosManager.prototype.resolveWaitForElementFromAStepToAppear = function(samplingInterval, count) {
+    ChaosManager.prototype.resolveWaitForElementFromAStepToAppear = function(samplingInterval, count, stepIndex) {
         if(this.pleaseStopReplay) {
             return;
         }
         var that = this;
-        this.waitForElementFromAStepToAppear(samplingInterval, count).then(
+        this.waitForElementFromAStepToAppear(samplingInterval, count, stepIndex).then(
             function(successObj) {
                 //if we want to drop some action right after this click, now it's the time to schedule it.
-                that.scheduleActionOperationForNextStep();
+                that.scheduleActionOperationForNextStep(stepIndex);
                 //now click the element, then increase indexOfStep
                 //console.log("click on "+step.textContent, step);
                 //this will call AuarInspectorChaosView_OnClickSomeElement in InspectorPanelSfdcChaos.js to create chaos card
                 $Aura.Inspector.publish("AuraInspector:OnClickSomeElement", successObj.step);
                 //highlight then actually click on the element
                 that.highlightElement(successObj.elementToClick);
-                setTimeout( function() { successObj.elementToClick.click(); }, 1000 );
-                that.chaosRunToReplay.indexOfStep++;
+                setTimeout( function() { //wait  before clicking
+                    successObj.elementToClick.click(); 
 
-                if(that.chaosRunToReplay.indexOfStep === that.chaosRunToReplay["currentChaosRunSteps"].length) {
-                    that.removeCircleElement();
-                    var message = "Chaos run finished";
-                    //console.log(message);
-                    //this will call AuarInspectorChaosView_OnReplayChaosRunNewStatus in InspectorPanelSfdcChaos.js
-                    $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': message});
-                    //this will call AuarInspectorChaosView_OnReplayChaosRunFinished in InspectorPanelSfdcChaos.js
-                    $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunFinished", {});
+                    stepIndex++;
+                    if( stepIndex === that.chaosRunToReplay["currentChaosRunSteps"].length) {
+                        that.removeCircleElement();
+                        var message = "Chaos run finished";  //console.log(message);
+                        //this will call AuarInspectorChaosView_OnReplayChaosRunNewStatus in InspectorPanelSfdcChaos.js
+                        $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': message});
+                        //this will call AuarInspectorChaosView_OnReplayChaosRunFinished in InspectorPanelSfdcChaos.js
+                        $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunFinished", {});
 
-                    return;
-                } else {
-                    that.resolveWaitForElementFromAStepToAppear(samplingInterval, 0);
-                }
+                        return;
+                    } else {
+                        that.resolveWaitForElementFromAStepToAppear(samplingInterval, 0, stepIndex);
+                    }
+                }, 1000);
+                
             },
             function(errorObj) {
-                //this will call AuraInspectorChaosView_OnReplayChaosRunFinished in InspectorPanelSfdcChaos 
-                $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunFinished", {'error': errorObj.errorMsg});
-                console.error(errorObj.errorMsg);
+                if(errorObj && errorObj.errorType && errorObj.errorType === "TryAgain") {
+                    that.resolveWaitForElementFromAStepToAppear(samplingInterval, tryCount+1, stepIndex);
+                } else {
+                     that.removeCircleElement();
+                     //this will call AuraInspectorChaosView_OnReplayChaosRunFinished in InspectorPanelSfdcChaos
+                     $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunFinished", {'error': errorObj.errorMsg});
+                     console.error(errorObj.errorMsg);
+                }
+               
             }
         );
     }
 
-    ChaosManager.prototype.waitForElementFromAStepToAppear = function(samplingInterval, count) {
+    ChaosManager.prototype.waitForElementFromAStepToAppear = function(samplingInterval, count, stepIndex) {
         var that = this;
         return new Promise(function(resolve, reject) {
             setTimeout(function() {
@@ -876,33 +862,46 @@
                         reject(
                             {
                                 errorType: "MaxTryExceed",
-                                errorMsg: "We have to stop replaying chaos run because element on the next step wouldn't show up"
+                                errorMsg: "We have to stop replaying chaos run because element on the next step wouldn't show up, maxTry="+that.getDefaultMaxTry()
                             }
                         );
                     } else {
-                        var step = that.chaosRunToReplay["currentChaosRunSteps"][that.chaosRunToReplay.indexOfStep];
-                        if(step && step.hasOwnProperty("cssPath")) {
-                            var message = "Replay step "+that.chaosRunToReplay.indexOfStep+": "+step.textContent
-                            +", try count: "+count;
-                            //console.log(message, step);
+                        var elementToClick = undefined;
+                        var step = that.chaosRunToReplay["currentChaosRunSteps"][stepIndex];
+                        if(step && (step.hasOwnProperty("locator") || step.hasOwnProperty("cssPath")) )
+                        {
+                            var message = "Replay step#"+stepIndex+": "+step.textContent + ", try count: "+count;
                             //this will call AuarInspectorChaosView_OnReplayChaosRunNewStatus in InspectorPanelSfdcChaos.js
                             $Aura.Inspector.publish("AuraInspector:OnReplayChaosRunNewStatus", {'message': message});
-
-                            var elementToClick = that.findElementWithLocatorOrCSSPath(step.locator, step.cssPath);
-                            if( elementToClick )  {
+                            if(step.hasOwnProperty("locator")) {
+                                if(!that.locatorEngine) {
+                                    that.loadLocatorEngine(that.resolveWaitForElementFromAStepToAppear.bind(that, samplingInterval, 0, 0));
+                                } else {
+                                    elementToClick = that.locatorEngine.findElementByLocator(step["locator"]);
+                                }
+                            } else if(step.hasOwnProperty("cssPath")) {
+                                elementToClick = that.findElementWithLocatorOrCSSPath(step.locator, step.cssPath);                            
+                            }
+                            if(elementToClick) {//yay, let's click it
                                 resolve({'elementToClick':elementToClick, 'step':step});
-                            } else {
-                                that.resolveWaitForElementFromAStepToAppear(samplingInterval, count+1);
+                            } else {//try again 
+                                //that.resolveWaitForElementFromAStepToAppear(samplingInterval, count+1, stepIndex);
+                                reject({
+                                    errorType: "TryAgain",
+                                    errorMsg: "Element of step#"+stepIndex+" hasn't show up yet, wait and try again",
+                                    tryCount: count
+                                });
                             }
                         } else {
+                            that.removeCircleElement();
                             reject({
                                     errorType: "BadStep",
-                                    errorMsg: "Chaos Run Stop because Step#"+that.chaosRunToReplay.indexOfStep+" is bogus"
+                                    errorMsg: "Chaos Run Stop because Step#"+stepIndex+" is bogus"
                             });
                         }
                     }
                 }
-            }, samplingInterval);   
+            }, samplingInterval);  //wait some seconds before checking if element of next step has show up 
         });
     }
 
@@ -966,17 +965,28 @@
     }
 
     /****************************************** functions for a new chaos run *************************************/
+    ChaosManager.prototype.loadLocatorEngine = function(callback) {
+        if(!this.locatorEngine) {
+                $A.createComponent('instrumentation:testCmp', {}, 
+                    function (cmp) {
+                        if(!cmp || !cmp.helper || !cmp.helper.libLocator || !cmp.helper.libLocator.Engine) {
+                            var errMsg = "We have to stop the new chaos run because either we could not load cmp that bring us locatorEngine, or locatorEngine doesn't come with libraries we are expecting";
+                            //ask chaos tab to create a chaos card, this will call stopChaosRun in InspectorPanelSfdcChaos
+                            $Aura.Inspector.publish("AuraInspector:OnStopNewChaosRunWithError", {'error': errMsg});
+                            console.warn(errMsg);   
+                        }
+                        //console.log("we get locatorEngine:", locatorEngine);
+                        this.locatorEngine = cmp.helper.libLocator.Engine;
+                        if (callback && callback instanceof Function) {
+                            callback();
+                        }
+                    }.bind(this)
+                );
+        }
+    }
 
-    /*
-        event handler for AuraInspector:OnStartChaosRun , called from InspectorPanelSfdcChaos.StartChaosRun_OnClick
-        data: { 'samplingInterval': number like 4000, 'actionDropPercentage': number between 0 to 100, 'actionErrorPercentage': number between 0 to 100 };
-    */
-    ChaosManager.prototype.startChaosRun = function(data) {
-            this.updateConfiguration(data);
-
-            if(this.pleaseStopNewChaosRun) { this.pleaseStopNewChaosRun = false; }//just in case 
-
-            //build a client-side timemachine
+    ChaosManager.prototype.buildTimemachine = function() {
+        //build a client-side timemachine
             if(typeof(Storage) !== "undefined" && sessionStorage) {
                 //just in case we are in a middle of another chaos run
                 sessionStorage.removeItem("chaosRunToReplay");
@@ -1005,8 +1015,23 @@
             } else {
                 console.warn("There is no web storage, cannot build Time Machine to service browser location change");
             }
+    }
+
+    /*
+        event handler for AuraInspector:OnStartChaosRun , called from InspectorPanelSfdcChaos.StartChaosRun_OnClick
+        data: { 'samplingInterval': number like 4000, 'actionDropPercentage': number between 0 to 100, 'actionErrorPercentage': number between 0 to 100 };
+    */
+    ChaosManager.prototype.startChaosRun = function(data) {      
+
+            this.updateConfiguration(data);
+            var samplingInternval = this.getDefaultSamplingInterval();
+
+            if(this.pleaseStopNewChaosRun) { this.pleaseStopNewChaosRun = false; }//just in case 
+
+            this.buildTimemachine();
+
             //now bring in the Promise
-            this.resolveWaitForAnyAuraRenderedElementToPresent(this.getDefaultSamplingInterval(), 0);
+            this.loadLocatorEngine( this.resolveWaitForAnyAuraRenderedElementToPresent.bind(this, samplingInternval, 0) );      
     }
 
     ChaosManager.prototype.resolveWaitForAnyAuraRenderedElementToPresent = function(samplingInterval, count) {
@@ -1059,7 +1084,7 @@
                 return;//we are dead
             }
         }
-        var elementToClickObj = this.getRandomClickableAuraElement();
+        var elementToClickObj = this.getOneClickableElementWithLocator();//this.getRandomClickableAuraElement();
         if(!elementToClickObj) {//we get into a place where we cannot find clickable element, stop chaos run
             var errMsg = "We have to stop the new chaos run because we couldn't find any clickable elements";
             //ask chaos tab to create a chaos card, this will call stopChaosRun in InspectorPanelSfdcChaos
@@ -1068,14 +1093,14 @@
             console.warn(errMsg);
             return;
         } else {
-            var elementToClick = elementToClickObj.element;
+            var elementToClick = elementToClickObj.target;
             var data = {
                 'textContent': elementToClick.textContent,
-                'locator': elementToClickObj.locator,
-                'cssPath': elementToClickObj.cssPath
+                'locator': elementToClickObj.locatorObject,
+                'cssPath': this.getCssPath(elementToClick)
             };
             this.currentChaosRunSteps.push(data);
-            //this will call InspectorPanelSfdcChaos_OnClickSomeElement in InspectorPanelSfdcChaos to create a chaos card
+            //this will call AuraInspectorChaosView_OnClickSomeElement in InspectorPanelSfdcChaos to create a chaos card
             $Aura.Inspector.publish("AuraInspector:OnClickSomeElement", data);
             //acutally click the element : TODO make it Promise?
             this.highlightElement(elementToClick);
@@ -1158,7 +1183,57 @@
         
     }
 
+    /*
+    return object like this: {
+        target: html element,
+        locatorObject: locator, 
+        locator: Locator.stringify(locator),
+        metadata: locator.metadata
+    }
+    for locator, it looks like this
+    {
+                    scope: string  "global-setup",
+                    target: string  "menu-trigger-link",
+                    metadata: object like {
+                        grandparent: string "markup://setup:gear"
+                        parent: string "markup://force:headerMenuTrigger"
+                        parentId: string "setupGear"
+                        root: string "markup://aura:html"
+                        rootId: string "link"
+                        scopeDescription: string "Global Setup"
+                        targetDescription: string "Menu trigger link"
+                    }
+                }
+    */
+    ChaosManager.prototype.getOneClickableElementWithLocator = function() {
+        var elementNodeList = [], locatorList = [];
+        var tryCount = 0;
+        do {
+            tryCount ++;
+            elementNodeList = this.getElementNodeList();
+            if(elementNodeList && elementNodeList.length) {
+                locatorList = this.locatorEngine.findInstrumentedElements(elementNodeList);
+            }
+        } while( tryCount < this.getDefaultMaxTry() && !locatorList.length )
+        if(!locatorList.length) {
+            return null; 
+        }
+        var randomIdx = Math.floor( Math.random() * locatorList.length );
+        return locatorList[randomIdx];   
+    }
     
+    ChaosManager.prototype.getElementNodeList = function() {
+        var tryCount = 0;
+        var randomIdx, selector, elementNodeList = [];
+        do {
+            tryCount ++;
+            randomIdx = Math.floor( Math.random() * this.getClicableElementList().length );
+            selector = this.getClicableElementList()[randomIdx] + this.getDataAuraRenderedBy();//selector would be something like : a[data-aura-rendered-by]
+            elementNodeList = document.querySelectorAll(selector);
+        } while( tryCount < this.getDefaultMaxTry() && !elementNodeList.length )
+
+        return elementNodeList;
+    }
 
     /*
     {
@@ -1182,7 +1257,7 @@
             randomIdx1 = Math.floor( Math.random() * this.getClicableElementList().length );
             clicableClasses = this.getClicableElementAndTheirClass()[ this.getClicableElementList()[randomIdx1] ];
             randomIdx2 = Math.floor( Math.random() * clicableClasses.length);
-            selector = this.getClicableElementList()[randomIdx1] + '.' + clicableClasses[randomIdx2] + this.getClicableParameter();
+            selector = this.getClicableElementList()[randomIdx1] + '.' + clicableClasses[randomIdx2] + this.getDataAuraRenderedBy();
             elementNodeList = document.querySelectorAll(selector);
             for (idx = 0; idx < elementNodeList.length; idx++) {
                 var elementNode = elementNodeList.item(idx);

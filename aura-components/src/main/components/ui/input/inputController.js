@@ -42,7 +42,13 @@
     handleLabelChange : function (cmp) {
         var labelComponent = cmp.find("inputLabel");
         if (!$A.util.isUndefinedOrNull(labelComponent)) {
-            labelComponent.set("v.label", cmp.get("v.label"));
+        	var isCompound = cmp.get("v.isCompound");
+        	var setAttribute = "v.label";
+	        //for compound fields we need to set legend and not label
+	        if(isCompound){
+	        	setAttribute = "v.legend";
+	        }
+            labelComponent.set(setAttribute, cmp.get("v.label"));
         }
     },
 

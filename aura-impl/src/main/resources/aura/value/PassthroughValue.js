@@ -299,7 +299,12 @@ PassthroughValue.prototype.removeValueHandler = function(config) {
  * @export
  */
 PassthroughValue.prototype.set = function(key, value, ignoreChanges) {
-   var path = key.split('.');
+    $A.assert($A.util.isString(key),
+              "PassthroughValue.prototype.set should be called with a valid key!\n"+
+              "[key]: " + key + '\n' +
+              "[primaryProviders]: " + this.primaryProviders + '\n' +
+              "[falls back component]: " + this.component + '\n');
+    var path = key.split('.');
     if (this.primaryProviders.hasOwnProperty(path[0])){
         var provider = this.primaryProviders[path[0]];
 

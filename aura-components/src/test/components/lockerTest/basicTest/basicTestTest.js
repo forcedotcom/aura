@@ -192,5 +192,11 @@
         test: function(cmp) {
             cmp.testLockerDisabledForUnsupportedBrowser();
         }
+    },
+    
+    testComponentPassedToOtherNamespaceViaCreateComponent: {
+        test: function(cmp) {
+            cmp.testComponentPassedToOtherNamespaceViaCreateComponent();
+        }
     }
 })

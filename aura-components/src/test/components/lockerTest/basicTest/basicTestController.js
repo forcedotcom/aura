@@ -232,5 +232,20 @@
         // do some minor operation to prove Aura is booted and functional
         var text = cmp.find("outputText").get("v.value");
         testUtils.assertEquals("Output Text here", text, "Unexpected value of output text");
+    },
+
+    testComponentPassedToOtherNamespaceViaCreateComponent: function(cmp, event, helper) {
+        var testUtils = cmp.get("v.testUtils");
+        helper.passCmpViaCreateComponent(cmp);
+        testUtils.addWaitForWithFailureMessage(
+                true,
+                function checkComponentCreationComplete() {
+                    return document.getElementById("content").textContent !== "";
+                },
+                "DOM element with return from createComponent never updated",
+                function assertReturnIsSecureComponentRef() {
+                    testUtils.assertStartsWith("SecureComponentRef", document.getElementById("content").textContent,
+                            "SecureComponent passed to another namespace should be filted to SecureComponentRef");
+                });
     }
 })

@@ -81,5 +81,19 @@
     	} catch(e) {
 	        testUtils.assertEquals("SecureElement.innerHTML cannot be used with " + property.toUpperCase() + " elements!", e.toString());
     	}
-	}
+	},
+
+    passCmpViaCreateComponent: function(cmp) {
+        var a = {"getCmpRef": function() { return cmp.find("innerCmp"); }};
+        $A.createComponent("lockerTestOtherNamespace:acceptsAttribute", { "obj": a },
+            function(newCmp, status, error){
+                var content = cmp.find("content");
+                if (status === "SUCCESS") {
+                    content.set("v.body", newCmp);
+                } else {
+                    content.getElement().textContent = error;
+                }
+            }
+        );
+    },
 })

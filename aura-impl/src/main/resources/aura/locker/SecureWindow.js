@@ -386,7 +386,7 @@ SecureWindow.metadata = {
             "Object":                               FUNCTION,
             "OfflineAudioCompletionEvent":          FUNCTION,
             "OfflineAudioContext":                  FUNCTION,
-            "Option":                               FUNCTION,
+            "Option":                               CTOR,
             "OscillatorNode":                       FUNCTION,
             "PERSISTENT":                           DEFAULT,
             "PageTransitionEvent":                  FUNCTION,

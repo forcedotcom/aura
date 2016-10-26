@@ -349,6 +349,7 @@
      */
     RANDOM_GRID_ELEM : 9,
     testAriaSelected : {
+    	browsers: ['DESKTOP'],
     	attributes: {value: "2013-09-25"},
     	test : [function(cmp) {
     		this.openDatePicker(cmp);
@@ -386,6 +387,7 @@
      * 4. Go back to the originally selected date and check that aria-selected=true (25th Sept 2013)
      */
     testAriaSelectedMonthYear : {
+    	browsers: ['DESKTOP'],
     	attributes: {value: "2013-09-25"},
     	test : [ function(cmp) {
     		this.openDatePicker(cmp);

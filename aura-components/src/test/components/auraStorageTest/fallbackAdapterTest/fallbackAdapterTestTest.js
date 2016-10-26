@@ -24,7 +24,6 @@
         $A.test.addCleanup(function(){ $A.storageService.deleteStorage("alternateAdapterTest"); });
     },
 
-
     /**
      * Verifies when an adapter fails initialization that AuraStorage falls back to the memory adapter
      */
@@ -39,7 +38,6 @@
         }
     },
 
-
     /**
      * Verifies after AuraStorage falls back to the memory adapter that a basic set + get of an object works.
      */
@@ -52,7 +50,6 @@
                 });
         }
     },
-
 
     /**
      * Verifies after AuraStorage falls back to the memory adapter that a basic set + get of an array works.

@@ -172,23 +172,21 @@
     // cyclic objects are supported by IndexedDB adapter unlike all other adapters
     testCyclicObject:{
         test:function(cmp){
-            var completed = false;
             var stuff = { "a": 2 };
             stuff["b"] = stuff;
 
             var that = this;
-            this.storage.set("testCyclicObject", stuff)
+            return this.storage.set("testCyclicObject", stuff)
                 .then(function() { return that.storage.get("testCyclicObject"); })
-                .then(function(value) {
-                    $A.test.assertEquals(2, value["a"], "testCyclicObject: constant is wrong");
-                    $A.test.assertEquals(value["b"], value, "testCyclicObject: looped value should be defined");
-                    completed = true;
-                })['catch'](function(e) {
-                   completed = true;
-                   $A.test.fail("Cyclic object set/get failed: " + e.message);
-                });
-
-            $A.test.addWaitFor(true, function() { return completed; });
+                .then(
+                    function(value) {
+                        $A.test.assertEquals(2, value["a"], "testCyclicObject: constant is wrong");
+                        $A.test.assertEquals(value["b"], value, "testCyclicObject: looped value should be defined");
+                    },
+                    function(e) {
+                        throw new Error("Cyclic object set/get failed: " + e.message);
+                    }
+                );
         }
     },
 

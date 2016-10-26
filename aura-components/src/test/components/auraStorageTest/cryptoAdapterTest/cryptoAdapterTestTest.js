@@ -234,43 +234,28 @@
                         "iframeContainer", "first load");
            },
            function setKeyAndClearStorage(cmp) {
-                var completed = false;
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();
                 iframeCmp.helper.setEncryptionKey(this.createCryptoKey(1));
 
                 var targetStorage = iframeCmp._storage;
-                targetStorage.clear()
-                    .then(function() {completed = true;})
-                    .catch(function(e) { $A.test.fail(e.toString());});
-
-                $A.test.addWaitFor(true, function() {return completed;});
+                return targetStorage.clear();
            },
            function addItemToStorage(cmp) {
-                var completed = false;
                 var targetStorage = cmp._iframeLib.getIframeRootCmp()._storage;
-                targetStorage.set("key1", cmp._expected)
-                    .then(function(){ completed = true; })
-                    .catch(function(e){ $A.test.fail(e.toString()); });
-
-                $A.test.addWaitFor(true, function() {return completed;});
+                return targetStorage.set("key1", cmp._expected);
            },
            function reloadIframe(cmp) {
                return cmp._iframeLib.reloadIframe(cmp, false, "first reload");
            },
            function changeKeyAndGetItemFromStorage(cmp) {
-                var completed = false;
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();
                 iframeCmp.helper.setEncryptionKey(this.createCryptoKey(2));
 
                 var targetStorage = iframeCmp._storage;
-                targetStorage.get("key1").
+                return targetStorage.get("key1").
                     then(function(value) {
                         $A.test.assertUndefined(value, "Found unexpected item from storage.");
-                        completed = true;
-                    })
-                    .catch(function(e){ $A.test.fail(e.toString()); });
-
-                $A.test.addWaitFor(true, function() {return completed;});
+                    });
             }
         ]
     },
@@ -373,16 +358,21 @@
                         "iframeContainer", "first load");
             },
             function addItemToStorage(cmp) {
-                var completed = false;
                 var iframeCmp = cmp._iframeLib.getIframeRootCmp();
                 iframeCmp.helper.setEncryptionKey(this.createCryptoKey(1));
 
                 var targetStorage = iframeCmp._storage;
-                targetStorage.set("key1", cmp._expected)
-                    .then(function(){ completed = true; })
-                    .catch(function(e){ $A.test.fail(e.toString()); });
-
-                $A.test.addWaitFor(true, function() {return completed;});
+                return targetStorage.set("key1", cmp._expected)
+                    .then(function() {
+                        return targetStorage.get("key1");
+                    })
+                    .then(function(value) {
+                        // Make sure test setup is ready.
+                        // There is just a warning when crypto adapter fails to initialize.
+                        $A.test.assertEquals("crypto", targetStorage.getName(),
+                                "Test setup fails: adapter falls back to alternative adapter");
+                        $A.test.assertEquals(cmp._expected, value, "Failed to add item to storage");
+                    });
             },
             function reloadIframe(cmp) {
                 return cmp._iframeLib.reloadIframe(cmp, false, "first reload");
@@ -395,6 +385,8 @@
                 var targetStorage = iframeCmp._storage;
                 return targetStorage.get("key1").
                     then(function(value) {
+                        $A.test.assertEquals("crypto", targetStorage.getName(),
+                                "Adapter falls back to alternative adapter");
                         $A.test.assertEquals(cmp._expected, value, "Found unexpected item from storage after page reload");
                     });
             }
@@ -455,22 +447,24 @@
         test: function(cmp) {
             var that = this;
             var emptyCipherAndIv = [
-                                    "key2",
-                                    {
-                                        expires : new Date().getTime() + 60000,
-                                        value: {
-                                            cipher: new ArrayBuffer(),
-                                            iv: new Uint8Array()
-                                        },
-                                    },
-                                    10];
+                    "key2",
+                    {
+                        expires : new Date().getTime() + 60000,
+                        value: {
+                            cipher: new ArrayBuffer(),
+                            iv: new Uint8Array()
+                        },
+                    },
+                    10
+                ];
             var absentValue = [
-                               "key3",
-                               {
-                                   expires : new Date().getTime() + 60000
-                                   // value is absent
-                               },
-                               5];
+               "key3",
+                    {
+                        expires : new Date().getTime() + 60000
+                        // value is absent
+                    },
+                    5
+                ];
 
             return this.storage.set("key1", "decryptable")
                 .then(function() {

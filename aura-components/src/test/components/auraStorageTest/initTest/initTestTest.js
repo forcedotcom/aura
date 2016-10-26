@@ -77,7 +77,8 @@
                     $A.test.assert(e.message.indexOf("Assertion Failed!: setStorable() cannot be called on a client action.") === 0);
                 }
                 $A.test.assertFalse(a.isStorable());
-            } ]
+            }
+        ]
     },
 
     /**

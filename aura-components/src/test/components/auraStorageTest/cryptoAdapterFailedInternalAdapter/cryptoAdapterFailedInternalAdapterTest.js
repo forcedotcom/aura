@@ -18,7 +18,7 @@
     // Keep list of MetricsService transactions to verify we're logging failed operations
     transactions: [],
 
-    storageName: "crypto-failed-adapter",
+    STORAGE_NAME: "crypto-failed-adapter",
 
     setUp: function(cmp) {
         var that = this;
@@ -27,16 +27,25 @@
         // a. lets CryptoAdapter complete its initialization
         // b. then fails for all operations
         this.operationCount = 4;
-        var FailingAdapter = cmp.helper.lib.adapters.getAdapterThatFailsAfterNOperations("mock", false, false, this.operationCount);
+        this.transactions = [];
+
+        var FailingAdapter;
+        if(cmp.get("v.failedAdapterType") === "initialization") {
+            FailingAdapter = cmp.helper.lib.adapters.getAdapterThatFailsInitialization("mock", false, false);
+        } else {
+            FailingAdapter = cmp.helper.lib.adapters.getAdapterThatFailsAfterNOperations("mock", false, false, this.operationCount);
+        }
+
         $A.storageService.getAdapterConfig("indexeddb").adapterClass = FailingAdapter;
         $A.installOverride("StorageService.selectAdapter", function(){ return "crypto" }, this);
 
         this.storage = $A.storageService.initStorage({
-            name: this.storageName,
+            name: this.STORAGE_NAME,
             maxSize: 32768,
             expiration: 2000,
             autoRefreshInterval: 3000,
-            clearOnInit: false
+            clearOnInit: false,
+            debugLogging: true
         });
 
         $A.installOverride("MetricsService.transaction",
@@ -51,94 +60,132 @@
                 this);
     },
 
+    testInternalAdapterInitFails: {
+        attributes: {failedAdapterType: "initialization"},
+        test: function(cmp) {
+            var that = this;
+            var storage = $A.storageService.getStorage(this.STORAGE_NAME);
+            return storage.set("hi", "bye")
+                .then(
+                    function() {
+                        $A.test.assertEquals("memory", storage.adapter.getName(),
+                            "adapter should fall back to MemoryAdapter when internal adapter fails to initialize");
+                        that.verifyLogs("adapterReady");
+                    }
+                );
+        }
+    },
+
     testSetFails: {
-        test: [
-           function doFailedStorageOperationAndVerifyError(cmp) {
-               var storage = $A.storageService.getStorage(this.storageName);
-               var promise = storage.set("hi", "bye");
-               this.doFailedActionAndVerifyError(promise, "Error: setItems(): mock fails after " + this.operationCount + " operations");
-           },
-           function verifyExpectedLogs(cmp) {
-               this.verifyLogs("setAll");
-           }
-        ]
+        test: function(cmp) {
+            var expectedMessage = "Error: setItems(): mock fails after " + this.operationCount + " operations";
+
+            var that = this;
+            var storage = $A.storageService.getStorage(this.STORAGE_NAME);
+            return storage.set("hi", "bye")
+                .then(
+                    function() {
+                        $A.test.fail("set() should return a rejected promise as test setup");
+                    },
+                    function(error) {
+                        $A.test.assertEquals(expectedMessage, error.toString(), "Unexpected error from CryptoAdapter");
+                        that.verifyLogs("setAll");
+                    }
+                );
+        }
     },
 
     testGetFails: {
-        test: [
-           function doFailedStorageOperationAndVerifyError(cmp) {
-               var storage = $A.storageService.getStorage(this.storageName);
-               var promise = storage.get("hi");
-               this.doFailedActionAndVerifyError(promise, "Error: getItems(): mock fails after " + this.operationCount + " operations");
-           },
-           function verifyExpectedLogs(cmp) {
-               this.verifyLogs("getAll");
-           }
-        ]
+        test: function(cmp) {
+            var expectedMessage = "Error: getItems(): mock fails after " + this.operationCount + " operations";
+
+            var that = this;
+            var storage = $A.storageService.getStorage(this.STORAGE_NAME);
+            return storage.get("hi")
+                .then(
+                    function() {
+                        $A.test.fail("get() should return a rejected promise as test setup");
+                    },
+                    function(error) {
+                        $A.test.assertEquals(expectedMessage, error.toString(), "Unexpected error from CryptoAdapter");
+                        that.verifyLogs("getAll");
+                    }
+                );
+       }
     },
 
     testGetAllFails: {
-        test: [
-           function doFailedStorageOperationAndVerifyError(cmp) {
-               var storage = $A.storageService.getStorage(this.storageName);
-               var promise = storage.getAll();
-               this.doFailedActionAndVerifyError(promise, "Error: getItems(): mock fails after " + this.operationCount + " operations");
-           },
-           function verifyExpectedLogs(cmp) {
-               this.verifyLogs("getAll");
-           }
-        ]
+        test: function(cmp) {
+            var expectedMessage = "Error: getItems(): mock fails after " + this.operationCount + " operations";
+
+            var that = this;
+            var storage = $A.storageService.getStorage(this.STORAGE_NAME);
+            return storage.getAll()
+                .then(
+                    function() {
+                        $A.test.fail("getAll() should return a rejected promise as test setup");
+                    },
+                    function(error) {
+                        $A.test.assertEquals(expectedMessage, error.toString(), "Unexpected error from CryptoAdapter");
+                        that.verifyLogs("getAll");
+                    }
+                );
+       }
     },
 
     testClearFails: {
-        test: [
-           function doFailedStorageOperationAndVerifyError(cmp) {
-               var storage = $A.storageService.getStorage(this.storageName);
-               var promise = storage.clear();
-               this.doFailedActionAndVerifyError(promise, "Error: clear(): mock fails after " + this.operationCount + " operations");
-           },
-           function verifyExpectedLogs(cmp) {
-               this.verifyLogs("clear");
-           }
-        ]
+        test: function(cmp) {
+            var expectedMessage = "Error: clear(): mock fails after " + this.operationCount + " operations";
+
+            var that = this;
+            var storage = $A.storageService.getStorage(this.STORAGE_NAME);
+            return storage.clear()
+                .then(
+                    function() {
+                        $A.test.fail("clear() should return a rejected promise as test setup");
+                    },
+                    function(error) {
+                        $A.test.assertEquals(expectedMessage, error.toString(), "Unexpected error from CryptoAdapter");
+                        that.verifyLogs("clear");
+                    }
+                );
+        }
     },
 
     testRemoveFails: {
-        test: [
-           function doFailedStorageOperationAndVerifyError(cmp) {
-               var storage = $A.storageService.getStorage(this.storageName);
-               var promise = storage.remove("key");
-               this.doFailedActionAndVerifyError(promise, "Error: removeItems(): mock fails after " + this.operationCount + " operations");
-           },
-           function verifyExpectedLogs(cmp) {
-               this.verifyLogs("removeAll");
-           }
-        ]
+        test: function(cmp) {
+            var expectedMessage = "Error: removeItems(): mock fails after " + this.operationCount + " operations";
+
+            var that = this;
+            var storage = $A.storageService.getStorage(this.STORAGE_NAME);
+            return storage.remove("key")
+                .then(
+                    function() {
+                        $A.test.fail("remove() should return a rejected promise as test setup");
+                    },
+                    function(error) {
+                        $A.test.assertEquals(expectedMessage, error.toString(), "Unexpected error from CryptoAdapter");
+                        that.verifyLogs("removeAll");
+                    }
+                );
+        }
     },
 
-    doFailedActionAndVerifyError: function(promise, errorMessage) {
-        var completed = false;
-        var error;
-        promise.then(
-            undefined, // Resolve handler should not be called
-            function(err) {
-                // Save error and let promise return to success state for test to verify error
-                error = err;
-            })
-            .then(function(){
-                completed = true;
-            });
+    testGetSizeFails: {
+        test: function(cmp) {
+            var expectedMessage = "Error: getSize(): mock fails after " + this.operationCount + " operations";
 
-        $A.test.addWaitFor(
-                true,
-                function() {
-                    return completed;
-                },
-                function(cmp) {
-                    $A.test.assertDefined(error, "The reject handler for the storage operation was never called");
-                    $A.test.assertEquals(errorMessage, error.toString(), "Unexpected error from CryptoAdapter");
-                }
-        );
+            var storage = $A.storageService.getStorage(this.STORAGE_NAME);
+            return storage.getSize()
+                .then(
+                    function() {
+                        $A.test.fail("getSize() should return a rejected promise as test setup");
+                    },
+                    function(error) {
+                        $A.test.assertEquals(expectedMessage, error.toString(), "Unexpected error from CryptoAdapter");
+                    }
+                );
+        }
     },
 
     /**
@@ -155,6 +202,6 @@
                 found = true;
             }
         });
-        $A.test.assertTrue(found, "Did not receive expected MetricsService log for failed " + operation + " operation");
+        $A.test.assertTrue(found, "Did not receive expected MetricsService log for failed " + operation + " operation: " + JSON.stringify(this.transactions));
     }
 })

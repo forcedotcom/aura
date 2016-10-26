@@ -212,7 +212,6 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
                 }
             };
 
-            var setCookie;
             mockAuraUtil(function() {
                 target.removeDefs(["descriptor"]);
 

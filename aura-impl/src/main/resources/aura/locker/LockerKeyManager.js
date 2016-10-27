@@ -201,16 +201,24 @@ var ls_getKey,
      * Moved from $A.lockerService.unwrap().
      */
     ls_unwrap = function(from, st, skipOpaque) {
-        var key = keychain.get(from);
-        
-        var ref = ls_getRef(st, key, skipOpaque);
+    	if (!st) {
+    		return st;
+    	}
+    	
+        var key = keychain.get(from);        
+        var ref;
         
         // If this is an array then write back to the raw object
-        if (Array.isArray(ref)) {
+        if (Array.isArray(st)) {
+        	// Only getRef on "secure" arrays
+        	ref = secureToRaw.get(st) ? ls_getRef(st, key, skipOpaque) : [];
         	ref.length = 0;
+        	
         	for (var n = 0; n < st.length; n++) {
         		ref.push(ls_unwrap(from, st[n], skipOpaque));
         	}
+        } else {
+        	ref = ls_getRef(st, key, skipOpaque);
         }
         
         return ref;

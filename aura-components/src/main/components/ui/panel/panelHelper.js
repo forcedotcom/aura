@@ -217,7 +217,12 @@
     },
 
     close: function (cmp, callback, shouldReturnFocus) {
+        if (!cmp.isValid()) {
+            return;
+        }
+
         var self = this;
+        
         cmp.getConcreteComponent().hide(function () {
             if (!cmp.isValid()) {
                 return;

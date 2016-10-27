@@ -2750,7 +2750,9 @@ AuraClientService.prototype.buildActionNameList = function(actions) {
  * @export
  */
 AuraClientService.prototype.hydrateActions = function(actions, preloadMapId, response) {
-    var xhr = new Aura.Services.AuraClientService$AuraXHR();
+    var xhr = this.getAvailableXHR(true);
+    $A.assert(xhr, 'Error restoring preloaded actions due to unavailable XHR resources');
+
     xhr.request = response;
 
     actions.forEach(function (action) {

@@ -1,5 +1,5 @@
 <aura:component description="Preload actions">
-    Aura.PreloadLayout = (function (config) {
+    Aura.PrefetchActionLoader = (function (config) {
         function buildParams(o) {
             return Object.keys(o).reduce(function (r, k) {
                 r.push(k + '=' + encodeURIComponent(o[k]));

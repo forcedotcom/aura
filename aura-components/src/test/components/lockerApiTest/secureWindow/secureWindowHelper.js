@@ -489,7 +489,7 @@
             "WebGLUniformLocation":                 { type: "function" },
             "WebKitAnimationEvent":                 { type: "function" },
             "WebKitCSSMatrix":                      { type: "function" },
-            "WebKitMutationObserver":               { type: "function" },
+            "WebKitMutationObserver":               { type: "function", support: false },
             "WebKitTransitionEvent":                { type: "function" },
             "WebSocket":                            { type: "function" },
             "WheelEvent":                           { type: "function" },

@@ -16,7 +16,7 @@
 
         $A.installOverride("StorageService.selectAdapter", function(){ return "crypto"; }, this);
         this.storage = this.createStorage("crypto-store", 32768, 2000, 3000);
-        $A.test.addCleanup(function(){ this.deleteStorage("crypto-store"); }.bind(this));
+        $A.test.addCleanup(function(){ return $A.storageService.deleteStorage("crypto-store"); });
     },
 
     createStorage: function(name, maxSize, expiration, autoRefreshInterval) {
@@ -28,19 +28,6 @@
             autoRefreshInterval: autoRefreshInterval,
             debugLogging: true
         });
-    },
-
-    deleteStorage: function(storageName) {
-        var completed = false;
-
-        $A.storageService.deleteStorage(storageName)
-            .then(function() {completed = true;})
-            .catch(function(e) {
-                var msg = "Failed to delete storage [" + storageName + "] :" + e.toString();
-                $A.test.fail(msg);
-            });
-
-        $A.test.addWaitFor(true, function() {return completed;});
     },
 
     /**
@@ -214,7 +201,7 @@
             // Due to differences in size calculation between adapters, pass in a storage with the correct size to
             // fill up the storage after 5 entries of a 512 character string.
             var storage = this.createStorage("crypto-store-overflow", 5000, 2000, 3000);
-            $A.test.addCleanup(function(){ this.deleteStorage("crypto-store-overflow"); }.bind(this));
+            $A.test.addCleanup(function(){ return $A.storageService.deleteStorage("crypto-store-overflow"); });
 
             return cmp._storageLib.testOverflow(cmp, storage);
         }
@@ -229,7 +216,7 @@
     testClearThenKeyChangeAndReload: {
         test: [
            function loadComponentInIframe(cmp) {
-                $A.test.addCleanup(function(){ this.deleteStorage("persistentStorageCmp"); }.bind(this));
+                $A.test.addCleanup(function(){ return $A.storageService.deleteStorage("persistentStorageCmp"); });
                 return cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true",
                         "iframeContainer", "first load");
            },
@@ -283,7 +270,7 @@
             // Due to differences in size calculation between adapters, pass in a storage with the correct size to
             // fill up the storage after 5 entries of a 512 character string.
             var storage = this.createStorage("crypto-store-overflow", 5000, 2000, 3000);
-            $A.test.addCleanup(function(){ this.deleteStorage("crypto-store-overflow"); }.bind(this));
+            $A.test.addCleanup(function(){ return $A.storageService.deleteStorage("crypto-store-overflow"); });
             return cmp._storageLib.testBulkSetLargerThanMaxSize(cmp, storage);
         }
     },
@@ -353,7 +340,7 @@
     _testReloadPage: {
         test: [
             function loadComponentInIframe(cmp) {
-                $A.test.addCleanup(function(){ this.deleteStorage("persistentStorageCmp"); }.bind(this));
+                $A.test.addCleanup(function(){ return $A.storageService.deleteStorage("persistentStorageCmp"); });
                 cmp._expected = "expected";
                 return cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true",
                         "iframeContainer", "first load");
@@ -400,7 +387,7 @@
     testDifferentEncryptKeysShouldClearStorage: {
         test: [
             function loadComponentInIframe(cmp) {
-                $A.test.addCleanup(function(){ this.deleteStorage("persistentStorageCmp"); }.bind(this));
+                $A.test.addCleanup(function(){ return $A.storageService.deleteStorage("persistentStorageCmp"); });
                 return cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=true",
                         "iframeContainer", "first load");
             },

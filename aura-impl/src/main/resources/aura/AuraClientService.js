@@ -1655,7 +1655,6 @@ AuraClientService.prototype.runAfterInitDefs = function(callback) {
 
 };
 
-
 /**
  * Run a callback after the application is ready (rendered)
  *
@@ -1673,8 +1672,8 @@ AuraClientService.prototype.runAfterAppReady = function(callback) {
     // Add to the list of callbacks waiting until the app is ready (finishInit)
     Aura["afterAppReady"] = Aura["afterAppReady"] || [];
     Aura["afterAppReady"].push(callback);
-
 };
+
 /**
  * Loads bootstrap.js from storage, if it exists, and populates several
  * global variables consumed by runAfterBootstrapReady().
@@ -1760,8 +1759,8 @@ AuraClientService.prototype.initializeApplication = function() {
     Aura.bootstrapMark("runAfterContextCreated");
     var self = this;
 
-    return new Promise(function (resolve) {
-        self.runAfterInitDefs(function () {
+    return new Promise(function(resolve) {
+        self.runAfterInitDefs(function() {
             Aura.bootstrapMark("runAfterInitDefsReady");
             self.runAfterBootstrapReady(function (bootConfig) {
                 Aura.bootstrapMark("runAfterBootstrapReady");

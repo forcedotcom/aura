@@ -1626,14 +1626,6 @@ TestInstance.prototype.dummyFunction = function() {
 };
 
 /**
- * @export
- * @function Test#getAppCacheEvents
- */
-TestInstance.prototype.getAppCacheEvents = function() {
-    return this.appCacheEvents;
-};
-
-/**
  * Extract the error message from Aura error div(the grey error message on the page)
  *
  * @returns {String} The text of the Aura error
@@ -2091,7 +2083,7 @@ TestInstance.prototype.runInternal = function(name) {
 /**
  * Calls user-defined setUp method. Accepts a Promise as a return value and waits for promise to resolve or reject
  * before continuing.
- * 
+ *
  * @private
  * @function Test#callSetUp
  */

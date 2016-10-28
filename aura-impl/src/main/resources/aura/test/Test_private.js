@@ -306,7 +306,7 @@ TestInstance.prototype.continueWhenReady = function() {
 
 /**
  * Times out the test with an error.
- * 
+ *
  * @private
  */
 TestInstance.prototype.timeoutTest = function() {
@@ -321,7 +321,7 @@ TestInstance.prototype.timeoutTest = function() {
 
 /**
  * Attempts to time out the test after the previously set timeout period.
- * 
+ *
  * @private
  */
 TestInstance.prototype.startTimer = function() {
@@ -341,82 +341,55 @@ TestInstance.prototype.startTimer = function() {
  * @function Test#getDump
  */
 TestInstance.prototype.getDump = function() {
-	try {
-		var status = "URL: " + window.location +  "\n";
+    try {
+        var status = "URL: " + window.location +  "\n";
 
-		status += "Test status: ";
-		if (this.inProgress === -1) {
-			status += "did not start\n";
-		} else if (this.inProgress === 0) {
-			status += "completed\n";
-		} else if (this.inProgress === 1) {
-			status += "tearing down\n";
-		} else if (this.inProgress >= 2) {
-			status += "running\n";
-		}
-		status += "Elapsed time: ";
-		status += this.elapsedTime || (new Date().getTime() - this.initTime);
-		status += "ms\n";
+        status += "Test status: ";
+        if (this.inProgress === -1) {
+            status += "did not start\n";
+        } else if (this.inProgress === 0) {
+            status += "completed\n";
+        } else if (this.inProgress === 1) {
+            status += "tearing down\n";
+        } else if (this.inProgress >= 2) {
+            status += "running\n";
+        }
+        status += "Elapsed time: ";
+        status += this.elapsedTime || (new Date().getTime() - this.initTime);
+        status += "ms\n";
 
-		var errors = TestInstance.prototype.errors;
-		if (errors.length > 0) {
-			status += "Errors: {" + this.print(this.getErrors()) + "}\n";
-		}
-		if (this.preErrors && this.preErrors.length > 0) {
-			status += "Errors during init: {" + this.print(this.preErrors)
-					+ "}\n";
-		}
-		if (this.currentWait) {
-			var actual = this.currentWait.actual;
+        var errors = TestInstance.prototype.errors;
+        if (errors.length > 0) {
+            status += "Errors: {" + this.print(this.getErrors()) + "}\n";
+        }
+        if (this.preErrors && this.preErrors.length > 0) {
+            status += "Errors during init: {" + this.print(this.preErrors)
+                    + "}\n";
+        }
+        if (this.currentWait) {
+            var actual = this.currentWait.actual;
             if ($A.util.isFunction(actual)) {
-    			try {
-    				actual = actual();
-    			} catch (e) {
-    				actual = [ "<error evaluating>" ];
-    			}
+                try {
+                    actual = actual();
+                } catch (e) {
+                    actual = [ "<error evaluating>" ];
+                }
             }
-			if (!$A.util.isUndefinedOrNull(this.currentWait.failureMessage)) {
-				status += "Wait failure: {" + this.currentWait.failureMessage
-						+ "}\n";
-			}
-			status += "Waiting for: {" + this.print(this.currentWait.expected)
-					+ "} currently {" + this.print(actual) + "}\n";
-			status += "Wait function: " + this.print(this.currentWait.actual)
-					+ "\n";
-		}
-		if (!$A.util.isUndefinedOrNull(this.lastStage)) {
-			status += "Last function: " + this.print(this.lastStage) + "\n";
-		}
-		return status;
-	} catch (e) {
-		// Just in case
-		return "Unhandled error retrieving dump:" + e.toString();
-	}
+            if (!$A.util.isUndefinedOrNull(this.currentWait.failureMessage)) {
+                status += "Wait failure: {" + this.currentWait.failureMessage
+                        + "}\n";
+            }
+            status += "Waiting for: {" + this.print(this.currentWait.expected)
+                    + "} currently {" + this.print(actual) + "}\n";
+            status += "Wait function: " + this.print(this.currentWait.actual)
+                    + "\n";
+        }
+        if (!$A.util.isUndefinedOrNull(this.lastStage)) {
+            status += "Last function: " + this.print(this.lastStage) + "\n";
+        }
+        return status;
+    } catch (e) {
+        // Just in case
+        return "Unhandled error retrieving dump:" + e.toString();
+    }
 };
-
-/**
- * Set up AppCache event listeners.
- *
- * @private
- * @function Test#appCacheEvents
- */
-TestInstance.prototype.appCacheEvents = (function() {
-    var appCacheEvents = [];
-
-    function push(value) {
-        appCacheEvents.push(value);
-    }
-
-    if (window.applicationCache && window.applicationCache.addEventListener) {
-        window.applicationCache.addEventListener("checking", push.bind(this, "checking"), false);
-        window.applicationCache.addEventListener("downloading", push.bind(this, "downloading"), false);
-        window.applicationCache.addEventListener("updateready", push.bind(this, "updateready"), false);
-        window.applicationCache.addEventListener("error", push.bind(this, "error"), false);
-        window.applicationCache.addEventListener("progress", push.bind(this, "progress"), false);
-        window.applicationCache.addEventListener("noupdate", push.bind(this, "noupdate"), false);
-        window.applicationCache.addEventListener("cached", push.bind(this, "cached"), false);
-        window.applicationCache.addEventListener("obsolete", push.bind(this, "obsolete"), false);
-    }
-
-    return appCacheEvents;
-})();

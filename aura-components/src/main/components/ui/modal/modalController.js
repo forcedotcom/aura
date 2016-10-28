@@ -30,7 +30,8 @@
 
     close: function (cmp, event, helper) {
         var callback = event.getParam && event.getParam('arguments').callback;
-        helper.close(cmp, callback);
+        var shouldReturnFocus = event.getParam && event.getParam('arguments').shouldReturnFocus;
+        helper.close(cmp, callback, shouldReturnFocus);
     },
 
     setActive: function(cmp, event, helper) {
@@ -40,11 +41,14 @@
     },
 
     onCloseBtnPressed: function(cmp, evt, helper) {
+        var callback = event.getParam && evt.getParam('arguments').callback;
+        var shouldReturnFocus = event.getParam && evt.getParam('arguments').shouldReturnFocus;
+        
         var closeAction = cmp.get('v.closeAction');
         if ($A.util.isFunction(closeAction)) {
             closeAction(cmp);
         } else {
-            helper.close(cmp);
+            helper.close(cmp, callback, shouldReturnFocus);
         }
     },
 

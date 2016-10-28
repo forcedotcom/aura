@@ -16,7 +16,9 @@
 package org.auraframework.impl.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +31,7 @@ import org.auraframework.cache.Cache;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DescriptorFilter;
@@ -44,10 +47,13 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.Location;
 import org.auraframework.system.RegistrySet;
 import org.auraframework.system.Source;
 import org.auraframework.system.SubDefDescriptor;
+import org.auraframework.throwable.ClientOutOfSyncException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
@@ -92,7 +98,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
 
     @Mock
     DefRegistry<Definition> registry2;
-
+    
     private AuraContext setupContext(DefinitionService service, Mode mode, Authentication access) {
         AuraContext context = new AuraContextImpl(mode, registries,
                 null /* defaultPrefixes */,
@@ -106,10 +112,19 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         return context;
     }
 
+    /**
+     * setupContext for definitionSercie passed in, mode=DEV, authentication=AUTHENTICATED
+     * @param service
+     * @return
+     */
     private AuraContext setupContext(DefinitionService service) {
         return setupContext(service, Mode.DEV, Authentication.AUTHENTICATED);
     }
-
+    
+    /**
+     * create new DefinitionServiceImpl instance with mocked cachingService, contextService, configAdapter and loggingService
+     * @return definitionService
+     */
     private DefinitionService createDefinitionServiceWithMocks() {
         DefinitionServiceImpl definitionService = new DefinitionServiceImpl();
         definitionService.setCachingService(cachingService);
@@ -119,6 +134,13 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         return definitionService;
     }
 
+    /**
+     * add defDescriptor desc to defRegistry reg, when we call reg.getDef(desc), it will return definition
+     * @param desc
+     * @param reg
+     * @param definition
+     * @throws Exception
+     */
     private <T extends Definition> void setupMockRegistryFor(DefDescriptor<T> desc, DefRegistry<T> reg, T definition)
             throws Exception {
         registries.addRegistryFor(desc, reg);
@@ -132,6 +154,11 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         return getClass().getSimpleName() + System.currentTimeMillis() + "_" + counter.getAndIncrement();
     }
 
+    /**
+     * Get a mocked descriptor, type=Action, name=test_Counter, namespace=thisClassName+timeStamp, qualifiedName="bah://namespace:name"
+     *
+     * @return mocked descriptor
+     */
     private DefDescriptor<Definition> getMockDescriptor() {
         String name = "test_"+counter.getAndIncrement();
 
@@ -156,6 +183,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         assertNull(definitionService.getDefinition(null));
     }
 
+    //verify validateDefinition and validateReferences are called once during getDefinition
     @Test
     public void testGetDefinitionLinksSimpleDef() throws Exception {
         DefinitionService definitionService = createDefinitionServiceWithMocks();
@@ -562,6 +590,130 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         String cacheKey = filter.toString() + "|" + registry1.toString();
         assertNull("Namespaces should be cached", cachingService.getDescriptorFilterCache().getIfPresent(cacheKey));
     }
+    
+    
+    /*
+     public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, DefDescriptor<?> accessDescriptor)
+     public <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def)
+     public boolean hasAccess(DefDescriptor<?> referencingDescriptor, DefDescriptor<?> accessDescriptor)
+     public <D extends Definition> boolean hasAccess(DefDescriptor<?> referencingDescriptor, D def)
+     */  
+    @Test
+    public void testHasAccessWithNullDef() throws QuickFixException {
+    	DefinitionService definitionService = createDefinitionServiceWithMocks();
+    	DefDescriptor<Definition> descriptor = getMockDescriptor();
+    	boolean res = definitionService.hasAccess(descriptor, (Definition)null);
+    	assertTrue("hasAccess on null definitation should return true", res);
+    }
+    
+    @Test
+    public void testHasAccessWithDefNoAccessDeclaration() throws QuickFixException {
+    	DefinitionService definitionService = createDefinitionServiceWithMocks();
+    	DefDescriptor<Definition> descriptor = getMockDescriptor();
+    	Definition definition = new MockDefinition(descriptor, null);
+    	try {
+    		definitionService.hasAccess(descriptor, definition);
+    		fail("we should throw RuntimeException when definition miss access declaration");
+    	} catch (Exception e) {
+    		assertExceptionMessageStartsWith(e, RuntimeException.class, "Missing access declaration for");
+    	}
+    }
+    
+    @Test
+    public void testHasAcessWithDefGlobalAccess() throws QuickFixException {
+    	DefinitionService definitionService = createDefinitionServiceWithMocks();
+    	DefDescriptor<Definition> descriptor = getMockDescriptor();
+    	Definition definition = new MockDefinition(descriptor);
+    	boolean res = definitionService.hasAccess(descriptor, definition);
+    	assertTrue("hasAccess on definition with access=GLOBAL should return true", res);
+    }
+    
+    @Test
+    public void testHasAcessWithDefPrivateAccess() throws QuickFixException {
+    	DefinitionService definitionService = createDefinitionServiceWithMocks();
+    	DefDescriptor<Definition> descriptor = getMockDescriptor();
+    	Definition definition = new MockDefinition(descriptor, AuraContext.Access.PRIVATE);
+    	boolean res = definitionService.hasAccess(descriptor, definition);
+    	assertTrue("hasAccess on definition with access=PRIVATE should return true only when referencingDescriptor the same as definition's descriptor", res);
+    }
+    
+    //todo: more test on hasAccess
+    
+    
+    /*
+     public List<ClientLibraryDef> getClientLibraries(String uid)
+    */
+    @Test
+    public void testGetClientLibrariesWithNullUid() {
+    	DefinitionService definitionService = createDefinitionServiceWithMocks();
+    	assertNull("we should return null when getting clientLibraries with null uid", definitionService.getClientLibraries(null));
+    }
+    
+    @Test
+    public void testGetClientLibraries() {
+    	DefinitionService definitionService = createDefinitionServiceWithMocks();
+    	
+    	Set<DefDescriptor<? extends Definition>> dependencies = new HashSet<>();
+    	List<ClientLibraryDef> clientLibraries = new ArrayList<>();
+    	DependencyEntry de = new DependencyEntry("testUID", dependencies, clientLibraries);
+    	AuraContext context = new AuraContextImpl(Mode.DEV, registries,
+                null /* defaultPrefixes */,
+                Format.JSON, Authentication.AUTHENTICATED,
+                null /* jsonContext */,
+                null /* globalProviders */,
+                configAdapter,
+                definitionService,
+                null /* testContextAdapter */);
+    	AuraContext mockedContext = Mockito.spy(context);
+    	Mockito.when(mockedContext.getLocalDependencyEntry("testUID")).thenReturn(de);
+    	Mockito.when(contextService.getCurrentContext()).thenReturn(mockedContext);    	
+    	
+    	assertEquals("we should return DependencyEntry's clientLibraries when getting clientLibraries with valid uid", 
+    			clientLibraries, definitionService.getClientLibraries("testUID"));
+    }
+    
+    /*
+     public Set<DefDescriptor<?>> getDependencies(String uid)
+     */
+    @Test
+    public void testGetDependenciesWithNullUid() {
+    	DefinitionService definitionService = createDefinitionServiceWithMocks();
+    	assertNull("we should return null when getting dependency with null uid", definitionService.getDependencies(null));
+    }
+    
+    @Test
+    public void testGetDependencies() {
+    	DefinitionService definitionService = createDefinitionServiceWithMocks();
+    	
+    	Set<DefDescriptor<? extends Definition>> dependencies = new HashSet<>();
+    	List<ClientLibraryDef> clientLibraries = new ArrayList<>();
+    	DependencyEntry de = new DependencyEntry("testUID", dependencies, clientLibraries);
+    	AuraContext context = new AuraContextImpl(Mode.DEV, registries,
+                null /* defaultPrefixes */,
+                Format.JSON, Authentication.AUTHENTICATED,
+                null /* jsonContext */,
+                null /* globalProviders */,
+                configAdapter,
+                definitionService,
+                null /* testContextAdapter */);
+    	AuraContext mockedContext = Mockito.spy(context);
+    	Mockito.when(mockedContext.getLocalDependencyEntry("testUID")).thenReturn(de);
+    	Mockito.when(contextService.getCurrentContext()).thenReturn(mockedContext);    	
+    	
+    	assertEquals("we should return DependencyEntry's clientLibraries when getting dependencies with valid uid", 
+    			dependencies, definitionService.getDependencies("testUID"));
+    }
+    
+    /*
+     public <T extends Definition> String getUid(String uid, DefDescriptor<T> descriptor)
+     */
+    @Test
+    public void getGetUidWithNullDescriptor() throws Exception {
+    	DefinitionService definitionService = createDefinitionServiceWithMocks();
+    	assertNull("we should return null when getting Uid with null descriptor", 
+    			definitionService.getUid("testUID", null));
+    }
+    
 
 //void updateLoaded(DefDescriptor<?> loading) throws QuickFixException, ClientOutOfSyncException;
 
@@ -606,6 +758,9 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
 //        return false;
 //    }
 //
+    
+    
+    
 
     @SuppressWarnings("serial")
     private static class MockDefinition implements Definition {
@@ -613,9 +768,31 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         private Set<DefDescriptor<?>> localDeps;
         private DefinitionAccess access = Mockito.mock(DefinitionAccess.class);
 
+        /**
+         * set descriptor, make access=GLOBAL
+         * @param descriptor
+         */
         public MockDefinition(DefDescriptor<Definition> descriptor) {
             this.descriptor = descriptor;
             Mockito.when(this.access.isGlobal()).thenReturn(true);
+        }
+        
+        public MockDefinition(DefDescriptor<Definition> descriptor, AuraContext.Access access) {
+        	this.descriptor = descriptor;
+        	if(access == null) {
+        		this.access = null;
+        	} else {
+        		switch(access) {
+        		case PRIVATE:
+        			Mockito.when(this.access.isGlobal()).thenReturn(false);
+        			Mockito.when(this.access.isPrivate()).thenReturn(true);
+        			Mockito.when(this.access.requiresAuthentication()).thenReturn(true);
+        			break;
+        		default:
+        			Mockito.when(this.access.isGlobal()).thenReturn(true);
+        		}
+        	}
+        	
         }
 
         public void addDependency(DefDescriptor<?> descriptor) {

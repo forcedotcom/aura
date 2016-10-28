@@ -157,17 +157,6 @@ public interface BaseComponentDef extends RootDefinition, HasJavascriptReference
     Set<ResourceDef> getResourceDefs() throws QuickFixException;
 
     /**
-     * Gets the application-wide token overrides.
-     */
-    List<DefDescriptor<TokensDef>> getTokenOverrides() throws QuickFixException;
-
-    /**
-     * Gets the application-wide default flavor override.
-     * @throws QuickFixException
-     */
-    DefDescriptor<FlavorsDef> getFlavorOverrides() throws QuickFixException;
-
-    /**
      * Gets the default flavor name, or if an explicit defaultFlavor is not specified, and a {@link FlavoredStyleDef}
      * exists in the bundle with a flavor named "default", then "default" will be returned.
      * <p>

@@ -23,14 +23,12 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
-import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LocatorDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.TokensDef;
 import org.auraframework.def.design.DesignDef;
 
 /**
@@ -69,27 +67,6 @@ public interface BaseComponentDefBuilder<T extends BaseComponentDef> extends Roo
     BaseComponentDefBuilder<T> addLocatorDef(LocatorDef locator);
 
     BaseComponentDefBuilder<T> setExtendsDescriptor(DefDescriptor<T> extendsDescriptor);
-
-    /**
-     * Specifies the token descriptors.
-     *
-     * @param tokenOverrides Comma-separated list of token descriptors.
-     */
-    BaseComponentDefBuilder<T> setTokenOverrides(String tokenOverrides);
-
-    /**
-     * Same as {@link #setTokenOverrides(String)}.
-     *
-     * @param tokenOverride The {@link TokensDef} descriptor.
-     */
-    BaseComponentDefBuilder<T> setTokenOverride(DefDescriptor<TokensDef> tokenOverride);
-
-    /**
-     * Specifies the {@link FlavorsDef} descriptor.
-     *
-     * @param flavorOverride The {@link FlavorsDef} descriptor.
-     */
-    BaseComponentDefBuilder<T> setFlavorOverrides(DefDescriptor<FlavorsDef> flavorOverrides);
 
     /**
      * Specifies the default flavor (the name of a flavor in the component bundle flavor def).

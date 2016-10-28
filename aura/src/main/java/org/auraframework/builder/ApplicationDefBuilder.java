@@ -16,8 +16,23 @@
 package org.auraframework.builder;
 
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.FlavorsDef;
 
 /**
  */
 public interface ApplicationDefBuilder extends BaseComponentDefBuilder<ApplicationDef> {
+    /**
+     * Specifies the token descriptors.
+     *
+     * @param tokenOverrides Comma-separated list of token descriptors.
+     */
+    BaseComponentDefBuilder<ApplicationDef> setTokenOverrides(String tokenOverrides);
+
+    /**
+     * Specifies the {@link FlavorsDef} descriptor.
+     *
+     * @param flavorOverride The {@link FlavorsDef} descriptor.
+     */
+    BaseComponentDefBuilder<ApplicationDef> setFlavorOverrides(DefDescriptor<FlavorsDef> flavorOverrides);
 }

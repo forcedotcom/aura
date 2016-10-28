@@ -85,7 +85,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
     private static final String ATTRIBUTE_MODEL = "model";
     private static final String ATTRIBUTE_CONTROLLER = "controller";
     private static final String ATTRIBUTE_WHITESPACE = "whitespace";
-    private static final String ATTRIBUTE_TOKEN_OVERRIDES = "tokens";
     private static final String ATTRIBUTE_DEFAULT_FLAVOR = "defaultFlavor";
     private static final String ATTRIBUTE_DYNAMICALLY_FLAVORABLE = "dynamicallyFlavorable";
 
@@ -97,7 +96,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
     protected static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
             ATTRIBUTE_RENDER, ATTRIBUTE_TEMPLATE, ATTRIBUTE_PROVIDER,
             ATTRIBUTE_STYLE, ATTRIBUTE_HELPER, ATTRIBUTE_RENDERER,
-            ATTRIBUTE_WHITESPACE, ATTRIBUTE_TOKEN_OVERRIDES, ATTRIBUTE_DEFAULT_FLAVOR,
+            ATTRIBUTE_WHITESPACE, ATTRIBUTE_DEFAULT_FLAVOR,
             ATTRIBUTE_DYNAMICALLY_FLAVORABLE)
             .addAll(ALLOWED_ATTRIBUTES).addAll(RootTagHandler.INTERNAL_ALLOWED_ATTRIBUTES)
             .build();
@@ -470,14 +469,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                     : WhitespaceBehavior.valueOf(whitespaceVal.toUpperCase());
 
             builder.setAccess(readAccessAttribute());
-
-            String tokenOverrides = getAttributeValue(ATTRIBUTE_TOKEN_OVERRIDES);
-            if (!AuraTextUtil.isNullEmptyOrWhitespace(tokenOverrides)) {
-                builder.setTokenOverrides(tokenOverrides);
-            }
-
-            // flavor overrides can only be parsed in the app handler for now--
-            // need to figure out a solution to bring it here (see notes there)
 
             String defaultFlavor = getAttributeValue(ATTRIBUTE_DEFAULT_FLAVOR);
             if (!AuraTextUtil.isNullEmptyOrWhitespace(defaultFlavor)) {

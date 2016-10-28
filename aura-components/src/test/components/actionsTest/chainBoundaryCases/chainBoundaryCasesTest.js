@@ -22,8 +22,9 @@
     /**
      *
      * Negative case: Verify that exceptions caused in chained controller are surfaced as part of only that controller and does not affect others.
+     * Flapper: W-3439121, fix and enable plz
      */
-    testSurfaceExceptionsWhileChaining:{
+     _testSurfaceExceptionsWhileChaining:{
         test:[function(cmp){
             multiply = $A.test.getAction(cmp,"c.multiply", {"a" : 2});
             multiply.setChained();

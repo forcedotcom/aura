@@ -41,6 +41,13 @@ function SecureAura(AuraInstance, key) {
 			enumerable : true,
 			value : sls
 		},
+		"getCallback" : {
+			value : function(f) {
+				// If the results of $A.getCallback() is wired up to an event handler, passed as an attribute or aura event attribute etc it will get 
+				// filtered and wrapped with the caller's perspective at that time. 
+				return AuraInstance.getCallback(f);
+			}
+		},
 		toString : {
 			value : function() {
 				return "SecureAura: " + AuraInstance + "{ key: " + JSON.stringify(key) + " }";
@@ -49,7 +56,7 @@ function SecureAura(AuraInstance, key) {
 	});
 
 	// SecureAura methods and properties
-	[ "createComponent", "createComponents", "enqueueAction", "reportError", "get", "getCallback", "getComponent", "getReference", "getRoot", "log", "warning" ]
+	[ "createComponent", "createComponents", "enqueueAction", "reportError", "get", "getComponent", "getReference", "getRoot", "log", "warning" ]
 			.forEach(function(name) {
 				Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, AuraInstance, name));
 			});

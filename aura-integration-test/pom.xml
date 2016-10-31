@@ -114,7 +114,7 @@
     </dependencies>
     <properties>
         <chromedriver.url>http://chromedriver.storage.googleapis.com/{version}/{artifactId}_{classifier}.zip</chromedriver.url>
-        <chromedriver.version>2.21</chromedriver.version>
+        <chromedriver.version>2.25</chromedriver.version>
         <jetty.spawn>true</jetty.spawn>
         <jetty.resources>${basedir}/../aura/src/main/webapp</jetty.resources>
         <aura.build.id />
@@ -574,7 +574,7 @@
                 </os>
             </activation>
             <properties>
-                <platform.chromedriver>mac32</platform.chromedriver>
+                <platform.chromedriver>mac64</platform.chromedriver>
             </properties>
         </profile>
         <profile>

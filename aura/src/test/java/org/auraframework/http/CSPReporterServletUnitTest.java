@@ -16,25 +16,86 @@
 
 package org.auraframework.http;
 
-import org.auraframework.adapter.ServletUtilAdapter;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.service.ServerService;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Format;
-import org.auraframework.test.util.DummyHttpServletResponse;
-import org.auraframework.util.test.util.UnitTestCase;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import java.io.Writer;
-import java.io.PrintWriter;
-import java.util.HashSet;
+import java.io.BufferedReader;
+import java.io.StringReader;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.auraframework.service.LoggingService;
+import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 /**
  * Simple (non-integration) test case for {@link CSPReporterServlet}.
  */
 public class CSPReporterServletUnitTest extends UnitTestCase {
+
+    @Mock
+    HttpServletRequest request;
+
+    @Mock
+    HttpServletResponse response;
+
+    @Mock
+    LoggingService loggingService;
+
+    @SuppressWarnings("serial")
+    private static class CSPReporterServletExtender extends CSPReporterServlet {
+        public void testDoPost(HttpServletRequest request, HttpServletResponse response) throws Exception {
+            doPost(request, response);
+        }
+    }
+
+    @Test
+    public void testPostCallsLoggingServiceWithValidJSON() throws Exception {
+        String json = "{'csp-report':'data'}";
+        CSPReporterServletExtender servlet = new CSPReporterServletExtender();
+        servlet.setLoggingService(loggingService);
+        Mockito.when(request.getReader()).thenReturn(new BufferedReader(new StringReader(json)));
+
+        servlet.testDoPost(request, response);
+
+        Mockito.verify(loggingService, Mockito.times(1)).establish();
+        Mockito.verify(loggingService, Mockito.times(1)).logCSPReport(Mockito.any());
+        Mockito.verify(loggingService, Mockito.times(1)).release();
+    }
+
+    @Test
+    public void testPostOkWithJSONNotHavingKey() throws Exception {
+        String json = "{}";
+        CSPReporterServletExtender servlet = new CSPReporterServletExtender();
+        servlet.setLoggingService(loggingService);
+        Mockito.when(request.getReader()).thenReturn(new BufferedReader(new StringReader(json)));
+
+        servlet.testDoPost(request, response);
+
+        Mockito.verify(loggingService, Mockito.times(0)).logCSPReport(Mockito.any());
+    }
+
+    @Test
+    public void testPostOkWithInvalidJSON() throws Exception {
+        String json = "}[]";
+        CSPReporterServletExtender servlet = new CSPReporterServletExtender();
+        servlet.setLoggingService(loggingService);
+        Mockito.when(request.getReader()).thenReturn(new BufferedReader(new StringReader(json)));
+
+        servlet.testDoPost(request, response);
+
+        Mockito.verify(loggingService, Mockito.times(0)).logCSPReport(Mockito.any());
+    }
+
+    @Test
+    public void testPostOkWithNothing() throws Exception {
+        String json = "";
+        CSPReporterServletExtender servlet = new CSPReporterServletExtender();
+        servlet.setLoggingService(loggingService);
+        Mockito.when(request.getReader()).thenReturn(new BufferedReader(new StringReader(json)));
+
+        servlet.testDoPost(request, response);
+
+        Mockito.verify(loggingService, Mockito.times(0)).logCSPReport(Mockito.any());
+    }
 }

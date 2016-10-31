@@ -923,9 +923,9 @@ AuraInstance.prototype.handleError = function(message, e) {
  * @platform
  */
 AuraInstance.prototype.reportError = function(message, error) {
-    // ignore external errors
     if ($A.logger.isExternalError(error)) {
-        return;
+        // ignore external errors
+        return false;
     }
 
     // for browsers that doesn't have 5th argument (error object) passed in the onerror handler,
@@ -949,6 +949,7 @@ AuraInstance.prototype.reportError = function(message, error) {
         $A.services.client.postProcess();
     }
     this.lastKnownError = null;
+    return true;
 };
 
 /**

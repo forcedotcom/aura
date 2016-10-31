@@ -561,6 +561,22 @@ Test.Aura.LoggerTest = function() {
         }
 
         [Fact]
+        function ReturnFalseIfAuraErrorIsFromBareGetCallback() {
+            var e = new Error();
+            e.message = "Error from app client controller";
+            e.stack = "Error: Error from app client controller\n\
+                at eval (http://bah.lightning.localhost.force.com:6109/components/c/testErrors.js:15:35)\n\
+                at http://bah.lightning.localhost.force.com:6109/auraFW/javascript/0A2soY7cB16nI8uLh9j3sA/aura_dev.js:19185:23";
+
+            var expected;
+            getAuraMock(function() {
+                var ae = new $A.auraError(null, e);
+                expected = logger.isExternalError(ae);
+            });
+            Assert.False(expected);
+        }
+
+        [Fact]
         function ReturnFalseIfAuraErrorIsNotFromExternalScript() {
             var e = new Error();
             e.message = "Error from app client controller";

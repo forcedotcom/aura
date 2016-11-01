@@ -115,6 +115,7 @@
     "SecureObject": true,
     "SecureComponentRef": true,
     "SecureComponent": true,
+    "SecureMutationObserver": true,
     "SecureNavigator": true,
     "SecureStorage": true,
     "SecureXMLHttpRequest": true,

@@ -59,6 +59,10 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
 			enumerable: true,
 			value: SecureStorage(win.sessionStorage, "SESSION", key)
 		},
+		MutationObserver: {
+			enumerable: true,
+			value: SecureMutationObserver(key)
+		},
 		navigator: {
 			enumerable: true,
 			value: SecureNavigator(win.navigator, key)
@@ -374,6 +378,8 @@ SecureWindow.metadata = {
             "MessagePort":                          FUNCTION,
             "MimeType":                             FUNCTION,
             "MimeTypeArray":                        FUNCTION,
+            "MutationObserver":                    	CTOR,
+            "MutationRecord":                    	FUNCTION,
             "MouseEvent":                           FUNCTION,
             "NaN":                                  DEFAULT,
             "NamedNodeMap":                         FUNCTION,

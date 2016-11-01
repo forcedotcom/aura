@@ -305,7 +305,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         includeDefRef.validateReferences(true);
         // getCode uses the existed JavascriptIncludeClass
         String actual = includeDefRef.getCode(true);
-        actual = actual.replaceFirst("//# sourceURL=libraries/string/thing[0-9]+\\.js\n", "");
+        actual = actual.replaceFirst("//# sourceURL=libraries/string/thing[0-9]+/dummy[0-9]+\\.js\n", "");
         // since minified code doesn't exist, we expect non-minified code
         String expected = String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s);",
                 JavascriptIncludeClass.getClientDescriptor(includeDesc), "function(){return 1}");

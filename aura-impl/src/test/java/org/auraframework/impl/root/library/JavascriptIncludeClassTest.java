@@ -187,7 +187,7 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
 
       String minifiedCode = javascriptClass.getMinifiedCode();
 
-      minifiedCode = minifiedCode.replaceFirst("//# sourceURL=libraries/string/thing[0-9]+\\.js\n", "");
+        minifiedCode = minifiedCode.replaceFirst("//# sourceURL=libraries/string/thing[0-9]+/test[0-9]+\\.js\n", "");
 
       String expected = String.format("$A.componentService.addLibraryInclude(\"%s\",[],%s);",
               JavascriptIncludeClass.getClientDescriptor(includeDesc), "function(){}");

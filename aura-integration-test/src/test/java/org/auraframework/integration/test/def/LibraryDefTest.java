@@ -173,7 +173,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
         Writer writer = new StringWriter();
         serverService.writeDefinitions(descs, writer);
         String actual = writer.toString();
-        actual = actual.replaceFirst("//# sourceURL=libraries/string/thing[0-9]+\\.js\n", "");
+        actual = actual.replaceFirst("//# sourceURL=libraries/string/thing[0-9]+/uncompressed[0-9]+\\.js\n", "");
         String expected = "function(){var a=\"truth\";window.blah&&(a+=\" hurts\");return a}";
         if (!actual.contains(expected)) {
             fail(String.format("library code was not compressed - expected <%s> but got <%s>", expected, actual));

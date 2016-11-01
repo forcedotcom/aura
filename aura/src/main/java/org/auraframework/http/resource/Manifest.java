@@ -170,6 +170,10 @@ public class Manifest extends AuraResourceImpl {
                 sw.write('\n');
             }
 
+            // inline.js is included in appcache so the app may boot while offline
+            sw.write(servletUtilAdapter.getInlineJsUrl(context, attributes));
+            sw.write('\n');
+
             // Add locker service safe eval worker url
             String lockerWorkerURL = configAdapter.getLockerWorkerURL();
             if (lockerWorkerURL != null) {
@@ -243,17 +247,17 @@ public class Manifest extends AuraResourceImpl {
     public void setRenderingService(RenderingService renderingService) {
         this.renderingService = renderingService;
     }
-    
+
     @Inject
     public void setExceptionAdapter(ExceptionAdapter exceptionAdapter) {
         this.exceptionAdapter = exceptionAdapter;
     }
-    
+
     @Inject
     public void setContextService(ContextService contextService) {
         this.contextService = contextService;
     }
-    
+
     public void setManifestUtil(ManifestUtil manifestUtil) {
         this.manifestUtil = manifestUtil;
     }

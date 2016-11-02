@@ -1022,7 +1022,8 @@ AuraClientService.prototype.handleAppCache = function() {
         //    network blip, etc), which means the fwk/app won't boot. so start/continue the bootup timers.
         acs.startBootTimers();
 
-        if (window.applicationCache.status === window.applicationCache.IDLE) {
+        if ((!("onLine" in window.navigator) || window.navigator.onLine) && window.applicationCache.status === window.applicationCache.IDLE) {
+            // perform only when online (OR onLine not supported) and appcache IDLE status
             try {
                 // force browser to keep trying to get updated js resources as manifest should be updated at this point
                 window.applicationCache.update();

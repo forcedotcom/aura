@@ -25,40 +25,6 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 
 public class ErrorHandlingUITest extends AbstractErrorUITestCase {
-    /**
-     * Verify that error message box displays in the auraErrorMask div and can be dismissed using the close button.
-     * Automation for W-1091838.
-     */
-    @Test
-    public void testErrorMessageDisplayAndClose() throws Exception {
-        open("/auratest/errorHandlingApp.app", Mode.PROD);
-        assertErrorMaskIsNotVisible();
-
-        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
-        String actualMessage = findErrorMessage();
-        String expectedMsg = "Error from app client controller";
-        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
-
-        findAndClickElement(ERROR_CLOSE_LOCATOR);
-        assertErrorMaskIsNotVisible();
-    }
-
-    /**
-     * Verify that error message box displays via $A.error.
-     */
-    @Test
-    public void testErrorMessageDisplayAndCloseViaAError() throws Exception {
-        open("/auratest/errorHandlingApp.app", Mode.PROD);
-        assertErrorMaskIsNotVisible();
-
-        String errorMsg = "Something went haywire!";
-        getAuraUITestingUtil().getEval("$A.error('" + errorMsg + "')");
-        String actualMessage = findErrorMessage();
-        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(errorMsg));
-
-        findAndClickElement(ERROR_CLOSE_LOCATOR);
-        assertErrorMaskIsNotVisible();
-    }
 
     /**
      * Verify that error message box displays in the auraErrorMask div and can be dismissed using the close button when
@@ -98,18 +64,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         String expectedMsg = "Error from app client controller";
         assertThat("Error modal doesn't contain expected message", actualMsg, containsString(expectedMsg));
         assertClientErrorNotContainsStacktrace(actualMsg);
-    }
-
-    @Test
-    public void testErrorMessageFromAuraAssertContainsStacktraceInDevMode() throws Exception {
-        open("/auratest/errorHandlingApp.app", Mode.DEV);
-
-        findAndClickElement(By.cssSelector(".errorFromAppTable .failAssertInClientControllerButton"));
-
-        String actualMsg = findErrorMessage();
-        String expectedMsg = "Assert failed in app client controller";
-        assertThat("Error modal doesn't contain expected message", actualMsg, containsString(expectedMsg));
-        assertClientErrorContainsStacktrace(actualMsg);
     }
 
     @Test
@@ -402,30 +356,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /**
-     * Verify Aura default error handler can handle systemError event when an error is thrown from render().
-     */
-    @Test
-    public void testDefaultHandleErrorFromRenderWhenNoCustomHandler() throws Exception {
-        open("/auratest/errorHandlingApp.app?throwErrorFromRender=true", Mode.PROD, false);
-        String actualMessage = findErrorMessage();
-        String expectedMsg = "Error from app render";
-        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
-    }
-
-    /**
-     * Verify systemError event can be handled by Aura default error handler event when an error is thrown from render()
-     * if a cmp/app contains custom error handler. When error is thrown from render(), $A is not initialized, so the
-     * event has to be handled by default handler.
-     */
-    @Test
-    public void testDefaultHandleErrorFromRenderWhenMarkEventHandled() throws Exception {
-        open("/auratest/errorHandlingApp.app?throwErrorFromRender=true&handleSystemError=true", Mode.PROD, false);
-        String actualMessage = findErrorMessage();
-        String expectedMsg = "Error from app render";
-        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
-    }
-
-    /**
      * Verify Aura default error handler can handle systemError event when an error is thrown from afterRender().
      */
     @Test
@@ -540,18 +470,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
         String actualMessage = findErrorMessage();
         String expectedMsg = "Error from app init";
-        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
-    }
-
-    /**
-     * Verify Aura default error handler can handle systemError event when there is an invalid component.
-     */
-    @Test
-    public void testDefaultHandleInvalidComponentErrorWhenMarkEventHandled() throws Exception {
-        open("/auratest/errorHandlingApp.app?handleSystemError=true&addInvalidComponent=true", Mode.PROD, false);
-
-        String actualMessage = findErrorMessage();
-        String expectedMsg = "Failed to initialize application";
         assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 

@@ -26,7 +26,7 @@
     <!-- The following attributes can be passed in with url to perform tests -->
     <!-- set false when testing defult handler-->
     <aura:attribute name="handleSystemError" type="Boolean" default="false"/>
-    <aura:attribute name="addInvalidComponent" type="Boolean" default="false"/>
+    <aura:attribute name="addAttributeMissingComponent" type="Boolean" default="false"/>
     <aura:attribute name="throwErrorFromInit" type="Boolean" default="false"/>
     <aura:attribute name="throwErrorFromRender" type="boolean" default="false"/>
     <aura:attribute name="throwErrorFromAfterRender" type="Boolean" default="false"/>
@@ -158,7 +158,7 @@
     </aura:if>
 
     <br/><br/>
-    <aura:if isTrue="{!v.addInvalidComponent}">
+    <aura:if isTrue="{!v.addAttributeMissingComponent}">
         <auratest:errorHandling/>
         <aura:set attribute="else">
             <auratest:errorHandling aura:id="containedCmp">

@@ -83,7 +83,7 @@ AttributeSet.getDef = function(key, component) {
  *
  */
 AttributeSet.prototype.get = function(key, component) {
-	var value = undefined;
+    var value = undefined;
     var path = null;
     var attribute=key;
     key=key.replace(/^body\b/g,"body."+component.globalId);
@@ -109,7 +109,7 @@ AttributeSet.prototype.get = function(key, component) {
             }
         }
     }
-	if (!path) {
+    if (!path) {
         var decorators=this.decorators[key];
         if(decorators&&decorators.length){
             if(decorators.decorating){
@@ -127,19 +127,19 @@ AttributeSet.prototype.get = function(key, component) {
         }else{
             value = this.values[key];
         }
-	} else {
-		value = aura.expressionService.resolve(key, this.values);
-	}
+    } else {
+        value = aura.expressionService.resolve(key, this.values);
+    }
 
-	if (aura.util.isExpression(value)) {
-		value = value.evaluate();
-	}
+    if (aura.util.isExpression(value)) {
+        value = value.evaluate();
+    }
 
     if(this.shadowValues.hasOwnProperty(key)) {
         value += this.getShadowValue(key);
     }
 
-	return value;
+    return value;
 };
 
 AttributeSet.prototype.getShadowValue=function(key){
@@ -238,7 +238,8 @@ AttributeSet.prototype.set = function(key, value, component) {
     }
 
     // Check the type
-    var attrType = defs[0].getTypeDefDescriptor();
+    // FIXME: access checks: the test for the existence of defs[0] is only for when access checks are off.
+    var attrType = defs[0] && defs[0].getTypeDefDescriptor();
     var isFacet = attrType === "aura://Aura.Component[]";
     if(isFacet && value) {
         var facetValue = value;

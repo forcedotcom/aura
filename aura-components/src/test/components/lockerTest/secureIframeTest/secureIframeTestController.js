@@ -11,6 +11,26 @@
         attributesBlacklist.forEach(function(name) {
             testUtils.assertFalse(name in iframe);
         });
+
+        function verifySrcdocBlocked(f) {
+        	try {
+        		f();
+        		testUtils.fail("SecureIFrameElement should have blocked setting of src doc attribute");
+    		} catch (e) {
+    			testUtils.assertEquals("SecureIFrameElement does not permit setting the srcdoc attribute!", e.toString());
+    		}
+        }
+
+        // Check to insure that SecureIFrameElement.setAttribute[NS]("srcdoc", value) is blocked
+        ["srcdoc", "SrCdOc"].forEach(function(name) {
+        	verifySrcdocBlocked(function() {
+        		iframe.setAttribute(name, "foo");
+        	})
+
+        	verifySrcdocBlocked(function() {
+        		iframe.setAttributeNS("http://www.w3.org/1999/xhtml", name, "foo");
+        	})
+    	});
     },
 
     testIframeMethods: function(cmp, event, helper) {

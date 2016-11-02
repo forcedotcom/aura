@@ -577,6 +577,8 @@ function getSupportedInterfaces(o) {
 		}
 
 		interfaces.push("Element", "Node", "EventTarget");
+	} else if (o instanceof Text) {
+		interfaces.push("Text", "CharacterData", "Node");
 	}
 
 	return interfaces;

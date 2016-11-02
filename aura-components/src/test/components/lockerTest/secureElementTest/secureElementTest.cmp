@@ -65,6 +65,8 @@
     <aura:method name="testCloneNodeDeep" action="{!c.testCloneNodeDeep}"/>
     <aura:method name="testCloneNodeDeep_VerifyAccess" action="{!c.testCloneNodeDeep_VerifyAccess}"/>
     <aura:method name="testCloneNodeDeep_VerifyBlockedAccess" action="{!c.testCloneNodeDeep_VerifyBlockedAccess}"/>
+    <aura:method name="testTextNodeApi" action="{!c.testTextNodeApi}"/>
+    <aura:method name="testTextNodeSplitText" action="{!c.testTextNodeSplitText}"/>
 
     <lockerTest:facet/>
 

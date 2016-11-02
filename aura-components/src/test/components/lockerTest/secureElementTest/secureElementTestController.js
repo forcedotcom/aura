@@ -342,5 +342,50 @@
             "Node of facet not cloned");
         testUtils.assertEquals(0, document.querySelectorAll("#table_facetLocked").length,
             "Cloned nodes should not be accessible from other namespace");
+    },
+
+    testTextNodeApi: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var initialText = "Hi there";
+
+        function verifyTextNode(textNode) {
+            var expectedText = initialText + ", friend";
+
+            // verify API on CharacterData
+            textNode.appendData(", friend");
+            testUtils.assertEquals(expectedText, textNode.data, "CharacterData.data returned unexpected results");
+
+            // verify API on Node
+            testUtils.assertStartsWith("SecureDocument", textNode.ownerDocument.toString(), "Node.ownerDocument should" +
+                    " return a SecureDocument");
+
+            // verify API on Text
+            testUtils.assertEquals(expectedText, textNode.wholeText, "Text.wholeText returned unexpected results");
+        }
+
+        var textNodeDynamic = document.createTextNode(initialText);
+        verifyTextNode(textNodeDynamic);
+
+        var textNodeConstructor = new Text(initialText);
+        verifyTextNode(textNodeConstructor);
+    },
+
+    testTextNodeSplitText: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var initialText = "treehouse";
+
+        var text = document.createTextNode(initialText);
+        var div = document.createElement("div");
+        div.appendChild(text);
+        var splitText = text.splitText(4);
+
+        testUtils.assertEquals("tree", text.data ,"text.data returned unexpected results");
+        testUtils.assertEquals("house", splitText.data, "Text.splitText().data returned unexpected results");
+        testUtils.assertEquals("treehouse", splitText.wholeText, "Text.splitText().wholeText returned unexpected results");
+        testUtils.assertEquals(2, div.childNodes.length, "Unexpected number of childNodes present on div");
+        testUtils.assertTrue(div.childNodes.item(1) === splitText, "2nd childnode on div should be what was returned from splitText()");
+        testUtils.assertStartsWith("SecureElement", splitText.toString(), "Text.splitText() should return a SecureElement");
+        testUtils.assertStartsWith("SecureElement", text.toString(), "Original text should be a SecureElement");
+    }
     }
 })

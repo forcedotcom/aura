@@ -36,6 +36,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.CSP;
 import org.auraframework.impl.util.BrowserUserAgent;
 import org.auraframework.impl.util.UserAgent;
+import org.auraframework.impl.util.TemplateUtil.Script;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.*;
 import org.auraframework.system.*;
@@ -46,6 +47,7 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
+import org.auraframework.impl.util.TemplateUtil;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -57,6 +59,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     private ExceptionAdapter exceptionAdapter;
     private SerializationService serializationService;
     private ClientLibraryService clientLibraryService;
+    protected TemplateUtil templateUtil = new TemplateUtil();
     protected DefinitionService definitionService;
 
     /**
@@ -358,12 +361,21 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     @Override
-    public  List <String> getJsClientLibraryUrls (AuraContext context) throws QuickFixException {
+    public List <String> getJsClientLibraryUrls (AuraContext context) throws QuickFixException {
     	return getClientLibraryUrls(context, ClientLibraryDef.Type.JS);
     }
 
     @Override
-    public  List <String> getCssClientLibraryUrls (AuraContext context) throws QuickFixException {
+    public void writeScriptUrls(AuraContext context, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException {
+        templateUtil.writeHtmlScripts(context, this.getJsClientLibraryUrls(context), Script.LAZY, sb);
+        templateUtil.writeHtmlScript(context, this.getInlineJsUrl(context, componentAttributes), Script.SYNC, sb);
+        templateUtil.writeHtmlScript(context, this.getFrameworkUrl(), Script.SYNC, sb);
+        templateUtil.writeHtmlScript(context, this.getAppJsUrl(context, null), Script.SYNC, sb);
+        templateUtil.writeHtmlScript(context, this.getBootstrapUrl(context, componentAttributes), Script.SYNC, sb);
+    }
+
+    @Override
+    public List <String> getCssClientLibraryUrls (AuraContext context) throws QuickFixException {
     	return new ArrayList<>(getClientLibraryUrls(context, ClientLibraryDef.Type.CSS));
     }
 

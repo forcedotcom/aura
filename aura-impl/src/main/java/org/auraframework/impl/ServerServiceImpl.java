@@ -612,11 +612,7 @@ public class ServerServiceImpl implements ServerService {
                 attributes.put("manifest", servletUtilAdapter.getManifestUrl(context, componentAttributes));
             }
             
-            templateUtil.writeHtmlScripts(context, servletUtilAdapter.getJsClientLibraryUrls(context), Script.LAZY, sb);
-            templateUtil.writeHtmlScript(context, servletUtilAdapter.getInlineJsUrl(context, componentAttributes), Script.SYNC, sb);
-            templateUtil.writeHtmlScript(context, servletUtilAdapter.getFrameworkUrl(), Script.SYNC, sb);
-            templateUtil.writeHtmlScript(context, servletUtilAdapter.getAppJsUrl(context, null), Script.SYNC, sb);
-            templateUtil.writeHtmlScript(context, servletUtilAdapter.getBootstrapUrl(context, componentAttributes), Script.SYNC, sb);
+            servletUtilAdapter.writeScriptUrls(context, componentAttributes, sb);
             
             attributes.put("auraNamespacesScriptTags", sb.toString());
             

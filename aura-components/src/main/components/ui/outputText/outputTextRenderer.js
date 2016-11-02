@@ -40,5 +40,11 @@
             helper.appendTextElements(value, span);
         }
         this.superRerender();
+    },
+
+    unrender: function (component, helper) {
+        helper.lib.interactive.removeDomEventsFromMap(component);
+        this.superUnrender();
     }
+
 })// eslint-disable-line semi

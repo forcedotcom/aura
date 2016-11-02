@@ -29,7 +29,15 @@ function SecureMutationObserver(key) {
 	"use strict";
 	
 	function filterRecords(st, records) {
-		return SecureObject.filterEverything(st, records);
+		var filtered = [];
+		
+		records.forEach(function(record) {
+			if (ls_hasAccess(st, record.target)) {
+				filtered.push(SecureObject.filterEverything(st, record));
+			}
+		});
+	
+		return filtered;
 	}
 
 	// Create a new closure constructor for new XHMLHttpRequest() syntax support that captures the key
@@ -37,7 +45,10 @@ function SecureMutationObserver(key) {
 		var o = Object.create(null); 
 		
 		var observer = new MutationObserver(function(records) {
-			callback(filterRecords(o, records));
+			var filtered = filterRecords(o, records);
+			if (filtered.length > 0) {
+				callback(filtered);
+			}
 		});
 
 		Object.defineProperties(o, {

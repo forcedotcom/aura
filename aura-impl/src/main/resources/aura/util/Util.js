@@ -1285,7 +1285,7 @@ Aura.Utils.Util.prototype.on = (function() {
  */
 Aura.Utils.Util.prototype.removeOn = function(element, eventName, listener, useCapture) {
     $A.assert(element, "try to remove an event listener from a no-longer-exist DOM element");
-    
+
     if (listener.registeredAuraHandler) {
         listener = listener.registeredAuraHandler;
     }
@@ -1553,7 +1553,7 @@ Aura.Utils.Util.prototype.noData = {
  * @returns {Boolean} Whether element accepts custom data attributes.
  */
 Aura.Utils.Util.prototype.acceptsData = function(element) {
-    if (!this.isElement(element)) {
+    if (!this.isHTMLElement(element)) {
         return false;
     }
 
@@ -1663,11 +1663,24 @@ Aura.Utils.Util.prototype.hasDataAttribute = function(element, key) {
  * @param {Object} obj
  * @returns {Boolean} True if the object is an HTMLElement object, or false otherwise.
  */
-Aura.Utils.Util.prototype.isElement = function(obj) {
+Aura.Utils.Util.prototype.isHTMLElement = function(obj) {
     if (typeof HTMLElement === "object") {
         return obj instanceof HTMLElement;
     } else {
-        return obj && obj.nodeType === 1 && typeof obj.nodeName==="string";
+        return obj && obj.nodeType === 1 && typeof obj.nodeName === "string";
+    }
+};
+
+/**
+ * Checks if the object is a SVG element.
+ * @param {Object} obj
+ * @returns {Boolean} True if the object is an SVGElement object, or false otherwise.
+ */
+Aura.Utils.Util.prototype.isSVGElement = function(obj) {
+    if (typeof SVGElement === "object") {
+        return obj instanceof SVGElement;
+    } else {
+        return obj && obj.nodeType === 1 && obj.nodeName.toLowerCase() === "svg";
     }
 };
 
@@ -2099,27 +2112,26 @@ Aura.Utils.Util.prototype.emptyComponentTrash = function() {
 
 /**
  * Determines if an element is either a descendant of, or the same as, another element in the DOM tree.
- * Both arguments to this function must be of type HTMLElement.
+ * Both arguments to this function must be of type HTMLElement or SVGElement.
  *
- * @param {HTMLElement} container The element you think is the outermost container.
- * @param {HTMLElement} element The element you think is buried inside the container.
+ * @param {(HTMLElement|SVGElement)} container The element you think is the outermost container.
+ * @param {(HTMLElement|SVGElement)} element The element you think is buried inside the container.
  * @returns {Boolean} Returns true if 'element' is indeed inside 'container', false otherwise.
  * @export
  */
 Aura.Utils.Util.prototype.contains = function(container, element) {
-    if ($A.util.isElement(container) && $A.util.isElement(element)) {
-        if (container === element) {
+    $A.assert($A.util.isHTMLElement(container) || $A.util.isSVGElement(container),
+            "$A.util.conatins(): 'container' must be HTMLElement or SVGElement: " + container);
+    $A.assert($A.util.isHTMLElement(element) || $A.util.isSVGElement(element),
+            "$A.util.conatins(): 'element' must be HTMLElement or SVGElement: " + element);
+
+    while(element) {
+        if (element === container) {
             return true;
         }
-        while(element.parentNode) {
-            if (element.parentNode === container) {
-                return true;
-            }
-            element = element.parentNode;
-        }
-    } else {
-        $A.assert(false, "Both arguments for this function must be HTMLElement objects.");
+        element = element.parentNode;
     }
+
     return false;
 };
 

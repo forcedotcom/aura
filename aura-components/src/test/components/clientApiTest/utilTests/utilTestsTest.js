@@ -121,5 +121,18 @@
             $A.test.assertEquals(cookieValue, $A.util.getCookie(cookieKey),
                     "Failed to get right cookie value");
         }
+    },
+
+    testContainsForSVGElement: {
+        test: function() {
+            var svgElement = document.createElementNS("http://www.w3.org/2000/svg", "SVG");
+            var divElement = document.createElement("div");
+
+            divElement.appendChild(svgElement);
+
+            var actual = $A.util.contains(divElement, svgElement);
+            $A.test.assertTrue(actual);
+        }
     }
+
 })

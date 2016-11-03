@@ -30,7 +30,7 @@
 
     close: function (cmp, event, helper) {
         var callback = event.getParam && event.getParam('arguments').callback;
-        var shouldReturnFocus = event.getParam && event.getParam('arguments').shouldReturnFocus;
+        var shouldReturnFocus = event.getParam && $A.util.getBooleanValue(event.getParam('arguments').shouldReturnFocus);
         helper.close(cmp, callback, shouldReturnFocus);
     },
 
@@ -51,12 +51,13 @@
         helper.lib.panelLibCore.handleNotify(cmp, event, helper);
     },
 
-    onCloseBtnPressed: function(cmp, evt, helper) {
+    onCloseBtnPressed: function(cmp, event, helper) {
         var closeAction = cmp.get('v.closeAction');
+        
         if ($A.util.isFunction(closeAction)) {
             closeAction(cmp, "closeOnButtonClick");
         } else {
-            helper.close(cmp);
+            helper.close(cmp, null, true);
         }
     }
 })// eslint-disable-line semi

@@ -30,7 +30,7 @@
 
     close: function (cmp, event, helper) {
         var callback = event.getParam && event.getParam('arguments').callback;
-        var shouldReturnFocus = event.getParam && event.getParam('arguments').shouldReturnFocus;
+        var shouldReturnFocus = event.getParam && $A.util.getBooleanValue(event.getParam('arguments').shouldReturnFocus);
         helper.close(cmp, callback, shouldReturnFocus);
     },
 
@@ -40,15 +40,13 @@
         callback && callback();
     },
 
-    onCloseBtnPressed: function(cmp, evt, helper) {
-        var callback = event.getParam && evt.getParam('arguments').callback;
-        var shouldReturnFocus = event.getParam && evt.getParam('arguments').shouldReturnFocus;
-        
+    onCloseBtnPressed: function(cmp, event, helper) {
         var closeAction = cmp.get('v.closeAction');
+        
         if ($A.util.isFunction(closeAction)) {
             closeAction(cmp);
         } else {
-            helper.close(cmp, callback, shouldReturnFocus);
+            helper.close(cmp, null, true);
         }
     },
 

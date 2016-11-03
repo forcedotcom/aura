@@ -29,7 +29,7 @@
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="showMore" action="{!c.showMore}"/>
 
-	<ul aura:id="ul" class="{!v.class}">
+	<ul aura:id="ul" class="{!v.class}" aria-describedby="{!v.ariaDescribedBy}">
 		<aura:iteration items="{!v.items}"
 						var="{!v.itemVar}"
 						template="{!v.itemTemplate}"

@@ -228,7 +228,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 //
                 // Clear the InstanceStack before trying to serialize the exception since the Throwable has likely
                 // rendered the stack inaccurate, and may falsely trigger NoAccessExceptions.
-                InstanceStack stack = this.contextService.getCurrentContext().getInstanceStack();
+                InstanceStack stack = context.getInstanceStack();
                 List<String> list = stack.getStackInfo();
                 for (int count = list.size(); count > 0; count--) {
                     stack.popInstance(stack.peek());

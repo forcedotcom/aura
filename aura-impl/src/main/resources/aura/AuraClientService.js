@@ -427,8 +427,25 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
             return ret;
         } else if (resp["exceptionEvent"] === true) {
             this.throwExceptionEvent(resp);
+            var evtObj = resp["event"];
+            var eventName;
+            if (evtObj["descriptor"]) {
+                var descriptor = new DefDescriptor(evtObj["descriptor"]);
+                eventName = descriptor.getName();
+
+                // Note that this if for response not 200, so returning COOS in AuraEnable controller would not go here
+                // ideally, we want to break the flow for all exception event, however, that causes regressions.
+                // for now, we stop the flow for COOS and invalidSession.
+                if (eventName === "clientOutOfSync" || eventName === "invalidSession") {
+                    // do not return a valid state (SUCCESS, INCOMPLETE, ERROR), we do not want action callback to handle this.
+                    ret["status"] = "SYSTEMERROR";
+                    return ret;
+                }
+            }
+
             ret["status"] = "ERROR";
-            ret["message"] = "Received exception event from server";
+            // at least output the exception event name so we know where to investigate.
+            ret["message"] = "Received exception event" + (eventName ? (" ["+eventName+"]") : "") + " from server";
             return ret;
         } else {
             // !!!!!!!!!!HACK ALERT!!!!!!!!!!

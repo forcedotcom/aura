@@ -806,6 +806,18 @@ Action.prototype.updateFromResponse = function(response) {
         for (i = 0; i < response["error"].length; i++) {
             var err = response["error"][i];
             if (err["exceptionEvent"]) {
+                // returning COOS in AuraEnable controller would go here 
+                var eventObj = err["event"];
+                if (eventObj["descriptor"]) {
+                    var eventDescriptor = new DefDescriptor(eventObj["descriptor"]);
+                    var eventName = eventDescriptor.getName();
+                    if (eventName === "clientOutOfSync" || eventName === "invalidSession") {
+                        $A.clientService.throwExceptionEvent(err);
+                        // should not invoke the callback for system level exception events
+                        return false;
+                    }
+                }
+
                 fired = true;
                 this.events.push(err["event"]);
             } else {
@@ -924,6 +936,7 @@ Action.prototype.finishAction = function(context) {
                     error = e;
                 }
             }
+
             this.complete();
             if (this.components && (cb || !this.storable || !this.getStorage())) {
                 context.finishComponentConfigs(id);

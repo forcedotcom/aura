@@ -84,5 +84,21 @@
             cmp.find("executeInFOREGROUND").get("e.press").fire();
             $A.test.assertEquals("clientExecuteInFOREGROUND", cmp.get("v.value"));
         }
+    },
+
+    testExceptionEventHandledByEventHandlerOnly : {
+        test: function(cmp) {
+            $A.test.assertFalse(cmp.get("v.coosHandled"));
+            var action = cmp.get("c.throwsClientOutOfSyncException");
+            var actionCallbackCalled = false;
+            action.setCallback(this, function(response) {
+                actionCallbackCalled = true;
+            });
+            $A.enqueueAction(action);
+            $A.test.addWaitFor(true, function() {return cmp.get("v.coosHandled");},
+               function() {
+                    $A.test.assertFalse(actionCallbackCalled);
+               });
+        }
     }
 })

@@ -354,10 +354,8 @@
         }
     },
 
-    /**
-     * This test may need to be changed after W-2692868 is done.
-     */
-    testActionWithErrorsIsErrorState: {
+    // the test will get into infinite reload because of coos so disable for now.
+    _testActionWithErrorsIsErrorState: {
         test: function(cmp) {
             var callbackCalled = false;
             var action = cmp.get("c.throwsClientOutOfSyncException");
@@ -371,8 +369,8 @@
                 function(){ return $A.test.areActionsComplete([action]); },
                 function() {
                     $A.test.assertEquals("ERROR", action.getState());
-                    $A.test.assertTrue(callbackCalled,
-                            "ERROR callback should get called.");
+                    $A.test.assertFalse(callbackCalled,
+                            "ERROR callback should not get called.");
                 });
         }
     },

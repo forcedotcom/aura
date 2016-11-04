@@ -131,6 +131,24 @@
             $A.test.assertUndefinedOrNull(hidden, "No hidden label span should appear when label is null");
         }
     },
+    
+    /**
+     * Verify aria-live is set correctly
+     * W-3338253
+     */
+    testAriaLiveSetAssertive: {
+        attributes : {stateful : true},
+        test: function(component){
+        	$A.test.assertEquals('assertive', component.find("button").getElement().getAttribute("aria-live"), "Button not rendered with aria-live='assertive'");
+        }
+    },
+    
+    testAriaLiveNotSet: {
+        test: function(component){
+        	$A.test.assertEquals('off', component.find("button").getElement().getAttribute("aria-live"), "Button not rendered with aria-live='off'");
+        }
+    },
+    
     //TODO W-1014086
     _testRerender:{
         attributes:{label:"Like", disabled:false, hasIcon:true, iconImgSrc:'/auraFW/resources/aura/images/bug.png'},

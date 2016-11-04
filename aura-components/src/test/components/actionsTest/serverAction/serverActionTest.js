@@ -798,62 +798,71 @@
         ]
     },
 
-    /*
-     * test server actions with same signature get schedule to send in a same XHR
-     * both are storable
-     * only the first action get to send to the server. second one get response from the 1st one
+
+    /**
+     * Tests that storable actions with identical signatures, when there is not a client-side cache hit, are:
+     * 1. Deduped so only 1 goes to the server yet both callbacks are invoked.
+     * 2. Action return values are isolated across callbacks so if a callback mutates the value no other callback sees it.
      */
     testConcurrentServerActionsBothStorable : {
         test : [
             function(cmp) {
-                var a1Return = undefined, a2Return = undefined;
-                var recordObjCounterFromA1 = undefined;
-                //create two actions with same signature
+                var returnValueFromA1;
+                var returnValueFromA2;
+                // create two actions with same signature
                 var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
                 var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
                 a1.setStorable();
                 a2.setStorable();
-                //we check response in callbacks
+
                 a1.setCallback(cmp, function(action) {
                     $A.test.assertFalse(action.isFromStorage(), "1st action should get response from server");
-                    a1Return = action.getReturnValue();
-                    $A.test.assertEquals(1, a1Return.Counter, "counter of 1nd action should be 1");
-                    recordObjCounterFromA1 = a1Return.recordObjCounter;
-                    $A.test.assertTrue(recordObjCounterFromA1!==undefined, "expect to get recordObjCounter from 1st action");
+
+                    var returnValue  = action.getReturnValue();
+                    returnValueFromA1 = returnValue;
+
+                    $A.test.assertEquals(1, returnValue.Counter, "counter of 1nd action should be 1");
+                    returnValue.Counter = 2; // mutate the value, shouldn't be visible in other callbacks
+
+                    $A.test.assertNotUndefinedOrNull(returnValue.recordObjCounter, "expect to get recordObjCounter from 1st action");
                 });
+
                 a2.setCallback(cmp, function(action) {
                     $A.test.assertFalse(action.isFromStorage(), "2nd action should get response from 1st, but not from storage");
-                    a2Return = action.getReturnValue();
-                    $A.test.assertEquals(1, a2Return.Counter, "counter of 2nd action should be 1");
-                    $A.test.assertEquals(recordObjCounterFromA1, a2Return.recordObjCounter, "2nd action should get a copy response from 1st action");
+
+                    var returnValue = action.getReturnValue();
+                    returnValueFromA2 = returnValue;
+
+                    $A.test.assertEquals(1, returnValue.Counter, "counter of 2nd action should be 1 (and not the mutated value from 1st action");
+
+                    // deep copy of values is passed to each callback
+                    $A.test.assertTrue(returnValueFromA1 !== returnValue, "returnValue provided to each callback should be distinct objects");
+                    // primitive values are not deep copied b/c they're immutable
+                    $A.test.assertEquals(returnValueFromA1.recordObjCounter, returnValue.recordObjCounter, "2nd action should get a copy response from 1st action");
                 });
-                //make sure both ations get schedule to send in a same XHR box
-                $A.run(
-                        function() {
-                            $A.enqueueAction(a1);
-                            $A.enqueueAction(a2);
-                        }
-                );
-                //just need to make sure both actions get some return
+
+                $A.enqueueAction(a1);
+                $A.enqueueAction(a2);
+
+                // just need to make sure both actions get some return
                 $A.test.addWaitForWithFailureMessage(true,
-                        function() { return (a1Return!==undefined); },
+                        function() { return returnValueFromA1 !== undefined; },
                         "fail waiting for action 1 returns something"
                 );
                 $A.test.addWaitForWithFailureMessage(true,
-                        function() { return (a2Return!==undefined); },
+                        function() { return returnValueFromA2 !== undefined; },
                         "fail waiting for action 2 returns something"
                 );
             }
         ]
     },
 
-    /*
-     * enqueue two server actions with same signature, the action has response in storage.
-     * both of them will read response from storage first.
-     * then we send two refresh actions.
-     * Note1: for refresh actions, 2nd one is not 1st one's dupe, they both go to server
-     * Note2: server action we enqueue here go to server, increase recordObjCounter, and bring it back,
-     * that's why we check new counter = old counter+2 at the end of the test, and also why this test is threadHostile
+
+     /**
+     * Tests that storable actions with identical signatures, when there is a client-side cache hit, are:
+     * 1. Action return values are isolated across callbacks so if a callback mutates the value no other callback sees it.
+     * 2. Only 1 refresh action is sent to the server (the 2nd is deduped). TODO - why is this?
+     * 3. The refresh action triggers callbacks to both actions.
      */
     testConcurrentServerActionsBothStorableWithResponseStored : {
         labels : [ "threadHostile" ],
@@ -863,47 +872,74 @@
                 a0.setStorable();
                 cmp._storageKey = a0.getStorageKey();
                 $A.enqueueAction(a0);
-                $A.test.addWaitForWithFailureMessage(true, function(){
-                    return $A.test.areActionsComplete([a0]) && !$A.test.isActionPending();
-                }, "a0 doesn't finish",
-                function() {
-                    cmp._counter = a0.getReturnValue().recordObjCounter;
-                });
+                $A.test.addWaitForWithFailureMessage(
+                        true,
+                        function() {
+                            return $A.test.areActionsComplete([a0]) && !$A.test.isActionPending();
+                        },
+                        "a0 doesn't finish",
+                        function() {
+                            cmp._counter = a0.getReturnValue().recordObjCounter;
+                        });
             },
             function enqueueTwoActionWithSameSignature(cmp) {
-                var recordObjCounterFromA1 = undefined;
-                //create two actions with same signature
+                var returnValueFromA1;
+                var returnValueFromA2;
+
+                // create two actions with same signature
                 var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
                 var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
-                a1.setStorable();
-                a2.setStorable();
-                a1.setStorable({  "refresh": 0 });
-                a2.setStorable({  "refresh": 0 });
+                // force action refresh to go to server. for each refresh recordObjCounter will be incremented.
+                a1.setStorable({"refresh": 0});
+                a2.setStorable({"refresh": 0});
 
-                //both ations get schedule to send in a same XHR box
+                // callbacks will be invoked 2 times: from storage then with refresh action
+                a1.setCallback(cmp, function(action) {
+                    var returnValue  = action.getReturnValue();
+                    returnValueFromA1 = returnValue;
+
+                    $A.test.assertEquals(1, returnValue.Counter, "counter of 1st action should be 1");
+                    // mutate the value, shouldn't be visible in other callbacks
+                    returnValue.Counter = 2;
+
+                    if (action.isFromStorage()) {
+                        $A.test.assertEquals(cmp._counter, returnValue.recordObjCounter, "expect to get recordObjCounter from storage");
+                    } else {
+                        $A.test.assertTrue(action.isRefreshAction(), "1st action should be refresh if not from storage");
+                        // a1 and a2 get refreshed, order is not guaranteed, so just require value to have incremented
+                        $A.test.assertTrue(cmp._counter < returnValue.recordObjCounter, "expect to get recordObjCounter from storage");
+                    }
+                });
+
+                a2.setCallback(cmp, function(action) {
+                    var returnValue  = action.getReturnValue();
+                    returnValueFromA2 = returnValue;
+
+                    $A.test.assertTrue(returnValueFromA1 !== returnValue, "returnValue provided to each callback should be distinct objects");
+                    $A.test.assertEquals(1, returnValue.Counter, "counter of 2nd action should be 1");
+
+                    if (action.isFromStorage()) {
+                        $A.test.assertEquals(cmp._counter, returnValue.recordObjCounter, "expect to get recordObjCounter from storage");
+                    } else {
+                        $A.test.assertTrue(action.isRefreshAction(), "2nd action should be refresh if not from storage");
+                        // a1 and a2 get refreshed, order is not guaranteed, so just require value to have incremented
+                        $A.test.assertTrue(cmp._counter < returnValue.recordObjCounter, "expect to get recordObjCounter from storage");
+                        $A.test.assertNotEquals(returnValueFromA1.recordObjCounter, returnValue.recordObjCounter, "refreshed 1st and 2nd actionrecordObjCounter should differ");
+                    }
+                });
+
                 $A.enqueueAction(a1);
                 $A.enqueueAction(a2);
 
+                // just need to make sure both actions get some return
                 $A.test.addWaitForWithFailureMessage(true,
-                        function() { return $A.test.areActionsComplete([a1, a2]) },
-                        "fail waiting for action1 and 2 to finish",
-                        function() {
-                            $A.test.assertTrue(a1.isFromStorage(), "1st action should get response from storage");
-                            $A.test.assertTrue(a2.isFromStorage(), "2st action should get response from storage");
-                        }
+                        function() { return returnValueFromA1 !== undefined && cmp._counter < returnValueFromA1.recordObjCounter; },
+                        "fail waiting for action 1 returns something"
                 );
-            },
-            function bothRefreshActionsGoToServer(cmp) {
-                $A.test.addWaitForWithFailureMessage(
-                    true,
-                    function() {
-                        $A.storageService.getStorage("actions").get(cmp._storageKey, true)
-                            .then(function(value) {
-                                cmp._newCounter = value.returnValue.recordObjCounter;
-                            });
-                        return cmp._newCounter && (cmp._newCounter == cmp._counter+2);
-                    },
-                    "fail to update stored response");
+                $A.test.addWaitForWithFailureMessage(true,
+                        function() { return returnValueFromA2 !== undefined && cmp._counter < returnValueFromA2.recordObjCounter; },
+                        "fail waiting for action 2 returns something"
+                );
             }
         ]
     },

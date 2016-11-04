@@ -51,7 +51,14 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return isInInternalNamespace ? INTERNAL_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
+        Set<String> allowed = isInInternalNamespace ? INTERNAL_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
+        
+        Set<String> extraAllowed = definitionParserAdapter.getAdditionalAllowedAttributes(getDefDescriptor().getDefType());
+        if (extraAllowed != null) {
+            allowed = ImmutableSet.<String>builder().addAll(allowed).addAll(extraAllowed).build();
+        }
+        
+        return allowed;
     }
 
     @Override
@@ -162,13 +169,13 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     private static final String ATTRIBUTE_BOOTSTRAP_PUBLIC_CACHE_EXPIRATION = "bootstrapPublicCacheExpiration";
 
     private static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
-            .add(ATTRIBUTE_APPCACHE_ENABLED, ATTRIBUTE_ADDITIONAL_APPCACHE_URLS, ATTRIBUTE_TOKEN_OVERRIDES)
+            .add(ATTRIBUTE_APPCACHE_ENABLED, ATTRIBUTE_ADDITIONAL_APPCACHE_URLS)
             .add(ATTRIBUTE_TEMPLATE)
             .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
 
     private static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
             ATTRIBUTE_PRELOAD, ATTRIBUTE_TRACK, ATTRIBUTE_LOCATION_CHANGE_EVENT, ATTRIBUTE_IS_ONE_PAGE_APP,
-            ATTRIBUTE_FLAVOR_OVERRIDES, ATTRIBUTE_BOOTSTRAP_PUBLIC_CACHE_EXPIRATION)
+            ATTRIBUTE_TOKEN_OVERRIDES, ATTRIBUTE_FLAVOR_OVERRIDES, ATTRIBUTE_BOOTSTRAP_PUBLIC_CACHE_EXPIRATION)
             .addAll(ALLOWED_ATTRIBUTES)
             .addAll(BaseComponentDefHandler.INTERNAL_ALLOWED_ATTRIBUTES)
             .build();

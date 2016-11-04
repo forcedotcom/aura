@@ -85,10 +85,10 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "description", "implements", "useAppcache",
                         "additionalAppCacheURLs", "controller", "model", "apiVersion", "abstract", "extensible",
-                        "extends", "template", "tokens");
+                        "extends", "template");
             internalAttrs = Sets.newHashSet("preload", "track", "locationChangeEvent", "isOnePageApp",
                     "render", "provider", "style", "helper", "renderer", "whitespace",
-                    "support", "flavorOverrides", "defaultFlavor", "dynamicallyFlavorable", "bootstrapPublicCacheExpiration");
+                    "support", "flavorOverrides", "defaultFlavor", "dynamicallyFlavorable", "bootstrapPublicCacheExpiration", "tokens");
             super.setUp();
         }
 

@@ -36,7 +36,6 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.CSP;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.AuraContext;
@@ -61,6 +60,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 @TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class})
 @ContextConfiguration(locations = {"/applicationContext.xml"})
 public abstract class IntegrationTestCase extends AuraImplTestCase {
+    private static final String BASE_CMP_URI = "/aura?aura.tag=%s%%3A%s&aura.deftype=%s&aura.format=%s";
 
     @Inject
     private TestServletConfig testServletConfig;
@@ -233,8 +233,7 @@ public abstract class IntegrationTestCase extends AuraImplTestCase {
      * @return the relative URL for the descriptor
      */
     protected String getUrl(DefDescriptor<? extends BaseComponentDef> desc) {
-        return String.format("/%s/%s.%s", desc.getNamespace(), desc.getName(),
-                DefType.APPLICATION.equals(desc.getDefType()) ? "app" : "cmp");
+        return String.format(BASE_CMP_URI, desc.getNamespace(), desc.getName(),desc.getDefType(), Format.HTML);
     }
 
     protected TestServletConfig getTestServletConfig() {

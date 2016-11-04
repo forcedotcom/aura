@@ -5,6 +5,10 @@
     testAppCacheEvents : {
         browsers : [ "-FIREFOX", "-IE7","-IE8","-IE9", "-IE10", "-IE11" ],
         test : [
+                function precheck(component) {
+                    $A.test.assertEquals(-1, this.getIndexOfAppCacheEvent("noupdate"), "Test prerequisite failed: appcache must not be populated when the test is started; received noupdate appcache event indicating it was");
+                    $A.test.assertEquals(-1, this.getIndexOfAppCacheEvent("error"), "appcache error event received, events: " + JSON.stringify(window.appCacheEvents));
+                },
                 function waitForAppCacheToPopulate(component) {
                     var that = this;
                     $A.test.addWaitForWithFailureMessage(
@@ -15,9 +19,6 @@
                             "appcache cached event was never received, events: " + JSON.stringify(window.appCacheEvents));
                 },
                 function verifyAppCacheEvents(component) {
-                    $A.test.assertEquals(-1, this.getIndexOfAppCacheEvent("error"), "Test prerequisite failed: appcache must not be populated when the test is started; received noupdate appcache event indicating it was");
-                    $A.test.assertEquals(-1, this.getIndexOfAppCacheEvent("error"), "appcache error event received, events: " + JSON.stringify(window.appCacheEvents));
-
                     // note: spec says checking will be fired but it's observed most browsers do not fire it
                     var downloading = this.getIndexOfAppCacheEvent("downloading");
                     var cached = this.getIndexOfAppCacheEvent("cached");

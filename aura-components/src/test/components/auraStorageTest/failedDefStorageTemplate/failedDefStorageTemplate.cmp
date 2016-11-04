@@ -8,11 +8,11 @@
              * fail[FunctionName] to true.
              *
              * clearCallCount - Track how many times clear was called for tests to verify
-             * failAll - Fail all storage operations with a rejected Promise. True by default.
+             * failAll - Fail all storage operations with a rejected Promise. False by default.
              */
             window.mockComponentDefStorage = {
                 clearCallCount : 0,
-                failAll: true
+                failAll: false
             };
 
             // Some of the component def caching logic is bypassed without an actions cache
@@ -20,7 +20,7 @@
                 name: "actions",
                 persistent: true,
                 secure: false,
-                maxSize: 8192,
+                maxSize: 4096000,
                 expiration: 200,
                 autoRefreshInterval: 300
             });
@@ -30,7 +30,7 @@
                 name: "ComponentDefStorageReal",
                 persistent: true,
                 secure: false,
-                maxSize: 8192,
+                maxSize: 4096000,
                 expiration: 200
             });
 
@@ -117,7 +117,7 @@
                 name: "ComponentDefStorage",
                 persistent: true,
                 secure: true,
-                maxSize: 8192,
+                maxSize: 4096000,
                 expiration: 200,
                 debugLogging: true,
                 clearOnInit: false

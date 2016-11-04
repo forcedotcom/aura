@@ -33,7 +33,7 @@
 	enterDragOperation: function (component, event, helper) {
 		helper.enterDragOperation(component);
 	},
-	
+
 	exitDragOperation: function (component, event, helper) {
 		helper.exitDragOperation(component);
 	},

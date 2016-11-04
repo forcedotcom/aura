@@ -302,9 +302,6 @@
 			"$dropOperationStatus$": this.newDropOperationStatus()
 		};
 		this.setDragClass(component, isInAccessibilityMode);
-		
-		// Set aria-describe
-		component.set("v.ariaGrabbed", true);
 	},
 	
 	newDropOperationStatus: function() {
@@ -328,8 +325,5 @@
 	exitDragOperation: function(component) {
 		// reset onDrag class
 		this.resetCssClass(component);
-		
-		// Set aria-describe
-		component.set("v.ariaGrabbed", false);
 	}
 })// eslint-disable-line semi

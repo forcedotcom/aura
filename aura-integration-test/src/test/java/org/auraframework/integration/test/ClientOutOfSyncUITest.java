@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
@@ -34,7 +35,10 @@ import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TokensDef;
+import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Key;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Ignore;
@@ -846,5 +850,54 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         getAuraUITestingUtil().waitForAuraInit();
         getAuraUITestingUtil().findDomElement(By.cssSelector("button")).click();
         getAuraUITestingUtil().waitForElementTextContains(By.cssSelector("#container"), "cmpNew", true);
+    }
+
+    @ServiceComponent
+    public static class TestController implements Controller {
+        @AuraEnabled
+        public String getString(@Key("param") String param) throws Exception {
+            return "Overridden: " + param;
+        }
+    }
+    
+    /*
+     * This scenario is when a component changes during a release, and the original action is no longer there (moved or removed)
+     */
+    @Test
+    public void testPostAfterServerControllerChange() throws Exception {
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(
+                        baseComponentTag,
+                        "controller='java://org.auraframework.components.test.java.controller.JavaTestController'",
+                        "<aura:attribute name='output' type='String'/>" +
+                        "<button class='button' onclick='{!c.post}'>post</button>" +
+                        "<div id='out'>{!v.output}</div>"));
+        DefDescriptor<?> controllerDesc = definitionService
+                .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
+                        ControllerDef.class);
+        addSourceAutoCleanup(
+                controllerDesc,
+                "{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});a.setCallback(this,function(res){c.set('v.output',res.getReturnValue())});$A.enqueueAction(a);}}");
+        open(cmpDesc);
+
+        By outputLocator = By.cssSelector("#out");
+        
+        getAuraUITestingUtil().findDomElement(By.cssSelector("button.button")).click();
+        getAuraUITestingUtil().waitForElementText(outputLocator, "dummy", true);
+        
+        updateStringSource(
+                cmpDesc,
+                String.format(
+                        baseComponentTag,
+                        "controller='java://org.auraframework.integration.test.ClientOutOfSyncUITest$TestController'",
+                        "<aura:attribute name='output' type='String'/>" +
+                        "<button class='button' onclick='{!c.post}'>post</button>" +
+                        "<div id='out'>{!v.output}</div>"));
+        triggerServerAction();
+        getAuraUITestingUtil().waitForElementText(outputLocator, "", true);
+        
+        getAuraUITestingUtil().findDomElement(By.cssSelector("button.button")).click();
+        getAuraUITestingUtil().waitForElementText(outputLocator, "Overridden: dummy", true);
     }
 }

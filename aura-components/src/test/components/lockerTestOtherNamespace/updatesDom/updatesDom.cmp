@@ -16,16 +16,8 @@
 
 -->
 <aura:component implements="aura:requireLocker">
-    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
 
-    <aura:method name="testSecureMutationObserver" action="{!c.testSecureMutationObserver}"/>
-    <aura:method name="testSecureMutationObserverFiltersRecords" action="{!c.testSecureMutationObserverFiltersRecords}"/>
+    <aura:method name="updateDom" action="{!c.updateDom}"/>
 
-    <div id="title">SecureMutationObserver test</div>
-    <div aura:id="content"/>
-
-    <div id="facetContainer">
-        <lockerTestOtherNamespace:updatesDom aura:id="facet"/>
-        <div id="insideContainer"/>
-    </div>
+    <div id="content" class="initialClass">updatesDom component div</div>
 </aura:component>

@@ -10,5 +10,11 @@
         test: function(cmp) {
             cmp.testSecureMutationObserver();
         }
+    },
+
+    testSecureMutationObserverFiltersRecords: {
+        test: function(cmp) {
+            cmp.testSecureMutationObserverFiltersRecords();
+        }
     }
 })

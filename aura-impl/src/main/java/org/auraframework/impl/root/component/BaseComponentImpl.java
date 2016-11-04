@@ -15,14 +15,8 @@
  */
 package org.auraframework.impl.root.component;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
@@ -35,6 +29,7 @@ import org.auraframework.def.ModelDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
+import org.auraframework.expression.FunctionCall;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.java.model.JavaModel;
 import org.auraframework.impl.root.AttributeDefImpl;
@@ -64,8 +59,13 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends BaseComponent<D, I>> implements
 BaseComponent<D, I> {
@@ -156,7 +156,17 @@ BaseComponent<D, I> {
         loggingService.startTimer(LoggingService.TIMER_COMPONENT_CREATION);
         try {
             this.concreteComponent = concreteComponent;
-            attributeSet.set(extender.getDescriptor().getDef().getFacets(), extender.getAttributes());
+            attributeSet.set(extender.getAttributes());
+            
+            // may work better: descriptor.getDef().getFacets();
+            final List<AttributeDefRef> facets = extender.getDescriptor().getDef().getFacets();
+            final D definition = this.getDescriptor().getDef();
+            for (AttributeDefRef facet : facets) {
+                if (definition.getAttributeDef(facet.getName()) != null) {
+                    attributeSet.set(facet);
+                }
+            }
+            
             finishInit();
         } finally {
             loggingService.stopTimer(LoggingService.TIMER_COMPONENT_CREATION);
@@ -213,6 +223,10 @@ BaseComponent<D, I> {
         try {
             this.globalId = getNextGlobalId();
 
+            if (attributeValueProvider == null) {
+                attributeValueProvider = this.getConcreteComponent();
+            }
+            
             this.attributeSet = new AttributeSetImpl(desc, attributeValueProvider, this);
 
             if (valueProviders != null) {
@@ -246,15 +260,50 @@ BaseComponent<D, I> {
         return this;
     }
 
-    @Override
-    public boolean isConcreteComponent() {
-        return this.concreteComponent == null || this.concreteComponent == this;
-    }
-
     protected void finishInit() throws QuickFixException {
         AuraContext context = contextService.getCurrentContext();
 
         injectComponent();
+        
+        // At the base level, we go back up the inheritance stack and setup all the facets.
+        if (this.isConcreteComponent()) {
+            List<AttributeDefRef> facets;
+            final Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = this.getComponentDef().getAttributeDefs();
+
+            List<BaseComponentDef> componentDefTree = Lists.newArrayList();
+            BaseComponentDef definition = this.getDescriptor().getDef();
+            componentDefTree.add(definition);
+            while (definition.getExtendsDescriptor() != null) {
+                definition = definition.getExtendsDescriptor().getDef();
+                componentDefTree.add(0, definition);
+            }
+
+            for (BaseComponentDef def : componentDefTree) {
+                // Facets take precedence, so they should be done after attributes.
+                facets = def.getFacets();
+                for (AttributeDefRef facet : facets) {
+                    // Body is done elsewhere.                	
+                    if (!facet.getName().equals("body") && attributeDefs.containsKey(facet.getDescriptor())) {
+                        if (facet.getValue() instanceof FunctionCall) {
+                            Object parentValue = this.getAttributes().getValue(facet.getName());
+                            FunctionCall fcv = (FunctionCall)facet.getValue();
+                            if (parentValue != null && fcv.getValueProvider() == null) {
+                                fcv.setValueProvider((PropertyReference propertyReference) -> {
+                                    if (propertyReference.getStem() != null && facet.getName().equals(propertyReference.getStem().getRoot())) {
+                                        return parentValue;
+                                    }
+                                    return null;
+                                });
+                            }
+                        }
+                        this.getAttributes().set(facet);
+                    }
+                }
+            }
+            // Do we really want to do this twice? That doesn't seem right.
+            // validateAttributes();
+        }
+
         createModel();
 
         context.getInstanceStack().setAttributeName("$");
@@ -360,7 +409,7 @@ BaseComponent<D, I> {
             }
             json.writeMapEntry("creationPath", getPath());
 
-            if ((attributeSet.getValueProvider() == null || hasProvidedAttributes) && !attributeSet.isEmpty()) {
+            if ((this.isConcreteComponent() || hasProvidedAttributes) && !attributeSet.isEmpty()) {
                 json.writeMapEntry("attributes", attributeSet);
             }
 
@@ -466,14 +515,22 @@ BaseComponent<D, I> {
 
     @Override
     public Object getValue(PropertyReference expr) throws QuickFixException {
+    	final String prefix = expr.getRoot();
+        final PropertyReference stem = expr.getStem();
+
+        // Body is special, that we maintain at every level, everything else on "v" should go through the concrete value provider.
+        // is v.body reference.
+        if (!this.isConcreteComponent() && !isBodyReference(expr) && prefix == AuraValueProviderType.VIEW.getPrefix()) {
+            return this.concreteComponent.getValue(expr);
+        }
+
+        
         AuraContext context = contextService.getCurrentContext();
         BaseComponent<?, ?> oldComponent = context.setCurrentComponent(this);
         try {
-            String prefix = expr.getRoot();
-            if ("c".equals(prefix)) {
+            if (AuraValueProviderType.CONTROLLER.getPrefix().equals(prefix)) {
                 prefix.toString();
             }
-            PropertyReference stem = expr.getStem();
 
             Object root = valueProviders.get(prefix);
             if (root == null) {
@@ -501,6 +558,12 @@ BaseComponent<D, I> {
             context.setCurrentComponent(oldComponent);
         }
     }
+    
+    @Override
+    public boolean isConcreteComponent() {
+        return this.concreteComponent == null || this.concreteComponent == this;
+    }
+    
 
     @Override
     public void index(Component component) {
@@ -590,6 +653,12 @@ BaseComponent<D, I> {
             }
 
         }
+    }
+    
+    private boolean isBodyReference(PropertyReference expr) {
+        final PropertyReference stem = expr.getStem();
+        
+        return  AuraValueProviderType.VIEW.getPrefix().equals(expr.getRoot()) && stem != null && !stem.getRoot().equals("body");
     }
 
 }

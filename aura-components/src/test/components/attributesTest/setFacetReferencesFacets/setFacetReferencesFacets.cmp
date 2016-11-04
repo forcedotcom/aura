@@ -1,0 +1,60 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component render="client" extensible="true" extends="attributesTest:setFacet2">
+    <aura:attribute name="setFacet3_String" type="String"/>
+    <aura:attribute name="setFacet3_Facet" type="Aura.Component[]"/>
+    <aura:attribute name="setFacet3_DefRef" type="Aura.ComponentDefRef[]"/>
+
+    <aura:set attribute="setFacet3_String" value="[asdf]" />
+
+    <aura:set attribute="setFacet1_Facet">
+        <span><attributesTest:setFacetDefRef><aura:set attribute="defref"><a title="{!v.setFacet3_String}" href="#">[setFacet1.0_Facet]</a> </aura:set> </attributesTest:setFacetDefRef></span>
+        <span>[setFacet1.1_Facet]</span>
+        <span>[setFacet1.2_Facet]</span>
+    </aura:set>
+
+
+    <aura:set attribute="setFacet3_Facet">
+        <aura:iteration items="{!v.setFacet1_Facet}" var="item">[setFacet3_Facet]{!item}[/setFacet3_Facet]</aura:iteration>
+    </aura:set>
+
+    <aura:set attribute="setFacet3_DefRef">
+        <aura:iteration items="{!v.setFacet1_Facet}" var="item">[setFacet3_DefRef]{!item}[/setFacet3_DefRef]</aura:iteration>
+            
+    </aura:set>
+
+    <p>
+        <b>v.setFacet1_Facet</b><br/>
+        <i>Expected:</i> <div>[setFacet1.0_Facet][setFacet1.1_Facet][setFacet1.2_Facet]</div>
+        <i>Actual:</i> <div aura:id="setFacet1_Facet_Output">{!v.setFacet1_Facet}</div>
+    </p>
+    <p>
+        <b>v.setFacet3_Facet</b><br/>
+        <i>Expected:</i> <div>[setFacet3_Facet][setFacet1.0_Facet][/setFacet3_Facet][setFacet3_Facet][setFacet1.1_Facet][/setFacet3_Facet][setFacet3_Facet][setFacet1.2_Facet][/setFacet3_Facet]</div>
+        <i>Actual:</i> <div aura:id="setFacet3_Facet_Output">{!v.setFacet3_Facet}</div>
+    </p>
+    <p>
+        <b>v.setFacet3_DefRef</b><br/>
+        <i>Expected:</i> <div>[setFacet3_DefRef][setFacet1.0_Facet][/setFacet3_DefRef][setFacet3_DefRef][setFacet1.1_Facet][/setFacet3_DefRef][setFacet3_DefRef][setFacet1.2_Facet][/setFacet3_DefRef]</div>
+        <i>Actual:</i> <div aura:id="setFacet3_DefRef_Output">{!v.setFacet3_DefRef}</div>
+    </p>
+ 
+
+
+    {!v.body}
+</aura:component>

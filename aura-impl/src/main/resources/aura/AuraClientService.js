@@ -263,6 +263,10 @@ AuraClientService.INCOMPLETE_BOOT_THRESHOLD = 10;
  */
 AuraClientService.CACHE_BUST_QUERY_PARAM = "nocache";
 
+/**
+ * The status to return to action postprocess when receiving a response with system exception event
+ */
+AuraClientService.SYSTEM_EXCEPTION_EVENT_RETURN_STATUS = "SYSTEMERROR";
 
 /**
  * set the queue size.
@@ -429,23 +433,28 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
             this.throwExceptionEvent(resp);
             var evtObj = resp["event"];
             var eventName;
+            var eventNamespace;
             if (evtObj["descriptor"]) {
                 var descriptor = new DefDescriptor(evtObj["descriptor"]);
                 eventName = descriptor.getName();
+                eventNamespace = descriptor.getNamespace();
 
-                // Note that this if for response not 200, so returning COOS in AuraEnable controller would not go here
+                // Note that this if for response not 200, so returning COOS in AuraEnabled controller would not go here
                 // ideally, we want to break the flow for all exception event, however, that causes regressions.
                 // for now, we stop the flow for COOS and invalidSession.
-                if (eventName === "clientOutOfSync" || eventName === "invalidSession") {
+                if (eventNamespace === "aura" && (eventName === "clientOutOfSync" || eventName === "invalidSession")) {
                     // do not return a valid state (SUCCESS, INCOMPLETE, ERROR), we do not want action callback to handle this.
-                    ret["status"] = "SYSTEMERROR";
+                    ret["status"] = AuraClientService.SYSTEM_EXCEPTION_EVENT_RETURN_STATUS;
                     return ret;
                 }
             }
 
             ret["status"] = "ERROR";
             // at least output the exception event name so we know where to investigate.
-            ret["message"] = "Received exception event" + (eventName ? (" ["+eventName+"]") : "") + " from server";
+            ret["message"] = "Received exception event" +
+                                (eventNamespace ? (" " + eventNamespace + ":") : "") +
+                                (eventName ? eventName : "") +
+                                " from server";
             return ret;
         } else {
             // !!!!!!!!!!HACK ALERT!!!!!!!!!!

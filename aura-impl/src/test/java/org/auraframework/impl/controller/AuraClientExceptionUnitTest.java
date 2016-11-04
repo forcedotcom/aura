@@ -17,7 +17,6 @@ package org.auraframework.impl.controller;
 
 import org.auraframework.impl.controller.ComponentController.AuraClientException;
 import org.auraframework.util.test.util.UnitTestCase;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -33,8 +32,8 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
 
         String expectedNamespace = "foo";
         String expectedComponent = "bar";
-        Assert.assertEquals(expectedNamespace, ace.getFailedComponentNamespace());
-        Assert.assertEquals(expectedComponent, ace.getFailedComponent());
+        assertEquals(expectedNamespace, ace.getFailedComponentNamespace());
+        assertEquals(expectedComponent, ace.getFailedComponent());
     }
 
     @Test
@@ -45,8 +44,8 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
 
         String expectedNamespace = "c";
         String expectedComponent = "DTE_ImageCarousel";
-        Assert.assertEquals(expectedNamespace, ace.getFailedComponentNamespace());
-        Assert.assertEquals(expectedComponent, ace.getFailedComponent());
+        assertEquals(expectedNamespace, ace.getFailedComponentNamespace());
+        assertEquals(expectedComponent, ace.getFailedComponent());
     }
 
     @Test
@@ -58,25 +57,25 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
         String expectedNamespace = "foo";
         String expectedComponent = "bar";
         String expectedMethod = "doSomething";
-        Assert.assertEquals(expectedNamespace, ace.getFailedComponentNamespace());
-        Assert.assertEquals(expectedComponent, ace.getFailedComponent());
-        Assert.assertEquals(expectedMethod, ace.getFailedComponentMethod());
+        assertEquals(expectedNamespace, ace.getFailedComponentNamespace());
+        assertEquals(expectedComponent, ace.getFailedComponent());
+        assertEquals(expectedMethod, ace.getFailedComponentMethod());
     }
 
     @Test
     public void testCreateAuraClientExceptionWithStacktrace() {
-        String stacktrace = 
+        String stacktrace =
                 "at VA (https://customers.sage.com/s/sfsites/auraFW/javascript/9vevg4v6I80p1u_pT1V5VQ/aura_prod.js:266:132)\n" +
                 "at b.P.get (https://customers.sage.com/s/sfsites/auraFW/javascript/9vevg4v6I80p1u_pT1V5VQ/aura_prod.js:263:381)\n" +
-                "at value [as get] (https://customers.sage.com/s/sfsites/auraFW/javascript/9vevg4v6I80p1u_pT1V5VQ/aura_prod.js:548:194)\n" + 
-                "at Object.next (components/c/UICarousel.js:57:36)"; 
+                "at value [as get] (https://customers.sage.com/s/sfsites/auraFW/javascript/9vevg4v6I80p1u_pT1V5VQ/aura_prod.js:548:194)\n" +
+                "at Object.next (components/c/UICarousel.js:57:36)";
 
         AuraClientException ace = new AuraClientException(null, null, null, stacktrace, null, null);
 
         String expectedNamespace = "c";
         String expectedComponent = "UICarousel";
-        Assert.assertEquals(expectedNamespace, ace.getFailedComponentNamespace());
-        Assert.assertEquals(expectedComponent, ace.getFailedComponent());
+        assertEquals(expectedNamespace, ace.getFailedComponentNamespace());
+        assertEquals(expectedComponent, ace.getFailedComponent());
     }
 
     @Test
@@ -102,64 +101,51 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
                 "at Object.<anonymous> (aura_prod.js)\n"+
                 "at Object.qz.ci (aura_prod.js)\n";
         String actual = new AuraClientException(null, null, null, jsstack, null, null).getStackTraceIdGen();
-        Assert.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     @Test
     public void testGetStackTraceIdGenReturnsTheSameWithDifferentDomainStacktraces() {
-        String jsstack1 = "at Object.<anonymous> (https://sidewalk.lightning.force.com/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22one%3Aone%22%2C%22fwuid%22%3A%22vR3RI4HaFe6ZgUzebBGZ9A%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fone%3Aone%22%3A%22iwsxloMETwvQdzPlAVTY8w%22%7D%2C%22requestedLocales%22%3A%5B%22en_US%22%2C%22en%22%5D%2C%22ls%22%3A%22NN%22%7D/app.js:6687:431)\n" + 
-                "at Object.<anonymous> (https://sidewalk.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:620:188)\n" + 
-                "at G.Ib (https://sidewalk.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:309:332)\n" + 
-                "at BD.A.lk (https://sidewalk.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:678:295)\n" + 
-                "at Object.qz.ci (https://sidewalk.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:177:255)\n" + 
-                "at G.Ib (https://sidewalk.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:176:130)\n" + 
-                "at T.Wg (https://sidewalk.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:387:444)\n" + 
-                "at Object.onXHRReceived (https://sidewalk.lightning.force.com/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22one%3Aone%22%2C%22fwuid%22%3A%22vR3RI4HaFe6ZgUzebBGZ9A%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fone%3Aone%22%3A%22iwsxloMETwvQdzPlAVTY8w%22%7D%2C%22requestedLocales%22%3A%5B%22en_US%22%2C%22en%22%5D%2C%22ls%22%3A%22NN%22%7D/app.js:4813:503)\n" + 
-                "at Object.<anonymous> (https://sidewalk.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:620:188)\n" + 
-                "at Object.qz.ci (https://sidewalk.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:177:255)";
-        String jsstack2 = "at Object.<anonymous> (https://rgp.lightning.force.com/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22one%3Aone%22%2C%22fwuid%22%3A%22vR3RI4HaFe6ZgUzebBGZ9A%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fone%3Aone%22%3A%22iwsxloMETwvQdzPlAVTY8w%22%7D%2C%22requestedLocales%22%3A%5B%22en_US%22%2C%22en%22%5D%2C%22ls%22%3A%22YN%22%7D/app.js:6687:431)\n" + 
-                "at Object.<anonymous> (https://rgp.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:620:188)\n" + 
-                "at G.Ib (https://rgp.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:309:332)\n" + 
-                "at BD.A.lk (https://rgp.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:678:295)\n" + 
-                "at Object.qz.ci (https://rgp.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:177:255)\n" + 
-                "at G.Ib (https://rgp.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:176:130)\n" + 
-                "at T.Wg (https://rgp.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:387:444)\n" + 
-                "at Object.onXHRReceived (https://rgp.lightning.force.com/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22one%3Aone%22%2C%22fwuid%22%3A%22vR3RI4HaFe6ZgUzebBGZ9A%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fone%3Aone%22%3A%22iwsxloMETwvQdzPlAVTY8w%22%7D%2C%22requestedLocales%22%3A%5B%22en_US%22%2C%22en%22%5D%2C%22ls%22%3A%22YN%22%7D/app.js:4813:503)\n" + 
-                "at Object.<anonymous> (https://rgp.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:620:188)\n" + 
-                "at Object.qz.ci (https://rgp.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:177:255)";
-        Assert.assertNotEquals(jsstack1, jsstack2);
+        // Domain placeholder: {DOMAIN}
+        String jsStackTemplate = "at Object.<anonymous> ({DOMAIN}/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22one%3Aone%22%2C%22fwuid%22%3A%22vR3RI4HaFe6ZgUzebBGZ9A%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fone%3Aone%22%3A%22iwsxloMETwvQdzPlAVTY8w%22%7D%2C%22requestedLocales%22%3A%5B%22en_US%22%2C%22en%22%5D%2C%22ls%22%3A%22NN%22%7D/app.js:6687:431)\n" +
+                "at Object.<anonymous> ({DOMAIN}/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:620:188)\n" +
+                "at G.Ib ({DOMAIN}/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:309:332)\n" +
+                "at BD.A.lk ({DOMAIN}/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:678:295)\n" +
+                "at Object.qz.ci ({DOMAIN}/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:177:255)\n" +
+                "at G.Ib ({DOMAIN}/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:176:130)\n" +
+                "at T.Wg ({DOMAIN}/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:387:444)\n" +
+                "at Object.onXHRReceived ({DOMAIN}/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22one%3Aone%22%2C%22fwuid%22%3A%22vR3RI4HaFe6ZgUzebBGZ9A%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fone%3Aone%22%3A%22iwsxloMETwvQdzPlAVTY8w%22%7D%2C%22requestedLocales%22%3A%5B%22en_US%22%2C%22en%22%5D%2C%22ls%22%3A%22NN%22%7D/app.js:4813:503)\n" +
+                "at Object.<anonymous> ({DOMAIN}/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:620:188)\n" +
+                "at Object.qz.ci ({DOMAIN}/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:177:255)";
+
+        String jsstack1 = jsStackTemplate.replace("{DOMAIN}", "https://sidewalk.lightning.force.com");
+        String jsstack2 = jsStackTemplate.replace("{DOMAIN}", "https://rgp.lightning.force.com");
 
         String actual1 = new AuraClientException(null, null, null, jsstack1, null, null).getStackTraceIdGen();
         String actual2 = new AuraClientException(null, null, null, jsstack2, null, null).getStackTraceIdGen();
-        Assert.assertEquals(actual1, actual2);
+        assertEquals(actual1, actual2);
     }
 
     @Test
     public void testGetStackTraceIdGenReturnsTheSameWithDifferentFrameworkUidStacktraces() {
-        String jsstack1 = "at Object.<anonymous> (https://sidewalk.lightning.force.com/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22one%3Aone%22%2C%22fwuid%22%3A%22vR3RI4HaFe6ZgUzebBGZ9A%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fone%3Aone%22%3A%22iwsxloMETwvQdzPlAVTY8w%22%7D%2C%22requestedLocales%22%3A%5B%22en_US%22%2C%22en%22%5D%2C%22ls%22%3A%22NN%22%7D/app.js:6687:431)\n" + 
-                "at Object.<anonymous> (https://sidewalk.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:620:188)\n" + 
-                "at G.Ib (https://sidewalk.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:309:332)\n" + 
-                "at BD.A.lk (https://sidewalk.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:678:295)\n" + 
-                "at Object.qz.ci (https://sidewalk.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:177:255)\n" + 
-                "at G.Ib (https://sidewalk.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:176:130)\n" + 
-                "at T.Wg (https://sidewalk.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:387:444)\n" + 
-                "at Object.onXHRReceived (https://sidewalk.lightning.force.com/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22one%3Aone%22%2C%22fwuid%22%3A%22vR3RI4HaFe6ZgUzebBGZ9A%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fone%3Aone%22%3A%22iwsxloMETwvQdzPlAVTY8w%22%7D%2C%22requestedLocales%22%3A%5B%22en_US%22%2C%22en%22%5D%2C%22ls%22%3A%22NN%22%7D/app.js:4813:503)\n" + 
-                "at Object.<anonymous> (https://sidewalk.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:620:188)\n" + 
-                "at Object.qz.ci (https://sidewalk.lightning.force.com/auraFW/javascript/vR3RI4HaFe6ZgUzebBGZ9A/aura_prod.js:177:255)";
-        String jsstack2 = "at Object.<anonymous> (https://vology.lightning.force.com/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22one%3Aone%22%2C%22fwuid%22%3A%22jW_bQSND_PAm5SMZfQEyeA%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fone%3Aone%22%3A%22ZMBKxrvhdt5qeYVal8Ss6g%22%7D%2C%22requestedLocales%22%3A%5B%22en_US%22%2C%22en%22%5D%2C%22ls%22%3A%22YN%22%7D/app.js:6687:431)\n" + 
-                "at Object.<anonymous> (https://vology.lightning.force.com/auraFW/javascript/jW_bQSND_PAm5SMZfQEyeA/aura_prod.js:619:188)\n" + 
-                "at G.Ib (https://vology.lightning.force.com/auraFW/javascript/jW_bQSND_PAm5SMZfQEyeA/aura_prod.js:309:332)\n" + 
-                "at BD.A.lk (https://vology.lightning.force.com/auraFW/javascript/jW_bQSND_PAm5SMZfQEyeA/aura_prod.js:677:295)\n" + 
-                "at Object.qz.ci (https://vology.lightning.force.com/auraFW/javascript/jW_bQSND_PAm5SMZfQEyeA/aura_prod.js:177:255)\n" + 
-                "at G.Ib (https://vology.lightning.force.com/auraFW/javascript/jW_bQSND_PAm5SMZfQEyeA/aura_prod.js:176:130)\n" + 
-                "at T.Wg (https://vology.lightning.force.com/auraFW/javascript/jW_bQSND_PAm5SMZfQEyeA/aura_prod.js:387:444)\n" + 
-                "at Object.onXHRReceived (https://vology.lightning.force.com/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22one%3Aone%22%2C%22fwuid%22%3A%22jW_bQSND_PAm5SMZfQEyeA%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fone%3Aone%22%3A%22ZMBKxrvhdt5qeYVal8Ss6g%22%7D%2C%22requestedLocales%22%3A%5B%22en_US%22%2C%22en%22%5D%2C%22ls%22%3A%22YN%22%7D/app.js:4813:503)\n" + 
-                "at Object.<anonymous> (https://vology.lightning.force.com/auraFW/javascript/jW_bQSND_PAm5SMZfQEyeA/aura_prod.js:619:188)\n" + 
-                "at Object.qz.ci (https://vology.lightning.force.com/auraFW/javascript/jW_bQSND_PAm5SMZfQEyeA/aura_prod.js:177:255)";
-        Assert.assertNotEquals(jsstack1, jsstack2);
+
+        // Framework UID placeholder: {FW_UID}
+        String jsStackTemplate = "at Object.<anonymous> (https://sidewalk.lightning.force.com/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22one%3Aone%22%2C%22fwuid%22%3A%22{FW_UID}%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fone%3Aone%22%3A%22iwsxloMETwvQdzPlAVTY8w%22%7D%2C%22requestedLocales%22%3A%5B%22en_US%22%2C%22en%22%5D%2C%22ls%22%3A%22NN%22%7D/app.js:6687:431)\n" +
+                "at Object.<anonymous> (https://sidewalk.lightning.force.com/auraFW/javascript/{FW_UID}/aura_prod.js:620:188)\n" +
+                "at G.Ib (https://sidewalk.lightning.force.com/auraFW/javascript/{FW_UID}/aura_prod.js:309:332)\n" +
+                "at BD.A.lk (https://sidewalk.lightning.force.com/auraFW/javascript/{FW_UID}/aura_prod.js:678:295)\n" +
+                "at Object.qz.ci (https://sidewalk.lightning.force.com/auraFW/javascript/{FW_UID}/aura_prod.js:177:255)\n" +
+                "at G.Ib (https://sidewalk.lightning.force.com/auraFW/javascript/{FW_UID}/aura_prod.js:176:130)\n" +
+                "at T.Wg (https://sidewalk.lightning.force.com/auraFW/javascript/{FW_UID}/aura_prod.js:387:444)\n" +
+                "at Object.onXHRReceived (https://sidewalk.lightning.force.com/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22one%3Aone%22%2C%22fwuid%22%3A%22{FW_UID}%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fone%3Aone%22%3A%22iwsxloMETwvQdzPlAVTY8w%22%7D%2C%22requestedLocales%22%3A%5B%22en_US%22%2C%22en%22%5D%2C%22ls%22%3A%22NN%22%7D/app.js:4813:503)\n" +
+                "at Object.<anonymous> (https://sidewalk.lightning.force.com/auraFW/javascript/{FW_UID}/aura_prod.js:620:188)\n" +
+                "at Object.qz.ci (https://sidewalk.lightning.force.com/auraFW/javascript/{FW_UID}/aura_prod.js:177:255)";
+
+        String jsstack1 = jsStackTemplate.replace("{FW_UID}", "vR3RI4HaFe6ZgUzebBGZ9A");
+        String jsstack2 = jsStackTemplate.replace("{FW_UID}", "jW_bQSND_PAm5SMZfQEyeA");
 
         String actual1 = new AuraClientException(null, null, null, jsstack1, null, null).getStackTraceIdGen();
         String actual2 = new AuraClientException(null, null, null, jsstack2, null, null).getStackTraceIdGen();
-        Assert.assertEquals(actual1, actual2);
+        assertEquals(actual1, actual2);
     }
 }

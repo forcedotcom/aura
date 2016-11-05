@@ -33,6 +33,8 @@ function AuraLocalizationService() {
         strictModeFormat : {},
         langLocale : {}
     };
+    
+    this.pendingTimezone = {};
 }
 
 /**
@@ -1017,25 +1019,17 @@ AuraLocalizationService.prototype.translateToOtherCalendar = function(date) {
  */
 AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callback) {
     $A.assert(callback, 'Callback is required');
-    this.initializeWalltime(function () {
-        if (!timezone) {
-            timezone = $A.get("$Locale.timezone");
-        }
-
-        if (timezone === "GMT" || timezone === "UTC") {
-            callback(date);
-            return;
-        }
-
-        if (!WallTime["zones"] || !WallTime["zones"][timezone]) {
-            // retrieve timezone data from server
-            var that = this;
-            this.getTimeZoneInfo(timezone, function() {
-                callback(that.getWallTimeFromUTC(date, timezone));
-            });
-        } else {
-            callback(this.getWallTimeFromUTC(date, timezone));
-        }
+    
+    if (!timezone) {
+        timezone = $A.get("$Locale.timezone");
+    }
+    if (timezone === "GMT" || timezone === "UTC") {
+        callback(date);
+        return;
+    }
+    
+    this.lazyInitTimeZoneInfo(timezone, function() {
+        callback(this.getWallTimeFromUTC(date, timezone));
     }.bind(this));
 };
 
@@ -1056,28 +1050,19 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
 AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callback) {
     $A.assert(callback, 'Callback is required');
 
-    this.initializeWalltime(function () {
-        if (typeof callback === 'function') {
-            if (!timezone) {
-                timezone = $A.get("$Locale.timezone");
-            }
-
-            if (timezone === "GMT" || timezone === "UTC") {
-                callback(date);
-                return;
-            }
-
-            if (!WallTime["zones"] || !WallTime["zones"][timezone]) {
-                // retrieve timezone data from server
-                var that = this;
-                this.getTimeZoneInfo(timezone, function() {
-                    callback(that.getUTCFromWallTime(date, timezone));
-                });
-            } else {
-                callback(this.getUTCFromWallTime(date, timezone));
-            }
+    if (typeof callback === 'function') {
+        if (!timezone) {
+            timezone = $A.get("$Locale.timezone");
         }
-    }.bind(this));
+        if (timezone === "GMT" || timezone === "UTC") {
+            callback(date);
+            return;
+        }
+
+        this.lazyInitTimeZoneInfo(timezone, function() {
+            callback(this.getUTCFromWallTime(date, timezone));
+        }.bind(this));
+    }
 };
 
 /**---------- Private functions ----------*/
@@ -1213,18 +1198,19 @@ AuraLocalizationService.prototype.getNormalizedLangLocale = function(langLocale)
 };
 
 /**
- * retrieve timezone info from server.
- *
+ * Initializes WallTime for a timezone by retrieving timezone info from the server
+ * @param timezone timezone to initialize
+ * @param afterInit callback to execute after timezone is initialized
  * @private
  */
-AuraLocalizationService.prototype.getTimeZoneInfo = function(timezone, callback) {
+AuraLocalizationService.prototype.initTimeZoneInfo = function(timezone, afterInit) {
     var a = $A.get("c.aura://TimeZoneInfoController.getTimeZoneInfo");
     a.setParams({
         "timezoneId": timezone
     });
-    a.setCallback(this, function(action){
+    a.setCallback(this, function(action) {
         var state = action.getState();
-        if(state === "SUCCESS"){
+        if (state === "SUCCESS") {
             var ret = action.returnValue;
             if (ret) {
                 WallTime["data"] = ret;
@@ -1233,16 +1219,47 @@ AuraLocalizationService.prototype.getTimeZoneInfo = function(timezone, callback)
                 } else { // initialize walltime-js if it doesn't yet
                     WallTime["autoinit"] = true;
                     WallTime["init"](WallTime["data"]["rules"], WallTime["data"]["zones"]);
-                    }
                 }
-            } else if(state === "INCOMPLETE" || state === "ERROR") {
-                var errors = action.getError().map(function(e){return e.message;}).toString();
-                $A.warning("Failed to get Time Zone Info from server: " + errors);
             }
+        } else if (state === "INCOMPLETE" || state === "ERROR") {
+            var errors = action.getError().map(function(e){return e.message;}).toString();
+            $A.warning("Failed to get Time Zone Info from server: " + errors);
+        }
+        afterInit();
+    });
+    $A.enqueueAction(a);
+};
+
+/**
+ * Ensures initTimeZoneInfo is called (and only once) and executes callback afterwards
+ * All pending callbacks will be executed after timezone initialization is completed
+ * @private
+ */
+AuraLocalizationService.prototype.lazyInitTimeZoneInfo = function(timezone, callback) {
+    // perform Walltime initialization first
+    this.initializeWalltime(function() {
+        if (WallTime["zones"] && WallTime["zones"][timezone]) {
+            // timezone already initialize, invoke callback directly
             callback();
-        });
-        $A.enqueueAction(a);
-    };
+            return;
+        }
+    
+        if (!this.pendingTimezone[timezone]) {
+            // first init call for timezone, initialize pending callbacks list and call init method
+            this.pendingTimezone[timezone] = [callback]; // add first callback bef calling initTimeZoneInfo
+            var afterInit = function () {
+                for (var i = 0; i < this.pendingTimezone[timezone].length; i++) {
+                    this.pendingTimezone[timezone][i]();
+                }
+                this.pendingTimezone[timezone] = [];
+            }.bind(this);
+            this.initTimeZoneInfo(timezone, afterInit); 
+        } else {
+            // add callback to pending list for timezone
+            this.pendingTimezone[timezone].push(callback);
+        }
+    }.bind(this));
+};
 
 /**
  * @private

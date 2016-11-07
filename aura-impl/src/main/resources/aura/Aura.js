@@ -124,6 +124,9 @@ window['$A'] = {};
 // #include aura.component.Component
 // #include aura.component.InvalidComponent
 // #include aura.component.ComponentDef
+// #include aura.component.ActionValueProvider
+// #include aura.component.EventValueProvider
+// #include aura.component.StyleValueProvider
 
 // -- Renderer ----------------------------------------------------------
 

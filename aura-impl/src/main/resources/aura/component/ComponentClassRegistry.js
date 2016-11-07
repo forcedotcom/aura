@@ -149,15 +149,14 @@ ComponentClassRegistry.prototype.buildLibraries = function(componentProperties) 
  * @returns {Function} The component class.
  */
 ComponentClassRegistry.prototype.buildConstructor = function(componentProperties) {
-
     // Create a named function dynamically to use as a constructor.
     // TODO: Update to the following line when all browsers have support for dynamic function names.
     // (only supported in IE11+).
     // var componentConstructor = function [className](){ Component.apply(this, arguments); };
 
     //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    var componentConstructor = function() {
-        Component.apply(this, arguments);
+    var componentConstructor = function(config, localCreation) {
+        Component.call(this, config, localCreation);
     };
     //#end
 
@@ -165,7 +164,7 @@ ComponentClassRegistry.prototype.buildConstructor = function(componentProperties
     var className = componentProperties["meta"]["name"];
 
     /*eslint-disable no-redeclare*/
-    var componentConstructor = $A.util.globalEval("(function " + className + "() { Component.apply(this, arguments); });", {
+    var componentConstructor = $A.util.globalEval("(function " + className + "(config, localCreation) { Component.call(this, config, localCreation); });", {
         "Component": Component
     });
     /*eslint-enable no-redeclare*/

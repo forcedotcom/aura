@@ -17,7 +17,11 @@
  * creates the right value object based on whats passed in
  */
 var valueFactory = {
-    create: function create(valueConfig, def, component) {
+    create: function create(valueConfig, component) {
+        // Currently we only care about objects and strings.
+        if(!valueConfig) {
+            return valueConfig;
+        }
         if (aura.util.isPlainObject(valueConfig)) {
             if (valueConfig["exprType"] === "PROPERTY") {
                 return new PropertyReferenceValue(valueConfig["path"], component);
@@ -27,7 +31,7 @@ var valueFactory = {
                 // Recurse over child objects to create Actions, PropertyReferences, and FunctionCalls
                 var childConfig={};
                 for(var key in valueConfig){
-                    childConfig[key]=valueFactory.create(valueConfig[key], def, component);
+                    childConfig[key]=valueFactory.create(valueConfig[key], component);
                 }
                 valueConfig=childConfig;
             }

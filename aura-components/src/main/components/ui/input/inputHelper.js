@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 ({
+    SUPPORTED_FIELDHELP_COMPONENTS: ['ui:tooltip', 'force:icon'],
+
     buildBody: function (component) {
         var labelAttribute = component.get("v.label");
         var isCompound = component.get("v.isCompound");
@@ -160,13 +162,15 @@
      **/
     renderFieldHelpComponent: function(component){
     	var fieldHelpComponent = component.get('v.fieldHelpComponent');
-		if($A.util.isArray(fieldHelpComponent)  &&
-		   !$A.util.isEmpty(fieldHelpComponent)	&&
-		   fieldHelpComponent[0].isInstanceOf('ui:tooltip')){
-
-		var labelComponent = component.find('inputLabel');
-	    	labelComponent.get('v.body').push(fieldHelpComponent[0]);
-	    }
+    	if ($A.util.isArray(fieldHelpComponent) && !$A.util.isEmpty(fieldHelpComponent)) {
+            for (var i = 0; i < this.SUPPORTED_FIELDHELP_COMPONENTS.length; i++) {
+                if (fieldHelpComponent[0].isInstanceOf(this.SUPPORTED_FIELDHELP_COMPONENTS[i])) {
+                    var labelComponent = component.find('inputLabel');
+                    labelComponent.get('v.body').push(fieldHelpComponent[0]);
+                    break;
+                }
+            }
+    	}
     },
     getGlobalId: function (component) {
         return component.get("v.domId") || component.getGlobalId();

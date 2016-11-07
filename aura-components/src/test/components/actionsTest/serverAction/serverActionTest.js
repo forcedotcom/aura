@@ -809,7 +809,7 @@
             function(cmp) {
                 var returnValueFromA1;
                 var returnValueFromA2;
-                // create two actions with same signature
+                // create two actions with same signature.
                 var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
                 var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
                 a1.setStorable();
@@ -868,7 +868,7 @@
         labels : [ "threadHostile" ],
         test : [
             function primeActionStorage(cmp) {
-                var a0 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+                var a0 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 10});
                 a0.setStorable();
                 cmp._storageKey = a0.getStorageKey();
                 $A.enqueueAction(a0);
@@ -886,19 +886,22 @@
                 var returnValueFromA1;
                 var returnValueFromA2;
 
-                // create two actions with same signature
-                var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
-                var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+                // create two actions with same signature (and same as above)
+                var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 10});
+                var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 10});
                 // force action refresh to go to server. for each refresh recordObjCounter will be incremented.
                 a1.setStorable({"refresh": 0});
                 a2.setStorable({"refresh": 0});
 
-                // callbacks will be invoked 2 times: from storage then with refresh action
+                // callbacks will be invoked 2 times: from storage then with refresh action.
+                // note that action invocation order is not guaranteed so identical checks in each is required.
+
                 a1.setCallback(cmp, function(action) {
                     var returnValue  = action.getReturnValue();
                     returnValueFromA1 = returnValue;
 
-                    $A.test.assertEquals(1, returnValue.Counter, "counter of 1st action should be 1");
+                    $A.test.assertTrue(returnValueFromA2 !== returnValue, "returnValue provided to each callback should be distinct objects");
+                    $A.test.assertEquals(10, returnValue.Counter, "counter of 1st action should be 10");
                     // mutate the value, shouldn't be visible in other callbacks
                     returnValue.Counter = 2;
 
@@ -908,6 +911,7 @@
                         $A.test.assertTrue(action.isRefreshAction(), "1st action should be refresh if not from storage");
                         // a1 and a2 get refreshed, order is not guaranteed, so just require value to have incremented
                         $A.test.assertTrue(cmp._counter < returnValue.recordObjCounter, "expect to get recordObjCounter from storage");
+                        $A.test.assertNotEquals(returnValueFromA2 && returnValueFromA2.recordObjCounter, returnValue.recordObjCounter, "refreshed 1st and 2nd action recordObjCounter should differ");
                     }
                 });
 
@@ -916,7 +920,9 @@
                     returnValueFromA2 = returnValue;
 
                     $A.test.assertTrue(returnValueFromA1 !== returnValue, "returnValue provided to each callback should be distinct objects");
-                    $A.test.assertEquals(1, returnValue.Counter, "counter of 2nd action should be 1");
+                    $A.test.assertEquals(10, returnValue.Counter, "counter of 2nd action should be 10");
+                    // mutate the value, shouldn't be visible in other callbacks
+                    returnValue.Counter = 3;
 
                     if (action.isFromStorage()) {
                         $A.test.assertEquals(cmp._counter, returnValue.recordObjCounter, "expect to get recordObjCounter from storage");
@@ -924,7 +930,7 @@
                         $A.test.assertTrue(action.isRefreshAction(), "2nd action should be refresh if not from storage");
                         // a1 and a2 get refreshed, order is not guaranteed, so just require value to have incremented
                         $A.test.assertTrue(cmp._counter < returnValue.recordObjCounter, "expect to get recordObjCounter from storage");
-                        $A.test.assertNotEquals(returnValueFromA1.recordObjCounter, returnValue.recordObjCounter, "refreshed 1st and 2nd actionrecordObjCounter should differ");
+                        $A.test.assertNotEquals(returnValueFromA1 && returnValueFromA1.recordObjCounter, returnValue.recordObjCounter, "refreshed 1st and 2nd action recordObjCounter should differ");
                     }
                 });
 
@@ -933,11 +939,17 @@
 
                 // just need to make sure both actions get some return
                 $A.test.addWaitForWithFailureMessage(true,
-                        function() { return returnValueFromA1 !== undefined && cmp._counter < returnValueFromA1.recordObjCounter; },
+                        function() {
+                            // second part of check is true only after refresh action arrives
+                            return returnValueFromA1 !== undefined && cmp._counter < returnValueFromA1.recordObjCounter;
+                        },
                         "fail waiting for action 1 returns something"
                 );
                 $A.test.addWaitForWithFailureMessage(true,
-                        function() { return returnValueFromA2 !== undefined && cmp._counter < returnValueFromA2.recordObjCounter; },
+                        function() {
+                            // second part of check is true only after refresh action arrives
+                            return returnValueFromA2 !== undefined && cmp._counter < returnValueFromA2.recordObjCounter;
+                        },
                         "fail waiting for action 2 returns something"
                 );
             }

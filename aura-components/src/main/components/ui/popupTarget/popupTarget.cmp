@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" description="A container that is displayed in response to a trigger event. If used in a mobile context, it is recommended that curtain be set to true to prevent nested iframes from consuming the closeOnClickOutside event." support="GA">
+<aura:component access="PRIVILEGED" extensible="true" implements="ui:visible" description="A container that is displayed in response to a trigger event. If used in a mobile context, it is recommended that curtain be set to true to prevent nested iframes from consuming the closeOnClickOutside event." support="GA">
 
 	<aura:import library="ui:panelPositioningLib" property="lib" />
 

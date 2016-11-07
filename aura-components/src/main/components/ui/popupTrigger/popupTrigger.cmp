@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" extends="ui:interactive" description="A trigger that expands and collapses a menu, used in a ui:menu component." support="GA">
+<aura:component access="PRIVILEGED" extensible="true" extends="ui:interactive" description="A trigger that expands and collapses a menu, used in a ui:menu component." support="GA">
 
     <aura:attribute access="GLOBAL" name="label" type="String" description="The text displayed on the component."/>
     <aura:attribute access="GLOBAL" name="title" type="String" default="" description="The text to display as a tooltip when the mouse pointer hovers over this component."/>

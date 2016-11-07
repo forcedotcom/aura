@@ -19,7 +19,7 @@
     <aura:attribute name="currentTarget"  type="String" description="The global Id of the source panel that holds information about the event"/>
     <aura:attribute name="target"         type="String" description="Identifies the component on which the event occurred. If the target component implements the interface typeOf, action is called against that component."/>
     <aura:attribute name="scope"          type="String" description="The scope of the event (all || id)"/>
-    <aura:attribute name="typeOf"         type="String" description="Interface to validate against before calling action on the target component"/>
+    <aura:attribute access="PRIVILEGED" name="typeOf"         type="String" description="Interface to validate against before calling action on the target component"/>
     <aura:attribute name="action"         type="String" description="Method to invoke"/>
-    <aura:attribute name="payload"        type="Object" description="Attributes passed to the method"/>
+    <aura:attribute access="PRIVILEGED" name="payload"        type="Object" description="Attributes passed to the method"/>
 </aura:event>

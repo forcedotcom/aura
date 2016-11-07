@@ -15,9 +15,9 @@
     limitations under the License.
 
 -->
-<aura:component implements="ui:visible" support="PROTO" description="A column of data in ui:dataGrid">
-	<aura:attribute name="name" type="String" description="Api name or field name on item. Can use dot notation."/>
-	<aura:attribute name="label" type="String" description="The text label displayed in column header."/>
+<aura:component access="PRIVILEGED" implements="ui:visible" support="PROTO" description="A column of data in ui:dataGrid">
+	<aura:attribute name="name" type="String" access="PRIVILEGED" description="Api name or field name on item. Can use dot notation."/>
+	<aura:attribute name="label" type="String" access="PRIVILEGED" description="The text label displayed in column header."/>
 	<aura:attribute name="hideLabel" type="Boolean" description="Whether to hide the label. A hidden label will be moved into an assistiveText span"/>
 	<aura:attribute name="title" type="String" description="The title attribute on the TH element"/>
 	<aura:attribute name="type" type="String" description="Data type."/>

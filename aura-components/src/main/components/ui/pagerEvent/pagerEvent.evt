@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" support="GA" description="The standard event object that is fired for paging events.">
+<aura:event access="PRIVILEGED" type="COMPONENT" support="GA" description="The standard event object that is fired for paging events.">
     <aura:attribute name="pageSize" type="Integer"     description="The desired pageSize to be set."/>
     <aura:attribute name="currentPage" type="Integer"  description="The desired page to be set."/>
 </aura:event>

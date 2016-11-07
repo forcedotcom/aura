@@ -17,6 +17,8 @@ package org.auraframework.impl.context;
 
 import org.auraframework.adapter.ContextAdapter;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.GlobalValue;
@@ -24,10 +26,19 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import javax.inject.Inject;
+
+import java.util.HashMap;
 import java.util.Map;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ContextService.class, AuraContextServiceImpl.class})
 public class AuraContextServiceImplTest extends AuraImplTestCase {
     @Inject
     private ContextAdapter contextAdapter;
@@ -39,6 +50,25 @@ public class AuraContextServiceImplTest extends AuraImplTestCase {
     @Test
     public void testAuraContextServiceImpl() {
         assertTrue(contextService instanceof AuraContextServiceImpl);
+    }
+    
+    /*
+     * Verify we can start Aura Context with globalValueProviders passed in
+     * public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Authentication access,
+                                    Map<String, GlobalValueProvider> globalValueProviders,
+                                    DefDescriptor<? extends BaseComponentDef> appDesc)
+     */
+    @Test
+    public void testStartLiteContext() throws Exception {
+    	Map<String, GlobalValueProvider> emptyGVP = new HashMap<>();
+    	ContextService contextServiceMocked = PowerMockito.spy(contextService);
+    	contextServiceMocked.startContext(Mode.DEV, null, Format.JSON, Authentication.AUTHENTICATED, emptyGVP, null);
+    	assertTrue(contextServiceMocked.isEstablished());
+    	assertNotNull(contextServiceMocked.getCurrentContext());
+    	
+    	PowerMockito.verifyPrivate(contextServiceMocked, Mockito.never()).invoke("getGlobalProviders");
+    	
+    	contextServiceMocked.endContext();
     }
 
     @Test

@@ -17,13 +17,6 @@
     afterRender : function(cmp, helper){
         this.superAfterRender();
         helper.setActive(cmp, {"index": cmp._activeTabIndex});
-    },
-    
-    unrender: function(cmp, helper) {
-    	try {
-    		helper.unrender(cmp);
-    	} finally {
-    		this.superUnrender();
-    	}
     }
+    
 })// eslint-disable-line semi

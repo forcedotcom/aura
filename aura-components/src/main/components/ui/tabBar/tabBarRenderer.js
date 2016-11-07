@@ -16,7 +16,11 @@
 
 ({
     render: function (cmp, helper) {
-        helper.setTabItems(cmp);
+        // Allow for cases when a auto-destory is disabled on the component, in such case a render may
+        // be called multiple times
+        if ($A.util.isEmpty(cmp.get("v.tabHeaders"))) {
+            helper.setTabItems(cmp);
+        }
         return this.superRender();
     },
 

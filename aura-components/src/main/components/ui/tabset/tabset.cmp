@@ -51,6 +51,7 @@
     <aura:registerevent name="onRemove" type="ui:tabsetEvent" description="The event is triggered when the tab is removed."/>
 
     <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+    <aura:handler name="destroy" value="{!this}" action="{!c.handleDestroy}"/>
 
     <aura:handler name="addTab" action="{!c.addTab}" />
     <aura:handler name="removeTab" action="{!c.removeTab}" />

@@ -699,7 +699,7 @@ Action.prototype.getState = function() {
  * @export
  */
 Action.prototype.getReturnValue = function() {
-    if (this.returnValueUserland) {
+    if (this.returnValueUserland !== undefined) {
         return this.returnValueUserland;
     }
 
@@ -794,6 +794,10 @@ Action.prototype.updateFromResponse = function(response) {
     this.responseState = response["state"];
 
     this.returnValue = response["returnValue"];
+    // TODO W-3455588 - in the future prevent "used" actions from being re-enqueued.
+    // for now force re-deep-copying the return value.
+    this.returnValueUserland = undefined;
+
     this.error = response["error"];
     this.storage = response["storage"];
     this.components = response["components"];

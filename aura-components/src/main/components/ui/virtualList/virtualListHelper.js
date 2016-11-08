@@ -81,6 +81,7 @@
     _initializeItemTemplate: function (cmpTemplate) {
         var container = document.createDocumentFragment();
         $A.render(cmpTemplate, container);
+        $A.afterRender(cmpTemplate);
         return container;
     },
     initializeTemplate: function (cmp) {

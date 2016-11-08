@@ -56,10 +56,9 @@ Aura.Services   = {};
 Aura.Storage    = {};
 Aura.Locker     = {};
 
-/**
- * @description This, $A, is supposed to be our ONLY window-polluting top-level variable.
- * Everything else in Aura is attached to it.
- */
+
+// This, $A, is supposed to be our ONLY window-polluting top-level variable.
+// Everything else in Aura is attached to it.
 window['$A'] = {};
 
 // -- Polyfills --------------------------------------------------------
@@ -670,8 +669,8 @@ AuraInstance.prototype.initAsync = function(config) {
         $A.clientService.setToken(config["token"]);
         $A.metricsService.initialize();
 
-        function reportError (e) { 
-            $A.reportError("Error initializing the application", e); 
+        function reportError (e) {
+            $A.reportError("Error initializing the application", e);
         }
 
         function initializeApp () {
@@ -696,7 +695,7 @@ AuraInstance.prototype.initAsync = function(config) {
         } else {
             Promise["all"]([
                 $A.clientService.loadBootstrapFromStorage(),
-                $A.componentService.restoreDefsFromStorage(context), 
+                $A.componentService.restoreDefsFromStorage(context),
                 $A.clientService.populatePersistedActionsFilter()
             ])
             .then(initializeApp, function (err) {
@@ -1477,6 +1476,7 @@ AuraInstance.prototype.Perf = window['Perf'] || PerfShim;
 // is just a placeholder. Use this function to preserve Aura while populating
 // $A, without making a new top-level name:
 (function bootstrap() {
+    Aura.bootstrapMark("execAuraJs");
     /**
      * @description This, $A, is supposed to be our ONLY window-polluting top-level variable. Everything else in Aura is
      *            attached to it.
@@ -1503,7 +1503,6 @@ AuraInstance.prototype.Perf = window['Perf'] || PerfShim;
      * @borrows AuraInstance#util as util
      * @borrows AuraInstance#reportError as $A.reportError
      */
-    Aura.bootstrapMark("execAuraJs");
     window['$A'] = new AuraInstance();
 })();
 

@@ -26,7 +26,6 @@ import org.auraframework.util.resource.ResourceLoader;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-	
 import org.auraframework.integration.test.util.IntegrationTestCase;
 
 public class ApiContentsModelTest extends IntegrationTestCase {
@@ -36,33 +35,46 @@ public class ApiContentsModelTest extends IntegrationTestCase {
      */
     @Test
     public void testLoadJavaScriptApi() {
-    	/* 
-    	 * Nodes string is equal to this, which was taken from symbolSet.json
-    	 
-    	[{
-		    'description': 'The Aura Event Service, accessible using $A.eventService. Creates and Manages Events.',
-		    'kind': 'class',
-		    'name': 'AuraEventService',
-		    'tags': [{
-		        'originalTitle': 'export',
-		        'title': 'export',
-		        'text': ''
-		    }],
-		    'longname': 'AuraEventService'
-		}]
+        /*
+         * Nodes string is equal to this, which was taken from symbolSet.json
 
-    	 */
-    	final String nodes = "[{\"description\":\"The Aura Event Service, accessible using $A.eventService. Creates and Manages Events.\",\"kind\":\"class\",\"name\":\"AuraEventService\",\"tags\":[{\"originalTitle\":\"export\",\"title\":\"export\",\"text\":\"\"}],\"longname\":\"AuraEventService\"}]";
+        [{
+            'description': 'The Aura Event Service, accessible using $A.eventService. Creates and Manages Events.',
+            'kind': 'class',
+            'name': 'AuraEventService',
+            'tags': [{
+                'originalTitle': 'export',
+                'title': 'export',
+                'text': ''
+            }],
+            'longname': 'AuraEventService'
+        }]
 
-    	
-    	InputStream stream = new ByteArrayInputStream(nodes.getBytes(StandardCharsets.UTF_8));
-    	ResourceLoader loader = Mockito.mock(ResourceLoader.class);
-    	Mockito.when(loader.getResourceAsStream(Mockito.eq("jsdoc/symbolSet.json"))).thenReturn(stream);
+         */
+        final String nodes = "[{\"description\":\"The Aura Event Service, accessible using $A.eventService. Creates and Manages Events.\",\"kind\":\"class\",\"name\":\"AuraEventService\",\"tags\":[{\"originalTitle\":\"export\",\"title\":\"export\",\"text\":\"\"}],\"longname\":\"AuraEventService\"}]";
 
-    	ApiContentsModel.refreshSymbols(loader);
-    	
-    	ApiContentsModel model = new ApiContentsModel();
+        InputStream stream = new ByteArrayInputStream(nodes.getBytes(StandardCharsets.UTF_8));
+        ResourceLoader loader = Mockito.mock(ResourceLoader.class);
+        Mockito.when(loader.getResourceAsStream(Mockito.eq("jsdoc/symbolSet.json"))).thenReturn(stream);
+
+        ApiContentsModel.refreshSymbols(loader);
+
+        ApiContentsModel model = new ApiContentsModel();
         List<TreeNode> jsDocTreeNodes = model.getNodes();
         assertTrue("No jsdoc nodes loaded from generated JSON file.", jsDocTreeNodes.size() > 0);
+    }
+
+    @Test
+    public void testNamespaceIsAddedToNodes() {
+        String nodes = "[{'description':'This, $A, is supposed to be our ONLY window-polluting top-level variable. Everything else in Aura is attached to it.', 'kind':'namespace', 'alias':'$A', 'name':'$A', 'longname':'$A', 'scope':'global'}]";
+        InputStream stream = new ByteArrayInputStream(nodes.getBytes(StandardCharsets.UTF_8));
+        ResourceLoader loader = Mockito.mock(ResourceLoader.class);
+        Mockito.when(loader.getResourceAsStream(Mockito.eq("jsdoc/symbolSet.json"))).thenReturn(stream);
+
+        ApiContentsModel.refreshSymbols(loader);
+
+        ApiContentsModel model = new ApiContentsModel();
+        List<TreeNode> jsDocTreeNodes = model.getNodes();
+        assertTrue("Namespace symbol has not been added to nodes.", jsDocTreeNodes.size() > 0);
     }
 }

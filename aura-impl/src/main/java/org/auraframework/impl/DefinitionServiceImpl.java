@@ -1306,6 +1306,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                 @SuppressWarnings("unchecked")
                 DefDescriptor<D> canonical = (DefDescriptor<D>) cachedDef.getDescriptor();
 
+                compiling.cacheable = true;
                 compiling.def = cachedDef;
                 compiling.descriptor = canonical;
                 compiling.built = false;

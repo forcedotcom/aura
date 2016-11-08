@@ -25,6 +25,7 @@ import org.auraframework.impl.java.controller.JavaAction;
 import org.auraframework.impl.java.controller.JavaActionDef;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.InstanceBuilder;
+import org.auraframework.instance.InstanceBuilderProvider;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
@@ -32,9 +33,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -43,7 +41,7 @@ import java.util.Map;
  * Provide an interface for an injectable builder of an instance.
  */
 @ServiceComponent
-public class JavaActionInstanceBuilder implements InstanceBuilder<Action, ActionDef>, ApplicationContextAware {
+public class JavaActionInstanceBuilder implements InstanceBuilder<Action, ActionDef> {
     @Inject
     private ContextService contextService;
 
@@ -56,7 +54,8 @@ public class JavaActionInstanceBuilder implements InstanceBuilder<Action, Action
     @Inject
     private LoggingService loggingService;
 
-    private ApplicationContext applicationContext;
+    @Inject
+    private InstanceBuilderProvider instanceBuilderProvider;
 
     /**
      * Get the class that this builder knows how to instantiate.
@@ -82,7 +81,7 @@ public class JavaActionInstanceBuilder implements InstanceBuilder<Action, Action
             Class<?> controllerClass = controllerDef.getJavaType();
             Object controllerBean;
             try {
-                controllerBean = applicationContext.getBean(controllerClass);
+                controllerBean = instanceBuilderProvider.get(controllerClass);
             } catch (Throwable t) {
                 throw new AuraRuntimeException(
                         "Failed to retreive controller instance for " + controllerDef.getDescriptor(), t);
@@ -93,10 +92,5 @@ public class JavaActionInstanceBuilder implements InstanceBuilder<Action, Action
         } finally {
             context.popCallingDescriptor();
         }
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 }

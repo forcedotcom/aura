@@ -167,9 +167,6 @@ function AuraClientService () {
     // can set this flag if ever required.
     this._disableBootstrapCacheCookie = "auraDisableBootstrapCache";
 
-    // cookie name counting consecutive reloads without fwk + app finishing boot
-    this._reloadCountKey = "auraReloadCount";
-
     // appcache progress. is 0 if appcache is not in use; otherwise ranges from 0 to 100.
     this.appCacheProgress = 0;
 
@@ -267,6 +264,15 @@ AuraClientService.CACHE_BUST_QUERY_PARAM = "nocache";
  * The status to return to action postprocess when receiving a response with system exception event
  */
 AuraClientService.SYSTEM_EXCEPTION_EVENT_RETURN_STATUS = "SYSTEMERROR";
+
+/**
+ * Framework + app reload counter to detect and prevent infinite reloads.
+ *
+ * Counter is cleared when Aura Framework finishes app instantiation. Counter is
+ * tracked in sessionStorage so it's per-tab.
+ */
+AuraClientService.CONSECUTIVE_RELOAD_COUNTER_KEY = "__RELOAD_COUNT";
+
 
 /**
  * set the queue size.
@@ -878,40 +884,58 @@ AuraClientService.prototype.dumpCachesAndReload = function() {
 /**
  * Tracks consecutive reloads that do not reach $A.finishInit to prevent infinite reloads.
  *
- * AuraClientService#hardRefresh() relies in this function to indicate when too many
+ * AuraClientService#hardRefresh() relies on this function to indicate when too many
  * consecutive reloads have occurred. In that case the caches are cleared and the user
  * is given a prompt indicating the app can't boot.
  *
  * @returns {boolean} true if too many consecutive reloads without the fwk + app booting.
  */
 AuraClientService.prototype.shouldPreventReload = function() {
-    var count = $A.util.getCookie(this._reloadCountKey);
-    count = +count; // coerce to number
-    count = isFinite(count) ? count : 0;
+    // if per-tab sessionStorage isn't available then reload detection is disabled
+    if (!$A.util.isSessionStorageEnabled()) {
+        return false;
+    }
 
-    if (count >= AuraClientService.INCOMPLETE_BOOT_THRESHOLD) {
-        // too many consecutive reloads without successful fwk + app init
-        var idb = window.indexedDB;
-        if (idb) {
-            // if inline.js fails then none of the storages are initialized
-            // so must brute force as methods in ComponentDefStorage won't work.
-            idb.deleteDatabase(Action.STORAGE_NAME);
-            idb.deleteDatabase($A.componentService.getComponentDefStorageName());
+    try {
+        var count = window.sessionStorage.getItem(AuraClientService.CONSECUTIVE_RELOAD_COUNTER_KEY);
+        count = +count; // coerce to number
+        count = isFinite(count) ? count : 0;
+
+        if (count >= AuraClientService.INCOMPLETE_BOOT_THRESHOLD) {
+            // too many consecutive reloads without successful fwk + app init
+            var idb = window.indexedDB;
+            if (idb) {
+                // if inline.js fails then none of the storages are initialized
+                // so must brute force as methods in ComponentDefStorage won't work.
+                idb.deleteDatabase(Action.STORAGE_NAME);
+                idb.deleteDatabase($A.componentService.getComponentDefStorageName());
+            }
+
+            // reset the counter so if user chooses to reload we allow multiple reloads again
+            this.clearReloadCount();
+            return true;
         }
 
-        // reset the counter so if user chooses to reload we allow multiple reloads again
-        $A.util.setCookie(this._reloadCountKey, "0");
-        return true;
+        window.sessionStorage.setItem(AuraClientService.CONSECUTIVE_RELOAD_COUNTER_KEY, ""+(count+1));
+        return false;
+    } catch (ignore) {
+        // intentional noop
     }
-    $A.util.setCookie(this._reloadCountKey, "" + (count+1));
     return false;
 };
 
 /**
- * Clears reload count cookie.
+ * Clears the counter tracking consecutive reloads.
  */
 AuraClientService.prototype.clearReloadCount = function() {
-    $A.util.clearCookie(this._reloadCountKey);
+    if (!$A.util.isSessionStorageEnabled()) {
+        return;
+    }
+    try {
+        window.sessionStorage.removeItem(AuraClientService.CONSECUTIVE_RELOAD_COUNTER_KEY);
+    } catch (ignore) {
+        // intentional noop
+    }
 };
 
 /**
@@ -1154,9 +1178,7 @@ AuraClientService.prototype.startBootTimers = function() {
         var progress = getBootProgressed(oldState, newState);
 
         // if progress made then start a new timer to check again
-        if (progress || (window.applicationCache &&
-            (window.applicationCache.status === window.applicationCache.CHECKING ||
-            window.applicationCache.status === window.applicationCache.DOWNLOADING))) {
+        if (progress || (window.applicationCache && (window.applicationCache.status === window.applicationCache.CHECKING || window.applicationCache.status === window.applicationCache.DOWNLOADING))) {
             that.startBootTimers();
             return;
         }

@@ -51,10 +51,9 @@ Aura.Utils.Util.prototype.isIE = (navigator.userAgent.indexOf("MSIE") !== -1) ||
 
 
 /**
- * Browser check for localStorage enablement
- *
+ * Browser check for localStorage enablement.
  * @returns {Boolean} true if LocalStorage is available
- * @export
+ * @private
  */
 Aura.Utils.Util.prototype.isLocalStorageEnabled = function () {
     if (this.localStorageEnabled === undefined) {
@@ -72,6 +71,29 @@ Aura.Utils.Util.prototype.isLocalStorageEnabled = function () {
 
     return this.localStorageEnabled;
 };
+
+/**
+ * Browser check for sessionStorage enablement.
+ * @returns {Boolean} true if SessionStorage is available
+ * @private
+ */
+Aura.Utils.Util.prototype.isSessionStorageEnabled = function () {
+    if (this.sessionStorageEnabled === undefined) {
+        this.sessionStorageEnabled = false;
+        if (window.sessionStorage) {
+            try {
+                window.sessionStorage.setItem("__AURA_SESSION_STORAGE_ENABLED_TEST", "");
+                window.sessionStorage.removeItem("__AURA_SESSION_STORAGE_ENABLED_TEST");
+                this.sessionStorageEnabled = true;
+            } catch (ignore) {
+                // do nothing
+            }
+        }
+    }
+
+    return this.sessionStorageEnabled;
+};
+
 
 
 /**

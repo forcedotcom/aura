@@ -1,0 +1,18 @@
+<aura:component isTemplate="true"
+                extends="aura:template"
+                implements="aura:requireLocker">
+
+    <div class="templateDiv">Some HTML before scripts</div>
+
+    <script>window._templateWindow = window + "";</script>
+
+    <div class="templateDiv" id="betweenScripts">Some HTML inbetween scripts</div>
+
+    <script>(function(global) { global._iifeWindow = window + "";})(window);</script>
+
+    <aura:set attribute="auraPreInitBlock">
+        <script>window._preInitBlockWindow = window + "";</script>
+    </aura:set>
+
+    <div class="templateDiv">Some HTML after scripts</div>
+</aura:component>

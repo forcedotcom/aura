@@ -264,6 +264,16 @@ window['aura'] = window['$A'];
 */
 
 Aura["frameworkJsReady"] = true;
+// only run scripts from custom template if inlineJs is complete, otherwise inline will handle them
+if (Aura["inlineJsLocker"] && Aura["inlineJsReady"]) {
+    var scripts = Aura["inlineJsLocker"];
+    if (scripts) {
+        for (var i = 0; i < scripts.length; i++) {
+            $A.lockerService.runScript(scripts[i]["callback"], scripts[i]["namespace"]);
+        }
+        delete Aura["inlineJsLocker"];
+    }
+}
 if (Aura["initConfig"]) {
   setTimeout(function () {
     $A.initAsync(Aura["initConfig"]);

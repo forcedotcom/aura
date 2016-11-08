@@ -24,6 +24,7 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
+import org.auraframework.instance.Instance;
 import org.auraframework.instance.Model;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -107,7 +108,6 @@ public class ProtoComponentImpl implements Component {
 	@Override
 	public void reinitializeModel() {
 	}
-	
 
     @Override
     public ComponentDef getComponentDef() throws QuickFixException {
@@ -122,5 +122,10 @@ public class ProtoComponentImpl implements Component {
 	@Override
 	public boolean isConcreteComponent() {
 		return true;
+	}
+	
+	@Override
+	public Instance<?> getLexicalParent() {
+		return null;
 	}
 }

@@ -181,6 +181,16 @@
         if (!window.Aura.frameworkJsReady) {
             window.Aura.initConfig = auraConfig;
         } else {
+            // scripts inside custom templates with Locker active are stored until now since we need FW and safeEval
+            // loaded before running
+            var scripts = window.Aura.inlineJsLocker;
+            if (scripts) {
+                scripts.forEach(function(script) {
+                    $A.lockerService.runScript(script["callback"], script["namespace"]);
+                });
+                delete window.Aura.inlineJsLocker;
+            }
+
             if ({!v.autoInitialize}) {
                 $A.initAsync(auraConfig);
             } else if ({!v.autoInitializeSync}) {

@@ -51,7 +51,7 @@ public interface BaseComponent<D extends BaseComponentDef, I extends BaseCompone
     Model getModel();
 
     void reinitializeModel() throws QuickFixException;
-    
+
     /**
      * Helper to get the definition of the component. 
      * Could also usually be retrieved from the descriptor.
@@ -74,4 +74,10 @@ public interface BaseComponent<D extends BaseComponentDef, I extends BaseCompone
      * @return
      */
     boolean isConcreteComponent();
+
+    /**
+     * Gets the lexical parent of the component.
+     * @return
+     */
+    Instance<?> getLexicalParent();
 }

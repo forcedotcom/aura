@@ -28,6 +28,7 @@ import org.auraframework.impl.java.model.JavaModel;
 import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
+import org.auraframework.instance.Instance;
 import org.auraframework.instance.Model;
 import org.auraframework.instance.ValueProvider;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -123,7 +124,7 @@ public class IterationValueProvider<D extends BaseComponentDef, I extends BaseCo
 	public void reinitializeModel() throws QuickFixException {
 		attributeValueProvider.reinitializeModel();
 	}
-	
+
     @Override
     public D getComponentDef() throws QuickFixException {
     	return Aura.getDefinitionService().getDefinition(this.getDescriptor());
@@ -137,5 +138,10 @@ public class IterationValueProvider<D extends BaseComponentDef, I extends BaseCo
 	@Override
 	public boolean isConcreteComponent() {
 		return attributeValueProvider.isConcreteComponent();
+	}
+
+	@Override
+	public Instance<?> getLexicalParent() {
+		return attributeValueProvider.getLexicalParent();
 	}
 }

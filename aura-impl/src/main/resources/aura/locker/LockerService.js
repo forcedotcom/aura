@@ -150,14 +150,25 @@ function LockerService() {
 			return key ? this.getEnv(key, doNotCreate) : undefined;
 		},
 
-		create : function(code, key, sourceURL, skipPreprocessing) {
-			var envRec;
+        runScript : function(code, namespace) {
+            var key = this.getKeyForNamespace(namespace);
+            // force Locker because scripts may be run before context is established
+            var ret = this.createInternal(code, key, undefined, undefined, true);
+            ret["returnValue"]();
+        },
+
+        create : function(code, key, sourceURL, skipPreprocessing) {
+            return this.createInternal(code, key, sourceURL, skipPreprocessing);
+        },
+
+        createInternal : function(code, key, sourceURL, skipPreprocessing, forceLocker) {
+            var envRec;
 
 			if (!lockerShadows) {
 				lazyInitInlinedSafeEvalWorkaround();
 			}
 
-			if (this.isEnabled()) {
+			if (forceLocker || this.isEnabled()) {
 				envRec = this.getEnv(key);
 				if (!lockerShadows) {
 					// one time operation to lazily create this giant object with
@@ -281,6 +292,7 @@ function LockerService() {
 	service["getEnvForSecureObject"] = service.getEnvForSecureObject;
 	service["getKeyForNamespace"] = service.getKeyForNamespace;
     service["wrapComponent"] = service.wrapComponent;
+	service["runScript"] = service.runScript;
 
 	Object.freeze(service);
 

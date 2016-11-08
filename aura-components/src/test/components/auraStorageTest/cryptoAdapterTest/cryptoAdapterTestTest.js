@@ -19,6 +19,12 @@
         $A.test.addCleanup(function(){ return $A.storageService.deleteStorage("crypto-store"); });
     },
 
+    tearDown : function(cmp) {
+        // verify adapter in tear down so any adapter fallback would've occurred
+        $A.test.assertEquals("crypto", this.storage.getName(), "CryptoAdapter not used in test. Did CryptoAdapter fail initialization and trigger adapter fallback?");
+    },
+
+
     createStorage: function(name, maxSize, expiration, autoRefreshInterval) {
         // StorageService.selectAdapter override ensures crypto is always returned
         return $A.storageService.initStorage({

@@ -142,11 +142,6 @@ IndexedDBAdapter.prototype.initializeInternal = function(version) {
         }, IndexedDBAdapter.INITIALIZE_TIMEOUT);
     }
 
-    // Firefox private browsing mode throws an uncatchable (except by window.onerror) InvalidStateError when
-    // indexedDB.open() is called. the onerror handler is also invoked which allows us to set the adapter to a
-    // permanent error state. FYI Logging.js suppresses InvalidStateError messages.
-    // see https://bugzilla.mozilla.org/show_bug.cgi?id=781982.
-
     if (version) {
         // version is dynamic because it needs to be incremented when we need to create an objectStore
         // for the current app or cmp. IndexedDB only allows modifications to db or objectStore during
@@ -172,6 +167,8 @@ IndexedDBAdapter.prototype.initializeInternal = function(version) {
         that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
         // reject all pending operations
         that.initializeComplete(false, message);
+        // prevent uncatchable InvalidStateError in FF private mode
+        e.preventDefault && e.preventDefault();
     };
     dbRequest.onblocked = function(/*error*/) {
         that.log(IndexedDBAdapter.LOG_LEVEL.INFO, "initializeInternal(): blocked from opening DB, most likely by another open browser tab");

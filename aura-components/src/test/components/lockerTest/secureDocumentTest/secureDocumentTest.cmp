@@ -20,7 +20,6 @@
 
     <aura:method name="testCreateDocumentFragmentReturnsSecureElement" action="{!c.testCreateDocumentFragmentReturnsSecureElement}"/>
     <aura:method name="testCreateScriptElementReturnsSecureScript" action="{!c.testCreateScriptElementReturnsSecureScript}"/>
-    <aura:method name="testCreateIframeElementReturnsSecureIframeElement" action="{!c.testCreateIframeElementReturnsSecureIframeElement}"/>
     <aura:method name="testCreateTextNodeReturnsSecureElement" action="{!c.testCreateTextNodeReturnsSecureElement}"/>
     <aura:method name="testCreateElementsAndPushToMarkup" action="{!c.testCreateElementsAndPushToMarkup}"/>
     <aura:method name="testGetElementByIdReturnsSecureElement" action="{!c.testGetElementByIdReturnsSecureElement}"/>

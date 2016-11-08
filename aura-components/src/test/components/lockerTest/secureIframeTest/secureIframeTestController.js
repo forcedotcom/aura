@@ -8,26 +8,32 @@
         attributesWhitelist.forEach(function(name) {
             testUtils.assertTrue(name in iframe);
         });
+        
         attributesBlacklist.forEach(function(name) {
             testUtils.assertFalse(name in iframe);
         });
 
-        function verifySrcdocBlocked(f) {
+        function verifySrcdocBlocked(iframe, name, f) {
         	try {
         		f();
         		testUtils.fail("SecureIFrameElement should have blocked setting of src doc attribute");
     		} catch (e) {
-    			testUtils.assertEquals("SecureIFrameElement does not permit setting the srcdoc attribute!", e.toString());
-    		}
+    			testUtils.assertEquals("SecureElement: [object HTMLIFrameElement]{ key: {\"namespace\":\"lockerTest\"} } does not permit setting the srcdoc attribute!", e.toString());
+    		} 	
+    		
+    		// Try to access the attribute via SecureElement.attributes
+    		iframe.attributes.forEach(function(attr) {
+    			testUtils.assertTrue(attr.name.toLowerCase() !== name.toLowerCase(), "SecureElement.attributes should not have contained: " + name);
+			});
         }
 
         // Check to insure that SecureIFrameElement.setAttribute[NS]("srcdoc", value) is blocked
         ["srcdoc", "SrCdOc"].forEach(function(name) {
-        	verifySrcdocBlocked(function() {
+        	verifySrcdocBlocked(iframe, name, function() {
         		iframe.setAttribute(name, "foo");
         	})
 
-        	verifySrcdocBlocked(function() {
+        	verifySrcdocBlocked(iframe, name, function() {
         		iframe.setAttributeNS("http://www.w3.org/1999/xhtml", name, "foo");
         	})
     	});

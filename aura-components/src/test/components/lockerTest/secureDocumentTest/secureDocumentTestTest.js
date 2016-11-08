@@ -23,12 +23,6 @@
         }
     },
 
-    testCreateIframeElementReturnsSecureIframeElement: {
-        test: function(cmp) {
-            cmp.testCreateIframeElementReturnsSecureIframeElement();
-        }
-    },
-
     testCreateTextNodeReturnsSecureElement: {
         test: function(cmp) {
             cmp.testCreateTextNodeReturnsSecureElement();

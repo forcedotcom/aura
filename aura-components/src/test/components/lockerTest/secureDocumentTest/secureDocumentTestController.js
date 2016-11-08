@@ -13,13 +13,6 @@
                 + " to return a SecureScript");
     },
 
-    testCreateIframeElementReturnsSecureIframeElement: function(cmp) {
-        var testUtils = cmp.get("v.testUtils");
-        var iframeElement = document.createElement("iframe");
-        testUtils.assertStartsWith("SecureIFrameElement", iframeElement.toString(), "Expected document.createElement('iframe')"
-                + " to return a SecureIFrameElement");
-    },
-
     testCreateTextNodeReturnsSecureElement: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var textNode = document.createTextNode();
@@ -31,11 +24,12 @@
         var testUtils = cmp.get("v.testUtils");
         var docFragment = document.createDocumentFragment();
         var span = document.createElement("span");
-        span.setAttribute("lockerAttr", "hello from the locker");
+        span.setAttribute("data-lockerAttr", "hello from the locker");
         docFragment.appendChild(span);
         var content = cmp.find("content").getElement();
         content.appendChild(docFragment);
-        testUtils.assertEquals("hello from the locker",  content.childNodes[0].getAttribute("lockerAttr"), "Unexpected attribute on document"
+        var actual = content.childNodes[0].getAttribute("data-lockerAttr");
+        testUtils.assertEquals("hello from the locker",  actual, "Unexpected attribute on document"
                 + " elements created in controller");
     },
 

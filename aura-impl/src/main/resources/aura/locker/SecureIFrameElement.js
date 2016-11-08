@@ -14,79 +14,44 @@
  * limitations under the License.
  */
 
-function SecureIFrameElement(el, key) {
-    "use strict";
+SecureIFrameElement = {
+	addMethodsAndProperties: function(prototype) {
+	    "use strict";
 
-    var o = ls_getFromCache(el, key);
-    if (o) {
-        return o;
-    }
-
-    function SecureIFrameContentWindow(w) {
-    	var sicw = Object.create(null, {
-            toString: {
-                value: function() {
-                    return "SecureIFrameContentWindow: " + w + "{ key: " + JSON.stringify(key) + " }";
-                }
-            }
-        });
-
-    	Object.defineProperties(sicw, {
-            postMessage: SecureObject.createFilteredMethod(sicw, w, "postMessage")
-    	});
-
-    	return sicw;
-    }
-
-    o = Object.create(null, {
-        toString: {
-            value: function() {
-                return "SecureIFrameElement: " + el + "{ key: " + JSON.stringify(key) + " }";
-            }
-        }
-    });
-    
-    function validateAttributeName(name) {
-		if (name.toLowerCase() === "srcdoc") {
-			throw new $A.auraError("SecureIFrameElement does not permit setting the srcdoc attribute!");
-		}    	
-    }
-
-    Object.defineProperties(o, {
-        // Standard HTMLElement methods
-        // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
-        blur: SecureObject.createFilteredMethod(o, el, "blur"),
-        focus: SecureObject.createFilteredMethod(o, el, "focus"),
-        contentWindow: {
-        	get: function() {
-        		return SecureIFrameContentWindow(el.contentWindow);
-        	}
-        },
-        setAttribute: {
-        	value: function(name, value) {
-        		validateAttributeName(name);
-        		el.setAttribute(name, value);
-        	}
-        },
-        setAttributeNS: {
-        	value: function(namespace, name, value) {
-        		validateAttributeName(name);
-        		el.setAttributeNS(namespace, name, value);
-        	}
-        }
-    });
-
-    // Standard list of iframe's properties from:
-    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
-    // Note: ignoring 'contentDocument', 'sandbox' and 'srcdoc' from the list above.
-    ["height", "width", "name", "src"].forEach(function (name) {
-		Object.defineProperty(o, name, SecureObject.createFilteredProperty(o, el, name));
-	});
-
-    SecureObject.addPrototypeMethodsAndProperties(SecureElement.metadata, o, el, key);
-
-    ls_setRef(o, el, key);
-    ls_addToCache(el, o, key);
-
-    return o;
-}
+	    function SecureIFrameContentWindow(w, key) {
+	    	var sicw = Object.create(null, {
+	            toString: {
+	                value: function() {
+	                    return "SecureIFrameContentWindow: " + w + "{ key: " + JSON.stringify(key) + " }";
+	                }
+	            }
+	        });
+	
+	    	Object.defineProperties(sicw, {
+	            postMessage: SecureObject.createFilteredMethod(sicw, w, "postMessage")
+	    	});
+	
+	    	return sicw;
+	    }
+	
+	    Object.defineProperties(prototype, {
+	        // Standard HTMLElement methods
+	        // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
+	        blur: SecureObject.createFilteredMethodStateless("blur", prototype),
+	        focus: SecureObject.createFilteredMethodStateless("focus", prototype),
+	        contentWindow: {
+	        	get: function() {
+					var raw = SecureObject.getRaw(this, prototype);
+	        		return SecureIFrameContentWindow(raw.contentWindow, ls_getKey(this));
+	        	}
+	        }
+	    });
+	    	
+	    // Standard list of iframe's properties from:
+	    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement
+	    // Note: ignoring 'contentDocument', 'sandbox' and 'srcdoc' from the list above.
+	    ["height", "width", "name", "src"].forEach(function (name) {
+			Object.defineProperty(prototype, name, SecureObject.createFilteredPropertyStateless(name, prototype));
+		});
+	}
+};

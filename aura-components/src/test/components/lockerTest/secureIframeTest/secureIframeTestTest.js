@@ -20,6 +20,8 @@
 
     testIframeAttributes: {
         test: function(cmp) {
+        	// Set srcdoc (forbidden in Locker) directly
+        	cmp.find("iframe").getElement().setAttribute("srcdoc", "<div>Hello World</div>");
             cmp.testIframeAttributes(this.AttributesWhitelist, this.AttributesBlacklist);
         }
     },

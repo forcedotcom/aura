@@ -40,6 +40,26 @@ function _trustChildNodes(node, key) {
 	}
 }
 
+function validateAttributeName(se, raw, name, prototype, caseInsensitiveAttributes) {
+	// Always allow names with the form a-b.* (e.g. data-foo, x-foo, ng-repeat, etc) 
+	if (name.indexOf("-") >= 0) {
+		return;
+	}
+
+	if (name in caseInsensitiveAttributes) {
+		return;
+	}
+	
+	// Allow SVG elements free reign
+	if (raw instanceof SVGElement) {
+		return;
+	}
+	
+	if (!(name in prototype)) {
+		throw new $A.auraError(se + " does not permit setting the " + name.toLowerCase() + " attribute!");
+	}
+}
+
 var KEY_TO_PROTOTYPES = typeof Map !== "undefined" ? new Map() : undefined;
 
 function SecureElement(el, key) {
@@ -56,9 +76,6 @@ function SecureElement(el, key) {
 	switch (tagName) {
 		case "FRAME":
 			throw new $A.auraError("The deprecated FRAME element is not supported in LockerService!");
-
-		case "IFRAME":
-			return SecureIFrameElement(el, key);
 
 		case "SCRIPT":
 			return SecureScriptElement(el, key);
@@ -87,151 +104,43 @@ function SecureElement(el, key) {
 	var prototype = prototypes.get(tagName);
 	if (!prototype) {
 		prototype = Object.create(null);
+		
+		// "class", "id", etc global attributes are special because they do not directly correspond to any property
+		var caseInsensitiveAttributes = { 
+			"class": true,
+			"contextmenu": true,
+			"dropzone": true,
+			"http-equiv": true,
+			"id": true
+		};
 
+		SecureElement.addStandardMethodAndPropertyOverrides(prototype, caseInsensitiveAttributes);
+		
 		Object.defineProperties(prototype, {
 			toString: {
 				value: function() {
 					var e = SecureObject.getRaw(this, prototype);
 					return "SecureElement: " + e + "{ key: " + JSON.stringify(ls_getKey(this)) + " }";
 				}
-			},
-
-			appendChild : {
-				value : function(child) {
-					if (!runIfRunnable(child)) {
-						var e = SecureObject.getRaw(this, prototype);
-						e.appendChild(ls_getRef(child, ls_getKey(this), true));
-					}
-
-					return child;
-				}
-			},
-
-			replaceChild : {
-				value : function(newChild, oldChild) {
-					if (!runIfRunnable(newChild)) {
-						var e = SecureObject.getRaw(this, prototype);
-						var k = ls_getKey(this);
-						e.replaceChild(ls_getRef(newChild, k, true), ls_getRef(oldChild, k, true));
-					}
-
-					return oldChild;
-				}
-			},
-
-			insertBefore : {
-				value : function(newNode, referenceNode) {
-					if (!runIfRunnable(newNode)) {
-						var e = SecureObject.getRaw(this, prototype);
-						var k = ls_getKey(this);
-						e.insertBefore(ls_getRef(newNode, k, true), referenceNode ? ls_getRef(referenceNode, k, true) : null);
-					}
-
-					return newNode;
-				}
-			},
-
-			querySelector: {
-				value: function(selector) {
-					var raw = SecureObject.getRaw(this, prototype);
-					return SecureElement.secureQuerySelector(raw, ls_getKey(this), selector);
-				}
-			},
-
-			insertAdjacentHTML: {
-				value: function(position, text) {
-					var raw = SecureObject.getRaw(this, prototype);
-
-					// Do not allow insertAdjacentHTML on shared elements (body/head)
-					if (SecureElement.isSharedElement(raw)) {
-						throw new $A.auraError("SecureElement.insertAdjacentHTML cannot be used with " + raw.tagName + " elements!");
-					}
-
-					var parent;
-					if (position === "afterbegin" || position === "beforeend") {
-						// We have access to el, nothing else to check.
-					} else if (position === "beforebegin" || position === "afterend") {
-						// Prevent writing outside secure node.
-						parent = raw.parentNode;
-						ls_verifyAccess(this, parent, true);
-					} else {
-						throw new $A.auraError("SecureElement.insertAdjacentHTML requires position 'beforeBegin', 'afterBegin', 'beforeEnd', or 'afterEnd'.");
-					}
-
-					// Allow SVG <use> element
-					var config = {
-						"ADD_TAGS" : [ "use" ]
-					};
-					raw.insertAdjacentHTML(position, DOMPurify["sanitize"](text, config));
-
-					trustChildNodes(this, parent || raw);
-				}
-			},
-
-			removeChild : SecureObject.createFilteredMethodStateless("removeChild", prototype, {
-				beforeCallback : function(child) {
-					// Verify that the passed in child is not opaque!
-					ls_verifyAccess(this, child, true);
-				}
-			}),
-
-			cloneNode : {
-				value : function(deep) {
-					function copyKeys(from, to) {
-						// Copy keys from the original to the cloned tree
-						var fromKey = ls_getKey(from);
-						if (fromKey) {
-							ls_setKey(to, fromKey);
-						}
-
-						var toChildren = to.childNodes;
-						var length = toChildren.length;
-						if (length > 0) {
-							var fromChildren = from.childNodes;
-							for (var i = 0; i < length; i++) {
-								copyKeys(fromChildren[i], toChildren[i]);
-							}
-						}
-					}
-
-					var e = SecureObject.getRaw(this, prototype);
-					var root = e.cloneNode(deep);
-
-					// Maintain the same ownership in the cloned subtree
-					copyKeys(e, root);
-
-					return SecureElement(root, ls_getKey(this));
-				}
-			},
-
-			textContent : {
-				get : function() {
-					return SecureObject.getRaw(this.cloneNode(true), prototype).textContent;
-				},
-				set : function(value) {
-					var raw = SecureObject.getRaw(this, prototype);
-					if (SecureElement.isSharedElement(raw)) {
-						throw new $A.auraError("SecureElement.textContent cannot be used with " + raw.tagName + " elements!");
-					}
-
-					value = SecureObject.unfilterEverything(this, value);
-
-					raw.textContent = value;
-
-					trustChildNodes(this, raw);
-				}
 			}
 		});
-
+		
 		prototypes.set(tagName, prototype);
 
 		var prototypicalInstance = Object.create(prototype);
 		ls_setRef(prototypicalInstance, el, key);
 
+		if (tagName === "IFRAME") {
+			SecureIFrameElement.addMethodsAndProperties(prototype);
+		}
+
 		var tagNameSpecificConfig = SecureObject.addPrototypeMethodsAndPropertiesStateless(SecureElement.metadata, prototypicalInstance, prototype);
 
 		// Conditionally add things that not all Node types support
 		if ("attributes" in el) {
+			
+			// DCHASMAN TODO We need Proxy (208) to fully implement the syntax/sematics of Element.attributes!
+			
 			tagNameSpecificConfig["attributes"] = SecureObject.createFilteredPropertyStateless("attributes", prototype, {
 				writable : false,
 				afterGetCallback : function(attributes) {
@@ -239,10 +148,14 @@ function SecureElement(el, key) {
 					var secureAttributes = [];
 					for (var i = 0; i < attributes.length; i++) {
 						var attribute = attributes[i];
-						secureAttributes.push({
-							name : attribute.name,
-							value : SecureObject.filterEverything(this, attribute.value)
-						});
+						
+						// Only add supported attributes
+						if (attribute.name in prototype || attribute.name in caseInsensitiveAttributes) {
+							secureAttributes.push({
+								name : attribute.name,
+								value : SecureObject.filterEverything(this, attribute.value)
+							});
+						}
 					}
 
 					return secureAttributes;
@@ -317,9 +230,16 @@ function SecureElement(el, key) {
 		Object.defineProperties(prototype, tagNameSpecificConfig);
 
 		Object.freeze(prototype);
+				
+		// Build case insensitive index for attribute validation
+		Object.keys(prototype).forEach(function(k) {
+			var lower = k.toLowerCase();
+			if (lower !== k) {
+				caseInsensitiveAttributes[lower] = true;
+			}
+		});
 	}
 
-	//o = Object.create(null, SECURE_ELEMENT_CONFIG);
 	o = Object.create(prototype);
 
 	ls_setRef(o, el, key);
@@ -327,6 +247,156 @@ function SecureElement(el, key) {
 
 	return o;
 }
+
+SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseInsensitiveAttributes) {
+	Object.defineProperties(prototype, {
+		appendChild : {
+			value : function(child) {
+				if (!runIfRunnable(child)) {
+					var e = SecureObject.getRaw(this, prototype);
+					e.appendChild(ls_getRef(child, ls_getKey(this), true));
+				}
+
+				return child;
+			}
+		},
+
+		replaceChild : {
+			value : function(newChild, oldChild) {
+				if (!runIfRunnable(newChild)) {
+					var e = SecureObject.getRaw(this, prototype);
+					var k = ls_getKey(this);
+					e.replaceChild(ls_getRef(newChild, k, true), ls_getRef(oldChild, k, true));
+				}
+
+				return oldChild;
+			}
+		},
+
+		insertBefore : {
+			value : function(newNode, referenceNode) {
+				if (!runIfRunnable(newNode)) {
+					var e = SecureObject.getRaw(this, prototype);
+					var k = ls_getKey(this);
+					e.insertBefore(ls_getRef(newNode, k, true), referenceNode ? ls_getRef(referenceNode, k, true) : null);
+				}
+
+				return newNode;
+			}
+		},
+
+		querySelector: {
+			value: function(selector) {
+				var raw = SecureObject.getRaw(this, prototype);
+				return SecureElement.secureQuerySelector(raw, ls_getKey(this), selector);
+			}
+		},
+
+		insertAdjacentHTML: {
+			value: function(position, text) {
+				var raw = SecureObject.getRaw(this, prototype);
+
+				// Do not allow insertAdjacentHTML on shared elements (body/head)
+				if (SecureElement.isSharedElement(raw)) {
+					throw new $A.auraError("SecureElement.insertAdjacentHTML cannot be used with " + raw.tagName + " elements!");
+				}
+
+				var parent;
+				if (position === "afterbegin" || position === "beforeend") {
+					// We have access to el, nothing else to check.
+				} else if (position === "beforebegin" || position === "afterend") {
+					// Prevent writing outside secure node.
+					parent = raw.parentNode;
+					ls_verifyAccess(this, parent, true);
+				} else {
+					throw new $A.auraError("SecureElement.insertAdjacentHTML requires position 'beforeBegin', 'afterBegin', 'beforeEnd', or 'afterEnd'.");
+				}
+
+				// Allow SVG <use> element
+				var config = {
+					"ADD_TAGS" : [ "use" ]
+				};
+				raw.insertAdjacentHTML(position, DOMPurify["sanitize"](text, config));
+
+				trustChildNodes(this, parent || raw);
+			}
+		},
+
+		removeChild : SecureObject.createFilteredMethodStateless("removeChild", prototype, {
+			beforeCallback : function(child) {
+				// Verify that the passed in child is not opaque!
+				ls_verifyAccess(this, child, true);
+			}
+		}),
+
+		cloneNode : {
+			value : function(deep) {
+				function copyKeys(from, to) {
+					// Copy keys from the original to the cloned tree
+					var fromKey = ls_getKey(from);
+					if (fromKey) {
+						ls_setKey(to, fromKey);
+					}
+
+					var toChildren = to.childNodes;
+					var length = toChildren.length;
+					if (length > 0) {
+						var fromChildren = from.childNodes;
+						for (var i = 0; i < length; i++) {
+							copyKeys(fromChildren[i], toChildren[i]);
+						}
+					}
+				}
+
+				var e = SecureObject.getRaw(this, prototype);
+				var root = e.cloneNode(deep);
+
+				// Maintain the same ownership in the cloned subtree
+				copyKeys(e, root);
+
+				return SecureElement(root, ls_getKey(this));
+			}
+		},
+
+		textContent : {
+			get : function() {
+				return SecureObject.getRaw(this.cloneNode(true), prototype).textContent;
+			},
+			set : function(value) {
+				var raw = SecureObject.getRaw(this, prototype);
+				if (SecureElement.isSharedElement(raw)) {
+					throw new $A.auraError("SecureElement.textContent cannot be used with " + raw.tagName + " elements!");
+				}
+
+				value = SecureObject.unfilterEverything(this, value);
+
+				raw.textContent = value;
+
+				trustChildNodes(this, raw);
+			}
+		},
+
+        getAttribute: SecureElement.createAttributeAccessMethodConfig("getAttribute", prototype, caseInsensitiveAttributes),
+        getAttributeNS: SecureElement.createAttributeAccessMethodConfig("getAttributeNS", prototype, caseInsensitiveAttributes, true),
+        
+        setAttribute: SecureElement.createAttributeAccessMethodConfig("setAttribute", prototype, caseInsensitiveAttributes),
+        setAttributeNS: SecureElement.createAttributeAccessMethodConfig("setAttributeNS", prototype, caseInsensitiveAttributes, true)
+	});
+};
+
+SecureElement.createAttributeAccessMethodConfig = function(methodName, prototype, caseInsensitiveAttributes, namespaced) {
+	return {
+    	value: function() {
+			var raw = SecureObject.getRaw(this, prototype);
+    		var args = SecureObject.ArrayPrototypeSlice.call(arguments);
+    		
+    		var name = args[namespaced ? 1 : 0];
+    		validateAttributeName(this, raw, name, prototype, caseInsensitiveAttributes);
+
+    		return raw[methodName].apply(raw, args);
+    	}
+    };
+};
 
 SecureElement.addEventTargetMethods = function(se, raw, key) {
 	Object.defineProperties(se, {

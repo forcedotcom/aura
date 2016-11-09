@@ -304,6 +304,29 @@
             this.assertCmpElemValues(component, 1000, "100,000%");
         }]
     },
+    
+    /**
+     * Test shortcut should work for decimal value when update on input
+     */
+    testShortcutWithDecimalUpdateOnInput : {
+    	attributes: { updateOn: "input" },
+    	test : [function(component) {
+    		this.inputValue(component, ".");
+    		$A.test.assertEquals(".", component.getElement().value, "Unexpected input value");
+    	}, function(component) {
+            var existingInputVal = component.getElement().value;
+    		this.inputValue(component, existingInputVal + "1");
+    		$A.test.assertEquals(".1", component.getElement().value, "Unexpected input value");
+    	}, function(component) {
+    		var existingInputVal = component.getElement().value;
+    		this.inputValue(component, existingInputVal + "m");
+    		$A.test.assertEquals(".1m", component.getElement().value, "Unexpected input value");
+    	},function(component) {
+    		this.triggerUpdateCmpElmValues(component);
+    	}, function(component) {
+    		this.assertCmpElemValues(component, 1000, "100,000%");
+    	}]
+    },
 
     /**
      * Test shortcut should still work follow after the decimal mark

@@ -85,6 +85,17 @@
             this.assertEventFired(cmp, 'paste', 1);
         }]
     },
+    
+    testInputPercentHandleUpdate : {
+    	attributes: {testInputCmp: "inputPercent"},
+    	test: [function(cmp) {	
+    		this.inputValue("12345");
+    	}, function(cmp) {
+    		this.triggerUpdateCmpElmValues();
+    	}, function(cmp) {
+    		this.assertCmpElemValues(cmp, 123.45, "12,345%");
+    	}]
+    },
 
     /**********************
      * Helper Functions
@@ -93,11 +104,35 @@
     getInputElement: function (cmp) {
         return $A.test.select('input')[0];
     },
+    
+    // set element value and fire appropriate events to simulate what happens
+    // when user types in input box
+    inputValue: function(value) {
+        var inputElm = this.getInputElement();
+        inputElm.value = value;
+        $A.test.fireDomEvent(inputElm, "input");
+    },
+    
+    // fire blur event to update v.value and format elem value
+    triggerUpdateCmpElmValues: function() {
+        var inputElm = this.getInputElement();
+        $A.test.fireDomEvent(inputElm, "change");
+        $A.test.fireDomEvent(inputElm, "blur");
+    },
 
+    // check correct events were fired the correct number of times
     assertEventFired: function (cmp, eventName, eventCounter) {
         $A.test.assertEquals(eventName, cmp.get('v.eventFired').getName(),
                 'The last fired event was ' + eventName);
         $A.test.assertEquals(eventCounter, cmp.get('v.eventList').length,
                 'The event counter doesn\'t match');
+    },
+    
+    // check component's internal v.value and displayed value on the input box
+    assertCmpElemValues: function (component, expectedCmpVal, expectedElemVal) {
+        $A.test.assertEquals(expectedCmpVal, component.find("input").get("v.value"),
+                "Cmp value doesn't equal to expected");
+        $A.test.assertEquals(expectedElemVal, this.getInputElement().value,
+                "Element value is not displayed/formatted correctly.");
     }
 })

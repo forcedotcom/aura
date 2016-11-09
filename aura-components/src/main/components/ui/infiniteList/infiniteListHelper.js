@@ -434,16 +434,18 @@
      *
      */
     updateAttributes: function(row, isOpen) {
-    	var swipeBody = row.querySelector('.swipeBody');
-    	var classOp = isOpen ? $A.util.addClass.bind($A.util) : $A.util.removeClass.bind($A.util);
-    	
-    	// Update aria attributes on swipe body
-    	if (swipeBody) {
-    		swipeBody.setAttribute('aria-hidden', !isOpen);
+    	if (!$A.util.isUndefinedOrNull(row)) {
+    		var swipeBody = row.querySelector('.swipeBody');
+        	var classOp = isOpen ? $A.util.addClass.bind($A.util) : $A.util.removeClass.bind($A.util);
+        	
+        	// Update aria attributes on swipe body
+        	if (swipeBody) {
+        		swipeBody.setAttribute('aria-hidden', !isOpen);
+        	}
+        	
+        	// Add or remove classes on the row
+        	classOp(row, 'open');
     	}
-    	
-    	// Add or remove classes on the row
-    	classOp(row, 'open');
     },
 
     isBlocked: function (cmp) {

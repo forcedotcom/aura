@@ -440,7 +440,7 @@
             <dependency>
                 <groupId>com.salesforce</groupId>
                 <artifactId>omakase</artifactId>
-                <version>0.8.0</version>
+                <version>0.8.1</version>
             </dependency>
             <dependency>
                 <groupId>biz.aQute</groupId>

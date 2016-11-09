@@ -159,10 +159,37 @@
         	// cannot simulate an ESC or SHIFT+TAB key press which is the only
         	// valid case for when focus should be returned.
         	panelGlobalId = this.getGlobalIdForPanelModal(1);
-            panel = $A.getCmp(panelGlobalId);
-            panel.close(null, true);
+        	panel = $A.getCmp(panelGlobalId);
+        	panel.close(null, true);
         }, function(cmp) {         
             this.waitForPanelDialogClose();
+        }, function(cmp) {
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var activeElement = $A.test.getActiveElement();
+                return $A.util.hasClass(activeElement, "inputFocusMeClass");
+            }, "The focus me input should be focused after the panel is closed.");
+        }]
+    },
+    
+    testModalReturnFocusElementDoesFocusOnClose: {
+        test: [function(cmp) {
+        	cmp.set('v.testReturnFocusElement', $A.test.getElementByClass('inputFocusMeClass')[0]);
+            
+        	// Set the focus to a different element before opening the panel.
+        	$A.test.getElementByClass('inputDoNotFocusMeClass')[0].focus();
+        }, function(cmp) {
+            this.createPanel(cmp);
+        }, function(cmp) {
+            this.waitForModalOpen()
+        }, function(cmp) {	
+        	// We must programmatically close the panel and force it to return focus because we
+        	// cannot simulate an ESC or SHIFT+TAB key press which is the only
+        	// valid case for when focus should be returned.
+        	panelGlobalId = this.getGlobalIdForPanelModal(1);
+        	panel = $A.getCmp(panelGlobalId);
+        	panel.close(null, true);
+        }, function(cmp) {         
+            this.waitForModalClose();
         }, function(cmp) {
             $A.test.addWaitForWithFailureMessage(true, function() {
                 var activeElement = $A.test.getActiveElement();
@@ -185,10 +212,31 @@
             this.waitForPanelDialogOpen()
         }, function(cmp) {	        	
         	panelGlobalId = this.getGlobalIdForPanelModal(1);
-            panel = $A.getCmp(panelGlobalId);
-            panel.close(null, false);
+        	panel = $A.getCmp(panelGlobalId);
+        	panel.close(null, false);
         }, function(cmp) {         
             this.waitForPanelDialogClose();
+        }, function(cmp) {
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var activeElement = $A.test.getActiveElement();
+                return !$A.util.hasClass(activeElement, "inputFocusMeClass");
+            }, "The focus me input should NOT be focused after the panel is closed.");
+        }]
+    },
+    
+    testModalReturnFocusElementDoesNotFocusOnClose: {
+        test: [function(cmp) {        	
+        	cmp.set('v.testReturnFocusElement', $A.test.getElementByClass('inputFocusMeClass')[0]);
+        }, function(cmp) {
+            this.createPanel(cmp);
+        }, function(cmp) {
+        	this.waitForModalOpen()
+        }, function(cmp) {	        	
+        	panelGlobalId = this.getGlobalIdForPanelModal(1);
+        	panel = $A.getCmp(panelGlobalId);
+        	panel.close(null, false);
+        }, function(cmp) {         
+        	 this.waitForModalClose();
         }, function(cmp) {
             $A.test.addWaitForWithFailureMessage(true, function() {
                 var activeElement = $A.test.getActiveElement();
@@ -214,10 +262,36 @@
         	// cannot simulate an ESC or SHIFT+TAB key press which is the only
         	// valid case for when focus should be returned.
         	panelGlobalId = this.getGlobalIdForPanelModal(1);
-            panel = $A.getCmp(panelGlobalId);
-            panel.close(null, true);
+        	panel = $A.getCmp(panelGlobalId);
+        	panel.close(null, true);
         }, function(cmp) {         
             this.waitForPanelDialogClose();
+        }, function(cmp) {
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var activeElement = $A.test.getActiveElement();
+                return $A.util.hasClass(activeElement, "inputFocusMeClass");
+            }, "The focus me input should be focused after the panel is closed.");
+        }]
+    },
+    
+    testModalReturnFocusDefaultBehaviorOnClose: {
+    	attributes : {"testAutoFocus": true },
+        test: [function(cmp) {
+        	// Set the focus before opening the panel.
+        	$A.test.getElementByClass('inputFocusMeClass')[0].focus();
+        }, function(cmp) {
+            this.createPanel(cmp);
+        }, function(cmp) {
+            this.waitForModalOpen()
+        }, function(cmp) {	        	
+        	// We must programmatically close the panel and force it to return focus because we
+        	// cannot simulate an ESC or SHIFT+TAB key press which is the only
+        	// valid case for when focus should be returned.
+        	panelGlobalId = this.getGlobalIdForPanelModal(1);
+        	panel = $A.getCmp(panelGlobalId);
+        	panel.close(null, true);
+        }, function(cmp) {         
+            this.waitForModalClose();
         }, function(cmp) {
             $A.test.addWaitForWithFailureMessage(true, function() {
                 var activeElement = $A.test.getActiveElement();

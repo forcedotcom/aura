@@ -91,7 +91,6 @@
 		trapFocus="{!v.testTrapFocus}"
 		closeOnLocationChange="{!v.testCloseOnLocationChange}"
 		returnFocusElement="{!v.testReturnFocusElement}"/>
-	/>
 	
 	 <section class="managerContainers">
     <div class="manager">

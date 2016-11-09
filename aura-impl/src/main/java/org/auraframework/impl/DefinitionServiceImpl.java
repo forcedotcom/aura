@@ -908,7 +908,7 @@ public class DefinitionServiceImpl implements DefinitionService {
     /**
      * Creates a key for the global {@link #depsCache}, using UID, type, and FQN.
      */
-    private String makeGlobalKey(String uid, @Nonnull DefDescriptor<?> descriptor) {
+    public String makeGlobalKey(String uid, @Nonnull DefDescriptor<?> descriptor) {
         return uid + "/" + makeLocalKey(descriptor);
     }
 

@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.cache.Cache;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -32,6 +33,7 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.DefinitionAccessImpl;
+import org.auraframework.impl.DefinitionServiceImpl;
 import org.auraframework.impl.context.AbstractRegistryAdapterImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefFactoryImpl;
@@ -42,6 +44,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
@@ -49,6 +52,7 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
@@ -857,6 +861,36 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 definitionService.find(new DescriptorFilter("css://" + appWithCss.getDescriptorName())).size());
         assertEquals("find() is finding non-existent CSS", 0,
                 definitionService.find(new DescriptorFilter("css://*:doesntexist")).size());
+    }
+    
+    /**
+     * Test for W-3458425: checks DependencyEntry (DE) is added to the depsCache even if already in defsCache
+     */
+    @ThreadHostileTest("checking the state of caches")
+    @Test
+    public void testDependencyCaching() throws Exception {
+        // problem was that compileDE was not adding the DE to depsCache when the definition was alredy in defsCache
+        
+        DefinitionServiceImpl definitionServiceImpl = (DefinitionServiceImpl)definitionService;
+        contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, laxSecurityApp);
+        DefDescriptor<?> descriptor = definitionService.getDefDescriptor("markup://ui:button", ComponentDef.class);
+        Cache<String, DependencyEntry> depsCache = definitionServiceImpl.getCachingService().getDepsCache();
+        
+        // first call to perform side effect of adding definition to defsCache
+        String uid = definitionService.getUid(null, descriptor);
+        String key = definitionServiceImpl.makeGlobalKey(uid, descriptor);
+        assertNotNull("DE should have been in depsCache", depsCache.getIfPresent(key));
+        
+        // remove DE from depsCache
+        depsCache.invalidateAll();
+        assertNull("DE shouldn't be in depsCache", depsCache.getIfPresent(key));
+        
+        // start new context to make sure DE is not found in "context.getLocalDependencyEntry()"
+        contextService.endContext();
+        contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, laxSecurityApp);
+        // perform another getUid()->compileDE() and verify DE is put in depsCache even though definition is already in defsCache
+        definitionService.getUid(uid, descriptor);
+        assertNotNull("DE should be back in depsCache", depsCache.getIfPresent(key));
     }
 
     public static class AuraTestRegistryProviderWithNulls extends AbstractRegistryAdapterImpl {

@@ -28,7 +28,7 @@ import org.openqa.selenium.By;
 
 public class AppCacheUITest extends WebDriverTestCase {
 
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IE10, BrowserType.IE11})
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IE7, BrowserType.IE8, BrowserType.IE9, BrowserType.IE10, BrowserType.IE11 })
     @Test
     public void testAppcacheIsEnabled() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,

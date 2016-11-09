@@ -1122,6 +1122,29 @@ Test.Aura.Storage.AuraStorageTest = function() {
 
             Assert.Equal(0, firedEvents.length);
         }
+
+        [Fact]
+        function AdapterSweepLogsStats() {
+            var actual = false;
+
+            var config = makeConfigAndAdapter();
+            config.expiration = 1;
+            config.adapterClass.prototype.sweep = function() {
+                return ResolvePromise();
+            };
+
+            mockTime(function() { mockA(function() {
+                time = 0;
+                var target = new Aura.Storage.AuraStorage(config);
+                target.logStats = function() {
+                    actual = true;
+                }
+
+                target.sweep(true);
+            }); });
+
+            Assert.True(actual);
+        }
     }
 
 

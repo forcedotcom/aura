@@ -774,7 +774,7 @@ IndexedDBAdapter.prototype.encodeStorable = function(tuple) {
  */
 IndexedDBAdapter.prototype.log = function (level, msg, obj) {
     if (this.debugLogging || level.id >= IndexedDBAdapter.LOG_LEVEL.WARNING.id) {
-        $A[level.fn]("IndexedDBAdapter '"+this.instanceName+"' "+msg, obj);
+        $A[level.fn]("IndexedDBAdapter['"+this.instanceName+"'] "+msg, obj);
     }
 };
 

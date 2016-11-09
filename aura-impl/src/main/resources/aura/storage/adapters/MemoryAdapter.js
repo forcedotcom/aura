@@ -284,7 +284,7 @@ MemoryAdapter.prototype.getMRU = function() {
  */
 MemoryAdapter.prototype.log = function (level, msg, obj) {
     if (this.debugLogging || level.id >= MemoryAdapter.LOG_LEVEL.WARNING.id) {
-        $A[level.fn]("MemoryAdapter '"+this.instanceName+"' "+msg, obj);
+        $A[level.fn]("MemoryAdapter['"+this.instanceName+"'] "+msg, obj);
     }
 };
 

@@ -18,6 +18,7 @@
 <aura:component extensible="true" extends="ui:abstractDataGrid" support="PROTO" description="Represents a table containing dynamic rows of data with inline edit support">
 	<aura:attribute name="summary" type="String"/>
 	<aura:attribute name="useRowHeaders" type="Boolean" default="false" description="Makes the first column of each row a header cell"/>
+	<aura:attribute name="devNameOrId" type="String" description="Id or alias for the virtual list" />
 
 	<aura:registerevent name="updateRowAttributes" type="ui:updateGridRow"/>
 
@@ -25,6 +26,11 @@
 	<aura:handler name="updateRowAttributes" action="{!c.handleUpdateRowAttrs}"/>
 	<aura:handler name="change" value="{!v.items}" action="{!c.handleItemsChange}" description="This lives here due to a bug in value objects."/>
 	<aura:handler name="change" value="{!v.columns}" action="{!c.handleColumnsChange}"/>
+
+
+	<aura:locator target="*" alias="data-grid-columns-content" description="Content in data grid columns">
+		<aura:locatorContext key="devNameOrId" value="{!v.devNameOrId}"/>
+	</aura:locator>
 
 	<!-- 
 	 ~ Default implementation is a table. Consider moving this logic to ui:dataTable 

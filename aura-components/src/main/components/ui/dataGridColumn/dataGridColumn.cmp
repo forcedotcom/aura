@@ -31,7 +31,6 @@
 	<aura:attribute name="order" type="Integer" default="0" description="The ordering of the sort (non-zero applies to multilevel sort only)."/>
 	<aura:attribute name="scope" type="String" default="col" description="{ col, row, colgroup, rowgroup }"/>
     <aura:attribute name="onsortchange" type="Aura.Action"/>
-    
     <aura:attribute name="assistiveSortText" type="String" default="Sort" description="Accessibility label for sort trigger links"/>
 	
 	<aura:attribute name="width" type="Integer" default="-1" description="Fixed width of the column in pixels."/>
@@ -46,7 +45,11 @@
 	
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 	<aura:handler name="change" value="{!v.disabled}" action="{!c.handleDisabledChange}"/>
-	
+
+	<aura:locator target="link" alias="sortable-link" description="Link to trigger sorting" >
+        <aura:locatorContext key="label" value="{!v.label}"/>
+    </aura:locator>
+
 	<!-- Currently works only for output components -->
 	<aura:handler name="change" value="{!v.name}" action="{!c.updateNameRef}" description="Handles a change to the name attribute by updating the wiring between the component and the name attribute."/>
 	
@@ -55,7 +58,7 @@
         <aura:if isTrue="{! v.body.length == 0 }">
             <!-- Conditionally insert link for column sorting. -->
             <aura:if isTrue="{!v.sortable}">
-                <a class="{! 'toggle ' + (v.disabled ? 'disabled' : '')}" onclick="{!c.handleClick}">
+                <a auar:id="link" class="{! 'toggle ' + (v.disabled ? 'disabled' : '')}" onclick="{!c.handleClick}">
                     <span class="assistiveText">{! (v.disabled ? '' : v.assistiveSortText) + ' '
                                                     + (v.hideLabel ? v.label : '') } </span>
                     {!(!v.hideLabel) ? v.label : ''}

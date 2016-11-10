@@ -42,9 +42,14 @@
     <aura:attribute name="showListFooter" access="PRIVILEGED" type="Boolean" default="true" description="Indicates whether the listFooter is visible. The default is true."/>
     <aura:attribute name="setDefaultHighlight" access="PRIVILEGED" type="boolean" default="true" description="Indicates whether the first option item should be highlighted by default. The default is true."/>
     <aura:attribute name="listReferenceComponent" type="Aura.Component[]" description="Sets the component that the lookup menu is displayed under."/>
+    <aura:attribute name="devNameOrId" type="String" description="Id or alias for the autocomplete." />
 
     <aura:handler name="change" value="{!v.listReferenceComponent}" action="{!c.referenceElementChange}"/>
     <!-- END - the following attributes are only used when using the default list -->
+
+    <aura:locator target="*" alias="autocomplete-content" description="Content in autocomplete">
+        <aura:locatorContext key="devNameOrId" value="{!v.devNameOrId}"/>
+    </aura:locator>
 
     <aura:attribute name="autocompleteList" type="Aura.Component[]" description="Custom list definition. Can be used to replace the default list."/>
 

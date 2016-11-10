@@ -41,23 +41,22 @@
 
     <aura:attribute name="tabIndex" type="Integer" access="INTERNAL" description="The tab index for the trigger, REQUIRED if the trigger is focus and there are no focusable elements in the body"/>
     <aura:attribute name="tabIndexOverride" type="Integer" access="INTERNAL" description="The tab index override "/>
-
     <aura:attribute name="disableFocusTrigger" type="Integer" access="INTERNAL" description="Disabled the focus trigger on the root element. Child focusable elements are not affected"/>
-    
-
-     <aura:attribute name="direction" type="String" access="INTERNAL" default="north" description="The direction in which the tooltip should go. Valid values are &quot;north&quot;, &quot;south&quot;, &quot;west&quot;, and &quot;east&quot;. The default is &quot;north&quot;."/>
-
-     <aura:attribute name="allowFlips" default="true" type="Boolean" access="INTERNAL" description="If true the tooltip will change direction automatically when needed to stay in the viewport"/>
-   
-     <aura:attribute name="domId" type="String" access="INTERNAL" description="DOM id of the input element. By default, this attribute resolved to the globalId of the component to avoid id collision." />
-
-     <aura:attribute name="boundingElementSelector" type="String" access="INTERNAL" description="The element to keep the tooltip inside (advanced only)" />
+    <aura:attribute name="direction" type="String" access="INTERNAL" default="north" description="The direction in which the tooltip should go. Valid values are &quot;north&quot;, &quot;south&quot;, &quot;west&quot;, and &quot;east&quot;. The default is &quot;north&quot;."/>
+    <aura:attribute name="allowFlips" default="true" type="Boolean" access="INTERNAL" description="If true the tooltip will change direction automatically when needed to stay in the viewport"/>
+    <aura:attribute name="domId" type="String" access="INTERNAL" description="DOM id of the input element. By default, this attribute resolved to the globalId of the component to avoid id collision." />
+    <aura:attribute name="boundingElementSelector" type="String" access="INTERNAL" description="The element to keep the tooltip inside (advanced only)" />
+    <aura:attribute name="devNameOrId" type="String" description="Id or alias for the autocomplete." />
 
     <aura:method name="show"/>
     <aura:method name="hide"/>
 
     <aura:handler name="change" value="{!v.tooltipBody}" action="{!c.handleBodyChange}"/>
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <aura:locator target="*" alias="tooltip-content" description="Content in tooltip">
+        <aura:locatorContext key="devNameOrId" value="{!v.devNameOrId}"/>
+    </aura:locator>
 
     <aura:dependency resource="markup://ui:tooltipAdvanced" type="COMPONENT"/>
     <aura:if isTrue="{!v.advanced}">

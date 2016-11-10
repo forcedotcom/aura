@@ -199,6 +199,19 @@
 	},
 
 	/**
+	 * Converts all html to entities
+	 * for XSS protection W-3351001
+	 */
+	_HTMLEntities: function(str) {
+		var ret;
+		var cleanerEl = document.createElement('div');
+		cleanerEl.innerText = str;
+		ret = cleanerEl.innerHTML;
+		cleanerEl = null; //explicitly derefrence so element is collected after use
+		return ret;
+	},
+
+	/**
 	 * Main config method that creates CKEditor config object
 	 * Called from renderer and controller (toggle)
 	 * Returns a config object
@@ -210,9 +223,8 @@
 			height = cmp.get('v.height'),
 			toolbarLocation = cmp.get('v.toolbarLocation'),
 			placeholder = cmp.get("v.placeholder"),
-            extraAllowedContent = this.getExtraAllowedContent(),
-			label = cmp.get('v.label');
-
+			extraAllowedContent = this.getExtraAllowedContent(),
+			label = this._HTMLEntities(cmp.get('v.label'));
 
 		var config = {
 				language : locale,

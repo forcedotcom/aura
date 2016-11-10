@@ -339,7 +339,7 @@ public class AuraTestingUtil {
     public String buildContextForPost(Mode mode, DefDescriptor<? extends BaseComponentDef> app, String appUid,
             String fwuid, Map<DefDescriptor<?>, String> extraLoaded, List<String> dn) throws QuickFixException {
         StringBuffer sb = new StringBuffer();
-        JsonEncoder json = new JsonEncoder(sb, false, false);
+        JsonEncoder json = new JsonEncoder(sb, false);
         Map<String, String> loaded = Maps.newHashMap();
 
         if (appUid == null) {

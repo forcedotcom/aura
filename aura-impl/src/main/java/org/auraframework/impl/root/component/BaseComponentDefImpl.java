@@ -49,7 +49,6 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.FlavoredStyleDef;
-import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LibraryDefRef;
@@ -64,7 +63,6 @@ import org.auraframework.def.ResourceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.TokensDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.DefinitionAccessImpl;
@@ -134,8 +132,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     private final List<ClientLibraryDef> clientLibraries;
     private final Map<String, LocatorDef> locatorDefs;
 
-    private final List<DefDescriptor<TokensDef>> tokenOverrides;
-    private final DefDescriptor<FlavorsDef> flavorOverrides;
     private final String defaultFlavor;
     private final boolean hasFlavorableChild;
     private final boolean dynamicallyFlavorable;
@@ -174,8 +170,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.whitespaceBehavior = builder.whitespaceBehavior;
         this.designDefDescriptor = builder.designDefDescriptor;
         this.svgDefDescriptor = builder.svgDefDescriptor;
-        this.tokenOverrides = AuraUtil.immutableList(builder.tokenOverrides);
-        this.flavorOverrides = builder.flavorOverrides;
         this.defaultFlavor = builder.defaultFlavor;
         this.hasFlavorableChild = builder.hasFlavorableChild;
         this.dynamicallyFlavorable = builder.dynamicallyFlavorable;
@@ -622,14 +616,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             }
         }
 
-        if (tokenOverrides != null) {
-            dependencies.addAll(tokenOverrides);
-        }
-
-        if (flavorOverrides != null) {
-            dependencies.add(flavorOverrides);
-        }
-
         for (DependencyDef dep : this.dependencies) {
             dep.appendDependencies(dependencies);
         }
@@ -1050,10 +1036,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     json.writeMapEntry("subDefs", subDefs.values());
                 }
 
-                if (flavorOverrides != null) {
-                    json.writeMapEntry("flavorOverrides", flavorOverrides.getDef());
-                }
-
                 String defaultFlavorToSerialize = getDefaultFlavorOrImplicit();
                 if (defaultFlavorToSerialize != null) {
                     json.writeMapEntry("defaultFlavor", defaultFlavorToSerialize);
@@ -1285,27 +1267,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     @Override
-    public List<DefDescriptor<TokensDef>> getTokenOverrides() throws QuickFixException{
-        List<DefDescriptor<TokensDef>> tokens=new ArrayList<>();
-        if(extendsDescriptor!=null){
-            tokens.addAll(extendsDescriptor.getDef().getTokenOverrides());
-        }
-        tokens.addAll(tokenOverrides);
-        return tokens;
-    }
-
-    @Override
-    public DefDescriptor<FlavorsDef> getFlavorOverrides() throws QuickFixException {
-        if (flavorOverrides != null) {
-            return flavorOverrides;
-        }
-        if (extendsDescriptor != null) {
-            return extendsDescriptor.getDef().getFlavorOverrides();
-        }
-        return null;
-    }
-
-    @Override
     public String getDefaultFlavorOrImplicit() throws QuickFixException {
         if (defaultFlavor == null
                 && flavoredStyleDescriptor != null
@@ -1398,8 +1359,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         public List<DependencyDef> dependencies;
         public List<ClientLibraryDef> clientLibraries;
         private RenderType renderType;
-        private List<DefDescriptor<TokensDef>> tokenOverrides;
-        private DefDescriptor<FlavorsDef> flavorOverrides;
+
         private String defaultFlavor;
         private boolean hasFlavorableChild;
         private boolean dynamicallyFlavorable;
@@ -1569,32 +1529,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         @Override
-        public BaseComponentDefBuilder<T> setTokenOverrides(String tokenOverrides) {
-            if (this.tokenOverrides == null) {
-                this.tokenOverrides = new ArrayList<>();
-            }
-            for (String name : Splitter.on(',').trimResults().omitEmptyStrings().split(tokenOverrides)) {
-                this.tokenOverrides.add(Aura.getDefinitionService().getDefDescriptor(name, TokensDef.class));
-            }
-            return this;
-        }
-
-        @Override
-        public BaseComponentDefBuilder<T> setTokenOverride(DefDescriptor<TokensDef> tokenOverride) {
-            if (this.tokenOverrides == null) {
-                this.tokenOverrides = new ArrayList<>();
-            }
-            this.tokenOverrides.add(tokenOverride);
-            return this;
-        }
-
-        @Override
-        public BaseComponentDefBuilder<T> setFlavorOverrides(DefDescriptor<FlavorsDef> flavorOverrides) {
-            this.flavorOverrides = flavorOverrides;
-            return this;
-        }
-
-        @Override
         public Builder<T> setDefaultFlavor(String defaultFlavor) {
             this.defaultFlavor = defaultFlavor;
             return this;
@@ -1712,9 +1646,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
         if (documentationDescriptor != null) {
             ret.add(documentationDescriptor);
-        }
-        if (flavorOverrides != null) {
-            ret.add(flavorOverrides);
         }
         return ret;
     }

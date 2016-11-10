@@ -28,17 +28,15 @@ import org.auraframework.ds.servicecomponent.ModelInitializationException;
 import org.auraframework.impl.java.model.JavaModel;
 import org.auraframework.impl.java.model.JavaModelDefImpl;
 import org.auraframework.instance.InstanceBuilder;
+import org.auraframework.instance.InstanceBuilderProvider;
 import org.auraframework.instance.Model;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 @ServiceComponent
-public class ModelInstanceBuilder implements InstanceBuilder<Model, ModelDef>, ApplicationContextAware {
+public class ModelInstanceBuilder implements InstanceBuilder<Model, ModelDef> {
 
     @Inject
     private ContextService contextService;
@@ -46,7 +44,8 @@ public class ModelInstanceBuilder implements InstanceBuilder<Model, ModelDef>, A
     @Inject
     private LoggingService loggingService;
 
-    private ApplicationContext applicationContext;
+    @Inject
+    private InstanceBuilderProvider instanceBuilderProvider;
 
     @Override
     public Class<?> getDefinitionClass() {
@@ -68,7 +67,7 @@ public class ModelInstanceBuilder implements InstanceBuilder<Model, ModelDef>, A
                         .forName(modelFactoryClassName);
                 Object instance;
                 try {
-                    instance = applicationContext.getBean(modelFactoryClass);
+                    instance = instanceBuilderProvider.get(modelFactoryClass);
                 } catch (Throwable t) {
                     throw new AuraRuntimeException(
                             "Failed to retreive model instance for " + modelDef.getDescriptor(), t);
@@ -90,10 +89,5 @@ public class ModelInstanceBuilder implements InstanceBuilder<Model, ModelDef>, A
         }
 
         return new JavaModel((JavaModelDefImpl) modelDef, bean, contextService, loggingService);
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 }

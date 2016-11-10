@@ -161,7 +161,7 @@ SecureObject.filterEverything = function(st, raw, options) {
 				mutated = true;
 				ls_setRef(swallowed, raw, key);
 
-				for ( var name in raw) {
+				for (var name in raw) {
 					if (typeof raw[name] === "function") {
 						Object.defineProperty(swallowed, name, SecureObject.createFilteredMethod(swallowed, raw, name, {
 							filterOpaque : true
@@ -577,6 +577,8 @@ function getSupportedInterfaces(o) {
 		}
 
 		interfaces.push("Element", "Node", "EventTarget");
+	} else if (o instanceof Text) {
+		interfaces.push("Text", "CharacterData", "Node");
 	}
 
 	return interfaces;

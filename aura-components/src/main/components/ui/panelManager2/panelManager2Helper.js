@@ -211,6 +211,11 @@
             panel             = panelObj.panel,
             index             = stack.indexOf(panel);
 
+        // shouldReturnFocus should default to true if it is not explicitly passed in.
+        if ($A.util.isUndefinedOrNull(shouldReturnFocus)) {
+            shouldReturnFocus = true;
+        } 
+
         $A.assert(panelObj, 'Couldnt find instance to destroy');
         $A.assert(index > -1, 'Couldnt find the reference in the stack');
 
@@ -221,21 +226,22 @@
         delete this.PANELS_OWNER[panelId];
         delete this.PANELS_INSTANCE[panelId];
         
-        if (shouldReturnFocus === true && cmp.returnFocus) {
-            cmp.returnFocus.focus();
-            cmp.returnFocus = null;
-        }
-
         // Notify the destroy
         config.onDestroy && config.onDestroy();
         if (panelObj.destroyCallback) {
             panelObj.destroyCallback(panelId);
         }
-
+        
         if (doActivateNext !== false) {
             this.activateNextPanel(cmp);
         }
-
+        
+        // Set the return focus. This has to happen after activating the next panel (above), otherwise activate will steal the focus.
+        if (shouldReturnFocus === true && cmp.returnFocus) {
+            cmp.returnFocus.focus();
+            cmp.returnFocus = null;
+        }
+        
         // this will happen if a panel is destroyed
         // without being closed first
         

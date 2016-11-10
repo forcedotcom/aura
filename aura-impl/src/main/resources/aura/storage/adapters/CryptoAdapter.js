@@ -602,7 +602,7 @@ CryptoAdapter.prototype.isPersistent = function() {
  */
 CryptoAdapter.prototype.log = function (level, msg, obj) {
     if (this.debugLogging || level.id >= CryptoAdapter.LOG_LEVEL.WARNING.id) {
-        $A[level.fn]("CryptoAdapter '"+this.instanceName+"' "+msg, obj);
+        $A[level.fn]("CryptoAdapter['"+this.instanceName+"']"+msg, obj);
     }
 };
 

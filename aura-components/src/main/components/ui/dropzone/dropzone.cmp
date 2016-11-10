@@ -27,8 +27,7 @@
 	<aura:attribute name="dragOverAccessibilityClass" type="String" default="" description="Additional CSS style to be attached to this component while it's being dragged over in accessibility mode. It's defaulted to dragOverClass attribute if it's unspecified."/>
 	
 	<aura:attribute name="label" type="String" description="Label for this component. It's primarily used for accessibility."/>
-	<aura:attribute name="ariaDropEffect" type="String" default="none" description="Indicate what operation this component is capable of receiving."/>
-	
+
 	<aura:registerEvent name="dragEnter" type="ui:dragEvent" description="Event fired when a dragged component enters this drop target."/>
 	<aura:registerEvent name="dragOver" type="ui:dragEvent" description="Event fired when a dragged component is hovered over this drop target."/>
 	<aura:registerEvent name="dragLeave" type="ui:dragEvent" description="Event fired when a dragged component leaves this drop target."/>
@@ -53,7 +52,7 @@
 		<aura:attribute name="isInAccessibilityMode" type="Boolean" default="true" description="Set to true if drag and drop operation is initiated in accessibility mode, i.e. through keyboard interaction."/>
 	</aura:method>
 	
-	<div aria-dropeffect="{!v.ariaDropEffect}" class="{!v.class}"
+	<div class="{!v.class}"
 		 ondragenter="{!c.handleDragEnter}" ondragover="{!c.handleDragOver}" ondragleave="{!c.handleDragLeave}" ondrop="{!c.handleDrop}">
 		{!v.body}
 	</div>

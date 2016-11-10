@@ -49,10 +49,16 @@
             cmp.testAuraMethod();
         }
     },
-    
+
     testAddHandler: {
         test: function(cmp) {
             cmp.testAddHandler();
+        }
+    },
+
+    testAddValueHandler: {
+        test: function(cmp) {
+            cmp.testAddValueHandler();
         }
     }
 })

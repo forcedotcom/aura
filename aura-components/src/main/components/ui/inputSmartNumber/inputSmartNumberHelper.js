@@ -136,8 +136,25 @@
 
         cmp.set('v.inputValue', newInputValue);
     },
+    convertInputValueToInternalValue : function (cmp) {
+        var lib        = this.inputNumberLibrary.number;
+        var formatter  = cmp.get("v.format");
+        var inputValue = cmp.get("v.inputValue");
+        return this.getUnScaledValue(cmp, lib.unFormatNumber(inputValue, formatter));
+    },
     getScaledValue : function (cmp) {
+        // number.js's formatNumber handles %, so no need to worry about it here
         return  Number(cmp.get('v.value') + 'e' + cmp.get('v.valueScale'));
+    },
+    getUnScaledValue : function (cmp, inputValue) {
+        var valueScale = cmp.get('v.valueScale');
+        if (this.isPercentStyle(cmp)) {
+            // is cmp is implementing percent, it should convert value back base on the scale
+            // .5 is 50% => scale 0 == -2 in back operation
+            return Number(inputValue + 'e' + (-valueScale - 2));
+        } else {
+            return Number(inputValue + 'e' + (-valueScale));
+        }
     },
     updateLastInputValue : function (cmp) {
         cmp.set('v.lastInputValue',cmp.get('v.inputValue'));
@@ -149,21 +166,12 @@
         return cmp.find("input").getElement();
     },
     setNewValue : function (cmp) {
-        var lib        = this.inputNumberLibrary.number;
-        var formatter  = cmp.get('v.format');
         var inputValue = cmp.get('v.inputValue');
-        var valueScale = cmp.get('v.valueScale');
-
         if (!inputValue.length) {
             this.setValueEmpty(cmp);
             return;
         }
-
-        var newValue = lib.unFormatNumber(inputValue, formatter);
-            // is cmp is implementing percent, it should convert value back base on the scale
-            // 'cause .5 is 50% => scale 0 == -2 in back operation.
-            newValue = this.isPercentStyle(cmp) ? Number(newValue + 'e' + (-valueScale - 2)) : newValue;
-
+        var newValue = this.convertInputValueToInternalValue(cmp);
         if (cmp.get('v.value') !== newValue) {
             cmp.set('v.value', newValue);
             this.fireChangeEvent(cmp);
@@ -173,11 +181,7 @@
         cmp.getEvent('change').fire();
     },
     hasChangedValue : function (cmp) {
-        var lib = this.inputNumberLibrary.number;
-        var formatter = cmp.get('v.format');
-        var inputValue = cmp.get('v.inputValue');
-
-        return String(lib.unFormatNumber(inputValue, formatter)) !== String(cmp.get('v.value'));
+        return String(this.convertInputValueToInternalValue(cmp)) !== String(cmp.get('v.value'));
     },
     removeSymbols : function (string) {
         var decimalSeparator  = $A.get("$Locale.decimal");

@@ -295,6 +295,23 @@ function SecureElement(el, key) {
 			};
 		}
 
+		// special handling for Text.splitText() instead of creating a new secure wrapper
+		if (tagName === "#text" && "splitText" in el) {
+			tagNameSpecificConfig["splitText"] = {
+					value: function(index) {
+						var raw = SecureObject.getRaw(this, prototype);
+						var newNode = raw.splitText(index);
+
+						var fromKey = ls_getKey(raw);
+						if (fromKey) {
+							ls_setKey(newNode, fromKey);
+						}
+
+						return SecureElement(newNode, ls_getKey(this));
+					}
+			};
+		}
+
 		SecureElement.createEventTargetMethodsStateless(tagNameSpecificConfig, prototype);
 
 		Object.defineProperties(prototype, tagNameSpecificConfig);
@@ -1295,6 +1312,28 @@ SecureElement.metadata = {
 			"setAttributeNode":               FUNCTION,
 			"setAttributeNodeNS":             FUNCTION,
 			"tagName":                        DEFAULT
+		},
+		"CharacterData": {
+			"after":                          FUNCTION,
+			"appendData":                     FUNCTION,
+			"before":                         FUNCTION,
+			"data":                           DEFAULT,
+			"deleteData":                     FUNCTION,
+			"insertData":                     FUNCTION,
+			"length":                         DEFAULT,
+			"nextElementSibling":             SKIP_OPAQUE,
+			"previousElementSibling":         SKIP_OPAQUE,
+			"remove":                         FUNCTION,
+			"replaceData":                    FUNCTION,
+			"replaceWith":                    FUNCTION,
+			"substringData":                  FUNCTION
+		},
+		"Text": {
+			"assignedSlot":                   DEFAULT,
+			"isElementContentWhitespace":     DEFAULT,
+			"replaceWholeText":               FUNCTION,
+			"splitText":                      FUNCTION,
+			"wholeText":                      DEFAULT
 		},
 		"Node": SecureElement.nodeMetadata,
 		"EventTarget": SecureElement.eventTargetMetadata

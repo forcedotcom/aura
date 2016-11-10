@@ -29,5 +29,11 @@
             }
         }
         return this.superAfterRender();
+    },
+
+    unrender: function (component, helper) {
+        helper.lib.interactive.removeDomEventsFromMap(component);
+        this.superUnrender();
     }
+
 })// eslint-disable-line semi

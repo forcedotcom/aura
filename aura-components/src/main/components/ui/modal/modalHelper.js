@@ -116,13 +116,13 @@
         return container;
     },
 
-    close: function (cmp, callback) {
+    close: function (cmp, callback, shouldReturnFocus) {
         cmp.hide(function () {
             if (cmp.isValid()) {
                 cmp.getEvent('notify').setParams({
                     action: 'destroyPanel',
                     typeOf: 'ui:destroyPanel',
-                    payload: {panelInstance: cmp.getGlobalId()}
+                    payload: {panelInstance: cmp.getGlobalId(), shouldReturnFocus: shouldReturnFocus}
                 }).fire();
             }
             if ($A.util.isFunction(callback)) {

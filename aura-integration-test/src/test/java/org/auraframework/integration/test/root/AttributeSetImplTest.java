@@ -176,7 +176,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
                         "<aura:attribute name='default' type='String' default='innie'/><aura:attribute name='both' type='String' default='outie' serializeTo='BOTH'/><aura:attribute name='server' type='String' default='lint' serializeTo='SERVER'/><aura:attribute name='none' type='String' default='holy' serializeTo='NONE'/>"));
         Component cmp = instanceService.getInstance(desc);
         Map<?, ?> attSet = (Map<?, ?>) new JsonReader().read(toJson(cmp.getAttributes()));
-        Map<?, ?> attSetValues = (Map<?, ?>) ((Map<?, ?>) attSet.get(Json.ApplicationKey.VALUE.toString())).get("values");
+        Map<?, ?> attSetValues = (Map<?, ?>) attSet.get("values");
         assertEquals(2, attSetValues.size());
         assertEquals("innie", attSetValues.get("default"));
         assertEquals("outie", attSetValues.get("both"));
@@ -190,7 +190,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
                         "<aura:attribute name='server' type='String' default='lint' serializeTo='SERVER'/><aura:attribute name='none' type='String' default='holy' serializeTo='NONE'/>"));
         cmp = instanceService.getInstance(desc);
         attSet = (Map<?, ?>) new JsonReader().read(toJson(cmp.getAttributes()));
-        attSetValues = (Map<?, ?>) ((Map<?, ?>) attSet.get(Json.ApplicationKey.VALUE.toString())).get("values");
+        attSetValues = (Map<?, ?>) attSet.get("values");
         assertEquals(0, attSetValues.size());
     }
 }

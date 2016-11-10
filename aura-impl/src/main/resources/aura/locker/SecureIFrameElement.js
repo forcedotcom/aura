@@ -45,6 +45,12 @@ function SecureIFrameElement(el, key) {
             }
         }
     });
+    
+    function validateAttributeName(name) {
+		if (name.toLowerCase() === "srcdoc") {
+			throw new $A.auraError("SecureIFrameElement does not permit setting the srcdoc attribute!");
+		}    	
+    }
 
     Object.defineProperties(o, {
         // Standard HTMLElement methods
@@ -54,6 +60,18 @@ function SecureIFrameElement(el, key) {
         contentWindow: {
         	get: function() {
         		return SecureIFrameContentWindow(el.contentWindow);
+        	}
+        },
+        setAttribute: {
+        	value: function(name, value) {
+        		validateAttributeName(name);
+        		el.setAttribute(name, value);
+        	}
+        },
+        setAttributeNS: {
+        	value: function(namespace, name, value) {
+        		validateAttributeName(name);
+        		el.setAttributeNS(namespace, name, value);
         	}
         }
     });

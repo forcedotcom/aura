@@ -171,6 +171,19 @@ public class ComponentController implements Controller {
         public String getFailedComponentMethod() {
             return this.methodName;
         }
+
+        public String getStackTraceIdGen() {
+            String[] traces = jsStack.split("\n");
+            StringBuilder sb = new StringBuilder();
+            for (String trace : traces) {
+                // remove domain and url parts except filename
+                trace = trace.replaceAll("https?://([^/]*/)+", "");
+                // remove line and column number
+                trace = trace.replaceAll(":[0-9]+:[0-9]+", "");
+                sb.append(trace+'\n');
+            }
+            return sb.toString();
+        }
     }
 
     @AuraEnabled

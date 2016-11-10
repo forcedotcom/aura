@@ -381,7 +381,7 @@ Logger.prototype.hasSubscriptions = function(level) {
 
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 /**
- * Prints log to both the console (if available), and to the aura debug component
+ * Prints log to the console (if available).
  * @private
  */
 Logger.prototype.devDebugConsoleLog = function(level, message, error) {
@@ -443,19 +443,6 @@ Logger.prototype.devDebugConsoleLog = function(level, message, error) {
                 console["log"](stringVersion);
             }
         }
-    }
-
-    // sending logging info to debug tool if enabled
-    if($A.util.getDebugToolComponent()) {
-        if (!stringVersion) {
-            if (!trace) {
-                trace = $A.logger.getStackTrace(error);
-            }
-            stringVersion = $A.logger.stringVersion(logMsg, error, trace);
-        }
-        var debugLogEvent = $A.util.getDebugToolsAuraInstance().get("e.aura:debugLog");
-        debugLogEvent.setParams({"type" : level, "message" : stringVersion});
-        debugLogEvent.fire();
     }
 };
 //#end

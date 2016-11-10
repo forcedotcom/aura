@@ -19,11 +19,18 @@
     <aura:attribute name="descriptor" type="String" required="true"/>
     <aura:attribute name="defType" type="String" default="Component"/>
 
-    <aura:iteration items="{!m.defs}" var="def">
-        <auradocs:editorPanel title="{!def.name+' source'}" descriptor="{!def.descriptor}" defType="{!def.defType}"/>
-    </aura:iteration>
+    <aura:if isTrue="{!m.error == null}">
+        <aura:iteration items="{!m.defs}" var="def">
+                <auradocs:editorPanel title="{!def.name+' source'}" descriptor="{!def.descriptor}" defType="{!def.defType}"/>
+            </aura:iteration>
 
-    <aura:iteration items="{!m.includeDefs}" var="def">
-        <auradocs:stretchEditorPanel title="{!def.includeDefName + '.js'}" descriptor="{!def.descriptor}" defType="{!def.defType}" includeDefName="{! def.includeDefName}"/>
-    </aura:iteration>
+            <aura:iteration items="{!m.includeDefs}" var="def">
+                <auradocs:stretchEditorPanel title="{!def.includeDefName + '.js'}" descriptor="{!def.descriptor}" defType="{!def.defType}" includeDefName="{! def.includeDefName}"/>
+            </aura:iteration>
+
+        <aura:set attribute="else">
+            <ui:message title="{!'Error when loading example for markup://' + v.descriptor}" severity="error">{!m.error}</ui:message>
+        </aura:set>
+    </aura:if>
+
 </aura:component>

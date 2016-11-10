@@ -39,7 +39,7 @@ function Component(config, localCreation) {
     this.inUnrender = false;
     this.localId = config["localId"];
     this.valueProviders = {};
-    this.eventDispatcher = undefined;
+    this.eventValueProvider = undefined;
     this.docLevelHandlers = undefined;
     this.references={};
     this.handlers = {};
@@ -505,7 +505,7 @@ Component.prototype.implementsDirectly = function(type) {
  * @platform
  */
 Component.prototype.addHandler = function(eventName, valueProvider, actionExpression, insert, phase, includeFacets) {
-    var dispatcher = this.getEventDispatcher(this);
+    var dispatcher = this.getEventDispatcher();
 
     if(!phase) {
         phase = "bubble";
@@ -1231,6 +1231,13 @@ Component.prototype.set = function(key, value, ignoreChanges) {
 
     var oldValue=valueProvider.get(subPath,this);
 
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    // Check if the previous value contains components
+    if ($A.util.isArray(oldValue) && oldValue.length && $A.util.isComponent(oldValue[0])) {
+        this.trackComponentReplacement(oldValue, key);
+    }
+    //#end
+
     var returnValue=valueProvider.set(subPath, value, this);
     if($A.util.isExpression(value)){
         value.addChangeHandler(this,key);
@@ -1247,6 +1254,54 @@ Component.prototype.set = function(key, value, ignoreChanges) {
     }
     return returnValue;
 };
+
+//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+/**
+ * Add a warning in the console if a list of components is not rendered by the end
+ * of the current event loop. This pattern usually lead to memory leaks.
+ * 
+ * @param {Component[]} prevComp The list of component that has been replaced
+ * @param {string} key The attribute key
+ */
+Component.prototype.trackComponentReplacement = function(prevCmps, key) {
+    // Filter valid and not rendered components 
+    var potentialLeak = []; 
+    for (var i = 0; i < prevCmps.length; i++) {
+        if (prevCmps[i].isValid() && !prevCmps[i].isRendered()) {
+            potentialLeak.push(prevCmps[i]);
+        }
+    }
+    
+    if (potentialLeak.length) {
+        var owner = this;
+        var handler = function() {
+            // Compute again if the some components are still not rendered 
+            var actualLeak = [];
+            for (var j = 0; j < potentialLeak.length; j++) {
+                if (potentialLeak[j].isValid() && !potentialLeak[j].isRendered()) {
+                    actualLeak.push(potentialLeak[j]);
+                }
+            }
+            
+            if (actualLeak.length) {
+                $A.warning([
+                    '[Performance degradation] ',
+                    actualLeak.length + ' component(s) in ' + owner.getName() + ' ["' + owner.getGlobalId() + '"] ',
+                    'have been created and removed before being rendered when calling cmp.set("' + key + '").\n',
+                    'More info: https://sfdc.co/performance-aura-component-set' 
+                ].join(''));
+            }
+        };
+        
+        // This event is triggered by the renderingService.rerenderDirty method
+        $A.eventService.addHandlerOnce({
+            'event': 'aura:doneRendering', 
+            'globaId': 'componentService', 
+            'handler': handler
+        });
+    }
+};
+//#end
 
 /**
  * Sets a shadow attribute. Used for programmatically adding values after FCVs.
@@ -1848,7 +1903,7 @@ Component.prototype.setupValueProviders = function(customValueProviders) {
     vp["v"]=this.attributeSet;
     vp["m"]=this.model;
     vp["c"]=this.createActionValueProvider();
-    vp["e"]=this.getEventDispatcher(this);
+    vp["e"]=this.createEventValueProvider();
     vp["this"]=this;
     vp["globalid"]=this.getGlobalId();
     vp["def"]=this.componentDef;
@@ -1865,46 +1920,12 @@ Component.prototype.setupValueProviders = function(customValueProviders) {
 Component.prototype.createActionValueProvider = function() {
     var controllerDef = this.componentDef.getControllerDef();
     if (controllerDef || this['controller']) {
-        var cmp=this;
-        var context = $A.getContext();
-        context.setCurrentAccess(cmp);
-        var returnObj = {
-            actions: {},
-            get: function(key) {
-                var actionDef = this.actions[key];
-                if (!actionDef) {
-                    actionDef = cmp['controller'] && cmp['controller'][key];
-                    if (actionDef) {
-                        actionDef = new ActionDef({
-                            "descriptor": cmp.getName() + "$controller$" + key,
-                            "name": key,
-                            "actionType": "CLIENT",
-                            "code": actionDef
-                        });
-                    } else {
-                        actionDef = controllerDef && controllerDef.getActionDef(key);
-                    }
-                    $A.assert(actionDef, "Unknown controller action '"+key+"'");
-                    this.actions[key] = actionDef;
-                }
-                return actionDef.newInstance(cmp);
-            }
-        };
-        context.releaseCurrentAccess();
-        return returnObj;
+        return new ActionValueProvider(this, controllerDef);
     }
 };
 
 Component.prototype.createStyleValueProvider = function() {
-    var cmp=this;
-    return {
-        get: function(key) {
-            if (key === "name") {
-                var styleDef = cmp.getDef().getStyleDef();
-                return !$A.util.isUndefinedOrNull(styleDef) ? styleDef.getClassName() : null;
-            }
-        }
-    };
+    return new StyleValueProvider(this);
 };
 
 /**
@@ -2073,7 +2094,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
                         configValues[defaultDef.getDescriptor().getName()] = defaultValue;
                     } else {
                         //JBUCH: HALO: FIXME: FIND A BETTER WAY TO HANDLE DEFAULT EXPRESSIONS
-                        configValues[defaultDef.getDescriptor().getName()] = valueFactory.create(defaultValue, null, cmp);
+                        configValues[defaultDef.getDescriptor().getName()] = valueFactory.create(defaultValue, cmp);
                     }
                 }
             }
@@ -2125,7 +2146,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
             var attributeValueProvider = (config&&config["valueProvider"])||cmp.getAttributeValueProvider();
 
             // JBUCH: HALO: DIEGO: TODO: Revisit to code is a bit ugly
-            value = valueFactory.create(value, attributeDef, config["valueProvider"]);
+            value = valueFactory.create(value, config["valueProvider"]);
             if($A.util.isExpression(value)){
                 value.addChangeHandler(cmp,"v."+attribute);
                 value = value.evaluate();
@@ -2154,7 +2175,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
                 // It's not an Array, is it an expression that points to a CDR?
                 // Something like body="{!v.attribute}" on a facet should reference v.attribute
                 // which could and should be a ComponentDefRef[]
-                var reference = valueFactory.create(value, attributeDef, config["valueProvider"]);
+                var reference = valueFactory.create(value, config["valueProvider"]);
                 if($A.util.isExpression(reference)) {
                     reference.addChangeHandler(cmp,"v."+attribute,null,true);
                     value = reference.evaluate();
@@ -2197,7 +2218,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
                 attributes[attribute] = cdrs;
             }
         } else {
-            attributes[attribute] = valueFactory.create(value, attributeDef, config["valueProvider"] || cmp);
+            attributes[attribute] = valueFactory.create(value, config["valueProvider"] || cmp);
             if($A.util.isExpression(attributes[attribute])){
                 attributes[attribute].addChangeHandler(cmp,"v."+attribute);
             }
@@ -2319,7 +2340,7 @@ Component.prototype.getActionCaller = function(valueProvider, actionExpression) 
         var clientAction;
 
         // JBUCH: HALO: HACK: FIXME?
-        actionExpression=valueFactory.create(actionExpression, null, valueProvider);
+        actionExpression=valueFactory.create(actionExpression, valueProvider);
 
         if($A.util.isExpression(actionExpression)){
             clientAction=actionExpression.evaluate();
@@ -2347,22 +2368,28 @@ Component.prototype.getActionCaller = function(valueProvider, actionExpression) 
 };
 
 /**
+ * Creates the e.* value provider
+ */
+Component.prototype.createEventValueProvider = function() {
+    if (!this.eventValueProvider) {
+        this.eventValueProvider = new EventValueProvider(this);
+    }
+
+    return this.eventValueProvider;
+};
+
+/**
  * Gets the event dispatcher.
  *
  * @public
  * @export
  */
-Component.prototype.getEventDispatcher = function(cmp) {
-    if (!this.eventDispatcher && cmp) {
-        var dispatcher = {
-            "get": function(key) {
-                return cmp.getEvent(key);
-            }
-        };
-        this.eventDispatcher = dispatcher;
+Component.prototype.getEventDispatcher = function() {
+    if (!this.eventValueProvider) {
+        this.createEventValueProvider();
     }
 
-    return this.eventDispatcher;
+    return this.eventValueProvider.events;
 };
 
 Component.prototype.setupComponentEvents = function(cmp, config) {
@@ -2372,7 +2399,7 @@ Component.prototype.setupComponentEvents = function(cmp, config) {
 
         var len = events.length;
         if (len > 0) {
-            dispatcher = this.getEventDispatcher(cmp);
+            dispatcher = this.getEventDispatcher();
             for (var i = 0; i < events.length; i++) {
                 dispatcher[events[i]] = {};
             }
@@ -2447,8 +2474,8 @@ Component.prototype.setupValueEventHandlers = function(cmp) {
         for (var i = 0; i < handlerDefs.length; i++) {
             var handlerDef = handlerDefs[i];
             var handlerConfig = {};
-            handlerConfig["action"] = valueFactory.create(handlerDef["action"],null,cmp);
-            handlerConfig["value"] = valueFactory.create(handlerDef["value"],null,cmp);
+            handlerConfig["action"] = valueFactory.create(handlerDef["action"],cmp);
+            handlerConfig["value"] = valueFactory.create(handlerDef["value"],cmp);
             handlerConfig["event"] = handlerDef["name"];
             cmp.addValueHandler(handlerConfig);
         }
@@ -2482,7 +2509,7 @@ Component.prototype.setupFlavors = function(config, configAttributes) {
     }
 
     if (config["flavor"]) {
-        this.flavor = valueFactory.create(config["flavor"], null, configAttributes["valueProvider"]);
+        this.flavor = valueFactory.create(config["flavor"], configAttributes["valueProvider"]);
     }
 };
 
@@ -2552,7 +2579,7 @@ Component.prototype.injectComponent = function(config, localCreation) {
 
         this.setupModel(config["model"],this);
         this.valueProviders["m"]=this.model;
-        this.valueProviders["c"]=this.createActionValueProvider(this);
+        this.valueProviders["c"]=this.createActionValueProvider();
     }
 };
 

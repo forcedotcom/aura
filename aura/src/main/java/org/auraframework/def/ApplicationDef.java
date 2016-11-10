@@ -40,5 +40,15 @@ public interface ApplicationDef extends BaseComponentDef {
     Integer getBootstrapPublicCacheExpiration() throws QuickFixException;
 
     Map<String, String> getTokens();
+    
+    /**
+     * Gets the application-wide token overrides.
+     */
+    List<DefDescriptor<TokensDef>> getTokenOverrides() throws QuickFixException;
 
+    /**
+     * Gets the application-wide default flavor override.
+     * @throws QuickFixException
+     */
+    DefDescriptor<FlavorsDef> getFlavorOverrides() throws QuickFixException;
 }

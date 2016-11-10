@@ -19,12 +19,14 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 
 import javax.inject.Inject;
 import java.util.Map;
+import java.util.Set;
 
 @ServiceComponent
 public class DefinitionParserAdapterImpl implements DefinitionParserAdapter {
@@ -44,5 +46,10 @@ public class DefinitionParserAdapterImpl implements DefinitionParserAdapter {
     @Inject
     public void setConfigAdapter(ConfigAdapter adapter) {
         this.configAdapter = adapter;
+    }
+
+    @Override
+    public Set<String> getAdditionalAllowedAttributes(DefType defType) {
+        return null;
     }
 }

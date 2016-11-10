@@ -53,22 +53,6 @@ public interface JsonSerializationContext {
     void popFormatRootItems();
 
     /**
-     * @return true if objects can be serialized by reference to prevent cycles
-     */
-    boolean refSupport();
-
-    /**
-     * Set a new state of serialization by reference, preserving the previous one.
-     * @param refSupport whenther objects should be serialized by reference.
-     */
-    void pushRefSupport(boolean refSupport);
-
-    /**
-     * Restore the previous state of reference serialization.
-     */
-    void popRefSupport();
-
-    /**
      * Get the serializer to use for the given object
      *
      * @return the serializer

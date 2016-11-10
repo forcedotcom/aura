@@ -25,7 +25,7 @@ var AuraStorage = function AuraStorage(config) {
     this.keyPrefix = this.generateKeyPrefix(config["isolationKey"], this.version);
     config["keyPrefix"] = this.keyPrefix;
 
-    // requests are enqueud until adapter indicates it is ready
+    // requests are queued until adapter indicates it is ready
     this.ready = undefined;
     this.queue = [];
 
@@ -49,6 +49,11 @@ var AuraStorage = function AuraStorage(config) {
 
     // telemetry
     this.operationsInFlight = 0;
+
+    // runtime stats
+    this.stats = {
+        size: -1 // unknown, populated on first call to getSize()
+    };
 
     // frequency guard for sweeping
     this.sweepInterval = Math.min(Math.max(this.expiration*0.5, AuraStorage["SWEEP_INTERVAL"]["MIN"]), AuraStorage["SWEEP_INTERVAL"]["MAX"]);
@@ -125,9 +130,11 @@ AuraStorage.prototype.getSize = function() {
 };
 
 AuraStorage.prototype.getSizeInternal = function(resolve, reject) {
+    var that = this;
     this.adapter.getSize()
         .then(
             function(size) {
+                that.stats.size = parseInt(size/1024.0, 10);
                 return size / 1024.0;
             }
         )
@@ -230,7 +237,7 @@ AuraStorage.prototype.executeQueue = function() {
 
     if (this.ready) {
         this.log(this.LOG_LEVEL.INFO, "executeQueue(): adapter completed initialization. Processing " + queue.length + " operations.");
-        // TODO logError() that init was successful?
+        this.logError({"operation":"initialize", "error":"success"});
     } else {
         var message = "executeQueue(): adapter failed initialization, entering permanent error state. All future operations will fail. Failing " + queue.length + " enqueued operations.";
         this.log(this.LOG_LEVEL.WARNING, message);
@@ -606,7 +613,10 @@ AuraStorage.prototype.sweep = function(ignoreInterval) {
     // @param {Error} e the error if the promise was rejected
     function doneSweeping(doNotFireModified, e) {
         this.operationsInFlight -= 1;
+
         this.log(this.LOG_LEVEL.INFO, "sweep() - complete" + (e ? " (with errors)" : ""));
+        this.logStats();
+
         this.sweepPromise = undefined;
         this.lastSweepTime = new Date().getTime();
         if (!doNotFireModified) {
@@ -629,6 +639,7 @@ AuraStorage.prototype.sweep = function(ignoreInterval) {
     return this.sweepPromise;
 };
 
+
 /**
  * Suspends sweeping.
  *
@@ -646,6 +657,7 @@ AuraStorage.prototype.suspendSweeping = function() {
     }
 };
 
+
 /**
  * Resumes sweeping to remove expired storage entries.
  * @export
@@ -662,6 +674,7 @@ AuraStorage.prototype.resumeSweeping = function() {
     this.sweep();
 };
 
+
 /**
  * Log a message.
  * @param {LOG_LEVEL} level The log level.
@@ -675,11 +688,12 @@ AuraStorage.prototype.log = function(level, msg, obj) {
     }
 };
 
+
 /**
  * Logs an error to the server.
  * @param {Object} payload The error payload object.
- * @param {String} payload.operation The operation which errored (eg get, set)
- * @param {Error=} payload.error Optional error object
+ * @param {String} payload.operation The operation which errored (eg get, set).
+ * @param {Error=} payload.error Optional error object.
  * @private
  */
 AuraStorage.prototype.logError = function(payload) {
@@ -693,6 +707,28 @@ AuraStorage.prototype.logError = function(payload) {
     }});
 };
 
+
+/**
+ * Logs runtime statistics to the server.
+ * @private
+ */
+AuraStorage.prototype.logStats = function() {
+    // only stores with successfully init'ed adapters have meaningful runtime stats
+    if (this.ready !== true) {
+        return;
+    }
+
+    $A.metricsService.transaction("aura", "performance:storage-stats", { "context": {
+        "attributes" : {
+            "name"      : this.name,
+            "adapter"   : this.getName(),
+            "sizeKB"      : this.stats.size,
+            "maxSizeKB"   : parseInt(this.getMaxSize(), 10)
+        }
+    }});
+};
+
+
 /**
  * Whether the storage implementation is persistent.
  * @returns {boolean} True if persistent.
@@ -701,6 +737,7 @@ AuraStorage.prototype.logError = function(payload) {
 AuraStorage.prototype.isPersistent = function() {
     return this.adapter.isPersistent();
 };
+
 
 /**
  * Whether the storage implementation is secure.
@@ -711,6 +748,7 @@ AuraStorage.prototype.isSecure = function() {
     return this.adapter.isSecure();
 };
 
+
 /**
  * Returns the storage version.
  * @returns {String} The storage version.
@@ -719,6 +757,7 @@ AuraStorage.prototype.isSecure = function() {
 AuraStorage.prototype.getVersion  = function() {
     return this.version;
 };
+
 
 /**
  * Returns the expiration in seconds.
@@ -729,6 +768,7 @@ AuraStorage.prototype.getExpiration = function() {
     return this.expiration / 1000;
 };
 
+
 /**
  * Returns the auto-refresh interval in seconds.
  * @returns {Number} The auto-refresh interval in seconds.
@@ -736,6 +776,7 @@ AuraStorage.prototype.getExpiration = function() {
 AuraStorage.prototype.getDefaultAutoRefreshInterval = function() {
     return this.autoRefreshInterval;
 };
+
 
 /**
  * Asynchronously deletes this storage.

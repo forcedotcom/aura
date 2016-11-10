@@ -104,6 +104,15 @@ public interface ServletUtilAdapter extends AuraAdapter {
     String getManifestUrl(AuraContext context, Map<String,Object> attributes);
 
     /**
+     * Write all urls on the string builder
+     *
+     * @param context the aura context to use.
+     * @param componentAttributes Component attributes.
+     * @param sb the string builder to use.
+     */
+    void writeScriptUrls(AuraContext context, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException;
+
+    /**
      * Get bootstrap url.
      */
 

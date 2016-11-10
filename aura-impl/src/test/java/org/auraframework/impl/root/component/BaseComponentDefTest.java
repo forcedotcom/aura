@@ -307,9 +307,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 null, null, null, false, false, AuraContext.Access.INTERNAL);
 
         Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmpDef));
-        String componentClass = (String) ((Map<?, ?>) json
-                .get(Json.ApplicationKey.VALUE.toString()))
-                        .get("componentClass");
+        String componentClass = (String) json.get("componentClass");
 
         assertNotNull(componentClass);
     }

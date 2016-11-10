@@ -35,6 +35,9 @@ Test.Aura.Component.ComponentTest=function(){
         "AttributeSet": function(){} // Prevent Global
     })(function(){
         [Import("aura-impl/src/main/resources/aura/component/Component.js"),
+         Import("aura-impl/src/main/resources/aura/component/EventValueProvider.js"),
+         Import("aura-impl/src/main/resources/aura/component/StyleValueProvider.js"),
+         Import("aura-impl/src/main/resources/aura/component/ActionValueProvider.js"),
          Import("aura-impl/src/main/resources/aura/attribute/AttributeSet.js"),
          Import("aura-impl/src/main/resources/aura/component/InvalidComponent.js")]
     });

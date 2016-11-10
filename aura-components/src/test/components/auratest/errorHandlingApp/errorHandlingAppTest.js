@@ -191,14 +191,21 @@
         ]
     },
 
-    waitForErrorModal: function() {
+    waitForErrorModal: function(callback) {
         $A.test.addWaitForWithFailureMessage(true,
             function(){
                 var element = document.getElementById('auraErrorMask');
                 var style = $A.test.getStyle(element, 'display');
                 return style === 'block';
             },
-            "Error Model didn't show up.");
+            "Error Model didn't show up.",
+            callback);
+    },
+
+    findStacktraceFromErrorModal: function() {
+        var element = document.getElementById('auraErrorStack');
+        $A.test.assertNotNull(element, "Failed to find stacktrace element");
+        return $A.test.getText(element);
     },
 
     /**

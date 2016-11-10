@@ -37,20 +37,20 @@ public class JavascriptTokenizer {
     private static final Pattern QUALIFIED_NAME_PATTERN = Pattern.compile("(markup://\\w+:\\w+)",
             Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
-	private final DefDescriptor<? extends RootDefinition> parentDescriptor;
+    private final DefDescriptor<? extends RootDefinition> parentDescriptor;
     private final String code;
     private final Location location;
 
     public JavascriptTokenizer(DefDescriptor<? extends RootDefinition> parentDescriptor, String code, Location location) {
-    	this.parentDescriptor = parentDescriptor;
+        this.parentDescriptor = parentDescriptor;
         this.code = code;
         this.location = location;
     }
 
     public void process(JavascriptCodeBuilder builder) {
         if (!AuraTextUtil.isNullEmptyOrWhitespace(code)) {
-	    	parseLabels(builder);
-	        addDependencies(builder);
+            parseLabels(builder);
+            addDependencies(builder);
         }
     }
 
@@ -61,7 +61,7 @@ public class JavascriptTokenizer {
         Matcher matcher = LABEL_GVP_PATTERN.matcher(code);
         while (matcher.find()) {
 
-        	String labelRef = matcher.group();
+            String labelRef = matcher.group();
 
             builder.addExpressionRef(new PropertyReferenceImpl(labelRef, location));
         }
@@ -73,14 +73,17 @@ public class JavascriptTokenizer {
     private void addDependencies(JavascriptCodeBuilder builder)  {
         Matcher matcher = QUALIFIED_NAME_PATTERN.matcher(code);
         while (matcher.find()) {
-
-        	String resource = matcher.group();
+            String resource = matcher.group();
 
             DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
             ddb.setParentDescriptor(parentDescriptor);
             ddb.setLocation(location);
             ddb.setResource(resource);
-            ddb.setType("*");
+            //
+            // JS can only get "root" definitions, minus applications, as applications can only be loaded
+            // as a "top level" load. Libraries could arguably be excluded.
+            //
+            ddb.setType("COMPONENT,INTERFACE,EVENT,LIBRARY");
             builder.addDependency(ddb.build());
         }
     }

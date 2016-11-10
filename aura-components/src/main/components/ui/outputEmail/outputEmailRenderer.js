@@ -32,5 +32,11 @@
         if (cmp.isDirty("v.value") || cmp.isDirty("v.label")) {
             helper.buildBody(cmp);
         }
+    },
+
+    unrender: function (component, helper) {
+        helper.lib.interactive.removeDomEventsFromMap(component);
+        this.superUnrender();
     }
+
 })// eslint-disable-line semi

@@ -56,10 +56,9 @@ Aura.Services   = {};
 Aura.Storage    = {};
 Aura.Locker     = {};
 
-/**
- * @description This, $A, is supposed to be our ONLY window-polluting top-level variable.
- * Everything else in Aura is attached to it.
- */
+
+// This, $A, is supposed to be our ONLY window-polluting top-level variable.
+// Everything else in Aura is attached to it.
 window['$A'] = {};
 
 // -- Polyfills --------------------------------------------------------
@@ -124,6 +123,9 @@ window['$A'] = {};
 // #include aura.component.Component
 // #include aura.component.InvalidComponent
 // #include aura.component.ComponentDef
+// #include aura.component.ActionValueProvider
+// #include aura.component.EventValueProvider
+// #include aura.component.StyleValueProvider
 
 // -- Renderer ----------------------------------------------------------
 
@@ -667,8 +669,8 @@ AuraInstance.prototype.initAsync = function(config) {
         $A.clientService.setToken(config["token"]);
         $A.metricsService.initialize();
 
-        function reportError (e) { 
-            $A.reportError("Error initializing the application", e); 
+        function reportError (e) {
+            $A.reportError("Error initializing the application", e);
         }
 
         function initializeApp () {
@@ -693,7 +695,7 @@ AuraInstance.prototype.initAsync = function(config) {
         } else {
             Promise["all"]([
                 $A.clientService.loadBootstrapFromStorage(),
-                $A.componentService.restoreDefsFromStorage(context), 
+                $A.componentService.restoreDefsFromStorage(context),
                 $A.clientService.populatePersistedActionsFilter()
             ])
             .then(initializeApp, function (err) {
@@ -733,7 +735,7 @@ AuraInstance.prototype.executeExternalLibraries = function () {
  * @public
  */
 AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializeServices) {
-    config = $A.util.json.resolveRefsObject(config);
+
     this.clientService.setNamespacePrivileges(config["ns"]);
     this.beforeInitHooks();
 
@@ -923,9 +925,9 @@ AuraInstance.prototype.handleError = function(message, e) {
  * @platform
  */
 AuraInstance.prototype.reportError = function(message, error) {
-    // ignore external errors
     if ($A.logger.isExternalError(error)) {
-        return;
+        // ignore external errors
+        return false;
     }
 
     // for browsers that doesn't have 5th argument (error object) passed in the onerror handler,
@@ -949,6 +951,7 @@ AuraInstance.prototype.reportError = function(message, error) {
         $A.services.client.postProcess();
     }
     this.lastKnownError = null;
+    return true;
 };
 
 /**
@@ -1473,6 +1476,7 @@ AuraInstance.prototype.Perf = window['Perf'] || PerfShim;
 // is just a placeholder. Use this function to preserve Aura while populating
 // $A, without making a new top-level name:
 (function bootstrap() {
+    Aura.bootstrapMark("execAuraJs");
     /**
      * @description This, $A, is supposed to be our ONLY window-polluting top-level variable. Everything else in Aura is
      *            attached to it.
@@ -1499,7 +1503,6 @@ AuraInstance.prototype.Perf = window['Perf'] || PerfShim;
      * @borrows AuraInstance#util as util
      * @borrows AuraInstance#reportError as $A.reportError
      */
-    Aura.bootstrapMark("execAuraJs");
     window['$A'] = new AuraInstance();
 })();
 

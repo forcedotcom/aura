@@ -141,13 +141,6 @@ TestInstance.prototype.doTearDown = function() {
         endTest();
         return;
     }
-    try {
-        for (i = 0; i < this.cleanups.length; i++) {
-            this.cleanups[i]();
-        }
-    } catch (ce) {
-        this.logError("Error during cleanup", ce);
-    }
 
     function endTest() {
         setTimeout(function() {
@@ -156,33 +149,66 @@ TestInstance.prototype.doTearDown = function() {
         }, 100);
     }
 
-    try {
-        if (this.suite && this.suite["tearDown"]) {
-            if (this.doNotWrapInAuraRun) {
-                this.suite["tearDown"].call(this.suite, this.cmp);
-                endTest();
+    function tearDown() {
+        try {
+            if (that.suite && that.suite["tearDown"]) {
+                if (that.doNotWrapInAuraRun) {
+                    that.suite["tearDown"].call(that.suite, that.cmp);
+                    endTest();
+                } else {
+                    $A.run(function() {
+                        var ret = that.suite["tearDown"].call(that.suite, that.cmp);
+                        if (ret && typeof ret.then === 'function') {
+                            ret.then(
+                                undefined,
+                                function(err) {
+                                    that.logError("Error during teardown", err);
+                                }
+                            ).then(
+                                function() {
+                                    endTest();
+                                }
+                            );
+                        } else {
+                            endTest();
+                        }
+                    });
+                }
             } else {
-                $A.run(function() {
-                    var result = that.suite["tearDown"].call(that.suite, that.cmp);
-                    if (result && typeof result.then === 'function') {
-                        result.then(function() {
-                            endTest();
-                        },
-                        function(err) {
-                            that.logError("Error during teardown", err);
-                            endTest();
-                        });
-                    } else {
-                        endTest();
-                    }
-                });
+                endTest();
             }
-        } else {
+        } catch (e) {
+            that.logError("Error during tearDown", e);
             endTest();
         }
-    } catch (e) {
-        this.logError("Error during tearDown", e);
-        endTest();
+    }
+
+    var promiseResults = [];
+    try {
+        for (i = 0; i < this.cleanups.length; i++) {
+            var result = this.cleanups[i]();
+            if (result && typeof result.then === 'function') {
+                promiseResults.push(result);
+            }
+        }
+    } catch (err) {
+        this.logError("Error during cleanup", err);
+    }
+
+    if(promiseResults.length !== 0) {
+        Promise["all"](promiseResults)
+            .then(
+                undefined,
+                function(err) {
+                    that.logError("Error during cleanup", err);
+                }
+            ).then(
+                function() {
+                    tearDown();
+                }
+            );
+    } else {
+        tearDown();
     }
 };
 

@@ -38,16 +38,11 @@ function lib(w) { //eslint-disable-line no-unused-vars
         MIN_LOADING_THRESHOLD = 5;
 
     function InfiniteLoading () {}
-    
-	var LOAD_MORE_TIMEOUT = 1000,
-	    REFRESH_EVT_COUNTER = 0;
-    
-	InfiniteLoading.prototype = {
+
+    InfiniteLoading.prototype = {
         init: function () {
             this._mergeInfiniteLoading();
             this.on('_initialize', this._initializeInfiniteLoading);
-            this.on('_refresh', this._disableLoadMore);
-            this._refreshEvtCounter = REFRESH_EVT_COUNTER;
         },
         _mergeInfiniteLoading: function () {
             this.opts.infiniteLoadingConfig = this._mergeConfigOptions(
@@ -180,7 +175,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
         },
         // This check is done when surfaceManager is disabled
         _checkLoadingThreshold: function (action, x, y) {
-            if (this._ilNoMoreData || this._ilFetchingData || this._disabled) {
+            if (this._ilNoMoreData || this._ilFetchingData) {
                 return;
             }
 
@@ -216,18 +211,6 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 Logger.log('triggerDataProvider');
                 this._triggerInfiniteLoadingDataProvider();
             }
-        },
-        _disableLoadMore: function() {
-        	// return if currently loadingMore
-        	if(this._ilFetchingData) { return; }
-        	this._disabled = true;
-        	this._refreshEvtCounter++;
-        	window.setTimeout(function(id) {
-        		if(id === this._refreshEvtCounter) {
-        			this._disabled = false;
-        			this._refreshEvtCounter = REFRESH_EVT_COUNTER;
-        		}
-        	}.bind(this, this._refreshEvtCounter), LOAD_MORE_TIMEOUT);
         },
         /* PUBLIC API */
         fetchData: function () {

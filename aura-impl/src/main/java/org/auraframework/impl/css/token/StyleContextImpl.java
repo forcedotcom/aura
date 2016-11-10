@@ -27,8 +27,10 @@ import java.util.Set;
 import org.auraframework.Aura;
 import org.auraframework.css.StyleContext;
 import org.auraframework.css.TokenCache;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.TokensDef;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
@@ -144,8 +146,8 @@ public final class StyleContextImpl implements StyleContext {
         TokenCache tokens = null;
         try {
             DefDescriptor<? extends BaseComponentDef> top = auraContext.getLoadingApplicationDescriptor();
-            if (top != null) {
-                List<DefDescriptor<TokensDef>> appOverrides = definitionService.getDefinition(top).getTokenOverrides();
+            if (top != null && top.getDefType() == DefType.APPLICATION) {
+                List<DefDescriptor<TokensDef>> appOverrides = ((ApplicationDef)definitionService.getDefinition(top)).getTokenOverrides();
                 tokens = new TokenCacheImpl(definitionService, Iterables.concat(appOverrides, additionalTokens));
             }
         } catch (QuickFixException e) {

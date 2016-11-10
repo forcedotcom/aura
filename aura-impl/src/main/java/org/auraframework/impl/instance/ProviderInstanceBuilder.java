@@ -21,24 +21,23 @@ import org.auraframework.def.ProviderDef;
 import org.auraframework.impl.java.provider.JavaProviderDefImpl;
 import org.auraframework.impl.java.provider.JavaProviderInstance;
 import org.auraframework.instance.InstanceBuilder;
+import org.auraframework.instance.InstanceBuilderProvider;
 import org.auraframework.instance.ProviderInstance;
 import org.auraframework.service.LoggingService;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import javax.inject.Inject;
 import java.util.Map;
 
 @ServiceComponent
-public class ProviderInstanceBuilder implements InstanceBuilder<ProviderInstance, ProviderDef>, ApplicationContextAware {
+public class ProviderInstanceBuilder implements InstanceBuilder<ProviderInstance, ProviderDef> {
 
     @Inject
     LoggingService loggingService;
 
-    private ApplicationContext applicationContext;
+    @Inject
+    private InstanceBuilderProvider instanceBuilderProvider;
 
     @Override
     public Class<?> getDefinitionClass() {
@@ -49,7 +48,7 @@ public class ProviderInstanceBuilder implements InstanceBuilder<ProviderInstance
     public ProviderInstance getInstance(ProviderDef providerDef, Map<String, Object> attributes) throws QuickFixException {
         Object instance;
         try {
-            instance = applicationContext.getBean(providerDef.getJavaType());
+            instance = instanceBuilderProvider.get(providerDef.getJavaType());
         } catch (Throwable t) {
             throw new AuraRuntimeException(
                     "Failed to retreive provider instance for " + providerDef.getDescriptor(), t);
@@ -60,11 +59,6 @@ public class ProviderInstanceBuilder implements InstanceBuilder<ProviderInstance
         }
 
         return null;
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 
 }

@@ -228,18 +228,14 @@
 	 * Make this component entering drag operation.
 	 * @param {Aura.Component} component - this component
 	 */
-	enterDragOperation: function(component) {
-		var types = component.get("v.types");
-		component.set("v.ariaDropEffect", types.join(" "));
+	enterDragOperation: function(component) { //eslint-disable-line no-unused-vars
 	},
-	
+
 	/**
 	 * Make this component exiting drag operation.
 	 * @param {Aura.Component} component - this component
 	 */
 	exitDragOperation: function(component) {
-		component.set("v.ariaDropEffect", "none");
-		
 		// reset onDragOver class
 		this.resetCssClass(component);
 	}

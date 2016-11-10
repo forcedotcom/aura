@@ -30,6 +30,7 @@ function SecureComponentRef(component, key) {
         }
     });
     Object.defineProperties(o, {
+        "addValueHandler": SecureObject.createFilteredMethod(o, component, "addValueHandler"),
         "addValueProvider": SecureObject.createFilteredMethod(o, component, "addValueProvider"),
         "getGlobalId": SecureObject.createFilteredMethod(o, component, "getGlobalId"),
         "getLocalId": SecureObject.createFilteredMethod(o, component, "getLocalId"),

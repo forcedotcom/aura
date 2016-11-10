@@ -22,9 +22,9 @@ import org.auraframework.def.TokenDescriptorProviderDef;
 import org.auraframework.impl.java.provider.JavaTokenDescriptorProviderDef;
 import org.auraframework.impl.java.provider.TokenDescriptorProviderInstance;
 import org.auraframework.instance.InstanceBuilder;
+import org.auraframework.instance.InstanceBuilderProvider;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.springframework.context.ApplicationContext;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -36,7 +36,7 @@ import java.util.Map;
 public class TokenDescriptorProviderInstanceBuilder implements InstanceBuilder<TokenDescriptorProviderInstance, TokenDescriptorProviderDef> {
 
     @Inject
-    private ApplicationContext applicationContext;
+    private InstanceBuilderProvider instanceBuilderProvider;
 
     @Override
     public Class<?> getDefinitionClass() {
@@ -52,7 +52,7 @@ public class TokenDescriptorProviderInstanceBuilder implements InstanceBuilder<T
         if (providerType.isAssignableFrom(providerClass)) {
             boolean isServiceComponentProvider = providerClass.getAnnotation(ServiceComponentProvider.class) != null;
             if (isServiceComponentProvider) {
-                instance = applicationContext.getBean(providerClass);
+                instance = instanceBuilderProvider.get(providerClass);
             } else {
                 try {
                     instance = providerClass.newInstance();

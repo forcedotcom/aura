@@ -21,6 +21,11 @@
        $A.test.addCleanup(function(){ this.deleteStorage("browserdb"); }.bind(this));
     },
 
+    tearDown : function(cmp) {
+        // verify adapter in tear down so any adapter fallback would've occurred
+        $A.test.assertEquals("indexeddb", this.storage.getName(), "IndexedDBAdapter not used in test. Did IndexedDBAdapter fail initialization and trigger adapter fallback?");
+    },
+
     deleteStorage: function(storageName) {
         var completed = false;
 

@@ -102,7 +102,22 @@
 			this.pushButton(cmp, "btnShowMore", 50);
 		}]
 	},
-
+	
+	/**
+	 * Verify ariaDescribedBy attribute is present on ui:infiniteList 
+	 * Bug: W-2548760
+	 */
+	testAriaDescribedByExistOnList : {
+		test: [function(cmp) {
+			// waiting for intial items of list to load.
+			this.waitForItems(cmp, 25);
+		}, function(cmp) {
+			var list = cmp.find("list");
+			var listElm = list.getElement().querySelector("ul");
+			$A.test.assertTrue(listElm.hasAttribute("aria-describedby"), "aria-describedby should be present on infiniteList");
+		}]
+	},
+	
     testChangeTemplate: {
         test: [function(cmp){
             cmp.set("v.loaded",false);

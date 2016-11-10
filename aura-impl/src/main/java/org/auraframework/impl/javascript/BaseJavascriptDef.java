@@ -32,22 +32,22 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 public abstract class BaseJavascriptDef<T extends Definition> extends DefinitionImpl<T> implements RemotableDefinition, Serializable {
-	private static final long serialVersionUID = -1007404546975926869L;
+    private static final long serialVersionUID = -1007404546975926869L;
 
-	private final String code;
-	private final Set<PropertyReference> expressionRefs;
-	private final Set<DependencyDef> dependencies;
+    private final String code;
+    private final Set<PropertyReference> expressionRefs;
+    private final Set<DependencyDef> dependencies;
 
     public BaseJavascriptDef(Builder<T> builder) {
         super(builder);
         this.code = builder.code;
         this.expressionRefs = builder.expressionRefs;
         this.dependencies = builder.dependencies;
-	}
+    }
 
     @Override
-	public String getCode() {
-    	return code;
+    public String getCode() {
+        return code;
     }
 
     @Override
@@ -62,11 +62,11 @@ public abstract class BaseJavascriptDef<T extends Definition> extends Definition
 
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-    	if (this.dependencies != null && !this.dependencies.isEmpty()) {
-	        for (DependencyDef dep : this.dependencies) {
-	            dep.appendDependencies(dependencies);
-	        }
-    	}
+        if (this.dependencies != null && !this.dependencies.isEmpty()) {
+            for (DependencyDef dep : this.dependencies) {
+                dep.appendDependencies(dependencies);
+            }
+        }
     }
 
     @Override
@@ -90,7 +90,7 @@ public abstract class BaseJavascriptDef<T extends Definition> extends Definition
             this.code = code;
         }
 
-		@Override
+        @Override
         public void addDependency(DependencyDef dependency) {
             if (this.dependencies == null) {
                 this.dependencies = new HashSet<>();
@@ -98,14 +98,14 @@ public abstract class BaseJavascriptDef<T extends Definition> extends Definition
             this.dependencies.add(dependency);
         }
 
-		@Override
-		public void addExpressionRef(PropertyReference propRef) {
+        @Override
+        public void addExpressionRef(PropertyReference propRef) {
             if (this.expressionRefs == null) {
-            	this.expressionRefs = new HashSet<>();
+                this.expressionRefs = new HashSet<>();
             }
             this.expressionRefs.add(propRef);
-		}
-	}
+        }
+    }
 
     @Override
     public boolean isLocal() {

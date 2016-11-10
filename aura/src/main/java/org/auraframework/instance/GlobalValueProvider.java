@@ -52,7 +52,7 @@ public interface GlobalValueProvider extends ValueProvider {
     boolean isEmpty();
 
     /**
-     * @deprecated GVPs no longer uses reference serialization
+     * @deprecated refSupport no longer supported
      */
     @Deprecated
     boolean refSupport();

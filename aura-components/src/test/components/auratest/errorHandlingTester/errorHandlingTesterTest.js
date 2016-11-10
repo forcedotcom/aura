@@ -1,4 +1,57 @@
 ({
+    /**
+     * Verify that error message box displays in the auraErrorMask div and can be dismissed using the close button.
+     */
+    testErrorMessageDisplayAndClose: {
+        test: [
+            function(cmp) {
+                var iframeSrc = "/auratest/errorHandlingApp.app";
+                this.loadIframe(iframeSrc, cmp, "iframeContainer");
+                this.waitForAuraReadyInIframe(this.getIframe());
+            },
+            function(cmp) {
+                var that = this;
+                var iframe = this.getIframe();
+
+                iframe.document.querySelector(".errorFromAppTable .errorFromClientControllerButton").click();
+                this.waitForErrorMaskVisibleInIframe(iframe, function() {
+                        // closing error mask
+                        iframe.document.querySelector("a[class~='close']").click();
+
+                        var isMaskVisible = that.isErrorMaskIsNotVisibleInIframe(iframe);
+                        $A.test.assertFalse(isMaskVisible, "The error mask should have been closed");
+                    });
+            }
+        ]
+    },
+
+    /**
+     * Verify that error message box displays via $A.error.
+     * Test coverage for deprecated API.
+     */
+    testErrorMessageDisplayAndCloseViaAError: {
+        test: [
+            function(cmp) {
+                var iframeSrc = "/auratest/errorHandlingApp.app";
+                this.loadIframe(iframeSrc, cmp, "iframeContainer");
+                this.waitForAuraReadyInIframe(this.getIframe());
+            },
+            function(cmp) {
+                var that = this;
+                var iframe = this.getIframe();
+
+                iframe.$A.error("Intended error through $A.error");
+                this.waitForErrorMaskVisibleInIframe(iframe, function() {
+                        // closing error mask
+                        iframe.document.querySelector("a[class~='close']").click();
+
+                        var isMaskVisible = that.isErrorMaskIsNotVisibleInIframe(iframe);
+                        $A.test.assertFalse(isMaskVisible, "The error mask should have been closed");
+                    });
+            }
+        ]
+    },
+
     testErrorFromContainedCmpRender: {
         test: function(cmp) {
             var iframeSrc = "/auratest/errorHandlingApp.app?throwErrorFromContainedCmpRender=true";
@@ -119,12 +172,89 @@
         ]
     },
 
+    /**
+     * Verify Aura default error handler can handle systemError event when there is a component which misses required attribute.
+     */
+    testErrorFromRequiredAttributeMissingComponent: {
+        test: function(cmp) {
+            var iframeSrc = "/auratest/errorHandlingApp.app?addAttributeMissingComponent=true";
+            this.loadIframe(iframeSrc, cmp, "iframeContainer");
+
+            var that = this;
+            var iframe = this.getIframe();
+            this.waitForErrorMaskVisibleInIframe(iframe, function() {
+                var errorMsg = that.getErrorMessageFromIframe(iframe);
+
+                var expectedMsg = "APPLICATION markup://auratest:errorHandlingApp is missing required attribute 'requiredAttribute'";
+                $A.test.assertTrue($A.test.contains(errorMsg, expectedMsg),
+                        "Failed to find original error message. Expected message: " + expectedMsg + "; Actual: " + errorMsg);
+            });
+        }
+    },
+
+    /**
+     * Verify systemError event can be handled by Aura default error handler event when an error is thrown from render()
+     * if a cmp/app contains custom error handler. When error is thrown from render(), $A is not initialized, so the
+     * event has to be handled by default handler.
+     */
+    testDefaultHandleErrorFromAppRenderWhenMarkEventHandled: {
+        test: function(cmp) {
+            var iframeSrc = "/auratest/errorHandlingApp.app?throwErrorFromRender=true&handleSystemError=true";
+            this.loadIframe(iframeSrc, cmp, "iframeContainer");
+
+            var that = this;
+            var iframe = this.getIframe();
+            this.waitForErrorMaskVisibleInIframe(iframe, function() {
+                var errorMsg = that.getErrorMessageFromIframe(iframe);
+
+                var expectedMsg = "Error from app render";
+                $A.test.assertTrue($A.test.contains(errorMsg, expectedMsg),
+                        "Failed to find original error message. Expected message: " + expectedMsg + "; Actual: " + errorMsg);
+
+                var failingDescriptor = "Failing descriptor: {markup://auratest:errorHandlingApp}";
+                $A.test.assertTrue($A.test.contains(errorMsg, failingDescriptor),
+                        "The error message has incorrect failing descriptor. Expected descriptor: " + failingDescriptor + "; Actual: " + errorMsg);
+            });
+        }
+    },
+
+    testErrorFromAuraAssertContainsStacktraceInDevMode: {
+        test: [
+            function(cmp) {
+                var iframeSrc = "/auratest/errorHandlingApp.app";
+                this.loadIframe(iframeSrc, cmp, "iframeContainer");
+                this.waitForAuraReadyInIframe(this.getIframe());
+            },
+            function(cmp) {
+                var that = this;
+                var iframe = this.getIframe();
+                iframe.document.querySelector(".errorFromAppTable .failAssertInClientControllerButton").click();
+
+                this.waitForErrorMaskVisibleInIframe(iframe, function() {
+                    var stacktrace = that.getStacktraceFromIframe(iframe);
+
+                    $A.test.assertTrue(stacktrace.length > 0, "stacktrace should not be empty")
+                });
+            }
+        ]
+    },
+
+    isErrorMaskIsNotVisibleInIframe: function(iframe) {
+        var errorMaskElement = iframe.document.getElementById("auraErrorMask");
+        return $A.util.hasClass(errorMaskElement, "auraForcedErrorBox")
+    },
+
     getIframe: function() {
         return document.getElementById("myFrame").contentWindow;
     },
 
     getErrorMessageFromIframe: function(iframe) {
         var errorMessageElement = iframe.document.getElementById("auraErrorMessage");
+        return $A.test.getText(errorMessageElement);
+    },
+
+    getStacktraceFromIframe: function(iframe) {
+        var errorMessageElement = iframe.document.getElementById("auraErrorStack");
         return $A.test.getText(errorMessageElement);
     },
 

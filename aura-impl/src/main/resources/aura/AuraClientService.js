@@ -167,9 +167,6 @@ function AuraClientService () {
     // can set this flag if ever required.
     this._disableBootstrapCacheCookie = "auraDisableBootstrapCache";
 
-    // cookie name counting consecutive reloads without fwk + app finishing boot
-    this._reloadCountKey = "auraReloadCount";
-
     // appcache progress. is 0 if appcache is not in use; otherwise ranges from 0 to 100.
     this.appCacheProgress = 0;
 
@@ -248,13 +245,13 @@ AuraClientService.BOOTSTRAP_KEY = "$AuraClientService.bootstrap$";
  * Duration (in milliseconds) to check for boot progress. If progress is not seen after
  * this duration then reload the page.
  */
-AuraClientService.BOOT_TIMER_DURATION = 9800;
+AuraClientService.BOOT_TIMER_DURATION = 30000;
 
 /**
  * Number of consecutive reloads without fwk + app finishing the boot sequence. When this is exceeded
  * the user is notified of an error and prompted to reload.
  */
-AuraClientService.INCOMPLETE_BOOT_THRESHOLD = 5;
+AuraClientService.INCOMPLETE_BOOT_THRESHOLD = 10;
 
 /**
  * Query parameter to ensure a server trip even with appcache enabled. Servlet performs
@@ -262,6 +259,19 @@ AuraClientService.INCOMPLETE_BOOT_THRESHOLD = 5;
  * on failure.
  */
 AuraClientService.CACHE_BUST_QUERY_PARAM = "nocache";
+
+/**
+ * The status to return to action postprocess when receiving a response with system exception event
+ */
+AuraClientService.SYSTEM_EXCEPTION_EVENT_RETURN_STATUS = "SYSTEMERROR";
+
+/**
+ * Framework + app reload counter to detect and prevent infinite reloads.
+ *
+ * Counter is cleared when Aura Framework finishes app instantiation. Counter is
+ * tracked in sessionStorage so it's per-tab.
+ */
+AuraClientService.CONSECUTIVE_RELOAD_COUNTER_KEY = "__RELOAD_COUNT";
 
 
 /**
@@ -402,7 +412,7 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
             //
             text = "//" + text;
         }
-        var resp = $A.util.json.decode(text, true);
+        var resp = $A.util.json.decode(text);
 
         // if the error on the server is meant to trigger a client-side event...
         if ($A.util.isUndefinedOrNull(resp)) {
@@ -427,8 +437,30 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
             return ret;
         } else if (resp["exceptionEvent"] === true) {
             this.throwExceptionEvent(resp);
+            var evtObj = resp["event"];
+            var eventName;
+            var eventNamespace;
+            if (evtObj["descriptor"]) {
+                var descriptor = new DefDescriptor(evtObj["descriptor"]);
+                eventName = descriptor.getName();
+                eventNamespace = descriptor.getNamespace();
+
+                // Note that this if for response not 200, so returning COOS in AuraEnabled controller would not go here
+                // ideally, we want to break the flow for all exception event, however, that causes regressions.
+                // for now, we stop the flow for COOS and invalidSession.
+                if (eventNamespace === "aura" && (eventName === "clientOutOfSync" || eventName === "invalidSession")) {
+                    // do not return a valid state (SUCCESS, INCOMPLETE, ERROR), we do not want action callback to handle this.
+                    ret["status"] = AuraClientService.SYSTEM_EXCEPTION_EVENT_RETURN_STATUS;
+                    return ret;
+                }
+            }
+
             ret["status"] = "ERROR";
-            ret["message"] = "Received exception event from server";
+            // at least output the exception event name so we know where to investigate.
+            ret["message"] = "Received exception event" +
+                                (eventNamespace ? (" " + eventNamespace + ":") : "") +
+                                (eventName ? eventName : "") +
+                                " from server";
             return ret;
         } else {
             // !!!!!!!!!!HACK ALERT!!!!!!!!!!
@@ -473,10 +505,6 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
         // #end
         ret["status"] = "ERROR";
         return ret;
-    }
-
-    if ("actions" in responseMessage) {
-        $A.util.json.resolveRefsObject(responseMessage["actions"]);
     }
 
     ret["status"] = "SUCCESS";
@@ -817,12 +845,10 @@ AuraClientService.prototype.isDevMode = function() {
  * @private
  */
 AuraClientService.prototype.actualDumpCachesAndReload = function() {
-    var that = this;
     function reload() {
-        // must use hardRefresh() to force .app request (with cache-busting query param)
-        // to the server. window.location.reload(true) does not hit the server if appcache
-        // is enabled.
-        that.hardRefresh();
+        // use location.reload(true) to clear browser cache.
+        // Using hardRefresh() made browser use old versions even though appCache was updated
+        window.location.reload(true);
     }
 
     $A.componentService.clearDefsFromStorage({"cause": "appcache"})
@@ -858,40 +884,58 @@ AuraClientService.prototype.dumpCachesAndReload = function() {
 /**
  * Tracks consecutive reloads that do not reach $A.finishInit to prevent infinite reloads.
  *
- * AuraClientService#hardRefresh() relies in this function to indicate when too many
+ * AuraClientService#hardRefresh() relies on this function to indicate when too many
  * consecutive reloads have occurred. In that case the caches are cleared and the user
  * is given a prompt indicating the app can't boot.
  *
  * @returns {boolean} true if too many consecutive reloads without the fwk + app booting.
  */
 AuraClientService.prototype.shouldPreventReload = function() {
-    var count = $A.util.getCookie(this._reloadCountKey);
-    count = +count; // coerce to number
-    count = isFinite(count) ? count : 0;
+    // if per-tab sessionStorage isn't available then reload detection is disabled
+    if (!$A.util.isSessionStorageEnabled()) {
+        return false;
+    }
 
-    if (count >= AuraClientService.INCOMPLETE_BOOT_THRESHOLD) {
-        // too many consecutive reloads without successful fwk + app init
-        var idb = window.indexedDB;
-        if (idb) {
-            // if inline.js fails then none of the storages are initialized
-            // so must brute force as methods in ComponentDefStorage won't work.
-            idb.deleteDatabase(Action.STORAGE_NAME);
-            idb.deleteDatabase($A.componentService.getComponentDefStorageName());
+    try {
+        var count = window.sessionStorage.getItem(AuraClientService.CONSECUTIVE_RELOAD_COUNTER_KEY);
+        count = +count; // coerce to number
+        count = isFinite(count) ? count : 0;
+
+        if (count >= AuraClientService.INCOMPLETE_BOOT_THRESHOLD) {
+            // too many consecutive reloads without successful fwk + app init
+            var idb = window.indexedDB;
+            if (idb) {
+                // if inline.js fails then none of the storages are initialized
+                // so must brute force as methods in ComponentDefStorage won't work.
+                idb.deleteDatabase(Action.STORAGE_NAME);
+                idb.deleteDatabase($A.componentService.getComponentDefStorageName());
+            }
+
+            // reset the counter so if user chooses to reload we allow multiple reloads again
+            this.clearReloadCount();
+            return true;
         }
 
-        // reset the counter so if user chooses to reload we allow multiple reloads again
-        $A.util.setCookie(this._reloadCountKey, "0");
-        return true;
+        window.sessionStorage.setItem(AuraClientService.CONSECUTIVE_RELOAD_COUNTER_KEY, ""+(count+1));
+        return false;
+    } catch (ignore) {
+        // intentional noop
     }
-    $A.util.setCookie(this._reloadCountKey, "" + (count+1));
     return false;
 };
 
 /**
- * Clears reload count cookie.
+ * Clears the counter tracking consecutive reloads.
  */
 AuraClientService.prototype.clearReloadCount = function() {
-    $A.util.clearCookie(this._reloadCountKey);
+    if (!$A.util.isSessionStorageEnabled()) {
+        return;
+    }
+    try {
+        window.sessionStorage.removeItem(AuraClientService.CONSECUTIVE_RELOAD_COUNTER_KEY);
+    } catch (ignore) {
+        // intentional noop
+    }
 };
 
 /**
@@ -1027,6 +1071,16 @@ AuraClientService.prototype.handleAppCache = function() {
         // b. the error indicates a file in the manifest can't be downloaded (server returned a 4xx, 5xx,
         //    network blip, etc), which means the fwk/app won't boot. so start/continue the bootup timers.
         acs.startBootTimers();
+
+        if ((!("onLine" in window.navigator) || window.navigator.onLine) && window.applicationCache.status === window.applicationCache.IDLE) {
+            // perform only when online (OR onLine not supported) and appcache IDLE status
+            try {
+                // force browser to keep trying to get updated js resources as manifest should be updated at this point
+                window.applicationCache.update();
+            } catch (ignore) {
+                // ignore
+            }
+        }
     }
 
     function handleAppcacheDownloading(e) {
@@ -1124,13 +1178,13 @@ AuraClientService.prototype.startBootTimers = function() {
         var progress = getBootProgressed(oldState, newState);
 
         // if progress made then start a new timer to check again
-        if (progress) {
+        if (progress || (window.applicationCache && (window.applicationCache.status === window.applicationCache.CHECKING || window.applicationCache.status === window.applicationCache.DOWNLOADING))) {
             that.startBootTimers();
             return;
         }
 
         // no progress made so reload the page
-        that.hardRefresh();
+        window.location.reload(true);
     }, AuraClientService.BOOT_TIMER_DURATION);
 };
 

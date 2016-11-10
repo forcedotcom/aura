@@ -16,6 +16,7 @@
 package org.auraframework.adapter;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefinitionAccess;
@@ -26,4 +27,7 @@ public interface DefinitionParserAdapter extends AuraAdapter {
     DefinitionAccess parseAccess(String namespace, String access) throws InvalidAccessValueException;
     
     Map<String, String> getRequiredVersions(DefDescriptor<?> desc);
+        
+    /** tmp API to allow attribute visibility controllable by org perms */
+    Set<String> getAdditionalAllowedAttributes(DefDescriptor.DefType defType);
 }

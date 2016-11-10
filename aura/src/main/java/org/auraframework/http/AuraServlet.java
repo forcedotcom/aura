@@ -441,8 +441,22 @@ public class AuraServlet extends AuraBaseServlet {
             }
             context.setFrameworkUID(fwUID);
 
-            Message message;
+            DefDescriptor<? extends BaseComponentDef> applicationDescriptor = context.getApplicationDescriptor();
+            if (applicationDescriptor != null) {
+                // Check only if client app out of sync
+                try {
+                    definitionService.updateLoaded(applicationDescriptor);
+                } catch (QuickFixException qfe) {
+                    // Ignore quick fix. If we got a 'new' quickfix, it will be thrown as
+                    // a client out of sync exception, since the UID will not match.
+                }
 
+                if (!context.isTestMode() && !context.isDevMode()) {
+                    assertAccess(definitionService.getDefinition(applicationDescriptor));
+                }
+            }
+
+            Message message;
             loggingService.startTimer(LoggingService.TIMER_DESERIALIZATION);
             try {
                 message = serializationService.read(new StringReader(msg), Message.class);
@@ -457,26 +471,9 @@ public class AuraServlet extends AuraBaseServlet {
                 configAdapter.validateCSRFToken(csrfToken.get(request));
             }
 
-            DefDescriptor<? extends BaseComponentDef> applicationDescriptor = context.getApplicationDescriptor();
-
-            // Knowing the app, we can do the HTTP headers, so of which depend on
+            // Knowing the app, we can do the HTTP headers, some of which depend on
             // the app in play, so we couldn't do this
             servletUtilAdapter.setCSPHeaders(applicationDescriptor, request, response);
-            if (applicationDescriptor != null) {
-                // ClientOutOfSync will drop down.
-                try {
-                    definitionService.updateLoaded(applicationDescriptor);
-                } catch (QuickFixException qfe) {
-                    //
-                    // ignore quick fix. If we got a 'new' quickfix, it will be thrown as
-                    // a client out of sync exception, since the UID will not match.
-                    //
-                }
-
-                if (!context.isTestMode() && !context.isDevMode()) {
-                    assertAccess(definitionService.getDefinition(applicationDescriptor));
-                }
-            }
 
             Map<String, Object> attributes = null;
             if (isBootstrapAction) {

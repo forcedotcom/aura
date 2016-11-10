@@ -140,6 +140,7 @@
             }
             row.appendChild(column);
         }
+        $A.afterRender(templates);
         return row;
     },
     

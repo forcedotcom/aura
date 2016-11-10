@@ -534,5 +534,21 @@
         test: function(cmp) {
             cmp.testCloneNodeDeep_VerifyBlockedAccess();
         }
+    },
+
+    testTextNodeApi: {
+        test: function(cmp) {
+            cmp.testTextNodeApi();
+        }
+    },
+
+    /**
+     * Text.splitText() is special because it creates a new node as a sibling to the current node and returns that
+     * to the user. LockerService must do special handling to key this new node before returning it.
+     */
+    testTextNodeSplitText: {
+        test: function(cmp) {
+            cmp.testTextNodeSplitText();
+        }
     }
 })

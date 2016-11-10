@@ -27,7 +27,7 @@ function FunctionCallValue(config, valueProvider){
 
     this.args = [];
     for (var i = 0; i < config["args"].length; i++) {
-        this.args.push(valueFactory.create(config["args"][i], null, this.valueProvider));
+        this.args.push(valueFactory.create(config["args"][i], this.valueProvider));
     }
 
 //#if {"modes" : ["STATS"]}

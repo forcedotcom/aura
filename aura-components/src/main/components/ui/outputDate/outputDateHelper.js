@@ -33,6 +33,10 @@
     },
 
     setOutputValue: function(component, displayValue) {
+        // component could be invalid since this is inside an async call
+        if (!component.isValid()) {
+            return;
+        }
         var outputElement = component.find("span").getElement();
         if (!$A.util.isUndefinedOrNull(outputElement)) {
             var textContent = displayValue ? $A.localizationService.translateToLocalizedDigits(displayValue) : "";

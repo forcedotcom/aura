@@ -60,7 +60,7 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.deferred = false;
 
     this.returnValue = undefined;
-    this.returnValueClone = undefined;
+    this.returnValueUserland = undefined;
 
     // FIXME: only for runActions - deprecated
     this.completion = undefined;
@@ -692,14 +692,36 @@ Action.prototype.getState = function() {
 };
 
 /**
- * Gets the return value of the Action. A server-side Action can return any object containing serializable JSON data.<br/>
+ * Gets the return value of the Action. A server-side Action can return any object containing serializable JSON data.
  *
  * @public
  * @platform
  * @export
  */
 Action.prototype.getReturnValue = function() {
-    return this.returnValue;
+    if (this.returnValueUserland !== undefined) {
+        return this.returnValueUserland;
+    }
+
+    // make deep copies to prevent userland code from changing values.
+    // optimization: only need to keep the original value if the action is storable
+    // and a success because it's a) return value is put into storage, and b) action
+    // deduping is possible.
+    if (this.storable && this.responseState === "SUCCESS") {
+        // deep copy only for objects and arrays
+        if ($A.util.isArray(this.returnValue)) {
+            this.returnValueUserland = $A.util.apply([], this.returnValue, true, true);
+        } else if ($A.util.isObject(this.returnValue)) {
+            this.returnValueUserland = $A.util.apply({}, this.returnValue, true, true);
+        } else {
+            this.returnValueUserland = this.returnValue;
+        }
+    } else {
+        this.returnValueUserland = this.returnValue;
+    }
+
+
+    return this.returnValueUserland;
 };
 
 /**
@@ -763,8 +785,7 @@ Action.prototype.runAfter = function(action) {
 /**
  * Updates the fields from a response.
  *
- * @param {Object}
- *            response The response from the server.
+ * @param {Object} response The response from the server.
  * @return {Boolean} Returns true if the response differs from the original response
  * @private
  */
@@ -773,21 +794,9 @@ Action.prototype.updateFromResponse = function(response) {
     this.responseState = response["state"];
 
     this.returnValue = response["returnValue"];
-    // make deep copies to prevent userland code from changing values put into storage
-    if (this.storable && this.responseState === "SUCCESS") {
-        // deep copy only for objects and arrays
-        if ($A.util.isArray(this.returnValue)) {
-            this.returnValueClone = $A.util.apply([], this.returnValue, true, true);
-        } else if ($A.util.isObject(this.returnValue)) {
-            this.returnValueClone = $A.util.apply({}, this.returnValue, true, true);
-        } else {
-            this.returnValueClone = this.returnValue;
-        }
-
-        // TODO W-3233036 - must deep copy response["components"], and store the clone, to prevent
-        // userland code from modifying partial configs
-
-    }
+    // TODO W-3455588 - in the future prevent "used" actions from being re-enqueued.
+    // for now force re-deep-copying the return value.
+    this.returnValueUserland = undefined;
 
     this.error = response["error"];
     this.storage = response["storage"];
@@ -811,6 +820,19 @@ Action.prototype.updateFromResponse = function(response) {
         for (i = 0; i < response["error"].length; i++) {
             var err = response["error"][i];
             if (err["exceptionEvent"]) {
+                // returning COOS in AuraEnabled controller would go here
+                var eventObj = err["event"];
+                if (eventObj["descriptor"]) {
+                    var eventDescriptor = new DefDescriptor(eventObj["descriptor"]);
+                    var eventName = eventDescriptor.getName();
+                    var eventNamespace = eventDescriptor.getNamespace();
+                    if (eventNamespace === "aura" && (eventName === "clientOutOfSync" || eventName === "invalidSession")) {
+                        $A.clientService.throwExceptionEvent(err);
+                        // should not invoke the callback for system level exception events
+                        return false;
+                    }
+                }
+
                 fired = true;
                 this.events.push(err["event"]);
             } else {
@@ -825,8 +847,8 @@ Action.prototype.updateFromResponse = function(response) {
         this.error = newErrors;
     } else if (this.originalResponse && this.state === "SUCCESS") {
         // Compare the refresh response with the original response and return false if they are equal (no update)
-        var originalValue = $A.util.json.orderedEncode(this.originalReturnValueClone);
-        var refreshedValue = $A.util.json.orderedEncode(this.returnValueClone);
+        var originalValue = $A.util.json.orderedEncode(this.originalReturnValue);
+        var refreshedValue = $A.util.json.orderedEncode(this.returnValue);
         if (refreshedValue === originalValue) {
             var originalComponents = $A.util.json.orderedEncode(this.originalResponse["components"]);
             var refreshedComponents = $A.util.json.orderedEncode(response["components"]);
@@ -855,8 +877,8 @@ Action.prototype.updateFromResponse = function(response) {
 Action.prototype.getStored = function() {
     if (this.storable && this.responseState === "SUCCESS") {
         return {
-            "returnValue" : this.returnValueClone,
-            "components" : this.components, // TODO W-3233036 use this.componentClone
+            "returnValue" : this.returnValue,
+            "components" : this.components,
             "state" : "SUCCESS",
             "storage" : {
                 "created" : new Date().getTime()
@@ -908,7 +930,7 @@ Action.prototype.finishAction = function(context) {
                     } catch (e) {
                         var eventFailedMessage = "Events failed: "+(this.def?this.def.toString():"");
                         $A.warning(eventFailedMessage, e);
-                        e.message = e.message ? (e.message + '\n' + eventFailedMessage) : eventFailedMessage; 
+                        e.message = e.message ? (e.message + '\n' + eventFailedMessage) : eventFailedMessage;
                         error = e;
                     }
                 }
@@ -929,6 +951,7 @@ Action.prototype.finishAction = function(context) {
                     error = e;
                 }
             }
+
             this.complete();
             if (this.components && (cb || !this.storable || !this.getStorage())) {
                 context.finishComponentConfigs(id);
@@ -1299,7 +1322,7 @@ Action.prototype.getRefreshAction = function(originalResponse) {
         var refreshAction = this.copyToRefresh();
         $A.log("Action.refresh(): auto refresh begin: " + this.getId() + " to " + refreshAction.getId());
         refreshAction.originalResponse = originalResponse;
-        refreshAction.originalReturnValueClone = this.returnValueClone;
+        refreshAction.originalReturnValue = this.returnValue;
 
         // TODO W-2835710 - remove support for supressing callbacks
         var executeCallbackIfUpdated = (this.storableConfig && !$A.util.isUndefined(this.storableConfig["executeCallbackIfUpdated"]))

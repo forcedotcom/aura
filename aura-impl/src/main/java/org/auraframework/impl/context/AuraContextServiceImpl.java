@@ -134,7 +134,7 @@ public class AuraContextServiceImpl implements ContextService {
         RegistryTrie registries = new RegistryTrie(getRegistries(mode, access, loaders));
         AuraContext context = contextAdapter.establish(mode, registries,
                 this.prefixDefaultsAdapter.getPrefixDefaults(mode), format, access,
-                AuraJsonContext.createContext(mode, true, jsonSerializerFactory), globalValueProviders, appDesc);
+                AuraJsonContext.createContext(mode, jsonSerializerFactory), globalValueProviders, appDesc);
         return context;
     }
 

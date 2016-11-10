@@ -34,5 +34,29 @@
         $A.popCreationPath("body");
 
         return body;
+    },
+
+    clearUnrenderedBody: function(cmp) {
+        var hasUnrenderBody = false;        
+        var currentBody = cmp.get('v.body');
+
+        for (var i = 0 ; i < currentBody.length; i++) {
+            var child = currentBody[i];
+            if (!child.isRendered()) {
+                hasUnrenderBody = true;
+                child.destroy();
+            }
+        }
+        
+        if (hasUnrenderBody && $A.getContext().getMode() !== 'PROD') {
+            var owner = cmp.getOwner();
+            $A.warning([
+                '[Performance degradation] ',
+                'markup://aura:if ["' + cmp.getGlobalId() + '"] in ',
+                owner.getName() + ' ["' + owner.getGlobalId() + '"] ',
+                'needed to clear unrendered body.\n',
+                'More info: https://sfdc.co/performance-aura-if'
+            ].join(''));
+        }
     }
 })// eslint-disable-line semi

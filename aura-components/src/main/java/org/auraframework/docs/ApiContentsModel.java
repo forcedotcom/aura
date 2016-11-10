@@ -166,9 +166,6 @@ public class ApiContentsModel implements ModelInstance {
                             properties.add(map);
                         }
                     }
-
-
-
                 }
 
                 // Sort the methods and properties collections alphabetically

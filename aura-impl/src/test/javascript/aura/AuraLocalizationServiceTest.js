@@ -129,7 +129,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
 		return locale;
     });
 
-	var mockGetTimeZoneInfo = Mocks.GetMock(targetService, "getTimeZoneInfo", function(timezone, callback){
+	var mockLazyInitTimeZoneInfo = Mocks.GetMock(targetService, "lazyInitTimeZoneInfo", function(timezone, callback){
 		callback(mockDateTime, timezone);
     });
 
@@ -1338,7 +1338,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
 
             // Act
         	mockWallTime(function(){
-        		mockGetTimeZoneInfo(function(){
+        		mockLazyInitTimeZoneInfo(function(){
             		mockGetWallTimeFromUTC(function(){
                         mockUtil(function () {
         				    targetService.UTCToWallTime(mockDateTime, "EST", callback);
@@ -1433,7 +1433,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
 
             // Act
         	mockWallTime(function(){
-        		mockGetTimeZoneInfo(function(){
+        		mockLazyInitTimeZoneInfo(function(){
         			mockGetUTCFromWallTime(function(){
                         mockUtil(function () {
         				    targetService.WallTimeToUTC(mockDateTime, "EST", callback);
@@ -1866,7 +1866,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
     }
 
     [Fixture]
-    function getTimeZoneInfo(){
+    function initTimeZoneInfo(){
 
     	[Fact]
         function callbackGetsCalled(){
@@ -1902,7 +1902,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             });
 
 			mockUtil(function(){
-				targetService.getTimeZoneInfo(targetTimezone, targetCallback);
+				targetService.initTimeZoneInfo(targetTimezone, targetCallback);
 			});
 
             // Assert
@@ -1963,7 +1963,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
 
 			mockUtil(function(){
 				mockWallTime(function(){
-					targetService.getTimeZoneInfo(targetTimezone, targetCallback);
+					targetService.initTimeZoneInfo(targetTimezone, targetCallback);
 				});
 			});
 
@@ -2025,13 +2025,53 @@ Test.Aura.AuraLocalizationServiceTest = function(){
 
 			mockUtil(function(){
 				mockWallTime(function(){
-					targetService.getTimeZoneInfo(targetTimezone, targetCallback);
+					targetService.initTimeZoneInfo(targetTimezone, targetCallback);
 				});
 			});
 
             // Assert
             Assert.Equal(expected, actual);
         }
+    }
+    
+    [Fixture]
+    function lazyInitTimeZoneInfo() {
+    	
+    	[Fact]
+    	function initTimeZoneInfoCalledOncePerTimezone(){
+        	// Arrange
+        	var initTimeZoneInfoCalls = [];
+        	
+        	var mockWallTime = Mocks.GetMock(Object.Global(), "WallTime",{
+            	zones: {
+            		PST:false,
+            		EST:false
+            	}
+        	});
+
+        	var mockInitializeWalltime = Mocks.GetMock(targetService, "initializeWalltime", function(callback) {
+                callback();
+        	})
+        	
+        	var mockInitTimeZoneInfo = Mocks.GetMock(targetService, "initTimeZoneInfo", function(timezone, afterInit) {
+        		initTimeZoneInfoCalls.push(timezone);
+                afterInit();
+        	})
+    		
+        	// Act
+        	mockWallTime(function() {
+        		mockInitializeWalltime(function() {
+        			mockInitTimeZoneInfo(function() {
+        				targetService.lazyInitTimeZoneInfo("PST", function() {});
+        				targetService.lazyInitTimeZoneInfo("PST", function() {});
+        				targetService.lazyInitTimeZoneInfo("EST", function() {});
+        			})
+        		})
+        	});
+    		
+    		// Assert
+    		Assert.Equal(["PST", "EST"], initTimeZoneInfoCalls);
+    	}
     }
 
     [Fixture]

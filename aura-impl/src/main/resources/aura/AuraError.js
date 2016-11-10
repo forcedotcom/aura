@@ -107,6 +107,18 @@ function AuraError() {
             return filtered.length > 0 ? filtered.join('\n') : frames.join('\n');
         }
 
+        function getStackTraceIdHashString(stacktrace) {
+            var ret = [];
+            var lines = stacktrace.split('\n');
+            lines.forEach(function(line) {
+                line = line.replace(/https?:\/\/([^\/]*\/)+/gi, "");
+                line = line.replace(/:[0-9]+:[0-9]+/gi, "");
+                ret.push(line);
+            });
+
+            return ret.join('\n')+"\n";
+        }
+
         if (message == null) {
             message = '';
         }
@@ -115,7 +127,7 @@ function AuraError() {
         this.message = message + (innerError ? " [" + (innerError.message || innerError.toString()) + "]" : "");
         this.stackFrames = getStackFrames(innerError);
         this.stackTrace = getStackTrace(this.stackFrames);
-        this.id = MurmurHash3.hashString(this.stackTrace.replace(/https?:\/\/[^\/]*\//gi, ""));
+        this.id = MurmurHash3.hashString(getStackTraceIdHashString(this.stackTrace));
         this.severity = innerError ? (innerError.severity || severity) : severity;
         this["handled"] = innerError ? (innerError["handled"] || false) : false;
         this["reported"] = innerError ? (innerError["reported"] || false) : false;

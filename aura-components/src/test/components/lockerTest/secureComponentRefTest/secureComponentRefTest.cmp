@@ -28,6 +28,7 @@
     <aura:method name="testGetComponentEvent" action="{!c.testGetComponentEvent}"/>
     <aura:method name="testAuraMethod" action="{!c.testAuraMethod}"/>
     <aura:method name="testAddHandler" action="{!c.testAddHandler}"/>
+    <aura:method name="testAddValueHandler" action="{!c.testAddValueHandler}"/>
 
     <div>SecureComponentRef test</div>
     <ui:button label="ui:button component" aura:id="facet"/>

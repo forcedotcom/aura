@@ -16,5 +16,9 @@
 
     throwsAnError : function(cmp) {
         throw new Error("intentional error");
+    },
+
+    handleCOOS: function(cmp) {
+        cmp.set("v.coosHandled", true);
     }
 })

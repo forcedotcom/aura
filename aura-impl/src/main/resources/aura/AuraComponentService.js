@@ -784,7 +784,7 @@ AuraComponentService.prototype.requestComponent = function(callback, config, avp
             value = value["value"];
         }
         // if we have an avp, use it here
-        var auraValue = valueFactory.create(value, null, avp);
+        var auraValue = valueFactory.create(value, avp);
         atts[key] = this.computeValue(auraValue, avp);
     }
 

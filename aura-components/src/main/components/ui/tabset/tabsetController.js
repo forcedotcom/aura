@@ -18,6 +18,10 @@
     	helper.initTabs(cmp);
     },
 
+    handleDestroy: function(cmp, evt, helper) {
+        helper.handleDestroy(cmp);
+    },
+
     closeTab: function(cmp, evt, helper) {
     	helper.closeTab(cmp, helper.getTabIndexFromEvent(cmp, evt));
     },

@@ -76,7 +76,7 @@ public class ResourceDefImplTest extends AuraImplTestCase {
         assertTrue("CSS resource should be in component", resourceDefs.contains(cssResourceDef));
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
+        JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false);
         jsResourceDef.serialize(json);
         cssResourceDef.serialize(json);
         json.close();

@@ -20,14 +20,14 @@ import java.util.List;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.Definition;
-import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
+import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.ds.servicecomponent.ModelInstance;
 import org.auraframework.instance.BaseComponent;
@@ -35,6 +35,7 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.AuraContext;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -48,13 +49,14 @@ public class TopicExampleModel implements ModelInstance {
     private final List<IncludeDefModel> includeDefs = Lists.newArrayList();
     private final DefinitionService definitionService;
     private final ConfigAdapter configAdapter;
+    private String error;
 
     @SuppressWarnings("unchecked")
     public TopicExampleModel(ContextService contextService, DefinitionService definitionService, ConfigAdapter configAdapter)
             throws QuickFixException {
-    	this.definitionService = definitionService;
-    	this.configAdapter = configAdapter;
-    	
+        this.definitionService = definitionService;
+        this.configAdapter = configAdapter;
+
         AuraContext context = contextService.getCurrentContext();
         BaseComponent<?, ?> component = context.getCurrentComponent();
 
@@ -64,7 +66,13 @@ public class TopicExampleModel implements ModelInstance {
         DefDescriptor<? extends RootDefinition> descriptor = (DefDescriptor<? extends RootDefinition>) definitionService
                 .getDefDescriptor(desc, defType.getPrimaryInterface());
 
-        Definition def = definitionService.getDefinition(descriptor);
+        Definition def = null;
+        try {
+            def = definitionService.getDefinition(descriptor);
+        } catch (DefinitionNotFoundException e) {
+            this.error = e.toString();
+            return;
+        }
 
         defs.add(new DefModel(descriptor));
 
@@ -94,6 +102,11 @@ public class TopicExampleModel implements ModelInstance {
     }
 
     @AuraEnabled
+    public String getError() {
+        return this.error;
+    }
+
+    @AuraEnabled
     public List<DefModel> getDefs() {
         return defs;
     }
@@ -102,7 +115,7 @@ public class TopicExampleModel implements ModelInstance {
     public List<IncludeDefModel> getIncludeDefs() {
         return includeDefs;
     }
-    
+
     private DefDescriptor<ApplicationDef> getReferencingDescriptor() {
         String defaultNamespace = configAdapter.getDefaultNamespace();
         if (defaultNamespace == null) {
@@ -112,7 +125,7 @@ public class TopicExampleModel implements ModelInstance {
         return definitionService.getDefDescriptor(String.format("%s:application", defaultNamespace),
                 ApplicationDef.class);
     }
-	
+
     public boolean hasAccess(Definition def) throws QuickFixException {
         return definitionService.hasAccess(getReferencingDescriptor(), def);
     }

@@ -22,9 +22,9 @@ import org.auraframework.impl.javascript.BaseJavascriptDef;
 public class JavascriptHelperDef extends BaseJavascriptDef<HelperDef> implements HelperDef {
     private static final long serialVersionUID = 1967445547376133339L;
 
-	protected JavascriptHelperDef(Builder builder) {
-		super(builder);
-	}
+    protected JavascriptHelperDef(Builder builder) {
+        super(builder);
+    }
 
     public static class Builder extends BaseJavascriptDef.Builder<HelperDef> {
 

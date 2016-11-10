@@ -74,7 +74,10 @@ public class CSP {
         FONT("font-src"),
         CONNECT("connect-src"),
         SANDBOX("sandbox"),
-        REPORT_URI("report-uri");
+        REPORT_URI("report-uri"),
+        PLUGIN_TYPES("plugin-types"),
+        BASE_URI("base-uri"),
+        REFERRER("referrer");
 
         private String directive;
 
@@ -176,6 +179,19 @@ public class CSP {
 
         public PolicyBuilder report_uri(String... uris) {
             directives.put(Directive.REPORT_URI, Lists.newArrayList(uris));
+            return this;
+        }
+
+        public PolicyBuilder plugin_types(String... pluginTypes) {
+            return extend(Directive.PLUGIN_TYPES, pluginTypes);
+        }
+
+        public PolicyBuilder base_uri(String... uris) {
+            return extend(Directive.BASE_URI, uris);
+        }
+
+        public PolicyBuilder referrer(String referrer) {
+            directives.put(Directive.REFERRER, Lists.newArrayList(referrer));
             return this;
         }
 

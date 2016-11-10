@@ -74,7 +74,7 @@
             accesskey="{!v.accesskey}"
             title="{!v.buttonTitle}"
             tabindex="{!v.tabIndex}"
-            aura:flavorable="true">
+            aura:flavorable="true" aria-live="{!v.stateful ? 'assertive': 'off'}">
 
         <aura:if isTrue="{! v.iconImgSrc != '' || v.iconClass != '' }">
             <img src="{! v.iconImgSrc != '' ? v.iconImgSrc : '/auraFW/resources/aura/s.gif'}" class="{! v.iconClass + ' icon bLeft' }" alt=""/>

@@ -803,18 +803,75 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function GetReturnValue() {
+        var mockContext = Mocks.GetMock(Object.Global(), "$A", {
+            getContext: function() {
+                return Test.Stubs.Aura.GetContext();
+            },
+            util : {
+                isArray : function(v) { return false; },
+                isObject : function(v) { return true; },
+                apply : function(base, obj, force, deep) {
+                    return {foo:"bar"};
+                }
+            }
+        });
+
         [Fact]
-        function ReturnsReturnValue() {
+        function ReturnValueCopied() {
             // Arrange
-            var expected = "expected";
+            var actual;
             var target = newAction();
-            target.returnValue = expected;
+            target.storable = true;
+            target.responseState = "SUCCESS";
+            target.returnValue = {foo:"bar"};
+
 
             // Act
-            var actual = target.getReturnValue();
+            mockContext(function() {
+                actual = target.getReturnValue();
+            });
+            target.returnValue.foo = "baz";
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.Equal("bar", actual.foo);
+        }
+
+        [Fact]
+        function ReturnValueNotCopiedIfNotSuccessful() {
+            // Arrange
+            var actual;
+            var target = newAction();
+            target.storable = true;
+            target.responseState = "ERROR";
+            target.error = [];
+            target.returnValue = {foo:"bar"};
+
+            // Act
+            mockContext(function() {
+                actual = target.getReturnValue();
+            });
+            target.returnValue.foo = "baz";
+
+            // Assert
+            Assert.Equal("baz", actual.foo);
+        }
+
+        [Fact]
+        function ReturnValueNotCopiedIfNotStorable() {
+            // Arrange
+            var actual;
+            var target = newAction();
+            target.responseState = "SUCCESS";
+            target.returnValue = {foo:"bar"};
+
+            // Act
+            mockContext(function() {
+                actual = target.getReturnValue();
+            });
+            target.returnValue.foo = "baz";
+
+            // Assert
+            Assert.Equal("baz", actual.foo);
         }
     }
 
@@ -1015,7 +1072,7 @@ Test.Aura.Controller.ActionTest = function() {
             // Arrange
             var target = newAction();
             target.storable = true;
-            target.returnValueClone = "NONE";
+            target.returnValue = "NONE";
             target.state = "SUCCESS";
             target.responseState = "SUCCESS";
 
@@ -1039,79 +1096,6 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Assert
             Assert.Equal("SUCCESS", stored["state"]);
-        }
-    }
-
-    [ Fixture ]
-    function UpdateFromResponse() {
-        var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-            getContext: function() {
-                return Test.Stubs.Aura.GetContext();
-            },
-            util : {
-                isArray : function(v) { return false; },
-                isObject : function(v) { return true; },
-                apply : function(base, obj, force, deep) {
-                    return {foo:"bar"};
-                }
-            }
-        });
-
-        [Fact]
-        function ReturnValueCopied() {
-            // Arrange
-            var target = newAction();
-            target.storable = true;
-            var response = {};
-            response.state = "SUCCESS";
-            response.returnValue = {foo:"bar"};
-
-            // Act
-            mockContext(function() {
-                target.updateFromResponse(response);
-            });
-            target.returnValue.foo = "baz";
-
-            // Assert
-            Assert.Equal({foo:"bar"}, target.returnValueClone);
-        }
-
-        [Fact]
-        function ReturnValueNotCopiedIfNotSuccessful() {
-            // Arrange
-            var target = newAction();
-            target.storable = true;
-            var response = {};
-            response.state = "ERROR";
-            response.error = [];
-            response.returnValue = {foo:"bar"};
-
-            // Act
-            mockContext(function() {
-                target.updateFromResponse(response);
-            });
-            target.returnValue.foo = "baz";
-
-            // Assert
-            Assert.Equal(undefined, target.returnValueClone);
-        }
-
-        [Fact]
-        function ReturnValueNotCopiedIfNotStorable() {
-            // Arrange
-            var target = newAction();
-            var response = {};
-            response.state = "SUCCESS";
-            response.returnValue = {foo:"bar"};
-
-            // Act
-            mockContext(function() {
-                target.updateFromResponse(response);
-            });
-            target.returnValue.foo = "baz";
-
-            // Assert
-            Assert.Equal(undefined, target.returnValueClone);
         }
     }
 

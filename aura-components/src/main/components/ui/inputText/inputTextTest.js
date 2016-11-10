@@ -18,7 +18,7 @@
      * Verify setting value to null will clear out the field.
      */
     testSetValueNull: {
-        attributes : {value: "test"},
+        attributes: {value: "test"},
         test: [ function(component) {
             component.set("v.value", null);
         } , function(component) {
@@ -27,7 +27,7 @@
     },
 
     testInputGetElementWithLabel: {
-        attributes : {label: "text label"},
+        attributes: {label: "text label"},
         test: [ function(component) {
             var inputCmp = component.getSuper(),
                 helper = component.getDef().getHelper();
@@ -46,7 +46,7 @@
     },
 
     testInputGetElementLabelDestroyed: {
-        attributes : {label: "text label"},
+        attributes: {label: "text label"},
         test: [ function(component) {
             var inputCmp = component.getSuper(),
                 helper = component.getDef().getHelper();
@@ -54,7 +54,28 @@
             var inputElement = helper.getInputElement(inputCmp);
             $A.test.assertEquals("input", inputElement.tagName.toLowerCase(), "should find the correct input element");
         }]
+    },
+
+    testLegendWhenIsCompoundFieldSet: {
+        attributes: { isCompound: true, label: "inputLabel" },
+        test: [function(component) {
+            var legendElms = component.getElement().getElementsByTagName("legend");
+            $A.test.assertEquals(1, legendElms.length,
+                "Compound fieldset <input/> should have 1 <legend/> tag");
+            $A.test.assertEquals("inputLabel", $A.test.getText(legendElms[0]),
+                "When isCompound=true, v.label should be used for <legend/>");
+        }]
+    },
+
+    testLabelWhenIsSimpleInput: {
+        attributes: { isCompound: false, label: "inputLabel" },
+        test: [function(component) {
+            var labelElms = component.getElement().getElementsByTagName("label");
+            $A.test.assertEquals(1, labelElms.length,
+                "Non-compound simple <input/> should have 1 <label/> tag");
+            $A.test.assertEquals("inputLabel", $A.test.getText(labelElms[0]),
+                "When isCompound=false, v.label should be used for <label/>");
+        }]
     }
-/*eslint-disable semi*/
-})
-/*eslint-enable semi*/
+
+})//eslint-disable-line semi

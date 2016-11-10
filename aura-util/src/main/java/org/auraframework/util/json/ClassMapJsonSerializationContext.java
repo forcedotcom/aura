@@ -29,9 +29,9 @@ public class ClassMapJsonSerializationContext extends BaseJsonSerializationConte
     private final JsonSerializerFactory jsonSerializerFactory;
 
     public ClassMapJsonSerializationContext(JsonSerializerFactory jsonSerializerFactory,
-                                            boolean format, boolean refSupport, int dataSizeLimit,
+                                            boolean format, int dataSizeLimit,
                                             int collectionSizeLimit) {
-        super(format, refSupport, dataSizeLimit, collectionSizeLimit, false);
+        super(format, dataSizeLimit, collectionSizeLimit, false);
         this.jsonSerializerFactory = jsonSerializerFactory;
     }
 

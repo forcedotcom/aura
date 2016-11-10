@@ -69,9 +69,6 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
     @Override
     public void serialize(Json json, AuraContext ctx) throws IOException {
 
-        JsonSerializationContext serializationContext = ctx.getJsonSerializationContext();
-        serializationContext.pushRefSupport(false);
-        
         json.writeMapBegin();
         json.writeMapEntry("mode", ctx.getMode());
 
@@ -223,7 +220,6 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         }
 
         json.writeMapEnd();
-        serializationContext.popRefSupport();
 
     }
 

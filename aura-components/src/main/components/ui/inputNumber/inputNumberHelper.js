@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 ({
-    setDefaultAttrs : function (cmp) {
+    setDefaultAttrs: function(cmp) {
         cmp.set('v.updateOnDisabled', true);
+    },
+
+    doUpdate: function() {
+        // disabled since it's handled by inputSmartNumber
     }
-});
+})//eslint-disable-line semi

@@ -22,12 +22,14 @@
     testGetCallback: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var that = cmp;
-        window.setTimeout($A.getCallback(function(){
+        var func = $A.getCallback(function(){
             testUtils.assertStartsWith("SecureWindow", this.toString(), "Expected SecureWindow as context to $A.getCallback");
             testUtils.assertStartsWith("SecureWindow", window.toString(), "Expected SecureWindow for window in $A.getCallback");
             testUtils.assertStartsWith("SecureDocument", document.toString(), "Expected SecureDocument as document in $A.getCallback");
             that.set("v.testComplete", true);
-        }), 0);
+        });
+        testUtils.assertTrue(func.toString().indexOf("SecureFunction") === -1, "$A.getCallback should not return a SecureFunction");
+        window.setTimeout(func, 0);
     },
     
     testGetGVP: function(cmp) {

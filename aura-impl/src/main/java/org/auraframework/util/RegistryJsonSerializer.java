@@ -69,7 +69,7 @@ public class RegistryJsonSerializer {
             String file) throws IOException {
         FileWriter f = new FileWriter(file, false);
         BufferedWriter bf = new BufferedWriter(f);
-        JsonEncoder.serialize(components, bf, shouldPrettyPrint, false);
+        JsonEncoder.serialize(components, bf, shouldPrettyPrint);
         bf.close();
     }
 

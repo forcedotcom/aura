@@ -24,12 +24,16 @@ import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ApplicationDefBuilder;
+import org.auraframework.builder.BaseComponentDefBuilder;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.EventDef;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.TokenDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.expression.Expression;
@@ -48,6 +52,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 
 /**
@@ -63,6 +68,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     private final Boolean isAppcacheEnabled;
     private final String additionalAppCacheURLs;
     private final String bootstrapPublicCacheExpiration;
+    private final List<DefDescriptor<TokensDef>> tokenOverrides;
+    private final DefDescriptor<FlavorsDef> flavorOverrides;
 
     private final Boolean isOnePageApp;
 
@@ -78,6 +85,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         this.additionalAppCacheURLs = builder.additionalAppCacheURLs;
         this.isOnePageApp = builder.isOnePageApp;
         this.bootstrapPublicCacheExpiration = builder.bootstrapPublicCacheExpiration;
+        this.tokenOverrides = AuraUtil.immutableList(builder.tokenOverrides);
+        this.flavorOverrides = builder.flavorOverrides;
     }
 
     public static class Builder extends BaseComponentDefImpl.Builder<ApplicationDef>implements ApplicationDefBuilder {
@@ -87,11 +96,31 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         public Boolean isOnePageApp;
         public String additionalAppCacheURLs;
         public String bootstrapPublicCacheExpiration;
+        private List<DefDescriptor<TokensDef>> tokenOverrides;
+        private DefDescriptor<FlavorsDef> flavorOverrides;
 
         public Builder() {
             super(ApplicationDef.class);
         }
 
+        @Override
+        public BaseComponentDefBuilder<ApplicationDef> setTokenOverrides(String tokenOverrides) {
+            if (this.tokenOverrides == null) {
+                this.tokenOverrides = new ArrayList<>();
+            }
+            for (String name : Splitter.on(',').trimResults().omitEmptyStrings().split(tokenOverrides)) {
+                this.tokenOverrides.add(Aura.getDefinitionService().getDefDescriptor(name, TokensDef.class));
+            }
+            return this;
+        }
+
+        @Override
+        public BaseComponentDefBuilder<ApplicationDef> setFlavorOverrides(DefDescriptor<FlavorsDef> flavorOverrides) {
+            this.flavorOverrides = flavorOverrides;
+            return this;
+        }
+
+        
         @Override
         public ApplicationDefImpl build() {
             finish();
@@ -134,6 +163,38 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     }
     
     @Override
+    public List<DefDescriptor<TokensDef>> getTokenOverrides() throws QuickFixException{
+        List<DefDescriptor<TokensDef>> tokens=new ArrayList<>();
+        if(getExtendsDescriptor()!=null){
+            tokens.addAll(getExtendsDescriptor().getDef().getTokenOverrides());
+        }
+        tokens.addAll(tokenOverrides);
+        return tokens;
+    }
+
+    @Override
+    public DefDescriptor<FlavorsDef> getFlavorOverrides() throws QuickFixException {
+        if (flavorOverrides != null) {
+            return flavorOverrides;
+        }
+        if (getExtendsDescriptor() != null) {
+            return getExtendsDescriptor().getDef().getFlavorOverrides();
+        }
+        return null;
+    }
+    
+    @Override
+    public List<DefDescriptor<?>> getBundle() {
+        List<DefDescriptor<?>> ret = super.getBundle();
+        
+        if (flavorOverrides != null) {
+            ret.add(flavorOverrides);
+        }
+        
+        return ret;
+    }
+
+    @Override
     protected void serializeFields(Json json) throws IOException, QuickFixException {
         DefDescriptor<EventDef> locationChangeEventDescriptor = getLocationChangeEventDescriptor();
         if (locationChangeEventDescriptor != null) {
@@ -143,6 +204,9 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         if (tokens != null && !tokens.isEmpty()) {
             json.writeMapEntry("tokens",tokens);
         }
+        if (flavorOverrides != null) {
+            json.writeMapEntry("flavorOverrides", flavorOverrides.getDef());
+        }
     }
 
     @Override
@@ -151,6 +215,14 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
         if (locationChangeEventDescriptor != null) {
             dependencies.add(locationChangeEventDescriptor);
+        }        
+
+        if (tokenOverrides != null) {
+            dependencies.addAll(tokenOverrides);
+        }
+
+        if (flavorOverrides != null) {
+            dependencies.add(flavorOverrides);
         }
     }
 
@@ -274,9 +346,12 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     public Map<String, String> getTokens(){
         Map<String,String> tokens=Maps.newHashMap();
         try {
-            List<DefDescriptor<TokensDef>> tokensDefs = Aura.getContextService().getCurrentContext().getLoadingApplicationDescriptor().getDef().getTokenOverrides();
-            for (DefDescriptor<TokensDef> descriptor : tokensDefs) {
-                addTokens(descriptor, tokens);
+            DefDescriptor<? extends BaseComponentDef> top = Aura.getContextService().getCurrentContext().getLoadingApplicationDescriptor();
+            if (top != null && top.getDefType() == DefType.APPLICATION)  {
+                List<DefDescriptor<TokensDef>> tokensDefs = ((ApplicationDef)top.getDef()).getTokenOverrides();
+                for (DefDescriptor<TokensDef> descriptor : tokensDefs) {
+                    addTokens(descriptor, tokens);
+                }                
             }
         } catch (QuickFixException e) {
             //?? No Application Def -- Borked

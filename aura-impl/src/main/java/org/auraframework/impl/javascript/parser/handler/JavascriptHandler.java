@@ -53,9 +53,9 @@ public abstract class JavascriptHandler<D extends Definition, T extends Definiti
     }
 
     @SuppressWarnings("unchecked")
-	DefDescriptor<? extends RootDefinition> getParentDescriptor() {
-    	DefDescriptor<? extends Definition> bundle = descriptor.getBundle();
-    	return (DefDescriptor<? extends RootDefinition>)bundle;
+    DefDescriptor<? extends RootDefinition> getParentDescriptor() {
+        DefDescriptor<? extends Definition> bundle = descriptor.getBundle();
+        return (DefDescriptor<? extends RootDefinition>)bundle;
     }
 
     public DefDescriptor<D> getDescriptor() {
@@ -144,9 +144,9 @@ public abstract class JavascriptHandler<D extends Definition, T extends Definiti
      */
     protected String mapToCode(Map<String, Object> map) throws IOException {
         StringBuilder sb = new StringBuilder(map.size() * 32);
-        JsonEncoder json = new JsonEncoder(sb, true, false);
+        JsonEncoder json = new JsonEncoder(sb, true);
         // Indent to ease debugging.
-		json.pushIndent(IndentType.BRACE);
+        json.pushIndent(IndentType.BRACE);
         json.writeValue(map);
         return sb.toString();
     }

@@ -177,7 +177,8 @@ Test.Aura.AuraErrorTest = function() {
     at Aura.$Event$.$Event$.$fire$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8128:6)\n\
     at Object.catchAndFireEvent (http://localhost:9090/components/ui/button.js:90:33)\n\
     at press (http://localhost:9090/components/ui/button.js:34:16)";
-            var expected = 68189688;
+            // Murmur32 hash with stacktraceIdGen
+            var expected = -2111460059;
 
             getAuraMock(function() {
                 actual = new Aura.Errors.AuraError(null, innerError).id;

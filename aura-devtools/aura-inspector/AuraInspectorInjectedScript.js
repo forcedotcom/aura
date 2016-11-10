@@ -2142,6 +2142,36 @@
         }
     }
 
+    /*
+    {
+        "actions": [],
+        "context":
+    }
+    */
+    function ripActionsOutFromResponse(response) {
+        var actionsStartIdx = response.indexOf("actions");
+        var actionsEndIdx = response.indexOf("context");
+        if(actionsStartIdx>=0 && actionsEndIdx >=0 ) {
+            var actionsStrInResponse = response.substring(actionsStartIdx, actionsEndIdx-1).replace(/\s/g, "");//we don't want '"' right before the 'context'
+            if(actionsStrInResponse.lastIndexOf(",") == actionsStrInResponse.length -1) {//get rid of ','
+                actionsStrInResponse = actionsStrInResponse.substring(0, actionsStrInResponse.length-1);
+            } 
+            return "{\""+actionsStrInResponse+"}";
+        }
+    }
+
+    function addMessageAndStackToResponse(response, message, stack) {
+        var actionsStartIdx = response.indexOf("actions");
+        if(actionsStartIdx>0) {
+            var res = response.substring(0, actionsStartIdx-1)+"\"message\":\""+message+"\",\"stack\":\""+stack+"\","
+            + response.substring(actionsStartIdx-1, response.length);
+            return res;
+        } else {
+            return response;
+        }
+    }
+
+
     //oldResponse: XMLHttpRequest
     //actionsFromAuraXHR: AuraXHR keep an object called actions, it has all actions client side are waiting for response, a map between actionId and action.
     function onDecode(config, oldResponse, noStrip) {
@@ -2161,73 +2191,47 @@
                         var actionWatched = actionsWatched[actionWatchedId];
                         if( oldResponseText.startsWith("while(1);") ) {
                             //parse oldResponseObj out of oldResponseText
-                            
-                            var oldResponseObj = JSON.parse(oldResponseText.substring(9, oldResponseText.length));
-
-                            //replace returnValue in oldResponseObj's actions
-                            if(oldResponseObj && oldResponseObj.actions) {
-                                var actionsFromOldResponse = oldResponseObj.actions;
-                                for(var i = 0; i < actionsFromOldResponse.length; i++) {
-                                    //console.log("decode action#"+actionsFromOldResponse[i].id, actionsFromOldResponse[i]);
-                                    if(actionsFromOldResponse[i].id && actionsFromOldResponse[i].id === actionWatchedId) {
+                            var actionsStrInResponse = ripActionsOutFromResponse(oldResponseText);
+                            var actionsObj = JSON.parse(actionsStrInResponse);
+                            if(actionsObj && actionsObj.actions) {
+                                for(var i=0; i < actionsObj.actions.length; i++) {
+                                    if(actionsObj.actions[i].id && actionsObj.actions[i].id === actionWatchedId) {
                                         if(actionWatched.nextError) {//we would like to return error response
                                             var errsArr = [];
                                             errsArr.push(actionWatched.nextError);
-                                            actionsFromOldResponse[i].state = "ERROR";
+                                            actionsObj.actions[i].state = "ERROR";
                                             //when action return with error, returnValue should be null
-                                            actionsFromOldResponse[i].returnValue = null;
-                                            actionsFromOldResponse[i].error = errsArr;
+                                            actionsObj.actions[i].returnValue = null;
+                                            actionsObj.actions[i].error = errsArr;
                                             responseWithError = true;
-                                            break;//get out of looping over actionsFromOldResponse
+                                            break;//get out of looping over actionsObj.actions
                                         } else if(actionWatched.nextResponse) {//we would like to return non-error response
-                                            var returnValue = actionsFromOldResponse[i].returnValue;
+                                            var returnValue = actionsObj.actions[i].returnValue;
                                             responseModified = replaceValueInObj(returnValue, actionWatched.nextResponse);
                                             if(responseModified === true) {
                                                 //no need to continue, returnValue now contains new response
-                                                actionsFromOldResponse[i].returnValue = returnValue;
-                                                break; //get out of looping over actionsFromOldResponse
+                                                actionsObj.actions[i].returnValue = returnValue;
+                                                break; //get out of looping over actionsObj.actions
                                             }
                                         } else {//we would like to kill action, return incomplete
                                             responseWithIncomplete = true;
                                         }
                                     }
-                                }//end of looping over actionsFromOldResponse
-                            }//end of oldResponseObj is valid and it has actions
-                            //replace context in oldResponseObj
+                                }//end of looping over actionsObj.actions
+                            }//if actionsObj has actions array
+
+                            
                             if(responseWithError === true ) {
-                                //udpate context:
-                                //if response is ERROR, we shouldn't have any SERIAL_REFID or SERIAL_ID related object in context, or our real decode will explode
-                                if(oldResponseObj.context && oldResponseObj.context.globalValueProviders) {
-                                    var newGVP = [];
-                                    for(var j = 0; j < oldResponseObj.context.globalValueProviders.length; j++) {
-                                        var gvpj = oldResponseObj.context.globalValueProviders[j];
-                                        if( isTrueObject(gvpj) && gvpj.type ) {
-                                            if(gvpj.type === "$Locale" || gvpj.type === "$Browser" || gvpj.type === "$Global") {
-                                                //we keep Local, Browser and Global ONLY
-                                                newGVP.push(gvpj);
-                                            } else {
-                                                //get rid of others
-                                            }
-                                        }
-                                    }
-                                    oldResponseObj.context.globalValueProviders = newGVP;
-                                }
-                                //update actions
-                                oldResponseObj.actions = actionsFromOldResponse;
-                                newResponseText = "while(1);\n"+JSON.stringify(oldResponseObj);
-                                //move the actionCard from watch list to Processed
-                                //this will call AuraInspectorActionsView_OnActionStateChange in AuraInspectorActionsView.js
-                                $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
-                                        "id": actionWatchedId,
-                                        "idtoWatch": actionWatched.idtoWatch,
-                                        "state": "RESPONSEMODIFIED",
-                                        "error": actionWatched.nextError,//we don't show error on processed actionAcard, but pass it anyway
-                                        "sentTime": performance.now()//do we need this?
-                                });
-                                break;//get out of looping over actionsWatched
+                                newResponseText = addMessageAndStackToResponse(oldResponseText, actionWatched.nextError.message, actionWatched.nextError.stack);
+                                break;
                             } else if(responseModified === true) {
-                                oldResponseObj.actions = actionsFromOldResponse;
-                                newResponseText = "while(1);\n"+JSON.stringify(oldResponseObj);
+                                //oldResponseObj.actions = actionsFromOldResponse;
+                                //newResponseText = "while(1);\n"+JSON.stringify(oldResponseObj);
+                                var actionsEndIdx = oldResponseText.indexOf("context");
+                                newResponseText = "while(1);\n"+
+                                    "{"+"\"actions\":"+JSON.stringify(actionsObj.actions)+","
+                                    +"\""+oldResponseText.substring(actionsEndIdx,oldResponseText.length);
+
                                 //move the actionCard from watch list to Processed
                                 //this will call AuraInspectorActionsView_OnActionStateChange in AuraInspectorActionsView.js
                                 $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
@@ -2282,17 +2286,25 @@
             
 
             if(responseWithIncomplete) {
-                oldResponse.status = 0;//so AuraClientService.isDisconnectedOrCancelled will return true
-
+                //oldResponse.status = 0;//so AuraClientService.isDisconnectedOrCancelled will return true
+                var newHttpRequest = {};
+                newHttpRequest.status = 0;
                 var ret = config["fn"].call(config["scope"], newHttpRequest, noStrip);
                 return ret;
             }
-            else if(responseModified === true || responseWithError === true) {
+            else if(responseModified === true) {
                 var newHttpRequest = {};
                 newHttpRequest = $A.util.apply(newHttpRequest, oldResponse);
                 newHttpRequest["response"] = newResponseText;
                 newHttpRequest["responseText"] = newResponseText;
 
+                var ret = config["fn"].call(config["scope"], newHttpRequest, noStrip);
+                return ret;
+            } else if (responseWithError === true) {
+                var newHttpRequest = {};
+                newHttpRequest["status"] = 500;//as long as it's not 200
+                newHttpRequest["response"] = newResponseText;
+                newHttpRequest["responseText"] = newResponseText;
                 var ret = config["fn"].call(config["scope"], newHttpRequest, noStrip);
                 return ret;
             } else {//nothing happended, just send back oldResponse

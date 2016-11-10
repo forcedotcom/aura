@@ -26,6 +26,7 @@ function LockerService() {
     //#include aura.locker.SecureDocument
     //#include aura.locker.SecureAura
     //#include aura.locker.SecureStorage
+    //#include aura.locker.SecureMutationObserver
     //#include aura.locker.SecureNavigator
     //#include aura.locker.SecureXMLHttpRequest
     //#include aura.locker.SecureWindow

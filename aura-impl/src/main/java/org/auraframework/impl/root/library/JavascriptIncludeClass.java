@@ -110,7 +110,14 @@ public class JavascriptIncludeClass extends BaseJavascriptClass {
         public String getSourceUrl() {
             String desc = jsDescriptor.split("://")[1];
             String[] parts = desc.split("[.]");
-            return "//# sourceURL=libraries/" + parts[0] + '/' + parts[1] + ".js\n";
+            StringBuilder sb = new StringBuilder();
+            sb.append("//# sourceURL=libraries");
+            for (String part : parts) {
+                sb.append('/');
+                sb.append(part);
+            }
+            sb.append(".js\n");
+            return sb.toString();
         }
 
         private void writeImports(StringBuilder out) {

@@ -400,14 +400,9 @@
             return cmp;
         }
     },
-    /**
-     * Clean up
-     * @private
-     */
-    unrender: function (cmp) {
-        // Probably unnecessary since we have auto destroy by default now?
+    handleDestroy: function (cmp) {
         cmp._tabCollection.destroy();
-        delete cmp._tabCollection;
+        cmp._tabCollection = [];
     },
     /**
      * Returns an object that wraps the a collection of tabs.

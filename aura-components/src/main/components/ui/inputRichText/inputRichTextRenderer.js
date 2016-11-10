@@ -18,7 +18,11 @@
 
 	afterRender: function (cmp, helper) {
 		helper.initEditor(cmp, function () {
-			helper.setContent(cmp, cmp.get("v.value"));
+			var value = cmp.get('v.value');
+			// only set value if it is not empty
+			if(!$A.util.isEmpty(value)) {
+				helper.setContent(cmp, cmp.get("v.value"));
+			}
 		});
 		this.superAfterRender();
 	},

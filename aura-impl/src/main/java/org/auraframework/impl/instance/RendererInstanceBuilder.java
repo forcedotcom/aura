@@ -21,24 +21,23 @@ import org.auraframework.def.RendererDef;
 import org.auraframework.impl.java.renderer.JavaRendererDef;
 import org.auraframework.impl.java.renderer.JavaRendererInstance;
 import org.auraframework.instance.InstanceBuilder;
+import org.auraframework.instance.InstanceBuilderProvider;
 import org.auraframework.instance.RendererInstance;
 import org.auraframework.service.LoggingService;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import javax.inject.Inject;
 import java.util.Map;
 
 @ServiceComponent
-public class RendererInstanceBuilder implements InstanceBuilder<RendererInstance, RendererDef>, ApplicationContextAware {
+public class RendererInstanceBuilder implements InstanceBuilder<RendererInstance, RendererDef> {
 
     @Inject
     LoggingService loggingService;
 
-    private ApplicationContext applicationContext;
+    @Inject
+    private InstanceBuilderProvider instanceBuilderProvider;
 
     @Override
     public Class<?> getDefinitionClass() {
@@ -49,7 +48,7 @@ public class RendererInstanceBuilder implements InstanceBuilder<RendererInstance
     public RendererInstance getInstance(RendererDef rendererDef, Map<String, Object> attributes) throws QuickFixException {
         Object instance;
         try {
-            instance = applicationContext.getBean(((JavaRendererDef)rendererDef).getJavaType());
+            instance = instanceBuilderProvider.get(((JavaRendererDef)rendererDef).getJavaType());
         } catch (Throwable t) {
             throw new AuraRuntimeException(
                     "Failed to retreive renderer instance for " + rendererDef.getDescriptor(), t);
@@ -62,11 +61,6 @@ public class RendererInstanceBuilder implements InstanceBuilder<RendererInstance
         // Consider throwing for now?
 
         return null;
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 
 }

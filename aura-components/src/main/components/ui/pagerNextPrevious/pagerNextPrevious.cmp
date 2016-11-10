@@ -16,10 +16,10 @@
 
 -->
 <aura:component access="PRIVILEGED" extends="ui:pager" extensible="true" support="GA" description="A pager implementation that allows the user to navigate sequentially between pages or jump to the first or last page.">
-    <aura:attribute name="Labels_First" type="String" default="First"          description="The text to display in the label of the link used to jump to the first page."/>
-    <aura:attribute name="Labels_Last" type="String" default="Last"            description="The text to display in the label of the link used to jump to the last page."/>
-    <aura:attribute name="Labels_Next" type="String" default="Next"            description="The text to display in the label of the link used to jump to the next page."/>
-    <aura:attribute name="Labels_Previous" type="String" default="Previous"    description="The text to display in the label of the link used to jump to the previous page."/>
+    <aura:attribute name="Labels_First" type="String" default="First" access="PRIVILEGED"          description="The text to display in the label of the link used to jump to the first page."/>
+    <aura:attribute name="Labels_Last" type="String" default="Last" access="PRIVILEGED"            description="The text to display in the label of the link used to jump to the last page."/>
+    <aura:attribute name="Labels_Next" type="String" default="Next" access="PRIVILEGED"            description="The text to display in the label of the link used to jump to the next page."/>
+    <aura:attribute name="Labels_Previous" type="String" default="Previous" access="PRIVILEGED"    description="The text to display in the label of the link used to jump to the previous page."/>
 
    <div class="{!v.class+' pagerContainer pagerNextPrevious'+(v.totalItems==0?' empty':'')}">
         <a aura:id="pager:first" class="{!'pagerControl first' + ((v.currentPage le 1)?' off':'')}" onclick="{!c.firstPage}" aria-disabled="{!v.currentPage le 1}">

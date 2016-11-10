@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" description="Notification event for a sort">
+<aura:event access="PRIVILEGED" type="COMPONENT" description="Notification event for a sort">
 	<aura:attribute name="sortBy"		type="String"/>
 	<aura:attribute name="callback"		type="Object"/>
 </aura:event>

@@ -372,7 +372,9 @@
         }
 
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-        delete namespace.instances[component.getGlobalId()];
+        if ($A.util.isObject(namespace) && $A.util.isObject(namespace.instances)) {
+            delete namespace.instances[component.getGlobalId()];
+        }
         // #end
 
         if (scroller) {

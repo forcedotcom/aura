@@ -34,6 +34,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.loadedOriginal = $A.util.apply({}, this.loaded);
 
     this.fwuid = config["fwuid"];
+    this.pathPrefix = config["pathPrefix"];
     this.num = 0;
 
     // To keep track of re-rendering service call
@@ -629,6 +630,15 @@ Aura.Context.AuraContext.prototype.getCurrentAction = function() {
     return this.currentAction;
 };
 
+/**
+ * Temporarily made public for Communities - return to private when prefixes are not needed
+ * @public
+ * @return {String} path prefix.
+ * @export
+ */
+Aura.Context.AuraContext.prototype.getPathPrefix = function () {
+    return this.pathPrefix;
+};
 
 /**
  * Servlet container context path

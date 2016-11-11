@@ -107,6 +107,8 @@ public class AuraContextImpl implements AuraContext {
     private final Map<DefDescriptor<?>, String> clientLoaded = Maps.newLinkedHashMap();
 
     private String contextPath = "";
+    
+    private String pathPrefix = "";
 
     private boolean preloading = false;
 
@@ -360,6 +362,11 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public String getContextPath() {
         return contextPath;
+    }
+    
+    @Override
+    public String getPathPrefix() {
+        return pathPrefix;
     }
 
     @Override

@@ -97,6 +97,7 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
             }
 
             String contextPath = context.getContextPath();
+            String pathPrefix = context.getPathPrefix();
             Mode mode = context.getMode();
 
             if (mode.allowLocalRendering() && def.isLocallyRenderable()) {
@@ -126,6 +127,7 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
                 auraInit.put("descriptor", def.getDescriptor());
                 auraInit.put("deftype", def.getDescriptor().getDefType());
                 auraInit.put("host", contextPath);
+                auraInit.put("pathPrefix", pathPrefix);
                 
                 String lockerWorkerURL = configAdapter.getLockerWorkerURL();
                 if (lockerWorkerURL != null) {

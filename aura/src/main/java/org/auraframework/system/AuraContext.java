@@ -295,6 +295,8 @@ public interface AuraContext {
     Map<String, GlobalValueProvider> getGlobalProviders();
 
     String getContextPath();
+    
+    String getPathPrefix();
 
     void setContextPath(String path);
 

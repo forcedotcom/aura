@@ -745,6 +745,7 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
         $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
             $A.context = context;
             $A.clientService.initDefs();
+            $A.metricsService.initialize();
             $A.initPriv(config["instance"], config["token"], null, doNotInitializeServices);
             $A.context.finishComponentConfigs($A.context.getCurrentAction().getId());
             $A.context.setCurrentAction(null);

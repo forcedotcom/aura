@@ -384,7 +384,7 @@ AuraExpressionService.prototype.resolveLocator = function (parent, root, include
     
     var grandparent = this.getContainer(parent).getConcreteComponent();
 
-    if (grandparent.isInstanceOf('ui:virtualComponent')) {
+    if (grandparent.isInstanceOf('ui:virtualComponent') || grandparent.isInstanceOf('ui:abstractList')) {
         grandparent = this.getContainer(grandparent).getConcreteComponent();
     }
     

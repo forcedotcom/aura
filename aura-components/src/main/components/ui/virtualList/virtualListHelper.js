@@ -245,8 +245,8 @@
         return id && $A.componentService.get(id);
     },
 
-    // NOTE: Do not rename this function not change its signature(instrumentation reliying on it)
-    _dispatchAction: function (action, event /*cmp*/) {
+    // NOTE: Do not rename this function nor change its signature(instrumentation relying on it)
+    _dispatchAction: function (action, event /*, cmp*/) {
         action.runDeprecated(event);
     },
     _getItemAttached: function (dom) {

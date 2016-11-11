@@ -43,7 +43,7 @@ DomHandlersPlugin.prototype.initialize = function (metricsService) {
     this.metricsService = metricsService;
 
     if (this["enabled"]) {
-        this.bind(metricsService);
+        this.bind();
     }
 };
 
@@ -51,7 +51,7 @@ DomHandlersPlugin.prototype.initialize = function (metricsService) {
 DomHandlersPlugin.prototype.enable = function () {
     if (!this["enabled"]) {
         this["enabled"] = true;
-        this.bind(this.metricsService);
+        this.bind();
     }
 };
 
@@ -161,72 +161,37 @@ DomHandlersPlugin.prototype.logUnInstrumentedClick = function (action, root) {
     $A.log("WARNING: **** Un-Instrumented click logged. Details: " + JSON.stringify(hierarchy));
 };
 
-DomHandlersPlugin.prototype.bind = function (metricsService) {
+DomHandlersPlugin.prototype.bindToHelper = function (descriptor, helperMethod) {
+    var self = this;
+
+    var defConfig  = $A.componentService.createDescriptorConfig(descriptor);
+    var def        = $A.componentService.getComponentDef(defConfig);
+    var defHelper  = def && def.getHelper();
+
+    if (defHelper) {
+        this.metricsService.instrument(
+            defHelper, 
+            helperMethod, 
+            DomHandlersPlugin.NAME,
+            false/*async*/,
+            null, 
+            null,
+            function (original) {
+                var xargs = Array.prototype.slice.call(arguments, 1);
+                self.dispatchActionHook.apply(self, xargs);
+                return original.apply(this, xargs);
+            }
+        );
+    }    
+};
+
+DomHandlersPlugin.prototype.bind = function () {
     var self = this;
     $A.clientService.runAfterInitDefs(function () {
-        // Hooking html helper to intercept all interactions
-        var defConfig  = $A.componentService.createDescriptorConfig("markup://aura:html");
-        var def        = $A.componentService.getComponentDef(defConfig);
-        var defHelper  = def && def.getHelper();
-
-        if (defHelper) {
-            metricsService.instrument(
-                defHelper, 
-                "dispatchAction", 
-                DomHandlersPlugin.NAME,
-                false/*async*/,
-                null, 
-                null,
-                function (original) {
-                    var xargs = Array.prototype.slice.call(arguments, 1);
-                    self.dispatchActionHook.apply(self, xargs);
-                    return original.apply(this, xargs);
-                }
-            );
-        }
-
-        // Hooking special handling for virtualList
-        defConfig  = $A.componentService.createDescriptorConfig("markup://ui:virtualList");
-        def        = $A.componentService.getComponentDef(defConfig);
-        defHelper  = def && def.getHelper();
-
-        if (defHelper) {
-            metricsService.instrument(
-                defHelper, 
-                "_dispatchAction", 
-                DomHandlersPlugin.NAME,
-                false/*async*/,
-                null, 
-                null,
-                function (original) {
-                    var xargs = Array.prototype.slice.call(arguments, 1);
-                    self.dispatchVirtualActionHook.apply(self, xargs);
-                    return original.apply(this, xargs);
-                }
-            );
-        }
-
-
-        // Hooking special handling for virtualList
-        defConfig  = $A.componentService.createDescriptorConfig("markup://ui:virtualDataGrid");
-        def        = $A.componentService.getComponentDef(defConfig);
-        defHelper  = def && def.getHelper();
-
-        if (defHelper) {
-            metricsService.instrument(
-                defHelper, 
-                "_dispatchAction",
-                DomHandlersPlugin.NAME,
-                false/*async*/,
-                null, 
-                null,
-                function (original) {
-                    var xargs = Array.prototype.slice.call(arguments, 1);
-                    self.dispatchVirtualActionHook.apply(self, xargs);
-                    return original.apply(this, xargs);
-                }
-            );
-        }
+        self.bindToHelper("markup://aura:html", "dispatchAction");
+        self.bindToHelper("markup://ui:virtualList", "_dispatchAction");
+        self.bindToHelper("markup://ui:virtualDataGrid", "_dispatchAction");
+        self.bindToHelper("markup://ui:virtualDataTable", "_dispatchAction");
     });
 };
 

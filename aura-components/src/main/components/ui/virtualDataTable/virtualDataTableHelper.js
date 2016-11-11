@@ -192,7 +192,8 @@
         var id  = $A.util.getDataAttribute(domElement, 'auraRenderedBy');
         return id && $A.componentService.get(id);
     },
-    _dispatchAction: function (actionHandler, event) {
+    // NOTE: Do not rename this function nor change its signature(instrumentation relying on it)
+    _dispatchAction: function (actionHandler, event /*,cmp*/) {
         actionHandler.runDeprecated(event);
     },
     _getActionHandler: function (htmlCmp, eventType) {

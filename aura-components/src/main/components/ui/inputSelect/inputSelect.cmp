@@ -43,6 +43,8 @@
     <aura:dependency resource="ui:radioMenuItem" />
     <aura:dependency resource="ui:checkboxMenuItem" />
 
+    <aura:set attribute="useSpanLabel" value="{!v.useMenu}"/>
+
     <aura:if isTrue="{!v.useMenu}">
         <ui:menu class="{!v.class}">
             <ui:menuTriggerLink aura:id="selectTrigger" class="select" disabled="{!v.disabled}" ariaLabel="{!v.label}"

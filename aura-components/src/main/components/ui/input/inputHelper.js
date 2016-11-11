@@ -26,6 +26,9 @@
             if (isCompound) {
                 wrapperTag = 'fieldset';
                 innerBody = this.addLegendToBody(component, labelAttribute);
+            } else if (component.get("v.useSpanLabel")) {
+                wrapperTag = 'div';
+                innerBody = this.addSpanLabelToBody(component, labelAttribute);
             } else {
                 wrapperTag = 'div';
                 innerBody = this.addLabelToBody(component, labelAttribute);
@@ -114,6 +117,40 @@
 
         return innerBody;
     },
+
+    addSpanLabelToBody: function (component, labelAttribute) {
+        var innerBody = component.get("v.body");
+
+        // setting attributes
+        var labelPositionAttribute = this.checkValidPosition(component.get("v.labelPosition"));
+        var labelClass = component.get("v.labelClass") + " uiPicklistLabel-" + labelPositionAttribute + " form-element__label";
+        var labelDisplay = labelPositionAttribute !== "hidden";
+        var requiredIndicator = labelDisplay && component.get("v.required") ? component.get("v.requiredIndicator") : null;
+
+        // creating picklistLabel component
+        var legendComponent = $A.createComponentFromConfig({
+            descriptor: 'markup://ui:picklistLabel',
+            localId: 'inputLabel',
+            valueProvider: component,
+            attributes: {
+                label: labelAttribute,
+                "class" : labelClass,
+                labelDisplay: labelDisplay,
+                title: component.get("v.labelTitle"),
+                requiredIndicator: requiredIndicator
+            }
+        });
+
+        // Inserting legend inside of innerBody
+        if (labelPositionAttribute === 'bottom') {
+            innerBody.push(legendComponent);
+        } else {
+            innerBody.unshift(legendComponent);
+        }
+
+        return innerBody;
+    },
+
     /**
      * The reason for passing a fieldHelpComponent instead of setting a
      * fieldHelp string is because we want to handle the tooltip differently

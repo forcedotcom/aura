@@ -33,7 +33,7 @@
         if (cmp._truth !== isTrue) {
             helper.clearUnrenderedBody(cmp);
 
-            cmp.set("v.body", helper.createBody(cmp, isTrue, true));
+            cmp.set("v.body", helper.createBody(cmp, isTrue));
             cmp._truth = isTrue;
         }
     }

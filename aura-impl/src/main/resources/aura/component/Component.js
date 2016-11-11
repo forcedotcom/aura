@@ -591,7 +591,9 @@ Component.prototype.removeValueHandler = function(config) {
         if (handlers[expression]) {
             for (var i = 0; i < handlers[expression].length; i++) {
                 var method = handlers[expression][i];
-                if (method===config["method"] || (config["id"] && config["key"] && method["id"] === config["id"] && method["key"] === config["key"])) {
+                // only check key because id could be different if component is aura:iteration, resulting in handler not being removed and the leak.
+                if (method===config["method"] ||
+                    (config["key"] && method["key"] === config["key"])) {
                     handlers[expression].splice(i--, 1);
                 }
             }

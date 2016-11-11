@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" extensible="false" description="Creates a container that enables native scrolling in Salesforce1.">
+<aura:component support="BETA" access="GLOBAL" extensible="false" description="Creates a container that enables native scrolling in Salesforce1.">
     <!-- Attributes -->
     <aura:attribute name="class" type="String" access="GLOBAL" description="A CSS class applied to the outer element. This style is in addition to base classes output by the component."/>
     <aura:attribute name="privateStartY" type="Integer" access="private" description="Determines the user's mouse position in the vertical axis."/>

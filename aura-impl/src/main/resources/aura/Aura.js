@@ -755,6 +755,8 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
         // FIXME: This is used by integration service, and will not work correctly with components.
         $A.getContext()['merge'](config["context"]);
     }
+
+    $A.executeExternalLibraries();
 };
 
 /**

@@ -1308,7 +1308,9 @@ TestInstance.prototype.getElementsByClassNameCustom = function(className, parent
     }
 
     this.walkTheDOM(parentElement, function(node) {
-        var a, c = node.className, i;
+        var a, i;
+        var c = $A.util.isSVGElement(node)? node.getAttribute("class"): node.className;
+
         if (c) {
             a = c.split(' ');
             for (i = 0; i < a.length; i++) {

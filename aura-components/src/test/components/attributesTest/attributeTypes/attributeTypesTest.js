@@ -25,24 +25,18 @@
     },
 
     // we can pass string to Integer attribute, it will get converted into number
+    // we can pass number to String attribute, it will get converted into String
     testIntegerTypeWithString: {
         attributes: {
             typeInteger: "123",
+            typeString: 123
         },
         test: function(cmp) {
             var value = cmp.get("v.typeInteger");
             $A.test.assertEquals("number", typeof value);
-        }
-    },
 
-    // we can pass number to String attribute, it remains a number
-    testStringTypeWithInteger: {
-        attributes: {
-            typeString: 123
-        },
-        test: function(cmp) {
-            var value = cmp.get("v.typeString");
-            $A.test.assertEquals("number", typeof value);
+            var valueStr = cmp.get("v.typeString");
+            $A.test.assertEquals("string", typeof valueStr);
         }
     },
 

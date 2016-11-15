@@ -237,6 +237,11 @@ public class AuraContextImpl implements AuraContext {
             this.currentDefs = userDefs;
         }
     }
+    
+    @Override
+    public boolean isSystemMode() {
+    	return this.isSystem;
+    }
 
     @Override
     public void setLocalDefNotCacheable(DefDescriptor<?> descriptor) {

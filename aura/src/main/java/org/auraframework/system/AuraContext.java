@@ -723,4 +723,9 @@ public interface AuraContext {
      * This is really a semi-private method used by the context adapter... Wish I had a better way to do it.
      */
     void setSystemMode(boolean systemMode);
+    
+    /**
+     * @return true if this context in 'system mode'.
+     */
+    boolean isSystemMode();
 }

@@ -858,27 +858,63 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
 
         if (!bootstrap["timming"]) {
             bootstrap["timing"] = {
-                "redirects"       : pn.redirectCount,
-                "type"            : pn.type,
                 "navigationStart" : pt.navigationStart,
                 "fetchStart"      : pt.fetchStart,
+
+                // Time consumed preparing the new page
+                "readyStart"      : pt.fetchStart - pt.navigationStart,
+
                 "dnsStart"        : pt.domainLookupStart,
                 "dnsEnd"          : pt.domainLookupEnd,
+
+                // DNS query time
+                "lookupDomainTime": pt.domainLookupEnd - pt.domainLookupStart,
+
                 "connectStart"    : pt.connectStart,
                 "connectEnd"      : pt.connectEnd,
+
+                // TCP connection time
+                "connectTime"     : pt.connectEnd - pt.connectStart,
+
                 "requestStart"    : pt.requestStart,
                 "responseStart"   : pt.responseStart,
                 "responseEnd"     : pt.responseEnd,
+
+                // Time spent during the request
+                "requestTime"     : pt.responseEnd - pt.requestStart,
+
                 "domLoading"      : pt.domLoading,
                 "domInteractive"  : pt.domInteractive,
+
+                // Request to completion of the DOM loading
+                "initDomTreeTime" : pt.domInteractive - pt.responseEnd,
+
                 "contentLoadStart": pt.domContentLoadedEventStart,
                 "contentLoadEnd"  : pt.domContentLoadedEventEnd,
                 "domComplete"     : pt.domComplete,
+
+                 // Time spent constructing the DOM tree
+                "domReadyTime"    : pt.domComplete - pt.domInteractive,
+
                 "loadEventStart"  : pt.loadEventStart,
                 "loadEventEnd"    : pt.loadEventEnd,
+
+                // Load event time
+                "loadEventTime"   : pt.loadEventEnd - pt.loadEventStart,
+
+                // Total time from start to load
+                "loadTime"        : pt.loadEventEnd - pt.fetchStart,
+
                 "unloadEventStart": pt.unloadEventStart,
                 "unloadEventEnd"  : pt.unloadEventEnd,
-                "appCache"        : pt.domainLookupStart - pt.fetchStart,
+
+                // Time spent unloading documents
+                "unloadEventTime" : pt.unloadEventEnd - pt.unloadEventStart,
+
+                // AppCache
+                "appCacheTime"    : pt.domainLookupStart - pt.fetchStart,
+
+                // Time spent during redirection
                 "redirectTime"    : pt.redirectEnd - pt.redirectStart
             };
         }

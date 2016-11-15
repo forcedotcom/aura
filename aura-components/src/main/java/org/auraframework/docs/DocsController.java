@@ -17,11 +17,15 @@ package org.auraframework.docs;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.instance.Component;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
@@ -35,6 +39,12 @@ public class DocsController implements Controller {
 
     @Inject
     private InstanceService instanceService;
+    
+    @Inject
+    private DefinitionService definitionService;
+    
+    @Inject
+    private ConfigAdapter configAdapter;
 
     @AuraEnabled
     public Component getTopic(@Key("topic") String topic) throws QuickFixException {
@@ -74,6 +84,12 @@ public class DocsController implements Controller {
             Preconditions.checkNotNull(descriptor);
             Preconditions.checkNotNull(defType);
             DefType dt = DefType.valueOf(defType.toUpperCase());
+            
+            DefDescriptor<?> defDescriptor = definitionService.getDefDescriptor(descriptor, dt.getPrimaryInterface());
+            if(!configAdapter.isDocumentedNamespace(defDescriptor.getNamespace())) {
+            	return null;
+            }
+            
             attributes.put("descriptor", descriptor);
             attributes.put("defType", dt.name());
             return instanceService.getInstance("auradocs:def", ComponentDef.class, attributes);

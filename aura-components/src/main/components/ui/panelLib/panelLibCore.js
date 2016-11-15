@@ -38,7 +38,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                     last: null
                 };
             }
-            var els = containerEl.querySelectorAll('input,button,a,textarea,select'),
+            var els = containerEl.querySelectorAll('input,button,a,textarea,select,[tabindex]'),
                 len = els.length,
                 i, el;
 
@@ -478,7 +478,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
          * @private
          */
         focusAllowed: function(el) {
-            return el && !el.disabled && !/hidden/i.test(el.type) && this.isVisible(el);
+            return el && !el.disabled && !/hidden/i.test(el.type) && this.isVisible(el) && el.getAttribute("tabindex") !== "-1";
         },
 
         /**

@@ -117,7 +117,7 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
         } else if (RegisterEventHandler.TAG.equalsIgnoreCase(tag)) {
             RegisterEventDefImpl regDef = new RegisterEventHandler<>(this, xmlReader, source, isInInternalNamespace,
                     definitionService, configAdapter, definitionParserAdapter).getElement();
-            builder.events.put(regDef.getAttributeName(), regDef);
+            builder.events.put(regDef.getDescriptor().getName(), regDef);
         } else if (MethodDefHandler.TAG.equalsIgnoreCase(tag)) {
             MethodDef methodDef = new MethodDefHandler<>(this, xmlReader, source, isInInternalNamespace,
                     definitionService, configAdapter, definitionParserAdapter).getElement();

@@ -181,11 +181,11 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             RegisterEventHandler<T> handler = new RegisterEventHandler<>(this, xmlReader, source,
                     isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
             RegisterEventDefImpl regDef = handler.getElement();
-            DefDescriptor<MethodDef> methodDef = definitionService.getDefDescriptor(regDef.getAttributeName(), MethodDef.class);
-            if (builder.events.containsKey(regDef.getAttributeName())) {
+            DefDescriptor<MethodDef> methodDef = definitionService.getDefDescriptor(regDef.getDescriptor().getName(), MethodDef.class);
+            if (builder.events.containsKey(regDef.getDescriptor().getName())) {
                 tagError("There is already an event named '%s' registered on %s '%s'.",
                         handler.getParentHandler().getDefDescriptor(),
-                        regDef.getAttributeName(),
+                        regDef.getDescriptor().getName(),
                         "%s", "%s"
                 );
             }
@@ -193,12 +193,12 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             if (builder.getMethodDefs().containsKey(methodDef)) {
                 tagError("The event '%s' conflicts with a method of the same name on %s '%s'.",
                     handler.getParentHandler().getDefDescriptor(),
-                    regDef.getAttributeName(),
+                    regDef.getDescriptor().getName(),
                     "%s","%s"
                 );
             }
 
-            builder.events.put(regDef.getAttributeName(), regDef);
+            builder.events.put(regDef.getDescriptor().getName(), regDef);
         } else if (EventHandlerDefHandler.TAG.equalsIgnoreCase(tag)) {
             builder.eventHandlers.add(new EventHandlerDefHandler(this, xmlReader, source, definitionService).getElement());
         } else if (LibraryDefRefHandler.TAG.equalsIgnoreCase(tag)) {

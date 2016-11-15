@@ -54,7 +54,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.json.JsonStreamReader;
@@ -214,9 +213,9 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     @Test
     public void testEqualsWithDifferentEvents() throws Exception {
         DefDescriptor<EventDef> eventDefDescriptor = definitionService.getDefDescriptor("fake:event2", EventDef.class);
-        Map<String, RegisterEventDef> eventDefs = ImmutableMap.of("fakey2",
-                (RegisterEventDef) vendor.makeRegisterEventDef(eventDefDescriptor, false, null));
         String desc = getAuraTestingUtil().getNonce("test:cmp");
+        Map<String, RegisterEventDef> eventDefs = ImmutableMap.of("fakey2",
+                (RegisterEventDef) vendor.makeRegisterEventDef(definitionService.getDefDescriptor(desc, ComponentDef.class), eventDefDescriptor, false, null));
         Location location = vendor.makeLocation("filename1", 5, 5, 0);
         BaseComponentDef bcd1 = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 desc, null, null, null, location, null, null, null, null, null, null, null, false, false, AuraContext.Access.INTERNAL);

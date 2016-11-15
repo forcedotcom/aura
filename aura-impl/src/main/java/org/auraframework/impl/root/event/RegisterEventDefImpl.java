@@ -22,6 +22,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.AuraUnhandledException;
@@ -30,35 +31,42 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 /**
- * registerEvent tag definition
- * 
- * FIXME: W-1328555 This should extend DefinitionImpl<RegisterEventDef> and
- * getEventDescriptor should be an override
+ * registerEvent tag definition.
  */
-public final class RegisterEventDefImpl extends DefinitionImpl<EventDef> implements RegisterEventDef {
+public final class RegisterEventDefImpl extends DefinitionImpl<RegisterEventDef> implements RegisterEventDef {
     private static final long serialVersionUID = 4878881039199031730L;
     private final boolean isGlobal;
-    private final String attName;
     private final int hashCode;
+    private final DefDescriptor<? extends RootDefinition> parentDescriptor;
+    private final DefDescriptor<EventDef> reference;
 
     protected RegisterEventDefImpl(Builder builder) {
         super(builder);
         this.isGlobal = builder.getAccess() != null && builder.getAccess().isGlobal();
-        this.attName = builder.attName;
-        this.hashCode = createHashCode();
+        this.parentDescriptor = builder.parentDescriptor;
+        this.reference = builder.eventDescriptor;
+        this.hashCode = AuraUtil.hashCode(descriptor, reference, parentDescriptor, isGlobal);
     }
 
-    private int createHashCode() {
-        return AuraUtil.hashCode(descriptor, isGlobal);
+    @Deprecated
+    @Override
+    public String getAttributeName() {
+        return descriptor.getName();
     }
 
     @Override
-    public String getAttributeName() {
-        return attName;
+    public DefDescriptor<? extends RootDefinition> getParentDescriptor() {
+        return parentDescriptor;
     }
 
+    @Deprecated
     public DefDescriptor<EventDef> getEventDescriptor() {
-        return this.descriptor;
+        return reference;
+    }
+
+    @Override
+    public DefDescriptor<EventDef> getReference() {
+        return reference;
     }
 
     @Override
@@ -69,10 +77,10 @@ public final class RegisterEventDefImpl extends DefinitionImpl<EventDef> impleme
     @Override
     public void serialize(Json json) throws IOException {
         try {
-            EventDef eventDef = Aura.getDefinitionService().getDefinition(descriptor);
+            EventDef eventDef = Aura.getDefinitionService().getDefinition(reference);
             json.writeMapBegin();
             json.writeMapEntry("eventDef", eventDef);
-            json.writeMapEntry("attributeName", attName);
+            json.writeMapEntry("attributeName", descriptor.getName());
             json.writeValue(getAccess());
             json.writeMapEnd();
         } catch (QuickFixException e) {
@@ -82,13 +90,16 @@ public final class RegisterEventDefImpl extends DefinitionImpl<EventDef> impleme
 
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        dependencies.add(descriptor);
+        dependencies.add(reference);
     }
 
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
-        if (descriptor == null) {
+        if (reference == null) {
+            throw new InvalidDefinitionException("Event cannot be null", location);
+        }
+        if (parentDescriptor == null) {
             throw new InvalidDefinitionException("Event cannot be null", location);
         }
     }
@@ -100,20 +111,23 @@ public final class RegisterEventDefImpl extends DefinitionImpl<EventDef> impleme
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
         
-        EventDef event = Aura.getDefinitionService().getDefinition(descriptor);
+        EventDef event = Aura.getDefinitionService().getDefinition(reference);
         if (event == null) {
-            throw new InvalidDefinitionException("Cannot register event of type " + descriptor, getLocation());
+            throw new InvalidDefinitionException("Cannot register event of type " + reference, getLocation());
         }
         if (!event.getEventType().canBeFired()) {
-            throw new InvalidDefinitionException("Cannot fire event of type: " + descriptor, getLocation());
-    	}        
+            throw new InvalidDefinitionException("Cannot fire event of type: " + reference, getLocation());
+    	}
     }
 
     @Override
     public boolean equals(Object o) {
         if (o instanceof RegisterEventDefImpl) {
             RegisterEventDefImpl def = (RegisterEventDefImpl) o;
-            return descriptor.equals(def.descriptor) && isGlobal == def.isGlobal;
+            return parentDescriptor.equals(def.parentDescriptor)
+                && descriptor.equals(def.descriptor)
+                && reference.equals(def.reference)
+                && isGlobal == def.isGlobal;
         }
         return false;
     }
@@ -123,24 +137,29 @@ public final class RegisterEventDefImpl extends DefinitionImpl<EventDef> impleme
         return hashCode;
     }
 
-    public static class Builder extends DefinitionImpl.RefBuilderImpl<EventDef, RegisterEventDef> {
+    public static class Builder extends DefinitionImpl.RefBuilderImpl<RegisterEventDef, RegisterEventDef> {
 
         public Builder() {
-            super(EventDef.class);
+            super(RegisterEventDef.class);
         }
 
-        private String attName;
+        private DefDescriptor<? extends RootDefinition> parentDescriptor;
+        private DefDescriptor<EventDef> eventDescriptor;
 
         @Override
         public RegisterEventDefImpl build() {
             return new RegisterEventDefImpl(this);
         }
 
-        /**
-         * Sets the attName for this instance.
-         */
-        public Builder setAttName(String attName) {
-            this.attName = attName;
+        public Builder setReference(DefDescriptor<EventDef> eventDescriptor) {
+            assert eventDescriptor != null;
+            this.eventDescriptor = eventDescriptor;
+            return this;
+        }
+
+        public Builder setParentDescriptor(DefDescriptor<? extends RootDefinition> parent) {
+            assert parent != null;
+            this.parentDescriptor = parent;
             return this;
         }
     }

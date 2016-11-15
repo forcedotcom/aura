@@ -256,14 +256,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         for (ClientLibraryDef def : this.clientLibraries) {
             def.validateDefinition();
         }
-
-        if (defaultFlavor != null) {
-            // component must be flavorable
-            if (!hasFlavorableChild() && !inheritsFlavorableChild() && !isDynamicallyFlavorable()) {
-                throw new InvalidDefinitionException("The defaultFlavor attribute cannot be "
-                        + "specified on a component with no flavorable children", location);
-            }
-        }
     }
 
     @Override
@@ -485,7 +477,14 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             def.validateReferences();
         }
 
+
         if (defaultFlavor != null) {
+            // component must be flavorable
+            if (!hasFlavorableChild() && !inheritsFlavorableChild() && !isDynamicallyFlavorable()) {
+                throw new InvalidDefinitionException("The defaultFlavor attribute cannot be "
+                        + "specified on a component with no flavorable children", location);
+            }
+
             Set<String> allFlavorNames = getAllFlavorNames();
 
             // check that each flavor name exists on this component or a parent

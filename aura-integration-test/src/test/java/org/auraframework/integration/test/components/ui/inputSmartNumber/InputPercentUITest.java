@@ -15,9 +15,6 @@
  */
 package org.auraframework.integration.test.components.ui.inputSmartNumber;
 
-import org.auraframework.test.util.WebDriverUtil.BrowserType;
-import org.junit.Test;
-
 public class InputPercentUITest extends BaseInputSmartNumber {
 
     public InputPercentUITest() {

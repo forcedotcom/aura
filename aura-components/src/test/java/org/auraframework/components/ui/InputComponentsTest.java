@@ -85,12 +85,12 @@ public class InputComponentsTest extends AuraTestCase {
             assertNotNull("ui:input is not registered to fire event named: " + eventName, registeredEvent);
             assertEquals(
                     "Expected ui:input to throw " + events.get(eventName) + " for eventname \"" + eventName + "\"",
-                    events.get(eventName), registeredEvent.getDescriptor().getQualifiedName());
-            assertEquals("Expected " + registeredEvent.getDescriptor().getQualifiedName()
+                    events.get(eventName), registeredEvent.getReference().getQualifiedName());
+            assertEquals("Expected " + registeredEvent.getReference().getQualifiedName()
                     + " event to be a component event but it is of type "
-                    + definitionService.getDefinition(registeredEvent.getDescriptor()).getEventType(),
+                    + definitionService.getDefinition(registeredEvent.getReference()).getEventType(),
                     EventType.COMPONENT,
-                    definitionService.getDefinition(registeredEvent.getDescriptor()).getEventType());
+                    definitionService.getDefinition(registeredEvent.getReference()).getEventType());
         }
     }
 }

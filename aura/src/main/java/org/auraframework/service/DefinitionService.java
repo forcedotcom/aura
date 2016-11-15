@@ -194,11 +194,19 @@ public interface DefinitionService extends AuraService {
 
     /**
      * assert that the referencingDescriptor has access to the definition.
+     *
+     * @param referencingDescriptor the descriptor of the component referencing the definition.
+     * @param def the definition being referenced.
+     * @throws QuickFixException if the reference is not allowed
      */
     <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException;
 
     /**
      * assert that the referencingDescriptor has access to the definition.
+     *
+     * @param referencingDescriptor the descriptor of the component referencing the definition.
+     * @param accessDescriptor a descriptor for a definition being accessed.
+     * @throws QuickFixException if the reference is not allowed
      */
     <D extends Definition> void assertAccess(DefDescriptor<?> referencingDescriptor, DefDescriptor<?> accessDescriptor) throws QuickFixException;
 

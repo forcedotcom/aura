@@ -164,8 +164,7 @@ public class JavaControllerTest extends AuraImplTestCase {
             definitionService.getDefinition(cmpDefDesc);
             fail("Expected NoAccessException when accessing Java controller in non-internal namespace.");
         } catch (Exception e) {
-            String expectedMessage = String.format("Access to controller 'org.auraframework.components.test.java.controller:TestController' from namespace '%s' in '%s(COMPONENT)'"
-                    , StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE, cmpDefDesc.getQualifiedName());
+            String expectedMessage = "Access to controller 'org.auraframework.components.test.java.controller:TestController'";
             checkExceptionContains(e, NoAccessException.class, expectedMessage);
         }
     }

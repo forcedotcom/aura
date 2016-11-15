@@ -25,6 +25,7 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignAttributeDefaultDef;
 import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -172,8 +173,8 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
 
-        ComponentDef cmp = Aura.getDefinitionService().getDefDescriptor(getParentDescriptor().getQualifiedName(),
-                ComponentDef.class).getDef();
+        DefinitionService definitionService = Aura.getDefinitionService();
+        ComponentDef cmp = definitionService.getDefinition(getParentDescriptor().getQualifiedName(),ComponentDef.class);
         AttributeDef attr = cmp.getAttributeDef(getName());
         if (attr == null || !attr.getName().equals(getName())) {
             throw new DefinitionNotFoundException(Aura.getDefinitionService().getDefDescriptor(getName(),

@@ -155,8 +155,8 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
 
         assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
         if(checkFullMessage) {
-        	String expected = "Access to event '"+eventDescriptor.getNamespace()+":"+eventDescriptor.getName()+
-                "' from namespace '"+descriptor.getNamespace()+"' in '"
+        	String expected = "Access to registerevent '"+cmpDescriptor.getNamespace()+":"+cmpDescriptor.getName()+
+                ".testeventAttr' with access 'INTERNAL' from namespace '"+descriptor.getNamespace()+"' in '"
         		+descriptor.getPrefix()+"://"+descriptor.getDescriptorName()+"("+descriptor.getDefType()+")' is not allowed";
         	assertEquals(expected, caught.getMessage());
         }
@@ -220,8 +220,8 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
        
         assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
         if(checkFullMessage) {
-        	String expected = "Access to event '"+eventDescriptor.getNamespace()+":"+eventDescriptor.getName()+
-                "' from namespace '"+descriptor.getNamespace()+"' in '"
+        	String expected = "Access to registerevent '"+cmpDescriptor.getNamespace()+":"+cmpDescriptor.getName()+
+                ".testeventAttr' with access 'PUBLIC' from namespace '"+descriptor.getNamespace()+"' in '"
         		+descriptor.getPrefix()+"://"+descriptor.getDescriptorName()+"("+descriptor.getDefType()+")' is not allowed";
         	assertEquals(expected, caught.getMessage());
         }
@@ -389,8 +389,8 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         
         assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
         if(checkFullMessage) {
-        	String expected = "Access to event '"+eventDescriptor.getNamespace()+":"+eventDescriptor.getName()+
-                "' from namespace '"+descriptor.getNamespace()+"' in '"
+        	String expected = "Access to registerevent '"+cmpDescriptor.getNamespace()+":"+cmpDescriptor.getName()+
+                ".testeventAttr' with access 'PUBLIC' from namespace '"+descriptor.getNamespace()+"' in '"
         		+descriptor.getPrefix()+"://"+descriptor.getDescriptorName()+"("+descriptor.getDefType()+")' is not allowed";
         	assertEquals(expected, caught.getMessage());
         }
@@ -456,8 +456,8 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
        
         assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
         if(checkFullMessage) {
-        	String expected = "Access to event '"+eventDescriptor.getNamespace()+":"+eventDescriptor.getName()+
-                "' from namespace '"+descriptor.getNamespace()+"' in '"
+        	String expected = "Access to registerevent '"+cmpDescriptor.getNamespace()+":"+cmpDescriptor.getName()+
+                ".testeventAttr' with access 'PUBLIC' from namespace '"+descriptor.getNamespace()+"' in '"
         		+descriptor.getPrefix()+"://"+descriptor.getDescriptorName()+"("+descriptor.getDefType()+")' is not allowed";
         	assertEquals(expected, caught.getMessage());
         }

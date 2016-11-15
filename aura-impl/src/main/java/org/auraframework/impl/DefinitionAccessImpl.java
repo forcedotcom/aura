@@ -223,6 +223,11 @@ public class DefinitionAccessImpl implements DefinitionAccess {
         return access != null || accessMethod != null;
     }
 
+    @Override
+    public String toString() {
+        return accessString;
+    }
+
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         if (accessString != null) {

@@ -20,6 +20,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
+import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl.Builder;
@@ -32,13 +33,13 @@ import org.auraframework.util.AuraTextUtil;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
 import java.util.Set;
 
 /**
  * handler for aura:registerEvent tag
  */
 public class RegisterEventHandler<P extends RootDefinition> extends ParentedTagHandler<RegisterEventDefImpl, P> {
-	
 
     public static final String TAG = "aura:registerevent";
 
@@ -81,8 +82,9 @@ public class RegisterEventHandler<P extends RootDefinition> extends ParentedTagH
         // validation on descriptor and such.
         builder.setDescription(getAttributeValue(RootTagHandler.ATTRIBUTE_DESCRIPTION));
         builder.setLocation(location);
-        builder.setDescriptor(eventDefDescriptor);
-        builder.setAttName(name);
+        builder.setReference(eventDefDescriptor);
+        builder.setDescriptor(getDefDescriptor(name, RegisterEventDef.class));
+        builder.setParentDescriptor(getParentDefDescriptor());
         
         try {
             builder.setAccess(readAccessAttribute());

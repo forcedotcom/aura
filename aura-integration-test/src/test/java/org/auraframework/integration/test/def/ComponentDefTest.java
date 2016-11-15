@@ -35,7 +35,6 @@ import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
 public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
@@ -90,7 +89,6 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         }
     }
 
-    @UnAdaptableTest("W-2929438")
     @Test
     public void testNoErrorWhenDefaultFlavorExistsOnParent() throws Exception {
         DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class,
@@ -104,7 +102,6 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         definitionService.getDefinition(desc).validateReferences(); // no exception
     }
 
-    @UnAdaptableTest("W-2929438")
     @Test
     public void testNoErrorWhenDefaultFlavorExistsOnDistantParent() throws Exception {
         // hierarchy two levels deep, up one level doesn't not have flavorable but above that does
@@ -131,7 +128,6 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         definitionService.getDefinition(desc).validateReferences(); // no exception
     }
 
-    @UnAdaptableTest("W-2929438")
     @Test
     public void testValidatesMultipleDefaultFlavorNamesFromParent() throws Exception {
         DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class,
@@ -164,18 +160,30 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
     public void testValidatesComponentIsFlavorable() throws Exception {
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "defaultFlavor='test'", "<div></div>"));
-        addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc), ".THIS--test{}");
+        addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc), ".THIS--test{background:red;}");
+        Exception expected = null;
 
         try {
-            definitionService.getDefinition(desc).validateReferences();
-            fail("expected to get an exception");
+            definitionService.getDefinition(desc);
         } catch (Exception e) {
-            checkExceptionContains(e, InvalidDefinitionException.class, "The defaultFlavor attribute cannot");
+            expected = e;
         }
+        assertNotNull("expected to get an exception", expected);
+        //
+        // FIXME: This check oscilates back and forth. It can be either
+        // The defaultFlavor attribute cannot be specified on a component with no flavorable children
+        //   -or-
+        // must contain at least one aura:flavorable element
+        //
+        checkExceptionContains(expected, InvalidDefinitionException.class, "flavorable");
+
+        boolean match = false;
+        match = match | expected.getMessage().contains("must contain at least one aura:flavorable element");
+        match = match | expected.getMessage().contains("The defaultFlavor attribute cannot be specified on a component with no flavorable children");
+        assertTrue("The compilation must match one of two errors", match);
     }
 
     /** if extending from a component with a flavorable element, the validation should pass */
-    @UnAdaptableTest("W-2929438")
     @Test
     public void testValidatesComponentIsFlavorableFromParent() throws Exception {
         DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class,
@@ -190,7 +198,6 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         definitionService.getDefinition(desc).validateReferences(); // no exception
     }
 
-    @UnAdaptableTest("W-2929438")
     @Test
     public void testValidatesComponentIsFlavorableFromDistantParent() throws Exception {
         // hierarchy two levels deep, up one level doesn't not have flavorable but above that does
@@ -210,7 +217,6 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         definitionService.getDefinition(desc).validateReferences(); // no exception
     }
 
-    @UnAdaptableTest("W-2929438, this one is passing, but it's only because we are expecting exception anyway")
     @Test
     public void testValidatesComponentNotFlavorableFromAnyParent() throws Exception {
         DefDescriptor<ComponentDef> distant = addSourceAutoCleanup(ComponentDef.class,
@@ -224,13 +230,15 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(getDefClass(),
                 String.format("<aura:component extends='%s' defaultFlavor='fromParent'></aura:component>",
                         parent.getDescriptorName()));
+        Exception expected = null;
 
         try {
             definitionService.getDefinition(desc).validateReferences();
-            fail("expected to get an exception");
         } catch (Exception e) {
-            checkExceptionContains(e, InvalidDefinitionException.class, "The defaultFlavor attribute cannot");
+            expected = e;
         }
+        assertNotNull("expected to get an exception", expected);
+        checkExceptionContains(expected, InvalidDefinitionException.class, "The defaultFlavor attribute cannot");
     }
 
     /**

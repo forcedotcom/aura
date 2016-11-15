@@ -30,6 +30,7 @@ public class AuraJsonContext extends ClassMapJsonSerializationContext {
     /**
      * @deprecated refSupport no longer supported
      */
+    @Deprecated
     public static AuraJsonContext createContext(Mode mode, boolean refSupport, JsonSerializerFactory factory) {
         return new AuraJsonContext(mode.prettyPrint(), factory);
     }

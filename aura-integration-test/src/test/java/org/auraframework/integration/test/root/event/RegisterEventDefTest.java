@@ -33,15 +33,16 @@ public class RegisterEventDefTest extends AuraImplTestCase {
     public void testGetEventDescriptor() {
         assertEquals(
                 vendor.makeEventDefDescriptor("aura:testevent"),
-                vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"), true,
-                        vendor.makeLocation("filename1", 5, 5, 0)).getDescriptor());
+                vendor.makeRegisterEventDef(null, vendor.makeEventDefDescriptor("aura:testevent"), true,
+                        vendor.makeLocation("filename1", 5, 5, 0)).getReference());
     }
 
     @Test
     public void testIsGlobal() {
-        assertTrue(vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"), true,
+        assertTrue(vendor.makeRegisterEventDef(null, vendor.makeEventDefDescriptor("aura:testevent"), true,
                 vendor.makeLocation("filename1", 5, 5, 0)).isGlobal());
-        assertFalse(vendor.makeRegisterEventDefWithNulls(vendor.makeEventDefDescriptor("aura:testevent"), false,
+        assertFalse(vendor.makeRegisterEventDefWithNulls(vendor.makeComponentDefDescriptor("a:b"),
+                vendor.makeEventDefDescriptor("aura:testevent"), false,
                 vendor.makeLocation("filename1", 5, 5, 0)).isGlobal());
     }
 
@@ -49,25 +50,29 @@ public class RegisterEventDefTest extends AuraImplTestCase {
     public void testGetLocation() {
         assertEquals(
                 vendor.makeLocation("filename1", 5, 5, 0),
-                vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"), true,
+                vendor.makeRegisterEventDef(null, vendor.makeEventDefDescriptor("aura:testevent"), true,
                         vendor.makeLocation("filename1", 5, 5, 0)).getLocation());
     }
 
     @Test
     public void testSerialize() throws Exception {
-        serializeAndGoldFile(vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("auratest:testEvent"), true,
+        serializeAndGoldFile(vendor.makeRegisterEventDef(null, vendor.makeEventDefDescriptor("auratest:testEvent"), true,
                 vendor.makeLocation("filename1", 5, 5, 0)));
     }
 
     @Test
     public void testValidateDefinition() throws Exception {
-        RegisterEventDefImpl def = vendor.makeRegisterEventDefWithNulls(null, true, null);
+        Throwable thrown = null;
         try {
+            RegisterEventDefImpl def = vendor.makeRegisterEventDefWithNulls(null, null, true, null);
             def.validateDefinition();
-            fail("Should have thrown InvalidDefinitionException for null EventDefDescriptor");
+        } catch (AssertionError assertion) {
+            // this can occur is assertions are enabled.
+            thrown = assertion;
         } catch (InvalidDefinitionException expected) {
-            // expected
+            thrown = expected;
         }
+        assertNotNull("Should have thrown InvalidDefinitionException for null EventDefDescriptor", thrown);
     }
 
     @Test
@@ -82,17 +87,16 @@ public class RegisterEventDefTest extends AuraImplTestCase {
     @Test
     public void testAppendDependencies() {
         Set<DefDescriptor<?>> descriptors = new HashSet<>();
-        vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"), true,
+        vendor.makeRegisterEventDef(null, vendor.makeEventDefDescriptor("aura:testevent"), true,
                 vendor.makeLocation("filename1", 5, 5, 0)).appendDependencies(descriptors);
-        assertTrue(descriptors.contains(vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"),
-                true, vendor.makeLocation("filename1", 5, 5, 0)).getDescriptor()));
+        assertTrue(descriptors.contains(vendor.makeEventDefDescriptor("aura:testevent")));
     }
 
     @Test
     public void testGetName() {
         assertEquals(
-                "testevent",
-                vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"), true,
+                "fakey",
+                vendor.makeRegisterEventDef(null, vendor.makeEventDefDescriptor("aura:testevent"), true,
                         vendor.makeLocation("filename1", 5, 5, 0)).getName());
     }
 

@@ -107,8 +107,9 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
         Map<String, RegisterEventDef> eventDefs = new HashMap<>();
 
         RegisterEventDefImpl.Builder regBuilder = new RegisterEventDefImpl.Builder();
-        regBuilder.setDescriptor(definitionService.getDefDescriptor("test:anevent", EventDef.class));
-        regBuilder.setAttName("fakey");
+        regBuilder.setReference(definitionService.getDefDescriptor("test:anevent", EventDef.class));
+        regBuilder.setDescriptor(definitionService.getDefDescriptor("fakey", RegisterEventDef.class));
+        regBuilder.setParentDescriptor(definitionService.getDefDescriptor("test:anEvent", ComponentDef.class));
         regBuilder.setAccess(new DefinitionAccessImpl(null, "public", false));
 
         eventDefs.put("fakey", regBuilder.build());

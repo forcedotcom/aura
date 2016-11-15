@@ -16,20 +16,37 @@
 package org.auraframework.def;
 
 /**
+ * An event registration.
+ *
+ * This class represents a registered event on a root definition. It has a name (the attribute name),
+ * and an event.
  */
-public interface RegisterEventDef extends Definition {
+public interface RegisterEventDef extends Definition, ParentedDef {
     /**
-     * FIXME: W-1328555 this method violates the contract with DefDescriptor.
-     * 
-     * These two calls should be used instead, but they cause other bugs.
-     * 
-     * DefDescriptor<RegisterEventDef> getDescriptor(); DefDescriptor<EventDef>
-     * getEventDescriptor();
+     * Return the descriptor for this 'def'.
+     *
+     * This descriptor is an 'attribute' descriptor, with only a name.
      */
     @Override
-    DefDescriptor<EventDef> getDescriptor();
+    DefDescriptor<RegisterEventDef> getDescriptor();
 
+    /**
+     * Return the descriptor of the event being registered.
+     */
+    DefDescriptor<EventDef> getReference();
+
+    /**
+     * is this event def global?.
+     *
+     * FIXME: this is probably not worth having here, you can always get the access and check global.
+     */
     boolean isGlobal();
 
+    /**
+     * Get the attribute name.
+     *
+     * @deprecated use #getDescriptor().getName()
+     */
+    @Deprecated
     String getAttributeName();
 }

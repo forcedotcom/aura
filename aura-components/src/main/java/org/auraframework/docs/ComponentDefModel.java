@@ -318,9 +318,9 @@ public class ComponentDefModel implements ModelInstance {
         }
 
         private AttributeModel(RegisterEventDef def) throws QuickFixException {
-            this.name = def.getAttributeName();
+            this.name = def.getDescriptor().getName();
             this.description = def.getDescription();
-            this.type = def.getDescriptor().getNamespace() + ":" + def.getDescriptor().getName();
+            this.type = def.getReference().getNamespace() + ":" + def.getReference().getName();
             this.required = false;
             this.defaultValue = null;
             this.parentName = null;

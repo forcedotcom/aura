@@ -105,7 +105,7 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
                         name), getLocation());
             }
             
-            event = definitionService.getDefinition(registerEvent.getDescriptor());
+            event = definitionService.getDefinition(registerEvent.getReference());
             if (!event.getEventType().equals(EventType.COMPONENT)) {
                 throw new InvalidReferenceException(
                         "A aura:handler that specifies a name=\"\" attribute must handle a component event. Either change the aura:event to have type=\"COMPONENT\" or alternately change the aura:handler to specify an event=\"\" attribute.",

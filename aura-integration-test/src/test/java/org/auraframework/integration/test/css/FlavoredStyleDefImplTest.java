@@ -113,18 +113,21 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
         assertTrue(dependencies.contains(nsTokens));
     }
 
-    /** custom flavors have a dependency on the component, standard flavors do not */
     @Test
-    public void testFlavorDependencies() throws QuickFixException {
+    public void testStandardFlavorDependencies() throws QuickFixException {
         DefDescriptor<ComponentDef> cmp = addComponentDef("<aura:component><div aura:flavorable='true'></div></aura:component>");
         DefDescriptor<FlavoredStyleDef> standard = addStandardFlavor(cmp, ".THIS--test {color:red}");
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
         definitionService.getDefinition(standard).appendDependencies(dependencies);
-        assertTrue("did not expect standard flavor to have dependencies", dependencies.isEmpty());
+        assertEquals("didn't get expected dependencies for standard flavor", 1, dependencies.size());
+    }
 
+    @Test
+    public void testCustomFlavorDependencies() throws QuickFixException {
+        DefDescriptor<ComponentDef> cmp = addComponentDef("<aura:component><div aura:flavorable='true'></div></aura:component>");
         DefDescriptor<FlavoredStyleDef> custom = addCustomFlavor(cmp, ".THIS--test{}");
-        dependencies = Sets.newHashSet();
+        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
         definitionService.getDefinition(custom).appendDependencies(dependencies);
         assertEquals("didn't get expected dependencies for custom flavor", 1, dependencies.size());
         assertTrue(dependencies.contains(cmp));

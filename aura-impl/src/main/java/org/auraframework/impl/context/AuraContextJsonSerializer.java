@@ -38,7 +38,6 @@ import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.util.json.JsonSerializers.NoneSerializer;
 
 import com.google.common.collect.Lists;

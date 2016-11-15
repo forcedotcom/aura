@@ -71,18 +71,16 @@ public final class FlavoredStyleDefImpl extends AbstractStyleDef<FlavoredStyleDe
             }
         }
 
-        if (getDescriptor().getPrefix().equals(DefDescriptor.CUSTOM_FLAVOR_PREFIX)) {
-            dependencies.add(Flavors.toComponentDescriptor(getDescriptor()));
-        }
+        dependencies.add(Flavors.toComponentDescriptor(getDescriptor()));
     }
 
     @Override
     public void validateReferences() throws QuickFixException {
         DefDescriptor<ComponentDef> desc = Flavors.toComponentDescriptor(getDescriptor());
-        ComponentDef def = desc.getDef();
+        ComponentDef def = Aura.getDefinitionService().getDefinition(desc);
         if (!def.hasFlavorableChild() && !def.inheritsFlavorableChild() && !def.isDynamicallyFlavorable()) {
             throw new InvalidDefinitionException(
-                    String.format("%s must contain at least one aura:flavorable element", desc), getLocation());
+                    String.format("%s must contain at least one aura:flavorable element: ", desc), getLocation());
         }
     }
 

@@ -460,7 +460,7 @@ public class AuraImplUnitTestingUtil {
 
         if (eventDefs == null) {
             eventDefs = new HashMap<>();
-            eventDefs.put("fakey", makeRegisterEventDef(null, false, null));
+            eventDefs.put("fakey", makeRegisterEventDef(null, null, false, null));
         }
 
         if (children == null) {
@@ -529,7 +529,7 @@ public class AuraImplUnitTestingUtil {
 
         if (eventDefs == null) {
             eventDefs = new HashMap<>();
-            eventDefs.put("fakey", makeRegisterEventDef(null, false, null));
+            eventDefs.put("fakey", makeRegisterEventDef(null, null, false, null));
         }
         builder.events = eventDefs;
 
@@ -626,7 +626,7 @@ public class AuraImplUnitTestingUtil {
 
         if (eventDefs == null) {
             eventDefs = new HashMap<>();
-            eventDefs.put("fakey", makeRegisterEventDef(null, false, null));
+            eventDefs.put("fakey", makeRegisterEventDef(null, null, false, null));
         }
 
         if (children == null) {
@@ -853,7 +853,7 @@ public class AuraImplUnitTestingUtil {
         builder.events = eventDefs;
         if (builder.events == null) {
             builder.events = new HashMap<>();
-            builder.events.put("fakey", makeRegisterEventDef(null, false, null));
+            builder.events.put("fakey", makeRegisterEventDef(null, null, false, null));
         }
 
         builder.extendsDescriptors = extendsDescriptors;
@@ -899,7 +899,7 @@ public class AuraImplUnitTestingUtil {
     }
 
     public RegisterEventDefImpl makeRegisterEventDef() {
-        return makeRegisterEventDef(null, false, null);
+        return makeRegisterEventDef(null, null, false, null);
     }
 
     /**
@@ -908,11 +908,13 @@ public class AuraImplUnitTestingUtil {
      * the parameter, you have to call the objects constructor directly.
      */
     public RegisterEventDefImpl makeRegisterEventDef(
+            DefDescriptor<? extends RootDefinition> parentDescriptor,
             DefDescriptor<EventDef> eventDescriptor, boolean isGlobal,
             Location location) {
         RegisterEventDefImpl.Builder builder = new RegisterEventDefImpl.Builder();
-        builder.setDescriptor(eventDescriptor == null ? getEventDefDescriptor() : eventDescriptor);
-        builder.setAttName("fakey");
+        builder.setParentDescriptor(parentDescriptor == null ? getComponentDefDescriptor() : parentDescriptor);
+        builder.setReference(eventDescriptor == null ? getEventDefDescriptor() : eventDescriptor);
+        builder.setDescriptor(definitionService.getDefDescriptor("fakey", RegisterEventDef.class));
         DefinitionAccessImpl access;
         try {
             access = new DefinitionAccessImpl(null, isGlobal ? "global" : "public", false);
@@ -925,11 +927,13 @@ public class AuraImplUnitTestingUtil {
     }
 
     public RegisterEventDefImpl makeRegisterEventDefWithNulls(
+            DefDescriptor<? extends RootDefinition> parentDescriptor,
             DefDescriptor<EventDef> eventDescriptor, boolean isGlobal,
             Location location) {
         RegisterEventDefImpl.Builder builder = new RegisterEventDefImpl.Builder();
-        builder.setDescriptor(eventDescriptor);
-        builder.setAttName("fakey");
+        builder.setReference(eventDescriptor);
+        builder.setParentDescriptor(parentDescriptor);
+        builder.setDescriptor(definitionService.getDefDescriptor("fakey", RegisterEventDef.class));
         DefinitionAccessImpl access;
         try {
             access = new DefinitionAccessImpl(null, isGlobal ? "global" : "public", false);

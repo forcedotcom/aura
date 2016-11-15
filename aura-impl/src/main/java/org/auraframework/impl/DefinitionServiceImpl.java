@@ -844,6 +844,7 @@ public class DefinitionServiceImpl implements DefinitionService {
 
         String namespace;
         String target;
+
         if (def instanceof ParentedDef) {
             ParentedDef parentedDef = (ParentedDef) def;
             DefDescriptor<? extends RootDefinition> parentDescriptor = parentedDef.getParentDescriptor();
@@ -876,9 +877,9 @@ public class DefinitionServiceImpl implements DefinitionService {
                 } else if (!referencingNamespace.equals(namespace)) {
                     // The caller and the def are not in the same namespace
                     status = String
-                            .format("Access to %s '%s' from namespace '%s' in '%s(%s)' is not allowed",
-                                    defType.toString().toLowerCase(), target, referencingNamespace,
-                                    referencingDescriptor, referencingDescriptor.getDefType());
+                            .format("Access to %s '%s' with access '%s' from namespace '%s' in '%s(%s)' is not allowed",
+                                    defType.toString().toLowerCase(), target, def.getAccess().toString(),
+                                    referencingNamespace, referencingDescriptor, referencingDescriptor.getDefType());
                 } else if (access.isPrivate()) {
                     status = String
                             .format("Access to %s '%s' with access PRIVATE from namespace '%s' in '%s(%s)' is not allowed",

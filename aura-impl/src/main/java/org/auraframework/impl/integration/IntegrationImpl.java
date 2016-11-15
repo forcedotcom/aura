@@ -146,7 +146,7 @@ public class IntegrationImpl implements Integration {
                         RegisterEventDef eventDef = componentDef.getRegisterEventDefs().get(key);
                         if (eventDef != null) {
                             // Emit component.addHandler() wired to special global scope value provider
-                            String name = eventDef.getAttributeName();
+                            String name = eventDef.getDescriptor().getName();
                             actionEventHandlers.put(name, (String) entry.getValue());
                         } else {
                             throw new AuraRuntimeException(String.format("Unknown attribute or event %s - %s", tag, key));

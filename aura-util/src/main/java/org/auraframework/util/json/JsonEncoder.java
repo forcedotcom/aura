@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,8 +36,6 @@ import javax.annotation.Nonnull;
 
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.UncloseableOutputStream;
-import org.auraframework.util.json.Serialization.ReferenceScope;
-import org.auraframework.util.json.Serialization.ReferenceType;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
@@ -139,6 +136,7 @@ public class JsonEncoder implements Json {
     /**
      * @deprecated refSupport no longer supported
      */
+    @Deprecated
     public JsonEncoder(Appendable out, boolean format, boolean refSupport) {
         this(out, format);
     }
@@ -186,6 +184,7 @@ public class JsonEncoder implements Json {
      * @param refSupport refSupport no longer supported
      * @throws JsonSerializationException if there's an issue during serialization
      */
+    @Deprecated
     public static void serialize(Object obj, Appendable out, boolean format, boolean refSupport) {
         serialize(obj, out, format);
     }
@@ -204,6 +203,7 @@ public class JsonEncoder implements Json {
      * @param refSupport refSupport is no longer supported
      * @return object serialized to string
      */
+    @Deprecated
     public static String serialize(Object obj, boolean format, boolean refSupport) {
         return serialize(obj, format);
     }
@@ -276,6 +276,7 @@ public class JsonEncoder implements Json {
     /**
      * @deprecated refSupport no longer supported
      */
+    @Deprecated
     public static JsonEncoder createJsonStream(@Nonnull OutputStream out, boolean format, boolean refSupport,
             boolean nullValues) {
         return createJsonStream(out, format, nullValues);

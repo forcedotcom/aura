@@ -219,8 +219,8 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
         Map<String, RegisterEventDef> events = def.getRegisterEventDefs();
 
         assertEquals("Wrong number of EventDefRefs found", 2, events.size());
-        assertEquals("First event not found", "markup://ui:cut", events.get("cut").getDescriptor().getQualifiedName());
-        assertEquals("Second event not found", "markup://ui:copy", events.get("copy").getDescriptor()
+        assertEquals("First event not found", "markup://ui:cut", events.get("cut").getReference().getQualifiedName());
+        assertEquals("Second event not found", "markup://ui:copy", events.get("copy").getReference()
                 .getQualifiedName());
     }
 

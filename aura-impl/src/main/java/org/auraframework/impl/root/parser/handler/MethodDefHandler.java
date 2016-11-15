@@ -49,8 +49,8 @@ public class MethodDefHandler<P extends RootDefinition> extends ParentedTagHandl
 
     private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_ACTION,
             ATTRIBUTE_NAME, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ACCESS);
-	private static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
-			ATTRIBUTE_SERIALIZE_TO).addAll(ALLOWED_ATTRIBUTES).build();
+    private static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
+            ATTRIBUTE_SERIALIZE_TO).addAll(ALLOWED_ATTRIBUTES).build();
 
     private final MethodDefImpl.Builder builder = new MethodDefImpl.Builder();
 
@@ -81,12 +81,12 @@ public class MethodDefHandler<P extends RootDefinition> extends ParentedTagHandl
         return isInInternalNamespace() ? INTERNAL_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
-	@Override
+    @Override
     protected void readAttributes() {
         String name = getAttributeValue(ATTRIBUTE_NAME);
 
         if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
-        	error("The attribute '%s' is required on '<%s>'.", ATTRIBUTE_NAME, TAG);
+            error("The attribute '%s' is required on '<%s>'.", ATTRIBUTE_NAME, TAG);
         }
 
         builder.setParentDescriptor(getParentHandler().getDefDescriptor());
@@ -104,10 +104,10 @@ public class MethodDefHandler<P extends RootDefinition> extends ParentedTagHandl
             }
         }
         try {
-			builder.setAccess(readAccessAttribute());
-		} catch (InvalidAccessValueException e) {
-			builder.setParseError(e);
-		}
+            builder.setAccess(readAccessAttribute());
+        } catch (InvalidAccessValueException e) {
+            builder.setParseError(e);
+        }
     }
 
     @Override

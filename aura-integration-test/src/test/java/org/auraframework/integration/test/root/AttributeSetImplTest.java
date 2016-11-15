@@ -15,6 +15,9 @@
  */
 package org.auraframework.integration.test.root;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
@@ -22,12 +25,8 @@ import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * Tests to verify AttributeSetImpl class. Component/Application instances are assigned an AttributeSet. A

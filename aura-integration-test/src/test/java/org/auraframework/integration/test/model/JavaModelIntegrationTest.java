@@ -157,8 +157,7 @@ public class JavaModelIntegrationTest extends AuraImplTestCase {
             definitionService.getDefinition(cmpDefDesc);
             fail("Expected NoAccessException when using Java model in non-internal namespace.");
         } catch (Exception e) {
-            String errorMessage = String.format("Access to model 'org.auraframework.impl.java.model:TestModel' from namespace '%s' in '%s(COMPONENT)'",
-                    StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE, cmpDefDesc.getQualifiedName());
+            String errorMessage = "Access to model 'org.auraframework.impl.java.model:TestModel'";
            checkExceptionContains(e, NoAccessException.class, errorMessage);
         }
     }

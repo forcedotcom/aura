@@ -45,6 +45,7 @@ import org.auraframework.impl.root.GenericXmlElementImpl;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -91,6 +92,7 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
 
+        DefinitionService definitionService = Aura.getDefinitionService();
         // I'm guessing that this should be in validateDefinition
         if (layoutDesignDefs != null) {
             //Ensure that only one item with the same name is defined in a layout.
@@ -105,8 +107,7 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
                                 if (!items.add(name)) {
                                     throw new InvalidDefinitionException(String.format("Item %s defined multiple times", name), getLocation());
                                 }
-                                descriptor = Aura.getDefinitionService()
-                                        .getDefDescriptor(name, DesignAttributeDef.class);
+                                descriptor = definitionService.getDefDescriptor(name, DesignAttributeDef.class);
                                 if (!attributeDesignDefs.containsKey(descriptor)) {
                                     throw new DefinitionNotFoundException(descriptor, getLocation());
                                 }

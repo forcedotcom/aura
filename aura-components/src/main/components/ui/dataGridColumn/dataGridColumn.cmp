@@ -58,7 +58,7 @@
         <aura:if isTrue="{! v.body.length == 0 }">
             <!-- Conditionally insert link for column sorting. -->
             <aura:if isTrue="{!v.sortable}">
-                <a auar:id="link" class="{! 'toggle ' + (v.disabled ? 'disabled' : '')}" onclick="{!c.handleClick}">
+                <a aura:id="link" class="{! 'toggle ' + (v.disabled ? 'disabled' : '')}" onclick="{!c.handleClick}">
                     <span class="assistiveText">{! (v.disabled ? '' : v.assistiveSortText) + ' '
                                                     + (v.hideLabel ? v.label : '') } </span>
                     {!(!v.hideLabel) ? v.label : ''}

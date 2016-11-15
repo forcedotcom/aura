@@ -32,10 +32,9 @@ var DomHandlersPlugin = function DomHandlersPlugin(config) {
 
 DomHandlersPlugin.NAME = "domHandlers";
 DomHandlersPlugin.DEFAULT_INTERACTION_TYPE = "user";
-DomHandlersPlugin.AURA_IF = "aura:if";
-DomHandlersPlugin.AURA_ITERATION = "aura:iteration";
 DomHandlersPlugin.WHITELISTEVENTS = { 
-    "click" : true // only click for now
+    "click"  : true,
+    "change" : true
 };
 
 /** @export */
@@ -81,15 +80,22 @@ DomHandlersPlugin.prototype.stringifyLocator = function (locator) {
 };
 */
 
+/**
+ * Logs LightningInteraction transactions if the html event handled is in the whitelist
+ * 
+ * @param action - This is unused
+ * @param event - The DOM Event
+ * @param root - The aura:html component that is handling the event
+ */
 DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, root) {
     if (!(event.type in DomHandlersPlugin.WHITELISTEVENTS)) {
         return;
     }
     
-    var parent = action.getComponent().getConcreteComponent();
+    var parent = $A.expressionService.getContainer(root).getConcreteComponent();
+
     // TODO: remove includeMetadata param before 206 release freeze: W-3378426
     var locator = parent.getLocator(root, true /*includeMetadata*/);
-    var ms = this.metricsService;
 
     // Only if we have a unique, identifier send the interaction
     if (locator) { 
@@ -99,10 +105,7 @@ DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, root) 
         var context = {
             "locator"     : locator,
             "eventType"   : DomHandlersPlugin.DEFAULT_INTERACTION_TYPE,
-            "eventSource" : event.type, // type of event (click, hover, scroll)
-            "attributes"  : {
-                "auraAction"  : action.getDef().getDescriptor().toString()    
-            }
+            "eventSource" : event.type // type of event (click, hover, scroll)
         };
         
         if (meta) {
@@ -112,39 +115,16 @@ DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, root) 
             }
         }
 
-        ms.transaction("aura", "interaction", { "context": context });
-    } else {
-        this.logUnInstrumentedClick(action, root);
+        $A.metricsService.transaction("aura", "interaction", { "context": context });
+    } else if (event.type === "click") {
+        this.logUnInstrumentedClick(parent, root);
     }
 };
 
-DomHandlersPlugin.prototype.dispatchVirtualActionHook = function (action, event, virtualCmp) {
-    // For virtualActions we want to capture only clicks for now
-    if (event.type === "click") {
-        this.dispatchActionHook(action, event, virtualCmp);
-    }
-};
-
-DomHandlersPlugin.prototype.getOwner = function (cmp) {
-    if (!cmp) {
-        return undefined;
-    }
-    // TODO mrafique: Manually checking for aura:iteration or aura:if is a hack. Ideally, getOwner() 
-    //    or another API would always return the proper container. 
-    //    based on advice from jbuch
-    var owner = cmp.getOwner();
-    var ownerName = owner.getName();
-    while (ownerName === DomHandlersPlugin.AURA_ITERATION || ownerName === DomHandlersPlugin.AURA_IF) {
-        owner = owner.getOwner();
-        ownerName = owner.getName();
-    }
-    return owner;
-};
-
-DomHandlersPlugin.prototype.logUnInstrumentedClick = function (action, root) {
-    var parent = action.getComponent().getConcreteComponent();
-    var grandparent = this.getOwner(parent).getConcreteComponent();
-    var grandparentContainer = this.getOwner(grandparent).getConcreteComponent();
+DomHandlersPlugin.prototype.logUnInstrumentedClick = function (parent, root) {
+    var es = $A.expressionService;
+    var grandparent = es.getContainer(parent).getConcreteComponent();
+    var grandparentContainer = es.getContainer(grandparent).getConcreteComponent();
     // root will always be an aura:html component. It's the root of all our click handlers
     var hierarchy = {
             "rootHtmlTag": root.get("v.tag"),
@@ -192,6 +172,25 @@ DomHandlersPlugin.prototype.bind = function () {
         self.bindToHelper("markup://ui:virtualList", "_dispatchAction");
         self.bindToHelper("markup://ui:virtualDataGrid", "_dispatchAction");
         self.bindToHelper("markup://ui:virtualDataTable", "_dispatchAction");
+        
+        // This is for input* components
+        var interactiveLib =    $A.componentService.hasLibrary("markup://ui:eventLib") &&
+                                $A.componentService.getLibraryInclude("js://ui.eventLib.interactive");
+        if (interactiveLib) {
+            self.metricsService.instrument(
+                    interactiveLib,
+                    "_dispatchAction",
+                    DomHandlersPlugin.NAME,
+                    false/*async*/,
+                    null, 
+                    null,
+                    function (original) {
+                        var xargs = Array.prototype.slice.call(arguments, 1);
+                        self.dispatchActionHook.apply(self, xargs);
+                        return original.apply(this, xargs);
+                    }
+                );
+        }
     });
 };
 

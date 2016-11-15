@@ -183,17 +183,35 @@ function lib() { //eslint-disable-line no-unused-vars
             if (helper && helper.preEventFiring) {
                 helper.preEventFiring(component, event);
             }
+            
+            // Do not change order here. DomHandlersPlugin expects these params in this order
+            lib._dispatchAction(undefined /*action*/, event, htmlCmp, component, helper);
 
+            if (event.type === "click" && component.isInstanceOf("ui:doubleClicks") && component.get("v.disableDoubleClicks")) {
+                component._recentlyClicked = true;
+                window.setTimeout(function() { component._recentlyClicked = false; }, 350);
+            }
+        },
+        
+        /**
+         * DO NOT modify the order of the input parameters to this method
+         * used by MetricsService DomHandlersPlugin to intercept clicks on 
+         * components managed through this lib
+         * 
+         * @param event The html event that was fired
+         * @param htmlCmp The html component inside component
+         * @param component The aura component containing the html components
+         * @param helper of component
+         * 
+         * The first three parameters are expected by DomHandlersPlugin
+         * DO NOT modify the order of the input parameters to this method
+         */
+        _dispatchAction: function (action, event, htmlCmp, component, helper) {
             // fire the equivalent Aura event
             if (helper && helper.fireEvent) {
                 helper.fireEvent(component, event, helper);
             } else {
                 lib.fireEvent(component, event, helper);
-            }
-
-            if (event.type === "click" && component.isInstanceOf("ui:doubleClicks") && component.get("v.disableDoubleClicks")) {
-                component._recentlyClicked = true;
-                window.setTimeout(function() { component._recentlyClicked = false; }, 350);
             }
         },
 

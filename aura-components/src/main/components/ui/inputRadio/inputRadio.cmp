@@ -19,7 +19,8 @@
                 description="The radio button used in the input.">
 
     <aura:attribute access="GLOBAL" name="disabled" type="Boolean" default="false" description="Specifies whether this radio button should be displayed in a disabled state. Disabled radio buttons can't be clicked. Default value is &quot;false&quot;."/>
-     
+    <aura:locator target="radio" isPrimitive="true" description="Radio button"/>
+    
     <input aura:id="radio" 
     	   id="{!v.domId}"
     	   class="{!v.class}"

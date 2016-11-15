@@ -154,6 +154,7 @@ Test.Aura.AuraExpressionServiceTest = function(){
                 getDef: function() { return { getLocatorDefs: function() {return undefined}}},
                 getOwner: function() { return {
                     getName: function () {return "";},
+                    isInstanceOf: function() {return false;},
                     getConcreteComponent: function () {return component}
                 }},
                 getLocalId: function() { return "ownerLocalId" }

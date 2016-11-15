@@ -113,6 +113,15 @@
                     "innerTextValue": innerCmp.get("v.innerTextValue") + innerCmp.get("v.addText")
                 });
         }
+    },
+    testParentWithAuraIdLocatorChildRadio: {
+        test: function (cmp) {
+            var trx = this.clickDivAndGetTransaction($A.util.format(".{0} .{1}", "locatorWrapperIdWithDef", "innerRadio"));
+            this.validateLocatorResult(trx.context.locator, "innerRadio__radio" /*target*/, "locatorWrapperIdWithDef" /*scope*/, 
+                    {
+                        "parentKey": cmp.get("v.wrapperText")
+                    });
+        }
     }
     
 })

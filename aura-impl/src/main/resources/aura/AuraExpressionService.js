@@ -309,7 +309,6 @@ AuraExpressionService.prototype.resolveLocatorContext = function (cmp, locatorDe
  * @param cmp - component
  *
  * @returns The component that contains cmp, bypassing if/iteration in the chain
- * @private
  */
 AuraExpressionService.prototype.getContainer = function (cmp) {
     if (!cmp) {
@@ -321,12 +320,19 @@ AuraExpressionService.prototype.getContainer = function (cmp) {
     //    based on advice from jbuch
     var owner = cmp.getOwner();
     var ownerName = owner.getName();
+    var prevOwner = undefined;
     while ( ownerName === AuraExpressionService.AURA_ITERATION ||
-            ownerName === AuraExpressionService.AURA_IF) {
+            ownerName === AuraExpressionService.AURA_IF ||
+            owner.isInstanceOf('ui:virtualComponent') ||
+            owner.isInstanceOf('ui:abstractList')) {
         owner = owner.getOwner();
         ownerName = owner.getName();
+        if (owner === prevOwner) {
+            break;
+        }
+        prevOwner = owner;
     }
-
+    
     return owner;
 };
 
@@ -383,10 +389,6 @@ AuraExpressionService.prototype.resolveLocator = function (parent, root, include
     }
 
     var grandparent = this.getContainer(parent).getConcreteComponent();
-
-    if (grandparent.isInstanceOf('ui:virtualComponent') || grandparent.isInstanceOf('ui:abstractList')) {
-        grandparent = this.getContainer(grandparent).getConcreteComponent();
-    }
 
     var parentLocatorDef = this.findLocatorDefInSuperChain(grandparent, parentId);
 

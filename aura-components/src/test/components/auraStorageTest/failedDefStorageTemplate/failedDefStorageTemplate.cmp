@@ -8,11 +8,11 @@
              * fail[FunctionName] to true.
              *
              * clearCallCount - Track how many times clear was called for tests to verify
-             * failAll - Fail all storage operations with a rejected Promise. False by default.
+             * failAll - Fail all storage operations with a rejected Promise. True by default.
              */
             window.mockComponentDefStorage = {
                 clearCallCount : 0,
-                failAll: false
+                failAll: true
             };
 
             // Some of the component def caching logic is bypassed without an actions cache

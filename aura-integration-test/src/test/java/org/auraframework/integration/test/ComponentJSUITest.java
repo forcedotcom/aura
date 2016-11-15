@@ -154,8 +154,11 @@ public class ComponentJSUITest extends TestSuite {
         }
 
         public String getUrl(DefType defType) {
-            return String.format("/aura?aura.tag=%s%%3A%s&aura.deftype=%s&aura.format=%s", descriptor.getNamespace(),
-                    descriptor.getName(), defType.name(), Format.HTML.name());
+            String ext = ".cmp";
+            if (defType == DefType.APPLICATION) {
+                ext = ".app";
+            }
+            return String.format("/%s/%s%s", descriptor.getNamespace(), descriptor.getName(), ext);
         }
     }
 
@@ -194,7 +197,7 @@ public class ComponentJSUITest extends TestSuite {
 
         public String getUrl() {
             DefType defType = caseDef.getDefType();
-            return String.format("%s&aura.jstestrun=%s&aura.testReset=true&aura.testTimeout=%s",
+            return String.format("%s?aura.jstestrun=%s&aura.testReset=true&aura.testTimeout=%s",
                     suite.getUrl(defType), caseDef.getName(), getAuraUITestingUtil().getTimeout());
         }
 
@@ -203,7 +206,7 @@ public class ComponentJSUITest extends TestSuite {
          */
         public String getAppUrl() {
             DefType defType = caseDef.getDefType();
-            return suite.getUrl(defType) + "&aura.jstest=" + caseDef.getName() + "&aura.testReset=true";
+            return suite.getUrl(defType) + "?aura.jstest=" + caseDef.getName() + "&aura.testReset=true";
         }
 
         @Override

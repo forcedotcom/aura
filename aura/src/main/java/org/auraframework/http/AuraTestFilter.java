@@ -48,7 +48,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
-import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -63,7 +62,6 @@ import org.auraframework.http.RequestParam.IntegerParam;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -90,7 +88,7 @@ public class AuraTestFilter implements Filter {
 
     private static final int DEFAULT_JSTEST_TIMEOUT = 30;
     private static final String BASE_URI = "/aura";
-    private static final String GET_URI = BASE_URI + "?aura.tag=%s%%3A%s&aura.deftype=%s&aura.mode=%s&aura.format=%s&aura.access=%s";
+    private static final String GET_URI = BASE_URI + "?aura.tag=%s:%s&aura.deftype=%s&aura.mode=%s&aura.format=%s&aura.access=%s";
 
     private static final StringParam contextConfig = new StringParam(AuraServlet.AURA_PREFIX + "context", 0, false);
 
@@ -124,10 +122,8 @@ public class AuraTestFilter implements Filter {
     private TestContextAdapter testContextAdapter;
     private ContextService contextService;
     private DefinitionService definitionService;
-    private SerializationService serializationService;
     private ConfigAdapter configAdapter;
     private ExceptionAdapter exceptionAdapter;
-    private ServletUtilAdapter servletUtilAdapter;
 
     @Inject
     public void setTestContextAdapter(TestContextAdapter testContextAdapter) {
@@ -145,11 +141,6 @@ public class AuraTestFilter implements Filter {
     }
 
     @Inject
-    public void setSerializationService(SerializationService serializationService) {
-        this.serializationService = serializationService;
-    }
-
-    @Inject
     public void setConfigAdapter(ConfigAdapter configAdapter) {
         this.configAdapter = configAdapter;
     }
@@ -159,15 +150,10 @@ public class AuraTestFilter implements Filter {
         this.exceptionAdapter = exceptionAdapter;
     }
 
-    @Inject
-    public void setServletUtilAdapter(ServletUtilAdapter servletUtilAdapter) {
-        this.servletUtilAdapter = servletUtilAdapter;
-    }
-
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException,
             IOException {
-        
+
         if (Aura.getConfigAdapter().isProduction()) {
             chain.doFilter(req, res);
             return;
@@ -179,7 +165,6 @@ public class AuraTestFilter implements Filter {
         }
 
         HttpServletRequest request = (HttpServletRequest) req;
-        HttpServletResponse response = (HttpServletResponse) res;
         TestContext testContext = getTestContext(request);
         boolean doResetTest = testReset.get(request, false);
         if (testContext != null && doResetTest) {
@@ -188,7 +173,7 @@ public class AuraTestFilter implements Filter {
 
         // Check for requests to execute a JSTest, i.e. initial component GETs with particular parameters.
         if ("GET".equals(request.getMethod())) {
-            DefDescriptor<? extends BaseComponentDef> targetDescriptor = getTargetDescriptor(request);
+            DefDescriptor<?> targetDescriptor = getTargetDescriptor(request);
             if (targetDescriptor != null) {
                 // Check if a single jstest is being requested.
                 String testToRun = jstestToRun.get(request);
@@ -208,10 +193,9 @@ public class AuraTestFilter implements Filter {
                             }
                             targetUri = buildJsTestTargetUri(targetDescriptor, testDef);
                         } catch (QuickFixException e) {
-                            response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-                            response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
-                            servletUtilAdapter.setNoCache(response);
-                            response.getWriter().append(e.getMessage());
+                            ((HttpServletResponse) res).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+                            res.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
+                            res.getWriter().append(e.getMessage());
                             exceptionAdapter.handleException(e);
                             return;
                         }
@@ -236,13 +220,9 @@ public class AuraTestFilter implements Filter {
                             return;
                         }
                     case JS:
+                        res.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
                         int timeout = testTimeout.get(request, DEFAULT_JSTEST_TIMEOUT);
-
-                        response.setContentType("text/javascript");
-                        response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
-                        servletUtilAdapter.setNoCache(response);
-                        
-                        writeJsTestScript(response.getWriter(), targetDescriptor, testToRun, timeout);
+                        writeJsTestScript(res.getWriter(), targetDescriptor, testToRun, timeout);
                         return;
                     default:
                         // Pass it on.
@@ -274,7 +254,8 @@ public class AuraTestFilter implements Filter {
                         qs = qs + "&test=" + testName;
                     }
 
-                    String newUri = createURI("aurajstest", "jstest", DefType.APPLICATION, mode, Format.HTML, Authentication.AUTHENTICATED, qs);
+                    String newUri = createURI("aurajstest", "jstest", DefType.APPLICATION, mode,
+                            Format.HTML, Authentication.AUTHENTICATED.name(), qs);
                     RequestDispatcher dispatcher = servletContext.getContext(newUri).getRequestDispatcher(newUri);
                     if (dispatcher != null) {
                         dispatcher.forward(req, res);
@@ -365,7 +346,8 @@ public class AuraTestFilter implements Filter {
                 TestCaseDef.class));
     }
 
-    private String createURI(String namespace, String name, DefType defType, Mode mode, Format format, Authentication access, String qs) {
+    private String createURI(String namespace, String name, DefType defType, Mode mode, Format format, String access,
+            String qs) {
         if (mode == null) {
             try {
                 mode = contextService.getCurrentContext().getMode();
@@ -434,7 +416,7 @@ public class AuraTestFilter implements Filter {
             }
             String qs = URLEncodedUtils.format(newParams, "UTF-8") + hash;
             return createURI(targetDescriptor.getNamespace(), targetDescriptor.getName(),
-                    targetDescriptor.getDefType(), null, Format.HTML, Authentication.AUTHENTICATED, qs);
+                    targetDescriptor.getDefType(), null, Format.HTML, Authentication.AUTHENTICATED.name(), qs);
         } else {
             // Free-form tests will load only the target component's template.
             // TODO: Allow specifying the template on the test.
@@ -469,7 +451,7 @@ public class AuraTestFilter implements Filter {
             TestContext testContext = testContextAdapter.getTestContext(testDef.getQualifiedName());
             testContext.getLocalDefs().add(targetDef);
             return createURI(newDescriptor.getNamespace(), newDescriptor.getName(),
-                    newDescriptor.getDefType(), null, Format.HTML, Authentication.AUTHENTICATED, null);
+                    newDescriptor.getDefType(), null, Format.HTML, Authentication.AUTHENTICATED.name(), null);
         }
     }
 
@@ -513,7 +495,7 @@ public class AuraTestFilter implements Filter {
         String qs = String.format("aura.jstestrun=%s&aura.testTimeout=%s&aura.nonce=%s", testName, timeout,
                 System.nanoTime());
         String suiteSrcUrl = createURI(targetDescriptor.getNamespace(), targetDescriptor.getName(),
-                targetDescriptor.getDefType(), null, Format.JS, Authentication.AUTHENTICATED, qs);
+                targetDescriptor.getDefType(), null, Format.JS, Authentication.AUTHENTICATED.name(), qs);
         tag = tag + String.format("<script src='%s'%s></script>\n", suiteSrcUrl, defer);
         return tag;
     }
@@ -553,13 +535,11 @@ public class AuraTestFilter implements Filter {
 
         // TODO: Inject test framework here, before the test suite code, separately from framework code.
         out.append(String.format("(function testBootstrap(suiteProps) {\n\tif (!window.Aura || !window.Aura.frameworkJsReady) {\n\t\twindow.Aura || (window.Aura = {});\n\t\twindow.Aura.beforeFrameworkInit = Aura.beforeFrameworkInit || [];\n\t\twindow.Aura.beforeFrameworkInit.push(testBootstrap.bind(null, suiteProps));\n\t} else {\n\t\t$A.test.run('%s', suiteProps, '%s');\n\t}\n}(", testName,testTimeout));
-        String suiteCode = suiteDef.getCode();
-        out.append(suiteCode);
+        out.append(suiteDef.getCode());
         out.append("\n));"); // handle trailing single-line comments with newline
     }
 
-    @SuppressWarnings("unchecked")
-    private DefDescriptor<? extends BaseComponentDef> getTargetDescriptor(HttpServletRequest request) {
+    private DefDescriptor<?> getTargetDescriptor(HttpServletRequest request) {
         String namespace = null;
         String name = null;
         DefType type = null;
@@ -590,7 +570,7 @@ public class AuraTestFilter implements Filter {
             }
 
             if (name != null) {
-                return (DefDescriptor<? extends BaseComponentDef>)definitionService.getDefDescriptor(
+                return definitionService.getDefDescriptor(
                         String.format("%s:%s", namespace, name), type.getPrimaryInterface());
             }
         } catch (Throwable t) {

@@ -99,8 +99,6 @@
      */
     testDefStorageClearedWhenAllOperationsFail: {
         test: function(cmp) {
-            window.mockComponentDefStorage.failAll = true;
-
             var actual;
             $A.createComponent("test:text", {}, function(newCmp) {
                 actual = newCmp;
@@ -162,28 +160,23 @@
             // When storeDefs() fails, clear() will be called.
             window.mockComponentDefStorage.failSetItems = true;
             $A.createComponent("test:text", {}, function(newCmp){
-                $A.test.assertEquals("test$text", newCmp.getName(),
-                        "Unexpected component returned from createComponent()");
-            });
+                    $A.test.assertEquals("test$text", newCmp.getName(),
+                            "Unexpected component returned from createComponent()");
+                });
 
             var that = this;
             $A.test.addWaitForWithFailureMessage(
-                true,
-                function() {
-                    // make sure clear() gets called
-                    return window.mockComponentDefStorage.clearCallCount > 0;
-                },
-                "Component def storage never called clear() when the adapter's setItems() fails",
-                function() {
-                    $A.test.addWaitForWithFailureMessage(
-                        true,
-                        function() {
-                            // This must stay sync with ComponentDefStorage.prototype.BROKEN_GRAPH_COOKIE
-                            var actual = $A.util.getCookie(that.BROKEN_GRAPH_COOKIE);
-                            return actual === undefined; 
-                        }
-                    );
-                }
+                    true,
+                    function() {
+                        // make sure clear() gets called
+                        return window.mockComponentDefStorage.clearCallCount > 0;
+                    },
+                    "Component def storage never called clear() when the adapter's setItems() fails",
+                    function() {
+                        // This must stay sync with ComponentDefStorage.prototype.BROKEN_GRAPH_COOKIE
+                        var actual = $A.util.getCookie(that.BROKEN_GRAPH_COOKIE);
+                        $A.test.assertUndefined(actual);
+                    }
             );
         }
     },
@@ -198,21 +191,21 @@
             window.mockComponentDefStorage.failClear = true;
 
             $A.createComponent("test:text", {}, function(newCmp){
-                $A.test.assertEquals("test$text", newCmp.getName(),
-                        "Unexpected component returned from createComponent()");
-            });
+                    $A.test.assertEquals("test$text", newCmp.getName(),
+                            "Unexpected component returned from createComponent()");
+                });
 
             var that = this;
             $A.test.addWaitForWithFailureMessage(
-                true,
-                function() {
-                    return window.mockComponentDefStorage.clearCallCount > 0;
-                },
-                "Component def storage never called clear() when the adapter's setItems() fails",
-                function() {
-                    var actual = $A.util.getCookie(that.BROKEN_GRAPH_COOKIE);
-                    $A.test.assertEquals("true", actual);
-                }
+                    true,
+                    function() {
+                        return window.mockComponentDefStorage.clearCallCount > 0;
+                    },
+                    "Component def storage never called clear() when the adapter's setItems() fails",
+                    function() {
+                        var actual = $A.util.getCookie(that.BROKEN_GRAPH_COOKIE);
+                        $A.test.assertEquals("true", actual);
+                    }
             );
         }
     },
@@ -220,16 +213,19 @@
     testDefStorageClearedWhenBrokenGraphCookieIsSet: {
         test: function(cmp) {
             $A.test.addCleanup(this.clearBrokenGraphCookie);
-            this.clearBrokenGraphCookie();
-            
-            window.mockComponentDefStorage.failGetAll = true;
+
+            window.mockComponentDefStorage.failAll = false;
+
+            $A.createComponent("test:text", {}, function(newCmp){
+                    $A.test.assertEquals("test$text", newCmp.getName(),
+                            "Unexpected component returned from createComponent()");
+                });
 
             var expiration = new Date(new Date().getTime() + 1000*60*60); //1h
             var existedCookie = this.BROKEN_GRAPH_COOKIE + "= true; expires=" + expiration.toUTCString();
             document.cookie = existedCookie;
 
             var that = this;
-            
             return $A.test.getAllComponentDefsFromStorage()
                 .then(function() {
                     $A.test.assertEquals(1, window.mockComponentDefStorage.clearCallCount,

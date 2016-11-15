@@ -29,7 +29,6 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -66,10 +65,9 @@ public class JSTestModel implements ModelInstance {
         } else {
             testMode = Mode.AUTOJSTEST;
         }
-        url = String.format("?aura.tag=%s%%3A%s&aura.deftype=%s&aura.mode=%s&aura.format=%s&aura.nonce=%s",
-                descriptor.getNamespace(), descriptor.getName(), defType.name(), testMode.name(), Format.HTML.name(),
-                nonce);
-        
+        url = String.format("/%s/%s.%s?aura.nonce=%s&aura.mode=%s", descriptor.getNamespace(), descriptor.getName(),
+                defType == DefType.COMPONENT ? "cmp" : "app", nonce, testMode.name());
+
         String test = (String) component.getAttributes().getValue("test");
         tcds = filterTestCases(test);
     }

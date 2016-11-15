@@ -126,15 +126,18 @@ Test.Aura.Locker.SecureObjectTest = function() {
         function testPassthroughValues() {
             var CustomFileClass = function(){};
             var CustomFileListClass = function(){};
+            var CustomPromiseClass = function(){};
             // Mock the File and FileList class with a custom class
             var mockClassTypes = Mocks.GetMocks(Object.Global(), {
                 File: CustomFileClass,
-                FileList: CustomFileListClass
+                FileList: CustomFileListClass,
+                Promise: CustomPromiseClass
             });
 
             [Fact]
             [Data({clazz: CustomFileClass, msg: "File type value should passthrough unfiltered"})]
             [Data({clazz: CustomFileListClass, msg: "FileList type value should passthrough unfiltered"})]
+            [Data({clazz: CustomPromiseClass, msg: "Promise type value should passthrough unfiltered"})]
             function PassThroughFileValue(data) {
                 // Arrange
                 var value = new data.clazz();

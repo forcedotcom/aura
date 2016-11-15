@@ -23,23 +23,25 @@
     <aura:attribute name="showClear" type="Boolean" default="false" description="Boolean value indicate if we should show the search clear button. Default value is &quot;false&quot;."/>
     <aura:registerevent name="search" type="ui:searchEvent" description="The event fired when the user runs a search."/>
 
-    <input aura:id="search"
-           id="{!v.domId}"
-           class="{!v.class + ' input'}"
-           type="{!v.type}"
-           value="{!v.value}"
-           placeholder="{!v.placeholder}"
-           required="{!v.required}"
-           disabled="{!v.disabled}"
-           maxlength="{!v.maxlength}"
-           size="{!v.size}"
-           oninput="{!c.input}"
-           aria-describedby="{!v.ariaDescribedBy}"/>
-    <aura:if isTrue="{!v.showClear}">
-        <ui:button aura:id="clearSearchTermButton"
-                   class="{!v.value ? 'clear' : 'hide clear'}"
-                   label="clear"
-                   labelDisplay="false"
-                   press="{!c.clearSearchTerm}"/>
-    </aura:if>
+    <div>
+        <input aura:id="search"
+               id="{!v.domId}"
+               class="{!v.class + ' input'}"
+               type="{!v.type}"
+               value="{!v.value}"
+               placeholder="{!v.placeholder}"
+               required="{!v.required}"
+               disabled="{!v.disabled}"
+               maxlength="{!v.maxlength}"
+               size="{!v.size}"
+               oninput="{!c.input}"
+               aria-describedby="{!v.ariaDescribedBy}"/>
+        <aura:if isTrue="{!v.showClear}">
+            <ui:button aura:id="clearSearchTermButton"
+                       class="{!v.value ? 'clear' : 'hide clear'}"
+                       label="clear"
+                       labelDisplay="false"
+                       press="{!c.clearSearchTerm}"/>
+        </aura:if>
+    </div>
 </aura:component>

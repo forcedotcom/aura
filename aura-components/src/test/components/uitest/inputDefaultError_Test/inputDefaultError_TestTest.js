@@ -23,6 +23,7 @@
      * Verify aria-describedby value on the input tags matches the ul of inputDefaultError
      */
     verifyAriaIdCorrect : function(ul, input){
+    	input = input.getElementsByTagName("input")[0] || input;
         var ulId = $A.test.getElementAttributeValue(ul, "id");
         var inputId =  $A.test.getElementAttributeValue(input, "aria-describedby");
 

@@ -13,7 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-input.THIS {
+ .THIS {
+    position: relative;
+ }
+ 
+.THIS input{
     padding-right: 30px;
     line-height: normal;
 }
@@ -24,20 +28,22 @@ input.THIS {
     appearance: none;
 }
 
-.THIS.clear {
+.THIS .clear {
     background: transparent url(/auraFW/resources/aura/images/clear.png) no-repeat;
     height: 15px;
     width: 15px;
     border: 0;
     outline: 0;
-    position: relative;
-    top: 3px;
-    left: -27px;    
+    right: 5px;    
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
     -webkit-box-shadow: none;
     box-shadow: none;
+    padding: inherit;
 }
 
-.THIS.hide {
+.THIS .hide {
     display: none;
 }
 

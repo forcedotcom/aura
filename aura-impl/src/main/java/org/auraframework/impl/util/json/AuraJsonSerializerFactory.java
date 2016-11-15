@@ -15,19 +15,22 @@
  */
 package org.auraframework.impl.util.json;
 
-import com.google.common.collect.ImmutableMap;
-import org.auraframework.adapter.JsonSerializerAdapter;
-import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.util.json.JsonSerializer;
-import org.auraframework.util.json.JsonSerializerFactory;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.util.Collection;
-import java.util.Map;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import org.auraframework.adapter.JsonSerializerAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.service.LoggingService;
+import org.auraframework.util.json.DefaultJsonSerializer;
+import org.auraframework.util.json.JsonSerializer;
+import org.auraframework.util.json.JsonSerializerFactory;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Retrieves Json Serializers
@@ -38,8 +41,12 @@ public class AuraJsonSerializerFactory implements JsonSerializerFactory {
     private static Map<String, JsonSerializer<?>> SERIALIZERS_LOOKUP_MAP;
     private static Map<Class<?>, JsonSerializer<?>> SERIALIZERS_INSTANCE_MAP;
     private static final ConcurrentMap<String, JsonSerializer<?>> cache = new ConcurrentHashMap<>();
+    private static final JsonSerializer NOT_FOUND = new DefaultJsonSerializer();
     private static final Object lock = new Object();
 
+    @Inject
+    private LoggingService loggingService;
+    
     @Inject
     private Collection<JsonSerializerAdapter> jsonSerializerAdapters;
 
@@ -64,16 +71,16 @@ public class AuraJsonSerializerFactory implements JsonSerializerFactory {
     @SuppressWarnings("unchecked")
     public <T> JsonSerializer<T> getSerializer(T o) {
         Class<?> c = o.getClass();
-        JsonSerializer<T> s = (JsonSerializer<T>) cache.get(c.getName());
+        String className = c.getName();
+        JsonSerializer<T> s = (JsonSerializer<T>) cache.get(className);
         if (s != null) {
-            return s;
+            return (s != NOT_FOUND)? s : null;
         }
 
         if (SERIALIZERS_INSTANCE_MAP == null) {
             initSerializerMaps();
         }
 
-        String className = c.getName();
         s = (JsonSerializer<T>) SERIALIZERS_LOOKUP_MAP.get(className);
         if (s != null) {
             cache.putIfAbsent(className, s);
@@ -87,6 +94,9 @@ public class AuraJsonSerializerFactory implements JsonSerializerFactory {
                 return s;
             }
         }
+
+        cache.putIfAbsent(className, NOT_FOUND);
+        loggingService.info("no JsonSerializer found for:" + className);
         return null;
     }
 }

@@ -121,7 +121,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         String cacheBuster = configAdapter.getLockerServiceCacheBuster();
         String lockerServiceEnabled = cacheBuster != null ? ",\"ls\":\"" + cacheBuster + "\"" : "";
         String expectedSubPath = AuraTextUtil.urlencode(String.format(
-                "{\"mode\":\"UTEST\",\"app\":\"%s\",\"test\":\"org.auraframework.integration.test.adapter.format.html.ApplicationDefHTMLFormatAdapterTest.testWriteManifest\"%s}",
+                "{\"mode\":\"UTEST\",\"app\":\"%s\",\"pathPrefix\":\"\",\"test\":\"org.auraframework.integration.test.adapter.format.html.ApplicationDefHTMLFormatAdapterTest.testWriteManifest\"%s}",
                 desc.getDescriptorName(), lockerServiceEnabled));
         String expectedAttribute = " manifest=\"/l/" + expectedSubPath + "/app.manifest";
         if (!tag.contains(expectedAttribute)) {

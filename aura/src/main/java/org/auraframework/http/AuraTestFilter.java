@@ -48,6 +48,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -125,6 +126,7 @@ public class AuraTestFilter implements Filter {
     private DefinitionService definitionService;
     private ConfigAdapter configAdapter;
     private ExceptionAdapter exceptionAdapter;
+    private ServletUtilAdapter servletUtilAdapter;
 
     @Inject
     public void setTestContextAdapter(TestContextAdapter testContextAdapter) {
@@ -151,6 +153,11 @@ public class AuraTestFilter implements Filter {
         this.exceptionAdapter = exceptionAdapter;
     }
 
+    @Inject
+    public void setServletUtilAdapter(ServletUtilAdapter servletUtilAdapter) {
+        this.servletUtilAdapter = servletUtilAdapter;
+    }
+
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException,
             IOException {
@@ -165,7 +172,8 @@ public class AuraTestFilter implements Filter {
             return;
         }
 
-        HttpServletRequest request = (HttpServletRequest) req;
+        HttpServletRequest request = (HttpServletRequest)req;
+        HttpServletResponse response = (HttpServletResponse)res;
         TestContext testContext = getTestContext(request);
         boolean doResetTest = testReset.get(request, false);
         if (testContext != null && doResetTest) {
@@ -194,9 +202,11 @@ public class AuraTestFilter implements Filter {
                             }
                             targetUri = buildJsTestTargetUri(targetDescriptor, testDef);
                         } catch (QuickFixException e) {
-                            ((HttpServletResponse) res).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-                            res.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
-                            res.getWriter().append(e.getMessage());
+                            response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+                            servletUtilAdapter.setNoCache(response);
+                            response.setContentType(servletUtilAdapter.getContentType(Format.HTML));
+                            response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
+                            response.getWriter().append(e.getMessage());
                             exceptionAdapter.handleException(e);
                             return;
                         }
@@ -207,23 +217,27 @@ public class AuraTestFilter implements Filter {
                         loadTestMocks(context, true, testContext.getLocalDefs());
 
                         // Capture the response and inject tags to load jstest.
-                        String capturedResponse = captureResponse(req, res, targetUri);
+                        String capturedResponse = captureResponse(req, response, targetUri);
                         if (capturedResponse != null) {
-                            res.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
+                            servletUtilAdapter.setNoCache(response);
+                            response.setContentType(servletUtilAdapter.getContentType(Format.HTML));
+                            response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
                             if (!contextService.isEstablished()) {
                                 // There was an error in the original response, so just write the response out.
-                                res.getWriter().write(capturedResponse);
+                                response.getWriter().write(capturedResponse);
                             } else {
                                 int timeout = testTimeout.get(request, DEFAULT_JSTEST_TIMEOUT);
                                 String testTag = buildJsTestScriptTag(targetDescriptor, testToRun, timeout, capturedResponse);
-                                injectScriptTags(res.getWriter(), capturedResponse, testTag);
+                                injectScriptTags(response.getWriter(), capturedResponse, testTag);
                             }
                             return;
                         }
                     case JS:
-                        res.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
+                        servletUtilAdapter.setNoCache(response);
+                        response.setContentType(servletUtilAdapter.getContentType(Format.JS));
+                        response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
                         int timeout = testTimeout.get(request, DEFAULT_JSTEST_TIMEOUT);
-                        writeJsTestScript(res.getWriter(), targetDescriptor, testToRun, timeout);
+                        writeJsTestScript(response.getWriter(), targetDescriptor, testToRun, timeout);
                         return;
                     default:
                         // Pass it on.
@@ -258,7 +272,7 @@ public class AuraTestFilter implements Filter {
                             Format.HTML, Authentication.AUTHENTICATED.name(), "", qs);
                     RequestDispatcher dispatcher = servletContext.getContext(newUri).getRequestDispatcher(newUri);
                     if (dispatcher != null) {
-                        dispatcher.forward(req, res);
+                        dispatcher.forward(req, response);
                         return;
                     }
                 }
@@ -272,7 +286,7 @@ public class AuraTestFilter implements Filter {
         } else {
             if (!contextService.isEstablished()) {
                 LOG.error("Aura context is not established! New context will NOT be created.");
-                chain.doFilter(req, res);
+                chain.doFilter(req, response);
                 return;
             }
             AuraContext context = contextService.getCurrentContext();
@@ -280,7 +294,7 @@ public class AuraTestFilter implements Filter {
             // Reset mocks if requested, or for the initial GET.
             loadTestMocks(context, doResetTest, testContext.getLocalDefs());
         }
-        chain.doFilter(req, res);
+        chain.doFilter(req, response);
     }
 
     @Override

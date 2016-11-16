@@ -17,7 +17,7 @@
 -->
 <aura:component access="GLOBAL" support="GA" implements="ui:visible, ui:uiEvents" extensible="true" abstract="true" provider="js://ui.menuItem" description="A UI menu item in a ui:menuList component.">
 
-    <aura:registerEvent name="menuSelect" type="ui:menuSelect" description="The event that is fired when the menu item is selected."/>
+    <aura:registerEvent name="menuSelect" access="PRIVILEGED" type="ui:menuSelect" description="The event that is fired when the menu item is selected."/>
 
     <aura:attribute access="GLOBAL" name="selected" type="Boolean" default="false" description="The status of the menu item. True means this menu item is selected; False is not selected."/>
     <aura:attribute access="GLOBAL" name="type" type="String" description="The concrete type of the menu item. Accepted values are 'action', 'checkbox', 'radio', 'separator' or any namespaced component descriptor, e.g. ns:xxxxmenuItem."/>

@@ -28,6 +28,7 @@ import org.junit.Test;
 
 @UnAdaptableTest("namespace start with c means something special in core")
 public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCase {
+	boolean checkFullMessage = true;
     /**
      * Default Access Tests for a component include another component which register a custom event in its markup starts
      */
@@ -133,13 +134,13 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testevent",
                         NamespaceAccess.INTERNAL);
-        //create component register above event as 'testevent'
-        String cmpSource = "<aura:component access='GLOBAL'><aura:registerEvent name='testevent' type='"+eventDescriptor.getNamespace()+":"+eventDescriptor.getName()+"'  /></aura:component>";
+        //create component register above event as 'testeventAttr'
+        String cmpSource = "<aura:component access='GLOBAL'><aura:registerEvent name='testeventAttr' type='"+eventDescriptor.getNamespace()+":"+eventDescriptor.getName()+"'  /></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent",
                         NamespaceAccess.INTERNAL);
-        //create component include above component in markup, set 'testevent' to its controller
-        String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testevent='{!c.action}'/> </aura:component> ";
+        //create component include above component in markup, set 'testeventAttr' to its controller
+        String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testeventAttr='{!c.action}'/> </aura:component> ";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.CUSTOM);
@@ -151,9 +152,19 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
             caught = e;
         }
         assertNotNull("component of a custom namespace shouldn't be able to set handler of event registered in a system namespace component", caught);
-        //Access to event 'string:testevent1' from namespace 'cstring' in 'markup://cstring:testcomponent23(COMPONENT)' is not allowed
+
         assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
+        if(checkFullMessage) {
+        	String expected = "Access to event '"+eventDescriptor.getNamespace()+":"+eventDescriptor.getName()+
+                "' from namespace '"+descriptor.getNamespace()+"' in '"
+        		+descriptor.getPrefix()+"://"+descriptor.getDescriptorName()+"("+descriptor.getDefType()+")' is not allowed";
+        	assertEquals(expected, caught.getMessage());
+        }
+        
+        
     }
+    
+    
     /**
      * Verify Default access enforcement
      * verifyAccess for Component,Custom,Custom
@@ -189,12 +200,12 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent",
                         NamespaceAccess.CUSTOM);
         //create component register above event as 'testevent'
-        String cmpSource = "<aura:component access='GLOBAL'><aura:registerEvent name='testevent' type='"+eventDescriptor.getNamespace()+":"+eventDescriptor.getName()+"'  /></aura:component>";
+        String cmpSource = "<aura:component access='GLOBAL'><aura:registerEvent name='testeventAttr' type='"+eventDescriptor.getNamespace()+":"+eventDescriptor.getName()+"'  /></aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent",
                         NamespaceAccess.CUSTOM);
-        //create component include above component in markup, set 'testevent' to its controller
-        String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testevent='{!c.action}'/> </aura:component> ";
+        //create component include above component in markup, set 'testeventAttr' to its controller
+        String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testeventAttr='{!c.action}'/> </aura:component> ";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.CUSTOM);
@@ -206,8 +217,14 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
             caught = e;
         }
         assertNotNull("component of a custom namespace shouldn't be able to set handler of event registered in another custom namespace component", caught);
-        //Access to event 'cstring:testevent1' from namespace 'cstring1' in 'markup://cstring1:testcomponent23(COMPONENT)' is not allowed
+       
         assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
+        if(checkFullMessage) {
+        	String expected = "Access to event '"+eventDescriptor.getNamespace()+":"+eventDescriptor.getName()+
+                "' from namespace '"+descriptor.getNamespace()+"' in '"
+        		+descriptor.getPrefix()+"://"+descriptor.getDescriptorName()+"("+descriptor.getDefType()+")' is not allowed";
+        	assertEquals(expected, caught.getMessage());
+        }
     }
     /**
      * Verify Default access enforcement
@@ -349,15 +366,15 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
         DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testevent",
                         NamespaceAccess.INTERNAL);
-        //create component register above event as 'testevent'
+        //create component register above event as 'testeventAttr'
         String cmpSource = "<aura:component access='GLOBAL'>"
-        		+ "<aura:registerEvent name='testevent' type='"+eventDescriptor.getNamespace()+":"+eventDescriptor.getName()+"' access='PUBLIC' />"
+        		+ "<aura:registerEvent name='testeventAttr' type='"+eventDescriptor.getNamespace()+":"+eventDescriptor.getName()+"' access='PUBLIC' />"
         				+ "</aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
                 StringSourceLoader.DEFAULT_NAMESPACE + ":testcomponent",
                         NamespaceAccess.INTERNAL);
-        //create component include above component in markup, set 'testevent' to its controller
-        String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testevent='{!c.action}'/> </aura:component> ";
+        //create component include above component in markup, set 'testeventAttr' to its controller
+        String source = "<aura:component> <" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testeventAttr='{!c.action}'/> </aura:component> ";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent2",
                         NamespaceAccess.CUSTOM);
@@ -369,8 +386,14 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
             caught = e;
         }
         assertNotNull("component of a custom namespace shouldn't be able to set handler of event registered in a system namespace component", caught);
-        //Access to event 'string:testevent1' from namespace 'cstring' in 'markup://cstring:testcomponent23(COMPONENT)' is not allowed
+        
         assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
+        if(checkFullMessage) {
+        	String expected = "Access to event '"+eventDescriptor.getNamespace()+":"+eventDescriptor.getName()+
+                "' from namespace '"+descriptor.getNamespace()+"' in '"
+        		+descriptor.getPrefix()+"://"+descriptor.getDescriptorName()+"("+descriptor.getDefType()+")' is not allowed";
+        	assertEquals(expected, caught.getMessage());
+        }
     }
     /**
      * Verify Public access enforcement
@@ -410,14 +433,14 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
                         NamespaceAccess.CUSTOM);
         //create component register above event as 'testevent'
         String cmpSource = "<aura:component access='GLOBAL'>"
-        		+ "<aura:registerEvent name='testevent' type='"+eventDescriptor.getNamespace()+":"+eventDescriptor.getName()+"' access='PUBLIC' />"
+        		+ "<aura:registerEvent name='testeventAttr' type='"+eventDescriptor.getNamespace()+":"+eventDescriptor.getName()+"' access='PUBLIC' />"
         				+ "</aura:component>";
         DefDescriptor<? extends Definition> cmpDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, cmpSource,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent",
                         NamespaceAccess.CUSTOM);
-        //create component include above component in markup, set 'testevent' to its controller
+        //create component include above component in markup, set 'testeventAttr' to its controller
         String source = "<aura:component>"
-        		+ "<" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testevent='{!c.action}'/> "
+        		+ "<" + cmpDescriptor.getNamespace() + ":" + cmpDescriptor.getName() + " testeventAttr='{!c.action}'/> "
         		+ "</aura:component> ";
         DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
                 StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponent2",
@@ -430,8 +453,14 @@ public class RegisterEventAccessAttributeEnforcementTest extends AuraImplTestCas
             caught = e;
         }
         assertNotNull("component of a custom namespace shouldn't be able to set handler of event registered in another custom namespace component", caught);
-        //Access to event 'cstring:testevent1' from namespace 'cstring1' in 'markup://cstring1:testcomponent23(COMPONENT)' is not allowed
+       
         assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
+        if(checkFullMessage) {
+        	String expected = "Access to event '"+eventDescriptor.getNamespace()+":"+eventDescriptor.getName()+
+                "' from namespace '"+descriptor.getNamespace()+"' in '"
+        		+descriptor.getPrefix()+"://"+descriptor.getDescriptorName()+"("+descriptor.getDefType()+")' is not allowed";
+        	assertEquals(expected, caught.getMessage());
+        }
     }
     /**
      * Verify Public access enforcement

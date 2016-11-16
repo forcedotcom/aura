@@ -579,16 +579,18 @@ Aura.Context.AuraContext.prototype.addLoaded = function(pair) {
  * Find a 'loaded' pair for a descriptor.
  *
  * @param {String} descriptor the descriptor string.
+ * @param {Object=} [loaded] Object to search
  * @returns {Object} an object that can be passed to addloaded.
  * @private
  */
-Aura.Context.AuraContext.prototype.findLoaded = function(descriptor) {
-    var cmpDescriptor = "COMPONENT@"+descriptor;
-    var appDescriptor = "APPLICATION@"+descriptor;
-    if (this.loaded[cmpDescriptor]) {
-        return { "key":cmpDescriptor, "value":this.loaded[cmpDescriptor] };
-    } else if (this.loaded[appDescriptor]) {
-        return { "key":appDescriptor, "value":this.loaded[appDescriptor] };
+Aura.Context.AuraContext.prototype.findLoaded = function(descriptor, loaded) {
+    var cmpDescriptor = "COMPONENT@" + descriptor;
+    var appDescriptor = "APPLICATION@" + descriptor;
+    loaded = loaded || this.loaded;
+    if (loaded[cmpDescriptor]) {
+        return { "key": cmpDescriptor, "value": loaded[cmpDescriptor] };
+    } else if (loaded[appDescriptor]) {
+        return { "key": appDescriptor, "value": loaded[appDescriptor] };
     }
     return null;
 };

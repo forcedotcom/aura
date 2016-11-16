@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.http.HttpStatus;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
@@ -63,6 +64,9 @@ public class BootstrapTest extends AuraImplTestCase {
     @Inject
     private ContextService contextService;
 
+    @Inject
+    private ExceptionAdapter exceptionAdapter;
+
     private Bootstrap getBootstrap() {
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.setConfigAdapter(configAdapter);
@@ -71,6 +75,7 @@ public class BootstrapTest extends AuraImplTestCase {
         bootstrap.setContextService(contextService);
         bootstrap.setInstanceService(instanceService);
         bootstrap.setServerService(serverService);
+        bootstrap.setExceptionAdapter(exceptionAdapter);
         return bootstrap;
     }
 
@@ -85,7 +90,7 @@ public class BootstrapTest extends AuraImplTestCase {
                 "<aura:application></aura:application>");
         AuraContext context = contextService.startContext(AuraContext.Mode.PROD, AuraContext.Format.MANIFEST,
                 AuraContext.Authentication.AUTHENTICATED, appDesc);
-
+        context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
         HttpServletRequest request = mock(HttpServletRequest.class);
         MockHttpServletResponse response = new MockHttpServletResponse();
 

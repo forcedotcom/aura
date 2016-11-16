@@ -15,30 +15,20 @@
  */
 package org.auraframework.integration.test.service;
 
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.ConcurrentModificationException;
-import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.http.HttpStatus;
-import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
@@ -48,16 +38,12 @@ import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.TypeDef;
 import org.auraframework.def.ValueDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.adapter.ServletUtilAdapterImpl;
 import org.auraframework.instance.AbstractActionImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.ActionDelegate;
 import org.auraframework.instance.Component;
-import org.auraframework.instance.InstanceStack;
-import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
-import org.auraframework.service.SerializationService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
@@ -71,8 +57,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 import javax.inject.Inject;
 import com.google.common.collect.Lists;
@@ -783,128 +767,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         ss.writeDefinitions(dependencies, output);
 
         return output.toString();
-    }
-
-    /**
-     * Unhandled exceptions such has InterruptedException should set response status to 500 for JS (and CSS)
-     * so it doesn't cache in browser, appcache, etc
-     */
-    @Test
-    public void testHandleInterruptedException() throws Exception {
-        PrintWriter writer = mock(PrintWriter.class);
-        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-        HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-        ContextService mockContextService = mock(ContextService.class);
-        AuraContext mockContext = mock(AuraContext.class);
-        ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
-        InstanceStack mockInstanceStack = mock(InstanceStack.class);
-        List<String> stack = Lists.newArrayList();
-        SerializationService mockSerializationService = mock(SerializationService.class);
-
-        Mockito.when(mockResponse.getWriter()).thenReturn(writer);
-        // for JS, SC_INTERNAL_SERVER_ERROR
-        Mockito.when(mockContext.getFormat()).thenReturn(AuraContext.Format.JS);
-        Mockito.when(mockContext.getMode()).thenReturn(Mode.PROD);
-        Mockito.when(mockContext.getInstanceStack()).thenReturn(mockInstanceStack);
-        Mockito.when(mockConfigAdapter.isProduction()).thenReturn(true);
-        Mockito.when(mockInstanceStack.getStackInfo()).thenReturn(stack);
-        Mockito.when(mockContextService.getCurrentContext()).thenReturn(mockContext);
-
-        Throwable exception = new InterruptedException("opps");
-
-        ServletUtilAdapterImpl adapter = new ServletUtilAdapterImpl();
-        adapter.setContextService(mockContextService);
-        adapter.setConfigAdapter(mockConfigAdapter);
-        adapter.setSerializationService(mockSerializationService);
-        adapter.handleServletException(exception, true, mockContext, mockRequest, mockResponse, true);
-
-        Mockito.verify(mockResponse).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-        Mockito.verify(mockContextService, atLeastOnce()).endContext();
-    }
-
-    /**
-     * Verifies first exception within handleServletException is caught and processed
-     * we throw 'EmptyStackException' when getting InstanceStack, then verify
-     * exceptionAdapter.handleException(death) is called with it
-     */
-    @Test
-    public void testHandleExceptionDeathCaught() throws Exception {
-        PrintWriter writer = mock(PrintWriter.class);
-        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-        HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-        ContextService mockContextService = mock(ContextService.class);
-        AuraContext mockContext = mock(AuraContext.class);
-        ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
-        ExceptionAdapter mockExceptionAdapter = mock(ExceptionAdapter.class);
-
-        Throwable firstException = new EmptyStackException();
-
-        Mockito.when(mockResponse.getWriter()).thenReturn(writer);
-        Mockito.when(mockContext.getFormat()).thenReturn(AuraContext.Format.JSON);
-        Mockito.when(mockContext.getMode()).thenReturn(Mode.PROD);
-        Mockito.when(mockConfigAdapter.isProduction()).thenReturn(true);
-        Mockito.when(mockContextService.getCurrentContext()).thenReturn(mockContext);
-        Mockito.when(mockContext.getInstanceStack()).thenThrow(firstException);
-
-        Throwable exception = new InterruptedException("opps");
-
-        ServletUtilAdapterImpl adapter = new ServletUtilAdapterImpl();
-        adapter.setContextService(mockContextService);
-        adapter.setConfigAdapter(mockConfigAdapter);
-        adapter.setExceptionAdapter(mockExceptionAdapter);
-        adapter.handleServletException(exception, true, mockContext, mockRequest, mockResponse, true);
-
-        ArgumentCaptor<Throwable> handledException = ArgumentCaptor.forClass(Throwable.class);
-        Mockito.verify(mockExceptionAdapter, Mockito.times(1)).handleException(handledException.capture());
-
-        assertTrue("Should handle EmptyStackException", handledException.getValue() instanceof EmptyStackException);
-
-        Mockito.verify(mockResponse, atLeastOnce()).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-        Mockito.verify(mockContextService, atLeastOnce()).endContext();
-    }
-
-    /**
-     * Verifies second exception within handleServletException is caught and processed
-     * we throw 'EmptyStackException' when getting InstanceStack, when
-     * exceptionAdapter.handleException(death) handle the exception,
-     * we throw second exception, then verify we printout the error message to response's writer
-     */
-    @Test
-    public void testHandleExceptionDoubleDeathCaught() throws Exception {
-        PrintWriter writer = mock(PrintWriter.class);
-        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-        HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-        ContextService mockContextService = mock(ContextService.class);
-        AuraContext mockContext = mock(AuraContext.class);
-        ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
-        ExceptionAdapter mockExceptionAdapter = mock(ExceptionAdapter.class);
-
-        Throwable firstException = new EmptyStackException();
-        String ccmeMsg = "double dead";
-        Throwable secondException = new ConcurrentModificationException("double dead");
-
-        Mockito.when(mockResponse.getWriter()).thenReturn(writer);
-        Mockito.when(mockContext.getFormat()).thenReturn(AuraContext.Format.HTML);
-        Mockito.when(mockContext.getMode()).thenReturn(Mode.DEV);
-        Mockito.when(mockConfigAdapter.isProduction()).thenReturn(false);
-        Mockito.when(mockContextService.getCurrentContext()).thenReturn(mockContext);
-        Mockito.when(mockContext.getInstanceStack()).thenThrow(firstException);
-        Mockito.when(mockExceptionAdapter.handleException(firstException)).thenThrow(secondException);
-
-        Throwable exception = new InterruptedException("opps");
-
-        ServletUtilAdapterImpl adapter = new ServletUtilAdapterImpl();
-        adapter.setContextService(mockContextService);
-        adapter.setConfigAdapter(mockConfigAdapter);
-        adapter.setExceptionAdapter(mockExceptionAdapter);
-        adapter.handleServletException(exception, true, mockContext, mockRequest, mockResponse, true);
-
-        ArgumentCaptor<String> exceptionMessage = ArgumentCaptor.forClass(String.class);
-        Mockito.verify(writer, Mockito.times(1)).println(exceptionMessage.capture());
-
-        assertEquals(ccmeMsg, exceptionMessage.getValue());
-        Mockito.verify(mockResponse, atLeastOnce()).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-        Mockito.verify(mockContextService, atLeastOnce()).endContext();
     }
 
 }

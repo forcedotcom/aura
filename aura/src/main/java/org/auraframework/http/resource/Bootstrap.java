@@ -114,13 +114,16 @@ public class Bootstrap extends AuraResourceImpl {
         
         Boolean gackOnException = true;
         try {
-        	setCacheHeaders(response, app);
+
+            servletUtilAdapter.checkFrameworkUID(context);
 
             if (!configAdapter.validateBootstrap(request.getParameter("jwt"))) {
                 // If jwt validation fails, just write error to client. Do not gack.
                 gackOnException = false;
                 throw new AuraJWTError("Invalid jwt parameter");
             }
+
+            setCacheHeaders(response, app);
 
             Instance<?> appInstance = instanceService.getInstance(desc, getComponentAttributes(request));
             definitionService.updateLoaded(desc);
@@ -194,13 +197,14 @@ public class Bootstrap extends AuraResourceImpl {
 
     private void writeError(Throwable t, HttpServletResponse response, AuraContext context) throws IOException {
         response.resetBuffer();
+        servletUtilAdapter.setNoCache(response);
         PrintWriter out = response.getWriter();
         out.print(PREPEND_JS);
         JsonEncoder json = JsonEncoder.createJsonStream(out, context.getJsonSerializationContext());
         json.writeMapBegin();
         
         if (t instanceof AuraJWTError) {
-        	json.writeMapEntry("errorType", "jwt");
+            json.writeMapEntry("errorType", "jwt");
         }
 
         json.writeMapEntry("error", t);

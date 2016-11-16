@@ -31,6 +31,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.AuraResource;
+import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 public interface ServletUtilAdapter extends AuraAdapter {
@@ -91,7 +92,7 @@ public interface ServletUtilAdapter extends AuraAdapter {
      *
      * @param context the aura context to use.
      * @param safeInlineJs should we include 'inline.js' to allow for CSP protection?
-     * @param ignoreNonCacheableScripts. Flag to ignore scripts that are dynamic so we don't potentially cache them such as bootstrap.js
+     * @param ignoreNonCacheableScripts Flag to ignore scripts that are dynamic so we don't potentially cache them such as bootstrap.js
      * This parameter will mostly be false but for calls from manifest or other caching calls alike.
      * @return the list of scripts.
      */
@@ -225,5 +226,5 @@ public interface ServletUtilAdapter extends AuraAdapter {
     Set<DefDescriptor<?>> verifyTopLevel(HttpServletRequest request, HttpServletResponse response,
             AuraContext context) throws IOException;
 
-
+    void checkFrameworkUID(AuraContext context) throws ClientOutOfSyncException;
 }

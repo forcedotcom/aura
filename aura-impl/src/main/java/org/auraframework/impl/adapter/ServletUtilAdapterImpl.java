@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -34,6 +35,7 @@ import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.CSP;
+import org.auraframework.http.ManifestUtil;
 import org.auraframework.impl.util.BrowserUserAgent;
 import org.auraframework.impl.util.UserAgent;
 import org.auraframework.impl.util.TemplateUtil.Script;
@@ -61,6 +63,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     private ClientLibraryService clientLibraryService;
     protected TemplateUtil templateUtil = new TemplateUtil();
     protected DefinitionService definitionService;
+    protected ManifestUtil manifestUtil;
 
     /**
      * "Short" pages (such as manifest cookies and AuraFrameworkServlet pages) expire in 1 day.
@@ -95,6 +98,11 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      * header at all is taken as an invitation for filters to add their own ideas.
      */
     protected static final String HDR_FRAME_ALLOWALL = "ALLOWALL";
+
+    @PostConstruct
+    public void createManifestUtil() {
+        this.manifestUtil = new ManifestUtil(definitionService, contextService, configAdapter);
+    }
 
     /**
      * Handle an exception in the servlet.
@@ -212,8 +220,17 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 // in some cases, but we don't want to go there unless we have to.
                 //
             }
-            if (format == Format.JS || format == Format.CSS) {
-                // Make sure js and css doesn't get cached in browser, appcache, etc
+            if (format == Format.JS) {
+                // send 500 by default
+                int jsStatus = HttpStatus.SC_INTERNAL_SERVER_ERROR;
+                if (!manifestUtil.isManifestEnabled()) {
+                    // if browser applicationCache is disabled then send 200 with javascript exception code below
+                    jsStatus = HttpStatus.SC_OK;
+                    // make sure error response is NOT cached
+                    setNoCache(response);
+                }
+                response.setStatus(jsStatus);
+            } else if(format == Format.CSS) {
                 response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
             }
             if (format == Format.JSON || format == Format.HTML || format == Format.JS || format == Format.CSS) {
@@ -405,8 +422,8 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     @Override
     public String getBootstrapFallbackUrl(AuraContext context, Map<String,Object> attributes) {
         String contextPath = context.getContextPath();
-        String nonce = context.getFrameworkUID();
-        return String.format("%s/auraFW/resources/%s/aura/fallback/fallback.bootstrap.js", contextPath, nonce);
+        // not including nonce in fallback url to force no cache headers
+        return String.format("%s/auraFW/resources/aura/fallback/fallback.bootstrap.js", contextPath);
     }
 
     @Override
@@ -744,6 +761,23 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     /**
+     * Checks current framework UID to one in provided AuraContext.
+     * Throws ClientOutOfSyncException if they don't match.
+     *
+     * @param context AuraContext
+     * @throws ClientOutOfSyncException
+     */
+    @Override
+    public void checkFrameworkUID(AuraContext context) throws ClientOutOfSyncException {
+        String fwUID = configAdapter.getAuraFrameworkNonce();
+        String ctxUID = context.getFrameworkUID();
+        if (!fwUID.equals(ctxUID)) {
+            throw new ClientOutOfSyncException("Framework UID mismatch. Expected: " + fwUID +
+                    " Actual: " + ctxUID);
+        }
+    }
+
+    /**
      * @param definitionService the definitionService to set
      */
     @Inject
@@ -789,5 +823,12 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     @Inject
     public void setClientLibraryService(ClientLibraryService clientLibraryService) {
         this.clientLibraryService = clientLibraryService;
+    }
+
+    /**
+     * Exposed for testing
+     */
+    public void setManifestUtil(ManifestUtil manifestUtil) {
+        this.manifestUtil = manifestUtil;
     }
 }

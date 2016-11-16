@@ -25,6 +25,10 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * Serializes ClientSideEventExceptions to JS format.
+ * Processed by $A.clientService.throwExceptionEvent
+ */
 @ThreadSafe
 @ServiceComponent
 public class ClientSideEventExceptionJSFormatAdapter extends JSFormatAdapter<ClientSideEventException> {
@@ -39,7 +43,7 @@ public class ClientSideEventExceptionJSFormatAdapter extends JSFormatAdapter<Cli
     @Override
     public void write(ClientSideEventException value, Map<String, Object> attributes, Appendable out) throws IOException,
             QuickFixException {
-        out.append("$A.service.client.throwExceptionEvent(");
+        out.append("$A.clientService.throwExceptionEvent(");
         serializationService.write(value, attributes, getType(), out, "JSON");
         out.append(");");
     }

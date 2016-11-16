@@ -90,6 +90,7 @@ public class InlineJsTest extends AuraImplTestCase {
                 AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
+        context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
 
         InlineJs inlineJs = getInlineJs();
 
@@ -119,6 +120,8 @@ public class InlineJsTest extends AuraImplTestCase {
                 AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
+
+        context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
 
         InlineJs inlineJs = getInlineJs();
 
@@ -156,6 +159,7 @@ public class InlineJsTest extends AuraImplTestCase {
                 AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
+        context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
 
         InlineJs inlineJs = getInlineJs();
 
@@ -218,6 +222,7 @@ public class InlineJsTest extends AuraImplTestCase {
                 AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
+        context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
 
         InlineJs inlineJs = getInlineJs();
 

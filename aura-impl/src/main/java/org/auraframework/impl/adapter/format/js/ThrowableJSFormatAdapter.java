@@ -16,17 +16,28 @@
 package org.auraframework.impl.adapter.format.js;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.service.SerializationService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * Default Throwable error serializer for JS format.
+ *
+ * This will serialize default javascript exception handling code for Throwable
+ * exceptions that do not have JsFormatAdapter registered.
+ */
 @ServiceComponent
 public class ThrowableJSFormatAdapter extends JSFormatAdapter<Throwable> {
-    @Inject
-    private SerializationService serializationService;
+
+    private final static String JS_EXCEPTION_CODE = ";\n" +
+            ";(function() {\n" +
+            "    try {\n" +
+            "        $A.message('There was an error loading the page. Please click Refresh.', null, true);\n" +
+            "    } catch (e) {\n" +
+            "        window.location.reload(true);\n" +
+            "    }\n" +
+            "}());";
 
     @Override
     public Class<Throwable> getType() {
@@ -36,8 +47,6 @@ public class ThrowableJSFormatAdapter extends JSFormatAdapter<Throwable> {
     @Override
     public void write(Throwable value, Map<String, Object> attributes, Appendable out) throws IOException,
             QuickFixException {
-        out.append("aura.error(");
-        serializationService.write(value, attributes, getType(), out, "JSON");
-        out.append(");");
+        out.append(JS_EXCEPTION_CODE);
     }
 }

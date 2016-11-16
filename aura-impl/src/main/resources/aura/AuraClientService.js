@@ -518,9 +518,11 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
  * This is published, but only for use in the case of an event exception serialized as JS,
  * not sure if this is important.
  *
- * @param {Object} config The data for the exception event
+ * Exported to be used in ClientSideEventExceptionJSFormatAdapter to serialize JS exception handling code.
+ *
+ * @param {Object} resp The data for the exception event
  * @memberOf AuraClientService
- * @private
+ * @export
  */
 AuraClientService.prototype.throwExceptionEvent = function(resp) {
     var evtObj = resp["event"];
@@ -1071,16 +1073,7 @@ AuraClientService.prototype.handleAppCache = function() {
         // b. the error indicates a file in the manifest can't be downloaded (server returned a 4xx, 5xx,
         //    network blip, etc), which means the fwk/app won't boot. so start/continue the bootup timers.
         acs.startBootTimers();
-
-        if ((!("onLine" in window.navigator) || window.navigator.onLine) && window.applicationCache.status === window.applicationCache.IDLE) {
-            // perform only when online (OR onLine not supported) and appcache IDLE status
-            try {
-                // force browser to keep trying to get updated js resources as manifest should be updated at this point
-                window.applicationCache.update();
-            } catch (ignore) {
-                // ignore
-            }
-        }
+        acs.updateAppCacheIfOnlineAndIdle();
     }
 
     function handleAppcacheDownloading(e) {
@@ -1199,6 +1192,14 @@ AuraClientService.prototype.startBootTimers = function() {
  */
 AuraClientService.prototype.setOutdated = function() {
     this.isOutdated = true;
+
+    if (!$A.getContext()) {
+        // exception in inline.js does not create aura context and reloadPointPassed is never true
+        // so we perform actual dump caches and reload
+        this.actualDumpCachesAndReload();
+        return;
+    }
+
     var appCache = window.applicationCache;
 
     // note: read jsdoc on dumpCachesAndReload() and hardReload() to understand this code and
@@ -1242,6 +1243,24 @@ AuraClientService.prototype.setOutdated = function() {
     // - CHECKING: manifest is being (re)fetched. appcache events will trigger handleAppCache().
     // - DOWNLOADING: appcache contents are being fetched. appcache events will trigger handleAppCache().
     // - UPDATEREADY: a new version of appcache is ready. handleAppCache() will apply the new version and reload.
+};
+
+/**
+ * Updates appCache if online and status is IDLE
+ * @returns {boolean} whether appcache update was performed
+ */
+AuraClientService.prototype.updateAppCacheIfOnlineAndIdle = function() {
+    if ((!("onLine" in window.navigator) || window.navigator.onLine) && window.applicationCache.status === window.applicationCache.IDLE) {
+        // perform only when online (OR onLine not supported) and appcache IDLE status
+        try {
+            // force browser to keep trying to get updated js resources as manifest should be updated at this point
+            window.applicationCache.update();
+            return true;
+        } catch (ignore) {
+            // ignore
+        }
+    }
+    return false;
 };
 
 /**
@@ -1616,6 +1635,7 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
     if (bootstrap.source === "network") {
         // must clean and save the network payload
         $A.util.json.resolveRefsObject(boot["data"]);
+        this.checkBootstrapUIDs(Aura["appBootstrapCache"]);
         this.saveBootstrapToStorage(boot);
     }
 
@@ -1648,6 +1668,7 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
                     $A.warning("AuraClientService.runAfterBootstrapReady(): bootstrap from network contained error: " + Aura["appBootstrap"]["error"]["message"]);
                 } else {
                     Aura["bootstrapUpgrade"] = this.appBootstrap["md5"] !== Aura["appBootstrap"]["md5"];
+                    this.checkBootstrapUIDs(Aura["appBootstrap"]);
                     this.checkBootstrapUpgrade();
                 }
             }
@@ -1658,9 +1679,40 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
 
     // release memory
     delete Aura["appBootstrap"];
-    delete Aura["appBootstrapCache"];
 
     callback.call(this, boot["data"]["app"]);
+};
+
+/**
+ * Checks whether framework or app UID of cached and network has changed.
+ * If either differs, dump caches and reload because we should not use stale defs in storage.
+ * UIDs check is different from bootstrap md5 check. bootstrap md5 is from application bootstrap and models
+ * whereas UIDs are framework code and application defs.
+ *
+ * @param {Object} boot bootstrap config
+ */
+AuraClientService.prototype.checkBootstrapUIDs = function(boot) {
+    var context = $A.getContext();
+    if (boot && boot["context"] && boot["context"]["fwuid"] && boot["context"]["loaded"] && context) {
+        var currentAppDesc = "markup://" + context.getApp();
+
+        var currentAppUid = null;
+        var bootAppUid = null;
+        var currentLoaded = context.findLoaded(currentAppDesc);
+        if ($A.util.isObject(currentLoaded)) {
+            currentAppUid = currentLoaded["value"];
+        }
+        var bootLoaded = context.findLoaded(currentAppDesc, boot["context"]["loaded"]);
+        if ($A.util.isObject(bootLoaded)) {
+            bootAppUid = bootLoaded["value"];
+        }
+
+        if (context.fwuid !== boot["context"]["fwuid"] || currentAppUid !== bootAppUid) {
+            if (!this.updateAppCacheIfOnlineAndIdle()) {
+                this.dumpCachesAndReload();
+            }
+        }
+    }
 };
 
 /**

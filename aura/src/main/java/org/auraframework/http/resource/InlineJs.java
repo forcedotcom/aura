@@ -115,17 +115,16 @@ public class InlineJs extends AuraResourceImpl {
     private <T extends BaseComponentDef> void internalWrite(HttpServletRequest request,
             HttpServletResponse response, DefDescriptor<T> defDescriptor, AuraContext context)
             throws IOException, QuickFixException {
-        // Knowing the app, we can do the HTTP headers, so of which depend on
-        // the app in play, so we couldn't do this earlier.
-        T def;
+
+        servletUtilAdapter.checkFrameworkUID(context);
 
         servletUtilAdapter.setCSPHeaders(defDescriptor, request, response);
-
-        context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
-
         context.setApplicationDescriptor(defDescriptor);
         definitionService.updateLoaded(defDescriptor);
-        def = definitionService.getDefinition(defDescriptor);
+
+        // Knowing the app, we can do the HTTP headers, so of which depend on
+        // the app in play, so we couldn't do this earlier.
+        T def = definitionService.getDefinition(defDescriptor);
 
         if (!context.isTestMode() && !context.isDevMode()) {
             String defaultNamespace = configAdapter.getDefaultNamespace();
@@ -158,7 +157,7 @@ public class InlineJs extends AuraResourceImpl {
         if (appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)) {
             Boolean isOnePageApp = ((ApplicationDef)definitionService.getDefinition(appDefDesc)).isOnePageApp();
             if (isOnePageApp != null) {
-                return isOnePageApp.booleanValue();
+                return isOnePageApp;
             }
         }
         return !manifestUtil.isManifestEnabled(request);

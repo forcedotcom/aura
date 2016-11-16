@@ -850,10 +850,9 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
 
     bootstrap["pageStartTime"] = pageStartTime;
 
-    if (window.performance && performance.timing && performance.navigation) {
+    if (window.performance && performance.timing) {
         // TODO: Eventually make this strings smaller to reduce payload
         var p  = window.performance;
-        var pn = p.navigation;
         var pt = p.timing;
 
         if (!bootstrap["timming"]) {

@@ -111,6 +111,10 @@ public abstract class BaseXMLElementHandler {
         return xmlReader.getName().getLocalPart();
     }
 
+    protected String getPITarget() {
+        return xmlReader.getPITarget();
+    }
+
     protected void error(String message, Object... args) {
         throw new AuraRuntimeException(String.format(message, args), getLocation());
     }
@@ -161,6 +165,17 @@ public abstract class BaseXMLElementHandler {
                     }
                     // we hit our own end tag, so stop handling
                     break loop;
+
+                case XMLStreamConstants.PROCESSING_INSTRUCTION:
+                    String target = getPITarget();
+                    switch (target.toLowerCase()) {
+                        case "ignore":
+                            break;
+                        default:
+                            error("Unsupported processing instruction: %s", target);
+                    }
+                    break;
+
                 case XMLStreamConstants.ENTITY_REFERENCE:
                 case XMLStreamConstants.COMMENT:
                     break;

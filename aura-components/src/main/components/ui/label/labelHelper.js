@@ -22,7 +22,9 @@
         	if ($A.util.isString(forVal)) {
                 var valueProvider = cmp.getAttributeValueProvider();
                 //try find the target component for the "for" attribute from valueProvider
-                var refCmp = valueProvider.find(forVal);
+
+ 				// PassThrough values don't have find. See W-3174244
+				var refCmp = valueProvider.find && valueProvider.find(forVal);
 
                 if (refCmp) {
                 	//use first one in the list if there are multiples

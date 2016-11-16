@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @description The Aura Localization service Service, accessible using $A.localizationService. Provides utility methods
+ * @description The Aura Localization Service, accessible using <code>$A.localizationService</code>. Provides utility methods
  * for localizing data or getting formatters for numbers, currencies, dates, etc.
  * @constructor
  * @export
@@ -33,7 +33,7 @@ function AuraLocalizationService() {
         strictModeFormat : {},
         langLocale : {}
     };
-    
+
     this.pendingTimezone = {};
 }
 
@@ -1019,7 +1019,7 @@ AuraLocalizationService.prototype.translateToOtherCalendar = function(date) {
  */
 AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callback) {
     $A.assert(callback, 'Callback is required');
-    
+
     if (!timezone) {
         timezone = $A.get("$Locale.timezone");
     }
@@ -1027,7 +1027,7 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
         callback(date);
         return;
     }
-    
+
     this.lazyInitTimeZoneInfo(timezone, function() {
         callback(this.getWallTimeFromUTC(date, timezone));
     }.bind(this));
@@ -1243,7 +1243,7 @@ AuraLocalizationService.prototype.lazyInitTimeZoneInfo = function(timezone, call
             callback();
             return;
         }
-    
+
         if (!this.pendingTimezone[timezone]) {
             // first init call for timezone, initialize pending callbacks list and call init method
             this.pendingTimezone[timezone] = [callback]; // add first callback bef calling initTimeZoneInfo
@@ -1253,7 +1253,7 @@ AuraLocalizationService.prototype.lazyInitTimeZoneInfo = function(timezone, call
                 }
                 this.pendingTimezone[timezone] = [];
             }.bind(this);
-            this.initTimeZoneInfo(timezone, afterInit); 
+            this.initTimeZoneInfo(timezone, afterInit);
         } else {
             // add callback to pending list for timezone
             this.pendingTimezone[timezone].push(callback);

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @description The Aura Dev Tool Service, accessible using $A.devToolServices.
+ * @description The Aura Dev Tool Service, accessible using <code>$A.devToolServices</code>.
  * Use mostly in non-production modes.
  * @constructor
  * @protected
@@ -517,7 +517,7 @@ var AuraDevToolService = function() {
         	 var errorArray = [];
         	 var imgType = "";
         	 var alt = "";
-        	 
+
         	 for(var index = 0; index < allImgTags.length; index++){
         	     data_aura_rendered_by = $A.util.getElementAttributeValue(allImgTags[index], "data-aura-rendered-by");
         	     imgType = null;
@@ -540,7 +540,7 @@ var AuraDevToolService = function() {
                        imgType = component.get('v.imageType');
                        alt     = component.get('v.alt');
                    }
-                
+
          	    }
 
          	     //Checking for injected image tag
@@ -576,37 +576,37 @@ var AuraDevToolService = function() {
 
         	 return accessAideFuncs.formatOutput(imgErrorMsg, errorArray);
             },
-            
+
             /**
-             * Function that checks all descendants of an element for a matching tag and retrieves the specified property 
+             * Function that checks all descendants of an element for a matching tag and retrieves the specified property
              * from the first encountered element - May need refactoring
-             * 
+             *
              * @param element - element whose descendants to check
              * @param property - the property to retrieve from the child element
              * @param childTag - the tag to match with the child elements
              * @returns property - property to be retrieved or null if property does not exist
              */
-            getPropertyFromDescendantTag : function (element, property, childTag) {	
+            getPropertyFromDescendantTag : function (element, property, childTag) {
             	if(!$A.util.isUndefinedOrNull(element)) {
             		var matchingChildren = element.getElementsByTagName(childTag);
-            		//if(!$A.util.isEmpty(matchingChildren)) {		
+            		//if(!$A.util.isEmpty(matchingChildren)) {
             		if(matchingChildren.length > 0) {
-            			return $A.util.getElementAttributeValue(matchingChildren[0], property) || 
+            			return $A.util.getElementAttributeValue(matchingChildren[0], property) ||
             				   $A.util.getElementAttributeValue(matchingChildren[0], "data-aura-rendered-by");
             		}
             	}
             	return null;
             },
-            
+
             /**
-             * Function that goes through all the labels and checks that they are associated with an input through the 'for' attribute 
+             * Function that goes through all the labels and checks that they are associated with an input through the 'for' attribute
              * or that they have a child input tag.
-             * 
+             *
              * @param lbls          -  All the labels to go over
              * @returns errorArray  -  Returns all the erroneous labels
              */
             matchLabelToInput : function(lbls) {
-            	
+
             	var errorArray = [];
             	var atrib = null;
             	var isParent = false;
@@ -614,14 +614,14 @@ var AuraDevToolService = function() {
             	var inputID = null;
                 var label = null;
             	var accessAideFuncs = aura.devToolService.accessbilityAide;
-            	
+
             	 for(var i = 0; i < lbls.length; i++){
             		 label = lbls[i];
                      atrib = $A.util.getElementAttributeValue(label, "for");
-                     isParent = (accessAideFuncs.getPropertyFromDescendantTag(label, "id", "INPUT") || 
-                 		 		 accessAideFuncs.getPropertyFromDescendantTag(label, "id", "TEXTAREA") || 
+                     isParent = (accessAideFuncs.getPropertyFromDescendantTag(label, "id", "INPUT") ||
+                 		 		 accessAideFuncs.getPropertyFromDescendantTag(label, "id", "TEXTAREA") ||
                  		 		 accessAideFuncs.getPropertyFromDescendantTag(label, "id", "SELECT"));
-                     
+
                      // if label is not associated through a 'for' and is not a parent of an input - ERROR
                      if($A.util.isEmpty(atrib) && (!isParent)) {
                     	 errorArray.push(label);
@@ -631,7 +631,7 @@ var AuraDevToolService = function() {
                      // check if multiple labels are associated to a single input
                      else
                      {
-                        inputID = atrib || isParent; 
+                        inputID = atrib || isParent;
                          if($A.util.isUndefinedOrNull(dict[inputID])){
                              dict[inputID] = label;
                          }
@@ -643,17 +643,17 @@ var AuraDevToolService = function() {
 
                      // Get the element that label's 'for' points to
                      // Element's id must match the for attribute value and check if its tag is an input
-                     if(!$A.util.isEmpty(atrib)) {	  
+                     if(!$A.util.isEmpty(atrib)) {
                     	var inputElem = document.getElementById(atrib);
                         if(($A.util.isUndefinedOrNull(inputElem)) || (inputElem.tagName !== "INPUT" && inputElem.tagName !== "TEXTAREA" && inputElem.tagName !== "SELECT")){
                         	errorArray.push(label);
                         }
                      }
                   }
-            	 
-            	return errorArray; 
+
+            	return errorArray;
             },
-            
+
             /**
              * Function that goes through all labels and check for either the for attribute and the label id, or if a parent tag is a label
              * This function skips over several input types: submit, reset, image, hidden, and button. All of these have labels associated
@@ -690,14 +690,14 @@ var AuraDevToolService = function() {
                         lblIsPres = ((inputTag.id in lblDict) || (accessAideFuncs.checkParentMatchesTag(inputTag, "LABEL")));
 
                         if(!lblIsPres){
-                        	
+
                         	// W-2812697: Allowing aria-label for an <input> if it exists inside a <th>
                         	if(inputTag.tagName === "INPUT" && type === "range") {
                         		var ariaLbl = $A.util.getElementAttributeValue(inputTag, "aria-label");
                         		var parent = accessAideFuncs.checkParentMatchesTag(inputTag, "TH");
                         		if($A.util.isEmpty(ariaLbl) || parent === false) {
                         			errorArray.push(inputTag);
-                        		}     		
+                        		}
                         	}
                         	else {
                         		errorArray.push(inputTag);
@@ -938,7 +938,7 @@ var AuraDevToolService = function() {
                   }
                   return errorArray;
                },
-               
+
                /**
                 * Method that takes in a list of buttons and makes sure that they do not have any duplicate text in them
                 * @param   - All buttons that are on the page
@@ -963,7 +963,7 @@ var AuraDevToolService = function() {
             				   text = descendant.getAttribute("alt");
             			   }
             			   text = text.toLowerCase().trim();
-            			   
+
             			   if(text !== "") {
             				   if(dict.indexOf(text) >= 0) {
                 				   errorArray.push(button);
@@ -976,7 +976,7 @@ var AuraDevToolService = function() {
             	   }
             	   return errorArray;
                },
-               
+
                /**
                 * Method that goes through all tables present on the page and makes sure the tags underneath them have either an id or scope associated with them
                 * @param   tables        - The tags to find
@@ -1155,7 +1155,7 @@ var AuraDevToolService = function() {
                     var errorArray = [];
                     var accessAideFuncs = aura.devToolService.accessbilityAide;
                     var buttonTags = domElem.getElementsByTagName('button');
-                    
+
                     errorArray = errorArray.concat(accessAideFuncs.buttonLabelAide(buttonTags));
                     return accessAideFuncs.formatOutput(buttonLabelErrorMsg, errorArray);
                }
@@ -1354,7 +1354,7 @@ var AuraDevToolService = function() {
                      return accessAideFuncs.formatOutput(inputErrorMsg, errorArray);
                 }
             },
-            
+
             /**
              * Check that there is no duplicate text inside a button so that screen readers don't read them twice
              * @returns String - Returns a string representation of the errors

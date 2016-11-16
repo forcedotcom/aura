@@ -86,7 +86,7 @@ Aura.Services.AuraClientService$AuraActionCollector = function AuraActionCollect
 
 
 /**
- * @description The Aura Client Service.
+ * @description The Aura Client Service, accessible using <code>$A.clientService</code>.
  *
  * There be dragons here.
  *

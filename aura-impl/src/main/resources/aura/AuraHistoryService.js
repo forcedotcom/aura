@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @description The Aura History Service, accessible using $A.historyService. Manages Browser History.
+ * @description The Aura History Service, accessible using <code>$A.historyService</code>. Manages browser history.
  * Internet Explorer 7 and 8 are not supported for this service.
  * @constructor
  * @export
@@ -26,11 +26,10 @@ function AuraHistoryService() {
 }
 
 /**
- * Sets the new location. For example, <code>$A.services.history.set("search")</code> sets the location to <code>#search</code>.
- * Otherwise, use <code>$A.services.layout.changeLocation()</code> to override existing URL parameters.
+ * Sets the new location. For example, <code>set("search")</code> sets the location to <code>#search</code>.
  *
- * Native Android browser doesn't completely support pushState so we force hash method for it
- * IOS7 UIWebView also has weirdness when using appcache and history so force onhashchange as well
+ * For browsers that don't support pushState (eg native Android browser, iOS7 webview), a manual hash
+ * update and firing onhashchange is used.
  *
  * @param {Object} token The provided token set to the current location hash
  * @memberOf AuraHistoryService
@@ -68,15 +67,11 @@ AuraHistoryService.prototype.set = function(token) {
  * Replaces the current location with the new location, meaning the current location will not be
  * stored in the browser history. Analogous to window.history.replace().
  * For example, if the last location in history was '#first', the current location is '#second',
- * then <code>$A.services.history.replace("third")</code> replaces <code>#second</code> with <code>#third</code>
+ * then <code>replace("third")</code> replaces <code>#second</code> with <code>#third</code>
  * as the current location. Pressing the browser back button would result in location <code>#first</code>
  *
- * Native Android browser doesn't completely support pushState so we force hash method for it
- * IOS7 UIWebView also has weirdness when using appcache and history so force onhashchange as well
- * Old Native Android and old IE don't support location.replace(), so we fallback to directly
- * setting window.location.hash.
- * So, if the browser doesn't support pushState or location.replace, AuraHistoryService.replace()
- * functions the same a AuraHistoryService.set().
+ * For browsers that don't support pushState or location.replace (eg native Android browser, iOS7 webview),
+ * workarounds are used.
  *
  * @param {Object} token The provided token set to the current location hash
  * @memberOf AuraHistoryService
@@ -288,13 +283,13 @@ AuraHistoryService.prototype.getEvent = function(){
  * @private
  */
 AuraHistoryService.prototype.changeHandler = function(){
-	
+
 	var loc = this.getLocationHash() || this.getHistoryState();
     var context = $A.getContext();
 
     // The event should be accessible in the context of the application.
     context.setCurrentAccess($A.getRoot());
-    
+
     var event = $A.eventService.newEvent(this.getEvent());
 
     context.releaseCurrentAccess();

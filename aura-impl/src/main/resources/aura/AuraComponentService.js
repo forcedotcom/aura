@@ -15,7 +15,8 @@
  */
 
 /**
- * @description The Aura Component Service, accessible using $A.service.component.  Creates and Manages Components.
+ * @description The Aura Component Service, accessible using <code>$A.componentService</code>.
+ * Creates and manages components.
  * @constructor
  * @export
  */

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @description The Aura Style Service, accessible using <b><code>$A.styleService</code></b>.
+ * @description The Aura Style Service, accessible using <code>$A.styleService</code>.
  *              Dynamically loads and applies tokenized CSS.
  * @constructor
  * @export
@@ -147,7 +147,7 @@ AuraStyleService.prototype.applyAllTokens = function(descriptors, config) {
     config = config || {};
 
     $A.run(function() {
-         
+
         // scan for client-loaded style defs if necessary
         var clientLoaded = [];
         if (config["forceClientScan"]) {
@@ -214,7 +214,7 @@ AuraStyleService.prototype.applyAllTokens = function(descriptors, config) {
                 throw e;
             }
 
-             
+
             if ($A.util.isFunction(config["callback"])) {
                 config["callback"]();
             }

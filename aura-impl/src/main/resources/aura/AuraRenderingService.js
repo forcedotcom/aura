@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @class The Aura Rendering Service, accessible using $A.renderingService.
+ * @class The Aura Rendering Service, accessible using <code>$A.renderingService</code>.
  *        Renders components. The default behaviors can be customized in a
  *        client-side renderer.
  * @constructor

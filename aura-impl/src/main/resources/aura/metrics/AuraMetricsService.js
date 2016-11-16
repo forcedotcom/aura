@@ -16,7 +16,7 @@
 
 
 /**
- * @description The metrics service implementation
+ * @description The Aura Metrics Service, accessible using <code>$A.metricsService</code>.
  * @constructor
  * @export
 **/

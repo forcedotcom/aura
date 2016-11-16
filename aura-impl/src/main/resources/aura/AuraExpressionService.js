@@ -15,8 +15,8 @@
  */
 
 /**
- * @description The Aura Expression Service, accessible using $A.expressionService.
- * Processes Expressions.
+ * @description The Aura Expression Service, accessible using <code>$A.expressionService</code>.
+ * Processes expressions.
  * @constructor
  * @export
  */
@@ -280,7 +280,7 @@ AuraExpressionService.prototype.resolve = function(expression, container, rawVal
 /**
  * @param cmp - component
  * @param locatorDef - LocatorDef defined in cmp
- * 
+ *
  * Resolves values within a locatorContext inside a locatorDef.
  * @private
  */
@@ -293,7 +293,7 @@ AuraExpressionService.prototype.resolveLocatorContext = function (cmp, locatorDe
     if (!contextDefs) {
         return undefined;
     }
-    
+
     var context = {};
     for (var key in contextDefs) {
         var expression = this.create(cmp, contextDefs[key]);
@@ -307,7 +307,7 @@ AuraExpressionService.prototype.resolveLocatorContext = function (cmp, locatorDe
 /**
  * Returns the component that cmp is contained in
  * @param cmp - component
- * 
+ *
  * @returns The component that contains cmp, bypassing if/iteration in the chain
  * @private
  */
@@ -315,13 +315,13 @@ AuraExpressionService.prototype.getContainer = function (cmp) {
     if (!cmp) {
         return undefined;
     }
-    
-    // TODO mrafique: Manually checking for aura:iteration or aura:if is a hack. Ideally, getOwner() 
-    //    or another API would always return the proper container. 
+
+    // TODO mrafique: Manually checking for aura:iteration or aura:if is a hack. Ideally, getOwner()
+    //    or another API would always return the proper container.
     //    based on advice from jbuch
     var owner = cmp.getOwner();
     var ownerName = owner.getName();
-    while ( ownerName === AuraExpressionService.AURA_ITERATION || 
+    while ( ownerName === AuraExpressionService.AURA_ITERATION ||
             ownerName === AuraExpressionService.AURA_IF) {
         owner = owner.getOwner();
         ownerName = owner.getName();
@@ -334,7 +334,7 @@ AuraExpressionService.prototype.getContainer = function (cmp) {
  * Returns a locatorDef targeting targetId inside cmp or it's super chain
  * @param cmp - component
  * @param targetId - targetId of locator def
- * 
+ *
  * @returns Any locator definition found in the super chain of a component
  * @private
  */
@@ -371,7 +371,7 @@ AuraExpressionService.prototype.resolveLocator = function (parent, root, include
 
     // We need to look at the linkage via super-chain in case the parent is extended
     var rootLocatorDef = this.findLocatorDefInSuperChain(parent, rootId);
-    
+
     // figure out if we need to jump another level for locators marked as primitive
     if (!primitiveFound && rootLocatorDef && rootLocatorDef["isPrimitive"]) {
         primitiveFound =  {};
@@ -381,15 +381,15 @@ AuraExpressionService.prototype.resolveLocator = function (parent, root, include
         parent = this.getContainer(parent).getConcreteComponent();
         return this.resolveLocator(parent, root, includeMetadata, primitiveFound);
     }
-    
+
     var grandparent = this.getContainer(parent).getConcreteComponent();
 
     if (grandparent.isInstanceOf('ui:virtualComponent') || grandparent.isInstanceOf('ui:abstractList')) {
         grandparent = this.getContainer(grandparent).getConcreteComponent();
     }
-    
+
     var parentLocatorDef = this.findLocatorDefInSuperChain(grandparent, parentId);
-    
+
     if (!rootLocatorDef || !parentLocatorDef) {
         return locator;
     }
@@ -399,23 +399,23 @@ AuraExpressionService.prototype.resolveLocator = function (parent, root, include
     var rootContext = this.resolveLocatorContext(parent, rootLocatorDef);
     var parentContext = this.resolveLocatorContext(grandparent, parentLocatorDef);
     var primitiveContext = primitiveFound && primitiveFound["resolvedContext"];
-    
+
     var context = $A.util.apply(parentContext || {}, rootContext);
     // any keys in primitiveContext will get overridden by higher levels
     context = $A.util.apply(context, primitiveContext);
-    
+
     if (!$A.util.isEmpty(context)) {
         locator["context"] = context;
     }
-    
+
     // Apply aliases from target and scope as needed
     locator["target"] = rootLocatorDef["alias"] || rootId;
     locator["scope"] = parentLocatorDef["alias"] || parentId;
-    
+
     if (primitiveFound) {
         locator["target"] = locator["target"] + AuraExpressionService.PRIMITIVE_SEPARATOR + primitiveFound["target"];
     }
-    
+
     // TODO - W-3378426 - put this in javascript directive to block out the if{} block in PROD mode
     if (includeMetadata) {
         locator["metadata"] = {

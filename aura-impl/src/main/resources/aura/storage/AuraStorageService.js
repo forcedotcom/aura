@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @description The Aura Storage Service, accessible using $A.storageService.
+ * @description The Aura Storage Service, accessible using <code>$A.storageService</code>.
  * @constructor
  * @export
  */
@@ -54,7 +54,7 @@ AuraStorageService.prototype.getStorages = function() {
 
 /**
  * Initializes and returns a new storage.
- * 
+ *
  * @example
  * var storage = $A.storageService.initStorage({
  *     "name":                "MyStorage",

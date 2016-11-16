@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @description The Aura Event Service, accessible using $A.eventService. Creates and Manages Events.
+ * @description The Aura Event Service, accessible using <code>$A.eventService</code>. Creates and manages events.
  * @constructor AuraEventService
  * @export
  */
@@ -64,7 +64,7 @@ AuraEventService.prototype.newEvent = function(eventDef, eventName, sourceCmp) {
 };
 
 /**
- * Get a new Event instance, but do not do an access check on the event definition. This method is private to 
+ * Get a new Event instance, but do not do an access check on the event definition. This method is private to
  * aura and should only be used within trusted portions of the framework.
  *
  * @param {String} eventDef The event object in the format namespace:component
@@ -133,7 +133,7 @@ AuraEventService.prototype.collectBubblePath = function(cmp, queue, visited, isO
         // collect the super chain before handling the containerComponent to mark the visited map
         this.collectBubblePath(superCmp, queue, visited, isOwner && true);
     }
-    
+
     var next = cmp;
     var queueIndex = queue.length;
     // loop until we find the next level
@@ -160,7 +160,7 @@ AuraEventService.prototype.collectBubblePath = function(cmp, queue, visited, isO
 
     if(cmp.isConcrete()) {
         // After collecting the owner chain, check if this level's concrete component's containerComponent
-        // is from a different level itself. This occurs when cmp is passed as the facet value 
+        // is from a different level itself. This occurs when cmp is passed as the facet value
         // to its containerComponent (transcluded) by the containerComponent's value provider.
         // e.g. <containerComponent><cur/></containerComponent>
         var concreteCmpContainerComponent = cmp.getContainerComponent();
@@ -201,7 +201,7 @@ AuraEventService.prototype.collectBubblePath = function(cmp, queue, visited, isO
 
 
 /**
- * Returns an iterator over the sequence of components for a given event 
+ * Returns an iterator over the sequence of components for a given event
  * through the "capture" phase then the "bubble" phase.
  * @return {Object} An object with the form { cmp: Component, isOwner: Boolean, phase: String }
  * @private
@@ -214,9 +214,9 @@ AuraEventService.prototype.getEventPhaseCmpIterator = (function() {
         // This is not lazy b/c calculating the next element in "capture"
         // would require iterating from the source to the last return value
         // on each iteration. Can revisit if the need arises.
-        
+
         // Build the queue for the entire bubble path
-        // JBA: If the containerComponent chain is completely separated from the owner chain at any point, 
+        // JBA: If the containerComponent chain is completely separated from the owner chain at any point,
         // this will result in an odd flow.
         var queue = eventService.collectBubblePath(cmp, [], {}, true);
 
@@ -250,7 +250,7 @@ AuraEventService.prototype.getEventPhaseCmpIterator = (function() {
                     currentValue = undefined;
                 }
             }
-            
+
             return {
                 value: currentValue,
                 done: done
@@ -260,7 +260,7 @@ AuraEventService.prototype.getEventPhaseCmpIterator = (function() {
         this.return = function(value) {
             if(!done) {
                 done = true;
-                currentValue = value; 
+                currentValue = value;
             }
             return {
                 value: currentValue,
@@ -304,7 +304,7 @@ AuraEventService.prototype.getEventPhaseCmpIterator = (function() {
  * Returns an iterator over event handlers for a given event that
  * supports "capture" and "bubble" phases. The HandlerIteratorResult
  * object are returned in the correct order for those two respective phases.
- * If stopPropagation() is called on the event before this iterator 
+ * If stopPropagation() is called on the event before this iterator
  * completes, it will terminate, returning a result with done=true and
  * whose value is the last HandlerIteratorResult that it previously returned
  * but with an undefined handler property. This facilitates consumers
@@ -380,7 +380,7 @@ AuraEventService.prototype.getPhasedEventHandlerIterator = (function() {
                     }
                 }
             }
-            
+
             return {
                 value: currentValue,
                 done: done
@@ -390,7 +390,7 @@ AuraEventService.prototype.getPhasedEventHandlerIterator = (function() {
         this.return = function(value) {
             if(!done) {
                 done = true;
-                currentValue = value; 
+                currentValue = value;
             }
             return {
                 value: currentValue,
@@ -440,7 +440,7 @@ AuraEventService.prototype.eventStopPropagationHandler = function(evt) {
  * A handlerSupplier implementation for phased COMPONENT event handlers
  * that go through capture and bubble phases.
  * @private
- */ 
+ */
 AuraEventService.prototype.getComponentEventHandlers = function(evt, cmp, phase, isOwner) {
     var handlers;
     var eventName = evt.getName();
@@ -483,10 +483,10 @@ AuraEventService.prototype.getComponentEventHandlers = function(evt, cmp, phase,
 
                             // And if we dont have a def, we are firing an event against ourselves
                             // TODO: Refactor this, once we remove all self-events + move parent->child event into methods
-                            
+
                             // This is from older code but may not be correct. It's forcing a stopPropagation if the first cmpHandlerDef
                             // in the array doesn't define the event type. It may have nothing to do with *THIS* event, but we're
-                            // stopping this one anyway. However, this is guarding against an infinite loop in some components with event 
+                            // stopping this one anyway. However, this is guarding against an infinite loop in some components with event
                             // handlers that fire an event on a child that bubbles right back to the same handler handler...!
                             if(!hDef && isOwner) {
                                 // insert a stopPropagation() call at this point in the iteration
@@ -515,7 +515,7 @@ AuraEventService.prototype.getComponentEventHandlers = function(evt, cmp, phase,
  * use for COMPONENT events that do NOT go through capture or bubble
  * phases.
  * @private
- */ 
+ */
 AuraEventService.prototype.getNonBubblingComponentEventHandlers = function(cmp, evt, phase/*, isOwner*/) {
     var handlers;
     // just get event handlers for this cmp, not its super(s)
@@ -542,7 +542,7 @@ AuraEventService.prototype.getNonBubblingComponentEventHandlers = function(cmp, 
 AuraEventService.prototype.getNonBubblingComponentEventHandlerIterator = (function() {
 
     // Component event handlers with no phase are coerced to the "bubble" phase for
-    // backwards compatibility. Events for this kind of iterator always execute in 
+    // backwards compatibility. Events for this kind of iterator always execute in
     // the "bubble" phase.
     var PHASE = AuraEventService.Phase.BUBBLE;
 
@@ -552,7 +552,7 @@ AuraEventService.prototype.getNonBubblingComponentEventHandlerIterator = (functi
         var cmp = evt.getSource();
         var currentCmp = cmp;
         var handlerIndex = 0;
-        
+
         function getHandlers() {
             while(cmp) {
                 currentCmp = cmp;
@@ -599,7 +599,7 @@ AuraEventService.prototype.getNonBubblingComponentEventHandlerIterator = (functi
         this.return = function(value) {
             if(!done) {
                 done = true;
-                currentValue = value; 
+                currentValue = value;
             }
             return {
                 value: currentValue,
@@ -623,7 +623,7 @@ AuraEventService.prototype.getNonBubblingComponentEventHandlerIterator = (functi
 })();
 
 /**
- * Returns an iterator over all event handlers for a VALUE event or method call event. 
+ * Returns an iterator over all event handlers for a VALUE event or method call event.
  * The iterator emits the next handler function to invoke for the event.
  * @param {Event} evt The event
  * @return {HandlerIteratorResult} A HandlerIteratorResult
@@ -686,7 +686,7 @@ AuraEventService.prototype.getValueHandlerIterator = (function() {
         this.return = function(value) {
             if(!done) {
                 done = true;
-                currentValue = value; 
+                currentValue = value;
             }
             return {
                 value: currentValue,
@@ -712,7 +712,7 @@ AuraEventService.prototype.getValueHandlerIterator = (function() {
 /**
  * A handlerSupplier implementation for APPLICATION event handlers
  * @private
- */ 
+ */
 AuraEventService.prototype.getPhasedApplicationEventHandlers = function(evt, cmp, phase, isOwner) {
     var evtDef = evt.eventDef;
     var eventDispatcher = evt.eventDispatcher;
@@ -778,7 +778,7 @@ AuraEventService.prototype.applicationEventHasPhasedHandlers = (function() {
 
 
 /**
- * Returns an iterator over all event handlers for a given APPLICATION event. 
+ * Returns an iterator over all event handlers for a given APPLICATION event.
  * The iterator emits the next handler function to invoke for the event.
  * @param {Event} evt The event
  * @return {HandlerIteratorResult} A HandlerIteratorResult
@@ -787,7 +787,7 @@ AuraEventService.prototype.applicationEventHasPhasedHandlers = (function() {
  */
 AuraEventService.prototype.getAppEventHandlerIterator = (function() {
 
-    // Iterator over all event handlers in the "default" phase 
+    // Iterator over all event handlers in the "default" phase
     function AppEventDefaultPhaseHandlerIterator(evt, rootId) {
         var done = false;
 
@@ -815,7 +815,7 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
                         if(defaultHandlersMap.hasOwnProperty(globalId)) {
                             var cmp = $A.getComponent(globalId);
                             // Some handlers may be added programmatically with a globalId that is
-                            // not a valid component id. If the handler is associated with a component, 
+                            // not a valid component id. If the handler is associated with a component,
                             // make sure the component is still valid.
                             if(cmp && !cmp.isValid()) {
                                 continue;
@@ -829,7 +829,7 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
                                     continue;
                                 }
 
-                                // JBA: Should we use containsResult.isOwner to distinguish between 
+                                // JBA: Should we use containsResult.isOwner to distinguish between
                                 // containment by owner and containment by transclusion?
                             }
 
@@ -867,7 +867,7 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
                     currentValue = null;
                 }
             }
-            
+
             return {
                 value: currentValue,
                 done: done
@@ -877,7 +877,7 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
         this.return = function(value) {
             if(!done) {
                 done = true;
-                currentValue = value; 
+                currentValue = value;
             }
             return {
                 value: currentValue,
@@ -936,7 +936,7 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
                         // stopPropagation() may have been invoked, so let's check the phaseRes.value
                         // for a defined value which would indicate if the iterator was stopped preemptively.
                         // PhasedEventHandlerIterator will terminate with a defined value if stopPropagation()
-                        // was called. 
+                        // was called.
                         currentPhase = AuraEventService.Phase.DEFAULT;
                         var bcastRootId = null;
                         if(evt.eventStopPropagation && phaseRes.value) {
@@ -960,7 +960,7 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
                     done = true;
                 }
             }
-            
+
             return {
                 value: currentValue,
                 done: done
@@ -970,7 +970,7 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
         this.return = function(value) {
             if(!done) {
                 done = true;
-                currentValue = value; 
+                currentValue = value;
             }
             return {
                 value: currentValue,
@@ -1037,9 +1037,9 @@ AuraEventService.prototype.addHandler = function(config) {
     }
     var includeFacets = config["includeFacets"];
     // $A.util.getBooleanValue isn't available here immediately
-    if(includeFacets !== undefined && includeFacets !== null && 
-        includeFacets !== false && includeFacets !== 0 && 
-        includeFacets !== "false" && includeFacets !== "" && 
+    if(includeFacets !== undefined && includeFacets !== null &&
+        includeFacets !== false && includeFacets !== 0 &&
+        includeFacets !== "false" && includeFacets !== "" &&
         includeFacets !== "f") {
         config["handler"].includeFacets = true;
     }
@@ -1088,7 +1088,7 @@ AuraEventService.prototype.addHandlerOnce = function(config) {
 /**
  * Returns the event definition.
  * Internal method to the framework. To get an event def from the API, use $A.get("e.prefix:name", function(def){});
- * 
+ *
  * @param {String} descriptor name of EventDef
  * @return {EventDef} The event definition.
  * @memberOf AuraEventService
@@ -1107,10 +1107,10 @@ AuraEventService.prototype.getEventDef = function(config) {
 };
 
 /**
- * Get the event definition. 
+ * Get the event definition.
  * Does access checks.
  * You cannot fire this though, use newEvent() for that.
- * 
+ *
  * @param  {String}  descriptor Event descriptor in the pattern prefix:name or markup://prefix:name.
  */
 AuraEventService.prototype.getDef = function(descriptor) {
@@ -1135,7 +1135,7 @@ AuraEventService.prototype.getDef = function(descriptor) {
             // Intentional fallthrough
         }
     }
-    
+
     return definition;
 };
 
@@ -1214,7 +1214,7 @@ AuraEventService.prototype.getDefinition = function(descriptor, callback) {
         var state = actionReponse.getState();
         if(state === "SUCCESS") {
             definition = this.getDef(descriptorName);
-        } 
+        }
         callback(definition);
     });
 

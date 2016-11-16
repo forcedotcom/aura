@@ -387,5 +387,4 @@
         testUtils.assertStartsWith("SecureElement", splitText.toString(), "Text.splitText() should return a SecureElement");
         testUtils.assertStartsWith("SecureElement", text.toString(), "Original text should be a SecureElement");
     }
-    }
 })

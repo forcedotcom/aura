@@ -39,8 +39,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.impl.util.TemplateUtil;
-import org.auraframework.impl.util.TemplateUtil.Script;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.IncludeDefRef;
@@ -48,6 +46,7 @@ import org.auraframework.def.LibraryDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.http.ManifestUtil;
+import org.auraframework.impl.util.TemplateUtil;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
@@ -486,7 +485,8 @@ public class ServerServiceImpl implements ServerService {
                         && (extraFilter == null || extraFilter.apply(descriptor))) {
                     @SuppressWarnings("unchecked")
                     DefDescriptor<D> dd = (DefDescriptor<D>) descriptor;
-                    D def = context.getLocalDef(dd);
+                    Optional<D> optionalDef = context.getLocalDef(dd);
+                    D def = (optionalDef != null)? optionalDef.orNull() : null;
                     if (def == null) {
                         try {
                             def = definitionService.getDefinition(dd);

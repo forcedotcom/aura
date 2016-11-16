@@ -40,6 +40,7 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 import org.auraframework.util.json.JsonSerializationContext;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -611,12 +612,12 @@ public interface AuraContext {
     void setLocalDefNotCacheable(DefDescriptor<?> descriptor);
 
     /**
-     * Get a locally cached def.
+     * Get Optional wrapping a locally cached def.
      *
      * @param descriptor The descriptor for which we want the definition
-     * @return the definition, or null if not found or does not exist.
+     * @return the wrapping Optional, or null if there is no locally cached def
      */
-    <D extends Definition> D getLocalDef(DefDescriptor<D> descriptor);
+    <D extends Definition> Optional<D> getLocalDef(DefDescriptor<D> descriptor);
 
     /**
      * Add a local def to the cache.
@@ -625,13 +626,6 @@ public interface AuraContext {
      * @param d the definition to add (can be null)
      */
     void addLocalDef(DefDescriptor<?> descriptor, Definition d);
-
-    /**
-     * Check to see if we have a locally cached def.
-     *
-     * @param descriptor the descriptor to check.
-     */
-    boolean hasLocalDef(DefDescriptor<?> descriptor);
 
     /**
      * Add a dynamically generated def to the context.

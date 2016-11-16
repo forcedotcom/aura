@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.auraframework.adapter.ConfigAdapter;
@@ -65,7 +64,6 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
-import org.eclipse.jetty.util.ConcurrentHashSet;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -151,15 +149,15 @@ public class AuraContextImpl implements AuraContext {
      */
     private static class LocalDefs {
         LocalDefs() {
-            this.defs = new ConcurrentHashMap<>();
-            this.dynamicDescs = new ConcurrentHashSet<>();
-            this.localDependencies = new ConcurrentHashMap<>();
-            this.defNotCacheable = new ConcurrentHashSet<>();
+            this.defs = new HashMap<>();
+            this.dynamicDescs = new HashSet<>();
+            this.localDependencies = new HashMap<>();
+            this.defNotCacheable = new HashSet<>();
         }
 
-        final ConcurrentHashMap<DefDescriptor<? extends Definition>, Optional<Definition>> defs;
-        final ConcurrentHashSet<DefDescriptor<? extends Definition>> dynamicDescs;
-        final ConcurrentHashSet<DefDescriptor<? extends Definition>> defNotCacheable;
+        final Map<DefDescriptor<? extends Definition>, Optional<Definition>> defs;
+        final Set<DefDescriptor<? extends Definition>> dynamicDescs;
+        final Set<DefDescriptor<? extends Definition>> defNotCacheable;
 
         /**
          * A local dependencies cache.
@@ -210,7 +208,7 @@ public class AuraContextImpl implements AuraContext {
         this.userDefs = new LocalDefs();
         this.systemDefs = new LocalDefs();
         this.currentDefs = userDefs;
-        this.clientClassesLoaded = new ConcurrentHashMap<>();
+        this.clientClassesLoaded = new HashMap<>();
         // Why is this a cache and not just a map?
         this.accessCheckCache = new CacheImpl.Builder<String, String>()
                 .setInitialSize(ACCESS_CHECK_CACHE_SIZE)
@@ -218,14 +216,6 @@ public class AuraContextImpl implements AuraContext {
                 .setRecordStats(true)
                 .setSoftValues(true)
                 .build();
-    }
-
-    /**
-     * Check to see if we have a def locally.
-     */
-    @Override
-    public boolean hasLocalDef(DefDescriptor<?> descriptor) {
-        return userDefs.defs.containsKey(descriptor) || (isSystem && systemDefs.defs.containsKey(descriptor));
     }
 
     @Override
@@ -264,22 +254,17 @@ public class AuraContextImpl implements AuraContext {
         }
         currentDefs.defs.putIfAbsent(descriptor, opt);
     }
-
+    
+    @SuppressWarnings("unchecked")
     @Override
-    public <D extends Definition> D getLocalDef(DefDescriptor<D> descriptor) {
-        Optional<Definition> opt = null;
-        opt = userDefs.defs.get(descriptor);
+    public <D extends Definition> Optional<D> getLocalDef(DefDescriptor<D> descriptor) {
+        Optional<D> opt = (Optional<D>)userDefs.defs.get(descriptor);
         if (opt == null && isSystem) {
-            opt = systemDefs.defs.get(descriptor);
+            opt = (Optional<D>)systemDefs.defs.get(descriptor);
         }
-        if (opt == null) {
-            return null;
-        }
-        @SuppressWarnings("unchecked")
-        D origDef = (D) opt.orNull();
-        return origDef;
+        return opt;
     }
-
+    
     /**
      * Filter the entire set of current definitions by a set of preloads.
      *

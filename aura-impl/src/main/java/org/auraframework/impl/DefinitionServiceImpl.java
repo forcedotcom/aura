@@ -179,15 +179,16 @@ public class DefinitionServiceImpl implements DefinitionService {
         if (descriptor == null) {
             return null;
         }
-
+            
         // TODO: Clean up so that we just walk up descriptor trees and back down them.
+        Optional<T> optLocalDef = null;
         if (descriptor instanceof SubDefDescriptor) {
             // Case 1: SubDef
             SubDefDescriptor<T, ?> subDefDescriptor = (SubDefDescriptor<T, ?>) descriptor;
             def = getDefinition(subDefDescriptor.getParentDescriptor()).getSubDefinition(subDefDescriptor);
-        } else if (context.hasLocalDef(descriptor)) {
+        } else if ((optLocalDef = context.getLocalDef(descriptor)) != null) {
             // Case 2: LocalDef
-            def = context.getLocalDef(descriptor);
+            def = optLocalDef.orNull();
         } else if (threadContext.get() != null) {
             // Case 2: Nested get. This should be removed, but is somewhat complicated, because we compile
             // in-line.
@@ -227,7 +228,8 @@ public class DefinitionServiceImpl implements DefinitionService {
                 if (de == null) {
                     compileDE(descriptor);
 
-                    def = context.getLocalDef(descriptor);
+                    Optional<T> optionalDef = context.getLocalDef(descriptor);
+                    def = (optionalDef != null)? context.getLocalDef(descriptor).orNull() : null;
                 } else {
                     //
                     // found an entry.
@@ -242,7 +244,8 @@ public class DefinitionServiceImpl implements DefinitionService {
                     //
                     buildDE(de, descriptor);
 
-                    def = context.getLocalDef(descriptor);
+                    Optional<T> optionalDef = context.getLocalDef(descriptor);
+                    def = (optionalDef != null)? context.getLocalDef(descriptor).orNull() : null;
                 }
             } finally {
                 rLock.unlock();
@@ -276,8 +279,9 @@ public class DefinitionServiceImpl implements DefinitionService {
         //
         // Always check for a local def before locking.
         //
-        if (context.hasLocalDef(descriptor)) {
-            return context.getLocalDef(descriptor);
+        Optional<D> optLocalDef = context.getLocalDef(descriptor);
+        if (optLocalDef != null) {
+            return optLocalDef.orNull();
         }
 
         //
@@ -312,8 +316,9 @@ public class DefinitionServiceImpl implements DefinitionService {
         AuraContext context = contextService.getCurrentContext();
         boolean regExists;
 
-        if (context.hasLocalDef(descriptor)) {
-            return context.getLocalDef(descriptor) != null;
+        Optional<D> optLocalDef = context.getLocalDef(descriptor);
+        if (optLocalDef != null) {
+            return optLocalDef.isPresent();
         }
         //
         // Try our various caches.
@@ -1279,8 +1284,9 @@ public class DefinitionServiceImpl implements DefinitionService {
         // First, check our local cached defs to see if we have a fully compiled version.
         // in this case, we don't care about caching, since we are done.
         //
-        if (currentCC.context.hasLocalDef(compiling.descriptor)) {
-            D localDef = currentCC.context.getLocalDef(compiling.descriptor);
+        Optional<D> optLocalDef = currentCC.context.getLocalDef(compiling.descriptor);
+        if (optLocalDef != null) {
+            D localDef = optLocalDef.orNull();
             if (localDef != null) {
                 compiling.def = localDef;
                 // I think this is no longer possible.
@@ -1288,7 +1294,8 @@ public class DefinitionServiceImpl implements DefinitionService {
                 if (compiling.built) {
                     localDef.validateDefinition();
                 }
-                if (currentCC.context.isLocalDefNotCacheable(compiling.descriptor)) {
+                // do not perform expensive isLocalDefNotCacheable() unless needed
+                if (currentCC.shouldCacheDependencies && currentCC.context.isLocalDefNotCacheable(compiling.descriptor)) {
                     currentCC.shouldCacheDependencies = false;
                 }
                 return true;

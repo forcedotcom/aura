@@ -2351,6 +2351,19 @@ Aura.Utils.Util.prototype.setText = function(node, text) {
     }
 };
 
+/**
+ * Posts message to the provided window. This was done to workaround an issue where browser sets
+ * event.source to be safeEvalWorker window (see W-3443540). 
+ * @param {Window} targetWindow The destination window for the message
+ * @param {Array} argsArray list of arguments to be posted
+ * @export
+ */
+Aura.Utils.Util.prototype.postMessage = function(targetWindow, argsArray){
+	if(targetWindow && targetWindow["postMessage"]){
+		targetWindow["postMessage"].apply(targetWindow, argsArray);
+	}
+};
+
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     /**
      * Gets the aura debug tool component whether in an iframe or not.
@@ -2433,7 +2446,7 @@ Aura.Utils.Util.prototype.setText = function(node, text) {
         }
         return t;
     };
-
+    
     /**
      * Loads a JavaScript resource.
      * @param {String} url The URL of the JavaScript resource to load.

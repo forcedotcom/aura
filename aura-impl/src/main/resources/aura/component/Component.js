@@ -1233,7 +1233,7 @@ Component.prototype.set = function(key, value, ignoreChanges) {
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     // Check if the previous value contains components
-    if ($A.util.isArray(oldValue) && oldValue.length && $A.util.isComponent(oldValue[0])) {
+    if ($A.util.isArray(oldValue) && oldValue.length &&  oldValue.every($A.util.isComponent)) {
         this.trackComponentReplacement(oldValue, key);
     }
     //#end

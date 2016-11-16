@@ -210,6 +210,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 					try {
 						appendResourceToWriter(writer, "momentWithLocales", rl.getResource("aura/resources/momentWithLocales/momentWithLocales.min.js"));
 						appendResourceToWriter(writer, "DOMPurify", rl.getResource("aura/resources/domPurify/DOMPurify.min.js"));
+						appendResourceToWriter(writer, "walltime-js", rl.getResource("aura/resources/walltime-js/walltime.min.js"));
 					} catch (Exception e) {}
 
 					writer.write("\n};");

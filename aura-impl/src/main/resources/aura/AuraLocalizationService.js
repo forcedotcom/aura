@@ -1142,20 +1142,6 @@ AuraLocalizationService.prototype.getStrictModeDateTimeString = function(dateTim
 };
 
 /**
- * Initializes Walltime
- *
- * @private
- */
-AuraLocalizationService.prototype.initializeWalltime = function(callback) {
-    $A.clientService.loadClientLibrary('Walltime', function (err) {
-        // If walltime autoinit changes, we need to init here:
-        // window.WallTime.init(window.WallTime.data.rules, window.WallTime.data.zones); } }).call(this);
-        callback(err);
-    });
-};
-
-
-/**
  * Normalize the input Java locale string to moment.js compatible one.
  *
  * @private
@@ -1236,29 +1222,26 @@ AuraLocalizationService.prototype.initTimeZoneInfo = function(timezone, afterIni
  * @private
  */
 AuraLocalizationService.prototype.lazyInitTimeZoneInfo = function(timezone, callback) {
-    // perform Walltime initialization first
-    this.initializeWalltime(function() {
-        if (WallTime["zones"] && WallTime["zones"][timezone]) {
-            // timezone already initialize, invoke callback directly
-            callback();
-            return;
-        }
+    if (WallTime["zones"] && WallTime["zones"][timezone]) {
+        // timezone already initialize, invoke callback directly
+        callback();
+        return;
+    }
 
-        if (!this.pendingTimezone[timezone]) {
-            // first init call for timezone, initialize pending callbacks list and call init method
-            this.pendingTimezone[timezone] = [callback]; // add first callback bef calling initTimeZoneInfo
-            var afterInit = function () {
-                for (var i = 0; i < this.pendingTimezone[timezone].length; i++) {
-                    this.pendingTimezone[timezone][i]();
-                }
-                this.pendingTimezone[timezone] = [];
-            }.bind(this);
-            this.initTimeZoneInfo(timezone, afterInit);
-        } else {
-            // add callback to pending list for timezone
-            this.pendingTimezone[timezone].push(callback);
-        }
-    }.bind(this));
+    if (!this.pendingTimezone[timezone]) {
+        // first init call for timezone, initialize pending callbacks list and call init method
+        this.pendingTimezone[timezone] = [callback]; // add first callback bef calling initTimeZoneInfo
+        var afterInit = function () {
+            for (var i = 0; i < this.pendingTimezone[timezone].length; i++) {
+                this.pendingTimezone[timezone][i]();
+            }
+            this.pendingTimezone[timezone] = [];
+        }.bind(this);
+        this.initTimeZoneInfo(timezone, afterInit);
+    } else {
+        // add callback to pending list for timezone
+        this.pendingTimezone[timezone].push(callback);
+    }
 };
 
 /**

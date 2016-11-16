@@ -996,7 +996,7 @@ AuraClientService.prototype.handleAppCache = function() {
     }
 
     function handleAppcacheChecking() {
-        this.appcacheDownloadingEventFired = false;
+        acs.appcacheDownloadingEventFired = false;
     }
 
     function handleAppcacheUpdateReady() {

@@ -45,7 +45,7 @@ Json.prototype.decode = function(json, refSupport) {
     try {
         obj = aura.util.globalEval(json);
     } catch (e) {
-        aura.error("Unable to parse JSON response", e);
+        $A.reportError("Unable to parse JSON response", e);
         return null;
     }
     return refSupport ? this.resolveRefsObject(obj) : obj;

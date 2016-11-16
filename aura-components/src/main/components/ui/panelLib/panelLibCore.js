@@ -116,15 +116,16 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                     }
                         
                     if (focusables && config.trapFocus) {
-                        if (current === focusables.last && !shiftPressed) {
+                        if (me.isSameTabstop(current, focusables.last) && !shiftPressed) {
                             $A.util.squash(event, true);
                             focusables.first.focus();
-                        } else if (current === focusables.first && shiftPressed) {
+                        } else if (me.isSameTabstop(current, focusables.first) && shiftPressed) {
                             $A.util.squash(event, true);
                             focusables.last.focus();
                         }
                     } else if (focusables && config.closeOnTabOut) {
-                        if ((current === focusables.last && !shiftPressed) || ((current === focusables.first || current === cmp.getElement()) && shiftPressed)) {
+                        if ((me.isSameTabstop(current, focusables.last) && !shiftPressed)
+                            || ((me.isSameTabstop(current, focusables.first) || current === cmp.getElement()) && shiftPressed)) {
                             $A.util.squash(event, true);
                             cmp.closedBy = "closeOnTabOut";
                             if ($A.util.isFunction(closeAction)) {
@@ -472,7 +473,8 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
          */
         isVisible: function(el) {
             while (el && el.style) {
-                if (window.getComputedStyle(el).display === 'none') {
+                var computedStyle = window.getComputedStyle(el);
+                if (computedStyle.display === 'none' || computedStyle.visibility === 'hidden') {
                     return false;
                 }
                 el = el.parentNode;
@@ -486,6 +488,14 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
          */
         focusAllowed: function(el) {
             return el && !el.disabled && !/hidden/i.test(el.type) && this.isVisible(el) && el.getAttribute("tabindex") !== "-1";
+        },
+
+        /**
+         * Determines whether two elements are the same tab stop (accounting for radio buttons)
+         * @private
+         */
+        isSameTabstop: function(el1, el2) {
+            return el1 === el2 || (/radio/i.test(el1.type) && /radio/i.test(el2.type) && el1.name === el2.name);
         },
 
         /**

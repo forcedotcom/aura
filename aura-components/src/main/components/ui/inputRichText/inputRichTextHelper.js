@@ -21,7 +21,7 @@
 	addDomHandler : function(cmp, event) {
 		var	editorInstance = this.getEditorInstance(cmp);
 
-		if (editorInstance) {
+		if (editorInstance && $A.util.isFunction(editorInstance.on)) {
             editorInstance.on(event, this.editorEventHandler, cmp);
 		} else {
 			var element = this.getInputElement(cmp);

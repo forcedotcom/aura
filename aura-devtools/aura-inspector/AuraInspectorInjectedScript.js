@@ -967,7 +967,7 @@
     /****************************************** functions for a new chaos run *************************************/
     ChaosManager.prototype.loadLocatorEngine = function(callback) {
         if(!this.locatorEngine) {
-                $A.createComponent('instrumentation:testCmp', {}, 
+                $A.createComponent('instrumentation:accessLocatorEngine', {}, 
                     function (cmp) {
                         if(!cmp || !cmp.helper || !cmp.helper.libLocator || !cmp.helper.libLocator.Engine) {
                             var errMsg = "We have to stop the new chaos run because either we could not load cmp that bring us locatorEngine, or locatorEngine doesn't come with libraries we are expecting";

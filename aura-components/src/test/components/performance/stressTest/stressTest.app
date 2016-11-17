@@ -21,7 +21,5 @@
         Clicking the button creates 50,000 aura:html components, and 50,000 aura:text components.
         It then logs to the console the time it took to create all these components.
     </p>
-	<button onclick="{!c.run}">Run Performance</button>
-
-
+	<ui:button press="{!c.run}" label="Run Performance Test"/>
 </aura:application>

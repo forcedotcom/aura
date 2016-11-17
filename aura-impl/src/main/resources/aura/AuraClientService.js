@@ -1624,7 +1624,6 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
             this.hardRefresh();
             return;
         } else if (boot["error"]["exceptionEvent"]) {
-            $A.util.json.resolveRefsObject(boot);
             this.throwExceptionEvent(boot["error"]);
             return;
         } else {
@@ -1633,8 +1632,6 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
     }
 
     if (bootstrap.source === "network") {
-        // must clean and save the network payload
-        $A.util.json.resolveRefsObject(boot["data"]);
         this.checkBootstrapUIDs(Aura["appBootstrapCache"]);
         this.saveBootstrapToStorage(boot);
     }
@@ -1734,9 +1731,6 @@ AuraClientService.prototype.checkBootstrapUpgrade = function() {
     }
     $A.log("Checking bootstrap signature: network returned " + (Aura["bootstrapUpgrade"] ? "new" : "same") + " version");
     if ($A["finishedInit"] && Aura["bootstrapUpgrade"]) {
-        // must "clean" the payload prior to storing or using it
-        $A.util.json.resolveRefsObject(Aura["appBootstrap"]["data"]);
-
         // save the new version of bootstrap to storage BEFORE notifying the app so that if the app chooses
         // to reload the app then cache contains the latest bootstrap value.
         this.saveBootstrapToStorage(Aura["appBootstrap"])
@@ -3160,9 +3154,7 @@ AuraClientService.prototype.runActions = function(actions, scope, callback) {
  * @memberOf AuraClientService
  * @export
  */
-AuraClientService.prototype.injectComponent = function(rawConfig, locatorDomId, localId) {
-    var config = $A.util.json.resolveRefsObject(rawConfig);
-
+AuraClientService.prototype.injectComponent = function(config, locatorDomId, localId) {
     // Save off any context global stuff like new labels
     var context = $A.getContext();
     context['merge'](config["context"]);

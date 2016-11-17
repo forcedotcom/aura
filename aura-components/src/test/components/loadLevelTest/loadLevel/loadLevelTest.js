@@ -74,11 +74,11 @@
         attributes: {testMissingRequiredAttribute:"true"},
         test: function(cmp) {
             var initCmpName = cmp.find("lazyWReqAttr").getName();
-            $A.test.assertEquals("aura$placeholder", initCmpName);
+            $A.test.assertEquals("aura:placeholder", initCmpName);
 
             cmp.helper.resumeGateId(cmp, "lazyWReqAttr");
 
-            $A.test.addWaitForWithFailureMessage("aura$text",
+            $A.test.addWaitForWithFailureMessage("aura:text",
                 function(){
                     return cmp.find("lazyWReqAttr").getName();
                 },

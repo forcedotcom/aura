@@ -36,7 +36,7 @@
             	"markup://auratest:accessDefaultComponent", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"auratest$accessDefaultComponent");
+            		$A.test.assertEquals(newCmp.getName(),"auratest:accessDefaultComponent");
             		that.componentCreated = newCmp;
             		completed = true;
             	}
@@ -84,7 +84,7 @@
             	"markup://auratest:accessGlobalComponent", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"auratest$accessGlobalComponent");
+            		$A.test.assertEquals(newCmp.getName(),"auratest:accessGlobalComponent");
             		that.componentCreated = newCmp;
             		completed = true;
             	}

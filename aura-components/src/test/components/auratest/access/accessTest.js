@@ -314,7 +314,7 @@
             	"markup://testCustomNS2:componentWithDefaultAccess", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"testCustomNS2$componentWithDefaultAccess");
+            		$A.test.assertEquals(newCmp.getName(),"testCustomNS2:componentWithDefaultAccess");
             		that.componentCreated = newCmp;
             		completed = true;
             	}
@@ -345,7 +345,7 @@
             	"markup://testCustomNS2:componentWithPublicAccess", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"testCustomNS2$componentWithPublicAccess");
+            		$A.test.assertEquals(newCmp.getName(),"testCustomNS2:componentWithPublicAccess");
             		that.componentCreated = newCmp;
             		completed = true;
             	}
@@ -376,7 +376,7 @@
             	"markup://testCustomNS2:componentWithGlobalAccess", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"testCustomNS2$componentWithGlobalAccess");
+            		$A.test.assertEquals(newCmp.getName(),"testCustomNS2:componentWithGlobalAccess");
             		that.componentCreated = newCmp;
             		completed = true;
             	}
@@ -412,7 +412,7 @@
             	"markup://testPrivilegedNS1:componentWithDefaultAccess", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"testPrivilegedNS1$componentWithDefaultAccess");
+            		$A.test.assertEquals(newCmp.getName(),"testPrivilegedNS1:componentWithDefaultAccess");
             		that.componentCreated = newCmp;
             		completed = true;
             	}
@@ -443,7 +443,7 @@
             	"markup://testPrivilegedNS1:componentWithPublicAccess", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"testPrivilegedNS1$componentWithPublicAccess");
+            		$A.test.assertEquals(newCmp.getName(),"testPrivilegedNS1:componentWithPublicAccess");
             		that.componentCreated = newCmp;
             		completed = true;
             	}
@@ -474,7 +474,7 @@
             	"markup://testPrivilegedNS1:componentWithGlobalAccess", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"testPrivilegedNS1$componentWithGlobalAccess");
+            		$A.test.assertEquals(newCmp.getName(),"testPrivilegedNS1:componentWithGlobalAccess");
             		that.componentCreated = newCmp;
             		completed = true;
             	}

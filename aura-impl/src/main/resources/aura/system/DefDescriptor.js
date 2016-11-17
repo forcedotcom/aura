@@ -29,7 +29,8 @@ function DefDescriptor(descriptor){
     this.namespace=hasNamespace?namespace[0]:'';
     this.name=namespace[hasNamespace?1:0];
     //this.qualifiedName=$A.util.format("{0}://{1}{2}{3}",this.prefix,this.namespace,separator,this.name);
-    this.qualifiedName = this.prefix+"://"+this.namespace+separator+this.name;
+    this.fullName = this.namespace+separator+this.name;
+    this.qualifiedName = this.prefix+"://"+this.fullName;
 }
 
 // Static Members
@@ -55,6 +56,15 @@ DefDescriptor.normalize=function(descriptor){
  */
 DefDescriptor.prototype.getQualifiedName = function(){
     return this.qualifiedName;
+};
+
+/**
+ * Gets the full name.
+ * @returns {String}
+ * @export
+ */
+DefDescriptor.prototype.getFullName = function(){
+    return this.fullName;
 };
 
 /**

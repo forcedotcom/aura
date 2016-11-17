@@ -32,8 +32,8 @@ var DomHandlersPlugin = function DomHandlersPlugin(config) {
 
 DomHandlersPlugin.NAME = "domHandlers";
 DomHandlersPlugin.DEFAULT_INTERACTION_TYPE = "user";
-DomHandlersPlugin.AURA_IF = "aura$if";
-DomHandlersPlugin.AURA_ITERATION = "aura$iteration";
+DomHandlersPlugin.AURA_IF = "aura:if";
+DomHandlersPlugin.AURA_ITERATION = "aura:iteration";
 DomHandlersPlugin.WHITELISTEVENTS = { 
     "click" : true // only click for now
 };

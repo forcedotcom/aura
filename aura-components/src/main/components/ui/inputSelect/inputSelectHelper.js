@@ -355,8 +355,7 @@
                         this.performOperationOnCmps(groupBody, op, result, newValues);
                     }
                 } else {
-                    var descriptor = cmp.getDef().getDescriptor();
-                    var cmpName = descriptor.getNamespace() + ":" + descriptor.getName();
+                    var cmpName = cmp.getName();
                     $A.warning("<" + cmpName + "> is currently not supported inside <ui:inputSelect> since it does not properly " +
                     "attach the options to the component. This will lead to undefined behavior. Please " +
                     "use 'v.options' to insert your option objects instead.");

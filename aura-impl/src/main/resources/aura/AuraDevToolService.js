@@ -768,15 +768,12 @@ var AuraDevToolService = function() {
                          cmp = $A.getCmp(data_aura_rendered_by);
                          if(!$A.util.isUndefinedOrNull(cmp)){
                         	 cmp = cmp.getAttributeValueProvider();
-                             if("getDef" in cmp){
-                                 cmp = cmp.getDef().getDescriptor();
-                                 cmpName = cmp.getNamespace()+":"+cmp.getName();
+                             cmpName = cmp.getName();
 
-                                 //Making sure that we have unique components
-                                 if(!(cmpName in cmpInfo)){
-                                     cmpInfo[cmpName] = "";
-                                     cmpNameList = cmpNameList +"    by "+ cmpName +"\n";
-                                 }
+                             //Making sure that we have unique components
+                             if(!(cmpName in cmpInfo)){
+                                 cmpInfo[cmpName] = "";
+                                 cmpNameList = cmpNameList +"    by "+ cmpName +"\n";
                              }
                          }
                      }

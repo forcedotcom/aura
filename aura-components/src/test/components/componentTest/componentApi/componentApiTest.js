@@ -1,7 +1,7 @@
 ({
     testGetComponentClassName: {
         test: function(cmp) {
-            var expected = "componentTest$componentApi";
+            var expected = "componentTest:componentApi";
             var actual = cmp.getName();
             $A.test.assertEquals(expected, actual);
         }

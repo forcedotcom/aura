@@ -384,8 +384,7 @@
                     $A.test.assertEquals(1, objectStoreNames.length);
 
                     // We use app/cmp name work as table name. An app should only get items from its own table.
-                    var descriptor = cmp.getDef().getDescriptor();
-                    var expected = descriptor.getNamespace() + ":" + descriptor.getName();
+                    var expected = cmp.getName();
                     $A.test.assertEquals(expected, objectStoreNames[0]);
                     completed = true;
                 };

@@ -23,7 +23,7 @@
                 	"markup://testCustomNS1:componentWithGlobalAccessHasComponentWithDefaultAccessInMarkup", 
                 	{}, 
                 	function(newCmp){
-                 		$A.test.assertEquals(newCmp.getName(),"testCustomNS1$componentWithGlobalAccessHasComponentWithDefaultAccessInMarkup");
+                 		$A.test.assertEquals(newCmp.getName(),"testCustomNS1:componentWithGlobalAccessHasComponentWithDefaultAccessInMarkup");
                 		that.componentCreated = newCmp;
                 		completed = true;
                 	}
@@ -32,7 +32,7 @@
          },
          function canAccessComponentWithPublicAccess(cmp) {
         	 var componentWithDefaultAccess = this.componentCreated.find("componentWithDefaultAccess");
-        	 $A.test.assertEquals(componentWithDefaultAccess.getName(),"testCustomNS1$componentWithDefaultAccess2");
+        	 $A.test.assertEquals(componentWithDefaultAccess.getName(),"testCustomNS1:componentWithDefaultAccess2");
          },
          /********************************* tests for attribute ***************************************/
          /*********** access attribute of componentWithDefaultAccess directly ********/
@@ -114,7 +114,7 @@
                 	"markup://testCustomNS1:componentWithGlobalAccessHasComponentWithPublicAccessInMarkup", 
                 	{}, 
                 	function(newCmp){
-                 		$A.test.assertEquals(newCmp.getName(),"testCustomNS1$componentWithGlobalAccessHasComponentWithPublicAccessInMarkup");
+                 		$A.test.assertEquals(newCmp.getName(),"testCustomNS1:componentWithGlobalAccessHasComponentWithPublicAccessInMarkup");
                 		that.componentCreated = newCmp;
                 		completed = true;
                 	}
@@ -123,7 +123,7 @@
          },
          function canAccessComponentWithPublicAccess(cmp) {
         	 var componentWithPublicAccess = this.componentCreated.find("componentWithPublicAccess");
-        	 $A.test.assertEquals(componentWithPublicAccess.getName(),"testCustomNS1$componentWithPublicAccess");
+        	 $A.test.assertEquals(componentWithPublicAccess.getName(),"testCustomNS1:componentWithPublicAccess");
          },
          /********************************* tests for attribute ***************************************/
          /*********** access attribute of componentWithPublicAccess directly ********/
@@ -205,7 +205,7 @@
                 	"markup://testCustomNS1:componentWithGlobalAccessHasComponentWithGlobalAccessInMarkup", 
                 	{}, 
                 	function(newCmp){
-                 		$A.test.assertEquals(newCmp.getName(),"testCustomNS1$componentWithGlobalAccessHasComponentWithGlobalAccessInMarkup");
+                 		$A.test.assertEquals(newCmp.getName(),"testCustomNS1:componentWithGlobalAccessHasComponentWithGlobalAccessInMarkup");
                 		that.componentCreated = newCmp;
                 		completed = true;
                 	}
@@ -214,7 +214,7 @@
          },
          function canAccessComponentWithGlobalAccess(cmp) {
         	 var componentWithGlobalAccess = this.componentCreated.find("componentWithGlobalAccess");
-        	 $A.test.assertEquals(componentWithGlobalAccess.getName(),"testCustomNS1$componentWithGlobalAccess");
+        	 $A.test.assertEquals(componentWithGlobalAccess.getName(),"testCustomNS1:componentWithGlobalAccess");
          },
          /********************************* tests for attribute ***************************************/
          /*********** access attribute of componentWithGlobalAccess directly ********/

@@ -45,7 +45,7 @@
         var ownerName = owner.getName();
         // TODO: Manually checking for aura:iteration or aura:if is a hack. Ideally, getOwner() or another API would
         //       always return the element we need to key against.
-        while (ownerName === "aura$iteration" || ownerName === "aura$if") {
+        while (ownerName === "aura:iteration" || ownerName === "aura:if") {
             owner = owner.getOwner();
             ownerName = owner.getName();
         }

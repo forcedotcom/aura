@@ -25,8 +25,8 @@ function AuraExpressionService() {
 }
 
 AuraExpressionService.PRIMITIVE_SEPARATOR = "__";
-AuraExpressionService.AURA_IF = "aura$if";
-AuraExpressionService.AURA_ITERATION = "aura$iteration";
+AuraExpressionService.AURA_IF = "aura:if";
+AuraExpressionService.AURA_ITERATION = "aura:iteration";
 
 AuraExpressionService.prototype.getReference = function (expression, valueProvider) {
     expression = $A.expressionService.normalize(expression);

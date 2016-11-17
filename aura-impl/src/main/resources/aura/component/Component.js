@@ -47,6 +47,7 @@ function Component(config, localCreation) {
     this.destroyed=false;
     this.version = config["version"];
     this.owner = context.getCurrentAccess();
+    this.name='';
 
     // allows components to skip creation path checks if it's doing something weird
     // such as wrapping server created components in client created one
@@ -254,12 +255,16 @@ Component.prototype.setupGlobalId = function(globalId, localCreation) {
 
 
 /**
- * Gets the component class name.
+ * Returns the component's canonical name, e.g. 'ui:button'.
  *
  * @export
+ * @platform
  */
 Component.prototype.getName = function() {
-    return this["meta"]["name"];
+    if(!this.name){
+        this.name=this.getDef().getDescriptor().getFullName();
+    }
+    return this.name;
 };
 
 /**
@@ -441,8 +446,7 @@ Component.prototype.getSuperest = function() {
  * @private
  */
 Component.prototype.findInstanceOf = function(type) {
-    var descriptor = this.getDef().getDescriptor();
-    if ((descriptor.getNamespace() + ":" + descriptor.getName()) === type) {
+    if (this.getName() === type) {
         return this;
     } else {
         var superComponent = this.getSuper();

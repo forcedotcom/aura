@@ -21,11 +21,7 @@
             var expected="aura:text";
 
             $A.createComponent(expected,null,function(targetComponent){
-                var actual=$A.util.format(
-                    "{0}:{1}",
-                    targetComponent.getDef().getDescriptor().getNamespace(),
-                    targetComponent.getDef().getDescriptor().getName()
-                );
+                var actual=targetComponent.getName();
 
                 $A.test.assertEquals(expected,actual);
             })

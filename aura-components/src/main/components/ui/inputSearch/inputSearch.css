@@ -15,6 +15,7 @@
  */
  .THIS {
     position: relative;
+    display: inline-block;
  }
  
 .THIS input{

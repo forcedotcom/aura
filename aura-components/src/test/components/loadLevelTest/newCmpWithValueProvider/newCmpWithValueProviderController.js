@@ -76,6 +76,7 @@
 
     /**
      * Test server dependent client created component with attributes containing PropertyReferenceValue in MapValue
+     Note: this no longer get component from server, not sure why, need to look into it.
      */
     createCmpWithMapValuePropRefValueFromServer : function(cmp, evt,helper){
     	var expression = "{!v.stringAttribute}";

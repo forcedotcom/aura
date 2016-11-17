@@ -52,14 +52,11 @@
     },
     
     /**
-     * ask receiverCmp(newCmpWithValueProvider) to create a new component(displayMap) whose definition is not available 
-     * at the client. This definition would be fetched from the server by a server action
+     * ask receiverCmp(newCmpWithValueProvider) to create a new component
      * kill receiverCmp BEFORE the request is send. 
      * 
-     * NOTE: displayMap.cmp has attributes refer to receiverCmp's attribute(v.stringAttribute) twice, 
-     * once we kill newCmpWithValueProvider, it will error out during encoding actions for request
      */
-    _testCmpCreatedByFetchingMapFromServer:{
+    testCmpCreatedByFetchingMapFromServer:{
         attributes:{ 
             receiverCmp: "loadLevelTest:newCmpWithValueProvider",
             receiverCmpAuraId: "receiverCmp",
@@ -71,7 +68,16 @@
         function(cmp){
             var receiverCmp = cmp.find("receiverCmp");
 
-            var actionToCreateNewCmp = receiverCmp.get(cmp.get("v.controllerFuncToCreateCmp"));
+            //var actionToCreateNewCmp = receiverCmp.get(cmp.get("v.controllerFuncToCreateCmp"));
+            var actionToCreateNewCmp = cmp.get("c.getComponents");
+            actionToCreateNewCmp.setParams({
+                input : 2,
+            	token : "Bla"
+            });
+            actionToCreateNewCmp.setCallback(cmp, function(action){
+            	var cmpArray = action.getReturnValue();
+            	receiverCmp.set("v.body", cmpArray);
+            });
             
             var cb_handle;
             var destroy_done = false;
@@ -80,8 +86,8 @@
                 var i;
                 var action = undefined;
                 for (i = 0; i < actions.length; i++) {
-                    if (actions[i].getDef().name === "getComponent" && 
-                    		actions[i].getParams().name === "markup://loadLevelTest:displayMap") {
+                    if (actions[i].getDef().name === "getComponents" && 
+                    		actions[i].getParams().token && actions[i].getParams().token === "Bla") {
                         action = actions[i];
                         break;
                     }
@@ -96,17 +102,15 @@
                     		);
                     //let the test know we have destroy the receiverCmp
                     destroy_done = true;
-                    //we expect the error twice because two reference to receiverCmp's attribute
-                    var errmsg = "Invalid component tried calling function [get] with arguments [v.stringAttribute], markup://loadLevelTest:newCmpWithValueProvider";
-                	$A.test.expectAuraError(errmsg);
-                	$A.test.expectAuraError(errmsg);
+                    var errorMsg = "Invalid component tried calling function [set] with arguments [v.body,[object Object],[object Object]], markup://loadLevelTest:newCmpWithValueProvider";
+                    $A.test.expectAuraError(errorMsg);
                 }
             };
             cb_handle = $A.test.addPreSendCallback(undefined, preSendCallback );
             $A.test.addWaitFor(true, function() { return destroy_done; });
 
             //now run the action
-            actionToCreateNewCmp.runDeprecated();//this will run createCmpByFetchingDefFromServer of newCmpWithValueProviderController.js
+            $A.enqueueAction(actionToCreateNewCmp);
         }
         ]
     },

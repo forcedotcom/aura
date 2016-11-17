@@ -35,13 +35,14 @@
     width: 15px;
     border: 0;
     outline: 0;
-    right: 5px;    
+    right: 4px;    
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     -webkit-box-shadow: none;
     box-shadow: none;
     padding: inherit;
+    margin: 0px;
 }
 
 .THIS .hide {

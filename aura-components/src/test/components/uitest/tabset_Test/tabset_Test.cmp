@@ -190,6 +190,19 @@
 	        </uitest:tabset_extendsTest>
 		</div>
 	</aura:if>
+	<aura:if isTrue="{! v.renderItem == 'destroy'}">
+        <div class="block">
+            <h1 class="header">Test Destroy</h1>
+            <ui:tabset aura:id="destroyTest" class="tabsetDestroy">
+                <ui:tab title="tab1" class="tab1">
+                    tab 1
+                </ui:tab>
+                <ui:tab title="tab 2">
+                    tab 2
+                </ui:tab>
+            </ui:tabset>
+        </div>
+    </aura:if>
 	
 	<!---extra data-->
 	<div class="extraFooter">

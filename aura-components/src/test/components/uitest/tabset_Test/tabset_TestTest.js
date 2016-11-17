@@ -259,6 +259,24 @@
             $A.test.assertEquals("onTabUnhover", cmp.get("v.lastTabEventFired"));
         }]
     },
+    
+    testTabsetDestroy : {
+        attributes: {"renderItem": "destroy"},
+        test: [function(cmp) {
+            var tabset = cmp.find('destroyTest');
+            $A.test.assertNotNull(tabset._tabCollection, '_tabCollection should not be null');
+            $A.test.assertEquals(2, tabset._tabCollection.tabIds.length, 'incorrect number of tabs');
+            
+            tabset.destroy();
+            
+            $A.test.addWaitFor(0, function(){
+                return $A.test.select(".tab1").length;
+            });
+        }, function(cmp) {
+            var tabset = cmp.find('destroyTest');
+            $A.test.assertTrue($A.util.isUndefinedOrNull(tabset), 'tabset should be destroyed');
+        }]
+    },
 
 	/*************************************************************************************************************
      * HELPER FUNCTIONS

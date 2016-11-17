@@ -373,7 +373,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         List<String> ret = Lists.newArrayList();
         // appcache fallback can only use for items NOT listed in the CACHE section of the manifest
         ret.add(getBootstrapUrl(context, attributes) + " " + getBootstrapFallbackUrl(context, attributes));
-        ret.add(configAdapter.getEncryptionKeyURL(true) + " " + configAdapter.getEncryptionKeyFallbackURL(true));
         return ret;
     }
 
@@ -485,11 +484,11 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      */
     @Override
     public void setCSPHeaders(DefDescriptor<?> top, HttpServletRequest req, HttpServletResponse rsp) {
-        
+
         if(canSkipCSPHeader(top, req)) {
             return;
         }
-        
+
         ContentSecurityPolicy csp = configAdapter.getContentSecurityPolicy(
                 top == null ? null : top.getQualifiedName(), req);
 
@@ -519,9 +518,9 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
             }
         }
     }
-    
+
     /**
-     * Check if CSP Header setting is already inherited from one.app (top level context) 
+     * Check if CSP Header setting is already inherited from one.app (top level context)
      * See https://www.w3.org/TR/CSP2/#which-policy-applies
      * @param defDesc
      * @param req
@@ -531,31 +530,31 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         if(defDesc == null | req == null) {
             return false;
         }
-        
+
         // CSP inheritance is supported starting from CSP2
         if(!isCSP2Supported(req)) {
             return false;
         }
-        
+
         final String descriptorName = defDesc.getDescriptorName();
-        if(!descriptorName.equals("one:one")) { // only skip while loading one.app 
+        if(!descriptorName.equals("one:one")) { // only skip while loading one.app
             return false;
         }
-        
+
         final String auraFormat = req.getParameter("aura.format");
         if(auraFormat != null && auraFormat.equals("HTML")) {
             return false;
         }
-        
+
         // Skip one.app requests for non HTML content with already established aura context
         final String auraContext = req.getParameter("aura.context");
         if(auraContext != null) {
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Check if Content Security Policy Level 2 is supported by the browser
      * Currently, IE, Edge and Opera Mini browsers don't support CSP2 as per http://caniuse.com/#feat=contentsecuritypolicy2
@@ -566,12 +565,12 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         if(userAgent == null) {
             return false;
         }
-        
+
         final int browser = BrowserUserAgent.parseBrowser(userAgent);
         if(UserAgent.IE.match(browser)) { // UserAgent.IE is used for IE11 and IE12 (Edge)
             return false;
         }
-        
+
         return true;
     }
 

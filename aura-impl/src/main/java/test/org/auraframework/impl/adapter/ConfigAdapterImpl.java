@@ -167,13 +167,13 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Inject
     private DefinitionService definitionService;
-    
+
     @Inject
     private InstanceService instanceService;
 
     @Inject
     private ContextService contextService;
-    
+
     @Inject
     private FileMonitor fileMonitor;
 
@@ -268,7 +268,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
         contextService.registerGlobal("isVoiceOver", true, false);
         contextService.registerGlobal("dynamicTypeSize", true, "");
-        
+
         if (!isProduction()) {
             fileMonitor.start();
         }
@@ -479,7 +479,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         }
         return equivalents;
     }
-    
+
     @Override
     public String getAuraJSURL() {
         AuraContext context = contextService.getCurrentContext();
@@ -506,14 +506,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         String encodedContext = context.getEncodedURL(AuraContext.EncodingStyle.Normal);
         String contextPath = context.getContextPath();
         return String.format("%s/l/%s/app.encryptionkey" + (jsFormat ? ".js" : ""), contextPath, encodedContext);
-    }
-
-    @Override
-    public String getEncryptionKeyFallbackURL(Boolean jsFormat) {
-        AuraContext context = contextService.getCurrentContext();
-        String contextPath = context.getContextPath();
-        String nonce = context.getFrameworkUID();
-        return String.format("%s/auraFW/resources/%s/aura/fallback/fallback.app.encryptionkey.js", contextPath, nonce);
     }
 
     /**

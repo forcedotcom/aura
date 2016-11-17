@@ -84,13 +84,6 @@ public interface ConfigAdapter extends AuraAdapter {
     String getEncryptionKeyURL(Boolean jsFormat);
 
     /**
-     * Returns URL of fallback JS for encryption key GET URL.
-     * @return URL for encryption key
-     */
-    String getEncryptionKeyFallbackURL(Boolean jsFormat);
-
-
-    /**
      * Returns the encryption key for the Crypto Adapter. The key must be a
      * JSON parseable array of numbers.
      * @return encryption key

@@ -192,7 +192,7 @@ public class Manifest extends AuraResourceImpl {
                 }
             }
 
-            // Add token for bootstrap.js and app.encryptionkey.js requests
+            // Add token for bootstrap.js requests
             // because those requests are issued from script tags in app-cached files
             String token = configAdapter.generateJwtToken();
             if (token != null) {

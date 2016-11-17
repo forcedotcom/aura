@@ -33,7 +33,7 @@
             .then(
                 function() {
                     if (defsCreated) {
-                        $A.storageService.deleteStorage("ComponentDefStorage");
+                        return $A.storageService.deleteStorage("ComponentDefStorage");
                     }
                 }
             )

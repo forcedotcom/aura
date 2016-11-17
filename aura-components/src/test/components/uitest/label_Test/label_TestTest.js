@@ -290,5 +290,20 @@
             $A.test.assertUndefined(component.find("destroyLabelInnermost"),
                 "innermost label cmp should have been destroyed");
         }]
+    },
+
+    /**
+     * Check if ui:label's for attribute generated in iteration works
+     * Test case for W-3174244
+     */
+    testLabelWithForGeneratedInIteration: {
+        test: function(component) {
+            var labelElms = $A.test.select(".labelWithForInIteration");
+            var expectedForValues = ["a", "b", "c"];
+            for (var i = 0; i < expectedForValues.length; i++) {
+                $A.test.assertEquals(expectedForValues[i], $A.util.getElementAttributeValue(labelElms[i], "for"),
+                    "Label's for attribute should have value " + expectedForValues[i]);
+            }
+        }
     }
-})
+})//eslint-disable-line semi

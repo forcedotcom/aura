@@ -858,8 +858,10 @@ public class AuraContextImpl implements AuraContext {
                 }
             }
             
-            if (pathPrefix != null) {
-                json.writeMapEntry("pathPrefix", pathPrefix);
+            String currentPathPrefix = getPathPrefix();
+
+            if (currentPathPrefix != null) {
+                json.writeMapEntry("pathPrefix", currentPathPrefix);
             }
 
             if (testContextAdapter != null) {

@@ -396,8 +396,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     public List<String> getFrameworkFallbackScripts(AuraContext context, boolean safeInlineJs, Map<String,Object> attributes)
         throws QuickFixException {
         List<String> ret = Lists.newArrayList();
-        // appcache fallback can only use for items NOT listed in the CACHE section of the manifest
-        ret.add(getBootstrapUrl(context, attributes) + " " + getBootstrapFallbackUrl(context, attributes));
         return ret;
     }
 
@@ -441,13 +439,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     @Override
     public String getBootstrapUrl(AuraContext context, Map<String,Object> attributes) {
         return commonJsUrl("/bootstrap.js", context, attributes);
-    }
-
-    @Override
-    public String getBootstrapFallbackUrl(AuraContext context, Map<String,Object> attributes) {
-        String contextPath = context.getContextPath();
-        // not including nonce in fallback url to force no cache headers
-        return String.format("%s/auraFW/resources/aura/fallback/fallback.bootstrap.js", contextPath);
     }
 
     @Override

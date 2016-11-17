@@ -118,7 +118,6 @@ public interface ServletUtilAdapter extends AuraAdapter {
      */
 
     String getBootstrapUrl(AuraContext context, Map<String,Object> attributes);
-    String getBootstrapFallbackUrl(AuraContext context, Map<String,Object> attributes);
 
     /**
      * Get inline.js url.

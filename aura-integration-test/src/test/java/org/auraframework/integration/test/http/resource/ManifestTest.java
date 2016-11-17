@@ -302,7 +302,7 @@ public class ManifestTest extends AuraImplTestCase {
 
         // Assert
         // Refer to the order in ServletUtilAdapterImpl.getFrameworkFallbackScripts
-        String[] expectedScripts = new String[]{"fallback.bootstrap.js"};
+        String[] expectedScripts = new String[]{};
 
         String[] lines = content.split("\n");
         int start = Arrays.asList(lines).indexOf("FALLBACK:");

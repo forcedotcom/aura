@@ -22,7 +22,7 @@ if (typeof Aura === "undefined") {//eslint-disable-line no-use-before-define
     Aura = window["Aura"] = {};
 }
 
-// -- Aura inlinning bootstrap
+// -- Aura inlining bootstrap
 Aura.time = window.performance && window.performance.now ? window.performance.now.bind(performance) : function(){return Date.now();};
 Aura["bootstrap"] = Aura["bootstrap"] || {};
 Aura.bootstrapMark = function (mark, value) {
@@ -33,6 +33,38 @@ Aura.bootstrapMark = function (mark, value) {
     //#end
     this["bootstrap"][mark] = value || this.time();
 };
+
+
+// bootstrap robustness:
+// - all files required for bootstrap are loaded with sync <script> tags
+// - DOMContentLoaded is fired after DOM is ready, which includes executing all sync <script> tags
+// - to detect errors we wait for DOMContentLoaded then check for all bootstrap file markers
+(function bootstrapRobustness() {
+    function verifyBootstrap() {
+        document.removeEventListener('DOMContentLoaded', verifyBootstrap);
+
+        // now that all <script> are loaded can update network bootstrap.js load status
+        $A.clientService.setAppBootstrapStatus();
+
+        // wait for bootstrap to load from storage
+        if ($A.clientService.gvpsFromStorage && !Aura["appBootstrapCacheStatus"]) {
+            setTimeout(verifyBootstrap, 1000);
+            return;
+        }
+
+        var state = $A.clientService.getBootstrapState(false);
+
+        var allFilesLoaded = Object.keys(state).reduce(function(prev, curr) {
+            return prev && state[curr];
+        }, true);
+        if (!allFilesLoaded) {
+            $A.clientService.dumpCachesAndReload(true);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', verifyBootstrap);
+})();
+
 
 // -- Namespaces ------------------------------------------------------------
 Aura.Utils      = {};
@@ -714,7 +746,7 @@ AuraInstance.prototype.initAsync = function(config) {
 };
 
 /**
- * This funciton initializes external libraries that were appended on aura.js
+ * This function initializes external libraries that were appended on aura.js
  * An example of library is moment.js
  */
 AuraInstance.prototype.executeExternalLibraries = function () {
@@ -737,7 +769,6 @@ AuraInstance.prototype.executeExternalLibraries = function () {
  * @public
  */
 AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializeServices) {
-
     this.clientService.setNamespacePrivileges(config["ns"]);
     this.clientService.setQueueSize(config["MaxParallelXHRCount"]);
     this.clientService.setXHRExclusivity(config["XHRExclusivity"]);
@@ -1534,8 +1565,8 @@ window['aura'] = window['$A'];
 
 /*
  * Async Bootstrap dependency
- * The scripts are loaded with no order, which means
- * we need to call iniAsync in case it was already evaluated
+ * The scripts are loaded with no order, which means we need to call initAsync in case it was already evaluated.
+ * TODO W-??? change bootstrap scripts to be async+defered for perf gains, after which this code block will be required
 */
 
 Aura["frameworkJsReady"] = true;
@@ -1544,5 +1575,6 @@ if (Aura["initConfig"]) {
     $A.initAsync(Aura["initConfig"]);
   }, 0);
 }
+
 
 // External libraries (like moment.js) will be appended here

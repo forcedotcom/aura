@@ -174,8 +174,8 @@ public class IntegrationImpl implements Integration {
                     // set event handlers to either js "undefined" or object of event and handler names
                     String eventHandlers = jsonEventHandlers != null ? jsonEventHandlers.toString() : "undefined";
                     String def = String.format(COMPONENT_DEF_TEMPLATE, tag, jsonAttributes.toString(), localId);
-                    
-                    String newComponentScript = String.format("(function (w) {\n    w.Aura || (w.Aura = {});\n    w.Aura.afterAppReady = Aura.afterAppReady || [];\n\n    function ais() {\n        $A.__aisScopedCallback(function() { \n            $A.clientService.injectComponentAsync(%s, '%s', %s); \n        }); \n    } \n\n    if (Aura.applicationReady) {\n        ais();\n    } else {\n        window.Aura.afterAppReady.push(ais); \n    }\n}(window));", def, locatorDomId, eventHandlers);
+
+                    String newComponentScript = String.format("(function (w) {\n    w.Aura || (w.Aura = {});\n    w.Aura.afterAppReady = Aura.afterAppReady || [];\n    window.Aura.inlineJsLoaded = true;\n\n    function ais() {\n        $A.__aisScopedCallback(function() { \n            $A.clientService.injectComponentAsync(%s, '%s', %s); \n        }); \n    } \n\n    if (Aura.applicationReady) {\n        ais();\n    } else {\n        window.Aura.afterAppReady.push(ais); \n    }\n}(window));", def, locatorDomId, eventHandlers);
 
                     init.append(newComponentScript);
 
@@ -225,7 +225,7 @@ public class IntegrationImpl implements Integration {
                         init.append(";\n");
                     }
 
-                    init.append(String.format("(function (w) {\n    w.Aura || (w.Aura = {});\n    w.Aura.afterAppReady = Aura.afterAppReady || [];\n\n    function ais() {\n        $A.__aisScopedCallback(function() { \n            $A.clientService.injectComponent(config, \"%s\", \"%s\"); \n        }); \n    } \n\n    if (Aura.applicationReady) {\n        ais();\n    } else {\n        window.Aura.afterAppReady.push(ais); \n    }\n}(window));", locatorDomId, localId));
+                    init.append(String.format("(function (w) {\n    w.Aura || (w.Aura = {});\n    w.Aura.afterAppReady = Aura.afterAppReady || [];\n    window.Aura.inlineJsLoaded = true;\n\n    function ais() {\n        $A.__aisScopedCallback(function() { \n            $A.clientService.injectComponent(config, \"%s\", \"%s\"); \n        }); \n    } \n\n    if (Aura.applicationReady) {\n        ais();\n    } else {\n        window.Aura.afterAppReady.push(ais); \n    }\n}(window));", locatorDomId, localId));
                 }
 
                 rc.pushScript();

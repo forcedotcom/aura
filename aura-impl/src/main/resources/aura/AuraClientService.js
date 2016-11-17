@@ -873,25 +873,25 @@ AuraClientService.prototype.actualDumpCachesAndReload = function() {
  * Queues a request to clear caches (actions/GVP, ComponentDefStorage) then
  * reload the .app from the server.
  *
- * IMPORTANT APPCACHE NOTE: the .app is always requested from the server
- * by using AuraClientService#hardRefresh() . This ensures the server can do
- * a server-side redirect to an auth endpoint, etc. If it redirects back to
- * the .app then the .app is pulled from appcache and the browser performs
- * the appcache refresh cycle.
+ * @param {Boolean} force True to force an immediate cache dump and reload. By default the
+ * request is enqueued until framework has finished initialization. This should only be
+ * used if $A.initAsync() will not be invoked (eg severe bootstrap error).
  */
-AuraClientService.prototype.dumpCachesAndReload = function() {
+AuraClientService.prototype.dumpCachesAndReload = function(force) {
+    // avoid concurrent dump/reload executions
     if (this.reloadFunction) {
         return;
     }
 
     this.reloadFunction = this.actualDumpCachesAndReload.bind(this);
 
-    if (this.reloadPointPassed) {
+    if (this.reloadPointPassed || force) {
         if (this.shouldPreventReload()) {
             this.showErrorDialogWithReload(new AuraError("We got stuck in a loop while loading the page. Please click Refresh."));
-            return;
+        } else {
+            this.reloadFunction();
         }
-        this.reloadFunction();
+        this.reloadFunction = undefined;
     }
 };
 
@@ -961,7 +961,14 @@ AuraClientService.prototype.clearReloadCount = function() {
 AuraClientService.prototype.showErrorDialogWithReload = function(e) {
     if (e && e.message) {
         $A.message(e.message, e, true);
-        $A.logger.reportError(e);
+
+        // if aura hasn't finished init'ing then reporting the error to the server
+        // via an action will fail. catch the failure and fallback to a hand-crafted XHR.
+        try {
+            $A.logger.reportError(e);
+        } catch (e2) {
+            // TODO W-3462566 report error to server despite aura not being booted. see this.sendBeacon().
+        }
     }
 };
 
@@ -1135,6 +1142,27 @@ AuraClientService.prototype.handleAppCache = function() {
 };
 
 /**
+ * Gets the framework and app bootstrap state, which indicates execution state of each file.
+ * @param {Boolean} appcache True to include appcache progress, if appcache is enabled.
+ * @return {Object} loading state for all bootstrap files.
+ * @private
+ */
+AuraClientService.prototype.getBootstrapState = function(appcache) {
+    var state = {
+        "inline.js": !!Aura["inlineJsLoaded"],
+        "aura.js": !!Aura["frameworkJsReady"],
+        "app.js": !!Aura["appJsReady"],
+        "bootstrap.js": !!Aura["appBootstrap"] || !!Aura["appBootstrapCache"] || !!this.appBootstrap
+    };
+
+    if (appcache && this.isManifestPresent()) {
+        state["appcache"] = this.appCacheProgress;
+    }
+
+    return state;
+};
+
+/**
  * Start or extend the boot timers that monitor for progress of the bootup sequence.
  * This is exclusively used in appcache scenarios: when an appcache error is triggered
  * the timer is started.
@@ -1142,17 +1170,6 @@ AuraClientService.prototype.handleAppCache = function() {
 AuraClientService.prototype.startBootTimers = function() {
     var that = this;
 
-    // captures current boot state
-    function getBootState() {
-        return {
-            "framework": !!Aura["frameworkJsReady"],
-            "app.js": !!Aura["bootstrap"]["execAppJs"],
-            "bootstrap.js": !!Aura["appBootstrap"] || !!Aura["appBootstrapCache"] || !!that.appBootstrap,
-            "inline.js": !!Aura["inlineJsReady"] || !!Aura["bootstrap"]["execInlineJs"],
-            "libs.js": !!Aura["frameworkLibrariesReady"],
-            "appcache": that.appCacheProgress
-        };
-    }
 
     // determines if progress has been made in booting fwk + app
     function getBootProgressed(state1, state2) {
@@ -1168,7 +1185,7 @@ AuraClientService.prototype.startBootTimers = function() {
     }
 
     // capture current state
-    var oldState = getBootState();
+    var oldState = this.getBootstrapState(true);
 
     // start the timer.
     // note: start the timer even if all files are loaded. by then measuring success as the app+fwk
@@ -1179,7 +1196,7 @@ AuraClientService.prototype.startBootTimers = function() {
             return;
         }
 
-        var newState = getBootState();
+        var newState = that.getBootstrapState(true);
         var progress = getBootProgressed(oldState, newState);
 
         // if progress made then start a new timer to check again
@@ -1576,6 +1593,10 @@ AuraClientService.prototype.initDefs = function() {
     delete Aura["afterAppDefsReady"];
 };
 
+/**
+ * Gets the bootstrap.js payload, from network or cache.
+ * @return {Object} the bootstrap payload and its source, or undefined if it hasn't yet loaded.
+ */
 AuraClientService.prototype.getAppBootstrap = function() {
     //  network &&  cache -> network
     //  network && !cache -> network
@@ -1599,17 +1620,42 @@ AuraClientService.prototype.getAppBootstrap = function() {
     }
     else if (Aura["appBootstrapStatus"] === "failed" && Aura["appBootstrapCacheStatus"] === "failed") {
         // if bootstrap.js has failed to load from network and storage then the app won't boot.
-        // note: bootstrap.js fallback is used if the server fetch failed even if appcache is in the
-        // process of fetching a new version. if we reload while appcache is updating/downloading
-        // then the current version (which may be stale) gets reused. bootstrap.js' fallback will
-        // again be used, and we loop infinitely. therefore only reload the .app?t when appcache
-        // is idle or not in use.
+        // note: if we reload while appcache is updating/downloading then the current version
+        // (which may be stale) gets reused, which will cause an infinite reload. therefore only
+        // reload the .app?t when appcache is idle or not in use.
         if (!window.applicationCache || window.applicationCache.status === window.applicationCache.UNCACHED || window.applicationCache.status === window.applicationCache.IDLE) {
             this.dumpCachesAndReload();
         }
     }
 
     return undefined;
+};
+
+/**
+ * Sets network bootstrap.js load status. To be invoked only after bootstrap.js &lt;script&gt;
+ * has been processed (eg loaded successfully or not).
+ *
+ * This was historically triggered via the appcache fallback mechanism but with the reduced use
+ * of appcache and the absence of a fallback for bootstrap.js, this is now triggered after all
+ * bootstrap &lt;script&gt; tags are processed.
+ *
+ * @private
+ */
+AuraClientService.prototype.setAppBootstrapStatus = function() {
+    if (Aura["appBootstrapStatus"] === "loaded") {
+        return;
+    }
+
+    // bootstrap.js failed to load from network
+    Aura["appBootstrapStatus"] = "failed";
+
+    if (Aura["afterBootstrapReady"] && Aura["afterBootstrapReady"].length){
+        var queue = Aura["afterBootstrapReady"];
+        Aura["afterBootstrapReady"] = [];
+        for (var i = 0; i < queue.length; i++) {
+            queue[i]();
+        }
+    }
 };
 
 AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
@@ -1792,12 +1838,17 @@ AuraClientService.prototype.runAfterAppReady = function(callback) {
 /**
  * Loads bootstrap.js from storage, if it exists, and populates several
  * global variables consumed by runAfterBootstrapReady().
+ *
+ * Aura["appBootstrapCacheStatus"] must be set at the end of all code paths so
+ * bootstrap robustness logic can determine when loading from storage is complete.
+ *
  * @return {Promise} a promise that always resolves. Errors are logged
  *  and the promise resolves.
  */
 AuraClientService.prototype.loadBootstrapFromStorage = function() {
     // if bootstrap.js from network has loaded then skip loading from cache
     if (Aura["appBootstrap"]) {
+        Aura["appBootstrapCacheStatus"] = "failed";
         return Promise["resolve"]();
     }
 

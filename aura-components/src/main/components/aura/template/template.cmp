@@ -116,8 +116,9 @@
     var time = window.performance &amp;&amp; window.performance.now ? window.performance.now.bind(performance) : function(){return Date.now();};
     window.Aura.bootstrap.execInlineJs = time();
 
+    window.Aura.inlineJsLoaded = true;
     var auraConfig = {!v.auraInit};
-    
+
     function initLocker () {
         if (auraConfig["safeEvalWorker"] &amp;&amp; !window['$$safe-eval$$'] &amp;&amp; !/^(.*?:)?\/\//.test(auraConfig["host"])) {
             var props = {

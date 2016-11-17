@@ -1403,6 +1403,46 @@ function lib(w) { //eslint-disable-line no-unused-vars
         },
 
         /**
+         * update position when scroller size has changed that cause
+         * position outisde of scroller
+         * NOTE: code copied from _resetPosition to make sure not interfering with existing behavior
+         * @param time {integer} Default time for the scroll in case a snap is needed
+         * @method _resetPositionIfOutOfBound
+         * @protected
+         */
+        _resetPositionIfOutOfBound: function (time) {
+            time || (time = 0);
+
+            var x = this.x,
+                y = this.y;
+
+            // Outside boundaries top
+            if (!this.hasScrollY || this.y > 0) {
+                y = 0;
+
+            // Outside boundaries bottom
+            } else if (this.y < this.maxScrollY) {
+                y = this.maxScrollY;
+            }
+
+            // Outsede left
+            if (!this.hasScrollX || this.x > 0 ) {
+                x = 0;
+
+            // Outside right
+            } else if (this.x < this.maxScrollX) {
+                x = this.maxScrollX;
+            }
+
+            if (y === this.y && x === this.x) {
+                return false;
+            }
+
+            this._scrollTo(x, y, time, EASING.regular);
+            return true;
+        },
+
+        /**
         * Sets the transition easing function property into the scroller node.
         * 
         * @param easing {integer} String representation of the CSS easing function
@@ -1656,9 +1696,16 @@ function lib(w) { //eslint-disable-line no-unused-vars
             }
         },
 
+        /**
+         * check if scroller's size has changed
+         * for scroller height, we need to include PTL div if available to get the right height
+         */
         _isScrollSizeChanged: function() {
-            return (this.scrollerWidth !== this.scroller.offsetWidth) ||
-                   (this.scrollerHeight !== this.scroller.offsetHeight);
+            var ptl = this.opts.pullToLoadMore;
+            var scrollerWidth = this.scrollerWidth;
+            var scrollerHeight = ptl ? this.scrollerHeight + this.getPTLSize() : this.scrollerHeight;
+            return (scrollerWidth !== this.scroller.offsetWidth) ||
+                   (scrollerHeight !== this.scroller.offsetHeight);
         },
 
         /**
@@ -1706,9 +1753,10 @@ function lib(w) { //eslint-disable-line no-unused-vars
             var self = this;
             if (!this._rafRefresh) {
                 this._rafRefresh = RAF(function () { // debounce the refresh
+                    var isScrollSizeChanged = self._isScrollSizeChanged();
                     self._setSize();
-                    if (self._isScrollSizeChanged()) {
-                        self._resetPosition();
+                    if (isScrollSizeChanged) {
+                        self._resetPositionIfOutOfBound(0);
                     }
                     self._fire('_refresh');
                     self._rafRefresh = null;

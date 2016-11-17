@@ -78,7 +78,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         String log = logs.get(0);
 
         boolean requireErrorId = true;
-        String failingDescriptor = "auratest$errorHandlingApp$controller$throwErrorFromClientController";
+        String failingDescriptor = "auratest:errorHandlingApp$controller$throwErrorFromClientController";
         String expectedMessage = String.format("Action failed: %s [Error from app client controller]", failingDescriptor);
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
@@ -169,7 +169,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         String log = logs.get(0);
 
         boolean requireErrorId = true;
-        String failingDescriptor = "auratest$errorHandling$controller$throwErrorFromClientController";
+        String failingDescriptor = "auratest:errorHandling$controller$throwErrorFromClientController";
         String expectedMessage = String.format("Action failed: %s [Error from component client controller]", failingDescriptor);
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
@@ -262,7 +262,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
 
         boolean requireErrorId = true;
         // the failing descriptor is the failing error handler, so that we can find out it's handler's error
-        String failingDescriptor = "auratest$errorHandlingApp$controller$handleSystemError";
+        String failingDescriptor = "auratest:errorHandlingApp$controller$handleSystemError";
         String expectedMessage = String.format("Action failed: %s [Error from error handler]", failingDescriptor);
         assertClientErrorLogContains(handlerErrorLog, expectedMessage, requireErrorId, failingDescriptor);
     }
@@ -289,7 +289,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         }
 
         boolean requireErrorId = true;
-        String failingDescriptor = "auratest$errorHandling$controller$throwErrorFromClientController";
+        String failingDescriptor = "auratest:errorHandling$controller$throwErrorFromClientController";
         String expectedMessage = String.format("Action failed: %s [Error from component client controller]", failingDescriptor);
         assertClientErrorLogContains(originalErrorLog, expectedMessage, requireErrorId, failingDescriptor);
     }

@@ -68,7 +68,7 @@
                 return "focus" === cmp.find("event").get("v.value");
             },"focus event didn't bubble");
             $A.test.addWaitForWithFailureMessage(true, function() {
-                return "ui$pillContainer" === cmp.find("component").get("v.value");
+                return "ui:pillContainer" === cmp.find("component").get("v.value");
             },"focus event was not from pillContainer");
         }
     },
@@ -84,7 +84,7 @@
                 return "blur" === cmp.find("event").get("v.value");
             },"blur event didn't bubble");
             $A.test.addWaitForWithFailureMessage(true, function() {
-                return "ui$pillContainer" === cmp.find("component").get("v.value");
+                return "ui:pillContainer" === cmp.find("component").get("v.value");
             },"blur event was not from pillContainer");
         }
     },

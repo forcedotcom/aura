@@ -1,24 +1,20 @@
 {
-  "s":1,
-  "v":{
-    "xs":"I",
-    "descriptor":"markup://aura:test",
-    "superDef":{
-      "s":2,
-      "v":{
-        "descriptor":"markup://aura:component"
-      }
+  "xs":"I",
+  "descriptor":"markup://aura:test",
+  "superDef":{
+    "descriptor":"markup://aura:component"
+  },
+  "attributeDefs":[
+    {
+      "name":"body",
+      "type":"aura://Aura.Component[]",
+      "xs":"G"
     },
-    "attributeDefs":[
-      {
-        "s":3,
-        "v":{
-          "name":"body",
-          "type":"aura://Aura.Component[]",
-          "xs":"G"
-        }
-      }
-    ],
-    "componentClass":"function(){$A.componentService.addComponentClass(\"markup://aura:test\",function() {\nvar aura$test = {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\nreturn aura$test;\n});\n}"
-  }
+    {
+      "name":"slot",
+      "type":"aura://String",
+      "xs":"G"
+    }
+  ],
+  "componentClass":"function(){$A.componentService.addComponentClass(\"markup://aura:test\",function() {\nvar aura$test = {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\nreturn aura$test;\n});\n}"
 }

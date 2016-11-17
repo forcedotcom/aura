@@ -53,5 +53,6 @@
     <aura:clientLibrary name="CkEditor" type="JS" />
 
     <aura:attribute name="body" type="Aura.Component[]" access="GLOBAL" description="The body of the component. In markup, this is everything in the body of the tag."/>
+    <aura:attribute name="slot" type="string" access="GLOBAL" description="The slot attribute represents the slot name of a slot to where this component is assigned."/>
 
 </aura:component>

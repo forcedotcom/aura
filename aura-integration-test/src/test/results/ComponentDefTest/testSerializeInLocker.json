@@ -1,23 +1,19 @@
 {
-  "s":1,
-  "v":{
-    "descriptor":"markup://nonInternal:component",
-    "superDef":{
-      "s":2,
-      "v":{
-        "descriptor":"markup://aura:component"
-      }
+  "descriptor":"markup://nonInternal:component",
+  "superDef":{
+    "descriptor":"markup://aura:component"
+  },
+  "attributeDefs":[
+    {
+      "name":"body",
+      "type":"aura://Aura.Component[]",
+      "xs":"G"
     },
-    "attributeDefs":[
-      {
-        "s":3,
-        "v":{
-          "name":"body",
-          "type":"aura://Aura.Component[]",
-          "xs":"G"
-        }
-      }
-    ],
-    "componentClass":"function(){$A.componentService.addComponentClass(\"markup://nonInternal:component\",function() {\n  var def = $A.componentService.getDef(\"markup://nonInternal:component\");  var locker = $A.lockerService.createForDef(\n\"var nonInternal$component = {\\n  \\\"meta\\\":{\\n    \\\"name\\\":\\\"nonInternal$component\\\",\\n    \\\"extends\\\":\\\"markup://aura:component\\\"\\n  }\\n};\\nreturn nonInternal$component;\\n\", def);\n  return locker.$result;\n});\n}"
-  }
+    {
+      "name":"slot",
+      "type":"aura://String",
+      "xs":"G"
+    }
+  ],
+  "componentClass":"function(){$A.componentService.addComponentClass(\"markup://nonInternal:component\",function() {\n  var def = $A.componentService.getDef(\"markup://nonInternal:component\");  var locker = $A.lockerService.createForDef(\n\"var nonInternal$component = {\\n  \\\"meta\\\":{\\n    \\\"name\\\":\\\"nonInternal$component\\\",\\n    \\\"extends\\\":\\\"markup://aura:component\\\"\\n  }\\n};\\nreturn nonInternal$component;\\n\", def);\n  return locker.$result;\n});\n}"
 }

@@ -19,6 +19,7 @@ Function.RegisterNamespace("Test.Aura.Locker");
 Test.Aura.Locker.SecureObjectTest = function() {
 
     Function.RegisterNamespace("Aura.Locker");
+    
     [Import("aura-impl/src/main/resources/aura/locker/SecureObject.js")]
 
     var mockGlobals = Mocks.GetMocks(Object.Global(), {
@@ -38,6 +39,7 @@ Test.Aura.Locker.SecureObjectTest = function() {
 
     // remove globals
     delete SecureObject;
+    delete getSupportedInterfaces;
 
     [Fixture]
     function unfilterEverything() {

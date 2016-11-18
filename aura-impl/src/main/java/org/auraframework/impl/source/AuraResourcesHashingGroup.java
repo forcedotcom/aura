@@ -43,7 +43,7 @@ public class AuraResourcesHashingGroup extends HashingGroup implements SourceLis
     public static final FileFilter FILE_FILTER = new FileFilter() {
         @Override
         public boolean accept(File f) {
-            return f.getName().endsWith(".css") || f.getName().endsWith(".js");
+            return f.getName().endsWith(".css") || f.getName().endsWith(".js") ||  f.getName().endsWith(".html");
         }
     };
 

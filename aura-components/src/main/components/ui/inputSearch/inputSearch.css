@@ -23,7 +23,7 @@
     line-height: normal;
 }
 
-.THIS::-webkit-search-cancel-button {
+.THIS input::-webkit-search-cancel-button {
    /* Remove default */    
     -webkit-appearance: none;
     appearance: none;

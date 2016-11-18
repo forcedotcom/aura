@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-SecureIFrameElement = {
+var SecureIFrameElement = {
 	addMethodsAndProperties: function(prototype) {
 	    "use strict";
 

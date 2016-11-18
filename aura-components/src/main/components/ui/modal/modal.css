@@ -24,68 +24,73 @@
 }
 
 /* ===== ANIMATION AND TRANSFORMS ======= */
+
 .THIS .transitioning {
     transition: transform .3s linear, opacity .2s linear;
 }
 
-.THIS .panel.movefrombottom {
-    visibility: visible;
-    animation: movefrombottom-modal .4s ease-in-out;
-}
-
-.THIS .panel.movetobottom {
-    visibility: visible;
-    animation: movetobottom-modal .4s ease-in-out;
-}
-
-.THIS .panel.movefromtop {
-    visibility: visible;
-    animation: movefromtop-modal .4s ease-in-out;
-}
-
-.THIS .panel.movetotop {
-    visibility: visible;
-    animation: movetotop-modal .4s ease-in-out;
-}
-
-.THIS .panel.movefromleft {
-    visibility: visible;
-    animation: movefromleft-modal .4s ease-in-out;
-}
-
-.THIS .panel.movetoleft{
-    visibility: visible;
-    animation: movetoleft-modal .4s ease-in-out;
-}
-
-.THIS .panel.movefromright {
-    visibility: visible;
-    animation: movefromright-modal .4s ease-in-out;
-}
-
-.THIS .panel.movetoright {
-    visibility: visible;
-    animation: movetoright-modal .4s ease-in-out;
-}
-
-.THIS .panel.movefromcenter {
-    visibility: visible;
-    animation: movefromcenter .4s ease-in-out;
-}
-
-.THIS .panel.movetocenter {
-    visibility: visible;
-    animation: movetocenter .4s ease-in-out;
-}
-
-.THIS .panel.movefrompop {
-    visibility: visible;
-    animation: movefrompop-modal .2s linear;
-}
-
+.THIS .panel.movefrombottom,
+.THIS .panel.movetobottom
+.THIS .panel.movefromtop,
+.THIS .panel.movetotop,
+.THIS .panel.movefromleft,
+.THIS .panel.movetoleft,
+.THIS .panel.movefromright,
+.THIS .panel.movetoright,
+.THIS .panel.movefromcenter,
+.THIS .panel.movetocenter,
+.THIS .panel.movefrompop,
 .THIS .panel.movetopop {
     visibility: visible;
-    animation: movetopop-modal .2s ease-in-out;
+}
+@if (!ie11) {
+    .THIS .panel.movefrombottom {
+        animation: movefrombottom-modal .4s ease-in-out;
+    }
+
+    .THIS .panel.movetobottom {
+        animation: movetobottom-modal .4s ease-in-out;
+    }
+
+    .THIS .panel.movefromtop {
+        animation: movefromtop-modal .4s ease-in-out;
+    }
+
+    .THIS .panel.movetotop {
+        animation: movetotop-modal .4s ease-in-out;
+    }
+
+    .THIS .panel.movefromleft {
+        animation: movefromleft-modal .4s ease-in-out;
+    }
+
+    .THIS .panel.movetoleft{
+        animation: movetoleft-modal .4s ease-in-out;
+    }
+
+    .THIS .panel.movefromright {
+        animation: movefromright-modal .4s ease-in-out;
+    }
+
+    .THIS .panel.movetoright {
+        animation: movetoright-modal .4s ease-in-out;
+    }
+
+    .THIS .panel.movefromcenter {
+        animation: movefromcenter .4s ease-in-out;
+    }
+
+    .THIS .panel.movetocenter {
+        animation: movetocenter .4s ease-in-out;
+    }
+
+    .THIS .panel.movefrompop {
+        animation: movefrompop-modal .2s linear;
+    }
+
+    .THIS .panel.movetopop {
+        animation: movetopop-modal .2s ease-in-out;
+    }
 }
 
 /* ANIMATIONS */

@@ -822,15 +822,18 @@ Aura.Services.MetricsService.prototype.registerBeacon = function (beacon) {
 */
 Aura.Services.MetricsService.prototype.summarizeResourcePerfInfo = function (r) {
     return {
-        "name"         : r.name,
-        "duration"     : parseInt(r.responseEnd - r.startTime, 10),
-        "startTime"    : parseInt(r.startTime, 10),
-        "fetchStart"   : parseInt(r.fetchStart, 10),
-        "requestStart" : parseInt(r.requestStart, 10),
-        "dns"          : parseInt(r.domainLookupEnd - r.domainLookupStart, 10),
-        "tcp"          : parseInt(r.connectEnd - r.connectStart, 10),
-        "ttfb"         : parseInt(r.responseStart - r.startTime, 10),
-        "transfer"     : parseInt(r.responseEnd - r.responseStart, 10)
+        "name"            : r.name,
+        "duration"        : parseInt(r.responseEnd - r.startTime, 10),
+        "startTime"       : parseInt(r.startTime, 10),
+        "fetchStart"      : parseInt(r.fetchStart, 10),
+        "requestStart"    : parseInt(r.requestStart, 10),
+        "dns"             : parseInt(r.domainLookupEnd - r.domainLookupStart, 10),
+        "tcp"             : parseInt(r.connectEnd - r.connectStart, 10),
+        "ttfb"            : parseInt(r.responseStart - r.startTime, 10),
+        "transfer"        : parseInt(r.responseEnd - r.responseStart, 10),
+        "transferSize"    : r.transferSize || 0,
+        "encodedBodySize" : r.encodedBodySize || 0,
+        "decodedBodySize" : r.decodedBodySize || 0
     };
 };
 

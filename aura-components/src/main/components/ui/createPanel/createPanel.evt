@@ -23,7 +23,7 @@
     <aura:attribute name="closeOnLocationChange"      type="Boolean" description="Set to false if the panel shouldn't be closed when the browser's location changes"/>
 
     <aura:attribute name="onInit"                     type="Object"  description="The callback before a panel is created"/>
-    <aura:attribute name="onCreate"                   type="Object"  description="The callback after a panel is created"/>
+    <aura:attribute name="onCreate"                   type="Object"  description="The callback after a panel is created" access="PRIVILEGED"/>
     <aura:attribute name="onDestroy"                  type="Object"  description="The callback after a panel is destroyed"/>
     <aura:attribute name="onBeforeShow"               type="Object"  description="The callback before a panel is displayed"/>
     <aura:attribute name="onAfterShow"                type="Object"  description="The callback after a panel is displayed"/>

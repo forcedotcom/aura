@@ -21,10 +21,10 @@
     <aura:import library="ui:panelLib" property="lib"/>
 
     <aura:attribute name="devNameOrId" type="String" description="Id or alias for the modal" />
-    <aura:attribute name="title" type="String" description="The title of the dialog window" />
+    <aura:attribute name="title" type="String" access="PRIVILEGED" description="The title of the dialog window" />
     <aura:attribute name="titleDisplay" type="Boolean" default="true" description="The title of the window can be shown/hidden for accessibility" />
     <aura:attribute name="class" type="String" description="CSS class" />
-    <aura:attribute name="modalClass" type="String" default="" description="additional CSS class for the panel" />
+    <aura:attribute name="modalClass" type="String" default="" access="PRIVILEGED" description="additional CSS class for the panel" />
     <aura:attribute name="headerClass" type="String" default="" description="additional CSS class for the header" />
     <aura:attribute name="bodyClass" type="String" description="additional CSS class for the body" />    
     <aura:attribute name="footerClass" type="String" default="" description="additional CSS class for the footer" />

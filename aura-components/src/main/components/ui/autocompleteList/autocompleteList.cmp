@@ -24,15 +24,15 @@
     <aura:attribute name="propertyToMatch" type="String" default="label" description="The property name in the data object which is used to match typing in the input field."/>
     <aura:attribute name="theme" type="String" default="default" description="Theme to apply to this component."/>
     <aura:attribute name="matchFunc" type="Aura.Action" description="Overrides default list item update behavior to allow custom text matching."/>
-    <aura:attribute name="footerSelected" type="boolean" default="false"/>
-    <aura:attribute name="headerSelected" type="boolean" default="false"/>
+    <aura:attribute name="footerSelected" type="boolean" default="false" description="Specifies whether the footer is selected. The default is false."/>
+    <aura:attribute name="headerSelected" type="boolean" default="false" description="Specifies whether the header is selected. The default is false."/>
     <aura:attribute name="listHeader" type="Aura.Component[]" description="A facet above the rendered list, for use as a list header"/>
     <aura:attribute name="listFooter" type="Aura.Component[]" description="A facet below the rendered list, for use as a list footer"/>
-    <aura:attribute name="showListHeader" type="Boolean" default="true" description="When true the listHeader will be visible"/>
-    <aura:attribute name="showListFooter" type="Boolean" default="true" description="When true the listFooter will be visible"/>
-    <aura:attribute name="setDefaultHighlight" type="boolean" default="true" description="Indicate if the first option item should be highlighted by default."/>
+    <aura:attribute name="showListHeader" type="Boolean" default="true" description="Specifies whether the list header is visible. The default is true."/>
+    <aura:attribute name="showListFooter" type="Boolean" default="true" description="Specifies whether the list footer is visible. The default is true."/>
+    <aura:attribute name="setDefaultHighlight" type="boolean" default="true" description="Specifies whether the first option item should be highlighted by default. The default is true."/>
     <aura:attribute name="listReferenceComponent" type="Aura.Component[]" description="Sets the component that the list is displayed under"/>
-    <aura:attribute name="loadingIndicatorDelay" type="Integer" default="300" description="Amount of time (ms) to delay before displaying the loading indicator when fetching data."/>
+    <aura:attribute name="loadingIndicatorDelay" type="Integer" default="300" description="Amount of time (ms) to delay before displaying the loading indicator when fetching data. The default is 300ms."/>
 
     <aura:registerEvent name="matchDone" type="ui:matchDone" description="The event fired when the matching is done."/>
     <aura:registerEvent name="selectListOption" type="ui:selectListOption" description="The event fired when a list option is selected."/>

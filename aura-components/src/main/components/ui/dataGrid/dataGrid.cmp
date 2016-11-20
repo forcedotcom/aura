@@ -16,11 +16,11 @@
 
 -->
 <aura:component extensible="true" extends="ui:abstractDataGrid" support="PROTO" description="Represents a table containing dynamic rows of data with inline edit support">
-	<aura:attribute name="summary" type="String"/>
+	<aura:attribute name="summary" type="String" description="The summary of the content of a table that's accessible to screen readers"/>
 	<aura:attribute name="useRowHeaders" type="Boolean" default="false" description="Makes the first column of each row a header cell"/>
 	<aura:attribute name="devNameOrId" type="String" description="Id or alias for the virtual list" />
 
-	<aura:registerevent name="updateRowAttributes" type="ui:updateGridRow"/>
+	<aura:registerevent name="updateRowAttributes" type="ui:updateGridRow" description="The event fired when the attributes on a dataGrid row is updated."/>
 
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 	<aura:handler name="updateRowAttributes" action="{!c.handleUpdateRowAttrs}"/>

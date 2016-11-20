@@ -18,22 +18,22 @@
 <aura:component access="PRIVILEGED" implements="ui:visible" support="PROTO" description="A column of data in ui:dataGrid">
 	<aura:attribute name="name" type="String" access="PRIVILEGED" description="Api name or field name on item. Can use dot notation."/>
 	<aura:attribute name="label" type="String" access="PRIVILEGED" description="The text label displayed in column header."/>
-	<aura:attribute name="hideLabel" type="Boolean" description="Whether to hide the label. A hidden label will be moved into an assistiveText span"/>
+	<aura:attribute name="hideLabel" type="Boolean" description="Specifies whether to hide the label. A hidden label will be moved into an assistiveText span."/>
 	<aura:attribute name="title" type="String" description="The title attribute on the TH element"/>
 	<aura:attribute name="type" type="String" description="Data type."/>
-	<aura:attribute name="sortable" type="Boolean" access="PRIVILEGED"/>
-	<aura:attribute name="disabled" type="Boolean" default="false" description="Sets whether the column header's interactions should be disabled"/>
+	<aura:attribute name="sortable" type="Boolean" access="PRIVILEGED" description="Specifies whether the column is sortable and displays a toggle link."/>
+	<aura:attribute name="disabled" type="Boolean" default="false" description="Specifies whether the column header's interactions should be disabled."/>
 	<aura:attribute name="required" type="Boolean" default="false" description="Required field in current layout."/>
-	<aura:attribute name="direction" type="String" access="PRIVILEGED" description="{ '', ascending, descending }"/>
-	<aura:attribute name="initialDirectionOnSort" type="String" default="descending" description="The initial sort direction when user clicks on the column header: {ascending, descending}"/>
-	<aura:attribute name="ascLabel" type="String" default="Sorted Ascending" description="Accessibility label to use when column is ascending"/>
-	<aura:attribute name="descLabel" type="String" default="Sorted Descending" description="Accessibility label to use when column is descending"/>
+	<aura:attribute name="direction" type="String" access="PRIVILEGED" description="The direction to sort. Possible values include ascending and descending. An empty string is used when disabled is set to true."/>
+	<aura:attribute name="initialDirectionOnSort" type="String" default="descending" description="The initial sort direction when user clicks on the column header. Possible values include ascending and descending. The default is descending."/>
+	<aura:attribute name="ascLabel" type="String" default="Sorted Ascending" description="Accessibility label to use when column is ascending. The default is &quot;Sorted Ascending&quot;."/>
+	<aura:attribute name="descLabel" type="String" default="Sorted Descending" description="Accessibility label to use when column is descending. The default is &quot;Sorted Descending&quot;."/>
 	<aura:attribute name="order" type="Integer" default="0" description="The ordering of the sort (non-zero applies to multilevel sort only)."/>
-	<aura:attribute name="scope" type="String" default="col" description="{ col, row, colgroup, rowgroup }"/>
-    <aura:attribute name="onsortchange" type="Aura.Action"/>
+	<aura:attribute name="scope" type="String" default="col" description="Specifies whether a header cell is a header for a column, row, or group of columns or rows. Possible values include col, row, colgroup, rowgroup. The default is col."/>
+    <aura:attribute name="onsortchange" type="Aura.Action" description="The action to run when the column is sorted."/>
     <aura:attribute name="assistiveSortText" type="String" default="Sort" description="Accessibility label for sort trigger links"/>
 	
-	<aura:attribute name="width" type="Integer" default="-1" description="Fixed width of the column in pixels."/>
+	<aura:attribute name="width" type="Integer" default="-1" description="Fixed width of the column in pixels. The default is -1."/>
 	
 	<aura:attribute name="outputComponent" 
 					type="Aura.ComponentDefRef[]" 

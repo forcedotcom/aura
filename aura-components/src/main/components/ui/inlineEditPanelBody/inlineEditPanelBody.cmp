@@ -15,13 +15,13 @@
     limitations under the License.
 
 -->
-<aura:component>
-	<aura:attribute name="index" type="Integer"/>
-	<aura:attribute name="updateMap" type="Object"/>
-    <aura:attribute name="submitOn" type="String" default="keydown" description="Event to listen to for submitting the edited value"/>
-	<aura:attribute name="inputComponent" type="Aura.Component[]" />
+<aura:component description="A popover containing an editable input field">
+	<aura:attribute name="index" type="Integer" description="Index of the row"/>
+	<aura:attribute name="updateMap" type="Object" description="A map of field names. Preserves the dot notation on the name."/>
+    <aura:attribute name="submitOn" type="String" default="keydown" description="Event to listen to for submitting the edited value. The default is keydown."/>
+	<aura:attribute name="inputComponent" type="Aura.Component[]" description="The input component to be edited."/>
 
-	<aura:registerevent name="submit" type="ui:gridAction" />
+	<aura:registerevent name="submit" type="ui:gridAction" description="The event fired when a change is submitted on the edit panel."/>
 	
     <aura:method name="submitValues">
 		<aura:attribute name="closeBehavior" type="String"/>

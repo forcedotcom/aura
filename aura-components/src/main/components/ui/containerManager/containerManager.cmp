@@ -19,7 +19,7 @@
     <aura:import library="ui:containerManagerLib" property="lib" />
     <aura:import library="ui:stackManagerLib" property="smLib" />
 
-    <aura:attribute name="registeredContainers" type="Aura.ComponentDefRef[]" />
+    <aura:attribute name="registeredContainers" type="Aura.ComponentDefRef[]" description="Definitions of registered containers" />
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
     <div aura:id="container" class="{!$Browser.formFactor}"/>

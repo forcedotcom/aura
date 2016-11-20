@@ -17,9 +17,9 @@
 -->
 <aura:component defaultFlavor="lookup" description="A list of results for the ui:autocomplete component that uses the panel positioning library." >
     <aura:import library="ui:panelPositioningLib" property="lib" />
-    <aura:attribute name="referenceElement" type="Object"/>
-    <aura:attribute name="visible" type="boolean" default="false" access="INTERNAL"/>
-    <aura:attribute name="zIndex" type="Integer" default="0"/>
+    <aura:attribute name="referenceElement" type="Object" description="The reference element that's attached to the panel containing the list of results."/>
+    <aura:attribute name="visible" type="boolean" default="false" access="INTERNAL" description="Specifies whether the panel is visible. The default is false."/>
+    <aura:attribute name="zIndex" type="Integer" default="0" description="The z-index for the panel. The default is 0."/>
     
     <aura:handler name="change" value="{!v.referenceElement}" action="{!c.handleReferenceElement}"/>
     <aura:handler name="change" value="{!v.zIndex}" action="{!c.handleZIndex}"/>

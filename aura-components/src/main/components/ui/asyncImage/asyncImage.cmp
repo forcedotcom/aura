@@ -20,7 +20,7 @@
                 description="Encapsulates asynchronously loading of an image."
                 support="BETA">
     <aura:attribute name="actualImageSrc" type="String" description="Actual image src attribute of the image"/>
-    <aura:registerEvent name="load" type="ui:load"/>
+    <aura:registerEvent name="load" type="ui:load" description="Event fired when the image is being loaded."/>
     <aura:handler name="load" action="{!c.load}"/>
     
     <aura:dependency resource="markup://ui:asyncComponentLoaded" type="EVENT"/>

@@ -16,12 +16,12 @@
 
 -->
 <aura:component access="PRIVILEGED" extensible="true" support="PROTO" description="A column of actionable buttons or links in ui:dataGrid">
-	<aura:attribute name="name" access="PRIVILEGED" type="String"/>
-	<aura:attribute name="label" access="PRIVILEGED" type="String"/>
-	<aura:attribute name="assistiveLabel" type="String" default="Actions" description="Hidden assistive text for the header."/>
-	<aura:attribute name="class" access="PRIVILEGED" type="String"/>
-	<aura:attribute name="scope" type="String" default="col" description="{ col, row, colgroup, rowgroup }"/>
-	<aura:attribute name="header" access="PRIVILEGED" type="Aura.Component[]"/>
+	<aura:attribute name="name" access="PRIVILEGED" type="String" description="Api name or field name on item."/>
+	<aura:attribute name="label" access="PRIVILEGED" type="String" description="A text label displayed in the column header."/>
+	<aura:attribute name="assistiveLabel" type="String" default="Actions" description="Hidden assistive text for the column header."/>
+	<aura:attribute name="class" access="PRIVILEGED" type="String" description="The CSS class for the header."/>
+	<aura:attribute name="scope" type="String" default="col" description="Specifies whether a header cell is a header for a column, row, or group of columns or rows. Possible values include col, row, colgroup, rowgroup. The default is col."/>
+	<aura:attribute name="header" access="PRIVILEGED" type="Aura.Component[]" description="Components for the header."/>
 	<aura:attribute name="outputComponent" access="PRIVILEGED" type="Aura.ComponentDefRef[]"/>
 	<aura:attribute name="body" type="Aura.ComponentDefRef[]"/>
 	<aura:attribute name="disabled" type="Boolean"/>

@@ -23,10 +23,10 @@
     <aura:attribute name="placeholder" access="PRIVILEGED" type="String" default="" description="Text that is displayed when the input field is empty, to prompt the user for a valid entry."/>
     <aura:attribute name="theme" type="String" default="default" description="Theme to apply to this component."/>
     <aura:attribute name="autocompleteButton" type="Aura.Component[]" description="Optional button to render with this component."/>
-    <aura:attribute name="usePanel" type="boolean" default="false"/>
+    <aura:attribute name="usePanel" type="boolean" default="false" description="Specifies whether to use ui:autocompletePanel as a wrapper for the list of options. The default is false."/>
     <aura:attribute name="maxlength" type="Integer" description="The maximum number of characters allowed in the inputTextForAutocomplete"/>
     <aura:attribute name="inputTitle" type="String" description="The title/tooltip for the input component."/>
-    <aura:attribute name="selectOnTab" type="boolean"  default="true" description="Indicates whether pressing the tab key will select the highlighted list item."/>
+    <aura:attribute name="selectOnTab" type="boolean"  default="true" description="Indicates whether pressing the tab key will select the highlighted list item. The default is true."/>
 
     <!-- START - the following attributes are only used when using the default list -->
     <aura:attribute name="dataProvider" access="PRIVILEGED" type="Aura.Component[]" description="A list of data provider components"/>

@@ -22,22 +22,22 @@
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     
     <aura:attribute name="height"               type="Integer"                                    description="Height of the carousel"/>
-    <aura:attribute name="swipeEnabled"         type="Boolean" default="true"                     description="Enable swipe"/>
+    <aura:attribute name="swipeEnabled"         type="Boolean" default="true"                     description="Specifies whether swiping is enabled. The default is true."/>
     <aura:attribute name="width"                type="Integer"                                    description="Width of the carousel"/>
     <aura:attribute name="pageModels"           type="Object[]"                                   description="Array of metadata component definitions to load"/>
     <aura:attribute name="pageComponents"       type="Aura.Component[]"                           description="Array of Components to inject"/>
     <aura:attribute name="prefetchedTab"        type="Aura.Component[]"                           description="If prefetchFirstTab is enabled, the provider will set the component in this parameter" />
-    <aura:attribute name="isDotIndicator"       type="Boolean"          default="false"           description="Set true to use a dot indicator rather than text"/>
-    <aura:attribute name="initialPage"          type="String"           default="0"               description="Initial page to display. Can be overriden by the pageModels metadata" />
-    <aura:attribute name="prefetchFirstTab"     type="Boolean"          default="false"           description="If pageModels defined, makes the provider fetch the first page within the same request" />
-    <aura:attribute name="lazyLoadTabs"         type="Boolean"          default="true"            description="Load the remaining tabs as soon as possible. If set to false it will load them once you swipe" />
-    <aura:attribute name="indicatorStateClass"  type="String"           default="indicator-state" description="Class name to identify the location for the indicator bar"/>
+    <aura:attribute name="isDotIndicator"       type="Boolean"          default="false"           description="Specifies whether to use a dot indicator instead of text. The default is false."/>
+    <aura:attribute name="initialPage"          type="String"           default="0"               description="Initial page to display. Can be overriden by the pageModels metadata. The default is 0." />
+    <aura:attribute name="prefetchFirstTab"     type="Boolean"          default="false"           description="If pageModels defined, makes the provider fetch the first page within the same request. The default is false." />
+    <aura:attribute name="lazyLoadTabs"         type="Boolean"          default="true"            description="Load the remaining tabs as soon as possible. If set to false, they are loaded once you swipe. The default is true." />
+    <aura:attribute name="indicatorStateClass"  type="String"           default="indicator-state" description="Class name to identify the location for the indicator bar. The default is indicator-state."/>
     <aura:attribute name="pageScrollerPlugins"  type="String"           default=""                description="Additional plugins to be included in each carousel page" />
-    <aura:attribute name="justifyContent"       type="String"           default="stretch"         description="Which horizontal justification to use for the page indicators. values: 'stretch' | 'leftGrowRight'"/>
+    <aura:attribute name="justifyContent"       type="String"           default="stretch"         description="Which horizontal justification to use for the page indicators. Possible values include 'stretch' | 'leftGrowRight'"/>
     <aura:attribute name="prefetchedTabIndex"   type="Integer"                                    description="If prefetchFirstTab is enabled, the provider will set this to the index of the prefetched tab" />
-    <aura:attribute name="suppressIndicators"   type="String"           default="false"           description="If true, will cause no indicator to render." />
-    <aura:attribute name="isScrollable"         type="Boolean"          default="true"            description="If true, will cause the individual pages to scroll" />
-    <aura:attribute name="bindEventsToScroller" type="Boolean"          default="true" />
+    <aura:attribute name="suppressIndicators"   type="String"           default="false"           description="Specifies whether to render indicators. The default is false." />
+    <aura:attribute name="isScrollable"         type="Boolean"          default="true"            description="Specifies whether individual pages are scrollable. The default is true." />
+    <aura:attribute name="bindEventsToScroller" type="Boolean"          default="true"            description="Specifies whether to bind mouse or touch events to the scroller DOM container. If set to false, events are attached to the window object. The default is true."/>
     
     <aura:attribute name="pageIndicatorComponent" type="Aura.Component[]" description="Component to display the tabBar. Needs to implement carouselIndicator interface">
         <ui:carouselIndicator/>

@@ -122,7 +122,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
             throw new DefinitionNotFoundException(descriptor);
         }
         if (def.isAbstract() && def.getProviderDescriptor() == null) {
-            throw new InvalidDefinitionException("Cannot directly instantiate "+descriptor, location);
+            throw new InvalidDefinitionException(descriptor+" cannot be instantiated directly.", location);
         }
 
         if (flavor != null) {

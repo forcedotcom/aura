@@ -194,17 +194,14 @@ BaseComponent<D, I> {
 
         if (def == null) {
             def = definitionService.getDefinition(descriptor);
-            if (extender == null && def.isAbstract() && def.getProviderDescriptor() == null) {
-                throw new InvalidDefinitionException(String.format("%s cannot be instantiated directly.",
-                        descriptor), def.getLocation());
-            }
-            if (extender == null && (def.isAbstract() || def.getLocalProviderDef() != null)) {
-                this.intfDescriptor = def.getDescriptor();
-            }
-
-            desc = descriptor;
-        } else {
-            desc = descriptor;
+        }
+        desc = descriptor;
+        if (extender == null && def.isAbstract() && def.getProviderDescriptor() == null) {
+            throw new InvalidDefinitionException(String.format("%s cannot be instantiated directly.",
+                    descriptor), def.getLocation());
+        }
+        if (extender == null && (def.isAbstract() || def.getLocalProviderDef() != null)) {
+            this.intfDescriptor = def.getDescriptor();
         }
 
         if (accessParent != null) {

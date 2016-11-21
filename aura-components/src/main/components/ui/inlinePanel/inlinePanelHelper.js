@@ -41,14 +41,14 @@
             conf = {closeOnClickOut: true};
             closeAction = function(panelCmp, action) {
                 if (panelCmp.get('v.closeOnClickOut')) {
-                    var callback = panelCmp.get("v.closeAction")
+                    var callback = panelCmp.get("v.closeAction");
                     if ($A.util.isFunction(callback)) {
                         callback(panelCmp, action);
                     } else {
                         panelCmp.getConcreteComponent().close();
                     }
                 }
-            }
+            };
         }
         
         if(!cmp[handleName]) {

@@ -241,7 +241,10 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 config.onFinish && config.onFinish();
             });
 
-            panel.setAttribute("aria-hidden", 'false');
+            if (!$A.util.isUndefinedOrNull(panel)) {
+                panel.setAttribute("aria-hidden", 'false');
+            }
+
             if (useTransition) {
                 animEl.addEventListener(animEnd, finishHandler, false);
 
@@ -315,7 +318,10 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 
             });
 
-            panel.setAttribute("aria-hidden", 'true');
+            if (!$A.util.isUndefinedOrNull(panel)) {
+                panel.setAttribute("aria-hidden", 'true');
+            }
+
             if (useTransition) {
                 animEl.addEventListener(animEnd, finishHandler, false);
                 $A.util.addClass(animEl,  'transitioning ' + animName);

@@ -81,7 +81,11 @@
 
     <table aura:id="table" class="{! 'slds-table ' + v.class + ( v.fixedHeader ? ' fixedHeader' : '') + (v.enableResizableColumns ? ' resizable-cols' : '')}" aura:flavorable="true">
         <thead aura:id="thead">
-            <tr aura:id="headerRow" class="slds-text-title--caps">{!v.headerColumns}</tr>
+            <tr aura:id="headerRow" class="slds-text-title--caps">
+                <aura:iteration items="{!v.headerColumns}" var="headerColumn">
+                    {!headerColumn}
+                </aura:iteration>
+            </tr>
         </thead>
         <tfoot aura:id="tfoot"></tfoot>
         <tbody aura:id="tbody"></tbody>

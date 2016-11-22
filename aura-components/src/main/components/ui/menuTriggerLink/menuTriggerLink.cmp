@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" extensible="true" extends="ui:popupTrigger" description="A link that triggers a dropdown menu.">
+<aura:component access="GLOBAL" support="GA" extensible="true" extends="ui:popupTrigger" description="A link that triggers a dropdown menu used in ui:menu">
     
     <aura:attribute name="ariaLabel" type="String"/>
 

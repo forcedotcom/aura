@@ -32,7 +32,11 @@ function SecureDocument(doc, key) {
         return o;
     }
 
-    o = Object.create(null, {
+    // create prototype to allow instanceof checks against document
+    var prototype = function() {};
+    Object.freeze(prototype);
+
+    o = Object.create(prototype, {
         toString: {
             value: function() {
                 return "SecureDocument: " + doc + "{ key: " + JSON.stringify(key) + " }";

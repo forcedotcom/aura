@@ -140,5 +140,10 @@
         var documentElement = document.documentElement;
         testUtils.assertStartsWith("SecureElement", documentElement.toString(), "Unexpected object type from document.documentElement");
         testUtils.assertTrue(documentElement.clientHeight > 0, "Expected non-zero value for documentElement.clientHeight");
+    },
+
+    testDocumentConstructorPassesInstanceOf: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertTrue(document instanceof document.constructor, "document instanceof document.constructor should be true");
     }
 })

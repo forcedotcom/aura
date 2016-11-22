@@ -121,5 +121,11 @@
         test: function(cmp) {
             cmp.testDocumentElementHasNonZeroPropertyValues();
         }
+    },
+
+    testDocumentConstructorPassesInstanceOf: {
+        test: function(cmp) {
+            cmp.testDocumentConstructorPassesInstanceOf();
+        }
     }
 })

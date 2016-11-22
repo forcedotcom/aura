@@ -1411,6 +1411,11 @@ function lib(w) { //eslint-disable-line no-unused-vars
          * @protected
          */
         _resetPositionIfOutOfBound: function (time) {
+            if ((this.opts.pullToRefresh && this.isTriggeredPTR()) ||
+                    (this.opts.pullToLoadMore && this.isTriggeredPTL())) {
+                return false;
+            }
+
             time || (time = 0);
 
             var x = this.x,

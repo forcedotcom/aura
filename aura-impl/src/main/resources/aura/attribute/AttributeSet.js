@@ -504,13 +504,7 @@ AttributeSet.prototype.initialize = function(attributes) {
 			value = this.getDefault(name);
 			hasValue = value !== undefined;
 		}
-
-        if (attributeDef.isRequired && attributeDef.isRequired()) {
-            if (!hasValue) {
-//                throw new Error("Missing required attribute " + name);
-            }
-        }
-
+        
 		if ((hasValue && this.values[name]!==value) || !hasAttribute) {
             if(hasAttribute && value instanceof FunctionCallValue) {
                 if (!this.decorators[name]) {
@@ -524,16 +518,6 @@ AttributeSet.prototype.initialize = function(attributes) {
             }
 		}
 	}
-
-    // Guard against unknown attributes
-    var unknownAttributes=[];
-    for(var attribute in configValues){
-        if(!this.hasAttribute(attribute)){
-            unknownAttributes.push(attribute);
-        }
-    }
-
-    $A.assert(unknownAttributes.length===0,"AttributeSet.initialize: The following unknown attributes could not be initialized: '"+unknownAttributes.join("', '")+"'. Please confirm the spelling and definition of these attributes.");
 };
 
 Aura.Attribute.AttributeSet = AttributeSet;

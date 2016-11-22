@@ -23,9 +23,9 @@
 			To display a URL, you can use an attribute value and bind it to the <code>ui:outputURL</code> component.
 		</p>
 		<pre>&lt;aura:attribute name="myURL" type="String" default="http://www.google.com"/>
-&lt;ui:outputURL value="{!v.myURL}" label="{!v.myURL}"/></pre>
+&lt;ui:outputURL value="{!v.myURL}" label="Search"/></pre>
 		<p>The previous example renders the following HTML.</p>
-		<pre>&lt;a href="http://www.google.com" dir="ltr" class="uiOutputURL">http://www.google.com&lt;/a></pre>
+		<pre>&lt;a href="http://www.google.com" class="uiOutputURL">Search&lt;/a></pre>
 		
 	</aura:description>	
 		<aura:example name="url" ref="uiExamples:url" label="Using ui:outputURL">

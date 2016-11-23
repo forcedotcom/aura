@@ -39,6 +39,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefFactoryImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.service.CachingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -54,7 +55,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -870,27 +870,50 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     @Test
     public void testDependencyCaching() throws Exception {
         // problem was that compileDE was not adding the DE to depsCache when the definition was alredy in defsCache
-        
+    	
         DefinitionServiceImpl definitionServiceImpl = (DefinitionServiceImpl)definitionService;
+        
         contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, laxSecurityApp);
         DefDescriptor<?> descriptor = definitionService.getDefDescriptor("markup://ui:button", ComponentDef.class);
-        Cache<String, DependencyEntry> depsCache = definitionServiceImpl.getCachingService().getDepsCache();
+        
+        CachingService cachingService = definitionServiceImpl.getCachingService();
+        Cache<String, DependencyEntry> depsCache = cachingService.getDepsCache();
         
         // first call to perform side effect of adding definition to defsCache
-        String uid = definitionService.getUid(null, descriptor);
-        String key = definitionServiceImpl.makeGlobalKey(uid, descriptor);
-        assertNotNull("DE should have been in depsCache", depsCache.getIfPresent(key));
+        String uid = definitionServiceImpl.getUid(null, descriptor);
+        Boolean foundit = false;
+        for(String key : depsCache.getKeySet()) {
+        	if(key.contains("markup://ui:button")) {
+        		DependencyEntry value = depsCache.getIfPresent(key);
+        		foundit = true;
+        	}
+        }
+        assertTrue("markup://ui:button should have been added to depsCache", foundit);
         
         // remove DE from depsCache
         depsCache.invalidateAll();
-        assertNull("DE shouldn't be in depsCache", depsCache.getIfPresent(key));
+        foundit = false;
+        for(String key : depsCache.getKeySet()) {
+        	if(key.contains("markup://ui:button")) {
+        		DependencyEntry value = depsCache.getIfPresent(key);
+        		foundit = true;
+        	}
+        }
+        assertFalse("markup://ui:button should not be in depsCache", foundit);
         
         // start new context to make sure DE is not found in "context.getLocalDependencyEntry()"
         contextService.endContext();
         contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, laxSecurityApp);
         // perform another getUid()->compileDE() and verify DE is put in depsCache even though definition is already in defsCache
         definitionService.getUid(uid, descriptor);
-        assertNotNull("DE should be back in depsCache", depsCache.getIfPresent(key));
+        foundit = false;
+        for(String key : depsCache.getKeySet()) {
+        	if(key.contains("markup://ui:button")) {
+        		DependencyEntry value = depsCache.getIfPresent(key);
+        		foundit = true;
+        	}
+        }
+        assertTrue("markup://ui:button should have been added to depsCache again", foundit);
     }
 
     public static class AuraTestRegistryProviderWithNulls extends AbstractRegistryAdapterImpl {

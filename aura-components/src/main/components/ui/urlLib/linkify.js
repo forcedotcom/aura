@@ -31,7 +31,7 @@ function lib() { //eslint-disable-line no-unused-vars
      * For more details on how this regex is constructed, refer to UrlUtil.java in core.
      */
     var linksMatchingRegex =
-        "((?:(?:https?|ftp)://[\\w\\-\\|=&%~#/+*@\\.,;:\\?!']{0,2047}(?:[\\w=/+#-]|\\([^\\s()]*\\)))|(?:\\b(?:[a-z0-9]" +
+        "((?:(?:https?|ftp)://(?:[\\w\\-\\|=%~#/+*@\\.,;:\\?!']|&(?!quot;|amp;|lt;|gt;|#39;)){0,2047}(?:[\\w=/+#-]|\\([^\\s()]*\\)))|(?:\\b(?:[a-z0-9]" +
         "(?:[-a-z0-9]{0,62}[a-z0-9])?\\.)+(?:AC|AD|AE|AERO|AF|AG|AI|AL|AM|AN|AO|AQ|AR|ARPA|AS|ASIA|AT|AU|AW|AX|AZ|BA|BB|" +
         "BD|BE|BF|BG|BH|BI|BIZ|BJ|BM|BN|BO|BR|BS|BT|BV|BW|BY|BZ|CA|CAT|CC|CD|CF|CG|CH|CI|CK|CL|CM|CN|CO|COM|COOP|CR|CU|" +
         "CV|CX|CY|CZ|DE|DJ|DK|DM|DO|DZ|EC|EDU|EE|EG|ER|ES|ET|EU|FI|FJ|FK|FM|FO|FR|GA|GB|GD|GE|GF|GG|GH|GI|GL|GM|GN|GOV|" +
@@ -72,7 +72,7 @@ function lib() { //eslint-disable-line no-unused-vars
         "<del[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/del>|<del[\\s]+[^>]+\/>|" +
         "<ins[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/ins>|<ins[\\s]+[^>]+\/>)";
 
-    var escapeCharacterMatchingRegex = "([<>&\"\'])";
+    var escapeCharacterMatchingRegex = "([<>\"\']|&(?!quot;|amp;|lt;|gt;|#39;))";
 
     var createHttpLink = function(match) {
         var href = match;

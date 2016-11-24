@@ -60,6 +60,28 @@
         }
     },
 
+    testUrlEndingWithQuotation:{
+        attributes:{value : '\"https://www.salesforce.com\" ....some literature about the company.'},
+        test:function(cmp){
+            var span = cmp.find('span');
+            //Make sure a span tag is used for outputTextArea. Failure might mean breaking styling of third party app
+            $A.test.assertEquals('SPAN', span.getElement().tagName, "OutputTextArea is expected to use a span tag to display value.");
+            this.assertTextNotPresent(cmp, "<span>Salesforce</span>");
+            this.assertLinksPresent(cmp, "href=\"https://www.salesforce.com\"");
+        }
+    },
+
+    testUrlEndingWithEscapedQuotation:{
+        attributes:{value : '&quot;https://www.salesforce.com&quot;&amp; ....some literature about the company.'},
+        test:function(cmp){
+            var span = cmp.find('span');
+            //Make sure a span tag is used for outputTextArea. Failure might mean breaking styling of third party app
+            $A.test.assertEquals('SPAN', span.getElement().tagName, "OutputTextArea is expected to use a span tag to display value.");
+            this.assertTextNotPresent(cmp, "<span>Salesforce</span>");
+            this.assertLinksPresent(cmp, "href=\"https://www.salesforce.com\"");
+        }
+    },
+
     assertLinksPresent: function(cmp, hrefText) {
         $A.test.addWaitForWithFailureMessage(true,
             function() {

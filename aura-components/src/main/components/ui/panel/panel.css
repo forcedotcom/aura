@@ -108,73 +108,28 @@
     transform : translate3d(0, 0, 0);
 }
 
-.THIS.movefrombottom,
-.THIS.movetobottom,
-.THIS.movefromtop
-.THIS.movetotop
-.THIS.movefromleft
-.THIS.movetoleft,
-.THIS.movefromright,
-.THIS.movetoright,
-.THIS.movefromcenter,
-.THIS.movetocenter,
-.THIS.movefrompop,
-.THIS.movetopop {
+/* That's a fix for safari/edge flicker which disable the opacity animation*/
+.THIS.movefrombottom {
     visibility: visible;
+    animation: movefrombottomnoopacity .1s ease-out backwards;
 }
-@if (!ie11) {
-    /* That's a fix for safari/edge flicker which disable the opacity animation*/
-    .THIS.movefrombottom {
-        animation: movefrombottomnoopacity .1s ease-out backwards;
-    }
-    .THIS.movetobottom {
-        animation: movefrombottom .2s ease-in both reverse;
-    }
-    .THIS.movefromtop {
-        animation: movefromtop .2s ease both;
-    }
-    .THIS.movetotop{
-        animation: movefromtop .2s ease both reverse;
-    }
-    .THIS.movefromleft {
-        animation: movefromleft .2s ease both;
-    }
-    .THIS.movetoleft{
-        animation: movefromleft .2s ease both reverse;
-    }
-    .THIS.movefromright {
-        animation: movefromright .2s ease both;
-    }
-    .THIS.movetoright {
-        animation: movefromright .2s ease both reverse;
-    }
-    .THIS.movefromcenter {
-        animation: movefromcenter .2s linear;
-    }
-    .THIS.movetocenter {
-        animation: movefromcenter .2s linear reverse;
-    }
-    .THIS.movefrompop {
-        animation: movefrompop .2s linear;
-    }
-    .THIS.movetopop {
-        animation: movefrompop .2s ease both reverse;
-    }
-}
-
     /* Enable opacity animation if it's Chrome*/
-@media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) {
-    .THIS.movefrombottom {
-        animation: movefrombottom .2s ease both;
+    @media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) {
+        .THIS.movefrombottom {
+            animation: movefrombottom .2s ease both;
+        }
     }
-}
     /* Enable opacity animation if it's Firefox*/
-@media all and (min--moz-device-pixel-ratio:0) and (min-width: 0px) { 
-    .THIS.movefrombottom {
-        animation: movefrombottom .2s ease both;
-    } 
-}
+    @media all and (min--moz-device-pixel-ratio:0) and (min-width: 0px) { 
+        .THIS.movefrombottom {
+            animation: movefrombottom .2s ease both;
+        } 
+    }
 
+.THIS.movetobottom {
+    visibility: visible;
+    animation: movefrombottom .2s ease-in both reverse;
+}
 @keyframes movefrombottomnoopacity {
     from {
         -webkit-transform:translate3d(0px, 16px , 0px);
@@ -200,6 +155,14 @@
     }
 }
 
+.THIS.movefromtop {
+    visibility: visible;
+    animation: movefromtop .2s ease both;
+}
+.THIS.movetotop{
+    visibility: visible;
+    animation: movefromtop .2s ease both reverse;
+}
 @keyframes movefromtop {
     from {
         -webkit-transform:translate3d(0px, -16px , 0px);
@@ -211,7 +174,14 @@
     }
 }
 
-
+.THIS.movefromleft {
+    visibility: visible;
+    animation: movefromleft .2s ease both;
+}
+.THIS.movetoleft{
+    visibility: visible;
+    animation: movefromleft .2s ease both reverse;
+}
 @keyframes movefromleft {
     from {
         -webkit-transform:translate3d(-16px, 0px , 0px);
@@ -221,6 +191,15 @@
         -webkit-transform:translate3d(0px, 0px , 0px);
         transform:translate3d(0px, 0px , 0px);
     }
+}
+
+.THIS.movefromright {
+    visibility: visible;
+    animation: movefromright .2s ease both;
+}
+.THIS.movetoright {
+    visibility: visible;
+    animation: movefromright .2s ease both reverse;
 }
 @keyframes movefromright {
     from {
@@ -232,6 +211,15 @@
         transform:translate3d(0px, 0px , 0px);
     }
 }
+
+.THIS.movefromcenter {
+    visibility: visible;
+    animation: movefromcenter .2s linear;
+}
+.THIS.movetocenter {
+    visibility: visible;
+    animation: movefromcenter .2s linear reverse;
+}
 @keyframes movefromcenter{
     from {
          -webkit-transform:scale3d(.97,.97,1);
@@ -239,6 +227,14 @@
     }
 }
 
+.THIS.movefrompop {
+    visibility: visible;
+    animation: movefrompop .2s linear;
+}
+.THIS.movetopop {
+    visibility: visible;
+    animation: movefrompop .2s ease both reverse;
+}
 @keyframes movefrompop {
 
     0% {
@@ -255,4 +251,5 @@
        -webkit-transform:scale3d(1,1,1);
        transform:scale3d(1,1,1);
     }
+
 }

@@ -1,4 +1,13 @@
 ({
+    testAriaAttributesAccessible: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var td = document.getElementById("td");
+        testUtils.assertEquals("cell", td.getAttribute("role"));
+        testUtils.assertEquals("123", td.getAttribute("aria-describedby"));
+        td.setAttribute("aria-describedby", "321");
+        testUtils.assertEquals("321", td.getAttribute("aria-describedby"));
+    },
+
     testElementProperties: function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
         var auraId = event.getParam("arguments").auraId;

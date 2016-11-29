@@ -550,5 +550,11 @@
         test: function(cmp) {
             cmp.testTextNodeSplitText();
         }
+    },
+
+    testAriaAttributesAccessible: {
+        test: function(cmp) {
+            cmp.testAriaAttributesAccessible();
+        }
     }
 })

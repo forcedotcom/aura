@@ -62,6 +62,50 @@ function validateAttributeName(se, raw, name, prototype, caseInsensitiveAttribut
 
 var KEY_TO_PROTOTYPES = typeof Map !== "undefined" ? new Map() : undefined;
 
+var domPurifyConfig = {
+        // Allow SVG <use> element
+       "ADD_TAGS" : [ "use" ],
+       "ADD_ATTR" : ["aria-activedescendant",
+                     "aria-atomic",
+                     "aria-autocomplete",
+                     "aria-busy",
+                     "aria-checked",
+                     "aria-controls",
+                     "aria-describedby",
+                     "aria-disabled",
+                     "aria-readonly",
+                     "aria-dropeffect",
+                     "aria-expanded",
+                     "aria-flowto",
+                     "aria-grabbed",
+                     "aria-haspopup",
+                     "aria-hidden",
+                     "aria-disabled",
+                     "aria-invalid",
+                     "aria-label",
+                     "aria-labelledby",
+                     "aria-level",
+                     "aria-live",
+                     "aria-multiline",
+                     "aria-multiselectable",
+                     "aria-orientation",
+                     "aria-owns",
+                     "aria-posinset",
+                     "aria-pressed",
+                     "aria-readonly",
+                     "aria-relevant",
+                     "aria-required",
+                     "aria-selected",
+                     "aria-setsize",
+                     "aria-sort",
+                     "aria-valuemax",
+                     "aria-valuemin",
+                     "aria-valuenow",
+                     "aria-valuetext",
+                     "role",
+                     "target"]
+};
+
 function SecureElement(el, key) {
 	"use strict";
 
@@ -104,14 +148,15 @@ function SecureElement(el, key) {
 	var prototype = prototypes.get(tagName);
 	if (!prototype) {
 		prototype = Object.create(null);
-		
+
 		// "class", "id", etc global attributes are special because they do not directly correspond to any property
 		var caseInsensitiveAttributes = { 
 			"class": true,
 			"contextmenu": true,
 			"dropzone": true,
 			"http-equiv": true,
-			"id": true
+			"id": true,
+			"role": true
 		};
 
 		SecureElement.addStandardMethodAndPropertyOverrides(prototype, caseInsensitiveAttributes);
@@ -197,11 +242,7 @@ function SecureElement(el, key) {
 
 					value = SecureObject.unfilterEverything(this, value);
 
-					// Allow SVG <use> element
-					var config = {
-						"ADD_TAGS" : [ "use" ]
-					};
-					raw.innerHTML = DOMPurify["sanitize"](value, config);
+					raw.innerHTML = DOMPurify["sanitize"](value, domPurifyConfig);
 
 					trustChildNodes(this, raw);
 				}
@@ -312,11 +353,7 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseIn
 					throw new $A.auraError("SecureElement.insertAdjacentHTML requires position 'beforeBegin', 'afterBegin', 'beforeEnd', or 'afterEnd'.");
 				}
 
-				// Allow SVG <use> element
-				var config = {
-					"ADD_TAGS" : [ "use" ]
-				};
-				raw.insertAdjacentHTML(position, DOMPurify["sanitize"](text, config));
+				raw.insertAdjacentHTML(position, DOMPurify["sanitize"](text, domPurifyConfig));
 
 				trustChildNodes(this, parent || raw);
 			}

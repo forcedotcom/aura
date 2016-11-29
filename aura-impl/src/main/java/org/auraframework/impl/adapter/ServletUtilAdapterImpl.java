@@ -36,20 +36,19 @@ import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.CSP;
 import org.auraframework.http.ManifestUtil;
-import org.auraframework.impl.util.BrowserUserAgent;
-import org.auraframework.impl.util.UserAgent;
+import org.auraframework.impl.util.*;
 import org.auraframework.impl.util.TemplateUtil.Script;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.*;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.AuraResource;
 import org.auraframework.throwable.*;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
-import org.auraframework.impl.util.TemplateUtil;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -537,7 +536,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         }
 
         final String descriptorName = defDesc.getDescriptorName();
-        if(!descriptorName.equals("one:one")) { // only skip while loading one.app
+        if(!descriptorName.equals("one:one") && !descriptorName.equals("clients:msMail")) { // only skip while loading one.app or msMail.app
             return false;
         }
 

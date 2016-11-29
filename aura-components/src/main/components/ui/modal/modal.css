@@ -16,7 +16,7 @@
 
 /* should be able to remove this next rule after ie11 support is dropped */
 .THIS {
-    position: fixed;
+    position: -ms-device-fixed;
 }
 
 .THIS .hidden {

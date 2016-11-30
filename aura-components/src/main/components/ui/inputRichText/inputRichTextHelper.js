@@ -90,12 +90,14 @@
     				editorInstance = CKEDITOR.replace(helper.getEditorId(cmp),  helper.getEditorConfig(cmp));
     			}
 
-    			editorInstance.on("instanceReady", $A.getCallback(function() {
-    				if (cmp.isValid()) {
-    					cmp.getEvent("editorInstanceReady").fire();
-    				}
-                    callback();
-    			}));
+    			if(editorInstance && $A.util.isFunction(editorInstance.on)) {
+    				editorInstance.on("instanceReady", $A.getCallback(function() {
+	    				if (cmp.isValid()) {
+	    					cmp.getEvent("editorInstanceReady").fire();
+	    				}
+	                    callback();
+    				}));
+    			}
                 
             }.bind(this));
 		}

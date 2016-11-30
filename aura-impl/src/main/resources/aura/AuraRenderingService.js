@@ -263,7 +263,7 @@ AuraRenderingService.prototype.unrender = function(components) {
     var context=$A.getContext();
     for (var i = 0; i < components.length; i++){
         var cmp = components[i];
-        if (cmp.isValid() && cmp.isRendered()) {
+        if ($A.util.isComponent(cmp) && cmp.isValid() && cmp.isRendered()) {
             //var renderer = cmp.getRenderer();
             cmp.setUnrendering(true);
             try {

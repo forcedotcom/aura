@@ -40,24 +40,26 @@ function _trustChildNodes(node, key) {
 	}
 }
 
-function validateAttributeName(se, raw, name, prototype, caseInsensitiveAttributes) {
-	// Always allow names with the form a-b.* (e.g. data-foo, x-foo, ng-repeat, etc) 
-	if (name.indexOf("-") >= 0) {
-		return;
-	}
+function isValidAttributeName(raw, name, prototype, caseInsensitiveAttributes) {
+    // Always allow names with the form a-b.* (e.g. data-foo, x-foo, ng-repeat, etc) 
+    if (name.indexOf("-") >= 0) {
+        return true;
+    }
 
-	if (name in caseInsensitiveAttributes) {
-		return;
-	}
-	
-	// Allow SVG elements free reign
-	if (raw instanceof SVGElement) {
-		return;
-	}
-	
-	if (!(name in prototype)) {
-		throw new $A.auraError(se + " does not permit setting the " + name.toLowerCase() + " attribute!");
-	}
+    if (name in caseInsensitiveAttributes) {
+        return true;
+    }
+
+    // Allow SVG elements free reign
+    if (raw instanceof SVGElement) {
+        return true;
+    }
+
+    if (name in prototype) {
+        return true;
+    }
+
+    return false;
 }
 
 var KEY_TO_PROTOTYPES = typeof Map !== "undefined" ? new Map() : undefined;
@@ -183,19 +185,20 @@ function SecureElement(el, key) {
 
 		// Conditionally add things that not all Node types support
 		if ("attributes" in el) {
-			
+
 			// DCHASMAN TODO We need Proxy (208) to fully implement the syntax/sematics of Element.attributes!
-			
+
 			tagNameSpecificConfig["attributes"] = SecureObject.createFilteredPropertyStateless("attributes", prototype, {
 				writable : false,
 				afterGetCallback : function(attributes) {
 					// Secure attributes
 					var secureAttributes = [];
+					var raw = SecureObject.getRaw(this, prototype);
 					for (var i = 0; i < attributes.length; i++) {
 						var attribute = attributes[i];
-						
+
 						// Only add supported attributes
-						if (attribute.name in prototype || attribute.name in caseInsensitiveAttributes) {
+						if (isValidAttributeName(raw, attribute.name, prototype, caseInsensitiveAttributes)) {
 							secureAttributes.push({
 								name : attribute.name,
 								value : SecureObject.filterEverything(this, attribute.value)
@@ -428,7 +431,9 @@ SecureElement.createAttributeAccessMethodConfig = function(methodName, prototype
     		var args = SecureObject.ArrayPrototypeSlice.call(arguments);
     		
     		var name = args[namespaced ? 1 : 0];
-    		validateAttributeName(this, raw, name, prototype, caseInsensitiveAttributes);
+            if (!isValidAttributeName(raw, name, prototype, caseInsensitiveAttributes)) {
+                throw new $A.auraError(this + " does not permit setting the " + name.toLowerCase() + " attribute!");
+            }
 
     		return raw[methodName].apply(raw, args);
     	}

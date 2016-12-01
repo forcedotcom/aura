@@ -556,5 +556,11 @@
         test: function(cmp) {
             cmp.testAriaAttributesAccessible();
         }
+    },
+    
+    testAttributesPropertyContainsData: {
+        test: function(cmp) {
+            cmp.testAttributesPropertyContainsData();
+        }
     }
 })

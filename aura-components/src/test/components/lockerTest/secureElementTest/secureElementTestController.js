@@ -8,6 +8,23 @@
         testUtils.assertEquals("321", td.getAttribute("aria-describedby"));
     },
 
+    testAttributesPropertyContainsData: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var dataFooFound = false;
+
+        var div = document.getElementById("attributesTester");
+        div.attributes.forEach(function(attribute) {
+            if (attribute.name === "data-foo") {
+                dataFooFound = true;
+            }
+            // only id and data-* attributes are not filtered out for this case
+            if (attribute.name !== "id" && attribute.name.indexOf("data-") !== 0) {
+                testUtils.fail("Unexpected attribute " + attribute.name + " found on element");
+            }
+        });
+        testUtils.assertTrue(dataFooFound, "Custom element attribute data-foo not present on div");
+    },
+
     testElementProperties: function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
         var auraId = event.getParam("arguments").auraId;

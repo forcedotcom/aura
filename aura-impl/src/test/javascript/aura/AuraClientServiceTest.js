@@ -312,6 +312,7 @@ Test.Aura.AuraClientServiceTest = function() {
             var target;
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
+                target.setQueueSize(4);
             });
 
             // Assert

@@ -637,6 +637,9 @@ public class ServerServiceImpl implements ServerService {
                 auraInit.put("safeEvalWorker", lockerWorkerURL);
             }
             
+            auraInit.put("MaxParallelXHRCount", configAdapter.getMaxParallelXHRCount());
+            auraInit.put("XHRExclusivity", configAdapter.getXHRExclusivity());
+
             auraInit.put("context", new Literal(context.serialize(AuraContext.EncodingStyle.Full)));
             attributes.put("auraInit", JsonEncoder.serialize(auraInit));
         }

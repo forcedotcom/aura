@@ -647,6 +647,8 @@ AuraInstance.prototype.initAsync = function(config) {
     Aura.bootstrapMark("runInitAsync");
     this.beforeInitHooks();
     this.clientService.setNamespacePrivileges(config["ns"]);
+    this.clientService.setQueueSize(config["MaxParallelXHRCount"]);
+    this.clientService.setUseOneXHRPerAction(config["XHRExclusivity"]);
 
     // Context is created async because of the GVPs go though async storage checks
     $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
@@ -737,6 +739,8 @@ AuraInstance.prototype.executeExternalLibraries = function () {
 AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializeServices) {
 
     this.clientService.setNamespacePrivileges(config["ns"]);
+    this.clientService.setQueueSize(config["XHRExclusivity"]);
+    this.clientService.setUseOneXHRPerAction(config["useOneXHRPerAction"]);
     this.beforeInitHooks();
 
     if (!useExisting || $A.util.isUndefined($A.getContext())) {

@@ -169,4 +169,14 @@ public interface ConfigAdapter extends AuraAdapter {
     boolean isLockerServiceEnabled();
     boolean requireLocker(RootDefinition def);
     String getLockerServiceCacheBuster();
+    
+    /**
+     * @return max number of parallel XHRs used to execute server actions, must be 2 or more
+     */
+    int getMaxParallelXHRCount();
+    
+    /**
+     * @return whether to use one XHR to send each action (use with HTTP/2 only)
+     */
+    boolean getXHRExclusivity();
 }

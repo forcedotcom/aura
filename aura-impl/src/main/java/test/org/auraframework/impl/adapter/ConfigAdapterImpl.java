@@ -867,4 +867,14 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         }
         return cacheable;
     }
+
+    @Override
+    public int getMaxParallelXHRCount() {
+        return 4;
+    }
+
+    @Override
+    public boolean getXHRExclusivity() {
+        return false;
+    }
 }

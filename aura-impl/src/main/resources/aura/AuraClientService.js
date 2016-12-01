@@ -180,8 +180,8 @@ function AuraClientService () {
     this.allXHRs = [ auraXHR ];
     this.actionStoreMap = {};
     this.collector = undefined;
-    // FIXME: this will go away in iteration 3.
-    this.setQueueSize(4);
+    // if true will use one XHR to send each action (to be used with HTTP/2)
+    this.useOneXHRPerAction = false;
 
     this.actionsQueued = [];
     this.actionsDeferred = [];
@@ -275,7 +275,7 @@ AuraClientService.CONSECUTIVE_RELOAD_COUNTER_KEY = "__RELOAD_COUNT";
 
 
 /**
- * set the queue size.
+ * set the XHR queue size.
  *
  * This is a one time set for the queue size. Any further attempts will be ignored.
  * This should become a configuration parameter at some point.
@@ -284,6 +284,9 @@ AuraClientService.CONSECUTIVE_RELOAD_COUNTER_KEY = "__RELOAD_COUNT";
  */
 AuraClientService.prototype.setQueueSize = function(queueSize) {
     var auraXHR;
+    if (queueSize < 2) {
+        throw new $A.auraError("number of XHRs must be at least 2, is " + queueSize, null, $A.severity.QUIET);
+    }
     if (this.allXHRs.length === 1) {
         for (var i = 1; i < queueSize; i+= 1) {
             auraXHR = new Aura.Services.AuraClientService$AuraXHR();
@@ -291,6 +294,15 @@ AuraClientService.prototype.setQueueSize = function(queueSize) {
             this.allXHRs.push(auraXHR);
         }
     }
+};
+
+/**
+ * set useOneXHRPerAction, if true will use one XHR to send each action (to be used with HTTP/2)
+ *
+ * @private
+ */
+AuraClientService.prototype.setUseOneXHRPerAction = function(useOneXHRPerAction) {
+    this.useOneXHRPerAction = useOneXHRPerAction;
 };
 
 /**
@@ -2380,28 +2392,32 @@ AuraClientService.prototype.sendActionXHRs = function() {
         }
     }
 
-    // either group caboose with at least one non-caboose foreground
-    // or send all caboose after 60s since last send
-    if( this.shouldSendOutForegroundActions(foreground, caboose) ) {
-        auraXHR = this.getAvailableXHR(false);
-        if (auraXHR) {
-            if (!this.send(auraXHR, foreground, "POST")) {
-                this.releaseXHR(auraXHR);
+    if (this.useOneXHRPerAction) {
+        this.sendAsSingle(foreground, foreground.length, { background: false });
+    } else {
+        // either group caboose with at least one non-caboose foreground
+        // or send all caboose after 60s since last send
+        if( this.shouldSendOutForegroundActions(foreground, caboose) ) {
+            auraXHR = this.getAvailableXHR(false);
+            if (auraXHR) {
+                if (!this.send(auraXHR, foreground, "POST")) {
+                    this.releaseXHR(auraXHR);
+                }
             }
         }
-    }
-    // If we don't have an XHR, that means we need to try to send later.
-    if (!auraXHR) {
-        this.actionsDeferred = this.actionsDeferred.concat(foreground);
+        // If we don't have an XHR, that means we need to try to send later.
+        if (!auraXHR) {
+            this.actionsDeferred = this.actionsDeferred.concat(foreground); 
+        }
     }
 
     if (background.length) {
-        this.sendAsSingle(background, background.length);
+        this.sendAsSingle(background, background.length, { background: true });
     }
 
     if (deferred.length) {
         if (this.idle()) {
-            this.sendAsSingle(deferred, 1);
+            this.sendAsSingle(deferred, deferred.length, { background: true });
         } else {
             this.actionsDeferred = this.actionsDeferred.concat(deferred);
         }
@@ -2417,12 +2433,14 @@ AuraClientService.prototype.sendActionXHRs = function() {
  * @private
  * @param {Array} actions the set of actions to send.
  * @param {int} count the number of actions to send.
+ * @param {Options} options extra options for the send, allows callers to set headers.
  */
-AuraClientService.prototype.sendAsSingle = function(actions, count) {
+AuraClientService.prototype.sendAsSingle = function(actions, count, options) {
     var i;
     var sent = 0;
     var auraXHR;
     var action;
+    var background = options && options.background;
 
     for (i = 0; i < actions.length; i++) {
         action = actions[i];
@@ -2434,9 +2452,9 @@ AuraClientService.prototype.sendAsSingle = function(actions, count) {
         auraXHR = undefined;
         if (sent < count) {
             sent += 1;
-            auraXHR = this.getAvailableXHR(true);
+            auraXHR = this.getAvailableXHR(background);
             if (auraXHR) {
-                if (!this.send(auraXHR, [ action ], "POST", { background: true })) {
+                if (!this.send(auraXHR, [ action ], "POST", options)) {
                     this.releaseXHR(auraXHR);
                 }
             }
@@ -2446,7 +2464,6 @@ AuraClientService.prototype.sendAsSingle = function(actions, count) {
         }
     }
 };
-
 
 /**
  * Continue with completions, running all action callbacks.

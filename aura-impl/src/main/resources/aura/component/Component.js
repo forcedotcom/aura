@@ -1235,9 +1235,16 @@ Component.prototype.set = function(key, value, ignoreChanges) {
     var oldValue=valueProvider.get(subPath,this);
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    // Check if the previous value contains components
-    if ($A.util.isArray(oldValue) && oldValue.length && $A.util.isComponent(oldValue[0])) {
-        this.trackComponentReplacement(oldValue, key);
+    // Check if the previous value contains only components
+    if ($A.util.isArray(oldValue) && oldValue.length) {
+        var containsOnlyComponents = true;
+        for (var i = 0; i < oldValue.length && containsOnlyComponents; i++) {
+            containsOnlyComponents = $A.util.isComponent(oldValue[i]);
+        }
+
+        if (containsOnlyComponents) {
+            this.trackComponentReplacement(oldValue, key);
+        }
     }
     //#end
 

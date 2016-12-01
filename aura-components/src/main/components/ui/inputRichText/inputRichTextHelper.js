@@ -22,7 +22,7 @@
 		var	editorInstance = this.getEditorInstance(cmp);
 
 		if (editorInstance && $A.util.isFunction(editorInstance.on)) {
-            editorInstance.on(event, this.editorEventHandler, cmp);
+            editorInstance.on(event, $A.getCallback(this.editorEventHandler), cmp);
 		} else {
 			var element = this.getInputElement(cmp);
             this.lib.interactive.attachDomHandlerToElement(cmp, element, event);
@@ -50,9 +50,21 @@
         }
 	},
 
+	/**
+	 * bound to ck event handler in
+	 * helper.addDomhandler
+	 */
 	editorEventHandler : function(event) {
-		var cmp = this.getConcreteComponent();
-		if (cmp.isValid()) {
+		var cmp;
+
+		// "this" inside this function is the component,
+		// because that is how it was bound in addDomHandler.
+		// Not the best approach, but this is how it was
+		if($A.util.isComponent(this) && this.isValid()) {
+			cmp = this.getConcreteComponent();
+		}
+
+		if (cmp && cmp.isValid()) {
 			var helper = cmp.getDef().getHelper();
 
 	        if (!helper) {

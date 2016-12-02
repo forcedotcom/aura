@@ -18,7 +18,11 @@ package org.auraframework.impl.adapter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -29,22 +33,32 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
-import org.auraframework.adapter.*;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ContentSecurityPolicy;
+import org.auraframework.adapter.ExceptionAdapter;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.clientlibrary.ClientLibraryService;
-import org.auraframework.def.*;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ClientLibraryDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.CSP;
 import org.auraframework.http.ManifestUtil;
-import org.auraframework.impl.util.*;
+import org.auraframework.impl.util.BrowserUserAgent;
+import org.auraframework.impl.util.TemplateUtil;
 import org.auraframework.impl.util.TemplateUtil.Script;
+import org.auraframework.impl.util.UserAgent;
 import org.auraframework.instance.InstanceStack;
-import org.auraframework.service.*;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.AuraResource;
-import org.auraframework.throwable.*;
+import org.auraframework.throwable.ClientOutOfSyncException;
+import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -123,29 +137,83 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     public void handleServletException(Throwable t, boolean quickfix, AuraContext context,
             HttpServletRequest request, HttpServletResponse response,
             boolean written) throws IOException {
-        try {
             Throwable mappedEx = t;
-            boolean map = !quickfix;
+        PrintWriter out = null;
             Format format = context.getFormat();
+        boolean map = true;
+        int status = 0;
 
             //
-            // This seems to fail, though the documentation implies that you can do
-            // it.
+        // First try to set up the status.
             //
-            // if (written && !response.isCommitted()) {
-            // response.resetBuffer();
-            // written = false;
-            // }
-            if (!written) {
-                // Should we only delete for JSON?
+        try {
+            //
+            // First, we make sure we get the status correct.
+            //
+            status = response.getStatus();
+            if (format == Format.JS) {
+                // send 500 by default
+                status = HttpStatus.SC_INTERNAL_SERVER_ERROR;
+                if (!manifestUtil.isManifestEnabled()) {
+                    // if browser applicationCache is disabled then send 200 with javascript exception code below
+                    status = HttpStatus.SC_OK;
+                }
+            } else if (format == Format.CSS) {
+                status = HttpStatus.SC_INTERNAL_SERVER_ERROR;
+            }
+            response.setStatus(status);
+            if (status == HttpStatus.SC_OK) {
                 setNoCache(response);
             }
-            if (mappedEx instanceof IOException) {
+        } catch (Throwable failStatus) {
+            try {
+                exceptionAdapter.handleException(failStatus);
+            } catch (Throwable doubleFail) {
+                // totally ignore. This should never fail.
+            }
+            try {
+                // Is this correct? We probably failed to set no cache headers, so maybe
+                // we want to blow away the status to avoid caching anywhere.
+                if (status == HttpStatus.SC_OK) {
+                    response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+                }
+            } catch (Throwable doubleFail) {
+                // totally ignore. If this fails, it likely failed above as well.
+            }
+        }
+
+        if (t instanceof IOException) {
+            this.contextService.endContext();
+            throw (IOException)t;
+        }
+
+        try {
+            //
+            // If we have written out data, We are kinda toast in this case.
+            // We really want to roll it all back, but we can't, so we opt
+            // for the best we can do. For HTML we can do nothing at all.
+            //
+            if (format == Format.JSON) {
+                out = response.getWriter();
+            if (!written) {
+                    out.write(CSRF_PROTECT);
+            }
                 //
-                // Just re-throw IOExceptions.
+                // If an exception happened while we were emitting JSON, we want the
+                // client to ignore the now-corrupt data structure. 404s and 500s
+                // cause the client to prepend /*, so we can effectively erase the
+                // bad data by appending a */ here and then serializing the exception
+                // info.
                 //
-                throw (IOException) mappedEx;
-            } else if (mappedEx instanceof NoAccessException) {
+                out.write("*/");
+            }
+        } catch (Throwable failToClose) {
+            // ignore again. If we can't write out the JSON closer, we are pretty much hosed,
+            // but in all likelihood we just can't write to the stream.
+        }
+
+        try {
+            if (mappedEx instanceof NoAccessException) {
                 Throwable cause = mappedEx.getCause();
                 String denyMessage = mappedEx.getMessage();
 
@@ -159,6 +227,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 }
                 //
                 // Is this correct?!?!?!
+                // Almost certainly not...
                 //
                 if (format != Format.JSON) {
                     this.send404(request.getServletContext(), request, response);
@@ -170,68 +239,21 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                     }
                     return;
                 }
-            } else if (mappedEx instanceof QuickFixException) {
-                if (isProductionMode(context.getMode())) {
-                    //
-                    // In production environments, we want wrap the quick-fix. But be a little careful here.
-                    // We should never mark the top level as a quick-fix, because that means that we gack
-                    // on every mis-spelled app. In this case we simply send a 404 and bolt.
-                    //
-                    if (mappedEx instanceof DefinitionNotFoundException) {
-                        DefinitionNotFoundException dnfe = (DefinitionNotFoundException) mappedEx;
-
-                        if (dnfe.getDescriptor() != null && dnfe.getDescriptor().equals(context.getApplicationDescriptor())) {
+            } else if (mappedEx instanceof DefinitionNotFoundException && isProductionMode(context.getMode())
+                    && format == Format.HTML) {
                             // We're in production and tried to hit an aura app that doesn't exist.
                             // just show the standard 404 page.
                             this.send404(request.getServletContext(), request, response);
                             return;
                         }
-                    }
-                    map = true;
-                    mappedEx = new AuraUnhandledException("404 Not Found (Application Error)", mappedEx);
-                }
-            }
             if (map) {
                 mappedEx = exceptionAdapter.handleException(mappedEx);
             }
 
-            PrintWriter out = response.getWriter();
+            if (out == null) {
+                out = response.getWriter();
+            }
 
-            //
-            // If we have written out data, We are kinda toast in this case.
-            // We really want to roll it all back, but we can't, so we opt
-            // for the best we can do. For HTML we can do nothing at all.
-            //
-            if (format == Format.JSON) {
-                if (!written) {
-                    out.write(CSRF_PROTECT);
-                }
-                //
-                // If an exception happened while we were emitting JSON, we want the
-                // client to ignore the now-corrupt data structure. 404s and 500s
-                // cause the client to prepend /*, so we can effectively erase the
-                // bad data by appending a */ here and then serializing the exception
-                // info.
-                //
-                out.write("*/");
-                //
-                // Unfortunately we can't do the following now. It might be possible
-                // in some cases, but we don't want to go there unless we have to.
-                //
-            }
-            if (format == Format.JS) {
-                // send 500 by default
-                int jsStatus = HttpStatus.SC_INTERNAL_SERVER_ERROR;
-                if (!manifestUtil.isManifestEnabled()) {
-                    // if browser applicationCache is disabled then send 200 with javascript exception code below
-                    jsStatus = HttpStatus.SC_OK;
-                    // make sure error response is NOT cached
-                    setNoCache(response);
-                }
-                response.setStatus(jsStatus);
-            } else if(format == Format.CSS) {
-                response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-            }
             if (format == Format.JSON || format == Format.HTML || format == Format.JS || format == Format.CSS) {
                 //
                 // We only write out exceptions for HTML or JSON.
@@ -264,7 +286,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
             // but at this point, it is unclear what we can do, as stuff is breaking right and left.
             //
             try {
-                response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
                 exceptionAdapter.handleException(death);
                 if (!isProductionMode(context.getMode())) {
                     response.getWriter().println(death.getMessage());
@@ -273,8 +294,13 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 throw ioe;
             } catch (Throwable doubleDeath) {
                 // we are totally hosed.
+                // We can't even guarantee that this will work...
+                try {
                 if (!isProductionMode(context.getMode())) {
                     response.getWriter().println(doubleDeath.getMessage());
+                }
+                } catch (Throwable tripleDeath) {
+                    // totally ignore, as we have run out of options.
                 }
             }
         } finally {

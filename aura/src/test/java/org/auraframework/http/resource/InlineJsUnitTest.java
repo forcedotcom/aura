@@ -15,11 +15,15 @@
  */
 package org.auraframework.http.resource;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.service.ContextService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraResource;
+import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -52,5 +56,27 @@ public class InlineJsUnitTest extends UnitTestCase {
         HttpServletResponse mockResponse = Mockito.mock(HttpServletResponse.class);
         resource.setContentType(mockResponse);
         Mockito.verify(mockResponse, Mockito.times(1)).setContentType(expected);
+    }
+
+    @Test
+    public void testExceptionHandling() throws Exception {
+        ContextService acs = Mockito.mock(ContextService.class);
+        AuraContext ac = Mockito.mock(AuraContext.class);
+        ServletUtilAdapter sua = Mockito.mock(ServletUtilAdapter.class);
+        ClientOutOfSyncException coos = Mockito.mock(ClientOutOfSyncException.class);
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        Mockito.when(acs.getCurrentContext()).thenReturn(ac);
+        Mockito.doThrow(coos).when(sua).checkFrameworkUID(ac);
+
+        InlineJs inline = new InlineJs();
+        inline.setServletUtilAdapter(sua);
+        inline.setContextService(acs);
+
+        inline.write(request, response, ac);
+
+        Mockito.verify(sua).handleServletException(coos, false, ac, request, response, false);
+        Mockito.verify(sua).checkFrameworkUID(ac);
+        Mockito.verifyNoMoreInteractions(sua);
     }
 }

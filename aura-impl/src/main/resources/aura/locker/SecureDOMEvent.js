@@ -93,7 +93,7 @@ SecureDOMEvent.filterTouchesDescriptor = function (se, event, propName) {
                 // and process the accessor on the spot. e.g.:
                 // https://developer.mozilla.org/en-US/docs/Web/Events/touchstart
                 return Object.keys(touch).reduce(function(o, p) {
-                    Object.defineProperty(o, p, {
+                    return Object.defineProperty(o, p, {
                         // all props in a touch object are readonly by spec:
                         // https://developer.mozilla.org/en-US/docs/Web/API/Touch
                         get: function() {

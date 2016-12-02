@@ -49,7 +49,6 @@
             owner = owner.getOwner();
             ownerName = owner.getName();
         }
-        $A.lockerService.trust(owner, component);
         $A.lockerService.trust(owner, element);
 
     	return element;

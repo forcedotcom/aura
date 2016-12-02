@@ -122,5 +122,28 @@
         test: function(cmp) {
             cmp.testGetEvent_InvalidEvent();
         }
+    },
+
+    testDynamicComponentAccessToFacet: {
+        test: [
+           function(cmp) {
+                $A.test.addWaitFor(true, function() {
+                    return cmp.get("v.childCmp") !== null
+                });
+            },
+            function(cmp) {
+                cmp.callFacetMethodFromDynamicComponent();
+                $A.test.assertTrue(cmp.get("v.childCmp").get("v.isSecureComponent"), 
+                        "Expected dynamically created (but not rendered) component to get back SecureComponent when calling find() on markup element");
+            }
+        ]
+    },
+    
+    testMarkupComponentAccessToFacet: {
+        test: function(cmp) {
+            cmp.callFacetMethodFromMarkupComponent();
+            $A.test.assertTrue(cmp.find("child").get("v.isSecureComponent"), 
+            "Expected component in markup to get back SecureComponent when calling find() on markup element");
+        }
     }
 })

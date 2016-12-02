@@ -75,6 +75,9 @@ Test.Aura.Component.ComponentTest=function(){
                                 getNames:function(){return []},
                                 getValues:function(){return null}
                             },
+                            descriptor: {
+                                getFullName: function() { return "" }
+                            },
                             getAllEvents:function(){
                                 return []
                             },

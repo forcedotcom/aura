@@ -21,6 +21,7 @@
     <aura:attribute name="attrString" type="String"/>
     <aura:attribute name="attrList" type="List"/>
     <aura:attribute name="attrMap" type="Map"/>
+    <aura:attribute name="childCmp" type="Aura.Component"/>
 	
     <aura:method name="testBlockedAPI" action="{!c.testBlockedAPI}"/>
     <aura:method name="testFindReturnsSecureComponent" action="{!c.testFindReturnsSecureComponent}"/>
@@ -43,6 +44,11 @@
    	<aura:method name="testGet_InvalidEvent" action="{!c.testGet_InvalidEvent}"/>
    	<aura:method name="testGetEvent_InvalidEvent" action="{!c.testGetEvent_InvalidEvent}"/>
 
+    <aura:method name="callFacetMethodFromMarkupComponent" action="{!c.callFacetMethodFromMarkupComponent}"/>
+    <aura:method name="callFacetMethodFromDynamicComponent" action="{!c.callFacetMethodFromDynamicComponent}"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
     <aura:registerevent name="press" type="ui:press"/>
     
   	<aura:method name="sayHello" action="{!c.sayHello}"/>
@@ -51,4 +57,7 @@
     <lockerTest:basicTest aura:id="innerCmp"/>
     
     <div aura:id="message"></div>
+
+    <lockerTest:cmpWithMethod aura:id="child"/>
+
 </aura:component>

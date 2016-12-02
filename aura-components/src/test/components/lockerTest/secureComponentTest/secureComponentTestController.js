@@ -1,4 +1,25 @@
 ({
+    doInit: function(cmp) {
+        $A.createComponent(
+                'lockerTest:cmpWithMethod', {
+                    'aura:id': 'dynamicChild'
+                },
+                function (newCmp) {
+                    cmp.set('v.childCmp', newCmp);
+                }
+        );
+    },
+
+    callFacetMethodFromMarkupComponent: function (component, event, helper) {
+        var child = component.find('child');
+        child.getDivFromMarkup();
+    },
+
+    callFacetMethodFromDynamicComponent: function (component, event, helper) {
+        var child = component.get('v.childCmp');
+        child.getDivFromMarkup();
+    },
+
     testBlockedAPI: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         testUtils.assertUndefined(cmp.removeDocumentLevelHandler, "An unexposed API (removeDocumentLevelHandler)"

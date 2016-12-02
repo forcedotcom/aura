@@ -1952,6 +1952,17 @@ Component.prototype.setupComponentDef = function(config) {
 
     // propagating locker key when possible
     $A.lockerService.trust(this.componentDef, this);
+    // aura:html is syntactic sugar for document.createElement() and the resulting elements need to be directly visible to the container
+    // otherwise no code would be able to manipulate them
+    if (this.componentDef.descriptor.getFullName() === "aura:html") {
+        var owner = this.getOwner();
+        var ownerName = owner.getName();
+        while (ownerName === "aura:iteration" || ownerName === "aura:if") {
+            owner = owner.getOwner();
+            ownerName = owner.getName();
+        }
+        $A.lockerService.trust(owner, this);
+    }
 };
 
 Component.prototype.createComponentStack = function(facets, valueProvider){

@@ -218,11 +218,17 @@
 
         $A.assert(panelObj, 'Couldnt find instance to destroy');
         $A.assert(index > -1, 'Couldnt find the reference in the stack');
-
+        
         stack.splice(index, 1);
-
+        
+        // Update the return focus element if the panel has a selector specified.
+        var returnFocusElementSelector = panel.get("v.returnFocusElementSelector");
+        if (returnFocusElementSelector) {
+            cmp.returnFocus = document.querySelector(returnFocusElementSelector);
+        }
+        
         this.containerManager.destroyContainer(panel);
-
+        
         delete this.PANELS_OWNER[panelId];
         delete this.PANELS_INSTANCE[panelId];
         
@@ -375,11 +381,11 @@
     
     /**
      * returns the element to be focused when the panel is destroyed.
-     * @param panel
+     * @param panelComponent
      * @private 
      */
     getReturnFocusElement: function(panelComponent) {
-    	var returnFocusElement = panelComponent.get('v.returnFocusElement');
+        var returnFocusElement = panelComponent.get('v.returnFocusElement');
         
         if ($A.util.isUndefinedOrNull(returnFocusElement)) {
         	returnFocusElement = document.activeElement;

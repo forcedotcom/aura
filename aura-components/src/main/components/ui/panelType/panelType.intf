@@ -22,6 +22,7 @@
     <aura:attribute name="header" type="Aura.Component[]" access="PRIVILEGED" description="The header of the panel" />
     <aura:attribute name="footer" type="Aura.Component[]" description="The footer of the panel" />
 	<aura:attribute name="returnFocusElement" type="Object" description="If specified, the panel will focus to the specified HTMLElement when it is closed." />
+    <aura:attribute name="returnFocusElementSelector" type="String" description="If specified, the panel will focus to the HTMLElement represented by the selector when the panel is closed. If the selector resolves to mutiple elements the first one will be used." />
 	
     <aura:method name="show" description="makes the panel visible (transitions can apply)">
         <aura:attribute name="callback" type="Object"/>

@@ -17,6 +17,8 @@
 -->
 <aura:component access="PRIVILEGED" extensible="true" support="PROTO" implements="ui:virtualComponent" description="Displays a table of data">
 	<aura:import library="ui:virtualDataGridLib" property="lib"/>
+    <aura:import library="ui:SVGLibrary" property="svgLib"/>
+    
     <aura:attribute name="sortBy" type="String" description="Comma-separated list of columns predicated by a '-' for descending." access="PRIVILEGED"/>
     
     <!-- This is deprecated, used in old grid, eventually this should be a <method> -->

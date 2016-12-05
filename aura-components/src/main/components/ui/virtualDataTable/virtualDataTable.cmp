@@ -22,6 +22,7 @@
  -->
 <aura:component implements="ui:virtualComponent" extensible="false" support="PROTO" description="Displays a table of data">
     <aura:import library="ui:virtualDataTableLib" property="lib"/>
+    <aura:import library="ui:SVGLibrary" property="svgLib"/>
     <aura:attribute name="sortBy" type="String" description="Comma-separated list of columns predicated by a '-' for descending."/>
     
     <!-- This is deprecated, used in old grid, eventually this should be a <method> -->

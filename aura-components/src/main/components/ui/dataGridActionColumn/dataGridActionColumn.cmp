@@ -24,7 +24,7 @@
 	<aura:attribute name="header" access="PRIVILEGED" type="Aura.Component[]" description="Components for the header."/>
 	<aura:attribute name="outputComponent" access="PRIVILEGED" type="Aura.ComponentDefRef[]"/>
 	<aura:attribute name="body" type="Aura.ComponentDefRef[]"/>
-	<aura:attribute name="disabled" type="Boolean"/>
+	<aura:attribute name="disabled" type="Boolean" access="PRIVILEGED"/>
 
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 

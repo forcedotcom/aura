@@ -18,5 +18,5 @@
 <aura:interface access="PRIVILEGED">
     <aura:attribute name="columns" access="PRIVILEGED" type="List"/>
     <aura:attribute name="items" access="PRIVILEGED" type="List"/>
-    <aura:attribute name="modelItemsKey" type="String" description="The AuraEnabled field name on the model representing the first page of items."/>
+    <aura:attribute name="modelItemsKey" type="String" access="PRIVILEGED" description="The AuraEnabled field name on the model representing the first page of items."/>
 </aura:interface>

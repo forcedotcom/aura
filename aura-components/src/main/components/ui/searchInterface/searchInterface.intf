@@ -16,5 +16,5 @@
 
 -->
 <aura:interface support="GA" description="The standard interface for searching components.">
-    <aura:attribute name="searchTerm" type="String" description="The term on which to search."/>
+    <aura:attribute name="searchTerm" type="String" access="PRIVILEGED" description="The term on which to search."/>
 </aura:interface>

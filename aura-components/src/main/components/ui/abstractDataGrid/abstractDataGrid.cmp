@@ -19,9 +19,9 @@
 	
 	<!-- Public attributes -->
 	<aura:attribute name="items" access="PRIVILEGED" type="List" description="Arbitrary list of objects to iterate over. Object type to avoid expensive wrapping."/>
-	<aura:attribute name="itemShape" type="Object" description="Template object with null fields to describe item shape. If not set, then concrete should derive shape from columns facet."/>
-	<aura:attribute name="mode" type="String" default="VIEW" description="The view or edit mode for the grid. Valid values include VIEW, VIEW_ONLY, EDIT, EDIT_ONLY. The default is VIEW."/>
-	<aura:attribute name="state" type="String" default="idle" description="Valid values include idle, loading, error. The default is idle."/>
+	<aura:attribute name="itemShape" type="Object" access="PRIVILEGED" description="Template object with null fields to describe item shape. If not set, then concrete should derive shape from columns facet."/>
+	<aura:attribute name="mode" type="String" access="PRIVILEGED" default="VIEW" description="The view or edit mode for the grid. Valid values include VIEW, VIEW_ONLY, EDIT, EDIT_ONLY. The default is VIEW."/>
+	<aura:attribute name="state" type="String" access="PRIVILEGED" default="idle" description="Valid values include idle, loading, error. The default is idle."/>
 	<aura:attribute name="sortable" type="Boolean" default="true" description="Toggle sorting by columns (via column header). The default is true."/>
 	<aura:attribute name="createable" type="Boolean" default="false" description="Describes whether the implementation should enable a creation pattern. The default is false."/>
     <aura:attribute name="selectAll" type="Boolean" default="false" description="All selected. The default is false."/>

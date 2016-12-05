@@ -21,7 +21,7 @@
     <aura:attribute name="namespaceOverride" type="String" description="Overrides the namespace for this component with the supplied text."/>
     <aura:attribute name="actionable" type="Boolean" default="true" description="Specifies whether the component can have an action performed on it. For example, to control whether the component can be clicked."/>
     <aura:attribute name="role" type="String" description="Defines the component to help orient the user. Use this attribute for accessibility or component description. Possible values: header, main, note, and so on."/>
-    <aura:attribute name="ariaDescribedBy" type="String" default="" description="Identifies the HTML element (or elements) that describes the component. Use this attribute for accessibility or component description."/>
+    <aura:attribute name="ariaDescribedBy" type="String" access="PRIVILEGED" default="" description="Identifies the HTML element (or elements) that describes the component. Use this attribute for accessibility or component description."/>
     <aura:attribute name="value" access="PRIVILEGED" type="Object" description="References the controller class variable that is associated with the component."/>
     <aura:attribute name="visible" type="Boolean" default="true" description="Controls the visibility of the component."/>
 

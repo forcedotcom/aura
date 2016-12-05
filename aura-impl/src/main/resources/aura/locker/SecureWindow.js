@@ -333,7 +333,7 @@ SecureWindow.metadata = {
             "HTMLVideoElement":                     RAW,
             "HashChangeEvent":                      FUNCTION,
             "IdleDeadline":                         FUNCTION,
-            "Image":                                FUNCTION,
+            "Image":                                CTOR,
             "ImageBitmap":                          FUNCTION,
             "ImageData":                            FUNCTION,
             "Infinity":                             DEFAULT,

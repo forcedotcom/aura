@@ -15,10 +15,6 @@
  */
 package org.auraframework.http.resource;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
@@ -30,11 +26,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletResponse;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
-import org.auraframework.http.ManifestUtil;
 import org.auraframework.http.resource.AuraResourceImpl.AuraResourceException;
 import org.auraframework.javascript.PreInitJavascript;
 import org.auraframework.service.ContextService;
@@ -49,7 +48,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.api.support.membermodification.MemberModifier;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -96,11 +94,14 @@ public class InlineJsUnitTest {
         AuraContext auraContext = Mockito.mock(AuraContext.class);
         ClientOutOfSyncException outOfSyncException = Mockito.mock(ClientOutOfSyncException.class);
         ExceptionAdapter exceptionAdapter = mock(ExceptionAdapter.class);
+        ConfigAdapter configAdapter = mock(ConfigAdapter.class);
+        Mockito.when(configAdapter.validateBootstrap(Mockito.anyString())).thenReturn(true);
 
         InlineJs inline = new InlineJs();
         inline.setServletUtilAdapter(servletUtilAdapter);
         inline.setContextService(contextService);
         inline.setExceptionAdapter(exceptionAdapter);
+        inline.setConfigAdapter(configAdapter);
 
         doThrow(outOfSyncException).when(servletUtilAdapter).checkFrameworkUID(same(auraContext));
 
@@ -206,12 +207,16 @@ public class InlineJsUnitTest {
         ServerService serverService = PowerMockito.mock(ServerService.class);
         RenderingService renderingService = PowerMockito.mock(RenderingService.class);
 
+        ConfigAdapter configAdapter = mock(ConfigAdapter.class);
+        Mockito.when(configAdapter.validateBootstrap(Mockito.anyString())).thenReturn(true);
+
         InlineJs inline = new InlineJs();
         inline.setServletUtilAdapter(servletUtilAdapter);
         inline.setContextService(contextService);
         inline.setDefinitionService(definitionService);
         inline.setServerService(serverService);
         inline.setRenderingService(renderingService);
+        inline.setConfigAdapter(configAdapter);
 
         InlineJs inlineSpy = PowerMockito.spy(inline);
         PowerMockito.doReturn(false).when(inlineSpy, "shouldCacheHTMLTemplate", anyObject(), anyObject(), anyObject());

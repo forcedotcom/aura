@@ -98,13 +98,15 @@ public interface ConfigAdapter extends AuraAdapter {
 
     /**
      * Validate the app.encryptionkey request
-     * @return true if the request has a valid ssid.
+     * 
+     * @return true if the request has a valid jwt token.
      */
     boolean validateGetEncryptionKey(String ssid);
 
     /**
-     * Validate the bootstrap.js request
-     * @return true if the request has a valid ssid.
+     * Validate the inline.js request
+     * 
+     * @return true if the request has a valid jwt token.
      */
     boolean validateBootstrap(String ssid);
 

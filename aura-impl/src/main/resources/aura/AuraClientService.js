@@ -1686,10 +1686,7 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
     var boot = bootstrap.value;
 
     if (boot["error"]) {
-        if (boot["errorType"] === "jwt") {
-            this.hardRefresh();
-            return;
-        } else if (boot["error"]["exceptionEvent"]) {
+        if (boot["error"]["exceptionEvent"]) {
             this.throwExceptionEvent(boot["error"]);
             return;
         } else {

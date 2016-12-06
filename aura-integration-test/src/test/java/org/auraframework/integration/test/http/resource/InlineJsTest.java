@@ -17,9 +17,12 @@ package org.auraframework.integration.test.http.resource;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
+import org.apache.http.HttpStatus;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
@@ -35,6 +38,7 @@ import org.auraframework.service.RenderingService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -237,5 +241,35 @@ public class InlineJsTest extends AuraImplTestCase {
 
         // Assert
         assertThat("Didn't find expected inline scripts in response content.", content, containsString(script));
+    }
+
+    @Test
+    public void testResponseWith404WhenTokenValidationFails() throws Exception {
+        // Arrange
+        if (contextService.isEstablished()) {
+            contextService.endContext();
+        }
+        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
+                "<aura:application></aura:application>");
+        AuraContext context = contextService.startContext(AuraContext.Mode.PROD, AuraContext.Format.MANIFEST,
+                AuraContext.Authentication.AUTHENTICATED, appDesc);
+        context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        ConfigAdapter configAdapter = mock(ConfigAdapter.class);
+
+        InlineJs inlineJs = getInlineJs();
+        inlineJs.setConfigAdapter(configAdapter);
+
+        // Force token validation to fail
+        Mockito.when(configAdapter.validateBootstrap(Mockito.anyString())).thenReturn(false);
+
+        // Act
+        inlineJs.write(request, response, context);
+
+        // Assert
+        // JWT token failure returns 404 response code
+        assertEquals(HttpStatus.SC_NOT_FOUND, response.getStatus());
     }
 }

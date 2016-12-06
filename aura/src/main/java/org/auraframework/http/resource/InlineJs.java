@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -40,6 +41,7 @@ import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.throwable.AuraJWTError;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.resource.ResourceLoader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,22 +64,22 @@ public class InlineJs extends AuraResourceImpl {
     private ManifestUtil manifestUtil;
 
     private List<PreInitJavascript> preInitJavascripts;
-    
+
     @Inject
     public void setContextService(ContextService contextService) {
         this.contextService = contextService;
     }
-    
+
     @Inject
     public void setRenderingService(RenderingService renderingService) {
         this.renderingService = renderingService;
     }
-    
+
     @PostConstruct
     public void initManifest() {
         this.manifestUtil = new ManifestUtil(definitionService, contextService, configAdapter);
     }
-    
+
     private void appendInlineJS(Component template, Appendable out) throws IOException, QuickFixException {
 
         // write walltime tz data
@@ -116,7 +118,7 @@ public class InlineJs extends AuraResourceImpl {
             }
         }
     }
-    
+
     private <T extends BaseComponentDef> void internalWrite(HttpServletRequest request,
             HttpServletResponse response, DefDescriptor<T> defDescriptor, AuraContext context)
             throws IOException, QuickFixException {
@@ -196,11 +198,23 @@ public class InlineJs extends AuraResourceImpl {
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context)
             throws IOException {
         try {
+            if (!configAdapter.validateBootstrap(request.getParameter("jwt"))) {
+                throw new AuraJWTError("Invalid jwt parameter");
+            }
             DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getLoadingApplicationDescriptor();
             internalWrite(request, response, appDefDesc, context);
         } catch (Throwable t) {
-            servletUtilAdapter.handleServletException(t, false, context, request, response, false);
-            exceptionAdapter.handleException(new AuraResourceException(getName(), response.getStatus(), t));
+            if (t instanceof AuraJWTError) {
+                // If jwt validation fails, just 404. Do not gack.
+                try {
+                    servletUtilAdapter.send404(request.getServletContext(), request, response);
+                } catch (ServletException e) {
+                    // ignore
+                }
+            } else {
+                servletUtilAdapter.handleServletException(t, false, context, request, response, false);
+                exceptionAdapter.handleException(new AuraResourceException(getName(), response.getStatus(), t));
+            }
         }
     }
 

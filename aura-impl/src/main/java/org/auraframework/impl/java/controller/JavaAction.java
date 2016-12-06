@@ -15,7 +15,12 @@
  */
 package org.auraframework.impl.java.controller;
 
-import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -30,10 +35,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Lists;
 
 /**
  * A server side java based action.
@@ -152,10 +154,20 @@ public class JavaAction extends AbstractActionImpl<JavaActionDef> {
         } catch (Exception e) {
             //
             // Several cases handled here, including
-            // * IllegalArgumentError: the conversion probably didn't work.
+            // * IllegalArgumentException: the conversion probably didn't work.
             // * IllegalAccessException: should not be possible.
             //
-            addException(e, State.ERROR, true, false, exceptionAdapter);
+            // Sometimes, IllegalArgumentExeption doesn't provide any detailed message,
+            // put detailed info into gack.
+            if(e instanceof IllegalArgumentException && e.getMessage() == null) {
+                String msg = String.format("Failed to invoke action %s with arguments %s",
+                        this.actionDef, Arrays.toString(args));
+                e = new IllegalArgumentException(msg, e);
+                // we don't want to gack/log IllegalArgumentException
+                addException(e, State.ERROR, false, false, exceptionAdapter);
+            } else {
+                addException(e, State.ERROR, true, false, exceptionAdapter);
+            }
         } finally {
             loggingService.stopTimer("java");
             loggingService.startTimer(LoggingService.TIMER_AURA);

@@ -15,6 +15,16 @@
  */
 package org.auraframework.impl;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.system.AuraContext;
@@ -25,12 +35,6 @@ import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.List;
-
 public class DefinitionAccessImpl implements DefinitionAccess {
     private static final long serialVersionUID = 8409052764733035151L;
     private static final String accessKey=Json.ApplicationKey.ACCESS.toString();
@@ -40,6 +44,13 @@ public class DefinitionAccessImpl implements DefinitionAccess {
     private boolean isInternalNamespace=false;
     private final String namespace;
     private final String accessString;
+   
+    private static final Map<String, Access> ACCESS_MAP;
+    private static final Map<String, Authentication> AUTHENTICATION_MAP ;
+    static {
+        ACCESS_MAP = Stream.of(Access.values()).collect(Collectors.toMap(Access::name, Function.identity()));
+        AUTHENTICATION_MAP = Stream.of(Authentication.values()).collect(Collectors.toMap(Authentication::name, Function.identity()));
+    }
 
     public DefinitionAccessImpl(AuraContext.Access access) {
         assert access != null : "You must specify the access level, null is not allowed.";
@@ -65,29 +76,26 @@ public class DefinitionAccessImpl implements DefinitionAccess {
     }
     
     protected void parseAccessItem(String namespace, String item) throws InvalidAccessValueException {
-        // See if we have authentication
         String ucItem = item.toUpperCase();
-        try {
-            Authentication auth = Authentication.valueOf(ucItem);
+        
+        // See if we have authentication
+        final Authentication auth = AUTHENTICATION_MAP.get(ucItem);
+        if(auth != null) {
             if (authentication != null && auth != authentication) {
                 throw new InvalidAccessValueException("Access attribute cannot specify both AUTHENTICATED and UNAUTHENTICATED");
             }
             authentication = auth;
             return;
-        } catch (IllegalArgumentException e) {
-            // continue to try other possibilities
         }
         
         // See if it is one of the scope constants
-        try {
-            Access acc = Access.valueOf(ucItem);
+        final Access acc = ACCESS_MAP.get(ucItem);
+        if(acc != null) {
             if (access != null && access != acc) {
                 throw new InvalidAccessValueException("Access attribute can only specify one of GLOBAL, PUBLIC, or PRIVATE"); // or internal or privileged
             }
             access = acc;
             return;
-        } catch (IllegalArgumentException e) {
-            // continue to try other possibilities
         }
         
         // Look for classname.methodname

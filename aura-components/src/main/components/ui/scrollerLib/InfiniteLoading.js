@@ -43,6 +43,9 @@ function lib(w) { //eslint-disable-line no-unused-vars
         init: function () {
             this._mergeInfiniteLoading();
             this.on('_initialize', this._initializeInfiniteLoading);
+            
+            // Allows a forced reflow of this scroller through the firing of a global custom event, "FORCEREFLOW"
+            document.addEventListener("FORCEREFLOW", function() { this._forceReflow(); }.bind(this));
         },
         _mergeInfiniteLoading: function () {
             this.opts.infiniteLoadingConfig = this._mergeConfigOptions(
@@ -211,6 +214,17 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 Logger.log('triggerDataProvider');
                 this._triggerInfiniteLoadingDataProvider();
             }
+        },
+        /**
+         * Forces this scroller to reflow after the next aura rendering cycle.
+         * This is used as a workaround for a browser bug where scroller's position is improperly rendered.
+         * W-3410155
+         */
+        _forceReflow: function() {
+            this.scroller.style.position = 'fixed';
+            window.setTimeout(function() {
+                this.scroller.style.position = '';
+            }.bind(this), 0);
         },
         /* PUBLIC API */
         fetchData: function () {

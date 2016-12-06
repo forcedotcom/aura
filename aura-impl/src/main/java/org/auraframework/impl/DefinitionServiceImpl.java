@@ -908,7 +908,7 @@ public class DefinitionServiceImpl implements DefinitionService {
     /**
      * Creates a key for the global {@link #depsCache}, using UID, type, and FQN.
      */
-    private String makeGlobalKey(String uid, @Nonnull DefDescriptor<?> descriptor) {//mU4amKc4jFd_zlcwl8havA  markup://ui:button
+    private String makeGlobalKey(String uid, @Nonnull DefDescriptor<?> descriptor) {
         return uid + "/" + makeLocalKey(descriptor);
     }
 
@@ -1491,7 +1491,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                 currentCC.context.addLocalDef(cd.descriptor, cd.def);
                 if (cd.built) {
                     if (cd.cacheable) { // false for non-internal namespaces, or non-cacheable registries
-                        currentCC.defsCache.put(cd.descriptor, Optional.of(cd.def));//markup://ui:keydown
+                        currentCC.defsCache.put(cd.descriptor, Optional.of(cd.def));
                     }
                     cd.def.markValid();
                 }

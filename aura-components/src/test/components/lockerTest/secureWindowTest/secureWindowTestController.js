@@ -126,5 +126,19 @@
                 testUtils.assertEquals("SecureWindow.open supports http://, https:// schemes and relative urls. It does not support javascript: scheme!", e.message);
             }
         });
+    },
+
+    // Automation for W-3547492
+    testCreateImageElement: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var imgCtor = new Image(25, 33);
+        testUtils.assertStartsWith("SecureElement", imgCtor.toString());
+        testUtils.assertEquals("IMG", imgCtor.tagName.toUpperCase(), "Failed to create <img> element using 'new Image()'");
+        testUtils.assertEquals(25, imgCtor.width);
+        testUtils.assertEquals(33, imgCtor.height);
+
+        var imgFunction = document.createElement("img");
+        testUtils.assertStartsWith("SecureElement", imgFunction.toString());
+        testUtils.assertEquals("IMG", imgFunction.tagName.toUpperCase(), "Failed to create <img> element using document.createElement()");
     }
 })

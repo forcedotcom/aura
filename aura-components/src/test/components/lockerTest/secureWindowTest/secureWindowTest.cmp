@@ -30,6 +30,7 @@
     <aura:method name="testHostedDefinedGlobalsExposedOnWindow" action="{!c.testHostedDefinedGlobalsExposedOnWindow}"/>
     <aura:method name="testObjectExposedOnWindow" action="{!c.testObjectExposedOnWindow}"/>
     <aura:method name="testTimerReturns" action="{!c.testTimerReturns}"/>
+    <aura:method name="testCreateImageElement" action="{!c.testCreateImageElement}"/>
 
     <aura:method name="testOpen_HttpsUrl" action="{!c.testOpen_HttpsUrl}"/>
     <aura:method name="testOpen_HttpUrl" action="{!c.testOpen_HttpUrl}"/>

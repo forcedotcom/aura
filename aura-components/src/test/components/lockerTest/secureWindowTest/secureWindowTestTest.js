@@ -108,5 +108,11 @@
         test: function(cmp) {
             cmp.testOpen_JavascriptIsBlocked();
         }
+    },
+
+    testCreateImageElement: {
+        test: function(cmp) {
+            cmp.testCreateImageElement();
+        }
     }
 })

@@ -181,7 +181,7 @@ function AuraClientService () {
     this.actionStoreMap = {};
     this.collector = undefined;
     // if true will use one XHR to send each action (to be used with HTTP/2)
-    this.useOneXHRPerAction = false;
+    this.xhrExclusivity = false;
 
     this.actionsQueued = [];
     this.actionsDeferred = [];
@@ -297,12 +297,12 @@ AuraClientService.prototype.setQueueSize = function(queueSize) {
 };
 
 /**
- * set useOneXHRPerAction, if true will use one XHR to send each action (to be used with HTTP/2)
+ * set xhrExclusivity, if true will use one XHR to send each action (to be used with HTTP/2)
  *
  * @private
  */
-AuraClientService.prototype.setUseOneXHRPerAction = function(useOneXHRPerAction) {
-    this.useOneXHRPerAction = useOneXHRPerAction;
+AuraClientService.prototype.setXHRExclusivity = function(xhrExclusivity) {
+    this.xhrExclusivity = xhrExclusivity;
 };
 
 /**
@@ -2392,7 +2392,7 @@ AuraClientService.prototype.sendActionXHRs = function() {
         }
     }
 
-    if (this.useOneXHRPerAction) {
+    if (this.xhrExclusivity) {
         this.sendAsSingle(foreground, foreground.length, { background: false });
     } else {
         // either group caboose with at least one non-caboose foreground

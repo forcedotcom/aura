@@ -175,7 +175,7 @@ public class IntegrationImpl implements Integration {
                     String eventHandlers = jsonEventHandlers != null ? jsonEventHandlers.toString() : "undefined";
                     String def = String.format(COMPONENT_DEF_TEMPLATE, tag, jsonAttributes.toString(), localId);
 
-                    String newComponentScript = String.format("(function (w) {\n    w.Aura || (w.Aura = {});\n    w.Aura.afterAppReady = Aura.afterAppReady || [];\n    window.Aura.inlineJsLoaded = true;\n\n    function ais() {\n        $A.__aisScopedCallback(function() { \n            $A.clientService.injectComponentAsync(%s, '%s', %s); \n        }); \n    } \n\n    if (Aura.applicationReady) {\n        ais();\n    } else {\n        window.Aura.afterAppReady.push(ais); \n    }\n}(window));", def, locatorDomId, eventHandlers);
+                    String newComponentScript = String.format("(function (w) {\n    w.Aura || (w.Aura = {});\n    w.Aura.afterAppReady = Aura.afterAppReady || [];\n    w.Aura.inlineJsLoaded = true;\n\n    function ais() {\n        $A.__aisScopedCallback(function() { \n            $A.clientService.injectComponentAsync(%s, '%s', %s); \n        }); \n    } \n\n    if (Aura.applicationReady) {\n        ais();\n    } else {\n        window.Aura.afterAppReady.push(ais); \n    }\n}(window));", def, locatorDomId, eventHandlers);
 
                     init.append(newComponentScript);
 

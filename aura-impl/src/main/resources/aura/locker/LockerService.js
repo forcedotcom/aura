@@ -287,6 +287,7 @@ function LockerService() {
 	service["getEnvForSecureObject"] = service.getEnvForSecureObject;
 	service["trust"] = service.trust;
 	service["showLockedNodes"] = service.showLockedNodes;
+	service["wrapComponent"] = service.wrapComponent;
 
 	Object.freeze(service);
 

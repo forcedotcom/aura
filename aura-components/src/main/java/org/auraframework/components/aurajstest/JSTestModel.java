@@ -65,7 +65,7 @@ public class JSTestModel implements ModelInstance {
         } else {
             testMode = Mode.AUTOJSTEST;
         }
-        url = String.format("/%s/%s.%s?aura.nonce=%s&aura.mode=%s", descriptor.getNamespace(), descriptor.getName(),
+        url = String.format("/%s/%s.%s?aura.nonce=%s&aura.mode=%s&aura.testReset=true", descriptor.getNamespace(), descriptor.getName(),
                 defType == DefType.COMPONENT ? "cmp" : "app", nonce, testMode.name());
 
         String test = (String) component.getAttributes().getValue("test");

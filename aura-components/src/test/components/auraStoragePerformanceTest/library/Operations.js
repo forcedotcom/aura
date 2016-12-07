@@ -405,8 +405,12 @@ function lib(StorageUtil) {
      * @param {Object} transaction - the Metrics Service transaction data.
      */
     Operations.prototype._log = function(operation, transaction) {
+        // filter to only our marks
+        var marks = transaction.marks["custom"].filter(function(t) {
+            return t.ns === Operations.MS_NAMESPACE;
+        });
         // sort by mark duration to make calculating ept95 simple
-        var marks = transaction.marks[Operations.MS_NAMESPACE].sort(function(a, b) {
+        marks = marks.sort(function(a, b) {
             if (a.duration < b.duration) {
                 return -1;
             }
@@ -428,7 +432,7 @@ function lib(StorageUtil) {
         var ept95Idx = Math.min(marks.length-1, Math.floor(marks.length * 0.95));
         var ept95 = marks[ept95Idx].duration;
 
-        // the values captures here must be a superset of those used in _msPostProcessor,
+        // the values captured here must be a superset of those used in _msPostProcessor,
         // which are the numbers exported for analysis.
         this._logs.push({
             adapterName : this._storage.getName(),

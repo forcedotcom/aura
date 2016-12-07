@@ -329,13 +329,21 @@
                 }
 
                 if(!component.positionConstraint) {
-                    var referenceElementAlign = 'left bottom';
-                    var elementAlign = 'left top';
+                    var referenceVerticalAlign = "bottom";
+                    var elementVerticalAlign = "top";
+                    var horizontalAlign = "left";
 
                     if (this.shouldFlip(elem, referenceElem)) {
-                        referenceElementAlign = 'left top';
-                        elementAlign = 'left bottom';
+                        referenceVerticalAlign = "top";
+                        elementVerticalAlign = "bottom";
                     }
+
+                    if (this.shouldAlignToRight(elem, referenceElem)) {
+                        horizontalAlign = "right";
+                    }
+
+                    var referenceElementAlign = horizontalAlign + " " + referenceVerticalAlign;
+                    var elementAlign = horizontalAlign + " " + elementVerticalAlign;
 
                     component.positionConstraint = this.lib.panelPositioning.createRelationship({
                         element:elem,
@@ -402,6 +410,19 @@
 
         if (referenceElemRect.top >= height         // enough space above
             && (viewPort.height - referenceElemRect.bottom) < height) { // not enough space below
+            return true;
+        }
+        return false;
+    },
+
+    shouldAlignToRight: function(element, targetElement) {
+        var viewPort = $A.util.getWindowSize();
+        var elemRect = element.getBoundingClientRect();
+        var referenceElemRect = targetElement.getBoundingClientRect();
+        var width = typeof elemRect.width !== 'undefined' ? elemRect.width : elemRect.right - elemRect.left;
+
+        if (referenceElemRect.right >= width         // enough space on the left
+            && (viewPort.width - referenceElemRect.left) < width) { // not enough space on the right
             return true;
         }
         return false;

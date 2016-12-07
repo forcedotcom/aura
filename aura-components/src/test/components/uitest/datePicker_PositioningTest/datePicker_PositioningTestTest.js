@@ -209,8 +209,13 @@
 		    datePickerRect = datePicker.getBoundingClientRect();
 		    inputDateRect = cmp.find('inputDate').getElement().getBoundingClientRect();
 
-	        return helper.checkDatePickerBelowInput(datePickerRect, inputDateRect, epsilon) ||
-					helper.checkDatePickerFlipped(datePickerRect, inputDateRect, epsilon);
+		    var checkDatePickerVerticalAlignment = helper.checkDatePickerBelowInput(datePickerRect, inputDateRect, epsilon) ||
+                helper.checkDatePickerFlipped(datePickerRect, inputDateRect, epsilon);
+
+		    var checkDatePickerHorizontalAlignment = helper.checkDatePickerLeftAligned(datePickerRect, inputDateRect, epsilon) ||
+                helper.checkDatePickerRightAligned(datePickerRect, inputDateRect, epsilon);
+
+	        return checkDatePickerVerticalAlignment && checkDatePickerHorizontalAlignment;
 
    		}, "Date Picker not visible or was not visible at the correct position. **DEBUG INFO**:\n datePickerTop=" + datePickerRect.top + "; inputDateBottom=" + inputDateRect.bottom + "; datePickerLeft=" + datePickerRect.left+ "; inputDateLeft=" + inputDateRect.left +"\n");
 	},
@@ -219,20 +224,26 @@
 		// check if datePicker is positioned immediately below inputDate and if its left margin is aligned to left margin of inputDate
 		return (datePickerRect.top + epsilon >= inputDateRect.bottom) &&
 				(datePickerRect.top - epsilon <= inputDateRect.bottom) &&
-				(datePickerRect.left + epsilon >= 0) &&
-				(datePickerRect.top + epsilon >= 0) &&
-				(datePickerRect.left + epsilon >= inputDateRect.left) &&
-				(datePickerRect.left - epsilon <= inputDateRect.left);
+				(datePickerRect.top + epsilon >= 0);
 	},
 
 	checkDatePickerFlipped : function(datePickerRect, inputDateRect, epsilon) {
 		// check if datePicker is positioned immediately below inputDate and if its left margin is aligned to left margin of inputDate
 		return (datePickerRect.bottom + epsilon >= inputDateRect.top) &&
 				(datePickerRect.bottom - epsilon <= inputDateRect.top) &&
-				(datePickerRect.left + epsilon >= 0) &&
-				(datePickerRect.bottom + epsilon >= 0) &&
-				(datePickerRect.left + epsilon >= inputDateRect.left) &&
-				(datePickerRect.left - epsilon <= inputDateRect.left);
-	}
+				(datePickerRect.bottom + epsilon >= 0);
+	},
+
+    checkDatePickerLeftAligned : function (datePickerRect, inputDateRect, epsilon) {
+		return (datePickerRect.left + epsilon >= inputDateRect.left) &&
+            (datePickerRect.left - epsilon <= inputDateRect.left) &&
+            (datePickerRect.left + epsilon >= 0);
+    },
+
+	checkDatePickerRightAligned : function (datePickerRect, inputDateRect, epsilon) {
+		return (datePickerRect.right + epsilon >= inputDateRect.right) &&
+            (datePickerRect.right - epsilon <= inputDateRect.right) &&
+            (datePickerRect.left + epsilon >= 0);
+    }
 
 })

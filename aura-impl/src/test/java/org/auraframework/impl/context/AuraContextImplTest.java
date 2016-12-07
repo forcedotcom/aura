@@ -515,4 +515,17 @@ public class AuraContextImplTest extends AuraImplTestCase {
         assertNull(impl.getLocalDef(desc));
         assertFalse(impl.isLocalDefNotCacheable(desc));
     }
+
+    @Test
+    public void testIsSystemMode() {
+        AuraContextImpl impl = new AuraContextImpl(null, null, null, null, null, null, null, null, null, null);
+
+        assertFalse(impl.isSystemMode());
+        impl.setSystemMode(false);
+        assertFalse(impl.isSystemMode());
+        impl.setSystemMode(true);
+        assertTrue(impl.isSystemMode());
+        impl.setSystemMode(false);
+        assertFalse(impl.isSystemMode());
+    }
 }

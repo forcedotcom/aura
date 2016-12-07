@@ -273,7 +273,7 @@
             "align":                          { type: "string" },
             "allowFullscreen":                { type: "boolean" },
             "contentDocument":                { type: "Null", support: false },
-            "contentWindow":                  { type: "Null", support: false },
+            "contentWindow":                  { type: "Window" },
             "frameBorder":                    { type: "string" },
             "getSVGDocument":                 { type: "function", support: false },
             "height":                         { type: "string" },

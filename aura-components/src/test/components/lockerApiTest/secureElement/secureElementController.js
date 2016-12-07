@@ -6,18 +6,24 @@
         var secureWindow = locker["$envRec"];
         var sdoc = secureWindow.document;
 
+        function handleIFrame(doc, e) {
+            // We need to insure that iframe is added to the document because contentWindow is null for iframe elements not in a live document
+            if (e.tagName === "IFRAME") {
+                e.style.display = "none";
+                doc.body.appendChild(e);
+            }
+        }
+        
         function test(tagName) {
         	var ns = this && this.namespace;
+        	
         	var raw = ns ? document.createElementNS(ns, tagName) : document.createElement(tagName);
+        	handleIFrame(document, raw);
+        	
             helper.utils.tester.testSystem(raw);
             
             var se = ns ? sdoc.createElementNS(ns, tagName) : sdoc.createElement(tagName);
-            
-            // We need to insure that iframe is added to the document because contentWindow is null for iframe elements not in a live document
-            if (tagName === "IFRAME") {
-	            se.style.display = "none";
-	            secureWindow.document.body.appendChild(se);
-            }
+            handleIFrame(sdoc, se);
             
             helper.utils.tester.testSecure(se, raw);
         }

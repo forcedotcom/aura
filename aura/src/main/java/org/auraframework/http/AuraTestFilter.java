@@ -161,7 +161,6 @@ public class AuraTestFilter implements Filter {
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException,
             IOException {
-
         if (Aura.getConfigAdapter().isProduction()) {
             chain.doFilter(req, res);
             return;
@@ -179,7 +178,6 @@ public class AuraTestFilter implements Filter {
         if (testContext != null && doResetTest) {
             testContext.getLocalDefs().clear();
         }
-
         // Check for requests to execute a JSTest, i.e. initial component GETs with particular parameters.
         if ("GET".equals(request.getMethod())) {
             DefDescriptor<?> targetDescriptor = getTargetDescriptor(request);
@@ -553,7 +551,19 @@ public class AuraTestFilter implements Filter {
         
 
         // TODO: Inject test framework here, before the test suite code, separately from framework code.
-        out.append(String.format("(function testBootstrap(suiteProps) {\n\tif (!window.Aura || !window.Aura.frameworkJsReady) {\n\t\twindow.Aura || (window.Aura = {});\n\t\twindow.Aura.beforeFrameworkInit = Aura.beforeFrameworkInit || [];\n\t\twindow.Aura.beforeFrameworkInit.push(testBootstrap.bind(null, suiteProps));\n\t} else {\n\t\t$A.test.run('%s', suiteProps, '%s');\n\t}\n}(", testName,testTimeout));
+        out.append(String.format(
+        "(function testBootstrap(suiteProps) { "
+        		+ "if (!window.Aura || !window.Aura.frameworkJsReady) {"
+        			+ "window.Aura || (window.Aura = {});\n\t\t"
+        			+ "window.Aura.beforeFrameworkInit = Aura.beforeFrameworkInit || [];\n\t\t "
+        			+ "window.Aura.beforeFrameworkInit.push(testBootstrap.bind(null, suiteProps));\n\t\t "
+        			+ "} else {\n\t\t "
+        				+ "window.$A.test.$testBootstrap$ = window.$A.test.$testBootstrap$?window.$A.test.$testBootstrap$:{}; \n\t\t "
+            			+ "window.$A.test.$testBootstrap$['testBootstrapFunction']=' Framework ready, call $A.test.run for test:"+testName+" #'+ window.Aura.time(); \n\t\t "
+            			+ "$A.test.run('%s', suiteProps, '%s');\n\t"
+        				+ "}\n"
+        		+ "}(", 
+        testName,testTimeout));
         out.append(suiteDef.getCode());
         out.append("\n));"); // handle trailing single-line comments with newline
     }

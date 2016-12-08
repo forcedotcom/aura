@@ -368,7 +368,30 @@ TestInstance.prototype.startTimer = function() {
  */
 TestInstance.prototype.getDump = function() {
     try {
-        var status = "URL: " + window.location +  "\n";
+    	var status = "From testBootstrap:\n";
+    	for(var it in this.testBootstrap) { status+=it+":"+this.testBootstrap[it]+"; "; }
+    	status += "\n";
+    	
+    	if(!Aura) {
+    		status += "Aura framework not ready !!!\n";
+    	} else {
+    		if (!Aura["bootstrap"]){
+        		status += "Aura bootstrap info not available !!!\n";
+        	} else {
+        		status += "From Aura.bootstrap:\n";
+        		for(it in Aura["bootstrap"]) { status+=it+":"+Aura["bootstrap"][it]+"; "; }
+            	status += "\n";
+        	}
+    		if(Aura['beforeFrameworkInit'] && Aura['beforeFrameworkInit'] instanceof Array) {
+    			status += "What's in Aura.beforeFrameworkInit?\n";
+    			for(var idx=0; idx < Aura['beforeFrameworkInit'].length; idx++) {
+    				status += Aura['beforeFrameworkInit'][idx];
+    			}
+    			status += "\n";
+    		}
+    	}
+    		
+        status += "URL: " + window.location +  "\n";
 
         status += "Test status: ";
         if (this.inProgress === -1) {

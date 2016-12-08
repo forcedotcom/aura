@@ -27,7 +27,11 @@
             this.pressAction(rowElm.children, 1);    
         	//verify row enabled
         }, function(cmp){
-        	$A.test.clickOrTouch(this.getCheckBox(rowElm));
+        	var self = this;
+        	$A.test.addWaitForWithFailureMessage(false, function(){
+        		$A.test.clickOrTouch(self.getCheckBox(rowElm));
+        		return self.getCheckBox(rowElm).checked;
+        	}, "Row should not be disabled");
         }, function(cmp){
         	this.verifyRowClass(rowElm, "disabled", false);
         	this.verifyRowSelectIsClickable(rowElm, false);

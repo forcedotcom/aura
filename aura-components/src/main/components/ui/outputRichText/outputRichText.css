@@ -13,10 +13,250 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*
+ * styles for outputRichText
+ * generated from outpurRichText.styl
+ * in quillbuilder, to properly support 
+ * quill output */
 .THIS em {
-	font-style : italic;	
+    font-style: italic;
 }
-
 .THIS strong {
-	font-weight : bold;
+    font-weight: bold;
+}
+.THIS p,
+.THIS ol,
+.THIS ul,
+.THIS pre,
+.THIS blockquote,
+.THIS h1,
+.THIS h2,
+.THIS h3,
+.THIS h4,
+.THIS h5,
+.THIS h6 {
+    counter-reset: resets(1 2 3 4 5 6 7 8 9);
+}
+.THIS ol,
+.THIS ul {
+    padding-left: 1.5em;
+}
+.THIS ol > li,
+.THIS ul > li {
+    list-style-type: none;
+}
+/* bring back the disk after removing it 
+    above, to support quill hacky indents
+    The indentation code below is copied from
+    quill: 
+    https://github.com/quilljs/quill/blob/develop/assets/core.styl */
+.THIS ul > li::before {
+    content: '\25CF';
+}
+.THIS li::before {
+    display: inline-block;
+    margin-right: 0.3em;
+    text-align: right;
+    white-space: nowrap;
+    width: 1.2em;
+}
+.THIS li:not(.ql-direction-rtl)::before {
+    margin-left: -1.5em;
+}
+.THIS ol li,
+.THIS ul li {
+    padding-left: 1.5em;
+}
+.THIS ol li {
+    counter-reset: resets(1 2 3 4 5 6 7 8 9);
+    counter-increment: list-num;
+}
+.THIS ol li:before {
+    content: counter(list-num, decimal) '. ';
+}
+.THIS ol li.ql-indent-1 {
+    counter-increment: list-1;
+}
+.THIS ol li.ql-indent-1:before {
+    content: counter(list-1, lower-alpha) '. ';
+}
+.THIS ol li.ql-indent-1 {
+    counter-reset: resets(2 3 4 5 6 7 8 9);
+}
+.THIS ol li.ql-indent-2 {
+    counter-increment: list-2;
+}
+.THIS ol li.ql-indent-2:before {
+    content: counter(list-2, lower-roman) '. ';
+}
+.THIS ol li.ql-indent-2 {
+    counter-reset: resets(3 4 5 6 7 8 9);
+}
+.THIS ol li.ql-indent-3 {
+    counter-increment: list-3;
+}
+.THIS ol li.ql-indent-3:before {
+    content: counter(list-3, decimal) '. ';
+}
+.THIS ol li.ql-indent-3 {
+    counter-reset: resets(4 5 6 7 8 9);
+}
+.THIS ol li.ql-indent-4 {
+    counter-increment: list-4;
+}
+.THIS ol li.ql-indent-4:before {
+    content: counter(list-4, lower-alpha) '. ';
+}
+.THIS ol li.ql-indent-4 {
+    counter-reset: resets(5 6 7 8 9);
+}
+.THIS ol li.ql-indent-5 {
+    counter-increment: list-5;
+}
+.THIS ol li.ql-indent-5:before {
+    content: counter(list-5, lower-roman) '. ';
+}
+.THIS ol li.ql-indent-5 {
+    counter-reset: resets(6 7 8 9);
+}
+.THIS ol li.ql-indent-6 {
+    counter-increment: list-6;
+}
+.THIS ol li.ql-indent-6:before {
+    content: counter(list-6, decimal) '. ';
+}
+.THIS ol li.ql-indent-6 {
+    counter-reset: resets(7 8 9);
+}
+.THIS ol li.ql-indent-7 {
+    counter-increment: list-7;
+}
+.THIS ol li.ql-indent-7:before {
+    content: counter(list-7, lower-alpha) '. ';
+}
+.THIS ol li.ql-indent-7 {
+    counter-reset: resets(8 9);
+}
+.THIS ol li.ql-indent-8 {
+    counter-increment: list-8;
+}
+.THIS ol li.ql-indent-8:before {
+    content: counter(list-8, lower-roman) '. ';
+}
+.THIS ol li.ql-indent-8 {
+    counter-reset: resets(9);
+}
+.THIS ol li.ql-indent-9 {
+    counter-increment: list-9;
+}
+.THIS ol li.ql-indent-9:before {
+    content: counter(list-9, decimal) '. ';
+}
+.THIS .ql-indent-1:not(.ql-direction-rtl) {
+    padding-left: 3em;
+}
+.THIS li.ql-indent-1:not(.ql-direction-rtl) {
+    padding-left: 4.5em;
+}
+.THIS .ql-indent-1.ql-direction-rtl.ql-align-right {
+    padding-right: 3em;
+}
+.THIS li.ql-indent-1.ql-direction-rtl.ql-align-right {
+    padding-right: 4.5em;
+}
+.THIS .ql-indent-2:not(.ql-direction-rtl) {
+    padding-left: 6em;
+}
+.THIS li.ql-indent-2:not(.ql-direction-rtl) {
+    padding-left: 7.5em;
+}
+.THIS .ql-indent-2.ql-direction-rtl.ql-align-right {
+    padding-right: 6em;
+}
+.THIS li.ql-indent-2.ql-direction-rtl.ql-align-right {
+    padding-right: 7.5em;
+}
+.THIS .ql-indent-3:not(.ql-direction-rtl) {
+    padding-left: 9em;
+}
+.THIS li.ql-indent-3:not(.ql-direction-rtl) {
+    padding-left: 10.5em;
+}
+.THIS .ql-indent-3.ql-direction-rtl.ql-align-right {
+    padding-right: 9em;
+}
+.THIS li.ql-indent-3.ql-direction-rtl.ql-align-right {
+    padding-right: 10.5em;
+}
+.THIS .ql-indent-4:not(.ql-direction-rtl) {
+    padding-left: 12em;
+}
+.THIS li.ql-indent-4:not(.ql-direction-rtl) {
+    padding-left: 13.5em;
+}
+.THIS .ql-indent-4.ql-direction-rtl.ql-align-right {
+    padding-right: 12em;
+}
+.THIS li.ql-indent-4.ql-direction-rtl.ql-align-right {
+    padding-right: 13.5em;
+}
+.THIS .ql-indent-5:not(.ql-direction-rtl) {
+    padding-left: 15em;
+}
+.THIS li.ql-indent-5:not(.ql-direction-rtl) {
+    padding-left: 16.5em;
+}
+.THIS .ql-indent-5.ql-direction-rtl.ql-align-right {
+    padding-right: 15em;
+}
+.THIS li.ql-indent-5.ql-direction-rtl.ql-align-right {
+    padding-right: 16.5em;
+}
+.THIS .ql-indent-6:not(.ql-direction-rtl) {
+    padding-left: 18em;
+}
+.THIS li.ql-indent-6:not(.ql-direction-rtl) {
+    padding-left: 19.5em;
+}
+.THIS .ql-indent-6.ql-direction-rtl.ql-align-right {
+    padding-right: 18em;
+}
+.THIS li.ql-indent-6.ql-direction-rtl.ql-align-right {
+    padding-right: 19.5em;
+}
+.THIS .ql-indent-7:not(.ql-direction-rtl) {
+    padding-left: 21em;
+}
+.THIS li.ql-indent-7:not(.ql-direction-rtl) {
+    padding-left: 22.5em;
+}
+.THIS .ql-indent-7.ql-direction-rtl.ql-align-right {
+    padding-right: 21em;
+}
+.THIS li.ql-indent-7.ql-direction-rtl.ql-align-right {
+    padding-right: 22.5em;
+}
+.THIS .ql-indent-8:not(.ql-direction-rtl) {
+    padding-left: 24em;
+}
+.THIS li.ql-indent-8:not(.ql-direction-rtl) {
+    padding-left: 25.5em;
+}
+.THIS .ql-indent-8.ql-direction-rtl.ql-align-right {
+    padding-right: 24em;
+}
+.THIS li.ql-indent-8.ql-direction-rtl.ql-align-right {
+    padding-right: 25.5em;
+}
+.THIS .ql-indent-9:not(.ql-direction-rtl) {
+    padding-left: 27em;
+}
+.THIS li.ql-indent-9:not(.ql-direction-rtl) {
+    padding-left: 28.5em;
+}
+.THIS .ql-indent-9.ql-direction-rtl.ql-align-right {
+    padding-right: 27em;
+}
+.THIS li.ql-indent-9.ql-direction-rtl.ql-align-right {
+    padding-right: 28.5em;
 }

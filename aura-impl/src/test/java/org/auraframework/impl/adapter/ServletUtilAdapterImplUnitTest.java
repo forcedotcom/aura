@@ -367,11 +367,10 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         AuraContext context = Mockito.mock(AuraContext.class);
         Map<String,Object> attributes = Maps.newHashMap();
         sua = Mockito.spy(sua);
-        List<String> expected = Lists.newArrayList("bootstrap fallback");
+        List<String> expected = Lists.newArrayList();
         List<String> actual;
 
         Mockito.doReturn("bootstrap").when(sua).getBootstrapUrl(context, attributes);
-        Mockito.doReturn("fallback").when(sua).getBootstrapFallbackUrl(context, attributes);
 
         actual = sua.getFrameworkFallbackScripts(context, true, attributes);
         assertEquals(expected, actual);
@@ -383,11 +382,10 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         AuraContext context = Mockito.mock(AuraContext.class);
         Map<String,Object> attributes = Maps.newHashMap();
         sua = Mockito.spy(sua);
-        List<String> expected = Lists.newArrayList("bootstrap fallback");
+        List<String> expected = Lists.newArrayList();
         List<String> actual;
 
         Mockito.doReturn("bootstrap").when(sua).getBootstrapUrl(context, attributes);
-        Mockito.doReturn("fallback").when(sua).getBootstrapFallbackUrl(context, attributes);
 
         actual = sua.getFrameworkFallbackScripts(context, false, attributes);
         assertEquals(expected, actual);
@@ -481,25 +479,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         assertEquals(expected, actual);
     }
 
-    @Test
-    public void testGetBootstrapFallbackUrl() throws Exception {
-        ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
-        ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
-        AuraContext context = Mockito.mock(AuraContext.class);
-        Map<String,Object> attributes = Maps.newLinkedHashMap();
-        String expected = "contextPath/auraFW/resources/aura/fallback/fallback.bootstrap.js";
-        String actual;
-        sua.setConfigAdapter(configAdapter);
 
-        attributes.put("first", "fv");
-        attributes.put("second", "sv");
-
-        Mockito.doReturn("contextPath").when(context).getContextPath();
-        Mockito.doReturn("nonce").when(context).getEncodedURL(AuraContext.EncodingStyle.Normal);
-
-        actual = sua.getBootstrapFallbackUrl(context, attributes);
-        assertEquals(expected, actual);
-    }
 
     @Test
     public void testGetInlineJsUrl() throws Exception {

@@ -64,7 +64,6 @@
             element.getElementsByTagName('input')[0] || element.getElementsByTagName('select')[0] || element.getElementsByTagName('textarea')[0] || element;
     },
 
-
     /**
      * Returns a package with the array of options (as either an array of components or an array of JS objects)
      * and the strategy to work with that array

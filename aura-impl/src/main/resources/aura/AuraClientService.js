@@ -251,7 +251,7 @@ AuraClientService.BOOT_TIMER_DURATION = 30000;
  * Number of consecutive reloads without fwk + app finishing the boot sequence. When this is exceeded
  * the user is notified of an error and prompted to reload.
  */
-AuraClientService.INCOMPLETE_BOOT_THRESHOLD = 10;
+AuraClientService.INCOMPLETE_BOOT_THRESHOLD = 5;
 
 /**
  * Query parameter to ensure a server trip even with appcache enabled. Servlet performs
@@ -832,7 +832,7 @@ AuraClientService.prototype.hardRefresh = function() {
     var cacheBustKey = "?" + AuraClientService.CACHE_BUST_QUERY_PARAM + "=";
 
     if (this.shouldPreventReload()) {
-        this.showErrorDialogWithReload(new AuraError("We got stuck in a loop while loading the page. Please click Refresh."));
+        this.showErrorDialogWithReload(new AuraError("We can't load the page. Please click Refresh."));
         return;
     }
 
@@ -887,7 +887,7 @@ AuraClientService.prototype.dumpCachesAndReload = function(force) {
 
     if (this.reloadPointPassed || force) {
         if (this.shouldPreventReload()) {
-            this.showErrorDialogWithReload(new AuraError("We got stuck in a loop while loading the page. Please click Refresh."));
+            this.showErrorDialogWithReload(new AuraError("We can't load the page. Please click Refresh."));
         } else {
             this.reloadFunction();
         }

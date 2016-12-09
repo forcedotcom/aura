@@ -44,7 +44,7 @@ public class LabelControllerTest extends AuraImplTestCase {
     private InstanceService instanceService;
 
     String getLabelDesc = "java://org.auraframework.impl.controller.LabelController/ACTION$getLabel";
-    String placeholder = "FIXME - LocalizationAdapter.getLabel() needs implementation!";
+    String placeholder = null;
 
     @Test
     public void testLabelController() throws Exception {

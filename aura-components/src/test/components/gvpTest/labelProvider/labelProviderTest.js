@@ -22,7 +22,7 @@
                     var sv2 = cmp.get("v.simplevalue2");
 
                     $A.test.assertTrue(
-                        sv2 === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
+                        sv2 === null ||
                         sv2.indexOf(label + " does not exist") !== -1,
                         "Failed to get expected error message: " + sv2);
                 }
@@ -40,7 +40,7 @@
                     var sv3 = cmp.get("v.simplevalue3");
 
                     $A.test.assertTrue(
-                        sv3 === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
+                        sv3 === null ||
                         sv3.indexOf(label + " does not exist") !== -1,
                         "Failed to get expected error message: " + sv3);
                 }
@@ -132,7 +132,7 @@
                     "Failed to run call back after fetching label from server",
                     function () {
                         $A.test.assertTrue(
-                            cmp._label === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
+                            cmp._label === null ||
                             cmp._label.indexOf(label + " does not exist") !== -1,
                             "$Label.Related_Lists.FooBar should have error value: " + cmp._label
                         );
@@ -150,7 +150,7 @@
                 //No need to wait for unlike previous case, call backs are immediate as value is available at client
                 $A.test.assertTrue(cmp._callBack);
                 $A.test.assertTrue(
-                    cmp._label === "FIXME - LocalizationAdapter.getLabel() needs implementation!" ||
+                    cmp._label === null ||
                     cmp._label.indexOf(label + " does not exist") !== -1,
                     "$Label.Related_Lists.FooBar should have error value: " + cmp._label
                 );

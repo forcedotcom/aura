@@ -93,7 +93,7 @@ public class LocalizationAdapterImpl implements LocalizationAdapter, TestableLoc
         	if(testLabels.containsKey(getLabelKey(section, name))) {
         		return testLabels.get(getLabelKey(section, name));
         	}
-            return "FIXME - LocalizationAdapter.getLabel() needs implementation!";
+            return null;
         }
         return label.get(this.getAuraLocale().getLanguageLocale().toString());
     }

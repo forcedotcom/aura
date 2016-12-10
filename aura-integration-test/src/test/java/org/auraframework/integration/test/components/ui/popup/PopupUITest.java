@@ -307,9 +307,9 @@ public class PopupUITest extends WebDriverTestCase {
         // Click the trigger and verify popup launches
         WebElement trigger = driver.findElement(By.cssSelector(triggerLocator));
         trigger.click();
-        waitForElementAppear("Popup with curtain did not launch", By.cssSelector(popupLocator));
         WebElement popCurtain = driver.findElement(By.cssSelector(popupLocator));
-
+        waitForElementPresent("Popup with curtain did not launch", popCurtain);
+        
         // Click outside popup and verify it closes
         clickOutsidePopup(POPUP_CONTAINER);
         waitForElementAbsent("Popup did not close", popCurtain);
@@ -346,7 +346,7 @@ public class PopupUITest extends WebDriverTestCase {
         	WebElement customTriggerButton = driver.findElement(By.className(buttonLocator));
         	customTriggerButton.click();
         }
-
+        
         waitForElementAbsent("Popup did not close", popContainerTgtElem);
     }
     
@@ -372,7 +372,7 @@ public class PopupUITest extends WebDriverTestCase {
         // Click the trigger and verify popup launches
         WebElement trigger = driver.findElement(By.cssSelector(triggerLocator));
         trigger.click();
-        By popContainerTgt = By.cssSelector(POPUP_CONTAINER_TARGET);
+        By popContainerTgt = By.cssSelector(POPUP_CONTAINER_TARGET); 
         waitForElementPresent("Popup did not launch", driver.findElement(popContainerTgt));
         verifyPopupSize(POPUP_CONTAINER, popupHeight, popupWidth);
         WebElement popContainerTgtElem = driver.findElement(popContainerTgt);
@@ -438,8 +438,8 @@ public class PopupUITest extends WebDriverTestCase {
     private void verifyPopupNotClosed(String popupLocator) throws Exception {
         try {
         	WebDriver driver = this.getDriver();
-            // wait 2s to see if popup closes
-            waitForElement("", driver.findElement(By.cssSelector(popupLocator)), false, 2);
+            // wait to see if popup closes
+            waitForElementAbsent(driver.findElement(By.cssSelector(popupLocator)));
             fail("Popup closed when it shouldn't");
         } catch (Exception e) {
             //Continue with no failure if the popup didn't close

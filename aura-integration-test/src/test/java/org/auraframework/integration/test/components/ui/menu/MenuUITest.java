@@ -38,10 +38,10 @@ import org.openqa.selenium.interactions.Actions;
 @TargetBrowsers({BrowserType.GOOGLECHROME, BrowserType.FIREFOX, BrowserType.IE11})
 public class MenuUITest extends WebDriverTestCase {
 
-    private static final String MENUTEST_APP = "/uitest/menu_Test.app";
-    private static final String MENUTEST_ATTACHTOBODY_APP = "/uitest/menu_AttachToBodyTest.app";
-    private static final String MENUTEST_METADATA_APP = "/uitest/menu_MetadataTest.app";
-    private static final String MENUTEST_EVENTBUBBLING_APP = "/uitest/menu_EventBubbling.app";
+    public static final String MENUTEST_APP = "/uitest/menu_Test.app";
+    public static final String MENUTEST_ATTACHTOBODY_APP = "/uitest/menu_AttachToBodyTest.app";
+    public static final String MENUTEST_METADATA_APP = "/uitest/menu_MetadataTest.app";
+    public static final String MENUTEST_EVENTBUBBLING_APP = "/uitest/menu_EventBubbling.app";
 
     /**
      * Test that verify's interaction with Action Menu.
@@ -102,13 +102,12 @@ public class MenuUITest extends WebDriverTestCase {
         // check menu list is not visible
         assertFalse("Menu list should not be visible", actionMenu.getAttribute("class").contains("visible"));
 
-        openMenu(menuLabel, menuName);
+        openMenu(menuLabel, actionMenu);
 
-        waitForElementAppear(By.className(menuItem3));
         getAuraUITestingUtil().setHoverOverElement(menuItem3);
         waitForFocusOnElement(actionItem3Element);
 
-        assertTrue("'Item 2' menu item should be visible on the page", actionItem2.isDisplayed());
+        assertTrue("Item 2 in the menu List is should be visible on the page", actionItem2.isDisplayed());
 
         // actionItem2 text starts with the letter F so pressing that key should switch focus to it
         actionItem3Element.sendKeys("f");
@@ -191,9 +190,10 @@ public class MenuUITest extends WebDriverTestCase {
         WebDriver driver = this.getDriver();
         WebElement menu = driver.findElement(By.className(menuClassName));
         WebElement menuLabel = menu.findElement(By.className("menuTrigger"));
+        WebElement menuList = menu.findElement(By.className("menuList"));
         WebElement expectedFocusedItem = menu.findElement(By.className(expectedFocusedItemClassName));
 
-        openMenu(menuLabel, "menuList", keys);
+        openMenu(menuLabel, menuList, keys);
         waitForFocusOnElement(expectedFocusedItem);
     }
     
@@ -217,6 +217,7 @@ public class MenuUITest extends WebDriverTestCase {
         String menuItem3 = "actionItem3" + appendString;
         String menuItem4 = "actionItem4" + appendString;
         WebElement menuLabel = driver.findElement(By.className(label));
+        WebElement actionMenu = driver.findElement(By.className(menuName));
         WebElement actionItem1 = driver.findElement(By.className(menuItem1));
         WebElement actionItem1Element = getAnchor(actionItem1);
         WebElement actionItem3 = driver.findElement(By.className(menuItem3));
@@ -224,8 +225,7 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement actionItem4 = driver.findElement(By.className(menuItem4));
         WebElement actionItem4Element = getAnchor(actionItem4);
 
-        openMenu(menuLabel, menuName);
-        WebElement actionMenu = driver.findElement(By.className(menuName));
+        openMenu(menuLabel, actionMenu);
 
         // default focus on trigger
         assertEquals("Focus should be on the trigger", menuLabel.getText(), getAuraUITestingUtil().getActiveElementText());
@@ -247,7 +247,7 @@ public class MenuUITest extends WebDriverTestCase {
             waitForMenuText(menuLabel, "Inter Milan");
         }
 
-        openMenu(menuLabel, menuName);
+        openMenu(menuLabel, actionMenu);
         getAuraUITestingUtil().setHoverOverElement(menuItem4);
         waitForFocusOnElement(actionItem4Element);
 
@@ -261,7 +261,7 @@ public class MenuUITest extends WebDriverTestCase {
             waitForMenuText(menuLabel, "Inter Milan");
         }
 
-        openMenu(menuLabel, menuName);
+        openMenu(menuLabel, actionMenu);
         getAuraUITestingUtil().setHoverOverElement(menuItem1);
         waitForFocusOnElement(actionItem1Element);
         actionItem1Element.sendKeys(Keys.ESCAPE);
@@ -275,22 +275,23 @@ public class MenuUITest extends WebDriverTestCase {
     	
     	WebDriver driver = this.getDriver();
         WebElement menuLabel = driver.findElement(By.className("trigger"));
+        WebElement actionMenu = driver.findElement(By.className("actionMenu"));
         WebElement focusAfterOpenItem = driver.findElement(By.className(focusAfterOpen));
-        WebElement focusAfterOpenElement;
+        WebElement focusAfterOpenElement = null;
         WebElement expectedItem = driver.findElement(By.className(itemExpected));
         WebElement expectedItemElement = getAnchor(expectedItem);
           
         // opening menu using keyboard return or space - focus would remain on the trigger
         if("trigger".equals(focusAfterOpen)) {
         	focusAfterOpenElement = menuLabel;
-        	openMenu(menuLabel, "actionMenu", openKey);
+        	openMenu(menuLabel, actionMenu, openKey);
         	assertEquals("Focus should be on the trigger", menuLabel.getText(), getAuraUITestingUtil().getActiveElementText());
         }
         
         // opening menu using keyboard interaction down button - focus should be on 1st element
         else {
         	focusAfterOpenElement = getAnchor(focusAfterOpenItem);
-            openMenu(menuLabel, "actionMenu", openKey);
+            openMenu(menuLabel, actionMenu, openKey);
             waitForFocusOnElement(focusAfterOpenElement);
         }
 
@@ -327,7 +328,7 @@ public class MenuUITest extends WebDriverTestCase {
         assertEquals("label is wrong", "NFC West Teams", menuLabel.getText());
         assertFalse("Default: CheckboxMenu list should not be visible", menu.getAttribute("class").contains("visible"));
 
-        openMenu(menuLabel, menuName);
+        openMenu(menuLabel, menu);
 
         WebElement item3 = driver.findElement(By.className(menuItem3));
         WebElement item3Element = getAnchor(item3);
@@ -359,19 +360,25 @@ public class MenuUITest extends WebDriverTestCase {
 
         // check item3 with click
         item3Element.click();
-        getAuraUITestingUtil().waitUntil(check -> Boolean.valueOf(item3Element.getAttribute("aria-checked")), "Item3 aria attribute should be checked after the click");
+        getAuraUITestingUtil().waitUntil(check -> {
+            return Boolean.valueOf(item3Element.getAttribute("aria-checked"));
+        }, "Item3 aria attribute should be checked after the click");
         assertTrue("Item3 v.selected should be true after the click",
             getCmpBoolAttribute(menuItem3, "v.selected"));
 
         // uncheck item3 with ENTER key
         item3Element.sendKeys(Keys.ENTER);
-        getAuraUITestingUtil().waitUntil(check -> !Boolean.valueOf(item3Element.getAttribute("aria-checked")), "Item3 aria attribute should be uncheked after pressing ENTER");
+        getAuraUITestingUtil().waitUntil(check -> {
+            return !Boolean.valueOf(item3Element.getAttribute("aria-checked"));
+        }, "Item3 aria attribute should be uncheked after pressing ENTER");
         assertFalse("Item3 v.selected should be false after pressing ENTER",
             getCmpBoolAttribute(menuItem3, "v.selected"));
 
         // check item3 with SPACE key
         item3Element.sendKeys(Keys.SPACE);
-        getAuraUITestingUtil().waitUntil(check -> Boolean.valueOf(item3Element.getAttribute("aria-checked")), "Item3 aria attribute should be checked after pressing SPACE");
+        getAuraUITestingUtil().waitUntil(check -> {
+            return Boolean.valueOf(item3Element.getAttribute("aria-checked"));
+        }, "Item3 aria attribute should be checked after pressing SPACE");
         assertTrue("Item3 v.selected should be true after pressing SPACE",
             getCmpBoolAttribute(menuItem3, "v.selected"));
         
@@ -416,11 +423,13 @@ public class MenuUITest extends WebDriverTestCase {
         assertFalse("Default: CheckboxMenu list should not be visible", menu.getAttribute("class").contains("visible"));
 
         // open menu list
-        openMenu(menuLabel, menuName);
+        openMenu(menuLabel, menu);
         
         // click and verify item3 got selected
         item3Element.click();
-        getAuraUITestingUtil().waitUntil(check -> item3Element.getAttribute("class").contains("selected"), "Item3 should be selected after the click");
+        getAuraUITestingUtil().waitUntil(check -> {
+            return item3Element.getAttribute("class").contains("selected");
+        }, "Item3 should be selected after the click");
 
         // send key to go to item 4 using 'd'
         item3Element.sendKeys("d");
@@ -443,7 +452,9 @@ public class MenuUITest extends WebDriverTestCase {
 
         // click on item 5 using space
         item5Element.sendKeys(Keys.SPACE);
-        getAuraUITestingUtil().waitUntil(check -> item5Element.getAttribute("class").contains("selected"), "Item5 should be checked after pressing Space");
+        getAuraUITestingUtil().waitUntil(check -> {
+            return item5Element.getAttribute("class").contains("selected");
+        }, "Item5 should be checked after pressing Space");
 
         assertFalse("Item3 should be unchecked after clicking item 5",
             item3Element.getAttribute("class").contains("selected"));
@@ -470,7 +481,7 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement button = driver.findElement(By.className("radioButton"));
 
         assertFalse("Action Menu list should not be visible", menu.getAttribute("class").contains("visible"));
-        openMenu(menuLabel, menuName);
+        openMenu(menuLabel, menu);
         button.click();
         waitForMenuClose(menu);
     }
@@ -508,6 +519,7 @@ public class MenuUITest extends WebDriverTestCase {
         String triggerGlobalId = getAuraUITestingUtil().getCmpGlobalIdGivenElementClassName(trigger);
         String menuListGlobalId = getAuraUITestingUtil().getCmpGlobalIdGivenElementClassName(menuList);
         WebElement menuLabel = driver.findElement(By.className(trigger));
+        WebElement menu = driver.findElement(By.className(menuList));
 
         try {
             // set initial size to make sure we have room to resize later
@@ -515,7 +527,7 @@ public class MenuUITest extends WebDriverTestCase {
             waitForWindowResize(initialDimension);
 
             // Verify menulist and trigger are properly aligned
-            openMenu(menuLabel, menuList);
+            openMenu(menuLabel, menu);
             waitForMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId,
                 "Menu List is not positioned correctly when the menuList rendered on the page");
 
@@ -533,7 +545,7 @@ public class MenuUITest extends WebDriverTestCase {
                     triggerLeftPosBeforeClick, triggerLeftPosAfterClick);
 
             // Resize window with menulist open and verify realigns properly
-            openMenu(menuLabel, menuList);
+            openMenu(menuLabel, menu);
             driver.manage().window().setSize(newDimension);
             waitForWindowResize(newDimension);
             waitForMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId,
@@ -551,6 +563,9 @@ public class MenuUITest extends WebDriverTestCase {
 
     /**
      * Wait for the current window to have expected dimensions.
+     *
+     * @param width  Expected width of the current window.
+     * @param height Expected height of the current window.
      */
     private void waitForWindowResize(final Dimension newDimension) {
         getAuraUITestingUtil().waitUntilWithCallback(
@@ -614,9 +629,10 @@ public class MenuUITest extends WebDriverTestCase {
         String menuName = "doubleClickDisabledMenuList";
         WebDriver driver = this.getDriver();
         WebElement menuLabel = driver.findElement(By.className(label));
+        WebElement menu = driver.findElement(By.className(menuName));
         Actions a = new Actions(driver);
         a.doubleClick(menuLabel).build().perform();
-        waitForMenuOpen(menuName);
+        waitForMenuOpen(menu);
     }
 
     /**
@@ -632,12 +648,13 @@ public class MenuUITest extends WebDriverTestCase {
         String menuItem2 = "actionItem2";
         String menuItem3 = "actionItem3";
         WebElement menuLabel = driver.findElement(By.className(label));
+        WebElement actionMenu = driver.findElement(By.className(menuName));
         WebElement actionItem2 = driver.findElement(By.className(menuItem2));
         WebElement actionItem2Element = getAnchor(actionItem2);
         WebElement actionItem3 = driver.findElement(By.className(menuItem3));
         WebElement actionItem3Element = getAnchor(actionItem3);
 
-        openMenu(menuLabel, menuName);
+        openMenu(menuLabel, actionMenu);
 
         assertEquals("Focus should be on the trigger", menuLabel.getText(), getAuraUITestingUtil().getActiveElementText());
 
@@ -660,10 +677,11 @@ public class MenuUITest extends WebDriverTestCase {
         String label = "trigger";
         String menuName = "actionMenu";
         WebElement menuLabel = driver.findElement(By.className(label));
+        WebElement actionMenu = driver.findElement(By.className(menuName));
         String valueExpression = getAuraUITestingUtil().getValueFromRootExpr("v.eventBubbled");
         valueExpression = getAuraUITestingUtil().prepareReturnStatement(valueExpression);
         assertNull("Event should not bubble up to parent div", getAuraUITestingUtil().getEval(valueExpression));
-        openMenu(menuLabel, menuName);
+        openMenu(menuLabel, actionMenu);
         assertTrue("Event should get bubble up to parent div", getAuraUITestingUtil().getBooleanEval(valueExpression));
     }
 
@@ -677,10 +695,11 @@ public class MenuUITest extends WebDriverTestCase {
         String label = "trigger";
         String menuName = "actionMenu";
         WebElement menuLabel = driver.findElement(By.className(label));
+        WebElement actionMenu = driver.findElement(By.className(menuName));
         String valueExpression = getAuraUITestingUtil().getValueFromRootExpr("v.eventBubbled");
         valueExpression = getAuraUITestingUtil().prepareReturnStatement(valueExpression);
         assertNull("Event should not bubble up to parent div", getAuraUITestingUtil().getEval(valueExpression));
-        openMenu(menuLabel, menuName);
+        openMenu(menuLabel, actionMenu);
         assertNull("Event should not bubble up to parent div when StopPropogoation is set on menu",
             getAuraUITestingUtil().getEval(valueExpression));
     }
@@ -708,12 +727,13 @@ public class MenuUITest extends WebDriverTestCase {
     
     private void verifyFocusOnTabOnOpenMenu(String nextFocusableElmClassName) {
     	WebDriver driver = this.getDriver();
+        WebElement menuElm = driver.findElement(By.className("actionMenu"));
         WebElement item1Elm = driver.findElement(By.className("actionItem1"));
         WebElement triggerElm = driver.findElement(By.className("trigger"));
         WebElement nextFocusableElm = driver.findElement(By.className(nextFocusableElmClassName));
 
         // open menu and make sure focus is on the trigger label
-        openMenu(triggerElm, "actionMenu");
+        openMenu(triggerElm, menuElm);
         waitForFocusOnElement(triggerElm);
 
         // move the focus to the menuList by moving to the first item
@@ -734,10 +754,11 @@ public class MenuUITest extends WebDriverTestCase {
 
 	/**
      * Open the menu and wait for it to have the visible class.
-     *  @param menuLabel  The WebElement to click on that opens the menu
-     * @param menuClassName The WebElement on which to wait for the visible class to be present
+     *
+     * @param menuLabel  The WebElement to click on that opens the menu
+     * @param actionMenu The WebElement on which to wait for the visible class to be present
      */
-    private void openMenu(WebElement menuLabel, String menuClassName) {
+    private void openMenu(WebElement menuLabel, WebElement actionMenu) {
         if (getBrowserType() == BrowserType.IE11) {
             // on win 7 IE11, for some reason webdriver moves the focus to the
             // last element of the list when activating the menu through click()
@@ -745,28 +766,31 @@ public class MenuUITest extends WebDriverTestCase {
         } else {
             menuLabel.click();  
         }
-        waitForMenuOpen(menuClassName);
+        waitForMenuOpen(actionMenu);
     }
     
     /**
      * Open the menu through a keyboard interaction and wait for it to have the visible class.
-     *  @param menuLabel  The WebElement to click on that opens the menu
-     * @param menuClassName The WebElement on which to wait for the visible class to be present
+     *
+     * @param menuLabel  The WebElement to click on that opens the menu
+     * @param actionMenu The WebElement on which to wait for the visible class to be present
      * @param openKey    The WebDriver key to use that opens the menu
      */
-    private void openMenu(WebElement menuLabel, String menuClassName, CharSequence openKey) {
+    private void openMenu(WebElement menuLabel, WebElement actionMenu, CharSequence openKey) {    	
     	menuLabel.sendKeys("");
         menuLabel.sendKeys(openKey);
-        waitForMenuOpen(menuClassName);
+        waitForMenuOpen(actionMenu);
     }
 
     /**
      * Wait for the visible class to be present on the menu list.
      *
-     * @param menuClassName The WebElement on which to wait for the visible class to be present
+     * @param actionMenu The WebElement on which to wait for the visible class to be present
      */
-    private void waitForMenuOpen(final String menuClassName) {
-        waitForElementAppear("Menu list should be visible after clicking to open", By.className(menuClassName));
+    private void waitForMenuOpen(final WebElement actionMenu) {
+        getAuraUITestingUtil().waitUntil(check -> {
+            return actionMenu.getAttribute("class").contains("visible");
+        }, "Menu list should be visible after clicking to open");
     }
 
     /**
@@ -799,7 +823,9 @@ public class MenuUITest extends WebDriverTestCase {
      * @param expectedText The expected text
      */
     private void waitForMenuText(final WebElement menuLabel, final String expectedText) {
-        getAuraUITestingUtil().waitUntil(check -> menuLabel.getText().equals(expectedText), "Menu text not updated after clicking menu item");
+        getAuraUITestingUtil().waitUntil(check -> {
+            return menuLabel.getText().equals(expectedText);
+        }, "Menu text not updated after clicking menu item");
     }
 
     /**

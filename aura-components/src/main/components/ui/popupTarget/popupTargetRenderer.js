@@ -15,13 +15,16 @@
  */
 ({
     afterRender: function(component, helper) {
+    	var ret;
+    	
         helper.setAriaAttributes(component);
 
-        if (component.get("v.visible")) {
-            helper.position(component);
-        }
+        // need to position this component after initial render
+        // or weirdness will ensue
+        helper.position(component);
+        ret = this.superAfterRender();        
 
-        this.superAfterRender();
+        return ret;
     },
     
     /*
@@ -36,6 +39,12 @@
         helper.onVisibleChange(component);
         helper.setAriaAttributes(component);
 
+        if(component.get('v.visible')) {
+            helper.position(component);
+        } else {
+            helper.unposition(component);
+        }
+        
         return ret;
     },
     

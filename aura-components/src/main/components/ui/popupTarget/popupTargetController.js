@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 ({
-    handleVisibilityChange: function (component, event, helper) {
-        if (component.get("v.visible")) {
-            helper.position(component);
-        } else {
-            helper.unposition(component);
-        }
-    },
-    handleKeyboardEvent: function (component, event, helper) {
-        var _helper = component.getConcreteComponent().getDef().getHelper() || helper;
-        _helper.handleKeyboardEvent(component.getConcreteComponent(), event);
+    handleKeyboardEvent: function(component, event, helper) {
+    	var _helper = component.getConcreteComponent().getDef().getHelper() || helper;
+    	_helper.handleKeyboardEvent(component.getConcreteComponent(), event);
     }
 })// eslint-disable-line semi

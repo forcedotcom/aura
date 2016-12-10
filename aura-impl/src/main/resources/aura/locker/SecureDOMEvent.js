@@ -89,10 +89,17 @@ SecureDOMEvent.filterTouchesDescriptor = function (se, event, propName) {
             // touches, of type ToucheList does not implement "map"
             return Array.prototype.map.call(touches, function(touch) {
                 // touches is normally a big big collection of touch objects,
-                // we do not want to pre-process them all, just create a the getters
+                // we do not want to pre-process them all, just create the getters
                 // and process the accessor on the spot. e.g.:
                 // https://developer.mozilla.org/en-US/docs/Web/Events/touchstart
-                return Object.keys(touch).reduce(function(o, p) {
+                var keys = [];
+                var touchShape = touch;
+                // Walk up the prototype chain and gather all properties
+                do {
+                    keys = keys.concat(Object.keys(touchShape));
+                }while((touchShape = Object.getPrototypeOf(touchShape)) && touchShape !== Object.prototype)
+                // Create a stub object with all the properties
+                return keys.reduce(function(o, p) {
                     return Object.defineProperty(o, p, {
                         // all props in a touch object are readonly by spec:
                         // https://developer.mozilla.org/en-US/docs/Web/API/Touch

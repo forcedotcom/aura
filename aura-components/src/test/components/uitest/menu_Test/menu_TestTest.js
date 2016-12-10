@@ -431,7 +431,7 @@
             menuListElement = menuList.getElement();
             item1 = cmp.find("checkPositionItem1").getElement();
             this.clickAnchor(trigger);
-            $A.test.setTestTimeout(30000);
+            $A.test.setTestTimeout(10000);
             $A.test.addWaitForWithFailureMessage(true, function () {
                 return $A.util.hasClass(menuList.getElement(), "visible")
             }, "Menu Should be visible");
@@ -458,11 +458,12 @@
             //open the menu
             this.clickAnchor(trigger);
             $A.test.addWaitForWithFailureMessage(true, function () {
-                return $A.util.hasClass(menuList.getElement(), "visible")
+                return $A.util.hasClass(menuList.getElement(), "visible");
             }, "Menu Should be visible after changing height of item1");
         }, function (cmp) {
-            topPropertyValue = $A.util.style.getCSSProperty(menuListElement, 'top');
-            $A.test.assertTrue(parseInt(topPropertyValue) < 0, "Menu is not position properly");
+            $A.test.addWaitForWithFailureMessage(true, function () {
+                return parseInt($A.util.style.getCSSProperty(menuListElement, 'top')) < 0;
+            }, "Menu is not positioned properly");
         }
         ]
     },

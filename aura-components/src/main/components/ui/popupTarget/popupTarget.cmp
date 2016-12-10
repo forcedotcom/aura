@@ -38,7 +38,8 @@
     <aura:registerEvent name="doClose" type="ui:collapse" description="Tell the target to close itself."/>
     
     <aura:handler name="popupKeyboardEvent" action="{!c.handleKeyboardEvent}"/>
-	
+    <aura:handler name="change" value="{!v.visible}" action="{!c.handleVisibilityChange}"/>
+
 	<aura:if isTrue="{! v.attachToBody &amp;&amp; v.curtain}">
 		<div class="{!v.class + ' popupCurtain ' + v.preTransitionClass}">
 			<div aura:id="popupTarget" class="popupTargetContainer">

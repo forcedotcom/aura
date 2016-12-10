@@ -74,41 +74,59 @@
     },
 
     position: function (component) {
-        var elements = this.getElementCache(component),
-            attachToBody = elements.target.get("v.attachToBody"),
-            autoPosition,
-            elemRect,
-            viewPort,
-            height;
-
-        var manualPosition = elements.target.get("v.manualPosition");
-        var visible = elements.target.get("v.visible");
+        var attachToBody = component.get("v.attachToBody");
 
         if (attachToBody === true) {
-            return this.positionAsBodyChild(component, manualPosition);
-        }
+            return this.positionAsBodyChild(component);
+        } else {
+            var elements = this.getElementCache(component);
+            if (elements.targetDiv && !manualPosition) {
+                elements.targetDiv.style.top = "auto";
 
-        if (elements.targetDiv && !manualPosition) {
-            elements.targetDiv.style.top = "auto";
+                if (visible) {
+                    autoPosition = component.get('v.autoPosition');
+                    elemRect = elements.targetDiv.getBoundingClientRect();
+                    viewPort = $A.util.getWindowSize();
 
-            if (visible) {
-                autoPosition = component.get('v.autoPosition');
-                elemRect = elements.targetDiv.getBoundingClientRect();
-                viewPort = $A.util.getWindowSize();
-
-                if (autoPosition && elemRect.bottom > viewPort.height) { // no enough space below
-                    // getBoundingClientRect method does not return height and width in IE7 and Ie8
-                    height = typeof elemRect.height !== 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
-                    elements.targetDiv.style.top = 0 - height + "px";
-                } else {
-                    elements.targetDiv.style.top = "auto";
+                    if (autoPosition && elemRect.bottom > viewPort.height) { // no enough space below
+                        // getBoundingClientRect method does not return height and width in IE7 and Ie8
+                        height = typeof elemRect.height !== 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
+                        elements.targetDiv.style.top = 0 - height + "px";
+                    } else {
+                        elements.targetDiv.style.top = "auto";
+                    }
                 }
             }
+
+/*
+            var element = component.find("popupTarget").getElement();
+            window.requestAnimationFrame($A.getCallback(function () {
+                if (!component.isValid()) {
+                    return;
+                 }
+                if (element && !component.get("v.manualPosition")) {
+                    element.style.top = "auto";
+
+                    var elemRect = element.getBoundingClientRect();
+                    var viewPort = $A.util.getWindowSize();
+
+                    if (component.get("v.autoPosition") && elemRect.bottom > viewPort.height && elemRect.height) {
+                        // not enough space below, position above
+                        // note that this has issues with very tall popups, it would place them entirely out of view,
+                        // with only the bottom of the popup visible, we should be limiting it so that it never goes
+                        // outside of the viewport instead.
+
+                        element.style.top = 0 - elemRect.height + "px";
+                    } else {
+                        element.style.top = "auto";
+                    }
+                }
+            }));*/
         }
     },
 
-    _getScrollableParent: function(elem) {
-        if(this._scrollableParent) {
+    _getScrollableParent: function (elem) {
+        if (this._scrollableParent) {
             return this._scrollableParent;
         }
 
@@ -116,12 +134,12 @@
         // however in firefox the opposite is not true
         var overflow = getComputedStyle(elem)['overflow-y'];
 
-        if(overflow === 'auto') {
+        if (overflow === 'auto') {
             this._scrollableParent = elem;
             return elem;
         }
 
-        if(elem === document.body) {
+        if (elem === document.body) {
             this._scrollableParent = null;
             return null;
         }
@@ -130,61 +148,59 @@
 
     },
 
-    positionAsBodyChild: function (component, manualPosition) {
+    positionAsBodyChild: function (component) {
         var element = component.find("popupTarget").getElement();
         var target = component.get("v.referenceElement");
-        var self = this;
         if (target && element) {
+            var manualPosition = component.get("v.manualPosition");
+            $A.util.attachToDocumentBody(component.getElement());
+
             if (manualPosition) {
                 $A.util.attachToDocumentBody(component.getElement());
             } else {
-                var horizontalCornerAlignment = this.rightCornerFitsInViewport(element, target) ? "left" : "right";
-                var verticalCornerAlignment = this.bottomCornerFitsInViewport(element, target) ? "top" : "bottom";
-                component._constraint = component.positionConstraint = this.lib.panelPositioning.createRelationship({
-                    element: element,
-                    target: target,
-                    appendToBody: true,
-                    align: horizontalCornerAlignment + " " + verticalCornerAlignment,
-                    targetAlign: horizontalCornerAlignment + " " + (verticalCornerAlignment === "top" ? "bottom" : "top"),
-                    padTop: 2
-                });
-
                 // make sure reposition happens outside the render cycle,
                 // and that the panel is not visible until it is in position.
-                element.style.opacity = 0;
-                setTimeout($A.getCallback(function () {
-                    self.lib.panelPositioning.reposition(function () {
+                window.requestAnimationFrame($A.getCallback(function () {
+                    if (!component.isValid()) {
+                        return;
+                    }
+                    element.style.opacity = 0;
+                    var viewPort = $A.util.getWindowSize();
+                    var elemRect = element.getBoundingClientRect();
+                    var referenceElemRect = target.getBoundingClientRect();
+                    var horizontalCornerAlignment = this.rightCornerFitsInViewport(viewPort, elemRect, referenceElemRect) ? "left" : "right";
+                    var verticalCornerAlignment = this.bottomCornerFitsInViewport(viewPort, elemRect, referenceElemRect) ? "top" : "bottom";
+                    component._constraint = component.positionConstraint = this.lib.panelPositioning.createRelationship({
+                        element: element,
+                        target: target,
+                        appendToBody: true,
+                        align: horizontalCornerAlignment + " " + verticalCornerAlignment,
+                        targetAlign: horizontalCornerAlignment + " " + (verticalCornerAlignment === "top" ? "bottom" : "top"),
+                        padTop: 2
+                    });
+
+                    this.lib.panelPositioning.reposition(function () {
                         element.style.opacity = 1;
                     });
-                }), 50);
+                }.bind(this)));
             }
         }
     },
 
-    unposition: function(component) {
-        if(component._constraint) {
+    unposition: function (component) {
+        if (component._constraint) {
             component._constraint.destroy();
-            delete component._constraint;
+            component._constraint = undefined;
         }
     },
 
-    rightCornerFitsInViewport: function(element, referenceElement) {
-        var viewPort = $A.util.getWindowSize();
-        var elemRect = element.getBoundingClientRect();
-        var referenceElemRect = referenceElement.getBoundingClientRect();
-        var width = typeof elemRect.width !== 'undefined' ? elemRect.width : elemRect.right - elemRect.left;
-
-        return (viewPort.width - referenceElemRect.left) > width;
+    rightCornerFitsInViewport: function (viewPort, elemRect, referenceElemRect) {
+        return (viewPort.width - referenceElemRect.left) > elemRect.width;
 
     },
 
-    bottomCornerFitsInViewport: function(element, referenceElement) {
-        var viewPort = $A.util.getWindowSize();
-        var elemRect = element.getBoundingClientRect();
-        var referenceElemRect = referenceElement.getBoundingClientRect();
-        var height = typeof elemRect.height !== 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
-
-        return (viewPort.height - referenceElemRect.bottom) > height;
+    bottomCornerFitsInViewport: function (viewPort, elemRect, referenceElemRect) {
+        return (viewPort.height - referenceElemRect.bottom) > elemRect.height;
 
     },
 

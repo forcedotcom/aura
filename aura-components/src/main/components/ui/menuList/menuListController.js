@@ -37,9 +37,12 @@
             var isPrintableCharacter =
                 (keyCode >= 48 && keyCode <= 57)
                 || (keyCode >= 65 && keyCode <= 90);
-            if (component.get("v.triggerTypeAhead") && isPrintableCharacter) {
+            var isVisible = component.get("v.visible");
+            // Enable type-ahead on trigger either when the menu is opened or the attribute is enabled.
+            var triggerTypeAheadEnabled = component.get("v.triggerTypeAhead") || isVisible;
+            if (triggerTypeAheadEnabled && isPrintableCharacter) {
                 $A.util.squash(originalEvent, true);
-                if (!component.get("v.visible")) {
+                if (!isVisible) {
                     component.set("v.visible", true);
                 }
                 window.requestAnimationFrame($A.getCallback(function() {

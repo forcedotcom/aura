@@ -16,17 +16,28 @@
 package org.auraframework.http;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.auraframework.AuraConfiguration;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.SerializationService;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.SourceLoader;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.throwable.ClientOutOfSyncException;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -102,6 +113,58 @@ public class AuraServletTest extends UnitTestCase {
         List<String> headers = response.getHeaders(name);
         assertEquals(String.format("Unexpected number of '%s' headers", name), 1, headers.size());
         assertEquals(String.format("Unexpected value for '%s' header", name), value, headers.get(0));
+    }
+    
+    @Mock
+    private ConfigAdapter configAdapter;
+    @Mock
+    private DefinitionService definitionService;
+    @Mock
+    private SerializationService serializationService;
+    
+    /*
+     * This test verify that we do definitionService.updateLoaded before serializationService.read, 
+     * when action from client arrives, if the client is running out-dated code, we will throw COOS to force it reload, 
+     * before the fix we always do de-serialization first, it could give us QFE, which leads to tons of Gack every release) 
+     * automation for W-3360478.
+     */
+    @Test
+    public void testDoPost_CoosBeforeQFE() throws Exception {
+        DefDescriptor<ApplicationDef> applicationDescriptor = Mockito.mock(DefDescriptor.class);
+        Mockito.when(applicationDescriptor.getDefType()).thenReturn(DefDescriptor.DefType.APPLICATION);
+    	contextService.startContext(Mode.PROD, null, Format.JSON, Authentication.AUTHENTICATED, applicationDescriptor);
+        
+        AuraContext auracontext = contextService.getCurrentContext();
+        
+        auracontext.setFrameworkUID("testFWUID");
+        Mockito.when(configAdapter.getAuraFrameworkNonce()).thenReturn("testFWUID");
+        
+    	MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setMethod("POST");
+        request.setScheme("http");
+        request.setServerName("server");
+        request.setServerPort(9090);
+        request.setRequestURI("/aura");
+        request.setParameter("JavaTest.echoText", "1");
+        request.setParameter("message", "{action:blablabla}");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
+        
+        ClientOutOfSyncException coos = new ClientOutOfSyncException("throw from test");
+        Mockito.doThrow(coos).when(definitionService).updateLoaded(Mockito.any());        
+        
+        DefinitionNotFoundException qfe = Mockito.mock(DefinitionNotFoundException.class);
+		Mockito.doThrow(qfe).when(serializationService).read(Mockito.any(), Mockito.any());
+        
+        servlet.setSerializationService(serializationService);
+        servlet.setServletUtilAdapter(servletUtilAdapter);
+        servlet.setConfigAdapter(configAdapter);
+        servlet.setDefinitionService(definitionService);
+        servlet.doPost(request, response);
+        
+        Mockito.verify(servletUtilAdapter).handleServletException(coos, false, auracontext, request, response, false);  
+        Mockito.verify(serializationService, Mockito.never()).read(Mockito.any(), Mockito.any());
     }
 
     @Test

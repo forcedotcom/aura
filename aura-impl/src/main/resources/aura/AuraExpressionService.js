@@ -324,7 +324,8 @@ AuraExpressionService.prototype.getContainer = function (cmp) {
     while ( ownerName === AuraExpressionService.AURA_ITERATION ||
             ownerName === AuraExpressionService.AURA_IF ||
             owner.isInstanceOf('ui:virtualComponent') ||
-            owner.isInstanceOf('ui:abstractList')) {
+            owner.isInstanceOf('ui:abstractList') ||
+            owner.isInstanceOf('ui:abstractDataGrid')) {
         owner = owner.getOwner();
         ownerName = owner.getName();
         if (owner === prevOwner) {

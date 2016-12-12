@@ -206,7 +206,8 @@
 	        "deleteCaption":                  { type: "function" },
 	        "rows":                           { type: "HTMLCollection" },
 	        "insertRow":                      { type: "function" },
-	        "deleteRow":                      { type: "function" }
+	        "deleteRow":                      { type: "function" },
+	        "width":                          { type: "string" }
 	    },
 	    "HTMLTableRowElement": {
 	        "cells":                          { type: "HTMLCollection" },

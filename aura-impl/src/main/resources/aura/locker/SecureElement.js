@@ -1091,7 +1091,8 @@ SecureElement.metadata = {
 			"deleteCaption":                  FUNCTION,
 			"rows":                           DEFAULT,
 			"insertRow":                      FUNCTION_TRUST_RETURN_VALUE,
-			"deleteRow":                      FUNCTION
+			"deleteRow":                      FUNCTION,
+			"width":                          DEFAULT
 		},
 		"HTMLTableRowElement": {
 			"cells":                          DEFAULT,

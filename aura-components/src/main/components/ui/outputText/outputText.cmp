@@ -18,7 +18,7 @@
 <aura:component implements="ui:visible" extensible="true" support="GA" access="GLOBAL" description="Displays text as specified by the value attribute.">
     <aura:import library="ui:eventLib" property="lib"/>
     <aura:attribute name="value" type="String" required="true" access="GLOBAL" description="The text displayed when this component is rendered."/>
-	<aura:attribute name="title" type="String" access="GLOBAL" description="The title attribute for the text in this component"/>
+	<aura:attribute name="title" type="String" access="GLOBAL" description="Displays extra information as hover text."/>
 	
     <span class="{!v.class}" dir="{!v.dir}" aura:id="span" title="{!v.title}"><!--value will be rendered here--></span>
 </aura:component>

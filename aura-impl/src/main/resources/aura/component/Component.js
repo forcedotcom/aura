@@ -785,6 +785,8 @@ Component.prototype.destroy = function(async) {
             }
         }
 
+        $A.eventService.removeHandlersByComponentId(globalId);
+
         if (this.model) {
             this.model.destroy(async);
         }
@@ -1306,7 +1308,7 @@ Component.prototype.trackComponentReplacement = function(prevCmps, key) {
         // This event is triggered by the renderingService.rerenderDirty method
         $A.eventService.addHandlerOnce({
             'event': 'aura:doneRendering', 
-            'globaId': 'componentService', 
+            'globalId': 'componentService', 
             'handler': handler
         });
     }

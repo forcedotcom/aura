@@ -280,6 +280,25 @@
         }
     },
 
+    testDestroyCleansUpDynamicallyAddedHandlers: {
+        test: function(cmp) {
+            var uniqueEventName = "markup://componentTest:destroy"
+
+            // Add a dynamic handler
+            $A.eventService.addHandler({
+                "event": uniqueEventName,
+                "globalId": cmp.getGlobalId(),
+                "handler": function(){}
+            });
+
+            // Delete component
+            cmp.destroy(false);
+
+            // Verify handler is no longer present on the component.
+            $A.test.assertFalse($A.eventService.hasHandlers(uniqueEventName), "The handler (" + uniqueEventName + ") should have been removed on delete of the component it was referencing.");
+        }
+    },
+
     verifyOuterFacetComponentDestroyed : function(cmp) {
         this.verifyChildComponentsDestroyed(cmp);
         $A.test.assertEquals(0, cmp.find("team").getElement().childNodes.length);

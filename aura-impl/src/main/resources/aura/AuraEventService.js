@@ -19,9 +19,10 @@
  * @export
  */
 function AuraEventService () {
-    this.eventDispatcher   = [];
+    this.eventDispatcher   = {};
     this.eventDefRegistry  = {};
     this.savedEventConfigs = {};
+    this.componentReferenceMap = {};
 }
 
 AuraEventService.Phase = {
@@ -818,6 +819,7 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
                             // not a valid component id. If the handler is associated with a component,
                             // make sure the component is still valid.
                             if(cmp && !cmp.isValid()) {
+                                delete defaultHandlersMap[globalId];
                                 continue;
                             }
                             if(rootCmp) {
@@ -1021,6 +1023,7 @@ AuraEventService.prototype.get = function(name, callback) {
 AuraEventService.prototype.addHandler = function(config) {
     config["event"] = this.qualifyEventName(config["event"]);
 
+    var globalId = config["globalId"];
     var handlers = this.eventDispatcher[config["event"]];
     if (!handlers) {
         this.eventDispatcher[config["event"]] = handlers = {};
@@ -1031,9 +1034,9 @@ AuraEventService.prototype.addHandler = function(config) {
         handlers[phase] = phaseHandlers = {};
     }
 
-    var cmpHandlers = phaseHandlers[config["globalId"]];
+    var cmpHandlers = phaseHandlers[globalId];
     if (cmpHandlers === undefined) {
-        phaseHandlers[config["globalId"]] = cmpHandlers = [];
+        phaseHandlers[globalId] = cmpHandlers = [];
     }
     var includeFacets = config["includeFacets"];
     // $A.util.getBooleanValue isn't available here immediately
@@ -1044,6 +1047,11 @@ AuraEventService.prototype.addHandler = function(config) {
         config["handler"].includeFacets = true;
     }
     cmpHandlers.push(config["handler"]);
+
+    if(!this.componentReferenceMap[globalId]) {
+        this.componentReferenceMap[globalId] = [];
+    }
+    this.componentReferenceMap[globalId].push({ "event": config["event"], "phase": phase });
 };
 
 /**
@@ -1066,6 +1074,23 @@ AuraEventService.prototype.removeHandler = function(config) {
     }
 };
 
+/**
+ * Removes all handlers in all the phases for a component. Used by component.destroy()
+ * @param {String} globalId the id of the component.
+ */
+AuraEventService.prototype.removeHandlersByComponentId = function(globalId) {
+    var references = this.componentReferenceMap[globalId];
+    if(references) {
+        var dispatcher = this.eventDispatcher;
+        for(var c=0,reference;c<references.length;c++) {
+            reference = references[c];
+            if(dispatcher[reference["event"]] && dispatcher[reference["event"]][reference["phase"]] && dispatcher[reference["event"]][reference["phase"]][globalId] ) {
+                delete dispatcher[reference["event"]][reference["phase"]][globalId];
+            }
+        }
+        delete this.componentReferenceMap[globalId];
+    }
+};
 
 /**
  * Adds an event handler that will trigger only once, and inmediately will be removed.
@@ -1297,8 +1322,18 @@ AuraEventService.prototype.saveEventConfig = function(config) {
  * @export
  */
 AuraEventService.prototype.hasHandlers = function(name) {
-    name = this.qualifyEventName(name);
-    return !$A.util.isUndefined(this.eventDispatcher[name]);
+    var qualifiedName = this.qualifyEventName(name);
+    var phases = this.eventDispatcher[qualifiedName];
+    if(phases) {
+        // If we added a handler, then removed it. The dispatcher will still have an entry for that event
+        // but we need to dig into the phases to see if there are any components 
+        for(var phase in phases) {
+            if(!$A.util.isEmpty(phases[phase])) {
+                return true;
+            }
+        }
+    }
+    return false;
 };
 
 /**

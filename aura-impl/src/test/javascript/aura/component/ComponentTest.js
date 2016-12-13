@@ -106,6 +106,9 @@ Test.Aura.Component.ComponentTest=function(){
                     index:function(){},
                     deIndex:function(){}
                 },
+                eventService: {
+                    removeHandlersByComponentId: function(){}
+                },
                 expressionService:{
                     clearReferences:function(){},
                     normalize:function(target){return target}

@@ -275,13 +275,14 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
 
     @Test
     public void testInlineJSNoCacheHeaders() throws Exception {
-        String url = "/l/" + AuraTextUtil.urlencode(getSimpleContext(Format.JS, false)) + "/inline.js";
+        String url = "/l/" + AuraTextUtil.urlencode(getSimpleContext(Format.JS, false)) + "/inline.js?jwt=TESTJWT";
 
         HttpGet get = obtainGetMethod(url);
         HttpResponse httpResponse = perform(get);
         get.releaseConnection();
 
         Header cacheControl[] = httpResponse.getHeaders(HttpHeaders.CACHE_CONTROL);
+        assertEquals(HttpStatus.SC_OK, getStatusCode(httpResponse));
         assertTrue(HttpHeaders.CACHE_CONTROL + " header must exists for inline.js", cacheControl.length > 0);
         assertTrue(HttpHeaders.CACHE_CONTROL + " header should be no-cache, no-store",
                 cacheControl[0].getValue().contains("no-cache, no-store"));

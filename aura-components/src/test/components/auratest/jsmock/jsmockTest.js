@@ -14,6 +14,7 @@
     }],
 
     testModelSuiteMocks : {
+        labels : ["basic"],
         test : function(cmp) {
             $A.test.assertEquals("<suite-level>supermock", $A.test.getText(cmp.find("output").getElement()));
         }
@@ -112,6 +113,7 @@
     },
 
     testActionString : {
+        labels : ["basic"],
         mocks : [{
             type : "ACTION",
             stubs : [{

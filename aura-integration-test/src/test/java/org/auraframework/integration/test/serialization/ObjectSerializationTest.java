@@ -65,7 +65,8 @@ public class ObjectSerializationTest extends AuraImplTestCase {
         assertEquals(null, newtest.getDescription());
         assertEquals("", newtest.getOwner());
         assertTrue(newtest.getBrowsers().isEmpty());
-        assertTrue(newtest.getTestLabels().isEmpty());
+        assertEquals(1, newtest.getTestLabels().size());
+        assertTrue(newtest.getTestLabels().contains("basic"));
         Definition def = newtest.getLocalDefs().get(0);
         assertEquals("java://org.auraframework.components.test.java.controller.JavaTestController", def.getDescriptor()
                 .getQualifiedName());

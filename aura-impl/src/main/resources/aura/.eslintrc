@@ -144,6 +144,8 @@
     "ls_unwrap": true,
     "ls_addToCache": true,
     "ls_getFromCache": true,
+    "ls_getData": true,
+    "ls_setData": true,
     "lazyInitInlinedSafeEvalWorkaround": true
   },
 

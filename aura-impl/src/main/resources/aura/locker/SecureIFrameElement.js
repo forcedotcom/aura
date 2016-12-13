@@ -42,7 +42,7 @@ var SecureIFrameElement = {
 	        contentWindow: {
 	        	get: function() {
 					var raw = SecureObject.getRaw(this, prototype);
-	        		return SecureIFrameContentWindow(raw.contentWindow, ls_getKey(this));
+	        		return raw.contentWindow ? SecureIFrameContentWindow(raw.contentWindow, ls_getKey(this)) : raw.contentWindow;
 	        	}
 	        }
 	    });

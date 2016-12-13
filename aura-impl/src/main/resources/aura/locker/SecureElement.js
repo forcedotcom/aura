@@ -143,13 +143,60 @@ function SecureElement(el, key) {
 	// Segregate prototypes by their locker
 	var prototypes = KEY_TO_PROTOTYPES.get(key);
 	if (!prototypes) {
-		prototypes = new Map();
-		KEY_TO_PROTOTYPES.set(key, prototypes);
+	    prototypes = new Map();
+	    KEY_TO_PROTOTYPES.set(key, prototypes);
 	}
 
 	var prototype = prototypes.get(tagName);
 	if (!prototype) {
-		prototype = Object.create(null);
+	    var expandoCapturingPrototype;
+	    if (SecureObject.useProxy()) {
+	        var basePrototype = Object.getPrototypeOf(el);
+    	    expandoCapturingPrototype = new Proxy({}, {
+    	        "getPrototypeOf": function() {
+    	            return basePrototype;
+    	        },
+    	        
+    	        "setPrototypeOf": function(target) {
+                    throw new Error("Attempt to set the prototype of: " + target);
+    	        },
+    	        
+    	        "get": function(target, property, receiver) {
+                    // If we got this far in the prototype chain and the requested property exists on the actual Element prototype 
+    	            // then we know the caller is trying to reference an unsupported property
+	                if (property in basePrototype) {                    
+	                    return undefined;
+	                }
+	                	                
+	                // Expando - retrieve it from a private locker scoped object
+	                var raw = SecureObject.getRaw(receiver, prototype);
+	                var data = ls_getData(raw, key);
+	                return data ? data[property] : undefined;
+    	        }, 	        
+                
+                "set": function(target, property, value, receiver) {
+                    // If we got this far in the prototype chain and the requested property exists on the actual Element prototype 
+                    // then we know the caller is trying to reference an unsupported property
+                    if (property in basePrototype) {                    
+                        return undefined;
+                    }   
+                    
+                    // Expando - store it from a private locker scoped object
+                    var raw = SecureObject.getRaw(receiver, prototype);
+                    var data = ls_getData(raw, key);
+                    if (!data) {
+                        data = {};
+                        ls_setData(raw, key, data);
+                    }
+                    
+                    data[property] = value;
+                    
+                    return true;
+                }
+    	    });
+	    }
+	    
+		prototype = Object.create(expandoCapturingPrototype || null);
 
 		// "class", "id", etc global attributes are special because they do not directly correspond to any property
 		var caseInsensitiveAttributes = { 
@@ -173,7 +220,7 @@ function SecureElement(el, key) {
 		});
 		
 		prototypes.set(tagName, prototype);
-
+		
 		var prototypicalInstance = Object.create(prototype);
 		ls_setRef(prototypicalInstance, el, key);
 
@@ -186,11 +233,15 @@ function SecureElement(el, key) {
 		// Conditionally add things that not all Node types support
 		if ("attributes" in el) {
 
-			// DCHASMAN TODO We need Proxy (208) to fully implement the syntax/sematics of Element.attributes!
+			// DCHASMAN TODO We need Proxy (208) to fully implement the syntax/semantics of Element.attributes!
 
 			tagNameSpecificConfig["attributes"] = SecureObject.createFilteredPropertyStateless("attributes", prototype, {
 				writable : false,
 				afterGetCallback : function(attributes) {
+				    if (!attributes) {
+				        return attribute;
+				    }
+				    
 					// Secure attributes
 					var secureAttributes = [];
 					var raw = SecureObject.getRaw(this, prototype);

@@ -36,6 +36,31 @@ function SecureObject(thing, key) {
 	return Object.seal(o);
 }
 
+var _useProxy;
+
+SecureObject.useProxy = function() {
+    if (_useProxy === undefined) {
+        _useProxy = false;
+        if ("Proxy" in window) {
+            // Attempt to create a proxy just to test if its really a Proxy and not some polyfill etc
+            try {
+                var handler = {
+                    "get": function(target, prop) {
+                        return prop === "foo" ? "proxied" : undefined;
+                    }
+                };
+                
+                var proxy = new Proxy({}, handler);
+                _useProxy = proxy["foo"] === "proxied";
+            } catch (e) {
+                // Do nothing
+            }
+        }
+    }
+        
+    return _useProxy;
+};
+
 SecureObject.getRaw = function(so, prototype) {
 	if (Object.getPrototypeOf(so) !== prototype) {
 		throw new Error("Blocked attempt to invoke secure method with altered prototype!");
@@ -157,27 +182,62 @@ SecureObject.filterEverything = function(st, raw, options) {
 				swallowed = SecureObject(raw, key);
 				mutated = true;
 			} else {
-				swallowed = {};
+			    // DCHASMAN Temporarily suppress the use of universal proxy until issue with TypeError: Illegal invocation with intrinsics can be corrected
+				swallowed = SecureObject.createUniversalProxy(raw, key, true);
 				mutated = true;
-				ls_setRef(swallowed, raw, key);
-
-				for (var name in raw) {
-					if (typeof raw[name] === "function") {
-						Object.defineProperty(swallowed, name, SecureObject.createFilteredMethod(swallowed, raw, name, {
-							filterOpaque : true
-						}));
-					} else {
-						Object.defineProperty(swallowed, name, SecureObject.createFilteredProperty(swallowed, raw, name, {
-							filterOpaque : true
-						}));
-					}
-				}
-				ls_addToCache(raw, swallowed, key);
 			}
 		}
 	}
 
 	return mutated ? swallowed : raw;
+};
+
+var univeralProxyHandler = {
+    "get": function(target, property, receiver) {
+        var value = target[property];
+        return value ? SecureObject.filterEverything(receiver, value) : value;
+    },
+    
+    "set": function(target, property, value, receiver) {
+        target[property] = SecureObject.unfilterEverything(receiver, value);
+        
+        return true;
+    }
+    
+    // DCHASMAN TODO apply and construct traps
+    /*apply: function(target, thisArg, argumentsList) {
+    },
+    
+    construct: function(target, argumentsList, newTarget) {
+    }*/
+};
+
+SecureObject.createUniversalProxy = function(raw, key, doNotUseProxy) {
+    var swallowed;
+    if (SecureObject.useProxy() && doNotUseProxy !== true) {
+        swallowed = new Proxy(raw, univeralProxyHandler);
+        ls_setKey(swallowed, key);
+    } else {
+        // Fallback for environments that do not support Proxy
+        swallowed = {};
+        ls_setRef(swallowed, raw, key);
+    
+        for (var name in raw) {
+            if (typeof raw[name] === "function") {
+                Object.defineProperty(swallowed, name, SecureObject.createFilteredMethod(swallowed, raw, name, {
+                    filterOpaque : true
+                }));
+            } else {
+                Object.defineProperty(swallowed, name, SecureObject.createFilteredProperty(swallowed, raw, name, {
+                    filterOpaque : true
+                }));
+            }
+        }
+    }
+    
+    ls_addToCache(raw, swallowed, key);
+    
+    return swallowed;
 };
 
 SecureObject.unfilterEverything = function(st, value, visited) {

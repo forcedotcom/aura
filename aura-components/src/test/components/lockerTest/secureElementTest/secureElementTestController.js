@@ -30,8 +30,9 @@
         var auraId = event.getParam("arguments").auraId;
         var elementPropertiesWhitelist = event.getParam("arguments").elementPropertiesWhitelist;
         var elementPropertiesBlacklist = event.getParam("arguments").elementPropertiesBlacklist;
-        var element = cmp.find(auraId).getElement();
-
+        var c = cmp.find(auraId);
+        var element = c.getElement();
+        
         elementPropertiesWhitelist.forEach(function(name) {
             testUtils.assertTrue(name in element, "Expected property '" + name + "' to be a property on SecureElement");
         });

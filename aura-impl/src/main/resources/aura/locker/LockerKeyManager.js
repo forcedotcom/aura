@@ -18,8 +18,7 @@
   * This is internal Locker API. We can export those methods because we know that there is never
   * more than one LockerService instance created (otherwise these would be overwritten), and
   * because all Aura objects are created inside an IIC function (otherwise objects would be
-  * exported on window and available outside of Aura Framework). Those replace & expand the functions
-  * getLockerSecret and setLockerSecret use in previous iterations of LockerService.
+  * exported on window and available outside of Aura Framework). 
   */
 
 var ls_getKey,
@@ -29,6 +28,8 @@ var ls_getKey,
     ls_verifyAccess,
     ls_getRef,
     ls_setRef,
+    ls_getData,
+    ls_setData,
     ls_isOpaque,
     ls_unwrap,
     ls_addToCache,
@@ -59,10 +60,11 @@ var ls_getKey,
 
     // Keyed objects can only have one owner. We prevent "null" and "undefined"
     // keys by guarding all set operations.
-    var keychain = newWeakMap();      // Replaces $lskey
-    var rawToSecureByKey = newMap();  // Replaces rawToSecureObjectCaches
-    var secureToRaw = newWeakMap();   // Replaces $lsref
-    var opaqueSecure = newWeakMap();  // Replaces $lsopaque
+    var keychain = newWeakMap();      
+    var rawToSecureByKey = newMap(); 
+    var secureToRaw = newWeakMap(); 
+    var opaqueSecure = newWeakMap();
+    var objectToKeyedData = newWeakMap();  
 
     // ALL METHODS BELOW USE KEY ONLY
 
@@ -70,7 +72,6 @@ var ls_getKey,
      * LockerService internal API.
      * Gets the key associated to a thing. The existence of a key means
      * the object has already been trusted.
-     * replaces getLockerSecret(thing, "key").
      */
     ls_getKey = function(thing) {
         return keychain.get(thing);
@@ -81,7 +82,6 @@ var ls_getKey,
      * Sets the key on a thing to mark it trusted. Trustred objects can't
      * have multiple keys, and we throw if there is an attempt to override
      * an existing key.
-     * Replaces setLockerSecret(thing, "key") used previously.
      */
     ls_setKey = function(thing, key) {
         if (!thing) {
@@ -105,7 +105,6 @@ var ls_getKey,
      * LockerService internal API.
      * The trust operation propagates the key to the thing being trusted.
      * This method is used when the key is not known.
-     * Moved from $A.lockerService.trust().
      */
     ls_trust = function(from, thing) {
     	if (from) {
@@ -119,7 +118,6 @@ var ls_getKey,
     /**
      * LockerService internal API.
      * Compare the keys of two objects.
-     * Moved from $A.lockerService.util.hasAccess().
      */
     ls_hasAccess = function(from, to) {
         return keychain.get(from) === keychain.get(to);
@@ -129,7 +127,6 @@ var ls_getKey,
      * LockerService internal API.
      * Assert that the keys of two objects are the same,
      * and, optionally, that the target object is not opaque.
-     * Moved from $A.lockerService.util.verifyAccess().
      */
     ls_verifyAccess = function(from, to, skipOpaque) {
         var fromKey = keychain.get(from);
@@ -148,7 +145,6 @@ var ls_getKey,
      * LockerService internal API.
      * Verify access and retrieve the reference,
      * optionally verifying whether the object is opaque.
-     * Replaces getLockerSecret(st, "ref").
      */
     ls_getRef = function(st, key, skipOpaque) {
         var toKey = keychain.get(st);
@@ -167,8 +163,6 @@ var ls_getKey,
      * Trust a secure object and create a secure to raw relation. We combine the
      * two operations to leverage the setKey validation to prevent any change
      * to references and to opacity using a different key.
-     * Replaces setLockerSecret(st, "key", key), setLockerSecret(st, "ref", raw),
-     * and optionally $A.lockerService.markOpaque(st);
      */
     ls_setRef = function(st, raw, key, isOpaque) {
         if (!st) {
@@ -186,8 +180,30 @@ var ls_getKey,
 
     /**
      * LockerService internal API.
+     * Given a object/key pair get the associated data object for the pair
+     */
+    ls_getData = function(object, key) {
+        var keyedData = objectToKeyedData.get(object);
+        return keyedData ? keyedData.get(key) : undefined;
+    };
+
+    /**
+     * LockerService internal API.
+     * Given a object/key pair set the associated data object for the pair
+     */
+    ls_setData = function(object, key, data) {
+        var keyedData = objectToKeyedData.get(object);
+        if (!keyedData) {
+            keyedData = newWeakMap();
+            objectToKeyedData.set(object, keyedData);
+        }
+        
+        keyedData.set(key, data);
+    };
+    
+    /**
+     * LockerService internal API.
      * Returns whether or not the provided object has been marked opaque.
-     * Moved from $A.lockerService.isOpaque(st).
      */
     ls_isOpaque = function(st) {
         return opaqueSecure.get(st) === true;
@@ -198,7 +214,6 @@ var ls_getKey,
      * Verify access and retrieve the raw object,
      * optionally verifying whether the object is opaque.
      * This method is used when the key is not known.
-     * Moved from $A.lockerService.unwrap().
      */
     ls_unwrap = function(from, st, skipOpaque) {
     	if (!st) {
@@ -228,7 +243,6 @@ var ls_getKey,
      * LockerService internal API.
      * Stores a SecureType under the provided raw object and key
      * to reduce cost of re-creation and improve identity continuity.
-     * Moved from SecureObject.addToCache().
      */
     ls_addToCache = function(raw, st, key) {
         if (!raw) {
@@ -251,7 +265,6 @@ var ls_getKey,
     /**
      * LockerService internal API.
      * Retrieve the SecureType associated with the given raw object and key.
-     * Moved from SecureObject.getCached().
      */
     ls_getFromCache = function(raw, key) {
         var rawToSecure = rawToSecureByKey.get(key);

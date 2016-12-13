@@ -18,15 +18,12 @@ package org.auraframework.impl.source.file;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.Parser.Format;
@@ -36,8 +33,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.IOUtil;
 
 public class FileSource<D extends Definition> extends Source<D> {
-
-    private static final long serialVersionUID = -5816647732422404876L;
     private final File file;
     private final long lastModified;
     private final String url;
@@ -69,21 +64,6 @@ public class FileSource<D extends Definition> extends Source<D> {
             throw new AuraRuntimeException(e);
         } catch (UnsupportedEncodingException uee) {
             throw new AuraError(uee);
-        }
-    }
-
-    @Override
-    public Writer getWriter() {
-        try {
-            if (!file.exists()) {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-            } else if (!file.canWrite()) {
-                Aura.getSourceControlAdapter().checkout(file);
-            }
-            return new FileWriter(file);
-        } catch (Exception e) {
-            throw new AuraRuntimeException(e);
         }
     }
 
@@ -126,14 +106,5 @@ public class FileSource<D extends Definition> extends Source<D> {
     @Override
     public boolean exists() {
         return file.exists();
-    }
-
-    @Override
-    public boolean addOrUpdate(CharSequence newContents) {
-        try {
-            return Aura.getSourceControlAdapter().writeIfDifferent(new StringBuilder(newContents), file);
-        } catch (IOException e) {
-            throw new AuraRuntimeException(e);
-        }
     }
 }

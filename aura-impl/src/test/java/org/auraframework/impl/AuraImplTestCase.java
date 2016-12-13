@@ -29,18 +29,18 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.ModelDef;
 import org.auraframework.impl.java.model.JavaModelDefImpl;
 import org.auraframework.impl.test.util.AuraImplUnitTestingUtil;
+import org.auraframework.impl.util.AuraTestingUtil;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Model;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
-import org.auraframework.system.Source;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.util.AuraTestCase;
-import org.auraframework.test.util.AuraTestingUtil;
 import org.auraframework.util.json.JsonSerializationContext;
 
 /**

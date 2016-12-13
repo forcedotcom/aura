@@ -16,7 +16,6 @@
 package org.auraframework.http;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -26,13 +25,11 @@ import org.auraframework.AuraConfiguration;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.SourceLoader;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;

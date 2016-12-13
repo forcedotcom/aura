@@ -20,7 +20,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Component;
 import org.auraframework.util.test.annotation.AuraTestLabels;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**

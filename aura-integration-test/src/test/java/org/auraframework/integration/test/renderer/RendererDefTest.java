@@ -15,18 +15,17 @@
  */
 package org.auraframework.integration.test.renderer;
 
+import java.util.Map;
+
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.junit.Test;
-
-import java.util.Map;
 
 /**
  * This class has automation to verify implementation of rendering for

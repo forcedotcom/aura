@@ -13,11 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.util;
+package org.auraframework.impl.util;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicLong;
+
+import javax.annotation.Nullable;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -31,21 +37,16 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener;
+import org.auraframework.test.source.StringSource;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.FileMonitor;
 import org.auraframework.util.json.JsonEncoder;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import javax.annotation.Nullable;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicLong;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class AuraTestingUtil {
     public static final long CACHE_CLEARING_TIMEOUT_SECS = 60;
@@ -123,6 +124,9 @@ public class AuraTestingUtil {
     public void updateSource(final DefDescriptor<?> desc, String content) {
         Source<?> src = getSource(desc);
 
+        if (src == null) {
+            throw new RuntimeException("unable to find "+desc);
+        }
         final Semaphore updated = new Semaphore(0);
         SourceListener changeListener = new SourceListener() {
             @Override
@@ -134,7 +138,12 @@ public class AuraTestingUtil {
         };
         fileMonitor.subscribeToChangeNotification(changeListener);
         try {
-            src.addOrUpdate(content);
+            if (StringSource.class.isAssignableFrom(src.getClass())) {
+                stringSourceLoader.putSource(src.getDescriptor(), content, true);
+            } else {
+                // FIXME:
+                throw new RuntimeException("Implement me");
+            }
             updated.acquire();
         } catch (InterruptedException e) {
             throw new RuntimeException("Interrupted while waiting for updated source event", e);
@@ -402,17 +411,4 @@ public class AuraTestingUtil {
         sb.setCharAt(3, flip);
         return sb.toString();
     }
-
-    /**
-     * Starts spring application context with provided annotated configuration class
-     *
-     * @param configurationClass annotated spring configuration class
-     */
-    public void startSpringContext(Class<?> configurationClass) {
-        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
-        applicationContext.register(configurationClass);
-        applicationContext.refresh();
-        applicationContext.close();
-    }
-
 }

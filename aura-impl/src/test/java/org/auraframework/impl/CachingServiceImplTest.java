@@ -53,344 +53,344 @@ import java.util.concurrent.locks.Lock;
 
 public class CachingServiceImplTest extends AuraImplTestCase {
 
-	private class Log4jCaptureAppender extends AppenderSkeleton {
+    private class Log4jCaptureAppender extends AppenderSkeleton {
 
-		List<LoggingEvent> events;
+        List<LoggingEvent> events;
 
-		public Log4jCaptureAppender(List<LoggingEvent> events) {
-			this.events = events;
-		}
+        public Log4jCaptureAppender(List<LoggingEvent> events) {
+            this.events = events;
+        }
 
-		@Override
-		public void close() {
-		}
+        @Override
+        public void close() {
+        }
 
-		@Override
-		public boolean requiresLayout() {
-			return false;
-		}
+        @Override
+        public boolean requiresLayout() {
+            return false;
+        }
 
-		@Override
-		protected void append(LoggingEvent event) {
-			events.add(event);
-		}
-	}
+        @Override
+        protected void append(LoggingEvent event) {
+            events.add(event);
+        }
+    }
 
-	@Inject
-	private LoggingAdapter loggingAdapter;
+    @Inject
+    private LoggingAdapter loggingAdapter;
 
-	@Test
-	public void testNotifyDependentSourceChange_LogsErrorIfWriteLockLocked() {
-		// capture logger output
-		StringWriter writer = new StringWriter();
-		Logger logger = Logger.getLogger(CachingServiceImpl.class);
-		logger.addAppender(new WriterAppender(new SimpleLayout(), writer));
-		List<LoggingEvent> events = Lists.newLinkedList();
-		logger.addAppender(new Log4jCaptureAppender(events));
+    @Test
+    public void testNotifyDependentSourceChange_LogsErrorIfWriteLockLocked() {
+        // capture logger output
+        StringWriter writer = new StringWriter();
+        Logger logger = Logger.getLogger(CachingServiceImpl.class);
+        logger.addAppender(new WriterAppender(new SimpleLayout(), writer));
+        List<LoggingEvent> events = Lists.newLinkedList();
+        logger.addAppender(new Log4jCaptureAppender(events));
 
-		// grab the lock
-		CachingServiceImpl cachingService = new CachingServiceImpl();
-		cachingService.setLoggingAdapter(loggingAdapter);
-		cachingService.initializeCaches();
-		Lock lock = cachingService.getReadLock();
-		try {
-			lock.lock();
+        // grab the lock
+        CachingServiceImpl cachingService = new CachingServiceImpl();
+        cachingService.setLoggingAdapter(loggingAdapter);
+        cachingService.initializeCaches();
+        Lock lock = cachingService.getReadLock();
+        try {
+            lock.lock();
 
-			// try to notify
-			cachingService.notifyDependentSourceChange(null, null, null, null);
-			long start = System.nanoTime();
-			do {
-				if (!events.isEmpty()) {
-					assertEquals("Unexpected number of events", 1,
-							events.size());
-					LoggingEvent event = events.get(0);
-					assertEquals("Unexpected logging level", Level.ERROR,
-							event.getLevel());
-					assertEquals(
-							"Couldn't acquire cache clear lock in a reasonable time.  Cache may be stale until next clear.",
-							event.getMessage());
-					return;
-				}
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-				}
-			} while (System.nanoTime() - start < 10000000000L); // 10 secs from now
-			fail("Timed out waiting for error event due to unobtainable lock");
-		} finally {
-			lock.unlock();
-		}
-	}
+            // try to notify
+            cachingService.notifyDependentSourceChange(null, null, null, null);
+            long start = System.nanoTime();
+            do {
+                if (!events.isEmpty()) {
+                    assertEquals("Unexpected number of events", 1,
+                            events.size());
+                    LoggingEvent event = events.get(0);
+                    assertEquals("Unexpected logging level", Level.ERROR,
+                            event.getLevel());
+                    assertEquals(
+                            "Couldn't acquire cache clear lock in a reasonable time.  Cache may be stale until next clear.",
+                            event.getMessage());
+                    return;
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                }
+            } while (System.nanoTime() - start < 10000000000L); // 10 secs from now
+            fail("Timed out waiting for error event due to unobtainable lock");
+        } finally {
+            lock.unlock();
+        }
+    }
 
-	@Test
-	public void testNotifyDependentSourceChange_NotifiesListeners() {
-		DefDescriptor<?> source = definitionService.getDefDescriptor(
-				getAuraTestingUtil().getNonce("some:descriptor"),
-				ComponentDef.class);
-		SourceMonitorEvent event = SourceMonitorEvent.CHANGED;
-		String filePath = "someFilePath";
-		Collection<WeakReference<SourceListener>> listeners = Sets.newHashSet();
-		for (int i = 0; i < 3; i++) {
-			listeners.add(new WeakReference<>(Mockito
-					.mock(SourceListener.class)));
-		}
+    @Test
+    public void testNotifyDependentSourceChange_NotifiesListeners() {
+        DefDescriptor<?> source = definitionService.getDefDescriptor(
+                getAuraTestingUtil().getNonce("some:descriptor"),
+                ComponentDef.class);
+        SourceMonitorEvent event = SourceMonitorEvent.CHANGED;
+        String filePath = "someFilePath";
+        Collection<WeakReference<SourceListener>> listeners = Sets.newHashSet();
+        for (int i = 0; i < 3; i++) {
+            listeners.add(new WeakReference<>(Mockito
+                    .mock(SourceListener.class)));
+        }
 
-		CachingServiceImpl cachingService = new CachingServiceImpl();
-		cachingService.setLoggingAdapter(loggingAdapter);
-		cachingService.initializeCaches();
-		cachingService.notifyDependentSourceChange(listeners, source, event, filePath);
-		for (WeakReference<SourceListener> ref : listeners) {
-			Mockito.verify(ref.get(), Mockito.times(1)).onSourceChanged(source,
-					event, filePath);
-		}
-	}
+        CachingServiceImpl cachingService = new CachingServiceImpl();
+        cachingService.setLoggingAdapter(loggingAdapter);
+        cachingService.initializeCaches();
+        cachingService.notifyDependentSourceChange(listeners, source, event, filePath);
+        for (WeakReference<SourceListener> ref : listeners) {
+            Mockito.verify(ref.get(), Mockito.times(1)).onSourceChanged(source,
+                    event, filePath);
+        }
+    }
 
-	@Test
-	public void testNotifyDependentSourceChange_NotifiesNoListeners() {
-		DefDescriptor<?> source = definitionService.getDefDescriptor(
-				getAuraTestingUtil().getNonce("some:descriptor"),
-				ComponentDef.class);
-		SourceMonitorEvent event = SourceMonitorEvent.CHANGED;
-		String filePath = "someFilePath";
-		Collection<WeakReference<SourceListener>> listeners = Sets.newHashSet();
+    @Test
+    public void testNotifyDependentSourceChange_NotifiesNoListeners() {
+        DefDescriptor<?> source = definitionService.getDefDescriptor(
+                getAuraTestingUtil().getNonce("some:descriptor"),
+                ComponentDef.class);
+        SourceMonitorEvent event = SourceMonitorEvent.CHANGED;
+        String filePath = "someFilePath";
+        Collection<WeakReference<SourceListener>> listeners = Sets.newHashSet();
 
-		CachingServiceImpl cachingService = new CachingServiceImpl();
-		cachingService.setLoggingAdapter(loggingAdapter);
-		cachingService.initializeCaches();
-		cachingService.notifyDependentSourceChange(listeners, source, event, filePath);
-	}
+        CachingServiceImpl cachingService = new CachingServiceImpl();
+        cachingService.setLoggingAdapter(loggingAdapter);
+        cachingService.initializeCaches();
+        cachingService.notifyDependentSourceChange(listeners, source, event, filePath);
+    }
 
-	private <K, V> void testNotifyDependentSourceChange_InvalidatesSomeCachedValues(
-			CachingService cachingService, Cache<K, V> cache,
-			Function<K, V> valGenerator, Set<K> keys, DefDescriptor<?> source,
-			Set<K> invalidatedKeys) {
+    private <K, V> void testNotifyDependentSourceChange_InvalidatesSomeCachedValues(
+            CachingService cachingService, Cache<K, V> cache,
+            Function<K, V> valGenerator, Set<K> keys, DefDescriptor<?> source,
+            Set<K> invalidatedKeys) {
 
-		// populate cache
-		for (K key : keys) {
-			cache.put(key, valGenerator.apply(key));
-		}
+        // populate cache
+        for (K key : keys) {
+            cache.put(key, valGenerator.apply(key));
+        }
 
-		// check cache value existence
-		for (K key : keys) {
-			assertNotNull("Cache missing value for " + key,
-					cache.getIfPresent(key));
-		}
+        // check cache value existence
+        for (K key : keys) {
+            assertNotNull("Cache missing value for " + key,
+                    cache.getIfPresent(key));
+        }
 
-		// call target function
-		cachingService.notifyDependentSourceChange(
-				Collections.<WeakReference<SourceListener>> emptySet(), source,
-				null, null);
+        // call target function
+        cachingService.notifyDependentSourceChange(
+                Collections.<WeakReference<SourceListener>> emptySet(), source,
+                null, null);
 
-		// check for invalidated and untouched keys
-		for (K key : keys) {
-			V val = cache.getIfPresent(key);
-			if (invalidatedKeys.contains(key)) {
-				assertNull("Cache not invalidated for " + key, val);
-			} else {
-				assertNotNull("Missing cached value for " + key, val);
-			}
-		}
-	}
+        // check for invalidated and untouched keys
+        for (K key : keys) {
+            V val = cache.getIfPresent(key);
+            if (invalidatedKeys.contains(key)) {
+                assertNull("Cache not invalidated for " + key, val);
+            } else {
+                assertNotNull("Missing cached value for " + key, val);
+            }
+        }
+    }
 
-	private <K, V> void testNotifyDependentSourceChange_InvalidatesAllCachedValues(
-			CachingService cachingService, Cache<K, V> cache,
-			Function<K, V> valGenerator, Set<K> keys) {
-		testNotifyDependentSourceChange_InvalidatesSomeCachedValues(cachingService,
-				cache, valGenerator, keys, null, keys);
-	}
+    private <K, V> void testNotifyDependentSourceChange_InvalidatesAllCachedValues(
+            CachingService cachingService, Cache<K, V> cache,
+            Function<K, V> valGenerator, Set<K> keys) {
+        testNotifyDependentSourceChange_InvalidatesSomeCachedValues(cachingService,
+                cache, valGenerator, keys, null, keys);
+    }
 
-	private Function<DefDescriptor<?>, Optional<? extends Definition>> mockDefinitionFunction = new Function<DefDescriptor<?>, Optional<? extends Definition>>() {
-		@Override
-		public Optional<? extends Definition> apply(DefDescriptor<?> key) {
-			return Optional.of(Mockito.mock(Definition.class));
-		}
-	};
+    private Function<DefDescriptor<?>, Optional<? extends Definition>> mockDefinitionFunction = new Function<DefDescriptor<?>, Optional<? extends Definition>>() {
+        @Override
+        public Optional<? extends Definition> apply(DefDescriptor<?> key) {
+            return Optional.of(Mockito.mock(Definition.class));
+        }
+    };
 
-	@Test
-	public void testNotifyDependentSourceChange_InvalidatesAllCachedDependencies() {
-		Set<String> keys = Sets.newHashSet(
-				getAuraTestingUtil().getNonce("some:descriptor"),
-				getAuraTestingUtil().getNonce("other:descriptor"),
-				getAuraTestingUtil().getNonce("some:extra"));
+    @Test
+    public void testNotifyDependentSourceChange_InvalidatesAllCachedDependencies() {
+        Set<String> keys = Sets.newHashSet(
+                getAuraTestingUtil().getNonce("some:descriptor"),
+                getAuraTestingUtil().getNonce("other:descriptor"),
+                getAuraTestingUtil().getNonce("some:extra"));
 
-		CachingServiceImpl cachingService = new CachingServiceImpl();
-		cachingService.setLoggingAdapter(loggingAdapter);
-		cachingService.initializeCaches();
-		testNotifyDependentSourceChange_InvalidatesAllCachedValues(cachingService,
-				cachingService.getDepsCache(),
-				new Function<String, DependencyEntry>() {
-					@Override
-					public DependencyEntry apply(String key) {
-						return new DependencyEntry(null);
-					}
-				}, keys);
-	}
+        CachingServiceImpl cachingService = new CachingServiceImpl();
+        cachingService.setLoggingAdapter(loggingAdapter);
+        cachingService.initializeCaches();
+        testNotifyDependentSourceChange_InvalidatesAllCachedValues(cachingService,
+                cachingService.getDepsCache(),
+                new Function<String, DependencyEntry>() {
+                    @Override
+                    public DependencyEntry apply(String key) {
+                        return new DependencyEntry(null);
+                    }
+                }, keys);
+    }
 
-	@Test
-	public void testNotifyDependentSourceChange_InvalidatesAllCachedDescriptorFilters() {
-		Set<String> keys = Sets.newHashSet(
-				getAuraTestingUtil().getNonce("some:descriptor"),
-				getAuraTestingUtil().getNonce("other:descriptor"),
-				getAuraTestingUtil().getNonce("some:extra"));
+    @Test
+    public void testNotifyDependentSourceChange_InvalidatesAllCachedDescriptorFilters() {
+        Set<String> keys = Sets.newHashSet(
+                getAuraTestingUtil().getNonce("some:descriptor"),
+                getAuraTestingUtil().getNonce("other:descriptor"),
+                getAuraTestingUtil().getNonce("some:extra"));
 
-		CachingServiceImpl cachingService = new CachingServiceImpl();
-		cachingService.setLoggingAdapter(loggingAdapter);
-		cachingService.initializeCaches();
-		testNotifyDependentSourceChange_InvalidatesAllCachedValues(cachingService,
-				cachingService.getDescriptorFilterCache(),
-				new Function<String, Set<DefDescriptor<?>>>() {
-					@Override
-					public Set<DefDescriptor<?>> apply(String key) {
-						return Collections.emptySet();
-					}
-				}, keys);
-	}
+        CachingServiceImpl cachingService = new CachingServiceImpl();
+        cachingService.setLoggingAdapter(loggingAdapter);
+        cachingService.initializeCaches();
+        testNotifyDependentSourceChange_InvalidatesAllCachedValues(cachingService,
+                cachingService.getDescriptorFilterCache(),
+                new Function<String, Set<DefDescriptor<?>>>() {
+                    @Override
+                    public Set<DefDescriptor<?>> apply(String key) {
+                        return Collections.emptySet();
+                    }
+                }, keys);
+    }
 
-	@Test
-	public void testNotifyDependentSourceChange_InvalidatesAllCachedStrings() {
-		Set<String> keys = Sets.newHashSet(
-				getAuraTestingUtil().getNonce("some:descriptor"),
-				getAuraTestingUtil().getNonce("other:descriptor"),
-				getAuraTestingUtil().getNonce("some:extra"));
+    @Test
+    public void testNotifyDependentSourceChange_InvalidatesAllCachedStrings() {
+        Set<String> keys = Sets.newHashSet(
+                getAuraTestingUtil().getNonce("some:descriptor"),
+                getAuraTestingUtil().getNonce("other:descriptor"),
+                getAuraTestingUtil().getNonce("some:extra"));
 
-		CachingServiceImpl cachingService = new CachingServiceImpl();
-		cachingService.setLoggingAdapter(loggingAdapter);
-		cachingService.initializeCaches();
-		testNotifyDependentSourceChange_InvalidatesAllCachedValues(cachingService,
-				cachingService.getStringsCache(), new Function<String, String>() {
-					@Override
-					public String apply(String key) {
-						return "";
-					}
-				}, keys);
-	}
+        CachingServiceImpl cachingService = new CachingServiceImpl();
+        cachingService.setLoggingAdapter(loggingAdapter);
+        cachingService.initializeCaches();
+        testNotifyDependentSourceChange_InvalidatesAllCachedValues(cachingService,
+                cachingService.getStringsCache(), new Function<String, String>() {
+                    @Override
+                    public String apply(String key) {
+                        return "";
+                    }
+                }, keys);
+    }
 
-	@Test
-	public void testNotifyDependentSourceChange_InvalidatesAllCachedDefinitionsIfDescriptorNull() {
-		Set<DefDescriptor<?>> keys = Sets.newHashSet();
-		keys.add(definitionService.getDefDescriptor(
-				getAuraTestingUtil().getNonce("some:descriptor"),
-				ComponentDef.class));
-		keys.add(definitionService.getDefDescriptor(
-				getAuraTestingUtil().getNonce("other:descriptor"),
-				ComponentDef.class));
-		keys.add(definitionService
-				.getDefDescriptor(getAuraTestingUtil().getNonce("some:extra"),
-						ComponentDef.class));
+    @Test
+    public void testNotifyDependentSourceChange_InvalidatesAllCachedDefinitionsIfDescriptorNull() {
+        Set<DefDescriptor<?>> keys = Sets.newHashSet();
+        keys.add(definitionService.getDefDescriptor(
+                getAuraTestingUtil().getNonce("some:descriptor"),
+                ComponentDef.class));
+        keys.add(definitionService.getDefDescriptor(
+                getAuraTestingUtil().getNonce("other:descriptor"),
+                ComponentDef.class));
+        keys.add(definitionService
+                .getDefDescriptor(getAuraTestingUtil().getNonce("some:extra"),
+                        ComponentDef.class));
 
-		CachingServiceImpl cachingService = new CachingServiceImpl();
-		cachingService.setLoggingAdapter(loggingAdapter);
-		cachingService.initializeCaches();
-		testNotifyDependentSourceChange_InvalidatesAllCachedValues(cachingService,
-				cachingService.getDefsCache(), mockDefinitionFunction, keys);
-	}
+        CachingServiceImpl cachingService = new CachingServiceImpl();
+        cachingService.setLoggingAdapter(loggingAdapter);
+        cachingService.initializeCaches();
+        testNotifyDependentSourceChange_InvalidatesAllCachedValues(cachingService,
+                cachingService.getDefsCache(), mockDefinitionFunction, keys);
+    }
 
-	private Set<DefDescriptor<?>> createDescriptors(DefDescriptor<?> baseDesc) {
-		Set<DefDescriptor<?>> res = Sets.newHashSet();
-		for (DefType defType : DefType.values()) {
-			// just use markup for these dummy descriptors
-			res.add(DefDescriptorImpl.getAssociateDescriptor(baseDesc,
-					defType.getPrimaryInterface(), DefDescriptor.MARKUP_PREFIX));
-		}
-		return res;
-	}
+    private Set<DefDescriptor<?>> createDescriptors(DefDescriptor<?> baseDesc) {
+        Set<DefDescriptor<?>> res = Sets.newHashSet();
+        for (DefType defType : DefType.values()) {
+            // just use markup for these dummy descriptors
+            res.add(DefDescriptorImpl.getAssociateDescriptor(baseDesc,
+                    defType.getPrimaryInterface(), DefDescriptor.MARKUP_PREFIX));
+        }
+        return res;
+    }
 
-	private <V> void testNotifyDependentSourceChange_InvalidatesSome(
-			CachingService cachingService, Cache<DefDescriptor<?>, V> cache,
-			Function<DefDescriptor<?>, V> valGenerator,
-			Set<DefDescriptor<?>> baseDds, DefDescriptor<?> source,
-			Set<DefDescriptor<?>> invalidatedDds) {
+    private <V> void testNotifyDependentSourceChange_InvalidatesSome(
+            CachingService cachingService, Cache<DefDescriptor<?>, V> cache,
+            Function<DefDescriptor<?>, V> valGenerator,
+            Set<DefDescriptor<?>> baseDds, DefDescriptor<?> source,
+            Set<DefDescriptor<?>> invalidatedDds) {
 
-		Set<DefDescriptor<?>> dds = Sets.newHashSet();
-		for (DefDescriptor<?> baseDesc : baseDds) {
-			dds.addAll(createDescriptors(baseDesc));
-		}
+        Set<DefDescriptor<?>> dds = Sets.newHashSet();
+        for (DefDescriptor<?> baseDesc : baseDds) {
+            dds.addAll(createDescriptors(baseDesc));
+        }
 
-		testNotifyDependentSourceChange_InvalidatesSomeCachedValues(cachingService,
-				cache, valGenerator, dds, source, invalidatedDds);
-	}
+        testNotifyDependentSourceChange_InvalidatesSomeCachedValues(cachingService,
+                cache, valGenerator, dds, source, invalidatedDds);
+    }
 
-	@Test
-	public void testNotifyDependentSourceChange_InvalidatesCachedSelfAndCmpDefinitionsIfDescriptorFound() {
-		DefDescriptor<?> source = definitionService.getDefDescriptor(
-				getAuraTestingUtil().getNonce("markup://some.desc"),
-				HelperDef.class);
+    @Test
+    public void testNotifyDependentSourceChange_InvalidatesCachedSelfAndCmpDefinitionsIfDescriptorFound() {
+        DefDescriptor<?> source = definitionService.getDefDescriptor(
+                getAuraTestingUtil().getNonce("markup://some.desc"),
+                HelperDef.class);
 
-		Set<DefDescriptor<?>> baseDds = Sets.newHashSet();
-		baseDds.add(source);
-		baseDds.add(definitionService.getDefDescriptor(getAuraTestingUtil()
-				.getNonce("markup://some:else"), ComponentDef.class));
+        Set<DefDescriptor<?>> baseDds = Sets.newHashSet();
+        baseDds.add(source);
+        baseDds.add(definitionService.getDefDescriptor(getAuraTestingUtil()
+                .getNonce("markup://some:else"), ComponentDef.class));
 
-		Set<DefDescriptor<?>> invalidatedDds = Sets.newHashSet();
-		invalidatedDds.add(source);
-		invalidatedDds.add(DefDescriptorImpl.getAssociateDescriptor(source,
-				ApplicationDef.class, DefDescriptor.MARKUP_PREFIX));
-		invalidatedDds.add(DefDescriptorImpl.getAssociateDescriptor(source,
-				ComponentDef.class, DefDescriptor.MARKUP_PREFIX));
+        Set<DefDescriptor<?>> invalidatedDds = Sets.newHashSet();
+        invalidatedDds.add(source);
+        invalidatedDds.add(DefDescriptorImpl.getAssociateDescriptor(source,
+                ApplicationDef.class, DefDescriptor.MARKUP_PREFIX));
+        invalidatedDds.add(DefDescriptorImpl.getAssociateDescriptor(source,
+                ComponentDef.class, DefDescriptor.MARKUP_PREFIX));
 
-		CachingServiceImpl cachingService = new CachingServiceImpl();
-		cachingService.setLoggingAdapter(loggingAdapter);
-		cachingService.initializeCaches();
-		Cache<DefDescriptor<?>, Optional<? extends Definition>> cache = cachingService
-				.getDefsCache();
-		testNotifyDependentSourceChange_InvalidatesSome(cachingService, cache,
-				mockDefinitionFunction, baseDds, source, invalidatedDds);
-	}
+        CachingServiceImpl cachingService = new CachingServiceImpl();
+        cachingService.setLoggingAdapter(loggingAdapter);
+        cachingService.initializeCaches();
+        Cache<DefDescriptor<?>, Optional<? extends Definition>> cache = cachingService
+                .getDefsCache();
+        testNotifyDependentSourceChange_InvalidatesSome(cachingService, cache,
+                mockDefinitionFunction, baseDds, source, invalidatedDds);
+    }
 
-	@Test
-	public void testNotifyDependentSourceChange_InvalidatesCachedSelfAndCmpExistsIfDescriptorFound() {
-		DefDescriptor<?> source = definitionService.getDefDescriptor(
-				getAuraTestingUtil().getNonce("markup://some.desc"),
-				StyleDef.class);
+    @Test
+    public void testNotifyDependentSourceChange_InvalidatesCachedSelfAndCmpExistsIfDescriptorFound() {
+        DefDescriptor<?> source = definitionService.getDefDescriptor(
+                getAuraTestingUtil().getNonce("markup://some.desc"),
+                StyleDef.class);
 
-		Set<DefDescriptor<?>> baseDds = Sets.newHashSet();
-		baseDds.add(source);
-		baseDds.add(definitionService.getDefDescriptor(getAuraTestingUtil()
-				.getNonce("markup://some:else"), ComponentDef.class));
+        Set<DefDescriptor<?>> baseDds = Sets.newHashSet();
+        baseDds.add(source);
+        baseDds.add(definitionService.getDefDescriptor(getAuraTestingUtil()
+                .getNonce("markup://some:else"), ComponentDef.class));
 
-		Set<DefDescriptor<?>> invalidatedDds = Sets.newHashSet();
-		invalidatedDds.add(source);
-		invalidatedDds.add(DefDescriptorImpl.getAssociateDescriptor(source,
-				ApplicationDef.class, DefDescriptor.MARKUP_PREFIX));
-		invalidatedDds.add(DefDescriptorImpl.getAssociateDescriptor(source,
-				ComponentDef.class, DefDescriptor.MARKUP_PREFIX));
+        Set<DefDescriptor<?>> invalidatedDds = Sets.newHashSet();
+        invalidatedDds.add(source);
+        invalidatedDds.add(DefDescriptorImpl.getAssociateDescriptor(source,
+                ApplicationDef.class, DefDescriptor.MARKUP_PREFIX));
+        invalidatedDds.add(DefDescriptorImpl.getAssociateDescriptor(source,
+                ComponentDef.class, DefDescriptor.MARKUP_PREFIX));
 
-		CachingServiceImpl cachingService = new CachingServiceImpl();
-		cachingService.setLoggingAdapter(loggingAdapter);
-		cachingService.initializeCaches();
-		Cache<DefDescriptor<?>, Boolean> cache = cachingService.getExistsCache();
-		testNotifyDependentSourceChange_InvalidatesSome(cachingService, cache,
-				new Function<DefDescriptor<?>, Boolean>() {
-					@Override
-					public Boolean apply(DefDescriptor<?> input) {
-						return true;
-					}
-				}, baseDds, source, invalidatedDds);
-	}
+        CachingServiceImpl cachingService = new CachingServiceImpl();
+        cachingService.setLoggingAdapter(loggingAdapter);
+        cachingService.initializeCaches();
+        Cache<DefDescriptor<?>, Boolean> cache = cachingService.getExistsCache();
+        testNotifyDependentSourceChange_InvalidatesSome(cachingService, cache,
+                new Function<DefDescriptor<?>, Boolean>() {
+                    @Override
+                    public Boolean apply(DefDescriptor<?> input) {
+                        return true;
+                    }
+                }, baseDds, source, invalidatedDds);
+    }
 
-	@Test
-	public void testNotifyDependentSourceChange_InvalidatesAllCachedExistsIfDescriptorNull() {
-		Set<DefDescriptor<?>> keys = Sets.newHashSet();
-		keys.add(definitionService.getDefDescriptor(
-				getAuraTestingUtil().getNonce("some:descriptor"),
-				ComponentDef.class));
-		keys.add(definitionService.getDefDescriptor(
-				getAuraTestingUtil().getNonce("other:descriptor"),
-				ComponentDef.class));
-		keys.add(definitionService
-				.getDefDescriptor(getAuraTestingUtil().getNonce("some:extra"),
-						ComponentDef.class));
+    @Test
+    public void testNotifyDependentSourceChange_InvalidatesAllCachedExistsIfDescriptorNull() {
+        Set<DefDescriptor<?>> keys = Sets.newHashSet();
+        keys.add(definitionService.getDefDescriptor(
+                getAuraTestingUtil().getNonce("some:descriptor"),
+                ComponentDef.class));
+        keys.add(definitionService.getDefDescriptor(
+                getAuraTestingUtil().getNonce("other:descriptor"),
+                ComponentDef.class));
+        keys.add(definitionService
+                .getDefDescriptor(getAuraTestingUtil().getNonce("some:extra"),
+                        ComponentDef.class));
 
-		CachingServiceImpl cachingService = new CachingServiceImpl();
-		cachingService.setLoggingAdapter(loggingAdapter);
-		cachingService.initializeCaches();
-		testNotifyDependentSourceChange_InvalidatesAllCachedValues(cachingService,
-				cachingService.getExistsCache(),
-				new Function<DefDescriptor<?>, Boolean>() {
-					@Override
-					public Boolean apply(DefDescriptor<?> key) {
-						return true;
-					}
-				}, keys);
-	}
+        CachingServiceImpl cachingService = new CachingServiceImpl();
+        cachingService.setLoggingAdapter(loggingAdapter);
+        cachingService.initializeCaches();
+        testNotifyDependentSourceChange_InvalidatesAllCachedValues(cachingService,
+                cachingService.getExistsCache(),
+                new Function<DefDescriptor<?>, Boolean>() {
+                    @Override
+                    public Boolean apply(DefDescriptor<?> key) {
+                        return true;
+                    }
+                }, keys);
+    }
 }

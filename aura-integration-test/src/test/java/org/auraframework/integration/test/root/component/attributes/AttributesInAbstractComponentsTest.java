@@ -17,7 +17,6 @@ package org.auraframework.integration.test.root.component.attributes;
 
 import java.util.ArrayList;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;

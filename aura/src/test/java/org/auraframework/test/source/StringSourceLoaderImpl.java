@@ -141,12 +141,12 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
             return (StringSource<D>)defs.get(descriptor);
         }
 
-    /**
+        /**
          * Put a definition in the namespace.
          *
          * @param def the definition.
          * @param overwrite should we overwrite whatever is there?
-     */
+         */
         public <D extends Definition> boolean put(StringSource<D> def, boolean overwrite) {
             StringSource<? extends Definition> oldDef;
             if (overwrite) {
@@ -176,6 +176,15 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
      * This map stores all of the sources owned by this loader, split into namespaces.
      */
     private final Map<String, NamespaceInfo> namespaces = new ConcurrentHashMap<>();
+
+    private String getNamespace(DefDescriptor<?> descriptor) {
+        String namespace;
+        do {
+            namespace = descriptor.getNamespace();
+            descriptor = descriptor.getBundle();
+        } while (namespace == null && descriptor != null);
+        return namespace;
+    }
 
     private NamespaceInfo getOrAddNamespace(String namespace, NamespaceAccess access) {
         nsLock.lock();
@@ -339,7 +348,7 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
 
         nsLock.lock();
         try {
-            String namespace = descriptor.getNamespace();
+            String namespace = getNamespace(descriptor); 
             NamespaceInfo namespaceInfo = getOrAddNamespace(namespace, access);
 
             boolean containsKey = namespaceInfo.put(source, overwrite);
@@ -364,7 +373,7 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
     public final void removeSource(DefDescriptor<?> descriptor) {
         nsLock.lock();
         try {
-            String namespace = descriptor.getNamespace();
+            String namespace = getNamespace(descriptor);
             NamespaceInfo namespaceInfo = namespaces.get(namespace);
             Preconditions.checkState(namespaceInfo != null);
             if (namespaceInfo.remove(descriptor) && !namespaceInfo.isPermanent) {
@@ -436,7 +445,10 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
 
     @Override
     public <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
-        NamespaceInfo namespaceInfo = namespaces.get(descriptor.getNamespace());
+        if (descriptor == null) {
+            return null;
+        }
+        NamespaceInfo namespaceInfo = namespaces.get(getNamespace(descriptor));
 
         if (namespaceInfo != null) {
             StringSource<D> ret = namespaceInfo.get(descriptor);

@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
@@ -38,28 +37,10 @@ import org.auraframework.util.resource.ResourceLoader;
  * Java classpath.
  */
 public class ResourceSource<D extends Definition> extends Source<D> {
-
-    private static final long serialVersionUID = 7135275798418700286L;
     private static final ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
 
     protected ResourceSource(DefDescriptor<D> descriptor, String systemId, Format format) {
         super(descriptor, systemId, format);
-    }
-
-    @Override
-    public boolean addOrUpdate(CharSequence newContents) {
-        Writer writer = null;
-        try {
-            try {
-                writer = resourceLoader.getWriter(getSystemId());
-                writer.write(newContents.toString());
-            } finally {
-                writer.close();
-            }
-        } catch (IOException e) {
-            throw new AuraRuntimeException(e);
-        }
-        return true;
     }
 
     /**
@@ -121,10 +102,4 @@ public class ResourceSource<D extends Definition> extends Source<D> {
         }
         return new InputStreamReader(is);
     }
-
-    @Override
-    public Writer getWriter() {
-        throw new UnsupportedOperationException();
-    }
-
 }

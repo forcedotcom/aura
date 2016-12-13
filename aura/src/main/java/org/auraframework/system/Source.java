@@ -15,7 +15,8 @@
  */
 package org.auraframework.system;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Reader;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -37,10 +38,7 @@ import org.auraframework.util.text.Hash;
  * Implementors should read the comments for {@link #getHash()} and ensure they honor the
  * contract.
  */
-public abstract class Source<D extends Definition> implements Serializable {
-
-    private static final long serialVersionUID = -1359253157810260816L;
-
+public abstract class Source<D extends Definition> {
     private final String systemId;
     private final Format format;
     private final DefDescriptor<D> descriptor;
@@ -167,8 +165,6 @@ public abstract class Source<D extends Definition> implements Serializable {
     // it to protected.
     public abstract Reader getReader();
 
-    public abstract Writer getWriter();
-
     /**
      * Get the hash promise for this source.
      *
@@ -221,8 +217,6 @@ public abstract class Source<D extends Definition> implements Serializable {
         return null;
     }
 
-    public abstract boolean addOrUpdate(CharSequence newContents);
-
     public abstract String getContents();
 
     public abstract long getLastModified();
@@ -237,14 +231,6 @@ public abstract class Source<D extends Definition> implements Serializable {
         return descriptor;
     }
 
-    /**
-     * Some Source types might want to clear their content before adding or
-     * updating the source. For example StringSource.
-     */
-    public void clearContents() {
-        // Do nothing.
-    }
-    
     /**
      * This adds support for default namespaces, so def handlers can properly deal
      * with child tags when looking at the source

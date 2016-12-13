@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.Writer;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -31,8 +30,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.IOUtil;
 
 public class StringSource<D extends Definition> extends Source<D> {
-    private static final long serialVersionUID = 8822758262106180101L;
-
     private final SourceListener sourceListener;
     private final transient StringData data;
 
@@ -112,11 +109,6 @@ public class StringSource<D extends Definition> extends Source<D> {
         }
     }
 
-    @Override
-    public Writer getWriter() {
-        return data;
-    }
-
     /** StringSource returns a "URL" like "markup://string:foo". */
     @Override
     public String getUrl() {
@@ -128,7 +120,6 @@ public class StringSource<D extends Definition> extends Source<D> {
         return data.getBuffer().length() > 0;
     }
 
-    @Override
     public boolean addOrUpdate(CharSequence newContents) {
         if (newContents != null) {
             data.getBuffer().setLength(0);
@@ -140,7 +131,6 @@ public class StringSource<D extends Definition> extends Source<D> {
         return true;
     }
 
-    @Override
     public void clearContents() {
         data.getBuffer().setLength(0);
         data.touch();

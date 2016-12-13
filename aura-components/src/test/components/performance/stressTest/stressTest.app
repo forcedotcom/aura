@@ -21,5 +21,8 @@
         Clicking the button creates 50,000 aura:html components, and 50,000 aura:text components.
         It then logs to the console the time it took to create all these components.
     </p>
+    <p>
+        <ui:inputCheckbox aura:id="profileCheckbox" label="Record Profile"/>
+    </p>
 	<ui:button press="{!c.run}" label="Run Performance Test"/>
 </aura:application>

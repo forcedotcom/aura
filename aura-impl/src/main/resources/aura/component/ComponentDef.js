@@ -161,7 +161,25 @@ function ComponentDef(config) {
     this.attributeDefs = new AttributeDefSet(config["attributeDefs"],this.descriptor.getNamespace());
     this.requiredVersionDefs = new RequiredVersionDefSet(config["requiredVersionDefs"]);
     this.initStyleDefs();
+    this.hasInitHandler;
 }
+
+ComponentDef.prototype.hasInit = function() {
+    if(this.hasInitHandler === undefined) {
+        if(!this.valueHandlerDefs) {
+            this.hasInitHandler = false;
+        } else {
+            for(var c=0;c<this.valueHandlerDefs.length;c++) {
+                if(this.valueHandlerDefs[c].name === "init") {
+                    this.hasInitHandler = true;
+                    return this.hasInitHandler;
+                }
+            }
+        }
+        this.hasInitHandler = false;
+    }
+    return this.hasInitHandler;
+};
 
 /**
  * Returns a DefDescriptor object.

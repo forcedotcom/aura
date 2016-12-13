@@ -179,7 +179,9 @@ function Component(config, localCreation) {
     }
 
     this._destroying = false;
-    this.fire("init");
+    if(this.getDef().hasInit()) {
+        this.fire("init");  
+    }
 }
 
 /**
@@ -2648,6 +2650,11 @@ Component.prototype.setProvided = function(realComponentDef, attributes) {
             "Provided component cannot be abstract: " + realComponentDef);
     $A.assert(!realComponentDef.hasRemoteDependencies() || (realComponentDef.hasRemoteDependencies() && this.partialConfig),
             "Client provided component cannot have server dependencies: " + realComponentDef);
+
+    // Definition did not change (if.cmp for example) so do not do any extra work.
+    if(this.componentDef === realComponentDef && !attributes) {
+        return;
+    }
 
     // JBUCH: HALO: TODO: FIND BETTER WAY TO RESET THESE AFTER PROVIDER INJECTION
     this.componentDef = realComponentDef;

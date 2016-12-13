@@ -15,6 +15,7 @@
  */
 ({
 	run: function(cmp, event, helper) {
+	    var runProfile = cmp.find("profileCheckbox").get("v.value");
 		var components = [];
         for(var c=0;c<50000;c++) {
             components.push(["markup://aura:html", {}]);
@@ -22,9 +23,19 @@
         }
 
         var start = performance.now();
-        $A.createComponents(components, function() {
+        if(runProfile) {
+            console.profile("Simple Component Creation");
+        }
+        $A.createComponents(components, function(components) {
+            if(runProfile) {
+                console.profileEnd("Simple Component Creation");
+            }
             var end = performance.now();
             console.log("stressTest.app Component Creation: ", end - start);
+
+             for(var c=0;c<components.length;c++) {
+                 components[c].destroy(false);
+             }
         });
 	}
 })

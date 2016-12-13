@@ -100,7 +100,8 @@ Test.Aura.Component.ComponentTest=function(){
                             getSuperDef:function(){},
                             getValueHandlerDefs:function(){},
                             isAbstract:function(){},
-                            isInstanceOf:function(){}
+                            isInstanceOf:function(){},
+                            hasInit:function(){}
                         };
                     },
                     index:function(){},

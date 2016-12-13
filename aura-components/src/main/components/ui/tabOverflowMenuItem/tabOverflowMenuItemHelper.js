@@ -50,8 +50,9 @@
 
 			if (!menuItemCache[id]) {
 				$A.createComponent("ui:actionMenuItem", {
-					"label" : title || id,
-					"id"	: id
+					"label"   : title || id,
+					"id"      : id,
+					"aura:id" : "overflow-item"
 				}, callback);
 			} else {
 				menuItems.push(menuItemCache[id]);

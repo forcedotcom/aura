@@ -61,15 +61,16 @@
     <aura:handler name="clearTabs" action="{!c.clearTabs}" />
 
     <aura:locator target="tabBar" description="UI Tab bar"> 
-        <aura:locatorContext key="devNameOrId" value="{!v.name}" />
+        <aura:locatorContext key="tab-name" value="{!v.name}" />
     </aura:locator>
 
      <aura:locator target="tabItem" alias="tabset" description="Tab Set component"> 
-        <aura:locatorContext key="devNameOrId" value="{!v.name}" />
+        <aura:locatorContext key="tab-name" value="{!v.name}" />
     </aura:locator>
 
     <div class="{!v.class}" aura:id="tabContainer" aura:flavorable="true">
         <ui:tabBar aura:id="tabBar" tabs="{!v.tabItems}"
+                   name="{!v.name}"
                    onTabActivated="{!c.onTabActivated}" onTabClosed="{!c.onTabClosed}"
                    useOverflowMenu="{!v.useOverflowMenu}"
                    overflowLabel="{!v.overflowLabel}"/>

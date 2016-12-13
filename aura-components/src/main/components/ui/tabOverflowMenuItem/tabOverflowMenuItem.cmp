@@ -33,6 +33,9 @@
     <aura:dependency resource="markup://ui:actionMenuItem" />
 
     <aura:method name="focus"/>
+    
+    <aura:locator target="overflowTrigger" alias="overflow" description="Tab Overflow Menu Trigger"/>
+    <aura:locator target="overflow-item" description="Tab Item from overflow"/>
 
     <aura:handler name="change" value="{!v.menuItems}" action="{!c.updateMenuItems}"/>
 

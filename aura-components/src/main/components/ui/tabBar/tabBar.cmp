@@ -23,7 +23,8 @@
                     description="Determines whether the tab bar should use an overflow menu. If true, and the total width of the tab items exceeds the specified bar width, a menu will be shown that includes the tabs that do not fit. Use in conjunction with barWidth and tabItemWidth"/>
     <aura:attribute name="overflowLabel" type="String" default="More" description="Label to use for the overflow menu trigger."/>
     <aura:attribute name="overflowIcon" type="Aura.Component[]"  description="Icon to use for the overflow menu trigger."/>
-
+    <aura:attribute name="name" type="String" description="Logging devNameOrId context"/>
+    
     <aura:attribute name="overflowData" type="Map" access="PRIVATE" description="Internal object used to store overflow information"/>
     <aura:attribute name="tabHeaders" type="Aura.Component[]" access="PRIVATE" />
 
@@ -46,7 +47,9 @@
     <aura:dependency resource="markup://ui:tabItem" />
     <aura:dependency resource="markup://ui:tabOverflowMenuItem" />
     
-    <aura:locator target="*" alias="tab-bar-content" description="Content inside tabs"/>
+    <aura:locator target="*" alias="tab-bar-content" description="Content inside tabs">
+        <aura:locatorContext key="tab-name" value="{!v.name}"/>
+    </aura:locator>
     
     <aura:if isTrue="{!v.useOverflowMenu}">
         <ui:resizeObserver onresize="{!c.onResize}"/>

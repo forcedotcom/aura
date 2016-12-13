@@ -541,16 +541,17 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
             Header[] headers = response.getHeaders("X-FRAME-OPTIONS");
 
             // And CSP
-            Map<String, String> csp = getCSP(response);
-            assertEquals("frame-ancestors is wrong", expectCspAncestors, csp.get("frame-ancestors"));
-            assertEquals("script-src is wrong", "'self'", csp.get("script-src"));
-            assertEquals("style-src is wrong", "'self'", csp.get("style-src"));
-            assertEquals("connect-src is wrong", "www.itrustu.com/ www.also.com/other", csp.get("connect-src"));
-            assertEquals("font-src is wrong", "*", csp.get("font-src"));
-            assertEquals("img-src is wrong", "*", csp.get("img-src"));
-            assertEquals("object-src is wrong", "'none'", csp.get("object-src"));
-            assertEquals("media-src is wrong", "*", csp.get("media-src"));
-            assertEquals("default-src is wrong", "'self'", csp.get("default-src"));
+			Map<String, List<String>> cspDirectives = getCSPDirectives(response);
+			assertTrue("frame-ancestors is wrong", cspDirectives.get("frame-ancestors").contains(expectCspAncestors));
+			assertTrue("script-src is wrong", cspDirectives.get("script-src").contains("'self'"));
+			assertTrue("style-src is wrong", cspDirectives.get("style-src").contains("'self'"));
+			assertTrue("connect-src is wrong",
+					cspDirectives.get("connect-src").contains("www.itrustu.com/ www.also.com/other"));
+			assertTrue("font-src is wrong", cspDirectives.get("font-src").contains("*"));
+			assertTrue("img-src is wrong", cspDirectives.get("img-src").contains("*"));
+			assertTrue("object-src is wrong", cspDirectives.get("object-src").contains("'none'"));
+			assertTrue("media-src is wrong", cspDirectives.get("media-src").contains("*"));
+			assertTrue("default-src is wrong", cspDirectives.get("default-src").contains("'self'"));
 
             return headers;
         } finally {

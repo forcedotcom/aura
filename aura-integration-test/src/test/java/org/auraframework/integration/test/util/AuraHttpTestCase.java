@@ -116,36 +116,38 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
             if (guarded) {
                 assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
-                Map<String, String> csp = getCSP(response);
+
                 AuraContext context = contextService.getCurrentContext();
                 boolean testMode = context != null && context.isTestMode();
-                if (testMode || allowInline) {
-                    assertEquals("frame-ancestors is wrong", "*", csp.get("frame-ancestors"));
-                    assertEquals("script-src is wrong", "'self' chrome-extension: 'unsafe-eval'",
-                            csp.get("script-src"));
-                    assertEquals("style-src is wrong", "'self' chrome-extension: 'unsafe-inline'",
-                            csp.get("style-src"));
-                    assertEquals("ALLOWALL", headers[0].getValue());
-                } else {
-                    assertEquals("frame-ancestors is wrong", "'self'", csp.get("frame-ancestors"));
-                    assertEquals("script-src is wrong",
-                            "'self' chrome-extension:",
-                            csp.get("script-src"));
-                    assertEquals("style-src is wrong",
-                            "'self' chrome-extension: 'unsafe-inline'",
-                            csp.get("style-src"));
-                    assertEquals("SAMEORIGIN", headers[0].getValue());
-                }
+                
+                // There may be multiple CSP headers, so we will look for the one we're interested in
+                Map<String, List<String>> cspDirectives = getCSPDirectives(response);
+                
+				if (testMode || allowInline) {
+					assertTrue("frame-ancestors is wrong", cspDirectives.get("frame-ancestors").contains("*"));
+					assertTrue("script-src is wrong",
+							cspDirectives.get("script-src").contains("'self' chrome-extension: 'unsafe-eval'"));
+					assertTrue("style-src is wrong",
+							cspDirectives.get("style-src").contains("'self' chrome-extension: 'unsafe-inline'"));
+					assertEquals("ALLOWALL", headers[0].getValue());
+				} else {
+					assertTrue("frame-ancestors is wrong", cspDirectives.get("frame-ancestors").contains("'self'"));
+					assertTrue("script-src is wrong",
+							cspDirectives.get("script-src").contains("'self' chrome-extension:"));
+					assertTrue("style-src is wrong",
+							cspDirectives.get("style-src").contains("'self' chrome-extension: 'unsafe-inline'"));
+					assertEquals("SAMEORIGIN", headers[0].getValue());
+				}
 
-                // These maybe aren't strictly "anti-clickjacking", but since
-                // we're testing the rest of the default CSP:
-                assertEquals("font-src is wrong", "*", csp.get("font-src"));
-                assertEquals("img-src is wrong", "*", csp.get("img-src"));
-                assertEquals("media-src is wrong", "*", csp.get("media-src"));
-                assertEquals("default-src is wrong", "'self'", csp.get("default-src"));
-                assertEquals("object-src is wrong", "'self'", csp.get("object-src"));
-                assertEquals("connect-src is wrong",
-                        "'self' http://invalid.salesforce.com http://offline https://offline", csp.get("connect-src"));
+				// These maybe aren't strictly "anti-clickjacking", but since
+				// we're testing the rest of the default CSP:
+				assertTrue("font-src is wrong", cspDirectives.get("font-src").contains("*"));
+				assertTrue("img-src is wrong", cspDirectives.get("img-src").contains("*"));
+				assertTrue("media-src is wrong", cspDirectives.get("media-src").contains("*"));
+				assertTrue("default-src is wrong", cspDirectives.get("default-src").contains("'self'"));
+				assertTrue("object-src is wrong", cspDirectives.get("object-src").contains("'self'"));
+				assertTrue("connect-src is wrong", cspDirectives.get("connect-src")
+						.contains("'self' http://invalid.salesforce.com http://offline https://offline"));
             } else {
                 headers = response.getHeaders("Content-Security-Policy");
                 assertEquals(0, headers.length);
@@ -156,24 +158,27 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     }
 
     /**
-     * Helper to take the Content-Security-Policy header and break it into its individual components. If the header is
-     * missing, this will fail the test with an assertion. Otherwise, a map keyed by the various CSP directives
-     * (script-src, style-src, etc.) with the literal values of each directive is returned.
-     *
-     * @param response
-     * @return a map of directive to value.
-     */
-    protected Map<String, String> getCSP(HttpResponse response) {
-        Header[] headers = response.getHeaders("Content-Security-Policy");
-        assertEquals("wrong number of CSP header lines", 1, headers.length);
-        String[] split = headers[0].getValue().split(";");
-        Map<String, String> csp = new HashMap<>();
-        for (String term : split) {
-            term = term.trim();
-            String word = term.substring(0, term.indexOf(' '));
-            csp.put(word, term.substring(word.length() + 1));
-        }
-        return csp;
+	 * Gather all the CSP directives in the response's headers into a Map keyed
+	 * by directive name. The entry values are a list of the directive values
+	 * found, since multiple headers may declare the same directives.
+	 */
+    protected Map<String, List<String>> getCSPDirectives(HttpResponse response) {
+		Header[] headers = response.getHeaders("Content-Security-Policy");
+		Map<String, List<String>> directives = Maps.newHashMap();
+		for (Header header : headers) {
+			for (String element : header.getValue().split(";")) {
+				String[] parts = element.trim().split(" ", 2);
+				String name = parts[0];
+				String value = parts[1];
+				List<String> entry = directives.get(name);
+				if (entry != null) {
+					entry.add(value);
+				} else {
+					directives.put(name, Lists.newArrayList(value));
+				}
+			}
+		}
+		return directives;
     }
 
     protected String getHost() throws Exception {

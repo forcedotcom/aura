@@ -94,8 +94,7 @@ DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, root) 
     
     var parent = $A.expressionService.getContainer(root).getConcreteComponent();
 
-    // TODO: remove includeMetadata param before 206 release freeze: W-3378426
-    var locator = parent.getLocator(root, true /*includeMetadata*/);
+    var locator = parent.getLocator(root, false /*includeMetadata*/);
 
     // Only if we have a unique, identifier send the interaction
     if (locator) { 
@@ -116,11 +115,16 @@ DomHandlersPlugin.prototype.dispatchActionHook = function (action, event, root) 
         }
 
         $A.metricsService.transaction("aura", "interaction", { "context": context });
-    } else if (event.type === "click") {
+    } 
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    else if (event.type === "click") {
         this.logUnInstrumentedClick(parent, root);
     }
+    //#end
+
 };
 
+//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 DomHandlersPlugin.prototype.logUnInstrumentedClick = function (parent, root) {
     var es = $A.expressionService;
     var grandparent = es.getContainer(parent).getConcreteComponent();
@@ -140,6 +144,7 @@ DomHandlersPlugin.prototype.logUnInstrumentedClick = function (parent, root) {
     }});
     $A.log("WARNING: **** Un-Instrumented click logged. Details: " + JSON.stringify(hierarchy));
 };
+//#end
 
 DomHandlersPlugin.prototype.bindToHelper = function (descriptor, helperMethod) {
     var self = this;

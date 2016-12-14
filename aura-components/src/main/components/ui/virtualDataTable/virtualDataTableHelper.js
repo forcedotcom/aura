@@ -248,7 +248,7 @@
             }
 
             child  = target;
-            target = target.parentElement;
+            target = target.parentNode;
         }
 
         if (!handlers.length > 0) {

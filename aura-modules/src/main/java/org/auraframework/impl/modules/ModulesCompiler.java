@@ -1,0 +1,83 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.auraframework.impl.modules;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+
+import com.eclipsesource.v8.JavaVoidCallback;
+import com.eclipsesource.v8.NodeJS;
+import com.eclipsesource.v8.V8Array;
+import com.eclipsesource.v8.V8Object;
+import com.eclipsesource.v8.utils.MemoryManager;
+
+public class ModulesCompiler {
+    public Future<String> compile(File file) throws Exception {
+        String SCRIPT = "" + "const compiler = require('raptor-compiler-core');" + "const filePath = '" + file.getPath()
+                + "';" + "const promise = compiler.compile({ entry: filePath });"
+                + "promise.then(onResultCallback).catch(onErrorCallback);";
+
+        CompletableFuture<String> future = new CompletableFuture<>();
+
+        JavaVoidCallback onErrorCallback = new JavaVoidCallback() {
+            @Override
+            public void invoke(final V8Object receiver, final V8Array parameters) {
+                String error = parameters.toString();
+                future.completeExceptionally(new RuntimeException(error));
+            }
+        };
+        JavaVoidCallback onResultCallback = new JavaVoidCallback() {
+            @Override
+            public void invoke(final V8Object receiver, final V8Array parameters) {
+                V8Object result = parameters.getObject(0);
+                future.complete(result.getString("code"));
+            }
+        };
+
+        NodeJS nodeJS = NodeJS.createNodeJS();
+        MemoryManager memoryManager = new MemoryManager(nodeJS.getRuntime());
+        nodeJS.getRuntime().registerJavaMethod(onErrorCallback, "onErrorCallback");
+        nodeJS.getRuntime().registerJavaMethod(onResultCallback, "onResultCallback");
+
+        File script = createTempScriptFile(SCRIPT, "temp");
+        try {
+            nodeJS.exec(script);
+            while (nodeJS.isRunning()) {
+                nodeJS.handleMessage();
+            }
+        } finally {
+            memoryManager.release();
+            nodeJS.release();
+            script.delete();
+        }
+
+        return future;
+    }
+
+    // util
+
+    private static File createTempScriptFile(final String script, final String name) throws IOException {
+        File file = File.createTempFile(name, ".js.tmp", new File("."));
+        file.deleteOnExit();
+        try (PrintWriter writer = new PrintWriter(file, "UTF-8")) {
+            writer.print(script);
+        }
+        return file;
+    }
+}

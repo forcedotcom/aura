@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>aura-framework</artifactId>
+        <groupId>org.auraframework</groupId>
+        <version>0.5217-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>aura-modules</artifactId>
+
+    <properties>
+        <j2v8.platform>macosx</j2v8.platform>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-interfaces</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.eclipsesource.j2v8</groupId>
+            <artifactId>j2v8_${j2v8.platform}_x86_64</artifactId>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>platform.linux</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <properties>
+                <j2v8.platform>linux</j2v8.platform>
+            </properties>
+        </profile>
+    </profiles>
+</project>

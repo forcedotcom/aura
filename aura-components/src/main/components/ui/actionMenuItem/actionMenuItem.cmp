@@ -20,7 +20,7 @@
     <aura:attribute name="id" type="String" description="id of the menu item"/>
     <aura:method name="select" action="{!c.select}"/>
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-    <aura:locator target="anchor" alias="action-menu-item" isPrimitive="true" description="Action item button">
+    <aura:locator target="anchor" alias="menu-item" isPrimitive="true" description="Action item button">
         <aura:locatorContext key="devNameOrId" value="{!v.id}"/>
     </aura:locator>
 

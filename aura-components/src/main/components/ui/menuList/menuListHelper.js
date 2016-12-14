@@ -248,6 +248,10 @@
     },
 
     onMenuItemSelected: function(component, event) {
+        if (!component.isValid()) {
+            return;
+        }
+
     	var concrete = component.getConcreteComponent();
 
         var deselectSiblings = event.getParam("deselectSiblings");

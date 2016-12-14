@@ -39,8 +39,11 @@
             var width = typeof triggerRect.width !== 'undefined' ? triggerRect.width : triggerRect.right - triggerRect.left;
             if (width > 0) {
                 menuListElement.style.width = width + "px";
-                // In case the width exceeds the max width we want to still limit to the width of the trigger
-                menuListElement.style.maxWidth = menuListElement.style.width;
+                var minWidth = 200;
+                // In case the width exceeds the max width we want to still limit to the width of the trigger,
+                // unless it's smaller than minWidth
+                menuListElement.style.maxWidth = Math.max(minWidth, width) + "px";
+                menuListElement.style.minWidth = minWidth + "px";
             }
         }
     },

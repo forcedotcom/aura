@@ -17,5 +17,8 @@
 -->
 <aura:component access="PRIVILEGED" extends="ui:action" support="PROTO" description="A button used in ui:dataGrid that enables row-level click events to bubble up to the grid.">
     <aura:attribute name="disabled" type="Boolean" description="Specifies whether the button is disabled."/>
-    <ui:button label="{!v.label}" press="{!c.handleClick}" disabled="{!v.disabled}"/>
+
+    <aura:locator target="actionButton" alias="action" description="Action"/>
+
+    <ui:button aura:id="actionButton" label="{!v.label}" press="{!c.handleClick}" disabled="{!v.disabled}"/>
 </aura:component>

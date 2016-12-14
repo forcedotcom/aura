@@ -60,11 +60,11 @@
     <aura:handler name="getActiveTab" action="{!c.getActiveTab}" />
     <aura:handler name="clearTabs" action="{!c.clearTabs}" />
 
-    <aura:locator target="tabBar" description="UI Tab bar"> 
+    <aura:locator target="tabBar" alias="tab-bar" description="UI Tab bar"> 
         <aura:locatorContext key="tab-name" value="{!v.name}" />
     </aura:locator>
 
-     <aura:locator target="tabItem" alias="tabset" description="Tab Set component"> 
+     <aura:locator target="tabItem" alias="tab-set" description="Tab Set component"> 
         <aura:locatorContext key="tab-name" value="{!v.name}" />
     </aura:locator>
 

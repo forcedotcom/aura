@@ -134,8 +134,10 @@
         var imgCtor = new Image(25, 33);
         testUtils.assertStartsWith("SecureElement", imgCtor.toString());
         testUtils.assertEquals("IMG", imgCtor.tagName.toUpperCase(), "Failed to create <img> element using 'new Image()'");
+        /* Disabling this assertion because ios 9.2 does not support height and width arguments in the ctor
+         causing this test to fail in autobuilds. Enable these assertions when autobuild starts using ios 10+
         testUtils.assertEquals(25, imgCtor.width);
-        testUtils.assertEquals(33, imgCtor.height);
+        testUtils.assertEquals(33, imgCtor.height);*/
 
         var imgFunction = document.createElement("img");
         testUtils.assertStartsWith("SecureElement", imgFunction.toString());

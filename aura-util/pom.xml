@@ -7,6 +7,12 @@
         <version>0.5217-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+    
+    <properties>
+        <j2v8.platform>macosx</j2v8.platform>
+        <aura.home>${basedir}/..</aura.home>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.auraframework</groupId>
@@ -89,10 +95,12 @@
             <artifactId>javax.inject</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.eclipsesource.j2v8</groupId>
+            <artifactId>j2v8_${j2v8.platform}_x86_64</artifactId>
+        </dependency>
     </dependencies>
-    <properties>
-        <aura.home>${basedir}/..</aura.home>
-    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -129,4 +137,30 @@
             </plugin>
         </plugins>
     </build>
+    
+    <profiles>
+        <profile>
+            <id>platform.linux</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <properties>
+                <j2v8.platform>linux</j2v8.platform>
+            </properties>
+        </profile>
+        <profile>
+            <id>platform.mac</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+                <j2v8.platform>macosx</j2v8.platform>
+            </properties>
+        </profile>
+    </profiles>
+    
 </project>

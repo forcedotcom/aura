@@ -21,6 +21,8 @@ import java.io.PrintWriter;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
+import org.auraframework.util.IOUtil;
+
 import com.eclipsesource.v8.JavaVoidCallback;
 import com.eclipsesource.v8.NodeJS;
 import com.eclipsesource.v8.V8Array;
@@ -28,9 +30,12 @@ import com.eclipsesource.v8.V8Object;
 import com.eclipsesource.v8.utils.MemoryManager;
 
 public class ModulesCompiler {
+    
     public Future<String> compile(File file) throws Exception {
-        String SCRIPT = "" + "const compiler = require('raptor-compiler-core');" + "const filePath = '" + file.getPath()
-                + "';" + "const promise = compiler.compile({ entry: filePath });"
+        String SCRIPT = ""
+                + "const compiler = require('raptor-compiler-core');"
+                + "const componentPath = '" + file.getPath() + "';"
+                + "const promise = compiler.compile({ componentPath: componentPath });"
                 + "promise.then(onResultCallback).catch(onErrorCallback);";
 
         CompletableFuture<String> future = new CompletableFuture<>();
@@ -50,7 +55,9 @@ public class ModulesCompiler {
             }
         };
 
+        IOUtil.newTempDir("to_force_create_tmpdir"); // otherwise next fails with IOException: No such file or directory
         NodeJS nodeJS = NodeJS.createNodeJS();
+        
         MemoryManager memoryManager = new MemoryManager(nodeJS.getRuntime());
         nodeJS.getRuntime().registerJavaMethod(onErrorCallback, "onErrorCallback");
         nodeJS.getRuntime().registerJavaMethod(onResultCallback, "onResultCallback");
@@ -73,6 +80,7 @@ public class ModulesCompiler {
     // util
 
     private static File createTempScriptFile(final String script, final String name) throws IOException {
+        // create script in current dir for require to find the modules
         File file = File.createTempFile(name, ".js.tmp", new File("."));
         file.deleteOnExit();
         try (PrintWriter writer = new PrintWriter(file, "UTF-8")) {

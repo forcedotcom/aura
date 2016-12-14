@@ -10,10 +10,6 @@
 
     <artifactId>aura-modules</artifactId>
 
-    <properties>
-        <j2v8.platform>macosx</j2v8.platform>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.auraframework</groupId>
@@ -24,22 +20,38 @@
             <artifactId>aura-interfaces</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.eclipsesource.j2v8</groupId>
-            <artifactId>j2v8_${j2v8.platform}_x86_64</artifactId>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-util</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-util</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
     </dependencies>
+    
+    <build>
+       <plugins>
+           <plugin>
+               <groupId>com.github.eirslett</groupId>
+               <artifactId>frontend-maven-plugin</artifactId>
+               <configuration>
+                   <workingDirectory>${project.parent.basedir}</workingDirectory>
+               </configuration>
+               <executions>
+                   <execution>
+                       <id>install-node-npm</id>
+                       <phase>pre-clean</phase>
+                   </execution>
+                   <execution>
+                       <id>npm-install</id>
+                       <phase>pre-clean</phase>
+                   </execution>
+               </executions>
+           </plugin>
+       </plugins>
+   </build>
 
-    <profiles>
-        <profile>
-            <id>platform.linux</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                </os>
-            </activation>
-            <properties>
-                <j2v8.platform>linux</j2v8.platform>
-            </properties>
-        </profile>
-    </profiles>
 </project>

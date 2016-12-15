@@ -48,7 +48,7 @@
 
 -->
 <aura:component access="GLOBAL" support="GA" extensible="true" implements="ui:visible" extends="ui:popup"
-                description="A dropdown menu list with a trigger that controls its visibility. Need to provide a menuTriggerLink and menuList component.">
+                description="A dropdown menu list with a trigger that controls its visibility. To create a clickable link and menu items, use ui:menuTriggerLink and and ui:menuList component.">
 
     {!v.body}
 

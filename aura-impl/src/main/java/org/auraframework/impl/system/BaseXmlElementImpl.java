@@ -47,7 +47,7 @@ public abstract class BaseXmlElementImpl implements BaseXmlElement {
     protected final String fullyQualifiedName;
 
 
-    protected final QuickFixException parseError;
+    protected transient final QuickFixException parseError;
     protected final String ownHash;
     protected final DefinitionAccess access;
     private boolean valid;

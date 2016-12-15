@@ -63,7 +63,8 @@ public interface AuraContext {
         PRODDEBUG(false, false, true, JavascriptGeneratorMode.PRODUCTIONDEBUG, true),
         PROD(false, false, false, JavascriptGeneratorMode.PRODUCTION, true),
         SELENIUM(true, false, true, JavascriptGeneratorMode.AUTOTESTING, true),
-        SELENIUMDEBUG(true, false, true, JavascriptGeneratorMode.AUTOTESTINGDEBUG, true);
+        SELENIUMDEBUG(true, false, true, JavascriptGeneratorMode.AUTOTESTINGDEBUG, true),
+        VALIDATION(false, true, true, JavascriptGeneratorMode.DEVELOPMENT, true);
 
         private final JavascriptGeneratorMode javascriptMode;
         private final boolean isTestMode;

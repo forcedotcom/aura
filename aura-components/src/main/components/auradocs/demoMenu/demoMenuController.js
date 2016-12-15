@@ -31,8 +31,7 @@
         }
     },
     getMenuSelected: function(cmp) {
-        var menuCmp = cmp.find("checkboxMenu");
-        var menuItems = menuCmp.get("v.childMenuItems");
+        var menuItems = cmp.find("checkbox");
         var values = [];
         for (var i = 0; i < menuItems.length; i++) {
             var c = menuItems[i];
@@ -44,8 +43,7 @@
         resultCmp.set("v.value", values.join(","));
     },
     getRadioMenuSelected: function(cmp) {
-        var menuCmp = cmp.find("radioMenu");
-        var menuItems = menuCmp.get("v.childMenuItems");
+        var menuItems = cmp.find("radio");
         var values = [];
         for (var i = 0; i < menuItems.length; i++) {
             var c = menuItems[i];

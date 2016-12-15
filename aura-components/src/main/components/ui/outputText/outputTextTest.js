@@ -23,6 +23,7 @@
             $A.test.assertEquals('', $A.test.getText(component.find("span").getElement()), "When value is initialized to an empty string, nothing should be shown.");
         }
     },
+
     /**
      * positive test case: Verify outputText can display text.
      */
@@ -52,24 +53,7 @@
         	$A.test.assertEquals('TestTitle', $A.test.getElementAttributeValue(component.find("span").getElement(), "title"), "Title attribute on element should  be present");
         }
     },
-    /**
-     * Verify that default direction of display is left to right.
-     */
-    testDefaultDirection:{
-        attributes : {value : 'some text'},
-        test:function(component){
-        	$A.test.assertEquals('ltr', component.get('v.dir'), "Default direction should be left to right.");
-        }
-    },
-    /**
-     * Verify that direction on span element changes when 'dir' attribute is changed.
-     */
-    testDir: {
-        attributes : {value: 'Hello World! You are welcome.', dir : 'rtl'},
-        test: function(component){
-        	$A.test.assertEquals('rtl', component.find("span").getElement().dir, "Dir attribute not correct");
-        }
-    },
+
     /**
      * Verify displaying non string value.
      */

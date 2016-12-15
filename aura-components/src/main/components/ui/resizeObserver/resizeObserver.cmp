@@ -19,7 +19,7 @@
 
     <aura:attribute name="onresize" access="PRIVILEGED" type="Aura.Action" description="The action that is run on resize."/>
 
-    <aura:method name="update"/>
+    <aura:method name="update" access="PRIVILEGED"/>
 
     <aura:handler event="ui:updateSize" action="{!c.updateSize}" description="The event fired when a component is resized."/>
 

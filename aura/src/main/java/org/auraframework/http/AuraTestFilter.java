@@ -553,10 +553,13 @@ public class AuraTestFilter implements Filter {
         // TODO: Inject test framework here, before the test suite code, separately from framework code.
         out.append(String.format(
         "(function testBootstrap(suiteProps) { "
+        		+ "window.$testBootstrapFunction$ || (window.$testBootstrapFunction$ = {});\n\t\t"
+        		+ "window.$testBootstrapFunction$['testBootstrapFunctionLoadingTime'] = window.performance && window.performance.now ? window.performance.now() : Date.now();"
         		+ "if (!window.Aura || !window.Aura.frameworkJsReady) {"
         			+ "window.Aura || (window.Aura = {});\n\t\t"
         			+ "window.Aura.beforeFrameworkInit = Aura.beforeFrameworkInit || [];\n\t\t "
         			+ "window.Aura.beforeFrameworkInit.push(testBootstrap.bind(null, suiteProps));\n\t\t "
+        			+ "window.$testBootstrapFunction$['AuraNotReady']=true;\n\t\t"
         			+ "} else {\n\t\t "
         				+ "window.$A.test.$testBootstrap$ = window.$A.test.$testBootstrap$?window.$A.test.$testBootstrap$:{}; \n\t\t "
             			+ "window.$A.test.$testBootstrap$['testBootstrapFunction']=' Framework ready, call $A.test.run for test:"+testName+" #'+ window.Aura.time(); \n\t\t "

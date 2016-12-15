@@ -372,6 +372,12 @@ TestInstance.prototype.getDump = function() {
     	for(var it in this.testBootstrap) { status+=it+":"+this.testBootstrap[it]+"; "; }
     	status += "\n";
     	
+    	status += "From window.testBootstrapFunction\n";
+    	if(window && window.testBootstrapFunction) { 
+    		for(it in window.testBootstrapFunction) { status+=it+":"+window.testBootstrapFunction[it]+"; "; }
+    	}
+    	status += "\n";
+    	
     	if(!Aura) {
     		status += "Aura framework not ready !!!\n";
     	} else {

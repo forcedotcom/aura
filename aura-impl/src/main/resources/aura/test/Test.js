@@ -48,7 +48,11 @@ function TestInstance() {
     this.name = undefined;
     
     this.testBootstrap = {};
+    this.testBootstrap['frameworkReadyWhenCreateTestInstance'] = false;
     this.testBootstrap['frameworkJsReadyWhenCreateTestInstance'] = false;
+    if(window['Aura']) {
+    	this.testBootstrap['frameworkReadyWhenCreateTestInstance'] = true;
+    }
     if(window['Aura'] && window['Aura']['frameworkJsReady']) {
     	this.testBootstrap['frameworkJsReadyWhenCreateTestInstance'] = true;
     }

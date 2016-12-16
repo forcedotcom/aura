@@ -815,13 +815,16 @@ Component.prototype.destroy = function(async) {
             superComponent.destroy(async);
         }
 
-// JBUCH: HALO: TODO: FIXME
-//        var references=this.references;
-//        if(references){
-//            for(var reference in references){
-//                references[reference].destroy();
-//            }
-//        }
+        var references=this.references;
+        for(key in references){
+            if(references[key]){
+                for(var access in references[key]){
+                    references[key][access].destroy();
+                    delete references[key][access];
+                }
+            }
+            delete references[key];
+        }
 
         // Swap in InvalidComponent prototype to keep us from having to add
         // validity checks all over the place

@@ -16,7 +16,7 @@
 
 function SecureObject(thing, key) {
 	"use strict";
-
+  
     var o = ls_getFromCache(thing, key);
     if (o) {
         return o;
@@ -120,11 +120,11 @@ SecureObject.filterEverything = function(st, raw, options) {
 		mutated = true;
         ls_setRef(swallowed, raw, key);
 	} else if (t === "object") {
-		if (raw === window) {
-			return $A.lockerService.getEnv(key);
-		} else if (raw === document) {
-			return $A.lockerService.getEnv(key).document;
-		}
+	    if (raw === window) {
+            return $A.lockerService.getEnv(key);
+        } else if (raw === document) {
+            return $A.lockerService.getEnv(key).document;
+        }
 
 		var isNodeList = raw && (raw instanceof NodeList || raw instanceof HTMLCollection);
 		if (Array.isArray(raw)) {			
@@ -178,8 +178,7 @@ SecureObject.filterEverything = function(st, raw, options) {
 				swallowed = SecureObject(raw, key);
 				mutated = true;
 			} else {
-			    // DCHASMAN Temporarily suppress the use of universal proxy until issue with TypeError: Illegal invocation with intrinsics can be corrected
-				swallowed = SecureObject.createUniversalProxy(raw, key, true);
+				swallowed = SecureObject.createFilteringProxy(raw, key);
 				mutated = true;
 			}
 		}
@@ -188,24 +187,100 @@ SecureObject.filterEverything = function(st, raw, options) {
 	return mutated ? swallowed : raw;
 };
 
-var univeralProxyHandler = {
-    "get": function(target, property, receiver) {
-        var value = target[property];
-        return value ? SecureObject.filterEverything(receiver, value) : value;
-    },
-    
-    "set": function(target, property, value, receiver) {
-        target[property] = SecureObject.unfilterEverything(receiver, value);
-        
-        return true;
-    }
-};
 
-SecureObject.createUniversalProxy = function(raw, key, doNotUseProxy) {
+var filteringProxyHandler = (function() {
+	function FilteringProxyHandler() {
+	}
+	
+	FilteringProxyHandler.prototype["get"] = function(target, property) {
+		var raw = ls_getRef(target, ls_getKey(target));
+	    var value = raw[property];
+	    
+	    return value ? SecureObject.filterEverything(target, value) : value;
+	};
+	
+	FilteringProxyHandler.prototype["set"] = function(target, property, value) {   	
+		var raw = ls_getRef(target, ls_getKey(target));
+		
+		// We unfilter and then refilter in case there is a transfer from one locker to another to insure that the final result is always
+		// relative to the target object's locker
+		// DCHASMAN TODO This will be reworked shortly when we switch to the much more efficient transfer() approach - we can't simply pass it raw to raw because that would allow direct
+		// spoofing attack type access to things like SecureElement, SecureDocument, etc
+		var filteredValue = value ? SecureObject.filterEverything(target, SecureObject.unfilterEverything(target, value)) : value;
+		
+	    raw[property] = filteredValue;
+	    
+	    return true;
+	};
+
+	// These are all direct pass through methods to preserve the shape etc of the delegate
+	
+	FilteringProxyHandler.prototype["getPrototypeOf"] = function(target) {
+		var raw = ls_getRef(target, ls_getKey(target));
+		return Object.getPrototypeOf(raw);
+    };
+    
+	FilteringProxyHandler.prototype["setPrototypeOf"] = function(target, prototype) {
+		var raw = ls_getRef(target, ls_getKey(target));
+		return Object.setPrototypeOf(raw, prototype);
+    };
+    
+    FilteringProxyHandler.prototype["has"] = function(target, property) {
+		var raw = ls_getRef(target, ls_getKey(target));
+		return property in raw;
+    };
+
+    FilteringProxyHandler.prototype["defineProperty"] = function(target, property, descriptor) {
+		var raw = ls_getRef(target, ls_getKey(target));
+		Object.defineProperty(raw, property, descriptor);
+		return true;
+    };
+    
+    FilteringProxyHandler.prototype["deleteProperty"] = function(target, property) {
+		var raw = ls_getRef(target, ls_getKey(target));
+		delete raw[property];
+		return true;
+    };
+
+    FilteringProxyHandler.prototype["ownKeys"] = function(target) {
+		var raw = ls_getRef(target, ls_getKey(target));
+		return Object.keys(raw);
+    };
+
+    FilteringProxyHandler.prototype["getOwnPropertyDescriptor"] = function(target, property) {
+		var raw = ls_getRef(target, ls_getKey(target));
+		return Object.getOwnPropertyDescriptor(raw, property);
+    };
+
+    FilteringProxyHandler.prototype["isExtensible"] = function(target) {
+		var raw = ls_getRef(target, ls_getKey(target));
+		return Object.isExtensible(raw);
+    };
+    
+    FilteringProxyHandler.prototype["preventExtensions"] = function(target) {
+		var raw = ls_getRef(target, ls_getKey(target));
+		return Object.preventExtensions(raw);
+    };    
+    
+	return new FilteringProxyHandler();
+})();
+
+// Prototype to make debugging and identification of direct exposure of the surrogate (should not happen) easier
+function FilteringProxySurrogate() {
+}
+
+SecureObject.createFilteringProxy = function(raw, key) {
     var swallowed;
-    if (SecureObject.useProxy() && doNotUseProxy !== true) {
-        swallowed = new Proxy(raw, univeralProxyHandler);
-        ls_setKey(swallowed, key);
+    if (SecureObject.useProxy()) {
+        // DCHASMAN TODO We need to switch this from a direct proxy on raw to a proxy on {} 
+        // like SecureElement to avoid the Proxy invariants for non-writable, non-configurable properties
+        var surrogate = new FilteringProxySurrogate();
+        ls_setRef(surrogate, raw, key);
+        
+        swallowed = new Proxy(surrogate, filteringProxyHandler);
+        
+        // DCHASMAN TODO We should be able to remove this (replaced with ls_setKey()) in the next phase of proxy work where we remove unfilterEverything() as something that is done all the time
+        ls_setRef(swallowed, raw, key);
     } else {
         // Fallback for environments that do not support Proxy
         swallowed = {};
@@ -764,7 +839,8 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata, so, raw, key)
 							if (typeof cls === "function") {
 								//  Function.prototype.bind.apply is being used to invoke the constructor and to pass all the arguments provided by the caller
 								// TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
-								result = new (Function.prototype.bind.apply(cls, [null].concat(args)));
+								var ctor = Function.prototype.bind.apply(cls, [null].concat(args));
+								result = new ctor();
 							} else {
 								// For browsers that use a constructor that's not a function, invoke the constructor directly.
 								// For example, on Mobile Safari window["Audio"] returns an object called AudioConstructor
@@ -847,7 +923,8 @@ SecureObject.addPrototypeMethodsAndPropertiesStateless = function(metadata, prot
 		        			var cls = raw[name];
 		        					        			
 		        			// TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
-		        			var result = new (Function.prototype.bind.apply(cls, [null].concat(Array.prototype.slice.call(arguments))));
+		        			var ctor = Function.prototype.bind.apply(cls, [null].concat(Array.prototype.slice.call(arguments)));
+		        			var result = new ctor();
 		        			$A.lockerService.trust(so, result);
 		        			
 		        			return SecureObject.filterEverything(so, result);

@@ -17,6 +17,7 @@ package org.auraframework.impl.modules;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -28,15 +29,37 @@ import com.eclipsesource.v8.NodeJS;
 import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Object;
 import com.eclipsesource.v8.utils.MemoryManager;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
 
 public class ModulesCompiler {
-    
+
+    private static final String COMPILER_JS_PATH;
+
+    static {
+        // put copy of compiler.js in the local file system
+        File compilerJSFile;
+        try {
+            InputStream input = ModulesCompiler.class.getClassLoader().getResourceAsStream("modules/compiler.js");
+            compilerJSFile = new File(IOUtil.newTempDir("modules"), "compiler.js");
+            ByteStreams.copy(input, Files.newOutputStreamSupplier(compilerJSFile));
+        } catch (IOException x) {
+            throw new Error(x);
+        }
+        COMPILER_JS_PATH = compilerJSFile.getAbsolutePath();
+    }
+
+    // API:
+
     public Future<String> compile(File file) throws Exception {
+
         String SCRIPT = ""
-                + "const compiler = require('raptor-compiler-core');"
+                + "const compiler = require('" + COMPILER_JS_PATH + "');"
                 + "const componentPath = '" + file.getPath() + "';"
                 + "const promise = compiler.compile({ componentPath: componentPath });"
                 + "promise.then(onResultCallback).catch(onErrorCallback);";
+        
+        //+ "const compiler = require('../aura-resources/src/main/resources/aura/resources/modules/compiler.js');"
 
         CompletableFuture<String> future = new CompletableFuture<>();
 
@@ -57,7 +80,7 @@ public class ModulesCompiler {
 
         IOUtil.newTempDir("to_force_create_tmpdir"); // otherwise next fails with IOException: No such file or directory
         NodeJS nodeJS = NodeJS.createNodeJS();
-        
+
         MemoryManager memoryManager = new MemoryManager(nodeJS.getRuntime());
         nodeJS.getRuntime().registerJavaMethod(onErrorCallback, "onErrorCallback");
         nodeJS.getRuntime().registerJavaMethod(onResultCallback, "onResultCallback");

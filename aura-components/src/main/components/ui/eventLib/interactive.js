@@ -131,7 +131,7 @@ function lib() { //eslint-disable-line no-unused-vars
                 // need to find the input|textarea|select element in childNodes
                 var inputElement = element.getElementsByTagName('input')[0] ||
                                    element.getElementsByTagName('textarea')[0] ||
-                                   element.getElementsByTagName('select')[0]; 
+                                   element.getElementsByTagName('select')[0];
                 if (inputElement) {
                     elementId = this.getUid(inputElement);
                     element = inputElement;
@@ -183,7 +183,7 @@ function lib() { //eslint-disable-line no-unused-vars
             if (helper && helper.preEventFiring) {
                 helper.preEventFiring(component, event);
             }
-            
+
             // Do not change order here. DomHandlersPlugin expects these params in this order
             lib._dispatchAction(undefined /*action*/, event, htmlCmp, component, helper);
 
@@ -192,17 +192,17 @@ function lib() { //eslint-disable-line no-unused-vars
                 window.setTimeout(function() { component._recentlyClicked = false; }, 350);
             }
         },
-        
+
         /**
          * DO NOT modify the order of the input parameters to this method
-         * used by MetricsService DomHandlersPlugin to intercept clicks on 
+         * used by MetricsService DomHandlersPlugin to intercept clicks on
          * components managed through this lib
-         * 
+         *
          * @param event The html event that was fired
          * @param htmlCmp The html component inside component
          * @param component The aura component containing the html components
          * @param helper of component
-         * 
+         *
          * The first three parameters are expected by DomHandlersPlugin
          * DO NOT modify the order of the input parameters to this method
          */
@@ -226,8 +226,10 @@ function lib() { //eslint-disable-line no-unused-vars
              // this component could become invalid, so guard just in-case
              if(component.isValid()) {
                 var e = component.getEvent(event.type);
-                lib.setEventParams(e, event);
-                e.fire();
+                if (!$A.util.isUndefinedOrNull(e)) {
+                    lib.setEventParams(e, event);
+                    e.fire();
+                }
              }
          },
 

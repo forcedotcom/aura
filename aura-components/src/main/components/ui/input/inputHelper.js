@@ -166,7 +166,9 @@
             for (var i = 0; i < this.SUPPORTED_FIELDHELP_COMPONENTS.length; i++) {
                 if (fieldHelpComponent[0].isInstanceOf(this.SUPPORTED_FIELDHELP_COMPONENTS[i])) {
                     var labelComponent = component.find('inputLabel');
-                    labelComponent.get('v.body').push(fieldHelpComponent[0]);
+                    if (!$A.util.isUndefinedOrNull(labelComponent)) {
+                        labelComponent.get('v.body').push(fieldHelpComponent[0]);
+                    }
                     break;
                 }
             }

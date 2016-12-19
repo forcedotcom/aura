@@ -18,36 +18,39 @@ Function.RegisterNamespace("Test.Components.Ui.Input");
 
 [Fixture]
 Test.Components.Ui.Input.HelperTest = function(){
-	var targetHelper;	
-	
+	var targetHelper;
+
 	// Aura Files need to be loaded as Json, to catch the object they contain
 	ImportJson("aura-components/src/main/components/ui/input/inputHelper.js",function(path,result){
 		targetHelper=result;
 	});
-	
+
     [Fixture]
     function renderFieldHelpComponent(){
-    	
-		var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
-			util: {   
-				isArray: function(array) { 
-					if(array instanceof Array){return true;} 
+
+		var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
+			util: {
+				isArray: function(array) {
+					if(array instanceof Array){return true;}
 					else {return false;}
 				},
-				isEmpty: function(array) { 
-					if(array.length > 0 ) {return false;} 
+				isEmpty: function(array) {
+					if(array.length > 0 ) {return false;}
 					else {return true;}
+				},
+                isUndefinedOrNull: function(obj) {
+					return obj === undefined || obj === null;
 				}
             }
-        });	
-    	
+        });
+
     	[Fact]
     	function positiveTest() {
     		var tooltip = {};
     		tooltip.isInstanceOf = function(instance) {
     			return true;
     		};
-    		
+
     		var tooltipArray = [tooltip];
     		var body = [];
     		var labelComponent = {
@@ -55,7 +58,7 @@ Test.Components.Ui.Input.HelperTest = function(){
     				if(attribute === 'v.body') {return body;}
     			}
     		};
-    		
+
     		var targetComponent = {
     				get: function(attribute) {
     					if(attribute === 'v.fieldHelpComponent') {
@@ -68,18 +71,18 @@ Test.Components.Ui.Input.HelperTest = function(){
     					}
     				}
     		};
-    		
-    		
+
+
 			mockUtil(function() {
 				targetHelper.renderFieldHelpComponent(targetComponent);
 			});
-    		
+
     		Assert.Equal(1, labelComponent.get('v.body').length);
     	}
-    	
+
     	[Fact]
     	function nonArrayPassedToFieldHelpComponentTest() {
-    		
+
     		var notAnArray = "This is not an array";
     		var body = [];
     		var labelComponent = {
@@ -87,7 +90,7 @@ Test.Components.Ui.Input.HelperTest = function(){
     				if(attribute === 'v.body') {return body;}
     			}
     		};
-    		
+
     		var targetComponent = {
     				get: function(attribute) {
     					if(attribute === 'v.fieldHelpComponent') {
@@ -100,18 +103,18 @@ Test.Components.Ui.Input.HelperTest = function(){
     					}
     				}
     		};
-    		
-    		
+
+
 			mockUtil(function() {
 				targetHelper.renderFieldHelpComponent(targetComponent);
 			});
-    		
+
     		Assert.Equal(0, labelComponent.get('v.body').length);
     	}
-    	
+
     	[Fact]
     	function emptyArrayPassedToFieldHelpComponentTest() {
-    		
+
     		var tooltipArray = [];
     		var body = [];
     		var labelComponent = {
@@ -119,7 +122,7 @@ Test.Components.Ui.Input.HelperTest = function(){
     				if(attribute === 'v.body') {return body;}
     			}
     		};
-    		
+
     		var targetComponent = {
     				get: function(attribute) {
     					if(attribute === 'v.fieldHelpComponent') {
@@ -132,22 +135,22 @@ Test.Components.Ui.Input.HelperTest = function(){
     					}
     				}
     		};
-    		
-    		
+
+
 			mockUtil(function() {
 				targetHelper.renderFieldHelpComponent(targetComponent);
 			});
-    		
+
     		Assert.Equal(0, labelComponent.get('v.body').length);
     	}
-    	
+
     	[Fact]
     	function nonInstanceOfTooltipTest() {
     		var notTooltip = {};
     		notTooltip.isInstanceOf = function(instance) {
     			return false;
     		};
-    		
+
     		var tooltipArray = [notTooltip];
     		var body = [];
     		var labelComponent = {
@@ -155,7 +158,7 @@ Test.Components.Ui.Input.HelperTest = function(){
     				if(attribute === 'v.body') {return body;}
     			}
     		};
-    		
+
     		var targetComponent = {
     				get: function(attribute) {
     					if(attribute === 'v.fieldHelpComponent') {
@@ -168,14 +171,14 @@ Test.Components.Ui.Input.HelperTest = function(){
     					}
     				}
     		};
-    		
-    		
+
+
 			mockUtil(function() {
 				targetHelper.renderFieldHelpComponent(targetComponent);
 			});
-    		
+
     		Assert.Equal(0, labelComponent.get('v.body').length);
     	}
     }
-	
+
 }

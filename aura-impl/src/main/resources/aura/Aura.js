@@ -1350,6 +1350,56 @@ AuraInstance.prototype.trace = function() {
     }
 };
 
+/*
+* Called from methods that have entered or are entering the deprecation pipeline. Provides first warnings, then errors to developers.
+* When possible, includes a workaround for the behavior or method being deprecated.
+*
+* @param {String} message The message to provide the developer indicating the method or behavior which has been or is being deprecated.
+* @param {String} workaround Any known or suggested workaround to accomplish the behavior being deprecated.
+* @param {Date} sinceDate The date since when the calling method has entered the deprecation pipeline. If omitted, deprecation is considered immediate.
+* @param {Date} dueDate The date at which the calling method is considered deprecated, and becomes an error. If omitted, deprecation is considered due upon the elapse of a default time period after 'sinceDate'.
+* @private
+* */
+AuraInstance.prototype.deprecated = function(message,workaround,sinceDate,dueDate){
+    //#if {"excludeModes" : ["PRODUCTION"]}
+    // This should be moved out to a constant, once we decide on the actual value.
+    var DEFAULT_DEPRECATION=1000*60*60*24*28; // Four weeks
+    var TEST_BUFFER=1000*60*60*24*14; // Two weeks
+    var testDueDate;
+    if(!dueDate){
+        if(!sinceDate){
+            dueDate=testDueDate=new Date();
+        }else {
+            sinceDate=new Date(sinceDate);
+            dueDate=new Date(sinceDate);
+            dueDate.setTime(dueDate.getTime() + DEFAULT_DEPRECATION);
+            testDueDate=new Date(dueDate.getTime() - TEST_BUFFER);
+        }
+    }else{
+        dueDate=new Date(dueDate);
+        testDueDate=new Date(dueDate);
+        testDueDate.setTime(testDueDate.getTime()-TEST_BUFFER);
+    }
+    message=$A.util.format("DEPRECATED (as of {0}): {1}\n\t{2}\n{3}",
+        $A.localizationService.formatDate(dueDate),
+        message,
+        $A.util.trim(new Error().stack.split('\n')[3]),
+        workaround||"No known workaround."
+    );
+    if(Date.now()>=dueDate){
+        $A.error(message);
+    }else{
+        $A.warning(message);
+    }
+    //#end
+    //#if {modes:["TESTING", "TESTINGDEBUG", "AUTOTESTING", "AUTOTESTINGDEBUG"]}
+    // BREAK EARLY IN TESTS
+    if(Date.now()>=testDueDate){
+        $A.error(message);
+    }
+    //#end
+};
+
 /**
  * Sets mode to production (default), development, or testing.
  *

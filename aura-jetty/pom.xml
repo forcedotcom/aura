@@ -28,6 +28,10 @@
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
+            <artifactId>aura-modules</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura-impl-expression</artifactId>
             <type>test-jar</type>
             <scope>runtime</scope>

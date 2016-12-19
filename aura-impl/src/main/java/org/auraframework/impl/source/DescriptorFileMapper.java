@@ -136,6 +136,7 @@ public class DescriptorFileMapper {
         addExtension(".design", NameFormat.BUNDLE, "markup", DefType.DESIGN, Format.XML);
         addExtension(".svg", NameFormat.BUNDLE, "markup", DefType.SVG, Format.SVG);
         addExtension(".flavors", NameFormat.BUNDLE, "markup", DefType.FLAVORS, Format.XML);
+        addExtension(".html", NameFormat.BUNDLE, "markup", DefType.MODULE, Format.XML);
 
         addExtension("Controller.js", NameFormat.BUNDLE, "js", DefType.CONTROLLER, Format.JS);
         addExtension("Renderer.js", NameFormat.BUNDLE, "js", DefType.RENDERER, Format.JS);

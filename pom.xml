@@ -92,9 +92,9 @@
         <module>aura-spring</module>
         <module>aura-util</module>
         <module>aura</module>
-        <module>aura-modules</module>
         <module>aura-impl</module>
         <module>aura-impl-expression</module>
+        <module>aura-modules</module>
         <module>aura-components</module>
         <module>aura-tools</module>
         <module>aura-resources</module>

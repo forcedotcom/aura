@@ -47,8 +47,7 @@ import java.util.regex.Pattern;
  * preload definitions etc.
  */
 public class IntegrationServiceImplTest extends AuraImplTestCase {
-    AuraTestingMarkupUtil tmu;
-    
+	
     private final String simpleComponentTag = "ui:button";
     private final String arraysComponentTag = "expressionTest:arrays";
 
@@ -57,7 +56,11 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
 
     @Inject
     private ContextService contextService;
-
+    
+    @Inject
+    private AuraTestingMarkupUtil tmu;
+    
+    
     public IntegrationServiceImplTest() {
         super();
         setShouldSetupContext(false);
@@ -66,7 +69,6 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        tmu = getAuraTestingMarkupUtil();
     }
 
     /**

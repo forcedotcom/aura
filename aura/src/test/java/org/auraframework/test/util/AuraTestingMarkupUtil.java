@@ -16,6 +16,22 @@
 
 package org.auraframework.test.util;
 
+import java.io.IOException;
+import java.io.StringWriter;
+
+import javax.inject.Inject;
+
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.instance.Component;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.RenderingService;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.springframework.context.annotation.Lazy;
+
+
+@ServiceComponent
+@Lazy
 public class AuraTestingMarkupUtil {
 	
     protected final static String baseApplicationTag = "<aura:application %s>%s</aura:application>";
@@ -41,8 +57,10 @@ public class AuraTestingMarkupUtil {
     protected final static String attributeObjectListMarkupWithDefault = "<aura:attribute name=%s type='Object[]' default=%s/>";
     protected final static String attributeCmpListMarkupWithDefault = 
 			"<aura:attribute name=%s type='Aura.Component[]'>" + "%s" + "</aura:attribute>";
-	
-	
+    
+	protected RenderingService renderingService;
+	protected DefinitionService definitionService;
+    
 	public String getCommonAttributeMarkup(boolean getString, boolean getBoolean, boolean getObject, 
 			boolean getComponent) {
 		String attributeMarkup="";
@@ -136,5 +154,39 @@ public class AuraTestingMarkupUtil {
 		return attributeMarkup;
 	}
 	
+	/**
+	 * Take a component instance that is capable of being server rendered and return it as a string. 
+	 * 
+	 * @param component
+	 * @return
+	 */
+	public String renderComponent(Component component) {
+		if(component == null){
+			return null;
+		}
+		
+        StringWriter sw = new StringWriter();
+        try {
+        	if(definitionService.getDefinition(component.getDescriptor()).isLocallyRenderable() == false) {
+        		return null;
+        	}
+			renderingService.render(component, sw);
+		} catch (QuickFixException e) {
+			return null;
+		} catch (IOException e) {
+			return null;
+		}
+        return sw.toString().trim();
+	}
+
+	@Inject
+    public void setRenderingService(RenderingService renderingService) {
+        this.renderingService = renderingService;
+    }
+    
+	@Inject
+    public void setDefinitionService(DefinitionService definitionService) {
+        this.definitionService = definitionService;
+    }
 	
 }

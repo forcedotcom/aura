@@ -116,6 +116,10 @@ public class ReinitializeModelTest extends AuraImplTestCase {
         }
         Map<String, Object> attributes = Maps.newHashMap();
 
+        String componentTagWithModelAndAttr = "<aura:component model='java://%s' extensible='true'>"
+                + "<aura:attribute name='attrInParent' type='String' default=%s/>" + "%s" + "<br/>Parent CMP<br/>"
+                + "m.valueParent={!m.valueParent}" + "%s" + "{!v.body}" + "</aura:component>";
+        
         DefDescriptor<ComponentDef> defDesParent = getDefDescriptor(componentTagWithModelAndAttr, model,
                 "'defaultattributeinParent1'", "", "");
 
@@ -161,7 +165,47 @@ public class ReinitializeModelTest extends AuraImplTestCase {
 
     @Test
     public void testReinitializedModelSuperCmp() throws Exception {
-        runTestReinitializedModelSuperCmp(false, "org.auraframework.components.test.java.model.TestReinitializeModel");
+    	 
+        Map<String, Object> attributes = Maps.newHashMap();
+        
+        final String parentMarkup = "<aura:component model='java://org.auraframework.components.test.java.model.TestReinitializeModel' extensible='true'>" +
+										                "<aura:attribute name='attrInParent' type='String' default='defaultattributeinParent1'/><br/>Parent CMP<br/>" +
+										                "m.valueParent={!m.valueParent}{!v.body}"+
+										            "</aura:component>";
+        final DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class, parentMarkup);
+
+        final String grandchildMarkup = "<aura:component extends='%s' render='client'>" +
+									              	"<aura:attribute name='attributeInGrandChild' type='String' default='default attribute in GrandChild'/>" +
+									                "<aura:set attribute='attrInParent' value='{!v.attributeInGrandChild}'/>" +
+									                "<br/>GrandCHILD CMP<br/>" + 
+									              "</aura:component>";
+        final DefDescriptor<ComponentDef> grandChild = addSourceAutoCleanup(ComponentDef.class, String.format(grandchildMarkup, parent.getDescriptorName()));
+        
+        final String childMarkup = "<aura:component extends='%s' render='client'>" +
+									              	 "<aura:attribute name='attributeInChild' type='String' default='default attribute in Child'/>" +
+									              	 "<aura:attribute name='attributeFromChildToGrandChild' type='String' default='default attributeFromChildToGrandChild'/>" +
+									                 "<aura:set attribute='attrInParent' value='{!v.attributeInChild}'/>" +
+									                 "<br/>GrandCHILD CMP<br/>" + 
+									                 "<%s attributeInGrandChild='{!v.attributeFromChildToGrandChild}'/>" + 
+									               "</aura:component>";
+        final DefDescriptor<ComponentDef> child = addSourceAutoCleanup(ComponentDef.class, String.format(childMarkup, parent.getDescriptorName(), grandChild.getDescriptorName()));
+        
+        Component childCmp = instanceService.getInstance(child, attributes);
+
+        String result =
+                "<br/>ParentCMP<br/>m.valueParent=defaultattributeinChild" +
+                        "<br/>GrandCHILDCMP<br/>" +
+                        "<br/>ParentCMP<br/>m.valueParent=defaultattributeFromChildToGrandChild" +
+                        "<br/>GrandCHILDCMP<br/>";
+        assertEquals(result, getRenderedBaseComponent(childCmp).replaceAll("\\s+", ""));
+
+        Map<String, Object> newAttributes = Maps.newHashMap();
+        newAttributes.put("attributeFromChildToGrandChild", "new attributeFromChildToGrandChild");
+        newAttributes.put("attributeInChild", "new attribute in Child");
+        childCmp.getAttributes().set(newAttributes);
+        childCmp.reinitializeModel();
+
+        assertEquals(result.replaceAll("default", "new"), getRenderedBaseComponent(childCmp).replaceAll("\\s+", ""));
     }
 
     @Test

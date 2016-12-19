@@ -20,6 +20,7 @@ package org.auraframework.impl.root.component;
 import java.io.IOException;
 import java.util.Map;
 
+import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.expression.PropertyReference;
@@ -121,5 +122,20 @@ public class IterationValueProvider<D extends BaseComponentDef, I extends BaseCo
 	@Override
 	public void reinitializeModel() throws QuickFixException {
 		attributeValueProvider.reinitializeModel();
+	}
+	
+    @Override
+    public D getComponentDef() throws QuickFixException {
+    	return Aura.getDefinitionService().getDefinition(this.getDescriptor());
+    }
+
+	@Override
+	public BaseComponent<D, I> getConcreteComponent() {
+		return attributeValueProvider.getConcreteComponent();
+	}
+
+	@Override
+	public boolean isConcreteComponent() {
+		return attributeValueProvider.isConcreteComponent();
 	}
 }

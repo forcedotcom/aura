@@ -1929,8 +1929,10 @@ Component.prototype.setupValueProviders = function(customValueProviders) {
     vp["null"]=null;
     vp["version"] = this.version ? this.version : this.getVersionInternal();
 
-    for (var key in customValueProviders) {
-        this.addValueProvider(key,customValueProviders[key]);
+    if(customValueProviders) {
+        for (var key in customValueProviders) {
+            this.addValueProvider(key,customValueProviders[key]);
+        }
     }
 };
 

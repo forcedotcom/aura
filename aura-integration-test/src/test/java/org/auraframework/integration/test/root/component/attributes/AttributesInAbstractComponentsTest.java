@@ -15,31 +15,34 @@
  */
 package org.auraframework.integration.test.root.component.attributes;
 
+import java.util.ArrayList;
+
+import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Component;
 import org.junit.Test;
 
-import java.util.ArrayList;
-
 /**
  * Automation to verify how attributes behave in abstract components.
+ * 
+ * @since 0.0.139
  */
 public class AttributesInAbstractComponentsTest extends AuraImplTestCase {
-    private final String abstractCmpMarkup = "<aura:component abstract='true'>%s</aura:component>";
-    private final String extensionCmpMarkup = "<aura:component extends='%s' > %s</aura:component>";
 
     /**
      * Setting inherited attribute's value using value assignment in <aura:set>
+     * 
+     * @throws Exception
      */
     @Test
     public void testSettingAttributeValuesInChildComponent() throws Exception {
-        String markup = String.format(abstractCmpMarkup, "<aura:attribute type='String' name='text' required='true'/>");
+        //String markup = String.format(abstractCmpMarkup, "<aura:attribute type='String' name='text' required='true'/>");
+    	String markup = "<aura:component abstract='true'><aura:attribute type='String' name='text' required='true'/></aura:component>";
         DefDescriptor<ComponentDef> abstractCmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
 
-        markup = String.format(extensionCmpMarkup, abstractCmpDesc.getQualifiedName(),
-                "<aura:set attribute='text' value='Aura'/>");
+    	markup = String.format("<aura:component extends='%s'><aura:set attribute='text' value='Aura'/></aura:component>", abstractCmpDesc.getQualifiedName());
         DefDescriptor<ComponentDef> extensionCmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
         assertNotNull(
                 "Failed to retrieve definition of extension component which was setting value of inherited attribute",
@@ -52,16 +55,17 @@ public class AttributesInAbstractComponentsTest extends AuraImplTestCase {
 
     /**
      * Setting inherited attribute's value in body of <aura:set></aura:set>
+     * 
+     * @throws Exception
      */
     @Test
     public void testSettingAttributeUsingSetBodyInChildComponent() throws Exception {
-        String markup = String.format(abstractCmpMarkup,
-                "<aura:attribute type='Aura.Component[]' name='innerBody' required='true'/>");
+    	String markup = "<aura:component abstract='true'><aura:attribute type='Aura.Component[]' name='innerBody' required='true'/></aura:component>";
         DefDescriptor<ComponentDef> abstractCmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
 
-        markup = String.format(extensionCmpMarkup, abstractCmpDesc.getQualifiedName(),
-                "<aura:set attribute='innerBody'><aura:text value='Aura'/></aura:set>");
+    	markup = String.format("<aura:component extends='%s'><aura:set attribute='innerBody'><aura:text value='Aura'/></aura:set></aura:component>", abstractCmpDesc.getQualifiedName());
         DefDescriptor<ComponentDef> extensionCmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
+        
         assertNotNull(
                 "Failed to retrieve definition of extension component which was setting value of inherited attribute",
                 definitionService.getDefinition(extensionCmpDesc));

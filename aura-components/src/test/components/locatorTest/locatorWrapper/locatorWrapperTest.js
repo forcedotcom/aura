@@ -59,16 +59,43 @@
            $A.test.assertUndefined(trx);
         }
     },
+
+    /**
+     * 1. Click on an element contained inside another component that is included in our component.
+     * 2. Get the transaction that happened as a result of clicking on the element.
+     * 3. Verify the target of the transaction is the element we clicked on.
+     * 4. Verify the scope is the component that contained the actual element.
+     * 5. Verify the context information is as expected.
+     */
     testParentChildWithLocatorDefs: {
         test: function (cmp) {
             var innerCmp = cmp.find("locatorWrapperIdWithDef");
-            this.doClickAndValidateTransaction("innerWithAuraIdLocator", "locatorWrapperIdWithDef", 
-                {
-                    "innerTextValue": innerCmp.get("v.innerTextValue") + innerCmp.get("v.addText"),
-                    "parentKey": cmp.get("v.wrapperText")
-                });
+            var expectedContext = {
+                "innerTextValue": innerCmp.get("v.innerTextValue") + innerCmp.get("v.addText"),
+                "parentKey": cmp.get("v.wrapperText")
+            };
+
+            $A.test.clickOrTouch($A.test.select(".locatorWrapperIdWithDef .innerWithAuraIdLocator")[0]);
+
+            $A.test.assertNotUndefinedOrNull(this.lastTransaction, "No transaction occured after clicking the element targeted with a locator.");
+
+            // Verify content of locator
+            var locator = this.lastTransaction.context.locator;
+            var actualTarget = locator.target;
+            var actualScope = locator.scope;
+            var actualContext = locator.context;
+            
+            $A.test.assertEquals("innerWithAuraIdLocator", actualTarget, "We actually clicked on the innerWithAuraIdLocator");
+            $A.test.assertEquals("locatorWrapperIdWithDef", actualScope, "We were inside the locatorWrapperIdWithDef when we clicked on innerWithAuraIdLocator.");
+
+            $A.test.assertEquals(Object.keys(expectedContext).length, Object.keys(actualContext).length, "Actual locator context didn't have the same number of keys")
+            for (var prop in expectedContext) {
+                $A.test.assertEquals(expectedContext[prop], actualContext[prop], "Found mismatch for locator context property: " + prop);
+            }
         }
     },
+
+
     testParentWithAuraIdOnlyChildWithLocatorDef: {
         test: function (cmp) {
             var innerCmp = cmp.find("locatorWrapperIdNoDef");

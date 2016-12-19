@@ -54,7 +54,7 @@ public abstract class AuraImplTestCase extends AuraTestCase {
     protected DefinitionService definitionService;
     
     @Inject
-    private RenderingService renderingService;
+    protected RenderingService renderingService;
 
     @Inject
     protected InstanceService instanceService;

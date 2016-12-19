@@ -67,7 +67,8 @@ public abstract class AuraTestCase extends UnitTestCase {
     @Inject
     protected FileMonitor fileMonitor;
 
-    private AuraTestingMarkupUtil auraTesingMarkupUtil;
+    @Inject
+    protected AuraTestingMarkupUtil auraTesingMarkupUtil;
 
     @Override
     public void setUp() throws Exception {
@@ -289,20 +290,6 @@ public abstract class AuraTestCase extends UnitTestCase {
         }
         assertTrue("Expected exception message to contain <" + message + ">, but was <" + e.getMessage() + " >", e
                 .getMessage().contains(message));
-    }
-
-    /*public AuraTestingUtil getAuraTestingUtil() {
-        if (auraTestingUtil == null) {
-            auraTestingUtil = new AuraTestingUtil(fileMonitor, stringSourceLoader, definitionService, configAdapter, contextService);
-        }
-        return auraTestingUtil;
-    }*/
-
-    protected AuraTestingMarkupUtil getAuraTestingMarkupUtil() {
-        if (auraTesingMarkupUtil == null) {
-            auraTesingMarkupUtil = new AuraTestingMarkupUtil();
-        }
-        return auraTesingMarkupUtil;
     }
 
     /**

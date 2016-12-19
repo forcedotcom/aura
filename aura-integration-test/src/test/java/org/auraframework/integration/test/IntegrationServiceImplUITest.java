@@ -42,6 +42,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 /**
  * UI test for usage of Integration Service.
  */
@@ -55,7 +57,8 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     // aura id of injected component
     String defaultLocalId = "injectedComponent";
 
-    AuraTestingMarkupUtil tmu;
+    @Inject
+    private AuraTestingMarkupUtil tmu;
 
     @Override
     public void setUp() throws Exception {
@@ -68,8 +71,6 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
             getIntegrationStubMarkup(
                 "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForTestingIntegrationService",
                 true, true, true));
-
-        tmu = getAuraTestingMarkupUtil();
     }
 
 

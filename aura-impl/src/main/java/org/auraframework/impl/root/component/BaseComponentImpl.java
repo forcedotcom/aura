@@ -238,6 +238,19 @@ BaseComponent<D, I> {
         }
     }
 
+    @Override
+    public BaseComponent<D, I> getConcreteComponent() {
+        if (this.concreteComponent != null) {
+            return this.concreteComponent;
+        }
+        return this;
+    }
+
+    @Override
+    public boolean isConcreteComponent() {
+        return this.concreteComponent == null || this.concreteComponent == this;
+    }
+
     protected void finishInit() throws QuickFixException {
         AuraContext context = contextService.getCurrentContext();
 
@@ -291,6 +304,7 @@ BaseComponent<D, I> {
 
     protected abstract void injectComponent() throws QuickFixException;
 
+    @Override
     public D getComponentDef() throws QuickFixException {
         return descriptor.getDef();
     }

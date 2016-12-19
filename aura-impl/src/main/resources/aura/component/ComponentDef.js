@@ -433,6 +433,28 @@ ComponentDef.prototype.getFacets = function() {
     return this.facets;
 };
 
+
+/**
+ * Gets Facet by facet descriptor
+ * @param  {String} facetName The name of the facet. If the attribute name was param1, then facetName would be "param1". Does not handle v., so v.param1 would not work.
+ * @return {Object}           The facet descriptor. Is current an object with two properties, descriptor which is the facetName you specified, and value which is the contents of the facet.
+ */
+ComponentDef.prototype.getFacet = function(facetName) {
+    if(!this.facetMap) {
+        var facetMap = {};
+        if(this.facets) {
+            var facets = this.facets;
+            for(var c=0,length=facets.length;c<length;c++){
+                facetMap[facets[c]["descriptor"]] = facets[c];
+            }
+        }
+        this.facetMap = facetMap;
+    }
+
+    // hasOwnProperty to prevent us returning a function when someone names their facet "toString"
+    return this.facetMap.hasOwnProperty(facetName) ? this.facetMap[facetName] : undefined;
+};
+
 /**
  * Gets the controller definition. Returns a ControllerDef object.
  *

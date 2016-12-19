@@ -17,12 +17,15 @@ package org.auraframework.impl.root.component;
 
 import java.io.IOException;
 
+import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.instance.AttributeSet;
+import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.instance.Model;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 /**
@@ -103,5 +106,21 @@ public class ProtoComponentImpl implements Component {
 
 	@Override
 	public void reinitializeModel() {
+	}
+	
+
+    @Override
+    public ComponentDef getComponentDef() throws QuickFixException {
+        return Aura.getDefinitionService().getDefinition(descriptor);
+    }
+
+	@Override
+	public BaseComponent<ComponentDef, Component> getConcreteComponent() {
+		return this;
+	}
+
+	@Override
+	public boolean isConcreteComponent() {
+		return true;
 	}
 }

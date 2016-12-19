@@ -18,6 +18,7 @@ package org.auraframework.integration.test.service;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -28,6 +29,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.inject.Inject;
 
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
@@ -56,9 +59,9 @@ import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
+import org.auraframework.util.json.JsonStreamReader;
 import org.junit.Test;
 
-import javax.inject.Inject;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -323,7 +326,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         Component sharedCmp = instanceService.getInstance("ifTest:testIfWithModel", ComponentDef.class,
                 attributes);
         StringWriter sw = new StringWriter();
-        ServerService ss = serverService;
         Action a = new EmptyAction(sw, "first action", definitionService);
         Action b = new EmptyAction(sw, "second action", definitionService);
         Action c = new EmptyAction(sw, "third action", definitionService);
@@ -333,7 +335,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         List<Action> actions = Lists.newArrayList(d, e, f);
         Message message = new Message(actions);
         // run the list of actions.
-        ss.run(message, contextService.getCurrentContext(), sw, null);
+        serverService.run(message, contextService.getCurrentContext(), sw, null);
 
         // sanity check, sharedCmp should have the latest attribute value.
         // this has nothing to do with the fix though
@@ -390,14 +392,13 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     public void testMultipleActions() throws Exception {
         contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         StringWriter sw = new StringWriter();
-        ServerService ss = serverService;
         Action a = new EmptyAction(sw, "first action", definitionService);
         Action b = new EmptyAction(sw, "second action", definitionService);
         Action c = new EmptyAction(sw, "third action", definitionService);
         List<Action> actions = Lists.newArrayList(a, b, c);
         Message message = new Message(actions);
         // run the list of actions.
-        ss.run(message, contextService.getCurrentContext(), sw, null);
+        serverService.run(message, contextService.getCurrentContext(), sw, null);
         String returnValuea = "{\"actions\":[";
         String returnValueb = returnValuea + "{\"action\":\"firstaction\"}";
         String returnValuec = returnValueb + ",{\"action\":\"secondaction\"}";
@@ -422,12 +423,11 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     public void testSameActionTwice() throws Exception {
         contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
         StringWriter sw = new StringWriter();
-        ServerService ss = serverService;
         Action a = new EmptyAction(sw, "first action", definitionService);
         Action b = new EmptyAction(sw, "second action", definitionService);
         List<Action> actions = Lists.newArrayList(a, b, a, b);
         Message message = new Message(actions);
-        ss.run(message, contextService.getCurrentContext(), sw, null);
+        serverService.run(message, contextService.getCurrentContext(), sw, null);
         assertTrue(((EmptyAction) a).getCount() == 2);
         assertTrue(((EmptyAction) b).getCount() == 2);
         // in the old way since we output action info into response after all actions finish running, the previous run's
@@ -450,12 +450,11 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     public void testSimpleAction() throws Exception {
         contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
 
-        ServerService ss = serverService;
         Action a = new EmptyAction(definitionService);
         List<Action> actions = Lists.newArrayList(a);
         Message message = new Message(actions);
         StringWriter sw = new StringWriter();
-        ss.run(message, contextService.getCurrentContext(), sw, null);
+        serverService.run(message, contextService.getCurrentContext(), sw, null);
         validateEmptyActionSerialization(sw.toString(), null, Arrays.asList("simpleaction"));
     }
 
@@ -468,14 +467,13 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     public void testSimpleActionWithExtras() throws Exception {
         contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
 
-        ServerService ss = serverService;
         Action a = new EmptyAction(definitionService);
         List<Action> actions = Lists.newArrayList(a);
         Map<String, String> extras = Maps.newHashMap();
         Message message = new Message(actions);
         StringWriter sw = new StringWriter();
         extras.put("this", "that");
-        ss.run(message, contextService.getCurrentContext(), sw, extras);
+        serverService.run(message, contextService.getCurrentContext(), sw, extras);
 
         Map<String, Object> json = validateEmptyActionSerialization(sw.toString(), Sets.newHashSet("this"),
                 Arrays.asList("simpleaction"));
@@ -489,7 +487,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      */
     @Test
     public void testWriteCssWithoutDupes() throws Exception {
-        ServerService ss = serverService;
         DefDescriptor<ApplicationDef> appDesc = definitionService
                 .getDefDescriptor("preloadTest:test_SimpleApplication", ApplicationDef.class);
         AuraContext context = contextService
@@ -500,7 +497,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
 
         StringWriter output = new StringWriter();
-        ss.writeAppCss(dependencies, output);
+        serverService.writeAppCss(dependencies, output);
 
         // A snippet of component css
         String cssPiece = "AuraResourceServletTest-testWriteCssWithoutDupes";
@@ -518,7 +515,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      */
     @Test
     public void testCSSOrder() throws Exception {
-        ServerService ss = serverService;
         DefDescriptor<ApplicationDef> appDesc = definitionService
                 .getDefDescriptor("auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
         DefDescriptor<ComponentDef> grandparent = definitionService
@@ -540,7 +536,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         writable.add(definitionService.getDefinition(child2).getStyleDescriptor());
 
         StringWriter output = new StringWriter();
-        ss.writeAppCss(writable, output);
+        serverService.writeAppCss(writable, output);
         String css = output.toString();
 
         //
@@ -557,7 +553,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
     @Test
     public void testPreloadCSSDependencies() throws Exception {
-        ServerService ss = serverService;
         DefDescriptor<ComponentDef> appDesc = definitionService
                 .getDefDescriptor("clientApiTest:cssStyleTest", ComponentDef.class);
         AuraContext context = contextService.startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
@@ -568,7 +563,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
 
         StringWriter output = new StringWriter();
-        ss.writeAppCss(dependencies, output);
+        serverService.writeAppCss(dependencies, output);
 
         String sourceNoWhitespace = output.toString().replaceAll("\\s", "");
         String preloaded1 = ".clientApiTestCssStyleTest{background-color:#eee}";
@@ -582,7 +577,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      */
     @Test
     public void testWriteDefinitionsWithoutDupes() throws Exception {
-        ServerService ss = serverService;
         DefDescriptor<ApplicationDef> appDesc = definitionService
                 .getDefDescriptor("appCache:withpreload", ApplicationDef.class);
         AuraContext context = contextService
@@ -594,7 +588,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
         // prime def cache
         StringWriter output = new StringWriter();
-        ss.writeDefinitions(dependencies, output);
+        serverService.writeDefinitions(dependencies, output);
         String text = output.toString();
         final String dupeCheck = "$A.clientService.initDefs(";
         if (text.indexOf(dupeCheck) != text.lastIndexOf(dupeCheck)) {
@@ -603,7 +597,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
         // now check that defs not re-written with unempty cache
         output = new StringWriter();
-        ss.writeDefinitions(dependencies, output);
+        serverService.writeDefinitions(dependencies, output);
         text = output.toString();
         if (text.indexOf(dupeCheck) != text.lastIndexOf(dupeCheck)) {
             fail("found duplicated code in: " + text);
@@ -615,7 +609,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      */
     @Test
     public void testWriteDefinitionsLockerServiceCacheBuster() throws Exception {
-        ServerService ss = serverService;
         DefDescriptor<ComponentDef> cmpDesc = definitionService
                 .getDefDescriptor("lockerTest:basicTest", ComponentDef.class);
         AuraContext context = contextService
@@ -627,22 +620,69 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         // get defs with LockerService enabled
         getMockConfigAdapter().setLockerServiceEnabled(true);
         StringWriter output = new StringWriter();
-        ss.writeDefinitions(dependencies, output);
+        serverService.writeDefinitions(dependencies, output);
         String firstOutput = output.toString();
 
         // now get defs with LockerService disabled
         getMockConfigAdapter().setLockerServiceEnabled(false);
         output = new StringWriter();
-        ss.writeDefinitions(dependencies, output);
+        serverService.writeDefinitions(dependencies, output);
         String secondOutput = output.toString();
 
         assertFalse("Expected writeDefinitions output to change after modifying LockerService cache buster",
                 firstOutput.equals(secondOutput));
     }
+
+    /**
+     * Verify that metrics service writes data out.
+     */
+    @Test
+    public void testWriteDefinitionsMetricsWithDevMode() throws Exception {
+        Action action = new EmptyAction(definitionService);
+        Message message = new Message(Lists.newArrayList(action));
+        DefDescriptor<ComponentDef> cmpDesc = definitionService
+                .getDefDescriptor("lockerTest:basicTest", ComponentDef.class);
+        AuraContext context = contextService
+                .startContext(Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, cmpDesc);
+
+        // get defs with LockerService enabled
+        getMockConfigAdapter().setIsProduction(false);
+        StringWriter output = new StringWriter();
+        serverService.run(message, context, output, null);
+        String outputStr = output.toString();
+        JsonStreamReader reader = new JsonStreamReader(new ByteArrayInputStream(outputStr.getBytes()));
+        reader.next();
+        Map<String,Object> outputObj = reader.getObject();
+        assertNotNull(outputObj);
+        assertNotNull(outputObj.get("perf"));
+    }
+
+    /**
+     * Verify that metrics service does not write anything out.
+     */
+    @Test
+    public void testWriteDefinitionsNoMetricsWithProdMode() throws Exception {
+        Action action = new EmptyAction(definitionService);
+        Message message = new Message(Lists.newArrayList(action));
+        DefDescriptor<ComponentDef> cmpDesc = definitionService
+                .getDefDescriptor("lockerTest:basicTest", ComponentDef.class);
+        AuraContext context = contextService
+                .startContext(Mode.PRODDEBUG, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, cmpDesc);
+
+        // get defs with LockerService enabled
+        getMockConfigAdapter().setIsProduction(true);
+        StringWriter output = new StringWriter();
+        serverService.run(message, context, output, null);
+        String outputStr = output.toString();
+        JsonStreamReader reader = new JsonStreamReader(new ByteArrayInputStream(outputStr.getBytes()));
+        reader.next();
+        Map<String,Object> outputObj = reader.getObject();
+        assertNotNull(outputObj);
+        assertNull(outputObj.get("perf"));
+    }
     
     @Test
     public void testPreloadJSDependencies() throws Exception {
-        ServerService ss = serverService;
         DefDescriptor<ComponentDef> appDesc = definitionService
                 .getDefDescriptor("clientApiTest:cssStyleTest", ComponentDef.class);
         AuraContext context = contextService.startContext(AuraContext.Mode.DEV, AuraContext.Format.JS,
@@ -654,7 +694,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         definitionService.getDefinition(appDesc);
 
         StringWriter output = new StringWriter();
-        ss.writeDefinitions(dependencies, output);
+        serverService.writeDefinitions(dependencies, output);
 
         String sourceNoWhitespace = output.toString().replaceAll("\\s", "");
 
@@ -742,9 +782,8 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         Writer writer = mock(Writer.class);
         when(writer.append('{')).thenThrow(new IOException(exceptionMessage));
         Message message = new Message(new ArrayList<Action>());
-        ServerService ss = serverService;
         try {
-            ss.run(message, contextService.getCurrentContext(), writer, null);
+            serverService.run(message, contextService.getCurrentContext(), writer, null);
             fail("Exception should be thrown from method run().");
         } catch(IOException e) {
             assertEquals(exceptionMessage, e.getMessage());
@@ -762,9 +801,8 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         context.addLoaded(appDesc, uid);
         Set<DefDescriptor<?>> dependencies = definitionService.getDependencies(uid);
 
-        ServerService ss = serverService;
         StringWriter output = new StringWriter();
-        ss.writeDefinitions(dependencies, output);
+        serverService.writeDefinitions(dependencies, output);
 
         return output.toString();
     }

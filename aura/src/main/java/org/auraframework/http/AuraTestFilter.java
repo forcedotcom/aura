@@ -513,7 +513,7 @@ public class AuraTestFilter implements Filter {
         String qs = String.format("aura.testTimeout=%s&aura.nonce=%s", timeout, System.nanoTime());
         String suiteSrcUrl = createURI(targetDescriptor.getNamespace(), targetDescriptor.getName(),
                 targetDescriptor.getDefType(), null, Format.JS, Authentication.AUTHENTICATED.name(), testName, qs);
-        tag = tag + String.format("<script src='%s'%s></script>\n", suiteSrcUrl, defer);
+        tag = tag + String.format("<script src='%s'%s></script>\n", suiteSrcUrl, "");
         return tag;
     }
 
@@ -552,14 +552,16 @@ public class AuraTestFilter implements Filter {
 
         // TODO: Inject test framework here, before the test suite code, separately from framework code.
         out.append(String.format(
+        		
         "(function testBootstrap(suiteProps) { "
+        		//+ "throw 'from testBootstrap';\n\t\t "
         		+ "window.$testBootstrapFunction$ || (window.$testBootstrapFunction$ = {});\n\t\t"
         		+ "window.$testBootstrapFunction$['testBootstrapFunctionLoadingTime'] = window.performance && window.performance.now ? window.performance.now() : Date.now();"
-        		+ "if (!window.Aura || !window.Aura.frameworkJsReady) {"
+        		+ "if (!window.Aura || !window.Aura.frameworkJsReady || !(window.Aura.appBootstrapStatus === 'loaded') ) {"
         			+ "window.Aura || (window.Aura = {});\n\t\t"
-        			+ "window.Aura.beforeFrameworkInit = Aura.beforeFrameworkInit || [];\n\t\t "
-        			+ "window.Aura.beforeFrameworkInit.push(testBootstrap.bind(null, suiteProps));\n\t\t "
-        			+ "window.$testBootstrapFunction$['AuraNotReady']=true;\n\t\t"
+        			+ "window.Aura.afterBootstrapReady = window.Aura.afterBootstrapReady || [];\n\t\t "
+        			+ "window.Aura.afterBootstrapReady.push(testBootstrap.bind(null, suiteProps));\n\t\t "
+        			+ "window.$testBootstrapFunction$['BootStrapReady']=false;\n\t\t"
         			+ "} else {\n\t\t "
         				+ "window.$A.test.$testBootstrap$ = window.$A.test.$testBootstrap$?window.$A.test.$testBootstrap$:{}; \n\t\t "
             			+ "window.$A.test.$testBootstrap$['testBootstrapFunction']=' Framework ready, call $A.test.run for test:"+testName+" #'+ window.Aura.time(); \n\t\t "

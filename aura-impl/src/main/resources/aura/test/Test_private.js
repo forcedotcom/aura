@@ -388,10 +388,10 @@ TestInstance.prototype.getDump = function() {
         		for(it in Aura["bootstrap"]) { status+=it+":"+Aura["bootstrap"][it]+"; "; }
             	status += "\n";
         	}
-    		if(Aura['beforeFrameworkInit'] && Aura['beforeFrameworkInit'] instanceof Array) {
-    			status += "What's in Aura.beforeFrameworkInit?\n";
-    			for(var idx=0; idx < Aura['beforeFrameworkInit'].length; idx++) {
-    				status += Aura['beforeFrameworkInit'][idx];
+    		if(Aura['afterBootstrapReady'] && Aura['afterBootstrapReady'] instanceof Array) {
+    			status += "What's in Aura.afterBootstrapReady?\n";
+    			for(var idx=0; idx < Aura['afterBootstrapReady'].length; idx++) {
+    				status += Aura['afterBootstrapReady'][idx];
     			}
     			status += "\n";
     		}

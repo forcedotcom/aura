@@ -20,7 +20,6 @@
         helper.setUpEvents(component, false);
         helper.addHeaderAndFooterClassesAndAttributes(component);
         helper.setDefaultHighlight(component);
-        helper.positionList(component);
     },
     rerender : function(component, helper){
         this.superRerender();

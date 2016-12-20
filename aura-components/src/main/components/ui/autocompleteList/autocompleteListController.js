@@ -121,4 +121,5 @@
     visibleChange: function(component, event, helper) {
         helper.setUpEvents(component, true);
     }
+    
 })// eslint-disable-line semi

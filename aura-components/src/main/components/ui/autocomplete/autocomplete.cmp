@@ -71,7 +71,7 @@
     
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:handler name="listExpand" event="ui:autocompleteListExpand" action="{!c.handleListExpand}"/>
-
+    
     <aura:if isTrue="{!v.inputType == 'inputTextArea'}">
         <ui:inputTextAreaForAutocomplete aura:id="input"
                                          aura:flavor="{!v.inputFlavor}"

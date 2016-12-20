@@ -19,7 +19,11 @@
 		cmp.getElement().style.zIndex = cmp.get('v.zIndex');
 	},
 
-	handleReferenceElement: function(cmp, evt, helper) {
-		helper.handleReferenceElement(cmp);
+	repositionPanel: function(cmp, evt, helper) {
+		helper.reposition(cmp, null);
+	},
+
+	listCollapse: function (cmp, evt, helper) {
+		cmp.set('v.visible', false);
 	}
 })// eslint-disable-line semi

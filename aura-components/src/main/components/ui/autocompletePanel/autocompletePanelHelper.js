@@ -14,37 +14,71 @@
  * limitations under the License.
  */
 ({
-
-
-	handleReferenceElement: function (cmp) {
-		var elem = cmp.getElement();
-		var referenceBox;
-		var referenceElem = cmp.get('v.referenceElement');
-
-		//hide while it is positioned
-		elem.style.opacity = 0;
-		if(!referenceElem) {
+	positionList: function(component) {
+		var referenceElement = component.get("v.referenceElement");
+		if ($A.util.isEmpty(referenceElement)) {
 			return;
-		} else {
-			referenceBox = referenceElem.getBoundingClientRect();
+		}
+		var listElement = component.getElement();
+
+		// All these styles are necessary since sometimes the position library puts some wonky left and top position values
+		// which make scrollbars appear on a page when it doesn't need to and cause it to not align correctly.
+		listElement.style.opacity = 0;
+		listElement.style.left = 0;
+		listElement.style.top = 0;
+
+		// The items take a while to render and the iterationComplete event doesn't get fired after they're rendered,
+		// so the only way to make sure all the items in the list are rendered by the time this is fired is to push
+		// this to the bottom of the callstack.
+		var self = this;
+		window.requestAnimationFrame($A.getCallback(function () {
+			self.addPositionConstraintAndReposition(component, listElement, referenceElement);
+		}));
+	},
+
+	shouldFlip: function(element, targetElement) {
+		var viewPort = $A.util.getWindowSize();
+		var elemRect = element.getBoundingClientRect();
+		var referenceElemRect = targetElement.getBoundingClientRect();
+		var height = elemRect.height;
+
+		return (referenceElemRect.top >= height  // enough space above
+		&& (viewPort.height - referenceElemRect.bottom) < height); // not enough space below
+	},
+
+	addPositionConstraintAndReposition: function (component, listElement, referenceElement) {
+		// If we've flipped upwards we just want to stay that way or else we can potentially keep flipping
+		if(!$A.util.getBooleanValue(component._shouldFlip)) {
+			component._shouldFlip = this.shouldFlip(listElement, referenceElement);
 		}
 
-		if(referenceBox) {
-			elem.style.width = referenceBox.width + 'px';
-		}
-		
-		if(!cmp.positionConstraint) {
-			cmp.positionConstraint = this.lib.panelPositioning.createRelationship({
-	            element:elem,
-	            target:referenceElem,
-	            appendToBody: true,
-	            align: 'left top',
-	            targetAlign: 'left bottom'
-        	});
-		}
-		
-		this.lib.panelPositioning.reposition(function() {
-			elem.style.opacity = 1;
+		var listVerticalAlignment = component._shouldFlip ? "top" : "bottom";
+		var listAlign = "left " + (listVerticalAlignment === "top" ? "bottom" : "top");
+		var targetAlign = "left " + listVerticalAlignment;
+		component.positionConstraint = this.lib.panelPositioning.createRelationship({
+			element: listElement,
+			target: referenceElement,
+			appendToBody: true,
+			align: listAlign,
+			targetAlign: targetAlign,
+			padTop: 2
 		});
+
+		this.reposition(component, $A.getCallback(function () {
+			listElement.style.opacity = 1;
+		}));
+	},
+
+	reposition: function(component, callback) {
+		if(component.get('v.visible') && component.positionConstraint) {
+			this.lib.panelPositioning.reposition(callback);
+		}
+	},
+
+	clearPositionConstraint: function(component) {
+		if(component.positionConstraint) {
+			component.positionConstraint.destroy();
+			component.positionConstraint = undefined;
+		}
 	}
 })// eslint-disable-line semi

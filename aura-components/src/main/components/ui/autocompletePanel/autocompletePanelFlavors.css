@@ -34,10 +34,8 @@
 }
 
 .THIS--lookup .lookup__item.highlighted a {
-    background-color:#0683C5;
-    color:#015BA7;
+    background-color:#F4F6F9;
     outline:none;
-    text-decoration:underline;
     padding:3px 9px;
 }
 

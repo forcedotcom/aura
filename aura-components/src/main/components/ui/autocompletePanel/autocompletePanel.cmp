@@ -20,9 +20,13 @@
     <aura:attribute name="referenceElement" type="Object" description="The reference element that's attached to the panel containing the list of results."/>
     <aura:attribute name="visible" type="boolean" default="false" access="INTERNAL" description="Specifies whether the panel is visible. The default is false."/>
     <aura:attribute name="zIndex" type="Integer" default="0" description="The z-index for the panel. The default is 0."/>
-    
-    <aura:handler name="change" value="{!v.referenceElement}" action="{!c.handleReferenceElement}"/>
+
     <aura:handler name="change" value="{!v.zIndex}" action="{!c.handleZIndex}"/>
+
+    <aura:registerEvent name="listCollapse" type="ui:autocompleteListCollapse" description="The event fired when the list is made invisible"/>
+    <aura:handler name="listCollapse" action="{!c.listCollapse}" includeFacets="true"/>
+
+    <aura:method name="repositionPanel" action="{!c.repositionPanel}" description="Force the panel to reposition itself." />
 
     <div class="{!v.visible == true ? ' visible' : ''}" aura:flavorable="true">
         {!v.body}

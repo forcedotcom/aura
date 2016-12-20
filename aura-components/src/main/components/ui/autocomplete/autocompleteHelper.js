@@ -219,6 +219,17 @@
     isDefaultList: function(component) {
         var listCmp = this.getListComponent(component);
         return (listCmp && listCmp.isInstanceOf("ui:autocompleteList"));
+    },
+
+    initPanelPositionHandlers: function(component) {
+        var dataProviders = component.get("v.dataProvider");
+        if (!component.get("v.usePanel") || $A.util.isEmpty(dataProviders)) {
+            return;
+        }
+
+        $A.util.forEach(dataProviders, function (dataProvider, index) {
+            dataProvider.addHandler("onchange", component, "c.repositionPanel");
+        });
     }
 
 })// eslint-disable-line semi

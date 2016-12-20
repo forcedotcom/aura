@@ -30,6 +30,8 @@
         }
 
         if (listCmp && listCmp.isInstanceOf("ui:autocompleteList")) {
+            helper.initPanelPositionHandlers(component);
+
             // check for required fields if we're not using a custom autocomplete list
             ["dataProvider", "optionVar", "listOption"].forEach(function(attribute) {
                 if (!component.get("v." + attribute)) {
@@ -170,5 +172,13 @@
             var referenceComponent = component.get("v.listReferenceComponent");
             list.set("v.listReferenceComponent", referenceComponent);
         }
+    },
+
+    repositionPanel: function (component, event, helper) {
+        if (!component.get('v.usePanel')) {
+            return;
+        }
+
+        component.find("panel").repositionPanel();
     }
 })// eslint-disable-line semi

@@ -193,7 +193,6 @@
 
     handleDataChange: function (component, event) {
         var concreteCmp = component.getConcreteComponent();
-
         // Refactor this component:
         // We want to update the internal v.items, but without udating iteration just yet
         // since customer might have thir own matchText function
@@ -679,20 +678,22 @@
 
     positionList: function(component) {
         var listReferenceComponent = component.get("v.listReferenceComponent");
-        if (!$A.util.isEmpty(listReferenceComponent) && !$A.util.isUndefinedOrNull(listReferenceComponent[0])) {
-
-            //get reference element rect
-            var referenceElement = listReferenceComponent[0].getElement();
-            var referenceElementRect = referenceElement.getBoundingClientRect();
-
-            //get parent component rect
-            var listElement = component.getElement();
-            listElement.style.left = "0"; // reset the position to obtain the correct relative difference
-            var listElementParentRect = listElement.getBoundingClientRect();
-
-            //set left position
-            var relativeLeft = referenceElementRect.left - listElementParentRect.left;
-            listElement.style.left = relativeLeft +"px";
+        if ($A.util.isEmpty(listReferenceComponent) || $A.util.isUndefinedOrNull(listReferenceComponent[0]) || !component.get("v.visible")) {
+            return;
         }
+
+        var referenceElement = listReferenceComponent[0].getElement();
+        var listElement = component.getElement();
+
+        //get reference element rect
+        var referenceElementRect = referenceElement.getBoundingClientRect();
+
+        //get parent component rect
+        listElement.style.left = "0"; // reset the position to obtain the correct relative difference
+        var listElementParentRect = listElement.getBoundingClientRect();
+
+        //set left position
+        var relativeLeft = referenceElementRect.left - listElementParentRect.left;
+        listElement.style.left = relativeLeft +"px";
     }
 })// eslint-disable-line semi

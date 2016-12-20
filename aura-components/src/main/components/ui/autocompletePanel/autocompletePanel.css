@@ -25,6 +25,6 @@
 	visibility: visible;
 }
 
-.THIS .uiAbstractList {
+.THIS .uiAbstractList.uiAbstractList {
 	position: relative;
 }

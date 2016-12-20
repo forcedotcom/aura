@@ -299,6 +299,22 @@
         }
     },
 
+    testDestroyCleansUpComponentHandlerReferences: {
+        test: function(cmp) {
+            var reference = cmp.getReference("c.handler");
+            var destroy;
+            $A.createComponent("componentTest:destroy", {}, function(component){
+                destroy = component;
+            });
+            destroy.addHandler("markup://aura:valueDestroy", cmp, reference, true, "default");
+
+            destroy.destroy(false);
+
+            // toJSON on an inValid reference is null
+            $A.test.assertUndefinedOrNull(reference.toJSON());
+        }
+    },
+
     verifyOuterFacetComponentDestroyed : function(cmp) {
         this.verifyChildComponentsDestroyed(cmp);
         $A.test.assertEquals(0, cmp.find("team").getElement().childNodes.length);

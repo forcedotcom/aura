@@ -772,6 +772,7 @@ Component.prototype.destroy = function(async) {
 
         var eventDispatcher = this.getEventDispatcher();
         if (eventDispatcher) {
+            var currentAction;
             for (key in eventDispatcher) {
                 var vals = eventDispatcher[key];
                 if (vals) {
@@ -779,6 +780,10 @@ Component.prototype.destroy = function(async) {
                         var arr = vals[phase];
                         if(arr) {
                             for (var j = 0; j < arr.length; j++) {
+                                currentAction = arr[j];
+                                if(currentAction && $A.util.isExpression(currentAction["actionExpression"])) {
+                                    currentAction["actionExpression"].destroy(async);
+                                }
                                 delete arr[j];
                             }
                         }

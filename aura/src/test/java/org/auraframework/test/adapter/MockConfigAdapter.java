@@ -15,6 +15,9 @@
  */
 package org.auraframework.test.adapter;
 
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
 import org.auraframework.test.util.MockBean;
@@ -35,7 +38,11 @@ public interface MockConfigAdapter extends ConfigAdapter, MockBean {
 
     void setValidateCSRFTokenException(RuntimeException exception);
 
+    void setValidateCSRFToken(Consumer<String> validationFunction);
+    
     void setCSRFToken(String token);
 
-    void setLockerServiceEnabled(boolean isLockerServiceEnabled);
+	void setCSRFToken(Supplier<String> tokenFunction);
+
+	void setLockerServiceEnabled(boolean isLockerServiceEnabled);
 }

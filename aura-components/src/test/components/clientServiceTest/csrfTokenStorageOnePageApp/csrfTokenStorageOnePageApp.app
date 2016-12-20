@@ -1,6 +1,4 @@
-
 <!--
-
     Copyright (C) 2013 salesforce.com, inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,16 +12,6 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
 -->
-<aura:component render="client">
-    <aura:import library="auraStorageTest:iframeTestLib" property="lib" />
-    
-    <aura:attribute name="url" type="String" default="/bootstrapTest/bootTest.app"/>
-    
-    <ui:button label="Load" press="{!c.loadFrame}"/>
-    <ui:inputText value="{!v.url}"/>
-     
-    <div aura:id="iframeContainer" />
-</aura:component>
-   
+<aura:application extends="clientServiceTest:csrfTokenStorage" isOnePageApp="true">
+</aura:application>

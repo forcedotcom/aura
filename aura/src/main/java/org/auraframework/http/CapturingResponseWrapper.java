@@ -23,16 +23,16 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
-class CapturingResponseWrapper extends HttpServletResponseWrapper {
+public class CapturingResponseWrapper extends HttpServletResponseWrapper {
     private ByteArrayOutputStream buffer;
     private ServletOutputStream outputStream;
     private PrintWriter writer;
 
-    CapturingResponseWrapper(HttpServletResponse res) {
+    public CapturingResponseWrapper(HttpServletResponse res) {
         super(res);
     }
 
-    String getCapturedResponseString() throws IOException {
+    public String getCapturedResponseString() throws IOException {
         flushBuffer();
         writer.flush();
         outputStream.flush();

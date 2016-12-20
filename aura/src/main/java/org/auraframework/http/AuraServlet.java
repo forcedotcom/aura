@@ -477,8 +477,8 @@ public class AuraServlet extends AuraBaseServlet {
 
             Map<String, Object> attributes = null;
             if (isBootstrapAction) {
-                attributes = Maps.newHashMap();
-                attributes.put("token", configAdapter.getCSRFToken());
+            	attributes = Maps.newHashMap();
+            	attributes.put("token", configAdapter.getCSRFToken());
             }
 
             PrintWriter out = response.getWriter();

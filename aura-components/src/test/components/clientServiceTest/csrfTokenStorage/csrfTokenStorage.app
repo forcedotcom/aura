@@ -13,10 +13,17 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<aura:application template="auraStorageTest:actionsStorageTemplate" render="client" access="unauthenticated">
+<aura:application template="clientServiceTest:csrfTokenStorageTemplate" render="client" access="unauthenticated" extensible="true"
+        controller="java://org.auraframework.components.test.java.controller.JavaTestController">
     <aura:attribute name="token" type="String" default="undefined"/>
+    <aura:attribute name="refreshIntervalInSeconds" type="Integer" default="10"/>
+    <aura:attribute name="getValueOnInit" type="Boolean" default="false"/>
+    <aura:attribute name="value" type="String" default="undefined"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
-    Token: <span class="output">{!v.token}</span>
+    <div>Token: <span class="output">{!v.token}</span></div>
+    <div>Value: <span class="value">{!v.value}</span></div>
+    
+    <ui:button class="trigger" label="get value" press="{!c.getValue}"/>
 </aura:application>

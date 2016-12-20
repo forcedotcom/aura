@@ -1,4 +1,3 @@
-
 <!--
 
     Copyright (C) 2013 salesforce.com, inc.
@@ -16,14 +15,18 @@
     limitations under the License.
 
 -->
-<aura:component render="client">
-    <aura:import library="auraStorageTest:iframeTestLib" property="lib" />
-    
-    <aura:attribute name="url" type="String" default="/bootstrapTest/bootTest.app"/>
-    
-    <ui:button label="Load" press="{!c.loadFrame}"/>
-    <ui:inputText value="{!v.url}"/>
-     
-    <div aura:id="iframeContainer" />
+<aura:component isTemplate="true" extends="aura:template">
+    <aura:set attribute="auraPreInitBlock">
+        <!--  persistence must be true so persistent actions filter is exercised -->
+        <auraStorage:init name="actions"
+                          maxSize="4096"
+                          defaultExpiration="3600"
+                          persistent="true"
+                          clearStorageOnInit="false" />
+        <script>
+            if(parent.$A &amp;&amp; parent.$A.test &amp;&amp; parent.$A.test.userInit){
+                parent.$A.test.userInit();
+            }
+        </script>
+    </aura:set>
 </aura:component>
-   

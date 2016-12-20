@@ -110,52 +110,5 @@
                 return cmp.helper.lib.iframeTest.waitForActionInStorage(this.BOOTSTRAP_KEY, "Bootstrap action never present in storage (second reload)");
             }
         ]
-    },
-    //flapper...
-    _testDisablesParallelBootstrapOnNextLoadWhenFailedToLoadCsrfTokenFromStorage: {
-        labels : ["flapper"],
-        test: [
-            function loadApplication(cmp) {
-                cmp._iframeLib = cmp.helper.lib.iframeTest;
-                cmp._iframeLib.loadIframe(cmp, "/bootstrapTest/bootTest.app",
-                        "iframeContainer", "first load");
-            },
-            function enableParallelBootstrapLoad(cmp) {
-                cmp._iframeLib.getIframe().$A.clientService.setParallelBootstrapLoad(true);
-                cmp._iframeLib.reloadIframe(cmp, false, "first reload");
-            },
-            function removeCsrfTokenStorage(cmp) {
-                var completed = false;
-                var targetWindow = cmp._iframeLib.getIframe();
-                $A.test.assertFalse(this.hasDisableBootstrapCacheCookie(targetWindow.document),
-                        "[Test Setup Failed] The test expects DisableBootstrapCacheCookie is not set.");
-
-                // Removing csrf token from storage doesn't work for the case, since csrf token from
-                // server will be stored back into storage during reloading.
-                // Deleting storage to let csrf token fail to be loaded from storage.
-                targetWindow.$A.storageService.deleteStorage("actions")
-                    .then(function() { completed = true; })
-                    .catch(function(e) { $A.test.fail(e); });
-                $A.test.addWaitFor(true, function(){ return completed; });
-            },
-            function reloadIframe(cmp) {
-                cmp._iframeLib.reloadIframe(cmp, false, "second reload");
-            },
-            function verifyParallelBootstrapIsDisabledOnNextLoad(cmp) {
-                var targetDocument = cmp._iframeLib.getIframe().document;
-                $A.test.assertTrue(this.hasDisableBootstrapCacheCookie(targetDocument),
-                        "setParallel bootstrap load is not disabled");
-            }
-        ]
-    },
-
-    /**
-     * Check if auraDisableBootstrapCache is set in cookie.
-     *
-     * When parallel bootstrap load is enabled, the cookie is to switch on/off bootstrap cache.
-     * See AuraClientService.getParallelBootstrapLoad
-     */
-    hasDisableBootstrapCacheCookie: function(document) {
-        return document.cookie.indexOf("auraDisableBootstrapCache=") >= 0;
     }
 })

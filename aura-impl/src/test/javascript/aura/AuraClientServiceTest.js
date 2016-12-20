@@ -866,7 +866,7 @@ Test.Aura.AuraClientServiceTest = function() {
     function setToken() {
 
         [Fact]
-        function RepectsTokenParam() {
+        function RespectsTokenParam() {
             var expected = "myToken";
             var targetService;
             mockGlobal(function() {

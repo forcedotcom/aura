@@ -21,9 +21,11 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -75,6 +77,7 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -158,18 +161,35 @@ public class AuraTestFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException,
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException,
             IOException {
         if (configAdapter.isProduction()) {
-            chain.doFilter(req, res);
+            chain.doFilter(request, response);
             return;
         }
 
         if (testContextAdapter == null) {
-            chain.doFilter(req, res);
+            chain.doFilter(request, response);
             return;
         }
 
+		final AtomicBoolean handled = new AtomicBoolean(false);
+		
+		for (HttpFilter filter : testCaseFilters) {
+			filter.doFilter((HttpServletRequest) request, (HttpServletResponse) response, (req, res) -> {
+				innerFilter(req, res, chain);
+				handled.set(true);
+			});
+			if (handled.get()) {
+				return; // Only 1 filter is allowed to generate a response
+			}
+		}
+
+		innerFilter(request, response, chain);
+    }
+    
+    private void innerFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+            throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest)req;
         HttpServletResponse response = (HttpServletResponse)res;
         TestContext testContext = getTestContext(request);
@@ -623,4 +643,22 @@ public class AuraTestFilter implements Filter {
         }
         return null;
     }
+
+    private List<HttpFilter> testCaseFilters = Collections.synchronizedList(Lists.newArrayList());
+    
+	public void addFilter(HttpFilter filter) {
+		synchronized (testCaseFilters) {
+			if (filter != null) {
+				testCaseFilters.add(0, filter);
+			}
+		}
+    }
+    
+	public synchronized void removeFilter(HttpFilter filter) {
+		synchronized (testCaseFilters) {
+			if (filter != null) {
+				testCaseFilters.remove(filter);
+			}
+		}
+	}
 }

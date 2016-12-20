@@ -1,6 +1,4 @@
-
 <!--
-
     Copyright (C) 2013 salesforce.com, inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +12,6 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
 -->
-<aura:application template="bootstrapTest:bootTestTemplate">
-    <aura:handler event="aura:applicationRefreshed" action="{!c.handleRefreshed}"/>
-    <section class="container" aura:id="container"> Bootstrap App </section>
-    <div aura:id="iframeContainer"/>
+<aura:application extends="clientServiceTest:csrfTokenStorage" useAppCache="true">
 </aura:application>

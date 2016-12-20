@@ -143,8 +143,8 @@ function AuraClientService () {
     this.namespaces={internal:{},privileged:{}};
     this.lastSendTime = Date.now();
 
-    // TODO: @dval We should send this from the server, but for LithgnigoutOut apps is a non-trivial change,
-    // so for the time being I hardcoded the resource path here to ensure we can lazu fetch them.
+    // TODO: @dval We should send this from the server, but for LightningOut apps is a non-trivial change,
+    // so for the time being I hard-coded the resource path here to ensure we can lazy fetch them.
     this.clientLibraries = {
         "walltime" : { resourceUrl : "/auraFW/resources/{fwuid}/walltime-js/walltime.min.js" },
         "ckeditor" : { resourceUrl : "/auraFW/resources/{fwuid}/ckeditor/ckeditor-4.x/rel/ckeditor.js" }
@@ -1375,9 +1375,9 @@ AuraClientService.prototype.loadTokenFromStorage = function() {
         return storage.adapter.getItems([AuraClientService.TOKEN_KEY])
             .then(function(items) {
                 if (items[AuraClientService.TOKEN_KEY]) {
-                    return items[AuraClientService.TOKEN_KEY]["value"];
+                    return items[AuraClientService.TOKEN_KEY]["value"]["token"];
                 }
-                return undefined;
+                return Promise["reject"](new Error("no token found in storage"));
             });
     }
     return Promise["reject"](new Error("no Action storage"));
@@ -3004,8 +3004,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
     var action, actionResponses, response, dupes;
     var token = responseMessage["token"];
     if (token) {
-        this._token = token;
-        this.saveTokenToStorage(); // async fire-and-forget
+        this.setToken(token, true);
     }
     var context=$A.getContext();
     var priorAccess=context.getCurrentAccess();

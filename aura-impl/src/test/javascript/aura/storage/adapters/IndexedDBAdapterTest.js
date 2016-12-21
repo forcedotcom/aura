@@ -35,6 +35,11 @@ Test.Aura.Storage.Adapters.IndexedDBAdapterTest = function(){
         IndexedDBAdapter: Aura.Storage.IndexedDBAdapter
     });
 
+    // required for non-prototypal functions on CryptoAdapter
+    var mockLocation = Mocks.GetMocks(Object.Global(), {
+        "window" : { "location":{} }
+    });
+
     // promise mocks
     var ResolvePromise = function ResolvePromise(value) {
         return {
@@ -95,8 +100,8 @@ Test.Aura.Storage.Adapters.IndexedDBAdapterTest = function(){
                     open: function() {
                         return {};
                     }
-                }
-
+                },
+                location: {}
             }
         });
 
@@ -109,10 +114,10 @@ Test.Aura.Storage.Adapters.IndexedDBAdapterTest = function(){
                 }
             });
 
-            mockIndexedDB(function() { mocks(function() { mockSetTimeout(function() {
+            mockLocation(function () {mockIndexedDB(function() { mocks(function() { mockSetTimeout(function() {
                 var adapter = new Aura.Storage.IndexedDBAdapter({});
                 adapter.initialize();
-            }); }); });
+            }); }); }); });
 
             Assert.True(actual);
         }
@@ -166,8 +171,8 @@ Test.Aura.Storage.Adapters.IndexedDBAdapterTest = function(){
                         open: function() {
                             return IDBOpenDBRequest;
                         }
-                    }
-
+                    },
+                    location: {}
                 }
             });
 

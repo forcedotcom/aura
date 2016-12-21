@@ -71,7 +71,9 @@ var IndexedDBAdapter = function IndexedDBAdapter(config) {
 
     // objectStore name is the descriptor of current app or cmp
     var context = $A.getContext();
-    this.tableName = (context && (context.app || context.cmp)) || "store";
+    var appname = (context && (context.app || context.cmp));
+    appname = appname || window.location.pathname;
+    this.tableName = appname || "store";
 
     this.sweepingSuspended = false;
 

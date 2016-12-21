@@ -45,7 +45,6 @@ import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
@@ -127,7 +126,7 @@ public class AuraTestFilter implements Filter {
     private ConfigAdapter configAdapter;
     private ExceptionAdapter exceptionAdapter;
     private ServletUtilAdapter servletUtilAdapter;
-
+    
     @Inject
     public void setTestContextAdapter(TestContextAdapter testContextAdapter) {
         this.testContextAdapter = testContextAdapter;
@@ -161,7 +160,7 @@ public class AuraTestFilter implements Filter {
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException,
             IOException {
-        if (Aura.getConfigAdapter().isProduction()) {
+        if (configAdapter.isProduction()) {
             chain.doFilter(req, res);
             return;
         }
@@ -215,7 +214,7 @@ public class AuraTestFilter implements Filter {
                         loadTestMocks(context, true, testContext.getLocalDefs());
 
                         // Capture the response and inject tags to load jstest.
-                        String capturedResponse = captureResponse(req, response, targetUri);
+                        String capturedResponse = captureResponse(request, response, targetUri);
                         if (capturedResponse != null) {
                             servletUtilAdapter.setNoCache(response);
                             response.setContentType(servletUtilAdapter.getContentType(Format.HTML));
@@ -270,7 +269,7 @@ public class AuraTestFilter implements Filter {
                             Format.HTML, Authentication.AUTHENTICATED.name(), "", qs);
                     RequestDispatcher dispatcher = servletContext.getContext(newUri).getRequestDispatcher(newUri);
                     if (dispatcher != null) {
-                        dispatcher.forward(req, response);
+                        dispatcher.forward(request, response);
                         return;
                     }
                 }
@@ -284,7 +283,7 @@ public class AuraTestFilter implements Filter {
         } else {
             if (!contextService.isEstablished()) {
                 LOG.error("Aura context is not established! New context will NOT be created.");
-                chain.doFilter(req, response);
+                chain.doFilter(request, response);
                 return;
             }
             AuraContext context = contextService.getCurrentContext();
@@ -292,7 +291,7 @@ public class AuraTestFilter implements Filter {
             // Reset mocks if requested, or for the initial GET.
             loadTestMocks(context, doResetTest, testContext.getLocalDefs());
         }
-        chain.doFilter(req, response);
+        chain.doFilter(request, response);
     }
 
     @Override
@@ -497,7 +496,7 @@ public class AuraTestFilter implements Filter {
             tag = String.format("<script src='%s'></script>", testUrl);
         }
 
-        switch (Aura.getContextService().getCurrentContext().getClient().getType()) {
+        switch (contextService.getCurrentContext().getClient().getType()) {
         case IE9:
         case IE8:
         case IE7:

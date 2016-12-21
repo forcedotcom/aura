@@ -22,13 +22,12 @@ import java.util.List;
 
 import org.auraframework.components.ui.TreeNode;
 import org.auraframework.docs.ApiContentsModel;
+import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.util.resource.ResourceLoader;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import org.auraframework.integration.test.util.IntegrationTestCase;
-
-public class ApiContentsModelTest extends IntegrationTestCase {
+public class ApiContentsModelTest extends AuraImplTestCase {
     /**
      * Verifies generated jsdoc JSON file is loaded and contains list of jsdoc
      * items.

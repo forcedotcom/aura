@@ -33,7 +33,6 @@ import org.auraframework.util.AuraTextUtil;
 
 /**
  */
-
 public class AuraResourceRewriteFilter implements Filter {
 
     public static final String FORMAT_PARAM = "aura.format";
@@ -50,7 +49,6 @@ public class AuraResourceRewriteFilter implements Filter {
 
     @Override
     public void destroy() {
-
     }
 
     private static String createURI(String context, String format, String type, String lookup) {
@@ -99,8 +97,6 @@ public class AuraResourceRewriteFilter implements Filter {
 
     @Override
     public void init(FilterConfig config) throws ServletException {
-
         servletContext = config.getServletContext();
     }
-
 }

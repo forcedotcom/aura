@@ -21,6 +21,8 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 
 import javax.inject.Inject;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -46,22 +48,29 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.test.annotation.IntegrationTest;
 import org.auraframework.util.test.configuration.TestServletConfig;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.web.WebApplicationInitializer;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Base class for all Aura integration tests.
  */
 @SuppressWarnings("deprecation")
 @IntegrationTest
-@RunWith(BlockJUnit4ClassRunner.class)
-@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class})
-@ContextConfiguration(locations = {"/applicationContext.xml"})
 public abstract class IntegrationTestCase extends AuraImplTestCase {
 
+	private static ServletContext servletContext;
+	
+	@Component
+	public static class ServletContextInitializer implements WebApplicationInitializer {
+		@Override
+		public void onStartup(ServletContext servletContext) throws ServletException {
+			IntegrationTestCase.servletContext = servletContext;
+		}
+	}
+	
     @Inject
     private TestServletConfig testServletConfig;
     
@@ -69,6 +78,27 @@ public abstract class IntegrationTestCase extends AuraImplTestCase {
 
     protected IntegrationTestCase() {
         setShouldSetupContext(false);
+    }
+
+    @Override
+    protected void injectBeans() throws Exception {
+		if (servletContext == null) {
+	    	// Tests may be created before the server is brought up
+			return;
+		}
+		
+		if(testServletConfig == null) {
+			// Already injected
+			return;
+		}
+		
+		WebApplicationContext webAppContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+		AutowireCapableBeanFactory beanFactory = webAppContext.getAutowireCapableBeanFactory();
+		beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_NO, false);
+    }
+    
+    public ServletContext getServletContext() {
+    	return servletContext;
     }
     
     @Override

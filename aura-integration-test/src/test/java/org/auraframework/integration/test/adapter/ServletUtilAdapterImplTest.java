@@ -21,7 +21,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.ManifestUtil;
-import org.auraframework.integration.test.util.IntegrationTestCase;
+import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -29,7 +29,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
 
-public class ServletUtilAdapterImplTest extends IntegrationTestCase {
+public class ServletUtilAdapterImplTest extends AuraImplTestCase {
 
     @Inject
     private ContextService contextService;

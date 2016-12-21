@@ -394,7 +394,7 @@ public abstract class UnitTestCase extends TestCase {
         return labels;
     }
     
-    private void injectBeans() throws Exception {
+    protected void injectBeans() throws Exception {
         if (applicationContext == null) {
             TestContextManager testContextManager = new TestContextManager(getClass());
             testContextManager.prepareTestInstance(this);

@@ -1371,6 +1371,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     @Override
     public void runBare() throws Throwable {
+    	injectBeans();
         logger.info(String.format("Running: %s.%s", getClass().getName(), getName()));
         runTest();
     }

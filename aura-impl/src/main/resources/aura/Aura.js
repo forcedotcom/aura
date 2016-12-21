@@ -39,6 +39,8 @@ Aura.bootstrapMark = function (mark, value) {
 // - all files required for bootstrap are loaded with sync <script> tags
 // - DOMContentLoaded is fired after DOM is ready, which includes executing all sync <script> tags
 // - to detect errors we wait for DOMContentLoaded then check for all bootstrap file markers
+// NOTE: if Aura is injected into the page (Lightning Out or AIS) then DOMContentLoaded is fired
+// before aura.js is loaded/executed, so verifyBootstrap() is never invoked.
 (function bootstrapRobustness() {
     function verifyBootstrap() {
         document.removeEventListener('DOMContentLoaded', verifyBootstrap);
@@ -46,8 +48,10 @@ Aura.bootstrapMark = function (mark, value) {
         // now that all <script> are loaded can update network bootstrap.js load status
         $A.clientService.setAppBootstrapStatus();
 
-        // wait for bootstrap to load from storage
-        if ($A.clientService.gvpsFromStorage && !Aura["appBootstrapCacheStatus"]) {
+        // wait for bootstrap to load from storage:
+        // 1. wait for $A.initAsync()'s AuraContext callback to be invoked: gvsFromStorage gets assigned true/false
+        // 2. if gvpsFromStorage is true then wait for bootstrap from storage (if false then bootstrap is not loaded from storage)
+        if ($A.clientService.gvpsFromStorage === undefined || ($A.clientService.gvpsFromStorage && Aura["appBootstrapCacheStatus"] === undefined)) {
             setTimeout(verifyBootstrap, 1000);
             return;
         }
@@ -721,7 +725,9 @@ AuraInstance.prototype.initAsync = function(config) {
         // Start by enabling the actions filter if relevant. populatePersistedActionsFilter() populates it,
         // called only if GVP + defs are loaded.
         $A.clientService.setupPersistedActionsFilter();
-        $A.clientService.gvpsFromStorage = context.globalValueProviders.LOADED_FROM_PERSISTENT_STORAGE; // Do not remove, used for instrumentation
+
+        //  do not modify - used by bootstrapRobustness() and instrumentation
+        $A.clientService.gvpsFromStorage = context.globalValueProviders.LOADED_FROM_PERSISTENT_STORAGE;
 
         if (!$A.clientService.gvpsFromStorage) {
             $A.log("Aura.initAsync: GVP not loaded from storage so not loading defs or actions either");

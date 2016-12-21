@@ -16,7 +16,9 @@
 package org.auraframework.impl.css.token;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +53,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
@@ -62,6 +63,7 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
 
     private final Map<String, TokenDef> tokens;
     private final List<DefDescriptor<TokensDef>> imports;
+    private final List<DefDescriptor<TokensDef>> reversedImports;
     private final Set<PropertyReference> expressionRefs;
     private final DefDescriptor<TokensDef> extendsDescriptor;
     private final DefDescriptor<TokenDescriptorProviderDef> descriptorProvider;
@@ -71,7 +73,8 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
 
     public TokensDefImpl(Builder builder) {
         super(builder);
-        this.imports = builder.orderedImmutableImports();
+        this.imports = AuraUtil.immutableList(builder.imports);
+        this.reversedImports = ImmutableList.copyOf(imports).reverse();        
         this.tokens = AuraUtil.immutableMap(builder.tokens);
         this.extendsDescriptor = builder.extendsDescriptor;
         this.descriptorProvider = builder.descriptorProvider;
@@ -83,7 +86,7 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
     }
 
     @Override
-    public boolean getSerializable(){
+    public boolean getSerializable() {
         return this.serializable;
     }
 
@@ -122,8 +125,8 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
         if (tokens.containsKey(name)) {
             return true;
         }
-        for (DefDescriptor<TokensDef> imp : imports) {
-            if (imp.getDef().hasToken(name)) {
+        for (DefDescriptor<TokensDef> imported : imports) {
+            if (imported.getDef().hasToken(name)) {
                 return true;
             }
         }
@@ -147,8 +150,8 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
             return Optional.of(tokens.get(name));
         }
 
-        for (DefDescriptor<TokensDef> imp : imports) {
-            Optional<TokenDef> value = imp.getDef().getTokenDef(name);
+        for (DefDescriptor<TokensDef> imported : reversedImports) {
+            Optional<TokenDef> value = imported.getDef().getTokenDef(name);
             if (value.isPresent()) {
                 return value;
             }
@@ -162,15 +165,25 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
     }
 
     @Override
+    public List<DefDescriptor<TokensDef>> getImportedDefs() {
+        return imports;
+    }
+    
+    @Override
     public Map<String, TokenDef> getDeclaredTokenDefs() {
         return tokens;
     }
 
     @Override
-    public List<DefDescriptor<TokensDef>> getDeclaredImports() {
-        return imports;
+    public Map<String, TokenDef> getOwnTokenDefs() throws QuickFixException {
+        Map<String, TokenDef> map = new LinkedHashMap<>();        
+        for (DefDescriptor<TokensDef> imported : imports) {
+            map.putAll(imported.getDef().getOwnTokenDefs());
+        }
+        map.putAll(tokens);
+        return map;        
     }
-
+    
     @Override
     public Set<String> getDeclaredNames() {
         return tokens.keySet();
@@ -178,13 +191,13 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
 
     @Override
     public Iterable<String> getImportedNames() throws QuickFixException {
-        if (imports.isEmpty()) {
+        if (reversedImports.isEmpty()) {
             return ImmutableSet.of();
         }
 
         List<Iterable<String>> iterables = Lists.newArrayList();
-        for (DefDescriptor<TokensDef> imp : imports) {
-            iterables.add(imp.getDef().getAllNames());
+        for (DefDescriptor<TokensDef> imported : reversedImports) {
+            iterables.add(imported.getDef().getAllNames());
         }
         return Iterables.concat(iterables);
     }
@@ -282,20 +295,20 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
             }
         }
 
-        for (DefDescriptor<TokensDef> imp : imports) {
+        for (DefDescriptor<TokensDef> imported : imports) {
             // TODO: mdr access checks
-            TokensDef def = definitionService.getDefinition(imp);
+            TokensDef def = definitionService.getDefinition(imported);
 
             // can't import a def with a parent. This is an arbitrary restriction to enforce a level of token lookup
             // simplicity and prevent misuse of imports.
             if (def.getExtendsDescriptor() != null) {
-                String msg = String.format("TokensDef %s cannot be imported since it uses the 'extends' attribute", imp);
+                String msg = String.format("TokensDef %s cannot be imported since it uses the 'extends' attribute", imported);
                 throw new InvalidDefinitionException(msg, getLocation());
             }
 
             // can't import a def that uses a provider.
             if (def.getDescriptorProvider() != null || def.getMapProvider() != null) {
-                String msg = String.format("TokensDef %s cannot be imported since it uses a provider", imp);
+                String msg = String.format("TokensDef %s cannot be imported since it uses a provider", imported);
                 throw new InvalidDefinitionException(msg, getLocation());
             }
         }
@@ -391,8 +404,8 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
         private DefDescriptor<TokenDescriptorProviderDef> descriptorProvider;
         private DefDescriptor<TokenMapProviderDef> mapProvider;
         private Set<PropertyReference> expressionRefs;
-        private Set<DefDescriptor<TokensDef>> imports = Sets.newLinkedHashSet();
-        private Map<String, TokenDef> tokens = Maps.newLinkedHashMap();
+        private List<DefDescriptor<TokensDef>> imports = new ArrayList<>();
+        private Map<String, TokenDef> tokens = new LinkedHashMap<>();
         private boolean serialize=false;
 
         public Builder() {
@@ -432,14 +445,6 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
             return this;
         }
 
-        public Map<String, TokenDef> tokens() {
-            return tokens;
-        }
-
-        public Set<DefDescriptor<TokensDef>> imports() {
-            return imports;
-        }
-
         public Builder addAllExpressionRefs(Collection<PropertyReference> refs) {
             if (expressionRefs == null) {
                 expressionRefs = Sets.newHashSet();
@@ -447,11 +452,15 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
             expressionRefs.addAll(refs);
             return this;
         }
-
-        public List<DefDescriptor<TokensDef>> orderedImmutableImports() {
-            return ImmutableList.copyOf(imports).reverse(); // reverse so that lookups follow "last one wins" semantics.
+        
+        public Map<String, TokenDef> tokens() {
+            return tokens;
         }
 
+        public List<DefDescriptor<TokensDef>> imports() {
+            return imports;
+        }
+    
         @Override
         public TokensDefImpl build() {
             return new TokensDefImpl(this);

@@ -368,7 +368,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             addTokens(extendsDef,tokens);
         }
         if(tokensDef.getSerializable()) {
-            Map<String, TokenDef> tokenDefs = tokensDef.getDeclaredTokenDefs();
+            Map<String, TokenDef> tokenDefs = tokensDef.getOwnTokenDefs();
             for (Map.Entry<String, TokenDef> token : tokenDefs.entrySet()) {
                 tokens.put(token.getKey(), (String) token.getValue().getValue());
             }

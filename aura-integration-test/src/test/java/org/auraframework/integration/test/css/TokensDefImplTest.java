@@ -196,7 +196,20 @@ public class TokensDefImplTest extends StyleTestCase {
         assertEquals("v3", definitionService.getDefinition(desc).getToken("inherited").get());
 
     }
-
+    
+    @Test
+    public void testGetDeclaredImports() throws Exception {
+        DefDescriptor<TokensDef> imported1 = addSeparateTokens(tokens());
+        DefDescriptor<TokensDef> imported2 = addSeparateTokens(tokens());
+        DefDescriptor<TokensDef> imported3 = addSeparateTokens(tokens());
+        DefDescriptor<TokensDef> desc = addSeparateTokens(tokens()
+                .imported(imported1)
+                .imported(imported2)
+                .imported(imported3));
+        List<DefDescriptor<TokensDef>> map = definitionService.getDefinition(desc).getImportedDefs();
+        assertEquals("didn't get expected map size", 3, map.size());
+    }   
+    
     @Test
     public void testGetDeclaredTokenDefs() throws Exception {
         DefDescriptor<TokensDef> desc = addSeparateTokens(tokens()
@@ -209,17 +222,44 @@ public class TokensDefImplTest extends StyleTestCase {
         assertTrue(map.get("test1") != null);
     }
 
-    @Test
-    public void testGetDeclaredImports() throws Exception {
-        DefDescriptor<TokensDef> imported1 = addSeparateTokens(tokens());
-        DefDescriptor<TokensDef> imported2 = addSeparateTokens(tokens());
-        DefDescriptor<TokensDef> imported3 = addSeparateTokens(tokens());
-        DefDescriptor<TokensDef> desc = addSeparateTokens(tokens()
-                .imported(imported1)
-                .imported(imported2)
-                .imported(imported3));
-        List<DefDescriptor<TokensDef>> map = definitionService.getDefinition(desc).getDeclaredImports();
-        assertEquals("didn't get expected map size", 3, map.size());
+    @Test 
+    public void testGetOwnTokenDefs() throws Exception {
+        DefDescriptor<TokensDef> parent = addSeparateTokens(
+                tokens()
+                .token("parent1", "parent1")
+                .token("parent2", "parent2"));
+        
+        DefDescriptor<TokensDef> importedA = addSeparateTokens(
+                tokens()
+                .token("importedA1", "a1")
+                .token("importedA2", "a2")
+                );
+        
+        DefDescriptor<TokensDef> importedB = addSeparateTokens(
+                tokens()
+                .token("importedB1", "b1")
+                .token("importedB2", "b2")
+                .token("importedA2", "bOverridden")
+                );
+        
+        DefDescriptor<TokensDef> desc = addSeparateTokens(
+                tokens()
+                .parent(parent)
+                .imported(importedA)
+                .imported(importedB)
+                .token("direct1", "d1")
+                .token("direct2", "d2")
+                .token("importedB1", "overridden"));
+               
+        Map<String, TokenDef> map = definitionService.getDefinition(desc).getOwnTokenDefs();
+        
+        assertEquals("didn't get expected map size", 6, map.size());
+        assertEquals("a1", map.get("importedA1").getValue().toString());
+        assertEquals("bOverridden", map.get("importedA2").getValue().toString());
+        assertEquals("overridden", map.get("importedB1").getValue().toString());
+        assertEquals("b2", map.get("importedB2").getValue().toString());
+        assertEquals("d1", map.get("direct1").getValue().toString());
+        assertEquals("d2", map.get("direct2").getValue().toString());
     }
 
     @Test

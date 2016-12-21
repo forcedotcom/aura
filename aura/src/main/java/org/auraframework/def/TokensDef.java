@@ -95,46 +95,54 @@ public interface TokensDef extends RootDefinition {
     Optional<TokenDef> getTokenDef(String name) throws QuickFixException;
 
     /**
+     * Gets the {@link TokensDef} imports declared directly in this def.
+     * <p>
+     * Note: This is in source order, but for evaluation order should be reversed.
+     */
+    List<DefDescriptor<TokensDef>> getImportedDefs();
+
+    /**
      * Gets the {@link TokenDef}s declared directly on this def (does not include imported or inherited tokens).
      */
     Map<String, TokenDef> getDeclaredTokenDefs();
 
     /**
-     * Gets the {@link TokensDef} imports declared directly in this def.
+     * Gets the {@link TokenDef}s imported or declared directly on this def (does not include inherited tokens).
      * <p>
-     * Note: This list is in reverse order of how the imports were declared in the source.
+     * Token defs from imports are included first then declared token defs. Declared defs may replace a def from an
+     * import.
      */
-    List<DefDescriptor<TokensDef>> getDeclaredImports();
+    Map<String, TokenDef> getOwnTokenDefs() throws QuickFixException;
 
     /**
-     * Gets the set of token defined directly on this def (does not include inherited or imported tokens, or map
+     * Gets the set of token names defined directly on this def (does not include inherited or imported tokens, or map
      * provided tokens).
      */
     Set<String> getDeclaredNames();
 
     /**
-     * Gets the set of tokens defined through imported defs.
+     * Gets the set of token names defined through imported defs.
      * <p>
      * Returns an iterable to avoid copying strings until required.
      */
     Iterable<String> getImportedNames() throws QuickFixException;
 
     /**
-     * Gets the set of tokens inherited from all parent defs.
-     * <p>
-     * Returns an iterable to avoid copying strings until required.
-     */
-    Iterable<String> getInheritedNames() throws QuickFixException;
-
-    /**
-     * Gets the set of tokens defined directly on this def ({@link #getDeclaredTokenDefs()}) or imported from another
-     * def ({@link #getImportedNames()}).
+     * Gets the set of token names defined directly on this def ({@link #getDeclaredTokenDefs()}) or imported from
+     * another def ({@link #getImportedNames()}).
      * <p>
      * Returns an iterable to avoid copying strings until required.
      * <p>
      * This does <em>not</em> check the map provider, if present.
      */
     Iterable<String> getOwnNames() throws QuickFixException;
+
+    /**
+     * Gets the set of token names inherited from all parent defs.
+     * <p>
+     * Returns an iterable to avoid copying strings until required.
+     */
+    Iterable<String> getInheritedNames() throws QuickFixException;
 
     /**
      * Gets the set of every token name that can be provided by this def (declared, imported or inherited).
@@ -146,7 +154,7 @@ public interface TokensDef extends RootDefinition {
     Iterable<String> getAllNames() throws QuickFixException;
 
     /**
-     * Gets the tokens from this def ({@link #getOwnNames()) that are also declared on a parent def
+     * Gets the token names from this def ({@link #getOwnNames()) that are also declared on a parent def
      * (#getInheritedNames()).
      */
     Set<String> getOverriddenNames() throws QuickFixException;

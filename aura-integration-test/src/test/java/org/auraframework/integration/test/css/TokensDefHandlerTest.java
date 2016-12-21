@@ -59,7 +59,7 @@ public class TokensDefHandlerTest extends StyleTestCase {
                 .imported(import2)
                 .imported(import3)));
 
-        List<DefDescriptor<TokensDef>> imports = def.getDeclaredImports();
+        List<DefDescriptor<TokensDef>> imports = def.getImportedDefs();
         assertEquals(3, imports.size());
     }
 

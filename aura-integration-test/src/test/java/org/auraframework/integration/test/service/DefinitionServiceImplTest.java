@@ -28,6 +28,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.EventDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TypeDef;
@@ -47,6 +48,8 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.SourceLoader;
+import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -55,6 +58,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -73,6 +77,36 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     @Override
     public void tearDown() throws Exception {
         super.tearDown();
+    }
+    
+    @Test
+    public void testGetDefinitionOfApplicationWithDependencyThatTriggerACF() throws Exception {
+    	String eventSource = "<aura:event type='APPLICATION' description='Application event under custom namespace'/>";
+    	DefDescriptor<EventDef> eventDefdesc = getAuraTestingUtil().addSourceAutoCleanup(
+                EventDef.class,
+                eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent", 
+                NamespaceAccess.CUSTOM);
+        String dependencySource = "<aura:dependency resource='"+
+        		eventDefdesc.getQualifiedName()+"' type='EVENT'/>";
+    	DefDescriptor<? extends BaseComponentDef> desc = getAuraTestingUtil().addSourceAutoCleanup(
+                ApplicationDef.class,
+                String.format(
+                        baseApplicationTag,
+                        "",
+                        dependencySource
+                        ),
+                StringSourceLoader.ANOTHER_CUSTOM_NAMESPACE+":testApplication", 
+                NamespaceAccess.CUSTOM);
+        contextService.startContext(Mode.PROD, Format.HTML, Authentication.UNAUTHENTICATED, desc);
+        try {
+        	definitionService.getDefinition(desc);
+        }catch(NoAccessException e) {
+        	String expectErrorMessage = "Access to event '"+eventDefdesc.getNamespace()+":"+eventDefdesc.getName()+"'"
+        	+" with access 'PUBLIC' from namespace '"+desc.getNamespace()+"' in '"+desc.getQualifiedName()+"(APPLICATION)'"+
+        	" is not allowed";
+        	assertEquals(expectErrorMessage, e.getMessage());
+        }
     }
 
     @Test
@@ -106,12 +140,13 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.UNAUTHENTICATED, desc);
         DefinitionNotFoundException expected = null;
         try {
-            definitionService.getDefinition(desc);
+        	definitionService.getDefinition(desc);
         } catch (DefinitionNotFoundException e) {
             expected = e;
         }
 
         assertNotNull("Expected DefinitionNotFoundException from assertAccess", expected);
+        assertEquals("No APPLICATION named "+desc.getQualifiedName()+" found", expected.getMessage());
     }
 
     @Test
@@ -196,10 +231,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                     cmpWithoutHelperDescriptor.getNamespace(), cmpWithoutHelperDescriptor.getName());
         this.checkExceptionContains(expected, DefinitionNotFoundException.class, errorMessage);
         }
-
-    /**
-     * ContextService.assertAccess is called during getDefinition(DefDescriptor).
-     */
+    
     @Test
     public void testGetDefinition_DefDescriptor_assertAccess() throws QuickFixException {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
@@ -213,32 +245,11 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             expected = e;
         }
         assertNotNull("Expected NoAccessException from assertAccess", expected);
+        assertEquals("Access to COMPONENT 'definitionServiceImplTest:targetComponent' is not allowed: referencing namespace was empty or null", expected.getMessage());
     }
 
-    /**
-     * ContextService.assertAccess is called during getDefinition(String, Class).
-     */
     @Test
-    public void testGetDefinition_StringClass_assertAccess() throws QuickFixException {
-        contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(
-                DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
-        NoAccessException expected = null;
-        Definition def = definitionService.getDefinition(desc.getQualifiedName(), ComponentDef.class);
-
-        try {
-            definitionService.assertAccess(null, def);
-        } catch (NoAccessException e) {
-            expected = e;
-        }
-        assertNotNull("Expected NoAccessException from assertAccess", expected);
-    }
-
-    /**
-     * ContextService.assertAccess is called during getDefinition(String, DefType...).
-     */
-    @Test
-    public void testGetDefinition_StringDefType_assertAccess() throws QuickFixException {
+    public void testAssertAccessWithNullReferencingDescriptor() throws QuickFixException {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(
                 DEFINITION_SERVICE_IMPL_TEST_TARGET_COMPONENT, ComponentDef.class);
@@ -250,6 +261,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             expected = e;
         }
         assertNotNull("Expected NoAccessException from assertAccess", expected);
+        assertEquals("Access to COMPONENT 'definitionServiceImplTest:targetComponent' is not allowed: referencing namespace was empty or null", expected.getMessage());
     }
 
     @Test

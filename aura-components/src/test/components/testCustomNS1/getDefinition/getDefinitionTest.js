@@ -105,7 +105,6 @@
         test: function(){
             var descriptor = "markup://e.aura:valueChange";
             var expected = "markup://aura:valueChange";
-
             $A.getDefinition(descriptor, function(definition) {
                 $A.test.assertNotUndefinedOrNull(definition, "Definition should be an object.");
                 $A.test.assertAuraType("EventDef", definition,
@@ -148,6 +147,35 @@
             $A.test.addWaitFor(true, function(){ return actionComplete; });
         }
     },
+   
+    testGetDefinitionForApplicationEventWithoutAccess: {
+    	 test: function(){
+    	 	$A.test.expectAuraError("Access Check Failed! EventService.getEventDef():'markup://testCustomNS2:applicationEventWithDefaultAccess' is not visible to 'markup://testCustomNS1:getDefinition");
+            var actionComplete = false;
+
+            $A.getDefinition("e.testCustomNS2:applicationEventWithDefaultAccess", function(definition) {
+                $A.test.assertNull(definition);
+                actionComplete = true;
+            });
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; });
+        }
+    
+    },
+    
+    testGetDefinitionForApplicationEventWithAccess: {
+    	 test: function(){
+            var actionComplete = false;
+            $A.getDefinition("e.testCustomNS1:applicationEventWithDefaultAccess", function(definition) {
+                $A.test.assertEquals("markup://testCustomNS1:applicationEventWithDefaultAccess", definition.getDescriptor().getQualifiedName());
+                actionComplete = true;
+            });
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; });
+        }
+    
+    },
+    
 
     testGetDefinitionFromServerWhenOffline: {
         test:function(cmp) {

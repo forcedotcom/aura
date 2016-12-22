@@ -23,7 +23,23 @@
 		helper.reposition(cmp, null);
 	},
 
-	listCollapse: function (cmp, evt, helper) {
+	listCollapse: function(cmp, evt, helper) {
 		cmp.set('v.visible', false);
+	},
+
+	handleVisibilityChange: function(cmp, evt, helper) {
+		if (cmp.get('v.visible')) {
+			helper.positionList(cmp);
+		} else {
+			helper.clearPositionConstraint(cmp);
+		}
+	},
+
+	handleReferenceChange: function(cmp, evt, helper) {
+		if (cmp.get('v.visible') && !cmp.positionConstraint) {
+			helper.positionList(cmp);
+		} else {
+			helper.reposition(cmp, null);
+		}
 	}
 })// eslint-disable-line semi

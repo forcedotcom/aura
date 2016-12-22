@@ -22,6 +22,8 @@
     <aura:attribute name="zIndex" type="Integer" default="0" description="The z-index for the panel. The default is 0."/>
 
     <aura:handler name="change" value="{!v.zIndex}" action="{!c.handleZIndex}"/>
+    <aura:handler name="change" value="{!v.visible}" action="{!c.handleVisibilityChange}"/>
+    <aura:handler name="change" value="{!v.referenceElement}" action="{!c.handleReferenceChange}"/>
 
     <aura:registerEvent name="listCollapse" type="ui:autocompleteListCollapse" description="The event fired when the list is made invisible"/>
     <aura:handler name="listCollapse" action="{!c.listCollapse}" includeFacets="true"/>

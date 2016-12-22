@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 ({
-    rerender : function(component, helper){
-        this.superRerender();
-        if(component.isDirty('v.visible')) {
-            if (component.get('v.visible')) {
-                helper.positionList(component);
-            } else {
-                helper.clearPositionConstraint(component);
-            }
+    afterRender : function(component, helper){
+        if (component.get('v.visible')) {
+            helper.positionList(component);
         }
     },
 

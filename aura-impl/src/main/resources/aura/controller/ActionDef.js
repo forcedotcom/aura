@@ -28,8 +28,8 @@ function ActionDef(config) {
     this.actionType = config["actionType"];
     this.meth = null;
     this.paramDefs = {};
-        this.background = false;
-        this.caboose = false;
+    this.background = false;
+    this.caboose = false;
 
     if (this.actionType === "SERVER") {
         this.returnType = config["returnType"]&&config["returnType"]["name"];
@@ -48,7 +48,7 @@ function ActionDef(config) {
         }
     }
 
-    if (this.actionType === "CLIENT") {
+    else if (this.actionType === "CLIENT") {
         try {
             this.meth = $A.util.json.decodeString(config["code"]);
         } catch (e) {

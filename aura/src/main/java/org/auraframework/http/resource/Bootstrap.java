@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -49,8 +48,6 @@ import org.auraframework.util.json.JsonSerializationContext;
 public class Bootstrap extends AuraResourceImpl {
 
     private ContextService contextService;
-
-    private ExceptionAdapter exceptionAdapter;
 
     public Bootstrap() {
         super("bootstrap.js", Format.JS);
@@ -107,19 +104,15 @@ public class Bootstrap extends AuraResourceImpl {
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context)
             throws IOException {
         DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();
-
         DefType type = app.getDefType();
 
-        DefDescriptor<?> desc = definitionService.getDefDescriptor(app.getDescriptorName(), type.getPrimaryInterface());
-        
-        Boolean gackOnException = true;
         try {
+            DefDescriptor<?> desc = definitionService.getDefDescriptor(app.getDescriptorName(), type.getPrimaryInterface());
 
             servletUtilAdapter.checkFrameworkUID(context);
 
             if (!configAdapter.validateBootstrap(request.getParameter("jwt"))) {
                 // If jwt validation fails, just write error to client. Do not gack.
-                gackOnException = false;
                 throw new AuraJWTError("Invalid jwt parameter");
             }
 
@@ -145,10 +138,12 @@ public class Bootstrap extends AuraResourceImpl {
             json.writeMapEnd();
             out.append(APPEND_JS);
         } catch (Throwable t) {
-            if (gackOnException) {
-                t = exceptionAdapter.handleException(t);                
+            Throwable handled = t;
+            if (!(t instanceof AuraJWTError)) {
+                handled = exceptionAdapter.handleException(t);
             }
-            writeError(t, response, context);
+            writeError(handled, response, context);
+            exceptionAdapter.handleException(new AuraResourceException(getName(), response.getStatus(), t));
         }
     }
 
@@ -202,7 +197,7 @@ public class Bootstrap extends AuraResourceImpl {
         out.print(PREPEND_JS);
         JsonEncoder json = JsonEncoder.createJsonStream(out, context.getJsonSerializationContext());
         json.writeMapBegin();
-        
+
         if (t instanceof AuraJWTError) {
             json.writeMapEntry("errorType", "jwt");
         }
@@ -222,13 +217,4 @@ public class Bootstrap extends AuraResourceImpl {
         this.contextService = contextService;
     }
 
-    /**
-     * Injection override.
-     *
-     * @param exceptionAdapter the ExceptionAdapter to set
-     */
-    @Inject
-    public void setExceptionAdapter(ExceptionAdapter exceptionAdapter) {
-        this.exceptionAdapter = exceptionAdapter;
-    }
 }

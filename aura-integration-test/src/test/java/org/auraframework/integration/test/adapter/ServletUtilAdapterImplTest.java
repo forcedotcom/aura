@@ -82,8 +82,8 @@ public class ServletUtilAdapterImplTest extends AuraImplTestCase {
         // @dval: Refactor this to make it readable...
     }
 
-     private String getLockerServiceContextValue() {
-        String cacheBuster = configAdapter.getLockerServiceCacheBuster();
-        return cacheBuster != null ? "%2C%22ls%22%3A%22" + cacheBuster + "%22" : "";
-    }
+//     private String getLockerServiceContextValue() {
+//        String cacheBuster = configAdapter.getLockerServiceCacheBuster();
+//        return cacheBuster != null ? "%2C%22ls%22%3A%22" + cacheBuster + "%22" : "";
+//    }
 }

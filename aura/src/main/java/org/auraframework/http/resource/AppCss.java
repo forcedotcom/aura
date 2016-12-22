@@ -40,10 +40,12 @@ public class AppCss extends AuraResourceImpl {
         if (dependencies == null) {
             return;
         }
+
         try {
             serverService.writeAppCss(dependencies, response.getWriter());
         } catch (Throwable t) {
             servletUtilAdapter.handleServletException(t, false, context, request, response, false);
+            exceptionAdapter.handleException(new AuraResourceException(getName(), response.getStatus(), t));
         }
     }
 }

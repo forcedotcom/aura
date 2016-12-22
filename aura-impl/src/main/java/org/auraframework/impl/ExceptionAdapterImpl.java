@@ -15,21 +15,23 @@
  */
 package org.auraframework.impl;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import javax.inject.Inject;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.http.resource.AuraResourceImpl.AuraResourceException;
 import org.auraframework.impl.controller.ComponentController.AuraClientException;
 import org.auraframework.instance.Action;
 import org.auraframework.throwable.AuraExceptionInfo;
 import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.util.json.JsonEncoder;
-
-import javax.inject.Inject;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 /**
  */
@@ -47,6 +49,14 @@ public class ExceptionAdapterImpl implements ExceptionAdapter {
 
     @Override
     public Throwable handleException(Throwable th) {
+        if(th instanceof AuraResourceException) {
+            AuraResourceException resourceException = ((AuraResourceException)th);
+            String message = String.format("An exception occured while creating Aura resource '%s', Status Code: %s.",
+                    resourceException.getResourceName(), resourceException.getStatusCode());
+            log.warn(message, resourceException);
+            return th;
+        }
+
         return handleException(th, null);
     }
 
@@ -60,21 +70,20 @@ public class ExceptionAdapterImpl implements ExceptionAdapter {
         if (th instanceof AuraHandledException) {
             //
             // If we have a aura handled exception, we really only want to gack
-            // the
-            // cause (if there is one).
+            // the cause (if there is one).
             //
             loggable = th.getCause();
             error = false;
-        } else{
-        	String message = "Unable to process your request";
-        	//If non-production setup, add more information to exception message
+        } else {
+            String message = "Unable to process your request";
+            //If non-production setup, add more information to exception message
             if (!configAdapter.isProduction()) {
                 StringWriter sw = new StringWriter();
                 PrintWriter p = new PrintWriter(sw);
                 th.printStackTrace(p);
                 message = message + "\n\n" + sw.toString();
-        	}
-        	mapped = new AuraUnhandledException(message);
+            }
+            mapped = new AuraUnhandledException(message);
         }
         if (error) {
             logging = log.isErrorEnabled();

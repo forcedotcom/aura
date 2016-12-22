@@ -137,15 +137,13 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     public void handleServletException(Throwable t, boolean quickfix, AuraContext context,
             HttpServletRequest request, HttpServletResponse response,
             boolean written) throws IOException {
-            Throwable mappedEx = t;
+        Throwable mappedEx = t;
         PrintWriter out = null;
-            Format format = context.getFormat();
+        Format format = context.getFormat();
         boolean map = true;
         int status = 0;
 
-            //
         // First try to set up the status.
-            //
         try {
             //
             // First, we make sure we get the status correct.
@@ -195,9 +193,9 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
             //
             if (format == Format.JSON) {
                 out = response.getWriter();
-            if (!written) {
+                if (!written) {
                     out.write(CSRF_PROTECT);
-            }
+                }
                 //
                 // If an exception happened while we were emitting JSON, we want the
                 // client to ignore the now-corrupt data structure. 404s and 500s
@@ -241,11 +239,12 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 }
             } else if (mappedEx instanceof DefinitionNotFoundException && isProductionMode(context.getMode())
                     && format == Format.HTML) {
-                            // We're in production and tried to hit an aura app that doesn't exist.
-                            // just show the standard 404 page.
-                            this.send404(request.getServletContext(), request, response);
-                            return;
-                        }
+                // We're in production and tried to hit an aura app that doesn't exist.
+                // just show the standard 404 page.
+                this.send404(request.getServletContext(), request, response);
+                return;
+            }
+
             if (map) {
                 mappedEx = exceptionAdapter.handleException(mappedEx);
             }
@@ -296,9 +295,9 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 // we are totally hosed.
                 // We can't even guarantee that this will work...
                 try {
-                if (!isProductionMode(context.getMode())) {
-                    response.getWriter().println(doubleDeath.getMessage());
-                }
+                    if (!isProductionMode(context.getMode())) {
+                        response.getWriter().println(doubleDeath.getMessage());
+                    }
                 } catch (Throwable tripleDeath) {
                     // totally ignore, as we have run out of options.
                 }

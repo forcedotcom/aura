@@ -16,19 +16,31 @@
 
 package org.auraframework.http.resource;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.times;
+
+import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.http.resource.AuraResourceImpl.AuraResourceException;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
-import org.auraframework.test.util.DummyHttpServletResponse;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.io.Writer;
-import java.io.PrintWriter;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -62,46 +74,46 @@ public class AppCssTest extends UnitTestCase {
      * Most of this is internal, but we want to make sure that we call handleServletException if there
      * is an exception in the writing of the CSS.
      */
-    @SuppressWarnings("unchecked")
     @Test
     public void testExceptionInWrite() throws Exception {
-        ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
-        ServerService serverService = Mockito.mock(ServerService.class);
+        // Arrange
+        ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
+        ServerService serverService = mock(ServerService.class);
+        ExceptionAdapter exceptionAdapter = mock(ExceptionAdapter.class);
+
         AppCss appCss = new AppCss();
-        Throwable t = new RuntimeException();
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         appCss.setServletUtilAdapter(servletUtilAdapter);
         appCss.setServerService(serverService);
-        Mockito.when(servletUtilAdapter.verifyTopLevel(Mockito.any(HttpServletRequest.class),
-                    Mockito.any(HttpServletResponse.class), Mockito.any(AuraContext.class)))
-            .thenReturn(new HashSet<DefDescriptor<?>>());
-        Mockito.doThrow(t).when(serverService).writeAppCss(Mockito.anySet(), Mockito.any(Writer.class));
-        PrintWriter writer = new PrintWriter(System.out);
-        Mockito.when(response.getWriter()).thenReturn(writer);
+        appCss.setExceptionAdapter(exceptionAdapter);
 
+        Set<DefDescriptor<?>> dependencies = new HashSet<>();
+        when(servletUtilAdapter.verifyTopLevel(any(HttpServletRequest.class), any(HttpServletResponse.class), any(AuraContext.class)))
+                .thenReturn(dependencies);
+
+        Throwable t = new RuntimeException();
+        doThrow(t).when(serverService).writeAppCss(eq(dependencies), any(Writer.class));
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        // Act
         appCss.write(null, response, null);
 
-        //
+        // Assert
         // Knock off the known calls. These are mocked above, and are internal implementation dependent.
-        //
-        Mockito.verify(servletUtilAdapter, Mockito.times(1)).verifyTopLevel(Mockito.any(HttpServletRequest.class),
-                Mockito.any(HttpServletResponse.class), Mockito.any(AuraContext.class));
-        Mockito.verify(response, Mockito.times(1)).getWriter();
-        Mockito.verify(serverService, Mockito.times(1)).writeAppCss(Mockito.anySet(), Mockito.any(Writer.class));
+        verify(servletUtilAdapter, times(1)).verifyTopLevel(any(HttpServletRequest.class),
+                any(HttpServletResponse.class), any(AuraContext.class));
+        verify(serverService, times(1)).writeAppCss(eq(dependencies), any(Writer.class));
 
-        //
         // And this is the expected call. This must stay.
-        //
-        Mockito.verify(servletUtilAdapter, Mockito.times(1)).handleServletException(Mockito.eq(t),
-                Mockito.eq(false), Mockito.any(AuraContext.class), Mockito.any(HttpServletRequest.class),
-                Mockito.any(HttpServletResponse.class), Mockito.anyBoolean());
+        verify(servletUtilAdapter, times(1)).handleServletException(eq(t), eq(false),
+                any(AuraContext.class), any(HttpServletRequest.class),
+                any(HttpServletResponse.class), anyBoolean());
+        verify(exceptionAdapter, times(1)).handleException(any(AuraResourceException.class));
 
-        //
         // Make sure nothing else happens.
-        //
-        Mockito.verifyNoMoreInteractions(response);
-        Mockito.verifyNoMoreInteractions(serverService);
-        Mockito.verifyNoMoreInteractions(servletUtilAdapter);
+        verifyNoMoreInteractions(serverService);
+        verifyNoMoreInteractions(servletUtilAdapter);
+        verifyNoMoreInteractions(exceptionAdapter);
     }
 
     /**
@@ -140,28 +152,18 @@ public class AppCssTest extends UnitTestCase {
      */
     @Test
     public void testSetContentType() {
+        ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
+        when(servletUtilAdapter.getContentType(AuraContext.Format.CSS)) .thenReturn("text/css");
+
         AppCss appCss = new AppCss();
-        ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
         appCss.setServletUtilAdapter(servletUtilAdapter);
-        Mockito.when(servletUtilAdapter.getContentType(AuraContext.Format.CSS))
-                .thenReturn("text/css");
 
-        DummyHttpServletResponse response = new DummyHttpServletResponse() {
-            String contentType = "defaultType";
+        MockHttpServletResponse response = new MockHttpServletResponse();
 
-            @Override
-            public String getContentType() {
-                return this.contentType;
-            }
-
-            @Override
-            public void setContentType(String contentType) {
-                this.contentType = contentType;
-            }
-        };
-
+        // Act
         appCss.setContentType(response);
 
+        // Assert
         assertEquals("text/css", response.getContentType());
     }
 }

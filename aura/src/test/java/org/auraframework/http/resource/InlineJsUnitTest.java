@@ -15,10 +15,19 @@
  */
 package org.auraframework.http.resource;
 
-import javax.servlet.http.HttpServletRequest;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+
 import javax.servlet.http.HttpServletResponse;
 
+import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.http.resource.AuraResourceImpl.AuraResourceException;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
@@ -27,6 +36,8 @@ import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 public class InlineJsUnitTest extends UnitTestCase {
 
@@ -60,23 +71,32 @@ public class InlineJsUnitTest extends UnitTestCase {
 
     @Test
     public void testExceptionHandling() throws Exception {
-        ContextService acs = Mockito.mock(ContextService.class);
-        AuraContext ac = Mockito.mock(AuraContext.class);
-        ServletUtilAdapter sua = Mockito.mock(ServletUtilAdapter.class);
-        ClientOutOfSyncException coos = Mockito.mock(ClientOutOfSyncException.class);
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        Mockito.when(acs.getCurrentContext()).thenReturn(ac);
-        Mockito.doThrow(coos).when(sua).checkFrameworkUID(ac);
+        // Arrange
+        ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
+        ContextService contextService = Mockito.mock(ContextService.class);
+        AuraContext auraContext = Mockito.mock(AuraContext.class);
+        ClientOutOfSyncException outOfSyncException = Mockito.mock(ClientOutOfSyncException.class);
+        ExceptionAdapter exceptionAdapter = mock(ExceptionAdapter.class);
 
         InlineJs inline = new InlineJs();
-        inline.setServletUtilAdapter(sua);
-        inline.setContextService(acs);
+        inline.setServletUtilAdapter(servletUtilAdapter);
+        inline.setContextService(contextService);
+        inline.setExceptionAdapter(exceptionAdapter);
 
-        inline.write(request, response, ac);
+        doThrow(outOfSyncException).when(servletUtilAdapter).checkFrameworkUID(same(auraContext));
 
-        Mockito.verify(sua).handleServletException(coos, false, ac, request, response, false);
-        Mockito.verify(sua).checkFrameworkUID(ac);
-        Mockito.verifyNoMoreInteractions(sua);
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        // Act
+        inline.write(request, response, auraContext);
+
+        // Assert
+        verify(servletUtilAdapter, times(1)).handleServletException(outOfSyncException, false, auraContext, request, response, false);
+        verify(servletUtilAdapter, times(1)).checkFrameworkUID(same(auraContext));
+        verify(exceptionAdapter, times(1)).handleException(any(AuraResourceException.class));
+
+        verifyNoMoreInteractions(servletUtilAdapter);
+        verifyNoMoreInteractions(exceptionAdapter);
     }
 }

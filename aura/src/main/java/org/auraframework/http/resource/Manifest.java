@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -53,7 +52,6 @@ public class Manifest extends AuraResourceImpl {
 
     // FIXME: this is horrendous we actually render the manifest as a component.
     private RenderingService renderingService;
-    private ExceptionAdapter exceptionAdapter;
     private ContextService contextService;
     private ManifestUtil manifestUtil;
 
@@ -246,11 +244,6 @@ public class Manifest extends AuraResourceImpl {
     @Inject
     public void setRenderingService(RenderingService renderingService) {
         this.renderingService = renderingService;
-    }
-
-    @Inject
-    public void setExceptionAdapter(ExceptionAdapter exceptionAdapter) {
-        this.exceptionAdapter = exceptionAdapter;
     }
 
     @Inject

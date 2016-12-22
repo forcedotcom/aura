@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.http.RequestParam.StringParam;
@@ -49,11 +50,12 @@ public abstract class AuraResourceImpl implements AuraResource {
     protected ConfigAdapter configAdapter;
     protected ServerService serverService;
     protected InstanceService instanceService;
+    protected ExceptionAdapter exceptionAdapter;
 
     public AuraResourceImpl(String name, Format format) {
         this(name, format, false);
     }
-    
+
     @Deprecated
     public AuraResourceImpl(String name, Format format, boolean CSRFProtect) {
         this.name = name;
@@ -64,7 +66,7 @@ public abstract class AuraResourceImpl implements AuraResource {
     public void setContentType(HttpServletResponse response) {
         response.setContentType(this.servletUtilAdapter.getContentType(this.format));
     }
-    
+
     @Override
     public abstract void write(HttpServletRequest request, HttpServletResponse response, AuraContext context) throws IOException;
 
@@ -134,6 +136,16 @@ public abstract class AuraResourceImpl implements AuraResource {
         this.instanceService = instanceService;
     }
 
+    /**
+     * Injection override.
+     *
+     * @param exceptionAdapter the ExceptionAdapter to set
+     */
+    @Inject
+    public void setExceptionAdapter(ExceptionAdapter exceptionAdapter) {
+        this.exceptionAdapter = exceptionAdapter;
+    }
+
     private final StringParam attributesParam = new StringParam("aura.attributes", 0, false);
 
     protected Map<String, Object> getComponentAttributes(HttpServletRequest request) {
@@ -167,6 +179,38 @@ public abstract class AuraResourceImpl implements AuraResource {
             }
             return attributes;
         }
-	}
+    }
+
+    /**
+     * Wrapper exception for the exceptions occurred while creating Aura resource, so that
+     * we are able to centrally handle the exceptions from resources.
+     */
+    public static class AuraResourceException extends Exception {
+        private static final long serialVersionUID = 4630562679200875774L;
+
+        private String resourceName;
+        private int statusCode;
+
+        public AuraResourceException(String resourceName, int statusCode, String message, Throwable cause) {
+            super(message, cause);
+            this.resourceName = resourceName;
+            this.statusCode = statusCode;
+        }
+
+        public AuraResourceException(String resourceName, int statusCode, Throwable cause) {
+            super(cause);
+            this.resourceName = resourceName;
+            this.statusCode = statusCode;
+        }
+
+        public String getResourceName() {
+            return resourceName;
+        }
+
+        public int getStatusCode() {
+            return statusCode;
+        }
+    }
+
 };
 

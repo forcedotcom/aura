@@ -30,12 +30,15 @@ import static org.mockito.Mockito.when;
 
 import java.io.PrintWriter;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.http.resource.AuraResourceImpl.AuraResourceException;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
@@ -77,18 +80,21 @@ public class AppJsTest extends UnitTestCase {
         // Arrange
         ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
         ServerService serverService = mock(ServerService.class);
-        Throwable expectedException = new RuntimeException();
-        MockHttpServletResponse response = new MockHttpServletResponse();
-
-        HashSet<DefDescriptor<?>> dependencies = new HashSet<>();
-        when(servletUtilAdapter.verifyTopLevel(any(HttpServletRequest.class),
-                    any(HttpServletResponse.class), any(AuraContext.class)))
-            .thenReturn(dependencies);
-        doThrow(expectedException).when(serverService).writeDefinitions(eq(dependencies), any(PrintWriter.class));
+        ExceptionAdapter exceptionAdapter = mock(ExceptionAdapter.class);
 
         AppJs appJs = new AppJs();
         appJs.setServletUtilAdapter(servletUtilAdapter);
         appJs.setServerService(serverService);
+        appJs.setExceptionAdapter(exceptionAdapter);
+
+        Set<DefDescriptor<?>> dependencies = new HashSet<>();
+        when(servletUtilAdapter.verifyTopLevel(any(HttpServletRequest.class), any(HttpServletResponse.class), any(AuraContext.class)))
+            .thenReturn(dependencies);
+
+        Throwable expectedException = new RuntimeException();
+        doThrow(expectedException).when(serverService).writeDefinitions(eq(dependencies), any(PrintWriter.class));
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
 
         // Act
         appJs.write(null, response, null);
@@ -99,6 +105,7 @@ public class AppJsTest extends UnitTestCase {
         verify(servletUtilAdapter, times(1)).handleServletException(eq(expectedException),
                 eq(false), any(AuraContext.class), any(HttpServletRequest.class),
                 any(HttpServletResponse.class), anyBoolean());
+        verify(exceptionAdapter, times(1)).handleException(any(AuraResourceException.class));
 
         // Knock off the known calls. These are mocked above, and are internal implementation dependent.
         verify(servletUtilAdapter, times(1)).verifyTopLevel(any(HttpServletRequest.class),
@@ -108,6 +115,7 @@ public class AppJsTest extends UnitTestCase {
         // Make sure nothing else happens.
         verifyNoMoreInteractions(serverService);
         verifyNoMoreInteractions(servletUtilAdapter);
+        verifyNoMoreInteractions(exceptionAdapter);
     }
 
     /**

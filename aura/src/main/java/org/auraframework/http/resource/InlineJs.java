@@ -140,18 +140,16 @@ public class InlineJs extends AuraResourceImpl {
         } else {
             servletUtilAdapter.setNoCache(response);
         }
-        
+
         // Prevents Mhtml Xss exploit:
         PrintWriter out = response.getWriter();
         out.write("\n    ");
-        
-        
+
         Component template = serverService.writeTemplate(context, def, getComponentAttributes(request), out);
         appendInlineJS(template, out);
         renderingService.render(template, null, out);
-
     }
-    
+
     private boolean shouldCacheHTMLTemplate(DefDescriptor<? extends BaseComponentDef> appDefDesc,
             HttpServletRequest request, AuraContext context) throws QuickFixException {
         if (appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)) {
@@ -171,6 +169,7 @@ public class InlineJs extends AuraResourceImpl {
             internalWrite(request, response, appDefDesc, context);
         } catch (Throwable t) {
             servletUtilAdapter.handleServletException(t, false, context, request, response, false);
+            exceptionAdapter.handleException(new AuraResourceException(getName(), response.getStatus(), t));
         }
     }
 

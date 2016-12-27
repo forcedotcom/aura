@@ -43,7 +43,7 @@
             cmp.testHistoryExposedOnWindow();
         }
     },
-    
+
     testLocationExposedOnWindow: {
         test: function(cmp) {
             cmp.testLocationExposedOnWindow();
@@ -113,6 +113,30 @@
     testCreateImageElement: {
         test: function(cmp) {
             cmp.testCreateImageElement();
+        }
+    },
+
+    testBlob: {
+        test: function(cmp) {
+            cmp.testBlob();
+        }
+    },
+
+    testBlob_WithScriptTagsBlocked: {
+        test: function (cmp) {
+            cmp.testBlob_WithScriptTagsBlocked();
+        }
+    },
+
+    testFile: {
+        test: function(cmp) {
+            cmp.testFile();
+        }
+    },
+
+    testFile_WithScriptTagsBlocked: {
+        test: function (cmp) {
+            cmp.testFile_WithScriptTagsBlocked();
         }
     }
 })

@@ -36,6 +36,11 @@
     <aura:method name="testOpen_HttpUrl" action="{!c.testOpen_HttpUrl}"/>
     <aura:method name="testOpen_RelativeUrl" action="{!c.testOpen_RelativeUrl}"/>
     <aura:method name="testOpen_JavascriptIsBlocked" action="{!c.testOpen_JavascriptIsBlocked}"/>
+    <aura:method name="testBlob" action="{!c.testBlob}"/>
+    <aura:method name="testBlob_WithScriptTagsBlocked" action="{!c.testBlob_WithScriptTagsBlocked}"/>
+    <aura:method name="testFile" action="{!c.testFile}"/>
+    <aura:method name="testFile_WithScriptTagsBlocked" action="{!c.testFile_WithScriptTagsBlocked}"/>
+
 
     <div>SecureWindow test</div>
 </aura:component>

@@ -7,13 +7,13 @@
     testDocumentExposedOnWindow: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         testUtils.assertStartsWith("SecureDocument", window.document.toString(), "Expected window.document to"
-                + " return SecureDocument");
+            + " return SecureDocument");
     },
 
     testCircularReferenceIsSecureWindow: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         testUtils.assertStartsWith("SecureWindow", window.window.toString(), "Expected window.window to"
-                + " return SecureWindow");
+            + " return SecureWindow");
     },
 
     testNoAccessToWindowViaSetTimeout: function(cmp) {
@@ -25,17 +25,17 @@
             cmp.set("v.testComplete", true);
         }, 0);
     },
-    
+
     testHistoryExposedOnWindow: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         testUtils.assertDefined(window.history);
     },
-    
+
     testLocationExposedOnWindow: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         testUtils.assertDefined(window.location);
     },
-    
+
     testNavigatorExposedOnWindow: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         testUtils.assertStartsWith("SecureNavigator", window.navigator.toString(), "Expected navigator to return SecureNavigator");
@@ -48,7 +48,7 @@
         testUtils.assertDefined(window.Object, "window.Object is not exposed");
 
         testUtils.assertTrue(window.Object === Object,
-                "window.Object and Object should reference to same thing.");
+            "window.Object and Object should reference to same thing.");
 
     },
 
@@ -59,7 +59,7 @@
         testUtils.assertDefined(window.decodeURIComponent, "window.decodeURIComponent is not exposed");
 
         testUtils.assertTrue(window.decodeURIComponent === decodeURIComponent,
-                "window.decodeURIComponent and decodeURIComponent should reference to same thing.");
+            "window.decodeURIComponent and decodeURIComponent should reference to same thing.");
     },
 
     testHostedDefinedGlobalsExposedOnWindow: function(cmp) {
@@ -136,11 +136,67 @@
         testUtils.assertEquals("IMG", imgCtor.tagName.toUpperCase(), "Failed to create <img> element using 'new Image()'");
         /* Disabling this assertion because ios 9.2 does not support height and width arguments in the ctor
          causing this test to fail in autobuilds. Enable these assertions when autobuild starts using ios 10+
-        testUtils.assertEquals(25, imgCtor.width);
-        testUtils.assertEquals(33, imgCtor.height);*/
+         testUtils.assertEquals(25, imgCtor.width);
+         testUtils.assertEquals(33, imgCtor.height);*/
 
         var imgFunction = document.createElement("img");
         testUtils.assertStartsWith("SecureElement", imgFunction.toString());
         testUtils.assertEquals("IMG", imgFunction.tagName.toUpperCase(), "Failed to create <img> element using document.createElement()");
+    },
+
+    testBlob: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var jsonString = JSON.stringify({hello: "world"}, null, 2);
+        var blob = new Blob([jsonString], {type : 'application/json'});
+        testUtils.assertNotUndefinedOrNull(blob);
+        // Verify the various properties of Blob
+        testUtils.assertEquals(jsonString.length, blob.size);
+        testUtils.assertEquals('application/json', blob.type);
+    },
+
+    testBlob_WithScriptTagsBlocked: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var scripts = [
+            "<script>alert(window)</script>",
+            "<script  >alert(window)</script  >",
+            "<SCRIPT>alert(window)</SCRIPT>"
+        ];
+        scripts.forEach(function(script){
+            try {
+                var blob = new Blob([script], {type:'text/html'});
+                testUtils.fail("Expect to block script tags while creating Blob:"+script);
+            } catch (e) {
+                testUtils.assertEquals("Blob creation failed: <script> tags are blocked", e.message);
+            }
+        });
+    },
+
+    testFile: function(cmp) {
+        var testUtils = cmp.get("v.testUtils"),
+            expectedFileName = 'test.html',
+            expectedFileType = 'text/html';
+
+        var file = new File(["<div>hello World</div>"], expectedFileName, {type:expectedFileType});
+        testUtils.assertNotUndefinedOrNull(file);
+        // Verify the various properties of File
+        testUtils.assertEquals(expectedFileName, file.name);
+        testUtils.assertEquals(expectedFileType, file.type);
+    },
+
+    testFile_WithScriptTagsBlocked: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var scripts = [
+            "<script>alert(window)</script>",
+            "<script  >alert(window)</script  >",
+            "<SCRIPT>alert(window)</SCRIPT>"
+        ];
+        scripts.forEach(function(script){
+            try {
+                var file = new File([script], 'test.html', {type:'text/html'});
+                testUtils.fail("Expect to block script tags while creating File:"+script);
+            } catch (e) {
+                testUtils.assertEquals("File creation failed: <script> tags are blocked", e.message);
+            }
+        });
     }
 })

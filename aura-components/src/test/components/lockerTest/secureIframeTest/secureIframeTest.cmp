@@ -17,6 +17,9 @@
 -->
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
+    <aura:attribute name="messageReceived" type="String"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
     <aura:method name="testIframeAttributes" action="{!c.testIframeAttributes}">
         <aura:attribute name="attributesWhitelist" type="List"/>
@@ -28,5 +31,5 @@
     <aura:method name="testContentWindow" action="{!c.testContentWindow}"/>
 
     <div aura:id="title">SecureIFrameElement test</div>
-    <iframe aura:id="iframe"/>
+    <iframe aura:id="iframe" id="iframe" src="/lockerTestOtherNamespace/iframeCmp.cmp" width="100%"/>
 </aura:component>

@@ -180,7 +180,7 @@ function Component(config, localCreation) {
 
     this._destroying = false;
     if(this.getDef().hasInit()) {
-        this.fire("init");  
+        this.fire("init");
     }
 }
 
@@ -1276,44 +1276,44 @@ Component.prototype.set = function(key, value, ignoreChanges) {
 /**
  * Add a warning in the console if a list of components is not rendered by the end
  * of the current event loop. This pattern usually lead to memory leaks.
- * 
+ *
  * @param {Component[]} prevComp The list of component that has been replaced
  * @param {string} key The attribute key
  */
 Component.prototype.trackComponentReplacement = function(prevCmps, key) {
-    // Filter valid and not rendered components 
-    var potentialLeak = []; 
+    // Filter valid and not rendered components
+    var potentialLeak = [];
     for (var i = 0; i < prevCmps.length; i++) {
         if (prevCmps[i].isValid() && !prevCmps[i].isRendered()) {
             potentialLeak.push(prevCmps[i]);
         }
     }
-    
+
     if (potentialLeak.length) {
         var owner = this;
         var handler = function() {
-            // Compute again if the some components are still not rendered 
+            // Compute again if the some components are still not rendered
             var actualLeak = [];
             for (var j = 0; j < potentialLeak.length; j++) {
                 if (potentialLeak[j].isValid() && !potentialLeak[j].isRendered()) {
                     actualLeak.push(potentialLeak[j]);
                 }
             }
-            
+
             if (actualLeak.length) {
                 $A.warning([
                     '[Performance degradation] ',
                     actualLeak.length + ' component(s) in ' + owner.getName() + ' ["' + owner.getGlobalId() + '"] ',
                     'have been created and removed before being rendered when calling cmp.set("' + key + '").\n',
-                    'More info: https://sfdc.co/performance-aura-component-set' 
+                    'More info: https://sfdc.co/performance-aura-component-set'
                 ].join(''));
             }
         };
-        
+
         // This event is triggered by the renderingService.rerenderDirty method
         $A.eventService.addHandlerOnce({
-            'event': 'aura:doneRendering', 
-            'globalId': 'componentService', 
+            'event': 'aura:doneRendering',
+            'globalId': 'componentService',
             'handler': handler
         });
     }
@@ -1678,7 +1678,7 @@ Component.prototype.toString = function() {
  * @private
  */
 Component.prototype.toJSON = function() {
-	return {
+    return {
         "globalId": this.globalId,
         "isValid": this.isValid()
     };
@@ -2678,7 +2678,7 @@ Component.prototype.associateRenderedBy = function(cmp, element) {
  * Resolves a locator that targets targetCmp from within this component
  * @param targetCmp
  * @param includeMetadata
- * 
+ *
  * @returns The locator object which contains the target & scope IDs and locator context resolved
  */
 Component.prototype.getLocator = function(targetCmp, includeMetadata) {

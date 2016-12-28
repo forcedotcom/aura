@@ -27,7 +27,7 @@
     },
 
     /**
-     * Test that toJSON() Does not return the concrete global id, but 
+     * Test that toJSON() Does not return the concrete global id, but
      * the ID of the component at that level.
      * @type {Object}
      */
@@ -38,23 +38,6 @@
 
             $A.test.assertNotEquals(expected, serialized.globalId);
         }
-    },
-
-    testToJSONSerializesForInvalidComponent: {
-        test: [
-            function(cmp){
-                var actual = cmp.toJSON().isValid;
-
-                $A.test.assertTrue(actual);
-            },
-            function(cmp){
-                var actual;
-
-                cmp.destroy(false);
-                actual = cmp.toJSON().isValid;
-
-                $A.test.assertFalse(actual);
-            }
-        ]
     }
+
  })

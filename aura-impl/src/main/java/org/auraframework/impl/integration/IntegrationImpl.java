@@ -327,6 +327,9 @@ public class IntegrationImpl implements Integration {
             namespaces.put("privileged", configAdapter.getPrivilegedNamespaces());
             auraInit.put("ns", namespaces);
 
+            auraInit.put("MaxParallelXHRCount", configAdapter.getMaxParallelXHRCount());
+            auraInit.put("XHRExclusivity", configAdapter.getXHRExclusivity());
+
             StringBuilder contextWriter = new StringBuilder();
 
             serializationService.write(context, null, AuraContext.class, contextWriter, "JSON");

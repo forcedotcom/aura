@@ -134,6 +134,9 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
                     auraInit.put("safeEvalWorker", lockerWorkerURL);
                 }
 
+                auraInit.put("MaxParallelXHRCount", configAdapter.getMaxParallelXHRCount());
+                auraInit.put("XHRExclusivity", configAdapter.getXHRExclusivity());
+
                 attributes.put("autoInitialize", "false");
                 attributes.put("autoInitializeSync", "true");
 

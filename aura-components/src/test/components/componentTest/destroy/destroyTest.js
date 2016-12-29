@@ -309,7 +309,53 @@
             destroy.addHandler("markup://aura:valueDestroy", cmp, reference, true, "default");
 
             destroy.destroy(false);
+            cmp.destroy(false);
+            
+            // toJSON on an inValid reference is null
+            $A.test.assertUndefinedOrNull(reference.toJSON());
+        }
+    },
 
+    testDestroyCleansUpSharedComponentHandlerStringReferences: {
+        test: function(cmp) {
+            var reference = cmp.getReference("c.handler");
+            var toCreate = [ ["componentTest:destroy", {}], ["componentTest:destroy", {}] ];
+            var toDestroy;
+            $A.createComponents(toCreate, function(components){
+                toDestroy = components;
+            });
+
+            toDestroy[0].addHandler("markup://aura:valueDestroy", cmp, "{!c.handler}", true, "default");
+            toDestroy[1].addHandler("markup://aura:valueDestroy", cmp, "{!c.handler}", true, "default");
+
+            toDestroy[0].destroy(false);
+            toDestroy[1].destroy(false);
+
+            cmp.destroy(false);
+            
+            // toJSON on an inValid reference is null
+            $A.test.assertUndefinedOrNull(reference.toJSON());
+        }
+    },
+    
+
+    testDestroyCleansUpSharedComponentHandlerReferences: {
+        test: function(cmp) {
+            var reference = cmp.getReference("c.handler");
+            var toCreate = [ ["componentTest:destroy", {}], ["componentTest:destroy", {}] ];
+            var toDestroy;
+            $A.createComponents(toCreate, function(components){
+                toDestroy = components;
+            });
+
+            toDestroy[0].addHandler("markup://aura:valueDestroy", cmp, reference, true, "default");
+            toDestroy[1].addHandler("markup://aura:valueDestroy", cmp, reference, true, "default");
+
+            toDestroy[0].destroy(false);
+            toDestroy[1].destroy(false);
+
+            cmp.destroy(false);
+            
             // toJSON on an inValid reference is null
             $A.test.assertUndefinedOrNull(reference.toJSON());
         }

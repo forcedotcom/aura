@@ -77,10 +77,11 @@
                 "iFrame component never initialized",
                 function() {
                     // iframe will echo back original message with some additional text prepended
-                    cw.postMessage({ msg: "Message from parent" }, "*");
                     testUtils.addWaitForWithFailureMessage(
                             "Message from iframe: Message from parent",
                             function() {
+                                // timing issues on slower builds so keep re-sending message until we get a response
+                                cw.postMessage({ msg: "Message from parent" }, "*");
                                 return cmp.get("v.messageReceived");
                             },
                             "Never received message back from iframe");

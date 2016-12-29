@@ -1040,5 +1040,24 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>core</id>
+            <activation>
+                <property>
+                    <!-- This property is set implicitly in core by the workspace settings maven extension to the directory that contains workspace.xml (core) -->
+                    <name>workspaceRoot</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.sfdc</groupId>
+                        <artifactId>sfdc-post-plugin</artifactId>
+                        <version>0.0.1</version>
+                        <extensions>true</extensions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>

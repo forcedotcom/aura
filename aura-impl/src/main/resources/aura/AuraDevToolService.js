@@ -768,8 +768,12 @@ var AuraDevToolService = function() {
                          cmp = $A.getCmp(data_aura_rendered_by);
                          if(!$A.util.isUndefinedOrNull(cmp)){
                         	 cmp = cmp.getAttributeValueProvider();
-                             cmpName = cmp.getName();
-
+                             //Cannot query cmp.getName() in case of PassthroughValue.
+                             if(typeof cmp.getName !== "function"){
+                                 cmp = cmp.getDef().getDescriptor().getFullName();
+                             }else{
+                                 cmpName = cmp.getName();
+                             }
                              //Making sure that we have unique components
                              if(!(cmpName in cmpInfo)){
                                  cmpInfo[cmpName] = "";

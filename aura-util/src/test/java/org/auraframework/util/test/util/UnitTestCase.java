@@ -34,6 +34,7 @@ import org.auraframework.util.test.annotation.UnitTest;
 import org.auraframework.util.test.diff.GoldFileUtils;
 import org.auraframework.util.test.perf.metrics.PerfMetrics;
 import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
+import org.auraframework.util.test.runner.AuraUnitTestRunner;
 import org.junit.*;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
@@ -50,7 +51,7 @@ import com.google.common.collect.Sets;
  * Base class for all aura tests.
  */
 @UnitTest
-@RunWith(BlockJUnit4ClassRunner.class)
+@RunWith(AuraUnitTestRunner.class)
 @ContextConfiguration(locations = {"/applicationContext.xml"})
 @TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class})
 @ActiveProfiles("auraTest")

@@ -191,6 +191,22 @@
         ]
     },
 
+    testStackTraceForErrorFromServerActionCallbackWrappedInGetCallback: {
+        test: [
+            function(cmp) {
+                $A.test.expectAuraError("Error in $A.getCallback() [Error from server action callback wrapped in $A.getCallback]");
+                $A.test.clickOrTouch(cmp.find("errorFromServerActionCallbackWrappedInGetCallbackButton").getElement());
+                this.waitForErrorModal();
+            },
+            function(cmp) {
+                var actual = this.findStacktraceFromErrorModal();
+                var expected = "java://org.auraframework.components.test.java.controller.TestController/ACTION$doSomething@markup://auratest:errorHandlingApp";
+
+                $A.test.assertTrue(actual.indexOf(expected) > -1);
+            }
+        ]
+    },
+
     waitForErrorModal: function(callback) {
         $A.test.addWaitForWithFailureMessage(true,
             function(){

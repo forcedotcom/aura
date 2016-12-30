@@ -81,35 +81,36 @@ function AuraError() {
         }
     };
 
-    function AuraErrorInternal(message, innerError, severity) {
-        /* parse error to create stack frames */
-        function getStackFrames(e) {
-            var remove = 0;
-            if (!e || !e.stack) {
-                try {
-                    throw new Error("foo");
-                } catch (f) {
-                    e = f;
-                    remove += 3;
-                }
+    /* parse error to create stack frames */
+    function getStackFrames(e) {
+        var remove = 0;
+        if (!e || !e.stack) {
+            try {
+                throw new Error("foo");
+            } catch (f) {
+                e = f;
+                remove += 3;
             }
-
-            return Aura.Errors.StackParser.parse(e).slice(remove);
         }
 
-        /* analyze stack frames to create meaningful trace */
-        function getStackTrace(frames) {
-            var filtered = frames.filter(function(frame) {
-                return !frame.fileName || frame.fileName.match(/aura_[^\.]+\.js$/gi) === null;
-            });
+        return Aura.Errors.StackParser.parse(e).slice(remove);
+    }
 
-            // if all stack frames are from framework, we still want to keep the trace.
-            return filtered.length > 0 ? filtered.join('\n') : frames.join('\n');
-        }
+    /* analyze stack frames to create meaningful trace */
+    function getStackTrace(frames) {
+        var filtered = frames.filter(function(frame) {
+            return !frame.fileName || frame.fileName.match(/aura_[^\.]+\.js$/gi) === null;
+        });
 
-        function getStackTraceIdHashString(stacktrace) {
+        // if all stack frames are from framework, we still want to keep the trace.
+        return filtered.length > 0 ? filtered.join('\n') : frames.join('\n');
+    }
+
+    var generateErrorId = function(stacktrace) {
+
+        function getStackTraceIdHashString(traces) {
             var ret = [];
-            var lines = stacktrace.split('\n');
+            var lines = traces.split('\n');
             lines.forEach(function(line) {
                 line = line.replace(/https?:\/\/([^\/]*\/)+/gi, "");
                 line = line.replace(/:[0-9]+:[0-9]+/gi, "");
@@ -119,6 +120,10 @@ function AuraError() {
             return ret.join('\n')+"\n";
         }
 
+        return MurmurHash3.hashString(getStackTraceIdHashString(stacktrace));
+    };
+
+    function AuraErrorInternal(message, innerError, severity) {
         if (message == null) {
             message = '';
         }
@@ -127,7 +132,7 @@ function AuraError() {
         this.message = message + (innerError ? " [" + (innerError.message || innerError.toString()) + "]" : "");
         this.stackFrames = getStackFrames(innerError);
         this.stackTrace = getStackTrace(this.stackFrames);
-        this.id = MurmurHash3.hashString(getStackTraceIdHashString(this.stackTrace));
+        this.id = generateErrorId(this.stackTrace);
         this.severity = innerError ? (innerError.severity || severity) : severity;
         this["handled"] = innerError ? (innerError["handled"] || false) : false;
         this["reported"] = innerError ? (innerError["reported"] || false) : false;
@@ -141,12 +146,24 @@ function AuraError() {
     this["severity"] = this.severity;
     this["data"] = null;
     this["id"] = this.id;
+    this.generateErrorId = generateErrorId;
 }
 
 AuraError.prototype = new Error();
 AuraError.prototype.constructor = AuraError;
 AuraError.prototype.toString = function() {
     return this.message || Error.prototype.toString();
+};
+
+/**
+ * When there is need to mess with stacktrace, call this method
+ * so that the error id will be recalculated
+ * @function
+ * @param {String} trace - The trace to be set to this error instance.
+ */
+AuraError.prototype.setStackTrace = function(trace) {
+    this.stackTrace = trace;
+    this.id = this.generateErrorId(trace);
 };
 
 Aura.Errors.AuraError = AuraError;

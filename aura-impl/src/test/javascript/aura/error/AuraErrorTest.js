@@ -26,7 +26,7 @@ Test.Aura.AuraErrorTest = function() {
     })(function() {
         Import("aura-impl/src/main/resources/aura/polyfill/stackframe.js");
         Import("aura-impl/src/main/resources/aura/polyfill/error-stack-parser.js");
-        Import("aura-impl/src/main/resources/aura/AuraError.js");
+        Import("aura-impl/src/main/resources/aura/error/AuraError.js");
         _StackFrame = StackFrame;
         _ErrorStackParser = ErrorStackParser;
         _AuraError = AuraError;
@@ -144,9 +144,7 @@ Test.Aura.AuraErrorTest = function() {
 
             Assert.True(actual != 0);
         }
-        
-        
-        
+
         [Fact]
         function ReturnsStackTrace_StrangeMessage() {
         	var actual = "";
@@ -156,6 +154,20 @@ Test.Aura.AuraErrorTest = function() {
             
             getAuraMock(function() {
                 actual = new Aura.Errors.AuraError("SomeMessage", innerError).message;
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ReturnsInnerErrorStackTrace() {
+            var actual = "";
+            var innerError = new Error();
+            innerError.stack = "innerErrorStack";
+            var expected = "innerErrorStack()";
+            
+            getAuraMock(function() {
+                actual = new Aura.Errors.AuraError("SomeMessage", innerError).stackTrace;
             });
 
             Assert.Equal(expected, actual);
@@ -267,15 +279,46 @@ press()@http://localhost:9090/components/ui/button.js:34:16";
             Assert.Equal(expected, target.toString());
         }
 
-		//when message is undefined, we will call Error.prototype.toString(), note in browser this will give us "Error"
+        //when message is undefined, we will call Error.prototype.toString(), note in browser this will give us "Error"
         [Fact]
         function ReturnsEmptyStringWhenMessageIsUndefined() {
             var target;
             getAuraMock(function(){
                 target = new Aura.Errors.AuraError();
             });
-			Assert.Equal('', target.toString());
+            Assert.Equal('', target.toString());
         }
         
+    }
+    [Fixture]
+    function setStackTrace() {
+        [Fact]
+        function SetsStackTrace() {
+            var actual;
+            var expected = "test stack";
+
+            getAuraMock(function() {
+                actual = new Aura.Errors.AuraError();
+                actual.setStackTrace(expected);
+            });
+
+            Assert.Equal(actual.stackTrace, expected);
+        }
+
+        [Fact]
+        function GeneratesDifferentErrorId() {
+            var target;
+            var actual;
+            var expected;
+
+            getAuraMock(function() {
+                target = new Aura.Errors.AuraError();
+                actual = target.id;
+                target.setStackTrace("test");
+                expected = target.id;
+            });
+
+            Assert.NotEqual(actual, expected);
+        }
     }
 }

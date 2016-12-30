@@ -55,6 +55,14 @@
         $A.enqueueAction(action);
     },
 
+    throwErrorFromServerActionCallbackWrappedInGetCallback: function(cmp) {
+        var action = cmp.get("c.doSomething");
+        action.setCallback(this, $A.getCallback(function() {
+                throw Error("Error from server action callback wrapped in $A.getCallback");
+            }));
+        $A.enqueueAction(action);
+    },
+
     throwErrorFromNestedGetCallbackFunctions: function(cmp) {
         var callback = $A.getCallback(function() {
                     var targetCmp = cmp.find("containedCmp");

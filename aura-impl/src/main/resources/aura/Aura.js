@@ -124,8 +124,8 @@ window['$A'] = {};
 // #include aura.util.Override
 
 // -- Errors ------------------------------------------------------------
-// #include aura.AuraError
-// #include aura.AuraFriendlyError
+// #include aura.error.AuraError
+// #include aura.error.AuraFriendlyError
 
 // -- System ------------------------------------------------------------
 // #include aura.system.DefDescriptor
@@ -1084,8 +1084,31 @@ AuraInstance.prototype.getCallback = function(callback) {
                 $A.lastKnownError = e;
                 throw e;
             } else {
+                // create a synthetic stack frame for errors from callback wrapped in $A.getCallback called by Action.finishAction
+                // because Safari 10/iOS Webview doesn't provide function name in stack.
+                var syntheticStackFrame = "";
+                if (arguments.length === 2) {
+                    var action = arguments[0];
+                    if (action) {
+                        var actionDef = action.getDef();
+                        if (actionDef) {
+                            syntheticStackFrame = actionDef.getDescriptor().toString();
+                        }
+                    }
+                    var actionComponent = arguments[1];
+                    if (actionComponent) {
+                        var actionComponentDef = actionComponent.getDef();
+                        if (actionComponentDef && syntheticStackFrame) {
+                            syntheticStackFrame += "@" + actionComponentDef.getDescriptor().toString() + "\n";
+                        }
+                    }
+                }
+
                 var errorWrapper = new $A.auraError("Error in $A.getCallback()", e);
                 errorWrapper.component = contextComponent;
+                if (syntheticStackFrame) {
+                    errorWrapper.setStackTrace(syntheticStackFrame + errorWrapper.stackTrace);
+                }
                 $A.lastKnownError = errorWrapper;
                 throw errorWrapper;
             }

@@ -482,7 +482,7 @@ Test.Aura.LoggerTest = function() {
         })(function() {
             Import("aura-impl/src/main/resources/aura/polyfill/stackframe.js");
             Import("aura-impl/src/main/resources/aura/polyfill/error-stack-parser.js");
-            Import("aura-impl/src/main/resources/aura/AuraError.js");
+            Import("aura-impl/src/main/resources/aura/error/AuraError.js");
             _StackFrame = StackFrame;
             _ErrorStackParser = ErrorStackParser;
             _AuraError = AuraError;

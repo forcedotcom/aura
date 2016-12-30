@@ -70,6 +70,14 @@
         </td>
     </tr>
     <tr>
+        <td>Error from Application Server Action Callback wrapped in $A.getCallback(): </td>
+        <td>
+          <ui:button label="Throw"
+                     press="{!c.throwErrorFromServerActionCallbackWrappedInGetCallback}"
+                     aura:id="errorFromServerActionCallbackWrappedInGetCallbackButton"/>
+        </td>
+    </tr>
+    <tr>
         <td>Error from CreateComponent Callback in Application: </td>
         <td>
           <ui:button label="Throw"

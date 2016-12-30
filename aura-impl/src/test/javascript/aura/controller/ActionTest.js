@@ -33,7 +33,7 @@ Test.Aura.Controller.ActionTest = function() {
         "AuraError":function(){}
     })(function() {
         [Import("aura-impl/src/main/resources/aura/controller/Action.js")]
-        [Import("aura-impl/src/main/resources/aura/AuraError.js")]
+        [Import("aura-impl/src/main/resources/aura/error/AuraError.js")]
     });
 
     var targetNextActionId = 123;

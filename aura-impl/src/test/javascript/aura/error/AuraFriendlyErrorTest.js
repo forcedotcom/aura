@@ -27,8 +27,8 @@ Test.Aura.AuraFriendlyErrorTest = function() {
     })(function() {
         Import("aura-impl/src/main/resources/aura/polyfill/stackframe.js");
         Import("aura-impl/src/main/resources/aura/polyfill/error-stack-parser.js");
-        Import("aura-impl/src/main/resources/aura/AuraError.js");
-        Import("aura-impl/src/main/resources/aura/AuraFriendlyError.js");
+        Import("aura-impl/src/main/resources/aura/error/AuraError.js");
+        Import("aura-impl/src/main/resources/aura/error/AuraFriendlyError.js");
         _StackFrame = StackFrame;
         _ErrorStackParser = ErrorStackParser;
         _AuraError = AuraError;

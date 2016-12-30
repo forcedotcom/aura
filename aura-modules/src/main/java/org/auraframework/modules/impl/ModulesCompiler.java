@@ -52,10 +52,14 @@ public class ModulesCompiler {
     // API:
 
     public Future<String> compile(File file) throws Exception {
+        return compile(file.getPath());
+    }
+
+    public Future<String> compile(String filePath) throws Exception {
 
         String SCRIPT = ""
                 + "const compiler = require('" + COMPILER_JS_PATH + "');"
-                + "const componentPath = '" + file.getPath() + "';"
+                + "const componentPath = '" + filePath + "';"
                 + "const promise = compiler.compile({ componentPath: componentPath });"
                 + "promise.then(onResultCallback).catch(onErrorCallback);";
         

@@ -20,32 +20,15 @@ import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
+import org.auraframework.def.module.ModuleDefRef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-/**
- * ModuleDef holds compiled code and serializes for client
- */
-public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDef {
+public class ModuleDefRefImpl extends DefinitionImpl<ModuleDef> implements ModuleDefRef {
 
-    private String path;
-    private String compiledCode;
-
-    public ModuleDefImpl(Builder builder) {
+    protected ModuleDefRefImpl(RefBuilderImpl<ModuleDef, ?> builder) {
         super(builder);
-        this.path = builder.path;
-        this.compiledCode = builder.compiledCode;
-    }
-
-    @Override
-    public String getCompiledCode() {
-        return compiledCode;
-    }
-
-    @Override
-    public String getPath() {
-        return path;
     }
 
     @Override
@@ -55,29 +38,19 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
 
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        // TODO MODULES: append dependencies
+        super.appendDependencies(dependencies);
+        dependencies.add(descriptor);
     }
 
-    public static final class Builder extends DefinitionImpl.BuilderImpl<ModuleDef> {
-
-        private String path;
-        private String compiledCode;
+    public static class Builder extends DefinitionImpl.RefBuilderImpl<ModuleDef, ModuleDefRef> {
 
         public Builder() {
             super(ModuleDef.class);
         }
 
-        public void setCompiledCode(String compiledCode) {
-            this.compiledCode = compiledCode;
-        }
-
-        public void setPath(String path) {
-            this.path = path;
-        }
-
         @Override
-        public ModuleDef build() throws QuickFixException {
-            return new ModuleDefImpl(this);
+        public ModuleDefRef build() throws QuickFixException {
+            return new ModuleDefRefImpl(this);
         }
     }
 }

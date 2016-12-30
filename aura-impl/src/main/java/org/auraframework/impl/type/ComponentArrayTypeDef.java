@@ -19,6 +19,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
+import org.auraframework.def.module.ModuleDefRef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.java.type.JavaValueProvider;
@@ -111,6 +112,8 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
                     components.add((BaseComponent<?, ?>) instanceService.getInstance((ComponentDefRef) defRef, valueProvider));
                     context.getInstanceStack().clearAttributeIndex(idx);
                     idx += 1;
+                } else if (defRef instanceof ModuleDefRef) {
+                    // TODO MODULE
                 } else {
                     throw new InvalidDefinitionException(String.format("Expected Component, received %s", defRef
                             .getClass().getName()), getLocation());

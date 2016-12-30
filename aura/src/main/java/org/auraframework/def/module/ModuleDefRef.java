@@ -18,15 +18,7 @@ package org.auraframework.def.module;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 
-/**
- * Module Definition
- */
-public interface ModuleDef extends Definition {
-
+public interface ModuleDefRef extends Definition {
     @Override
     DefDescriptor<ModuleDef> getDescriptor();
-
-    String getCompiledCode();
-
-    String getPath();
 }

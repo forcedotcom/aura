@@ -45,6 +45,7 @@ import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.def.module.ModuleDef;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.impl.util.TemplateUtil;
 import org.auraframework.instance.Action;
@@ -440,6 +441,9 @@ public class ServerServiceImpl implements ServerService {
         serializationService.writeCollection(controllers, ControllerDef.class, sb, "JSON");
         sb.append(");\n");
 
+        // TODO MODULE
+        Collection<ModuleDef> modules = filterAndLoad(ModuleDef.class, dependencies, null);
+
         return sb.toString();
     }
 
@@ -512,7 +516,7 @@ public class ServerServiceImpl implements ServerService {
     /**
      * Get a named string from the cache for a cacheable definition.
      *
-     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
+     * @param uid the UID for the definition (must have called {@link DefinitionService#getUid(String, DefDescriptor)}).
      * @param descriptor the descriptor.
      * @param key the key.
      * @param loader the loader for the string
@@ -527,7 +531,7 @@ public class ServerServiceImpl implements ServerService {
     /**
      * Get a named string from the alternate cache for a cacheable definition.
      *
-     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
+     * @param uid the UID for the definition (must have called {@link DefinitionService#getUid(String, DefDescriptor)}).
      * @param descriptor the descriptor.
      * @param key the key.
      * @param loader the loader for the string

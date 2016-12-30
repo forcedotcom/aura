@@ -181,4 +181,7 @@ public interface ConfigAdapter extends AuraAdapter {
      * @return whether to use one XHR to send each action (use with HTTP/2 only)
      */
     boolean getXHRExclusivity();
+
+    // TODO MODULES
+    boolean isModulesEnabled();
 }

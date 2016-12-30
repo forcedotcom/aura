@@ -30,6 +30,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.HelperDef;
@@ -43,6 +44,7 @@ import org.auraframework.def.ResourceDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.design.DesignDef;
+import org.auraframework.def.module.ModuleDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.css.util.Flavors;
@@ -51,6 +53,7 @@ import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.impl.root.component.BaseComponentDefImpl.Builder;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
+import org.auraframework.impl.root.parser.handler.module.ModuleDefRefHandler;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
@@ -102,7 +105,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             .build();
 
     private int innerCount = 0;
-    private final List<ComponentDefRef> body = Lists.newArrayList();
+    private final List<Definition> body = Lists.newArrayList();
     protected B builder;
 
     private ContextService contextService;
@@ -256,6 +259,16 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             tagError("Cannot use tag '%s' directly. Must be used inside '%s' in %s '%s'.",
                     this.getDefDescriptor(), tag, LocatorDefHandler.TAG, "%s", "%s");
         } else {
+
+            if (configAdapter.isModulesEnabled()) {
+                DefDescriptor<ModuleDef> moduleDefDescriptor = definitionService.getDefDescriptor(getTagName(), ModuleDef.class);
+                if (definitionService.exists(moduleDefDescriptor)) {
+                    body.add(new ModuleDefRefHandler<>(this, xmlReader, source, isInInternalNamespace,
+                            definitionService, configAdapter, definitionParserAdapter).getElement());
+                    return;
+                }
+            }
+
             // if it wasn't one of the above, it must be a defref, or an error
             ComponentDefRef cdr = getDefRefHandler(this).getElement();
             if (cdr.isFlavorable() || cdr.hasFlavorableChild()) {

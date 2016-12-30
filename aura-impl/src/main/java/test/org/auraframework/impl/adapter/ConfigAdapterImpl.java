@@ -877,4 +877,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public boolean getXHRExclusivity() {
         return false;
     }
+
+    @Override
+    public boolean isModulesEnabled() {
+        return Boolean.parseBoolean(System.getProperty("aura.modules"));
+    }
 }

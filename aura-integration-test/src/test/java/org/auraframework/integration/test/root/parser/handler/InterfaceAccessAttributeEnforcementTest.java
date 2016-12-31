@@ -308,6 +308,22 @@ public class InterfaceAccessAttributeEnforcementTest extends AuraImplTestCase {
         //Access to interface 'string:testinterface1' from namespace 'cstring' in 'markup://cstring:testcomponent2(COMPONENT)' is not allowed
         assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
     }
+    
+    @Test
+    public void testComponentWithCustomNamespaceImplementsInterfaceWithSystemNamespaceGlobal() throws QuickFixException {
+        //create interface with system namespace
+        String interfaceSource = "<aura:interface access='Global'/>";
+        DefDescriptor<? extends Definition> interfaceDescriptor = getAuraTestingUtil().addSourceAutoCleanup(InterfaceDef.class, interfaceSource,
+                StringSourceLoader.DEFAULT_NAMESPACE + ":testinterface",
+                        NamespaceAccess.INTERNAL);
+        //create component implements the interface, the component is in a custom namespace ( non-internal )
+        String source = "<aura:component implements='" + interfaceDescriptor.getNamespace() + ":" + interfaceDescriptor.getName() + "' /> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent",
+                        NamespaceAccess.CUSTOM);
+
+        definitionService.getDefinition(descriptor);
+    }
     @Test
     public void testComponentWithCustomNamespaceImplementsInterfaceWithPrivilegedNamespace() throws QuickFixException {
         //create interface with system namespace

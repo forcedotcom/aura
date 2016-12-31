@@ -47,14 +47,17 @@ function TestInstance() {
     this.installOverride();
     this.name = undefined;
     
-    this.testBootstrap = {};
-    this.testBootstrap['frameworkReadyWhenCreateTestInstance'] = false;
-    this.testBootstrap['frameworkJsReadyWhenCreateTestInstance'] = false;
-    if(window['Aura']) {
-    	this.testBootstrap['frameworkReadyWhenCreateTestInstance'] = true;
-    }
-    if(window['Aura'] && window['Aura']['frameworkJsReady']) {
-    	this.testBootstrap['frameworkJsReadyWhenCreateTestInstance'] = true;
+    //borrow Aura.time if it's there, if not, pollyfill 
+    this.time = 
+    	(window['Aura'] && Aura.time && Aura.time instanceof Function)?
+    	Aura.time:(
+    		(window.performance && window.performance.now) ? window.performance.now.bind(performance) : function(){return Date.now();}
+    	);  
+    //for debug use only
+    if(window.sessionStorage) {
+    	sessionStorage.setItem('frameworkReadyWhenCreateTestInstance', window['Aura']?true:false);
+    	sessionStorage.setItem('frameworkJsReadyWhenCreateTestInstance', (window['Aura'] && window['Aura']['frameworkJsReady'])?true:false);
+    	sessionStorage.setItem('timeStampOfTestInstanceCreation', this.time());
     }
 }
 

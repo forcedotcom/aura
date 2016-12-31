@@ -548,28 +548,40 @@ public class AuraTestFilter implements Filter {
             return;
         }
         
-
-        // TODO: Inject test framework here, before the test suite code, separately from framework code.
-        out.append(String.format(
-        		
-        "(function testBootstrap(suiteProps) { "
-        		//+ "throw 'from testBootstrap';\n\t\t "
-        		+ "window.$testBootstrapFunction$ || (window.$testBootstrapFunction$ = {});\n\t\t"
-        		+ "window.$testBootstrapFunction$['testBootstrapFunctionLoadingTime'] = window.performance && window.performance.now ? window.performance.now() : Date.now();"
-        		+ "if (!window.Aura || !window.Aura.frameworkJsReady || !(window.Aura.appBootstrapStatus === 'loaded') ) {"
-        			+ "window.Aura || (window.Aura = {});\n\t\t"
-        			+ "window.Aura.afterBootstrapReady = window.Aura.afterBootstrapReady || [];\n\t\t "
-        			+ "window.Aura.afterBootstrapReady.push(testBootstrap.bind(null, suiteProps));\n\t\t "
-        			+ "window.$testBootstrapFunction$['BootStrapReady']=false;\n\t\t"
-        			+ "} else {\n\t\t "
-        				+ "window.$A.test.$testBootstrap$ = window.$A.test.$testBootstrap$?window.$A.test.$testBootstrap$:{}; \n\t\t "
-            			+ "window.$A.test.$testBootstrap$['testBootstrapFunction']=' Framework ready, call $A.test.run for test:"+testName+" #'+ window.Aura.time(); \n\t\t "
-            			+ "$A.test.run('%s', suiteProps, '%s');\n\t"
-        				+ "}\n"
-        		+ "}(", 
-        testName,testTimeout));
-        out.append(suiteDef.getCode());
-        out.append("\n));"); // handle trailing single-line comments with newline
+        out.append(
+        		String.format(
+        			"var testBootstrapFunction = function(testName, suiteProps, testTimeout) { \n"+
+        					"if(!$A.test.isComplete()) {\n"+
+        						"if(window.sessionStorage) {\n"+
+        							"var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
+        							"sessionStorage.setItem('TestRunStatus',(oldStatus?oldStatus:'')+'Run '+testName+', timeStamp#'+$A.test.time()+'.'); \n"+
+        						"}\n"+
+        						"$A.test.run(testName, suiteProps, testTimeout); \n"+
+        					"} else {\n"+
+        						"if(window.sessionStorage) {\n"+
+        							"var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
+        							"sessionStorage.setItem('TestRunStatus',(oldStatus?oldStatus:'')+'Skip '+testName+', Test Already Complete, timeStamp#'+$A.test.time()+'.'); \n"+
+        						"}\n"+
+        					"}\n"+
+        			"}; \n"+
+        			"if(window && window.Aura && window.Aura.appBootstrapStatus === 'loaded' " +//bootstrap is finished
+        		         "&& window.$A && window.$A.test && window.$A.test.isComplete instanceof Function ) { \n"+//but the test wasn't
+        		         "if(window.sessionStorage) {\n"+
+								//"var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
+								"sessionStorage.setItem('TestRunStatus','Run %s directly, as bootstrap finish before we can push test to its run-after, timeStamp#'+$A.test.time()+'.'); \n"+
+						 "}\n"+
+						 "testBootstrapFunction('%s', %s, '%s'); \n"+
+        			"} else {\n"+
+	        			"if(window.sessionStorage) {\n"+
+							//"var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
+							"sessionStorage.setItem('TestRunStatus','Push %s to bootstrap run after, timeStamp#'+$A.test.time()+'.'); \n"+
+						"}\n"+
+						"window.Aura || (window.Aura = {}); \n"+
+	        			"window.Aura.afterBootstrapReady || (window.Aura.afterBootstrapReady = []); \n"+
+	        			"window.Aura.afterBootstrapReady.push(testBootstrapFunction.bind(this, '%s', %s, '%s')); \n"+
+        			"} \n"
+        			,testName, testName, suiteDef.getCode()+"\t\n", testTimeout, testName, testName, suiteDef.getCode()+"\t\n", testTimeout)
+        );
     }
 
     private DefDescriptor<?> getTargetDescriptor(HttpServletRequest request) {

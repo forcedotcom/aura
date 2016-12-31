@@ -366,18 +366,25 @@ TestInstance.prototype.startTimer = function() {
  * @export
  * @function Test#getDump
  */
-TestInstance.prototype.getDump = function() {
+TestInstance.prototype.getDump = function(clearSessionStorage) {
     try {
-    	var status = "From testBootstrap:\n";
-    	for(var it in this.testBootstrap) { status+=it+":"+this.testBootstrap[it]+"; "; }
-    	status += "\n";
+    	var status = '';
     	
-    	status += "From window.testBootstrapFunction\n";
-    	if(window && window.testBootstrapFunction) { 
-    		for(it in window.testBootstrapFunction) { status+=it+":"+window.testBootstrapFunction[it]+"; "; }
-    	}
-    	status += "\n";
-    	
+    	if(window.sessionStorage) {
+    		status += "From sessionStorage:\n";
+    		status+= 'frameworkReadyWhenCreateTestInstance:'+sessionStorage.getItem('frameworkReadyWhenCreateTestInstance')+';\n';
+    		status+= 'frameworkJsReadyWhenCreateTestInstance:'+sessionStorage.getItem('frameworkJsReadyWhenCreateTestInstance')+';\n';
+    		status+= 'timeStampOfTestInstanceCreation:'+sessionStorage.getItem('timeStampOfTestInstanceCreation')+';\n';
+    		status+= 'TestRunStatus:'+sessionStorage.getItem('TestRunStatus')+';\n';
+    		
+    		if(clearSessionStorage === true) {
+    			sessionStorage.removeItem('frameworkReadyWhenCreateTestInstance');
+    			sessionStorage.removeItem('frameworkJsReadyWhenCreateTestInstance');
+    			sessionStorage.removeItem('timeStampOfTestInstanceCreation');
+    			sessionStorage.removeItem('TestRunStatus');
+    		}
+    	}    	
+    	    	
     	if(!Aura) {
     		status += "Aura framework not ready !!!\n";
     	} else {
@@ -385,13 +392,13 @@ TestInstance.prototype.getDump = function() {
         		status += "Aura bootstrap info not available !!!\n";
         	} else {
         		status += "From Aura.bootstrap:\n";
-        		for(it in Aura["bootstrap"]) { status+=it+":"+Aura["bootstrap"][it]+"; "; }
+        		for(var it in Aura["bootstrap"]) { status+=it+":"+Aura["bootstrap"][it]+"; "; }
             	status += "\n";
         	}
     		if(Aura['afterBootstrapReady'] && Aura['afterBootstrapReady'] instanceof Array) {
     			status += "What's in Aura.afterBootstrapReady?\n";
     			for(var idx=0; idx < Aura['afterBootstrapReady'].length; idx++) {
-    				status += Aura['afterBootstrapReady'][idx];
+    				status += Aura['afterBootstrapReady'][idx] + '\n';
     			}
     			status += "\n";
     		}

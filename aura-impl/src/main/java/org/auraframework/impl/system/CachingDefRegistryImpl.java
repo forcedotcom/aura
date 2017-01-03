@@ -19,7 +19,6 @@ import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
 import org.auraframework.system.CacheableDefFactory;
 
 /**
@@ -30,6 +29,11 @@ public class CachingDefRegistryImpl extends NonCachingDefRegistryImpl {
     private static final long serialVersionUID = -1052118918311747954L;
 
     private final CacheableDefFactory<?> cacheableFactory;
+
+    public CachingDefRegistryImpl(CacheableDefFactory<?> factory, DefType defType, String prefix) {
+        super(factory, defType, prefix);
+        this.cacheableFactory = factory;
+    }
 
     public CachingDefRegistryImpl(CacheableDefFactory<?> factory, Set<DefType> defTypes, Set<String> prefixes) {
         super(factory, defTypes, prefixes);

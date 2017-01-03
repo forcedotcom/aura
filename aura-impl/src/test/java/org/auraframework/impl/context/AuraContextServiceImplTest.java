@@ -62,7 +62,7 @@ public class AuraContextServiceImplTest extends AuraImplTestCase {
     public void testStartLiteContext() throws Exception {
     	Map<String, GlobalValueProvider> emptyGVP = new HashMap<>();
     	ContextService contextServiceMocked = PowerMockito.spy(contextService);
-    	contextServiceMocked.startContext(Mode.DEV, null, Format.JSON, Authentication.AUTHENTICATED, emptyGVP, null);
+    	contextServiceMocked.startContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED, emptyGVP, null);
     	assertTrue(contextServiceMocked.isEstablished());
     	assertNotNull(contextServiceMocked.getCurrentContext());
     	

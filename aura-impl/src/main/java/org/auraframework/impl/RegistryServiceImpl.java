@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.context;
+package org.auraframework.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,8 +22,10 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,11 +37,9 @@ import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
-import org.auraframework.def.RendererDef;
 import org.auraframework.impl.compound.controller.CompoundControllerDefFactory;
 import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
 import org.auraframework.impl.java.controller.JavaControllerDefFactory;
@@ -56,13 +56,17 @@ import org.auraframework.impl.source.resource.ResourceSourceLoader;
 import org.auraframework.impl.system.CacheableDefFactoryImpl;
 import org.auraframework.impl.system.CachingDefRegistryImpl;
 import org.auraframework.impl.system.CompilingDefRegistry;
+import org.auraframework.impl.system.NonCachingDefRegistryImpl;
 import org.auraframework.impl.system.PassThroughDefRegistry;
+import org.auraframework.impl.system.RegistryTrie;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.service.RegistryService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.system.RegistrySet;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -72,23 +76,25 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 @ServiceComponent
-public class AuraRegistryProviderImpl extends AbstractRegistryAdapterImpl implements SourceListener {
-    @Inject
+public class RegistryServiceImpl implements RegistryService, SourceListener {
     private FileMonitor fileMonitor;
 
-    @Inject
     private DefinitionService definitionService;
 
-    @Inject
     private ConfigAdapter configAdapter;
 
-    @Inject
     private ParserFactory parserFactory;
 
     @Inject
+    private Optional<Collection<RegistryAdapter>> adaptersInject;
+
+    private Collection<RegistryAdapter> adapters;
+
     private List<ComponentLocationAdapter> locationAdapters;
 
-    private static final Logger _log = Logger.getLogger(RegistryAdapter.class);
+    private static final Logger _log = Logger.getLogger(RegistryService.class);
+
+    private ConcurrentHashMap<ComponentLocationAdapter, SourceLocationInfo> locationMap = new ConcurrentHashMap<>();
 
     private static final Set<String> markupPrefixes = ImmutableSet.of(
             DefDescriptor.MARKUP_PREFIX,
@@ -156,6 +162,11 @@ public class AuraRegistryProviderImpl extends AbstractRegistryAdapterImpl implem
         if (fileMonitor != null) {
             fileMonitor.subscribeToChangeNotification(this);
         }
+        if (adaptersInject.isPresent()) {
+            adapters = adaptersInject.get();
+        } else if (adapters == null) {
+            adapters = Lists.newArrayList();
+        }
     }
 
     /**
@@ -201,7 +212,7 @@ public class AuraRegistryProviderImpl extends AbstractRegistryAdapterImpl implem
                 if (o instanceof List) {
                     @SuppressWarnings("unchecked")
                     List<DefRegistry> l = (List<DefRegistry>)o;
-                    return l.toArray(new DefRegistry [l.size()]);
+                    return l.toArray(new DefRegistry[l.size()]);
                 }
                 return (DefRegistry[]) ois.readObject();
             } catch (Exception e) {
@@ -290,8 +301,6 @@ public class AuraRegistryProviderImpl extends AbstractRegistryAdapterImpl implem
         return new SourceLocationInfo(staticRegs, canonical, markupRegistries, javaLoaders);
     }
 
-    private ConcurrentHashMap<ComponentLocationAdapter, SourceLocationInfo> locationMap = new ConcurrentHashMap<>();
-
     private SourceLocationInfo getSourceLocationInfo(ComponentLocationAdapter location) {
         SourceLocationInfo sli = locationMap.get(location);
         if (sli != null) {
@@ -302,66 +311,83 @@ public class AuraRegistryProviderImpl extends AbstractRegistryAdapterImpl implem
         return sli;
     }
 
-    @Override
-    public DefRegistry[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders) {
-        DefRegistry[] ret;
+    /**
+     * Get the component location adapter registries.
+     */
+    private List<DefRegistry> getCLARegistries() {
+        Collection<ComponentLocationAdapter> markupLocations = getAllComponentLocationAdapters();
+        List<SourceLoader> markupLoaders = Lists.newArrayList();
+        List<SourceLoader> javaLoaders = Lists.newArrayList();
+        List<DefRegistry> regBuild = Lists.newArrayList();
 
-            Collection<ComponentLocationAdapter> markupLocations = getAllComponentLocationAdapters();
-            List<SourceLoader> markupLoaders = Lists.newArrayList();
-            List<SourceLoader> javaLoaders = Lists.newArrayList();
-            List<DefRegistry> regBuild = Lists.newArrayList();
-
-            regBuild.add(AuraStaticTypeDefRegistry.INSTANCE);
-            regBuild.add(AuraStaticControllerDefRegistry.getInstance(definitionService));
-            for (ComponentLocationAdapter location : markupLocations) {
-                if (location != null) {
-                    SourceLocationInfo sli = getSourceLocationInfo(location);
-                    if (!sli.isChanged() && sli.staticLocationRegistries != null) {
-                        regBuild.addAll(sli.staticLocationRegistries);
-                    } else {
-                    regBuild.addAll(sli.markupRegistries);
-                        javaLoaders.addAll(sli.javaSourceLoaders);
-                    }
+        regBuild.add(AuraStaticTypeDefRegistry.INSTANCE);
+        regBuild.add(AuraStaticControllerDefRegistry.getInstance(definitionService));
+        for (ComponentLocationAdapter location : markupLocations) {
+            if (location != null) {
+                SourceLocationInfo sli = getSourceLocationInfo(location);
+                if (!sli.isChanged() && sli.staticLocationRegistries != null) {
+                    regBuild.addAll(sli.staticLocationRegistries);
+                } else {
+                regBuild.addAll(sli.markupRegistries);
+                    javaLoaders.addAll(sli.javaSourceLoaders);
                 }
             }
+        }
 
-            if (extraLoaders != null) {
-                markupLoaders.addAll(extraLoaders);
-                javaLoaders.addAll(extraLoaders);
-            }
+        if (markupLoaders.size() > 0) {
+            SourceFactory markupSourceFactory = new SourceFactory(markupLoaders, configAdapter);
+            CacheableDefFactoryImpl<Definition> factory = new CacheableDefFactoryImpl<>(markupSourceFactory, parserFactory);
+            regBuild.add(new CachingDefRegistryImpl(factory, markupDefTypes, markupPrefixes));
+        }
 
-            if (markupLoaders.size() > 0) {
-                SourceFactory markupSourceFactory = new SourceFactory(markupLoaders, configAdapter);
-                CacheableDefFactoryImpl<Definition> factory = new CacheableDefFactoryImpl<>(markupSourceFactory, parserFactory);
-                regBuild.add(new CachingDefRegistryImpl(factory, markupDefTypes, markupPrefixes));
-            }
+        regBuild.add(new NonCachingDefRegistryImpl(new CompoundControllerDefFactory(),
+                DefType.CONTROLLER, DefDescriptor.COMPOUND_PREFIX));
 
-            regBuild.add(AuraRegistryProviderImpl.<ControllerDef>createDefRegistry(new CompoundControllerDefFactory(),
-                    DefType.CONTROLLER, DefDescriptor.COMPOUND_PREFIX));
-
-            if (javaLoaders.size() > 0) {
-                regBuild.add(AuraRegistryProviderImpl.<ControllerDef>createDefRegistry(
-                        new JavaControllerDefFactory(javaLoaders, definitionService),
-                        DefType.CONTROLLER, DefDescriptor.JAVA_PREFIX));
-                regBuild.add(AuraRegistryProviderImpl.<RendererDef>createDefRegistry(
-                        new JavaRendererDefFactory(javaLoaders), DefType.RENDERER, DefDescriptor.JAVA_PREFIX));
-                regBuild.add(createDefRegistry(new JavaTypeDefFactory(javaLoaders),
-                        DefType.TYPE, DefDescriptor.JAVA_PREFIX));
-                regBuild.add(createDefRegistry(new JavaModelDefFactory(javaLoaders),
-                        DefType.MODEL, DefDescriptor.JAVA_PREFIX));
-                regBuild.add(createDefRegistry(new JavaProviderDefFactory(javaLoaders), DefType.PROVIDER,
-                        DefDescriptor.JAVA_PREFIX));
-                regBuild.add(createDefRegistry(new JavaTokenDescriptorProviderDefFactory(javaLoaders),
-                        DefType.TOKEN_DESCRIPTOR_PROVIDER, DefDescriptor.JAVA_PREFIX));
-                regBuild.add(createDefRegistry(new JavaTokenMapProviderDefFactory(javaLoaders),
-                        DefType.TOKEN_MAP_PROVIDER, DefDescriptor.JAVA_PREFIX));
-            }
-
-            ret = regBuild.toArray(new DefRegistry[regBuild.size()]);
-        return ret;
+        // Gah! this is stupid.
+        if (javaLoaders.size() > 0) {
+            regBuild.add(new CachingDefRegistryImpl(
+                    new JavaControllerDefFactory(javaLoaders, definitionService),
+                    DefType.CONTROLLER, DefDescriptor.JAVA_PREFIX));
+            regBuild.add(new CachingDefRegistryImpl(
+                    new JavaRendererDefFactory(javaLoaders), DefType.RENDERER, DefDescriptor.JAVA_PREFIX));
+            regBuild.add(new CachingDefRegistryImpl(new JavaTypeDefFactory(javaLoaders),
+                    DefType.TYPE, DefDescriptor.JAVA_PREFIX));
+            regBuild.add(new CachingDefRegistryImpl(new JavaModelDefFactory(javaLoaders),
+                    DefType.MODEL, DefDescriptor.JAVA_PREFIX));
+            regBuild.add(new CachingDefRegistryImpl(new JavaProviderDefFactory(javaLoaders), DefType.PROVIDER,
+                    DefDescriptor.JAVA_PREFIX));
+            regBuild.add(new CachingDefRegistryImpl(new JavaTokenDescriptorProviderDefFactory(javaLoaders),
+                    DefType.TOKEN_DESCRIPTOR_PROVIDER, DefDescriptor.JAVA_PREFIX));
+            regBuild.add(new CachingDefRegistryImpl(new JavaTokenMapProviderDefFactory(javaLoaders),
+                    DefType.TOKEN_MAP_PROVIDER, DefDescriptor.JAVA_PREFIX));
+        }
+        return regBuild;
     }
 
-    protected Collection<ComponentLocationAdapter> getAllComponentLocationAdapters() {
+    @Override
+    public RegistrySet getDefaultRegistrySet(Mode mode, Authentication access) {
+        List<DefRegistry> registries = getCLARegistries();
+        for (RegistryAdapter adapter : adapters) {
+            DefRegistry[] provided = adapter.getRegistries(mode, access, null);
+            if (registries != null) {
+                Collections.addAll(registries, provided);
+            }
+        }
+        return new RegistryTrie(registries);
+    }
+
+
+    @Override
+    public RegistrySet getRegistrySet(DefRegistry registry) {
+        return new RegistryTrie(Lists.newArrayList(registry));
+    }
+
+    @Override
+    public RegistrySet getRegistrySet(Collection<DefRegistry> registries) {
+        return new RegistryTrie(registries);
+    }
+
+    private  Collection<ComponentLocationAdapter> getAllComponentLocationAdapters() {
         List<ComponentLocationAdapter> ret = Lists.newArrayList();
         //ret.addAll(ServiceLocator.get().getAll(ComponentLocationAdapter.class));
         ret.addAll(locationAdapters);
@@ -393,4 +419,94 @@ public class AuraRegistryProviderImpl extends AbstractRegistryAdapterImpl implem
             }
         }
     }
+
+    /**
+     * @return the fileMonitor
+     */
+    public FileMonitor getFileMonitor() {
+        return fileMonitor;
+    }
+
+    /**
+     * @param fileMonitor the fileMonitor to set
+     */
+    @Inject
+    public void setFileMonitor(FileMonitor fileMonitor) {
+        this.fileMonitor = fileMonitor;
+    }
+
+    /**
+     * @return the definitionService
+     */
+    public DefinitionService getDefinitionService() {
+        return definitionService;
+    }
+
+    /**
+     * @param definitionService the definitionService to set
+     */
+    @Inject
+    public void setDefinitionService(DefinitionService definitionService) {
+        this.definitionService = definitionService;
+    }
+
+    /**
+     * @return the configAdapter
+     */
+    public ConfigAdapter getConfigAdapter() {
+        return configAdapter;
+    }
+
+    /**
+     * @param configAdapter the configAdapter to set
+     */
+    @Inject
+    public void setConfigAdapter(ConfigAdapter configAdapter) {
+        this.configAdapter = configAdapter;
+    }
+
+    /**
+     * @return the parserFactory
+     */
+    public ParserFactory getParserFactory() {
+        return parserFactory;
+    }
+
+    /**
+     * @param parserFactory the parserFactory to set
+     */
+    @Inject
+    public void setParserFactory(ParserFactory parserFactory) {
+        this.parserFactory = parserFactory;
+    }
+
+    /**
+     * @return the adapters
+     */
+    public Collection<RegistryAdapter> getAdapters() {
+        return adapters;
+    }
+
+    /**
+     * @param adapters the adapters to set
+     */
+    public void setAdapters(Collection<RegistryAdapter> adapters) {
+        this.adapters = adapters;
+    }
+
+    /**
+     * @return the locationAdapters
+     */
+    public List<ComponentLocationAdapter> getLocationAdapters() {
+        return locationAdapters;
+    }
+
+    /**
+     * @param locationAdapters the locationAdapters to set
+     */
+    @Inject
+    public void setLocationAdapters(List<ComponentLocationAdapter> locationAdapters) {
+        this.locationAdapters = locationAdapters;
+    }
+
 }

@@ -16,7 +16,6 @@
 package org.auraframework.service;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
@@ -26,8 +25,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.SourceLoader;
-import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -48,33 +45,22 @@ public interface ContextService extends AuraService {
     AuraContext startContext(Mode mode, Format format, Authentication access, DefDescriptor<? extends BaseComponentDef> appDesc);
 
     /**
-     * Start a AuraContext and include these extra source loaders
-     * 
-     * @throws QuickFixException
-     */
-    AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Authentication access,
-            DefDescriptor<? extends BaseComponentDef> appDesc) throws QuickFixException;
-
-    /**
      * Start a AuraContext with the given Mode, Format, and Access
      */
     AuraContext startContext(Mode mode, Format format, Authentication access);
 
     /**
-     * Start a AuraContext and include these extra source loaders
-     * 
-     * @throws QuickFixException
-     */
-    AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Authentication access)
-            throws QuickFixException;
-
-    /**
      * Start a AuraContext with the given Mode, SourceLoaders, Format, and Access, GlobalValueProviders, Descriptor
      */
-    AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Authentication access,
+    AuraContext startContext(Mode mode, Format format, Authentication access,
                              Map<String, GlobalValueProvider> globalValueProviders,
                              DefDescriptor<? extends BaseComponentDef> appDesc);
 
+    /**
+     * Start a minimal aura context (no global value providers).
+     */
+    AuraContext startContextNoGVP(Mode mode, Format format, Authentication access,
+                                 DefDescriptor<? extends BaseComponentDef> appDesc);
     /**
      * Close the current AuraContext, no matter which type it is.
      */

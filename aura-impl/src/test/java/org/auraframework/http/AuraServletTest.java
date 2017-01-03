@@ -129,7 +129,7 @@ public class AuraServletTest extends UnitTestCase {
     public void testDoPost_CoosBeforeQFE() throws Exception {
         DefDescriptor<ApplicationDef> applicationDescriptor = Mockito.mock(DefDescriptor.class);
         Mockito.when(applicationDescriptor.getDefType()).thenReturn(DefDescriptor.DefType.APPLICATION);
-    	contextService.startContext(Mode.PROD, null, Format.JSON, Authentication.AUTHENTICATED, applicationDescriptor);
+    	contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, applicationDescriptor);
         
         AuraContext auracontext = contextService.getCurrentContext();
         

@@ -296,18 +296,16 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     @Test
     public void testIsCacheableWithNullDescriptor() {//null descriptor
     	ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), localizationAdapter, instanceService, contextService, fileMonitor);
-    	@SuppressWarnings("rawtypes")
-		DefRegistry mockReg = mock(DefRegistry.class);
+        DefRegistry mockReg = mock(DefRegistry.class);
     	assertFalse(impl.isCacheable(mockReg, null));
     }
     
     @Test
     public void testIsCacheableWithCacheDependencyExceptionsDescriptor() {//special rules for apex
     	ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), localizationAdapter, instanceService, contextService, fileMonitor);
+        DefRegistry mockRegistry = mock(DefRegistry.class);
     	@SuppressWarnings("rawtypes")
-		DefRegistry mockRegistry = mock(DefRegistry.class);
-    	@SuppressWarnings("rawtypes")
-		DefDescriptor mockDescriptor = mock(DefDescriptor.class);
+        DefDescriptor mockDescriptor = mock(DefDescriptor.class);
     	when(mockDescriptor.getQualifiedName()).thenReturn("apex://applauncher.appmenu");
     	
     	assertTrue(impl.isCacheable(mockRegistry, mockDescriptor));
@@ -316,10 +314,9 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     @Test
     public void testIsCacheableWithNullNamespaceNullPrefix() {//when namespace is null, prefix is not null, not cacheable
     	ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), localizationAdapter, instanceService, contextService, fileMonitor);
+        DefRegistry mockRegistry = mock(DefRegistry.class);
     	@SuppressWarnings("rawtypes")
-		DefRegistry mockRegistry = mock(DefRegistry.class);
-    	@SuppressWarnings("rawtypes")
-		DefDescriptor mockDescriptor = mock(DefDescriptor.class);
+        DefDescriptor mockDescriptor = mock(DefDescriptor.class);
     	when(mockDescriptor.getQualifiedName()).thenReturn("java://testNs:testName");
     	when(mockDescriptor.getPrefix()).thenReturn(null);
     	when(mockDescriptor.getNamespace()).thenReturn(null);
@@ -331,10 +328,9 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     @Test
     public void testIsCacheableWithNullNamespaceValidPrefix() {//when namespace is null, prefix is not null, it's up to registry
     	ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), localizationAdapter, instanceService, contextService, fileMonitor);
+        DefRegistry mockRegistry = mock(DefRegistry.class);
     	@SuppressWarnings("rawtypes")
-		DefRegistry mockRegistry = mock(DefRegistry.class);
-    	@SuppressWarnings("rawtypes")
-		DefDescriptor mockDescriptor = mock(DefDescriptor.class);
+        DefDescriptor mockDescriptor = mock(DefDescriptor.class);
     	when(mockDescriptor.getQualifiedName()).thenReturn("java://testNs:testName");
     	when(mockDescriptor.getPrefix()).thenReturn("prefix");
     	when(mockDescriptor.getNamespace()).thenReturn(null);
@@ -346,10 +342,9 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     @Test
     public void testIsCacheableWithNullNamespaceCompoundPrefix() {//when namespace is null, prefix is compound, it's cachable
     	ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), localizationAdapter, instanceService, contextService, fileMonitor);
+        DefRegistry mockRegistry = mock(DefRegistry.class);
     	@SuppressWarnings("rawtypes")
-		DefRegistry mockRegistry = mock(DefRegistry.class);
-    	@SuppressWarnings("rawtypes")
-		DefDescriptor mockDescriptor = mock(DefDescriptor.class);
+        DefDescriptor mockDescriptor = mock(DefDescriptor.class);
     	when(mockDescriptor.getQualifiedName()).thenReturn("prefix://testNs.testName");
     	when(mockDescriptor.getPrefix()).thenReturn("compound");
     	when(mockDescriptor.getNamespace()).thenReturn(null);
@@ -361,10 +356,9 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     @Test
     public void testIsCacheableWithNullPrefixInternalNamespace() {//when prefix is null, namespace is not, it's up to namespace
     	ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), localizationAdapter, instanceService, contextService, fileMonitor);
+        DefRegistry mockRegistry = mock(DefRegistry.class);
     	@SuppressWarnings("rawtypes")
-		DefRegistry mockRegistry = mock(DefRegistry.class);
-    	@SuppressWarnings("rawtypes")
-		DefDescriptor mockDescriptor = mock(DefDescriptor.class);
+        DefDescriptor mockDescriptor = mock(DefDescriptor.class);
     	when(mockDescriptor.getQualifiedName()).thenReturn("prefix://testNs.testName");
     	when(mockDescriptor.getPrefix()).thenReturn(null);
     	when(mockDescriptor.getNamespace()).thenReturn("testNs");
@@ -377,10 +371,9 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     @Test
     public void testIsCacheableWithInternalNamespaceValidPrefix() {//when both prefix and namespace are not null, either of them is cacheable
     	ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), localizationAdapter, instanceService, contextService, fileMonitor);
+        DefRegistry mockRegistry = mock(DefRegistry.class);
     	@SuppressWarnings("rawtypes")
-		DefRegistry mockRegistry = mock(DefRegistry.class);
-    	@SuppressWarnings("rawtypes")
-		DefDescriptor mockDescriptor = mock(DefDescriptor.class);
+        DefDescriptor mockDescriptor = mock(DefDescriptor.class);
     	when(mockDescriptor.getPrefix()).thenReturn("java");//java, aura or compound are cachable
     	when(mockDescriptor.getNamespace()).thenReturn("testNs");//not internal
     	when(mockDescriptor.getQualifiedName()).thenReturn("java://testNs:testName");

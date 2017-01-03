@@ -337,11 +337,7 @@ public class RegistrySerializer {
             throw new RegistrySerializerException("Unable to create "+outputFile, fnfe);
         }
         try {
-            try {
-                Aura.getContextService().startContext(Mode.DEV, null, Format.JSON, Authentication.AUTHENTICATED, null);
-            } catch (QuickFixException qfe) {
-                throw new RegistrySerializerException("problem creating context "+qfe);
-            }
+            Aura.getContextService().startContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED, null);
             try {
                 write(namespaces, out);
             } finally {

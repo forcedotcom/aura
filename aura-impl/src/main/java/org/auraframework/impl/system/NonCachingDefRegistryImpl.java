@@ -25,6 +25,8 @@ import org.auraframework.system.DefFactory;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.collect.Sets;
+
 /**
  * Doesn't do any caching at all.
  * 
@@ -35,6 +37,10 @@ public class NonCachingDefRegistryImpl extends DefRegistryImpl {
     private static final long serialVersionUID = 5781588775451737960L;
     private final DefFactory<?> factory;
     private String name;
+
+    public NonCachingDefRegistryImpl(DefFactory<?> factory, DefType defType, String prefix) {
+        this(factory, Sets.newHashSet(defType), Sets.newHashSet(prefix), null);
+    }
 
     public NonCachingDefRegistryImpl(DefFactory<?> factory, Set<DefType> defTypes, Set<String> prefixes) {
         this(factory, defTypes, prefixes, null);

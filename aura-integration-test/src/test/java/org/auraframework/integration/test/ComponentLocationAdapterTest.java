@@ -13,33 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.context;
+package org.auraframework.integration.test;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
 
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
-import javax.inject.Inject;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
-public class AuraRegistryProviderImplTest extends AuraImplTestCase {
+public class ComponentLocationAdapterTest extends AuraImplTestCase {
     @Inject
-    private AuraRegistryProviderImpl auraRegistryProviderImpl;
-    
-    // Stop running the test in SFDC integration build. The test includes all component location
-    // adapters. It's often broke by other teams.
+    private List<ComponentLocationAdapter> locationAdapters;
+
+    // FIXME: can we make this a precheckin test?
     @UnAdaptableTest("Prevent this test running with SFDC integration build. W-2820492")
     @Test
-    public void testAllRegistries() throws Exception {
-        Collection<ComponentLocationAdapter> markupLocations;
+    public void testAllLocations() throws Exception {
         List<File> broken = new ArrayList<>();
 
-        markupLocations = auraRegistryProviderImpl.getAllComponentLocationAdapters();
-        for (ComponentLocationAdapter location : markupLocations) {
+        for (ComponentLocationAdapter location : locationAdapters) {
             if (location != null) {
                 File file = location.getComponentSourceDir();
                 if (file != null && (!file.canRead() || !file.canExecute() || !file.isDirectory())) {

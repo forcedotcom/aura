@@ -48,7 +48,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
     public void setUp() throws Exception {
         super.setUp();
         // Establish a PROD context
-        contextService.startContext(Mode.PROD, null, Format.JSON, Authentication.UNAUTHENTICATED, laxSecurityApp);
+        contextService.startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED, laxSecurityApp);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         // Have to stop and start context because a given def is cached in MasterDefRegistry per request (context of the
         // request)
         contextService.endContext();
-        contextService.startContext(Mode.PROD, null, Format.JSON, Authentication.AUTHENTICATED);
+        contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
 
         StringSource<?> source = (StringSource<?>) getSource(dd);
         source.addOrUpdate(String.format(markup, "<aura:attribute type=\"String\" name=\"attr\"/>"));
@@ -128,7 +128,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         // Have to stop and start context because a given def is cached in MasterDefRegistry per request (context of the
         // request)
         contextService.endContext();
-        contextService.startContext(Mode.PROD, null, Format.JSON, Authentication.UNAUTHENTICATED, laxSecurityApp);
+        contextService.startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED, laxSecurityApp);
         StringSource<?> source = (StringSource<?>) getSource(dd);
         source.addOrUpdate(String.format(markup, "<aura:attribute type=\"String\" name=\"attr\"/>"));
         source.setLastModified(startTimeStamp + 5);

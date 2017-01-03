@@ -15,8 +15,8 @@
  */
 package org.auraframework.impl.system;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +33,7 @@ import org.auraframework.system.DefRegistry;
 import org.auraframework.system.RegistrySet;
 import org.auraframework.throwable.AuraError;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -41,7 +42,7 @@ import com.google.common.collect.Sets;
  */
 public class RegistryTrie implements RegistrySet {
 
-    private final DefRegistry[] allRegistries;
+    private final Collection<DefRegistry> allRegistries;
     private final Set<String> allNamespaces = new HashSet<>();
     // a map of map of maps
     private final HashMap<String,Object> root = Maps.newHashMap();
@@ -125,14 +126,19 @@ public class RegistryTrie implements RegistrySet {
         allNamespaces.remove("*");
     }
 
-    public RegistryTrie(@Nonnull DefRegistry... registries) {
-        allRegistries = registries;
+    public RegistryTrie(Collection<DefRegistry> registries) {
+        allRegistries = Collections.unmodifiableCollection(registries);
         initializeHashes();
+    }
+
+    @Deprecated
+    public RegistryTrie(@Nonnull DefRegistry... registries) {
+        this(Lists.newArrayList(registries));
     }
 
     @Override
     public Collection<DefRegistry> getAllRegistries() {
-        return Arrays.asList(allRegistries);
+        return allRegistries;
     }
 
     /**

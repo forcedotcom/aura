@@ -508,7 +508,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 top == null ? null : top.getQualifiedName(), req);
 
         if (csp != null) {
-            rsp.setHeader(CSP.Header.SECURE, csp.getCspHeaderValue());
+            rsp.addHeader(CSP.Header.SECURE, csp.getCspHeaderValue());
             Collection<String> terms = csp.getFrameAncestors();
             if (terms != null) {
                 // not open to the world; figure whether we can express an X-FRAME-OPTIONS header:

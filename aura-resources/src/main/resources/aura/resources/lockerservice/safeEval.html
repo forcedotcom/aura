@@ -48,15 +48,20 @@
       }
 
       function evalAndReturn(src) {
-          var script = document.createElement('script');
-          script.type = 'text/javascript';
-          window[hookFn] = undefined;
-          script.appendChild(document.createTextNode(src));
-          placeholder.appendChild(script);
-          placeholder.removeChild(script);
-          var result = window[hookFn];
-          window[hookFn] = undefined;
-          return result;
+          var tmp =  window[hookFn];
+          try{
+              var script = document.createElement('script');
+              script.type = 'text/javascript';
+              window[hookFn] = undefined;
+              script.appendChild(document.createTextNode(src));
+              placeholder.appendChild(script);
+              placeholder.removeChild(script);
+          }
+          finally{
+              var result = window[hookFn];
+              window[hookFn] = tmp;
+              return result;
+          }
       }
 
       // adding non-configurable hooks into parent window.

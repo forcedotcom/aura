@@ -284,6 +284,10 @@ AuraClientService.CONSECUTIVE_RELOAD_COUNTER_KEY = "__RELOAD_COUNT";
  */
 AuraClientService.prototype.setQueueSize = function(queueSize) {
     var auraXHR;
+    if (queueSize === undefined) {
+        // use default value if config doesn't specify it, i.e. lightning out
+        queueSize = 4;
+    }
     if (queueSize < 2) {
         throw new $A.auraError("number of XHRs must be at least 2, is " + queueSize, null, $A.severity.QUIET);
     }
@@ -302,6 +306,10 @@ AuraClientService.prototype.setQueueSize = function(queueSize) {
  * @private
  */
 AuraClientService.prototype.setXHRExclusivity = function(xhrExclusivity) {
+    if (xhrExclusivity === undefined) {
+        // use default value if config doesn't specify it, i.e. lightning out
+        xhrExclusivity = false;
+    }
     this.xhrExclusivity = xhrExclusivity;
 };
 

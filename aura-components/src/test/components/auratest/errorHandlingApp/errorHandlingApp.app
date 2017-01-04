@@ -45,6 +45,9 @@
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler event="aura:systemError" action="{!c.handleSystemError}"/>
 
+    <aura:registerEvent name="testEvt" type="auratest:testEvent"/>
+    <aura:handler name="testEvt" action="{!c.nonExistingHandler}"/>
+
     <aura:method name="throwErrorFromClientController"
                  action="{!c.throwErrorFromClientController}"/>
     <aura:method name="throwErrorFromServerActionCallback"
@@ -152,6 +155,14 @@
                      press="{!c.throwErrorFromInvalidComponent}"
                      class="errorFromInvalidComponentButton"
                      aura:id="errorFromInvalidComponentButton"/>
+        </td>
+    </tr>
+    <tr>
+        <td>Fire Test Event: </td>
+        <td>
+          <ui:button label="Fire"
+                     press="{!c.fireTestEvent}"
+                     aura:id="fireTestEventButton"/>
         </td>
     </tr>
     </table>

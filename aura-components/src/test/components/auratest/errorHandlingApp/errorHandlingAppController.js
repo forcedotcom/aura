@@ -121,6 +121,10 @@
             });
     },
 
+    fireTestEvent: function(cmp) {
+        cmp.get("e.testEvt").fire();
+    },
+
     doServerAction: function(cmp) {
         var action = cmp.get("c.doSomething");
         action.setCallback(this, function() {

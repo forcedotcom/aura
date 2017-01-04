@@ -207,6 +207,22 @@
         ]
     },
 
+    testFailingDescriptorForNonExistingEventHandlerError: {
+        test: [
+            function(cmp) {
+                $A.test.expectAuraError("Unable to find 'nonExistingHandler'");
+                $A.test.clickOrTouch(cmp.find("fireTestEventButton").getElement());
+                this.waitForErrorModal();
+            },
+            function(cmp) {
+                var actual = this.findFailingDescriptorFromErrorModal();
+                var expected = cmp.getDef().getDescriptor().getQualifiedName();
+
+                $A.test.assertEquals(expected, actual);
+            }
+        ]
+    },
+
     waitForErrorModal: function(callback) {
         $A.test.addWaitForWithFailureMessage(true,
             function(){

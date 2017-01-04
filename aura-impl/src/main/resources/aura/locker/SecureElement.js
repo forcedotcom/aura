@@ -61,7 +61,7 @@ function isValidAttributeName(raw, name, prototype, caseInsensitiveAttributes) {
 
     // Special case Label element's 'for' attribute. It called 'htmlFor' on prototype but
     // needs to be addressable as 'for' via accessors like .attributes/getAttribute()/setAtribute()
-    if("LABEL" === raw.tagName && "for" === name.toLowerCase()){
+    if(raw.tagName === "LABEL"  && name.toLowerCase() === "for"){
         return true;
     }
 

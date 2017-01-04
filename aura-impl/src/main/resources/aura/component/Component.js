@@ -1556,10 +1556,10 @@ Component.prototype.getEvent = function(name) {
     }
     if (!$A.clientService.allowAccess(eventDef,this)) {
         var context=$A.getContext();
-        var contextCmp = context && context.getCurrentAccess()+"";
+        var contextCmp = context && context.getCurrentAccess();
         var message="Access Check Failed! Component.getEvent():'" + name + "' of component '" + this + "' is not visible to '" + contextCmp + "'.";
         var ae = new $A.auraError(message);
-        ae.component = contextCmp;
+        ae.component = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
         if(context.enableAccessChecks) {
             if(context.logAccessFailures){
                 $A.error(null, ae);
@@ -2051,10 +2051,10 @@ Component.prototype.setupSuper = function(configAttributes) {
                     var facetDef = AttributeSet.getDef(facets[i]["descriptor"], this.componentDef);
                     if (!$A.clientService.allowAccess(facetDef[0], facetDef[1])) {
                         var context=$A.getContext();
-                        var contextCmp = context && context.getCurrentAccess()+"";
+                        var contextCmp = context && context.getCurrentAccess();
                         var message="Access Check Failed! Component.setupSuper():'" + facets[i]["descriptor"] + "' of component '" + this + "' is not visible to '" + contextCmp + "'.";
                         var ae = new $A.auraError(message);
-                        ae.component = contextCmp;
+                        ae.component = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
                         if(context.enableAccessChecks) {
                             if(context.logAccessFailures){
                                 $A.error(null, ae);
@@ -2151,10 +2151,10 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
             var def=AttributeSet.getDef(attribute,cmp.getDef());
             if(!$A.clientService.allowAccess(def[0],def[1])) {
                 var context=$A.getContext();
-                var contextCmp = context && context.getCurrentAccess()+"";
+                var contextCmp = context && context.getCurrentAccess();
                 var message="Access Check Failed! Component.setupAttributes():'" + attribute + "' of component '" + cmp + "' is not visible to '" + contextCmp + "'.";
                 var ae = new $A.auraError(message);
-                ae.component = contextCmp;
+                ae.component = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
                 if(context.enableAccessChecks){
                     if(context.logAccessFailures){
                         $A.error(null, ae);
@@ -2311,10 +2311,10 @@ Component.prototype.getMethodHandler = function(methodDef){
     return function(/*param1,param2,paramN*/){
         if(!$A.clientService.allowAccess(methodDef,component)) {
             var context = $A.getContext();
-            var contextCmp = context && context.getCurrentAccess()+"";
+            var contextCmp = context && context.getCurrentAccess();
             var message = "Access Check Failed! Component.method():'" + methodDef.getDescriptor().toString() + "' is not visible to '" + contextCmp + "'.";
             var ae = new $A.auraError(message);
-            ae.component = contextCmp;
+            ae.component = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
             if (context.enableAccessChecks) {
                 if (context.logAccessFailures) {
                     $A.error(null, ae);

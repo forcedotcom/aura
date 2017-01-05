@@ -234,7 +234,13 @@ function lib(w) { //eslint-disable-line no-unused-vars
         * @static
         * @default "false"
         */
-        MOUSE_WHEEL_INVERTED  = false;
+        MOUSE_WHEEL_INVERTED  = false,
+
+        /**
+        * Specifies the input elements that are needed to scroll into view
+        * manually when scroller is using css transition
+        */
+        INPUT_TAGS = ['INPUT', 'TEXTAREA'];
 
     /**
     * Scroller class that provides the core logic for scrolling.
@@ -620,6 +626,9 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 return;
             }
 
+            eventType(wrapper, 'input', this);
+            eventType(wrapper, 'focusin', this);
+
             // Touch interaction handlers
 
             if (SUPPORT.touch && !this.opts.disableTouch) {
@@ -729,6 +738,10 @@ function lib(w) { //eslint-disable-line no-unused-vars
         */
         handleEvent: function (e) {
             switch (e.type) {
+                case 'focusin':
+                case 'input':
+                    this._scrollToInputElementIfNeeded(e.target);
+                    break;
                 case 'touchstart':
                 case 'pointerdown':
                 case 'MSPointerDown':
@@ -1699,6 +1712,43 @@ function lib(w) { //eslint-disable-line no-unused-vars
             var scrollerHeight = ptl ? this.scrollerHeight + this.getPTLSize() : this.scrollerHeight;
             return (scrollerWidth !== this.scroller.offsetWidth) ||
                    (scrollerHeight !== this.scroller.offsetHeight);
+        },
+
+        /**
+         * Scroll element into view when element is out of view
+         * This is only for scroller that uses css transition to handle scrolling
+         */
+        _scrollIntoViewIfNeeded: function(elm) {
+            if (this.opts.useCSSTransition) {
+                var x = this.x,
+                    y = this.y,
+                    topOffset = this.wrapper.getBoundingClientRect().top,
+                    elmBot = elm.getBoundingClientRect().bottom - topOffset,
+                    elmTop = elm.getBoundingClientRect().top - topOffset,
+                    elmHeight = elmBot - elmTop,
+                    pos;
+
+                // Stop scrolling to not mess up position calculation
+                this._stopMomentum();
+                this._isScrolling = false;
+
+                // Only scroll when element is out of view
+                if (elmBot > this.wrapperHeight || elmBot < 0) {
+                    y = y - elmTop + (this.wrapperHeight - elmHeight) / 2;
+                    pos = this._getValidPosition(x, y);
+                    this._translate(pos.x, pos.y);
+                }
+            }
+        },
+
+        _isInputElement: function(elm) {
+            return INPUT_TAGS.indexOf(elm.tagName) !== -1;
+        },
+
+        _scrollToInputElementIfNeeded: function(elm) {
+            if (this._isInputElement(elm)) {
+                this._scrollIntoViewIfNeeded(elm);
+            }
         },
 
         /**

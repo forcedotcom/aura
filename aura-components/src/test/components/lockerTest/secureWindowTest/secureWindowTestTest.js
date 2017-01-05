@@ -129,12 +129,16 @@
     },
 
     testFile: {
+        // window.File is not implemented correctly in iOS 9.2
+        browsers: ["-IE8", "-IE9", "-IE10", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testFile();
         }
     },
 
     testFile_WithScriptTagsBlocked: {
+        // window.File is not implemented correctly in iOS 9.2
+        browsers: ["-IE8", "-IE9", "-IE10", "-IPHONE", "-IPAD"],
         test: function (cmp) {
             cmp.testFile_WithScriptTagsBlocked();
         }

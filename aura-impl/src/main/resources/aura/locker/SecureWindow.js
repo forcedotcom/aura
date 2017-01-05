@@ -130,9 +130,29 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
                         if (scriptTagsRegex.test(args[0])) {
                             throw new $A.auraError(name + " creation failed: <script> tags are blocked");
                         }
-                        //  Function.prototype.bind.apply is being used to invoke the constructor and to pass all the arguments provided by the caller
-                        // TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
-                        result = new (Function.prototype.bind.apply(cls, [null].concat(args)));
+                        if (typeof cls === "function") {
+                            //  Function.prototype.bind.apply is being used to invoke the constructor and to pass all the arguments provided by the caller
+                            // TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
+                            result = new (Function.prototype.bind.apply(cls, [null].concat(args)));
+                        } else {
+                            // For browsers that use a constructor that's not a function, invoke the constructor directly.
+                            // For example, on Mobile Safari window["Blob"] returns an object called BlobConstructor
+                            // Invoke constructor with specific arguments, handle up to 3 arguments(Blob accepts 2 param, File accepts 3 param)
+                            switch (args.length) {
+                                case 0:
+                                    result = new cls();
+                                    break;
+                                case 1:
+                                    result = new cls(args[0]);
+                                    break;
+                                case 2:
+                                    result = new cls(args[0], args[1]);
+                                    break;
+                                case 3:
+                                    result = new cls(args[0], args[1], args[2]);
+                                    break;
+                            }
+                        }
                         return result;
                     };
                 }

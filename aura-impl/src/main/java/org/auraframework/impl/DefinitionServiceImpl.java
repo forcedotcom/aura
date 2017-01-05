@@ -288,7 +288,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         // If there is no local cache, we must first check to see if there is a registry, as we may not have
         // a registry (depending on configuration). In the case that we don't find one, we are done here.
         //
-        DefRegistry<D> registry = context.getRegistries().getRegistryFor(descriptor);
+        DefRegistry registry = context.getRegistries().getRegistryFor(descriptor);
         if (registry == null) {
             context.addLocalDef(descriptor, null);
             return null;
@@ -346,7 +346,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                     return false;
                 }
             }
-            DefRegistry<D> reg = context.getRegistries().getRegistryFor(descriptor);
+            DefRegistry reg = context.getRegistries().getRegistryFor(descriptor);
             if (reg == null) {
                 return false;
             }
@@ -368,7 +368,7 @@ public class DefinitionServiceImpl implements DefinitionService {
     @Override
     public <T extends Definition> Source<T> getSource(DefDescriptor<T> descriptor) {
         AuraContext context = contextService.getCurrentContext();
-        DefRegistry<T> reg = context.getRegistries().getRegistryFor(descriptor);
+        DefRegistry reg = context.getRegistries().getRegistryFor(descriptor);
         if (reg != null) {
             return reg.getSource(descriptor);
         }
@@ -418,7 +418,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                 // we will make them undesirable.
                 //
                 boolean cacheable = configAdapter.isCacheable(matcher) && namespaceMatcher.isConstant();
-                for (DefRegistry<?> reg : context.getRegistries().getRegistries(matcher)) {
+                for (DefRegistry reg : context.getRegistries().getRegistries(matcher)) {
                     if (reg.hasFind()) {
                         //
                         // Now we walk then entire set of registries, and check to see if our namespace
@@ -1328,7 +1328,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         // If there is no local cache, we must first check to see if there is a registry, as we may not have
         // a registry (depending on configuration). In the case that we don't find one, we are done here.
         //
-        DefRegistry<D> registry = currentCC.registries.getRegistryFor(compiling.descriptor);
+        DefRegistry registry = currentCC.registries.getRegistryFor(compiling.descriptor);
         if (registry == null) {
             currentCC.context.addLocalDef(compiling.descriptor, null);
             return false;

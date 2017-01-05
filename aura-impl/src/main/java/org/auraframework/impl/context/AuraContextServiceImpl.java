@@ -158,17 +158,17 @@ public class AuraContextServiceImpl implements ContextService {
         contextAdapter.popSystemContext();
     }
 
-    private DefRegistry<?>[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> loaders) {
-        List<DefRegistry<?>> ret = new ArrayList<>();
+    private DefRegistry[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> loaders) {
+        List<DefRegistry> ret = new ArrayList<>();
         ret.addAll(addRegistriesFromProviders(providers, mode, access, loaders));
         return ret.toArray(new DefRegistry[ret.size()]);
     }
 
-    private List<DefRegistry<?>> addRegistriesFromProviders(Collection<RegistryAdapter> providers, Mode mode,
+    private List<DefRegistry> addRegistriesFromProviders(Collection<RegistryAdapter> providers, Mode mode,
                                                             Authentication access, Set<SourceLoader> loaders) {
-        List<DefRegistry<?>> ret = new ArrayList<>();
+        List<DefRegistry> ret = new ArrayList<>();
         for (RegistryAdapter provider : providers) {
-            DefRegistry<?>[] registries = provider.getRegistries(mode, access, loaders);
+            DefRegistry[] registries = provider.getRegistries(mode, access, loaders);
             if (registries != null) {
                 Collections.addAll(ret, registries);
                 }

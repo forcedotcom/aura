@@ -30,7 +30,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Sets;
 
-public class PassThroughDefRegistry implements DefRegistry<Definition> {
+public class PassThroughDefRegistry implements DefRegistry {
     private static final long serialVersionUID = 1741611975153818048L;
 
     private final SourceLoader sourceLoader;
@@ -52,11 +52,11 @@ public class PassThroughDefRegistry implements DefRegistry<Definition> {
     }
 
     @Override
-    public Definition getDef(DefDescriptor<Definition> descriptor) throws QuickFixException {
-        Source<Definition> source = sourceLoader.getSource(descriptor);
+    public <T extends Definition> T getDef(DefDescriptor<T> descriptor) throws QuickFixException {
+        Source<T> source = sourceLoader.getSource(descriptor);
         if (source != null && source.exists()) {
             descriptor = source.getDescriptor();
-            Parser<Definition> parser = parserFactory.getParser(source.getFormat(), descriptor);
+            Parser<T> parser = parserFactory.getParser(source.getFormat(), descriptor);
             return parser.parse(descriptor, source);
         }
         return null;
@@ -77,8 +77,8 @@ public class PassThroughDefRegistry implements DefRegistry<Definition> {
     }
 
     @Override
-    public boolean exists(DefDescriptor<Definition> descriptor) {
-        Source<Definition> source = sourceLoader.getSource(descriptor);
+    public <T extends Definition> boolean exists(DefDescriptor<T> descriptor) {
+        Source<T> source = sourceLoader.getSource(descriptor);
         return source != null && source.exists();
     }
 
@@ -98,7 +98,7 @@ public class PassThroughDefRegistry implements DefRegistry<Definition> {
     }
 
     @Override
-    public Source<Definition> getSource(DefDescriptor<Definition> descriptor) {
+    public <T extends Definition> Source<T> getSource(DefDescriptor<T> descriptor) {
         return sourceLoader.getSource(descriptor);
     }
 

@@ -81,15 +81,15 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     
     @Test
     public void testGetDefinitionOfApplicationWithDependencyThatTriggerACF() throws Exception {
-    	String eventSource = "<aura:event type='APPLICATION' description='Application event under custom namespace'/>";
-    	DefDescriptor<EventDef> eventDefdesc = getAuraTestingUtil().addSourceAutoCleanup(
+        String eventSource = "<aura:event type='APPLICATION' description='Application event under custom namespace'/>";
+        DefDescriptor<EventDef> eventDefdesc = getAuraTestingUtil().addSourceAutoCleanup(
                 EventDef.class,
                 eventSource,
                 StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent", 
                 NamespaceAccess.CUSTOM);
         String dependencySource = "<aura:dependency resource='"+
-        		eventDefdesc.getQualifiedName()+"' type='EVENT'/>";
-    	DefDescriptor<? extends BaseComponentDef> desc = getAuraTestingUtil().addSourceAutoCleanup(
+                eventDefdesc.getQualifiedName()+"' type='EVENT'/>";
+        DefDescriptor<? extends BaseComponentDef> desc = getAuraTestingUtil().addSourceAutoCleanup(
                 ApplicationDef.class,
                 String.format(
                         baseApplicationTag,
@@ -100,12 +100,12 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 NamespaceAccess.CUSTOM);
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.UNAUTHENTICATED, desc);
         try {
-        	definitionService.getDefinition(desc);
+            definitionService.getDefinition(desc);
         }catch(NoAccessException e) {
-        	String expectErrorMessage = "Access to event '"+eventDefdesc.getNamespace()+":"+eventDefdesc.getName()+"'"
-        	+" with access 'PUBLIC' from namespace '"+desc.getNamespace()+"' in '"+desc.getQualifiedName()+"(APPLICATION)'"+
-        	" is not allowed";
-        	assertEquals(expectErrorMessage, e.getMessage());
+            String expectErrorMessage = "Access to event '"+eventDefdesc.getNamespace()+":"+eventDefdesc.getName()+"'"
+            +" with access 'PUBLIC' from namespace '"+desc.getNamespace()+"' in '"+desc.getQualifiedName()+"(APPLICATION)'"+
+            " is not allowed";
+            assertEquals(expectErrorMessage, e.getMessage());
         }
     }
 
@@ -140,7 +140,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.UNAUTHENTICATED, desc);
         DefinitionNotFoundException expected = null;
         try {
-        	definitionService.getDefinition(desc);
+            definitionService.getDefinition(desc);
         } catch (DefinitionNotFoundException e) {
             expected = e;
         }
@@ -882,7 +882,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     @Test
     public void testDependencyCaching() throws Exception {
         // problem was that compileDE was not adding the DE to depsCache when the definition was alredy in defsCache
-    	
+        
         DefinitionServiceImpl definitionServiceImpl = (DefinitionServiceImpl)definitionService;
         
         contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, laxSecurityApp);
@@ -895,10 +895,10 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         String uid = definitionServiceImpl.getUid(null, descriptor);
         Boolean foundit = false;
         for(String key : depsCache.getKeySet()) {
-        	if(key.contains("markup://ui:button")) {
-        		DependencyEntry value = depsCache.getIfPresent(key);
-        		foundit = true;
-        	}
+            if(key.contains("markup://ui:button")) {
+                DependencyEntry value = depsCache.getIfPresent(key);
+                foundit = true;
+            }
         }
         assertTrue("markup://ui:button should have been added to depsCache", foundit);
         
@@ -906,10 +906,10 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         depsCache.invalidateAll();
         foundit = false;
         for(String key : depsCache.getKeySet()) {
-        	if(key.contains("markup://ui:button")) {
-        		DependencyEntry value = depsCache.getIfPresent(key);
-        		foundit = true;
-        	}
+            if(key.contains("markup://ui:button")) {
+                DependencyEntry value = depsCache.getIfPresent(key);
+                foundit = true;
+            }
         }
         assertFalse("markup://ui:button should not be in depsCache", foundit);
         
@@ -920,10 +920,10 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         definitionService.getUid(uid, descriptor);
         foundit = false;
         for(String key : depsCache.getKeySet()) {
-        	if(key.contains("markup://ui:button")) {
-        		DependencyEntry value = depsCache.getIfPresent(key);
-        		foundit = true;
-        	}
+            if(key.contains("markup://ui:button")) {
+                DependencyEntry value = depsCache.getIfPresent(key);
+                foundit = true;
+            }
         }
         assertTrue("markup://ui:button should have been added to depsCache again", foundit);
     }
@@ -931,8 +931,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     public static class AuraTestRegistryProviderWithNulls extends AbstractRegistryAdapterImpl {
 
         @Override
-        public DefRegistry<?>[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders) {
-            return new DefRegistry<?>[] { createDefRegistry(new TestTypeDefFactory(), DefType.TYPE, "test") };
+        public DefRegistry[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders) {
+            return new DefRegistry[] { createDefRegistry(new TestTypeDefFactory(), DefType.TYPE, "test") };
         }
 
         public static class TestTypeDefFactory extends DefFactoryImpl<TypeDef> {

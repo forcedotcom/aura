@@ -58,7 +58,7 @@ public class CacheableDefFactoryImpl<D extends Definition> extends DefFactoryImp
     }
 
     @Override
-    public long getLastMod(DefDescriptor<D> descriptor) {
+    public long getLastMod(DefDescriptor<?> descriptor) {
         return sourceFactory.getSource(descriptor).getLastModified();
     }
 

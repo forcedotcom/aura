@@ -28,7 +28,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import java.util.Map;
 import java.util.Set;
 
-public class AuraStaticTypeDefRegistry extends StaticDefRegistryImpl<TypeDef> {
+public class AuraStaticTypeDefRegistry extends StaticDefRegistryImpl {
 
     private static final long serialVersionUID = -969733961482080930L;
 

@@ -37,7 +37,7 @@ public interface RegistrySet {
      *
      * @return an immutable list of registries.
      */
-    public Collection<DefRegistry<?>> getAllRegistries();
+    public Collection<DefRegistry> getAllRegistries();
 
     /**
      * Get a set of registries for a given descriptor filter.
@@ -45,7 +45,7 @@ public interface RegistrySet {
      * @param matcher the filter for which we need registries.
      * @return an immutable collection of registries.
      */
-    public Collection<DefRegistry<?>> getRegistries(DescriptorFilter matcher);
+    public Collection<DefRegistry> getRegistries(DescriptorFilter matcher);
 
     /**
      * Get a registry for a given descriptor.
@@ -53,5 +53,5 @@ public interface RegistrySet {
      * @param descriptor the descriptor for which we need a registry.
      * @return the registry corresponding to the descriptor.
      */
-    public <T extends Definition> DefRegistry<T> getRegistryFor(DefDescriptor<T> descriptor);
+    public <T extends Definition> DefRegistry getRegistryFor(DefDescriptor<T> descriptor);
 }

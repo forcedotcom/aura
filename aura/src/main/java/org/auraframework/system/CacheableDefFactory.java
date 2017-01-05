@@ -24,5 +24,5 @@ import org.auraframework.def.Definition;
  */
 public interface CacheableDefFactory<D extends Definition> extends DefFactory<D> {
 
-    long getLastMod(DefDescriptor<D> descriptor);
+    long getLastMod(DefDescriptor<?> descriptor);
 }

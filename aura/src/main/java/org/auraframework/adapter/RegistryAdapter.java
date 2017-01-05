@@ -25,5 +25,5 @@ import org.auraframework.system.SourceLoader;
 /**
  */
 public interface RegistryAdapter extends AuraAdapter {
-    DefRegistry<?>[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders);
+    DefRegistry[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders);
 }

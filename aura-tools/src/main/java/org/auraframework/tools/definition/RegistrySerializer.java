@@ -207,7 +207,7 @@ public class RegistrySerializer {
      * @throws RegistrySerializerException if there is an error.
      */
     public void write(@Nonnull Set<String> namespaces, @Nonnull OutputStream out) {
-        List<DefRegistry<Definition>> regs = Lists.newArrayList();
+        List<DefRegistry> regs = Lists.newArrayList();
         for (String name : namespaces) {
             regs.add(getRegistry(name));
         }
@@ -234,7 +234,7 @@ public class RegistrySerializer {
      *
      * @param namespace the namespace for which we want to retrieve a static registry.
      */
-    private DefRegistry<Definition> getRegistry(@Nonnull String namespace) {
+    private DefRegistry getRegistry(@Nonnull String namespace) {
         Set<String> prefixes = Sets.newHashSet();
         Set<DefType> types = Sets.newHashSet();
         Set<DefDescriptor<?>> descriptors;
@@ -281,7 +281,7 @@ public class RegistrySerializer {
             logger.error("No files compiled for "+namespace);
             error = true;
         }
-        return new StaticDefRegistryImpl<>(types, prefixes, namespaces, defs);
+        return new StaticDefRegistryImpl(types, prefixes, namespaces, defs);
     }
 
     public static final String ERR_ARGS_REQUIRED = "Component and Output Directory are both required";

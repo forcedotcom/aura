@@ -19,12 +19,11 @@ import java.io.Serializable;
 import java.util.Set;
 
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
 import org.auraframework.system.DefRegistry;
 
 import com.google.common.collect.Sets;
 
-public abstract class DefRegistryImpl<T extends Definition> implements DefRegistry<T>, Serializable {
+public abstract class DefRegistryImpl implements DefRegistry, Serializable {
     private static final long serialVersionUID = 1011408241457411660L;
     private final Set<DefType> defTypes;
     private final Set<String> prefixes;

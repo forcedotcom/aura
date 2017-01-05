@@ -122,16 +122,16 @@ public class AuraRegistryProviderImpl extends AbstractRegistryAdapterImpl implem
             );
 
     private static class SourceLocationInfo {
-        public final List<DefRegistry<?>> staticLocationRegistries;
+        public final List<DefRegistry> staticLocationRegistries;
         public final List<SourceLoader> javaSourceLoaders;
-        public final List<DefRegistry<?>> markupRegistries;
+        public final List<DefRegistry> markupRegistries;
         public final String baseDir;
         private boolean changed;
 
-        public SourceLocationInfo(DefRegistry<?>[] staticLocationRegistries, String baseDir,
-                List<DefRegistry<?>> markupRegistries,
+        public SourceLocationInfo(DefRegistry[] staticLocationRegistries, String baseDir,
+                List<DefRegistry> markupRegistries,
                 List<SourceLoader> javaSourceLoaders) {
-            List<DefRegistry<?>> slr_list = null;
+            List<DefRegistry> slr_list = null;
             if (staticLocationRegistries != null) {
                 slr_list = Arrays.asList(staticLocationRegistries);
             }
@@ -180,7 +180,7 @@ public class AuraRegistryProviderImpl extends AbstractRegistryAdapterImpl implem
         return fis;
     }
 
-    private DefRegistry<?>[] getStaticRegistries(ComponentLocationAdapter location) {
+    private DefRegistry[] getStaticRegistries(ComponentLocationAdapter location) {
         InputStream ris = null;
 
         String pkg = location.getComponentSourcePackage();
@@ -200,8 +200,8 @@ public class AuraRegistryProviderImpl extends AbstractRegistryAdapterImpl implem
                 Object o = ois.readObject();
                 if (o instanceof List) {
                     @SuppressWarnings("unchecked")
-                    List<DefRegistry<?>> l = (List<DefRegistry<?>>)o;
-                    return l.toArray(new DefRegistry<?> [l.size()]);
+                    List<DefRegistry> l = (List<DefRegistry>)o;
+                    return l.toArray(new DefRegistry [l.size()]);
                 }
                 return (DefRegistry[]) ois.readObject();
             } catch (Exception e) {
@@ -227,12 +227,12 @@ public class AuraRegistryProviderImpl extends AbstractRegistryAdapterImpl implem
     }
 
     private SourceLocationInfo createSourceLocationInfo(ComponentLocationAdapter location) {
-        DefRegistry<?>[] staticRegs = getStaticRegistries(location);
+        DefRegistry[] staticRegs = getStaticRegistries(location);
         String pkg = location.getComponentSourcePackage();
         String canonical = null;
         List<SourceLoader> markupLoaders = Lists.newArrayList();
         List<SourceLoader> javaLoaders = Lists.newArrayList();
-        List<DefRegistry<?>> markupRegistries = Lists.newArrayList();
+        List<DefRegistry> markupRegistries = Lists.newArrayList();
         if (pkg != null) {
             ResourceSourceLoader rsl = new ResourceSourceLoader(pkg);
             markupLoaders.add(rsl);
@@ -281,9 +281,9 @@ public class AuraRegistryProviderImpl extends AbstractRegistryAdapterImpl implem
         //
         SourceFactory sf = new SourceFactory(markupLoaders, configAdapter);
         if (staticRegs != null) {
-            for (DefRegistry<?> reg : staticRegs) {
+            for (DefRegistry reg : staticRegs) {
                 if (reg instanceof StaticDefRegistryImpl) {
-                    ((StaticDefRegistryImpl<?>)reg).setSourceFactory(sf);
+                    ((StaticDefRegistryImpl)reg).setSourceFactory(sf);
                 }
             }
         }
@@ -303,13 +303,13 @@ public class AuraRegistryProviderImpl extends AbstractRegistryAdapterImpl implem
     }
 
     @Override
-    public DefRegistry<?>[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders) {
-        DefRegistry<?>[] ret;
+    public DefRegistry[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders) {
+        DefRegistry[] ret;
 
             Collection<ComponentLocationAdapter> markupLocations = getAllComponentLocationAdapters();
             List<SourceLoader> markupLoaders = Lists.newArrayList();
             List<SourceLoader> javaLoaders = Lists.newArrayList();
-            List<DefRegistry<?>> regBuild = Lists.newArrayList();
+            List<DefRegistry> regBuild = Lists.newArrayList();
 
             regBuild.add(AuraStaticTypeDefRegistry.INSTANCE);
             regBuild.add(AuraStaticControllerDefRegistry.getInstance(definitionService));
@@ -333,7 +333,7 @@ public class AuraRegistryProviderImpl extends AbstractRegistryAdapterImpl implem
             if (markupLoaders.size() > 0) {
                 SourceFactory markupSourceFactory = new SourceFactory(markupLoaders, configAdapter);
                 CacheableDefFactoryImpl<Definition> factory = new CacheableDefFactoryImpl<>(markupSourceFactory, parserFactory);
-                regBuild.add(new CachingDefRegistryImpl<>(factory, markupDefTypes, markupPrefixes));
+                regBuild.add(new CachingDefRegistryImpl(factory, markupDefTypes, markupPrefixes));
             }
 
             regBuild.add(AuraRegistryProviderImpl.<ControllerDef>createDefRegistry(new CompoundControllerDefFactory(),
@@ -357,7 +357,7 @@ public class AuraRegistryProviderImpl extends AbstractRegistryAdapterImpl implem
                         DefType.TOKEN_MAP_PROVIDER, DefDescriptor.JAVA_PREFIX));
             }
 
-            ret = regBuild.toArray(new DefRegistry<?>[regBuild.size()]);
+            ret = regBuild.toArray(new DefRegistry[regBuild.size()]);
         return ret;
     }
 
@@ -383,7 +383,7 @@ public class AuraRegistryProviderImpl extends AbstractRegistryAdapterImpl implem
                     for (SourceLocationInfo sli : locationMap.values()) {
                         if (sli.baseDir != null && canonical.startsWith(sli.baseDir)) {
                             sli.setChanged(true);
-                            for (DefRegistry<?> registry : sli.markupRegistries) {
+                            for (DefRegistry registry : sli.markupRegistries) {
                                 registry.reset();
                             }
                         }

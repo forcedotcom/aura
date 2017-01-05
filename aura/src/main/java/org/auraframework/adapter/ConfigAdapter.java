@@ -150,7 +150,7 @@ public interface ConfigAdapter extends AuraAdapter {
      * @param descriptor the descriptor to check.
      * @return true if the descriptor is cacheable.
      */
-    boolean isCacheable(DefRegistry<?> registry, DefDescriptor<?> descriptor);
+    boolean isCacheable(DefRegistry registry, DefDescriptor<?> descriptor);
 
     /**
      * Gets the Content-Security-Policy and X-FRAME-OPTION whitelist for a

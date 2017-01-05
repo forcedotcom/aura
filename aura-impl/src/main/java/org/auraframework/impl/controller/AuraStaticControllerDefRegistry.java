@@ -34,10 +34,7 @@ import java.util.Set;
 /**
  * @since 0.0.116
  */
-public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Definition> {
-
-    /**
-     */
+public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl {
     private static final long serialVersionUID = -969733961482080930L;
 
     public static final String PREFIX = "aura";
@@ -92,11 +89,11 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Defin
                 allMap = builder.build();
             } catch (QuickFixException qfe) {
                 throw new RuntimeException(qfe);
-    }
+            }
         }
 
         return allMap.values();
-        }
+    }
 
     public Map<DefDescriptor<? extends Definition>, Definition> getAll() {
         return allMap;

@@ -31,30 +31,31 @@ import java.util.Set;
 /**
  * Immutable DefRegistry implementation, backed by a prepopulated map.
  */
-public class StaticDefRegistryImpl<T extends Definition> extends DefRegistryImpl<T> {
+public class StaticDefRegistryImpl extends DefRegistryImpl {
 
     private static final long serialVersionUID = 1L;
-    protected final Map<DefDescriptor<T>, T> defs;
+    protected final Map<DefDescriptor<?>, Definition> defs;
     private transient SourceFactory sourceFactory = null;
 
-    public StaticDefRegistryImpl(Set<DefType> defTypes, Set<String> prefixes, Set<String> namespaces, Collection<T> defs) {
-        this(defTypes, prefixes, namespaces, Maps.<DefDescriptor<T>, T> newHashMapWithExpectedSize(defs.size()));
-        for (T def : defs) {
-            @SuppressWarnings("unchecked")
-            DefDescriptor<T> desc = (DefDescriptor<T>) def.getDescriptor();
+    public StaticDefRegistryImpl(Set<DefType> defTypes, Set<String> prefixes, Set<String> namespaces,
+            Collection<? extends Definition> defs) {
+        this(defTypes, prefixes, namespaces, Maps.<DefDescriptor<?>, Definition> newHashMapWithExpectedSize(defs.size()));
+        for (Definition def : defs) {
+            DefDescriptor<?> desc = def.getDescriptor();
             this.defs.put(desc, def);
         }
     }
 
     public StaticDefRegistryImpl(Set<DefType> defTypes, Set<String> prefixes, Set<String> namespaces,
-            Map<DefDescriptor<T>, T> defs) {
+            Map<DefDescriptor<?>, Definition> defs) {
         super(defTypes, prefixes, namespaces);
         this.defs = defs;
     }
 
     @Override
-    public T getDef(DefDescriptor<T> descriptor) {
-        return defs.get(descriptor);
+    @SuppressWarnings("unchecked")
+    public <D extends Definition> D getDef(DefDescriptor<D> descriptor) {
+        return (D)defs.get(descriptor);
     }
 
     public void setSourceFactory(SourceFactory sourceFactory) {
@@ -70,7 +71,7 @@ public class StaticDefRegistryImpl<T extends Definition> extends DefRegistryImpl
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         Set<DefDescriptor<?>> ret = new HashSet<>();
 
-        for (DefDescriptor<T> key : defs.keySet()) {
+        for (DefDescriptor<?> key : defs.keySet()) {
             if (matcher.matchDescriptor(key)) {
                 ret.add(key);
             }
@@ -79,12 +80,12 @@ public class StaticDefRegistryImpl<T extends Definition> extends DefRegistryImpl
     }
 
     @Override
-    public boolean exists(DefDescriptor<T> descriptor) {
+    public <D extends Definition> boolean exists(DefDescriptor<D> descriptor) {
         return defs.containsKey(descriptor);
     }
 
     @Override
-    public Source<T> getSource(DefDescriptor<T> descriptor) {
+    public <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
         if (sourceFactory != null) {
             return sourceFactory.getSource(descriptor);
         }

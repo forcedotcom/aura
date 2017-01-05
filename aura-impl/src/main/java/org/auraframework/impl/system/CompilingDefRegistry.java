@@ -32,7 +32,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class CompilingDefRegistry implements DefRegistry<Definition> {
+public class CompilingDefRegistry implements DefRegistry {
     private static final long serialVersionUID = -4852130888436267039L;
 
     private final SourceLoader sourceLoader;
@@ -85,7 +85,7 @@ public class CompilingDefRegistry implements DefRegistry<Definition> {
 
 
     @Override
-    public Definition getDef(DefDescriptor<Definition> descriptor) throws QuickFixException {
+    public <T extends Definition> T getDef(DefDescriptor<T> descriptor) throws QuickFixException {
         DefHolder holder = registry.get(descriptor);
 
         if (holder == null) {
@@ -111,7 +111,8 @@ public class CompilingDefRegistry implements DefRegistry<Definition> {
         if (holder.qfe != null) {
             throw holder.qfe;
         }
-        Definition def = holder.def;
+        @SuppressWarnings("unchecked")
+        T def = (T)holder.def;
         return def;
     }
 
@@ -133,7 +134,7 @@ public class CompilingDefRegistry implements DefRegistry<Definition> {
     }
 
     @Override
-    public boolean exists(DefDescriptor<Definition> descriptor) {
+    public <T extends Definition> boolean exists(DefDescriptor<T> descriptor) {
         return registry.containsKey(descriptor);
     }
 
@@ -153,7 +154,7 @@ public class CompilingDefRegistry implements DefRegistry<Definition> {
     }
 
     @Override
-    public Source<Definition> getSource(DefDescriptor<Definition> descriptor) {
+    public <T extends Definition> Source<T> getSource(DefDescriptor<T> descriptor) {
         return sourceLoader.getSource(descriptor);
     }
 

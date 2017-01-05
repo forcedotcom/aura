@@ -127,7 +127,7 @@ public abstract class BaseJavaDefFactory<D extends Definition> extends DefFactor
     }
 
     @Override
-    public long getLastMod(DefDescriptor<D> descriptor) {
+    public long getLastMod(DefDescriptor<?> descriptor) {
         return 0;
     }
 }

@@ -92,10 +92,10 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
     private MockRegistrySet registries = new MockRegistrySet();
 
     @Mock
-    DefRegistry<Definition> registry1;
+    DefRegistry registry1;
 
     @Mock
-    DefRegistry<Definition> registry2;
+    DefRegistry registry2;
     
     private AuraContext setupContext(DefinitionService service, Mode mode, Authentication access) {
         AuraContext context = new AuraContextImpl(mode, registries,
@@ -139,7 +139,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
      * @param definition
      * @throws Exception
      */
-    private <T extends Definition> void setupMockRegistryFor(DefDescriptor<T> desc, DefRegistry<T> reg, T definition)
+    private <T extends Definition> void setupMockRegistryFor(DefDescriptor<T> desc, DefRegistry reg, T definition)
             throws Exception {
         registries.addRegistryFor(desc, reg);
         Mockito.when(reg.getDef(desc)).thenReturn(definition);
@@ -884,45 +884,44 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
      * Registry sets do not lend themselves to mocking, too many generics.
      */
     private static class MockRegistrySet implements RegistrySet {
-        private final Map<DefDescriptor<?>,DefRegistry<?>> registryMap = Maps.newHashMap();
-        private final Map<DescriptorFilter, Collection<DefRegistry<?>>> filterMap = Maps.newHashMap();
-        private final List<DefRegistry<?>> allRegistries = Lists.newArrayList();
+        private final Map<DefDescriptor<?>,DefRegistry> registryMap = Maps.newHashMap();
+        private final Map<DescriptorFilter, Collection<DefRegistry>> filterMap = Maps.newHashMap();
+        private final List<DefRegistry> allRegistries = Lists.newArrayList();
         
-        public void addRegistryFor(DefDescriptor<?> descriptor, DefRegistry<?> registry) {
+        public void addRegistryFor(DefDescriptor<?> descriptor, DefRegistry registry) {
             registryMap.put(descriptor, registry);
             if (!allRegistries.contains(registry)) {
                 allRegistries.add(registry);
             }
         }
 
-        public void addFilterFor(DescriptorFilter matcher, Collection<DefRegistry<?>> registries) {
+        public void addFilterFor(DescriptorFilter matcher, Collection<DefRegistry> registries) {
             filterMap.put(matcher, registries);
-            for (DefRegistry<?> registry: registries) {
+            for (DefRegistry registry: registries) {
                 if (!allRegistries.contains(registry)) {
                     allRegistries.add(registry);
                 }
             }
         }
 
-        public void addFilterFor(DescriptorFilter matcher, DefRegistry<?> registry) {
+        public void addFilterFor(DescriptorFilter matcher, DefRegistry registry) {
             addFilterFor(matcher, Lists.newArrayList(registry));
         }
 
 
         @Override
-        public Collection<DefRegistry<?>> getAllRegistries() {
+        public Collection<DefRegistry> getAllRegistries() {
             return allRegistries;
         }
 
         @Override
-        public Collection<DefRegistry<?>> getRegistries(DescriptorFilter matcher) {
+        public Collection<DefRegistry> getRegistries(DescriptorFilter matcher) {
             return filterMap.get(matcher);
         }
 
         @Override
-        @SuppressWarnings("unchecked")
-        public <T extends Definition> DefRegistry<T> getRegistryFor(DefDescriptor<T> descriptor) {
-            return (DefRegistry<T>)registryMap.get(descriptor);
+        public <T extends Definition> DefRegistry getRegistryFor(DefDescriptor<T> descriptor) {
+            return registryMap.get(descriptor);
         }
     }
 }

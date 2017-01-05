@@ -31,25 +31,30 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * This is a very thin wrapper around a factory, in fact, it is a little hard to
  * tell the difference. FIXME: collapse them.
  */
-public class NonCachingDefRegistryImpl<T extends Definition> extends DefRegistryImpl<T> {
+public class NonCachingDefRegistryImpl extends DefRegistryImpl {
     private static final long serialVersionUID = 5781588775451737960L;
-    private final DefFactory<T> factory;
+    private final DefFactory<?> factory;
     private String name;
 
-    public NonCachingDefRegistryImpl(DefFactory<T> factory, Set<DefType> defTypes, Set<String> prefixes) {
+    public NonCachingDefRegistryImpl(DefFactory<?> factory, Set<DefType> defTypes, Set<String> prefixes) {
         this(factory, defTypes, prefixes, null);
     }
 
-    public NonCachingDefRegistryImpl(DefFactory<T> factory, Set<DefType> defTypes, Set<String> prefixes,
+    public NonCachingDefRegistryImpl(DefFactory<?> factory, Set<DefType> defTypes, Set<String> prefixes,
             Set<String> namespace) {
         super(defTypes, prefixes, namespace);
         this.factory = factory;
         this.name = getClass().getSimpleName() + defTypes + prefixes + namespace;
     }
 
+    @SuppressWarnings("unchecked")
+    private <T extends Definition> DefFactory<T> getFactory(DefDescriptor<T> descriptor) {
+        return (DefFactory<T>)factory;
+    }
+
     @Override
-    public T getDef(DefDescriptor<T> descriptor) throws QuickFixException {
-        return factory.getDef(descriptor);
+    public <T extends Definition> T getDef(DefDescriptor<T> descriptor) throws QuickFixException {
+        return getFactory(descriptor).getDef(descriptor);
     }
 
     @Override
@@ -63,13 +68,13 @@ public class NonCachingDefRegistryImpl<T extends Definition> extends DefRegistry
     }
 
     @Override
-    public boolean exists(DefDescriptor<T> descriptor) {
-        return factory.exists(descriptor);
+    public <T extends Definition> boolean exists(DefDescriptor<T> descriptor) {
+        return getFactory(descriptor).exists(descriptor);
     }
 
     @Override
-    public Source<T> getSource(DefDescriptor<T> descriptor) {
-        return factory.getSource(descriptor);
+    public <T extends Definition> Source<T> getSource(DefDescriptor<T> descriptor) {
+        return getFactory(descriptor).getSource(descriptor);
     }
 
     @Override

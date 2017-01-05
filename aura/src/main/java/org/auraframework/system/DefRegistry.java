@@ -36,7 +36,7 @@ import javax.annotation.Nonnull;
  *
  * Note: The typing here is as bogus as it gets. T is not valid.
  */
-public interface DefRegistry<T extends Definition> extends Serializable {
+public interface DefRegistry extends Serializable {
 
     /**
      * Return the definition for this descriptor, or null if it does not exist.
@@ -46,7 +46,7 @@ public interface DefRegistry<T extends Definition> extends Serializable {
      * @throws QuickFixException
      */
     @CheckForNull
-    T getDef(DefDescriptor<T> descriptor) throws QuickFixException;
+    <T extends Definition> T getDef(DefDescriptor<T> descriptor) throws QuickFixException;
 
     /**
      * Return true if the find methods work.
@@ -69,7 +69,7 @@ public interface DefRegistry<T extends Definition> extends Serializable {
      * compile the definition if it was not already compiled, and does not
      * guarantee that it can compile.
      */
-    boolean exists(DefDescriptor<T> descriptor);
+    <T extends Definition> boolean exists(DefDescriptor<T> descriptor);
 
     /**
      * The DefTypes that this registry handles (returns)
@@ -97,7 +97,7 @@ public interface DefRegistry<T extends Definition> extends Serializable {
      * This is not always available, and so may return null even if the descriptor has a definition.
      */
     @CheckForNull
-    Source<T> getSource(DefDescriptor<T> descriptor);
+    <T extends Definition> Source<T> getSource(DefDescriptor<T> descriptor);
 
     /**
      * return true if the caller can cache the value.

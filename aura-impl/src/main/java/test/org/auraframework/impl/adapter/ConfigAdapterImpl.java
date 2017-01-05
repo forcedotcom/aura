@@ -813,7 +813,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
      * Return true if the namespace of the provided descriptor supports caching.
      */
     @Override
-    public boolean isCacheable(DefRegistry<?> registry, DefDescriptor<?> descriptor) {
+    public boolean isCacheable(DefRegistry registry, DefDescriptor<?> descriptor) {
         if (descriptor == null) {
             return false;
         }

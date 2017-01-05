@@ -25,18 +25,18 @@ import org.auraframework.system.CacheableDefFactory;
 /**
  * base class for registries, adds some important methods that aren't exposed through the top level interface
  */
-public class CachingDefRegistryImpl<T extends Definition> extends NonCachingDefRegistryImpl<T> {
+public class CachingDefRegistryImpl extends NonCachingDefRegistryImpl {
 
     private static final long serialVersionUID = -1052118918311747954L;
 
-    private final CacheableDefFactory<T> cacheableFactory;
+    private final CacheableDefFactory<?> cacheableFactory;
 
-    public CachingDefRegistryImpl(CacheableDefFactory<T> factory, Set<DefType> defTypes, Set<String> prefixes) {
+    public CachingDefRegistryImpl(CacheableDefFactory<?> factory, Set<DefType> defTypes, Set<String> prefixes) {
         super(factory, defTypes, prefixes);
         this.cacheableFactory = factory;
     }
 
-    protected long getLastMod(DefDescriptor<T> descriptor) {
+    protected long getLastMod(DefDescriptor<?> descriptor) {
         return cacheableFactory.getLastMod(descriptor);
     }
 

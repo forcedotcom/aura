@@ -35,19 +35,19 @@ import com.google.common.collect.Sets;
 public abstract class AbstractRegistryAdapterImpl implements RegistryAdapter {
 
     @Override
-    public abstract DefRegistry<?>[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders);
+    public abstract DefRegistry[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders);
 
-    protected static <T extends Definition> DefRegistry<T> createDefRegistry(DefFactory<T> factory, DefType defType,
+    protected static <T extends Definition> DefRegistry createDefRegistry(DefFactory<T> factory, DefType defType,
             String prefix) {
         return createDefRegistry(factory, EnumSet.of(defType), Sets.newHashSet(prefix));
     }
 
-    protected static <T extends Definition> DefRegistry<T> createDefRegistry(DefFactory<T> factory,
+    protected static <T extends Definition> DefRegistry createDefRegistry(DefFactory<T> factory,
             Set<DefType> defTypes, Set<String> prefixes) {
         if (factory instanceof CacheableDefFactory) {
-            return new CachingDefRegistryImpl<>((CacheableDefFactory<T>) factory, defTypes, prefixes);
+            return new CachingDefRegistryImpl((CacheableDefFactory<T>) factory, defTypes, prefixes);
         } else {
-            return new NonCachingDefRegistryImpl<>(factory, defTypes, prefixes);
+            return new NonCachingDefRegistryImpl(factory, defTypes, prefixes);
         }
     }
 }

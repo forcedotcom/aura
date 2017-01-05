@@ -1356,49 +1356,28 @@ function lib(w) { //eslint-disable-line no-unused-vars
         _resetPosition: function (time) {
             time || (time = 0);
 
-            var x = this.x,
-                y = this.y,
-                custom;
+            var pos;
 
             // TODO: Find a way to decouple completely pullToRefresh and pullToLoadMore
             if (this._customResetPosition()) {
                 if (this.opts.pullToRefresh && this.isTriggeredPTR()) {
-                    custom = this.getResetPositionPTR();
+                    pos = this.getResetPositionPTR();
                 } else if (this.opts.pullToLoadMore && this.isTriggeredPTL()) {
-                    custom = this.resetPositionPTL();
+                    pos = this.resetPositionPTL();
                 }
             }
 
-            if (custom) {
-                y    = custom.y;
-                x    = custom.x;
-                time = custom.time || time;
-
+            if (pos) {
+                time = pos.time || time;
             } else {
-                // Outside boundaries top
-                if (!this.hasScrollY || this.y > 0) {
-                    y = 0;
-
-                // Outside boundaries bottom
-                } else if (this.y < this.maxScrollY) {
-                    y = this.maxScrollY;
-                }
-
-                // Outsede left
-                if (!this.hasScrollX || this.x > 0 ) {
-                    x = 0;
-
-                // Outside right
-                } else if (this.x < this.maxScrollX) {
-                    x = this.maxScrollX;
-                }
+                pos = this._getValidPosition(this.x, this.y);
             }
 
-            if (y === this.y && x === this.x) {
+            if (pos.y === this.y && pos.x === this.x) {
                 return false;
             }
 
-            this._scrollTo(x, y, time, EASING.regular);
+            this._scrollTo(pos.x, pos.y, time, EASING.regular);
             return true;
         },
 
@@ -1421,33 +1400,39 @@ function lib(w) { //eslint-disable-line no-unused-vars
 
             time || (time = 0);
 
-            var x = this.x,
-                y = this.y;
+            var pos = this._getValidPosition(this.x, this.y);
+            if (pos.y === this.y && pos.x === this.x) {
+                return false;
+            }
 
+            this._scrollTo(pos.x, pos.y, time, EASING.regular);
+            return true;
+        },
+
+        /**
+         * Returns a position that's within the boundary of scroller's
+         * wrapper based on the input position.
+         */
+        _getValidPosition: function(x, y) {
             // Outside boundaries top
-            if (!this.hasScrollY || this.y > 0) {
+            if (!this.hasScrollY || y > 0) {
                 y = 0;
 
             // Outside boundaries bottom
-            } else if (this.y < this.maxScrollY) {
+            } else if (y < this.maxScrollY) {
                 y = this.maxScrollY;
             }
 
             // Outsede left
-            if (!this.hasScrollX || this.x > 0 ) {
+            if (!this.hasScrollX || x > 0 ) {
                 x = 0;
 
             // Outside right
-            } else if (this.x < this.maxScrollX) {
+            } else if (x < this.maxScrollX) {
                 x = this.maxScrollX;
             }
 
-            if (y === this.y && x === this.x) {
-                return false;
-            }
-
-            this._scrollTo(x, y, time, EASING.regular);
-            return true;
+            return {x: x, y: y};
         },
 
         /**

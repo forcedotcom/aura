@@ -1742,11 +1742,10 @@ function lib(w) { //eslint-disable-line no-unused-vars
         resize: function () {
             var self = this;
             RAF(function () {
-                // NOTE: Check the translate(0,0), we do it so when we get narrow width,
-                // The scroll position may not exist anymore
-                // We should be able to calculate the new (x,y) position
-                self._translate(0,0);
+                // update size
                 self._setSize();
+                // position might be invalid after resizing, move it to the edge if so
+                self._resetPositionIfOutOfBound();
             });
         },
 

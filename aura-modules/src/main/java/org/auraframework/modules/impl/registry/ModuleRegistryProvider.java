@@ -16,10 +16,13 @@
 package org.auraframework.modules.impl.registry;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.auraframework.adapter.ConfigAdapter;
@@ -27,6 +30,7 @@ import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.impl.source.SourceFactory;
 import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.impl.system.CompilingDefRegistry;
 import org.auraframework.modules.source.ModuleLocationAdapter;
@@ -40,6 +44,7 @@ import org.auraframework.util.FileMonitor;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Provides DefRegistry for Aura modules
@@ -67,24 +72,58 @@ public class ModuleRegistryProvider implements RegistryAdapter, SourceListener {
     @Inject
     private List<ModuleLocationAdapter> locationAdapters;
 
+    private Map<ModuleLocationAdapter, DefRegistry> locationMap = Maps.newConcurrentMap();
+
     @Override
     public DefRegistry[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders) {
-
         List<DefRegistry> registries = Lists.newArrayList();
+        List<SourceLoader> moduleLoaders = Lists.newArrayList();
 
         for(ModuleLocationAdapter location : locationAdapters) {
             File modules = location.getSourceDir();
             if (modules != null && modules.canRead() && modules.canExecute() && modules.isDirectory()) {
                 FileSourceLoader fsl = new FileSourceLoader(modules, fileMonitor);
-                registries.add(new CompilingDefRegistry(fsl, PREFIXES, DEF_TYPES, parserFactory));
+                moduleLoaders.add(fsl);
+                CompilingDefRegistry defRegistry = new CompilingDefRegistry(fsl, PREFIXES, DEF_TYPES, parserFactory);
+                registries.add(defRegistry);
+
+                locationMap.putIfAbsent(location, defRegistry);
             }
+        }
+
+        if (moduleLoaders.size() > 0) {
+            // ensure file based module namespaces are cached
+            new SourceFactory(moduleLoaders, configAdapter);
         }
 
         return registries.toArray(new DefRegistry[registries.size()]);
     }
 
+    @PostConstruct
+    public void init() {
+        if (fileMonitor != null) {
+            fileMonitor.subscribeToChangeNotification(this);
+        }
+    }
+
     @Override
     public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
-
+        synchronized (this) {
+            if (filePath != null) {
+                try {
+                    File changedFile = new File(filePath);
+                    String canonicalPath = changedFile.getCanonicalPath();
+                    for (ModuleLocationAdapter mla : locationMap.keySet()) {
+                        String moduleLocationPath = mla.getSourceDir().getCanonicalPath();
+                        if (canonicalPath.startsWith(moduleLocationPath)) {
+                            DefRegistry registry = locationMap.get(mla);
+                            registry.reset();
+                        }
+                    }
+                } catch (IOException ignored) {
+                    // skip
+                }
+            }
+        }
     }
 }

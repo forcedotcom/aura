@@ -40,62 +40,60 @@
           for (var i = 0; i < options.levels; i++) {
               src = 'with(arguments[' + i + ']||{}){' + src + '}';
           }
+          
           var code = 'function ' + hookFn + '(){' + src + '}';
           if (options.sourceURL) {
               code += '\n//# sourceURL=' + options.sourceURL;
           }
+          
           return code;
       }
 
       function evalAndReturn(src) {
           var tmp =  window[hookFn];
-          try{
+          try {
               var script = document.createElement('script');
               script.type = 'text/javascript';
               window[hookFn] = undefined;
               script.appendChild(document.createTextNode(src));
               placeholder.appendChild(script);
               placeholder.removeChild(script);
-          }
-          finally{
+          } finally {
               var result = window[hookFn];
               window[hookFn] = tmp;
               return result;
           }
+      }
+      
+      function safeEval(src, sourceURL, skipPreprocessing, useStrict, originalThis, originalArguments) {
+          if (!src) {
+              return undefined;
+          }
+          
+          var args = Array.prototype.slice.call(originalArguments, 3);
+          
+          var scoped = addLexicalScopesToSource(src, {
+              levels: args.length,
+              useStrict: useStrict,
+              sourceURL: sourceURL, 
+              skipPreprocessing: skipPreprocessing
+          });
+          
+          var fn = evalAndReturn(scoped);
+          
+          return fn.apply(originalThis, args);
       }
 
       // adding non-configurable hooks into parent window.
       Object.defineProperties(parent, {
           '$$safe-eval$$': {
               value: function(src, sourceURL, skipPreprocessing) {
-                  if (!src) {
-                	  return undefined;
-                  }
-                  
-                  var args = Array.prototype.slice.call(arguments, 3);
-                  
-                  var fn = evalAndReturn(addLexicalScopesToSource(src, {
-                      levels: args.length,
-                      useStrict: true,
-                      sourceURL: sourceURL, 
-                      skipPreprocessing: skipPreprocessing
-                  }));
-                  return fn.apply(undefined, args);
+                  return safeEval(src, sourceURL, skipPreprocessing, true, undefined, arguments);
               }
           },
           '$$safe-eval-compat$$': {
               value: function(src, sourceURL, skipPreprocessing) {
-                  if (!src) return undefined;
-
-                  var args = Array.prototype.slice.call(arguments, 3);
-
-                  var fn = evalAndReturn(addLexicalScopesToSource(src, {
-                      levels: args.length,
-                      useStrict: false,
-                      sourceURL: sourceURL,
-                      skipPreprocessing: skipPreprocessing
-                  }));
-                  return fn.apply(args[0], args);
+                  return safeEval(src, sourceURL, skipPreprocessing, false, arguments[0], arguments);
               }
           }
       });

@@ -51,7 +51,7 @@ public class ProviderInstanceBuilder implements InstanceBuilder<ProviderInstance
             instance = instanceBuilderProvider.get(providerDef.getJavaType());
         } catch (Throwable t) {
             throw new AuraRuntimeException(
-                    "Failed to retreive provider instance for " + providerDef.getDescriptor(), t);
+                    "Failed to retrieve provider instance for " + providerDef.getDescriptor(), t);
         }
 
         if (instance instanceof Provider) {

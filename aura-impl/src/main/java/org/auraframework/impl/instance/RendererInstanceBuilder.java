@@ -51,7 +51,7 @@ public class RendererInstanceBuilder implements InstanceBuilder<RendererInstance
             instance = instanceBuilderProvider.get(((JavaRendererDef)rendererDef).getJavaType());
         } catch (Throwable t) {
             throw new AuraRuntimeException(
-                    "Failed to retreive renderer instance for " + rendererDef.getDescriptor(), t);
+                    "Failed to retrieve renderer instance for " + rendererDef.getDescriptor(), t);
         }
         
         if (instance instanceof Renderer) {

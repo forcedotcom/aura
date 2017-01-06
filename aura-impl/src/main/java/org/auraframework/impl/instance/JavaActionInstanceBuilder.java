@@ -84,7 +84,7 @@ public class JavaActionInstanceBuilder implements InstanceBuilder<Action, Action
                 controllerBean = instanceBuilderProvider.get(controllerClass);
             } catch (Throwable t) {
                 throw new AuraRuntimeException(
-                        "Failed to retreive controller instance for " + controllerDef.getDescriptor(), t);
+                        "Failed to retrieve controller instance for " + controllerDef.getDescriptor(), t);
             }
 
             return new JavaAction(controllerDesc, (JavaActionDef) def, controllerBean, attributes,

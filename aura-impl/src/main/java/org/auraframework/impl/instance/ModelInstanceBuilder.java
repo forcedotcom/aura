@@ -70,7 +70,7 @@ public class ModelInstanceBuilder implements InstanceBuilder<Model, ModelDef> {
                     instance = instanceBuilderProvider.get(modelFactoryClass);
                 } catch (Throwable t) {
                     throw new AuraRuntimeException(
-                            "Failed to retreive model instance for " + modelDef.getDescriptor(), t);
+                            "Failed to retrieve model instance for " + modelDef.getDescriptor(), t);
                 }
                 if (instance instanceof ModelFactory) {
                     bean = ((ModelFactory) instance).modelInstance();

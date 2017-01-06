@@ -36,5 +36,11 @@
         test: function(cmp) {
             cmp.testContentWindow();
         }
+    },
+
+    testMessageChannel: {
+        test: function(cmp) {
+            cmp.testMessageChannel();
+        }
     }
 })

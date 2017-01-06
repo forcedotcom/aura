@@ -19,8 +19,6 @@
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
     <aura:attribute name="messageReceived" type="String"/>
 
-    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-
     <aura:method name="testIframeAttributes" action="{!c.testIframeAttributes}">
         <aura:attribute name="attributesWhitelist" type="List"/>
         <aura:attribute name="attributesBlacklist" type="List"/>
@@ -29,7 +27,10 @@
         <aura:attribute name="methodsWhitelist" type="List"/>
     </aura:method>
     <aura:method name="testContentWindow" action="{!c.testContentWindow}"/>
+    <aura:method name="testMessageChannel" action="{!c.testMessageChannel}"/>
 
     <div aura:id="title">SecureIFrameElement test</div>
+
     <iframe aura:id="iframe" id="iframe" src="/lockerTestOtherNamespace/iframeCmp.cmp" width="100%"/>
+    <iframe aura:id="iframeMessageChannel" id="iframeMessageChannel" src="/lockerTestOtherNamespace/iframeMessageChannel.cmp" width="100%"/>
 </aura:component>

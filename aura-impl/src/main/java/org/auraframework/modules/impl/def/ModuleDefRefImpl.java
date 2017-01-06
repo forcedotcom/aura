@@ -16,6 +16,7 @@
 package org.auraframework.modules.impl.def;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
@@ -25,7 +26,9 @@ import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-public class ModuleDefRefImpl extends DefinitionImpl<ModuleDef> implements ModuleDefRef {
+public class ModuleDefRefImpl extends DefinitionImpl<ModuleDef> implements ModuleDefRef, Serializable {
+
+    private static final long serialVersionUID = 2121381558446216947L;
 
     protected ModuleDefRefImpl(RefBuilderImpl<ModuleDef, ?> builder) {
         super(builder);

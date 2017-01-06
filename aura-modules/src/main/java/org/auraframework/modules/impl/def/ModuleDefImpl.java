@@ -16,6 +16,7 @@
 package org.auraframework.modules.impl.def;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
@@ -27,8 +28,9 @@ import org.auraframework.util.json.Json;
 /**
  * ModuleDef holds compiled code and serializes for client
  */
-public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDef {
+public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDef, Serializable {
 
+    private static final long serialVersionUID = 5154640929496754931L;
     private String path;
     private String compiledCode;
 

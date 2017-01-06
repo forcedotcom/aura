@@ -592,19 +592,13 @@
         //validate the list shares the left position of the button
 		$A.test.addWaitForWithFailureMessage(true, function() {
 			var refElementLoc,autoCompleteListLoc;
-			if(referenceElemId.indexOf("left") !=-1){
-				refElementLoc = cmp.find(referenceElemId).getElement().getBoundingClientRect().right;
-			    autoCompleteListLoc = autocomplete.getSuper().find("list").getElement().getBoundingClientRect().right;
-			}
-			else{
-				refElementLoc = cmp.find(referenceElemId).getElement().getBoundingClientRect().right;
-			    autoCompleteListLoc = autocomplete.getSuper().find("list").getElement().getBoundingClientRect().right;
-			}
+            refElementLoc = cmp.find(referenceElemId).getElement().getBoundingClientRect().left;
+            autoCompleteListLoc = autocomplete.getSuper().find("panel").getElement().getBoundingClientRect().left;
 
             // these values must be rounded because panel position is integer only
             // but browsers support fractions of pixels
             
-			return Math.ceil(refElementLoc)===Math.ceil(autoCompleteListLoc);
+			return (refElementLoc|0)===(autoCompleteListLoc|0);
 		}, "List should be position below "+referenceElemId);
     }
 })

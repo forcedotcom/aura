@@ -41,7 +41,6 @@ public class InputSearchUITest extends WebDriverTestCase {
         WebElement input = getAuraUITestingUtil().findElementAndTypeEventNameInIt("search");
         assertFalse("Search event should not have been triggered yet",
                 getAuraUITestingUtil().getBooleanEval(valueExpression));
-        assertNull("Component value should not be updated yet", getAuraUITestingUtil().getEval(cmpValueExpression));
         getAuraUITestingUtil().pressEnter(input);
         waitForCondition(valueExpression);
         // test case for W-1545841

@@ -30,6 +30,14 @@
     },
 
     input: function(component, event, helper) {
+    	var searchCmp = component.find("search");
+    	
+    	if(searchCmp) {
+    		var el = searchCmp.getElement();
+        	if(el) {
+        		component.set("v.value", el.value);
+        	}
+    	}
         helper.toggleClearButton(component);
     }
 })// eslint-disable-line semi

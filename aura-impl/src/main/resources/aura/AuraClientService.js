@@ -3484,9 +3484,10 @@ AuraClientService.prototype.enqueueAction = function(action, background) {
  * @param {Action} action - target action
  * @return {Promise} a promise which is resolved or rejected depending on the state of the action
  * @export
+ * @deprecated
  */
 AuraClientService.prototype.deferAction = function (action) {
-    $A.warning("$A.deferAction is broken, do not use it!");
+    $A.deprecated("$A.deferAction is broken, do not use it.","Use '$A.enqueueAction(action);'.","2017/01/06");
     var acs = this;
     var promise = new Promise(function(success, error) {
 

@@ -24,6 +24,7 @@ Test.Aura.AuraComponentServiceTest = function(){
                 throw error;
             }
         },
+        deprecated:function(){},
         util: {
             isFunction: function(obj){
                 return false;

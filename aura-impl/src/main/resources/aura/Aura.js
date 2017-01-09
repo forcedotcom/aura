@@ -239,9 +239,6 @@ window['$A'] = {};
  * @borrows Aura.Services.AuraComponentService#createComponent as createComponent
  * @borrows Aura.Services.AuraComponentService#createComponents as createComponents
  * @borrows Aura.Services.AuraComponentService#getComponent as getComponent
- * @borrows Aura.Services.AuraComponentService#newComponentDeprecated as newCmp
- * @borrows Aura.Services.AuraComponentService#newComponentDeprecated as newCmpDeprecated
- * @borrows Aura.Services.AuraComponentService#newComponentAsync as newCmpAsync
  * @borrows Aura.Services.AuraEventService.newEvent as getEvt
  */
 function AuraInstance () {
@@ -442,7 +439,6 @@ function AuraInstance () {
     this.Component                 = Component;
 
     this.enqueueAction             = this.clientService.enqueueAction.bind(this.clientService);
-    this.deferAction               = this.clientService.deferAction.bind(this.clientService);
     this.deferPendingActions       = this.clientService.deferPendingActions.bind(this.clientService);
     this.runAfterInit              = this.clientService.runAfterInitDefs.bind(this.clientService);
 
@@ -455,12 +451,16 @@ function AuraInstance () {
     this.getComponent              = this.componentService.getComponent.bind(this.componentService);
     this.createComponent           = this.componentService["createComponent"].bind(this.componentService);
     this.createComponents          = this.componentService["createComponents"].bind(this.componentService);
-    this.newCmp                    = this.componentService["newComponentDeprecated"].bind(this.componentService);
-    this.newCmpDeprecated          = this.componentService["newComponentDeprecated"].bind(this.componentService);
-    this.newCmpAsync               = this.componentService["newComponentAsync"].bind(this.componentService);
 
     this.createComponentFromConfig = this.componentService.createComponentFromConfig.bind(this.componentService);
     this.getEvt                    = this.eventService.newEvent.bind(this.eventService);
+
+    // DEPRECATED
+    this.deferAction               = this.clientService.deferAction.bind(this.clientService);
+    this.newCmp                    = this.componentService["newComponentDeprecated"].bind(this.componentService);
+    this.newCmpDeprecated          = this.componentService["newComponentDeprecated"].bind(this.componentService);
+    this.newCmpAsync               = this.componentService["newComponentAsync"].bind(this.componentService);
+    // END DEPRECATED
 
     /**
      * Pushes current portion of attribute's creationPath onto stack
@@ -533,7 +533,6 @@ function AuraInstance () {
     this["styleService"] = this.styleService;
     this["services"] = this.services;
     this["enqueueAction"] = this.enqueueAction;
-    this["deferAction"] = this.deferAction;
     this["deferPendingActions"] = this.deferPendingActions;
     this["render"] = this.render;
     this["rerender"] = this.rerender;
@@ -549,15 +548,11 @@ function AuraInstance () {
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     this["devToolService"] = this.devToolService;
     this["getQueryStatement"] = this.devToolService.newStatement;
-    this["qhelp"] = function() { return this.devToolService.help();};
     //#end
 
     this["createComponent"] = this.createComponent;
     this["createComponents"] = this.createComponents;
     this["createComponentFromConfig"] = this.createComponentFromConfig;
-    this["newCmp"] = this.newCmp;
-    this["newCmpDeprecated"] = this.newCmpDeprecated;
-    this["newCmpAsync"] = this.newCmpAsync;
     this["getEvt"] = this.getEvt;
     this["Component"] = this.Component;
 
@@ -573,6 +568,17 @@ function AuraInstance () {
     this["hasDefinition"] = this.hasDefinition;
     this["getDefinition"] = this.getDefinition;
     this["getDefinitions"] = this.getDefinitions;
+
+    // DEPRECATED
+    this["deferAction"] = this.deferAction;
+    this["newCmp"] = this.newCmp;
+    this["newCmpDeprecated"] = this.newCmpDeprecated;
+    this["newCmpAsync"] = this.newCmpAsync;
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    this["qhelp"] = function() { return this.devToolService.help();};
+    //#end
+
+    // END DEPRECATED
 
     var services = this.services;
 
@@ -1407,13 +1413,28 @@ AuraInstance.prototype.deprecated = function(message,workaround,sinceDate,dueDat
     }else{
         dueDate=new Date(dueDate);
         testDueDate=new Date(dueDate);
-        testDueDate.setTime(testDueDate.getTime()-TEST_BUFFER);
+        testDueDate.setTime(testDueDate.getTime() - TEST_BUFFER);
+        if(!sinceDate) {
+            sinceDate = new Date(dueDate);
+            sinceDate.setTime(sinceDate.getTime() - DEFAULT_DEPRECATION);
+        }else{
+            sinceDate=new Date(sinceDate);
+        }
     }
-    message=$A.util.format("DEPRECATED (as of {0}): {1}\n\t{2}\n{3}",
+    // JBUCH: Try the stackparser, confirm across browsers
+    //var source=Aura.Errors.StackParser.parse(new Error())[3]['getFunctionName']();
+    var source=new Error().stack.split('\n')[3];
+    if(source.indexOf("/aura_")>-1){
+        // JBUCH: TEMPORARILY IGNORE CALLS BY FRAMEWORK.
+        // REMOVE WHEN ALL @public METHODS HAVE BEEN ADDRESSED.
+        return;
+    }
+    message=$A.util.format("DEPRECATED (as of {0}, unusable on {1}): {2}\n\t{3}\n{4}",
+        $A.localizationService.formatDate(sinceDate),
         $A.localizationService.formatDate(dueDate),
         message,
-        $A.util.trim(new Error().stack.split('\n')[3]),
-        workaround||"No known workaround."
+        $A.util.trim(source),
+        workaround?"Workaround: "+workaround:"No known workaround."
     );
     if(Date.now()>=dueDate){
         $A.error(message);

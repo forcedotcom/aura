@@ -1406,6 +1406,7 @@ var AuraDevToolService = function() {
             return result;
         },
         help : function(){
+            $A.deprecated("$A.qhelp and $A.devToolService.help are not supported.",null,"2017/01/06");
             var ret = [];
             ret.push("\n COQL Usage");
             var txt = this.helpText;

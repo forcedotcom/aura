@@ -18,9 +18,9 @@
         var dom = this.superRender();
         return dom;
     },
-    afterRender: function (cmp, hlp) {
+    afterRender: function (cmp) {
         this.superAfterRender();
-        hlp.afterRenderCarousel(cmp);
+        cmp.getConcreteComponent().getDef().getHelper().afterRenderCarousel(cmp);
     },
     unrender: function () {
         this.superUnrender();

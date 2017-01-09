@@ -21,8 +21,9 @@
 	<aura:html tag="a" aura:id="noAttr">link no attributes</aura:html><br/>
 	<!-- TODO : @auraframework - uncommment after bug W-1538537
 	<aura:html tag="object" aura:id="objecttag">unsupported tag</aura:html><br/>
-	<aura:html tag="abc" aura:id="invalidtag">invalid tag</aura:html><br/> 
+	<aura:html tag="abc" aura:id="invalidtag">invalid tag</aura:html><br/>
 	-->
+	<Div aura:id="mixedCaseHtmlElement">mixedCaseHtmlElement</Div>
 	<aura:attribute default="false" name="testUndefinedTagAttr" type="Boolean"/>
 	<aura:if isTrue="{!v.testUndefinedTagAttr}">
 		<aura:html aura:id="undefinedTag" tag="{!v.attr}">Reference to undefined attribute</aura:html>

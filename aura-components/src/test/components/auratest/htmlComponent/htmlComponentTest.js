@@ -65,7 +65,7 @@
 			$A.test.assertNull(tag, "Unsupported tag should NOT have rendered");
 		}
 	},
-	
+
 	/*
 	 * TODO : @auraframework - uncommment after bug W-1538537
 	 */
@@ -76,6 +76,19 @@
 		test: function(component){
 			var tag = component.find("invalidtag").getElement();	
 			$A.test.assertNull(tag, "Invlaid tag should NOT have rendered");
+		}
+	},
+
+	/**
+	 * Use mismatched case for tag name
+	 */
+	testMixedCaseTag: {
+		test: function(component){
+			var tag = component.find("mixedCaseHtmlElement").getElement();
+			$A.test.assertNotNull(tag, "mismatched case tag should have rendered");
+			$A.createComponent("aura:html", {"tag":"DiV"}, function(cmp) {
+				$A.test.assertNotNull(cmp, "mismatched case tag should have been created");
+			})
 		}
 	},
 	

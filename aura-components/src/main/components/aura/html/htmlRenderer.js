@@ -20,7 +20,7 @@
 			throw new Error("Undefined tag attribute for " + component.getGlobalId());
 		}
 
-		if(!helper.ALLOWED_TAGS.hasOwnProperty(tag)){
+		if(!helper.ALLOWED_TAGS.hasOwnProperty(tag) && !helper.ALLOWED_TAGS.hasOwnProperty(tag.toLowerCase())){
 			throw new Error("The HTML tag '"+tag+"' is not allowed.");
 		}
 

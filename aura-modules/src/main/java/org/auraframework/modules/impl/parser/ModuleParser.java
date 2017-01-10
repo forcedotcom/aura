@@ -15,7 +15,7 @@
  */
 package org.auraframework.modules.impl.parser;
 
-import java.util.concurrent.Future;
+import java.io.File;
 
 import javax.inject.Inject;
 
@@ -26,6 +26,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.modules.impl.ModulesCompiler;
+import org.auraframework.modules.impl.ModulesCompilerJ2V8;
 import org.auraframework.modules.impl.def.ModuleDefImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
@@ -60,7 +61,7 @@ public class ModuleParser implements Parser<ModuleDef> {
         // Hack to get .js path for modules compiler.
         // Will eventually need to write our own FileSourceLoader that has own DescriptorFileMapper mapping for ".js"
         filePath = filePath.replace(".html", ".js");
-        ModulesCompiler compiler = new ModulesCompiler();
+        ModulesCompiler compiler = new ModulesCompilerJ2V8();
 
         ModuleDefImpl.Builder builder = new ModuleDefImpl.Builder();
 
@@ -78,8 +79,8 @@ public class ModuleParser implements Parser<ModuleDef> {
         builder.setPath(filePath);
 
         try {
-            Future<String> future = compiler.compile(filePath);
-            builder.setCompiledCode(future.get());
+            String compiledCode = compiler.compile(new File(filePath));
+            builder.setCompiledCode(compiledCode);
             return builder.build();
 
         } catch (Exception e) {

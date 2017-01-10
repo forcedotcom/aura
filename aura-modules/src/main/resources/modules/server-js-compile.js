@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.modules.impl;
+console.log("START: server-js-compile.js");
 
-import java.io.File;
-
-/**
- * Interface to compile modules
- */
-public interface ModulesCompiler {
-
-    String compile(File file) throws Exception;
-}
+var scriptReady = false;
+compiler.compile({
+    componentPath: codes.componentPath,
+    sourceTemplate: codes.sourceTemplate,
+    sourceClass: codes.sourceClass
+}).then((result) => {
+    console.log('\n--- CODE START ---\n' + result.code + '--- CODE END ---');
+    scriptReady = true;
+}).catch((err) => {
+    console.log('\n--- ERROR START ---\n' + err + '--- ERROR END ---');
+    scriptReady = true; // otherwise will hit timeout when there's a compilation failure.
+});

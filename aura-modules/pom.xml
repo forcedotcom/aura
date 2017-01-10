@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>aura-framework</artifactId>
         <groupId>org.auraframework</groupId>
@@ -27,7 +27,15 @@
             <groupId>org.auraframework</groupId>
             <artifactId>aura-impl</artifactId>
         </dependency>
-        
+        <!-- for ModulesCompilerServerJS -->
+        <!-- requires httpclient:4.5.2 and httpcore:4.4.4
+        <dependency>
+            <groupId>com.force.nodeapp</groupId>
+            <artifactId>nodeapp-client</artifactId>
+            <version>0.0.12</version>
+        </dependency>
+        -->
+
         <dependency>
             <groupId>org.auraframework</groupId>
             <artifactId>aura-util</artifactId>
@@ -35,27 +43,27 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
+
     <build>
-       <plugins>
-           <plugin>
-               <groupId>com.github.eirslett</groupId>
-               <artifactId>frontend-maven-plugin</artifactId>
-               <configuration>
-                   <workingDirectory>${project.parent.basedir}</workingDirectory>
-               </configuration>
-               <executions>
-                   <execution>
-                       <id>install-node-npm</id>
-                       <phase>pre-clean</phase>
-                   </execution>
-                   <execution>
-                       <id>npm-install</id>
-                       <phase>pre-clean</phase>
-                   </execution>
-               </executions>
-           </plugin>
-       </plugins>
-   </build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <configuration>
+                    <workingDirectory>${project.parent.basedir}</workingDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install-node-npm</id>
+                        <phase>pre-clean</phase>
+                    </execution>
+                    <execution>
+                        <id>npm-install</id>
+                        <phase>pre-clean</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

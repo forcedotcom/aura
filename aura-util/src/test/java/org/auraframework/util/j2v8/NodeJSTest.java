@@ -27,6 +27,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.eclipsesource.v8.JavaVoidCallback;
@@ -66,6 +67,7 @@ public class NodeJSTest extends UnitTestCase {
 
     // profile
 
+    @Ignore("may flap")
     @Test
     public void testProfile() throws Exception {
         File quickSortJS = getResourceFile("/testdata/j2v8/quickSort.js");

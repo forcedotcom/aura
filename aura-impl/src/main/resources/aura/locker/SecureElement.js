@@ -114,6 +114,12 @@ var domPurifyConfig = {
                      "target"]
 };
 
+function propertyIsSupported(target, property) {
+    // If the SecureElement prototype does not have the property directly on it then this
+    // is an attempt to get a property that we do not support
+    return Object.getPrototypeOf(target).hasOwnProperty(property);
+}
+
 function SecureElement(el, key) {
 	"use strict";
 
@@ -153,43 +159,48 @@ function SecureElement(el, key) {
 	    KEY_TO_PROTOTYPES.set(key, prototypes);
 	}
 
-	var prototype = prototypes.get(tagName);
-	if (!prototype) {
-	    var expandoCapturingPrototype;
+	var prototypeInfo = prototypes.get(tagName);
+	if (!prototypeInfo) {
+	    var expandoCapturingHandler;
+        var elementPrototypeProxy;
 	    if (SecureObject.useProxy()) {
 	        var basePrototype = Object.getPrototypeOf(el);
 	        
-    	    expandoCapturingPrototype = new Proxy({}, {
-    	        "getPrototypeOf": function() {
-    	            return basePrototype;
-    	        },
-    	        
-    	        "setPrototypeOf": function(target) {
-                    throw new Error("Illegal attempt to set the prototype of: " + target);
-    	        },
-    	        
+	        // The magic to make SecureElements appear to be Elements
+	        elementPrototypeProxy = new Proxy({}, {
+                "getPrototypeOf": function() {
+                    return basePrototype;
+                },
+                
+                "setPrototypeOf": function() {
+                    throw new Error("Illegal attempt to set the prototype of: " + basePrototype);
+                }
+            });                
+
+	        expandoCapturingHandler = {
     	        "get": function(target, property) {
-                    // If we got this far in the prototype chain and the requested property exists on the actual Element prototype 
-    	            // then we know the caller is trying to reference an unsupported property
-	                if (property in basePrototype) {                    
-	                    return undefined;
+	                if (property in basePrototype) {
+	                    return propertyIsSupported(target, property) ? target[property] : undefined;
 	                }
-	                	                	                
+	                	                	                	                
 	                // Expando - retrieve it from a private locker scoped object
-	                var raw = ls_getRef(o, key);
+	                var raw = ls_getRef(target, key);
 	                var data = ls_getData(raw, key);
 	                return data ? data[property] : undefined;
     	        }, 	        
                 
                 "set": function(target, property, value) {
-                    // If we got this far in the prototype chain and the requested property exists on the actual Element prototype 
-                    // then we know the caller is trying to reference an unsupported property
-                    if (property in basePrototype) {                    
-                        return undefined;
+                    if (property in basePrototype) {
+                        if (!propertyIsSupported(target, property)) {
+                            throw new Error("SecureElement does not allow access to " + property);
+                        }
+
+                        target[property] = value;
+                        return true;
                     }   
-                                        
+                                                          
                     // Expando - store it from a private locker scoped object
-                    var raw = ls_getRef(o, key);
+                    var raw = ls_getRef(target, key);
                     var data = ls_getData(raw, key);
                     if (!data) {
                         data = {};
@@ -200,10 +211,10 @@ function SecureElement(el, key) {
                     
                     return true;
                 }
-    	    });
+    	    };
 	    }
 	    
-		prototype = Object.create(expandoCapturingPrototype || null);
+		var prototype = Object.create(elementPrototypeProxy || null);
 
 		// "class", "id", etc global attributes are special because they do not directly correspond to any property
 		var caseInsensitiveAttributes = { 
@@ -226,7 +237,12 @@ function SecureElement(el, key) {
 			}
 		});
 		
-		prototypes.set(tagName, prototype);
+		prototypeInfo = {
+            prototype: prototype,
+            expandoCapturingHandler: expandoCapturingHandler
+        };
+	
+		prototypes.set(tagName, prototypeInfo);
 		
 		var prototypicalInstance = Object.create(prototype);
 		ls_setRef(prototypicalInstance, el, key);
@@ -342,11 +358,16 @@ function SecureElement(el, key) {
 		});
 	}
 
-	o = Object.create(prototype);
+	o = Object.create(prototypeInfo.prototype);
 
+    if (prototypeInfo.expandoCapturingHandler) {
+        ls_setRef(o, el, key);
+        o = new Proxy(o, prototypeInfo.expandoCapturingHandler);
+    }
+    
 	ls_setRef(o, el, key);
 	ls_addToCache(el, o, key);
-
+    
 	return o;
 }
 

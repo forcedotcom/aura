@@ -165,13 +165,13 @@ function SecureElement(el, key) {
         var elementPrototypeProxy;
 	    if (SecureObject.useProxy()) {
 	        var basePrototype = Object.getPrototypeOf(el);
-	        
+
 	        // The magic to make SecureElements appear to be Elements
 	        elementPrototypeProxy = new Proxy({}, {
                 "getPrototypeOf": function() {
                     return basePrototype;
                 },
-                
+
                 "setPrototypeOf": function() {
                     throw new Error("Illegal attempt to set the prototype of: " + basePrototype);
                 }
@@ -182,13 +182,13 @@ function SecureElement(el, key) {
 	                if (property in basePrototype) {
 	                    return propertyIsSupported(target, property) ? target[property] : undefined;
 	                }
-	                	                	                	                
+
 	                // Expando - retrieve it from a private locker scoped object
 	                var raw = ls_getRef(target, key);
 	                var data = ls_getData(raw, key);
 	                return data ? data[property] : undefined;
-    	        }, 	        
-                
+    	        },
+
                 "set": function(target, property, value) {
                     if (property in basePrototype) {
                         if (!propertyIsSupported(target, property)) {
@@ -198,7 +198,7 @@ function SecureElement(el, key) {
                         target[property] = value;
                         return true;
                     }   
-                                                          
+
                     // Expando - store it from a private locker scoped object
                     var raw = ls_getRef(target, key);
                     var data = ls_getData(raw, key);
@@ -210,6 +210,44 @@ function SecureElement(el, key) {
                     data[property] = value;
                     
                     return true;
+                },
+
+                "has": function(target, property) {
+                    if (property in basePrototype) {
+                        return true;
+                    }
+                    var raw = ls_getRef(target, key);
+                    var data = ls_getData(raw, key);
+                    return !!data && property in data;
+                },
+
+                "deleteProperty": function(target, property) {
+                    var raw = ls_getRef(target, key);
+                    var data = ls_getData(raw, key);
+                    if (data && property in data) {
+                        return delete data[property];
+                    }
+                    return delete target[property];
+                },
+
+                "ownKeys": function(target) {
+                    var raw = ls_getRef(target, key);
+                    var data = ls_getData(raw, key);
+                    var keys = Object.keys(raw);
+                    if (data) {
+                        keys = keys.concat(Object.keys(data));
+                    }
+                    return keys;
+                },
+
+                "getOwnPropertyDescriptor": function(target, property) {
+                    var desc = Object.getOwnPropertyDescriptor(target, property);
+                    if (!desc) {
+                        var raw = ls_getRef(target, key);
+                        var data = ls_getData(raw, key);
+                        desc = Object.getOwnPropertyDescriptor(data,  property);
+                    }
+                    return desc;
                 }
     	    };
 	    }

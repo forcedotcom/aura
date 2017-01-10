@@ -32,12 +32,12 @@
         var elementPropertiesBlacklist = event.getParam("arguments").elementPropertiesBlacklist;
         var c = cmp.find(auraId);
         var element = c.getElement();
-        
+
         elementPropertiesWhitelist.forEach(function(name) {
             testUtils.assertTrue(name in element, "Expected property '" + name + "' to be a property on SecureElement");
         });
         elementPropertiesBlacklist.forEach(function(name) {
-            testUtils.assertFalse(name in element, "Expected property '" + name + "' to not be exposed on SecureElement");
+            testUtils.assertUndefined(element[name], "Expected property '" + name + "' to return undefined on SecureElement");
         });
     },
 
@@ -51,7 +51,7 @@
             testUtils.assertTrue(name in element, "Expected property '" + name + "' to be a property on SecureElement");
         });
         htmlPropertiesBlacklist.forEach(function(name) {
-            testUtils.assertFalse(name in element, "Expected property '" + name + "' to not be exposed on SecureElement");
+            testUtils.assertFalse(element[name], "Expected property '" + name + "' to return undefined on SecureElement");
         });
     },
 

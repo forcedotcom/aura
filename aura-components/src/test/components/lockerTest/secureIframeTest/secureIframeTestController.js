@@ -10,7 +10,7 @@
         });
         
         attributesBlacklist.forEach(function(name) {
-            testUtils.assertFalse(name in iframe);
+            testUtils.assertUndefined(iframe[name], "Expected property '" + name + "' to be undefined on SecureIFrameElement");
         });
 
         function verifySrcdocBlocked(iframe, name, f) {

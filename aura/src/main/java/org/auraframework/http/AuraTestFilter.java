@@ -77,7 +77,6 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -321,7 +320,9 @@ public class AuraTestFilter implements Filter {
     }
     
     public void processInjection(FilterConfig filterConfig) {
-        SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, servletContext);
+        if (testContextAdapter == null) {
+            SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, servletContext);
+        }
     }
 
     @Override

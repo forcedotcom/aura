@@ -157,7 +157,11 @@ public class AuraContextFilter implements Filter {
             loggingService.setValue(LoggingService.REQUEST_METHOD, request.getMethod());
             loggingService.setValue(LoggingService.AURA_REQUEST_URI, request.getRequestURI());
             loggingService.setValue(LoggingService.AURA_REQUEST_QUERY, request.getQueryString());
-            testFilter.doFilter(req, res, chain);
+            if (testFilter != null) {
+                testFilter.doFilter(req, res, chain);
+            } else {
+                chain.doFilter(req, res);
+            }
         } catch (InvalidParamException e) {
             HttpServletResponse response = (HttpServletResponse) res;
             response.setStatus(500);
@@ -389,7 +393,9 @@ public class AuraContextFilter implements Filter {
         if (!AuraTextUtil.isNullEmptyOrWhitespace(dirConfig)) {
             componentDir = filterConfig.getServletContext().getRealPath("/") + dirConfig;
         }
-        testFilter.init(filterConfig);
+        if (testFilter != null) {
+            testFilter.init(filterConfig);
+        }
     }
     
     public void processInjection(FilterConfig filterConfig) {

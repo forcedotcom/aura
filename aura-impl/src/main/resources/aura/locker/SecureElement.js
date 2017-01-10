@@ -158,37 +158,38 @@ function SecureElement(el, key) {
 	    var expandoCapturingPrototype;
 	    if (SecureObject.useProxy()) {
 	        var basePrototype = Object.getPrototypeOf(el);
+	        
     	    expandoCapturingPrototype = new Proxy({}, {
     	        "getPrototypeOf": function() {
     	            return basePrototype;
     	        },
     	        
     	        "setPrototypeOf": function(target) {
-                    throw new Error("Attempt to set the prototype of: " + target);
+                    throw new Error("Illegal attempt to set the prototype of: " + target);
     	        },
     	        
-    	        "get": function(target, property, receiver) {
+    	        "get": function(target, property) {
                     // If we got this far in the prototype chain and the requested property exists on the actual Element prototype 
     	            // then we know the caller is trying to reference an unsupported property
 	                if (property in basePrototype) {                    
 	                    return undefined;
 	                }
-	                	                
+	                	                	                
 	                // Expando - retrieve it from a private locker scoped object
-	                var raw = SecureObject.getRaw(receiver, prototype);
+	                var raw = ls_getRef(o, key);
 	                var data = ls_getData(raw, key);
 	                return data ? data[property] : undefined;
     	        }, 	        
                 
-                "set": function(target, property, value, receiver) {
+                "set": function(target, property, value) {
                     // If we got this far in the prototype chain and the requested property exists on the actual Element prototype 
                     // then we know the caller is trying to reference an unsupported property
                     if (property in basePrototype) {                    
                         return undefined;
                     }   
-                    
+                                        
                     // Expando - store it from a private locker scoped object
-                    var raw = SecureObject.getRaw(receiver, prototype);
+                    var raw = ls_getRef(o, key);
                     var data = ls_getData(raw, key);
                     if (!data) {
                         data = {};

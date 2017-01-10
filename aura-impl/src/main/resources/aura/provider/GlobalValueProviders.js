@@ -23,6 +23,7 @@
  *   <li>getStorableValues[optional] get a storable version of the GVP values
  *   <li>getValues: get a set of values that can be exposed.
  *   <li>set[optional]: set a value on the provider
+ *   <li>isStorable[optional]: should values be saved to storage
  * </ul>
  *
  * @param {Object} gvp an optional serialized GVP to load.
@@ -157,8 +158,12 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
                 for (type in that.valueProviders) {
                     if (that.valueProviders.hasOwnProperty(type)) {
                         valueProvider = that.valueProviders[type];
-                        values = valueProvider.getStorableValues ? valueProvider.getStorableValues() : (valueProvider.getValues ? valueProvider.getValues() : valueProvider);
-                        toStore.push({ "type" : type, "values" : values });
+                        // GVP values saved to storage be default. isStorable allows it to not be stored
+                        var storable = typeof valueProvider["isStorable"] === "function" ? valueProvider["isStorable"]() : true;
+                        if (storable) {
+                            values = valueProvider.getStorableValues ? valueProvider.getStorableValues() : (valueProvider.getValues ? valueProvider.getValues() : valueProvider);
+                            toStore.push({"type": type, "values": values});
+                        }
                     }
                 }
 

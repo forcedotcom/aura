@@ -15,6 +15,10 @@
  */
 package org.auraframework.impl.java.controller;
 
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
+
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -25,10 +29,6 @@ import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.util.json.Json;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * The default implementation for a java controller def.
@@ -52,6 +52,7 @@ public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> impleme
         super.appendDependencies(dependencies);
         // FIXME: put all of our action dependencies in here...
     }
+
     /**
      * used by the controller itself to get the type
      */

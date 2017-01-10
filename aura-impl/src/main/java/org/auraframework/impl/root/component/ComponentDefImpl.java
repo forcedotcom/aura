@@ -55,15 +55,15 @@ public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> impleme
             return new ComponentDefImpl(this);
         }
 
-    @Override
-    public DefDescriptor<ComponentDef> getDefaultExtendsDescriptor() {
-        return ComponentDefImpl.PROTOTYPE_COMPONENT;
+        @Override
+        public DefDescriptor<ComponentDef> getDefaultExtendsDescriptor() {
+            return ComponentDefImpl.PROTOTYPE_COMPONENT;
+        }
     }
-	}
 
     @Override
     public List<DefDescriptor<ComponentDef>> getTrackedDependencies() {
-    	return null;
+        return null;
     }
 
     @Override

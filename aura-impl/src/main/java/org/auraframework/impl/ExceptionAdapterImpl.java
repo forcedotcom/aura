@@ -26,6 +26,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.http.resource.AuraResourceImpl.AuraResourceException;
+import org.auraframework.impl.compound.controller.CompoundControllerDefFactory.ActionNameConflictException;
 import org.auraframework.impl.controller.ComponentController.AuraClientException;
 import org.auraframework.instance.Action;
 import org.auraframework.throwable.AuraExceptionInfo;
@@ -54,6 +55,10 @@ public class ExceptionAdapterImpl implements ExceptionAdapter {
             String message = String.format("An exception occured while creating Aura resource '%s', Status Code: %s.",
                     resourceException.getResourceName(), resourceException.getStatusCode());
             log.warn(message, resourceException);
+            return th;
+        }
+        else if(th instanceof ActionNameConflictException) {
+            log.warn(th.getMessage());
             return th;
         }
 

@@ -35,6 +35,7 @@ import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
@@ -82,6 +83,8 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     private DefinitionService definitionService;
 
     private ConfigAdapter configAdapter;
+
+    private ExceptionAdapter exceptionAdapter;
 
     private ParserFactory parserFactory;
 
@@ -340,7 +343,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             regBuild.add(new CachingDefRegistryImpl(factory, markupDefTypes, markupPrefixes));
         }
 
-        regBuild.add(new NonCachingDefRegistryImpl(new CompoundControllerDefFactory(),
+        regBuild.add(new NonCachingDefRegistryImpl(new CompoundControllerDefFactory(exceptionAdapter),
                 DefType.CONTROLLER, DefDescriptor.COMPOUND_PREFIX));
 
         // Gah! this is stupid.
@@ -509,4 +512,12 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         this.locationAdapters = locationAdapters;
     }
 
+    public ExceptionAdapter getExceptionAdapter() {
+        return exceptionAdapter;
+    }
+
+    @Inject
+    public void setExceptionAdapter(ExceptionAdapter exceptionAdapter) {
+        this.exceptionAdapter = exceptionAdapter;
+    }
 }

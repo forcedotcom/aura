@@ -203,6 +203,17 @@ IndexedDBAdapter.prototype.getSize = function() {
 IndexedDBAdapter.prototype.getItems = function(keys /*, includeExpired*/) {
     $A.assert(this.ready, "IndexedDBAdapter.getItems() called with this.ready=" + this.ready);
     // TODO - optimize by respecting includeExpired
+
+    // Chrome bug, having a call to keys.join will fix the issue that inactive tab isn't fully loaded (W-3609709)
+    // note that Chrome UA string has Safari in it so can only negate not FF and not IE
+    var userAgent = navigator.userAgent;
+    if (!$A.initialized &&
+            userAgent.indexOf("Firefox") === -1 &&
+            userAgent.indexOf("MSIE") === -1 &&
+            userAgent.indexOf("Chrome") > -1) {
+        keys.join(',');    
+    }
+    
     var that = this;
     return new Promise(function(resolve, reject) {
         if (!Array.isArray(keys) || keys.length === 0) {

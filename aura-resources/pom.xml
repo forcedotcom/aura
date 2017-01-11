@@ -15,8 +15,8 @@
         </dependency>
     </dependencies>
     <build>
-        <resources>
-            <resource>
+      <resources>
+         <resource>
                 <!-- We generate resources into a separate directory from
                      target/classes, so Eclipse can look for it with C-S-r if
                      anyone wants that for debugging. -->
@@ -96,7 +96,6 @@
             <executions>
                <execution>
                   <id>copy-jsdoc3</id>
-                  <!-- here the phase you need -->
                   <phase>validate</phase>
                   <goals>
                      <goal>copy-resources</goal>
@@ -147,6 +146,18 @@
       </plugins>
       <pluginManagement>
          <plugins>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-jar-plugin</artifactId>
+               <configuration>
+                  <excludes>
+                     <exclude>jsdoc/**/*.html</exclude>
+                     <exclude>jsdoc/**/*.js</exclude>
+                     <exclude>jsdoc/**/*.css</exclude>
+                     <exclude>jsdoc/**/*.txt</exclude>
+                  </excludes>
+               </configuration>
+            </plugin>
             <!--This plugin's configuration is used to store Eclipse m2e settings
                     only. It has no influence on the Maven build itself. -->
             <plugin>

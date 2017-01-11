@@ -41,7 +41,7 @@
     <aura:handler name="change" value="{!v.isVisible}" action="{!c.handleVis}"/>
     <aura:handler name="change" value="{!v.tooltipBody}" action="{!c.handleVis}"/>
     <!-- aria-hidden is ALWAYS true, there is a copy of the content in the tooltip.cmp parent to make the content accesible -->
-    <div class="{!v.classList}" aura:flavorable="true" aura:id="tooltip" style="{!v.tooltipStyle}" aria-hidden="true">
+    <div class="{!v.classList}" aura:flavorable="true" aura:id="tooltip" aria-hidden="true">
         <div aura:id="tooltipwrapper">
             <div class="pointer pointer-advanced"></div>
             <div aura:id="tooltipbody" id="{!v.domId}" class="tooltip-advanced tooltip-body">{!v.tooltipBody}</div>

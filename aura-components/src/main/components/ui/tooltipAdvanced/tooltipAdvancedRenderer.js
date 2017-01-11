@@ -47,8 +47,13 @@
 
         if(isDirty) {
             helper.initStyle(component);
+            helper.setStyle(component);
         }
         return this.superRerender();
+    },
+    
+    afterRender: function(component, helper) {
+        helper.setStyle(component);
     }
 
 })// eslint-disable-line semi

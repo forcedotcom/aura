@@ -21,6 +21,12 @@
 	initStyle: function(component) {
 		this.ttLib.tooltip.computeTooltipStyle(component);     
 	},
+	
+	setStyle: function(component) {
+	    var tooltip = component.find("tooltip");
+        var tooltipStyle = component.get("v.tooltipStyle");
+        tooltip.getElement().style = tooltipStyle;
+	},
 
 	show: function(cmp) {
 		var classList = this.ttLib.tooltip.getClassList(cmp);

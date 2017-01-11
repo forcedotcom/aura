@@ -590,21 +590,24 @@ AuraStorage.prototype.sweep = function(ignoreInterval) {
     if (this.sweepPromise) {
         return this.sweepPromise;
     }
-    // 2. sweeping has been suspended. often set when the client goes offline or the store's size is being manually managed.
-    if (this.sweepingSuspended) {
-        return Promise["resolve"]();
-    }
-    // 3. adapter isn't ready
+    // 2. adapter isn't ready
     if (!this.ready) {
         return Promise["resolve"]();
     }
-    // 4. framework hasn't finished init'ing
+    // 3. framework hasn't finished init'ing
     if (!$A["finishedInit"]) {
         return Promise["resolve"]();
     }
-    // 5. frequency (yet respect ignoreInterval)
+    // 4. frequency (yet respect ignoreInterval)
     var sweepInterval = new Date().getTime() - this.lastSweepTime;
     if (!ignoreInterval && sweepInterval < this.sweepInterval) {
+        return Promise["resolve"]();
+    }
+
+    // 5. sweeping has been suspended. often set when the client goes offline or the store's size is being manually managed.
+    if (this.sweepingSuspended) {
+        // though sweeping is suspended we still want to track stats
+        this.logStats();
         return Promise["resolve"]();
     }
 

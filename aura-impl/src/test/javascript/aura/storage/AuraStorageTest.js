@@ -865,6 +865,25 @@ Test.Aura.Storage.AuraStorageTest = function() {
             Assert.Equal(expected, actual);
         }
 
+        [Fact]
+        function SuspendSweepLogsStats() {
+            var actual = false;
+
+            var config = makeConfigAndAdapter();
+
+            mockTime(function() { mockA(function() {
+                time = 0;
+                var target = new Aura.Storage.AuraStorage(config);
+                target.logStats = function() {
+                    actual = true;
+                }
+
+                target.suspendSweeping();
+                target.sweep();
+            }); });
+
+            Assert.True(actual);
+        }
 
         [Fact]
         function ResumeTriggersSweep() {

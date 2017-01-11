@@ -17,6 +17,12 @@
         }
     },
 
+    testCreateDocumentFragmentAndVerifyShape: {
+        test: function(cmp) {
+            cmp.testCreateDocumentFragmentAndVerifyShape();
+        }
+    },
+
     testCreateScriptElementReturnsSecureScript: {
         test: function(cmp) {
             cmp.testCreateScriptElementReturnsSecureScript();

@@ -18,26 +18,27 @@
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
 
-    <aura:method name="testCreateDocumentFragmentReturnsSecureElement" action="{!c.testCreateDocumentFragmentReturnsSecureElement}"/>
-    <aura:method name="testCreateScriptElementReturnsSecureScript" action="{!c.testCreateScriptElementReturnsSecureScript}"/>
-    <aura:method name="testCreateTextNodeReturnsSecureElement" action="{!c.testCreateTextNodeReturnsSecureElement}"/>
-    <aura:method name="testCreateElementsAndPushToMarkup" action="{!c.testCreateElementsAndPushToMarkup}"/>
-    <aura:method name="testGetElementByIdReturnsSecureElement" action="{!c.testGetElementByIdReturnsSecureElement}"/>
-    <aura:method name="testQuerySelectorReturnsSecureElement" action="{!c.testQuerySelectorReturnsSecureElement}"/>
-    <aura:method name="testSecureDocumentCookie" action="{!c.testSecureDocumentCookie}">
+    <aura:method name="testCreateDocumentFragmentReturnsSecureElement"/>
+    <aura:method name="testCreateDocumentFragmentAndVerifyShape"/>
+    <aura:method name="testCreateScriptElementReturnsSecureScript"/>
+    <aura:method name="testCreateTextNodeReturnsSecureElement"/>
+    <aura:method name="testCreateElementsAndPushToMarkup"/>
+    <aura:method name="testGetElementByIdReturnsSecureElement"/>
+    <aura:method name="testQuerySelectorReturnsSecureElement"/>
+    <aura:method name="testSecureDocumentCookie">
         <aura:attribute name="cookie" type="String"/>
     </aura:method>
-    <aura:method name="testDocumentTitle" action="{!c.testDocumentTitle}"/>
-    <aura:method name="testQuerySelectorAllReturnsSecureNodeList" action="{!c.testQuerySelectorAllReturnsSecureNodeList}"/>
-    <aura:method name="testDocumentBodyConstructorNotExposed" action="{!c.testDocumentBodyConstructorNotExposed}"/>
-    <aura:method name="testCreateElementCoersionExploit" action="{!c.testCreateElementCoersionExploit}"/>
-    <aura:method name="testCreateElementNSForSVGElement" action="{!c.testCreateElementNSForSVGElement}"/>
-    <aura:method name="testGetElementsByTagNameForScriptTag" action="{!c.testGetElementsByTagNameForScriptTag}"/>
-    <aura:method name="testCreateEvent" action="{!c.testCreateEvent}"/>
-    <aura:method name="testDefaultView" action="{!c.testDefaultView}"/>
-    <aura:method name="testDocumentImplementationHTMLDocumentCreation" action="{!c.testDocumentImplementationHTMLDocumentCreation}" />
-    <aura:method name="testDocumentElementHasNonZeroPropertyValues" action="{!c.testDocumentElementHasNonZeroPropertyValues}"/>
-    <aura:method name="testDocumentConstructorPassesInstanceOf" action="{!c.testDocumentConstructorPassesInstanceOf}"/>
+    <aura:method name="testDocumentTitle"/>
+    <aura:method name="testQuerySelectorAllReturnsSecureNodeList"/>
+    <aura:method name="testDocumentBodyConstructorNotExposed"/>
+    <aura:method name="testCreateElementCoersionExploit"/>
+    <aura:method name="testCreateElementNSForSVGElement"/>
+    <aura:method name="testGetElementsByTagNameForScriptTag"/>
+    <aura:method name="testCreateEvent"/>
+    <aura:method name="testDefaultView"/>
+    <aura:method name="testDocumentImplementationHTMLDocumentCreation"/>
+    <aura:method name="testDocumentElementHasNonZeroPropertyValues"/>
+    <aura:method name="testDocumentConstructorPassesInstanceOf"/>
 
     <div id="title">SecureDocument test</div>
 

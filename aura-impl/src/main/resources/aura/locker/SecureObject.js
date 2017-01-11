@@ -537,7 +537,7 @@ function getSupportedInterfaces(o) {
 		}
 		interfaces.push("Document", "Node", "EventTarget");
 	} else if (o instanceof DocumentFragment) {
-		interfaces.push("Node", "EventTarget");
+		interfaces.push("Node", "EventTarget", "DocumentFragment");
 	} else if (o instanceof Element) {
 		if (o instanceof HTMLElement) {
 			// Look for all HTMLElement subtypes

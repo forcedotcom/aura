@@ -6,6 +6,19 @@
                 + " to return a SecureElement");
     },
 
+    testCreateDocumentFragmentAndVerifyShape: function(cmp){
+        var testUtils = cmp.get("v.testUtils");
+        var documentFragment = document.createDocumentFragment();
+        var nodeList = documentFragment.querySelectorAll("*");
+        testUtils.assertEquals("[object NodeList]", nodeList.toString() , "querySelectorAll() method"+
+            " expected to return a NodeList");
+        testUtils.assertEquals(0, nodeList.length);
+        var children = documentFragment.children;
+        testUtils.assertEquals("[object HTMLCollection]", children.toString(), "documentFragment.children property"+
+            " expected to return a HTMLCollection");
+        testUtils.assertEquals(0, children.length);
+    },
+
     testCreateScriptElementReturnsSecureScript: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var scriptElement = document.createElement("script");

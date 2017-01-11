@@ -54,6 +54,10 @@
         <xunit.js.currentModule>${project.basedir}</xunit.js.currentModule>
         <spring.version>4.1.7.RELEASE</spring.version>
         <jetty.version>8.1.15.v20140411</jetty.version>
+        <node.download.root.url>http://repo.auraframework.org/simple/plugins-release-local/node/</node.download.root.url>
+        <npm.download.root.url>http://repo.auraframework.org/simple/plugins-release-local/npm/</npm.download.root.url>
+        <node.version>v4.2.1</node.version>
+        <npm.version>2.14.7</npm.version>
     </properties>
     <repositories>
         <repository>
@@ -940,10 +944,10 @@
                                 <goal>install-node-and-npm</goal>
                             </goals>
                             <configuration>
-                                <nodeVersion>v4.2.1</nodeVersion>
-                                <npmVersion>2.14.7</npmVersion>
-                                <nodeDownloadRoot>http://repo.auraframework.org/simple/plugins-release-local/node/</nodeDownloadRoot>
-			                    <npmDownloadRoot>http://repo.auraframework.org/simple/plugins-release-local/npm/2.14.7/</npmDownloadRoot>
+                                <nodeVersion>${node.version}</nodeVersion>
+                                <npmVersion>${npm.version}</npmVersion>
+                                <nodeDownloadRoot>${node.download.root.url}</nodeDownloadRoot>
+                                <npmDownloadRoot>${npm.download.root.url}${npm.version}/</npmDownloadRoot>
                             </configuration>
                         </execution>
                         <execution>
@@ -1050,6 +1054,37 @@
                         <artifactId>sfdc-post-plugin</artifactId>
                         <version>0.0.1</version>
                         <extensions>true</extensions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>zen-jacoco</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>0.7.6.201602180812</version>
+                        <configuration>
+                            <destFile>${project.build.directory}/jacoco.exec</destFile>
+                            <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>pre-unit-test</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>post-unit-test</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

@@ -1,0 +1,56 @@
+# pipeline_type dictates how Zen will treat your repository.
+# maven_docker means this is a Java project that will be built with
+# "mvn clean install" in a drone-managed container.
+pipeline_type: maven_docker
+
+# These maven profiles, if present in your POM, will be explicitly
+# activated by Zen.
+# zen-jacoco is not marked active in your POM, so will not be used
+# outside of Zen builds.
+active_profiles: zen,zen-jacoco
+
+# If the maven build succeeds, a code coverage test is performed using Jacoco.
+# If Jacoco determines that the code coverage is less than this percentage, the
+# build will be deemed unsuccessful, despite compilation and tests succeeding.
+# (A value of zero disables the code coverage step.)
+minimum_code_coverage_percentage: 0
+
+# Content between here and the end of the file, while it must be valid YAML,
+# is currently read textually by Zen. The order of the sections cannot change.
+
+script:
+  rm -r {node,node_modules} || true
+  wget --quiet --recursive --no-parent --reject "index.html*" --level=99 http://localhost/node_modules/ || true
+  wget --quiet --recursive --no-parent --reject "index.html*" --level=99 http://localhost/node/ || true
+  chmod -R 0755 localhost
+  mv localhost/* .
+  chown -R mvn-user $(pwd)
+  sudo -iu mvn-user bash -c "cd $(pwd);mvn clean deploy -DskipJsDoc $MAVEN_ARGS -DaltDeploymentRepository=zen::default::file://$(pwd)/$LOCAL_DEPLOY_DIR -Dnode.download.root.url=http://localhost/node/ -Dchromedriver.download.root.url=http://localhost/chromedriver -Dnpm.download.root.url=http://localhost/npm/" || export status=$? || true
+  chown -R $ORIG_UID:$ORIG_UID $(pwd)
+  exit ${status:-0}
+# It is currently required that there be an empty line following the script: section
+
+# Everything from here to the end of the file is used as a .drone.yml file. In the drone
+# container, the commands in the script: section will be executed. No Zen-specific content
+# can be added.
+build:
+  image: registry.dci.sfdc.net/dci/centos-aura-tools
+  pull: true
+  auth_config:
+    username: $$DOCKER_USERNAME
+    password: $$DOCKER_PASSWORD
+  environment:
+    ORIG_UID: $$UID
+    MAVEN_ARGS: $$MAVEN_ARGS
+    LOCAL_DEPLOY_DIR: $$LOCAL_DEPLOY_DIR
+  extra_hosts:
+    - external-tools
+  commands:
+    - ./.zenbuild.sh
+compose:
+  external-tools:
+    image: registry.dci.sfdc.net/dci/alpine-aura-tools-external
+    pull: true
+    auth_config:
+      username: $$DOCKER_USERNAME
+      password: $$DOCKER_PASSWORD

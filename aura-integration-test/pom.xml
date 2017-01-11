@@ -113,7 +113,7 @@
         </dependency>
     </dependencies>
     <properties>
-        <chromedriver.url>http://chromedriver.storage.googleapis.com/{version}/{artifactId}_{classifier}.zip</chromedriver.url>
+        <chromedriver.download.root.url>http://chromedriver.storage.googleapis.com</chromedriver.download.root.url>
         <chromedriver.version>2.25</chromedriver.version>
         <jetty.spawn>true</jetty.spawn>
         <jetty.resources>${basedir}/../aura/src/main/webapp</jetty.resources>
@@ -291,7 +291,7 @@
                                 <version>${chromedriver.version}</version>
                                 <packaging>zip</packaging>
                                 <classifier>${platform.chromedriver}</classifier>
-                                <downloadUrl>${chromedriver.url}</downloadUrl>
+                                <downloadUrl>${chromedriver.download.root.url}/{version}/{artifactId}_{classifier}.zip</downloadUrl>
                                 <install>true</install>
                             </artifactItem>
                         </artifactItems>

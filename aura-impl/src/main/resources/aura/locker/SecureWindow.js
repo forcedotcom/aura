@@ -167,13 +167,17 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
     ["sforce", "Sfdc"].forEach(function(name) {
         SecureObject.addPropertyIfSupported(o, win, name);
     });
+    
+    var workerFrame = win.document.getElementById("safeEvalWorker");
+    var safeEvalWindow = workerFrame && workerFrame.contentWindow;            
+    var globalScope = safeEvalWindow || win;
 
     // Has to happen last because it depends on the secure getters defined above that require the object to be keyed
     globalAttributeWhitelist.forEach(function(name) {
         // These are direct passthrough's and should never be wrapped in a SecureObject
         Object.defineProperty(o, name, {
             enumerable: true,
-            value: win[name]
+            value: globalScope[name]
         });
     });
 
@@ -277,13 +281,13 @@ SecureWindow.metadata = {
             "DragEvent":                            FUNCTION,
             "DynamicsCompressorNode":               FUNCTION,
             "ES6Promise":                           DEFAULT,
-            "Element":                              FUNCTION,
+            "Element":                              RAW,
             "Error":                                FUNCTION,
             "ErrorEvent":                           FUNCTION,
             "EvalError":                            FUNCTION,
             "Event":                                FUNCTION,
             "EventSource":                          FUNCTION,
-            "EventTarget":                          FUNCTION,
+            "EventTarget":                          RAW,
             "FederatedCredential":                  FUNCTION,
             "FileError":                            FUNCTION,
             "FileList":                             RAW,

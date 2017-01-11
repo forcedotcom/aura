@@ -113,6 +113,24 @@ function LockerService() {
 	];
 
 	var nsKeys = {};
+	
+    var workerFrame = window.document.getElementById("safeEvalWorker");
+    var safeEvalWindow = workerFrame && workerFrame.contentWindow;
+    var typeToOtherRealmType;
+    
+    // Wire up bidirectional back references from one realm to the other for cross realm instanceof checks
+    if (safeEvalWindow) {
+        typeToOtherRealmType = new Map();
+        var types = Object.keys(SecureWindow.metadata["prototypes"]["Window"]).concat(["Blob", "File"]);
+        types.forEach(function(name) {
+            var mainInstance = window[name];
+            var safeEvalInstance = safeEvalWindow[name];
+            if (mainInstance && safeEvalInstance) {
+                typeToOtherRealmType.set(safeEvalInstance, mainInstance);
+                typeToOtherRealmType.set(mainInstance, safeEvalInstance);
+            }
+        });
+    }
     
 	// defining LockerService as a service
 	var service = {
@@ -269,6 +287,15 @@ function LockerService() {
 		unwrap : ls_unwrap,
 
 		trust : ls_trust,
+		
+		instanceOf : function(value, type) {
+		    if (value instanceof type) {
+		        return true;
+		    } else {
+		        var otherRealmType = typeToOtherRealmType && typeToOtherRealmType.get(type);
+		        return otherRealmType && value instanceof otherRealmType;
+		    }
+		},
 
 		showLockedNodes : function showLockedNodes(root) {
 			if (!root) {
@@ -295,6 +322,7 @@ function LockerService() {
 	service["trust"] = service.trust;
 	service["showLockedNodes"] = service.showLockedNodes;
 	service["wrapComponent"] = service.wrapComponent;
+    service["instanceOf"] = service.instanceOf;
 
 	Object.freeze(service);
 

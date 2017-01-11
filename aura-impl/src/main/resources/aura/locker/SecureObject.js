@@ -805,10 +805,22 @@ SecureObject.addPrototypeMethodsAndPropertiesStateless = function(metadata, prot
 	return config;
 };
 
+var workerFrame = window.document.getElementById("safeEvalWorker");
+var safeEvalScope = workerFrame && workerFrame.contentWindow;
+
+var unfilteredTypes = [File, FileList, CSSStyleDeclaration, TimeRanges, Date, Promise, MessagePort, MessageChannel, MessageEvent];
+if (typeof ValidityState !== "undefined") {
+    unfilteredTypes.push(ValidityState);
+}
+
 SecureObject.isUnfilteredType = function(raw) {
-	return (raw instanceof File || raw instanceof FileList || raw instanceof CSSStyleDeclaration || raw instanceof TimeRanges ||
-			raw instanceof Date || (typeof ValidityState !== "undefined" && raw instanceof ValidityState) || raw instanceof Promise ||
-			raw instanceof MessagePort || raw instanceof MessageChannel || raw instanceof MessageEvent);
+    for (var n = 0; n < unfilteredTypes.length; n++) {
+        if ($A.lockerService.instanceOf(raw, unfilteredTypes[n])) {
+            return true;
+        }
+    }
+    
+    return false;
 };
 
 

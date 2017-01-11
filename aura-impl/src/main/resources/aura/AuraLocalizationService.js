@@ -882,7 +882,7 @@ AuraLocalizationService.prototype.startOf = function(date, unit) {
  * @platform
  */
 AuraLocalizationService.prototype.toISOString = function(date) {
-    if (date && (date instanceof Date)) {
+    if (date && $A.lockerService.instanceOf(date, Date)) {
         if (date.toISOString) {
             return date.toISOString();
         } else {

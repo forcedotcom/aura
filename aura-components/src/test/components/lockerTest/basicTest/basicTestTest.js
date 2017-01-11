@@ -198,5 +198,11 @@
         test: function(cmp) {
             cmp.testComponentPassedToOtherNamespaceViaCreateComponent();
         }
+    },
+    
+    testInstanceOf: {
+        test: function(cmp) {
+            cmp.testInstanceOf(window);
+        }
     }
 })

@@ -247,5 +247,58 @@
                     testUtils.assertStartsWith("SecureComponentRef", document.getElementById("content").textContent,
                             "SecureComponent passed to another namespace should be filted to SecureComponentRef");
                 });
+    },
+    
+    testInstanceOf: function(cmp, event, helper) {
+        var testUtils = cmp.get("v.testUtils");
+
+        // Test Object
+        var o = new Object();
+        testUtils.assertTrue(o instanceof Object, "Object created via 'new Object()' should be an instance of Object");
+
+        o = Object.create(Object.prototype);
+        testUtils.assertTrue(o instanceof Object, "Object created via 'Object.create(null)'  should be an instance of Object");
+
+        o = {};
+        testUtils.assertTrue(o instanceof Object, "Object created via object literal should be an instance of Object");
+        
+        // Test Function
+        function foo() {
+            return "foo";
+        }       
+        
+        testUtils.assertTrue(foo instanceof Function, "Function foo() should be an instance of Function");
+
+        // Test Array
+        var array = new Array();
+        testUtils.assertTrue(array instanceof Array, "Array created via 'new Array()' should be an instance of Array");
+
+        array = [1, 2, 3];
+        testUtils.assertTrue(array instanceof Array, "Array created via array literal should be an instance of Array");
+
+        // Test Date
+        var date = new Date();
+        testUtils.assertTrue(date instanceof Date, "Array created via 'new Date()' should be an instance of Date");
+        
+        var iso = $A.localizationService.toISOString(date);
+        testUtils.assertEquals(date.toISOString(), iso);
+                
+        // Test Element
+        var element = document.createElement("div");
+        testUtils.assertTrue(element instanceof HTMLDivElement, "DIV element should be an instance of HTMLDivElement");
+        testUtils.assertTrue(element instanceof HTMLElement, "DIV element should be an instance of HTMLElement");
+        testUtils.assertTrue(element instanceof Element, "DIV element should be an instance of Element");
+        testUtils.assertTrue(element instanceof Node, "DIV element should be an instance of Node");
+        testUtils.assertTrue(element instanceof EventTarget, "DIV element should be an instance of EventTarget");
+        
+        // DCHASMAN TODO Negative assertions for now - we expect that functions, arrays, 
+        // and objects created in system mode will not match the type system of the locker.
+        // However, these will flip to true once universal proxy is enabled where we can then explicitly wire up 
+        // the prototype/or proxied getPrototypeOf() to cross realms /or masquarade as the underlying type (e.g. SecureWindow instanceof Window)!
+        testUtils.assertFalse(cmp instanceof Object, "Object cmp should not be an instance of Object");
+        testUtils.assertFalse(cmp.getGlobalId instanceof Function, "Function cmp.getGlobalId should not be an instance of Function");
+        testUtils.assertFalse(cmp.get("v.body") instanceof Array, "Array cmp.get('v.body') should not be an instance of Array");
+        testUtils.assertFalse(document instanceof Document, "document should not be an instance of Document");
+        testUtils.assertFalse(window instanceof Window, "window should not be an instance of Window");
     }
 })

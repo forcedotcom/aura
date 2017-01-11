@@ -42,6 +42,7 @@
     <aura:method name="testSecureElementPrototypeCounterMeasures" action="{!c.testSecureElementPrototypeCounterMeasures}"/>
     <aura:method name="testLockerDisabledForUnsupportedBrowser" action="{!c.testLockerDisabledForUnsupportedBrowser}"/>
     <aura:method name="testComponentPassedToOtherNamespaceViaCreateComponent" action="{!c.testComponentPassedToOtherNamespaceViaCreateComponent}"/>
+    <aura:method name="testInstanceOf" action="{!c.testInstanceOf}"/>
 
     <div>LockerService test</div>
     <div aura:id="content" id="content"/>

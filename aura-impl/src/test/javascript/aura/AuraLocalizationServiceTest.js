@@ -17,8 +17,12 @@ Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
 Test.Aura.AuraLocalizationServiceTest = function(){
-    var Aura = {Services:{}};
-	// Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
+    var Aura = {
+        Services: {   
+        }
+    };
+	
+    // Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
 	Mocks.GetMocks(Object.Global(), {
         "Aura": Aura,
         "AuraLocalizationService":function(){}
@@ -57,6 +61,11 @@ Test.Aura.AuraLocalizationServiceTest = function(){
         clientService: {
             loadClientLibrary: function (name, callback) {
                 callback();
+            }
+        },
+        lockerService: {
+            instanceOf: function(value, type) {
+                return value instanceof type;
             }
         }
     });
@@ -1177,7 +1186,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
     [Fixture]
     function toISOString(){
 
-    	[Fact]
+        [Fact]
         function Null(){
             // Arrange
             var expected = null;
@@ -1210,7 +1219,9 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             var actual;
 
             // Act
-            actual = targetService.toISOString(targetDate);
+            mockUtil(function() { 
+                actual = targetService.toISOString(targetDate);
+            });
 
             // Assert
             Assert.Equal(expected, actual);
@@ -1230,7 +1241,9 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             var actual;
 
             // Act
-            actual = targetService.toISOString(dt);
+            mockUtil(function() { 
+                actual = targetService.toISOString(dt);
+            });
 
             // Assert
             Assert.Equal(expected, actual);
@@ -1251,8 +1264,10 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             var actual;
 
             // Act
-            actual = targetService.toISOString(dt);
-
+            mockUtil(function() { 
+                actual = targetService.toISOString(dt);
+            });
+            
             // Assert
             Assert.Equal(expected, actual);
         }

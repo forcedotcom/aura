@@ -18,7 +18,7 @@
         }
       }
     ],
-    "componentClass":"function(){$A.componentService.addComponentClass(\"markup://nonInternal:component\",function() {\n  var def = $A.componentService.getDef(\"markup://nonInternal:component\");  var locker = $A.lockerService.createForDef(\n\"var nonInternal$component = {\\n  \\\"meta\\\":{\\n    \\\"name\\\":\\\"nonInternal$component\\\",\\n    \\\"extends\\\":\\\"markup://aura:application\\\"\\n  }\\n};\\nreturn nonInternal$component;\\n\", def);\n  return locker.$result;\n});\n}",
+    "componentClass":"function(){$A.componentService.addComponentClass(\"markup://nonInternal:component\",function() {\n  var def = $A.componentService.getDef(\"markup://nonInternal:component\");  var locker = $A.lockerService.createForDef(\n\"var nonInternal$component = {\\n  \\\"meta\\\":{\\n    \\\"name\\\":\\\"nonInternal$component\\\",\\n    \\\"extends\\\":\\\"markup://aura:application\\\"\\n  }\\n};\\nreturn nonInternal$component;\\n\", def);\n  return locker.returnValue;\n});\n}",
     "locationChangeEventDef":{
       "s":4,
       "v":{

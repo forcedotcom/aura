@@ -36,7 +36,7 @@ function LockerService() {
     //#include aura.locker.SecureComponentRef
 
 	var lockers = [];
-	var keyToEnvironmentMap = {};
+    var keyToEnvironmentMap = {};
 	var lockerShadows;
 
 	// This whilelist represents reflective ECMAScript APIs or reflective DOM APIs
@@ -140,14 +140,14 @@ function LockerService() {
 		},
 
 		getEnv : function(key, doNotCreate) {
-			var psuedoKeySymbol = JSON.stringify(key);
-			var env = keyToEnvironmentMap[psuedoKeySymbol];
-			if (!env && !doNotCreate) {
-				env = keyToEnvironmentMap[psuedoKeySymbol] = SecureWindow(window, key, whitelist);
-			}
+            var psuedoKeySymbol = JSON.stringify(key);
+            var env = keyToEnvironmentMap[psuedoKeySymbol];
+            if (!env && !doNotCreate) {
+                env = keyToEnvironmentMap[psuedoKeySymbol] = SecureWindow(window, key, whitelist);
+            }
 
-			return env;
-		},
+            return env;
+        },
 
         getKeyForNamespace : function(namespace) {
             // Get the locker key for this namespace
@@ -198,11 +198,16 @@ function LockerService() {
 				}
 			}
 			
+			var returnValue = window['$$safe-eval$$'](code, sourceURL, skipPreprocessing, envRec, lockerShadows);
+			
 			var locker = {
-				"$envRec": envRec,
-				"$result": window['$$safe-eval$$'](code, sourceURL, skipPreprocessing, envRec, lockerShadows)
+				globals: envRec,
+                returnValue: returnValue
 			};
 
+			locker["globals"] = locker.globals;
+            locker["returnValue"] = locker.returnValue;
+			
 			Object.freeze(locker);
 			lockers.push(locker);
 			
@@ -218,7 +223,7 @@ function LockerService() {
 
 		destroyAll : function() {
 			lockers = [];
-			keyToEnvironmentMap = [];
+		    keyToEnvironmentMap = [];
 		},
 
 		wrapComponent : function(component) {
@@ -286,6 +291,7 @@ function LockerService() {
     service["create"] = service.create;
 	service["createForDef"] = service.createForDef;
 	service["getEnvForSecureObject"] = service.getEnvForSecureObject;
+    service["getKeyForNamespace"] = service.getKeyForNamespace;
 	service["trust"] = service.trust;
 	service["showLockedNodes"] = service.showLockedNodes;
 	service["wrapComponent"] = service.wrapComponent;

@@ -3,7 +3,7 @@
         helper.utils.tester.initTests(helper.testName, helper.testPlan);
 
         var locker = $A.lockerService.create(null, "the secret is silence");
-        var secureWindow = locker["$envRec"];
+        var secureWindow = locker.globals;
         var sdoc = secureWindow.document;
 
         function handleIFrame(doc, e) {

@@ -181,7 +181,11 @@
         cmp.getEvent('change').fire();
     },
     hasChangedValue : function (cmp) {
-        return String(this.convertInputValueToInternalValue(cmp)) !== String(cmp.get('v.value'));
+        var value = String(cmp.get('v.value'));
+        var inputValue = cmp.get("v.inputValue");
+        
+        // convertInputValueToInternalValue() returns 0 whenever inputValue is ""
+        return String(this.convertInputValueToInternalValue(cmp)) !== value || (inputValue === "" && value === "0");
     },
     removeSymbols : function (string) {
         var decimalSeparator  = $A.get("$Locale.decimal");

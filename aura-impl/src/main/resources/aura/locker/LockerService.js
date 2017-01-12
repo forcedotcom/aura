@@ -121,7 +121,7 @@ function LockerService() {
     // Wire up bidirectional back references from one realm to the other for cross realm instanceof checks
     if (safeEvalWindow) {
         typeToOtherRealmType = new Map();
-        var types = Object.keys(SecureWindow.metadata["prototypes"]["Window"]).concat(["Blob", "File"]);
+        var types = Object.keys(SecureWindow.metadata["prototypes"]["Window"]).concat(["Blob", "File", "FormData"]);
         types.forEach(function(name) {
             var mainInstance = window[name];
             var safeEvalInstance = safeEvalWindow[name];

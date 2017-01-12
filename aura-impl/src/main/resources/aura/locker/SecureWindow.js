@@ -118,6 +118,23 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
         });
     });
 
+    if ("FormData" in win) {
+        Object.defineProperty(o, "FormData", {
+            get: function() {
+                return function() {
+                    var args = SecureObject.ArrayPrototypeSlice.call(arguments);
+                    var unfilteredArgs = SecureObject.unfilterEverything(o, args);
+                    var cls = win["FormData"];
+                    if (typeof cls === "function") {
+                        return new (Function.prototype.bind.apply(window["FormData"], [null].concat(unfilteredArgs)));
+                    } else {
+                        return new cls(unfilteredArgs);
+                    }
+                };
+            }
+        });
+    }
+
     ["Blob", "File"].forEach(function(name) {
         if(name in win) {
             Object.defineProperty(o, name, {
@@ -296,7 +313,6 @@ SecureWindow.metadata = {
             "Float64Array":                         RAW,
             "FocusEvent":                           FUNCTION,
             "FontFace":                             FUNCTION,
-            "FormData":                             FUNCTION,
             "Function":                             FUNCTION,
             "GainNode":                             FUNCTION,
             "HTMLAllCollection":                    FUNCTION,

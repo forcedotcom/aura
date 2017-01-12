@@ -808,7 +808,7 @@ SecureObject.addPrototypeMethodsAndPropertiesStateless = function(metadata, prot
 var workerFrame = window.document.getElementById("safeEvalWorker");
 var safeEvalScope = workerFrame && workerFrame.contentWindow;
 
-var unfilteredTypes = [File, FileList, CSSStyleDeclaration, TimeRanges, Date, Promise, MessagePort, MessageChannel, MessageEvent];
+var unfilteredTypes = [File, FileList, CSSStyleDeclaration, TimeRanges, Date, Promise, MessagePort, MessageChannel, MessageEvent, FormData];
 if (typeof ValidityState !== "undefined") {
     unfilteredTypes.push(ValidityState);
 }

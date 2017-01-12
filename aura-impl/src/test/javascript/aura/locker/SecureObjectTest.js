@@ -39,7 +39,8 @@ Test.Aura.Locker.SecureObjectTest = function() {
         "TimeRanges": function() {}, 
         "MessagePort": function() {}, 
         "MessageChannel": function() {}, 
-        "MessageEvent": function() {}
+        "MessageEvent": function() {},
+        "FormData": function() {}
     })(function() {
         [Import("aura-impl/src/main/resources/aura/locker/SecureObject.js")]
     });

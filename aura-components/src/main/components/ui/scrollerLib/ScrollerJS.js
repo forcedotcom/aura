@@ -494,7 +494,6 @@ function lib(w) { //eslint-disable-line no-unused-vars
             if (this.opts.gpuOptimization && this.opts.useNativeScroller && oldSize !== this.wrapperSize) {
                 this.scroller.style.height = this.wrapperSize + 'px';
             }
-            
         },
         /**
         * Sets the overall sizes of the scroller.
@@ -526,7 +525,6 @@ function lib(w) { //eslint-disable-line no-unused-vars
 
             this.hasScrollX     = this.maxScrollX < 0;
             this.hasScrollY     = this.maxScrollY < 0;
-
         },
         /**
         * To be overriden by the `PullToShowMore` plugin.
@@ -1703,7 +1701,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
         },
 
         /**
-         * check if scroller's size has changed
+         * Check if scroller's size has changed
          * for scroller height, we need to include PTL div if available to get the right height
          */
         _isScrollSizeChanged: function() {
@@ -1752,6 +1750,24 @@ function lib(w) { //eslint-disable-line no-unused-vars
         },
 
         /**
+         * Check if element is visible and occupying space on the page offsetParent is null when
+         * - its ancestor or itself has display:none
+         * - it has position:fixed
+         *   - for this case we also check the dimensions
+         *
+         * This is inaccurate when user intentionally sets dimensions to 0 and uses position:fixed,
+         * but that would be unlikely. This is much more performant than getComputedStyle to
+         * check display property.
+         *
+         * Using on this.scroller, this should work all the time since it's highly unlikely that
+         * its position would be set to position:fixed and that would make the whole scroller unscrollable.
+         */
+        _isScrollerVisible: function() {
+            var el = this.scroller;
+            return !!(el.offsetParent || el.offsetHeight || el.offsetWidth);
+        },
+
+        /**
         * Prepend an Array of elements into the scroller.
         * This function is overriden by SurfaceManager to allow a custom DOM manipulation.
         * @param eventType {string} Event name
@@ -1795,13 +1811,18 @@ function lib(w) { //eslint-disable-line no-unused-vars
             var self = this;
             if (!this._rafRefresh) {
                 this._rafRefresh = RAF(function () { // debounce the refresh
-                    var isScrollSizeChanged = self._isScrollSizeChanged();
-                    self._setSize();
-                    if (isScrollSizeChanged) {
-                        self._resetPositionIfOutOfBound(0);
+                    // only refresh when scroller is visible and occupying space
+                    if (self._isScrollerVisible()) {
+
+                        var isScrollSizeChanged = self._isScrollSizeChanged();
+                        self._setSize();
+                        if (isScrollSizeChanged) {
+                            self._resetPositionIfOutOfBound();
+                        }
+
+                        self._fire('_refresh');
+                        self._rafRefresh = null;
                     }
-                    self._fire('_refresh');
-                    self._rafRefresh = null;
                 });
             }
         },

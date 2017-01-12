@@ -1165,7 +1165,7 @@ AuraInstance.prototype.getToken = function(token){
  * @public
  * @function
  * @param {String} key - The data key to look up on element, for example, <code>$A.get("$Label.section.key")</code>.
- * @param {Function} callback - The method to call with the result if a server trip is expected.
+ * @param {Function} [callback] - The method to call with the result if a server trip is expected.
  * @platform
  */
 AuraInstance.prototype.get = function(key, callback) {

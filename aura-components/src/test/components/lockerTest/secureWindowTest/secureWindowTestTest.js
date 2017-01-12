@@ -82,7 +82,7 @@
 
     testOpen_HttpsUrl: {
         // window.open will not open a new window for mobile autobuild runs
-        browsers: ["-IE8", "-IE9", "-IE10", "-IPHONE", "-IPAD"],
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testOpen_HttpsUrl();
         }
@@ -90,7 +90,7 @@
 
     testOpen_HttpUrl: {
         // window.open will not open a new window for mobile autobuild runs
-        browsers: ["-IE8", "-IE9", "-IE10", "-IPHONE", "-IPAD"],
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testOpen_HttpUrl();
         }
@@ -98,7 +98,7 @@
 
     testOpen_RelativeUrl:{
         // window.open will not open a new window for mobile autobuild runs
-        browsers: ["-IE8", "-IE9", "-IE10", "-IPHONE", "-IPAD"],
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testOpen_RelativeUrl();
         }
@@ -130,7 +130,7 @@
 
     testFile: {
         // window.File is not implemented correctly in iOS 9.2
-        browsers: ["-IE8", "-IE9", "-IE10", "-IPHONE", "-IPAD"],
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testFile();
         }
@@ -138,7 +138,7 @@
 
     testFile_WithScriptTagsBlocked: {
         // window.File is not implemented correctly in iOS 9.2
-        browsers: ["-IE8", "-IE9", "-IE10", "-IPHONE", "-IPAD"],
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],
         test: function (cmp) {
             cmp.testFile_WithScriptTagsBlocked();
         }

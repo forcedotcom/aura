@@ -174,7 +174,7 @@
         }
     },
 
-    repositionPanel: function (component, event, helper) {
+    repositionPanel: function (component) {
         if (!component.get('v.usePanel')) {
             return;
         }

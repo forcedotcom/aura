@@ -23,7 +23,7 @@
 		helper.reposition(cmp, null);
 	},
 
-	listCollapse: function(cmp, evt, helper) {
+	listCollapse: function(cmp) {
 		cmp.set('v.visible', false);
 	},
 

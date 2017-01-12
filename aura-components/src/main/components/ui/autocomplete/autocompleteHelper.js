@@ -227,7 +227,7 @@
             return;
         }
 
-        dataProviders.forEach(function (dataProvider, index) {
+        dataProviders.forEach(function (dataProvider) {
             dataProvider.addHandler("onchange", component, "c.repositionPanel");
         });
     }

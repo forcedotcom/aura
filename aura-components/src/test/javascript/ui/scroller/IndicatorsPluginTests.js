@@ -46,7 +46,7 @@ Test.Components.Ui.Scroller.IndicatorsPluginTests=function(){
 
 			var indicatorsPlugin,
 				refreshMock,
-				domStubAlias = Test.Stubs.Aura.Dom,
+				domStubAlias = Stubs.Dom,
 				expectedOpts = {
 					disableTouch:false,
 					disablePointer:false,
@@ -88,7 +88,7 @@ Test.Components.Ui.Scroller.IndicatorsPluginTests=function(){
 		function CallRAFwithXY(data){
 			var indicatorsPlugin,
 				refreshMock,
-				domStubAlias = Test.Stubs.Aura.Dom,
+				domStubAlias = Stubs.Dom,
 				expectedOpts = {},
 				actualPoint={x:0,y:0},
 				scrollToMock,
@@ -145,7 +145,7 @@ Test.Components.Ui.Scroller.IndicatorsPluginTests=function(){
 			 var indicatorsPlugin,
 		     	 expectedOpts = {},
 		     	 expectedSize = data.expectedSize,
-		     	 domStubAlias = Test.Stubs.Aura.Dom,
+		     	 domStubAlias = Stubs.Dom,
 		     	 actualSize,
 		     	 indicator = {
 		     	 	wrapperHeight:0,
@@ -198,7 +198,7 @@ Test.Components.Ui.Scroller.IndicatorsPluginTests=function(){
 			var indicatorsPlugin,
 				expectedOpts = {},
 		   	    expected = data.expectedSize,
-		   	    domStubAlias = Test.Stubs.Aura.Dom,
+		   	    domStubAlias = Stubs.Dom,
 		   	    actual,
                 indicator = {
                 	wrapperHeight:0,
@@ -252,7 +252,7 @@ Test.Components.Ui.Scroller.IndicatorsPluginTests=function(){
 			var indicatorsPlugin,
 				expectedOpts = {},
 		   	    expected = data.expectedSize,
-		   	    domStubAlias = Test.Stubs.Aura.Dom,
+		   	    domStubAlias = Stubs.Dom,
 		   	    actual,
                 indicator = {
                 	wrapperHeight:0,

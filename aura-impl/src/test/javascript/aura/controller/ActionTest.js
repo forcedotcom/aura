@@ -626,7 +626,7 @@ Test.Aura.Controller.ActionTest = function() {
             var expected = "expected";
             var mockAura = Mocks.GetMock(Object.Global(), "$A", {
                 getContext: function() {
-                    return Test.Stubs.Aura.GetContext();
+                    return Stubs.Aura.GetContext();
                 },
                 assert : function(param) {
                     actual = param;
@@ -680,7 +680,7 @@ Test.Aura.Controller.ActionTest = function() {
             var expectedState = "SUCCESS";
             var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
                 getContext: function() {
-                    return Test.Stubs.Aura.GetContext();
+                    return Stubs.Aura.GetContext();
                 },
                 assert : function(param) {
                 },
@@ -730,7 +730,7 @@ Test.Aura.Controller.ActionTest = function() {
             var mockAssert = Mocks.GetMocks(Object.Global(), {
                 "$A": {
                     getContext: function () {
-                        return Test.Stubs.Aura.GetContext();
+                        return Stubs.Aura.GetContext();
                     },
                     assert: function (param) {},
                     auraError:function() {},
@@ -760,7 +760,7 @@ Test.Aura.Controller.ActionTest = function() {
                 window: Object.Global()
             });
             var target = newAction();
-            target.cmp = Test.Stubs.Aura.GetComponent();
+            target.cmp = Stubs.Aura.GetComponent();
             target.def = {
                 getDescriptor : function() {
                     return {
@@ -805,7 +805,7 @@ Test.Aura.Controller.ActionTest = function() {
     function GetReturnValue() {
         var mockContext = Mocks.GetMock(Object.Global(), "$A", {
             getContext: function() {
-                return Test.Stubs.Aura.GetContext();
+                return Stubs.Aura.GetContext();
             },
             util : {
                 isArray : function(v) { return false; },
@@ -968,7 +968,7 @@ Test.Aura.Controller.ActionTest = function() {
             var expectedReturn = "expectedReturn";
             var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
                 getContext: function() {
-                    return Test.Stubs.Aura.GetContext();
+                    return Stubs.Aura.GetContext();
                 },
                 assert : function(param) {
                 },
@@ -1034,7 +1034,7 @@ Test.Aura.Controller.ActionTest = function() {
         [Fact]
         function ActionGetStoredReturnsComponents() {
             // Arrange
-            var expected = [Test.Stubs.Aura.GetComponent()];
+            var expected = [Stubs.Aura.GetComponent()];
             var target = newAction();
             target.storable = true;
             target.responseState = "SUCCESS";
@@ -1104,7 +1104,7 @@ Test.Aura.Controller.ActionTest = function() {
         var mockContext = function(inloop) {
             return Mocks.GetMock(Object.Global(), "$A", {
                 getContext : function() {
-                    return Test.Stubs.Aura.GetContext();
+                    return Stubs.Aura.GetContext();
                 },
                 clientService : {
                     inAuraLoop : function() {

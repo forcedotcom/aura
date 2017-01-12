@@ -27,7 +27,7 @@ Aura.time = window.performance && window.performance.now ? window.performance.no
 Aura["bootstrap"] = Aura["bootstrap"] || {};
 Aura.bootstrapMark = function (mark, value) {
     //#if {"excludeModes" : ["PRODUCTION"]}
-    if (window.console.timeStamp) {
+    if (window.console&&window.console.timeStamp) {
         window.console.timeStamp(mark);
     }
     //#end
@@ -1430,10 +1430,16 @@ AuraInstance.prototype.deprecated = function(message,workaround,sinceDate,dueDat
             sinceDate=new Date(sinceDate);
         }
     }
-    // JBUCH: Try the stackparser, confirm across browsers
-    //var source=Aura.Errors.StackParser.parse(new Error())[3]['getFunctionName']();
-    var source=new Error().stack.split('\n')[3];
-    if(source.indexOf("/aura_")>-1){
+    var caller=new Error();
+    if(!caller.stack){
+        try{
+            throw caller;
+        }catch(e){
+            caller=e;
+        }
+    }
+    caller=(caller.stack||'').split('\n')[3]||'at unknown location';
+    if(caller.indexOf("/aura_")>-1){
         // JBUCH: TEMPORARILY IGNORE CALLS BY FRAMEWORK.
         // REMOVE WHEN ALL @public METHODS HAVE BEEN ADDRESSED.
         return;
@@ -1442,11 +1448,11 @@ AuraInstance.prototype.deprecated = function(message,workaround,sinceDate,dueDat
         $A.localizationService.formatDate(sinceDate),
         $A.localizationService.formatDate(dueDate),
         message,
-        $A.util.trim(source),
+        $A.util.trim(caller),
         workaround?"Workaround: "+workaround:"No known workaround."
     );
     if(Date.now()>=dueDate){
-        $A.error(message);
+        throw new Error(message);
     }else{
         $A.warning(message);
     }
@@ -1454,7 +1460,7 @@ AuraInstance.prototype.deprecated = function(message,workaround,sinceDate,dueDat
     //#if {modes:["TESTING", "TESTINGDEBUG", "AUTOTESTING", "AUTOTESTINGDEBUG"]}
     // BREAK EARLY IN TESTS
     if(Date.now()>=testDueDate){
-        $A.error(message);
+        throw new Error(message);
     }
     //#end
 };

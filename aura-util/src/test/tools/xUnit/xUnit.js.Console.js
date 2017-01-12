@@ -1,4 +1,4 @@
-// Copyright (c) 2006-2015 John Buchanan 
+// Copyright (c) 2006-2017 John Buchanan 
 // Permission is hereby granted, free of charge, to any person obtaining  
 // a copy of this software and associated documentation files (the "Software"),  
 // to deal in the Software without restriction, including without limitation the  
@@ -407,7 +407,8 @@ Function.prototype.Implement=function(type,name){
         if(instance)return instance;
         try{
             instance={};
-            target.apply(instance,[]);
+            var result=target.apply(instance,[]);
+            if(result)instance=result;
             return instance;
         }catch(e){
             instance=null;
@@ -1304,7 +1305,7 @@ xUnit.js.Mocks=new function(){
     this.GetMocks=function(target,mockeries){
         if(target==undefined||!{"function":1,"object":1}[typeof(target)])throw new Error("xUnit.js.Mocks.GetMocks: 'target' must be a valid Object.");
         if(!Object.IsType(Object,mockeries))throw new Error("xUnit.js.Mocks.GetMock: 'mockeries' must be a valid Object containing member to mock mappings.");
-        return function Mockery(during,argument1,argument2,argumentN){
+        function Mockery(during,argument1,argument2,argumentN){
             if(!Object.IsType(Function,during))throw new Error("xUnit.js.Mocks.Mockery: 'during' must be a valid Function pointer.");
             var mockTargets=Object.Copy({},target,mockeries);
             try{
@@ -1326,6 +1327,26 @@ xUnit.js.Mocks=new function(){
                 }
             }
         };
+        Mockery.IsMock=true;
+        return Mockery;
+    };
+
+    this.Mock=function(mock1,mock2,mockN){
+        var mocks=Array.Copy(arguments);
+        for(var i=0;i<mocks.length;i++){
+            if(!Object.IsType(Function,mocks[i])||!mocks[i].IsMock)throw new Error("xUnit.js.Mocks.Mock: 'mock' must be a valid mockery, at position '"+(i+1)+"'.");
+        }
+        var currentMock=-1;
+        return function ChainMock(during){
+            if(++currentMock<mocks.length){
+                return mocks[currentMock](function(){
+                    return ChainMock(during);
+                });
+            }else{
+                currentMock=-1;
+                return during();
+            }
+        }
     };
 }; 
  
@@ -1361,8 +1382,15 @@ xUnit.js.Stubs=new function(){
     };
     
     this.GetMethod=function(param1,param2,paramN,returnValue){
-        var methodParameters=Array.prototype.slice.call(arguments,0,arguments.length-1);
-        var methodReturnValue=arguments.length?arguments[arguments.length-1]:undefined;
+        var methodParameters;
+        var methodReturnValue;
+        if(arguments.length==1&&Object.IsType(Function,param1)){
+            methodParameters=Function.GetParameters(param1);
+            methodReturnValue=param1;
+        }else{
+            methodParameters=Array.prototype.slice.call(arguments,0,arguments.length-1);
+            methodReturnValue=arguments.length?arguments[arguments.length-1]:undefined;
+        }
         var method=function(){
             // Collect Calling Arguments
             var callingArguments={};
@@ -1399,7 +1427,6 @@ xUnit.js.Stubs=new function(){
                 var parameters=[];
                 var returnValue=null;
                 if(Object.IsType(Function,methods[x])){
-                    parameters=Function.GetParameters(methods[x]);
                     returnValue=methods[x];
                 }else{
                     parameters=methods[x].parameters||[];
@@ -1433,6 +1460,13 @@ Function.RegisterNamespace("xUnit.js.Model");
 
 xUnit.js.Model.ISkippable=new function(){
     this.Skip=function(reason){};
+}; 
+ 
+Function.RegisterNamespace("xUnit.js.Model");
+
+xUnit.js.Model.IMockable=new function(){
+    this.AddMock=function(mock){};
+    this.GetMocks=function(){return [];};
 }; 
  
 Function.RegisterNamespace("xUnit.js.Model");
@@ -1504,6 +1538,7 @@ Function.RegisterNamespace("xUnit.js.Model");
 xUnit.js.Model.Fact=function(method,name){
     // Private members
     var _events;
+    var _mocks;
     var _skip;
     var _reason;
 
@@ -1521,6 +1556,7 @@ xUnit.js.Model.Fact=function(method,name){
     // ctor
     function Fact(method,name,parent){
         if(!Object.IsType(Function,method))throw new Error("xUnit.js.Model.Fact.ctor: 'method' must be a valid Function pointer.");
+        _mocks=[];
         this.Events=_events=new System.Event.EventManager("BeforeRun","AfterRun");
         this.Method=method;
         this.Name=name||method&&Function.GetName(method)||"[Anonymous]";
@@ -1534,6 +1570,17 @@ xUnit.js.Model.Fact=function(method,name){
     }
     if(this.constructor==xUnit.js.Model.Fact)Fact.apply(this,arguments);
     
+    this.AddMock=function(mock){
+        if(!Object.IsType(Function,mock)||!mock.IsMock)throw new Error("xUnit.js.Model.Fact.AddMock: 'mock' must be a valid mockery.");
+        _mocks.push(mock);
+    };
+
+    this.GetMocks=function(){
+        var mocks=_mocks.slice();
+        if(this.Parent)return this.Parent.GetMocks().concat(mocks);
+        return mocks;
+    };
+
     this.GetPath=function(){
         var path=[];
         var step=this;
@@ -1602,7 +1649,9 @@ xUnit.js.Model.Fact=function(method,name){
                 if(!Object.IsType(Function,delegate))throw new xUnit.js.Model.AssertError("callback(delegate): 'delegate' was not a valid Function.");
             }
             var asserts=Assert.Calls;
-            delegate.apply(Object.Global(),parameters||[]);
+            xUnit.js.Mocks.Mock.apply(xUnit.js.Mocks,fact.GetMocks())(function(){
+                delegate.apply(Object.Global(),parameters||[]);
+            });
             if(fact.Asynchronous&&!inCallback){
                 return runNext(fact);
             }
@@ -1641,7 +1690,8 @@ xUnit.js.Model.Fact=function(method,name){
 };
 
 xUnit.js.Model.Fact.Implement(xUnit.js.Model.IRunnable,"xUnit.js.Model.Fact");
-xUnit.js.Model.Fact.Implement(xUnit.js.Model.ISkippable,"xUnit.js.Model.Fact"); 
+xUnit.js.Model.Fact.Implement(xUnit.js.Model.ISkippable,"xUnit.js.Model.Fact");
+xUnit.js.Model.Fact.Implement(xUnit.js.Model.IMockable,"xUnit.js.Model.Fact"); 
  
 Function.RegisterNamespace("xUnit.js.Model");
 
@@ -1651,6 +1701,7 @@ xUnit.js.Model.Fixture=function(){
     var _events;
     var _facts;
     var _fixtures;
+    var _mocks;
     
     // Public members
     this.Asynchronous=false;
@@ -1662,11 +1713,23 @@ xUnit.js.Model.Fixture=function(){
     function Fixture(name,parent){
         _facts=[];
         _fixtures=[];
+        _mocks=[];
         this.Events=_events=new System.Event.EventManager("BeforeRun","AfterRun");
         this.Name=name||"[Anonymous]";
         this.Parent=parent||null;
     }
     Fixture.apply(this,arguments);
+
+    this.AddMock=function(mock){
+        if(!Object.IsType(Function,mock)||!mock.IsMock)throw new Error("xUnit.js.Model.Fixture.AddMock: 'mock' must be a valid mockery.");
+        _mocks.push(mock);
+    };
+
+    this.GetMocks=function(){
+        var mocks=_mocks.slice();
+        if(this.Parent)return this.Parent.GetMocks().concat(mocks);
+        return mocks;
+    };
 
     this.GetPath=function(){
         var path=[];
@@ -1760,7 +1823,8 @@ xUnit.js.Model.Fixture=function(){
 
 xUnit.js.Model.Fixture.Implement(xUnit.js.Model.ICompositeFixture,"xUnit.js.Model.Fixture");
 xUnit.js.Model.Fixture.Implement(xUnit.js.Model.IRunnable,"xUnit.js.Model.Fixture");
-xUnit.js.Model.Fixture.Implement(xUnit.js.Model.ISkippable,"xUnit.js.Model.Fixture"); 
+xUnit.js.Model.Fixture.Implement(xUnit.js.Model.ISkippable,"xUnit.js.Model.Fixture");
+xUnit.js.Model.Fixture.Implement(xUnit.js.Model.IMockable,"xUnit.js.Model.Fixture"); 
  
 Function.RegisterNamespace("xUnit.js.Model");  
 
@@ -1805,6 +1869,12 @@ xUnit.js.Model.Warning=function(){
 
 xUnit.js.Model.Warning.prototype=new Error();
 xUnit.js.Model.Warning.prototype.constructor=xUnit.js.Model.Warning; 
+ 
+// Global Convenience Mapping
+Assert=xUnit.js.Assert;
+Mocks=xUnit.js.Mocks;
+Record=xUnit.js.Record;
+Stubs=xUnit.js.Stubs; 
 
 // System.js.Script 
  
@@ -1978,6 +2048,12 @@ System.Script.Attributes.IAttribute=new function(){
  
 Function.RegisterNamespace("System.Script.Attributes");
 
+System.Script.Attributes.IDecoration=new function(){
+    this.GetDecoration=function(){};
+}; 
+ 
+Function.RegisterNamespace("System.Script.Attributes");
+
 System.Script.Attributes.Attribute=function(){
     // Public members
     this.Name;
@@ -2068,8 +2144,9 @@ System.Script.Attributes.DecoratedFunction=function(){
     //Public members
     this.Name;
     
-    // ctor`
+    // ctor
     function DecoratedFunction(method,name,attributes1,attributes2,attributesN){
+        if(this.constructor!=System.Script.Attributes.DecoratedFunction)method=function(){};
         if(!Object.IsType(Function,method))throw new Error("System.Script.Attributes.DecoratedFunction.ctor: 'method' must be a valid Function pointer.");
         _attributes=[];
         _decoration=this;
@@ -2094,7 +2171,7 @@ System.Script.Attributes.DecoratedFunction=function(){
             if(context.Error)throw context.Error;
         }
     }
-    
+
     DecorationWrapper.GetDecoration=function(){
         return _decoration;
     };
@@ -2165,7 +2242,8 @@ System.Script.Attributes.DecoratedFunction=function(){
         return attribute.Name==match||Function.GetName(attribute.constructor)==match;
     }
 };
- 
+
+System.Script.Attributes.DecoratedFunction.Implement(System.Script.Attributes.IDecoration,"System.Script.Attributes.DecoratedFunction"); 
  
 Function.RegisterNamespace("System.Script.ScriptLoadStrategy");
 
@@ -2808,22 +2886,32 @@ xUnit.js.Attributes.DataAttribute=function(data){
 xUnit.js.Attributes.DataAttribute.Inherit(System.Script.Attributes.Attribute);
  
  
-// Global Attribute Convenience Mapping
-Import=System.Script.ScriptLoader.Attributes.ImportAttribute;
-ImportJson=System.Script.ScriptLoader.Attributes.ImportJsonAttribute;
+Function.RegisterNamespace("xUnit.js.Attributes");
 
-Assert=xUnit.js.Assert;
-Mocks=xUnit.js.Mocks;
-Record=xUnit.js.Record;
-Stubs=xUnit.js.Stubs;
+xUnit.js.Attributes.MockAttribute=function(mock1,mock2,mockN){
+    // Public Members (Can't declare, this is global scope!)
+    // this.Mocks
 
-Async=xUnit.js.Attributes.AsyncAttribute;
-Data=xUnit.js.Attributes.DataAttribute;
-Fixture=xUnit.js.Attributes.FixtureAttribute;
-Fact=xUnit.js.Attributes.FactAttribute;
-MockedImport=xUnit.js.Attributes.MockedImportAttribute;
-Skip=xUnit.js.Attributes.SkipAttribute;
-Trait=xUnit.js.Attributes.TraitAttribute; 
+    // ctor
+    function MockAttribute(mock1,mock2,mockN){
+        this.base("Mock");
+        if(!Object.IsType(Function,this.Target))throw new Error("xUnit.js.Attributes.MockAttribute.ctor: unable to locate attribute target.");
+        this.Mocks=arguments.length==1&&Object.IsType(Array,arguments[0])?arguments[0]:Array.Copy(arguments);
+        if(Object.IsType(Function,this.Target.GetDecoration)){
+            var targetMethod=this.Target.GetDecoration().GetMethod();
+            if(targetMethod.GetModel){
+                var model=targetMethod.GetModel();
+                if(Object.Implements(xUnit.js.Model.IMockable,model)){
+                    Array.ForEach(this.Mocks,model.AddMock);
+                }
+            }
+        }
+    }
+    return System.Script.DelayedConstructor(this,xUnit.js.Attributes.MockAttribute,MockAttribute,arguments);
+}
+
+xUnit.js.Attributes.MockAttribute.Inherit(System.Script.Attributes.Attribute);
+ 
  
 Function.RegisterNamespace("xUnit.js.Attributes.Model");
 
@@ -2840,6 +2928,19 @@ xUnit.js.Attributes.Model.Fixture=function(name,parent,method){
 };
 
 xUnit.js.Attributes.Model.Fixture.Inherit(xUnit.js.Model.Fixture); 
+ 
+// Global Attribute Convenience Mapping
+Import=System.Script.ScriptLoader.Attributes.ImportAttribute;
+ImportJson=System.Script.ScriptLoader.Attributes.ImportJsonAttribute;
+
+Async=xUnit.js.Attributes.AsyncAttribute;
+Data=xUnit.js.Attributes.DataAttribute;
+Fixture=xUnit.js.Attributes.FixtureAttribute;
+Fact=xUnit.js.Attributes.FactAttribute;
+Mock=xUnit.js.Attributes.MockAttribute;
+MockedImport=xUnit.js.Attributes.MockedImportAttribute;
+Skip=xUnit.js.Attributes.SkipAttribute;
+Trait=xUnit.js.Attributes.TraitAttribute; 
 
 // System.js.Environment 
  
@@ -3004,9 +3105,7 @@ System.EnvironmentStrategy.Rhino=function(){
 
     // IEnvironmentStrategy members
     this.Execute=function(command,parameters,voidOutput){
-        var options={output:''};
-        runCommand.apply(Object.Global(),[command].concat(parameters, options));
-        return options.output;
+        return runCommand.apply(Object.Global(),[command].concat(parameters))+'';
     };
 
     this.Exit=function(errorCode){
@@ -4992,7 +5091,7 @@ System.EnvironmentStrategy.Node=function(){
     };
 
     this.Exit=function(errorCode){
-        process.reallyExit(errorCode!=0?1:0);
+        process.reallyExit(errorCode);
     };
 
     this.GetNewLine=function(){
@@ -5124,15 +5223,15 @@ xUnit.js.Console.IO.DirectoryStrategy.Jsdb=function(){
     };
 
     this.GetFiles=function(path){
-        var files=system.files(System.IO.Path.Combine(path,'*.*'));
-        for(var i=0;i<files.length;i++)files[i]=System.IO.Path.Combine(path,files[i]);
-        return files;
+		var files=system.files(System.IO.Path.Combine(path,'*.*'));
+		for(var i=0;i<files.length;i++)files[i]=System.IO.Path.Combine(path,files[i]);
+		return files;
     };
     
     this.GetDirectories=function(path){
-        var directories=system.folders(System.IO.Path.Combine(path,'*'));
-        for(var i=0;i<directories.length;i++)directories[i]=System.IO.Path.Combine(path,directories[i]);
-        return directories;
+		var directories=system.folders(System.IO.Path.Combine(path,'*'));
+		for(var i=0;i<directories.length;i++)directories[i]=System.IO.Path.Combine(path,directories[i]);
+		return directories;
     };
 
     this.IsSatisfiedBy=function(candidate){
@@ -5383,17 +5482,17 @@ xUnit.js.Console.IO.FileStrategy.Stream=function(){
             var file=new Stream(path);
             if(file){
                 fileText=file.readText();
-                fileText=decode(fileText);
+ 		        fileText=decode(fileText);
             }
         }catch(e){}
         return fileText;
     };
         
     this.SaveFile=function(path,text){
-        var file=new Stream(path,"wt+");
-        if(file){
-            file.write(text);
-        }
+		var file=new Stream(path,"wt+");
+		if(file){
+		    file.write(text);
+		}
     };
 
     // IStrategySpecification Members

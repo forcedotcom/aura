@@ -47,12 +47,12 @@ Test.Components.Ui.Scroller.SurfaceManager=function(){
 		};
 		surfaceManager._getCustomAppendedElements = function () {return 0};
 		
-		surfaceManager.scroller=Test.Stubs.Aura.Dom.GetNode({
+		surfaceManager.scroller=Stubs.Dom.GetNode({
 			id:'scroller',
 			_isScrolling:false
 		},
 		null,
-		[Test.Stubs.Aura.Dom.GetNode({
+		[Stubs.Dom.GetNode({
 			id:'child1'
 		})]);
 		
@@ -96,7 +96,7 @@ Test.Components.Ui.Scroller.SurfaceManager=function(){
 		[Fact]
 		function PrependItems(){
 			var value,
-				domStubAlias=Test.Stubs.Aura.Dom;
+				domStubAlias=Stubs.Dom;
 			fnMocks(function(){
 				windowMock(function(){
 					surfaceManager.init();

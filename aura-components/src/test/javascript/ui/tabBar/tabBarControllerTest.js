@@ -59,13 +59,13 @@ Test.Components.Ui.TabBar = function() {
         function OnTabHoverFiresOnTabHoverComponentEvent() {
             // ARRANGE -- setup aura and component mocks
             var eventName = "onTabHover";
-            var onTabHoverEvent = Test.Stubs.Aura.GetEvent();
-            var component = Test.Stubs.Aura.GetComponent({}, {}, {
+            var onTabHoverEvent = Stubs.Aura.GetEvent();
+            var component = Stubs.Aura.GetComponent({}, {}, {
                 getEvent: function(name){
                     if(name === eventName) {return onTabHoverEvent;}
                 }
             });
-            var event = Test.Stubs.Aura.GetEvent({"tabComponent":component});
+            var event = Stubs.Aura.GetEvent({"tabComponent":component});
             
             // ACT -- call target function with mocked data
             targetController.onTabHover(component, event);
@@ -78,13 +78,13 @@ Test.Components.Ui.TabBar = function() {
         function OnTabHoverPassesComponent() {
             // ARRANGE -- setup aura and component mocks
             var eventName = "onTabHover";
-            var onTabHoverEvent = Test.Stubs.Aura.GetEvent();
-            var component = Test.Stubs.Aura.GetComponent({}, {}, {
+            var onTabHoverEvent = Stubs.Aura.GetEvent();
+            var component = Stubs.Aura.GetComponent({}, {}, {
                 getEvent: function(name){
                     if(name === eventName) {return onTabHoverEvent;}
                 }
             });
-            var event = Test.Stubs.Aura.GetEvent({"tabComponent":component});
+            var event = Stubs.Aura.GetEvent({"tabComponent":component});
             var expected = event.getParams();
             
             // ACT -- call target function with mocked data
@@ -103,13 +103,13 @@ Test.Components.Ui.TabBar = function() {
         function OnTabUnhoverFiresOnTabHoverComponentEvent() {
             // ARRANGE -- setup aura and component mocks
             var eventName = "onTabUnhover";
-            var onTabUnhoverEvent = Test.Stubs.Aura.GetEvent();
-            var component = Test.Stubs.Aura.GetComponent({}, {}, {
+            var onTabUnhoverEvent = Stubs.Aura.GetEvent();
+            var component = Stubs.Aura.GetComponent({}, {}, {
                 getEvent: function(name){
                     if(name === eventName) {return onTabUnhoverEvent;}
                 }
             });
-            var event = Test.Stubs.Aura.GetEvent({"tabComponent":component});
+            var event = Stubs.Aura.GetEvent({"tabComponent":component});
             
             // ACT -- call target function with mocked data
             targetController.onTabUnhover(component, event);
@@ -122,13 +122,13 @@ Test.Components.Ui.TabBar = function() {
         function OnTabUnhoverPassesComponent() {
             // ARRANGE -- setup aura and component mocks
             var eventName = "onTabUnhover";
-            var onTabUnhoverEvent = Test.Stubs.Aura.GetEvent();
-            var component = Test.Stubs.Aura.GetComponent({}, {}, {
+            var onTabUnhoverEvent = Stubs.Aura.GetEvent();
+            var component = Stubs.Aura.GetComponent({}, {}, {
                 getEvent: function(name){
                     if(name === eventName) {return onTabUnhoverEvent;}
                 }
             });
-            var event = Test.Stubs.Aura.GetEvent({"tabComponent":component});
+            var event = Stubs.Aura.GetEvent({"tabComponent":component});
             var expected = event.getParams();
             
             // ACT -- call target function with mocked data

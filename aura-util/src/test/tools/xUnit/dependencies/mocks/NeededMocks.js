@@ -47,7 +47,7 @@ Test.Mocks.NeededMocks={
 						style:{}
 					},
 					createElement:function(tagName){
-						return Test.Stubs.Aura.Dom.GetNode({
+						return Stubs.Dom.GetNode({
 							classList:{add:function(className){}},
 							style:{height:'',width:''},
 							tagName:tagName,
@@ -57,7 +57,7 @@ Test.Mocks.NeededMocks={
 						});
 					},
 					createDocumentFragment:function(){
-						return Test.Stubs.Aura.Dom.GetNode({style:{height:'',width:''}});
+						return Stubs.Dom.GetNode({style:{height:'',width:''}});
 					},
 					querySelector:function(s){
 						return {};

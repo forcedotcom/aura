@@ -60,7 +60,7 @@ Test.Components.Ui.Scroller.PullToRefreshTests=function(){
 		function AppendsPTRcontainerAsFirstChild(){
 			var PTRplugin,
 				neededMocks,
-				domStubAlias=Test.Stubs.Aura.Dom,
+				domStubAlias=Stubs.Dom,
 				actual;
 
 			windowMock(function(){
@@ -83,7 +83,7 @@ Test.Components.Ui.Scroller.PullToRefreshTests=function(){
 		function AppendsPTRcontainerAsChild(){
 			var PTRplugin,
 				neededMocks,
-				domStubAlias=Test.Stubs.Aura.Dom,
+				domStubAlias=Stubs.Dom,
 				actual;
 
 			windowMock(function(){

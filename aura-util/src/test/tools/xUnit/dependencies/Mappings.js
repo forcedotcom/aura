@@ -14,6 +14,15 @@ if (System.Environment.GetParameters().named.coverage === "true") {
     window = {'jscoverage_report':true};
 }
 
-//Global Convenience Mappings
+// Global Convenience Mappings
+
+// Attributes to load parts or all of Aura
+Aura = Test.Tools.Aura.Attributes.AuraAttribute;
+AuraUtil = Test.Tools.Aura.Attributes.AuraUtilAttribute;
+
+// Override Import Attributes to path correctly
 Import = Test.Tools.Aura.Attributes.ImportAttribute;
 ImportJson = Test.Tools.Aura.Attributes.ImportJsonAttribute;
+
+// Add Canned Aura Stubs
+Stubs.Aura=Test.Tools.Aura.Stubs.Aura;

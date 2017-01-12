@@ -32,8 +32,8 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
         function testDragEventParams(){
 			//Arrange
 			var expectedRenderingComponent = "someComponent";
-			var event = Test.Stubs.Aura.GetEvent();
-			var dropComponent = Test.Stubs.Aura.GetComponent({
+			var event = Stubs.Aura.GetEvent();
+			var dropComponent = Stubs.Aura.GetComponent({
 				"v.types":"move", 
 				"v.dragOverClass": "",
 				"v.dragOverAccessibilityClass":"",
@@ -74,8 +74,8 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 			var expectedRenderingComponent = "someComponent";
 			var actual;
 
-			var event = Test.Stubs.Aura.GetEvent();
-			var dropComponent = Test.Stubs.Aura.GetComponent({
+			var event = Stubs.Aura.GetEvent();
+			var dropComponent = Stubs.Aura.GetComponent({
 				"v.types":"move", 
 				"v.dragOverClass": "",
 				"v.dragOverAccessibilityClass":"",
@@ -258,7 +258,7 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 		function testDragEventParams(){
 			//Arrange
 			var expectedRenderingComponent = "someComponent";
-			var dragEvent = Test.Stubs.Aura.GetEvent();
+			var dragEvent = Stubs.Aura.GetEvent();
 			var targetComponent = {
 				getEvent : function(expression){
 					if(expression == "dragLeave"){return dragEvent;}
@@ -298,7 +298,7 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 		function handleDragLeaveFiresDragLeaveEvent(){
 			//Arrange
 			var expectedRenderingComponent = "someComponent";
-			var dragEvent = Test.Stubs.Aura.GetEvent();
+			var dragEvent = Stubs.Aura.GetEvent();
 			var targetComponent = {
 				getEvent : function(expression){
 					if(expression == "dragLeave"){return dragEvent;}

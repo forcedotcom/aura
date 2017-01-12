@@ -146,7 +146,7 @@ Test.Aura.AuraComponentServiceTest = function(){
             };
             targetService.requestComponent = function() {
                 actual = true;
-                return Test.Stubs.Aura.GetAction();
+                return Stubs.Aura.GetAction();
             }
 
             $Amock(function(){
@@ -171,7 +171,7 @@ Test.Aura.AuraComponentServiceTest = function(){
             };
             targetService.requestComponent = function() {
                 actual = true;
-                return Test.Stubs.Aura.GetAction();
+                return Stubs.Aura.GetAction();
             }
 
             $Amock(function(){
@@ -372,7 +372,7 @@ Test.Aura.AuraComponentServiceTest = function(){
         [Fact]
         function NoDescriptorTypeInDefinitionAssumesMarkup() {
             var descriptor = "prefix:name";
-            var definition = Test.Stubs.Aura.GetComponentDef(descriptor)
+            var definition = Stubs.Aura.GetComponentDef(descriptor)
             var actual;
 
             $Amock(function() {
@@ -386,7 +386,7 @@ Test.Aura.AuraComponentServiceTest = function(){
         [Fact]
         function ReturnsTrueIfDefinitionIsPresentOnClient() {
             var descriptor = "markup://prefix:name";
-            var definition = Test.Stubs.Aura.GetComponentDef(descriptor)
+            var definition = Stubs.Aura.GetComponentDef(descriptor)
             var actual;
 
             $Amock(function() {

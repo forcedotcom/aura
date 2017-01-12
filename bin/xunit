@@ -5,5 +5,5 @@ if [ $? -eq 1 ];
 then
     mvn install -DskipUnitTests -DskipJsDoc -Pxunit.js -Dxunit.js.format=text -DskipComponentCompile -Dxunit.js.verbose=true $1
 else
-    node aura-util/src/test/tools/xUnit/xUnit.js.Console.js /dependency:aura-util/src/test/tools/xUnit/dependencies /strict:false /verbose:false aura-impl/src/test/javascript/ aura-components/src/test/javascript $1
+    node aura-util/src/test/tools/xUnit/xUnit.js.Console.js /dependency:aura-util/src/test/tools/xUnit/dependencies /strict:false /verbose:false ${1:-aura-impl/src/test/javascript/ aura-components/src/test/javascript}
 fi

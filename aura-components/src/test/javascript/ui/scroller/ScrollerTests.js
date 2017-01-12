@@ -64,7 +64,7 @@ Test.Components.Ui.Scroller.ScrollerTest=function(){
 
 		function getScrollerInstance(scrollerOptions){
 			var scrollerInstance,
-				nodeAlias=Test.Stubs.Aura.Dom,
+				nodeAlias=Stubs.Dom,
 
 				childNode=nodeAlias.GetNode(
 				{

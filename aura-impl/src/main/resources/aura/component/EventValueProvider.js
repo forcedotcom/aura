@@ -24,3 +24,5 @@ function EventValueProvider(component) {
 EventValueProvider.prototype.get = function(key) {
 	return this.component.getEvent(key);
 };
+
+Aura.Component.EventValueProvider = EventValueProvider;

@@ -415,7 +415,7 @@ PassthroughValue.prototype.isValid = function() {
         valueProvider = valueProvider.getComponent();
     }
 
-    if (valueProvider instanceof Component) {
+    if ($A.util.isComponent(valueProvider)) {
         return valueProvider.isValid();
     }
 

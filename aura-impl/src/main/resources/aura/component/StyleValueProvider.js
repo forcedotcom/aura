@@ -23,3 +23,5 @@ StyleValueProvider.prototype.get = function(key) {
         return !$A.util.isUndefinedOrNull(styleDef) ? styleDef.getClassName() : null;
     }
 };
+
+Aura.Component.StyleValueProvider = StyleValueProvider;

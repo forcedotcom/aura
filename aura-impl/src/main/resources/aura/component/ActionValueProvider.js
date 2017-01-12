@@ -54,3 +54,6 @@ ActionValueProvider.prototype.get = function(key) {
     }
     return actionDef.newInstance(this.component);
 };
+
+
+Aura.Component.ActionValueProvider = ActionValueProvider;

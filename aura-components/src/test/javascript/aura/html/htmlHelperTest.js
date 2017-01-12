@@ -18,11 +18,12 @@ Function.RegisterNamespace("Test.Aura.Html");
 
 [Fixture]
 Test.Aura.Html.HtmlHelperTest = function(){
-    var targetHelper;
 
-    ImportJson("aura-components/src/main/components/aura/html/htmlHelper.js",function(path,result){
-        targetHelper = result;
-    });
+    Function.RegisterNamespace("Aura.Component");
+    [Import("aura-impl/src/main/resources/aura/component/Component.js"),
+     Import("aura-impl/src/main/resources/aura/component/HtmlComponent.js")]
+     delete Component;
+     delete HtmlComponent;
 
     [Fixture]
     function dispatchAction() {
@@ -37,6 +38,7 @@ Test.Aura.Html.HtmlHelperTest = function(){
             // Arrange
             var mockEvent = {};
             var mockAction = Stubs.GetObject({runDeprecated : function(event){}});
+            var targetHelper = Aura.Component.HtmlComponent.prototype.helper;
 
             // Act
             mockAura(function(){

@@ -174,6 +174,7 @@ DomHandlersPlugin.prototype.bind = function () {
     var self = this;
     $A.clientService.runAfterInitDefs(function () {
         self.bindToHelper("markup://aura:html", "dispatchAction");
+        $A.installOverride("HtmlComopnent.dispatchAction", self.instrumentCallback, self);
         self.bindToHelper("markup://ui:virtualList", "_dispatchAction");
         self.bindToHelper("markup://ui:virtualDataGrid", "_dispatchAction");
         self.bindToHelper("markup://ui:virtualDataTable", "_dispatchAction");
@@ -199,6 +200,15 @@ DomHandlersPlugin.prototype.bind = function () {
     });
 };
 
+DomHandlersPlugin.prototype.instrumentCallback = function (/*original*/) {
+    var xargs = Array.prototype.slice.call(arguments, 1);
+    // this.dispatchActionHook.apply(this, xargs);
+    // return original.apply(this, xargs);
+    var config = Array.prototype.shift.apply(arguments);
+    this.dispatchActionHook.apply(this, xargs);
+    return config["fn"].apply(config["scope"], arguments);
+};
+
 //#if {"excludeModes" : ["PRODUCTION"]}
 /** @export */
 DomHandlersPlugin.prototype.postProcess = function (transportMarks) {
@@ -207,10 +217,13 @@ DomHandlersPlugin.prototype.postProcess = function (transportMarks) {
 //#end
 
 DomHandlersPlugin.prototype.unbind = function (metricsService) {
-        var defConfig  = $A.componentService.createDescriptorConfig("markup://aura:html");
-        var htmlDef    = $A.componentService.getComponentDef(defConfig);
-        var htmlHelper = htmlDef.getHelper();
+    var defConfig  = $A.componentService.createDescriptorConfig("markup://aura:html");
+    var htmlDef    = $A.componentService.getComponentDef(defConfig);
+    var htmlHelper = htmlDef.getHelper();
+    
     metricsService["unInstrument"](htmlHelper, "dispatchAction");
+
+    $A.uninstallOverride("HtmlComopnent.dispatchAction", this.instrumentCallback, this);
 };
 
 $A.metricsService.registerPlugin({

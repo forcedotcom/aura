@@ -97,6 +97,6 @@ public class JavascriptRendererDefTest extends AuraImplTestCase {
         RendererDef rendererDef = definitionService.getDefinition(rendererDesc);
 
         assertThat(rendererDef, instanceOf(JavascriptRendererDef.class));
-        goldFileText(rendererDef.getCode());
+        goldFileText(rendererDef.getCode() != null ? rendererDef.getCode() : "");
     }
 }

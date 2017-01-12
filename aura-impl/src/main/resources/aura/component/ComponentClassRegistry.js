@@ -28,6 +28,39 @@ function ComponentClassRegistry () {
     this.classConstructors = {};
 }
 
+/** 
+ * By default all components will use Aura.Component.Component as the constructor.
+ * This wires up all the features a component might need.
+ * Some rootComponents are moving into the framework with custom Component extensions. 
+ * This map defines the constructor they use in buildConstructor
+ */
+ComponentClassRegistry.prototype.customConstructorMap = { 
+    /*eslint-disable no-undef*/
+    "aura$text": TextComponent
+    
+    // Things to do when switching to HtmlComponent
+    // * Remove aura:html special case from Component.prototype.setupComponentDef
+    // If Final: 
+    // * Delete htmlHelper.js
+    // * Delete methods in htmlRenderer.js but leave the file. (Needs to exist.)
+    // * Delete self.bindToHelper("markup://aura:html", "dispatchAction") call in DomHandlersPlugin.js
+    // * Delete unInstrement call for "dispatchAction" in DomHandlersPlugin.prototype.unbind. (NOT THE uninstallOverride)
+    //"aura$html":HtmlComponent, 
+    
+    // Things to do when switching to ExpressionComponent
+    // * Remove this.setContainerComponentId() call in Component.js constructor
+    // * Remove Expression special logic in Component.prototype.setContainerComponentId
+    // If Final:
+    // * Remove methods in expressionRenderer.js
+    //"aura$expression": ExpressionComponent, 
+
+    // We have no yet implemented specific classes for these components.
+    // Switching them to SimpleComponent should work. (Not tested though)
+    //"aura$if":SimpleComponent,
+    //"aura$iteration":SimpleComponent, 
+    //"aura$component":SimpleComponent
+};
+
 /**
  * Detects if the component class exists without actually defining it.
  * @param {String} descriptor The qualified name of the component in the form markup://namespace:component
@@ -153,29 +186,34 @@ ComponentClassRegistry.prototype.buildConstructor = function(componentProperties
     // TODO: Update to the following line when all browsers have support for dynamic function names.
     // (only supported in IE11+).
     // var componentConstructor = function [className](){ Component.apply(this, arguments); };
+    var componentConstructor;
+    var className = componentProperties["meta"]["name"];
+    var FrameworkConstructor = this.customConstructorMap[className] || Component;
 
     //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    var componentConstructor = function(config, localCreation) {
-        Component.call(this, config, localCreation);
+    componentConstructor = function(config, localCreation) {
+        FrameworkConstructor.call(this, config, localCreation);
     };
     //#end
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    var className = componentProperties["meta"]["name"];
-
-    /*eslint-disable no-redeclare*/
-    var componentConstructor = $A.util.globalEval("(function " + className + "(config, localCreation) { Component.call(this, config, localCreation); });", {
-        "Component": Component
+    componentConstructor = $A.util.globalEval("(function " + className + "(config, localCreation) { Component.call(this, config, localCreation); });", {
+        "Component": FrameworkConstructor
     });
-    /*eslint-enable no-redeclare*/
     //#end
-
+    
     // Extends from Component (and restore constructor).
-    componentConstructor.prototype = Object.create(Component.prototype);
+    componentConstructor.prototype = Object.create(FrameworkConstructor.prototype);
     componentConstructor.prototype.constructor = componentConstructor;
 
     // Mixin inner classes (controller, helper, renderer, provider) and meta properties.
-    Object.assign(componentConstructor.prototype, componentProperties);
+    // Some components will already have this defined in their Component class, so don't overwrite if it is already defined.
+    var constructorPrototype = componentConstructor.prototype;
+    for(var key in componentProperties) {
+        if(constructorPrototype[key] === undefined){
+            constructorPrototype[key] = componentProperties[key];
+        }
+    }
 
     return componentConstructor;
 };

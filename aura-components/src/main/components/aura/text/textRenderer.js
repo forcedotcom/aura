@@ -14,37 +14,5 @@
  * limitations under the License.
  */
 ({
-    render: function(component){
-        var value = component.get("v.value");
-        
-        var trunc = component.get("v.truncate");
-        var truncateByWord = $A.util.getBooleanValue(component.get("v.truncateByWord"));
-        var ellipsis = $A.util.getBooleanValue(component.get("v.ellipsis"));
-        
-        if(trunc){
-            trunc = 1 * trunc;
-            value = $A.util.truncate(value, trunc, ellipsis, truncateByWord);
-        }
-        
-        var textNode = document.createTextNode($A.util.isUndefinedOrNull(value) ? '' : value);
-        
-        // aura:text is syntactic sugar for document.createTextNode() and the resulting nodes need to be directly visible to the container
-    	// otherwise no code would be able to manipulate them
-    	$A.lockerService.trust(component, textNode);
-    	
-        return [textNode];
-    },
-    
-    rerender:function(component){
-        var element=component.getElement();
-        // Check for unowned node so IE doesn't crash
-        if (element && element.parentNode) {
-        	var textValue = component.get("v.value");
-            textValue = $A.util.isUndefinedOrNull(textValue) ? '' : textValue;
-            
-            if (element.nodeValue !== textValue) {
-                element.nodeValue = textValue;
-            }
-        }
-    }
+    // Needs to exist because we have to have a client renderer when we have a server renderer. 
 })// eslint-disable-line semi

@@ -3,9 +3,6 @@ var test$testComponent = {
   "meta":{
     "name":"test$testComponent",
     "extends":"markup://aura:component"
-  },
-  "renderer":{
-
   }
 };
 return test$testComponent;

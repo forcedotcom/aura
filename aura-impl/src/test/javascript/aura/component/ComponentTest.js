@@ -42,11 +42,18 @@ Test.Aura.Component.ComponentTest=function(){
          Import("aura-impl/src/main/resources/aura/component/InvalidComponent.js")]
     });
 
+    delete StyleValueProvider;
+    delete ActionValueProvider;
+    delete EventValueProvider;
+
     function mockFramework(during){
         var mock = {
             "Component": Aura.Component.Component,
             "InvalidComponent": Aura.Component.InvalidComponent,
             "AttributeSet": Aura.Attribute.AttributeSet,
+            "StyleValueProvider": Aura.Component.StyleValueProvider,
+            "ActionValueProvider": Aura.Component.ActionValueProvider,
+            "EventValueProvider": Aura.Component.EventValueProvider,
             "$A": {
                 assert:function(condition,message){if(!condition)throw new Error(message)},
                 error:function(message){throw new Error(message)},

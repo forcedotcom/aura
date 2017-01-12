@@ -19,12 +19,26 @@ Function.RegisterNamespace("Test.Aura.Component");
 Test.Aura.Component.ComponentClassRegistryTest = function () {
 
     Function.RegisterNamespace("Aura.Component");
-    [Import("aura-impl/src/main/resources/aura/component/ComponentClassRegistry.js")]
+    [Import("aura-impl/src/main/resources/aura/component/Component.js"),
+     Import("aura-impl/src/main/resources/aura/component/ExpressionComponent.js"),
+     Import("aura-impl/src/main/resources/aura/component/HtmlComponent.js"),
+     Import("aura-impl/src/main/resources/aura/component/SimpleComponent.js"),
+     Import("aura-impl/src/main/resources/aura/component/TextComponent.js"),
+     Import("aura-impl/src/main/resources/aura/component/ComponentClassRegistry.js")]
     delete ComponentClassRegistry;
+    delete Component;
+    delete HtmlComponent;
+    delete SimpleComponent;
+    delete TextComponent;
+    delete ExpressionComponent;
 
     
     var mockFramework = Mocks.GetMocks(Object.Global(), {
         "Component": function() {},
+        "HtmlComponent": function() {},
+        "SimpleComponent": function() {},
+        "TextComponent": function() {},
+        "ExpressionComponent": function() {},
         "$A": {
             "assert": function(condition, message){ if (!condition) { throw new message }},
             "util": {

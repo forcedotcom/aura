@@ -192,6 +192,8 @@ function Component(config, localCreation) {
  */
 Component.prototype.setContainerComponentId = function(containerComponentId) {
     this.containerComponentId = containerComponentId;
+
+    // Remove when ExpressionComponent is back.
     if(this.isValid() && this.isInstanceOf("aura:expression")) {
         // set the containerComponentId for expression values to the expression component itself
         var context = $A.getContext();
@@ -1464,7 +1466,7 @@ Component.prototype.setAttributeValueProvider = function (avp) {
  */
 Component.prototype.getComponentValueProvider = function() {
     var valueProvider = this.attributeValueProvider||this.facetValueProvider;
-    while (!(valueProvider instanceof Component) && $A.util.isFunction(valueProvider.getComponent)) {
+    while (!$A.util.isComponent(valueProvider) && $A.util.isFunction(valueProvider.getComponent)) {
         valueProvider = valueProvider.getComponent();
     }
     return valueProvider;
@@ -1991,7 +1993,7 @@ Component.prototype.createComponentStack = function(facets, valueProvider){
         var components = [];
         for (var index = 0; index < facetConfig.length; index++) {
             var config = facetConfig[index];
-            if (config instanceof Component) {
+            if ($A.util.isComponent(config)) {
                 components.push(config);
                 config.setContainerComponentId(this.globalId);
             } else if (config && config["componentDef"]) {

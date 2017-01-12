@@ -62,7 +62,6 @@ public class JavascriptControllerDefHandler extends JavascriptHandler<Controller
 
         String recode = mapToCode(map);
         builder.setCode(recode);
-
         return builder.build();
     }
 

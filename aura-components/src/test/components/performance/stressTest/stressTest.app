@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application>
+<aura:application access="GLOBAL">
     <h1>Component Creation Stress Test</h1>
     <p>
         Clicking the button creates 50,000 aura:html components, and 50,000 aura:text components.

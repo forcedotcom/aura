@@ -239,6 +239,16 @@ Aura.OverrideMap = function OverrideMap() {
             function(orig) {
                 $A.metricsService.transaction = orig;
             }
+        ),
+        
+        "HtmlComopnent.dispatchAction" : new Aura.Utils.Override(null, Aura.Component.HtmlComponent.prototype["helper"].dispatchAction,
+            true,
+            function(bound) {
+                HtmlComponent.prototype["helper"].dispatchAction = bound;
+            },
+            function(orig) {
+                HtmlComponent.prototype["helper"].dispatchAction = orig;
+            }
         )
     };
 };

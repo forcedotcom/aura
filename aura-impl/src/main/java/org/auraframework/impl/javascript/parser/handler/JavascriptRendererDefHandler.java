@@ -48,8 +48,10 @@ public class JavascriptRendererDefHandler extends JavascriptHandler<RendererDef,
         new JavascriptTokenizer(getParentDescriptor(), code, getLocation()).process(builder);
 
         Map<String, Object> map = codeToMap(code);
-        String recode = mapToCode(map);
-        builder.setCode(recode);
+        if(map.size() > 0) {
+	        String recode = mapToCode(map);
+	        builder.setCode(recode);
+        }
 
         return builder.build();
     }

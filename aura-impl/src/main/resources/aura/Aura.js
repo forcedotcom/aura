@@ -157,6 +157,10 @@ window['$A'] = {};
 // #include aura.component.ComponentClassRegistry
 // #include aura.component.ComponentDefStorage
 // #include aura.component.Component
+// #include aura.component.ExpressionComponent
+// #include aura.component.HtmlComponent
+// #include aura.component.SimpleComponent
+// #include aura.component.TextComponent
 // #include aura.component.InvalidComponent
 // #include aura.component.ComponentDef
 // #include aura.component.ActionValueProvider

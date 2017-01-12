@@ -201,7 +201,7 @@ AuraComponentService.prototype.contains = (function() {
             // loop until we find the next level
             while(next) {
                 next = next.getOwner();
-                if (next === cmp || !(next instanceof Component)) {
+                if (next === cmp || !($A.util.isComponent(next))) {
                     // We are at the top-level now, so we are done
                     return {
                         result: false

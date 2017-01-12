@@ -952,7 +952,7 @@ TestInstance.prototype.assertAuraType = function(type, condition, assertMessage)
         case "Event": return condition instanceof Event;
         case "EventDef": return condition instanceof EventDef;
 
-        case "Component": return condition instanceof Component;
+        case "Component": return $A.util.isComponent(condition);
         case "ComponentDef": return condition instanceof ComponentDef;
 
         case "ControllerDef": return condition instanceof ControllerDef;

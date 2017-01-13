@@ -168,7 +168,7 @@ public class ServerServiceImpl implements ServerService {
             loggingService.stopTimer(LoggingService.TIMER_AURA_RUN);
 
             // MetricsService for Non PROD environments
-            if (context.isDevMode()) {
+            if (context.getMode() != Mode.PROD) {
                 try {
                     metricsService.serializeMetrics(json);
                     metricsService.clearMetrics();

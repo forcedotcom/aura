@@ -667,7 +667,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDesc = definitionService
                 .getDefDescriptor("lockerTest:basicTest", ComponentDef.class);
         AuraContext context = contextService
-                .startContext(Mode.PRODDEBUG, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, cmpDesc);
+                .startContext(Mode.PROD, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, cmpDesc);
 
         // get defs with LockerService enabled
         getMockConfigAdapter().setIsProduction(true);

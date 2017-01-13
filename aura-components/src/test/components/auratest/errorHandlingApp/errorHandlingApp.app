@@ -44,6 +44,7 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler event="aura:systemError" action="{!c.handleSystemError}"/>
+    <aura:handler event="aura:serverActionError" action="{!c.noop}"/>
 
     <aura:registerEvent name="testEvt" type="auratest:testEvent"/>
     <aura:handler name="testEvt" action="{!c.nonExistingHandler}"/>

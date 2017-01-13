@@ -131,5 +131,9 @@
                 cmp.set("v.actionDone", true);
             });
         $A.enqueueAction(action);
+    },
+
+    noop: function(cmp) {
+        // no-op
     }
 })

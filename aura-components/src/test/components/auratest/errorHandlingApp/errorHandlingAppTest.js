@@ -223,6 +223,32 @@
         ]
     },
 
+    testFiringServerActionErrorEvent: {
+        test: [
+            function(cmp) {
+                // arrange
+                var expected = "foo";
+                var actual;
+
+                $A.eventService.addHandler({
+                    "event": "aura:serverActionError",
+                    "globalId": cmp.getGlobalId(),
+                    "handler": function(event) {
+                        actual = event.getParam("auraError").message;
+                    }
+                });
+
+                // act
+                var event = $A.eventService.newEvent("aura:serverActionError");
+                event.setParam("auraError", new Error(expected));
+                event.fire();
+
+                // assert
+                $A.test.assertEquals(expected, actual);
+            }
+        ]
+    },
+
     waitForErrorModal: function(callback) {
         $A.test.addWaitForWithFailureMessage(true,
             function(){

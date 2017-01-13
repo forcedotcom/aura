@@ -27,6 +27,32 @@
             this.assertEventFired(cmp, 'copy', 1);
         }]
     },
+    
+    /**
+     * ui:inputNumber renders zero when initial value is set 
+     * to an attribute of value 0
+     * Bug: W-3568421
+     */
+    testInputNumberWhenValueSetToZeroDuringInit: {
+        attributes: {setValueToZeroDuringInit: "true", testInputCmp: "inputNumber"},
+        test: function (cmp) {
+            this.assertCmpElemValues(cmp, 0, "0");
+        }
+    },
+    
+    testInputCurrencyWhenValueSetToZeroDuringInit: {
+        attributes: {setValueToZeroDuringInit: "true", testInputCmp: "inputCurrency"},
+        test: function (cmp) {
+            this.assertCmpElemValues(cmp, 0, "$0.00");
+        }
+    },
+    
+    testInputPercentWhenValueSetToZeroDuringInit: {
+        attributes: {setValueToZeroDuringInit: "true", testInputCmp: "inputPercent"},
+        test: function (cmp) {
+            this.assertCmpElemValues(cmp, 0, "0%");
+        }
+    },
 
     testInputNumberPasteEvent: {
         attributes: {testInputCmp: "inputNumber"},
@@ -130,7 +156,7 @@
     
     // check component's internal v.value and displayed value on the input box
     assertCmpElemValues: function (component, expectedCmpVal, expectedElemVal) {
-        $A.test.assertEquals(expectedCmpVal, component.find("input").get("v.value"),
+    	$A.test.assertEquals(expectedCmpVal, component.find("input").get("v.value"),
                 "Cmp value doesn't equal to expected");
         $A.test.assertEquals(expectedElemVal, this.getInputElement().value,
                 "Element value is not displayed/formatted correctly.");

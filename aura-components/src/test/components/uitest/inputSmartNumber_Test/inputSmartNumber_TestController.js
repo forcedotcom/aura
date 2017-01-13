@@ -40,6 +40,9 @@
                 "keypress"
             ];
             var inputCmp = cmp.find("input");
+            if(cmp.get("v.setValueToZeroDuringInit")){
+            	inputCmp.set("v.value",0);
+            }
             supportedEvts.forEach(function (evt) {
                 inputCmp.addHandler(evt, cmp, "c.updateEventList");
             });

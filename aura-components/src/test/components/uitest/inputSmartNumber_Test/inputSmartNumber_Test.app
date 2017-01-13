@@ -28,6 +28,7 @@
     <aura:attribute name="max" type="Decimal" default="99999999999999"/>
     <aura:attribute name="min" type="Decimal" default="-99999999999999"/>
     <aura:attribute name="disabled" type="Boolean" default="false"/>
+    <aura:attribute name="setValueToZeroDuringInit" type="Boolean" default="false"/>
 
     <aura:handler name="init" value="{! this }" action="{! c.init }" />
 
@@ -44,17 +45,17 @@
         <aura:if isTrue="{! v.testInputCmp == 'inputNumber' }">
             <ui:inputNumber
                     aura:id="input" label="inputNumber" labelPosition="top"
-                    disabled="{! v.disabled }" max="{! v.max }" min="{! v.min }" />
+                    disabled="{! v.disabled }" max="{! v.max }" min="{! v.min }" value="{!v.value}"/>
         </aura:if>
         <aura:if isTrue="{! v.testInputCmp == 'inputCurrency' }">
             <ui:inputCurrency
                     aura:id="input" label="inputCurrency" labelPosition="top"
-                    disabled="{! v.disabled }" max="{! v.max }" min="{! v.min }"/>
+                    disabled="{! v.disabled }" max="{! v.max }" min="{! v.min }"  value="{!v.value}"/>
         </aura:if>
         <aura:if isTrue="{! v.testInputCmp == 'inputPercent' }">
             <ui:inputPercent
                     aura:id="input" label="inputPercent" labelPosition="top"
-                    disabled="{! v.disabled }" max="{! v.max }" min="{! v.min }"/>
+                    disabled="{! v.disabled }" max="{! v.max }" min="{! v.min }"  value="{!v.value}"/>
         </aura:if>
 
         <div>

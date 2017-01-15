@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -45,13 +46,11 @@ import org.auraframework.service.StyleService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.salesforce.omakase.ast.CssAnnotation;
 import com.salesforce.omakase.ast.atrule.AtRule;
 import com.salesforce.omakase.ast.declaration.Declaration;
-import com.salesforce.omakase.broadcast.annotation.Observe;
 import com.salesforce.omakase.broadcast.annotation.Rework;
 import com.salesforce.omakase.plugin.Plugin;
 import com.salesforce.omakase.plugin.conditionals.ConditionalsValidator;
@@ -257,7 +256,7 @@ public class StyleServiceImpl implements StyleService {
         }
 
         /** if the function references one of our tokens then add an annotation indicating we should keep it */
-        @Observe
+        @Rework
         public void annotate(TokenFunction function) throws QuickFixException {
             Declaration declaration = function.declaration();
             if (hasMatchingToken(function.args())) {
@@ -272,7 +271,7 @@ public class StyleServiceImpl implements StyleService {
         }
 
         /** if the media query references on of our tokens then annotate it */
-        @Observe
+        @Rework
         public void annotate(TokenExpression expression) throws QuickFixException {
             if (hasMatchingToken(Args.extract(expression.expression()))) {
                 expression.parent().annotateUnlessPresent(ANNOTATION);
@@ -294,7 +293,6 @@ public class StyleServiceImpl implements StyleService {
         /** remove all at-rules that weren't given the special annotation */
         @Rework
         public void sift(AtRule atRule) {
-            atRule.refine();
             if (!atRule.hasAnnotation(ANNOTATION)) {
                 atRule.destroy();
             }

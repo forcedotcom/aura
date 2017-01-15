@@ -15,12 +15,13 @@
  */
 package org.auraframework.impl.css.parser.plugin;
 
+import java.util.Optional;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.css.util.Styles;
 
-import com.google.common.base.Optional;
 import com.salesforce.omakase.ast.selector.ClassSelector;
 
 /** utils for flavor plugins */
@@ -68,7 +69,7 @@ final class FlavorPluginUtil {
             }
         }
 
-        return Optional.fromNullable(flavor);
+        return Optional.ofNullable(flavor);
     }
 
     /**
@@ -93,6 +94,6 @@ final class FlavorPluginUtil {
             }
         }
 
-        return Optional.fromNullable(flavor);
+        return Optional.ofNullable(flavor);
     }
 }

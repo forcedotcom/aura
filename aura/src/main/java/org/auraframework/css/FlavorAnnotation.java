@@ -16,8 +16,7 @@
 package org.auraframework.css;
 
 import java.io.Serializable;
-
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 /**
  * An annotation containing metadata about a particular flavor.
@@ -30,7 +29,7 @@ public interface FlavorAnnotation extends Serializable {
 
     /**
      * Optional <code>extends</code> param.
-     * */
+     */
     Optional<String> getExtends();
 
     /**

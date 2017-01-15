@@ -51,8 +51,7 @@ public final class FlavoredStyleParser implements Parser<FlavoredStyleDef> {
     public FlavoredStyleDef parse(DefDescriptor<FlavoredStyleDef> descriptor, Source<FlavoredStyleDef> source)
             throws QuickFixException {
 
-        ParserResult result = CssPreprocessor
-                .initial()
+        ParserResult result = CssPreprocessor.initial()
                 .source(source.getContents())
                 .resourceName(source.getSystemId())
                 .allowedConditions(Iterables.concat(ALLOWED_CONDITIONS, Aura.getStyleAdapter().getExtraAllowedConditions()))

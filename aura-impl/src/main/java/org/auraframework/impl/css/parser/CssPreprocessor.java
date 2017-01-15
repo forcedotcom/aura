@@ -15,8 +15,10 @@
  */
 package org.auraframework.impl.css.parser;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.auraframework.Aura;
@@ -36,20 +38,19 @@ import org.auraframework.impl.css.parser.plugin.TokenSecurityPlugin;
 import org.auraframework.impl.css.parser.plugin.UrlCacheBustingPlugin;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.StyleParserException;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Sets;
 import com.salesforce.omakase.Omakase;
 import com.salesforce.omakase.PluginRegistry;
 import com.salesforce.omakase.plugin.Plugin;
 import com.salesforce.omakase.plugin.conditionals.Conditionals;
 import com.salesforce.omakase.plugin.conditionals.ConditionalsValidator;
-import com.salesforce.omakase.plugin.misc.UnquotedIEFilterPlugin;
+import com.salesforce.omakase.plugin.core.AutoRefine;
+import com.salesforce.omakase.plugin.core.AutoRefine.Match;
+import com.salesforce.omakase.plugin.core.StandardValidation;
 import com.salesforce.omakase.plugin.prefixer.PrefixCleaner;
 import com.salesforce.omakase.plugin.prefixer.Prefixer;
-import com.salesforce.omakase.plugin.validator.StandardValidation;
+import com.salesforce.omakase.plugin.syntax.UnquotedIEFilterPlugin;
 import com.salesforce.omakase.writer.StyleWriter;
 
 /**
@@ -58,8 +59,9 @@ import com.salesforce.omakase.writer.StyleWriter;
  * Use either {@link #initial()} or {@link #runtime(Client.Type)} to get started.
  */
 public final class CssPreprocessor {
-    /** Use one of the constructor methods instead */
-    private CssPreprocessor() {}
+    /** Use one of the constructor methods */
+    private CssPreprocessor() {
+    }
 
     /** For the initial preprocessing of css, this includes all syntax validations and static rework */
     public static ParserConfiguration initial() {
@@ -86,7 +88,7 @@ public final class CssPreprocessor {
         private String content;
         private String resourceName;
         private final boolean runtime;
-        private final Set<Plugin> plugins = Sets.newLinkedHashSet();
+        private final Set<Plugin> plugins = new LinkedHashSet<>();
 
         public ParserConfiguration() {
             this.runtime = false;
@@ -95,15 +97,12 @@ public final class CssPreprocessor {
         public ParserConfiguration(boolean runtime) {
             this.runtime = runtime;
 
-            // add default plugins
             if (!runtime) {
-                // we only want extra validation on the initial pass. During subsequent runtime calls we will already
-                // know the code is valid so no need to validate again.
-                plugins.add(new StandardValidation());
+                plugins.add(new UrlContextPathPlugin());
                 plugins.addAll(Aura.getStyleAdapter().getCompilationPlugins());
             }
 
-            plugins.add(new UrlContextPathPlugin());
+            
             plugins.add(new UrlCacheBustingPlugin());
             plugins.add(new UnquotedIEFilterPlugin());
             plugins.add(Prefixer.defaultBrowserSupport().prune(true).rearrange(true));
@@ -137,6 +136,10 @@ public final class CssPreprocessor {
                 // this will resolve all token function references
                 TokenValueProvider tvp = Aura.getStyleAdapter().getTokenValueProvider(style, ResolveStrategy.RESOLVE_NORMAL);
                 plugins.add(new TokenFunctionPlugin(tvp));
+                
+                // in runtime mode refine all at-rules, so that tokens inside of them are not missed
+                // todo: this can be optimized further
+                plugins.add(AutoRefine.only(Match.AT_RULES));
             } else {
                 // this will collect all token function references but will leave them unevaluated in the CSS
                 TokenValueProvider tvp = Aura.getStyleAdapter().getTokenValueProvider(style, ResolveStrategy.PASSTHROUGH);
@@ -158,7 +161,7 @@ public final class CssPreprocessor {
             return this;
         }
 
-        /** allowed conditionals (e.g., set of allowed browsers) */
+        /** sets allowed conditionals (e.g., set of allowed browsers) */
         public ParserConfiguration allowedConditions(Iterable<String> allowedConditions) {
             plugins.add(new ConditionalsValidator(allowedConditions));
             return this;
@@ -174,7 +177,7 @@ public final class CssPreprocessor {
             return this;
         }
 
-        /** adds the given plugin */
+        /** specifies an additional plugin to run */
         public ParserConfiguration extra(Plugin plugin) {
             this.plugins.add(plugin);
             return this;
@@ -186,15 +189,20 @@ public final class CssPreprocessor {
             return this;
         }
 
-        /** parses the CSS according to the specified configuration */
-        public ParserResult parse() throws StyleParserException, QuickFixException {
+        /** parses the CSS according to the current configuration */
+        public ParserResult parse() throws StyleParserException {
             // determine the output compression level based on the aura mode
             Mode mode = Aura.getContextService().getCurrentContext().getMode();
             StyleWriter writer = mode.prettyPrint() ? StyleWriter.inline() : StyleWriter.compressed();
 
             if (!runtime) {
-                // write annotated comments out on the initial pass, in case the runtime pass needs them
+                // write annotated comments out on the compilation pass, in case the runtime pass needs them
                 writer.writeAnnotatedComments(true);
+
+                // we only want full refinement and validation on the compilation pass. During subsequent runtime calls
+                // we will already know the code is valid so no need to validate again. This should be the last plugin
+                // so we don't preempt other refiners.
+                plugins.add(new StandardValidation());
             }
 
             // do the parsing
@@ -202,7 +210,9 @@ public final class CssPreprocessor {
             PluginRegistry registry = Omakase.source(content).use(plugins).use(writer).use(em).process();
 
             // report any errors found during parsing
-            em.checkErrors();
+            if (em.hasErrors()) {
+                throw new StyleParserException(em.summarize(), null);
+            }
 
             // return the results
             ParserResult result = new ParserResult();
@@ -214,7 +224,7 @@ public final class CssPreprocessor {
 
             Optional<TokenFunctionPlugin> tokensPlugin = registry.retrieve(TokenFunctionPlugin.class);
             if (tokensPlugin.isPresent()) {
-                result.expressions = tokensPlugin.get().parsedExpressions();
+                result.expressions = tokensPlugin.get().expressions();
             }
 
             Optional<FlavorCollectorPlugin> flavorCollector = registry.retrieve(FlavorCollectorPlugin.class);

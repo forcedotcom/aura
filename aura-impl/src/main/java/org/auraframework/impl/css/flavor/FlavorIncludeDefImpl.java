@@ -109,7 +109,7 @@ public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> imple
             DefDescriptor<ComponentDef> cmp = Flavors.toComponentDescriptor(style);
             Map<String, FlavorAnnotation> annotations = style.getDef().getFlavorAnnotations();
             for (FlavorAnnotation annotation : annotations.values()) {
-                table.put(cmp, annotation.getFlavorName(), new FlavorOverrideLocationImpl(style, annotation.getOverridesIf().orNull()));
+                table.put(cmp, annotation.getFlavorName(), new FlavorOverrideLocationImpl(style, annotation.getOverridesIf().orElse(null)));
             }
         }
 

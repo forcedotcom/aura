@@ -21,6 +21,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import org.auraframework.css.FlavorOverrideLocation;
@@ -28,7 +29,6 @@ import org.auraframework.css.FlavorOverrideLocator;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
@@ -45,7 +45,7 @@ public final class FlavorOverrideLocatorImpl implements FlavorOverrideLocator {
     public Optional<FlavorOverrideLocation> getLocation(DefDescriptor<ComponentDef> component, String flavorName) {
         // LIFO behavior is maintained on insertion, not retrieval
         Deque<FlavorOverrideLocation> overrides = table.get(component, flavorName);
-        return (overrides == null) ? Optional.<FlavorOverrideLocation>absent() : Optional.of(overrides.peek());
+        return (overrides == null) ? Optional.empty() : Optional.of(overrides.peek());
     }
 
     @Override
@@ -53,7 +53,7 @@ public final class FlavorOverrideLocatorImpl implements FlavorOverrideLocator {
             Set<String> trueConditions) {
         Deque<FlavorOverrideLocation> overrides = table.get(component, flavorName);
         if (overrides == null) {
-            return Optional.absent();
+            return Optional.empty();
         } else {
             // LIFO behavior is maintained on insertion, not retrieval
             for (FlavorOverrideLocation override : overrides) {
@@ -62,7 +62,7 @@ public final class FlavorOverrideLocatorImpl implements FlavorOverrideLocator {
                     return Optional.of(override);
                 }
             }
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 

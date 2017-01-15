@@ -17,11 +17,11 @@ package org.auraframework.impl.css.parser.plugin;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.auraframework.css.FlavorAnnotation;
 import org.auraframework.throwable.quickfix.StyleParserException;
 
-import com.google.common.base.Optional;
 import com.salesforce.omakase.ast.Comment;
 import com.salesforce.omakase.ast.Rule;
 import com.salesforce.omakase.ast.selector.ClassSelector;

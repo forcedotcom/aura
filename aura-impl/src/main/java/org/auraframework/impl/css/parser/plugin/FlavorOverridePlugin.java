@@ -17,25 +17,29 @@ package org.auraframework.impl.css.parser.plugin;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.auraframework.css.FlavorOverrideLocation;
 import org.auraframework.css.FlavorOverrideLocator;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.css.util.Styles;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.salesforce.omakase.PluginRegistry;
 import com.salesforce.omakase.ast.selector.ClassSelector;
 import com.salesforce.omakase.ast.selector.Selector;
+import com.salesforce.omakase.broadcast.Broadcaster;
+import com.salesforce.omakase.broadcast.annotation.Refine;
 import com.salesforce.omakase.broadcast.annotation.Rework;
+import com.salesforce.omakase.parser.Grammar;
 import com.salesforce.omakase.plugin.DependentPlugin;
 import com.salesforce.omakase.plugin.conditionals.Conditionals;
+import com.salesforce.omakase.plugin.syntax.SelectorPlugin;
 
 /**
  * Enables removing flavor styles that have been overridden via an app's {@link FlavorsDef}.
@@ -52,7 +56,7 @@ public final class FlavorOverridePlugin implements DependentPlugin {
     private final DefDescriptor<FlavoredStyleDef> style;
     private final DefDescriptor<ComponentDef> component;
     private final FlavorOverrideLocator overrides;
-    private Optional<Conditionals> conditionalsPlugin;
+    private Conditionals conditionalsPlugin;
 
     public FlavorOverridePlugin(DefDescriptor<FlavoredStyleDef> style, FlavorOverrideLocator overrides) {
         this.style = checkNotNull(style, "style cannot be null");
@@ -63,13 +67,13 @@ public final class FlavorOverridePlugin implements DependentPlugin {
     @Override
     public void dependencies(PluginRegistry registry) {
         // just so that we can hijack which conditions are true
-        this.conditionalsPlugin = registry.retrieve(Conditionals.class);
+        this.conditionalsPlugin = registry.retrieve(Conditionals.class).orElse(null);
     }
 
-    @Rework
-    public void refine(Selector selector) {
+    @Refine
+    public void refine(Selector selector, Grammar grammar, Broadcaster broadcaster) {
         if (selector.raw().isPresent() && selector.raw().get().content().contains(FlavorPluginUtil.DELIMITER)) {
-            selector.refine();
+            SelectorPlugin.delegateRefinement(selector, grammar, broadcaster);
         }
     }
 
@@ -95,7 +99,7 @@ public final class FlavorOverridePlugin implements DependentPlugin {
     }
 
     private Set<String> getTrueConditions() {
-        return conditionalsPlugin.isPresent() ? conditionalsPlugin.get().config().trueConditions() : ImmutableSet.<String>of();
+        return conditionalsPlugin != null ? conditionalsPlugin.config().trueConditions() : ImmutableSet.<String>of();
     }
 
 }

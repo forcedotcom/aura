@@ -30,12 +30,10 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.salesforce.omakase.broadcast.emitter.SubscriptionException;
 
 /**
  * Basic CSS style parser.
@@ -83,7 +81,7 @@ public abstract class StyleParser implements Parser<StyleDef> {
     }
 
     @Override
-    abstract public Format getFormat();
+    public abstract Format getFormat();
 
     @Override
     public DefType getDefType() {
@@ -92,42 +90,25 @@ public abstract class StyleParser implements Parser<StyleDef> {
 
     @Override
     public StyleDef parse(DefDescriptor<StyleDef> descriptor, Source<StyleDef> source) throws QuickFixException {
-        String className = Styles.buildClassName(descriptor);
-
         boolean shouldValidate = validate
                 && !descriptor.getName().toLowerCase().endsWith("template")
                 && Aura.getConfigAdapter().validateCss();
+        
+        String className = Styles.buildClassName(descriptor);
+
+        ParserResult result = CssPreprocessor.initial()
+                .source(source.getContents())
+                .resourceName(source.getSystemId())
+                .allowedConditions(Iterables.concat(ALLOWED_CONDITIONS, Aura.getStyleAdapter().getExtraAllowedConditions()))
+                .componentClass(className, shouldValidate)
+                .tokens(descriptor)
+                .parse();
 
         StyleDefImpl.Builder builder = new StyleDefImpl.Builder();
         builder.setDescriptor(descriptor);
         builder.setLocation(source.getSystemId(), source.getLastModified());
-        ParserResult result;
-
-        try {
-            result = CssPreprocessor
-                    .initial()
-                    .source(source.getContents())
-                    .resourceName(source.getSystemId())
-                    .allowedConditions(Iterables.concat(ALLOWED_CONDITIONS, Aura.getStyleAdapter().getExtraAllowedConditions()))
-                    .componentClass(className, shouldValidate)
-                    .tokens(descriptor)
-                    .parse();
-        } catch (QuickFixException qfe) {
-            builder.setParseError(qfe);
-            return builder.build();
-        } catch (SubscriptionException se) {
-            //
-            // Subscription exceptions are a special case (read !!!!HACK!!!!) that allow someone to pass through
-            // an exception. We should probably disallow this and figure out a better way to handle the exceptions,
-            // as this currently bypasses the aura framework and leaves things in a bad state.
-            //
-            throw se;
-        } catch (Throwable t) {
-            builder.setParseError(new InvalidDefinitionException("Unable to parse css", builder.getLocation(), t));
-            return builder.build();
-        }
-        builder.setClassName(className);
         builder.setOwnHash(source.getHash());
+        builder.setClassName(className);
         builder.setContent(result.content());
         builder.setTokenExpressions(result.expressions());
         builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));

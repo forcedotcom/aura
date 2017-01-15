@@ -18,11 +18,11 @@ package org.auraframework.impl.css.parser.plugin;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.auraframework.css.FlavorAnnotation;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.salesforce.omakase.ast.Comment;
 
@@ -50,21 +50,21 @@ public final class FlavorAnnotationImpl implements FlavorAnnotation {
     private static final String NAME = "@flavor";
 
     private final String flavorName;
-    private final Optional<String> optionExtends;
-    private final Optional<String> optionOverridesIf;
+    private final String optionExtends;
+    private final String optionOverridesIf;
 
     public FlavorAnnotationImpl(Map<String, String> map) {
         this.flavorName = checkNotNull(map.get("flavor"), "flavorName cannot be null");
-        this.optionExtends = Optional.fromNullable(map.get("extends"));
+        this.optionExtends = map.get("extends");
 
         String overridesIf = map.get("overrides-if");
-        this.optionOverridesIf = overridesIf != null ?Optional.of(overridesIf.toLowerCase()) : Optional.<String>absent();
+        this.optionOverridesIf = overridesIf != null ? overridesIf.toLowerCase() : null;
     }
 
     public FlavorAnnotationImpl(String name) {
         this.flavorName = checkNotNull(name, "flavor name cannot be null");
-        this.optionExtends = Optional.absent();
-        this.optionOverridesIf = Optional.absent();
+        this.optionExtends = null;
+        this.optionOverridesIf = null;
     }
 
     @Override
@@ -74,12 +74,12 @@ public final class FlavorAnnotationImpl implements FlavorAnnotation {
 
     @Override
     public Optional<String> getExtends() {
-        return optionExtends;
+        return Optional.ofNullable(optionExtends);
     }
 
     @Override
     public Optional<String> getOverridesIf() {
-        return optionOverridesIf;
+        return Optional.ofNullable(optionOverridesIf);
     }
 
     @Override
@@ -99,6 +99,6 @@ public final class FlavorAnnotationImpl implements FlavorAnnotation {
             Map<String, String> map = Splitter.on(",").trimResults().omitEmptyStrings().withKeyValueSeparator(" ").split(string);
             return Optional.<FlavorAnnotation>of(new FlavorAnnotationImpl(map));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 }

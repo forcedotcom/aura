@@ -176,7 +176,7 @@ public class FlavorOutputTest extends StyleTestCase {
             definitionService.getDefinition(addStandardFlavor(addFlavorableComponentDef(), src));
             fail("parser should have thrown exception.");
         } catch (Exception e) {
-            checkExceptionContains(e, SubscriptionException.class, "it was already specified to extend");
+            checkExceptionContains(e, StyleParserException.class, "it was already specified to extend");
         }
     }
 
@@ -189,7 +189,7 @@ public class FlavorOutputTest extends StyleTestCase {
             definitionService.getDefinition(addStandardFlavor(addFlavorableComponentDef(), src));
             fail("parser should have thrown exception.");
         } catch (Exception e) {
-            checkExceptionContains(e, SubscriptionException.class, "unknown flavor");
+            checkExceptionContains(e, StyleParserException.class, "unknown flavor");
         }
     }
 
@@ -204,7 +204,7 @@ public class FlavorOutputTest extends StyleTestCase {
             definitionService.getDefinition(addStandardFlavor(addFlavorableComponentDef(), src));
             fail("parser should have thrown exception.");
         } catch (Exception e) {
-            checkExceptionContains(e, SubscriptionException.class, "multi-level extension not allowed");
+            checkExceptionContains(e, StyleParserException.class, "multi-level extension not allowed");
         }
     }
 }

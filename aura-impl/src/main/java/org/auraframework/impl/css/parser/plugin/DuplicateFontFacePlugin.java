@@ -18,8 +18,8 @@ package org.auraframework.impl.css.parser.plugin;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
-import com.google.common.base.Optional;
 import com.salesforce.omakase.ast.atrule.FontDescriptor;
 import com.salesforce.omakase.broadcast.annotation.Validate;
 import com.salesforce.omakase.data.Property;
@@ -28,6 +28,7 @@ import com.salesforce.omakase.error.ErrorManager;
 import com.salesforce.omakase.plugin.Plugin;
 
 /**
+ * TODONM: move this to core
  * Handles checking for font-faces declaring duplicate font-families.
  * <p>
  * This helps to catch situations that are usually mistakes, programming errors, or incompatible components.

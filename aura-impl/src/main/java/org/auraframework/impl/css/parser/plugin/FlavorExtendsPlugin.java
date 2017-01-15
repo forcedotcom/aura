@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import org.auraframework.css.FlavorAnnotation;
@@ -26,7 +27,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.throwable.quickfix.StyleParserException;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;

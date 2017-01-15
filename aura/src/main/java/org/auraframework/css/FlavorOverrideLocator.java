@@ -15,13 +15,13 @@
  */
 package org.auraframework.css;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 
-import com.google.common.base.Optional;
 
 /**
  * Maps which {@link FlavoredStyleDef} contains the applicable override for a {@link ComponentDef} and flavor name

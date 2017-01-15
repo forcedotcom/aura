@@ -20,49 +20,32 @@ import java.util.List;
 
 import org.auraframework.Aura;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.AuraUnhandledException;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.throwable.quickfix.StyleParserException;
 
 import com.salesforce.omakase.ast.Syntax;
+import com.salesforce.omakase.broadcast.emitter.SubscriptionException;
 import com.salesforce.omakase.error.ErrorLevel;
 import com.salesforce.omakase.error.ErrorManager;
 import com.salesforce.omakase.parser.ParserException;
 
 /**
- * Custom error manager that stores errors, allowing us to report them all at once.
+ * Stores errors, allowing us to report them all at once.
  */
 final class CssErrorManager implements ErrorManager {
-    private final Mode mode = Aura.getContextService().getCurrentContext().getMode();
-    private final List<QuickFixException> wrappedExceptions = new ArrayList<>();
-    private final List<String> messages = new ArrayList<>();
+    private final Mode mode;
     private final String resourceName;
+    private final List<String> messages = new ArrayList<>();
 
     /**
      * @param resourceName Name of the resource. Used for error reporting.
      */
     public CssErrorManager(String resourceName) {
         this.resourceName = resourceName;
+        this.mode = Aura.getContextService().getCurrentContext().getMode();
     }
 
     @Override
     public String getSourceName() {
         return resourceName;
-    }
-
-    @Override
-    public void report(ErrorLevel level, ParserException exception) {
-        // QFEs are checked exceptions, so we have no choice but to deal with it stupidly
-        if (exception.getCause() != null && exception.getCause() instanceof QuickFixException) {
-            wrappedExceptions.add((QuickFixException) exception.getCause());
-        }
-
-        // warnings are ignored in prod mode
-        if (level != ErrorLevel.WARNING || mode != Mode.PROD) {
-            messages.add(exception.getMessage());
-        }
     }
 
     @Override
@@ -73,54 +56,42 @@ final class CssErrorManager implements ErrorManager {
         }
     }
 
-    /**
-     * Gets whether any error or warning messages were collected by this error manager.
-     */
-    public boolean hasMessages() {
+    @Override
+    public void report(ParserException exception) {
+        messages.add(exception.getMessage());
+    }
+
+    @Override
+    public void report(SubscriptionException exception) {
+        messages.add(exception.getMessage());
+    }
+
+    @Override
+    public boolean hasErrors() {
         return !messages.isEmpty();
     }
 
-    /**
-     * Combines all gathered messages into a single, formatted string.
-     */
-    public String concatMessages(boolean includeTitle) {
+    @Override
+    public boolean autoSummarize() {
+        return false;
+    }
+
+    @Override
+    public String summarize() {
         StringBuilder builder = new StringBuilder(256);
 
-        if (includeTitle) {
-            builder.append("Issue(s) found by CSS Parser");
+        builder.append("Issue(s) found by CSS Parser");
 
-            if (resourceName != null) {
-                builder.append(" (").append(resourceName).append(")");
-            }
-
-            builder.append(":\n\n");
+        if (resourceName != null) {
+            builder.append(" (").append(resourceName).append(")");
         }
+
+        builder.append(":\n\n");
 
         for (String message : messages) {
             builder.append(message).append("\n\n");
         }
 
         return builder.toString();
-    }
-
-    /**
-     * Throws an exception if there are any errors.
-     *
-     * @throws StyleParserException If there are CSS errors.
-     */
-    public void checkErrors() throws StyleParserException, QuickFixException {
-        // check for wrapped QFEs. However if it's a DefinitionNotFound... currently throwing one of those will
-        // get confused with the StyleDef itself so we have to wrap it in a runtime exception (and kill the quickfix).
-        if (!wrappedExceptions.isEmpty()) {
-            QuickFixException e = wrappedExceptions.get(0);
-            if (e instanceof DefinitionNotFoundException) {
-                throw new AuraRuntimeException(e);
-            }
-            throw e;
-        }
-
-        if (hasMessages()) {
-            throw new StyleParserException(concatMessages(true), null, new AuraUnhandledException(concatMessages(false)));
-        }
     }
 }

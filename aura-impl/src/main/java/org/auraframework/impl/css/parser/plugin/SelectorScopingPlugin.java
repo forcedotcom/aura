@@ -15,7 +15,8 @@
  */
 package org.auraframework.impl.css.parser.plugin;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
+
 import com.salesforce.omakase.PluginRegistry;
 import com.salesforce.omakase.ast.selector.ClassSelector;
 import com.salesforce.omakase.ast.selector.Selector;
@@ -25,7 +26,7 @@ import com.salesforce.omakase.broadcast.annotation.Validate;
 import com.salesforce.omakase.error.ErrorLevel;
 import com.salesforce.omakase.error.ErrorManager;
 import com.salesforce.omakase.plugin.DependentPlugin;
-import com.salesforce.omakase.plugin.basic.AutoRefiner;
+import com.salesforce.omakase.plugin.syntax.SelectorPlugin;
 import com.salesforce.omakase.util.Selectors;
 
 /**
@@ -46,7 +47,7 @@ public final class SelectorScopingPlugin implements DependentPlugin {
 
     @Override
     public void dependencies(PluginRegistry registry) {
-        registry.require(AutoRefiner.class).selectors();
+        registry.require(SelectorPlugin.class);
     }
 
     @Rework

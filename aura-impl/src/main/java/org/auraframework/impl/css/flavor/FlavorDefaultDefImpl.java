@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import org.auraframework.Aura;
@@ -43,7 +44,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> implements FlavorDefaultDef {

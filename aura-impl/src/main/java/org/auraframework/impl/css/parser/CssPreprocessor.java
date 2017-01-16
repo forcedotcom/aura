@@ -97,9 +97,9 @@ public final class CssPreprocessor {
         public ParserConfiguration(boolean runtime) {
             this.runtime = runtime;
 
-            if (!runtime) {
-                plugins.add(new UrlContextPathPlugin());
+            if (!runtime) {                
                 plugins.addAll(Aura.getStyleAdapter().getCompilationPlugins());
+                plugins.add(new UrlContextPathPlugin());
             }
 
             

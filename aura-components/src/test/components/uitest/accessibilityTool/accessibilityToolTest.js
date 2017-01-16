@@ -115,10 +115,10 @@
                 caseToRender: 'full'
             },
             test: [function (cmp) {
-                    this.runTest(7, "Unexpected return from CheckAccessibility, should return 7 errors. output: \n", null, ["A11Y_DOM_02"]);
+                    this.runTest(13, "Unexpected return from CheckAccessibility, should return 13 errors. output: \n", null, ["A11Y_DOM_02", "A11Y_DOM_15"]);
                 },
                 function (cmp) {
-                    this.runTest(9, "Unexpected return from CheckAccessibility, should return 9 errors. output: \n", null, ["A11Y_DOM_06", "A11Y_DOM_02", "A11Y_DOM_08"]);
+                    this.runTest(15, "Unexpected return from CheckAccessibility, should return 15 errors. output: \n", null, ["A11Y_DOM_06", "A11Y_DOM_02", "A11Y_DOM_08", "A11Y_DOM_15"]);
                 }]
         },
 
@@ -137,7 +137,7 @@
             },
             test: function (cmp) {
             	cmp.find("inputErrorTest").find("validate").getEvent("press").fire();
-                this.runTest(1, "Unexpected return from CheckAccessibility, should return 1 error. output: \n");
+                this.runTest(4, "Unexpected return from CheckAccessibility, should return 4 error. output: \n");
             }
         },
         testWithNoHeader: {
@@ -387,10 +387,10 @@
             },
             test: [
                 function (cmp) {
-                    this.runTest(4, "Unexpected return from CheckAccessibility, should return 4 error. output: \n", document.getElementById("table1"));
+                    this.runTest(7, "Unexpected return from CheckAccessibility, should return 7 error. output: \n", document.getElementById("table1"));
                 },
                 function (cmp) {
-                    this.runTest(2, "Unexpected return from CheckAccessibility, should return 2 error. output: \n", document.getElementById("field_set"));
+                    this.runTest(4, "Unexpected return from CheckAccessibility, should return 4 error. output: \n", document.getElementById("field_set"));
                 }
             ]
 
@@ -425,7 +425,7 @@
         //Full tests
         testCheckAccessibility: {
             test: function (cmp) {
-                this.runTest(10, "Unexpected return from CheckAccessibility, should return 10 error. output: \n");
+                this.runTest(16, "Unexpected return from CheckAccessibility, should return 16 error. output: \n");
             }
         },
 

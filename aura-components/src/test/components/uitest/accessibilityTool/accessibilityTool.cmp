@@ -387,9 +387,19 @@
 	            <th></th>
 	            <tr><td>
 	                <ui:block>
-	                    <ui:inputText aura:id="first" placeholder="First name"/>
-	                    <ui:inputText aura:id="mid" placeholder="Middle Name"/>
-	                    <ui:inputText aura:id="last" placeholder="Last name"/>
+	                	<ui:label for="first">My Label</ui:label>
+	                    <ui:inputText aura:id="first" placeholder="First name" label="My 2nd Label" labelPosition="hidden"/>
+
+	                    <ui:inputText aura:id="mid" placeholder="Middle Name"/><br/>
+
+	                    <ui:label label="Last Label">
+	                    	<ui:inputText aura:id="last" placeholder="Last name" label="Last Label 2" labelPosition="hidden"/>
+	                    </ui:label>
+
+	                    <ui:label for="div" label="Div Label" />
+	                    <div aura:id="div">
+	                    	<ui:inputText placeholder="Input inside div" label="Hidden Div Label" labelPosition="hidden" />
+	                    </div>
 	                 </ui:block>
 	            </td></tr>
 	            <tr><td><iframe title="Lets go to google" height="300px" width="50%" src="http://www.salesforce.com"></iframe></td></tr>

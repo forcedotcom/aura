@@ -253,38 +253,19 @@
         }
 
         // fill the cache
-        this.getOnClickEventProp.cache["isTouchDevice"] = !$A.util.isUndefined(document.ontouchstart);
-
-        if (this.getOnClickEventProp.cache["isTouchDevice"]) {
-            this.getOnClickEventProp.cache["onClickStartEvent"] = "touchstart";
-            this.getOnClickEventProp.cache["onClickEndEvent"] = "touchend";
-        } else {
-            this.getOnClickEventProp.cache["onClickStartEvent"] = "mousedown";
-            this.getOnClickEventProp.cache["onClickEndEvent"] = "mouseup";
-        }
+        this.getOnClickEventProp.cache["onClickStartEvent"] = "mousedown";
+        this.getOnClickEventProp.cache["onClickEndEvent"] = "mouseup";
 
         return this.getOnClickEventProp.cache[prop];
     },
 
     getOnClickStartFunction: function (component) {
-        var helper,
-            func;
+        var func;
 
         if ($A.util.isUndefined(component._onClickStartFunc)) {
-            helper = this;
             func = function (event) {
-                var touch;
-
-                if (helper.getOnClickEventProp("isTouchDevice")) {
-                    touch = event.changedTouches[0];
-                    // record the ID to ensure it's the same finger on a multi-touch device
-                    component._onStartId = touch.identifier;
-                    component._onStartX = touch.clientX;
-                    component._onStartY = touch.clientY;
-                } else {
-                    component._onStartX = event.clientX;
-                    component._onStartY = event.clientY;
-                }
+                component._onStartX = event.clientX;
+                component._onStartY = event.clientY;
             };
 
             component._onClickStartFunc = func;
@@ -302,12 +283,6 @@
             func = function (event) {
                 // ignore gestures/swipes; only run the click handler if it's a click or tap
                 var elements = helper.getElementCache(component),
-                    clickEndEvent,
-                    touchIdFound,
-                    startX,
-                    startY,
-                    endX,
-                    endY,
                     doIf = {
                         clickIsInsideTarget: helper.isElementInComponent(elements.target, event.target),
                         clickIsInsideTrigger: helper.isElementInComponent(elements.trigger, event.target),
@@ -315,34 +290,6 @@
                         closeOnClickOutside: component.get('v.closeOnClickOutside'),
                         clickIsInCurtain: $A.util.hasClass(event.target, 'popupCurtain')
                     };
-
-                if (helper.getOnClickEventProp("isTouchDevice")) {
-                    touchIdFound = false;
-
-                    for (var i = 0; i < event.changedTouches.length; i++) {
-                        clickEndEvent = event.changedTouches[i];
-
-                        if (clickEndEvent.identifier === component._onStartId) {
-                            touchIdFound = true;
-                            break;
-                        }
-                    }
-
-                    startX = component._onStartX;
-                    startY = component._onStartY;
-                    endX = clickEndEvent.clientX;
-                    endY = clickEndEvent.clientY;
-
-                    if (Math.abs(endX - startX) > 0 || Math.abs(endY - startY) > 0) {
-                        return;
-                    }
-
-                    if (helper.getOnClickEventProp("isTouchDevice") && !touchIdFound) {
-                        return;
-                    }
-                } else {
-                    clickEndEvent = event;
-                }
 
                 if (
                     (doIf.clickIsInsideTarget && doIf.closeOnClickInside) // if click is in target and v.closeonclickinside is true

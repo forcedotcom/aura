@@ -88,9 +88,15 @@ TransportMetricsPlugin.prototype.receiveOverride = function(/* config, auraXHR *
     endMark["context"] = {
         "auraXHRId"      : auraXHR.marker,
         "status"         : auraXHR.request.status,
-        "statusText"     : auraXHR.request.statusText,
-        "responseLength" : auraXHR.request.responseText.length
+        "statusText"     : auraXHR.request.statusText
     };
+    // Accessing responseText can fail in IE11 for large payloads or other reasons
+    // set to 0 if can't access it
+    try {
+        endMark["context"]["responseLength"] = auraXHR.request.responseText.length;
+    } catch (ex) {
+        endMark["context"]["responseLength"] = 0;
+    }
 
     if (window.performance && window.performance.getEntriesByName) {
         var allResources = window.performance.getEntriesByType("resource");

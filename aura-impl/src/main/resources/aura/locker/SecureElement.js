@@ -533,15 +533,15 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseIn
 			}
 		},
 
-        getAttribute: SecureElement.createAttributeAccessMethodConfig("getAttribute", prototype, caseInsensitiveAttributes),
-        getAttributeNS: SecureElement.createAttributeAccessMethodConfig("getAttributeNS", prototype, caseInsensitiveAttributes, true),
+        getAttribute: SecureElement.createAttributeAccessMethodConfig("getAttribute", prototype, caseInsensitiveAttributes, null),
+        getAttributeNS: SecureElement.createAttributeAccessMethodConfig("getAttributeNS", prototype, caseInsensitiveAttributes, null, true),
         
-        setAttribute: SecureElement.createAttributeAccessMethodConfig("setAttribute", prototype, caseInsensitiveAttributes),
-        setAttributeNS: SecureElement.createAttributeAccessMethodConfig("setAttributeNS", prototype, caseInsensitiveAttributes, true)
+        setAttribute: SecureElement.createAttributeAccessMethodConfig("setAttribute", prototype, caseInsensitiveAttributes, undefined),
+        setAttributeNS: SecureElement.createAttributeAccessMethodConfig("setAttributeNS", prototype, caseInsensitiveAttributes, undefined, true)
 	});
 };
 
-SecureElement.createAttributeAccessMethodConfig = function(methodName, prototype, caseInsensitiveAttributes, namespaced) {
+SecureElement.createAttributeAccessMethodConfig = function(methodName, prototype, caseInsensitiveAttributes, invalidAttributeReturnValue, namespaced) {
 	return {
     	value: function() {
 			var raw = SecureObject.getRaw(this, prototype);
@@ -549,7 +549,8 @@ SecureElement.createAttributeAccessMethodConfig = function(methodName, prototype
     		
     		var name = args[namespaced ? 1 : 0];
             if (!isValidAttributeName(raw, name, prototype, caseInsensitiveAttributes)) {
-                throw new $A.auraError(this + " does not permit setting the " + name.toLowerCase() + " attribute!");
+            	$A.warning(this + " does not allow getting/setting the " + name.toLowerCase() + " attribute, ignoring!");
+            	return invalidAttributeReturnValue;
             }
 
     		return raw[methodName].apply(raw, args);

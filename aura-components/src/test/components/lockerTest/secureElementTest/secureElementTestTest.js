@@ -562,5 +562,12 @@
         test: function(cmp) {
             cmp.testAttributesPropertyContainsData();
         }
+    },
+
+    testGetSetInvalidAttributes: {
+        test: function(cmp) {
+            cmp.testGetSetInvalidAttributes();
+        }
     }
+
 })

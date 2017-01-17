@@ -413,5 +413,13 @@
         testUtils.assertTrue(div.childNodes.item(1) === splitText, "2nd childnode on div should be what was returned from splitText()");
         testUtils.assertStartsWith("SecureElement", splitText.toString(), "Text.splitText() should return a SecureElement");
         testUtils.assertStartsWith("SecureElement", text.toString(), "Original text should be a SecureElement");
+    },
+
+    testGetSetInvalidAttributes: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var button = document.createElement("button");
+        testUtils.assertNull(button.getAttribute("href"));
+        testUtils.assertUndefined(button.setAttribute("href", "/foo"));
+        testUtils.assertNull(button.getAttribute("href"));
     }
 })

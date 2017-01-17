@@ -69,6 +69,7 @@
     <aura:method name="testTextNodeSplitText" action="{!c.testTextNodeSplitText}"/>
     <aura:method name="testAriaAttributesAccessible" action="{!c.testAriaAttributesAccessible}"/>
     <aura:method name="testAttributesPropertyContainsData" action="{!c.testAttributesPropertyContainsData}"/>
+    <aura:method name="testGetSetInvalidAttributes"/>
 
     <lockerTest:facet/>
 

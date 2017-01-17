@@ -26,6 +26,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             labelNoData  : 'No more data to display',
             labelIdle    : '',
             labelLoading : 'Loading more...',
+            autoFillPage : false,
             threshold    : 0
         },
         CLASS_LOADING = 'loading',
@@ -73,6 +74,10 @@ function lib(w) { //eslint-disable-line no-unused-vars
             if (!this.opts.infiniteLoading || !ilConfig.dataProvider) {
                 Logger.log('warn', 'InfiniteLoading will not work because there is no data provider or is not activated');
                 return;
+            }
+
+            if (ilConfig.autoFillPage) {
+                this.on('_refresh', thresholdCheck);
             }
 
             this.on('scrollMove', thresholdCheck);

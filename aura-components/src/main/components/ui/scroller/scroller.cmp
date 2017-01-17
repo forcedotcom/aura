@@ -61,6 +61,7 @@
     <aura:attribute name="infiniteLoading"             type="Boolean"     								    description="Enable Infinite loading (adds the infinite loading plugin to the scroller)"/>
     <aura:attribute name="infiniteLoadingThreshold"	   type="Integer"     								    description="Callback invoked When the user scrolls to this many pixels from the bottom"/>
     <aura:attribute name="infiniteLoadingDataProvider" type="Aura.Action" 								    description="The action invoked when the user has reached the end of the scrolling area"/>
+	<aura:attribute name="infiniteLoadingAutoFillPage" type="Boolean"     default="false"               	description="Enable auto trigger data provider when there is empty space"/>
 	<aura:attribute name="infiniteLoadingNoDataLabel"  type="String"      default="No more data to display" description="The text to display when no more data is available to be shown"/>
 	<aura:attribute name="infiniteLoadingIdleLabel"	   type="String"      default="" 						description="The text to display when no loading is happening"/>
 	<aura:attribute name="infiniteLoadingLoadingLabel" type="String"	  default="Loading more..." 		description="The text to display while the infinite loading callback is invoked"/>

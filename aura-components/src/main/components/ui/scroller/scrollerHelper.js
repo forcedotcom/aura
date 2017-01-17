@@ -203,6 +203,7 @@
         return {
             threshold    : component.get('v.infiniteLoadingThreshold'),
             dataProvider : dataProviderBridge,
+            autoFillPage : component.get('v.infiniteLoadingAutoFillPage'),
             labelNoData  : component.get("v.infiniteLoadingNoDataLabel"),
             labelIdle    : component.get("v.infiniteLoadingIdleLabel"),
             labelLoading : component.get("v.infiniteLoadingLoadingLabel")

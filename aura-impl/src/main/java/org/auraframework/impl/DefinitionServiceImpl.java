@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
+import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -376,7 +377,7 @@ public class DefinitionServiceImpl implements DefinitionService {
     }
 
     @Override
-    public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
+    public Set<DefDescriptor<?>> find(DescriptorFilter matcher, BaseComponentDef referenceDescriptor) {
         final String filterKey = matcher.toString();
         Set<DefDescriptor<?>> matched = Sets.newHashSet();
         GlobMatcher namespaceMatcher = matcher.getNamespaceMatch();
@@ -464,7 +465,19 @@ public class DefinitionServiceImpl implements DefinitionService {
                                 registryResults = reg.find(matcher);
                             }
 
-                            matched.addAll(registryResults);
+                            if (referenceDescriptor != null) {
+                                matched.addAll(registryResults.stream()
+                                        .filter(regRes -> {
+                                            try {
+                                                return computeAccess(referenceDescriptor.getDescriptor(), regRes.getDef()) == null;
+                                            } catch (QuickFixException e) {
+                                                return false;
+                                            }
+                                        })
+                                        .collect(Collectors.toSet()));
+                            } else {
+                                matched.addAll(registryResults);
+                            }
                         }
                     }
                 }

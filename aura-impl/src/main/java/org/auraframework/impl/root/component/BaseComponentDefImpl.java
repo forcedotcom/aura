@@ -616,7 +616,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         for (DependencyDef dep : this.dependencies) {
-            dep.appendDependencies(dependencies);
+            dep.appendDependencies(dependencies, this);
         }
     }
 

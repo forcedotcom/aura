@@ -141,5 +141,20 @@
                 }
             );
         }
+    },
+
+    testWildcardDependency: {
+        test: function(cmp) {
+            cmp.set("v.body", []);
+            $A.createComponent("markup://dependencyTest:cmpWithDependencyWildcards", {},
+                function (newCmp) {
+                    cmp.set("v.body", [newCmp]);
+                }
+            );
+            $A.test.addWaitFor(true,
+                function() {
+                    return cmp.get("v.body").length == 1;
+                });
+        }
     }
 })

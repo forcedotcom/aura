@@ -19,10 +19,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.ClientOutOfSyncException;
@@ -147,8 +149,21 @@ public interface DefinitionService extends AuraService {
      * does not guarantee that they can compile.
      *
      * @param matcher the matcher to find descriptors
+     * @param referenceDescriptor if matcher contains a wildcard, will be used to filter matches based on access
      */
-    Set<DefDescriptor<?>> find(DescriptorFilter matcher);
+    Set<DefDescriptor<?>> find(DescriptorFilter matcher, BaseComponentDef referenceDescriptor);
+
+    /**
+     * Given a string that contains search patterns or wildcards, return a set
+     * of Descriptors for all existing Definitions who have source that exists.
+     * Does not compile the definitions if they were not already compiled, and
+     * does not guarantee that they can compile.
+     *
+     * @param matcher the matcher to find descriptors
+     */
+    default Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
+        return this.find(matcher, null);
+    }
 
     /**
      * update the set of loaded descriptors, and validate.

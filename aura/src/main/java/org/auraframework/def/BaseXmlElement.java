@@ -53,6 +53,22 @@ public interface BaseXmlElement extends Serializable {
     void appendDependencies(Set<DefDescriptor<?>> dependencies);
 
     /**
+     * Adds all the descriptors for all definitions this depends on to the set.
+     * <p>
+     * This function MUST append descriptors for any dependencies that will be
+     * fetched in validateReferences(). If they are not appended here, an exception
+     * will be thrown during the compile.
+     * <p>
+     * This is always called before validateReferences.
+     *
+     * @param dependencies the set to which we should append.
+     * @param referenceDescriptor if provided will filter matched dependencies based on access when wildcard matches are used
+     */
+    default void appendDependencies(Set<DefDescriptor<?>> dependencies, BaseComponentDef referenceDescriptor) {
+        this.appendDependencies(dependencies);
+    }
+
+    /**
      * Second pass validation, which validates any references to other
      * definitions which might not be in the cache yet.
      * <p>

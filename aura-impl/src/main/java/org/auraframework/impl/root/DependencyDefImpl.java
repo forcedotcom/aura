@@ -17,6 +17,7 @@ package org.auraframework.impl.root;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.DependencyDefBuilder;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.DescriptorFilter;
@@ -88,7 +89,12 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
 
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        Set<DefDescriptor<?>> found = Aura.getDefinitionService().find(this.dependency);
+        this.appendDependencies(dependencies, null);
+    }
+
+    @Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies, BaseComponentDef referenceDescriptor) {
+        Set<DefDescriptor<?>> found = Aura.getDefinitionService().find(this.dependency, referenceDescriptor);
         if (found.size() == 0) {
             // TODO: QuickFix for broken dependency.
             if (error == null) {

@@ -775,10 +775,15 @@ SecureObject.addPrototypeMethodsAndPropertiesStateless = function(metadata, prot
 		        	},
 
 		            set: function(callback) {
-		            	var so = this;
-		            	SecureObject.getRaw(so, prototypeForValidation)[name] = function(e) {
+		            	var raw = SecureObject.getRaw(this, prototypeForValidation);
+
+                        // Insure that we pick up the current proxy for the raw object
+		            	var key = ls_getKey(raw);
+		            	var o = ls_getFromCache(raw, key);
+
+                        raw[name] = function(e) {
 		            	    if (callback) {
-		            	        callback.call(so, SecureDOMEvent(e, ls_getKey(so)));
+		            	        callback.call(o, SecureDOMEvent(e, key));
 		            	    }
 		                };
 		            }

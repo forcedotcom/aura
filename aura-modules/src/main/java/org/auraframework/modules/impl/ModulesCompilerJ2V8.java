@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
 import org.auraframework.util.IOUtil;
+import org.springframework.util.StringUtils;
 
 import com.eclipsesource.v8.JavaVoidCallback;
 import com.eclipsesource.v8.NodeJS;
@@ -34,11 +35,27 @@ public final class ModulesCompilerJ2V8 implements ModulesCompiler {
     @Override
     public String compile(File file) throws Exception {
         String filePath = file.getAbsolutePath();
+        String options = "{ componentPath: '" + filePath + "' }";
+        return compile(options);
+    }
 
-        String SCRIPT = ""
+    @Override
+    public String compile(String componentPath, String sourceTemplate, String sourceClass) throws Exception {
+        sourceTemplate = StringUtils.replace(sourceTemplate, "`", "\\`");
+        sourceClass = StringUtils.replace(sourceClass, "`", "\\`");
+        
+        String options = "{ componentPath: '" + componentPath
+                + "'\n, sourceTemplate: `" + sourceTemplate
+                + "`\n, sourceClass: `" + sourceClass + "`\n}";
+        return compile(options);
+    }
+
+    //
+
+    private String compile(String options) throws Exception {
+        String script = ""
                 + "const compiler = require('" + ModulesCompilerUtil.COMPILER_JS_PATH + "');"
-                + "const componentPath = '" + filePath + "';"
-                + "const promise = compiler.compile({ componentPath: componentPath });"
+                + "const promise = compiler.compile(" + options + ");"
                 + "promise.then(onResultCallback).catch(onErrorCallback);";
 
         CompletableFuture<String> future = new CompletableFuture<>();
@@ -65,16 +82,16 @@ public final class ModulesCompilerJ2V8 implements ModulesCompiler {
         nodeJS.getRuntime().registerJavaMethod(onErrorCallback, "onErrorCallback");
         nodeJS.getRuntime().registerJavaMethod(onResultCallback, "onResultCallback");
 
-        File script = ModulesCompilerUtil.createTempScriptFile(SCRIPT, "temp");
+        File tempScript = ModulesCompilerUtil.createTempScriptFile(script, "temp");
         try {
-            nodeJS.exec(script);
+            nodeJS.exec(tempScript);
             while (nodeJS.isRunning()) {
                 nodeJS.handleMessage();
             }
         } finally {
             memoryManager.release();
             nodeJS.release();
-            script.delete();
+            tempScript.delete();
         }
 
         return future.get();

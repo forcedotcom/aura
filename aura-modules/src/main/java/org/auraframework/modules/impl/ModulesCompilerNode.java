@@ -30,11 +30,12 @@ import com.google.common.io.CharStreams;
  * ModulesCompiler implementation that spawns a process to invoke node
  */
 public final class ModulesCompilerNode implements ModulesCompiler {
-    
+
     private static final String PATH_TO_NODE = AuraFiles.Core.getPath() + "/node/node";
 
     @Override
     public String compile(File file) throws Exception {
+        // executes: node .../raptor-compiler-cli.js .../compiler.js input.js output.js
         String filePath = file.getAbsolutePath();
         File output = ModulesCompilerUtil.createTempFile("out");
         List<String> command = new ArrayList<>();
@@ -51,11 +52,17 @@ public final class ModulesCompilerNode implements ModulesCompiler {
 
         int exitCode = process.waitFor();
         if (exitCode != 0) {
-            throw new RuntimeException("ModulesCompilerNode failed for: " + filePath + "\n    exit code: " + exitCode + '\n' + stdout);
+            throw new RuntimeException(
+                    "ModulesCompilerNode failed for: " + filePath + "\n    exit code: " + exitCode + '\n' + stdout);
         }
 
         String result = new String(Files.readAllBytes(output.toPath()), Charsets.UTF_8);
         output.delete();
         return result;
+    }
+
+    @Override
+    public String compile(String componentPath, String sourceTemplate, String sourceClass) {
+        throw new Error("NYI");
     }
 }

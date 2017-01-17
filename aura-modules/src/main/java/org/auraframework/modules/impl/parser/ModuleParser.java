@@ -25,6 +25,9 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.DefinitionAccessImpl;
+import org.auraframework.impl.source.file.FileSource;
+import org.auraframework.impl.source.resource.ResourceSource;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.modules.impl.ModulesCompiler;
 import org.auraframework.modules.impl.ModulesCompilerJ2V8;
 import org.auraframework.modules.impl.def.ModuleDefImpl;
@@ -55,18 +58,15 @@ public class ModuleParser implements Parser<ModuleDef> {
     }
 
     @Override
-    public ModuleDef parse(DefDescriptor<ModuleDef> descriptor, Source<ModuleDef> source) throws QuickFixException {
-        String filePath = source.getSystemId();
-
-        // Hack to get .js path for modules compiler.
-        // Will eventually need to write our own FileSourceLoader that has own DescriptorFileMapper mapping for ".js"
-        filePath = filePath.replace(".html", ".js");
-        ModulesCompiler compiler = new ModulesCompilerJ2V8();
+    public ModuleDef parse(DefDescriptor<ModuleDef> descriptor, Source<ModuleDef> templateSource) throws QuickFixException {
+        // this modules parser is special in that it needs multiple source files
+        // for now we localize the logic for this in this class
+        Source<ModuleDef> classSource = makeClassSource(templateSource);
 
         ModuleDefImpl.Builder builder = new ModuleDefImpl.Builder();
 
         // base definition
-        Location location = new Location(filePath, source.getLastModified());
+        Location location = new Location(classSource);
         builder.setDescriptor(descriptor);
         builder.setTagName(descriptor.getDescriptorName());
         builder.setLocation(location);
@@ -76,15 +76,43 @@ public class ModuleParser implements Parser<ModuleDef> {
         builder.setAccess(new DefinitionAccessImpl(isInInternalNamespace ? AuraContext.Access.INTERNAL : AuraContext.Access.PUBLIC));
 
         // module
-        builder.setPath(filePath);
+        builder.setPath(classSource.getSystemId());
 
+        // gets the .html+.js source contents and passes them to the modules compiler
+        String sourceTemplate = templateSource.getContents();
+        String sourceClass = classSource.getContents();
+        String componentPath = descriptor.getNamespace() + '/' + descriptor.getName() + '/' + descriptor.getName() + ".js";
         try {
-            String compiledCode = compiler.compile(new File(filePath));
+            ModulesCompiler compiler = new ModulesCompilerJ2V8();
+            String compiledCode = compiler.compile(componentPath, sourceTemplate, sourceClass);
             builder.setCompiledCode(compiledCode);
             return builder.build();
-
         } catch (Exception e) {
             throw new DefinitionNotFoundException(descriptor, location);
         }
+    }
+
+    /**
+     * @return classSource corresponding to templateSource
+     */
+    private Source<ModuleDef> makeClassSource(Source<ModuleDef> templateSource) {
+        DefDescriptor<ModuleDef> templateDescriptor = templateSource.getDescriptor();
+        DefDescriptor<ModuleDef> classDescriptor = makeClassDescriptor(templateDescriptor);
+        
+        if (templateSource instanceof FileSource) {
+            String templatePath = templateSource.getUrl().substring(7); // strip "file://"
+            String classPath = templatePath.replace(".html", ".js");
+            return new FileSource<>(classDescriptor, new File(classPath), Format.JS);
+        } else if (templateSource instanceof ResourceSource) {
+            String classSystemId = templateSource.getSystemId().replace(".html", ".js");
+            return new ResourceSource<>(classDescriptor, classSystemId, Format.JS);
+        }
+        
+        throw new RuntimeException("TODO: " + templateSource.getClass().getName());
+    }
+
+    private DefDescriptor<ModuleDef> makeClassDescriptor(DefDescriptor<ModuleDef> templateDescriptor) {
+        return new DefDescriptorImpl<> ("js", templateDescriptor.getNamespace(), templateDescriptor.getName()
+                , ModuleDef.class);
     }
 }

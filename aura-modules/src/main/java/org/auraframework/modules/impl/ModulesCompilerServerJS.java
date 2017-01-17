@@ -26,6 +26,11 @@ public final class ModulesCompilerServerJS implements ModulesCompiler {
     public String compile(File file) throws Exception {
         throw new Error("NYI");
     }
+
+    @Override
+    public String compile(String componentPath, String sourceTemplate, String sourceClass) {
+        throw new Error("NYI");
+    }
     
     // COMMENTED OUT SO IT COMPILES IN AURA OSS
 
@@ -108,7 +113,7 @@ public final class ModulesCompilerServerJS implements ModulesCompiler {
         // generates:
         // codes = {};
         // codes.componentPath='{path to .js file} '
-        // codes.sourceTmpl=`{.html file contents}`
+        // codes.sourceTemplate=`{.html file contents}`
         // codes.sourceClass=`{.js file contents}`
         String jsPath = file.getAbsolutePath();
         String htmlPath = jsPath.substring(0, jsPath.length() - 2) + "html";

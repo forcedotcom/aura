@@ -22,5 +22,8 @@ import java.io.File;
  */
 public interface ModulesCompiler {
 
+    @Deprecated
     String compile(File file) throws Exception;
+    
+    String compile(String componentPath, String sourceTemplate, String sourceClass) throws Exception;
 }

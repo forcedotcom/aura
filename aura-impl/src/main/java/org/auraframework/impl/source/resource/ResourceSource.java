@@ -39,7 +39,7 @@ import org.auraframework.util.resource.ResourceLoader;
 public class ResourceSource<D extends Definition> extends Source<D> {
     private static final ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
 
-    protected ResourceSource(DefDescriptor<D> descriptor, String systemId, Format format) {
+    public ResourceSource(DefDescriptor<D> descriptor, String systemId, Format format) {
         super(descriptor, systemId, format);
     }
 

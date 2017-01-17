@@ -9,6 +9,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>aura-modules</artifactId>
+   
+    <properties>
+        <modules.dir>aura_modules</modules.dir>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -60,6 +64,67 @@
                     <execution>
                         <id>npm-install</id>
                         <phase>pre-clean</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- copies aura modules from src/main/modules to target/classes/aura_modules -->
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-components</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/modules</directory>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                    <excludes>
+                                        <exclude>**/.gitignore</exclude>
+                                    </excludes>
+                                </resource>
+                                <resource>
+                                    <directory>target/src-gen/main/modules</directory>
+                                    <includes>
+                                        <include>.index</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.outputDirectory}/${modules.dir}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- generate .index file with components in the jar (same logic as aura-components/pom.xml) -->
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>index-components</id>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <target>
+                                <path id="definitions">
+                                    <fileset dir="src/main/modules">
+                                        <include name="**/*.html" />
+                                        <include name="**/*.js" />
+                                    </fileset>
+                                </path>
+                                <pathconvert property="definitionList" refid="definitions" pathsep=",">
+                                    <!-- Allow either slash (Windows actually uses both) -->
+                                    <regexpmapper from=".*[/\\]([^/\\]*)[/\\]([^/\\]*)[/\\](.*)" to="\1/\2/\3" />
+                                </pathconvert>
+                                <echo file="target/src-gen/main/modules/.index">${definitionList}</echo>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

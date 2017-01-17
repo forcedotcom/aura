@@ -17,7 +17,6 @@ package org.auraframework.modules.impl.source;
 
 import java.io.File;
 
-import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.modules.source.ModuleLocationAdapter;
 
@@ -35,5 +34,13 @@ public class AuraModuleLocationAdapter implements ModuleLocationAdapter {
     @Override
     public String getSourcePackage() {
         return "aura_modules";
+    }
+    
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("AuraModuleLocationAdapter(sourceDir=" + getSourceDir().getAbsolutePath());
+        sb.append(",sourcePackage=" + getSourcePackage());
+        return sb.toString();
     }
 }

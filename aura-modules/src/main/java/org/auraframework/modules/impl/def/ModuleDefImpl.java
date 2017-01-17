@@ -34,7 +34,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     private String path;
     private String compiledCode;
 
-    public ModuleDefImpl(Builder builder) {
+    private ModuleDefImpl(Builder builder) {
         super(builder);
         this.path = builder.path;
         this.compiledCode = builder.compiledCode;

@@ -17,6 +17,7 @@ package org.auraframework.modules.impl.registry;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.source.SourceFactory;
 import org.auraframework.impl.source.file.FileSourceLoader;
+import org.auraframework.impl.source.resource.ResourceSourceLoader;
 import org.auraframework.impl.system.CompilingDefRegistry;
 import org.auraframework.modules.source.ModuleLocationAdapter;
 import org.auraframework.impl.parser.ParserFactory;
@@ -76,19 +78,25 @@ public class ModuleRegistryProvider implements RegistryAdapter, SourceListener {
 
     @Override
     public DefRegistry[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders) {
-        List<DefRegistry> registries = Lists.newArrayList();
-        List<SourceLoader> moduleLoaders = Lists.newArrayList();
+        List<DefRegistry> registries = new ArrayList<>();
+        List<SourceLoader> moduleLoaders = new ArrayList<>();
 
-        for(ModuleLocationAdapter location : locationAdapters) {
+        for (ModuleLocationAdapter location : locationAdapters) {
             File modules = location.getSourceDir();
+            SourceLoader sourceLoader;
             if (modules != null && modules.canRead() && modules.canExecute() && modules.isDirectory()) {
-                FileSourceLoader fsl = new FileSourceLoader(modules, fileMonitor);
-                moduleLoaders.add(fsl);
-                CompilingDefRegistry defRegistry = new CompilingDefRegistry(fsl, PREFIXES, DEF_TYPES, parserFactory);
-                registries.add(defRegistry);
-
-                locationMap.putIfAbsent(location, defRegistry);
+                sourceLoader = new FileSourceLoader(modules, fileMonitor);
+            } else {
+                // jar mode:
+                sourceLoader = new ResourceSourceLoader(location.getSourcePackage());
             }
+
+            moduleLoaders.add(sourceLoader);
+            CompilingDefRegistry defRegistry = new CompilingDefRegistry(sourceLoader, PREFIXES, DEF_TYPES,
+                    parserFactory);
+            registries.add(defRegistry);
+
+            locationMap.putIfAbsent(location, defRegistry);
         }
 
         if (moduleLoaders.size() > 0) {

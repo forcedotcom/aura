@@ -18,15 +18,44 @@
 <aura:documentation> 
     <aura:description>
         <p>A <code>ui:scrollerWrapper</code> creates a container that enables native scrolling in Salesforce1. This component enables you to nest more than one scroller inside the container.
-        Use the <code>class</code> attribute to define the height and width of the container.</p>
-        <p>The Lightning Design System <code>scrollable</code> class isn't compatible with native scrolling on mobile devices. Use <code>ui:scrollerWrapper</code> if you want to enable scrolling in Salesforce1.</p>
-        <p>Here is an example.</p>
+        Use the <code>class</code> attribute to define the height and width of the container. To enable scrolling, specify a height that's smaller than its content.</p>
+        <p>This example creates a scrollable area with a height of 300px.</p>
         <pre>&lt;aura:component>
-    &lt;ui:scrollerWrapper>
+    &lt;ui:scrollerWrapper class="scrollerSize">
         &lt;!--Scrollable content here -->
     &lt;/ui:scrollerWrapper>
 &lt;/aura:component>
+
+/** CSS **/
+.THIS.scrollerSize {
+    height: 300px;
+}
         </pre>
+        <p>The Lightning Design System <code>scrollable</code> class isn't compatible with native scrolling on mobile devices. Use <code>ui:scrollerWrapper</code> if you want to enable scrolling in Salesforce1.</p>
+        <h4>Usage Considerations</h4>
+        <p>In Google Chrome on mobile devices, nested <code>ui:scrollerWrapper</code> components are not scrollable when <code>border-radius</code> CSS property is set to a non-zero value.
+        To enable scrolling in this case, set <code>border-radius</code> to a non-zero value on the outer <code>ui:scrollerWrapper</code> component.</p>
+        <p>Here is an example.</p>
+        <pre>&lt;aura:component>
+    &lt;ui:scrollerWrapper class="outerScroller">
+        &lt;!-- Scrollable content here -->
+        &lt;ui:scrollerWrapper class="innerScroller">
+            &lt;!-- Scrollable content here -->
+        &lt;/ui:scrollerWrapper>
+        &lt;!-- Scrollable content here -->
+    &lt;/ui:scrollerWrapper>
+&lt;/aura:component>
+
+/** CSS **/
+.THIS.outerScroller {
+    /* fix innerScroller not scrollable */
+    border-radius: 1px;
+}
+.THIS.innerScroller {
+    /* make innerScroller rounded */
+    border-radius: 10px;
+}</pre>
+        
     </aura:description>
 </aura:documentation> 
 

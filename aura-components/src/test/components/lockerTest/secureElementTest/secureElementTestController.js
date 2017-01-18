@@ -418,8 +418,8 @@
     testGetSetInvalidAttributes: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var button = document.createElement("button");
-        testUtils.assertNull(button.getAttribute("href"));
-        testUtils.assertUndefined(button.setAttribute("href", "/foo"));
-        testUtils.assertNull(button.getAttribute("href"));
+        testUtils.assertNull(button.getAttribute("href"), "Should have got null when trying to access invalid attributes");
+        testUtils.assertUndefined(button.setAttribute("href", "/foo"), "Should return undefined when trying to set invalid attributes on dom element");
+        testUtils.assertNull(button.getAttribute("href"), "Accessing invalid attribute values should continue to return undefined");
     }
 })

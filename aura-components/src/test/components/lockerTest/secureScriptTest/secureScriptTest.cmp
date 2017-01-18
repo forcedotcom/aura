@@ -18,8 +18,9 @@
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
 
-    <aura:method name="testScriptSrcExposed" action="{!c.testScriptSrcExposed}"/>
-    <aura:method name="testGetSetAttribute" action="{!c.testGetSetAttribute}"/>
+    <aura:method name="testScriptSrcExposed"/>
+    <aura:method name="testGetSetAttribute"/>
+    <aura:method name="testGetSetAttributeNode"/>
 
     <div aura:id="title">SecureScriptElement test</div>
 </aura:component>

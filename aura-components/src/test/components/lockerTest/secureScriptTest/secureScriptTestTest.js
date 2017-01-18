@@ -21,5 +21,11 @@
         test: function(cmp) {
             cmp.testGetSetAttribute();
         }
+    },
+
+    testGetSetAttributeNode: {
+        test: function(cmp) {
+            cmp.testGetSetAttributeNode();
+        }
     }
 })

@@ -61,6 +61,24 @@ function SecureScriptElement(el, key) {
 			}
 		},
 
+		getAttributeNode : {
+			value: function(name) {
+				return el.getAttributeNode(getAttributeName(name));
+			}
+		},
+
+		setAttributeNode : {
+			value: function(value) {
+				el.setAttributeNode(value);
+			}
+		},
+
+		removeAttributeNode : {
+			value: function(value) {
+				el.removeAttributeNode(value);
+			}
+		},
+
 		$run : {
 			value : function() {
 				var src = o.getAttribute("src");

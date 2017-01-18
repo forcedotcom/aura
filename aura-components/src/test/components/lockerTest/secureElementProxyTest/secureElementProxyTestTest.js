@@ -5,7 +5,8 @@
      */
 
     // LockerService not supported on IE
-    browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
+    // TODO: Re-enable for Firefox and iOS when autobuilds use a version that supports all Proxy traps we implement
+    browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPAD", "-IPHONE"],
 
     setUp: function(cmp) {
         cmp.set("v.testUtils", $A.test);

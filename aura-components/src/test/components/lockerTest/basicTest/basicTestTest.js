@@ -193,14 +193,16 @@
             cmp.testLockerDisabledForUnsupportedBrowser();
         }
     },
-    
+
     testComponentPassedToOtherNamespaceViaCreateComponent: {
         test: function(cmp) {
             cmp.testComponentPassedToOtherNamespaceViaCreateComponent();
         }
     },
-    
+
     testInstanceOf: {
+        // TODO: Re-enable for Firefox and iOS when autobuilds use a version that supports all Proxy traps we implement
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPAD", "-IPHONE"],
         test: function(cmp) {
             cmp.testInstanceOf(window);
         }

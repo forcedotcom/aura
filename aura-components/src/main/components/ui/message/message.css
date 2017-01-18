@@ -30,6 +30,7 @@
 }
 .uiMessage.hide{
     opacity:0;
+	display:none;
 }
 /*******************************************
  this selector needs to be moved into base*/

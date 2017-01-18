@@ -166,69 +166,64 @@ public class SVGParserTest extends AuraImplTestCase {
 
     @Test
     public void testValidTags() throws QuickFixException {
-        DefDescriptor<SVGDef> descriptor = setupSimpleSVGDef(VALID_SVG);
+        DefDescriptor<SVGDef> descriptor = getAuraTestingUtil().createStringSourceDescriptor(null, SVGDef.class, null);
         Source<SVGDef> source = new StringSource<>(descriptor, VALID_SVG, "test", null);
         parser.parse(descriptor,source);
     }
 
     @Test
     public void testInvalidTags() {
+        QuickFixException qfe = null;
+        DefDescriptor<SVGDef> descriptor = getAuraTestingUtil().createStringSourceDescriptor(null, SVGDef.class, null);
+        Source<SVGDef> source = new StringSource<>(descriptor, INVALID_SCRIPT, "test", null);
         try {
-            DefDescriptor<SVGDef> descriptor = setupSimpleSVGDef(INVALID_SCRIPT);
-            Source<SVGDef> source = new StringSource<>(descriptor, INVALID_SCRIPT, "test", null);
             parser.parse(descriptor,source);
         } catch (QuickFixException e) {
-            assertTrue(e.getMessage().contains("script"));
-            return;
+            qfe = e;
         }
-        fail("SVG can not contain script tags");
+        assertNotNull("SVG can not contain script tags", qfe);
+        assertTrue("Message should contain 'script': "+qfe.getMessage(), qfe.getMessage().contains("script"));
     }
 
     @Test
     public void testInvalidCharacters() {
+        QuickFixException qfe = null;
+        DefDescriptor<SVGDef> descriptor = getAuraTestingUtil().createStringSourceDescriptor(null, SVGDef.class, null);
+        Source<SVGDef> source = new StringSource<>(descriptor, INVALID_CHAR, "test", null);
         try {
-            DefDescriptor<SVGDef> descriptor = setupSimpleSVGDef(INVALID_CHAR);
-            Source<SVGDef> source = new StringSource<>(descriptor, INVALID_CHAR, "test", null);
             parser.parse(descriptor,source);
         } catch (QuickFixException e) {
-            assertTrue(e.getMessage().contains("<"));
-            return;
+            qfe = e;
         }
-        fail("SVG can not contain characters, &, /, <, > ");
+        assertNotNull("SVG can not contain characters, &, /, <, > ", qfe);
+        assertTrue("Message should contain '<': "+qfe.getMessage(), qfe.getMessage().contains("<"));
     }
 
     @Test
     public void testInvalidXML() {
+        QuickFixException qfe = null;
+        DefDescriptor<SVGDef> descriptor = getAuraTestingUtil().createStringSourceDescriptor(null, SVGDef.class, null);
+        Source<SVGDef> source = new StringSource<>(descriptor, INVALID_XML, "test", null);
         try {
-            DefDescriptor<SVGDef> descriptor = setupSimpleSVGDef(INVALID_XML);
-            Source<SVGDef> source = new StringSource<>(descriptor, INVALID_XML, "test", null);
             parser.parse(descriptor,source);
         } catch (QuickFixException e) {
-            assertTrue(e.getMessage().contains("ParseError"));
-            return;
+            qfe = e;
         }
-        fail("SVG Should not be able to parse invalid xml");
+        assertNotNull("SVG Should not be able to parse invalid xml", qfe);
+        assertTrue("Message should contain 'ParseError': "+qfe.getMessage(), qfe.getMessage().contains("ParseError"));
     }
 
     @Test
     public void testInvalidAttribute() {
+        QuickFixException qfe = null;
+        DefDescriptor<SVGDef> descriptor = getAuraTestingUtil().createStringSourceDescriptor(null, SVGDef.class, null);
+        Source<SVGDef> source = new StringSource<>(descriptor, INVALID_ATTR, "test", null);
         try {
-
-            DefDescriptor<SVGDef> descriptor = setupSimpleSVGDef(INVALID_ATTR);
-            Source<SVGDef> source = new StringSource<>(descriptor, INVALID_ATTR, "test", null);
             parser.parse(descriptor,source);
         } catch (QuickFixException e) {
-            assertTrue(e.getMessage().contains("onclick"));
-            return;
+            qfe = e;
         }
-        fail("SVG should not allow on* event listeners");
-    }
-
-    private DefDescriptor<SVGDef> setupSimpleSVGDef(String markup) {
-        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
-                ComponentDef.class, null);
-        DefDescriptor<SVGDef> desc = definitionService.getDefDescriptor(cmpDesc.getQualifiedName(),
-                SVGDef.class);
-        return desc;
+        assertNotNull("SVG should not allow on* event listeners", qfe);
+        assertTrue("Message should contain 'onclick': "+qfe.getMessage(), qfe.getMessage().contains("onclick"));
     }
 }

@@ -258,6 +258,8 @@ public class AuraTestFilter implements Filter {
                     default:
                         // Pass it on.
                     }
+                } else if (testToRun != null && testToRun.isEmpty()) {
+                    LOG.error("Got an empty test name in request: " + request.getRequestURL() + "?" + request.getQueryString(), new Error("aura.jstestrun empty"));
                 }
 
                 // aurajstest:jstest app is invokable in the following ways:
@@ -315,6 +317,7 @@ public class AuraTestFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+    	LOG.info("AuraTestFilter.init()", new Error("AuraTestFilter.init()"));
         servletContext = filterConfig.getServletContext();
         processInjection(filterConfig);
     }
@@ -391,6 +394,7 @@ public class AuraTestFilter implements Filter {
         if (testName == null) {
             // This must be set in a forwarded request because the query string is merged and a non-empty value would
             // cause a loop
+        	LOG.info("AuraTestFilter.createURI()", new Error("testName was null"));
             testName = "";
         }
         

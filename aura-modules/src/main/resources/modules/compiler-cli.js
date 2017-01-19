@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// usage: node raptor-compiler-cli.js compiler.js file.js output.js
+// usage: node compiler-cli.js compiler.js file.js output.js
 if (process.argv.length != 5) {
     console.error('usage: ' + __filename + ' compiler.js input.js output.js');
     process.exit(-1);
@@ -26,7 +26,7 @@ const outputPath = process.argv[4];
 const compiler = require(compilerJs);
 const fs = require('fs');
 
-const promise = compiler.compile({ componentPath: componentPath });
+const promise = compiler.compile(componentPath, {format: 'amd'});
 
 promise.then((result) => {
     fs.writeFile(outputPath, result.code, function(err) {

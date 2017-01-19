@@ -35,27 +35,26 @@ public final class ModulesCompilerJ2V8 implements ModulesCompiler {
     @Override
     public String compile(File file) throws Exception {
         String filePath = file.getAbsolutePath();
-        String options = "{ componentPath: '" + filePath + "' }";
-        return compile(options);
+        return compile(filePath, "{format: 'amd'}");
     }
 
     @Override
-    public String compile(String componentPath, String sourceTemplate, String sourceClass) throws Exception {
+    public String compile(String entry, String sourceTemplate, String sourceClass) throws Exception {
         sourceTemplate = StringUtils.replace(sourceTemplate, "`", "\\`");
         sourceClass = StringUtils.replace(sourceClass, "`", "\\`");
         
-        String options = "{ componentPath: '" + componentPath
-                + "'\n, sourceTemplate: `" + sourceTemplate
-                + "`\n, sourceClass: `" + sourceClass + "`\n}";
-        return compile(options);
+        String options = "{ sourceTemplate: `" + sourceTemplate
+                + "`\n, sourceClass: `" + sourceClass + "`\n"
+                + ", format: 'amd'}";
+        return compile(entry, options);
     }
 
     //
 
-    private String compile(String options) throws Exception {
+    private String compile(String entry, String options) throws Exception {
         String script = ""
                 + "const compiler = require('" + ModulesCompilerUtil.COMPILER_JS_PATH + "');"
-                + "const promise = compiler.compile(" + options + ");"
+                + "const promise = compiler.compile('" + entry + "', " + options + ");"
                 + "promise.then(onResultCallback).catch(onErrorCallback);";
 
         CompletableFuture<String> future = new CompletableFuture<>();

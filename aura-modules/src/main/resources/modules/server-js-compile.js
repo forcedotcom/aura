@@ -16,10 +16,10 @@
 console.log("START: server-js-compile.js");
 
 var scriptReady = false;
-compiler.compile({
-    componentPath: codes.componentPath,
+compiler.compile(codes.componentPath, {
     sourceTemplate: codes.sourceTemplate,
-    sourceClass: codes.sourceClass
+    sourceClass: codes.sourceClass,
+    format: 'amd'
 }).then((result) => {
     console.log('\n--- CODE START ---\n' + result.code + '--- CODE END ---');
     scriptReady = true;

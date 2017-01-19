@@ -33,6 +33,7 @@ public final class ModulesCompilerServerJS implements ModulesCompiler {
     }
     
     // COMMENTED OUT SO IT COMPILES IN AURA OSS
+    // (uncomment it locally to verify it still works when making upgrades)
 
     /*
     private final byte[] htmlInput;
@@ -47,7 +48,7 @@ public final class ModulesCompilerServerJS implements ModulesCompiler {
         html.append("</head>\n");
         html.append("<body><div id='root'/>\n");
         html.append("<script>var module = {};</script>");
-        html.append("<script src='/compiler-repl.js'></script>\n");
+        html.append("<script src='/compiler-web.js'></script>\n");
         html.append("<script src='/inlined-source.js'></script>\n");
         html.append("<script src='/server-js-compile.js'></script>\n");
         html.append("</body>\n");
@@ -65,8 +66,8 @@ public final class ModulesCompilerServerJS implements ModulesCompiler {
         request.maxResourceSizeMb = 10;
         request.maxResourceCount = 10;
         request.pageUrl = "http://www.mytestpage.com"; // arbitrary http
-        request.prefetchedResources.put(request.pageUrl + "/compiler-repl.js",
-                new StringEntity(getResource(ModulesCompilerUtil.COMPILER_REPL_JS_PATH)));
+        request.prefetchedResources.put(request.pageUrl + "/compiler-web.js",
+                new StringEntity(getResource(ModulesCompilerUtil.COMPILER_WEB_JS_PATH)));
         request.prefetchedResources.put(request.pageUrl + "/inlined-source.js",
                 new StringEntity(generateInlinedSource(file)));
         request.prefetchedResources.put(request.pageUrl + "/server-js-compile.js",
@@ -121,9 +122,9 @@ public final class ModulesCompilerServerJS implements ModulesCompiler {
         StringBuilder source = new StringBuilder("codes = {};\n");
         source.append("codes.componentPath='" + jsPath + "';\n");
         source.append("codes.sourceClass=`\n");
-        source.append(getResource(jsPath));
+        source.append(StringUtils.replace(getResource(jsPath), "`", "\\`"));
         source.append("\n`\ncodes.sourceTemplate=`\n");
-        source.append(getResource(htmlPath));
+        source.append(StringUtils.replace(getResource(htmlPath), "`", "\\`"));
         source.append("\n`\n");
 
         return source.toString();

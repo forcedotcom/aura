@@ -18,34 +18,30 @@
         cmp.find(id).set("v.body", []);
     },
     setCmpBody : function(cmp, id){
-        $A.newCmpAsync(this,function(newCmp){
-                cmp.find(id).set("v.body", [newCmp]);
-            },
+        $A.createComponent(
+            "ui:button",
             {
-                componentDef:"markup://ui:button",
-                attributes:{
-                  values:{
-                            label : "New Button"
-                         }
-                },
-                localId: "newButton"
-            }, cmp);
+                label : "New Button"
+            },
+            function(newCmp){
+                cmp.find(id).set("v.body", [newCmp]);
+                cmp.index("newButton", newCmp.getGlobalId());
+            }
+        );
     },
     addCmpBody : function(cmp, id){
-        $A.newCmpAsync(this,function(newCmp){
-            var body = cmp.find(id).get("v.body");
-            var newBody = body.length > 0 ? [body[0]] : [];
-            newBody.push(newCmp);
-            cmp.find(id).set("v.body", newBody);
-        },
-        {
-            componentDef:"markup://ui:button",
-            attributes:{
-              values:{
-                        label : "Added Button"
-                     }
+        $A.createComponent(
+            "ui:button",
+            {
+                label : "Added Button"
             },
-            localId: "addButton"
-        }, cmp);
+            function(newCmp){
+                var body = cmp.find(id).get("v.body");
+                var newBody = body.length > 0 ? [body[0]] : [];
+                newBody.push(newCmp);
+                cmp.find(id).set("v.body", newBody);
+                cmp.index("addButton", newCmp.getGlobalId());
+            }
+        );
     }
 })

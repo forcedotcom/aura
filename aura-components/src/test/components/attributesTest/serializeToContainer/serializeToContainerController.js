@@ -15,23 +15,19 @@
  */
 ({
     newComponent : function(cmp, evt, helper){
-        var newcmp = $A.newCmpAsync(
-                this,
-                function(newcmp) {
-                    cmp.find("target").set("v.body", [newcmp]);
-                },
-                {
-                "componentDef" : "markup://attributesTest:serializeTo",
-                "attributes" : {
-                    "values" : {
-                        both : "bulk",
-                        server : "hulk",
-                        none : "sulk",
-                        bothDefault : "bilk",
-                        serverDefault : "milk",
-                        noneDefault : "silk"
-                    }
-                }
-        });
+        $A.createComponent(
+            "markup://attributesTest:serializeTo",
+            {
+                both : "bulk",
+                server : "hulk",
+                none : "sulk",
+                bothDefault : "bilk",
+                serverDefault : "milk",
+                noneDefault : "silk"
+            },
+            function(newcmp) {
+                cmp.find("target").set("v.body", [newcmp]);
+            }
+        );
     }
 })

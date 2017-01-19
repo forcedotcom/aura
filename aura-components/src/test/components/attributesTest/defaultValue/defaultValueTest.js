@@ -100,60 +100,55 @@
      */
     testNewComponentChangingDefaultValues : {
         test : function(cmp) {
-            $A.newCmpAsync(
-                    this,
-                    function (newComp) {
-                        this.verifyChangingAttributeValues(newComp);
-                    },
-                    "markup://attributesTest:defaultValue"
+            var self = this;
+            $A.createComponent("attributesTest:defaultValue", {},
+                function (newComp) {
+                    self.verifyChangingAttributeValues(newComp);
+                }
             );
         }
     },
 
     testNewComponentDefaultValueBasicDataTypes: {
         test: function(cmp) {
-            $A.newCmpAsync(
-                    this,
-                    function (newComp) {
-                        this.verifyDefaultValuesOfBasicDataType(newComp);
-                    },
-                    "markup://attributesTest:defaultValue"
+            var self = this;
+            $A.createComponent("attributesTest:defaultValue", {},
+                function (newComp) {
+                    self.verifyDefaultValuesOfBasicDataType(newComp);
+                }
             );
         }
     },
 
     testNewComponentDefaultValueObjectDataType: {
         test: function(cmp) {
-            $A.newCmpAsync(
-                    this,
-                    function (newComp) {
-                        this.verifyDefaultValuesOfObjectDataType(newComp);
-                    },
-                    "markup://attributesTest:defaultValue"
+            var self = this;
+            $A.createComponent("attributesTest:defaultValue", {},
+                function(newComp) {
+                    self.verifyDefaultValuesOfObjectDataType(newComp);
+                }
             );
         }
     },
 
     testNewComponentDefaultValueListDataType: {
         test: function(cmp) {
-            $A.newCmpAsync(
-                    this,
-                    function (newComp) {
-                        this.verifyDefaultValuesOfListDataType(newComp);
-                    },
-                    "markup://attributesTest:defaultValue"
+            var self = this;
+            $A.createComponent("attributesTest:defaultValue", {},
+                function (newComp) {
+                    self.verifyDefaultValuesOfListDataType(newComp);
+                }
             );
         }
     },
 
     testNewComponentDefaultValueMapDataType: {
         test: function(cmp) {
-            $A.newCmpAsync(
-                    this,
-                    function (newComp) {
-                        this.verifyDefaultValuesOfMapDataType(newComp);
-                    },
-                    "markup://attributesTest:defaultValue"
+            var self = this;
+            $A.createComponent("attributesTest:defaultValue", {},
+                function (newComp) {
+                    self.verifyDefaultValuesOfMapDataType(newComp);
+                }
             );
         }
     },

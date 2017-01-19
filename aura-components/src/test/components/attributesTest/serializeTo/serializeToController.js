@@ -15,24 +15,19 @@
  */
 ({
     newComponent : function(cmp, evt, helper){
-        $A.newCmpAsync(
-            this,
+        $A.createComponent(
+            "attributesTest:serializeTo",
+            {
+                both : "double",
+                server : "single",
+                none : "strikeout",
+                bothDefault : "double again",
+                serverDefault : "single again",
+                noneDefault : "strikeout again"
+            },
             function (newcmp) {
                 cmp.find("target").set("v.body", [newcmp]);
-            },
-            {
-                "componentDef" : "markup://attributesTest:serializeTo",
-                "attributes" : {
-                    "values" : {
-                        both : "double",
-                        server : "single",
-                        none : "strikeout",
-                        bothDefault : "double again",
-                        serverDefault : "single again",
-                        noneDefault : "strikeout again"
-                    }
-                }
             }
-        )
+        );
     }
 })

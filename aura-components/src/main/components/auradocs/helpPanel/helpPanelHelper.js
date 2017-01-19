@@ -15,34 +15,29 @@
  */
 ({ 
     setTopicPanelFacet : function(cmp, topic) {
-        var config = {
-                'componentDef' : 'markup://auradocs:topicPanel',
-                'attributes' : {
-                    'values' : {
-                        'topic' : topic
+        $A.createComponent(
+            'auradocs:topicPanel',
+            {
+                topic : topic
+            },
+            function(topicPanel, status) {
+                console.log('XXXXXXXXXXXXXXXXXXXXXXXX helpPanelTopic');
+                try {
+                    if (status === "SUCCESS") {
+                        cmp.set('v.topicPanel', [topicPanel]);
                     }
-                }};
-        
-       $A.componentService.newComponentAsync(
-          this,
-          function(topicPanel, status) {  
-              try {
-	            	  if (status === "SUCCESS") {
-	            		  cmp.set('v.topicPanel', [topicPanel]);
-	                  }
-                  } catch (e) {
-                  // Handle the catch-all scenario.
-                      if(topic !== 'welcome') {
-                    	  /*eslint-disable no-console*/
-                           console.log("Got a non-existent topic. Falling back to the welcome topic");
-                           setTopicPanelFacet(cmp, 'welcome');
-                           } else {
-                        	   /*eslint-disable no-console*/
-                       console.log("Unable to get the welcome topic.");
-                  }
-              }
-          },
-          config, null, true, true
-          );
+                } catch (e) {
+                    // Handle the catch-all scenario.
+                    if(topic !== 'welcome') {
+                        /*eslint-disable no-console*/
+                         console.log("Got a non-existent topic. Falling back to the welcome topic");
+                         setTopicPanelFacet(cmp, 'welcome');
+                    } else {
+                        /*eslint-disable no-console*/
+                        console.log("Unable to get the welcome topic.");
+                    }
+                }
+            }
+        );
     }
 });

@@ -62,24 +62,24 @@
      * Verify that dynamically added components are considered by COQL.
      */
     testQueryDynamicallyAddedComponents:{
-        test:function(cmp){
+        test: function(cmp){
              var result = $A.getQueryStatement().query();
              this.verifyQueryResultCount(result, 2);
-             $A.newCmpAsync(
-            		 this,
-                    function(newCmp){
-                            var body = cmp.get("v.body");
-                        body.push(newCmp);
-                        cmp.set("v.body", body);
-                    },
-                    {
-                        componentDef:"markup://aura:text",
-                        localId:"txt_Id"
-                    },
-                    cmp
+             
+             var lock = {};
+             $A.createComponent(
+                 "markup://aura:text",
+                 {},
+                 function(newCmp){
+                     var body = cmp.get("v.body");
+                     body.push(newCmp);
+                     cmp.set("v.body", body);
+                     cmp.index("txt_Id", newCmp.getGlobalId());
+                     lock.set = true;
+                 }
               );
 
-              $A.test.addWaitFor(false, $A.test.isActionPending, function(){
+              $A.test.addWaitFor(true, function(){ return lock.set; }, function(){
                    result = $A.getQueryStatement().query();
                    this.verifyQueryResultCount(result, 3);
                    $A.test.assertEquals(cmp.find("txt_Id"), result.rows[2], "Components created on client side are not retrieved by query.");

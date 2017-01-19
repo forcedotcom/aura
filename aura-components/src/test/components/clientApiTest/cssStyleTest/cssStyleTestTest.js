@@ -23,18 +23,17 @@
      */
     testNewDepStylesAppendedToHead : {
         test : function(cmp) {
-            var config = {componentDef: "preloadTest:test_SpecialCharacter"};
             var cmpName;
             $A.run(function(){
-                $A.newCmpAsync(
-                    this,
+                $A.createComponent(
+                    "preloadTest:test_SpecialCharacter",
+                    {},
                     function(newCmp){
                         cmpName = newCmp.getDef().getDescriptor().getQualifiedName();
                         var body = cmp.get("v.body");
                         body.push(newCmp);
                         cmp.set("v.body", body);
-                    },
-                    config
+                    }
                 );
             });
             $A.test.addWaitFor(false, $A.test.isActionPending, function(){

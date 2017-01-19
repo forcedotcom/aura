@@ -159,15 +159,14 @@ public class AuraTestFilter implements Filter {
         this.servletUtilAdapter = servletUtilAdapter;
     }
 
+    public AuraTestFilter() {
+        LOG.info("AuraTestFilter.ctor()", new Error("AuraTestFilter.ctor()"));
+    }
+    
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException,
             IOException {
-        if (configAdapter.isProduction()) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        if (testContextAdapter == null) {
+        if (testContextAdapter == null || configAdapter.isProduction()) {
             chain.doFilter(request, response);
             return;
         }

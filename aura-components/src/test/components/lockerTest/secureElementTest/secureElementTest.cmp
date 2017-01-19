@@ -70,6 +70,8 @@
     <aura:method name="testAriaAttributesAccessible" action="{!c.testAriaAttributesAccessible}"/>
     <aura:method name="testAttributesPropertyContainsData" action="{!c.testAttributesPropertyContainsData}"/>
     <aura:method name="testGetSetInvalidAttributes"/>
+    <aura:method name="testLabelForInput"/>
+    <aura:method name="testForAttributeAllowedOnLabelOnly"/>
 
     <lockerTest:facet/>
 
@@ -83,6 +85,9 @@
     <img aura:id="img" />
     <area aura:id="area" />
     <label aura:id="label" />
+    <label aura:id="labelFor" for="labelFor_Id">Labeled Input</label>
+    <input aura:id="inputWithLabel" type="text" id="labelFor_Id" value="Input With Label"/><br/>
+    <input aura:id="inputWithoutLabel" type="text" id="woLabel_Id" value="Input Without Label"/>
     <!-- object -->
     <table aura:id="table" id="table">
         <tr aura:id="tr" >

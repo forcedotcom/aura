@@ -232,6 +232,18 @@
         }
     },
 
+    testLabelForInput: {
+        test: function(cmp) {
+            cmp.testLabelForInput();
+        }
+    },
+
+    testForAttributeAllowedOnLabelOnly: {
+        test: function(cmp) {
+            cmp.testForAttributeAllowedOnLabelOnly();
+        }
+    },
+
     //FIXME - goliver - "LI" : [ "value" ],
 
     //FIXME - goliver - "LINK" : [ "crossOrigin", "href", "hreflang", "media", "rel", "sizes", "title", "type" ],
@@ -569,5 +581,4 @@
             cmp.testGetSetInvalidAttributes();
         }
     }
-
 })

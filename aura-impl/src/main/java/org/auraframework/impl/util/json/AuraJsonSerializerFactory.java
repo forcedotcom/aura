@@ -38,16 +38,14 @@ import com.google.common.collect.ImmutableMap;
 @ServiceComponent
 public class AuraJsonSerializerFactory implements JsonSerializerFactory {
 
-    private static Map<String, JsonSerializer<?>> SERIALIZERS_LOOKUP_MAP;
-    private static Map<Class<?>, JsonSerializer<?>> SERIALIZERS_INSTANCE_MAP;
-    private static final ConcurrentMap<String, JsonSerializer<?>> cache = new ConcurrentHashMap<>();
-    private static final JsonSerializer NOT_FOUND = new DefaultJsonSerializer();
-    private static final Object lock = new Object();
+    private Map<String, JsonSerializer<?>> SERIALIZERS_LOOKUP_MAP;
+    private Map<Class<?>, JsonSerializer<?>> SERIALIZERS_INSTANCE_MAP;
+    private final ConcurrentMap<String, JsonSerializer<?>> cache = new ConcurrentHashMap<>();
+    private final JsonSerializer<?> NOT_FOUND = new DefaultJsonSerializer();
+    private final Object lock = new Object();
 
-    @Inject
     private LoggingService loggingService;
     
-    @Inject
     private Collection<JsonSerializerAdapter> jsonSerializerAdapters;
 
     @PostConstruct
@@ -98,5 +96,35 @@ public class AuraJsonSerializerFactory implements JsonSerializerFactory {
         cache.putIfAbsent(className, NOT_FOUND);
         loggingService.info("no JsonSerializer found for:" + className);
         return null;
+    }
+
+    /**
+     * @return the loggingService
+     */
+    public LoggingService getLoggingService() {
+        return loggingService;
+    }
+
+    /**
+     * @param loggingService the loggingService to set
+     */
+    @Inject
+    public void setLoggingService(LoggingService loggingService) {
+        this.loggingService = loggingService;
+    }
+
+    /**
+     * @return the jsonSerializerAdapters
+     */
+    public Collection<JsonSerializerAdapter> getJsonSerializerAdapters() {
+        return jsonSerializerAdapters;
+    }
+
+    /**
+     * @param jsonSerializerAdapters the jsonSerializerAdapters to set
+     */
+    @Inject
+    public void setJsonSerializerAdapters(Collection<JsonSerializerAdapter> jsonSerializerAdapters) {
+        this.jsonSerializerAdapters = jsonSerializerAdapters;
     }
 }

@@ -55,7 +55,7 @@
                 'markup://aura:if ["' + cmp.getGlobalId() + '"] in ',
                 owner.getName() + ' ["' + owner.getGlobalId() + '"] ',
                 'needed to clear unrendered body.\n',
-                'More info: https://sfdc.co/performance-aura-if'
+                'More info: https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/perf_warnings_if.htm'
             ].join(''));
         }
     }

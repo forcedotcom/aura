@@ -35,12 +35,14 @@ ActionValueProvider.prototype.get = function(key) {
                 "code": actionDef
             });
 
-            try {
-                this.controllerDef.getActionDef(key);
-                var message = "Component '" + this.component.getName() + "' has server and client action name conflicts: " + key;
-                $A.warning(message);
-            } catch(e) {
-                // this means there's no such action on the server side
+            if(this.controllerDef) {
+                try {
+                    this.controllerDef.getActionDef(key);
+                    var message = "Component '" + this.component.getName() + "' has server and client action name conflicts: " + key;
+                    $A.warning(message);
+                } catch(e) {
+                    // there's no such action on the server side
+                }
             }
         } else {
             actionDef = this.controllerDef && this.controllerDef.getActionDef(key);

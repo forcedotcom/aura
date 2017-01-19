@@ -32,6 +32,8 @@ function SecureScriptElement(el, key) {
 	// Create a placeholder script element in the doc
 	el = el || document.createElement("SCRIPT");
 
+	ls_setKey(el, key);
+
 	o = Object.create(null, {
 		src : {
 			enumerable: true,
@@ -138,7 +140,7 @@ function SecureScriptElement(el, key) {
 			}
 		}
 	});
-
+	
     ls_setRef(o, el, key);
     ls_addToCache(el, o, key);
 

@@ -300,5 +300,26 @@
         testUtils.assertFalse(cmp.get("v.body") instanceof Array, "Array cmp.get('v.body') should not be an instance of Array");
         testUtils.assertFalse(document instanceof Document, "document should not be an instance of Document");
         testUtils.assertFalse(window instanceof Window, "window should not be an instance of Window");
+    },
+    
+    // Test "liveness" of HTMLCollection and NodeList proxy layer
+    testLiveCollections: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var e = cmp.find("content").getElement();
+        
+        var childNodes = e.childNodes;
+        var children = e.children;
+                
+        testUtils.assertEquals(0, childNodes.length);
+        testUtils.assertEquals(0, children.length);
+              
+        var child = document.createElement("span");
+        e.appendChild(child);
+         
+        testUtils.assertEquals(1, childNodes.length);
+        testUtils.assertStartsWith("SecureElement", childNodes[0].toString(), "Expected childNodes[0] to be a SecureElement");
+        
+        testUtils.assertEquals(1, children.length);
+        testUtils.assertStartsWith("SecureElement", children[0].toString(), "Expected children[0] to be a SecureElement");
     }
 })

@@ -127,8 +127,9 @@ SecureObject.filterEverything = function(st, raw, options) {
 		}
 
 		var isNodeList = raw && (raw instanceof NodeList || raw instanceof HTMLCollection);
-		if (Array.isArray(raw) || isNodeList) {
+		if (Array.isArray(raw)) {			
 			swallowed = [];
+			
 			for (var n = 0; n < raw.length; n++) {
 				var newValue = SecureObject.filterEverything(st, raw[n]);
 
@@ -142,15 +143,10 @@ SecureObject.filterEverything = function(st, raw, options) {
 			}
 
             ls_setRef(swallowed, raw, key);
-
-			// Decorate with .item() to preserve NodeList shape
-			if (isNodeList) {
-				Object.defineProperty(swallowed, "item", {
-					value : function(index) {
-						return swallowed[index];
-					}
-				});
-			}
+		} else if (isNodeList) {
+			swallowed = SecureObject.createProxyForArrayLikeObjects(raw, key);
+            ls_setRef(swallowed, raw, key);
+			mutated = true;
 		} else {
             var rawKey = ls_getKey(raw);
             var hasAccess = rawKey === key;
@@ -203,13 +199,6 @@ var univeralProxyHandler = {
         
         return true;
     }
-    
-    // DCHASMAN TODO apply and construct traps
-    /*apply: function(target, thisArg, argumentsList) {
-    },
-    
-    construct: function(target, argumentsList, newTarget) {
-    }*/
 };
 
 SecureObject.createUniversalProxy = function(raw, key, doNotUseProxy) {
@@ -238,6 +227,103 @@ SecureObject.createUniversalProxy = function(raw, key, doNotUseProxy) {
     ls_addToCache(raw, swallowed, key);
     
     return swallowed;
+};
+
+
+// We cache 1 array like thing proxy per key
+var KEY_TO_ARRAY_LIKE_THING_HANLDER = typeof Map !== "undefined" ? new Map() : undefined;
+
+function getFilteredArray(raw, key) {
+    var filtered = [];
+    
+    for (var n = 0; n < raw.length; n++) {
+    	var value = raw[n];
+        if (ls_getKey(value) === key || SecureElement.isSharedElement(value)) {
+        	filtered.push(value);
+        }
+    }
+    
+    return filtered;
+}
+
+function getArrayLikeThingProxyHandler(key) {
+	function getFromFiltered(so, filtered, index) {
+		// Numeric indexing into array
+        var value = filtered[index];
+        return value ? SecureObject.filterEverything(so, value) : value;	
+	}
+	
+    var handler = KEY_TO_ARRAY_LIKE_THING_HANLDER.get(key);
+    if (!handler) {    	
+		handler = {
+		    "get": function(target, property) {
+		    	var filtered = getFilteredArray(target, key);
+		    	var ret;
+		    	
+		    	// Symbols have to be handled in some browsers
+		    	if (typeof property === "symbol") {
+		    		if (property === Symbol["toStringTag"]) {
+		    			property = "toString";
+		    		} else {
+		    			property = property.toString();
+		    		}
+		    	}
+		    	
+		    	if (isNaN(property)) {
+		    		switch (property) {
+		    			case "length":
+		    				ret = filtered.length;
+		    				break;
+		    				
+		    			case "item": 
+		    				ret = function(index) {
+		    					return getFromFiltered(handler, filtered, index);
+		    				};
+		    				break;
+		    				
+		    			case "namedItem": 
+		    				ret = function(name) {
+			    		        var value = target.namedItem(name);
+			    		        return value ? SecureObject.filterEverything(handler, value) : value;	
+		    				};
+		    				break;
+		    				
+		    			case "toString":
+		    				ret = function() {
+		    					return target.toString();
+		    				};
+		    				break;
+		    		
+		    			case "toJSON":
+		    				ret = function() {
+		    					return JSON.stringify(filtered);
+		    				};
+		    				break;
+
+		    			default:
+		    				throw new Error("Unsupported " + target + " method: " + property);
+		    		}
+		    	} else {
+			        ret = getFromFiltered(handler, filtered, property);		    		
+		    	}
+		    	
+		    	return ret;
+		    }
+		};
+		
+		ls_setKey(handler, key);
+		
+		KEY_TO_ARRAY_LIKE_THING_HANLDER.set(key, handler);
+    }
+    
+    return handler;
+}
+
+SecureObject.createProxyForArrayLikeObjects = function(raw, key) {
+    var proxy = new Proxy(raw, getArrayLikeThingProxyHandler(key));
+    ls_setKey(proxy, key);
+    
+    return proxy;
 };
 
 SecureObject.unfilterEverything = function(st, value, visited) {

@@ -123,6 +123,10 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
             get: function() {
                 return function() {
                     var args = SecureObject.ArrayPrototypeSlice.call(arguments);
+                    // make sure we have access to any <form> passed in to constructor
+                    if (args.length > 0) {
+                        ls_verifyAccess(o, args[0]);
+                    }
                     var unfilteredArgs = SecureObject.unfilterEverything(o, args);
                     var cls = win["FormData"];
                     if (typeof cls === "function") {

@@ -234,17 +234,45 @@
                     "event": "aura:serverActionError",
                     "globalId": cmp.getGlobalId(),
                     "handler": function(event) {
-                        actual = event.getParam("auraError").message;
+                        actual = event.getParam("customError").message;
                     }
                 });
 
                 // act
                 var event = $A.eventService.newEvent("aura:serverActionError");
-                event.setParam("auraError", new Error(expected));
+                event.setParam("customError", new Error(expected));
                 event.fire();
 
                 // assert
                 $A.test.assertEquals(expected, actual);
+            }
+        ]
+    },
+
+    testHandlingServerActionError: {
+        test: [
+            function(cmp) {
+                // arrage
+                var expected = "testCustomMessage";
+                var action = cmp.get("c.throwGenericEventExceptionWithServerActionErrorEvent");
+                var called = false;
+                action.setCallback(cmp, function(response) {
+                    actual = response.error[0].data.customMessage;
+                    called = true;
+                });
+
+                // act
+                $A.enqueueAction(action);
+
+                //assert
+                $A.test.addWaitFor(
+                    true,
+                    function() {
+                        return called;
+                    },
+                    function() {
+                        $A.test.assertEquals(expected, actual);
+                    });
             }
         ]
     },

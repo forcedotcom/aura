@@ -826,10 +826,17 @@ Action.prototype.updateFromResponse = function(response) {
                     var eventDescriptor = new DefDescriptor(eventObj["descriptor"]);
                     var eventName = eventDescriptor.getName();
                     var eventNamespace = eventDescriptor.getNamespace();
-                    if (eventNamespace === "aura" && (eventName === "clientOutOfSync" || eventName === "invalidSession")) {
-                        $A.clientService.throwExceptionEvent(err);
-                        // should not invoke the callback for system level exception events
-                        return false;
+                    if (eventNamespace === "aura") {
+                        if (eventName === "clientOutOfSync" || eventName === "invalidSession") {
+                            $A.clientService.throwExceptionEvent(err);
+                            // should not invoke the callback for system level exception events
+                            return false;
+                        }
+                        if (eventName === "serverActionError") {
+                            this.error = [eventObj["attributes"]["values"]["customError"]];
+                            // should only invoke client action callback for serverActionError for custom handling
+                            return true;
+                        }
                     }
                 }
 

@@ -20,8 +20,9 @@
 			return;
 		}
 		var listElement = component.getElement();
+        listElement.style.width = referenceElement.getBoundingClientRect().width + 'px';
 
-		// All these styles are necessary since sometimes the position library puts some wonky left and top position values
+        // All these styles are necessary since sometimes the position library puts some wonky left and top position values
 		// which make scrollbars appear on a page when it doesn't need to and cause it to not align correctly.
 		listElement.style.opacity = 0;
 		listElement.style.left = 0;

@@ -3486,7 +3486,7 @@ AuraClientService.prototype.enqueueAction = function(action, background) {
  * @deprecated
  */
 AuraClientService.prototype.deferAction = function (action) {
-    $A.deprecated("$A.deferAction is broken, do not use it.","Use '$A.enqueueAction(action);'.","2017/01/06");
+    $A.deprecated("$A.deferAction is broken, do not use it.","Use '$A.enqueueAction(action);'.","2017/01/06","2017/02/17");
     var acs = this;
     var promise = new Promise(function(success, error) {
 

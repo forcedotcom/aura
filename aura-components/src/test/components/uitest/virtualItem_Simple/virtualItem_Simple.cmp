@@ -19,25 +19,11 @@
     <aura:attribute name="id" type="String"/>
     <aura:attribute name="index" type="String"/>
     <aura:attribute name="name" type="String"/>
-    <aura:attribute name="balance" type="String"/>
-    <aura:attribute name="friends" type="Object"/>
-    <aura:attribute name="counter" default="0" type="Integer"/>
 
-    <div onclick="{!c.count}" class="item" style="margin:8px;padding: 14px; border: 1px solid #333">
+    <div class="item" style="margin:8px;padding: 14px; border: 1px solid #333">
         <p class="id">Id: <span>{!v.id}</span></p>
         <p class="index">Index: <span style="color:blue">{!v.index}</span></p>
         <p class="name" >Name: <span>{!v.name}</span></p>
-        <p style="background:green;padding:10px" onclick="{!c.salary}" class="balance">Salary: <span>{!v.balance}</span></p>
-        <p>List of Friends:</p>
-        <ul>
-            <aura:iteration aura:id="friends" items="{!v.friends}" var="i">
-                <li>{!i.name}</li>
-            </aura:iteration>
-        </ul>
-        <ui:button class="showItemInfo" label="Show yourself!" press="{!c.like}"/>
-        <ui:outputText class="outputItemInfo" aura:id="outputItemInfo" value=""/> <br/><br/>
-        <p class="counter" style="text-align:right">Click counter: <span>{!v.counter}</span></p>
-        <test:testVirtualListTemplateChild name="{!v.name}"/>
     </div>
 
 </aura:component>

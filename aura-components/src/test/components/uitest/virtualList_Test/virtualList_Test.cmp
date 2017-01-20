@@ -25,30 +25,29 @@
 
 
 <!--**********************************************************************************************************-->
-
-    
     
     <aura:attribute name="template" type="Aura.ComponentDefRef[]" description="template">
         <test:testVirtualListTemplate/>
     </aura:attribute>
+    <aura:attribute name="templateMap" type="Object" description="Template Map" />
+    
 	<div class="header">
-		    <ui:button class="kitchenButton" label="Re-fire datagrid's provide" press="{!c.replaceData}"/>
-		    <ui:button class="kitchenButtonEmptyData" label="Fire Data Provider With Empty Data" press="{!c.emptyData}"/>         
-			<br/>
-		</div>
+		<ui:button class="kitchenButton" label="Re-fire datagrid's provide" press="{!c.replaceData}"/>
+		<ui:button class="kitchenButtonEmptyData" label="Fire Data Provider With Empty Data" press="{!c.emptyData}"/>         
+		<ui:button label="Update List with Multiple Templates" press="{!c.sendTemplateMap}" />
+        <br/>
+	</div>
     <div>
         <ui:virtualList 
             aura:id="list" 
             itemVar="item">
             <aura:set attribute="dataProvider">
-                <!--<test:testVirtualListDataProvider aura:id="data"/>-->
-            <uitest:virtualList_TestDataProvider      aura:id="provider"
-                                                   pageSize="{!v.pageSize}"
-                                                   currentPage="{!v.currentPage}"
-                                                   totalPages="{!v.totalPages}"
-                                                   />
+                <uitest:virtualList_TestDataProvider   aura:id="provider"
+                                                       pageSize="{!v.pageSize}"
+                                                       currentPage="{!v.currentPage}"
+                                                       totalPages="{!v.totalPages}"/>
             </aura:set>
-
+            
             <aura:set attribute="itemTemplate">
                 <test:testVirtualListTemplate
                     id="{!item._id}"
@@ -56,9 +55,8 @@
                     name="{!item.name}"
                     balance="{!item.balance}"
                     friends="{!item.friends}"
-                />
+                    counter="{!item.counter}"/>
             </aura:set>
         </ui:virtualList>
     </div>
-
 </aura:component>

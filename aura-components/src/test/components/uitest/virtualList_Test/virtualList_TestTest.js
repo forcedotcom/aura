@@ -41,6 +41,8 @@
               row["friends"][k]["id"] = k;
               row["friends"][k]["name"] = $A.test.getText(tbody[j].getElementsByTagName("li")[k]);
           }
+          row["counter"] = parseInt(this.getItemRenderedValue(tbody[j], "counter"));
+          row["key"] = (row["index"] % 3 === 0) ? 'simple' : 'complex';
           rows.push(row);
       }
       return rows;
@@ -157,27 +159,6 @@
 	    	$A.test.assertTrue($A.test.contains(expectedName, initialData[rowNumber-1].name), "Name is not changed correcly for Row "+ rowNumber);
     	  	var renderedData = this.getRenderedRows(cmp);
             this.compareArray(initialData, renderedData, "The virtualList rendered data correctly after Row "+ rowNumber +" was changed");
-      }]
-  },
-  
-  /**
-   * Verify Child cmp handles change event correctly
-   */
-  testActionOnChildCmpRendersInfoCorrectly : {
-      test : [function(cmp){
-            initialData = cmp.find("list").get("v.items");
-            initialRenderedData = this.getRenderedRows(cmp);
-            rowNumber = 1;
-      	  	var infoBtn = this.getInfoButton(rowNumber);
-      	  	$A.test.clickOrTouch(infoBtn);
-      }, function(cmp) {
-          var changeNameBtn = this.getChangeNameButton(rowNumber);
-          $A.test.clickOrTouch(changeNameBtn);
-      }, function(cmp) {
-	    	expectedString = "Expected Name Change";
-	    	expectedInfo = JSON.stringify(initialRenderedData[rowNumber-1]);
-	    	actualInfo = $A.test.getText($A.test.select(".outputItemInfo")[rowNumber-1]);
-	    	$A.test.assertEquals(expectedInfo, actualInfo, "Action from Child Cmp did not update the info for Row " + rowNumber);
       }]
   }
 })

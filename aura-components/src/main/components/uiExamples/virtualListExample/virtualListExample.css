@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-	replaceData : function(cmp, evt, helper) {
-		cmp.find("provider").set("v.empty", false);
-		cmp.find("provider").getEvent("provide").fire();
-	},
-	
-	emptyData : function(cmp, evt, helper) {
-		cmp.find("provider").set("v.empty", true);
-		cmp.find("provider").getEvent("provide").fire();
-	},
-	
-	sendTemplateMap : function(cmp, evt, helper) {
-	    helper.generateItemTemplates(cmp);
-	    cmp.find("list").set("v.templateMap", cmp.get("v.templateMap"));
-	}
-})
+.THIS {
+    
+}
+
+.THIS .listItem {
+    display:block;
+}
+
+.THIS .inline {
+    display:inline-block;
+    width: 30%;
+    float: left;
+}

@@ -26,13 +26,19 @@
         { type: 'focus', useCapture: true },
         { type: 'blur', useCapture: true }
     ],
+    
+    DEFAULT_TEMPLATE_KEY: 'TEMPLATE',
+    DEFAULT_ITEM_ELEMENT: 'DIV',
+    
     initialize: function (cmp) {
         // Internal variables we use
-        cmp._template          = null;
+        cmp._templateMap       = {};
         cmp._virtualItems      = [];
-        cmp._ptv               = null;
         cmp._dirtyFlag         = 0;
         cmp.set('v._dirty', 0, true);
+    },
+    reset: function (cmp) {
+        this.initialize(cmp);
     },
     initializeBody: function (cmp) {
         var body = cmp.get('v.body');
@@ -68,15 +74,20 @@
         }
 
         if (!ptv.sync && cmp.isRendered()) { // Some component has updated asyncronously the item, rerender it
-
             ptv.sync = true; // at this point the action becomes sync
             var item = evt.getParam('value');
             this._rerenderDirtyElement(cmp, item);
         }
     },
     ignorePTVChanges: function (cmp, ignore) {
-        cmp._ptv.sync = ignore;
-        cmp._ptv.ignoreChanges = ignore;
+        var templateMap = cmp._templateMap;
+        
+        for (var templateData in templateMap) {
+            if (templateData.ptv) {
+                templateData.ptv.sync = ignore;
+                templateData.ptv.ignoreChanges = ignore;
+            }
+        }
     },
     _initializeItemTemplate: function (cmpTemplate) {
         var container = document.createDocumentFragment();
@@ -84,25 +95,50 @@
         $A.afterRender(cmpTemplate);
         return container;
     },
-    initializeTemplate: function (cmp) {
-        var tmpl  = cmp.get('v.itemTemplate')[0];
-        var ref   = cmp.get('v.itemVar');
-        var ptv   = this._createPassthroughValue(cmp, ref);
-        tmpl["attributes"]["valueProvider"] = ptv;
-        var shape = $A.createComponentFromConfig(tmpl);
+    initializeTemplate: function (cmp) { 
+        var tmpl        = cmp.get('v.itemTemplate')[0];
+        var templateMap = cmp.get('v.templateMap');
+        var ref         = cmp.get('v.itemVar');
+        
+        if (templateMap) {
+            // ignore itemTemplate if we have a template map
+            for (var key in templateMap) {
+                this._setTemplateCache(cmp, key, this.createTemplateData(cmp, templateMap[key], ref));
+            }
+        } else {
+            this._setTemplateCache(cmp, this.DEFAULT_TEMPLATE_KEY, this.createTemplateData(cmp, tmpl, ref));
+        }
+    },
 
-        // Initialize internal setup
-        cmp._shape             = shape;
-        cmp._ptv               = ptv;
-        cmp._template          = this._initializeItemTemplate(shape);
-        ptv.ignoreChanges      = true;
-        ptv.dirty              = false;
-
+    createTemplateData: function(cmp, template, ref) {
+        var templateData = {};
+        
+        templateData.ptv = this._createPassthroughValue(cmp, ref);
+        template["attributes"]["valueProvider"] = templateData.ptv;
+        
+        var shape = $A.createComponentFromConfig(template);
+        templateData.shape = shape;
+        templateData.template = this._initializeItemTemplate(shape);
+        
+        templateData.ptv.ignoreChanges = true;
+        templateData.ptv.dirty = false;
+        
         cmp.addValueHandler({
-            event  : 'change',
-            value  : ref,
-            method : this.onItemChange.bind(this, cmp, ptv)
+            event   : 'change',
+            value   : ref,
+            method  : this.onItemChange.bind(this, cmp, templateData.ptv)
         });
+    
+        return templateData;
+    },
+    
+    handleTemplateChange: function(cmp, templateAttribute) {
+        this.reset(cmp);
+        this.initializeTemplate(cmp);
+
+        this.markClean(cmp, 'v.' + templateAttribute);
+        this.createVirtualList(cmp);
+        this.markDirty(cmp); // So we go into the rerender
     },
 
     initializeItems: function (cmp) {
@@ -120,24 +156,27 @@
         dom._data = item;
     },
     _generateVirtualItem: function (cmp, item) {
-        var rowTmpl = cmp._template,
-            ptv     = cmp._ptv,
-            itemVar = cmp.get('v.itemVar'),
-            clonedItem;
-
-        // Change the PTV -> dirty whatever is needed
-        ptv.set(itemVar, item);
-
-        cmp.markClean('v.items'); // Mark ourselves clean before rerender (avoid calling rerender on ourselves)
-        $A.renderingService.rerenderDirty('virtualRendering');
-
-        // Snapshot the DOM
-        clonedItem = rowTmpl.firstChild.cloneNode(true);
-
-        // Attach the data to the element
-        this._attachItemToElement(clonedItem, item);
-
-        return clonedItem;
+        var templateData = this._getTemplateData(cmp, item);
+        if (templateData) {
+            var rowTmpl = templateData.template,
+                ptv     = templateData.ptv,
+                itemVar = cmp.get('v.itemVar'),
+                clonedItem;
+            
+            ptv.set(itemVar, item);
+            
+            cmp.markClean('v.items');
+            $A.renderingService.rerenderDirty('virtualRendering');
+            
+            clonedItem = rowTmpl.firstChild.cloneNode(true);
+            
+            this._attachItemToElement(clonedItem, item);
+            
+            return clonedItem;
+        } else {
+            $A.warning("No template data found. Defaulting to " + this.DEFAULT_ITEM_ELEMENT);
+            return document.createElement(this.DEFAULT_ITEM_ELEMENT);
+        }
     },
     createVirtualList: function (cmp) {
         var items = cmp.get('v.items');
@@ -148,9 +187,27 @@
             } 
         }
     },
+    
+    appendVirtualRows: function (cmp, items) {
+        $A.metricsService.markStart(this.NS, this.NAME + ".appendVirtualRows", {auraid : cmp.getGlobalId()});
+        this.ignorePTVChanges(cmp, true);
+        var fragment  = document.createDocumentFragment(),
+            container = this.getListBody(cmp);
+
+        for (var i = 0; i < items.length; i++) {
+            var virtualItem = this._generateVirtualItem(cmp, items[i]);
+            cmp._virtualItems.push(virtualItem);
+            fragment.appendChild(virtualItem);
+        }
+        container.appendChild(fragment);
+        cmp.set('v.items', (cmp.get('v.items') || []).concat(items), true);
+        this.ignorePTVChanges(cmp, false);
+        $A.metricsService.markEnd(this.NS, this.NAME + ".appendVirtualRows");
+    },
+
     getListBody: function (cmp, dom) {
         var node = dom ? dom[0] : cmp.getElement();
-        return  node;
+        return node;
     },
     markClean: function (cmp, value) {
         var concreteCmp = cmp.getConcreteComponent();
@@ -171,25 +228,11 @@
             container.addEventListener(events[i].type, delegate, events[i].useCapture);
         }
     },
-    appendVirtualRows: function (cmp, items) {
-        $A.metricsService.markStart(this.NS, this.NAME + ".appendVirtualRows", {auraid : cmp.getGlobalId()});
-        this.ignorePTVChanges(cmp, true);
-        var fragment  = document.createDocumentFragment(),
-            container = this.getListBody(cmp);
 
-        for (var i = 0; i < items.length; i++) {
-            var virtualItem = this._generateVirtualItem(cmp, items[i]);
-            cmp._virtualItems.push(virtualItem);
-            fragment.appendChild(virtualItem);
-        }
-        container.appendChild(fragment);
-        cmp.set('v.items', (cmp.get('v.items') || []).concat(items), true);
-        this.ignorePTVChanges(cmp, false);
-        $A.metricsService.markEnd(this.NS, this.NAME + ".appendVirtualRows");
-    },
     updateItem: function (cmp, item, index) {
         this._rerenderDirtyElement(cmp, item, null, index);
     },
+    // TODO: Test TemplateMap
     getComponentByIndex: function(cmp, index, callback) {
         var items = cmp._virtualItems;
         if (index<0 || index>=items.length) {
@@ -197,11 +240,14 @@
             return;
         }
 
-        var shape  = cmp._shape,
-            ptv    = cmp._ptv,
-            ref    = cmp.get('v.itemVar'),
-            target = cmp._virtualItems[index],
-            item   = this._getItemAttached(target);
+        var target = cmp._virtualItems[index];
+        var item = this._getItemAttached(target);
+        
+        var templateData = this._getTemplateData(cmp, item);
+        
+        var shape  = templateData.shape,
+            ptv    = templateData.ptv,
+            ref    = cmp.get('v.itemVar');
 
         // Setting up the component with the current item
         shape.getElement = function () { return target; };
@@ -219,6 +265,7 @@
                 return i;
             }
         }
+        return null;
     },
     _replaceDOMElement: function (parent, newChild, oldChild) {
         parent.replaceChild(newChild, oldChild);
@@ -231,7 +278,7 @@
             position   = (!$A.util.isUndefined(index))?index:this._findVirtualElementPosition(items, item, oldElement),
             newElement = this._generateVirtualItem(cmp, item);
 
-        if (!$A.util.isUndefinedOrNull(listRoot) && !$A.util.isUndefined(position) && position>=0 && position<items.length) {
+        if (!$A.util.isUndefinedOrNull(listRoot) && !$A.util.isUndefinedOrNull(position) && position>=0 && position<items.length) {
             if (!oldElement) {
                 oldElement = items[position];
             }
@@ -257,15 +304,12 @@
             htmlAttr = htmlCmp.isInstanceOf('aura:html') && htmlCmp.get('v.HTMLAttributes');
         return htmlAttr && htmlAttr[eventTypeAttribute];
     },
+
     _eventDelegator: function (cmp, e) {
         var type     = e.type,
             target    = e.target,
-            ref       = cmp.get('v.itemVar'),
             handlers  = [],
-            shape     = cmp._shape,
-            ptv       = cmp._ptv,
-            getElmt   = function (t) { return t; },
-            item, targetCmp, actionHandler, actionHandlerScope;
+            item, targetCmp, actionHandler;
 
         while (target) {
             targetCmp = this._getRenderingComponentForElement(target);
@@ -293,7 +337,14 @@
         }
         
         if (item) {
-            // Seting up the event with some custom properties
+            var templateData = this._getTemplateData(cmp, item),
+                shape = templateData.shape,
+                ptv = templateData.ptv,
+                ref = cmp.get('v.itemVar'),
+                getElmt   = function (t) { return t; },
+                actionHandlerScope;
+                
+            // Setting up the event with some custom properties
             e.templateItem = item;
             e.templateElement = target;
             shape.getElement = getElmt.bind(null, target);
@@ -334,5 +385,20 @@
             cmp = superCmp;
         }
         return cmp;
+    },
+    
+    _setTemplateCache: function(cmp, key, value) {
+        cmp._templateMap[key] = value;
+    },
+    
+    _getTemplateData: function(cmp, item) {
+        var templateMap = cmp._templateMap;
+        var template = templateMap[item.key];
+        
+        if (!template) {
+            template = templateMap[this.DEFAULT_TEMPLATE_KEY];
+        }
+        
+        return template;
     }
 })// eslint-disable-line semi

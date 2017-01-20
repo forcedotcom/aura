@@ -26,6 +26,12 @@
 
         cmp._initializing = false;
     },
+    handleTemplateChange: function(cmp, event, helper) {
+        helper.handleTemplateChange(cmp, 'itemTemplate');
+    },
+    handleTemplateMapChange: function(cmp, event, helper) {
+        helper.handleTemplateChange(cmp, 'templateMap');
+    },
     handleItemsChange: function (cmp, event, helper) {
     	if (cmp._initializing || cmp._appending || cmp._updating) {
     		return;

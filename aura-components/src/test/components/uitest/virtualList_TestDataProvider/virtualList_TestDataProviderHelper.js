@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 ({
+    // TODO: Refactor test component
 	createItems: function (cmp, currentPage, pageSize) {
     	var items = [];
 
-        // Hack to make 'zero based'. 
+        // Hack to make 'zero based'.
         --currentPage;
-        var tmpId;
-        
+
         for (var i = 1; i <= pageSize; i++) {
-        	tmpId = ((currentPage * pageSize) + i);
-        	randomNumber = Math.floor(Math.random()*1E13),
+        	var tmpId = ((currentPage * pageSize) + i);
+        	var randomNumber = Math.floor(Math.random()*1E13);
             items.push({
                 _id           : randomNumber,
                 index: tmpId,
                 balance : Math.floor(Math.random() * 100000 + 1),
-                name : 'John Doe '+tmpId, 
+                name : 'John Doe '+tmpId,
                 friends: [
                  {
                    "id": 0,
@@ -42,7 +42,9 @@
                    "id": 2,
                    "name": "Joanne Gardner " + randomNumber
                  }
-               ]
+               ],
+               counter : 0,
+               key : (i % 3 === 0) ? 'simple' : 'complex'
             });
         }
         return cmp.get("v.empty") ? [] : items;

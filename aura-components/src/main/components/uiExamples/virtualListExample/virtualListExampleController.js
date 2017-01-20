@@ -14,18 +14,26 @@
  * limitations under the License.
  */
 ({
-	replaceData : function(cmp, evt, helper) {
-		cmp.find("provider").set("v.empty", false);
-		cmp.find("provider").getEvent("provide").fire();
-	},
-	
-	emptyData : function(cmp, evt, helper) {
-		cmp.find("provider").set("v.empty", true);
-		cmp.find("provider").getEvent("provide").fire();
-	},
-	
-	sendTemplateMap : function(cmp, evt, helper) {
+	init: function(cmp, event, helper) {
 	    helper.generateItemTemplates(cmp);
-	    cmp.find("list").set("v.templateMap", cmp.get("v.templateMap"));
+	    
+	    helper.initializeLists(cmp);
+	},
+	
+	refreshSingleList: function(cmp, event, helper) {
+	    helper.refreshItems(cmp, "singleTemplate");
+	},
+	
+	refreshMultiList: function(cmp, event, helper) {
+	    helper.refreshItems(cmp, "multiTemplate");
+	},
+	
+	appendMultiList: function(cmp, event, helper) {
+	    helper.appendItems(cmp, "multiTemplate");
+	},
+	
+	updateMultiList: function(cmp, event, helper) {
+	    helper.updateItem(cmp, 4, "multiTemplate");
 	}
 })
+

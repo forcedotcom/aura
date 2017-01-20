@@ -23,6 +23,9 @@
     <aura:attribute name="forceRender"  type="Boolean" default="false"/>
     <aura:attribute name="itemVar"      type="String"           required="true" description="name for the variable to iterate"/>
     <aura:attribute name="dataProvider" type="Aura.Component[]"/>
+    
+    <!-- For multi-template lists -->
+    <aura:attribute name="templateMap" type="Object" />
 
     <aura:method name="rerenderList"/>
     <aura:method name="appendItems">
@@ -39,5 +42,7 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="change" value="{!v.items}" action="{!c.handleItemsChange}"/>
+    <aura:handler name="change" value="{!v.itemTemplate}" action="{!c.handleTemplateChange}"/>
+    <aura:handler name="change" value="{!v.templateMap}" action="{!c.handleTemplateMapChange}"/>
     {!v.body}
 </aura:component>

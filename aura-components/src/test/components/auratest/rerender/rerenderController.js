@@ -47,19 +47,9 @@
 			return;
 		}
 
-		$A.componentService.newComponentAsync(this, function(newcmp) {
+		$A.createComponent("aura:text", { value : "PUSHED." }, function(newcmp) {
 			array.push(newcmp);
 			cmp.set(whichArray, array);
-		}, {
-			"componentDef" : {
-				"descriptor" : "markup://aura:text"
-			},
-
-			"attributes" : {
-				"values" : {
-					"value" : "PUSHED."
-				}
-			}
 		});
 	},
 
@@ -70,19 +60,9 @@
 			return;
 		}
 
-		$A.componentService.newComponentAsync(this, function(newcmp) {
+		$A.createComponent("auratest:rerenderChild", { title : new Date().getTime() }, function(newcmp) {
 			array.push(newcmp);
 			cmp.set(whichArray, array);
-		}, {
-			"componentDef" : {
-				"descriptor" : "markup://auratest:rerenderChild"
-			},
-
-			"attributes" : {
-				"values" : {
-					"title" : new Date().getTime()
-				}
-			}
 		});
 	},
 

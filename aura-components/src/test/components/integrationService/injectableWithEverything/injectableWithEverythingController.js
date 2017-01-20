@@ -18,14 +18,20 @@
         var valueFromHelper = cmp.getDef().getHelper().returnAString();
         var a = cmp.get('c.getString');
 
-        a.setCallback(cmp,function(a){
-                $A.componentService.newComponentAsync(this, function(newCmp){
+        a.setCallback(cmp, function(a){
+            $A.createComponent(
+                "aura:text",
+                {
+                    value: a.getReturnValue()
+                },
+                function(newCmp){
                     var body = cmp.find('dataFromController').get('v.body');
                     body.push(newCmp);
                     cmp.find('dataFromController').set('v.body', body);
-                }, {componentDef: 'markup://aura:text', attributes:{ values:{ value: a.getReturnValue() }}})}
+                }
             );
             $A.enqueueAction(a);
+        });
     },
     showStyle: function(cmp) {
         var dfaElement = cmp.find('dataFromAttribute').getElement();

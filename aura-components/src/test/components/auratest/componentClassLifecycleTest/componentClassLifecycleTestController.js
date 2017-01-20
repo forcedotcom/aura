@@ -18,27 +18,18 @@
 		
 		var cmpDef = cmp.get("v.cmpDef");
 		var errorOutFrom = cmp.get("v.errorOutFrom");
-        //componentDef : "markup://auratest:componentClassParent",
-		var componentConfig = {
-        		componentDef : cmpDef,
-    			attributes : {
-                     values : {
-                    	 errorOutFromRender_Parent : true
-                     }
-                 }
-        };
-        //create the component and push it to testCmp's body
-        //var that = this;
-        //var cmpCreated = false;
        
-    	$A.componentService.newComponentAsync(this, function(newCmp) {
-            var output = cmp.find("client");
-            var body = output.get("v.body");
-            body.push(newCmp);
-            output.set("v.body", body);
-            //cmpCreated = true;
-        }, componentConfig, null, true, true);
-        
+    	$A.createComponent(
+    	    cmpDef,
+    	    {
+    	        errorOutFromRender_Parent : true
+    	    },
+    	    function(newCmp) {
+                var output = cmp.find("client");
+                var body = output.get("v.body");
+                body.push(newCmp);
+                output.set("v.body", body);
+    	    }
+    	);
     }
-
 })

@@ -184,25 +184,23 @@
     //create Parent dynamically, check if it behaves just like loading it statically
     testClientCreatedParent : {
         test : [function(testCmp) {
-        	var componentConfig = {
-                    componentDef : "markup://auratest:componentClassParent",
-                    attributes : {
-                        values : {
-                            id : "ClientCreatedParent"
-                        }
-                    }
-            };
             //create the component and push it to testCmp's body
             var that = this;
             var cmpCreated = false;
-            $A.componentService.newComponentAsync(that, function(newCmp) {
-                var output = testCmp.find("client");
-                var body = output.get("v.body");
-                body.push(newCmp);
-                output.set("v.body", body);
-                that.setTargetCmp(testCmp, newCmp);
-                cmpCreated = true;
-            }, componentConfig, null, true, true);
+            $A.createComponent(
+                "auratest:componentClassParent",
+                {
+                    id : "ClientCreatedParent"
+                },
+                function(newCmp) {
+                    var output = testCmp.find("client");
+                    var body = output.get("v.body");
+                    body.push(newCmp);
+                    output.set("v.body", body);
+                    that.setTargetCmp(testCmp, newCmp);
+                    cmpCreated = true;
+                }
+            );
             $A.test.addWaitFor(true, function() {
                 return cmpCreated;
             });
@@ -400,25 +398,23 @@
      */
     testClientCreatedOuter : {
         test : [function(testCmp) {
-            var componentConfig = {
-                componentDef : "markup://auratest:componentClassOuter",
-                attributes : {
-                    values : {
-                        id : "ClientCreatedOuter"
-                    }
-                }
-            };
            //create the component and push it to testCmp's body
             var that = this;
             var cmpCreated = false;
-            $A.componentService.newComponentAsync(that, function(newCmp) {
-                var output = testCmp.find("client");
-                var body = output.get("v.body");
-                body.push(newCmp);
-                output.set("v.body", body);
-                that.setTargetCmp(testCmp, newCmp, [newCmp.find("Inner")]);
-                cmpCreated = true;
-            }, componentConfig, null, true, true);
+            $A.createComponent(
+                "auratest:componentClassOuter",
+                {
+                    id : "ClientCreatedOuter"
+                },
+                function(newCmp) {
+                    var output = testCmp.find("client");
+                    var body = output.get("v.body");
+                    body.push(newCmp);
+                    output.set("v.body", body);
+                    that.setTargetCmp(testCmp, newCmp, [newCmp.find("Inner")]);
+                    cmpCreated = true;
+                }
+            );
             $A.test.addWaitFor(true, function() {
                 return cmpCreated;
             });
@@ -569,25 +565,23 @@
     
     testClientCreatedChild : {
         test : [function(testCmp) {
-            var componentConfig = {
-                componentDef : "markup://auratest:componentClassChild",
-                attributes : {
-                    values : {
-                        id : "ClientCreatedChild"
-                    }
-                }
-            };
            //create the component and push it to testCmp's body
             var that = this;
             var cmpCreated = false;
-            $A.componentService.newComponentAsync(that, function(newCmp) {
-                var output = testCmp.find("client");
-                var body = output.get("v.body");
-                body.push(newCmp);
-                output.set("v.body", body);
-                that.setTargetCmp(testCmp, newCmp);
-                cmpCreated = true;
-            }, componentConfig, null, true, true);
+            $A.createComponent(
+                "auratest:componentClassChild",
+                {
+                    id : "ClientCreatedChild"
+                },
+                function(newCmp) {
+                    var output = testCmp.find("client");
+                    var body = output.get("v.body");
+                    body.push(newCmp);
+                    output.set("v.body", body);
+                    that.setTargetCmp(testCmp, newCmp);
+                    cmpCreated = true;
+                }
+            );
             $A.test.addWaitFor(true, function() {
                 return cmpCreated;
             });
@@ -899,24 +893,22 @@
     //we create GrandChildServerProvider component dynamically, then verify it behave just like the one we load statically
     testClientCreatedGrandChildServerProvider : {
         test : [function(testCmp) {
-            var componentConfig = {
-                componentDef : "markup://auratest:componentClassGrandChildServerProvider",
-                attributes : {
-                    values : {
-                        id : "ClientCreatedGrandChildServerProvider"
-                    }
-                }
-            };
 			var that = this;
 			var cmpCreated = false;
-			$A.componentService.newComponentAsync(that, function(newCmp) {
-			    var output = testCmp.find("client");
-			    var body = output.get("v.body");
-			    body.push(newCmp);
-			    output.set("v.body", body);
-			    that.setTargetCmp(testCmp, newCmp);
-			    cmpCreated = true;
-			}, componentConfig, null, true, true);
+            $A.createComponent(
+                "auratest:componentClassGrandChildServerProvider",
+                {
+                    id : "ClientCreatedGrandChildServerProvider"
+                },
+    			function(newCmp) {
+    			    var output = testCmp.find("client");
+    			    var body = output.get("v.body");
+    			    body.push(newCmp);
+    			    output.set("v.body", body);
+    			    that.setTargetCmp(testCmp, newCmp);
+    			    cmpCreated = true;
+    			}
+            );
 			$A.test.addWaitFor(true, function() {
 			    return cmpCreated;
 			});
@@ -939,25 +931,23 @@
      */
     testClientCreatedServerProvidedGrandChildServerProvider : {
         test : [function(testCmp) {
-            var componentConfig = {
-                componentDef : "markup://auratest:componentClassServerProvider",
-                attributes : {
-                    values : {
-                        requestDescriptor : "markup://auratest:componentClassGrandChildServerProvider",
-                        id : "ClientCreatedServerProvidedGrandChildServerProvider"
-                    }
-                }
-            };
             var that = this;
 			var cmpCreated = false;
-			$A.componentService.newComponentAsync(that, function(newCmp) {
-			    var output = testCmp.find("client");
-			    var body = output.get("v.body");
-			    body.push(newCmp);
-			    output.set("v.body", body);
-			    that.setTargetCmp(testCmp, newCmp);
-			    cmpCreated = true;
-			}, componentConfig, null, true, true);
+            $A.createComponent(
+                "auratest:componentClassServerProvider",
+                {
+                    requestDescriptor : "markup://auratest:componentClassGrandChildServerProvider",
+                    id : "ClientCreatedServerProvidedGrandChildServerProvider"
+                },
+    			function(newCmp) {
+    			    var output = testCmp.find("client");
+    			    var body = output.get("v.body");
+    			    body.push(newCmp);
+    			    output.set("v.body", body);
+    			    that.setTargetCmp(testCmp, newCmp);
+    			    cmpCreated = true;
+    			}
+            );
 			$A.test.addWaitFor(true, function() {
 			    return cmpCreated;
 			});
@@ -982,25 +972,23 @@
      */
     testClientCreatedClientProvidedGrandChildServerProvider : {
         test : [function(testCmp) {
-            var componentConfig = {
-                componentDef : "markup://auratest:componentClassClientProvider",
-                attributes : {
-                    values : {
-                        requestDescriptor : "markup://auratest:componentClassGrandChildServerProvider",
-                        id : "ClientCreatedClientProvidedGrandChildServerProvider"
-                    }
-                }
-            };
             var that = this;
 			var cmpCreated = false;
-			$A.componentService.newComponentAsync(that, function(newCmp) {
-			    var output = testCmp.find("client");
-			    var body = output.get("v.body");
-			    body.push(newCmp);
-			    output.set("v.body", body);
-			    that.setTargetCmp(testCmp, newCmp);
-			    cmpCreated = true;
-			}, componentConfig, null, true, true);
+            $A.createComponent(
+                "auratest:componentClassClientProvider",
+                {
+                    requestDescriptor : "markup://auratest:componentClassGrandChildServerProvider",
+                    id : "ClientCreatedClientProvidedGrandChildServerProvider"
+                },
+    			function(newCmp) {
+    			    var output = testCmp.find("client");
+    			    var body = output.get("v.body");
+    			    body.push(newCmp);
+    			    output.set("v.body", body);
+    			    that.setTargetCmp(testCmp, newCmp);
+    			    cmpCreated = true;
+    			}
+            );
 			$A.test.addWaitFor(true, function() {
 			    return cmpCreated;
 			});
@@ -1410,24 +1398,22 @@
     //we create GrandChildClientProvider component dynamically, then verify it behave just like the one we load statically
     testClientCreatedGrandChildClientProvider : {
         test : [function(testCmp) {
-            var componentConfig = {
-                componentDef : "markup://auratest:componentClassGrandChildClientProvider",
-                attributes : {
-                    values : {
-                        id : "ClientCreatedGrandChildClientProvider"
-                    }
-                }
-            };
             var that = this;
 			var cmpCreated = false;
-			$A.componentService.newComponentAsync(that, function(newCmp) {
-			    var output = testCmp.find("client");
-			    var body = output.get("v.body");
-			    body.push(newCmp);
-			    output.set("v.body", body);
-			    that.setTargetCmp(testCmp, newCmp);
-			    cmpCreated = true;
-			}, componentConfig, null, true, true);
+            $A.createComponent(
+                "auratest:componentClassGrandChildClientProvider",
+                {
+                    id : "ClientCreatedGrandChildClientProvider"
+                },
+    			function(newCmp) {
+    			    var output = testCmp.find("client");
+    			    var body = output.get("v.body");
+    			    body.push(newCmp);
+    			    output.set("v.body", body);
+    			    that.setTargetCmp(testCmp, newCmp);
+    			    cmpCreated = true;
+    			}
+            );
 			$A.test.addWaitFor(true, function() {
 			    return cmpCreated;
 			});
@@ -1448,25 +1434,23 @@
     */
     testClientCreatedServerProvidedGrandChildClientProvider : {
         test : [function(testCmp) {
-            var componentConfig = {
-                componentDef : "markup://auratest:componentClassServerProvider",
-                attributes : {
-                    values : {
-                        requestDescriptor : "markup://auratest:componentClassGrandChildClientProvider",
-                        id : "ClientCreatedServerProvidedGrandChildClientProvider"
-                    }
-                }
-            };
             var that = this;
 			var cmpCreated = false;
-			$A.componentService.newComponentAsync(that, function(newCmp) {
-			    var output = testCmp.find("client");
-			    var body = output.get("v.body");
-			    body.push(newCmp);
-			    output.set("v.body", body);
-			    that.setTargetCmp(testCmp, newCmp);
-			    cmpCreated = true;
-			}, componentConfig, null, true, true);
+            $A.createComponent(
+                "auratest:componentClassServerProvider",
+                {
+                    requestDescriptor : "markup://auratest:componentClassGrandChildClientProvider",
+                    id : "ClientCreatedServerProvidedGrandChildClientProvider"
+                },
+    			function(newCmp) {
+    			    var output = testCmp.find("client");
+    			    var body = output.get("v.body");
+    			    body.push(newCmp);
+    			    output.set("v.body", body);
+    			    that.setTargetCmp(testCmp, newCmp);
+    			    cmpCreated = true;
+    			}
+            );
 			$A.test.addWaitFor(true, function() {
 			    return cmpCreated;
 			});
@@ -1492,25 +1476,23 @@
     */
     testClientCreatedClientProvidedGrandChildClientProvider : {
         test : [function(testCmp) {
-            var componentConfig = {
-                componentDef : "markup://auratest:componentClassClientProvider",
-                attributes : {
-                    values : {
-                        requestDescriptor : "markup://auratest:componentClassGrandChildClientProvider",
-                        id : "ClientCreatedClientProvidedGrandChildClientProvider"
-                    }
-                }
-            };
             var that = this;
 			var cmpCreated = false;
-			$A.componentService.newComponentAsync(that, function(newCmp) {
-			    var output = testCmp.find("client");
-			    var body = output.get("v.body");
-			    body.push(newCmp);
-			    output.set("v.body", body);
-			    that.setTargetCmp(testCmp, newCmp);
-			    cmpCreated = true;
-			}, componentConfig, null, true, true);
+            $A.createComponent(
+                "auratest:componentClassClientProvider",
+                {
+                    requestDescriptor : "markup://auratest:componentClassGrandChildClientProvider",
+                    id : "ClientCreatedClientProvidedGrandChildClientProvider"
+                },
+    			function(newCmp) {
+    			    var output = testCmp.find("client");
+    			    var body = output.get("v.body");
+    			    body.push(newCmp);
+    			    output.set("v.body", body);
+    			    that.setTargetCmp(testCmp, newCmp);
+    			    cmpCreated = true;
+    			}
+            );
 			$A.test.addWaitFor(true, function() {
 			    return cmpCreated;
 			});

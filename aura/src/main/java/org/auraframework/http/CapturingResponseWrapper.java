@@ -34,8 +34,8 @@ public class CapturingResponseWrapper extends HttpServletResponseWrapper {
 
     public String getCapturedResponseString() throws IOException {
         flushBuffer();
-        writer.flush();
-        outputStream.flush();
+        getWriter().flush();
+        getOutputStream().flush();
         return buffer.toString();
     }
 

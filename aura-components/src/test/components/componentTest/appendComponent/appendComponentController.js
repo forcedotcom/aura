@@ -15,21 +15,16 @@
  */
 ({
     appendComponent: function(cmp) {
-        $A.componentService.newComponentAsync(
-            this,
+        $A.createComponent(
+            cmp.get("v.descriptor"),
+            {
+                value : cmp.get("v.value")
+            },
             function(newCmp) {
             	var outputAtrr = cmp.get("v.output");
             	outputAtrr.push(newCmp);
             	cmp.set("v.output", outputAtrr);
-            },
-        	{
-                componentDef: {
-                    descriptor: cmp.get("v.descriptor")
-                },
-                attributes: {
-                    values: { value : cmp.get("v.value") }
-                }
-            }, null, null, null
+            }
         );
     }
 });

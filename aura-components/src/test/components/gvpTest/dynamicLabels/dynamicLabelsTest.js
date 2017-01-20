@@ -4,8 +4,8 @@
      */
     testNewLabelsInDynamicComponent:{
         test:function(cmp){
-            $A.componentService.newComponentAsync(
-                this,
+            $A.createComponent(
+                "gvpTest:newLabels", {},
                 function(newCmp){
                     // Component should be sent back from server with necessary labels
                     $A.test.assertEquals("Today", $A.get("$Label.Related_Lists.task_mode_today"),
@@ -13,9 +13,6 @@
                     $A.test.assertEquals("Today + Overdue", $A.get("$Label.Related_Lists.task_mode_today_overdue"),
                         "Failed to add all labels from dynamically created components");
                     cmp.find("container").set("v.body", newCmp);
-                },
-                {
-                    componentDef: "gvpTest:newLabels"
                 }
             );
 
@@ -34,16 +31,13 @@
      */
     testNewLabelsInInnerComponent: {
         test:function(cmp) {
-            $A.componentService.newComponentAsync(
-                this,
+            $A.createComponent(
+                "gvpTest:newLabels", {},
                 function(newCmp) {
                     // Component should be sent back from server with necessary labels
                     $A.test.assertEquals("Tomorrow", $A.get("$Label.Related_Lists.task_mode_tomorrow"),
                         "Failed to add labels from inner cmp on dynamically created component");
                     cmp.find("container").set("v.body", newCmp);
-                },
-                {
-                    componentDef: "gvpTest:newLabels"
                 }
             );
 
@@ -62,8 +56,8 @@
      */
     testNewLabelsInDependencyComponent: {
         test:function(cmp) {
-            $A.componentService.newComponentAsync(
-                this,
+            $A.createComponent(
+                "gvpTest:newLabels", {},
                 function(newCmp) {
                     // Component should be sent back from server with necessary labels
                     $A.test.assertEquals("Controller", $A.get("$Label.Section1.controller"),
@@ -75,9 +69,6 @@
                     $A.test.assertEquals("Renderer", $A.get("$Label.Section1.renderer"),
                         "Failed to add labels from declared dependency on dynamically created component");
                     cmp.find("container").set("v.body", newCmp);
-                },
-                {
-                    componentDef: "gvpTest:newLabels"
                 }
             );
 
@@ -128,18 +119,19 @@
 
     testLabelIsLoadedToClientWhenCreatingComponent: {
         test: function(cmp){
-                $A.createComponent("gvpTest:newLabels",null,function(newCmp, state) {
-                        $A.test.assertEquals("SUCCESS", state);
-                    });
+            $A.createComponent("gvpTest:newLabels", null, function(newCmp, state) {
+                $A.test.assertEquals("SUCCESS", state);
+            });
 
-                $A.test.addWaitFor(false, $A.test.isActionPending,
-                    function() {
-                        // since the label is loaded to client when creating component,
-                        // the label should be directly returned.
-                        var actualLabel = $A.get("$Label.Related_Lists.task_mode_today_overdue");
-                        $A.test.assertEquals("Today + Overdue", actualLabel,
-                                "The label doesn't exist in client LabelValueProvider.");
-                    });
+            $A.test.addWaitFor(false, $A.test.isActionPending,
+                function() {
+                    // since the label is loaded to client when creating component,
+                    // the label should be directly returned.
+                    var actualLabel = $A.get("$Label.Related_Lists.task_mode_today_overdue");
+                    $A.test.assertEquals("Today + Overdue", actualLabel,
+                            "The label doesn't exist in client LabelValueProvider.");
+                }
+            );
         }
     }
 })

@@ -18,18 +18,12 @@
         var desc = cmp.get("v.newDescriptor");
         var attStr = cmp.get("v.newAttributes");
         var atts = eval("false||"+attStr);
-        var config = { componentDef:desc, attributes:{ values:atts } };
-        $A.componentService.newComponentAsync(
-            this,
+        $A.createComponent(desc, atts,
             function(newCmp){
             	var body = cmp.get("v.body"); 
                 body.unshift(newCmp);
                 cmp.set("v.body", body);
-            },
-            config,
-            null,
-            true,
-            false
+            }
         );
     }
 })

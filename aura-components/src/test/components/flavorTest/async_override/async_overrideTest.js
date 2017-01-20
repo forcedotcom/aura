@@ -23,8 +23,8 @@
             var addedCmp;
 
             // dynamically load a cmp
-            $A.componentService.newComponentAsync(
-                this,
+            $A.createComponent(
+                "flavorTest:x_sample", {},
                 function(newCmp){
                     addedCmp = newCmp;
                     //Add the new cmp to the body array
@@ -32,8 +32,6 @@
                     body.push(newCmp);
                     cmp.set("v.body", body);
                     loaded = true;
-                }, {
-                    "componentDef": "markup://flavorTest:x_sample"
                 }
             );
 

@@ -78,14 +78,13 @@
     testNewComponentFiresInit:{
         test:function(cmp){
             $A.run(function() {
-                $A.componentService.newComponentAsync(
-                    this,
+                $A.createComponent(
+                    "valueChange:newComponentInit", {},
                     function(newCmp){
                         var body = cmp.get("v.body");
                         body.push(newCmp);
                         cmp.set("v.body", body);
-                    },
-                    { componentDef: "markup://valueChange:newComponentInit" }
+                    }
                 );
                 $A.test.addWaitFor(false, $A.test.isActionPending, function(){
                     var newCmp = cmp.get('v.body')[0];

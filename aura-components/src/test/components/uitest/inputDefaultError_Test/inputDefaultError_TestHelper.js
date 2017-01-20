@@ -18,21 +18,20 @@
 
     // Extracting out the ability to create this new inputDefaultError
     createNewCmp : function(cmp, lblAide) {
-        $A.componentService.newComponentAsync(this, function(newcmp) {
-            var propsArea = cmp.find("propsArea");
-            var body = propsArea.get("v.body");
-            body.push(newcmp);
-            propsArea.set("v.body", body);
-        }, {
-            "componentDef" : "markup://uitest:inputDefaultErrorDynamic_test",
-            "attributes" : {
-                "values" : {
-                    label : "Label" + lblAide,
-                    value : "123",
-                    name : "Label" + lblAide,
-                    newClass : "class" + lblAide
-                }
+        $A.createComponent(
+            "uitest:inputDefaultErrorDynamic_test",
+            {
+                label : "Label" + lblAide,
+                value : "123",
+                name : "Label" + lblAide,
+                newClass : "class" + lblAide
+            },
+            function(newcmp) {
+                var propsArea = cmp.find("propsArea");
+                var body = propsArea.get("v.body");
+                body.push(newcmp);
+                propsArea.set("v.body", body);
             }
-        });
+        );
     }
 })

@@ -22,13 +22,10 @@
     insertClientSide : function(cmp) {
         var finished = false;
 
-        $A.componentService.newComponentAsync(this, function(newCmp) {
-                cmp.find("insertion").set("v.body", [ newCmp ]);
-                finished = true;
-            },
-            {
-                "componentDef": "gvpTest:voiceOverTest"
-            });
+        $A.createComponent("gvpTest:voiceOverTest", {}, function(newCmp) {
+            cmp.find("insertion").set("v.body", [ newCmp ]);
+            finished = true;
+        });
         // wait for our component to be inserted.
         $A.test.addWaitFor(true, function() {
             return finished

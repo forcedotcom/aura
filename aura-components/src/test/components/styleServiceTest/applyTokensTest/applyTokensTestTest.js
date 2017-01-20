@@ -180,8 +180,8 @@
             var addedCmp;
 
             // dynamically load a cmp
-            $A.componentService.newComponentAsync(
-                this,
+            $A.createComponent(
+                "styleServiceTest:asyncLoaded", {},
                 function(newCmp){
                     addedCmp = newCmp;
                     //Add the new cmp to the body array
@@ -193,9 +193,6 @@
                     $A.styleService.applyTokens("styleServiceTest:colorTokens1", {
                         callback: function() {loaded = true}
                     });
-                },
-                {
-                    "componentDef": "markup://styleServiceTest:asyncLoaded"
                 }
             );
 

@@ -129,46 +129,5 @@
 			var cmpFromComponentClass = $A.componentService.getComponentClass(type);
         	$A.test.assertTrue(newCmp instanceof cmpFromComponentClass);
 		}
-	},
-
-	testNewComponentAsyncReturnCorrectType : {
-		test: function(testCmp) {
-			var type = "markup://aura:text";
-			$A.componentService.newComponentAsync(
-                this,
-                function(newCmp){
-                	var cmpFromComponentClass = $A.componentService.getComponentClass(type);
-                	$A.test.assertTrue(newCmp instanceof cmpFromComponentClass);
-                },
-                type
-            );
-		}
-	},
-
-	testNewComponentAsyncServerDependencyReturnCorrectType : {
-		test: function(testCmp) {
-			var type="markup://auratest:componentClassUnloaded";
-			var done = false;
-			var newComponent;
-			$A.test.addWaitForWithFailureMessage(true,
-        			function() {
-						return done;
-					},
-					"createComponent fail to get us a new component",
-					function() {
-						var cmpFromComponentClass = $A.componentService.getComponentClass(type);
-						$A.test.assertTrue(newComponent instanceof cmpFromComponentClass);
-					}
-			);
-			$A.componentService.newComponentAsync(
-	                this,
-	                function(newCmp){
-	                	newComponent = newCmp;
-	                	done = true;
-	                },
-	                type
-	        );
-		}
 	}
-
 })

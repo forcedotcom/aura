@@ -17,15 +17,18 @@
     createComponent: function(cmp) {
         var a = cmp.get('c.getString');
         a.setCallback(cmp, function (a) {
-            $A.componentService.newComponentAsync(
-                this, function (newCmp) {
+            $A.createComponent(
+                "aura:text",
+                {
+                    value : a.getReturnValue()
+                },
+                function (newCmp) {
                     var dataFromController=cmp.find('dataFromController');
                     var body=dataFromController.get('v.body');
                     body.push(newCmp);
                     dataFromController.set("v.body",body);
-                },
-                {componentDef: 'markup://aura:text', attributes: { values: { value: a.getReturnValue() }}}
-            )
+                }
+            );
         });
         $A.enqueueAction(a);
     },

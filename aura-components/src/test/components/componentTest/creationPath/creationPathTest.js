@@ -18,7 +18,11 @@
 
     assertCreationPath : function(cmp, path, msg) {
         var cp = $A.test.getCreationPath(cmp);
-        $A.test.assertEquals(path, cp.substring(cp.indexOf("/")), msg); 
+        if (path) {
+            $A.test.assertEquals(path, cp.substring(cp.indexOf("/")), msg);    
+        } else {
+            $A.test.assertEquals(path, cp, msg);
+        }
     },
     
     addComponent : function(root, cmp, descriptor, value) {
@@ -206,7 +210,7 @@
             this.addComponent(cmp, cmp.find("iterinst"), "aura:text", "hi");
         }, function(cmp) {
             $A.test.assertEqualsIgnoreWhitespace("0 - hi", $A.test.getText(cmp.find("iterinst").find("output").getElement()));
-            this.assertCreationPath(cmp.find("iterinst").get("v.output")[0], "client created");
+            this.assertCreationPath(cmp.find("iterinst").get("v.output")[0], undefined);
         }]
     },
 
@@ -215,12 +219,12 @@
             this.addComponent(cmp, cmp.find("iterinst"), "aura:text", "a");
         }, function(cmp) {
             $A.test.assertEqualsIgnoreWhitespace("0 - a", $A.test.getText(cmp.find("iterinst").find("output").getElement()));
-            this.assertCreationPath(cmp.find("iterinst").get("v.output")[0], "client created");
+            this.assertCreationPath(cmp.find("iterinst").get("v.output")[0], undefined);
             
             this.addComponent(cmp, cmp.find("iterinst"), "aura:text", "bb");
         }, function(cmp) {
             $A.test.assertEqualsIgnoreWhitespace("0 - abb", $A.test.getText(cmp.find("iterinst").find("output").getElement()));
-            this.assertCreationPath(cmp.find("iterinst").get("v.output")[1], "client created");
+            this.assertCreationPath(cmp.find("iterinst").get("v.output")[1], undefined);
         }]
     },
 

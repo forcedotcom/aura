@@ -17,16 +17,16 @@
     testNewComponentFromServerWithDefaultValues:{
         test:function(cmp){
         	$A.run(function(){
-	            $A.componentService.newComponentAsync(
-	                this,
+	            $A.createComponent(
+	                "attributesTest:defaultValue",
+	                {},
 	                function(newCmp){
 	                	var body = cmp.get("v.body");
 	                	body.push(newCmp);
 	                	cmp.set("v.body", body);
-	                },
-	                "attributesTest:defaultValue"
+	                }
 	            );
-            })
+            });
             
             $A.test.addWaitFor(false, $A.test.isActionPending, function(){
             	var body = cmp.get('v.body');

@@ -61,10 +61,14 @@
      */
     testClientProvidedDescriptorNotPreloadedError:{
         test:function(cmp){
-            var config = { componentDef:"markup://provider:clientProvider",
-                           attributes:{ values:{ value:'attributesTest:parent'} } };
             try{
-                $A.componentService.newComponentAsync(this, function(){}, config, null, true, false);
+                $A.createComponent(
+                    "provider:clientProvider",
+                    {
+                        value:"attributesTest:parent"
+                    },
+                    function(){}
+                );
                 $A.test.fail("ERROR: Expecting exception when provider return non-loaded componentDef");
             } catch (e){
                 $A.test.assertEquals("Assertion Failed!: No definition for provided component: markup://provider:clientProvider : false", e.message);
@@ -149,9 +153,14 @@
      */
     testClientProvidedUnknownDescriptor:{
         test:function(cmp){
-            var config = { componentDef:"markup://provider:clientProvider", attributes:{ values:{ value:'arrested:development'} } };
             try{
-                $A.componentService.newComponentAsync(this, function(){}, config, null, true, false);
+                $A.createComponent(
+                    "provider:clientProvider",
+                    {
+                        value:"arrested:development"
+                    },
+                    function(){}
+                );
                 $A.test.fail("Expected error to be thrown during new component creation");
             } catch (e){
                 $A.test.assertEquals("Assertion Failed!: No definition for provided component: markup://provider:clientProvider : false", e.message);
@@ -164,14 +173,15 @@
      */
     testClientProvidedNullDescriptor:{
         test:function(cmp){
-            var config = { componentDef:"markup://provider:clientProvider", attributes:{ values:{ value:null} } };
-            $A.componentService.newComponentAsync(
-                this,
+            $A.createComponent(
+                "provider:clientProvider",
+                {
+                    value: null
+                },
                 function(newCmp){
                     $A.test.assertEquals("markup://provider:clientProvider", newCmp.getDef().getDescriptor().getQualifiedName());
                     $A.test.assertEquals(null, newCmp.get("v.value"));
-                },
-                config, null, true, false
+                }
             );
         }
     },
@@ -181,14 +191,15 @@
      */
     testClientProvidedUndefinedDescriptor:{
         test:function(cmp){
-            var config = { componentDef:"markup://provider:clientProvider", attributes:{ values:{ value:undefined} } };
-            $A.componentService.newComponentAsync(
-                this,
+            $A.createComponent(
+                "provider:clientProvider",
+                {
+                    value : undefined
+                },
                 function(newCmp){
                     $A.test.assertEquals("markup://provider:clientProvider", newCmp.getDef().getDescriptor().getQualifiedName());
                     $A.test.assertEquals(undefined, newCmp.get("v.value"));
-                },
-                config, null, true, false
+                }
             );
         }
     },

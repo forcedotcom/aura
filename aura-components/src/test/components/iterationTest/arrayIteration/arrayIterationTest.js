@@ -19,19 +19,14 @@
      */
     testClientSideCmpCreationPreloaded: {
         test:function(cmp) {
-            $A.componentService.newComponentAsync(
-                this,
+            $A.createComponent(
+                "iterationTest:arrayIterationPreloaded",
+                {
+                    "value" : ['one string', 'two string', 'red string', 'blue string']
+                },
                 function(newCmp) {
                     cmp.set("v.newCmp", newCmp);
                     $A.rerender(cmp);
-                },
-                {
-                "componentDef": "markup://iterationTest:arrayIterationPreloaded",
-                "attributes": {
-                        "values": {
-                            "value" : ['one string', 'two string', 'red string', 'blue string']
-                        }
-                    }
                 }
             );
 
@@ -50,17 +45,16 @@
     testClientSideCmpCreationNotPreloaded: {
         test:function(cmp) {
             $A.run(function(){
-                $A.componentService.newComponentAsync(this, function(newCmp){
-                    cmp.set("v.newCmp", newCmp);
-                    $A.rerender(cmp);
-                }, {
-                    "componentDef": "markup://iterationTest:arrayIterationNotPreloaded",
-                    "attributes": {
-                        "values": {
-                            "value": ['one string', 'two string', 'red string', 'blue string']
-                        }
+                $A.createComponent(
+                    "iterationTest:arrayIterationNotPreloaded",
+                    {
+                        "value": ['one string', 'two string', 'red string', 'blue string']
+                    },
+                    function(newCmp){
+                        cmp.set("v.newCmp", newCmp);
+                        $A.rerender(cmp);
                     }
-                });
+                );
             });
 
             // Non-preloaded cmp creation will be asynchronous so add a wait here.

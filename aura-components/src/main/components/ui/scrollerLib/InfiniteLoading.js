@@ -54,7 +54,10 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 this.opts.infiniteLoadingConfig
             );
         },
-       _createInfiniteLoadingMarkup: function () {
+        _getTemplate: function () {
+            return this.opts.infiniteLoadingConfig.template;
+        },
+        _createInfiniteLoadingMarkup: function () {
             var il_container = w.document.createElement('div'),
                 label        = document.createElement('span'),
                 idleLabel    = this.opts.infiniteLoadingConfig.labelIdle;
@@ -62,7 +65,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             label.className        = CLASS_IDLE;
             label.textContent      = idleLabel;
             il_container.className = 'infinite-loading';
-            
+
             il_container.appendChild(label);
 
             return il_container;
@@ -76,9 +79,17 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 return;
             }
 
-            this.on('scrollMove', thresholdCheck);
-            this.on('scrollEnd',  thresholdCheck);
-            this._itemsThreshold = this.items && this.items.length || 10;
+            var template = this._getTemplate();
+            if (!(template && template.get("v.manualLoad"))) {
+                this.on('scrollMove', thresholdCheck);
+                this.on('scrollEnd', thresholdCheck);
+                this._itemsThreshold = this.items && this.items.length || 10;
+            }
+            else if (template) {
+                template.set("v.manualLoadTrigger", $A.getCallback(function() {
+                    this._triggerInfiniteLoadingDataProvider();
+                }.bind(this)));
+            }
 
             this._appendInfiniteLoading();
             this._setSize();
@@ -93,23 +104,33 @@ function lib(w) { //eslint-disable-line no-unused-vars
             }
         },
         _appendInfiniteLoading: function () {
-            var il_container = this._createInfiniteLoadingMarkup(),
-                target       = this.scroller;
+            var template   = this._getTemplate();
 
-            target.appendChild(il_container);
+            if (!template) {
+                var il_container = this._createInfiniteLoadingMarkup(),
+                    target       = this.scroller;
 
-            this.ilDOM   = il_container;
-            this.ilLabel = il_container.firstChild;
-            this._ilSize = il_container.offsetHeight; //relayout
+                target.appendChild(il_container);
+
+                this.ilDOM   = il_container;
+                this.ilLabel = il_container.firstChild;
+                this._ilSize = il_container.offsetHeight; //relayout
+            }
         },
         _setState: function (loading) {
             this._loading = loading;
-            if (loading) {
-                this.ilDOM.classList.add(CLASS_LOADING);
-                this.ilLabel.textContent = this.opts.infiniteLoadingConfig.labelLoading;
-            } else {
-                this.ilDOM.classList.remove(CLASS_LOADING);
-                this.ilLabel.textContent = this.opts.infiniteLoadingConfig.labelIdle;
+            var template = this._getTemplate();
+            if (template) {
+                template.set("v.loading", loading);
+            }
+            else {
+                if (loading) {
+                    this.ilDOM.classList.add(CLASS_LOADING);
+                    this.ilLabel.textContent = this.opts.infiniteLoadingConfig.labelLoading;
+                } else {
+                    this.ilDOM.classList.remove(CLASS_LOADING);
+                    this.ilLabel.textContent = this.opts.infiniteLoadingConfig.labelIdle;
+                }
             }
         },
         _appendData: function (items) {
@@ -236,15 +257,22 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 this.scroller.style.position = '';
             }.bind(this), 0);
         },
+        _setNoMoreData: function(noMoreData) {
+            this._ilNoMoreData = noMoreData;
+            var template = this._getTemplate();
+            if (template) {
+                template.set("v.hasMoreData", !this._ilNoMoreData);
+            }
+        },
         /* PUBLIC API */
         fetchData: function () {
             this._triggerInfiniteLoadingDataProvider();
         },
         unlockFetchData: function () {
-            this._ilNoMoreData = false;
+            this._setNoMoreData(false);
         },
         lockFetchData: function () {
-            this._ilNoMoreData = true;
+            this._setNoMoreData(true);
         },
         updateLabels:function(payload) {
             if (typeof (payload.labelIdle) !== "undefined") {

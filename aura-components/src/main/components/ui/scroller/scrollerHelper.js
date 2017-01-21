@@ -198,7 +198,14 @@
     },
     _getInfiniteLoadingConfig: function (component) {
         var auraDataProvider   = component.get('v.infiniteLoadingDataProvider'),
-            dataProviderBridge = auraDataProvider && this._bind(this._bridgeScrollerCallback, component, auraDataProvider);
+            dataProviderBridge = auraDataProvider && this._bind(this._bridgeScrollerCallback, component, auraDataProvider),
+            templates = component.get("v.infiniteLoadingTemplate"),
+            template = (templates && templates.length==1)?templates[0]:null;
+
+        if (template && !template.isInstanceOf("ui:infiniteLoading")) {
+            $A.warning("Infinite Loading Template must implement ui:infiniteLoading.");
+            template = null; // fallback to the default
+        }
 
         return {
             threshold    : component.get('v.infiniteLoadingThreshold'),
@@ -206,7 +213,8 @@
             autoFillPage : component.get('v.infiniteLoadingAutoFillPage'),
             labelNoData  : component.get("v.infiniteLoadingNoDataLabel"),
             labelIdle    : component.get("v.infiniteLoadingIdleLabel"),
-            labelLoading : component.get("v.infiniteLoadingLoadingLabel")
+            labelLoading : component.get("v.infiniteLoadingLoadingLabel"),
+            template     : template
         };
     },
     _getVoiceOverConfig: function (component) {

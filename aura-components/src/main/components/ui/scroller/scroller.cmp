@@ -64,7 +64,8 @@
 	<aura:attribute name="infiniteLoadingAutoFillPage" type="Boolean"     default="false"               	description="Enable auto trigger data provider when there is empty space"/>
 	<aura:attribute name="infiniteLoadingNoDataLabel"  type="String"      default="No more data to display" description="The text to display when no more data is available to be shown"/>
 	<aura:attribute name="infiniteLoadingIdleLabel"	   type="String"      default="" 						description="The text to display when no loading is happening"/>
-	<aura:attribute name="infiniteLoadingLoadingLabel" type="String"	  default="Loading more..." 		description="The text to display while the infinite loading callback is invoked"/>
+    <aura:attribute name="infiniteLoadingLoadingLabel" type="String"	  default="Loading more..." 		description="The text to display while the infinite loading callback is invoked"/>
+    <aura:attribute name="infiniteLoadingTemplate"     type="Aura.Component[]"                              description="If set this component is used to display loading more data instead of the default markup"/>
 
     <!--Labels pullToShowMore -->
     <aura:attribute name="pullToShowMoreClick"    type="String" default="Tap to show more"           description="The text before the user pulls clicks to refresh content"/>
@@ -106,6 +107,7 @@
     <div aura:id="scrollWrapper" class="{!v.class}" style="{! (v.width ? ('width: ' + v.width + 'px;'): '') + (v.height? ('height: ' + v.height + 'px') : '') }">
         <div aura:id="scrollContent" class="{!v.scrollContentClass}">
             {!v.body}
+            {!v.infiniteLoadingTemplate}
         </div>
     </div>
 </aura:component>

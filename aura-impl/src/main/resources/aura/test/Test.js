@@ -47,7 +47,7 @@ function TestInstance() {
     this.installOverride();
     this.name = undefined;
     
-    //borrow Aura.time if it's there, if not, pollyfill 
+    //borrow Aura.time if it's there, if not, polyfill 
     this.time = 
     	(window['Aura'] && Aura.time && Aura.time instanceof Function)?
     	Aura.time:(
@@ -1800,13 +1800,13 @@ TestInstance.prototype.addPrePostSendCallback = function (action, preSendCallbac
         throw new Error("TestInstance.addPrePostSendCallback: one of the callback must be not-null");
     }
     if (preSendCallback !== null && preSendCallback !== undefined) {
-        if (!(preSendCallback instanceof Function)) {
+        if (!($A.util.isFunction(preSendCallback))) {
             throw new Error("TestInstance.addPrePostSendCallback: preSendCallback must be a function"
                 +preSendCallback);
         }
     }
     if (postSendCallback !== null && postSendCallback !== undefined) {
-        if (!(postSendCallback instanceof Function)) {
+        if (!($A.util.isFunction(postSendCallback))) {
             throw new Error("TestInstance.addPrePostSendCallback: preSendCallback must be a function"
                 +postSendCallback);
         }

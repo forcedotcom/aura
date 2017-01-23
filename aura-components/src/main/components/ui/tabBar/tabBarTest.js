@@ -14,92 +14,88 @@
  * limitations under the License.
  */
 ({
-    
-    testActiveTabOnLoad : {
-        attributes : {"tabs" : [{
-                       "componentDef": "markup://ui:tabItem",
-                       "attributes": {
-                           "values": {
-                               "title": "tabOne",
-                               "name": "tabOne"
-                           }
-                       }
-                   },{
-                       "componentDef": "markup://ui:tabItem",
-                       "attributes": {
-                           "values": {
-                               "title": "tabTwo",
-                               "name": "tabTwo",
-                               "active": true
-                           }
-                       }
-                   }
-                   ]},
-        test : function(cmp){
+
+    testActiveTabOnLoad: {
+        attributes: {
+            "tabs": [{
+                "descriptor": "markup://ui:tabItem",
+                "attributes": {
+                    "title": "tabOne",
+                    "name": "tabOne"
+                }
+            }, {
+                "descriptor": "markup://ui:tabItem",
+                "attributes": {
+                    "title": "tabTwo",
+                    "name": "tabTwo",
+                    "active": true
+                }
+            }
+            ]
+        },
+        test: function (cmp) {
             var page = this.newPageObject(cmp);
-            
+
             $A.test.assertEquals("tabTwo", page.getActiveTabTitle(), "Wrong tab or no tab was marked as active.");
         }
     },
-    
-    testTabMovesActiveOnSwitch : {
-        attributes : {"tabs" : [{
-                       "componentDef": "markup://ui:tabItem",
-                       "attributes": {
-                           "values": {
-                               "title": "tabOne",
-                               "name": "tabOne",
-                               "active": true
-                           }
-                       }
-                   },{
-                       "componentDef": "markup://ui:tabItem",
-                       "attributes": {
-                           "values": {
-                               "title": "tabTwo",
-                               "name": "tabTwo"
-                           }
-                       }
-                   }]},
-        test : function(cmp){
+
+    testTabMovesActiveOnSwitch: {
+        attributes: {
+            "tabs": [{
+                "descriptor": "markup://ui:tabItem",
+                "attributes": {
+                    "title": "tabOne",
+                    "name": "tabOne",
+                    "active": true
+                }
+            }, {
+                "descriptor": "markup://ui:tabItem",
+                "attributes": {
+                    "title": "tabTwo",
+                    "name": "tabTwo"
+                }
+            }]
+        },
+        test: function (cmp) {
             var page = this.newPageObject(cmp);
-            
-            page.setActiveTabByIndex(1, function() {
-                
+
+            page.setActiveTabByIndex(1, function () {
+
                 // Assert
                 $A.test.assertEquals("tabTwo", page.getActiveTabTitle(), "Wrong tab or no tab was marked as active.");
             }, "Failed switching active to the second tab.");
         }
     },
-    
-    newPageObject: function(cmp) {
-        
+
+    newPageObject: function (cmp) {
+
         return {
-            getActiveTabTitle: function() {
+            getActiveTabTitle: function () {
                 var element = cmp.getElement().querySelectorAll(".uiTabItem.active a");
-                
-                if(!element) {
+
+                if (!element) {
                     throw new Error("No tabItems marked as active");
                 }
-                
-                if(element.length !== 1) {
-                    throw new Error("More than one tabItem was marked as active"); 
+
+                if (element.length !== 1) {
+                    throw new Error("More than one tabItem was marked as active");
                 }
-                
+
                 return element[0].getAttribute("title");
             },
-            
-            setActiveTabByIndex: function(index, callback, errorMessage) {
-               cmp.get("e.setActive").fire({index: index, active: true});
-               
-               var targetTab = cmp.getElement().querySelectorAll(".uiTabItem")[index];
-                
-               $A.test.addWaitForWithFailureMessage(true, function() {
-                   return targetTab.classList.contains("active");
-               }, errorMessage, callback);
+
+            setActiveTabByIndex: function (index, callback, errorMessage) {
+                cmp.get("e.setActive").fire({index: index, active: true});
+
+                var targetTab = cmp.getElement().querySelectorAll(".uiTabItem")[index];
+
+                $A.test.addWaitForWithFailureMessage(true, function () {
+                    return targetTab.classList.contains("active");
+                }, errorMessage, callback);
             }
         };
     }
-/*eslint-disable semi*/
+    /*eslint-disable semi*/
 })
 /*eslint-enable semi*/

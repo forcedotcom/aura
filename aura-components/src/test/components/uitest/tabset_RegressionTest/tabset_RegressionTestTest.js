@@ -71,7 +71,7 @@
     },
 
     /**
-     * Test updating existing tabs 
+     * Test updating existing tabs
      */
     testUpdateTab: {
         attributes: {
@@ -101,16 +101,12 @@
                 tabSet = cmp.find(self.SELECTOR.tabsetcmp),
                 newIconText = "T",
                 //Using aura:text just to confirm icon was updated since it's of type Aura.Component[]
-                newIcon = [{
-                    "componentDef": {
-                        descriptor: "markup://aura:text"
-                    },
+                newIcon = {
+                    "descriptor": "markup://aura:text",
                     "attributes": {
-                        "values": {
-                            "value": newIconText
-                        }
+                        "value": newIconText
                     }
-                }];
+                };
 
                 self.updateTab(tabSet, 0, undefined, {icon: newIcon});
             }, function(cmp) {
@@ -137,7 +133,7 @@
                     $A.test.addWaitForWithFailureMessage(
                         newBodyText,
                         function() {
-                            var tabbody = $A.test.select(self.SELECTOR.tabbody)[0]; 
+                            var tabbody = $A.test.select(self.SELECTOR.tabbody)[0];
                             return $A.test.getText(tabbody);
                         },
                         "Body should be " + newBodyText
@@ -162,7 +158,7 @@
                     function() {
                         return $A.test.select(self.SELECTOR.tabitem_anchor)[0].title;
                     },
-                    "Title of tab 0 should be " + newTitle0 
+                    "Title of tab 0 should be " + newTitle0
                 );
             }, function(cmp) {
                 var self = this,
@@ -172,7 +168,7 @@
                     function() {
                         return $A.test.select(self.SELECTOR.tabitem_anchor)[1].title;
                     },
-                    "Title of tab 1 should be " + newTitle1 
+                    "Title of tab 1 should be " + newTitle1
                 );
             }
         ]
@@ -210,7 +206,7 @@
                 // close tab manually
                 var self = this,
                 tabSet = cmp.find(self.SELECTOR.tabsetcmp);
-                
+
                 self.closeActiveTab();
 
                 //assertion tab items
@@ -262,19 +258,19 @@
                         cmp.set('v._tabTitle', self.getTabTitlesString());
 
                         $A.test.assertEqualsIgnoreWhitespace(
-                            'tab 0 title', 
+                            'tab 0 title',
                             $A.util.getElementAttributeValue(
                                 $A.test.select(self.SELECTOR.tabitem_anchor)[0],
                                 'title'
-                            ), 
+                            ),
                             '"Tab 0 title" attribute should be populated'
                         );
                         $A.test.assertEqualsIgnoreWhitespace(
-                            'tab 1 title', 
+                            'tab 1 title',
                             $A.util.getElementAttributeValue(
                                 $A.test.select(self.SELECTOR.tabitem_anchor)[1],
                                 'title'
-                            ), 
+                            ),
                             '"Tab 1 title" attribute should be populated'
                         );
                     }
@@ -303,13 +299,13 @@
                         cmp.set('v._tabTitle', self.getTabTitlesString());
 
                         $A.test.assertEqualsIgnoreWhitespace(
-                            'dynamictab<b>dummy html</b>', 
+                            'dynamictab<b>dummy html</b>',
                             $A.util.getElementAttributeValue(
                                 $A.test.select(self.SELECTOR.tabitem_anchor)[2],
                                 'title'
-                            ), 
+                            ),
                             '"dynamictab<b>dummy html</b>" special tab title with HTML encoded'
-                        );                        
+                        );
                     }
                 );
             }
@@ -367,7 +363,7 @@
 
                 //assert dom presence
                 $A.test.assertTruthy(
-                    isDomPresent, 
+                    isDomPresent,
                     curtabitemId + ': should be present in the dom: isDomPresent="' + isDomPresent + '"'
                 );
             },
@@ -388,14 +384,14 @@
                     }
                 );
 
-                
+
                 //assert that tab 1 is of zero width and zero height
                 self.verifyAfterRenderSizeZero(afterRenderWidth, curtabitemId + ': afterRenderWidth:');
                 self.verifyAfterRenderSizeZero(afterRenderHeight, curtabitemId + ': afterRenderHeight:');
 
                 //assert dom presence
                 $A.test.assertFalse(
-                    isDomPresent, 
+                    isDomPresent,
                     curtabitemId + ': should NOT BE present in the dom (because tab0 is currently selected): isDomPresent="' + isDomPresent + '"'
                 );
             }
@@ -454,7 +450,7 @@
 
                 //assert dom presence
                 $A.test.assertTruthy(
-                    isDomPresent, 
+                    isDomPresent,
                     curtabitemId + ': should be present in the dom: isDomPresent="' + isDomPresent + '"'
                 );
             },
@@ -475,14 +471,14 @@
                     }
                 );
 
-                
+
                 //assert that tab 1 is of zero width and zero height
                 self.verifyAfterRenderSizeZero(afterRenderWidth, curtabitemId + ': afterRenderWidth:');
                 self.verifyAfterRenderSizeZero(afterRenderHeight, curtabitemId + ': afterRenderHeight:');
 
                 //assert dom presence
                 $A.test.assertFalse(
-                    isDomPresent, 
+                    isDomPresent,
                     curtabitemId + ': should NOT BE present in the dom (because tab0 is currently selected): isDomPresent="' + isDomPresent + '"'
                 );
             }
@@ -490,7 +486,7 @@
     },
 
 
-    
+
     /**
      * test after tabset render container width and height clipping rectangle.
      * no selected tab on page init
@@ -541,7 +537,7 @@
 
                 //assert dom presence
                 $A.test.assertTruthy(
-                    isDomPresent, 
+                    isDomPresent,
                     curtabitemId + ': should be present in the dom: isDomPresent="' + isDomPresent + '"'
                 );
             },
@@ -562,14 +558,14 @@
                     }
                 );
 
-                
+
                 //assert that tab 1 is of zero width and zero height
                 self.verifyAfterRenderSizeZero(afterRenderWidth, curtabitemId + ': afterRenderWidth:');
                 self.verifyAfterRenderSizeZero(afterRenderHeight, curtabitemId + ': afterRenderHeight:');
 
                 //assert dom presence
                 $A.test.assertFalse(
-                    isDomPresent, 
+                    isDomPresent,
                     curtabitemId + ': should NOT BE present in the dom (because tab0 is currently selected): isDomPresent="' + isDomPresent + '"'
                 );
             }
@@ -679,7 +675,7 @@
         e.setParams({ name: tabName });
         e.fire();
     },
-    
+
     /**
      * @return tab titles separated by " | "
      */

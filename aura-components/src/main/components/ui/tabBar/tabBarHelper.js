@@ -87,13 +87,12 @@
             tab.title && existingTab.set("v.title", tab.title);
 
             if(tab.icon) {
-                $A.componentService.newComponentAsync(this, function(newCmp) {
-                    existingTab.set("v.icon", newCmp);
-                    if(typeof callback === "function") {
-                        callback(existingTab);
-                    }
-                }, tab.icon);
-            } else if(typeof callback === "function") {
+                var icon = $A.createComponentFromConfig(tab.icon);
+                existingTab.set("v.icon", icon);
+                if (typeof callback === "function") {
+                    callback(existingTab);
+                }
+            } else if (typeof callback === "function") {
                 callback(existingTab);
             }
         }
@@ -225,8 +224,9 @@
 
         for (var i = 0; i < len; i++) {
             var config = tabValues.get ? tabValues.get(i) : tabValues[i];
-            $A.componentService.newComponentAsync(this, fn, config, config.valueProvider || cmp);
-            
+            var newComponent = $A.createComponentFromConfig(config);
+            fn(newComponent);
+
         }
         
     },

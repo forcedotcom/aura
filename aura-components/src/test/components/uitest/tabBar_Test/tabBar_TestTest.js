@@ -27,8 +27,8 @@
                 values["active"] = true;
                 values["hidden"] = false;
                 values["closable"] = true;
-                config["attributes"] = { "values" : values };
-                config["componentDef"] = "ui:tabItem";
+                config["attributes"] = values;
+                config["descriptor"] = "markup://ui:tabItem";
 
                 var tabBar = cmp.find("tabBar");
                 tabBar.get("e.addTab").setParams({

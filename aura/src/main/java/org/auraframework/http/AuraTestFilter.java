@@ -30,7 +30,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.RequestDispatcher;
@@ -85,8 +84,8 @@ import com.google.common.collect.Lists;
  * Supports test framework functionality, primarily for jstest mocks.
  */
 @ServiceComponent
-public class AuraTestFilter implements Filter {
-    private static final Log LOG = LogFactory.getLog(AuraTestFilter.class);
+public class AuraTestFilter {
+    private final Log LOG = LogFactory.getLog(AuraTestFilter.class);
 
     private static final int DEFAULT_JSTEST_TIMEOUT = 30;
     private static final String BASE_URI = "/aura";
@@ -160,10 +159,9 @@ public class AuraTestFilter implements Filter {
     }
 
     public AuraTestFilter() {
-        LOG.info("AuraTestFilter.ctor()", new Error("AuraTestFilter.ctor()"));
+        LOG.info(this + " ctor()", new Error());
     }
     
-    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException,
             IOException {
         if (testContextAdapter == null || configAdapter.isProduction()) {
@@ -206,6 +204,7 @@ public class AuraTestFilter implements Filter {
                     Format format = context.getFormat();
                     switch (format) {
                     case HTML:
+                        LOG.info(this + " jstest request: " + request.getRequestURL() + "?" + request.getQueryString(), new Error());
                         TestCaseDef testDef;
                         String targetUri;
                         try {
@@ -258,7 +257,9 @@ public class AuraTestFilter implements Filter {
                         // Pass it on.
                     }
                 } else if (testToRun != null && testToRun.isEmpty()) {
-                    LOG.error("Got an empty test name in request: " + request.getRequestURL() + "?" + request.getQueryString(), new Error("aura.jstestrun empty"));
+                    Object origRequest = request.getAttribute(AuraResourceServlet.ORIG_REQUEST_URI);
+                    LOG.error(this + " empty jstestrun: " + request.getRequestURL() + "?" + request.getQueryString()
+                            + " original request: " + origRequest, new Error());
                 }
 
                 // aurajstest:jstest app is invokable in the following ways:
@@ -302,7 +303,7 @@ public class AuraTestFilter implements Filter {
             testContextAdapter.clear();
         } else {
             if (!contextService.isEstablished()) {
-                LOG.error("Aura context is not established! New context will NOT be created.");
+                LOG.error(this + " Aura context is not established! New context will NOT be created.");
                 chain.doFilter(request, response);
                 return;
             }
@@ -314,9 +315,8 @@ public class AuraTestFilter implements Filter {
         chain.doFilter(request, response);
     }
 
-    @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-    	LOG.info("AuraTestFilter.init()", new Error("AuraTestFilter.init()"));
+    	LOG.info(this + " init()", new Error());
         servletContext = filterConfig.getServletContext();
         processInjection(filterConfig);
     }
@@ -325,10 +325,6 @@ public class AuraTestFilter implements Filter {
         if (testContextAdapter == null) {
             SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, servletContext);
         }
-    }
-
-    @Override
-    public void destroy() {
     }
 
     @SuppressWarnings("unchecked")
@@ -393,7 +389,7 @@ public class AuraTestFilter implements Filter {
         if (testName == null) {
             // This must be set in a forwarded request because the query string is merged and a non-empty value would
             // cause a loop
-        	LOG.info("AuraTestFilter.createURI()", new Error("testName was null"));
+        	LOG.info(this + " createURI(): null testName", new Error());
             testName = "";
         }
         
@@ -418,7 +414,7 @@ public class AuraTestFilter implements Filter {
                 }
                 context.addDynamicDef(def);
             } catch (Throwable t) {
-                LOG.error("Failed to add mock " + def, t);
+                LOG.error(this + " Failed to add mock " + def, t);
                 error = true;
             }
         }

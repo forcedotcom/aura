@@ -18,7 +18,11 @@ Function.RegisterNamespace("Test.Aura.Locker");
 [Fixture]
 Test.Aura.Locker.LockerKeyManagerTest = function() {
 
-    [Import("aura-impl/src/main/resources/aura/locker/LockerKeyManager.js")]
+	Mocks.GetMocks(Object.Global(), {
+        "Proxy": function() {}
+    })(function() {
+    	[Import("aura-impl/src/main/resources/aura/locker/LockerKeyManager.js")]
+    });
 
     [Fixture]
     function testSetKey() {

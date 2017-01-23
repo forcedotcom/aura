@@ -36,8 +36,17 @@ var ls_getKey,
     ls_getFromCache;
 
 (function LockerKeyManager() {
+	var substituteMapForWeakMap = false;
+	if (typeof WeakMap !== "undefined") {
+		// Test for the Edge weakmap with proxies bug https://github.com/Microsoft/ChakraCore/issues/1662
+		var map = new WeakMap();
+		var proxyAsKey = new Proxy({}, {});
+		map.set(proxyAsKey, true);
+		substituteMapForWeakMap = map.get(proxyAsKey) !== true;
+	}
+	
     function newWeakMap() {
-        return typeof WeakMap !== "undefined" ? new WeakMap() : {
+        return typeof WeakMap !== "undefined" ? (!substituteMapForWeakMap ? new WeakMap() : new Map()) : {
             /* WeakMap dummy polyfill */
             "get" : function() {
                 return undefined;
@@ -149,7 +158,7 @@ var ls_getKey,
     ls_getRef = function(st, key, skipOpaque) {
         var toKey = keychain.get(st);
         if (toKey !== key || (skipOpaque && opaqueSecure.get(st))) {
-            throw new Error("Access denied: " + JSON.stringify({
+        	throw new Error("Access denied: " + JSON.stringify({
                 from : key,
                 to : toKey
             }));

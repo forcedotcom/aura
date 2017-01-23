@@ -76,16 +76,21 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 return;
             }
 
-            if (ilConfig.autoFillPage) {
-                this.on('_refresh', thresholdCheck);
-            }
-
             this.on('scrollMove', thresholdCheck);
             this.on('scrollEnd',  thresholdCheck);
             this._itemsThreshold = this.items && this.items.length || 10;
 
             this._appendInfiniteLoading();
             this._setSize();
+
+            // option to automatically trigger data provider when a scrollbar 
+            // doesnt exist even though there are more data to load
+            if (ilConfig.autoFillPage) {
+                // initial loading might not fire a refresh event when user loads
+                // data before rendering
+                thresholdCheck.call(this);
+                this.on('_refresh', thresholdCheck);
+            }
         },
         _appendInfiniteLoading: function () {
             var il_container = this._createInfiniteLoadingMarkup(),

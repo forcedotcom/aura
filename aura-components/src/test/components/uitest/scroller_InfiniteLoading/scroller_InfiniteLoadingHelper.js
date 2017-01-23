@@ -1,8 +1,19 @@
 ({
-	generateListItems: function(startIndex, listSize, callback) {
-		for (var i = startIndex; i < listSize; i++) {
-			callback(this.generateListItem(i), i);
+    renderItemsToDom: function(div, items) {
+		var fragment = document.createDocumentFragment();
+		for (var i = 0; i < items.length; i++) {
+			fragment.appendChild(items[i]);
 		}
+		div.appendChild(fragment);
+    },
+
+	generateListItems: function(startIndex, numItems, itemCallback, doneCallback) {
+		for (var i = startIndex; i < numItems; i++) {
+			itemCallback(this.generateListItem(i), i);
+        }
+        if (doneCallback) {
+            doneCallback();
+        }
 	},
 	
 	generateListItem: function(index) {

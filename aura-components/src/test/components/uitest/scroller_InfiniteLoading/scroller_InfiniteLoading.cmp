@@ -17,17 +17,22 @@
 -->
 <aura:component description="A test scroller.">
 
-	<aura:attribute name="initialSize" type="Integer" default="40"/>
-	<aura:attribute name="loadDelay_ms" type="Integer" default="250" description="delay before the scroller load the new items"/>
-	<aura:handler name="init" value="{!this}" action="{!c.init}"/> 	
+    <aura:attribute name="initBeforeRender" type="Boolean" default="true"/>
+    <aura:attribute name="initialSize" type="Integer" default="40"/>
+    <aura:attribute name="loadSize" type="Integer" default="20"/>
+    <aura:attribute name="loadDelay_ms" type="Integer" default="250" description="delay before the scroller load the new items"/>
+    <aura:attribute name="autoFillPage" type="Boolean" default="false"/>
+
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
 	<div id="header" class="common">Scroller - Infinite Loading Test</div>
 	<div id="body">	
 		<ui:scroller class="scrollWrapper" 
-			aura:id="test-scroller"
+			aura:id="scrollWrapper"
 			useNativeScroller="true"
 			bindEventsToScroller="true"
 			infiniteLoading="true"
+            infiniteLoadingAutoFillPage="{!v.autoFillPage}"
 			infiniteLoadingDataProvider="{!c.onLoadMore}"
 			infiniteLoadingLoadingLabel="Test Loading...1234567890">
 			<div aura:id="body"></div>

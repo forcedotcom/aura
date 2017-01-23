@@ -1,35 +1,35 @@
 ({
 	render: function(cmp, helper) {
-		var dom = this.superRender(),
-			fragment = document.createDocumentFragment();
-		
-		for (var i = 0; i < cmp._virtualItems.length; i++) {
-			fragment.appendChild(cmp._virtualItems[i]);
-		}
-		
-		cmp.find("body").getElement().appendChild(fragment);
+		var dom = this.superRender();
+        var div = cmp.find("body").getElement();
+        var items = cmp._virtualItems;
+        helper.renderItemsToDom(div, items);
 		return dom;
 	},
 	
 	afterRender: function(cmp, helper) {
-		return this.superAfterRender();
+		var dom = this.superAfterRender();
+        if (!cmp.get("v.initBeforeRender")) {
+            var listSize = cmp.get("v.initialSize");
+            helper.generateListItems(0, listSize,
+                function(item) {
+                    cmp._virtualItems.push(item);
+                },
+                function() {
+                    var div = cmp.find("body").getElement();
+                    var items = cmp._virtualItems;
+                    helper.renderItemsToDom(div, items);
+                }
+            );
+        }
+        return dom;
 	},
 	
 	rerender: function(cmp, helper) {
-		var dom = this.superRerender(),
-			fragment = document.createDocumentFragment();
-		
-		for (var i = 0; i < cmp._virtualItems.length; i++) {
-			fragment.appendChild(cmp._virtualItems[i]);
-		}
-		
-		var body = cmp.find("body").getElement();
-		
-		while (body.firstChild) {
-			body.removeChild(body.firstChild);
-		}
-		body.appendChild(fragment);
-		
+        var dom = this.superRerender();
+        var div = cmp.find("body").getElement();
+        var items = cmp._virtualItems;
+        helper.renderItemsToDom(div, items);
 		return dom;
 	}
 })

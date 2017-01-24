@@ -164,7 +164,7 @@ public class AuraTestFilter {
     
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException,
             IOException {
-        if (testContextAdapter == null || configAdapter.isProduction()) {
+        if (testContextAdapter == null || configAdapter == null || configAdapter.isProduction()) {
             chain.doFilter(request, response);
             return;
         }

@@ -21,13 +21,13 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
 /**
- * A server side representation of a customizable error on the client side Note that this should only be used by the
+ * A server side representation of an error on the client side Note that this should only be used by the
  * server side error handling API within Aura Framework.
  * 
  * @author yungcheng.chen
  *
  */
-public class ClientSideCustomError implements JsonSerializable {
+public class ClientSideError implements JsonSerializable {
 
     /*
      * Error message.
@@ -49,7 +49,7 @@ public class ClientSideCustomError implements JsonSerializable {
      * */
     private final String errorId;
 
-    public ClientSideCustomError(
+    public ClientSideError(
             String message,
             String stacktrace,
             JsonSerializable data,

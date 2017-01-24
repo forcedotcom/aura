@@ -234,13 +234,13 @@
                     "event": "aura:serverActionError",
                     "globalId": cmp.getGlobalId(),
                     "handler": function(event) {
-                        actual = event.getParam("customError").message;
+                        actual = event.getParam("error").message;
                     }
                 });
 
                 // act
                 var event = $A.eventService.newEvent("aura:serverActionError");
-                event.setParam("customError", new Error(expected));
+                event.setParam("error", new Error(expected));
                 event.fire();
 
                 // assert
@@ -251,15 +251,11 @@
 
     testHandleException: {
         test: [
-            function (cmp) {
-                // arrange
-                var actual;
-                var expected = "Event fired";
+            function(cmp) {
+                // arrage
                 var action = cmp.get("c.handleException");
                 var called = false;
-
-                action.setCallback(cmp, function (response) {
-                    actual = response.error[0].message;
+                action.setCallback(cmp, function(response) {
                     called = true;
                 });
 
@@ -267,14 +263,9 @@
                 $A.enqueueAction(action);
 
                 // assert
-                $A.test.addWaitFor(
-                    true,
-                    function() {
-                        return called;
-                    },
-                    function() {
-                        $A.test.assertEquals(expected, actual);
-                    });
+                this.waitForErrorModal(function() {
+                    $A.test.assertFalse(called);
+                });
             }
         ]
     },

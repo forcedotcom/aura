@@ -28,8 +28,7 @@ import java.util.UUID;
 
 public class ServerErrorUtilAdapterImplUnitTest extends UnitTestCase {
 
-    private static final String DEFAULT_SERVER_ERROR_EVENT = "aura:defaultServerError";
-    private static final String CUSTOM_SERVER_ERROR_EVENT = "aura:serverActionError";
+    private static final String SERVER_ERROR_EVENT = "aura:serverActionError";
 
     private ServerErrorUtilAdapterImpl serverErrorUtilAdapter = new ServerErrorUtilAdapterImpl();
 
@@ -39,7 +38,7 @@ public class ServerErrorUtilAdapterImplUnitTest extends UnitTestCase {
             serverErrorUtilAdapter.handleException("err");
             fail("Expected exception not thrown");
         } catch (GenericEventException gee) {
-            assertTrue(gee.getMessage().equals(DEFAULT_SERVER_ERROR_EVENT) && gee.getCause() == null);
+            assertTrue(gee.getMessage().equals(SERVER_ERROR_EVENT) && gee.getCause() == null);
         }
     }
 
@@ -50,7 +49,7 @@ public class ServerErrorUtilAdapterImplUnitTest extends UnitTestCase {
             serverErrorUtilAdapter.handleCustomException("err", re);
             fail("Expected exception not thrown");
         } catch (GenericEventException gee) {
-            assertTrue(gee.getMessage().equals(CUSTOM_SERVER_ERROR_EVENT) && gee.getCause().equals(re));
+            assertTrue(gee.getMessage().equals(SERVER_ERROR_EVENT) && gee.getCause().equals(re));
         }
     }
 

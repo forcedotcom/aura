@@ -465,7 +465,7 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
                 eventName = descriptor.getName();
                 eventNamespace = descriptor.getNamespace();
 
-                // Note that this if for response not 200, so returning COOS in AuraEnabled controller would not go here
+                // Note that this is for response not 200, so returning COOS in AuraEnabled controller would not go here
                 // ideally, we want to break the flow for all exception event, however, that causes regressions.
                 // for now, we stop the flow for COOS and invalidSession.
                 if (eventNamespace === "aura" && (eventName === "clientOutOfSync" || eventName === "invalidSession")) {

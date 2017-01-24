@@ -820,6 +820,18 @@ Action.prototype.updateFromResponse = function(response) {
         for (i = 0; i < response["error"].length; i++) {
             var err = response["error"][i];
             if (err["exceptionEvent"]) {
+                // default server action error handling, ignore action callback
+                if (err["useDefault"]) {
+                    var evtArgs = {"message":err["event"]["attributes"]["values"]["error"]["message"],"error":null,"auraError":null};
+                    // fire the event later so the funtion could return even if an error occurs in the event handler.
+                    window.setTimeout(function() {  //eslint-disable-line no-loop-func
+                        $A.eventService.getNewEvent('markup://aura:systemError').fire(evtArgs);
+                    }, 0);
+
+                    // should not invoke the callback
+                    return false;
+                }
+
                 // returning COOS in AuraEnabled controller would go here
                 var eventObj = err["event"];
                 if (eventObj["descriptor"]) {
@@ -833,7 +845,7 @@ Action.prototype.updateFromResponse = function(response) {
                             return false;
                         }
                         if (eventName === "serverActionError") {
-                            this.error = [eventObj["attributes"]["values"]["customError"]];
+                            this.error = [eventObj["attributes"]["values"]["error"]];
                             // should only invoke client action callback for serverActionError for custom handling
                             return true;
                         }

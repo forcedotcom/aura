@@ -31,6 +31,7 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.AuraUnhandledException;
+import org.auraframework.throwable.GenericEventException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -104,7 +105,7 @@ public class JavaAction extends AbstractActionImpl<JavaActionDef> {
 
     /**
      * Add an exception to our set of errors.
-     * 
+     *
      * @param t the throwable to add.
      * @param newState the 'State' to set.
      * @param loggable should this exception be run through the 'exception adapter'.

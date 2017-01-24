@@ -24,25 +24,6 @@ import org.auraframework.util.json.JsonSerializable;
  * {@link AuraEnabled} controller methods.
  */
 public interface ServerErrorUtilAdapter extends AuraAdapter {
-
-    /**
-     * Event names used to trigger default vs. custom error handling experience.
-     */
-    enum EventName {
-        CUSTOM("aura:serverActionError"),
-        DEFAULT("aura:defaultServerError");
-
-        private final String name;
-
-        EventName(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
-
     /**
      * Provides the default experience for errors.
      * Action error callback will not be invoked.

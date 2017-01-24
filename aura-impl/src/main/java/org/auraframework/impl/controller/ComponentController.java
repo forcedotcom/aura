@@ -122,7 +122,7 @@ public class ComponentController implements Controller {
             }
 
             // parsing stacktrace to figure out whether the error is from external script 
-            if (jsStack != null && !jsStack.isEmpty()) {
+            if (this.componentName == null && jsStack != null && !jsStack.isEmpty()) {
                 String[] traces = jsStack.split("\n");
                 for (String trace : traces) {
                     // extract filename

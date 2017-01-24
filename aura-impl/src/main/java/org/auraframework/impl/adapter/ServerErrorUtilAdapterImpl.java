@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 import org.auraframework.adapter.ServerErrorUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.throwable.AuraExceptionUtil;
-import org.auraframework.throwable.ClientSideCustomError;
+import org.auraframework.throwable.ClientSideError;
 import org.auraframework.throwable.GenericEventException;
 import org.auraframework.util.json.JsonSerializable;
 
@@ -35,6 +35,7 @@ import java.util.UUID;
 @ServiceComponent
 public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
 
+    private static final String EVENTNAME = "aura:serverActionError";
     private static final Logger logger = Logger.getLogger(ServerErrorUtilAdapterImpl.class);
 
     @Override
@@ -48,8 +49,11 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
         final String errorId = processError(message, thrown);
 
         // Create a new exception, add error id as a param.
-        final GenericEventException gee = new GenericEventException(EventName.DEFAULT.getName(), thrown);
-        gee.addParam("errorId", errorId);
+        final GenericEventException gee = new GenericEventException(EVENTNAME, thrown);
+        gee.setDefault();
+
+        final ClientSideError customError = new ClientSideError(message, thrown != null ? AuraExceptionUtil.getStackTrace(thrown) : null, null, errorId);
+        gee.addParam("error", customError);
 
         throw gee;
     }
@@ -64,9 +68,9 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
         // Process the error and get its id.
         final String errorId = processError(message, thrown);
 
-        final GenericEventException gee = new GenericEventException(EventName.CUSTOM.getName(), thrown);
-        final ClientSideCustomError customError = new ClientSideCustomError(message, AuraExceptionUtil.getStackTrace(thrown), data, errorId);
-        gee.addParam("customError", customError);
+        final GenericEventException gee = new GenericEventException(EVENTNAME, thrown);
+        final ClientSideError customError = new ClientSideError(message, AuraExceptionUtil.getStackTrace(thrown), data, errorId);
+        gee.addParam("error", customError);
 
         throw gee;
     }

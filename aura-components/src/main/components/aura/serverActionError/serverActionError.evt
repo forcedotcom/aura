@@ -16,5 +16,5 @@
 
 -->
 <aura:event type="APPLICATION" access="GLOBAL" description="An event used to communicate customizable error object from server action to its client callback, the event should not be used outside of framework.">
-    <aura:attribute name="customError" type="Object" />
+    <aura:attribute name="error" type="Object" />
 </aura:event>

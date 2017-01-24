@@ -31,7 +31,7 @@ function AuraError() {
     this["reported"] = false;
 
     // the component that throws the error
-    this.component = "";
+    this["component"] = "";
 
     // the action that errors out
     this.action = null;
@@ -146,6 +146,7 @@ function AuraError() {
     this["severity"] = this.severity;
     this["data"] = null;
     this["id"] = this.id;
+    this["stackFrames"] = this.stackFrames;
     this.generateErrorId = generateErrorId;
 }
 

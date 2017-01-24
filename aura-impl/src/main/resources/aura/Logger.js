@@ -147,7 +147,7 @@ Logger.prototype.reportError = function(e, action){
     var reportAction = $A.get("c.aura://ComponentController.reportFailedAction");
     reportAction.setCaboose();
     reportAction.setParams({
-        "failedAction": action || actionName || e.component,
+        "failedAction": action || actionName || e["component"],
         "failedId": e.id && e.id.toString(),
         "clientError": e.toString(),
         // Note that stack is non-standard, and even if present, may be obfuscated

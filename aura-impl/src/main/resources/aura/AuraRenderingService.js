@@ -76,11 +76,11 @@ AuraRenderingService.prototype.render = function(components, parent) {
                 renderedElements=this.finishRender(cmp, renderedElements);
                 elements = elements.concat(renderedElements);
             } catch (e) {
-                if (e instanceof $A.auraError && e.component) {
+                if (e instanceof $A.auraError && e["component"]) {
                     throw e;
                 } else {
                     var ae = new $A.auraError("render threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
-                    ae.component = cmp.getDef().getDescriptor().toString();
+                    ae["component"] = cmp.getDef().getDescriptor().toString();
                     $A.lastKnownError = ae;
                     throw ae;
                 }
@@ -145,11 +145,11 @@ AuraRenderingService.prototype.rerender = function(components) {
                     rerenderedElements=cmp["rerender"]();
                     context.releaseCurrentAccess();
                 } catch (e) {
-                    if (e instanceof $A.auraError && e.component) {
+                    if (e instanceof $A.auraError && e["component"]) {
                         throw e;
                     } else {
                         var ae = new $A.auraError("rerender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
-                        ae.component = cmp.getDef().getDescriptor().toString();
+                        ae["component"] = cmp.getDef().getDescriptor().toString();
                         $A.lastKnownError = ae;
                         throw ae;
                     }
@@ -215,11 +215,11 @@ AuraRenderingService.prototype.afterRender = function(components) {
             } catch (e) {
                 // The after render routine threw an error, so we should
                 //  (a) log the error
-                if (e instanceof $A.auraError && e.component) {
+                if (e instanceof $A.auraError && e["component"]) {
                         throw e;
                 } else {
                     var ae = new $A.auraError("afterRender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
-                    ae.component = cmp.getDef().getDescriptor().toString();
+                    ae["component"] = cmp.getDef().getDescriptor().toString();
                     $A.lastKnownError = ae;
                     throw ae;
                 }
@@ -273,11 +273,11 @@ AuraRenderingService.prototype.unrender = function(components) {
                         cmp["unrender"]();
                         context.releaseCurrentAccess(cmp);
                     } catch (e) {
-                        if (e instanceof $A.auraError && e.component) {
+                        if (e instanceof $A.auraError && e["component"]) {
                             throw e;
                         } else {
                             var ae = new $A.auraError("unrender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
-                            ae.component = cmp.getDef().getDescriptor().toString();
+                            ae["component"] = cmp.getDef().getDescriptor().toString();
                             $A.lastKnownError = ae;
                             throw ae;
                         }

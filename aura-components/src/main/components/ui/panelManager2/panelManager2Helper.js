@@ -243,7 +243,8 @@
         }
         
         // Set the return focus. This has to happen after activating the next panel (above), otherwise activate will steal the focus.
-        if (shouldReturnFocus === true && cmp.returnFocus) {
+        if (panel.closedBy !== "closeOnClickOut" && 
+            shouldReturnFocus === true && cmp.returnFocus) {
             cmp.returnFocus.focus();
             cmp.returnFocus = null;
         }

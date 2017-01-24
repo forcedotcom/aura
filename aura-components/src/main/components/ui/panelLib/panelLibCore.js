@@ -126,6 +126,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                     } else if (focusables && config.closeOnTabOut) {
                         if ((current === focusables.last && !shiftPressed) || ((current === focusables.first || current === cmp.getElement()) && shiftPressed)) {
                             $A.util.squash(event, true);
+                            cmp.closedBy = "closeOnTabOut";
                             if ($A.util.isFunction(closeAction)) {
                             	closeAction(cmp, "closeOnTabOut");
                             } else {
@@ -158,7 +159,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 if (config.closeOnClickOut && isVisible) {
                     var clickedInside = $A.util.contains(panelEl, target);
                     if (panelEl && !clickedInside) {
-
+                        panelCmp.closedBy = "closeOnClickOut";
                     	if ($A.util.isFunction(closeAction)) {
                         	closeAction(panelCmp, "closeOnClickOut");
                         } else {

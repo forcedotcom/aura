@@ -53,7 +53,7 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 					}
 				},
 				set : function(expression, value) {
-					if (expression === "v.items") {
+					if (expression === "v.privateItems") {
 						actual = value;	
 					}
 				},
@@ -105,7 +105,7 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 					}
 				},
 				set : function(expression, value) {
-					if (expression === "v.items") {
+					if (expression === "v.privateItems") {
 						actual = value;	
 					}
 				},
@@ -157,7 +157,7 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 					}
 				},
 				set : function(expression, value) {
-					if (expression === "v.items") {
+					if (expression === "v.privateItems") {
 						actual = value;	
 					}
 				},
@@ -205,7 +205,7 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 					}
 				},
 				set : function(expression, value) {
-					if (expression === "v.items") {
+					if (expression === "v.privateItems") {
 						actual = value;	
 					}
 				},
@@ -257,7 +257,7 @@ Test.Components.Ui.AutocompleteList.AutocompleteListHelperTest=function(){
 					}
 				},
 				set : function(expression, value) {
-					if (expression === "v.items") {
+					if (expression === "v.privateItems") {
 						actual = value;	
 					}
 				},

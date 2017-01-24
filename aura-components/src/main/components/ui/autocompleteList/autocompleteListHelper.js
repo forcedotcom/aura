@@ -193,12 +193,10 @@
 
     handleDataChange: function (component, event) {
         var concreteCmp = component.getConcreteComponent();
-        // Refactor this component:
-        // We want to update the internal v.items, but without udating iteration just yet
-        // since customer might have thir own matchText function
-        concreteCmp.set("v.items", event.getParam("data"), true/*ignore changes, dont notify*/);
-
-        this.matchText(concreteCmp, event.getParam("data"));
+        var newItems = event.getParam("data");
+        // Users of the component that implement their own v.matchFunc rely on this being set.
+        concreteCmp.set("v.items", newItems);
+        this.matchText(concreteCmp, newItems);
     },
 
     handleListHighlight: function (component, event) {
@@ -512,16 +510,8 @@
         }
         this.showLoading(component, false);
 
-        // Finally we update the v.items so iteration can 
-        // create the final items here.
-        component.set("v.items", items);
+        component.set("v.privateItems", items);
 
-        //this.updateEmptyListContent(component);
-        //JBUCH: HALO: HACK: WTF: FIXME THIS WHOLE COMPONENT
-        var itemCmps = component.find("iter").get("v.body");
-        for (var i = 0; i < itemCmps.length; i++) {
-            $A.util.toggleClass(itemCmps[i], "force");
-        }
         this.fireMatchDoneEvent(component, items);
     },
 

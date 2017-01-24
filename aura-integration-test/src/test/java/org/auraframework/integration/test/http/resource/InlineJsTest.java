@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThat;
 import javax.inject.Inject;
 
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
@@ -60,6 +61,9 @@ public class InlineJsTest extends AuraImplTestCase {
     @Inject
     private ServerService serverService;
 
+    @Inject
+    private ExceptionAdapter exceptionAdapter;
+
     private InlineJs getInlineJs() {
         InlineJs inlineJs = new InlineJs();
         inlineJs.setServletUtilAdapter(servletUtilAdapter);
@@ -69,6 +73,7 @@ public class InlineJsTest extends AuraImplTestCase {
         inlineJs.setContextService(contextService);
         inlineJs.setServerService(serverService);
         inlineJs.setRenderingService(renderingService);
+        inlineJs.setExceptionAdapter(exceptionAdapter);
         return inlineJs;
     }
 

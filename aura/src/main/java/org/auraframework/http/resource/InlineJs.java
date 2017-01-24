@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.auraframework.http.resource;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -34,12 +34,15 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.Component;
+import org.auraframework.javascript.PreInitJavascript;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.resource.ResourceLoader;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Maps;
 
@@ -53,10 +56,12 @@ public class InlineJs extends AuraResourceImpl {
     public InlineJs() {
         super("inline.js", Format.JS);
     }
-    
+
     private ContextService contextService;
     private RenderingService renderingService;
     private ManifestUtil manifestUtil;
+
+    private List<PreInitJavascript> preInitJavascripts;
     
     @Inject
     public void setContextService(ContextService contextService) {
@@ -147,7 +152,33 @@ public class InlineJs extends AuraResourceImpl {
 
         Component template = serverService.writeTemplate(context, def, getComponentAttributes(request), out);
         appendInlineJS(template, out);
+        appendPreInitJavascripts(def, context.getMode(), out);
         renderingService.render(template, null, out);
+    }
+
+    /**
+     * Writes javascript into pre init "beforeFrameworkInit"
+     *
+     * @param def current application or component
+     * @param mode current Mode from AuraContext
+     * @param out response writer
+     */
+    private void appendPreInitJavascripts(BaseComponentDef def, Mode mode, PrintWriter out) {
+        if (this.preInitJavascripts != null && !this.preInitJavascripts.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (PreInitJavascript js : this.preInitJavascripts) {
+                if (js.shouldInsert(def, mode)) {
+                    String code = js.getJavascriptCode(def, mode);
+                    if (code != null && !code.isEmpty()) {
+                        sb.append(String.format("window.Aura.beforeFrameworkInit.push(function() { %s ; }); ", code));
+                    }
+                }
+            }
+            if (sb.length() > 0) {
+                String output = String.format(";(function() { window.Aura = window.Aura || {}; window.Aura.beforeFrameworkInit = Aura.beforeFrameworkInit || []; %s }());", sb.toString());
+                out.append(output);
+            }
+        }
     }
 
     private boolean shouldCacheHTMLTemplate(DefDescriptor<? extends BaseComponentDef> appDefDesc,
@@ -173,4 +204,8 @@ public class InlineJs extends AuraResourceImpl {
         }
     }
 
+    @Autowired(required = false) // only clean way to allow no bean vs using Optional
+    public void setPreInitJavascripts(List<PreInitJavascript> preInitJavascripts) {
+        this.preInitJavascripts = preInitJavascripts;
+    }
 }

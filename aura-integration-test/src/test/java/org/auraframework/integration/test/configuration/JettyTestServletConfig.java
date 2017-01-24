@@ -29,6 +29,7 @@ import org.auraframework.test.util.SauceUtil;
 import org.auraframework.util.test.configuration.TestServletConfig;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 
 import javax.inject.Inject;
 import java.net.InetAddress;
@@ -58,8 +59,8 @@ public class JettyTestServletConfig implements TestServletConfig {
         if (spawnJetty) {
             Server server = AuraJettyServer.getInstance();
             Connector connector = server.getConnectors()[0];
-            port = connector.getPort();
-            host = connector.getHost();
+            port = ((ServerConnector)connector).getPort();
+            host = ((ServerConnector)connector).getHost();
             if (host == null) {
                 try {
                     host = getHost();

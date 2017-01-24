@@ -53,7 +53,7 @@
         <xunit.js.isStrict>true</xunit.js.isStrict>
         <xunit.js.currentModule>${project.basedir}</xunit.js.currentModule>
         <spring.version>4.1.7.RELEASE</spring.version>
-        <jetty.version>8.1.15.v20140411</jetty.version>
+        <jetty.version>9.4.0.v20161208</jetty.version>
         <node.download.root.url>http://repo.auraframework.org/simple/plugins-release-local/node/</node.download.root.url>
         <npm.download.root.url>http://repo.auraframework.org/simple/plugins-release-local/npm/</npm.download.root.url>
         <node.version>v4.2.1</node.version>
@@ -711,7 +711,7 @@
                     <version>1.8</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.mortbay.jetty</groupId>
+                    <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-maven-plugin</artifactId>
                     <version>${jetty.version}</version>
                     <dependencies>

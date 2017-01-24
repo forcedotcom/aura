@@ -16,12 +16,11 @@
 package org.auraframework.integration.test.util;
 
 import java.io.File;
+import java.net.InetSocketAddress;
 
 import org.auraframework.Aura;
 import org.auraframework.util.IOUtil;
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.openqa.selenium.net.PortProber;
 
@@ -50,14 +49,8 @@ public class AuraJettyServer extends Server {
     }
 
     private AuraJettyServer(String host, int port, String contextPath) {
+    	super(new InetSocketAddress(host!=null?host:"localhost", port));
         File tmpDir = new File(IOUtil.newTempDir("webcache"));
-
-        Connector connector = new SelectChannelConnector();
-        if (host != null) {
-            connector.setHost(host);
-        }
-        connector.setPort(port);
-        setConnectors(new Connector[] { connector });
 
         WebAppContext context = new WebAppContext();
             context.setDefaultsDescriptor(Aura.class.getResource("/aura/webapp/WEB-INF/webdefault.xml").toString());

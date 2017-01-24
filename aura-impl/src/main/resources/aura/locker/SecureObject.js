@@ -339,7 +339,7 @@ SecureObject.unfilterEverything = function(st, value, visited) {
 	}
 
 	var t = typeof value;
-	
+
 	if (!value || (t !== "object" && t !== "function") || value === window || value === document || SecureObject.isUnfilteredType(value)) {
 		// ignoring falsy, nully references, non-objects and non-functions, global window/document, and any pass throughs
 		// from filterEverything
@@ -910,7 +910,12 @@ SecureObject.isUnfilteredType = function(raw) {
             return true;
         }
     }
-    
+
+    // Do not filter ArrayBufferView types. https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView
+    if (raw && $A.lockerService.instanceOf(raw.buffer, ArrayBuffer) && raw.byteLength !== undefined) {
+        return true;
+    }
+
     return false;
 };
 

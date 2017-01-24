@@ -85,5 +85,11 @@
         test: function(cmp) {
             cmp.testRawObjectsConstructorAndProperties();
         }
+    },
+    
+    testUnfilteringOfArrayBuffer: {
+        test: function(cmp) {
+            cmp.testUnfilteringOfArrayBuffer();
+        }
     }
 })

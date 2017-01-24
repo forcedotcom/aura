@@ -73,5 +73,14 @@
         var textEncoder = new TextEncoder("UTF-8");
         testUtils.assertEquals("utf-8", textEncoder.encoding, "Unexpected encoding property from constructed TextEncoder");
         testUtils.assertDefined(textEncoder.encode, "Expected static method 'encode' to be defined on constructed TextEncoder");
+    },
+    
+    testUnfilteringOfArrayBuffer: function(component) {
+        var testUtils = component.get("v.testUtils");
+        // pass in a special "TypedArray" as a param and verify Locker properly unfilters it (by letting it pass through)
+        var uint8Array = new Uint8Array(16);
+        crypto.getRandomValues(uint8Array);
+        var valuesChanged = uint8Array[0] !== 0 || uint8Array[1] !== 0 || uint8Array[2] !== 0;
+        testUtils.assertTrue(valuesChanged, "Uint8Array not populated with values after calling Crypto.getRandomValues");
     }
 })

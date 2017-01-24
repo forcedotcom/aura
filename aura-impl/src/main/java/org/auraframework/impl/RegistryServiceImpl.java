@@ -75,6 +75,7 @@ import org.auraframework.util.FileMonitor;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 @ServiceComponent
 public class RegistryServiceImpl implements RegistryService, SourceListener {
@@ -98,6 +99,8 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     private static final Logger _log = Logger.getLogger(RegistryService.class);
 
     private ConcurrentHashMap<ComponentLocationAdapter, SourceLocationInfo> locationMap = new ConcurrentHashMap<>();
+
+    private static String SERVICECOMPONENT_PREFIX = "servicecomponent";
 
     private static final Set<String> markupPrefixes = ImmutableSet.of(
             DefDescriptor.MARKUP_PREFIX,
@@ -346,23 +349,23 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         regBuild.add(new NonCachingDefRegistryImpl(new CompoundControllerDefFactory(exceptionAdapter),
                 DefType.CONTROLLER, DefDescriptor.COMPOUND_PREFIX));
 
-        // Gah! this is stupid.
+        // Gah! this is stupid... we will want to end up with one registry here.
         if (javaLoaders.size() > 0) {
-            regBuild.add(new CachingDefRegistryImpl(
-                    new JavaControllerDefFactory(javaLoaders, definitionService),
-                    DefType.CONTROLLER, DefDescriptor.JAVA_PREFIX));
-            regBuild.add(new CachingDefRegistryImpl(
-                    new JavaRendererDefFactory(javaLoaders), DefType.RENDERER, DefDescriptor.JAVA_PREFIX));
+            Set<String> java_prefixes = Sets.newHashSet(DefDescriptor.JAVA_PREFIX, SERVICECOMPONENT_PREFIX);
+            regBuild.add(new CachingDefRegistryImpl(new JavaControllerDefFactory(javaLoaders, definitionService),
+                    Sets.newHashSet(DefType.CONTROLLER), java_prefixes));
+            regBuild.add(new CachingDefRegistryImpl(new JavaRendererDefFactory(javaLoaders),
+                    Sets.newHashSet(DefType.RENDERER), java_prefixes));
             regBuild.add(new CachingDefRegistryImpl(new JavaTypeDefFactory(javaLoaders),
-                    DefType.TYPE, DefDescriptor.JAVA_PREFIX));
+                    Sets.newHashSet(DefType.TYPE), java_prefixes));
             regBuild.add(new CachingDefRegistryImpl(new JavaModelDefFactory(javaLoaders),
-                    DefType.MODEL, DefDescriptor.JAVA_PREFIX));
-            regBuild.add(new CachingDefRegistryImpl(new JavaProviderDefFactory(javaLoaders), DefType.PROVIDER,
-                    DefDescriptor.JAVA_PREFIX));
+                    Sets.newHashSet(DefType.MODEL), java_prefixes));
+            regBuild.add(new CachingDefRegistryImpl(new JavaProviderDefFactory(javaLoaders),
+                    Sets.newHashSet(DefType.PROVIDER), java_prefixes));
             regBuild.add(new CachingDefRegistryImpl(new JavaTokenDescriptorProviderDefFactory(javaLoaders),
-                    DefType.TOKEN_DESCRIPTOR_PROVIDER, DefDescriptor.JAVA_PREFIX));
+                    Sets.newHashSet(DefType.TOKEN_DESCRIPTOR_PROVIDER), java_prefixes));
             regBuild.add(new CachingDefRegistryImpl(new JavaTokenMapProviderDefFactory(javaLoaders),
-                    DefType.TOKEN_MAP_PROVIDER, DefDescriptor.JAVA_PREFIX));
+                    Sets.newHashSet(DefType.TOKEN_MAP_PROVIDER), java_prefixes));
         }
         return regBuild;
     }

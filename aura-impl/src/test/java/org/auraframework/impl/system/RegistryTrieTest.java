@@ -210,7 +210,7 @@ public class RegistryTrieTest extends AuraTestCase {
         MockRegistry reg = new MockRegistry().setNamespaces("testNamespace");
         RegistryTrie trie = new RegistryTrie(Lists.newArrayList(reg));
 
-        DefDescriptor descriptor = new DefDescriptorImpl("js://*:*", ComponentDef.class);
+        DefDescriptor<ComponentDef> descriptor = new DefDescriptorImpl("js://*:*", ComponentDef.class);
         DefRegistry actual = trie.getRegistryFor(descriptor);
         assertEquals(null, actual);
     }

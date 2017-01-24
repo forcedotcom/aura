@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.components.test.java.controller.TestController" render="client">
+<aura:component controller="serviceComponent://org.auraframework.components.test.java.controller.TestController" render="client">
     <aura:attribute name="label" type="String" default="Button"/>
     <test:test_button label="{!v.label}" press="{!c.handleClick}" class="test_locator"/>
 </aura:component>

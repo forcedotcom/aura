@@ -1587,6 +1587,7 @@ AuraClientService.prototype.initDefs = function() {
         $A.componentService.initEventDefs(config["eventDefs"]);
         $A.componentService.initLibraryDefs(config["libraryDefs"]);
         $A.componentService.initControllerDefs(config["controllerDefs"]);
+        $A.componentService.initModuleDefs(config["moduleDefs"]);
 
         delete Aura["ApplicationDefs"];
     }

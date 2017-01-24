@@ -25,6 +25,8 @@ import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
+import com.google.common.collect.ImmutableMap;
+
 /**
  * ModuleDef holds compiled code and serializes for client
  */
@@ -52,7 +54,11 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
 
     @Override
     public void serialize(Json json) throws IOException {
-
+        StringBuilder code = new StringBuilder();
+        code.append("return function (define) {\n//raptor\n");
+        code.append(compiledCode);
+        code.append("\n//end-raptor\n};");
+        json.writeMap(ImmutableMap.of("descriptor", getDescriptor().getQualifiedName(), "code", code.toString()));
     }
 
     @Override

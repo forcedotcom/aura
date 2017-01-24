@@ -122,6 +122,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             List<Definition> componentDefs = Lists.newArrayList();
             List<Definition> eventDefs = Lists.newArrayList();
             List<Definition> libraryDefs = Lists.newArrayList();
+            List<Definition> moduleDefs = Lists.newArrayList();
 
             for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defMap.entrySet()) {
                 DefDescriptor<? extends Definition> desc = entry.getKey();
@@ -143,12 +144,15 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
                         eventDefs.add(d);
                     } else if (DefType.LIBRARY.equals(dt)) {
                         libraryDefs.add(d);
+                    } else if (DefType.MODULE.equals(dt)) {
+                        moduleDefs.add(d);
                     }
                 }
             }
             writeDefs(json, "eventDefs", eventDefs);
             writeDefs(json, "libraryDefs", libraryDefs);
             writeDefs(json, "componentDefs", componentDefs);
+            writeDefs(json, "moduleDefs", moduleDefs);
         }
 
         try {

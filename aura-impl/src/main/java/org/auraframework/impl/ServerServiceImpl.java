@@ -441,8 +441,11 @@ public class ServerServiceImpl implements ServerService {
         serializationService.writeCollection(controllers, ControllerDef.class, sb, "JSON");
         sb.append(");\n");
 
-        // TODO MODULE
+        // MODULE
+        sb.append("$A.componentService.initModuleDefs(");
         Collection<ModuleDef> modules = filterAndLoad(ModuleDef.class, dependencies, null);
+        serializationService.writeCollection(modules, ModuleDef.class, sb, "JSON");
+        sb.append(");\n");
 
         return sb.toString();
     }

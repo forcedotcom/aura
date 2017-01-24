@@ -27,6 +27,7 @@ if (!Aura.frameworkJsReady) {
         addLibraryExporter: function (d, e) { Aura.ApplicationDefs.libExporter[d] = e; },
         initEventDefs: function (e) { Aura.ApplicationDefs.eventDefs = e; },
         initLibraryDefs: function (e) { Aura.ApplicationDefs.libraryDefs = e; },
-        initControllerDefs: function (e) { Aura.ApplicationDefs.controllerDefs = e; }
+        initControllerDefs: function (e) { Aura.ApplicationDefs.controllerDefs = e; },
+        initModuleDefs: function (e) { Aura.ApplicationDefs.moduleDefs = e; }
     }};
 }

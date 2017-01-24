@@ -651,6 +651,16 @@ AuraComponentService.prototype.initControllerDefs = function(controllerConfigs) 
 };
 
 /**
+ * Init module defs
+ * @export
+ */
+AuraComponentService.prototype.initModuleDefs = function(moduleDefs) {
+	for (var i = 0; i < moduleDefs.length; i++) {
+		// console.log("TODO: add ModuleDef: " + moduleDefs[i]["descriptor"]);
+	}
+};
+
+/**
  * Detects of the component class has been already defined without actually defining it.
  * hasComponentClass is more performant that running getComponentClass() since if the class
  * hasn't been built yet, we don't want it to be forcably built if not requested.

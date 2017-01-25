@@ -1146,10 +1146,12 @@ Component.prototype.getReference = function(key) {
 };
 
 /**
- * Clears a live reference to the value indicated using property syntax.
+ * Clears a live reference for the value indicated using property syntax.
+ * For example, if you use aura:set to set a value and later want to reset the value using component.set(),
+ * clear the reference before resetting the value.
  *
  * @param {String}
- *            key The data key for which to clear the reference.
+ *            key The data key for which to clear the reference. For example, "v.attributeName".
  * @public
  * @platform
  * @export

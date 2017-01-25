@@ -200,22 +200,42 @@
         var auraDataProvider   = component.get('v.infiniteLoadingDataProvider'),
             dataProviderBridge = auraDataProvider && this._bind(this._bridgeScrollerCallback, component, auraDataProvider),
             templates = component.get("v.infiniteLoadingTemplate"),
-            template = (templates && templates.length==1)?templates[0]:null;
+            template = (templates && templates.length===1)?templates[0]:null;
 
-        if (template && !template.isInstanceOf("ui:infiniteLoading")) {
-            $A.warning("Infinite Loading Template must implement ui:infiniteLoading.");
-            template = null; // fallback to the default
-        }
-
-        return {
+        var config = {
             threshold    : component.get('v.infiniteLoadingThreshold'),
             dataProvider : dataProviderBridge,
             autoFillPage : component.get('v.infiniteLoadingAutoFillPage'),
             labelNoData  : component.get("v.infiniteLoadingNoDataLabel"),
             labelIdle    : component.get("v.infiniteLoadingIdleLabel"),
             labelLoading : component.get("v.infiniteLoadingLoadingLabel"),
-            template     : template
+            hasTemplate  : false
         };
+
+        if (template) {
+            if (!template.isInstanceOf("ui:scrollerInfiniteLoadingTemplate")) {
+                $A.warning("Infinite Loading Template must implement ui:scrollerInfiniteLoadingTemplate.");
+            }
+            else {
+                config.hasTemplate = true;
+                config.templateContainer = template.getElement();
+                config.templateIsManualLoad = template.get("v.manualLoad");
+                config.templateSetLoadingFn = function(loading) {
+                    template.set("v.loading", loading);
+                };
+                config.templateSetHasMoreDataFn = function(moreData) {
+                    template.set("v.hasMoreData", moreData);
+                };
+                config.templateSetHasMoreDataFn = function(moreData) {
+                    template.set("v.hasMoreData", moreData);
+                };
+                config.templateSetManualTriggerFn = function(triggerFn) {
+                    template.set("v.manualLoadTrigger", $A.getCallback(triggerFn));
+                };
+            }
+        }
+
+        return config;
     },
     _getVoiceOverConfig: function (component) {
         return {

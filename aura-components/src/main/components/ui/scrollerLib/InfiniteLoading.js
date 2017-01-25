@@ -54,9 +54,6 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 this.opts.infiniteLoadingConfig
             );
         },
-        _getTemplate: function () {
-            return this.opts.infiniteLoadingConfig.template;
-        },
         _createInfiniteLoadingMarkup: function () {
             var il_container = w.document.createElement('div'),
                 label        = document.createElement('span'),
@@ -79,16 +76,15 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 return;
             }
 
-            var template = this._getTemplate();
-            if (!(template && template.get("v.manualLoad"))) {
+            if (!(ilConfig.hasTemplate && ilConfig.templateIsManualLoad)) {
                 this.on('scrollMove', thresholdCheck);
                 this.on('scrollEnd', thresholdCheck);
                 this._itemsThreshold = this.items && this.items.length || 10;
             }
-            else if (template) {
-                template.set("v.manualLoadTrigger", $A.getCallback(function() {
+            else if (ilConfig.hasTemplate) {
+                ilConfig.templateSetManualTriggerFn(function() {
                     this._triggerInfiniteLoadingDataProvider();
-                }.bind(this)));
+                }.bind(this));
             }
 
             this._appendInfiniteLoading();
@@ -104,9 +100,8 @@ function lib(w) { //eslint-disable-line no-unused-vars
             }
         },
         _appendInfiniteLoading: function () {
-            var template   = this._getTemplate();
-
-            if (!template) {
+            var ilConfig = this.opts.infiniteLoadingConfig;
+            if (!ilConfig.hasTemplate) {
                 var il_container = this._createInfiniteLoadingMarkup(),
                     target       = this.scroller;
 
@@ -116,12 +111,15 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 this.ilLabel = il_container.firstChild;
                 this._ilSize = il_container.offsetHeight; //relayout
             }
+            else {
+                this.ilDOM = ilConfig.templateContainer;
+            }
         },
         _setState: function (loading) {
             this._loading = loading;
-            var template = this._getTemplate();
-            if (template) {
-                template.set("v.loading", loading);
+            var ilConfig = this.opts.infiniteLoadingConfig;
+            if (ilConfig.hasTemplate) {
+                ilConfig.templateSetLoadingFn(loading);
             }
             else {
                 if (loading) {
@@ -259,9 +257,9 @@ function lib(w) { //eslint-disable-line no-unused-vars
         },
         _setNoMoreData: function(noMoreData) {
             this._ilNoMoreData = noMoreData;
-            var template = this._getTemplate();
-            if (template) {
-                template.set("v.hasMoreData", !this._ilNoMoreData);
+            var ilConfig = this.opts.infiniteLoadingConfig;
+            if (ilConfig.hasTemplate) {
+                ilConfig.templateSetHasMoreDataFn(!this._ilNoMoreData);
             }
         },
         /* PUBLIC API */
@@ -270,6 +268,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
         },
         unlockFetchData: function () {
             this._setNoMoreData(false);
+            this._ilFetchingData = false;
         },
         lockFetchData: function () {
             this._setNoMoreData(true);

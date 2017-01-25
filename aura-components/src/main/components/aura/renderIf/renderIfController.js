@@ -14,38 +14,73 @@
  * limitations under the License.
  */
 ({
-    facetChange: function(component, event) {
-    	var value = event.getParam("value");
-    	if (!$A.util.isArray(value)) {
-    	    value = [value];
-    	}
-    	var oldValue = event.getParam("oldValue");
-    	if (!$A.util.isArray(oldValue)) {
-    	    oldValue = [oldValue];
-    	}
-    	var facets=[value, oldValue];
-        for(var i=0;i<facets.length;i++){
-            for(var j=0;j<facets[i].length;j++){
-                facets[i][j].autoDestroy(true);
-            }
-        }
-    },
+    init: function(cmp) {
+        var isTrue        = $A.util.getBooleanValue(cmp.get("v.isTrue"));
+        var bodyTemplate  = cmp.get("v.body");
+        var elseTemplate  = cmp.get("v.else");
+        var template      = cmp.get("v.template");
 
-    init: function(component) {
-        var facets=[component.get("v.body"),component.get("v.else")];
+        if (bodyTemplate.length && !template.length) {
+            template=bodyTemplate;
+        }
+        var facets=[template,elseTemplate];
         for(var i=0;i<facets.length;i++){
             for(var j=0;j<facets[i].length;j++){
                 facets[i][j].autoDestroy(false);
             }
         }
+
+        cmp.set("v.template", template, true);
+        cmp.set("v.body", isTrue?template:elseTemplate, true);
     },
 
-    destroy:function(component){
-        var facets=[component.get("v.body"),component.get("v.else")];
+    destroy:function(cmp){
+        var facets=[cmp.get("v.template"),cmp.get("v.else")];
         for(var i=0;i<facets.length;i++){
             for(var j=0;j<facets[i].length;j++){
                 facets[i][j].destroy();
             }
         }
+    },
+
+    facetChange: function(cmp, event) {
+        if(this.updating){
+            return;
+        }
+        var j;
+        var i;
+        var facets=[event.getParam("value"), event.getParam("oldValue")];
+        for(i=0;i<facets.length;i++){
+            if (!$A.util.isArray(facets[i])) {
+                facets[i]=[facets[i]];
+            }
+            for(j=0;j<facets[i].length;j++){
+                facets[i][j].autoDestroy(true);
+            }
+        }
+        var isTrue = $A.util.getBooleanValue(cmp.get("v.isTrue"));
+        var bodyTemplate=cmp.get("v.body");
+        var elseTemplate=cmp.get("v.else");
+        var template=cmp.get("v.template");
+        if(bodyTemplate!==template){
+            template=bodyTemplate;
+        }
+        facets=[template,elseTemplate];
+        for(i=0;i<facets.length;i++){
+            for(j=0;j<facets[i].length;j++){
+                facets[i][j].autoDestroy(false);
+            }
+        }
+        this.updating=true;
+        cmp.set("v.body", isTrue?template:elseTemplate);
+        this.updating=false;
+    },
+
+    updateBody:function(cmp){
+        var isTrue = $A.util.getBooleanValue(cmp.get("v.isTrue"));
+        this.updating=true;
+        cmp.set("v.body", isTrue?cmp.get("v.template"):cmp.get("v.else"));
+        this.updating=false;
     }
+
 })// eslint-disable-line semi

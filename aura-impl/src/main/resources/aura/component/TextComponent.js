@@ -151,6 +151,8 @@ TextComponent.prototype["renderer"] = {
         // otherwise no code would be able to manipulate them
         $A.lockerService.trust(component, textNode);
         
+        $A.renderingService.setMarker(component, textNode);
+
         return textNode;
     },
     

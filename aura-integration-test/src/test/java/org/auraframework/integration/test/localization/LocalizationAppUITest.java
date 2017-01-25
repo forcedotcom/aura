@@ -172,29 +172,30 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         open(URL);
 
         // initial load
+        By outputSelector=By.cssSelector("span[class~='uiOutputPercent']");
         WebElement elementInput = findDomElement(By.cssSelector("input[class~='uiInputPercent']"));
-        WebElement elementoutput = findDomElement(By.cssSelector("span[class~='uiOutputPercent']"));
+        WebElement elementoutput = findDomElement(outputSelector);
         assertEquals("InputPercent component rendered with wrong value", "1,235%", elementInput.getAttribute("value"));
         assertEquals("outputPercent component rendered with wrong value", "1,235%", elementoutput.getText());
 
         // Tab out
         elementInput.click();
-        elementInput.clear();
+        elementInput.sendKeys(Keys.HOME, Keys.chord(Keys.SHIFT, Keys.END));
         elementInput.sendKeys("22.35");
         getAuraUITestingUtil().pressTab(elementInput);
 
+        getAuraUITestingUtil().waitForElementText(outputSelector, "22%", true, "outputPercent component rendered with wrong value");
         assertEquals("InputPercent component rendered with wrong value", "22%", elementInput.getAttribute("value"));
-        assertEquals("outputPercent component rendered with wrong value", "22%", elementoutput.getText());
 
         // Submit click
         elementInput.click();
-        elementInput.clear();
+        elementInput.sendKeys(Keys.HOME, Keys.chord(Keys.SHIFT, Keys.END));
         elementInput.sendKeys("1.2235");
         WebElement elementButton = findDomElement(By.cssSelector("button[title~='Percent']"));
         elementButton.click();
 
+        getAuraUITestingUtil().waitForElementText(outputSelector,"1%",true,"outputPercent component rendered with wrong value");
         assertEquals("InputPercent component rendered with wrong value", "1%", elementInput.getAttribute("value"));
-        assertEquals("outputPercent component rendered with wrong value", "1%", elementoutput.getText());
     }
 
     // Excluded on mobile browsers for lack of tab support
@@ -206,30 +207,30 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         open(URL);
 
         // initial load
-        WebElement elementInput = findDomElement(By
-                .cssSelector("span[id='MyCurrency'] > input[class~='uiInput']"));
-        WebElement elementoutput = findDomElement(By.cssSelector("span[class~='uiOutputCurrency']"));
+        By outputSelector=By.cssSelector("span[class~='uiOutputCurrency']");
+        WebElement elementInput = findDomElement(By.cssSelector("span[id='MyCurrency'] > input[class~='uiInput']"));
+        WebElement elementOutput = findDomElement(outputSelector);
         assertEquals("InputCurrency component rendered with wrong value", "$123,456.79",
                 elementInput.getAttribute("value"));
-        assertEquals("outputCurrency component rendered with wrong value", "$123,456.79", elementoutput.getText());
+        assertEquals("outputCurrency component rendered with wrong value", "$123,456.79", elementOutput.getText());
 
         // Tab out
         elementInput.click();
-        elementInput.clear();
+        elementInput.sendKeys(Keys.HOME, Keys.chord(Keys.SHIFT, Keys.END));
         elementInput.sendKeys("123456");
         getAuraUITestingUtil().pressTab(elementInput);
 
+        getAuraUITestingUtil().waitForElementText(outputSelector, "$123,456.00", true, "OutputCurrency component rendered with wrong value");
         assertEquals("InputCurrency component rendered with wrong value", "$123,456.00", elementInput.getAttribute("value"));
-        assertEquals("outputCurrency component rendered with wrong value", "$123,456.00", elementoutput.getText());
 
         // Submit click
         elementInput.click();
-        elementInput.clear();
+        elementInput.sendKeys(Keys.HOME, Keys.chord(Keys.SHIFT, Keys.END));
         elementInput.sendKeys("123.45");
         WebElement elementButton = findDomElement(By.cssSelector("button[title~='Currency']"));
         elementButton.click();
 
+        getAuraUITestingUtil().waitForElementText(outputSelector, "$123.45", true, "OutputCurrency component rendered with wrong value");
         assertEquals("InputCurrency component rendered with wrong value", "$123.45", elementInput.getAttribute("value"));
-        assertEquals("outputCurrency component rendered with wrong value", "$123.45", elementoutput.getText());
     }
 }

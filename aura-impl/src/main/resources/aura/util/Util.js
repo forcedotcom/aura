@@ -834,6 +834,11 @@ Aura.Utils.Util.prototype.createElementsFromMarkup=function(markup){
  */
  Aura.Utils.Util.prototype.insertFirst = function(newEl, referenceEl){
     if (this.isArray(newEl)) {
+        // Don't create a fragment for just one item.
+        if(newEl.length === 1) {
+            this.insertFirst(newEl[0], referenceEl);
+            return;
+        }
         var frag = document.createDocumentFragment();
         this.appendChild(newEl, frag);
         this.insertFirst(frag, referenceEl);
@@ -842,8 +847,7 @@ Aura.Utils.Util.prototype.createElementsFromMarkup=function(markup){
     var firstChild = referenceEl.firstChild;
     if (firstChild) {
         referenceEl.insertBefore(newEl, firstChild);
-    }
-    else {
+    } else {
         referenceEl.appendChild(newEl);
     }
 };
@@ -859,6 +863,10 @@ Aura.Utils.Util.prototype.createElementsFromMarkup=function(markup){
  */
 Aura.Utils.Util.prototype.insertBefore = function(newEl, referenceEl) {
     if (this.isArray(newEl)) {
+        if(newEl.length === 1) {
+            this.insertBefore(newEl[0], referenceEl);
+            return;
+        }
         var frag = document.createDocumentFragment();
         this.appendChild(newEl, frag);
         this.insertBefore(frag, referenceEl);
@@ -882,6 +890,10 @@ Aura.Utils.Util.prototype.insertBefore = function(newEl, referenceEl) {
  */
 Aura.Utils.Util.prototype.insertAfter = function(newEl, referenceEl) {
     if (this.isArray(newEl)) {
+        if(newEl.length === 1) {
+            this.insertAfter(newEl[0], referenceEl);
+            return;
+        }
         var frag = document.createDocumentFragment();
         this.appendChild(newEl, frag);
         this.insertAfter(frag, referenceEl);
@@ -913,6 +925,10 @@ Aura.Utils.Util.prototype.appendChild = function(newEl, referenceEl) {
         return;
     }
     if (this.isArray(newEl)) {
+        if(newEl.length === 1) {
+            referenceEl.appendChild(newEl[0]);
+            return;
+        }
         var frag = document.createDocumentFragment();
         var len = newEl.length;
         for(var i=0;i<len;i++){
@@ -963,7 +979,6 @@ Aura.Utils.Util.prototype.removeElement = function(element) {
                 $A.assert(this.isUndefined(element["aura_deleted"]), "Element was reused after delete");
                 element["aura_deleted"] = true;
             }
-
             this.trashcan.appendChild(element);
         } else{
             this.trash.push(element);

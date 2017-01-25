@@ -66,32 +66,8 @@
             // Verify renderIf
             var value = cmp.find("if").get("v.body");
             $A.test.assertTrue($A.util.isArray(value));
-            $A.test.assertEquals(3, value.length);
-            var iteration = cmp.find("iteration");
-            $A.test.assertEquals(iteration, value[1]);
-
-            this.assertTemplateComponentDefRef(cmp);
-
-            var body = iteration.get("v.body");
-            $A.test.assertTrue( $A.util.isArray(body));
-            $A.test.assertEquals(2, body.length);
-            $A.test.assertFalse(iteration.isRendered());
-            $A.test.assertEquals(0, iteration.getElements().length);
-
-            value = body[0];
-            $A.test.assertTrue($A.util.isObject(value));
-            $A.test.assertTrue($A.util.isComponent(value));
-            $A.test.assertEquals("markup://aura:expression", value.getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals("0:alpha,", value.get("v.value"));
-            $A.test.assertFalse(value.isRendered());
-            $A.test.assertEquals(0, value.getElements().length);
-            value = body[1];
-            $A.test.assertTrue($A.util.isObject(value));
-            $A.test.assertTrue($A.util.isComponent(value));
-            $A.test.assertEquals("markup://aura:expression", value.getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals("1:omega,", value.get("v.value"));
-            $A.test.assertFalse(value.isRendered());
-            $A.test.assertEquals(0, value.getElements().length);
+            $A.test.assertEquals(1, value.length);
+            $A.test.assertEquals($A.test.getText(value[0].getElement()),"iteration disabled");
         }
     },
 

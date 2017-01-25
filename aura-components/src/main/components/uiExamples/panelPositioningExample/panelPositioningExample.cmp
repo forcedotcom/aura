@@ -25,33 +25,36 @@
         <div class="make-panel">
             <form>
                 <fieldset class="simple">
-                <div class="{!v.advanced ? 'disabled' : ''}">
-                <ui:inputSelect disabled="{!v.advanced}" aura:id="direction" label="Direction">
-                    <ui:inputSelectOption text="north"/>
-                    <ui:inputSelectOption text="east"/>
-                    <ui:inputSelectOption text="west"/>
-                    <ui:inputSelectOption text="south"/>
-                    <ui:inputSelectOption text="northwest"/>
-                    <ui:inputSelectOption text="northeast"/>
-                    <ui:inputSelectOption text="southeast"/>
-                    <ui:inputSelectOption text="southwest"/>
-                </ui:inputSelect>
-                </div>
-                <ui:inputCheckbox label="inside" value="false" aura:id="isInside" />
-                
-                <ui:inputNumber aura:id="pad" label="pad" value="15"  />
-                <ui:inputNumber aura:id="padTop" label="padTop" value=""  />
+                    <div class="{!v.advanced ? 'disabled' : ''}">
+                        <ui:inputSelect disabled="{!v.advanced}" aura:id="direction" label="Direction">
+                            <ui:inputSelectOption text="north"/>
+                            <ui:inputSelectOption text="east"/>
+                            <ui:inputSelectOption text="west"/>
+                            <ui:inputSelectOption text="south"/>
+                            <ui:inputSelectOption text="northwest"/>
+                            <ui:inputSelectOption text="northeast"/>
+                            <ui:inputSelectOption text="southeast"/>
+                            <ui:inputSelectOption text="southwest"/>
+                        </ui:inputSelect>
+                    </div>
+                    <ui:inputCheckbox label="inside" value="false" aura:id="isInside" />
+
+                    <ui:inputNumber aura:id="pad" label="pad" value="15"  />
+                    <ui:inputNumber aura:id="padTop" label="padTop" value=""  />
+                    <ui:inputNumber aura:id="bundingBoxPad" label="bundingBoxPad" value="20"  />
+                    <ui:inputNumber aura:id="boxDirectionPad" label="boxDirectionPad" value="5"  />
+                    <ui:inputNumber aura:id="pointerPad" label="pointerPad" value="-15"  />
                 </fieldset>
                 <ui:inputCheckbox change="{!c.handleChange}" label="Use Advanced" value="false" aura:id="isAdvanced" />
-                
+
                 <aura:if isTrue="{!v.advanced}">
                     <fieldset class="advanced">
                         <legend>Advanced</legend>
-                    <ui:inputText aura:id="align" label="Align" value="left bottom" />
-                    <ui:inputText aura:id="targetAlign" label="Target Align" value="left top"  />
-                     </fieldset>
+                        <ui:inputText aura:id="align" label="Align" value="left bottom" />
+                        <ui:inputText aura:id="targetAlign" label="Target Align" value="left top"  />
+                    </fieldset>
                 </aura:if>
-               
+
                 <ui:button label="GO!" press="{!c.handlePress}"/>
             </form>
         </div>
@@ -65,8 +68,8 @@
     <div class="manager">
         <ui:panelManager2 aura:id="pm">
             <aura:set attribute="registeredPanels">
-                    <ui:panel alias="panel"/>
-                    <ui:modal alias="modal"/>
+                <ui:panel alias="panel"/>
+                <ui:modal alias="modal"/>
             </aura:set>
         </ui:panelManager2>
     </div>

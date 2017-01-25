@@ -14,6 +14,87 @@
  * limitations under the License.
  */
 ({
+    DIRECTION_MAP : {
+        'left top': 'east',
+        'left center': 'east',
+        'right top': 'west',
+        'right center': 'west',
+        'center top': 'south',
+        'center center': 'north',
+        'left bottom': 'north',
+        'right bottom': 'north',
+        'center bottom':  'north'
+    },
+
+    DIRECTION_CFG_HANDLER: {
+        'north': function (config) {
+            config.align = 'center bottom';
+            config.targetAlign = 'center top';
+            config.bbDirections = {
+                left:true,
+                right:true
+            };
+        },
+        'south': function (config) {
+            config.align = 'center top';
+            config.targetAlign = 'center bottom';
+            config.bbDirections = {
+                left:true,
+                right:true
+            };
+        },
+        'west':  function (config) {
+            config.align = 'right center';
+            config.targetAlign = 'left center';
+            config.pointerPad = -15;
+            config.bbDirections = {
+                top:true,
+                bottom:true
+            };
+        },
+        'east': function (config) {
+            config.align = 'left center';
+            config.targetAlign = 'right center';
+            config.pointerPad = -15;
+            config.bbDirections = {
+                top:true,
+                bottom:true
+            };
+        },
+        'southeast': function (config) {
+            config.align = 'left top';
+            config.targetAlign = 'right bottom';
+            config.bbDirections = {
+                top:true,
+                bottom:true
+            };
+        },
+        'southwest': function (config) {
+            config.align = 'right top';
+            config.targetAlign = 'left bottom';
+            config.bbDirections = {
+                top:true,
+                bottom:true
+            };
+        },
+        'northwest': function (config) {
+            config.align = 'right bottom';
+            config.targetAlign = 'left top';
+            config.bbDirections = {
+                top:true,
+                bottom:true
+            };
+        },
+        'northeast': function (config) {
+            config.align = 'left bottom';
+            config.targetAlign = 'right top';
+            config.bbDirections = {
+                top: true,
+                bottom: true
+            };
+        }
+    },
+
     init: function(cmp) {
         var closeAction = cmp.get("v.closeAction");
         //handler for tab key to trap the focus within the modal
@@ -30,11 +111,11 @@
         if ($A.util.isEmpty(cmp.get('v.closeButton')) && cmp.get('v.showCloseButton')) {
             $A.componentService.createComponent('markup://ui:button', {
                 'body': $A.createComponentFromConfig({
-                            descriptor: 'markup://aura:unescapedHtml',
-                            attributes: {
-                                value: '&times;'
-                            }
-                        }),
+                    descriptor: 'markup://aura:unescapedHtml',
+                    attributes: {
+                        value: '&times;'
+                    }
+                }),
                 'class': "closeBtn",
                 'press': cmp.getReference("c.onCloseBtnPressed"),
                 'label': cmp.get('v.closeDialogLabel'),
@@ -55,7 +136,7 @@
 
     _getKeyHandler: function(cmp) {
         if (!cmp._keyHandler && cmp.isValid()) {
-        	var closeAction = cmp.get("v.closeAction");
+            var closeAction = cmp.get("v.closeAction");
             var trapFocus = $A.util.getBooleanValue(cmp.get('v.trapFocus'));
             cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {
                 closeOnEsc: true,
@@ -66,27 +147,27 @@
         }
         return cmp._keyHandler;
     },
-    
-    _getMouseHandler: function(cmp) {
+
+    _getMouseHandler: function (cmp) {
         if (!cmp._mouseHandler && cmp.isValid()) {
-        	var closeAction = cmp.get("v.closeAction");
+            var closeAction = cmp.get("v.closeAction");
             cmp._mouseHandler = this.lib.panelLibCore.getMouseEventListener(cmp, {closeOnClickOut: cmp.get('v.closeOnClickOut')}, closeAction);
         }
         return cmp._mouseHandler;
     },
-     
-    _getReferenceElement: function(cmp) {
+
+    _getReferenceElement: function (cmp) {
         var referenceElementSelector = cmp.get("v.referenceElementSelector");
         var referenceEl = cmp.get('v.referenceElement');
-        
+
         if(!referenceEl) {
             referenceEl = referenceElementSelector ? document.querySelector(referenceElementSelector) : null;
         }
-        
-        // refereceElement is an array or NodeList, grabbing first element 
-        if (referenceEl && !this.positioningLib.positioningUtils.isWindow(referenceEl) && ($A.util.isArray(referenceEl) || referenceEl.hasOwnProperty('length') || 
-        		typeof referenceEl.length === 'number')) {
-        	referenceEl = referenceEl.length > 0 ? referenceEl[0] : null;
+
+        // refereceElement is an array or NodeList, grabbing first element
+        if (referenceEl && !this.positioningLib.positioningUtils.isWindow(referenceEl) && ($A.util.isArray(referenceEl) || referenceEl.hasOwnProperty('length') ||
+            typeof referenceEl.length === 'number')) {
+            referenceEl = referenceEl.length > 0 ? referenceEl[0] : null;
         }
 
         return referenceEl;
@@ -96,19 +177,19 @@
         if ($A.util.isUndefinedOrNull(cmp) || !cmp.isValid()) {
             return undefined;
         }
-        
+
         if (cmp.getDef().getDescriptor().getQualifiedName() === 'markup://ui:panel') {
             return cmp;
         } else {
             return this._getRootPanelCmp(cmp.getSuper());
-        }        
+        }
     },
 
     show: function (cmp, callback) {
         var autoFocus = cmp.get('v.autoFocus');
         var panelEl = cmp.getElement();
         var referenceEl = this._getReferenceElement(cmp);
-        
+
         cmp.set('v.visible', true);
 
         var self = this;
@@ -118,25 +199,25 @@
             animationName: 'movefrom' + cmp.get('v.animation'),
             autoFocus: false,
             onFinish: function() {
-            	var keyHandler = self._getKeyHandler(cmp);
-            	if ($A.util.isFunction(keyHandler)) {
+                var keyHandler = self._getKeyHandler(cmp);
+                if ($A.util.isFunction(keyHandler)) {
                     $A.util.on(panelEl, 'keydown', keyHandler);
-            	}
+                }
                 if (cmp.get('v.closeOnClickOut')) {
                     //Need to attach event in setTimeout in case the same click event that fires the show panel event
                     //bubbles up to the document, and if the closeOnClickOut is true, it causes the panel to close right away
                     //if the click is outside of the panel
-                	var mouseHandler = self._getMouseHandler(cmp);
-                	if ($A.util.isFunction(mouseHandler)) {
-                		window.setTimeout(function () {
+                    var mouseHandler = self._getMouseHandler(cmp);
+                    if ($A.util.isFunction(mouseHandler)) {
+                        window.setTimeout(function () {
                             $A.util.on(document, 'click', mouseHandler);
                         }, 0);
-                	}
+                    }
                 }
-                
+
                 if(referenceEl) {
                     panelEl.style.visibility = 'hidden';
-                    
+
                     requestAnimationFrame($A.getCallback(function() {
                         panelEl.style.visibility = 'visible';
                         //need to set focus after animation frame
@@ -151,7 +232,7 @@
                     }
                     $A.warning('Target element for panel not found.');
                 }
-            
+
                 callback && callback();
             }
         };
@@ -166,17 +247,17 @@
                     panelEl.style.opacity = '1';
                     self.lib.panelLibCore.show(cmp, conf);
                 }));
-                
+
             }));
         } else {
             this.lib.panelLibCore.show(cmp, conf);
         }
-        
+
     },
 
     reposition: function(cmp, callback) {
         if(cmp.positioned) { // reposition will blow up
-                             // if you call it before positioning
+            // if you call it before positioning
             var referenceEl = this._getReferenceElement(cmp);
             this.cleanPositioning(cmp);
             if(referenceEl) {
@@ -198,17 +279,17 @@
                         panelEl.style.display = 'none';
                     }
                     var keyHandler = self._getKeyHandler(cmp);
-                	if ($A.util.isFunction(keyHandler)) {
-                		$A.util.removeOn(panelEl, 'keydown', keyHandler);
-                	}
-                	var mouseHandler = self._getMouseHandler(cmp);
-                	if ($A.util.isFunction(mouseHandler)) {
+                    if ($A.util.isFunction(keyHandler)) {
+                        $A.util.removeOn(panelEl, 'keydown', keyHandler);
+                    }
+                    var mouseHandler = self._getMouseHandler(cmp);
+                    if ($A.util.isFunction(mouseHandler)) {
                         $A.util.removeOn(document, 'click', mouseHandler);
                     }
                     cmp.set('v.visible', false);
                     callback && callback();
                 } else {
-                    // The panel has already been destroyed, 
+                    // The panel has already been destroyed,
                     // possibly by someobody else. Call the callback.
                     callback && callback();
                 }
@@ -222,7 +303,7 @@
         }
 
         var self = this;
-        
+
         cmp.getConcreteComponent().hide(function () {
             if (!cmp.isValid()) {
                 return;
@@ -236,7 +317,7 @@
                 payload: {panelInstance: cmp.getGlobalId(), shouldReturnFocus: shouldReturnFocus }
             }).fire();
             if ($A.util.isFunction(callback)) {
-            	callback();
+                callback();
             }
         });
     },
@@ -252,298 +333,212 @@
     },
 
     position: function(cmp, referenceEl, callback) {
+        var config = this._buildConfig(cmp, referenceEl);
 
-        var direction = cmp.get('v.direction'), 
-            showPointer = cmp.get('v.showPointer'),
-            align,
-            pad = cmp.get('v.pad'),
-            padTop = pad,
-            advancedConfig = cmp.get('v.advancedConfig'),
-            targetAlign, 
-            pointer,
-            bbDirections,
-            boundingElement,
-            pointerPad;
-        
         cmp.getElement().classList.add('positioned');
+        cmp.getElement().classList.add(config.direction);
 
-        
-        if(showPointer) {
-            pointer = this._getRootPanelCmp(cmp).find('pointer').getElement();
-        }
-
-        boundingElement = cmp.get('v.boundingElement');
-
-        if(!boundingElement) {
-            boundingElement = window;
-        }
-
-        if(!advancedConfig) {
-
-            
-            switch (direction) {
-                case 'north':
-                    align = 'center bottom';
-                    targetAlign = 'center top';
-                    bbDirections = {
-                        left:true,
-                        right:true
-                    };
-                    break;
-                case 'south':
-                    align = 'center top';
-                    targetAlign = 'center bottom';
-                    bbDirections = {
-                        left:true,
-                        right:true
-                    };
-                    break;
-                case 'west':
-                    align = 'right center';
-                    targetAlign = 'left center';
-                    pointerPad = -15;
-                    bbDirections = {
-                        top:true,
-                        bottom:true
-                    };
-                    break;
-                case 'east':
-                    align = 'left center';
-                    targetAlign = 'right center';
-                    pointerPad = -15;
-                    bbDirections = {
-                        top:true,
-                        bottom:true
-                    };
-                    break;
-                case 'southeast':
-                    align = 'left top';
-                    targetAlign = 'right bottom';
-                    bbDirections = {
-                        top:true,
-                        bottom:true
-                    };
-                    break;
-                case 'southwest':
-                    align = 'right top';
-                    targetAlign = 'left bottom';
-                    bbDirections = {
-                        top:true,
-                        bottom:true
-                    };
-                    break;
-                case 'northwest':
-                    align = 'right bottom';
-                    targetAlign = 'left top';
-                    bbDirections = {
-                        top:true,
-                        bottom:true
-                    };
-                    break;
-                case 'northeast':
-                    align = 'left bottom';
-                    targetAlign = 'right top';
-                    bbDirections = {
-                        top:true,
-                        bottom:true
-                    };
-                    break;
-                default :
-                    if(direction) {
-                        $A.assert(direction.match(/(south|north)(west|east)$|^(east|west|north|south)$/), 'Invalid direction');
-                    }
-            }
-        }
-
-        if(advancedConfig) {
-            align = advancedConfig.align;
-            targetAlign = advancedConfig.targetAlign;
-            padTop = advancedConfig.vertPad;
-            
-            // insane rules to figure out where to put the arrow
-            switch (align) {
-                case 'left top':
-                case 'left center':
-                    direction = 'east';
-                    break;
-                case 'right top':
-                case 'right center':
-                    direction = 'west';
-                    break;
-                case 'center top':
-                    direction = 'south';
-                    break;
-                case 'center center':
-                case 'left bottom':
-                case 'right bottom':
-                case 'center bottom':
-                    direction = 'north';
-                    break;
-
-            }
-
-            // special cases override above
-            if(align.match(/(^left|right)\stop$/) && targetAlign.match(/(^left|right|center)\sbottom$/)) {
-                direction = 'south';
-            } 
-        }
-        cmp.getElement().classList.add(direction);
-
-        if(cmp.get('v.inside')) {
-            align = targetAlign;
-        }
         if(!cmp.constraints) {
-            cmp.constraints = [];
-            cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
-                element:cmp.getElement(),
-                target:referenceEl,
-                align:align,
-                targetAlign: targetAlign,
-                enable: true,
-                pad: pad,
-                padTop: padTop
-            }));
-            cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
-                element:cmp.getElement(),
-                target: boundingElement,
-                type: 'bounding box',
-                enable: true,
-                pad: 20
-            }));
+            this._createConstraints(cmp, config);
+        }
 
-            if(pointer) {
-                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
-                    element:pointer,
-                    target:referenceEl,
-                    align: align,
-                    targetAlign: targetAlign,
-                    enable: true,
-                    pad: pointerPad
-                }));
+        this.positioningLib.panelPositioning.reposition(callback);
+    },
+
+    _buildConfig: function (cmp, referenceEl) {
+        var config = {
+            direction: cmp.get('v.direction'),
+            align: "",
+            pad: cmp.get('v.pad'),
+            padTop:  cmp.get('v.pad'),
+            advancedConfig: cmp.get('v.advancedConfig'),
+            targetAlign: "",
+            pointer: cmp.get('v.showPointer') ? this._getRootPanelCmp(cmp).find('pointer').getElement() : null,
+            bbDirections: {},
+            boundingElement: cmp.get('v.boundingElement') || window,
+            pointerPad: cmp.get("v.pointerPad"),
+            boundingBoxPad: cmp.get("v.boundingBoxPad"),
+            boxDirectionPad: cmp.get("v.boxDirectionPad"),
+            referenceEl: referenceEl
+        };
+
+        if (!config.advancedConfig) {
+            if (this.DIRECTION_CFG_HANDLER[config.direction]) {
+                this.DIRECTION_CFG_HANDLER[config.direction].apply(this, [config]);
+            } else {
+                if(config.direction) {
+                    $A.assert(config.direction.match(/(south|north)(west|east)$|^(east|west|north|south)$/), 'Invalid direction');
+                }
             }
+        } else {
+            config.align = config.advancedConfig.align;
+            config.targetAlign = config.advancedConfig.targetAlign;
+            config.padTop = config.advancedConfig.vertPad;
 
-            if(pointer && direction === 'east') {
-                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
-                    element:pointer,
+            // insane rules to figure out where to put the arrow
+            config.direction = this._mapRelativeToCardinal(config);
+        }
+        config.align = cmp.get('v.inside')? config.targetAlign : config.align;
+
+        return config;
+    },
+
+    _mapRelativeToCardinal: function(config) {
+        if(config.align.match(/(^left|right)\stop$/) &&
+            config.targetAlign.match(/(^left|right|center)\sbottom$/)) {
+            return this.DIRECTION_MAP['center top']; // aka south.
+        }
+        return this.DIRECTION_MAP[config.align];
+    },
+
+    _createRelationship: function(config) {
+        return this.positioningLib.panelPositioning.createRelationship(config);
+    },
+
+    _createConstraints: function (cmp, config) {
+        cmp.constraints = [];
+
+        cmp.constraints.push(this._createRelationship({
+            element:        cmp.getElement(),
+            target:         config.referenceEl,
+            align:          config.align,
+            targetAlign:    config.targetAlign,
+            enable:         true,
+            pad:            config.pad,
+            padTop:         config.padTop
+        }));
+
+        cmp.constraints.push(this._createRelationship({
+            element:    cmp.getElement(),
+            target:     config.boundingElement,
+            type:       'bounding box',
+            enable:     true,
+            pad:        config.boundingBoxPad
+        }));
+
+        if(config.pointer) {
+            cmp.constraints.push(this._createRelationship({
+                element: config.pointer,
+                target: config.referenceEl,
+                align: config.align,
+                targetAlign: config.targetAlign,
+                enable: true,
+                pad: config.pointerPad
+            }));
+
+            if(config.direction === 'east') {
+                cmp.constraints.push(this._createRelationship({
+                    element: config.pointer,
                     target:cmp.getElement(),
                     align: 'right center',
                     targetAlign: 'left center',
                     enable: true,
-                    pad: pointerPad
+                    pad: config.pointerPad
                 }));
             }
 
-            if(pointer && direction === 'west') {
-                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
-                    element:pointer,
-                    target:cmp.getElement(),
+            if(config.direction === 'west') {
+                cmp.constraints.push(this._createRelationship({
+                    element: config.pointer,
+                    target: cmp.getElement(),
                     align: 'left center',
                     targetAlign: 'right center',
                     enable: true,
-                    pad: pointerPad
-                }));
-            }
-            
-            if(pointer) {
-                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
-                    element:pointer,
-                    target:cmp.getElement(),
-                    type:'bounding box',
-                    enable: true,
-                    boxDirections: bbDirections,
-                    pad: 5
+                    pad: config.pointerPad
                 }));
             }
 
-            // The following constraints are there
-            // to keep east and west panels inside the viewport where possible
-            // but still allow them to leave the viewport cleanly on scroll and 
-            // never open with a panel top outside the viewport
-            // W-2678291 & W-2701440
-            if(direction === 'east' || direction === 'west') {
+            cmp.constraints.push(this._createRelationship({
+                element: config.pointer,
+                target: cmp.getElement(),
+                type:'bounding box',
+                enable: true,
+                boxDirections: config.bbDirections,
+                pad: config.boxDirectionPad
+            }));
+        }
 
-                // keep the panel above the bottom of the viewport...
-                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
-                        element:cmp.getElement(),
-                        target:window,
-                        type:'bounding box',
-                        enable: true,
-                        boxDirections: {
-                            top: false,
-                            bottom: true
-                        },
-                        pad: 5
-                }));
+        // The following constraints are there
+        // to keep east and west panels inside the viewport where possible
+        // but still allow them to leave the viewport cleanly on scroll and
+        // never open with a panel top outside the viewport
+        // W-2678291 & W-2701440
+        if(config.direction === 'east' || config.direction === 'west') {
+            // keep the panel above the bottom of the viewport...
+            cmp.constraints.push(this._createRelationship({
+                element: cmp.getElement(),
+                target: window,
+                type: 'bounding box',
+                enable: true,
+                boxDirections: {
+                    top: false,
+                    bottom: true
+                },
+                pad: config.boxDirectionPad
+            }));
 
-                // unless it would go off screen to the top
-                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
-                        element:cmp.getElement(),
-                        target:window,
-                        type:'bounding box',
-                        enable: true,
-                        boxDirections: {
-                            top: true,
-                            bottom: false
-                        },
-                        pad: 5
-                }));
-            }
+            cmp.constraints.push(this._createRelationship({
+                element: cmp.getElement(),
+                target: window,
+                type:'bounding box',
+                enable: true,
+                boxDirections: {
+                    top: true,
+                    bottom: false
+                },
+                pad: config.boxDirectionPad
+            }));
+        }
 
+        if (config.pointer) {
             // this constraint will keep the pointer attached to the panel,
             // so if the target is scrolled out of the viewport the whole panel will go with it
-            if(pointer && (direction === 'east' || direction === 'west')) {
-                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+            if (config.direction === 'east' || config.direction === 'west') {
+                cmp.constraints.push(this._createRelationship({
                     element:cmp.getElement(),
-                    target:pointer,
+                    target: config.pointer,
                     type:'inverse bounding box',
                     enable: true,
                     boxDirections: {
                         top: true,
                         bottom: true
                     },
-                    pad: 5
+                    pad: config.boxDirectionPad
                 }));
             }
 
-            if(pointer && direction === 'north') {
-                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
-                    element:pointer,
-                    target:cmp.getElement(),
-                    type:'top',
-                    enable: true,
-                    targetAlign: 'center bottom',
-                    pad: -15
-                }));
-            } else if (pointer && direction === 'south') {
-                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
-                    element:pointer,
-                    target:cmp.getElement(),
-                    type:'bottom',
-                    enable: true,
-                    targetAlign: 'center top',
-                    pad: -15
-                }));
-            } else if (pointer && direction === 'east') {
-                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
-                    element:pointer,
-                    target:cmp.getElement(),
-                    type:'right',
-                    enable: true,
-                    targetAlign: 'left bottom',
-                    pad: -15 //this is very specific. 
-                }));
+            var relationShip = {
+                element:    config.pointer,
+                target:     cmp.getElement(),
+                enable:     true,
+                pad:        config.pointerPad
+            };
+            switch (config.direction) {
+                case 'north':
+                    relationShip.type = 'top';
+                    relationShip.targetAlign =  'center bottom';
+                    break;
+                case 'south':
+                    relationShip.type = "bottom";
+                    relationShip.targetAlign =  'center top';
+                    break;
+                case 'east':
+                    relationShip.type = 'right';
+                    relationShip.targetAlign = 'left bottom';
+                    break;
+                default:
+                    relationShip = null;
             }
-            
-            this.positioningLib.panelPositioning.reposition(callback);
-        } else {
-            this.positioningLib.panelPositioning.reposition(callback);
+            if (relationShip) {
+                cmp.constraints.push(this._createRelationship(relationShip));
+            }
         }
     },
-    
+
     scopeScrollables: function (cmp) {
         this.lib.panelLibCore.scopeScrollables(cmp);
     },
-    
+
     startY : 0,
     iNoBounceEnabled : false,
     iNoBounce : function (el) {

@@ -35,6 +35,9 @@
         var value = cmp.find('direction').get('v.value');
         var pad = parseInt(cmp.find('pad').get('v.value'),10);
         var padTop = cmp.find('padTop').get('v.value');
+        var bundingBoxPad = cmp.find('bundingBoxPad').get('v.value');
+        var boxDirectionPad = cmp.find('boxDirectionPad').get('v.value');
+        var pointerPad = cmp.find('pointerPad').get('v.value');
         var isInside;
         isInside = cmp.find('isInside').get('v.value');
 
@@ -49,7 +52,10 @@
             boundingElement: isInside ? window : bigTarget,
             inside: isInside,
             pad: pad,
-            padTop: padTop !== undefined ? parseInt(padTop, 10) : undefined
+            padTop: padTop !== undefined ? parseInt(padTop, 10) : undefined,
+            pointerPad: pointerPad,
+            bundingBoxPad: bundingBoxPad,
+            boxDirectionPad: boxDirectionPad
         };
 
         if(cmp.find('isAdvanced').get('v.value')) {

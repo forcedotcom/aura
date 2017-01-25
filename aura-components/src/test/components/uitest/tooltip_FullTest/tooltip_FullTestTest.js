@@ -46,9 +46,10 @@
 				else
 					trigger = document.getElementById(triggers[2]);
 				tt = component.find(tooltips[i]);
+				// verify that the tooltip is not visible
+				this.checkTooltipNotVisible(component, tt.get('v.advanced'), tooltips[i]);
+				$A.test.fireDomEvent(trigger, "mouseover");		
 				var ttElem = $A.test.getElementByClass(tooltips[i])[0];
-				$A.test.assertFalse($A.util.hasClass(ttElem,"visible"), "Tooltip should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
-				$A.test.fireDomEvent(trigger, "mouseover");			
 				$A.test.addWaitForWithFailureMessage(true, function(){return ($A.util.hasClass(ttElem,"visible"));}, "Problem with tooltip having aura:id = " + tooltips[i]);
 					
 			}
@@ -94,12 +95,15 @@
 			var tooltips = ['advTrueTooltip', 'advFalseTooltip', 'advEmptyTooltip'];			
 			var trigger = "";
 			var tt = "";
+			var self = this;
 			for(var i = 0; i < triggers.length; i++) {
 				function checkAdvanced(tooltip, trigger) {
 					var triggerElem = component.find(trigger).getElement();
 					var tt = component.find(tooltip);
-					var ttElem = $A.test.getElementByClass(tooltip)[0];
-					$A.test.assertFalse($A.util.hasClass(ttElem,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
+					
+					// verify that the tooltip is not visible
+					self.checkTooltipNotVisible(component, tt.get('v.advanced'), tooltip);
+					
 					$A.test.clickOrTouch(triggerElem, true, true);
 					if(tt.get('v.advanced')) {
 						var wrapper = $A.test.getElementByClass(tooltips[i])[0];
@@ -151,10 +155,21 @@
 	checkTrigger : function(component, ttLabel, triggerLabel, domEvent, assertion) {
 		var trigger = component.find(triggerLabel).getElement();
 		var tt = component.find(ttLabel);
-		var ttElem = $A.test.getElementByClass(ttLabel)[0];
-		$A.test.assertFalse($A.util.hasClass(ttElem,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ ttLabel);
-		$A.test.fireDomEvent(trigger, domEvent);		
-		$A.test.addWaitForWithFailureMessage(assertion, function(){return ($A.util.hasClass(ttElem,"visible"));}, "Problem with tooltip having aura:id = " + ttLabel);
+		
+		// verify that the tooltip is not visible
+        this.checkTooltipNotVisible(component, tt.get('v.advanced'), ttLabel);
+        
+		$A.test.fireDomEvent(trigger, domEvent);	
+		if(ttLabel === "triggernone" || ttLabel === "triggerempty") {
+		    // in this case, the tooltip is never created due to lazy loading of advanced tooltips
+		    var ttElem = $A.test.getElementByClass(ttLabel);
+		    $A.test.assertTrue($A.util.isUndefinedOrNull(ttElem));
+		}
+		else {
+		    var ttElem = $A.test.getElementByClass(ttLabel)[0];
+	        $A.test.addWaitForWithFailureMessage(assertion, function(){return ($A.util.hasClass(ttElem,"visible"));}, "Problem with tooltip having aura:id = " + ttLabel);
+		}
+		
 	},
 	
 	/**
@@ -588,7 +603,6 @@
 		var self = this;
 		var trigger = cmp.find("changeTextBtn").getElement();
 		var tt = "dynamicBody";
-		var tooltip = $A.test.getElementByClass(tt)[0];
 		var tooltipBodies = {	"basic"            : "hey",
 		                     	"specialChars"     : "This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \")",
 		                     	"specialCharsLong" : "This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \") This info here is just to add some more text to the tooltip. Just adding more and more! It's like theres no end to this right? Wrong! All you need is patience. Man! I have to move this test further down the screen just because this tooltip has so many characters! Its just growing and growing. I don't know if the text will overflow. It doesn't look like it will. This was pretty well written so its all been handled very well! Don't you worry, we've got your back!",
@@ -598,6 +612,7 @@
 	
 		cmp.find(tt).set("v.tooltipBody", tooltipBodies[testCase]);
 		$A.test.fireDomEvent(trigger, "mouseover");
+		var tooltip = $A.test.getElementByClass(tt)[0];
 		$A.test.addWaitForWithFailureMessage(true, function(){
 			if($A.util.hasClass(tooltip,"visible")) {		
 				
@@ -641,13 +656,14 @@
 	openOrCloseTT : function(component, ttLabel, tooltip, action) {
 		var trigger = component.find(ttLabel).getElement();
 		var tt = component.find(tooltip);
-		var ttElem = $A.test.getElementByClass(tooltip)[0];
 		if(action == "open") {
 			$A.test.fireDomEvent(trigger, "mouseover");
+			var ttElem = $A.test.getElementByClass(tooltip)[0];
 			$A.test.addWaitForWithFailureMessage(true, function(){return ($A.util.hasClass(ttElem,"visible"));}, "Tooltip not opening for tooltip with aura:id = " + tooltip);
 		}
 		else if(action == "close") {
 			$A.test.fireDomEvent(trigger, "mouseout");
+			var ttElem = $A.test.getElementByClass(tooltip)[0];
 			$A.test.addWaitForWithFailureMessage(false, function(){return ($A.util.hasClass(ttElem,"visible"));}, "Tooltip not closing for tooltip with aura:id = " + tooltip);
 		}
 	},
@@ -666,6 +682,18 @@
     		}
     			
     	}, "Could not complete action: " + action);
+	},
+	
+	checkTooltipNotVisible : function(component, advanced, tooltip) {
+	    if(advanced) {
+            // when tooltip's advanced=true, tooltip is lazy loaded and hence does not exist
+            var ttElem = $A.test.getElementByClass(tooltip);
+            $A.test.assertTrue($A.util.isUndefinedOrNull(ttElem));
+        }
+        else {
+            var ttElem = $A.test.getElementByClass(tooltip)[0];
+            $A.test.assertFalse($A.util.hasClass(ttElem,"visible"), "Tooltip should not be visible at this point for tooltip with aura:id = "+ tooltip);
+        }
 	}
 
 })

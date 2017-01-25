@@ -96,7 +96,7 @@
 			component._toggleGuard = false;
 		}, 500);
 		
-		component.set('v.isVisible', true);
+		component.set('v.isVisible', false);
 		this.buildTooltip(component, $A.getCallback(function(tt) {
 			if (tt && tt.isValid()) {
 				tt.set('v.isVisible', true);
@@ -203,13 +203,5 @@
 		}
 		component._trigger = node;
 
-		this.buildTooltip(component, $A.getCallback(function() {
-			// it seems that there is a race condition 
-			// somewhere when components are destroyed 
-			// and created rapidly (clicking home over and over)
-			if(component && component.isValid()) {
-				self.initStyle(component);
-			}
-		}));
 	}
 })// eslint-disable-line semi

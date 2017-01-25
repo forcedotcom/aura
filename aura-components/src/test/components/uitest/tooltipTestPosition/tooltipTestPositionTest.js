@@ -35,8 +35,8 @@
 				function topRow(ttLabel, triggerLabel) {
 					var trigger = component.find(triggerLabel).getElement();
 					var ttCmp = component.find(ttLabel);
-					var tt = $A.test.getElementByClass(ttLabel)[0];
-					$A.test.fireDomEvent(trigger, "mouseover");			console.log(ttLabel);			
+					$A.test.fireDomEvent(trigger, "mouseover");
+					var tt = $A.test.getElementByClass(ttLabel)[0];			
 					$A.test.addWaitForWithFailureMessage(true, function(){	
 						
 						if($A.util.hasClass(tt,"visible") == true) {
@@ -98,8 +98,8 @@
 				function centerRow(ttLabel, triggerLabel) {
 					var trigger = component.find(triggerLabel).getElement();
 					var ttCmp = component.find(ttLabel);
+					$A.test.fireDomEvent(trigger, "mouseover");
 					var tt = $A.test.getElementByClass(ttLabel)[0];
-					$A.test.fireDomEvent(trigger, "mouseover");						
 					$A.test.addWaitForWithFailureMessage(true, function(){	
 						
 						if($A.util.hasClass(tt,"visible") == true) {
@@ -177,8 +177,8 @@
 				function bottomRow(ttLabel, triggerLabel) {
 					var trigger = component.find(triggerLabel).getElement();
 					var ttCmp = component.find(ttLabel);
+					$A.test.fireDomEvent(trigger, "mouseover");
 					var tt = $A.test.getElementByClass(ttLabel)[0];
-					$A.test.fireDomEvent(trigger, "mouseover");						
 					$A.test.addWaitForWithFailureMessage(true, function(){	
 											
 						if($A.util.hasClass(tt,"visible") == true) {

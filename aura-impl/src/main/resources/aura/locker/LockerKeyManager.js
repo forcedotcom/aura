@@ -37,7 +37,7 @@ var ls_getKey,
 
 (function LockerKeyManager() {
 	var substituteMapForWeakMap = false;
-	if (typeof WeakMap !== "undefined") {
+	if (typeof WeakMap !== "undefined" && typeof Proxy !== "undefined") {
 		// Test for the Edge weakmap with proxies bug https://github.com/Microsoft/ChakraCore/issues/1662
 		var map = new WeakMap();
 		var proxyAsKey = new Proxy({}, {});

@@ -27,7 +27,8 @@
     <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
     <ui:inputDate aura:id="inputDate"
                 label="InputDate"
-                displayDatePicker="true"/> <br/>
+                displayDatePicker="true"
+                loadDatePicker="true"/> <br/>
     <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
     <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
     <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>

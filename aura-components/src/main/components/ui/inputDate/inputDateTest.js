@@ -58,7 +58,7 @@
      */
     testInvalidFormat: {
         browsers: ['DESKTOP'],
-        attributes: {displayDatePicker: 'true', format: 'KKKKKK'},
+        attributes: {displayDatePicker: 'true', format: 'KKKKKK', loadDatePicker: 'true'},
         test: [function (cmp) {
             cmp.find("datePicker").get('c.selectToday').runDeprecated();
         }, function (cmp) {
@@ -151,7 +151,7 @@
      */
     testDatePickerWithLabel: {
         browsers: ['DESKTOP'],
-        attributes: {displayDatePicker: 'true', label: 'my date cmp'},
+        attributes: {displayDatePicker: 'true', label: 'my date cmp', loadDatePicker: 'true'},
         test: function (cmp) {
             var datePickerOpener = cmp.find("datePickerOpener");
             $A.test.assertNotNull(datePickerOpener, "datePickerOpener anchor not present");

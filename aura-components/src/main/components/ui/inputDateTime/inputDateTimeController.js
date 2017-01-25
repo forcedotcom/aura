@@ -18,34 +18,8 @@
 		component.set("v.value", "");
 	},
 
-	click: function(component, event, helper) {
-        event.preventDefault();
-        var concreteCmp = component.getConcreteComponent();
-        helper.displayDatePicker(concreteCmp);
-    },
-
     doInit: function(component, event, helper) {
-    	// only add the placeholder when there is no date picker opener.
-        if (helper.isDesktopMode(component)) {
-            helper.updateTimeFormat(component);
-            if (!component.get("v.displayDatePicker")) {
-                var dateFormat = component.get("v.dateFormat"),
-                    timeFormat = component.get("v.timeFormat");
-                dateFormat = $A.util.isEmpty(dateFormat) ? $A.get("$Locale.dateFormat") : dateFormat;
-                timeFormat = $A.util.isEmpty(timeFormat) ? $A.get("$Locale.timeFormat") : timeFormat;
-
-                if ($A.util.isEmpty(component.get("v.placeholder"))) {
-                    component.set("v.placeholder", dateFormat);
-                }
-                if ($A.util.isEmpty(component.get("v.timePlaceholder"))) {
-                    component.set("v.timePlaceholder", timeFormat);
-                }
-            }
-            if (component.get("v.useManager")) {
-                helper.checkManagerExists(component);
-                component.set("v.loadDatePicker", false);
-            }
-        }
+        helper.init(component);
     },
 
     openDatePicker: function(component, event, helper) {
@@ -58,93 +32,25 @@
     },
 
     inputDateFocus: function(component, event, helper) {
-        var inputText = helper.getDateString(component);
-
-        if ($A.util.isEmpty(inputText) && !component.get("v.disabled") && component.get("v.displayDatePicker")) {
-            helper.displayDatePicker(component);
-        }
+        helper.handleInputDateFocused(component);
     },
 
     inputTimeFocus: function(component, event, helper) {
         event.stopPropagation();
-        var inputText = helper.getTimeString(component);
-        if ($A.util.isEmpty(inputText) && !component.get("v.disabled")) {
-            helper.displayTimePicker(component);
-        }
+        helper.handleInputTimeFocused(component);
     },
 
-    // override ui:handlesDateSelected
+    // override ui:handlesDateSelected, used by ui:datePickerManager
     onDateSelected: function(component, event, helper) {
-        var dateValue = event.getParam("arguments").value;
-        if (dateValue) {
-            helper.setDateValue(component, dateValue);
-        }
+	    helper.handleDateSelectionByManager(component, event);
     },
 
     // override ui:hasManager
-    registerManager: function(component, event) {
-        var sourceComponentId = event.getParam('sourceComponentId') || event.getParam("arguments").sourceComponentId;
-        if ($A.util.isUndefinedOrNull(sourceComponentId)) {
-            return;
-        }
-
-        var sourceComponent = $A.componentService.get(sourceComponentId);
-        if (sourceComponent && sourceComponent.isInstanceOf("ui:datePickerManager")) {
-            component.set("v.managerExists", true);
-        }
+    registerManager: function(component, event, helper) {
+        helper.registerManager(component, event);
     },
 
-    setValue: function(component, event, helper) {
-
-        var dateValue = event.getParam("value"),
-            selectedHours = event.getParam("hours"),
-            selectedMinutes = event.getParam("minutes");
-
-        if (helper.isDesktopMode(component)) {
-            var hasNewDate = !$A.util.isUndefinedOrNull(dateValue),
-                hasNewTime = !$A.util.isUndefinedOrNull(selectedHours) && !$A.util.isUndefinedOrNull(selectedMinutes);
-
-            if (hasNewDate) {
-                helper.setDateValue(component, dateValue);
-            } else if (hasNewTime) {
-                helper.setTimeValue(component, selectedHours, selectedMinutes);
-            }
-
-        } else {
-            var outputCmp = component.find("inputDate");
-            var elem = outputCmp ? outputCmp.getElement() : null;
-            var value = elem ? elem.value : null;
-            var format = component.get("v.format");
-            if (!format) { // use default format
-                format = $A.get("$Locale.datetimeFormat");
-            }
-            var langLocale = component.get("v.langLocale");
-            var secs = 0;
-            var ms = 0;
-            if (value) {
-                var currDate = $A.localizationService.parseDateTimeUTC(value, format, langLocale);
-                // if invalid text is entered in the inputDate, currentDate will be null
-                if (!$A.util.isUndefinedOrNull(currDate)) {
-                    secs = currDate.getUTCSeconds();
-                    ms = currDate.getUTCMilliseconds();
-                }
-            }
-
-            var newDate = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD", langLocale);
-
-            var targetTime = Date.UTC(newDate.getUTCFullYear(),
-                                      newDate.getUTCMonth(),
-                                      newDate.getUTCDate(),
-                                      selectedHours,
-                                      selectedMinutes,
-                                      secs,
-                                      ms);
-            var d = new Date(targetTime);
-
-            var timezone = component.get("v.timezone");
-            $A.localizationService.WallTimeToUTC(d, timezone, function(utcDate) {
-                component.set("v.value", $A.localizationService.toISOString(utcDate));
-            });
-        }
+    setDateTime: function(component, event, helper) {
+	    helper.handleDateTimeSelection(component, event);
     }
 })// eslint-disable-line semi

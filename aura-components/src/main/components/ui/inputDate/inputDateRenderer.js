@@ -15,21 +15,21 @@
  */
 ({
     afterRender: function(component) {
-        var concreteCmp = component.getConcreteComponent();
-        var _helper = concreteCmp.getDef().getHelper();
+        var _helper = component.getConcreteComponent().getDef().getHelper();
+
         _helper.displayValue(component);
-        _helper.toggleClearButton(component);
+        _helper.togglePickerIcon(component);
         _helper.initializeDatePicker(component);
-        _helper.toggleOpenIconVisibility(component);
+
         return this.superAfterRender();
 	},
 
 	rerender: function(component) {
-        var concreteCmp = component.getConcreteComponent();
-        var _helper = concreteCmp.getDef().getHelper();
+        var _helper = component.getConcreteComponent().getDef().getHelper();
+
         _helper.displayValue(component);
-        _helper.toggleClearButton(component);
-        _helper.toggleOpenIconVisibility(component);
+        _helper.togglePickerIcon(component);
+
         return this.superRerender();
     }
 })// eslint-disable-line semi

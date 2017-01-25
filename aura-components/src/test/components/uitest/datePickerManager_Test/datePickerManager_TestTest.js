@@ -131,15 +131,15 @@
     },
 
     /**
-     * Test verifying that inputDate and inputDateTime load their own datePicker
-     * when not using manager
+     * Test verifying that inputDate and inputDateTime don't load their own datePicker on init even
+     * when not using manager. (They will load their datepicker after clicking on the picker icon)
      * Excluding mobile because on mobile we use native date pickers
      */
     testDatePickerNotUseManager: {
         attributes: {useManager: "false"},
         test: function(cmp) {
-            // the dom should contain 3 datePickers (datePickerManager, inputDate, and inputDateTime)
-            var expectedDatePickerSize = 3;
+            // the dom should contain 1 datePicker even when useManager=false.
+            var expectedDatePickerSize = 1;
             var datePickerSize = $A.test.getElementByClass("uiDatePicker").length;
             $A.test.assertEquals(expectedDatePickerSize, datePickerSize,
                 "Expected " + expectedDatePickerSize + " datePicker(s) on the screen but there aren't");
@@ -168,17 +168,17 @@
         var grid = this.getDPMDatePicker(cmp).find("grid");
         var start = false; // start search, the first few dates can be from previous month
         var dateElm = null;
-        
+
         // go through each cell and check to see if label matches date
         for (var i=0; i<42; i++) {
             var dateCmp = grid.find(i);
             var targetDate = dateCmp.get('v.label');
-            
+
             // on dates that are in previous month?
             if (!start && targetDate === 1) {
                 start = true;
             }
-            
+
             if (start) {
                 if (targetDate === date) {
                     dateElm = dateCmp.getElement();
@@ -186,7 +186,7 @@
                 }
             }
         }
-        
+
         $A.test.clickOrTouch(dateElm);
     },
 

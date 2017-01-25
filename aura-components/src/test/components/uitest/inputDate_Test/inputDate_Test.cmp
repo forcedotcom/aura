@@ -27,6 +27,7 @@
     <ui:inputDate aura:id="datePickerTestCmp"
                 label="date picker with label"
                 displayDatePicker="true"
+                loadDatePicker="true"
                 class="date_input_box"
                 timezone="{!v.timezone}"
                 format="{!v.format}"

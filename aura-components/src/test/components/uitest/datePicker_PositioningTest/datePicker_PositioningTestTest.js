@@ -176,7 +176,12 @@
 	},
 
 	verifyDatePickerIsClosed : function (cmp) {
-		var datePicker = cmp.find('inputDate').find('datePicker').getElement();
+        var datePickerCmp = cmp.find('inputDate').find('datePicker');
+        if (!datePickerCmp) {
+            // no datepicker loaded, so we're safe
+            return true;
+        }
+        var datePicker = datePickerCmp.getElement();
 		$A.test.addWaitForWithFailureMessage(false, function(){
 			return $A.util.hasClass(datePicker,"visible");
 		},"datePicker didn't close");

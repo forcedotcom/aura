@@ -74,8 +74,8 @@
             var openDatePickerEvt = dateTimePickerTest.getEvent("openPicker");
             $A.test.assertNotUndefinedOrNull(openDatePickerEvt, "Didn't find an openPicker event");
             openDatePickerEvt.fire();
-            var datePicker = dateTimePickerTest.find("datePicker").getElement();
             $A.test.addWaitFor(true, function () {
+                var datePicker = dateTimePickerTest.find("datePicker").getElement();
                 return $A.util.hasClass(datePicker, "visible")
             });
         }
@@ -352,13 +352,13 @@
     openDatePicker: function (cmp) {
         var opener = cmp.find("dateTimePickerTest").find("datePickerOpener").getElement();
         var inputBox = cmp.find("dateTimePickerTest").find("inputDate").getElement();
-        var datePicker = cmp.find("dateTimePickerTest").find("datePicker").getElement();
         if ($A.util.isUndefinedOrNull(opener)) {
             $A.test.clickOrTouch(inputBox);
         } else {
             $A.test.clickOrTouch(opener);
         }
         $A.test.addWaitFor(true, function () {
+            var datePicker = cmp.find("dateTimePickerTest").find("datePicker").getElement();
             return $A.util.hasClass(datePicker, "visible")
         });
     },

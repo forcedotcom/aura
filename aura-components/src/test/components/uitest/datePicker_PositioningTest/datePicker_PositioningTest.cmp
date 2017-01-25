@@ -1,19 +1,19 @@
 <aura:component>
- 
+
 	<aura:attribute name="pos" type="Integer" default="1" description="Position at which the datePicker currently is" />
-	
+
 	<div class="title">
 		Date Picker Positioning Test<br/>
 	</div>
 	<div class="desc">
 		Click forward or back button to change position of inputDate and click on calendar icon to open datePicker
 	</div>
-	
-	<div class="buttons">	
+
+	<div class="buttons">
 		<ui:button aura:id="backBtn" class="btn" label="back" press="{!c.back}"/>
 		<ui:button aura:id="forwardBtn" class="btn" label="forward" press="{!c.forward}"/>
 	</div>
-	
+
 	<div aura:id="inputDateDiv" class="pos1">
 		<ui:inputDate aura:id="inputDate" displayDatePicker="true" />
 	</div>
@@ -26,5 +26,5 @@
 	<ui:outputText aura:id="pos7" class="pos7" value="Position 7" />
 	<ui:outputText aura:id="pos8" class="pos8" value="Position 8" />
 	<ui:outputText aura:id="pos9" class="pos9" value="Position 9" />
-	
+
 </aura:component>

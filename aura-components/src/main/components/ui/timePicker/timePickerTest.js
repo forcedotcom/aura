@@ -49,14 +49,14 @@
     testInputSelNotPreset : {
         attributes : { "is24HourFormat" : true  },
         test : function(cmp) {
-            $A.test.assertNull(cmp.find("ampm").getElement(),"The inputSelect for am/pm is rendered and it should not be");
+            $A.test.assertUndefinedOrNull(cmp.find("ampm"),"The inputSelect for am/pm is rendered and it should not be");
         }
     },
 
     testInputSelPresent : {
         attributes : { "is24HourFormat" : false},
         test : function(cmp) {
-            $A.test.assertNotNull(cmp.find("ampm").getElement(),"The inputSelect for am/pm is not rendered and it should be");
+            $A.test.assertNotUndefinedOrNull(cmp.find("ampm"),"The inputSelect for am/pm is not rendered and it should be");
         }
     },
 
@@ -361,21 +361,21 @@
             $A.test.assertEquals("01", "" + minutes, "The item in the minutes textbox was not correctly converted");
         }]
     },
-    
+
     // Check that the hours value is correctly updated at 12AM and 12PM
     testCheck12AMPMHourValue : {
     	attributes : {"is24HourFormat" : false, "hours" : 12, "minutes" : 0},
     	test : [function(cmp) {
     	        	var ampmCmp = cmp.find("ampm");
     	        	$A.test.assertEquals("pm", ampmCmp.get('v.value'), "The time period is wrong");
-    	        	$A.test.assertEquals(12, cmp.get('v.hours'), "Hours is wrong");  	
+    	        	$A.test.assertEquals(12, cmp.get('v.hours'), "Hours is wrong");
     	        },function(cmp) {
     	        	this.togglePeriodAndVerify(cmp, "am", 0);
     	        },function(cmp) {
     	        	this.togglePeriodAndVerify(cmp, "pm", 12);
     	        }]
     },
-    
+
     togglePeriodAndVerify : function(cmp, period, expectedHours){
     	var ampmCmp = cmp.find("ampm");
     	ampmCmp.set('v.value', period);

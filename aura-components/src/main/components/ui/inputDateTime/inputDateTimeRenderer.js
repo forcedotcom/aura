@@ -15,39 +15,24 @@
  */
 ({
     afterRender: function(component) {
-        var ret = this.superAfterRender();
-        var concreteCmp = component.getConcreteComponent();
-        var _helper = concreteCmp.getDef().getHelper();
-        _helper.formatDateTime(component);
-        _helper.toggleClearButton(component);
-        _helper.initializeDatePicker(component);
+        var _helper = component.getConcreteComponent().getDef().getHelper();
 
-        var timePicker = concreteCmp.find("timePicker");
-        if (!$A.util.isUndefinedOrNull(timePicker)) {
-            timePicker.set("v.referenceElement", concreteCmp.find("inputTime").getElement());
-        }
-        return ret;
+        _helper.displayValue(component);
+        _helper.togglePickerIcon(component);
+        _helper.initializeDatePicker(component);
+        _helper.initializeTimePicker(component);
+
+        return this.superAfterRender();
     },
 
     rerender: function(component) {
-    	var ret = this.superRerender();
-        var concreteCmp = component.getConcreteComponent();
-        var _helper = concreteCmp.getDef().getHelper();
+        var _helper = component.getConcreteComponent().getDef().getHelper();
 
-        if (component.isDirty("v.value")) {
-            // on rerender, if an incorrect datetime is entered, do not change the display value so the user has a chance to fix the invalid input
-            var currentDateString = _helper.getDateString(component);
-            var currentTimeString = _helper.getTimeString(component);
-
-            if (!_helper.isDesktopMode(component)
-                || ($A.util.isEmpty(currentDateString) && $A.util.isEmpty(currentTimeString))
-                || _helper.parseDateTimeInput(false, component, currentDateString, currentTimeString)) {
-
-                _helper.formatDateTime(component);
-            }
+        if (component.isDirty("v.value") && _helper.shouldUpdateDisplayValue(component)) {
+            _helper.displayValue(component);
         }
+        _helper.togglePickerIcon(component);
 
-        _helper.toggleClearButton(component);
-        return ret;
+        return this.superRerender();
     }
 })// eslint-disable-line semi

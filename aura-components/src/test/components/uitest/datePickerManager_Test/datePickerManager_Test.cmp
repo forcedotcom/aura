@@ -20,6 +20,6 @@
 
     <ui:datePickerManager aura:id="dpm" loadDatePicker="true"/>
     <ui:inputDateTrigger aura:id="inputDateTrigger" displayDatePicker="true"/><br/><br/>
-    <ui:inputDate aura:id="inputDate" displayDatePicker="true" loadDatePicker="true" useManager="{!v.useManager}"/><br/><br/>
-    <ui:inputDateTime aura:id="inputDateTime" displayDatePicker="true" loadDatePicker="true" useManager="{!v.useManager}"/>
+    <ui:inputDate aura:id="inputDate" displayDatePicker="true" useManager="{!v.useManager}"/><br/><br/>
+    <ui:inputDateTime aura:id="inputDateTime" displayDatePicker="true" useManager="{!v.useManager}"/>
 </aura:component>

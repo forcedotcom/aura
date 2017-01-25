@@ -23,13 +23,19 @@ function lib() { //eslint-disable-line no-unused-vars
         }
     };
 
+    var convertFromTimezone = function(date, timezone, callback) {
+        var localDate = new Date(date);
+        $A.localizationService.WallTimeToUTC(localDate, timezone, callback);
+    };
+
     return {
         /*
          * Get the formatted display value of a date string based on timezone
+         * callback(dateDisplayValue, timeDisplayValue) is called after formatting and converting to timezone
          */
         getDisplayValue: function(value, config, callback) {
             if ($A.util.isEmpty(value)) {
-                callback(value);
+                callback(value, value);
                 return;
             }
 
@@ -43,15 +49,20 @@ function lib() { //eslint-disable-line no-unused-vars
             var date = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD", config.langLocale, useStrictParsing);
 
             if ($A.util.isEmpty(date)) {
-                callback(value);
+                callback(value, value);
                 return;
             }
 
             var displayValue = function (convertedDate) {
                 var translatedDate = $A.localizationService.translateToOtherCalendar(convertedDate);
                 var formattedDate = $A.localizationService.formatDateUTC(translatedDate, config.format, config.langLocale);
+                var formattedTime;
+                // time format is provided by inputDateTime, where there is a separate input for date and time
+                if (config.timeFormat) {
+                    formattedTime = $A.localizationService.formatTimeUTC(translatedDate, config.timeFormat, config.langLocale);
+                }
 
-                callback(formattedDate);
+                callback(formattedDate, formattedTime);
             };
 
             if (hasTime) {
@@ -59,6 +70,31 @@ function lib() { //eslint-disable-line no-unused-vars
             } else {
                 displayValue(date);
             }
+        },
+
+        /*
+         * Get an ISO8601 string representing the passed in Date object.
+         */
+        getISOValue: function(date, config, callback) {
+            var hours = config.hours;
+            var minutes = config.minutes;
+
+            if (hours) {
+                date = Date.UTC(date.getUTCFullYear(),
+                    date.getUTCMonth(),
+                    date.getUTCDate(),
+                    hours,
+                    minutes);
+            }
+
+            var isoValue = function (convertedDate) {
+                var translatedDate = $A.localizationService.translateFromOtherCalendar(convertedDate);
+                var isoString = $A.localizationService.toISOString(translatedDate);
+
+                callback(isoString);
+            };
+
+            convertFromTimezone(date, config.timezone, $A.getCallback(isoValue));
         }
     };
 }

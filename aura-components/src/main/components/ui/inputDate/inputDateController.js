@@ -18,56 +18,26 @@
 		component.set("v.value", "");
 	},
 
-	click: function(component, event) {
-        event.preventDefault();
-        var concreteCmp = component.getConcreteComponent();
-        var _helper = concreteCmp.getDef().getHelper();
-        _helper.displayDatePicker(component);
-    },
-
     doInit: function(component, event, helper) {
-    	// only add the placeholder when there is no date picker opener.
-        if ($A.get("$Browser.formFactor") === "DESKTOP") {
-            if (!component.get("v.displayDatePicker")) {
-                component.set("v.placeholder", component.get("v.format"));
-            }
-            if (component.get("v.useManager")) {
-                helper.checkManagerExists(component);
-                component.set("v.loadDatePicker", false);
-            }
-        }
+        helper.init(component);
     },
 
-    openDatePicker: function(component) {
-        var concreteCmp = component.getConcreteComponent();
-        var _helper = concreteCmp.getDef().getHelper();
-        _helper.displayDatePicker(component);
+    openDatePicker: function(component, event, helper) {
+        helper.displayDatePicker(component);
     },
 
     inputDateFocus: function(component, event, helper) {
-        var inputText = component.find("inputText").getElement().value;
-
-        if ($A.util.isEmpty(inputText) && !component.get("v.disabled") && component.get("v.displayDatePicker")) {
-            helper.displayDatePicker(component);
-        }
+	    helper.handleInputDateFocused(component);
     },
 
     // override ui:handlesDateSelected
     onDateSelected: function(component, event, helper) {
-        helper.setValue(component, event);
+        helper.handleDateSelectionByManager(component, event);
     },
 
     // override ui:hasManager
-    registerManager: function(component, event) {
-        var sourceComponentId = event.getParam('sourceComponentId') || event.getParam("arguments").sourceComponentId;
-        if ($A.util.isUndefinedOrNull(sourceComponentId)) {
-            return;
-        }
-
-        var sourceComponent = $A.componentService.get(sourceComponentId);
-        if (sourceComponent && sourceComponent.isInstanceOf("ui:datePickerManager")) {
-            component.set("v.managerExists", true);
-        }
+    registerManager: function(component, event, helper) {
+	    helper.registerManager(component, event);
     }
 
 })// eslint-disable-line semi

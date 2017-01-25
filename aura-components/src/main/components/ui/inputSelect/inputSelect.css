@@ -23,3 +23,7 @@
 .THIS .uiPopupTrigger a:hover {
     text-decoration: none;
 }
+
+.THIS > .uiMenu {
+    position: inherit;
+}

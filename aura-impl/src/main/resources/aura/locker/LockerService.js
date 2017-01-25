@@ -77,12 +77,18 @@ function LockerService() {
 		typeToOtherRealmType = new Map();
 		var types = Object.keys(SecureWindow.metadata["prototypes"]["Window"]).concat([ "Blob", "File", "FormData" ]);
 		types.forEach(function(name) {
-			var mainInstance = window[name];
-			var safeEvalInstance = safeEvalWindow[name];
-			if (mainInstance && safeEvalInstance) {
-				typeToOtherRealmType.set(safeEvalInstance, mainInstance);
-				typeToOtherRealmType.set(mainInstance, safeEvalInstance);
+			try{
+				var mainInstance = window[name];
+				var safeEvalInstance = safeEvalWindow[name];
+				if (mainInstance && safeEvalInstance) {
+					typeToOtherRealmType.set(safeEvalInstance, mainInstance);
+					typeToOtherRealmType.set(mainInstance, safeEvalInstance);
+				}
 			}
+			catch(e){
+				//continue if we hit exception getting properties
+                //e.g window.frameElement throws AccessDenied in Edge/IE)
+            }
 		});
 	}
 

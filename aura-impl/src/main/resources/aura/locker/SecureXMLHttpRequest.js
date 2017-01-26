@@ -42,7 +42,7 @@ function SecureXMLHttpRequest(key) {
 
 		// Properties
 		["readyState", "status", "statusText", "response", "responseType", "responseText",
-		 "responseXML", "responseURL", "timeout", "withCredentials"].forEach(function (name) {
+		 "responseXML", "responseURL", "timeout", "withCredentials", "upload"].forEach(function (name) {
 			SecureObject.addPropertyIfSupported(o, xhr, name);
 		});
 

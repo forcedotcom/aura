@@ -85,7 +85,7 @@ import com.google.common.collect.Lists;
  */
 @ServiceComponent
 public class AuraTestFilter {
-    private final Log LOG = LogFactory.getLog(AuraTestFilter.class);
+    private final Log LOG;
 
     private static final int DEFAULT_JSTEST_TIMEOUT = 30;
     private static final String BASE_URI = "/aura";
@@ -159,7 +159,8 @@ public class AuraTestFilter {
     }
 
     public AuraTestFilter() {
-        LOG.info(this + " ctor()", new Error());
+        LOG = LogFactory.getLog(AuraTestFilter.class);
+        LOG.info("ctor()", new Error());
     }
     
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException,
@@ -172,6 +173,9 @@ public class AuraTestFilter {
 		final AtomicBoolean handled = new AtomicBoolean(false);
 		
 		for (HttpFilter filter : testCaseFilters) {
+			if (filter == null) {
+				continue;
+			}
 			filter.doFilter((HttpServletRequest) request, (HttpServletResponse) response, (req, res) -> {
 				innerFilter(req, res, chain);
 				handled.set(true);

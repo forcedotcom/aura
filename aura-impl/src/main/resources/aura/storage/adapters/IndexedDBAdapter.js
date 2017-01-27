@@ -93,6 +93,8 @@ IndexedDBAdapter.LOG_LEVEL = {
 /** Max time for initialize to complete */
 IndexedDBAdapter.INITIALIZE_TIMEOUT = 30 * 1000;
 
+/** Threshold of time elapsed getting items from object store before a metric is logged */
+IndexedDBAdapter.OBJECTSTORE__GET_THRESHOLD = 500;
 
 /**
  * Returns the name of the adapter.
@@ -350,6 +352,9 @@ IndexedDBAdapter.prototype.getItemsInternal = function(keys, resolve, reject) {
 
     var results = {};
     var collected = 0;
+    var visibleAtBeginning = document.visibilityState === "visible";
+    var startTransaction = (new Date()).getTime();
+
     function collector(event) {
         var stored = event.target.result || {};
         var key = stored["key"];
@@ -359,6 +364,17 @@ IndexedDBAdapter.prototype.getItemsInternal = function(keys, resolve, reject) {
             results[key] = item;
         }
         collected++;
+        var elapsedTime = (new Date()).getTime() - startTransaction;
+        if (visibleAtBeginning && document.visibilityState === "visible" && elapsedTime > IndexedDBAdapter.OBJECTSTORE__GET_THRESHOLD) {
+            $A.metricsService.transaction("aura", "performance:storage-indexdb-transaction", { "context": {
+                "attributes" : {
+                    "name"      : key,
+                    "keys"      : keys,
+                    "elapsed"   : elapsedTime,
+                    "collected" : collected
+                }
+            }});
+        }
         if (collected === keys.length) {
             resolve(results);
             return;

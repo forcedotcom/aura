@@ -210,7 +210,7 @@ Aura.Event.Event.prototype.setParam = function(key, value) {
 /**
  * Gets an Event parameter.
  * @param {String} name The name of the Event. For example, <code>event.getParam("button")</code> returns the value of the pressed mouse button (0, 1, or 2).
- * @returns {String} The parameter value
+ * @returns {Object} The parameter value
  * @platform
  * @export
  */

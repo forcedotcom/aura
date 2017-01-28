@@ -15,26 +15,52 @@
  */
 package org.auraframework.impl.java.provider;
 
-import java.util.List;
-
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.TokenMapProviderDef;
-import org.auraframework.impl.java.provider.AbstractJavaProviderDef.Builder;
-import org.auraframework.system.SourceLoader;
+import org.auraframework.impl.DefinitionAccessImpl;
+import org.auraframework.impl.java.JavaSourceImpl;
+import org.auraframework.system.Annotations.Provider;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.DefinitionFactory;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Factory for token map provider classes.
  */
-public final class JavaTokenMapProviderDefFactory extends AbstractJavaProviderDefFactory<TokenMapProviderDef> {
-    public JavaTokenMapProviderDefFactory() {
-        super();
-    }
+@ServiceComponent
+public final class JavaTokenMapProviderDefFactory
+        implements DefinitionFactory<JavaSourceImpl<TokenMapProviderDef>, TokenMapProviderDef> {
+    public TokenMapProviderDef getDefinition(JavaSourceImpl<TokenMapProviderDef> source)
+            throws QuickFixException {
+        Class<?> providerClass = source.getJavaClass();
+        JavaTokenMapProviderDef.Builder builder = new JavaTokenMapProviderDef.Builder();
 
-    public JavaTokenMapProviderDefFactory(List<SourceLoader> sourceLoaders) {
-        super(sourceLoaders);
+        builder.setDescriptor(source.getDescriptor());
+        builder.setLocation(providerClass.getCanonicalName(), 0);
+        builder.setProviderClass(providerClass);
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
+        Provider ann = source.findAnnotation(Provider.class);
+        if (ann == null) {
+            throw new InvalidDefinitionException(String.format(
+                    "@Provider annotation is required on all Providers.  Not found on %s", source.getDescriptor()),
+                    builder.getLocation());
+        }
+        return builder.build();
     }
 
     @Override
-    protected Builder<TokenMapProviderDef> newBuilder() {
-        return new JavaTokenMapProviderDef.Builder();
+    public Class<?> getReferenceInterface() {
+        return JavaSourceImpl.class;
+    }
+
+    @Override
+    public Class<TokenMapProviderDef> getReferenceType() {
+        return TokenMapProviderDef.class;
+    }
+
+    @Override
+    public String getMimeType() {
+        return JavaSourceImpl.JAVA_MIME_TYPE;
     }
 }

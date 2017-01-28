@@ -15,20 +15,15 @@
  */
 package org.auraframework.system;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.util.text.Hash;
+import org.auraframework.util.text.HashingReader;
 
 /**
  * Abstract base class for providing access to source code and metadata.
@@ -43,86 +38,6 @@ public abstract class Source<D extends Definition> {
     private final Format format;
     private final DefDescriptor<D> descriptor;
     private final Hash hash;
-
-    /**
-     * A {@link Reader} that, on completion will update the containing
-     * {@link Source} with {@link ChangeInfo}. This provides a read-once
-     * method to both parse and hash the contents.
-     */
-    public class HashingReader extends Reader {
-
-        private final Reader reader;
-        private MessageDigest digest;
-        private final Charset utf8;
-        private boolean hadError;
-        private boolean closed;
-
-        public HashingReader(Reader reader) {
-            this.reader = reader;
-            try {
-                digest = MessageDigest.getInstance("MD5");
-            } catch (NoSuchAlgorithmException e) {
-                throw new IllegalStateException("MD5 is a required MessageDigest algorithm, but is not registered here.");
-            }
-            utf8 = Charset.forName("UTF-8");
-        }
-
-        @Override
-        public void close() throws IOException {
-            if (closed) {
-                return;
-            }
-            closed = true;
-            if (reader.read() != -1) {
-                //
-                // If someone didn't finish reading the file, we want to yell at them
-                // and make sure the code is fixed. If we let it fall through, we may end
-                // up with a null hash, which no-one will notice.
-                //
-                throw new IllegalStateException("Closed a hashing file without reading the entire thing");
-            }
-            if (digest != null) {
-                setChangeInfo();
-            }
-            reader.close();
-        }
-
-        @Override
-        public int read(char[] cbuf, int off, int len) throws IOException {
-            try {
-                int result = reader.read(cbuf, off, len);
-                if (digest != null) {
-                    if (result > 0) {
-                        ByteBuffer bytes = utf8.encode(CharBuffer.wrap(cbuf, off, result));
-                        digest.update(bytes);
-                    } else if (result < 0) {
-                        setChangeInfo();
-                    }
-                }
-                return result;
-            } catch (IOException e) {
-                // Ensure we don't make a (probably wrong) hash from bad content.
-                // We'll probably be running away anyway, but it's easy to be sure.
-                hadError = true;
-                throw e;
-            }
-        }
-
-        private void setChangeInfo() {
-            if (!hadError && digest != null) {
-                synchronized (hash) {
-                    // Multi-threading guard: if we have multiple readers for a
-                    // single Source, only one needs to set the hash. Note that
-                    // the parallel reads is probably a bad idea anyway, but it
-                    // shouldn't be a fatal one!
-                    if (!hash.isSet()) {
-                        hash.setHash(digest.digest());
-                    }
-                }
-                digest = null; // We're done; ensure we can't try to set it again.
-            }
-        }
-    }
 
     protected Source(DefDescriptor<D> descriptor, String systemId, Format format) {
         this.systemId = systemId;
@@ -151,6 +66,13 @@ public abstract class Source<D extends Definition> {
      */
     public Format getFormat() {
         return format;
+    }
+
+    /**
+     * get the mime type.
+     */
+    public String getMimeType() {
+        return "";
     }
 
     /**
@@ -187,7 +109,7 @@ public abstract class Source<D extends Definition> {
             // we should never need to re-read, but today we do.
             return getReader();
         }
-        return new HashingReader(getReader());
+        return new HashingReader(getReader(), hash);
     }
 
     /**

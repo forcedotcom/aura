@@ -15,18 +15,22 @@
  */
 package org.auraframework.impl.type;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.util.Map;
+import java.util.Set;
+
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.TypeDef;
+import org.auraframework.impl.java.JavaSourceImpl;
+import org.auraframework.impl.java.JavaSourceLoader;
 import org.auraframework.impl.java.type.JavaTypeDefFactory;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class AuraStaticTypeDefRegistry extends StaticDefRegistryImpl {
 
@@ -44,9 +48,14 @@ public class AuraStaticTypeDefRegistry extends StaticDefRegistryImpl {
         lowercasedefs.put(name.toLowerCase(), def);
     }
 
-    private static void putAuraType(JavaTypeDefFactory factory, String name) throws QuickFixException {
+    private static void putAuraType(JavaTypeDefFactory factory, JavaSourceLoader loader, String name)
+            throws QuickFixException {
         TypeDef def;
-        def = factory.getDef(new DefDescriptorImpl<>(String.format("aura://%s", name), TypeDef.class, null));
+        DefDescriptor<TypeDef> descriptor;
+        
+        descriptor = new DefDescriptorImpl<>(String.format("aura://%s", name), TypeDef.class, null);
+        JavaSourceImpl<TypeDef> source = loader.getSource(descriptor);
+        def = factory.getDefinition(source);
         putAuraType(name, def);
     }
 
@@ -61,13 +70,14 @@ public class AuraStaticTypeDefRegistry extends StaticDefRegistryImpl {
         // TODO: non array defref type
         putAuraType("Aura.Action", new ActionTypeDef.Builder().build());
 
-        JavaTypeDefFactory factory = new JavaTypeDefFactory(null);
+        JavaSourceLoader loader = new JavaSourceLoader();
+        JavaTypeDefFactory factory = new JavaTypeDefFactory();
         try {
             for (String baseType : baseTypes) {
-                putAuraType(factory, baseType);
-                putAuraType(factory, String.format("List<%s>", baseType));
-                putAuraType(factory, String.format("%s[]", baseType));
-                putAuraType(factory, String.format("Set<%s>", baseType));
+                putAuraType(factory, loader, baseType);
+                putAuraType(factory, loader, String.format("List<%s>", baseType));
+                putAuraType(factory, loader, String.format("%s[]", baseType));
+                putAuraType(factory, loader, String.format("Set<%s>", baseType));
             }
         } catch (QuickFixException qfe) {
             // This should _never_ happen

@@ -15,49 +15,53 @@
  */
 package org.auraframework.impl.java.model;
 
-import java.util.List;
-
-import org.auraframework.builder.DefBuilder;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ModelDef;
 import org.auraframework.impl.DefinitionAccessImpl;
-import org.auraframework.impl.java.BaseJavaDefFactory;
+import org.auraframework.impl.java.JavaSourceImpl;
 import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.SourceLoader;
+import org.auraframework.system.DefinitionFactory;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * def factory for the java model
  */
-public class JavaModelDefFactory extends BaseJavaDefFactory<ModelDef> {
+@ServiceComponent
+public class JavaModelDefFactory implements DefinitionFactory<JavaSourceImpl<ModelDef>, ModelDef> {
+    @Override
+    public ModelDef getDefinition(JavaSourceImpl<ModelDef> source) throws QuickFixException {
+        JavaModelDefImpl.Builder builder = new JavaModelDefImpl.Builder();
+        DefDescriptor<ModelDef> descriptor = source.getDescriptor();
+        Class<?> clazz = source.getJavaClass();
 
-    public JavaModelDefFactory() {
-        this(null);
-    }
-
-    public JavaModelDefFactory(List<SourceLoader> sourceLoaders) {
-        super(sourceLoaders);
+        builder.setDescriptor(descriptor);
+        builder.setLocation(descriptor.getName(), 0);
+        builder.setModelClass(clazz);
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
+        Model ann = source.findAnnotation(Model.class);
+        if (ann == null) {
+            throw new InvalidDefinitionException(String.format(
+                    "@Model annotation is required on all Models.  Not found on %s", source.getDescriptor()),
+                    builder.getLocation());
+        }
+        return builder.build();
     }
 
     @Override
-    protected DefBuilder<?, ? extends ModelDef> getBuilder(DefDescriptor<ModelDef> descriptor) throws QuickFixException {
-        JavaModelDefImpl.Builder builder = new JavaModelDefImpl.Builder();
-        Class<?> c = getClazz(descriptor);
-        if (c == null) {
-            return null;
-        }
-        builder.setDescriptor(descriptor);
-        builder.setLocation(descriptor.getName(), 0);
-        builder.setModelClass(c);
-        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
-        Model ann = findAnnotation(c, Model.class);
-        if (ann == null) {
-            throw new InvalidDefinitionException(String.format(
-                    "@Model annotation is required on all Models.  Not found on %s", descriptor),
-                    builder.getLocation());
-        }
-        return builder;
+    public Class<?> getReferenceInterface() {
+        return JavaSourceImpl.class;
+    }
+
+    @Override
+    public Class<ModelDef> getReferenceType() {
+        return ModelDef.class;
+    }
+
+    @Override
+    public String getMimeType() {
+        return JavaSourceImpl.JAVA_MIME_TYPE;
     }
 }

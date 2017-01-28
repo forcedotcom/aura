@@ -24,7 +24,6 @@ import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
-import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.ClientOutOfSyncException;

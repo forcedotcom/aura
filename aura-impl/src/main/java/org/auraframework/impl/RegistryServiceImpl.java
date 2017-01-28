@@ -43,13 +43,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.compound.controller.CompoundControllerDefFactory;
 import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
-import org.auraframework.impl.java.controller.JavaControllerDefFactory;
-import org.auraframework.impl.java.model.JavaModelDefFactory;
-import org.auraframework.impl.java.provider.JavaProviderDefFactory;
-import org.auraframework.impl.java.provider.JavaTokenDescriptorProviderDefFactory;
-import org.auraframework.impl.java.provider.JavaTokenMapProviderDefFactory;
-import org.auraframework.impl.java.renderer.JavaRendererDefFactory;
-import org.auraframework.impl.java.type.JavaTypeDefFactory;
+import org.auraframework.impl.java.JavaSourceLoader;
 import org.auraframework.impl.parser.ParserFactory;
 import org.auraframework.impl.source.SourceFactory;
 import org.auraframework.impl.source.file.FileSourceLoader;
@@ -60,8 +54,10 @@ import org.auraframework.impl.system.CompilingDefRegistry;
 import org.auraframework.impl.system.NonCachingDefRegistryImpl;
 import org.auraframework.impl.system.PassThroughDefRegistry;
 import org.auraframework.impl.system.RegistryTrie;
+import org.auraframework.impl.system.SourceLoaderDefRegistry;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
+import org.auraframework.service.CompilerService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.RegistryService;
 import org.auraframework.system.AuraContext.Authentication;
@@ -88,6 +84,9 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     private ExceptionAdapter exceptionAdapter;
 
     private ParserFactory parserFactory;
+
+    @Inject
+    private CompilerService compilerService;
 
     @Inject
     private Optional<Collection<RegistryAdapter>> adaptersInject;
@@ -323,7 +322,6 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     private List<DefRegistry> getCLARegistries() {
         Collection<ComponentLocationAdapter> markupLocations = getAllComponentLocationAdapters();
         List<SourceLoader> markupLoaders = Lists.newArrayList();
-        List<SourceLoader> javaLoaders = Lists.newArrayList();
         List<DefRegistry> regBuild = Lists.newArrayList();
 
         regBuild.add(AuraStaticTypeDefRegistry.INSTANCE);
@@ -334,8 +332,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
                 if (!sli.isChanged() && sli.staticLocationRegistries != null) {
                     regBuild.addAll(sli.staticLocationRegistries);
                 } else {
-                regBuild.addAll(sli.markupRegistries);
-                    javaLoaders.addAll(sli.javaSourceLoaders);
+                    regBuild.addAll(sli.markupRegistries);
                 }
             }
         }
@@ -349,24 +346,11 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         regBuild.add(new NonCachingDefRegistryImpl(new CompoundControllerDefFactory(exceptionAdapter),
                 DefType.CONTROLLER, DefDescriptor.COMPOUND_PREFIX));
 
-        // Gah! this is stupid... we will want to end up with one registry here.
-        if (javaLoaders.size() > 0) {
-            Set<String> java_prefixes = Sets.newHashSet(DefDescriptor.JAVA_PREFIX, SERVICECOMPONENT_PREFIX);
-            regBuild.add(new CachingDefRegistryImpl(new JavaControllerDefFactory(javaLoaders, definitionService),
-                    Sets.newHashSet(DefType.CONTROLLER), java_prefixes));
-            regBuild.add(new CachingDefRegistryImpl(new JavaRendererDefFactory(javaLoaders),
-                    Sets.newHashSet(DefType.RENDERER), java_prefixes));
-            regBuild.add(new CachingDefRegistryImpl(new JavaTypeDefFactory(javaLoaders),
-                    Sets.newHashSet(DefType.TYPE), java_prefixes));
-            regBuild.add(new CachingDefRegistryImpl(new JavaModelDefFactory(javaLoaders),
-                    Sets.newHashSet(DefType.MODEL), java_prefixes));
-            regBuild.add(new CachingDefRegistryImpl(new JavaProviderDefFactory(javaLoaders),
-                    Sets.newHashSet(DefType.PROVIDER), java_prefixes));
-            regBuild.add(new CachingDefRegistryImpl(new JavaTokenDescriptorProviderDefFactory(javaLoaders),
-                    Sets.newHashSet(DefType.TOKEN_DESCRIPTOR_PROVIDER), java_prefixes));
-            regBuild.add(new CachingDefRegistryImpl(new JavaTokenMapProviderDefFactory(javaLoaders),
-                    Sets.newHashSet(DefType.TOKEN_MAP_PROVIDER), java_prefixes));
-        }
+        regBuild.add(new SourceLoaderDefRegistry(compilerService, new JavaSourceLoader(),
+                    Sets.newHashSet(DefType.CONTROLLER, DefType.RENDERER, DefType.TYPE, DefType.MODEL,
+                        DefType.PROVIDER, DefType.TOKEN_DESCRIPTOR_PROVIDER, DefType.TOKEN_MAP_PROVIDER),
+                    Sets.newHashSet(DefDescriptor.JAVA_PREFIX, SERVICECOMPONENT_PREFIX),
+                    Sets.newHashSet("*"), false));
         return regBuild;
     }
 

@@ -15,42 +15,40 @@
  */
 package org.auraframework.impl.java.renderer;
 
-import java.util.List;
-
-import org.auraframework.builder.DefBuilder;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.DefinitionAccessImpl;
-import org.auraframework.impl.java.BaseJavaDefFactory;
+import org.auraframework.impl.java.JavaSourceImpl;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.SourceLoader;
+import org.auraframework.system.DefinitionFactory;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-/**
- */
-public class JavaRendererDefFactory extends BaseJavaDefFactory<RendererDef> {
-
-    public JavaRendererDefFactory() {
-        this(null);
-    }
-
-    public JavaRendererDefFactory(List<SourceLoader> sourceLoaders) {
-        super(sourceLoaders);
-    }
-
+@ServiceComponent
+public class JavaRendererDefFactory implements DefinitionFactory<JavaSourceImpl<RendererDef>, RendererDef> {
     @Override
-    protected DefBuilder<?, ? extends RendererDef> getBuilder(DefDescriptor<RendererDef> descriptor) throws QuickFixException {
+    public RendererDef getDefinition(JavaSourceImpl<RendererDef> source) throws QuickFixException {
         JavaRendererDef.Builder builder = new JavaRendererDef.Builder();
-        Class<?> rendererClass = getClazz(descriptor);
+        Class<?> rendererClass = source.getJavaClass();
 
-        if (rendererClass == null) {
-            return null;
-        }
-        
-        builder.setDescriptor(descriptor);
+        builder.setDescriptor(source.getDescriptor());
         builder.setLocation(rendererClass.getCanonicalName(), -1);
         builder.setRendererClass(rendererClass);
         builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
-        return builder;
+        return builder.build();
+    }
+
+    @Override
+    public Class<?> getReferenceInterface() {
+        return JavaSourceImpl.class;
+    }
+
+    @Override
+    public Class<RendererDef> getReferenceType() {
+        return RendererDef.class;
+    }
+
+    @Override
+    public String getMimeType() {
+        return JavaSourceImpl.JAVA_MIME_TYPE;
     }
 }

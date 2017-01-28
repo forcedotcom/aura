@@ -15,7 +15,13 @@
  */
 package org.auraframework.integration.test.root.parser.handler;
 
-import org.auraframework.def.*;
+import java.util.List;
+
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DependencyDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.test.source.StringSourceLoader;
@@ -23,10 +29,7 @@ import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
-import org.junit.Ignore;
 import org.junit.Test;
-
-import java.util.List;
 
 @UnAdaptableTest("namespace start with c means something special in core")
 public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {

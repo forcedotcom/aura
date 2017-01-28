@@ -15,105 +15,43 @@
  */
 package org.auraframework.impl.java.type;
 
-import org.auraframework.builder.DefBuilder;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.DefinitionAccessImpl;
-import org.auraframework.impl.java.BaseJavaDefFactory;
+import org.auraframework.impl.java.JavaSourceImpl;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.SourceLoader;
-import org.auraframework.util.AuraTextUtil;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import org.auraframework.system.DefinitionFactory;
 
 /**
  * Loads Java types for Aura components.
  */
-public class JavaTypeDefFactory extends BaseJavaDefFactory<TypeDef> {
-    public JavaTypeDefFactory() {
-        this(null);
-    }
-
-    public JavaTypeDefFactory(List<SourceLoader> sourceLoaders) {
-        super(sourceLoaders);
-    }
-
+@ServiceComponent
+public class JavaTypeDefFactory implements DefinitionFactory<JavaSourceImpl<TypeDef>, TypeDef> {
     @Override
-    protected DefBuilder<?, ? extends TypeDef> getBuilder(DefDescriptor<TypeDef> descriptor) {
+    public TypeDef getDefinition(JavaSourceImpl<TypeDef> source) {
         JavaTypeDef.Builder builder;
-        Class<?> clazz = getClazz(descriptor);
+        Class<?> clazz = source.getJavaClass();
 
-        if (clazz == null) {
-            return null;
-        }
         builder = new JavaTypeDef.Builder();
-        builder.setDescriptor(descriptor);
+        builder.setDescriptor(source.getDescriptor());
         builder.setLocation(clazz.getCanonicalName(), 0);
         builder.setTypeClass(clazz);
         builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.GLOBAL));
-        return builder;
-    }
-
-    /**
-     * Return base of class name, truncating Generic qualifier, if included.
-     * Can't instantiate a class with parameters using Class.forName().
-     * 
-     * @param className - the class name, with or without a < > clause
-     * @return - the base class name minus generic parameters
-     */
-    private String getRawClassName(String className) {
-
-        int genPos = className.indexOf('<');
-        String name = genPos == -1 ? className : className.substring(0, genPos);
-        return name;
+        return builder.build();
     }
 
     @Override
-    protected Class<?> getClazz(DefDescriptor<TypeDef> descriptor) {
-        Class<?> clazz = null;
-        String className = descriptor.getName();
-        if (descriptor.getNamespace() == null) {
+    public Class<?> getReferenceInterface() {
+        return JavaSourceImpl.class;
+    }
 
-            if (className.equals("List") || className.startsWith("List<") || className.endsWith("[]")) {
-                clazz = ArrayList.class;
-            } else if (className.equals("Map") || className.startsWith("Map<")) {
-                clazz = HashMap.class;
-            } else if (className.equals("Set") || className.startsWith("Set<")) {
-                clazz = HashSet.class;
-            } else if (className.equals("Decimal")) {
-                clazz = BigDecimal.class;
-            } else if (className.equals("Date")) {
-                clazz = Date.class;
-            } else if (className.equals("DateTime")) {
-                clazz = Calendar.class;
-            } else if (className.equals("int")) {
-                clazz = Integer.class;
-            } else if (className.equals("char")) {
-                clazz = Character.class;
-            } else {
-                try {
-                    clazz = Class.forName("java.lang." + AuraTextUtil.initCap(className));
-                } catch (ClassNotFoundException e) {
-                    // ignore
-                }
-            }
-        } else {
-            className = String.format("%s.%s", descriptor.getNamespace(), getRawClassName(className));
-        }
+    @Override
+    public Class<TypeDef> getReferenceType() {
+        return TypeDef.class;
+    }
 
-        if (clazz == null) {
-            try {
-                clazz = Class.forName(className);
-            } catch (ClassNotFoundException e) {
-                // ignore
-            }
-        }
-        return clazz;
+    @Override
+    public String getMimeType() {
+        return JavaSourceImpl.JAVA_MIME_TYPE;
     }
 }

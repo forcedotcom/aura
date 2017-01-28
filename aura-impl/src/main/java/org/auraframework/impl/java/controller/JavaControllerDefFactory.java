@@ -15,9 +15,17 @@
  */
 package org.auraframework.impl.java.controller;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import org.auraframework.builder.DefBuilder;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -25,7 +33,7 @@ import org.auraframework.def.TypeDef;
 import org.auraframework.def.ValueDef;
 import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.impl.DefinitionAccessImpl;
-import org.auraframework.impl.java.BaseJavaDefFactory;
+import org.auraframework.impl.java.JavaSourceImpl;
 import org.auraframework.impl.java.model.JavaValueDef;
 import org.auraframework.impl.java.type.JavaTypeDef;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
@@ -37,65 +45,22 @@ import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.DefFactory;
+import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.Location;
-import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * A {@link DefFactory} for Java controllers.
  */
-public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> {
+@ServiceComponent
+public class JavaControllerDefFactory implements DefinitionFactory<JavaSourceImpl<ControllerDef>, ControllerDef> {
 
+    @Inject
     private DefinitionService definitionService;
-
-    public JavaControllerDefFactory(List<SourceLoader> sourceLoaders, DefinitionService definitionService) {
-        super(sourceLoaders);
-        this.definitionService = definitionService;
-    }
-
-    public ControllerDef getDef_DONOTUSE(DefDescriptor<ControllerDef> descriptor, Class<?> clazz)
-            throws QuickFixException {
-        return getBuilder(descriptor, clazz).build();
-    }
-
-    @Override
-    protected DefBuilder<?, ? extends ControllerDef> getBuilder(DefDescriptor<ControllerDef> descriptor)
-            throws QuickFixException {
-        Class<?> clazz = getClazz(descriptor);
-        if (clazz == null) {
-            return null;
-        }
-        return getBuilder(descriptor, clazz);
-    }
-
-    private DefBuilder<?, ? extends ControllerDef> getBuilder(DefDescriptor<ControllerDef> descriptor, Class<?> clazz)
-            throws QuickFixException {
-        JavaControllerDefImpl.Builder builder = new JavaControllerDefImpl.Builder();
-        builder.setDescriptor(descriptor);
-        builder.setControllerClass(clazz);
-        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
-        builder.setLocation(clazz.getCanonicalName(), -1);
-        if (!Controller.class.isAssignableFrom(clazz)) {
-            throw new InvalidDefinitionException(String.format(
-                    "%s must implement org.auraframework.ds.servicecomponent.Controller", clazz.toString()),
-                    builder.getLocation());
-        }
-        try {
-            builder.setActionMap(createActions(clazz, builder.getDescriptor()));
-        } catch (QuickFixException qfe) {
-            builder.setParseError(qfe);
-        }
-        return builder;
-    }
 
     private static String formatType(Type t) {
         Class<?> clazz = JavaTypeDef.getClass(t);
@@ -178,8 +143,8 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
         actionBuilder.setParams(params);
         actionBuilder.setLoggableParams(loggableParams);
         
-    	actionBuilder.setBackground(method.isAnnotationPresent(BackgroundAction.class));
-    	actionBuilder.setCaboose(method.isAnnotationPresent(CabooseAction.class));
+        actionBuilder.setBackground(method.isAnnotationPresent(BackgroundAction.class));
+        actionBuilder.setCaboose(method.isAnnotationPresent(CabooseAction.class));
 
         actionBuilder.setAccess(new DefinitionAccessImpl(Access.INTERNAL));
 
@@ -226,5 +191,54 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
             }
         }
         return actions;
+    }
+
+    @Override
+    public ControllerDef getDefinition(JavaSourceImpl<ControllerDef> source) throws QuickFixException {
+        JavaControllerDefImpl.Builder builder = new JavaControllerDefImpl.Builder();
+        Class<?> clazz = source.getJavaClass();
+
+        builder.setDescriptor(source.getDescriptor());
+        builder.setControllerClass(clazz);
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
+        builder.setLocation(clazz.getCanonicalName(), -1);
+        if (!Controller.class.isAssignableFrom(clazz)) {
+            throw new InvalidDefinitionException(String.format(
+                    "%s must implement org.auraframework.ds.servicecomponent.Controller", clazz.toString()),
+                    builder.getLocation());
+        }
+        try {
+            builder.setActionMap(createActions(clazz, builder.getDescriptor()));
+        } catch (QuickFixException qfe) {
+            builder.setParseError(qfe);
+        }
+        return builder.build();
+    }
+
+    public ControllerDef getDef_DONOTUSE(DefDescriptor<ControllerDef> descriptor, Class<?> clazz)
+            throws QuickFixException {
+        return getDefinition(new JavaSourceImpl<ControllerDef>(descriptor, clazz));
+    }
+
+    @Override
+    public Class<?> getReferenceInterface() {
+        return JavaSourceImpl.class;
+    }
+
+    @Override
+    public Class<ControllerDef> getReferenceType() {
+        return ControllerDef.class;
+    }
+
+    @Override
+    public String getMimeType() {
+        return JavaSourceImpl.JAVA_MIME_TYPE;
+    }
+
+    /**
+     * @param definitionService the definitionService to set
+     */
+    public void setDefinitionService(DefinitionService definitionService) {
+        this.definitionService = definitionService;
     }
 }

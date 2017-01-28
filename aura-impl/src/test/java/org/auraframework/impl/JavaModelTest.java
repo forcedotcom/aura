@@ -15,16 +15,17 @@
  */
 package org.auraframework.impl;
 
+import java.io.IOException;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.ModelDef;
+import org.auraframework.impl.java.JavaSourceLoader;
 import org.auraframework.impl.java.model.JavaModelDefFactory;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Model;
 import org.auraframework.util.json.Json;
 import org.junit.Test;
-
-import java.io.IOException;
 
 /**
  * This class provides automation for Java models.
@@ -32,15 +33,17 @@ import java.io.IOException;
 public class JavaModelTest extends AuraImplTestCase {
     @Test
     public void testSerializeMetadata() throws Exception {
+        JavaSourceLoader loader = new JavaSourceLoader();
         JavaModelDefFactory factory = new JavaModelDefFactory();
-        ModelDef def = factory.getDef(descriptor);
+        ModelDef def = factory.getDefinition(loader.getSource(descriptor));
         serializeAndGoldFile(def);
     }
 
     @Test
     public void testSerializeData() throws Exception {
-        JavaModelDefFactory factory = new JavaModelDefFactory(null);
-        ModelDef def = factory.getDef(descriptor);
+        JavaSourceLoader loader = new JavaSourceLoader();
+        JavaModelDefFactory factory = new JavaModelDefFactory();
+        ModelDef def = factory.getDefinition(loader.getSource(descriptor));
         Model model = instanceService.getInstance(def, null);
         serializeAndGoldFile(model);
     }

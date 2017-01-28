@@ -64,7 +64,8 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl {
     private static synchronized Collection<Definition> getDefs(DefinitionService definitionService) {
         if (allMap == null) {
             try {
-                JavaControllerDefFactory jcdf = new JavaControllerDefFactory(null, definitionService);
+                JavaControllerDefFactory jcdf = new JavaControllerDefFactory();
+                jcdf.setDefinitionService(definitionService);
                 ImmutableMap.Builder<DefDescriptor<? extends Definition>, Definition> builder;
                 ControllerDef cd;
                 DefDescriptor<ControllerDef> descriptor;

@@ -15,27 +15,52 @@
  */
 package org.auraframework.impl.java.provider;
 
-import java.util.List;
-
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.TokenDescriptorProviderDef;
-import org.auraframework.impl.java.provider.AbstractJavaProviderDef.Builder;
-import org.auraframework.system.SourceLoader;
+import org.auraframework.impl.DefinitionAccessImpl;
+import org.auraframework.impl.java.JavaSourceImpl;
+import org.auraframework.system.Annotations.Provider;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.DefinitionFactory;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Factory for token descriptor provider classes.
  */
-public final class JavaTokenDescriptorProviderDefFactory extends
-        AbstractJavaProviderDefFactory<TokenDescriptorProviderDef> {
-    public JavaTokenDescriptorProviderDefFactory() {
-        super();
-    }
+@ServiceComponent
+public final class JavaTokenDescriptorProviderDefFactory
+        implements DefinitionFactory<JavaSourceImpl<TokenDescriptorProviderDef>, TokenDescriptorProviderDef> {
+    public TokenDescriptorProviderDef getDefinition(JavaSourceImpl<TokenDescriptorProviderDef> source)
+            throws QuickFixException {
+        Class<?> providerClass = source.getJavaClass();
+        JavaTokenDescriptorProviderDef.Builder builder = new JavaTokenDescriptorProviderDef.Builder();
 
-    public JavaTokenDescriptorProviderDefFactory(List<SourceLoader> sourceLoaders) {
-        super(sourceLoaders);
+        builder.setDescriptor(source.getDescriptor());
+        builder.setLocation(providerClass.getCanonicalName(), 0);
+        builder.setProviderClass(providerClass);
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
+        Provider ann = source.findAnnotation(Provider.class);
+        if (ann == null) {
+            throw new InvalidDefinitionException(String.format(
+                    "@Provider annotation is required on all Providers.  Not found on %s", source.getDescriptor()),
+                    builder.getLocation());
+        }
+        return builder.build();
     }
 
     @Override
-    protected Builder<TokenDescriptorProviderDef> newBuilder() {
-        return new JavaTokenDescriptorProviderDef.Builder();
+    public Class<?> getReferenceInterface() {
+        return JavaSourceImpl.class;
+    }
+
+    @Override
+    public Class<TokenDescriptorProviderDef> getReferenceType() {
+        return TokenDescriptorProviderDef.class;
+    }
+
+    @Override
+    public String getMimeType() {
+        return JavaSourceImpl.JAVA_MIME_TYPE;
     }
 }

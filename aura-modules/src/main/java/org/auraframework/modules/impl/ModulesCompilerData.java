@@ -15,15 +15,20 @@
  */
 package org.auraframework.modules.impl;
 
-import java.io.File;
+import java.util.List;
 
 /**
- * Interface to compile modules
+ * POJO with the parsed data ModulesCompiler generates
  */
-public interface ModulesCompiler {
+public class ModulesCompilerData {
 
-    @Deprecated
-    ModulesCompilerData compile(File file) throws Exception;
+    public final String code;
+    public final List<String> bundleDependencies;
+    public final List<String> templateUsedIds;
     
-    ModulesCompilerData compile(String entry, String sourceTemplate, String sourceClass) throws Exception;
+    ModulesCompilerData(String code, List<String> bundleDependencies, List<String> templateUsedIds) {
+        this.code = code;
+        this.bundleDependencies = bundleDependencies;
+        this.templateUsedIds = templateUsedIds;
+    }
 }

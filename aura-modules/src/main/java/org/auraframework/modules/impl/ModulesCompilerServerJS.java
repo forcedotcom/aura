@@ -23,12 +23,12 @@ import java.io.File;
 public final class ModulesCompilerServerJS implements ModulesCompiler {
 
     @Override
-    public String compile(File file) throws Exception {
+    public ModulesCompilerData compile(File file) throws Exception {
         throw new Error("NYI");
     }
 
     @Override
-    public String compile(String componentPath, String sourceTemplate, String sourceClass) {
+    public ModulesCompilerData compile(String componentPath, String sourceTemplate, String sourceClass) {
         throw new Error("NYI");
     }
     

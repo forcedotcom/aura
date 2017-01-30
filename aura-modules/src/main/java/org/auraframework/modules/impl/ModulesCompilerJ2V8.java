@@ -33,16 +33,16 @@ import com.eclipsesource.v8.utils.MemoryManager;
 public final class ModulesCompilerJ2V8 implements ModulesCompiler {
 
     @Override
-    public String compile(File file) throws Exception {
+    public ModulesCompilerData compile(File file) throws Exception {
         String filePath = file.getAbsolutePath();
         return compile(filePath, "{format: 'amd'}");
     }
 
     @Override
-    public String compile(String entry, String sourceTemplate, String sourceClass) throws Exception {
+    public ModulesCompilerData compile(String entry, String sourceTemplate, String sourceClass) throws Exception {
         sourceTemplate = StringUtils.replace(sourceTemplate, "`", "\\`");
         sourceClass = StringUtils.replace(sourceClass, "`", "\\`");
-        
+
         String options = "{ sourceTemplate: `" + sourceTemplate
                 + "`\n, sourceClass: `" + sourceClass + "`\n"
                 + ", format: 'amd'}";
@@ -51,13 +51,13 @@ public final class ModulesCompilerJ2V8 implements ModulesCompiler {
 
     //
 
-    private String compile(String entry, String options) throws Exception {
+    private ModulesCompilerData compile(String entry, String options) throws Exception {
         String script = ""
                 + "const compiler = require('" + ModulesCompilerUtil.COMPILER_JS_PATH + "');"
                 + "const promise = compiler.compile('" + entry + "', " + options + ");"
                 + "promise.then(onResultCallback).catch(onErrorCallback);";
 
-        CompletableFuture<String> future = new CompletableFuture<>();
+        CompletableFuture<ModulesCompilerData> future = new CompletableFuture<>();
 
         JavaVoidCallback onErrorCallback = new JavaVoidCallback() {
             @Override
@@ -69,8 +69,8 @@ public final class ModulesCompilerJ2V8 implements ModulesCompiler {
         JavaVoidCallback onResultCallback = new JavaVoidCallback() {
             @Override
             public void invoke(final V8Object receiver, final V8Array parameters) {
-                V8Object result = parameters.getObject(0);
-                future.complete(result.getString("code"));
+                ModulesCompilerData data = ModulesCompilerUtil.parseCompilerOutput(parameters.getObject(0));
+                future.complete(data);
             }
         };
 

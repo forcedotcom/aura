@@ -29,6 +29,7 @@ import org.auraframework.impl.source.file.FileSource;
 import org.auraframework.impl.source.resource.ResourceSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.modules.impl.ModulesCompiler;
+import org.auraframework.modules.impl.ModulesCompilerData;
 import org.auraframework.modules.impl.ModulesCompilerJ2V8;
 import org.auraframework.modules.impl.def.ModuleDefImpl;
 import org.auraframework.system.AuraContext;
@@ -84,8 +85,8 @@ public class ModuleParser implements Parser<ModuleDef> {
         String componentPath = descriptor.getNamespace() + '/' + descriptor.getName() + '/' + descriptor.getName() + ".js";
         try {
             ModulesCompiler compiler = new ModulesCompilerJ2V8();
-            String compiledCode = compiler.compile(componentPath, sourceTemplate, sourceClass);
-            builder.setCompiledCode(compiledCode);
+            ModulesCompilerData compilerData = compiler.compile(componentPath, sourceTemplate, sourceClass);
+            builder.setCompiledCode(compilerData.code);
             return builder.build();
         } catch (Exception e) {
             throw new DefinitionNotFoundException(descriptor, location);

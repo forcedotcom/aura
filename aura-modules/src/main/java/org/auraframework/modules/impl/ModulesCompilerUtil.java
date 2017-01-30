@@ -19,9 +19,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.auraframework.util.IOUtil;
 
+import com.eclipsesource.v8.V8Array;
+import com.eclipsesource.v8.V8Object;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 
@@ -29,9 +33,9 @@ final class ModulesCompilerUtil {
 
     static final String COMPILER_JS_PATH = pathToLocalTempFile("modules/compiler.js");
     static final String COMPILER_CLI_JS_PATH = pathToLocalTempFile("modules/compiler-cli.js");
-    
+
     static final String SERVER_JS_COMPILE_PATH = pathToLocalTempFile("modules/server-js-compile.js");
-    
+
     private static String pathToLocalTempFile(String classpathResource) {
         try {
             ClassLoader classLoader = ModulesCompilerUtil.class.getClassLoader();
@@ -57,5 +61,21 @@ final class ModulesCompilerUtil {
         File file = File.createTempFile(name, ".js.tmp", new File("."));
         file.deleteOnExit();
         return file;
+    }
+
+    static ModulesCompilerData parseCompilerOutput(V8Object result) {
+        String code = result.getString("code");
+        V8Object metadata = result.getObject("metadata");
+        V8Array v8BundleDependencies = metadata.getArray("bundleDependencies");
+        List<String> bundleDependencies = new ArrayList<>();
+        for (int i = 0; i < v8BundleDependencies.length(); i++) {
+            bundleDependencies.add(v8BundleDependencies.getString(i));
+        }
+        V8Array v8TemplateUsedIds = metadata.getArray("templateUsedIds");
+        List<String> templateUsedIds = new ArrayList<>();
+        for (int i = 0; i < v8TemplateUsedIds.length(); i++) {
+            templateUsedIds.add(v8TemplateUsedIds.getString(i));
+        }
+        return new ModulesCompilerData(code, bundleDependencies, templateUsedIds);
     }
 }

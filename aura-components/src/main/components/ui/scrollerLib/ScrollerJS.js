@@ -1821,8 +1821,9 @@ function lib(w) { //eslint-disable-line no-unused-vars
                         }
 
                         self._fire('_refresh');
-                        self._rafRefresh = null;
                     }
+                    // done with current refresh, unset it to allow the next refresh
+                    self._rafRefresh = null;
                 });
             }
         },

@@ -365,17 +365,28 @@
                 var highlightedCmp = this.iters[this.highlightedIndex];
                 highlightedCmp.set("v.highlighted", true);
                 var highlightedElement = highlightedCmp.getElement();
-                if (highlightedElement) {
-                    if (highlightedElement.scrollIntoViewIfNeeded) {
-                        highlightedElement.scrollIntoViewIfNeeded();
-                    } else {
-                        highlightedElement.scrollIntoView(false);
-                    }
-                }
+                self.scrollIntoViewIfNeeded(highlightedElement);
                 self.updateAriaAttributes(cmp, highlightedCmp);
             }
 
         };
+    },
+
+    scrollIntoViewIfNeeded: function(element) {
+        if (element) {
+            if (element.scrollIntoViewIfNeeded) {
+                element.scrollIntoViewIfNeeded();
+            } else {
+                if (!this.isInViewport(element)) {
+                    element.scrollIntoView(false);
+                }
+            }
+        }
+    },
+
+    isInViewport: function(element) {
+        var rect = element.getBoundingClientRect();
+        return (rect.top >= 0 && rect.bottom <= window.innerHeight);
     },
 
     addHeaderAndFooterClassesAndAttributes: function (component) {

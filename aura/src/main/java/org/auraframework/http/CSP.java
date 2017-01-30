@@ -77,7 +77,8 @@ public class CSP {
         REPORT_URI("report-uri"),
         PLUGIN_TYPES("plugin-types"),
         BASE_URI("base-uri"),
-        REFERRER("referrer");
+        REFERRER("referrer"),
+        UPGRADE_INSECURE_REQUESTS("upgrade-insecure-requests");
 
         private String directive;
 
@@ -128,6 +129,8 @@ public class CSP {
      * See {@link CSP} for example usage.
      */
     public static class PolicyBuilder {
+        private static final List<String> DIRECTIVE_WITHOUT_VALUE_PLACEHOLDER = Lists.newArrayList("");
+
         public PolicyBuilder() {}
 
         private EnumMap<Directive, List<String>> directives = new EnumMap<>(Directive.class);
@@ -192,6 +195,12 @@ public class CSP {
 
         public PolicyBuilder referrer(String referrer) {
             directives.put(Directive.REFERRER, Lists.newArrayList(referrer));
+            return this;
+        }
+
+        public PolicyBuilder upgrade_insecure_requests() {
+            // upgrade-insecure-requests does not have an associated value
+            directives.put(Directive.UPGRADE_INSECURE_REQUESTS, DIRECTIVE_WITHOUT_VALUE_PLACEHOLDER);
             return this;
         }
 

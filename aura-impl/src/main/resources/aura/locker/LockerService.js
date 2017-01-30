@@ -285,11 +285,13 @@ function LockerService() {
 	// Exports
 	service["create"] = service.create;
 	service["createForDef"] = service.createForDef;
+	service["getEnv"] = service.getEnv;
 	service["getEnvForSecureObject"] = service.getEnvForSecureObject;
 	service["getKeyForNamespace"] = service.getKeyForNamespace;
 	service["trust"] = service.trust;
 	service["showLockedNodes"] = service.showLockedNodes;
 	service["wrapComponent"] = service.wrapComponent;
+	service["unwrap"] = service.unwrap;
 	service["instanceOf"] = service.instanceOf;
 
 	Object.freeze(service);

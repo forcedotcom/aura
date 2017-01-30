@@ -120,7 +120,11 @@
     var auraConfig = {!v.auraInit};
 
     function initLocker () {
-        if (auraConfig["safeEvalWorker"] &amp;&amp; !window['$$safe-eval$$'] &amp;&amp; !/^(.*?:)?\/\//.test(auraConfig["host"])) {
+        //Check if strict-csp is being enforced by the browser
+        var isEvalAllowed = true;
+        try{ eval(""); }catch(e){ isEvalAllowed = false; }
+        
+        if (!isEvalAllowed &amp;&amp; auraConfig["safeEvalWorker"] &amp;&amp; !window['$$safe-eval$$'] &amp;&amp; !/^(.*?:)?\/\//.test(auraConfig["host"])) {
             var props = {
                 src: auraConfig.safeEvalWorker,
                 id: "safeEvalWorker", width: "0", height: "0", tabIndex: "-1", "aura-hidden": "true", title:"sctipts"

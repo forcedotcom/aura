@@ -161,18 +161,13 @@ Aura.Utils.Util.prototype.isIOSWebView = function() {
  * @private
  */
 Aura.Utils.Util.prototype.globalEval = function(src, globals, optionalSourceURL) {
-    // Ignoring IE for now until we figure how to make it work under weird conditions in SFX.
-    if (window["$$safe-eval-compat$$"] && !Aura.Utils.Util.prototype.isIE) {
+    if (window["$$safe-eval-compat$$"]) {
         return window["$$safe-eval-compat$$"](src, optionalSourceURL || "", false, window, globals);
     }
 
     // --- backward compatibility ---
-    // If the worker is not ready, we have to fallback to the old mechanism of evaluation.
-    // This is mostly due to `$A.initConfig()` calls on AuraElement from Aloha and VF, which is due to be removed.
-    // The protection mechanism here is that if CSP is in place, and the worker is not, the evaluation will be prevented,
-    // but if CSP is off, and the worker was initialized, the system still behaves.
-    // This block can be removed as part of that work is described here: @W-2900324
-
+    // If eval is allowed by the browser (e.g. IE11, AIS, LO), we don't load safeEvalWorker. In such cases we fallback
+    // to the old mechanism of evaluation.
     // This evaluation occurs in the global scope and with the extra globals visible but not defined there.
     var keys = [];
     var vals = [];

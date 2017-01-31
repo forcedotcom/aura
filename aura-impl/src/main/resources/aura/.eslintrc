@@ -120,6 +120,7 @@
     "SecureComponent": true,
     "SecureMutationObserver": true,
     "SecureNavigator": true,
+    "SecureNotification": true,
     "SecureStorage": true,
     "SecureXMLHttpRequest": true,
     "SecureWindow": true,

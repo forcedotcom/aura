@@ -139,6 +139,29 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
         });
     }
 
+    if ("Notification" in win) {
+        Object.defineProperty(o, "Notification", {
+            get: function() {
+                var notification = SecureNotification(key);
+                if ("requestPermission" in win["Notification"]) {
+                    Object.defineProperty(notification, "requestPermission", {
+                        enumerable : true,
+                        value : function(callback) {
+                            return Notification["requestPermission"](callback);
+                        }
+                    });
+                }
+                if ("permission" in win["Notification"]) {
+                    Object.defineProperty(notification, "permission", {
+                        enumerable : true,
+                        value : Notification["permission"]
+                    });
+                }
+                return notification;
+            }
+        });
+    }
+    
     ["Blob", "File"].forEach(function(name) {
         if(name in win) {
             Object.defineProperty(o, name, {
@@ -452,7 +475,6 @@ SecureWindow.metadata = {
             "NodeFilter":                           FUNCTION,
             "NodeIterator":                         FUNCTION,
             "NodeList":                             FUNCTION,
-            "Notification":                         FUNCTION,
             "Number":                               FUNCTION,
             "Object":                               FUNCTION,
             "OfflineAudioCompletionEvent":          FUNCTION,
@@ -656,7 +678,7 @@ SecureWindow.metadata = {
             "WebKitAnimationEvent":                 FUNCTION,
             "WebKitCSSMatrix":                      CTOR,
             "WebKitTransitionEvent":                FUNCTION,
-            "WebSocket":                            FUNCTION,
+            "WebSocket":                            RAW,
             "WheelEvent":                           FUNCTION,
             "Window":                               FUNCTION,
             "XMLDocument":                          FUNCTION,

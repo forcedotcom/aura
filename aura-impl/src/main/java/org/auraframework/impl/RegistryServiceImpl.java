@@ -129,7 +129,8 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             DefType.STYLE,
             DefType.SVG,
             DefType.TESTSUITE,
-            DefType.TOKENS
+            DefType.TOKENS,
+            DefType.MODULE
             );
 
     private static class SourceLocationInfo {

@@ -15,32 +15,16 @@
  */
 package org.auraframework.modules.impl.source;
 
-import java.io.File;
-
+import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.modules.source.ModuleLocationAdapter;
 
 /**
  * Provides file location of aura modules dir
  */
 @ServiceComponent
-public class AuraModuleLocationAdapter implements ModuleLocationAdapter {
+public class AuraModuleLocationAdapter extends ComponentLocationAdapter.Impl {
 
-    @Override
-    public File getSourceDir() {
-        return AuraModuleFiles.MODULES_DIR.asFile();
-    }
-
-    @Override
-    public String getSourcePackage() {
-        return "aura_modules";
-    }
-    
-    @Override
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("AuraModuleLocationAdapter(sourceDir=" + getSourceDir().getAbsolutePath());
-        sb.append(",sourcePackage=" + getSourcePackage());
-        return sb.toString();
+    public AuraModuleLocationAdapter() {
+        super(AuraModuleFiles.MODULES_DIR.asFile(), null, "aura_modules");
     }
 }

@@ -183,7 +183,6 @@ public class RegistryTrie implements RegistrySet {
         //System.out.println("GET_REGISTRY_FOR: "+descriptor+"@"+descriptor.getDefType());
         String ns = descriptor.getNamespace();
         String prefix = descriptor.getPrefix().toLowerCase();
-        DefType defType = descriptor.getDefType();
 
         if (ns == null) {
             ns = "*";
@@ -207,19 +206,11 @@ public class RegistryTrie implements RegistrySet {
         if (nsObj == null) {
             return null;
         }
-
-        // ensure registry handles specific DefType
-        if (nsObj instanceof DefRegistry && ((DefRegistry) nsObj).getDefTypes().contains(defType)) {
+        if (nsObj instanceof DefRegistry) {
             return (DefRegistry) nsObj;
         }
 
-
-        if (nsObj instanceof Map) {
-            Map<DefType,DefRegistry> defTypeMap = (Map<DefType,DefRegistry>)nsObj;
-        	return defTypeMap.get(descriptor.getDefType());
-        }
-
-        return null;
-        
+        Map<DefType,DefRegistry> defTypeMap = (Map<DefType,DefRegistry>)nsObj;
+        return defTypeMap.get(descriptor.getDefType());
     }
 }

@@ -183,6 +183,9 @@ Aura.Services.MetricsService.prototype.emitBootstrapTransaction = function () {
                 // We need to override manually the duration to add the time before aura was initialized
                 var bootstrapStart = Aura.Services.MetricsService.PERFTIME ? 0 : transaction["pageStartTime"];
 
+                // Tab visibility at end of boot
+                bootstrap["visibilityStateEnd"] = document.visibilityState;
+
                 transaction["context"] = {
                     "eventType"   : "bootstrap",
                     "eventSource" : "framework",
@@ -851,6 +854,10 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
         bootstrap[m] = parseInt(Aura["bootstrap"][m], 10);
     }
 
+    // allow non-numerics
+    bootstrap["visibilityStateStart"] = Aura["bootstrap"]["visibilityStateStart"];
+
+
     bootstrap["pageStartTime"] = pageStartTime;
 
     if (window.performance && performance.timing) {
@@ -858,7 +865,7 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
         var p  = window.performance;
         var pt = p.timing;
 
-        if (!bootstrap["timming"]) {
+        if (!bootstrap["timing"]) {
             bootstrap["timing"] = {
                 "navigationStart" : pt.navigationStart,
                 "fetchStart"      : pt.fetchStart,
@@ -942,7 +949,7 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
 
                     for (var i in frameworkRequests) {
                         if (resource.name.indexOf(frameworkRequests[i]) !== -1) {
-                            summaryRequest.name = frameworkRequests[i]; // mutate the proccessed resource
+                            summaryRequest.name = frameworkRequests[i]; // mutate the processed resource
                             bootstrap[i] = summaryRequest;
                             continue;
                         }

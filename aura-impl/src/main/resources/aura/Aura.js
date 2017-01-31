@@ -20,6 +20,7 @@
 // -- Aura Bootstrap ------------------------------------------------------------
 Aura.time = window.performance && window.performance.now ? window.performance.now.bind(performance) : function(){return Date.now();};
 Aura["bootstrap"] = Aura["bootstrap"] || {};
+Aura["bootstrap"]["visibilityStateStart"] = document.visibilityState;
 Aura.bootstrapMark = function (mark, value) {
     //#if {"excludeModes" : ["PRODUCTION"]}
     if (window.console&&window.console.timeStamp) {

@@ -19,6 +19,7 @@ package org.auraframework.def.genericxml;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
@@ -68,9 +69,11 @@ public abstract class GenericXmlValidator implements GenericXmlAdapter {
      * Whether this validator allows the attribute.
      * @param attribute The name of the attribute.
      * @param isInternalNs whether the definition if from an internal namespace.
-     * @return true if the attribute is allowed.
+     * @return true if the attribute is allowed (case insensitive).
      */
     public boolean allowsAttribute(String attribute, boolean isInternalNs) {
-        return getAllowedAttributes(isInternalNs).contains(attribute.toLowerCase());
+        TreeSet<String> caseInsensitiveSet = new TreeSet<>(String::compareToIgnoreCase);
+        caseInsensitiveSet.addAll(getAllowedAttributes(isInternalNs));
+        return caseInsensitiveSet.contains(attribute);
     }
 }

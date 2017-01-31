@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Generic tag implementation. Responsible for basic xml validation.
@@ -119,7 +120,7 @@ public class GenericXmlElementImpl extends BaseXmlElementImpl implements Generic
         private final Class<? extends GenericXmlValidator> validatorClass;
         private Multimap<Class<? extends GenericXmlValidator>, GenericXmlElement> children =
                 Multimaps.newSetMultimap(Maps.newHashMap(), Suppliers.ofInstance(Sets.newHashSet()));
-        private Map<String, String> attributes = Maps.newHashMap();
+        private Map<String, String> attributes = new TreeMap<>(String::compareToIgnoreCase);
         private String text = null;
 
         public Builder(Class<? extends GenericXmlValidator> validatorClass, String tagName) {
@@ -141,6 +142,10 @@ public class GenericXmlElementImpl extends BaseXmlElementImpl implements Generic
         }
 
         public void appendAttribute(String attribute, String value) {
+            if (attributes.containsKey(attribute)) {
+                setParseError(new XMLParseException(String.format("Element contains duplicate attribute \"%s\"", attribute)));
+                return;
+            }
             attributes.put(attribute, value);
         }
 

@@ -24,6 +24,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.factory.XMLParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
 import javax.annotation.Nonnull;
@@ -157,6 +158,40 @@ public class GenericXmlHandlerTest extends AuraImplTestCase {
         assertEquals("expected child text to be \"testText\"",
                 (def.getChildren().stream().filter(ele -> ele.getName().equals(childTag)).findFirst().get())
                         .getText(), "testText");
+    }
+
+    @Test
+    public void testAttributeCaseInsensitive() throws Exception {
+        final String attrUppercase = nonPriviledgedAttr.get(0).toUpperCase();
+        final String attrLowercase = nonPriviledgedAttr.get(0);
+        GenericXmlValidator validator = new MockValidator(TAG, false, ATTRIBUTE_FUNC);
+        final String xml = String.format("<aura:designtest %s=\"test\"></aura:designtest>", attrUppercase);
+        GenericXmlElementHandler handler = createGenericXmlHandler(xml, validator);
+        GenericXmlElement def = handler.createElement();
+        //Passing in lowerCase to attribute map should still find the attribute (case insensitivity)
+        assertEquals("Expected attribute to equal \"test\"", "test", def.getAttributes().get(attrLowercase));
+    }
+
+    /**
+     * Make sure a attribute can only be defined once regardless of case
+     * @throws Exception
+     */
+    @Test
+    public void testAttributeSingularity() throws Exception {
+        final String attrUppercase = nonPriviledgedAttr.get(0).toUpperCase();
+        final String attrLowercase = nonPriviledgedAttr.get(0);
+        GenericXmlValidator validator = new MockValidator(TAG, false, ATTRIBUTE_FUNC);
+        final String xml = String.format("<aura:designtest %s=\"test\" %s=\"replace\"></aura:designtest>", attrUppercase, attrLowercase);
+        GenericXmlElementHandler handler = createGenericXmlHandler(xml, validator);
+        QuickFixException exception = null;
+        try {
+            handler.createElement().validateDefinition();
+        } catch (QuickFixException e) {
+            exception = e;
+        }
+        assertNotNull("Expected to issue while validating definition", exception);
+        String message = exception.getMessage();
+        assertTrue("Expected error to be about duplicate attribute", message.toLowerCase().contains(attrLowercase));
     }
 
     private static class MockValidator extends GenericXmlValidator {

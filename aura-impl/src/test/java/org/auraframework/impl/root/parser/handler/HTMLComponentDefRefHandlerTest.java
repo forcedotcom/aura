@@ -125,7 +125,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
     public void testCreateDefinition() throws Exception {
         ComponentDefRef cd = htmlHandler.createDefinition();
         assertEquals("html", cd.getDescriptor().getName());
-        assertEquals(2, cd.getAttributeValues().size());
+        assertEquals(2, cd. getAttributeValues().size());
         assertEquals("div", cd.getAttributeDefRef("tag").getValue());
     }
 

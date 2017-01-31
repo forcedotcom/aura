@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def.module;
+package org.auraframework.builder;
 
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefinitionReference;
+import org.auraframework.def.module.ModuleDef;
+import org.auraframework.def.module.ModuleDefRef;
 
-public interface ModuleDefRef extends DefinitionReference {
-    @Override
-    DefDescriptor<ModuleDef> getDescriptor();
+/**
+ * Module definition reference builder.
+ */
+public interface ModuleDefRefBuilder extends DefinitionReferenceBuilder<ModuleDefRef, ModuleDef> {
 }

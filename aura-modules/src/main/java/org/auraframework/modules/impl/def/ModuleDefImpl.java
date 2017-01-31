@@ -16,7 +16,6 @@
 package org.auraframework.modules.impl.def;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
@@ -30,7 +29,7 @@ import com.google.common.collect.ImmutableMap;
 /**
  * ModuleDef holds compiled code and serializes for client
  */
-public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDef, Serializable {
+public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDef {
 
     private static final long serialVersionUID = 5154640929496754931L;
     private String path;

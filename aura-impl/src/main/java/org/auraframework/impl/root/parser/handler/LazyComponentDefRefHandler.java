@@ -18,7 +18,7 @@ package org.auraframework.impl.root.parser.handler;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ComponentDefRef.Load;
+import org.auraframework.def.DefinitionReference.Load;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.component.LazyComponentDefRef;
 import org.auraframework.service.DefinitionService;

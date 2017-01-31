@@ -18,7 +18,7 @@ package org.auraframework.impl.root.parser.handler;
 import com.google.common.collect.ImmutableSet;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
-import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.HtmlTag;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -60,7 +60,7 @@ public class HTMLComponentDefRefHandler<P extends RootDefinition> extends Compon
     }
 
     @Override
-    protected void setBody(List<ComponentDefRef> body) {
+    protected void setBody(List<DefinitionReference> body) {
         htmlBuilder.setComponentAttribute(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME, body);
     }
 

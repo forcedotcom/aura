@@ -16,17 +16,13 @@
 package org.auraframework.def;
 
 import java.util.List;
-import java.util.Map;
 
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Interface for component definition references.
  */
-public interface ComponentDefRef extends Definition {
-    enum Load {
-        DEFAULT, LAZY, EXCLUSIVE
-    }
+public interface ComponentDefRef extends DefinitionReference {
 
     /**
      * FIXME: W-1328556 this method violates the contract with DefDescriptor.
@@ -39,28 +35,5 @@ public interface ComponentDefRef extends Definition {
     @Override
     DefDescriptor<ComponentDef> getDescriptor();
 
-    Map<DefDescriptor<AttributeDef>, AttributeDefRef> getAttributeValues();
-
     List<AttributeDefRef> getAttributeValueList() throws QuickFixException;
-
-    AttributeDefRef getAttributeDefRef(String name);
-
-    String getLocalId();
-
-    Load getLoad();
-
-    /**
-     * Returns true if this ref was marked with aura:flavorable. See {@link FlavoredStyleDef}.
-     */
-    boolean isFlavorable();
-
-    /**
-     * Returns true if a child ComponentDefRef was marked with aura:flavorable. This will be on nested html tags.
-     */
-    boolean hasFlavorableChild();
-
-    /**
-     * Gets the flavor.
-     */
-    Object getFlavor();
 }

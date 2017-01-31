@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ComponentDefRefBuilder;
@@ -31,10 +30,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RegisterEventDef;
-import org.auraframework.impl.DefinitionAccessImpl;
-import org.auraframework.impl.root.AttributeDefRefImpl;
-import org.auraframework.impl.system.DefinitionImpl;
-import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.impl.root.DefinitionReferenceImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -42,45 +38,20 @@ import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.json.Serialization;
-import org.auraframework.util.json.Serialization.ReferenceType;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * An immutable reference to a ComponentDef, containing only instance-specific properties, like the Attributes and body.
  * All other definition-level information about the ComponentDefRef can be found in the corresponding ComponentDef
  * FIXME: W-1328556 This should extend DefinitionImpl<ComponentDefRef> and getComponentDescriptor should be an override
  */
-@Serialization(referenceType = ReferenceType.NONE)
-public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements ComponentDefRef {
+public class ComponentDefRefImpl extends DefinitionReferenceImpl<ComponentDef> implements ComponentDefRef {
     private static final long serialVersionUID = 4650210933042431716L;
-    protected final Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeValues;
-    private final int hashCode;
-    private final String localId;
-    protected final Load load;
-    private final boolean isFlavorable;
-    private final boolean hasFlavorableChild;
-    private final Object flavor;
 
     protected ComponentDefRefImpl(Builder builder) {
         super(builder);
-        this.attributeValues = AuraUtil.immutableMap(builder.attributeValues);
-        this.hashCode = AuraUtil.hashCode(descriptor, location);
-        this.localId = builder.localId;
-        this.load = builder.load;
-        this.isFlavorable = builder.isFlavorable;
-        this.hasFlavorableChild = builder.hasFlavorableChild;
-        this.flavor = builder.flavor;
-    }
-
-
-    @Override
-    public Map<DefDescriptor<AttributeDef>, AttributeDefRef> getAttributeValues() {
-        return attributeValues;
     }
 
     @Override
@@ -95,24 +66,6 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
             }
         }
         return ret;
-    }
-
-    /**
-     * Recursively adds the ComponentDescriptors of all components in this ComponentDef's children to the provided set.
-     * The set may then be used to analyze freshness of all of those types to see if any of them should be recompiled
-     * from source.
-     *
-     * @param dependencies A Set that this method will append RootDescriptors to for every RootDef that this
-     *            ComponentDefDef requires
-     * @throws QuickFixException
-     */
-    @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        super.appendDependencies(dependencies);
-        dependencies.add(descriptor);
-        for (AttributeDefRef attributeDefRef : attributeValues.values()) {
-            attributeDefRef.appendDependencies(dependencies);
-        }
     }
 
     @Override
@@ -147,7 +100,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
      *
      * @param referencingDesc referencing descriptor
      */
-    private void validateAttributesValues(DefDescriptor<?> referencingDesc) throws QuickFixException, AttributeNotFoundException {
+    private void validateAttributesValues(DefDescriptor<?> referencingDesc) throws QuickFixException {
         ComponentDef def = descriptor.getDef();
         Map<DefDescriptor<AttributeDef>, AttributeDef> atts = def.getAttributeDefs();
         Map<String, RegisterEventDef> registeredEvents = def.getRegisterEventDefs();
@@ -177,23 +130,6 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
             entry.getValue().validateReferences();
             // heres where some type validation would go
         }
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof ComponentDefRefImpl) {
-            ComponentDefRefImpl other = (ComponentDefRefImpl) obj;
-
-            // TODO: factor attributeDefs into this? #W-689622
-            return descriptor.equals(other.getDescriptor()) && location.equals(other.getLocation());
-        }
-
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return hashCode;
     }
 
     /**
@@ -245,44 +181,19 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     }
 
     @Override
-    public AttributeDefRef getAttributeDefRef(String name) {
-        return getAttributeValues().get(Aura.getDefinitionService().getDefDescriptor(name, AttributeDef.class));
+    public boolean equals(Object obj) {
+        if (obj instanceof ComponentDefRefImpl) {
+            ComponentDefRefImpl other = (ComponentDefRefImpl) obj;
+
+            // TODO: factor attributeDefs into this? #W-689622
+            return descriptor.equals(other.getDescriptor()) && location.equals(other.getLocation());
+        }
+
+        return false;
     }
 
-    @Override
-    public String getLocalId() {
-        return localId;
-    }
-
-    @Override
-    public Load getLoad() {
-        return load;
-    }
-
-    @Override
-    public boolean isFlavorable() {
-        return isFlavorable;
-    }
-
-    @Override
-    public boolean hasFlavorableChild() {
-        return hasFlavorableChild;
-    }
-
-    @Override
-    public Object getFlavor() {
-        return flavor;
-    }
-
-    public static class Builder extends DefinitionImpl.RefBuilderImpl<ComponentDef, ComponentDefRef> implements
+    public static class Builder extends DefinitionReferenceImpl.Builder<ComponentDefRef, ComponentDef> implements
             ComponentDefRefBuilder {
-
-        private Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeValues;
-        private String localId;
-        private Load load = Load.DEFAULT;
-        private boolean isFlavorable;
-        private boolean hasFlavorableChild;
-        private Object flavor;
 
         public Builder() {
             super(ComponentDef.class);
@@ -291,92 +202,6 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
         @Override
         public ComponentDefRef build() {
             return new ComponentDefRefImpl(this);
-        }
-
-        public Builder clearAttributes() {
-            if (this.attributeValues != null) {
-                this.attributeValues.clear();
-            }
-            return this;
-        }
-
-        @Override
-        public Builder setAttribute(String key, Object value) {
-            if (value != null) {
-                AttributeDefRefImpl.Builder valueBuilder = new AttributeDefRefImpl.Builder();
-                valueBuilder.setDescriptor(Aura.getDefinitionService().getDefDescriptor(key, AttributeDef.class));
-                valueBuilder.setValue(value);
-                valueBuilder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
-                AttributeDefRef adr = valueBuilder.build();
-                setAttribute(adr.getDescriptor(), adr);
-            } else if (attributeValues != null) {
-                DefDescriptor<AttributeDef> attr = Aura.getDefinitionService().getDefDescriptor(key, AttributeDef.class);
-                attributeValues.remove(attr);
-            }
-            return this;
-        }
-
-        @Override
-        public ComponentDefRefBuilder setLocalId(String localId) {
-            if (!AuraTextUtil.isNullEmptyOrWhitespace(localId)) {
-                this.localId = localId;
-            }
-            return this;
-        }
-
-        /**
-         * Gets the attributeValues for this instance.
-         *
-         * @return The attributeValues.
-         */
-        @Override
-        public AttributeDefRef getAttributeValue(DefDescriptor<AttributeDef> key) {
-            return this.attributeValues.get(key);
-        }
-
-        public Builder setAttribute(DefDescriptor<AttributeDef> desc, AttributeDefRef value) {
-            if (value == null) {
-                throw new NullPointerException("Value cannot be null");
-            }
-            if (attributeValues == null) {
-                attributeValues = Maps.newHashMap();
-            }
-
-            attributeValues.put(desc, value);
-            return this;
-        }
-
-        /**
-         * Gets the localId for this instance.
-         *
-         * @return The localId.
-         */
-        public String getLocalId() {
-            return this.localId;
-        }
-
-        @Override
-        public ComponentDefRefBuilder setLoad(Load load) {
-            this.load = load;
-            return this;
-        }
-
-        @Override
-        public ComponentDefRefBuilder setIsFlavorable(boolean isFlavorable) {
-            this.isFlavorable = isFlavorable;
-            return this;
-        }
-
-        @Override
-        public ComponentDefRefBuilder setHasFlavorableChild(boolean hasFlavorableChild) {
-            this.hasFlavorableChild = hasFlavorableChild;
-            return this;
-        }
-
-        @Override
-        public ComponentDefRefBuilder setFlavor(Object flavor) {
-            this.flavor = flavor;
-            return this;
         }
     }
 }

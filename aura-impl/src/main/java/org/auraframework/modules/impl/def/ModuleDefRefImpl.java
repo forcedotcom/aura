@@ -16,43 +16,85 @@
 package org.auraframework.modules.impl.def;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.Set;
+import java.util.Map;
 
+import org.auraframework.builder.ModuleDefRefBuilder;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDefRef;
-import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.impl.root.DefinitionReferenceImpl;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-public class ModuleDefRefImpl extends DefinitionImpl<ModuleDef> implements ModuleDefRef, Serializable {
+/**
+ * ModuleDefRef implementation.
+ * Uses same base impl as ComponentDefRef
+ */
+public class ModuleDefRefImpl extends DefinitionReferenceImpl<ModuleDef> implements ModuleDefRef {
 
     private static final long serialVersionUID = 2121381558446216947L;
 
-    protected ModuleDefRefImpl(RefBuilderImpl<ModuleDef, ?> builder) {
+    protected ModuleDefRefImpl(Builder builder) {
         super(builder);
     }
 
     @Override
     public void serialize(Json json) throws IOException {
+        json.writeMapBegin();
+        json.writeMapKey("componentDef");
 
+        json.writeMapBegin();
+        json.writeMapEntry("descriptor", descriptor);
+        json.writeMapEntry("type", "module");
+        json.writeMapEnd();
+
+        if (!attributeValues.isEmpty()) {
+            json.writeMapKey("attributes");
+
+            json.writeMapBegin();
+            json.writeMapKey("values");
+
+            json.writeMapBegin();
+            for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : attributeValues.entrySet()) {
+                json.writeMapEntry(entry.getKey(), entry.getValue());
+            }
+            json.writeMapEnd();
+
+            json.writeMapEnd();
+        }
+
+        json.writeMapEnd();
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        super.appendDependencies(dependencies);
-        dependencies.add(descriptor);
+    public void validateReferences() throws QuickFixException {
+        ModuleDef def = descriptor.getDef();
+        if (def == null) {
+            throw new DefinitionNotFoundException(descriptor);
+        }
     }
 
-    public static class Builder extends DefinitionImpl.RefBuilderImpl<ModuleDef, ModuleDefRef> {
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ModuleDefRefImpl) {
+            ModuleDefRefImpl other = (ModuleDefRefImpl) obj;
+            return descriptor.equals(other.getDescriptor()) && location.equals(other.getLocation());
+        }
+        return false;
+    }
+
+    public static class Builder extends DefinitionReferenceImpl.Builder<ModuleDefRef, ModuleDef> implements
+            ModuleDefRefBuilder {
 
         public Builder() {
             super(ModuleDef.class);
         }
 
         @Override
-        public ModuleDefRef build() throws QuickFixException {
+        public ModuleDefRef build() {
             return new ModuleDefRefImpl(this);
         }
     }

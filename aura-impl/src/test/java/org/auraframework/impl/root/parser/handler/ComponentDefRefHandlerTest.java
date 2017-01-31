@@ -19,7 +19,7 @@ import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.ComponentDefRef.Load;
+import org.auraframework.def.DefinitionReference.Load;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -58,7 +58,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
     }
 
     @Test
-    public void testCreateDefinition() {
+    public void testCreateDefinition() throws Exception {
         ComponentDefRef cdr = cdrHandler.createDefinition();
         assertEquals("attr value", cdr.getAttributeDefRef("attr").getValue());
     }

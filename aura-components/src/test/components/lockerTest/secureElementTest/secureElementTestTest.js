@@ -580,5 +580,11 @@
         test: function(cmp) {
             cmp.testGetSetInvalidAttributes();
         }
+    },
+
+    testRecursiveTraversal: {
+        test: function(cmp) {
+            cmp.testRecursiveTraversal();
+        }
     }
 })

@@ -72,6 +72,7 @@
     <aura:method name="testGetSetInvalidAttributes"/>
     <aura:method name="testLabelForInput"/>
     <aura:method name="testForAttributeAllowedOnLabelOnly"/>
+    <aura:method name="testRecursiveTraversal"/>
 
     <lockerTest:facet/>
 

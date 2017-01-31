@@ -630,7 +630,7 @@ SecureObject.createFilteredPropertyStateless = function(propertyName, prototype,
 		if (options && options.skipOpaque === true) {
 			while (value) {
                 var hasAccess = ls_hasAccess(st, value);
-				if (hasAccess || value === document.body || value === document.head || value === document.documentElement) {
+				if (hasAccess || value === document.body || value === document.head || value === document.documentElement || value === document) {
 					break;
 				}
 				value = value[propertyName];

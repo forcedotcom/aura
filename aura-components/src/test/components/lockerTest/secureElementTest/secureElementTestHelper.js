@@ -11,5 +11,17 @@
         }
 
         return null;
+    },
+
+    // Verify that container contains the element provided
+    contains: function(container, element) {
+        if ( element ) {
+            while ( (element = element.parentNode) ) {
+                if (element === container) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 })

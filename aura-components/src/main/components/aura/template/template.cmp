@@ -123,6 +123,8 @@
         //Check if strict-csp is being enforced by the browser
         var isEvalAllowed = true;
         try{ eval(""); }catch(e){ isEvalAllowed = false; }
+        // remove the worker url from config to streamline safeEvalWorker's health check
+        if(isEvalAllowed){ auraConfig["safeEvalWorker"] = undefined; }
         
         if (!isEvalAllowed &amp;&amp; auraConfig["safeEvalWorker"] &amp;&amp; !window['$$safe-eval$$'] &amp;&amp; !/^(.*?:)?\/\//.test(auraConfig["host"])) {
             var props = {

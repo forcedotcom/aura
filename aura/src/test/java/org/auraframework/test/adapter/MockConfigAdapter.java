@@ -44,5 +44,7 @@ public interface MockConfigAdapter extends ConfigAdapter, MockBean {
 
 	void setCSRFToken(Supplier<String> tokenFunction);
 
+	void setJwtToken(Supplier<String> tokenFunction);
+
 	void setLockerServiceEnabled(boolean isLockerServiceEnabled);
 }

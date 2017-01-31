@@ -637,7 +637,11 @@ public class ServerServiceImpl implements ServerService {
             auraInit.put("deftype", value.getDescriptor().getDefType());
             auraInit.put("host", context.getContextPath());
             auraInit.put("pathPrefix", context.getPathPrefix());
-            auraInit.put("token", configAdapter.getCSRFToken());
+            
+            // appcached apps must receive the token via bootstrap to avoid caching of the token
+        	if (!manifestUtil.isManifestEnabled()) {
+        		auraInit.put("token", configAdapter.getCSRFToken());
+        	}
             
             String lockerWorkerURL = configAdapter.getLockerWorkerURL();
             if (lockerWorkerURL != null) {

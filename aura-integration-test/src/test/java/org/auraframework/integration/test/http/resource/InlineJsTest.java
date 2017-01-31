@@ -78,6 +78,7 @@ public class InlineJsTest extends AuraImplTestCase {
         inlineJs.setServerService(serverService);
         inlineJs.setRenderingService(renderingService);
         inlineJs.setExceptionAdapter(exceptionAdapter);
+        inlineJs.initManifest();
         return inlineJs;
     }
 
@@ -98,6 +99,7 @@ public class InlineJsTest extends AuraImplTestCase {
         AuraContext context = contextService.startContext(
                 AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        mockRequest.addParameter("jwt", configAdapter.generateJwtToken());
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
         context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
 
@@ -128,6 +130,7 @@ public class InlineJsTest extends AuraImplTestCase {
         AuraContext context = contextService.startContext(
                 AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        mockRequest.addParameter("jwt", configAdapter.generateJwtToken());
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
         context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
@@ -167,6 +170,7 @@ public class InlineJsTest extends AuraImplTestCase {
         AuraContext context = contextService.startContext(
                 AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        mockRequest.addParameter("jwt", configAdapter.generateJwtToken());
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
         context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
 
@@ -200,6 +204,7 @@ public class InlineJsTest extends AuraImplTestCase {
                 AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        mockRequest.addParameter("jwt", configAdapter.generateJwtToken());
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
         InlineJs inlineJs = getInlineJs();
@@ -230,6 +235,7 @@ public class InlineJsTest extends AuraImplTestCase {
         AuraContext context = contextService.startContext(
                 AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        mockRequest.addParameter("jwt", configAdapter.generateJwtToken());
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
         context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
 

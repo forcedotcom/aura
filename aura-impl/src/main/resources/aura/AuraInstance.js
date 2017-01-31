@@ -510,6 +510,7 @@ AuraInstance.prototype.initAsync = function(config) {
         function loadStoredToken () {
             return $A.clientService.loadTokenFromStorage().then(function setStoredToken(token){
                 $A.clientService.setToken(token);
+                $A.log("Aura.initAsync(): token loaded from storage");
             }, function tokenNotFound(reason){
                 $A.log("Aura.initAsync(): token not loaded from storage: " + reason);
             });

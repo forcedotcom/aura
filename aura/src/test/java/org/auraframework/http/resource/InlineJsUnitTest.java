@@ -103,6 +103,7 @@ public class InlineJsUnitTest {
         inline.setContextService(contextService);
         inline.setExceptionAdapter(exceptionAdapter);
         inline.setConfigAdapter(configAdapter);
+        inline.initManifest();
 
         doThrow(outOfSyncException).when(servletUtilAdapter).checkFrameworkUID(same(auraContext));
 
@@ -222,6 +223,7 @@ public class InlineJsUnitTest {
         InlineJs inlineSpy = PowerMockito.spy(inline);
         PowerMockito.doReturn(false).when(inlineSpy, "shouldCacheHTMLTemplate", anyObject(), anyObject(), anyObject());
         PowerMockito.doNothing().when(inlineSpy, "appendInlineJS", anyObject(), anyObject());
+        inlineSpy.initManifest();
 
         return inlineSpy;
     }

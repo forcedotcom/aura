@@ -23,6 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -36,6 +37,7 @@ import org.auraframework.instance.Instance;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
+import org.auraframework.throwable.AuraJWTError;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
@@ -109,6 +111,15 @@ public class Bootstrap extends AuraResourceImpl {
             DefDescriptor<?> desc = definitionService.getDefDescriptor(app.getDescriptorName(),
                     type.getPrimaryInterface());
             servletUtilAdapter.checkFrameworkUID(context);
+            
+            // CSRF token is usually handled in inline.js, but in the few cases
+            // where inline.js may be cached, bootstrap may need to be able to
+            // return a current token.
+            String jwtToken = request.getParameter("jwt");
+            if (jwtToken != null && !configAdapter.validateBootstrap(jwtToken)) {
+                throw new AuraJWTError("Invalid jwt parameter");
+	        }
+            
             setCacheHeaders(response, app);
             Instance<?> appInstance = instanceService.getInstance(desc, getComponentAttributes(request));
             definitionService.updateLoaded(desc);
@@ -127,12 +138,26 @@ public class Bootstrap extends AuraResourceImpl {
             json.writeMapEnd();
             json.writeMapEntry("md5", out.getMD5());
             json.writeMapEntry("context", context);
+            
+            if (jwtToken != null) {
+                json.writeMapEntry("token", configAdapter.getCSRFToken());
+	        }
+            
             json.writeMapEnd();
             out.append(APPEND_JS);
         } catch (Throwable t) {
-            t = exceptionAdapter.handleException(t);
-            writeError(t, response, context);
-            exceptionAdapter.handleException(new AuraResourceException(getName(), response.getStatus(), t));
+            if (t instanceof AuraJWTError) {
+                // If jwt validation fails, just 404. Do not gack.
+                try {
+                    servletUtilAdapter.send404(request.getServletContext(), request, response);
+                } catch (ServletException e) {
+                    // ignore
+                }
+            } else {
+                t = exceptionAdapter.handleException(t);
+                writeError(t, response, context);
+                exceptionAdapter.handleException(new AuraResourceException(getName(), response.getStatus(), t));
+            }
         }
     }
 

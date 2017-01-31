@@ -198,8 +198,12 @@ public class InlineJs extends AuraResourceImpl {
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context)
             throws IOException {
         try {
-            if (!configAdapter.validateBootstrap(request.getParameter("jwt"))) {
-                throw new AuraJWTError("Invalid jwt parameter");
+        	// For appcached apps, inline is not expected to return a CSRF token
+        	if (!manifestUtil.isManifestEnabled()) {
+	        	String token = request.getParameter("jwt");
+	            if (!configAdapter.validateBootstrap(token)) {
+            		throw new AuraJWTError("Invalid jwt parameter");
+            	}
             }
             DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getLoadingApplicationDescriptor();
             internalWrite(request, response, appDefDesc, context);

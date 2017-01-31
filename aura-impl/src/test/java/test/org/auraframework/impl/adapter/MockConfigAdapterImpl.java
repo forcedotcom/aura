@@ -198,6 +198,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     private ContentSecurityPolicy csp;
     private Consumer<String> csrfValidationFunction = null;
     private Supplier<String> csrfTokenFunction = null;
+	private Supplier<String> jwtTokenFunction = null;
     private Boolean isLockerServiceEnabledGlobally;
 
     public MockConfigAdapterImpl() {
@@ -216,6 +217,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         validateCss = null;
         csrfValidationFunction = null;
         csrfTokenFunction = null;
+        jwtTokenFunction = null;
         isLockerServiceEnabledGlobally = null;
     }
 
@@ -392,6 +394,20 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     	}
     }
 
+    @Override
+    public String generateJwtToken() {
+    	if (this.jwtTokenFunction != null) {
+    		return this.jwtTokenFunction.get();
+    	} else {
+    		return super.generateJwtToken();
+    	}
+    }
+    
+    @Override
+    public void setJwtToken(Supplier<String> tokenFunction) {
+    	this.jwtTokenFunction = tokenFunction;
+    }
+    
     @Override
     public void setLockerServiceEnabled(boolean enabled) {
 		isLockerServiceEnabledGlobally = enabled;

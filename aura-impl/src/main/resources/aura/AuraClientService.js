@@ -1354,7 +1354,10 @@ AuraClientService.prototype.saveTokenToStorage = function() {
          ];
 
         return storage.adapter.setItems([tuple]).then(
-            function() { return token; },
+            function() {
+                $A.log("AuraClientService.saveTokenToStorage(): token persisted");
+                return token;
+            },
             function(err) {
                 $A.warning("AuraClientService.saveTokenToStorage(): failed to persist token: " + err);
                 return token;
@@ -1696,6 +1699,10 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
     }
 
     if (bootstrap.source === "network") {
+        if (boot["token"]) {
+            $A.log("AuraClientService.runAfterBootstrapReady(): Received updated token from bootstrap");
+            this.setToken(boot["token"], true);
+        }
         this.checkBootstrapUIDs(Aura["appBootstrapCache"]);
         this.saveBootstrapToStorage(boot);
     }
@@ -1729,6 +1736,10 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
                     $A.warning("AuraClientService.runAfterBootstrapReady(): bootstrap from network contained error: " + Aura["appBootstrap"]["error"]["message"]);
                 } else {
                     Aura["bootstrapUpgrade"] = this.appBootstrap["md5"] !== Aura["appBootstrap"]["md5"];
+                    if (Aura["appBootstrap"]["token"]) {
+                        $A.log("AuraClientService.runAfterBootstrapReady(): Received updated token after cached bootstrap");
+                        this.setToken(Aura["appBootstrap"]["token"], true);
+                    }
                     this.checkBootstrapUIDs(Aura["appBootstrap"]);
                     this.checkBootstrapUpgrade();
                 }

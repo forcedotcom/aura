@@ -275,7 +275,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
 
     @Test
     public void testInlineJSNoCacheHeaders() throws Exception {
-        String url = "/l/" + AuraTextUtil.urlencode(getSimpleContext(Format.JS, false)) + "/inline.js?jwt=TESTJWT";
+        String url = "/l/" + AuraTextUtil.urlencode(getSimpleContext(Format.JS, false)) + "/inline.js";
 
         HttpGet get = obtainGetMethod(url);
         HttpResponse httpResponse = perform(get);
@@ -295,7 +295,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     @Test
     public void testInlineJSExceptionCode() throws Exception {
         // modified uid url
-        String url = "/l/" + AuraTextUtil.urlencode(getSimpleContext(Format.JS, true)) + "/inline.js?jwt=TESTJWT";
+        String url = "/l/" + AuraTextUtil.urlencode(getSimpleContext(Format.JS, true)) + "/inline.js";
 
         HttpGet get = obtainGetMethod(url);
         HttpResponse httpResponse = perform(get);

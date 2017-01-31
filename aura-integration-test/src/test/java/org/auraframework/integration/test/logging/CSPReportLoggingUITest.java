@@ -150,7 +150,7 @@ public class CSPReportLoggingUITest extends AbstractLoggingUITest {
                 "@font-face {font-family: Gentium;src: url(http://example.com/fonts/Gentium.ttf);}");
         String uri = String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName());
 
-        openNoAura(uri);
+        open(uri);
         // trigger script violation to generate CSP logs.
         getAuraUITestingUtil().getRawEval("var s=document.createElement('script');s.type='text/javascript';s.async=true;s.src='http://expectedreport.salesforce.com/';document.getElementsByTagName('head')[0].appendChild(s);");
 

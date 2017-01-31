@@ -17,19 +17,28 @@ Function.RegisterNamespace("Test.Tools.Aura.Attributes");
 
 Test.Tools.Aura.Attributes.AuraAttribute=function(){
     // ls aura-resources/target/*SNAPSHOT.jar
-    // Import("aura-impl/src/main/resources/aura/Aura.js");
-    var mockWindow=Stubs.Dom.GetWindow();
-    Mocks.Dom.GetDom(mockWindow)(function(){
-        //Import("aura-impl/src/main/resources/aura/Aura.js");
-        Import("aura-resources/target/src-gen/main/resources/aura/javascript/aura_proddebug.js");
-        Import("aura-resources/src/main/resources/aura/resources/moment/moment.js");
-        $A.initAsync({context:{mode:"dev"}});
-    });
-    System.Environment.Write("\n\n\n$A: "+mockWindow.$A+"\n\n\n");
+    if(!Test.Tools.Aura.Attributes.AuraAttribute.WindowStub) {
+        this.WindowStub = Test.Tools.Aura.Attributes.AuraAttribute.WindowStub = Stubs.Dom.GetWindow();
+        var additionalMocks = ["File", "FileList", "CSSStyleDeclaration", "TimeRanges", "Date", "Promise", "Proxy", "MessagePort", "MessageChannel", "MessageEvent", "FormData"];
+        for (var i = 0; i < additionalMocks.length; i++) {
+            if (!Object.Global()[additionalMocks[i]]) {
+                this.WindowStub[additionalMocks[i]] = {};
+            }
+        }
+
+        Mocks.Dom.GetDom(this.WindowStub)(function () {
+            Import("aura-resources/target/src-gen/main/resources/aura/javascript/aura_proddebug.js");
+            $A.createComponent=Stubs.GetMethod(function(type,attributes,callback){
+                callback(Stubs.Aura.GetComponent(attributes,{},{},type));
+            });
+        });
+    }else{
+        this.WindowStub=Test.Tools.Aura.Attributes.AuraAttribute.WindowStub;
+    }
 
     this.base("Aura");
     if(!Object.IsType(Function,this.Target))throw new Error("Test.Tools.Aura.Attributes.AuraAttribute.ctor: unable to locate attribute target.");
-    new xUnit.js.Attributes.MockAttribute(Mocks.Dom.GetDom(mockWindow));
+    new xUnit.js.Attributes.MockAttribute(Mocks.Dom.GetDom(this.WindowStub));
 };
 Test.Tools.Aura.Attributes.AuraAttribute.Inherit(System.Script.Attributes.Attribute);
 

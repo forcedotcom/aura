@@ -36,16 +36,8 @@ function ComponentClassRegistry () {
  */
 ComponentClassRegistry.prototype.customConstructorMap = { 
     /*eslint-disable no-undef*/
-    "aura$text": TextComponent
-    
-    // Things to do when switching to HtmlComponent
-    // * Remove aura:html special case from Component.prototype.setupComponentDef
-    // If Final: 
-    // * Delete htmlHelper.js
-    // * Delete methods in htmlRenderer.js but leave the file. (Needs to exist.)
-    // * Delete self.bindToHelper("markup://aura:html", "dispatchAction") call in DomHandlersPlugin.js
-    // * Delete unInstrement call for "dispatchAction" in DomHandlersPlugin.prototype.unbind. (NOT THE uninstallOverride)
-    //"aura$html":HtmlComponent, 
+    "aura$text":TextComponent,
+    "aura$html":HtmlComponent
     
     // Things to do when switching to ExpressionComponent
     // * Remove this.setContainerComponentId() call in Component.js constructor

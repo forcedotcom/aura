@@ -25,6 +25,7 @@ import org.auraframework.cache.Cache;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.DependencyEntry;
+import org.auraframework.system.RegistrySet;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
 
@@ -67,6 +68,8 @@ public interface CachingService extends AuraService {
 
     Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> getDefDescriptorByNameCache();
 
+    Cache<RegistrySet.RegistrySetKey, RegistrySet> getRegistrySetCache();
+    
     Lock getReadLock();
 
     Lock getWriteLock();

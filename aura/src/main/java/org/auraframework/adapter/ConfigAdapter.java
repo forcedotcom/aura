@@ -63,6 +63,14 @@ public interface ConfigAdapter extends AuraAdapter {
 
     boolean validateCss();
 
+    /**
+     * SessionCacheKey is a key that is used for caches that are based typically per customer basis. 
+     * if this returns null, it mean that caches that uses this key will not be active.
+     * 
+     * @return a String, may be null
+     */
+    String getSessionCacheKey();
+    
     String getAvailableTimezone(String timezone);
 
     /**

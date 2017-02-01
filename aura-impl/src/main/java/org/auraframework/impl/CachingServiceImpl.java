@@ -38,6 +38,8 @@ import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.CachingService;
 import org.auraframework.system.DependencyEntry;
+import org.auraframework.system.RegistrySet;
+import org.auraframework.system.RegistrySet.RegistrySetKey;
 import org.auraframework.system.SourceListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -63,6 +65,9 @@ public class CachingServiceImpl implements CachingService {
 
     /** Default size of client lib caches, in number of entries */
     private final static int CLIENT_LIB_CACHE_SIZE = 30;
+    
+    /** Default size of registry sets, in number of entries */
+    private final static int REGISTRY_SET_CACHE_SIZE = 100;
 
     @Configuration
     public static class BeanConfiguration {
@@ -93,6 +98,7 @@ public class CachingServiceImpl implements CachingService {
     private Cache<String, DependencyEntry> depsCache;
     private Cache<String, String> clientLibraryOutputCache;
     private Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> defDescriptorByNameCache;
+    private Cache<RegistrySet.RegistrySetKey, RegistrySet> registrySetCache;
 
     private static final Logger logger = Logger.getLogger(CachingServiceImpl.class);
 
@@ -172,6 +178,18 @@ public class CachingServiceImpl implements CachingService {
                         .setConcurrencyLevel(20)
                         .setName("defDescByNameCache")
                         .build();
+        
+        size = getCacheSize("aura.cache.registrySetCacheSize", REGISTRY_SET_CACHE_SIZE);
+        registrySetCache = 
+               this.<RegistrySet.RegistrySetKey, RegistrySet> getCacheBuilder()
+                   .setInitialSize(size)
+                   .setLoggingAdapter(loggingAdapter)
+                   .setMaximumSize(size)
+                   .setSoftValues(true)
+                   .setName("registrySetCache")
+                   .setRecordStats(true)
+                   .build();
+        
     }
 
     @Override
@@ -213,7 +231,12 @@ public class CachingServiceImpl implements CachingService {
     public final Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> getDefDescriptorByNameCache() {
         return defDescriptorByNameCache;
     }
-
+    
+    @Override
+    public Cache<RegistrySetKey, RegistrySet> getRegistrySetCache() {
+        return registrySetCache;
+    }
+    
     @Override
     public Lock getReadLock() {
         return rwLock.readLock();
@@ -273,12 +296,14 @@ public class CachingServiceImpl implements CachingService {
     }
 
     private void invalidateSourceRelatedCaches(DefDescriptor<?> descriptor) {
-
+        
+        
         depsCache.invalidateAll();
         descriptorFilterCache.invalidateAll();
         stringsCache.invalidateAll();
         altStringsCache.invalidateAll();
         clientLibraryOutputCache.invalidateAll();
+        registrySetCache.invalidateAll();
 
         if (descriptor == null) {
             defsCache.invalidateAll();

@@ -16,10 +16,15 @@
 package org.auraframework.system;
 
 import java.util.Collection;
+import java.util.Objects;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.system.AuraContext.Mode;
+
+import com.google.common.base.Preconditions;
 
 /**
  * An interface that defines a set of registries for resolving definitions.
@@ -54,4 +59,66 @@ public interface RegistrySet {
      * @return the registry corresponding to the descriptor.
      */
     public <T extends Definition> DefRegistry getRegistryFor(DefDescriptor<T> descriptor);
+
+    /**
+     * Cache key for RegistrySet.
+     *
+     * @author pmagnusson
+     * @since 208
+     */
+    public static final class RegistrySetKey {
+
+        private final Mode mode;
+        private final Authentication access;
+        private final String sessionCacheKey;
+        private final int hashCode;
+
+        public RegistrySetKey(Mode mode, Authentication access, String sessionCacheKey) {
+            this.access = Preconditions.checkNotNull(access);
+            this.mode = Preconditions.checkNotNull(mode);
+            this.sessionCacheKey = Preconditions.checkNotNull(sessionCacheKey);
+            Preconditions.checkArgument(!this.sessionCacheKey.isEmpty(), "identifier cannot be empty");
+
+            this.hashCode = Objects.hash(this.mode, this.access, this.sessionCacheKey);
+        }
+
+        public Mode getMode() {
+            return this.mode;
+        }
+
+        public Authentication getAccess() {
+            return this.access;
+        }
+
+        public String getSessionCacheKey() {
+            return this.sessionCacheKey;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof RegistrySetKey)) {
+                return false;
+            }
+            final RegistrySetKey key = (RegistrySetKey)obj;
+            return Objects.equals(this.access, key.access)
+                    && Objects.equals(this.mode, key.mode)
+                    && Objects.equals(this.sessionCacheKey, key.sessionCacheKey);
+        }
+
+        @Override
+        public int hashCode() {
+            return this.hashCode;
+        }
+
+        @Override
+        public String toString() {
+            return "RegistrySetKey [getMode()=" + getMode() + ", getAccess()=" + getAccess()
+                    + ", getSessionCacheKey()=" + getSessionCacheKey() + "]";
+        }
+
+    }
+
 }

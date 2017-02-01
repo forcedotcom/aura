@@ -883,4 +883,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public boolean isModulesEnabled() {
         return Boolean.parseBoolean(System.getProperty("aura.modules"));
     }
+
+    @Override
+    public String getSessionCacheKey() {
+        // return a static session key here, to ensure we always cache unless overriden.
+        return "aura.sessionCacheKey";
+    }
+
 }

@@ -27,7 +27,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -38,6 +40,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.cache.Cache;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
@@ -57,6 +60,7 @@ import org.auraframework.impl.system.RegistryTrie;
 import org.auraframework.impl.system.SourceLoaderDefRegistry;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
+import org.auraframework.service.CachingService;
 import org.auraframework.service.CompilerService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.RegistryService;
@@ -64,6 +68,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.RegistrySet;
+import org.auraframework.system.RegistrySet.RegistrySetKey;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -72,6 +77,8 @@ import org.auraframework.util.FileMonitor;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.ExecutionError;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 
 @ServiceComponent
 public class RegistryServiceImpl implements RegistryService, SourceListener {
@@ -92,6 +99,8 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     private Optional<Collection<RegistryAdapter>> adaptersInject;
 
     private Collection<RegistryAdapter> adapters;
+
+    private CachingService cachingService;
 
     private List<ComponentLocationAdapter> locationAdapters;
 
@@ -355,6 +364,53 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
 
     @Override
     public RegistrySet getDefaultRegistrySet(Mode mode, Authentication access) {
+        if (cachingService == null || mode == null || access == null) {
+            return buildDefaultRegistrySet(mode, access);
+        }
+
+        Cache<RegistrySetKey, RegistrySet> cache = cachingService.getRegistrySetCache();
+        if (cache == null) {
+            return buildDefaultRegistrySet(mode, access);
+        }
+
+        // build cachekey
+        String sessionCacheKey = configAdapter.getSessionCacheKey();
+        if (sessionCacheKey == null) {
+
+            // if session cache key is null, it means that we're not caching this.
+            return buildDefaultRegistrySet(mode, access);
+        }
+
+        final RegistrySetKey registrySetCacheKey = new RegistrySetKey(mode, access, sessionCacheKey);
+
+        try {
+            return cache.get(registrySetCacheKey, new Callable<RegistrySet>() {
+
+                @Override
+                public RegistrySet call() throws Exception {
+                    RegistrySet res = buildDefaultRegistrySet(mode, access);
+
+                    if (res == null) {
+                        // see com.google.common.cache.Cache#get; this method may never return null.
+                        throw new NullPointerException("null RegistrySet for key=" + registrySetCacheKey);
+                    }
+                    return res;
+                }
+            });
+        } catch (UncheckedExecutionException e) {
+            // thrown if a unchecked exception was thrown in call
+            throw (RuntimeException)e.getCause();
+        } catch (ExecutionException e) {
+            // thrown if a checked exception was thrown in call
+            throw new RuntimeException(e.getCause());
+        } catch (ExecutionError e) {
+            // if an error was thrown while loading the value.
+            throw new Error(e.getCause());
+        }
+    }
+
+    // test accessible
+    RegistrySet buildDefaultRegistrySet(Mode mode, Authentication access) {
         List<DefRegistry> registries = getCLARegistries();
         for (RegistryAdapter adapter : adapters) {
             DefRegistry[] provided = adapter.getRegistries(mode, access, null);
@@ -364,7 +420,6 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         }
         return new RegistryTrie(registries);
     }
-
 
     @Override
     public RegistrySet getRegistrySet(DefRegistry registry) {
@@ -506,4 +561,10 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     public void setExceptionAdapter(ExceptionAdapter exceptionAdapter) {
         this.exceptionAdapter = exceptionAdapter;
     }
+
+    @Inject
+    public void setCachingService(CachingService cachingService) {
+        this.cachingService = cachingService;
+    }
+
 }

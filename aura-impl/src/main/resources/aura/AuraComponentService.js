@@ -503,6 +503,7 @@ AuraComponentService.prototype.newComponentDeprecated = function(config, attribu
                     contextCmp + "'.";
             var ae = new $A.auraError(message);
             ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+            ae["componentStack"] = context && context.getAccessStackHierarchy();
             if(context.enableAccessChecks) {
                 if(context.logAccessFailures){
                     $A.error(null, ae);
@@ -755,6 +756,7 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
                     var message="Access Check Failed! AuraComponentService.newComponentAsync(): '" + def.getDescriptor().getQualifiedName() + "' is not visible to '" + contextCmp + "'.";
                     var ae = new $A.auraError(message);
                     ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+                    ae["componentStack"] = context && context.getAccessStackHierarchy();
                     if(context.enableAccessChecks) {
                         if(context.logAccessFailures){
                             $A.error(null, ae);
@@ -1003,6 +1005,7 @@ AuraComponentService.prototype.getDefinition = function(descriptor, callback) {
             var message="Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + contextCmp + "'.";
             var ae = new $A.auraError(message);
             ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+            ae["componentStack"] = context && context.getAccessStackHierarchy();
             if(context.enableAccessChecks) {
                 if(context.logAccessFailures){
                     $A.error(null, ae);
@@ -1085,6 +1088,7 @@ AuraComponentService.prototype.getDef = function(descriptor) {
         var message="Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + contextCmp + "'.";
         var ae = new $A.auraError(message);
         ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+        ae["componentStack"] = context && context.getAccessStackHierarchy();
         if(context.enableAccessChecks){
             if(context.logAccessFailures){
                 $A.error(null, ae);
@@ -1541,6 +1545,7 @@ AuraComponentService.prototype.createComponentPrivAsync = function (config, call
             var message="Access Check Failed! AuraComponentService.createComponent(): '" + descriptor + "' is not visible to '" + contextCmp + "'.";
             var ae = new $A.auraError(message);
             ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+            ae["componentStack"] = context && context.getAccessStackHierarchy();
             if(context.enableAccessChecks) {
                 if(context.logAccessFailures){
                     $A.error(null, ae);
@@ -1574,6 +1579,7 @@ AuraComponentService.prototype.createComponentPriv = function (config) {
         var message="Access Check Failed! AuraComponentService.createComponentFromConfig(): '" + descriptor + "' is not visible to '" + contextCmp + "'.";
         var ae = new $A.auraError(message);
         ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+        ae["componentStack"] = context && context.getAccessStackHierarchy();
         if(context.enableAccessChecks) {
             if(context.logAccessFailures){
                 $A.error(null, ae);

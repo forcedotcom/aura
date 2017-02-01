@@ -98,6 +98,7 @@ AttributeSet.prototype.get = function(key, component) {
         var message="Access Check Failed! AttributeSet.get(): attribute '"+attribute+"' of component '"+component+"' is not visible to '"+contextCmp+"'.";
         var ae = new $A.auraError(message);
         ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+        ae["componentStack"] = context && context.getAccessStackHierarchy();
         if(context.enableAccessChecks){
             if(context.logAccessFailures){
                 $A.error(null, ae);
@@ -189,6 +190,7 @@ AttributeSet.prototype.set = function(key, value, component) {
         var message="Access Check Failed! AttributeSet.set(): '"+attribute+"' of component '"+component+"' is not visible to '"+contextCmp+"'.";
         var ae = new $A.auraError(message);
         ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+        ae["componentStack"] = context && context.getAccessStackHierarchy();
         if(context.enableAccessChecks){
             if(context.logAccessFailures){
                 $A.error(null, ae);

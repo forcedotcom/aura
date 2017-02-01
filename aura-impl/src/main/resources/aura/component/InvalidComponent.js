@@ -332,6 +332,10 @@ InvalidComponent.prototype.raiseInvalidComponentError = function(func, args) {
 
     var ae = new $A.auraError(error, null, $A.severity.QUIET);
     ae["component"] = this.toString();
+    var context = $A.getContext();
+    if (context) {
+        ae["componentStack"] = context.getAccessStackHierarchy();
+    }
     throw ae;
 };
 

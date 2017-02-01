@@ -1148,6 +1148,7 @@ AuraEventService.prototype.getDef = function(descriptor) {
         var message="Access Check Failed! EventService.getEventDef():'" + definition.getDescriptor().toString() + "' is not visible to '" + contextCmp + "'.";
         var ae = new $A.auraError(message);
         ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+        ae["componentStack"] = context && context.getAccessStackHierarchy();
         if(context.enableAccessChecks) {
             if(context.logAccessFailures){
                 $A.error(null, ae);
@@ -1181,6 +1182,7 @@ AuraEventService.prototype.hasDefinition = function(descriptor) {
         var message="Access Check Failed! EventService.hasDefinition():'" + definition.getDescriptor().toString() + "' is not visible to '" + contextCmp + "'.";
         var ae = new $A.auraError(message);
         ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+        ae["componentStack"] = context && context.getAccessStackHierarchy();
         if(context.enableAccessChecks) {
            if(context.logAccessFailures){
                $A.error(null, ae);

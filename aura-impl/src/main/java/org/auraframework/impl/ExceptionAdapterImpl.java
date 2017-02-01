@@ -125,6 +125,9 @@ public class ExceptionAdapterImpl implements ExceptionAdapter {
                     extended.append("\n");
                 }
 
+                extended.append("Component hierarchy: ");
+                extended.append(ace.getComponentStack());
+                extended.append("\n");
                 extended.append("Javascript stack: ");
                 extended.append(ace.getClientStack());
                 extended.append("\n");

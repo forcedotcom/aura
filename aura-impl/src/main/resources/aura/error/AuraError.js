@@ -33,6 +33,9 @@ function AuraError() {
     // the component that throws the error
     this["component"] = "";
 
+    // the component stack that contains the component that throws the error
+    this["componentStack"] = "";
+
     // the action that errors out
     this.action = null;
 

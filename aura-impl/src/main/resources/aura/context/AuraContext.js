@@ -159,6 +159,12 @@ Aura.Context.AuraContext.prototype.getCurrentAccessCaller=function(){
     return this.accessStack[this.accessStack.length-2];
 };
 
+Aura.Context.AuraContext.prototype.getAccessStackHierarchy=function(){
+    return this.accessStack ? this.accessStack.map(function(component) {
+        return "[" + component.getName() + "]";
+    }).join(" > ") : null;
+};
+
 /**
  * @export
 */

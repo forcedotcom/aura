@@ -74,8 +74,9 @@ public class ComponentController implements Controller {
         private String namespace;
         private String componentName;
         private String methodName;
+        private String cmpStack;
 
-        public AuraClientException(String desc, String id, String message, String jsStack,
+        public AuraClientException(String desc, String id, String message, String jsStack, String cmpStack,
                                    InstanceService instanceService, ExceptionAdapter exceptionAdapter) {
             super(message);
             Action action = null;
@@ -142,6 +143,7 @@ public class ComponentController implements Controller {
 
             this.action = action;
             this.jsStack = jsStack;
+            this.cmpStack = cmpStack;
         }
 
         public Action getOriginalAction() {
@@ -150,6 +152,10 @@ public class ComponentController implements Controller {
 
         public String getClientStack() {
             return jsStack;
+        }
+
+        public String getComponentStack() {
+            return cmpStack;
         }
 
         public String getCauseDescriptor() {
@@ -244,12 +250,14 @@ public class ComponentController implements Controller {
      * @param stack Not always available (it's browser dependent), but if present, a browser-dependent
      *      string describing the Javascript stack for the error.  Some frames may be obfuscated,
      *      anonymous, omitted after inlining, etc., but it may help diagnosis.
+     * @param componentStack Not always available (it's context dependent), but if present, a
+     *      string describing the component hierarchy stack for the error.
      */
     @AuraEnabled
     public void reportFailedAction(@Key(value = "failedAction") String desc, @Key("failedId") String id,
-                                   @Key("clientError") String error, @Key("clientStack") String stack) {
+                                   @Key("clientError") String error, @Key("clientStack") String stack, @Key("componentStack") String componentStack) {
         // Error reporting (of errors in prior client-side actions) are handled specially
-        AuraClientException ace = new AuraClientException(desc, id, error, stack, instanceService, exceptionAdapter);
+        AuraClientException ace = new AuraClientException(desc, id, error, stack, componentStack, instanceService, exceptionAdapter);
         exceptionAdapter.handleException(ace, ace.getOriginalAction());
     }
 

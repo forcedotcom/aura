@@ -81,6 +81,7 @@ AuraRenderingService.prototype.render = function(components, parent) {
                 } else {
                     var ae = new $A.auraError("render threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
                     ae["component"] = cmp.getDef().getDescriptor().toString();
+                    ae["componentStack"] = $A.getContext().getAccessStackHierarchy();
                     $A.lastKnownError = ae;
                     throw ae;
                 }
@@ -150,6 +151,7 @@ AuraRenderingService.prototype.rerender = function(components) {
                     } else {
                         var ae = new $A.auraError("rerender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
                         ae["component"] = cmp.getDef().getDescriptor().toString();
+                        ae["componentStack"] = $A.getContext().getAccessStackHierarchy();
                         $A.lastKnownError = ae;
                         throw ae;
                     }
@@ -220,6 +222,7 @@ AuraRenderingService.prototype.afterRender = function(components) {
                 } else {
                     var ae = new $A.auraError("afterRender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
                     ae["component"] = cmp.getDef().getDescriptor().toString();
+                    ae["componentStack"] = $A.getContext().getAccessStackHierarchy();
                     $A.lastKnownError = ae;
                     throw ae;
                 }
@@ -278,6 +281,7 @@ AuraRenderingService.prototype.unrender = function(components) {
                         } else {
                             var ae = new $A.auraError("unrender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
                             ae["component"] = cmp.getDef().getDescriptor().toString();
+                            ae["componentStack"] = $A.getContext().getAccessStackHierarchy();
                             $A.lastKnownError = ae;
                             throw ae;
                         }

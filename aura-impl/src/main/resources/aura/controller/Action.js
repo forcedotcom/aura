@@ -1257,6 +1257,11 @@ Action.prototype.markException = function(e) {
         e["component"] = e["component"] || descriptor;
     }
 
+    var context = $A.getContext();
+    if (!e['componentStack'] && context) {
+        e['componentStack'] = context.getAccessStackHierarchy();
+    }
+
     this.state = "ERROR";
     this.error = e;
     if ($A.clientService.inAuraLoop()) {

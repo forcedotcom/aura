@@ -875,6 +875,7 @@ AuraInstance.prototype.message = function(msg, error, showReload) {
 AuraInstance.prototype.getCallback = function(callback) {
     $A.assert($A.util.isFunction(callback),"$A.getCallback(): 'callback' must be a valid Function");
     var context=$A.getContext().getCurrentAccess();
+    var contextComponentStack = $A.getContext().getAccessStackHierarchy();
     var contextComponent = null;
     if (context && context.getDef) {
         var contextComponentDef = context.getDef();
@@ -892,6 +893,7 @@ AuraInstance.prototype.getCallback = function(callback) {
             // customers who throw AFE would want to handle it with their own custom experience.
             if (e instanceof $A.auraError) {
                 e["component"] = e["component"] || contextComponent;
+                e["componentStack"] = e["componentStack"] || contextComponentStack;
                 $A.lastKnownError = e;
                 throw e;
             } else {
@@ -917,6 +919,7 @@ AuraInstance.prototype.getCallback = function(callback) {
 
                 var errorWrapper = new $A.auraError("Error in $A.getCallback()", e);
                 errorWrapper["component"] = contextComponent;
+                errorWrapper["componentStack"] = contextComponentStack;
                 if (syntheticStackFrame) {
                     errorWrapper.setStackTrace(syntheticStackFrame + errorWrapper.stackTrace);
                 }

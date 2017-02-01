@@ -64,11 +64,35 @@
                 + " to return a SecureElement");
     },
 
-    testSecureDocumentCookie: function(cmp, event, helper) {
+    testSecureDocumentCookieFiltersSystemMode: function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
         var systemModeCookie = event.getParam("arguments").cookie;
         var userModeCookie = document.cookie;
-        testUtils.assertEquals(systemModeCookie, userModeCookie);
+        testUtils.assertNotEquals(systemModeCookie, userModeCookie, "System mode cookie should be filtered out in user mode");
+    },
+
+    testCookiesIsolatedToNamespace: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var otherNs = cmp.find("otherNs");
+        var newKey = "keyChild";
+
+        document.cookie = "key1=value1";
+        testUtils.assertTrue(document.cookie.indexOf("key1=value1") !== -1);
+        otherNs.addCookie(newKey);
+        testUtils.assertTrue(document.cookie.indexOf(newKey) === -1);
+    },
+
+    testCookiesAddRemove: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var otherNs = cmp.find("otherNs");
+
+        document.cookie = "key1=value1";
+        testUtils.assertTrue(document.cookie.indexOf("key1=value1") !== -1);
+        document.cookie = "key2=value2";
+        testUtils.assertTrue(document.cookie.indexOf("key2=value2") !== -1);
+        document.cookie = "key1=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        testUtils.assertTrue(document.cookie.indexOf("key1=value1") === -1);
+        testUtils.assertTrue(document.cookie.indexOf("key2=value2") !== -1);
     },
 
     testDocumentTitle: function(cmp) {

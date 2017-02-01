@@ -94,10 +94,34 @@ function SecureDocument(doc, key) {
 
 	SecureElement.addEventTargetMethods(o, doc, key);
 
-    Object.defineProperties(o, {
-        cookie: SecureObject.createFilteredProperty(o, doc, "cookie", {
-            writable: false
-        })
+    function getCookieKey() {
+        return "LSKey[" + key["namespace"] + "]";
+    }
+
+    Object.defineProperty(o, "cookie", {
+        get: function() {
+            var fullCookie = doc.cookie;
+            var entries = fullCookie.split(";");
+            var cookieKey = getCookieKey();
+            // filter out cookies that do not match current namespace
+            var nsFiltered = entries.filter(function(val) {
+                var left = val.split("=")[0].trim();
+                return left.indexOf(cookieKey) === 0;
+            });
+            // strip LockerService key before returning to user land
+            var keyFiltered = nsFiltered.map(function(val) {
+                return val.trim().substring(cookieKey.length);
+            });
+            return keyFiltered.join("; ");
+        },
+        set: function(cookie) {
+            var chunks = cookie.split(";");
+            var entry = chunks[0].split("=");
+            var newKey = getCookieKey() + entry[0];
+            chunks[0] = newKey + "=" + entry[1];
+            var newCookie = chunks.join(";");
+            doc.cookie = newCookie;
+        }
     });
 
     ["implementation", "location"].forEach(function(name) {

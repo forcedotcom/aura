@@ -163,6 +163,26 @@ Aura.Event.Event.prototype.getName = function(){
 };
 
 /**
+ * Gets the type of the Event definition, e.g. 'c:myEvent'.
+ * @returns {String} The event definition type
+ * @platform
+ * @export
+ */
+Aura.Event.Event.prototype.getType = function(){
+    return this.eventDef.getDescriptor().getFullName();
+};
+
+/**
+ * Gets the type of the Event, e.g. 'COMPONENT' or 'APPLICATION'.
+ * @returns {String} The event type
+ * @platform
+ * @export
+ */
+Aura.Event.Event.prototype.getEventType = function(){
+    return this.eventDef.getEventType();
+};
+
+/**
  * Sets parameters for the Event. Does not modify an event that has already been fired.
  * Maps key in config to attributeDefs.
  * @param {Object} config - The parameters for the Event.

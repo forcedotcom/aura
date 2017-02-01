@@ -50,8 +50,9 @@
         }
         container.appendChild(fragment);
     },
-    unrender: function (cmp) {
-        cmp._shape.destroy();
+    unrender: function (cmp, helper) {
+        helper._destroyShapes(cmp);
+        
         this.superUnrender();
     }
 })// eslint-disable-line semi

@@ -400,5 +400,16 @@
         }
         
         return template;
+    },
+    
+    _destroyShapes: function(cmp) {
+        var templateMap = cmp._templateMap;
+        
+        for (var key in templateMap) {
+            var shape = templateMap[key].shape;
+            if (shape) {
+                shape.destroy();
+            }
+        }
     }
 })// eslint-disable-line semi

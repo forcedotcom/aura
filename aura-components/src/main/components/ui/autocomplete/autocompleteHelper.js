@@ -81,7 +81,7 @@
 
     handleEnterKey: function(component) {
         var list = this.getListComponent(component);
-        if (list.get("v.visible") === true) {
+        if (list.get("v.visible") === true && !$A.util.isEmpty(list.get("v.items"))) {
             this.handleEnterkeyOnList(component, list);
         } else {
             this.handleEnterKeyOnInput(component, component.find("input"));

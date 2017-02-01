@@ -64,6 +64,9 @@
         if (elem) {
             $A.util.addClass(optionCmp, "mouseovered");
         }
+        
+        var highlightEvent = component.get("e.listHighlight");
+        highlightEvent.fire({ activeOption: component });
     },
     
     handleMouseout: function(component) {
@@ -72,6 +75,8 @@
         if (elem) {
             $A.util.removeClass(optionCmp, "mouseovered");
         }
+        
+        component.set("v.highlighted", false);
     },
     
     htmlEscape: function(str) {

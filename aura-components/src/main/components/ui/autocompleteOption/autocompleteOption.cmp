@@ -24,6 +24,8 @@
     <aura:attribute name="theme" type="String" default="default" description="Theme to apply to this component."/>
     <aura:attribute name="domId" type="String" default="" description="Id of the option component's anchor"/>
     
+    <aura:registerEvent name="listHighlight" type="ui:listHighlight" description="The event fired when a list option is highlighted, e.g. keyboard navigation."/>
+    
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="mouseover" action="{!c.handleMouseover}"/>
     <aura:handler name="mouseout" action="{!c.handleMouseout}"/>

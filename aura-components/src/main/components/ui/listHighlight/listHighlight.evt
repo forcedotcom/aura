@@ -17,4 +17,5 @@
 -->
 <aura:event type="COMPONENT" support="GA" description="Highlight list option.">
     <aura:attribute name="activeIndex" type="Integer" description="The list option should be highlighted."/>
+    <aura:attribute name="activeOption" type="Aura.Component" description="The list component option should be highlighted."/>
 </aura:event>

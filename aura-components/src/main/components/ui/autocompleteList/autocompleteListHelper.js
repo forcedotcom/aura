@@ -201,15 +201,21 @@
 
     handleListHighlight: function (component, event) {
         var selectedSection = this.createKeyboardTraversalList(component);
+        
         if (selectedSection) {
-            var direction = event.getParam("activeIndex");
-            selectedSection.deselect();
-            if (direction < 0) { // highlight previous visible option
-                selectedSection = selectedSection.decrement();
-            } else { // highlight next visible option
-                selectedSection = selectedSection.increment();
+            if(event.getParam("activeOption")) {
+                selectedSection.deselect();
+                event.getParam("activeOption").set("v.highlighted", true);
+            } else {
+                var direction = event.getParam("activeIndex");
+                selectedSection.deselect();
+                if (direction < 0) { // highlight previous visible option
+                    selectedSection = selectedSection.decrement();
+                } else { // highlight next visible option
+                    selectedSection = selectedSection.increment();
+                }
+                selectedSection.select(component);
             }
-            selectedSection.select(component);
         }
     },
 

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" extends="ui:inputTextArea" extensible="true" description="An input field for entering rich text.">
+<aura:component access="GLOBAL" support="GA" extends="ui:inputTextArea" extensible="true" description="An input field for entering rich text. This component is not supported by LockerService.">
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:clientLibrary name="CkEditor" type="JS" />

@@ -17,6 +17,7 @@
 -->
 <aura:documentation>
 	<aura:description>
+	        <p>We recommend that you use <code>lightning:inputRichText</code> instead of <code>ui:inputRichText</code>. <code>ui:inputRichText</code> is no longer supported when LockerService is activated.</p>
 		<p>
 		    <code>ui:inputRichText</code> renders a WYSIWYG editor for entering rich text, using the CKEditor library to provide formatting and accessibility features.
 		</p>

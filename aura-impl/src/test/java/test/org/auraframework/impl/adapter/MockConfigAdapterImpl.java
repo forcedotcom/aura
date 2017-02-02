@@ -36,6 +36,7 @@ import org.auraframework.http.CSP;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.test.adapter.MockConfigAdapter;
@@ -111,8 +112,14 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         public Collection<String> getScriptSources() {
             List<String> list = (List<String>) baseline.getScriptSources();
             AuraContext context = Aura.getContextService().getCurrentContext();
-            if (context != null && context.isTestMode()) {
-                list.add(CSP.UNSAFE_EVAL);
+            if (context != null) {
+                Mode mode = context.getMode();
+                // Webdriver's executeScript() needs unsafe-eval. We should find an alternative for
+                //our test-utils (e.g. AuraUITestingUtil.getRawEval()) and then remove this.
+                if(mode == Mode.AUTOJSTEST || mode == Mode.AUTOJSTESTDEBUG ||
+                        mode == Mode.SELENIUM || mode == Mode.SELENIUMDEBUG){
+                    list.add(CSP.UNSAFE_EVAL);
+                }
             }
             return list;
         }

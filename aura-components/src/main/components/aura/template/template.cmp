@@ -118,15 +118,33 @@
 
     window.Aura.inlineJsLoaded = true;
     var auraConfig = {!v.auraInit};
-
+    
     function initLocker () {
-        //Check if strict-csp is being enforced by the browser
-        var isEvalAllowed = true;
-        try{ eval(""); }catch(e){ isEvalAllowed = false; }
-        // remove the worker url from config to streamline safeEvalWorker's health check
-        if(isEvalAllowed){ auraConfig["safeEvalWorker"] = undefined; }
-        
-        if (!isEvalAllowed &amp;&amp; auraConfig["safeEvalWorker"] &amp;&amp; !window['$$safe-eval$$'] &amp;&amp; !/^(.*?:)?\/\//.test(auraConfig["host"])) {
+		var initSafeEvalWorker;
+		if (auraConfig["safeEvalWorker"] &amp;&amp; !window['$$safe-eval$$'] &amp;&amp; !/^(.*?:)?\/\//.test(auraConfig["host"])) {
+			initSafeEvalWorker = true;
+			//Check if strict-csp is being enforced by the browser
+			var isEvalAllowed = true;
+			try{ eval("(function(){})();");}catch(e){isEvalAllowed = false;}
+			var isInlineAllowed;
+			if(isEvalAllowed){
+				var script = document.createElement("script");
+				script.type = "text/javascript";
+				script.appendChild(document.createTextNode("(function(){})();"));
+				isInlineAllowed = true;
+				script.addEventListener('error', function(){isInlineAllowed = false;});
+				document.body.appendChild(script);
+				document.body.removeChild(script)
+			}
+			if(isEvalAllowed &amp;&amp; isInlineAllowed){
+				//no need for the worker as main frame has no restriction
+				initSafeEvalWorker = false;
+				//remove the worker url from config to streamline safeEvalWorker's health check
+				auraConfig["safeEvalWorker"] = undefined;
+			}
+        }
+
+        if (initSafeEvalWorker) {
             var props = {
                 src: auraConfig.safeEvalWorker,
                 id: "safeEvalWorker", width: "0", height: "0", tabIndex: "-1", "aura-hidden": "true", title:"sctipts"

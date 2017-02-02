@@ -30,7 +30,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.HelperDef;
@@ -105,7 +105,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             .build();
 
     private int innerCount = 0;
-    private final List<Definition> body = Lists.newArrayList();
+    private final List<DefinitionReference> body = Lists.newArrayList();
     protected B builder;
 
     private ContextService contextService;

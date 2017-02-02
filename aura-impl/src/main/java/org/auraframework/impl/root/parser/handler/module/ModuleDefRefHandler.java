@@ -47,6 +47,8 @@ public class ModuleDefRefHandler<P extends RootDefinition> extends BaseDefRefHan
     protected Builder createBuilder() {
         Builder builder = new Builder();
         builder.setDescriptor(definitionService.getDefDescriptor(getTagName(), ModuleDef.class));
+        builder.setHasFlavorableChild(false);
+        builder.setIsFlavorable(false);
         return builder;
     }
 

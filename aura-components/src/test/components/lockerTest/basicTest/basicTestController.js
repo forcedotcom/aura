@@ -273,27 +273,6 @@
         testUtils.assertFalse(window instanceof Window, "window should not be an instance of Window");
     },
     
-    // Test "liveness" of HTMLCollection and NodeList proxy layer
-    testLiveCollections: function(cmp) {
-        var testUtils = cmp.get("v.testUtils");
-        var e = cmp.find("content").getElement();
-        
-        var childNodes = e.childNodes;
-        var children = e.children;
-                
-        testUtils.assertEquals(0, childNodes.length);
-        testUtils.assertEquals(0, children.length);
-              
-        var child = document.createElement("span");
-        e.appendChild(child);
-         
-        testUtils.assertEquals(1, childNodes.length);
-        testUtils.assertStartsWith("SecureElement", childNodes[0].toString(), "Expected childNodes[0] to be a SecureElement");
-        
-        testUtils.assertEquals(1, children.length);
-        testUtils.assertStartsWith("SecureElement", children[0].toString(), "Expected children[0] to be a SecureElement");
-    },
-    
     testFilteringProxy: function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
                 
@@ -309,7 +288,9 @@
         testUtils.assertTrue("foo" in po);
         testUtils.assertEquals("fooValue", po.foo());
 
-        testUtils.assertEquals(JSON.stringify(Object.getOwnPropertyDescriptor(o, "someProperty")), JSON.stringify(Object.getOwnPropertyDescriptor(po, "someProperty")));
+        testUtils.assertEquals(
+            JSON.stringify(Object.getOwnPropertyDescriptor(o, "someProperty")),
+            JSON.stringify(Object.getOwnPropertyDescriptor(po, "someProperty")));
 
         // Add a dynamic property and make sure its visible on the proxy
         po.expando = "expandoValue";

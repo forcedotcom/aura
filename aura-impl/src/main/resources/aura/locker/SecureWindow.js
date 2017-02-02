@@ -640,7 +640,7 @@ SecureWindow.metadata = {
             "StyleSheet":                           FUNCTION,
             "StyleSheetList":                       FUNCTION,
             "SubtleCrypto":                         FUNCTION,
-            "Symbol":                               FUNCTION,
+            "Symbol":                               RAW,
             "SyntaxError":                          FUNCTION,
             "TEMPORARY":                            DEFAULT,
             "Text":                                 CTOR,

@@ -210,14 +210,6 @@
         }
     },
     
-    testLiveCollections: {
-        test: function(cmp) {
-            cmp.find("content").getElement().appendChild(document.createElement("h1"));
-            
-            cmp.testLiveCollections();
-        }
-    },
-
     testFilteringProxy: {
         test: function(cmp) {
             function TestPrototype() {

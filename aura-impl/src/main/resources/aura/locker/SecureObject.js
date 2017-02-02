@@ -390,8 +390,8 @@ function getArrayLikeThingProxyHandler(key) {
         var value = filtered[index];
         return value ? SecureObject.filterEverything(so, value) : value;	
 	}
-	
-    var handler = KEY_TO_ARRAY_LIKE_THING_HANLDER.get(key);
+
+	var handler = KEY_TO_ARRAY_LIKE_THING_HANLDER.get(key);
     if (!handler) {    	
 		handler = {
 		    "get": function(target, property) {
@@ -431,7 +431,22 @@ function getArrayLikeThingProxyHandler(key) {
 		    					return JSON.stringify(filtered);
 		    				};
 		    				break;
-
+						case "Symbol(Symbol.iterator)":
+							ret = function () {
+										var nextIndex = 0;
+										return {
+											next: function() {
+												if(nextIndex < filtered.length) {
+													var value = filtered[nextIndex];
+													nextIndex++;
+													return {value: value ? SecureObject.filterEverything(handler, value) : value, done: false};
+												} else {
+													return {done: true};
+												}
+											}
+										};
+									};
+							break;
 		    			default:
 		    				$A.warning("Unsupported " + raw + " method: " + property + ". Returning undefined");
 							return undefined;

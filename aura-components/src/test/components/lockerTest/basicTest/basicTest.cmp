@@ -44,7 +44,6 @@
     <aura:method name="testLockerDisabledForUnsupportedBrowser" action="{!c.testLockerDisabledForUnsupportedBrowser}"/>
     <aura:method name="testComponentPassedToOtherNamespaceViaCreateComponent" action="{!c.testComponentPassedToOtherNamespaceViaCreateComponent}"/>
     <aura:method name="testInstanceOf" action="{!c.testInstanceOf}"/>
-    <aura:method name="testLiveCollections" action="{!c.testLiveCollections}"/>
     <aura:method name="testFilteringProxy" action="{!c.testFilteringProxy}"/>
 
     <div>LockerService test</div>

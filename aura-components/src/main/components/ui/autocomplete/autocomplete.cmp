@@ -43,6 +43,7 @@
     <aura:attribute name="setDefaultHighlight" access="PRIVILEGED" type="boolean" default="true" description="Indicates whether the first option item should be highlighted by default. The default is true."/>
     <aura:attribute name="listReferenceComponent" type="Aura.Component[]" description="Sets the component that the lookup menu is displayed under."/>
     <aura:attribute name="devNameOrId" type="String" description="Id or alias for the autocomplete." />
+    <aura:attribute name="showEmptyList" type="boolean" default="false" description="Indicate if empty list should be visible when v.keyword is empty"/>
 
     <aura:handler name="change" value="{!v.listReferenceComponent}" action="{!c.referenceElementChange}"/>
     <!-- END - the following attributes are only used when using the default list -->
@@ -122,7 +123,8 @@
                                      selectListOption="{!c.handleSelectOption}"
                                      updateAriaAttributes="{!c.updateAriaAttributes}"
                                      matchFunc="{!v.matchFunc}"
-                                     setDefaultHighlight="{!v.setDefaultHighlight}"/>
+                                     setDefaultHighlight="{!v.setDefaultHighlight}"
+                                     showEmptyList="{!v.showEmptyList}"/>
             </ui:autocompletePanel>
             <aura:set attribute="else">
                 <ui:autocompleteList aura:id="list" class="{!v.class + ' lookup__menu'}"
@@ -143,7 +145,8 @@
                                      selectListOption="{!c.handleSelectOption}"
                                      updateAriaAttributes="{!c.updateAriaAttributes}"
                                      matchFunc="{!v.matchFunc}"
-                                     setDefaultHighlight="{!v.setDefaultHighlight}"/>
+                                     setDefaultHighlight="{!v.setDefaultHighlight}"
+                                     showEmptyList="{!v.showEmptyList}"/>
             </aura:set>
         </aura:if>
         <aura:set attribute="else">

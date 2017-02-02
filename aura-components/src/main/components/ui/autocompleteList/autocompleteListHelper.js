@@ -553,7 +553,7 @@
     },
 
     toggleListVisibility: function (component, items) {
-        var showEmptyListContent = !$A.util.isEmpty(component.get("v.emptyListContent")) && !$A.util.isEmpty(component.get("v.keyword"));
+        var showEmptyListContent = !$A.util.isEmpty(component.get("v.emptyListContent")) && (component.get("v.showEmptyList") || !$A.util.isEmpty(component.get("v.keyword")));
         var hasVisibleOption = this.hasVisibleOption(items);
         component.set("v.visible", hasVisibleOption || showEmptyListContent);
     },

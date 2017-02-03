@@ -3,6 +3,9 @@
 # "mvn clean install" in a drone-managed container.
 pipeline_type: maven_docker
 
+# for Zen workflow V2
+version: 2.0
+
 # These maven profiles, if present in your POM, will be explicitly
 # activated by Zen.
 # zen-jacoco is not marked active in your POM, so will not be used
@@ -25,7 +28,7 @@ script:
   chmod -R 0755 localhost
   mv localhost/* .
   chown -R mvn-user $(pwd)
-  sudo -iu mvn-user bash -c "cd $(pwd);mvn clean deploy -DskipJsDoc $MAVEN_ARGS -DaltDeploymentRepository=zen::default::file://$(pwd)/$LOCAL_DEPLOY_DIR -Dnode.download.root.url=http://localhost/node/ -Dchromedriver.download.root.url=http://localhost/chromedriver -Dnpm.download.root.url=http://localhost/npm/" || export status=$? || true
+  sudo -iu mvn-user bash -c "cd $(pwd);mvn clean deploy -DskipJsDoc $MAVEN_ARGS -Dmaven.repo.local=$(pwd)/.m2/repository -DaltDeploymentRepository=zen::default::file://$(pwd)/$LOCAL_DEPLOY_DIR -Dnode.download.root.url=http://localhost/node/ -Dchromedriver.download.root.url=http://localhost/chromedriver -Dnpm.download.root.url=http://localhost/npm/" || export status=$? || true
   chown -R $ORIG_UID:$ORIG_UID $(pwd)
   exit ${status:-0}
 # It is currently required that there be an empty line following the script: section

@@ -36,36 +36,7 @@ function SecureObject(thing, key) {
 	return Object.seal(o);
 }
 
-var _useProxy;
-
-SecureObject.useProxy = function() {
-    if (_useProxy === undefined) {
-        _useProxy = false;
-        if ("Proxy" in window) {
-            // Attempt to create a proxy just to test if its really a Proxy and not some polyfill etc
-            try {
-                var handler = {
-                    "get": function(target, prop) {
-                        return prop === "foo" ? "proxied" : undefined;
-                    }
-                };
-                
-                var proxy = new Proxy({}, handler);
-                _useProxy = proxy["foo"] === "proxied";
-            } catch (e) {
-                // Do nothing
-            }
-        }
-    }
-        
-    return _useProxy;
-};
-
-SecureObject.getRaw = function(so, prototype) {
-	if (Object.getPrototypeOf(so) !== prototype) {
-		throw new Error("Blocked attempt to invoke secure method with altered prototype!");
-	}
-	
+SecureObject.getRaw = function(so) {
 	var raw = ls_getRef(so, ls_getKey(so));
 	
 	if (!raw) {
@@ -270,34 +241,13 @@ function FilteringProxySurrogate() {
 }
 
 SecureObject.createFilteringProxy = function(raw, key) {
-    var swallowed;
-    if (SecureObject.useProxy()) {
-        // DCHASMAN TODO We need to switch this from a direct proxy on raw to a proxy on {} 
-        // like SecureElement to avoid the Proxy invariants for non-writable, non-configurable properties
-        var surrogate = new FilteringProxySurrogate();
-        ls_setRef(surrogate, raw, key);
-        
-        swallowed = new Proxy(surrogate, filteringProxyHandler);
-        
-        // DCHASMAN TODO We should be able to remove this (replaced with ls_setKey()) in the next phase of proxy work where we remove unfilterEverything() as something that is done all the time
-        ls_setRef(swallowed, raw, key);
-    } else {
-        // Fallback for environments that do not support Proxy
-        swallowed = {};
-        ls_setRef(swallowed, raw, key);
+    var surrogate = new FilteringProxySurrogate();
+    ls_setRef(surrogate, raw, key);
     
-        for (var name in raw) {
-            if (typeof raw[name] === "function") {
-                Object.defineProperty(swallowed, name, SecureObject.createFilteredMethod(swallowed, raw, name, {
-                    filterOpaque : true
-                }));
-            } else {
-                Object.defineProperty(swallowed, name, SecureObject.createFilteredProperty(swallowed, raw, name, {
-                    filterOpaque : true
-                }));
-            }
-        }
-    }
+    var swallowed = new Proxy(surrogate, filteringProxyHandler);
+    
+    // DCHASMAN TODO We should be able to remove this (replaced with ls_setKey()) in the next phase of proxy work where we remove unfilterEverything() as something that is done all the time
+    ls_setRef(swallowed, raw, key);
     
     ls_addToCache(raw, swallowed, key);
     
@@ -332,7 +282,9 @@ function getArrayLikeThingProxyHandler(key) {
     if (!handler) {    	
 		handler = {
 		    "get": function(target, property) {
-		    	var filtered = getFilteredArray(target, key);
+		    	var raw = ls_getRef(target, key);
+
+		    	var filtered = getFilteredArray(raw, key);
 		    	var ret;
 		    	
 		    	// Symbols have to be handled in some browsers
@@ -358,14 +310,14 @@ function getArrayLikeThingProxyHandler(key) {
 		    				
 		    			case "namedItem": 
 		    				ret = function(name) {
-			    		        var value = target.namedItem(name);
+			    		        var value = raw.namedItem(name);
 			    		        return value ? SecureObject.filterEverything(handler, value) : value;	
 		    				};
 		    				break;
 		    				
 		    			case "toString":
 		    				ret = function() {
-		    					return target.toString();
+		    					return raw.toString();
 		    				};
 		    				break;
 		    		
@@ -376,7 +328,7 @@ function getArrayLikeThingProxyHandler(key) {
 		    				break;
 
 		    			default:
-		    				throw new Error("Unsupported " + target + " method: " + property);
+		    				throw new Error("Unsupported " + raw + " method: " + property);
 		    		}
 		    	} else {
 			        ret = getFromFiltered(handler, filtered, property);		    		
@@ -395,7 +347,10 @@ function getArrayLikeThingProxyHandler(key) {
 }
 
 SecureObject.createProxyForArrayLikeObjects = function(raw, key) {
-    var proxy = new Proxy(raw, getArrayLikeThingProxyHandler(key));
+	var surrogate = Object.create(Object.getPrototypeOf(raw));
+	ls_setRef(surrogate, raw, key);
+	
+    var proxy = new Proxy(surrogate, getArrayLikeThingProxyHandler(key));   
     ls_setKey(proxy, key);
     
     return proxy;
@@ -526,7 +481,7 @@ SecureObject.createFilteredMethodStateless = function(methodName, prototype, opt
 		enumerable : true,
 		value : function() {
 			var st = this;
-			var raw = SecureObject.getRaw(st, prototype);
+			var raw = SecureObject.getRaw(st);
 						
 			var args = SecureObject.ArrayPrototypeSlice.call(arguments);
 
@@ -622,7 +577,7 @@ SecureObject.createFilteredPropertyStateless = function(propertyName, prototype,
 
 	descriptor.get = function() {
 		var st = this;
-		var raw = SecureObject.getRaw(st, prototype);
+		var raw = SecureObject.getRaw(st);
 		
 		var value = raw[propertyName];
 
@@ -887,87 +842,90 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata, so, raw, key)
 };
 
 
-SecureObject.addPrototypeMethodsAndPropertiesStateless = function(metadata, prototypicalInstance, prototypeForValidation) {
-	var rawPrototypicalInstance = SecureObject.getRaw(prototypicalInstance, prototypeForValidation);
-	var prototype;
-	var config = {};
-
-	function worker(name) {
-		var descriptor;
-		var item = prototype[name];
-
-		if (!(name in prototypicalInstance) && (name in rawPrototypicalInstance)) {
-			var options = {
-                filterOpaque: item.filterOpaque || true,
-	            skipOpaque: item.skipOpaque || false,
-	            defaultValue: item.defaultValue || null,
-	            trustReturnValue: item.trustReturnValue || false
-            };
-			
-			if (item.type === "function") {
-				descriptor = SecureObject.createFilteredMethodStateless(name, prototypeForValidation, options);
-			} else if (item.type === "@raw") {
-				descriptor = {
-        			// Does not currently secure proxy the actual class
-		        	get: function() {
-	        			var raw = SecureObject.getRaw(this, prototypeForValidation);
-		        		return raw[name];
-		        	}
-		        };
-			} else if (item.type === "@ctor") {
-				descriptor = {
-		        	get: function() {
-		        		return function() {
-		        			var so = this;
-		        			var raw = SecureObject.getRaw(so, prototypeForValidation);
-		        			var cls = raw[name];
-		        					        			
-		        			// TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
-		        			var ctor = Function.prototype.bind.apply(cls, [null].concat(Array.prototype.slice.call(arguments)));
-		        			var result = new ctor();
-		        			$A.lockerService.trust(so, result);
-		        			
-		        			return SecureObject.filterEverything(so, result);
-		        		};
-		        	}
-		        };
-			} else if (item.type === "@event") {
-				descriptor = {
-		        	get: function() {
-		        		return SecureObject.filterEverything(this, SecureObject.getRaw(this, prototypeForValidation)[name]);
-		        	},
-
-		            set: function(callback) {
-		            	var raw = SecureObject.getRaw(this, prototypeForValidation);
-
-                        // Insure that we pick up the current proxy for the raw object
-		            	var key = ls_getKey(raw);
-		            	var o = ls_getFromCache(raw, key);
-
-                        raw[name] = function(e) {
-		            	    if (callback) {
-		            	        callback.call(o, SecureDOMEvent(e, key));
-		            	    }
-		                };
-		            }
-		        };
-			} else {
-				// Properties
-				descriptor = SecureObject.createFilteredPropertyStateless(name, prototypeForValidation, options);
-			}
-		}
+//Closure factory
+function addPrototypeMethodsAndPropertiesStatelessHelper(name, prototype, prototypicalInstance, prototypeForValidation, rawPrototypicalInstance, config) {
+	var descriptor;
+	var item = prototype[name];
+	
+	if (!prototypeForValidation.hasOwnProperty(name) && (name in rawPrototypicalInstance)) {
+		var options = {
+            filterOpaque: item.filterOpaque || true,
+            skipOpaque: item.skipOpaque || false,
+            defaultValue: item.defaultValue || null,
+            trustReturnValue: item.trustReturnValue || false
+        };
 		
-		if (descriptor) {
-			config[name] = descriptor;
+		if (item.type === "function") {
+			descriptor = SecureObject.createFilteredMethodStateless(name, prototypeForValidation, options);
+		} else if (item.type === "@raw") {
+			descriptor = {
+    			// Does not currently secure proxy the actual class
+	        	get: function() {
+        			var raw = SecureObject.getRaw(this);
+	        		return raw[name];
+	        	}
+	        };
+		} else if (item.type === "@ctor") {
+			descriptor = {
+	        	get: function() {
+	        		return function() {
+	        			var so = this;
+	        			var raw = SecureObject.getRaw(so);
+	        			var cls = raw[name];
+	        					        			
+	        			// TODO Switch to ES6 when available https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator
+	        			var ctor = Function.prototype.bind.apply(cls, [null].concat(Array.prototype.slice.call(arguments)));
+	        			var result = new ctor();
+	        			$A.lockerService.trust(so, result);
+	        			
+	        			return SecureObject.filterEverything(so, result);
+	        		};
+	        	}
+	        };
+		} else if (item.type === "@event") {
+			descriptor = {
+	        	get: function() {
+	        		return SecureObject.filterEverything(this, SecureObject.getRaw(this)[name]);
+	        	},
+
+	            set: function(callback) {
+	            	var raw = SecureObject.getRaw(this);
+
+                    // Insure that we pick up the current proxy for the raw object
+	            	var key = ls_getKey(raw);
+	            	var o = ls_getFromCache(raw, key);
+
+                    raw[name] = function(e) {
+	            	    if (callback) {
+	            	        callback.call(o, SecureDOMEvent(e, key));
+	            	    }
+	                };
+	            }
+	        };
+		} else {
+			// Properties
+			descriptor = SecureObject.createFilteredPropertyStateless(name, prototypeForValidation, options);
 		}
 	}
+	
+	if (descriptor) {
+		config[name] = descriptor;
+	}
+}
 
+SecureObject.addPrototypeMethodsAndPropertiesStateless = function(metadata, prototypicalInstance, prototypeForValidation) {
+	var rawPrototypicalInstance = SecureObject.getRaw(prototypicalInstance);
+	var prototype;
+	var config = {};
+	
 	var supportedInterfaces = getSupportedInterfaces(rawPrototypicalInstance);
 
 	var prototypes = metadata["prototypes"];
 	supportedInterfaces.forEach(function(name) {
 		prototype = prototypes[name];
-		Object.keys(prototype).forEach(worker);
+		for (var property in prototype) {
+			addPrototypeMethodsAndPropertiesStatelessHelper(property, prototype, prototypicalInstance, prototypeForValidation, rawPrototypicalInstance, config);
+		}
 	});
 	
 	return config;

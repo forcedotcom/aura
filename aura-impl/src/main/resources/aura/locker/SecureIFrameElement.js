@@ -41,7 +41,7 @@ var SecureIFrameElement = {
 	        focus: SecureObject.createFilteredMethodStateless("focus", prototype),
 	        contentWindow: {
 	        	get: function() {
-					var raw = SecureObject.getRaw(this, prototype);
+					var raw = SecureObject.getRaw(this);
 	        		return raw.contentWindow ? SecureIFrameContentWindow(raw.contentWindow, ls_getKey(this)) : raw.contentWindow;
 	        	}
 	        }

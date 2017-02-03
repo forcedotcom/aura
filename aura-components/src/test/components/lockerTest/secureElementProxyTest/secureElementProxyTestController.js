@@ -4,22 +4,18 @@
         var div = document.getElementById("title");
         var divProto = Object.getPrototypeOf(div);
 
-        testUtils.assertEquals("object", typeof divProto);
-        testUtils.assertTrue(divProto instanceof HTMLElement);
-        testUtils.assertTrue(divProto instanceof HTMLDivElement);
+        testUtils.assertTrue(divProto === HTMLDivElement.prototype);
     },
 
     testSetPrototypeOfBaseElementThrowsError: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var div = document.getElementById("title");
-        var divProto = Object.getPrototypeOf(div);
-        var divProtoProto = Object.getPrototypeOf(divProto); // HTMLDivElement
-
+        
         try {
             // note that with the SecureElement Proxy we need to go down an extra prototype level to get to
             // HTMLDivElement. The first getPrototypeOf returns our first Proxy layer.
-            Object.setPrototypeOf(divProtoProto, {});
-            testUtils.fail("Expected error trying to set new prototype for HTMLDivElement");
+            Object.setPrototypeOf(div, {});
+            testUtils.fail("Expected error trying to set new prototype for SecureElement");
         } catch (e) {
             testUtils.assertStartsWith("Illegal attempt to set the prototype of", e.message, "Unexpected error trying to set new prototype");
         }

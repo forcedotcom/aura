@@ -161,99 +161,90 @@ function SecureElement(el, key) {
 
 	var prototypeInfo = prototypes.get(tagName);
 	if (!prototypeInfo) {
-	    var expandoCapturingHandler;
-        var elementPrototypeProxy;
-	    if (SecureObject.useProxy()) {
-	        var basePrototype = Object.getPrototypeOf(el);
+        var basePrototype = Object.getPrototypeOf(el);
 
-	        // The magic to make SecureElements appear to be Elements
-	        elementPrototypeProxy = new Proxy({}, {
-                "getPrototypeOf": function() {
-                    return basePrototype;
-                },
-
-                "setPrototypeOf": function() {
-                    throw new Error("Illegal attempt to set the prototype of: " + basePrototype);
+        var expandoCapturingHandler = {
+	        "get": function(target, property) {
+                if (property in basePrototype) {
+                    return propertyIsSupported(target, property) ? target[property] : undefined;
                 }
-            });                
 
-	        expandoCapturingHandler = {
-    	        "get": function(target, property) {
-	                if (property in basePrototype) {
-	                    return propertyIsSupported(target, property) ? target[property] : undefined;
-	                }
+                // Expando - retrieve it from a private locker scoped object
+                var raw = ls_getRef(target, key);
+                var data = ls_getData(raw, key);
+                return data ? data[property] : undefined;
+	        },
 
-	                // Expando - retrieve it from a private locker scoped object
-	                var raw = ls_getRef(target, key);
-	                var data = ls_getData(raw, key);
-	                return data ? data[property] : undefined;
-    	        },
-
-                "set": function(target, property, value) {
-                    if (property in basePrototype) {
-                        if (!propertyIsSupported(target, property)) {
-                            throw new Error("SecureElement does not allow access to " + property);
-                        }
-
-                        target[property] = value;
-                        return true;
-                    }   
-
-                    // Expando - store it from a private locker scoped object
-                    var raw = ls_getRef(target, key);
-                    var data = ls_getData(raw, key);
-                    if (!data) {
-                        data = {};
-                        ls_setData(raw, key, data);
+            "set": function(target, property, value) {
+                if (property in basePrototype) {
+                    if (!propertyIsSupported(target, property)) {
+                        throw new Error("SecureElement does not allow access to " + property);
                     }
-                    
-                    data[property] = value;
-                    
+
+                    target[property] = value;
                     return true;
-                },
+                }   
 
-                "has": function(target, property) {
-                    if (property in basePrototype) {
-                        return true;
-                    }
-                    var raw = ls_getRef(target, key);
-                    var data = ls_getData(raw, key);
-                    return !!data && property in data;
-                },
-
-                "deleteProperty": function(target, property) {
-                    var raw = ls_getRef(target, key);
-                    var data = ls_getData(raw, key);
-                    if (data && property in data) {
-                        return delete data[property];
-                    }
-                    return delete target[property];
-                },
-
-                "ownKeys": function(target) {
-                    var raw = ls_getRef(target, key);
-                    var data = ls_getData(raw, key);
-                    var keys = Object.keys(raw);
-                    if (data) {
-                        keys = keys.concat(Object.keys(data));
-                    }
-                    return keys;
-                },
-
-                "getOwnPropertyDescriptor": function(target, property) {
-                    var desc = Object.getOwnPropertyDescriptor(target, property);
-                    if (!desc) {
-                        var raw = ls_getRef(target, key);
-                        var data = ls_getData(raw, key);
-                        desc = Object.getOwnPropertyDescriptor(data,  property);
-                    }
-                    return desc;
+                // Expando - store it from a private locker scoped object
+                var raw = ls_getRef(target, key);
+                var data = ls_getData(raw, key);
+                if (!data) {
+                    data = {};
+                    ls_setData(raw, key, data);
                 }
-    	    };
-	    }
-	    
-		var prototype = Object.create(elementPrototypeProxy || null);
+                
+                data[property] = value;
+                
+                return true;
+            },
 
+            "has": function(target, property) {
+                if (property in basePrototype) {
+                    return true;
+                }
+                var raw = ls_getRef(target, key);
+                var data = ls_getData(raw, key);
+                return !!data && property in data;
+            },
+
+            "deleteProperty": function(target, property) {
+                var raw = ls_getRef(target, key);
+                var data = ls_getData(raw, key);
+                if (data && property in data) {
+                    return delete data[property];
+                }
+                return delete target[property];
+            },
+
+            "ownKeys": function(target) {
+                var raw = ls_getRef(target, key);
+                var data = ls_getData(raw, key);
+                var keys = Object.keys(raw);
+                if (data) {
+                    keys = keys.concat(Object.keys(data));
+                }
+                return keys;
+            },
+
+            "getOwnPropertyDescriptor": function(target, property) {
+                var desc = Object.getOwnPropertyDescriptor(target, property);
+                if (!desc) {
+                    var raw = ls_getRef(target, key);
+                    var data = ls_getData(raw, key);
+                    desc = Object.getOwnPropertyDescriptor(data,  property);
+                }
+                return desc;
+            },
+            
+			"getPrototypeOf": function() {
+                return basePrototype;
+            },
+
+            "setPrototypeOf": function() {
+                throw new Error("Illegal attempt to set the prototype of: " + basePrototype);
+            }
+	    };
+	    
 		// "class", "id", etc global attributes are special because they do not directly correspond to any property
 		var caseInsensitiveAttributes = { 
 			"class": true,
@@ -264,23 +255,25 @@ function SecureElement(el, key) {
 			"role": true
 		};
 
+		var prototype = (function() {
+			function SecureElementPrototype() {
+			}
+			
+			SecureElementPrototype.prototype["tagName"] = tagName;
+			
+			return new SecureElementPrototype();
+		})();
+				
 		SecureElement.addStandardMethodAndPropertyOverrides(prototype, caseInsensitiveAttributes);
 		
 		Object.defineProperties(prototype, {
 			toString: {
 				value: function() {
-					var e = SecureObject.getRaw(this, prototype);
+					var e = SecureObject.getRaw(this);
 					return "SecureElement: " + e + "{ key: " + JSON.stringify(ls_getKey(this)) + " }";
 				}
 			}
 		});
-		
-		prototypeInfo = {
-            prototype: prototype,
-            expandoCapturingHandler: expandoCapturingHandler
-        };
-	
-		prototypes.set(tagName, prototypeInfo);
 		
 		var prototypicalInstance = Object.create(prototype);
 		ls_setRef(prototypicalInstance, el, key);
@@ -305,7 +298,7 @@ function SecureElement(el, key) {
 				    
 					// Secure attributes
 					var secureAttributes = [];
-					var raw = SecureObject.getRaw(this, prototype);
+					var raw = SecureObject.getRaw(this);
 					for (var i = 0; i < attributes.length; i++) {
 						var attribute = attributes[i];
 
@@ -326,10 +319,10 @@ function SecureElement(el, key) {
 		if ("innerText" in el) {
 			tagNameSpecificConfig["innerText"] = {
 				get: function() {
-					return SecureObject.getRaw(this.cloneNode(true), prototype).innerText;
+					return SecureObject.getRaw(this.cloneNode(true)).innerText;
 				},
 				set: function(value) {
-					var raw = SecureObject.getRaw(this, prototype);
+					var raw = SecureObject.getRaw(this);
 					if (SecureElement.isSharedElement(raw)) {
 						throw new $A.auraError("SecureElement.innerText cannot be used with " + raw.tagName + " elements!");
 					}
@@ -346,10 +339,10 @@ function SecureElement(el, key) {
 		if ("innerHTML" in el) {
 			tagNameSpecificConfig["innerHTML"] = {
 				get : function() {
-					return SecureObject.getRaw(this.cloneNode(true), prototype).innerHTML;
+					return SecureObject.getRaw(this.cloneNode(true)).innerHTML;
 				},
 				set : function(value) {
-					var raw = SecureObject.getRaw(this, prototype);
+					var raw = SecureObject.getRaw(this);
 					// Do not allow innerHTML on shared elements (body/head)
 					if (SecureElement.isSharedElement(raw)) {
 						throw new $A.auraError("SecureElement.innerHTML cannot be used with " + raw.tagName + " elements!");
@@ -368,7 +361,7 @@ function SecureElement(el, key) {
 		if (tagName === "#text" && "splitText" in el) {
 			tagNameSpecificConfig["splitText"] = {
 					value: function(index) {
-						var raw = SecureObject.getRaw(this, prototype);
+						var raw = SecureObject.getRaw(this);
 						var newNode = raw.splitText(index);
 
 						var fromKey = ls_getKey(raw);
@@ -384,8 +377,6 @@ function SecureElement(el, key) {
 		SecureElement.createEventTargetMethodsStateless(tagNameSpecificConfig, prototype);
 
 		Object.defineProperties(prototype, tagNameSpecificConfig);
-
-		Object.freeze(prototype);
 				
 		// Build case insensitive index for attribute validation
 		Object.keys(prototype).forEach(function(k) {
@@ -394,10 +385,17 @@ function SecureElement(el, key) {
 				caseInsensitiveAttributes[lower] = true;
 			}
 		});
+						
+		prototypeInfo = {
+            prototype: prototype,
+            expandoCapturingHandler: expandoCapturingHandler
+        };
+	
+		prototypes.set(tagName, prototypeInfo);
 	}
 
 	o = Object.create(prototypeInfo.prototype);
-
+	
     if (prototypeInfo.expandoCapturingHandler) {
         ls_setRef(o, el, key);
         o = new Proxy(o, prototypeInfo.expandoCapturingHandler);
@@ -405,7 +403,7 @@ function SecureElement(el, key) {
     
 	ls_setRef(o, el, key);
 	ls_addToCache(el, o, key);
-    
+	    
 	return o;
 }
 
@@ -414,7 +412,7 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseIn
 		appendChild : {
 			value : function(child) {
 				if (!runIfRunnable(child)) {
-					var e = SecureObject.getRaw(this, prototype);
+					var e = SecureObject.getRaw(this);
 					e.appendChild(ls_getRef(child, ls_getKey(this), true));
 				}
 
@@ -425,7 +423,7 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseIn
 		replaceChild : {
 			value : function(newChild, oldChild) {
 				if (!runIfRunnable(newChild)) {
-					var e = SecureObject.getRaw(this, prototype);
+					var e = SecureObject.getRaw(this);
 					var k = ls_getKey(this);
 					e.replaceChild(ls_getRef(newChild, k, true), ls_getRef(oldChild, k, true));
 				}
@@ -437,7 +435,7 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseIn
 		insertBefore : {
 			value : function(newNode, referenceNode) {
 				if (!runIfRunnable(newNode)) {
-					var e = SecureObject.getRaw(this, prototype);
+					var e = SecureObject.getRaw(this);
 					var k = ls_getKey(this);
 					e.insertBefore(ls_getRef(newNode, k, true), referenceNode ? ls_getRef(referenceNode, k, true) : null);
 				}
@@ -448,14 +446,14 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseIn
 
 		querySelector: {
 			value: function(selector) {
-				var raw = SecureObject.getRaw(this, prototype);
+				var raw = SecureObject.getRaw(this);
 				return SecureElement.secureQuerySelector(raw, ls_getKey(this), selector);
 			}
 		},
 
 		insertAdjacentHTML: {
 			value: function(position, text) {
-				var raw = SecureObject.getRaw(this, prototype);
+				var raw = SecureObject.getRaw(this);
 
 				// Do not allow insertAdjacentHTML on shared elements (body/head)
 				if (SecureElement.isSharedElement(raw)) {
@@ -505,7 +503,7 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseIn
 					}
 				}
 
-				var e = SecureObject.getRaw(this, prototype);
+				var e = SecureObject.getRaw(this);
 				var root = e.cloneNode(deep);
 
 				// Maintain the same ownership in the cloned subtree
@@ -517,10 +515,10 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseIn
 
 		textContent : {
 			get : function() {
-				return SecureObject.getRaw(this.cloneNode(true), prototype).textContent;
+				return SecureObject.getRaw(this.cloneNode(true)).textContent;
 			},
 			set : function(value) {
-				var raw = SecureObject.getRaw(this, prototype);
+				var raw = SecureObject.getRaw(this);
 				if (SecureElement.isSharedElement(raw)) {
 					throw new $A.auraError("SecureElement.textContent cannot be used with " + raw.tagName + " elements!");
 				}
@@ -544,7 +542,7 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseIn
 SecureElement.createAttributeAccessMethodConfig = function(methodName, prototype, caseInsensitiveAttributes, invalidAttributeReturnValue, namespaced) {
 	return {
     	value: function() {
-			var raw = SecureObject.getRaw(this, prototype);
+			var raw = SecureObject.getRaw(this);
     		var args = SecureObject.ArrayPrototypeSlice.call(arguments);
     		
     		var name = args[namespaced ? 1 : 0];
@@ -585,7 +583,7 @@ SecureElement.createEventTargetMethodsStateless = function(config, prototype) {
 	// was actually wired up originally
 	config["removeEventListener"] = {
 		value : function(type, listener, options) {
-			var raw = SecureObject.getRaw(this, prototype);
+			var raw = SecureObject.getRaw(this);
 			var sCallback = ls_getFromCache(listener, ls_getKey(this));
 			raw.removeEventListener(type, sCallback, options);
 		}
@@ -618,7 +616,7 @@ SecureElement.createAddEventListenerDescriptor = function(st, el, key) {
 	};
 };
 
-SecureElement.createAddEventListenerDescriptorStateless = function(prototype) {
+SecureElement.createAddEventListenerDescriptorStateless = function() {
 	return {
 		value : function(event, callback, useCapture) {
 			if (!callback) {
@@ -627,7 +625,7 @@ SecureElement.createAddEventListenerDescriptorStateless = function(prototype) {
 			}
 
 			var so = this;
-			var el = SecureObject.getRaw(so, prototype);
+			var el = SecureObject.getRaw(so);
 			var key = ls_getKey(so);
 			var sCallback = ls_getFromCache(callback, key);
 			if (!sCallback) {

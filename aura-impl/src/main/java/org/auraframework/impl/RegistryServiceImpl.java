@@ -360,7 +360,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         List<DefRegistry> registries = getCLARegistries();
         for (RegistryAdapter adapter : adapters) {
             DefRegistry[] provided = adapter.getRegistries(mode, access, null);
-            if (registries != null) {
+            if (registries != null && provided != null) {
                 Collections.addAll(registries, provided);
             }
         }

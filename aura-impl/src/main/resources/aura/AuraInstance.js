@@ -1229,11 +1229,6 @@ AuraInstance.prototype.deprecated = function(message,workaround,sinceDate,dueDat
         }
     }
     caller=(caller.stack||'').split('\n')[3]||'at unknown location';
-    if(caller.indexOf("/aura_")>-1){
-        // JBUCH: TEMPORARILY IGNORE CALLS BY FRAMEWORK.
-        // REMOVE WHEN ALL @public METHODS HAVE BEEN ADDRESSED.
-        return;
-    }
     message=$A.util.format("DEPRECATED (as of {0}, unusable on {1}): {2}\n\t{3}\n{4}",
         $A.localizationService.formatDate(sinceDate),
         $A.localizationService.formatDate(dueDate),
@@ -1241,6 +1236,22 @@ AuraInstance.prototype.deprecated = function(message,workaround,sinceDate,dueDat
         $A.util.trim(caller),
         workaround?"Workaround: "+workaround:"No known workaround."
     );
+
+    // JBUCH: TEMPORARILY IGNORE CALLS BY FRAMEWORK.
+    // REMOVE WHEN ALL @public METHODS HAVE BEEN ADDRESSED.
+    if(caller.indexOf("/aura_")>-1) {
+        $A.log("Framework use of deprecated method: " + message);
+        return;
+    }
+
+    // JBUCH: TEMPORARILY IGNORE CALLS BY ui: and aura: NAMESPACES.
+    // REMOVE WHEN VIEW LOGIC IS COMPILED WITH FRAMEWORK.
+    var context=$A.getContext();
+    context=context&&context.getCurrentAccess();
+    if(/^(ui|aura):\w+$/.test(context&&context.getName())){
+        $A.log("Framework component use of deprecated method: "+message);
+        return;
+    }
     if(Date.now()>=dueDate){
         throw new Error(message);
     }else{

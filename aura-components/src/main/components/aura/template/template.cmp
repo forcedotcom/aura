@@ -118,9 +118,8 @@
 
     window.Aura.inlineJsLoaded = true;
     var auraConfig = {!v.auraInit};
-    
+    var initSafeEvalWorker;
     function initLocker () {
-		var initSafeEvalWorker;
 		if (auraConfig["safeEvalWorker"] &amp;&amp; !window['$$safe-eval$$'] &amp;&amp; !/^(.*?:)?\/\//.test(auraConfig["host"])) {
 			initSafeEvalWorker = true;
 			//Check if strict-csp is being enforced by the browser
@@ -139,8 +138,6 @@
 			if(isEvalAllowed &amp;&amp; isInlineAllowed){
 				//no need for the worker as main frame has no restriction
 				initSafeEvalWorker = false;
-				//remove the worker url from config to streamline safeEvalWorker's health check
-				auraConfig["safeEvalWorker"] = undefined;
 			}
         }
 
@@ -176,6 +173,7 @@
         window.Aura.beforeFrameworkInit = Aura.beforeFrameworkInit || [];
         window.Aura.beforeFrameworkInit.push(auraPreInitBlock);
         window.Aura.inlineJsReady = time();
+        window.Aura.initSafeEvalWorker = initSafeEvalWorker;
 
         if (!window.Aura.frameworkJsReady) {
             window.Aura.initConfig = auraConfig;

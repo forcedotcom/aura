@@ -13,22 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.modules.impl;
-
-import java.util.List;
+package org.auraframework.modules;
 
 /**
- * POJO with the parsed data ModulesCompiler generates
+ * Interface to compile modules
  */
-public class ModulesCompilerData {
-
-    public final String code;
-    public final List<String> bundleDependencies;
-    public final List<String> templateUsedIds;
-    
-    ModulesCompilerData(String code, List<String> bundleDependencies, List<String> templateUsedIds) {
-        this.code = code;
-        this.bundleDependencies = bundleDependencies;
-        this.templateUsedIds = templateUsedIds;
-    }
+public interface ModulesCompiler {
+    ModulesCompilerData compile(String entry, String sourceTemplate, String sourceClass) throws Exception;
 }

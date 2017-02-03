@@ -18,6 +18,8 @@ package org.auraframework.modules.impl;
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
+import org.auraframework.modules.ModulesCompiler;
+import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.util.IOUtil;
 import org.springframework.util.StringUtils;
 
@@ -31,13 +33,7 @@ import com.eclipsesource.v8.utils.MemoryManager;
  * ModulesCompiler implementation using https://github.com/eclipsesource/J2V8
  */
 public final class ModulesCompilerJ2V8 implements ModulesCompiler {
-
-    @Override
-    public ModulesCompilerData compile(File file) throws Exception {
-        String filePath = file.getAbsolutePath();
-        return compile(filePath, "{format: 'amd'}");
-    }
-
+    
     @Override
     public ModulesCompilerData compile(String entry, String sourceTemplate, String sourceClass) throws Exception {
         sourceTemplate = StringUtils.replace(sourceTemplate, "`", "\\`");

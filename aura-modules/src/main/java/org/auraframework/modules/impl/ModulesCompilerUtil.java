@@ -22,6 +22,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.util.IOUtil;
 
 import com.eclipsesource.v8.V8Array;
@@ -33,8 +34,6 @@ final class ModulesCompilerUtil {
 
     static final String COMPILER_JS_PATH = pathToLocalTempFile("modules/compiler.js");
     static final String COMPILER_CLI_JS_PATH = pathToLocalTempFile("modules/compiler-cli.js");
-
-    static final String SERVER_JS_COMPILE_PATH = pathToLocalTempFile("modules/server-js-compile.js");
 
     private static String pathToLocalTempFile(String classpathResource) {
         try {

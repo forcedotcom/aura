@@ -30,14 +30,6 @@
             <groupId>org.auraframework</groupId>
             <artifactId>aura-impl</artifactId>
         </dependency>
-        <!-- for ModulesCompilerServerJS -->
-        <!-- requires httpclient:4.5.2 and httpcore:4.4.4
-        <dependency>
-            <groupId>com.force.nodeapp</groupId>
-            <artifactId>nodeapp-client</artifactId>
-            <version>0.0.12</version>
-        </dependency>
-        -->
 
         <dependency>
             <groupId>org.auraframework</groupId>

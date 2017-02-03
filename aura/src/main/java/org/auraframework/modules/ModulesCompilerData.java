@@ -13,17 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-console.log("START: server-js-compile.js");
+package org.auraframework.modules;
 
-var scriptReady = false;
-compiler.compile(codes.componentPath, {
-    sourceTemplate: codes.sourceTemplate,
-    sourceClass: codes.sourceClass,
-    format: 'amd'
-}).then((result) => {
-    console.log('\n--- CODE START ---\n' + result.code + '--- CODE END ---');
-    scriptReady = true;
-}).catch((err) => {
-    console.log('\n--- ERROR START ---\n' + err + '--- ERROR END ---');
-    scriptReady = true; // otherwise will hit timeout when there's a compilation failure.
-});
+import java.util.List;
+
+/**
+ * POJO with the parsed data ModulesCompiler generates
+ */
+public class ModulesCompilerData {
+
+    public final String code;
+    public final List<String> bundleDependencies;
+    public final List<String> templateUsedIds;
+    
+    public ModulesCompilerData(String code, List<String> bundleDependencies, List<String> templateUsedIds) {
+        this.code = code;
+        this.bundleDependencies = bundleDependencies;
+        this.templateUsedIds = templateUsedIds;
+    }
+}

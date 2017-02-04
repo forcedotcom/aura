@@ -43,7 +43,7 @@
     <aura:attribute name="setDefaultHighlight" access="PRIVILEGED" type="boolean" default="true" description="Indicates whether the first option item should be highlighted by default. The default is true."/>
     <aura:attribute name="listReferenceComponent" type="Aura.Component[]" description="Sets the component that the lookup menu is displayed under."/>
     <aura:attribute name="devNameOrId" type="String" description="Id or alias for the autocomplete." />
-    <aura:attribute name="showEmptyList" type="boolean" default="false" description="Indicate if empty list should be visible when v.keyword is empty"/>
+    <aura:attribute name="showEmptyList" type="boolean" default="false" description="Indicates if an empty list is visible when the keyword attribute is empty. The default is false."/>
 
     <aura:handler name="change" value="{!v.listReferenceComponent}" action="{!c.referenceElementChange}"/>
     <!-- END - the following attributes are only used when using the default list -->

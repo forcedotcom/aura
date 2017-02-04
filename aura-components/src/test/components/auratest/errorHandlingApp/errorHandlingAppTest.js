@@ -249,14 +249,76 @@
         ]
     },
 
-    testHandlingServerActionError: {
+    testHandleException: {
+        test: [
+            function (cmp) {
+                // arrange
+                var actual;
+                var expected = "Event fired";
+                var action = cmp.get("c.handleException");
+                var called = false;
+
+                action.setCallback(cmp, function (response) {
+                    actual = response.error[0].message;
+                    called = true;
+                });
+
+                // act
+                $A.enqueueAction(action);
+
+                // assert
+                $A.test.addWaitFor(
+                    true,
+                    function() {
+                        return called;
+                    },
+                    function() {
+                        $A.test.assertEquals(expected, actual);
+                    });
+            }
+        ]
+    },
+
+    testHandleCustomException: {
+        test: [
+            function (cmp) {
+                // arrange
+                var actual;
+                var expected = "err";
+                var action = cmp.get("c.handleCustomException");
+                var called = false;
+
+                action.setCallback(cmp, function (response) {
+                    actual = response.error[0].message;
+                    called = true;
+                });
+
+                // act
+                $A.enqueueAction(action);
+
+                // assert
+                $A.test.addWaitFor(
+                    true,
+                    function() {
+                        return called;
+                    },
+                    function() {
+                        $A.test.assertEquals(expected, actual);
+                    });
+            }
+        ]
+    },
+
+    testHandleCustomExceptionWithData: {
         test: [
             function(cmp) {
-                // arrage
+                // arrange
+                var actual;
                 var expected = "testCustomMessage";
-                var action = cmp.get("c.throwGenericEventExceptionWithServerActionErrorEvent");
+                var action = cmp.get("c.handleCustomExceptionWithData");
                 var called = false;
-                action.setCallback(cmp, function(response) {
+
+                action.setCallback(cmp, function (response) {
                     actual = response.error[0].data.customMessage;
                     called = true;
                 });
@@ -264,7 +326,7 @@
                 // act
                 $A.enqueueAction(action);
 
-                //assert
+                // assert
                 $A.test.addWaitFor(
                     true,
                     function() {

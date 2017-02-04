@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.auraframework.adapter.ServerErrorUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -47,6 +48,9 @@ public class TestController implements Controller {
 
     @Inject
     private ContextService contextService;
+
+    @Inject
+    private ServerErrorUtilAdapter serverErrorUtilAdapter;
 
 
     @AuraEnabled
@@ -110,15 +114,19 @@ public class TestController implements Controller {
     }
 
     @AuraEnabled
-    public void throwGenericEventExceptionWithServerActionErrorEvent() {
-        GenericEventException gee = new GenericEventException("aura:serverActionError");
-        ClientSideCustomError ae = new ClientSideCustomError(
-                "testMessage",
-                "testStacktrace",
-                new TestCustomErrorData("testCustomMessage"),
-                "testErrorId");
-        gee.addParam("customError", ae);
-        throw gee;
+    public void handleException() {
+        serverErrorUtilAdapter.handleException("err");
+    }
+
+    @AuraEnabled
+    public void handleCustomException() {
+        serverErrorUtilAdapter.handleCustomException("err", new RuntimeException());
+    }
+
+    @AuraEnabled
+    public void handleCustomExceptionWithData() {
+        TestCustomErrorData data = new TestCustomErrorData("testCustomMessage");
+        serverErrorUtilAdapter.handleCustomException("err", new RuntimeException(), data);
     }
 
     private class TestCustomErrorData implements JsonSerializable {

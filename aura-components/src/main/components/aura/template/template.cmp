@@ -120,25 +120,27 @@
     var auraConfig = {!v.auraInit};
     var initSafeEvalWorker;
     function initLocker () {
-		if (auraConfig["safeEvalWorker"] &amp;&amp; !window['$$safe-eval$$'] &amp;&amp; !/^(.*?:)?\/\//.test(auraConfig["host"])) {
-			initSafeEvalWorker = true;
-			//Check if strict-csp is being enforced by the browser
-			var isEvalAllowed = true;
-			try{ eval("(function(){})();");}catch(e){isEvalAllowed = false;}
-			var isInlineAllowed;
-			if(isEvalAllowed){
-				var script = document.createElement("script");
-				script.type = "text/javascript";
-				script.appendChild(document.createTextNode("(function(){})();"));
-				isInlineAllowed = true;
-				script.addEventListener('error', function(){isInlineAllowed = false;});
-				document.body.appendChild(script);
-				document.body.removeChild(script)
-			}
-			if(isEvalAllowed &amp;&amp; isInlineAllowed){
-				//no need for the worker as main frame has no restriction
-				initSafeEvalWorker = false;
-			}
+        if (auraConfig["safeEvalWorker"] &amp;&amp; !window['$$safe-eval$$'] &amp;&amp; !/^(.*?:)?\/\//.test(auraConfig["host"])) {
+            initSafeEvalWorker = true;
+            //Check if strict-csp is being enforced by the browser
+            var isEvalAllowed = true;
+            try{ eval("(function(){})();");}catch(e){isEvalAllowed = false;}
+            var isInlineAllowed;
+            if(isEvalAllowed){
+                var  inlineAllowedProp = "$unsafeInlineAllowed$";
+                var script = document.createElement("script");
+                script.type = "text/javascript";
+                script.appendChild(document.createTextNode("(function(){ window['"+inlineAllowedProp+"']=true; })();"));
+                isInlineAllowed = true;
+                document.body.appendChild(script);
+                document.body.removeChild(script);
+                isInlineAllowed = window[inlineAllowedProp] || false;
+                window[inlineAllowedProp] = undefined;
+            }
+            if(isEvalAllowed &amp;&amp; isInlineAllowed){
+                //no need for the worker as main frame has no restriction
+                initSafeEvalWorker = false;
+            }
         }
 
         if (initSafeEvalWorker) {

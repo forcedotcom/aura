@@ -1739,6 +1739,9 @@ Test.Aura.AuraClientServiceTest = function() {
            storageClearCalled = false;
            componentDefsClearCalled = false;
            mockDeps(function() {
+                window.applicationCache.swapCache = function(){};
+                window.applicationCache.UPDATEREADY = 4;
+                window.applicationCache.status = 4;
                 var targetService = new Aura.Services.AuraClientService();
                 targetService.shouldPreventReload = function() { return false; };
                 targetService.reloadPointPassed = true;
@@ -1746,6 +1749,23 @@ Test.Aura.AuraClientServiceTest = function() {
            });
 
            Assert.True(componentDefsClearCalled);
+       }
+
+       [Fact]
+       function doesNotCallComponentRegistryClearWhenUpdateReadyIsntReallyReady() {
+           storageClearCalled = false;
+           componentDefsClearCalled = false;
+           mockDeps(function() {
+                window.applicationCache.swapCache = function(){};
+                window.applicationCache.UPDATEREADY = 4;
+                window.applicationCache.status = undefined;
+                var targetService = new Aura.Services.AuraClientService();
+                targetService.shouldPreventReload = function() { return false; };
+                targetService.reloadPointPassed = true;
+                evtCallbacks["updateready"]();
+           });
+
+           Assert.False(componentDefsClearCalled);
        }
     }
 

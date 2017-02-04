@@ -1035,9 +1035,9 @@ AuraClientService.prototype.handleAppCache = function() {
             } catch(ignore) {
                 // quirk: some browser's incorrectly throw InvalidStateError
             }
+            // dump caches due to change in fwk and/or app.
+            acs.dumpCachesAndReload();
         }
-        // dump caches due to change in fwk and/or app.
-        acs.dumpCachesAndReload();
     }
 
     function handleAppcacheError(e) {

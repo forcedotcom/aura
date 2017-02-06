@@ -20,5 +20,19 @@
         testUtils.assertEquals(params.message, secureAuraEvent.getParams().message);
         testUtils.assertEquals("function", typeof secureAuraEvent.fire);
         testUtils.assertEquals("function", typeof secureAuraEvent.stopPropagation);
+    },
+
+    testGetType: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var expected = "aura:debugLog";
+        var secureAuraEvent = cmp.getEvent("debugLog");
+        testUtils.assertEquals(expected, secureAuraEvent.getType(), "Unexpected type returned from Event.js#getType");
+    },
+
+    testGetEventType: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var expected = "APPLICATION";
+        var secureAuraEvent = cmp.getEvent("debugLog");
+        testUtils.assertEquals(expected, secureAuraEvent.getEventType(), "Unexpected type returned from Event.js#getEventType");
     }
 })

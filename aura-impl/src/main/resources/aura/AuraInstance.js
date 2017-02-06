@@ -18,18 +18,14 @@
  * @class Aura
  * @classdesc The Aura framework. Default global instance name is $A.
  * @constructor
- *
- * @borrows Aura.Services.AuraClientService#enqueueAction as enqueueAction
- * @borrows Aura.Services.AuraClientService#deferAction as deferAction
- * @borrows Aura.Services.AuraRenderingService#render as render
- * @borrows Aura.Services.AuraRenderingService#rerender as rerender
- * @borrows Aura.Services.AuraRenderingService#unrender as unrender
- * @borrows Aura.Services.AuraRenderingService#afterRender as afterRender
- * @borrows Aura.Services.AuraComponentService#get as getCmp
- * @borrows Aura.Services.AuraComponentService#createComponent as createComponent
- * @borrows Aura.Services.AuraComponentService#createComponents as createComponents
- * @borrows Aura.Services.AuraComponentService#getComponent as getComponent
- * @borrows Aura.Services.AuraEventService.newEvent as getEvt
+ * @platform
+ * @namespace
+ * @alias $A
+ * 
+ * @borrows AuraClientService#enqueueAction as enqueueAction
+ * @borrows AuraComponentService#createComponent as createComponent
+ * @borrows AuraComponentService#createComponents as createComponents
+ * @borrows AuraComponentService#getComponent as getComponent
  */
 function AuraInstance () {
     this.globalValueProviders = {};

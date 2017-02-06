@@ -617,7 +617,7 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
 
     this.lastSweep = now;
     try {
-        var transaction = this.db.transaction([this.tableName], "readwrite");
+        var transaction = this.db.transaction([this.tableName], "readonly");
         var objectStore = transaction.objectStore(this.tableName);
         var index = objectStore.index("expires");
         var cursor = index.openCursor();
@@ -627,6 +627,7 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
         var expireDate = now + this.expiresFudge;
         var that = this;
         var removeSize = requestedSize || 0;
+        var keysToDelete = [];
 
         // if we are above the low water mark, sweep down to it.
         if (this.sizeGuess > this.limitSweepLow) {
@@ -657,7 +658,7 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
 
                     if (shouldEvict) {
                         that.log(IndexedDBAdapter.LOG_LEVEL.INFO, "expireCache(): sweep removing "+icursor.primaryKey);
-                        icursor["delete"]();
+                        keysToDelete.push(icursor.primaryKey);
                         expiredSize += stored["size"];
                     } else {
                         size += stored["size"];
@@ -668,6 +669,9 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
             } else {
                 that.refreshSize(size, count);
 
+                if (keysToDelete.length > 0) {
+                    that.removeItems(keysToDelete);
+                }
                 if (resolve) {
                     // intentionally don't return: the sweep is done so resolve the promise
                     // but then check if we need to do an async sweep due to size

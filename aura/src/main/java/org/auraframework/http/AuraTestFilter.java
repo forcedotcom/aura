@@ -33,7 +33,6 @@ import javax.inject.Inject;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -85,8 +84,6 @@ import com.google.common.collect.Lists;
  */
 @ServiceComponent
 public class AuraTestFilter {
-    private final Log LOG;
-
     private static final int DEFAULT_JSTEST_TIMEOUT = 30;
     private static final String BASE_URI = "/aura";
     private static final String GET_URI = BASE_URI
@@ -116,7 +113,8 @@ public class AuraTestFilter {
     // private static final Pattern headTagPattern = Pattern.compile("(?is).*(<\\s*head[^>]*>).*");
     // private static final Pattern bodyTagPattern = Pattern.compile("(?is).*(<\\s*body[^>]*>).*");
 
-    private ServletContext servletContext;
+    private final Log LOG = LogFactory.getLog(AuraTestFilter.class);;
+    private final List<HttpFilter> testCaseFilters = Collections.synchronizedList(Lists.newArrayList());
 
     // TODO: DELETE this once all existing tests have been updated to have attributes.
     private boolean ENABLE_FREEFORM_TESTS = Boolean.parseBoolean(System.getProperty("aura.jstest.free"));
@@ -158,11 +156,6 @@ public class AuraTestFilter {
         this.servletUtilAdapter = servletUtilAdapter;
     }
 
-    public AuraTestFilter() {
-        LOG = LogFactory.getLog(AuraTestFilter.class);
-        LOG.info("ctor()", new Error());
-    }
-    
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException,
             IOException {
         if (testContextAdapter == null || configAdapter == null || configAdapter.isProduction()) {
@@ -170,19 +163,21 @@ public class AuraTestFilter {
             return;
         }
 
-		final AtomicBoolean handled = new AtomicBoolean(false);
-		
-		for (HttpFilter filter : testCaseFilters) {
-			if (filter == null) {
-				continue;
-			}
-			filter.doFilter((HttpServletRequest) request, (HttpServletResponse) response, (req, res) -> {
-				innerFilter(req, res, chain);
-				handled.set(true);
-			});
-			if (handled.get()) {
-				return; // Only 1 filter is allowed to generate a response
-			}
+		if (testCaseFilters != null && testCaseFilters.size() > 0) {
+	        final AtomicBoolean handled = new AtomicBoolean(false);
+	        
+	        for (HttpFilter filter : testCaseFilters) {
+	            if (filter == null) {
+	                continue;
+	            }
+	            filter.doFilter((HttpServletRequest) request, (HttpServletResponse) response, (req, res) -> {
+	                innerFilter(req, res, chain);
+	                handled.set(true);
+	            });
+	            if (handled.get()) {
+	                return; // Only 1 filter is allowed to generate a response
+	            }
+	        }
 		}
 
 		innerFilter(request, response, chain);
@@ -292,7 +287,7 @@ public class AuraTestFilter {
 
                     String newUri = createURI("aurajstest", "jstest", DefType.APPLICATION, mode,
                             Format.HTML, Authentication.AUTHENTICATED.name(), "", qs);
-                    RequestDispatcher dispatcher = servletContext.getContext(newUri).getRequestDispatcher(newUri);
+                    RequestDispatcher dispatcher = request.getServletContext().getContext(newUri).getRequestDispatcher(newUri);
                     if (dispatcher != null) {
                         dispatcher.forward(request, response);
                         return;
@@ -321,13 +316,12 @@ public class AuraTestFilter {
 
     public void init(FilterConfig filterConfig) throws ServletException {
     	LOG.info(this + " init()", new Error());
-        servletContext = filterConfig.getServletContext();
         processInjection(filterConfig);
     }
     
     public void processInjection(FilterConfig filterConfig) {
         if (testContextAdapter == null) {
-            SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, servletContext);
+            SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, filterConfig.getServletContext());
         }
     }
 
@@ -499,7 +493,7 @@ public class AuraTestFilter {
     private String captureResponse(ServletRequest req, ServletResponse res, String uri) throws ServletException,
             IOException {
         CapturingResponseWrapper responseWrapper = new CapturingResponseWrapper((HttpServletResponse) res);
-        RequestDispatcher dispatcher = servletContext.getContext(uri).getRequestDispatcher(uri);
+        RequestDispatcher dispatcher = req.getServletContext().getContext(uri).getRequestDispatcher(uri);
         if (dispatcher == null) {
             return null;
         }
@@ -509,7 +503,6 @@ public class AuraTestFilter {
 
     private String buildJsTestScriptTag(DefDescriptor<?> targetDescriptor, String testName, int timeout, String original) {
         String tag = "";
-        String defer;
 
         // Inject test framework script tag if it isn't on page already. Unlikely, but framework may not
         // be loaded if the target is server-rendered, or if the target is designed that way (e.g.
@@ -518,18 +511,6 @@ public class AuraTestFilter {
         if (original == null
                 || !original.matches(String.format("(?is).*<script\\s*src\\s*=\\s*['\"]%s['\"][^>]*>.*", testUrl))) {
             tag = String.format("<script src='%s'></script>", testUrl);
-        }
-
-        switch (contextService.getCurrentContext().getClient().getType()) {
-        case IE9:
-        case IE8:
-        case IE7:
-        case IE6:
-            defer = "";
-            break;
-        default:
-            defer = " defer";
-            break;
         }
 
         // Inject tag to load and execute test.
@@ -648,8 +629,6 @@ public class AuraTestFilter {
         return null;
     }
 
-    private List<HttpFilter> testCaseFilters = Collections.synchronizedList(Lists.newArrayList());
-    
 	public void addFilter(HttpFilter filter) {
 		synchronized (testCaseFilters) {
 			if (filter != null) {

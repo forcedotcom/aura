@@ -30,17 +30,13 @@ Test.Aura.Locker.SecureObjectTest = function() {
                 "getElementById": function() {
                     return undefined;
                 }
-            }
+            },
+            "File": CustomFileClass,
+            "FileList": CustomFileListClass,
+            "Promise": CustomPromiseClass,
         },
-        "File": CustomFileClass, 
-        "FileList": CustomFileListClass, 
-        "Promise": CustomPromiseClass, 
-        "CSSStyleDeclaration": function() {}, 
-        "TimeRanges": function() {}, 
-        "MessagePort": function() {}, 
-        "MessageChannel": function() {}, 
-        "MessageEvent": function() {},
-        "FormData": function() {}
+        "CSSStyleDeclaration": function() {},
+        "TimeRanges": function() {}
     })(function() {
         [Import("aura-impl/src/main/resources/aura/locker/SecureObject.js")]
     });

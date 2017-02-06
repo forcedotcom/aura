@@ -934,10 +934,28 @@ SecureObject.addPrototypeMethodsAndPropertiesStateless = function(metadata, prot
 var workerFrame = window.document.getElementById("safeEvalWorker");
 var safeEvalScope = workerFrame && workerFrame.contentWindow;
 
-var unfilteredTypes = [File, FileList, CSSStyleDeclaration, TimeRanges, Date, Promise, MessagePort, MessageChannel, MessageEvent, FormData];
-if (typeof ValidityState !== "undefined") {
-    unfilteredTypes.push(ValidityState);
+function getUnfilteredTypes() {
+	var ret = [];
+	var unfilteredTypesMeta = [
+		"File",
+		"FileList",
+		"CSSStyleDeclaration",
+		"TimeRanges",
+		"Date",
+		"Promise",
+		"MessagePort",
+		"MessageChannel",
+		"MessageEvent",
+		"FormData",
+		"ValidityState"];
+	unfilteredTypesMeta.forEach(function(unfilteredType){
+		if (typeof window[unfilteredType] !== "undefined") {
+			ret.push(window[unfilteredType]);
+		}
+	});
+	return ret;
 }
+var unfilteredTypes = getUnfilteredTypes();
 
 SecureObject.isUnfilteredType = function(raw) {
     for (var n = 0; n < unfilteredTypes.length; n++) {

@@ -140,7 +140,7 @@ public class AuraContextImpl implements AuraContext {
 
     private boolean isSystem = false;
 
-
+    private boolean isModulesEnabled = false;
     /**
      * The set of defs that are thread local.
      *
@@ -872,6 +872,10 @@ public class AuraContextImpl implements AuraContext {
             }
             
             json.writeMapEntry("ls", configAdapter.getLockerServiceCacheBuster());
+
+            if (this.isModulesEnabled) {
+                json.writeMapEntry("m", 1);
+            }
             
             json.writeMapEnd();
         } catch (IOException ioe) {
@@ -954,5 +958,15 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public RegistrySet getRegistries() {
         return this.registries;
+    }
+
+    @Override
+    public void setModulesEnabled(boolean isModulesEnabled) {
+        this.isModulesEnabled = isModulesEnabled;
+    }
+
+    @Override
+    public boolean isModulesEnabled() {
+        return this.isModulesEnabled;
     }
 }

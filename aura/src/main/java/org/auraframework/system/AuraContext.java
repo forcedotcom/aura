@@ -723,4 +723,8 @@ public interface AuraContext {
      * @return true if this context in 'system mode'.
      */
     boolean isSystemMode();
+
+    void setModulesEnabled(boolean isModulesEnabled);
+
+    boolean isModulesEnabled();
 }

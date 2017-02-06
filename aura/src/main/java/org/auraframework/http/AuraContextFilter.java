@@ -237,6 +237,7 @@ public class AuraContextFilter implements Filter {
         context.setNum(num.get(request));
         context.setRequestedLocales(requestedLocales);
         context.setClient(new Client(request.getHeader(HttpHeaders.USER_AGENT)));
+        context.setModulesEnabled(isModulesEnabled(request, configMap, m));
         if (configMap != null) {
             getLoaded(context, configMap.get("loaded"));
             @SuppressWarnings("unchecked")
@@ -352,6 +353,31 @@ public class AuraContextFilter implements Filter {
         }
 
         return m;
+    }
+
+    /**
+     * Whether modules should be enabled based on ConfigAdapter, URL param, or context config from URL
+     *
+     * @param request http request
+     * @param configMap context config from encoded url
+     * @return whether modules should be enabled
+     */
+    protected boolean isModulesEnabled(HttpServletRequest request, Map<String, Object> configMap, Mode mode) {
+        boolean isModulesEnabled = configAdapter.isModulesEnabled(); // TODO is this costly ?
+        if (configMap != null && configMap.containsKey("m")) {
+            String configValue = String.valueOf(configMap.get("m"));
+            isModulesEnabled = "1".equals(configValue);
+        }
+
+        if (mode != Mode.PROD) {
+            // DO NOT allow url param override in prod
+            String modulesEnabledParam = request.getParameter(AuraServlet.AURA_PREFIX + "modules");
+            if (modulesEnabledParam != null) {
+                isModulesEnabled = "1".equals(modulesEnabledParam);
+            }
+        }
+
+        return isModulesEnabled;
     }
 
     private DefDescriptor<? extends BaseComponentDef> getAppParam(HttpServletRequest request, Map<String, Object> configMap) {

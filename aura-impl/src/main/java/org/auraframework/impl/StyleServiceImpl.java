@@ -54,6 +54,7 @@ import com.salesforce.omakase.ast.declaration.Declaration;
 import com.salesforce.omakase.broadcast.annotation.Rework;
 import com.salesforce.omakase.plugin.Plugin;
 import com.salesforce.omakase.plugin.conditionals.ConditionalsValidator;
+import com.salesforce.omakase.plugin.syntax.UnquotedIEFilterPlugin;
 import com.salesforce.omakase.util.Args;
 
 @ServiceComponent
@@ -213,6 +214,7 @@ public class StyleServiceImpl implements StyleService {
             String css = CssPreprocessor.raw()
                     .source(style.getRawCode())
                     .tokens(style.getDescriptor())
+                    .extra(new UnquotedIEFilterPlugin())
                     .extra(conditionalsValidator)
                     .extra(magicEraser)
                     .parse()

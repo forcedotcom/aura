@@ -202,7 +202,7 @@ public final class CssPreprocessor {
                 // we only want full refinement and validation on the compilation pass. During subsequent runtime calls
                 // we will already know the code is valid so no need to validate again. This should be the last plugin
                 // so we don't preempt other refiners.
-                plugins.add(new StandardValidation());
+                plugins.add(new StandardValidation()); // todo, don't do this in raw mode
             }
 
             // do the parsing

@@ -131,7 +131,8 @@
 
     testFile: {
         // window.File is not implemented correctly in iOS 9.2
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],
+        // TODO(W-3674741): FF browser versions in autobuilds are too far behind
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD", "-FIREFOX"],
         test: function(cmp) {
             cmp.testFile();
         }
@@ -139,7 +140,8 @@
 
     testFile_WithScriptTagsBlocked: {
         // window.File is not implemented correctly in iOS 9.2
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],
+        // TODO(W-3674741): FF browser versions in autobuilds are too far behind
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD", "-FIREFOX"],
         test: function (cmp) {
             cmp.testFile_WithScriptTagsBlocked();
         }

@@ -123,7 +123,8 @@
 
     testAttemptToEvalToWindow: {
         // This exploit not covered in IE11
-        browsers: ["-IE8", "-IE9", "-IE10", "-IE11"],
+        // TODO(W-3674741,W-3674751): FF and iOS browser versions in autobuilds are too far behind
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
         test: function(cmp) {
             cmp.testEvalBlocking();
 

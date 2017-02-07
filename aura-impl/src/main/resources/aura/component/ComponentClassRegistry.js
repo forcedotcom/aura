@@ -37,14 +37,8 @@ function ComponentClassRegistry () {
 ComponentClassRegistry.prototype.customConstructorMap = { 
     /*eslint-disable no-undef*/
     "aura$text":TextComponent,
-    "aura$html":HtmlComponent
-    
-    // Things to do when switching to ExpressionComponent
-    // * Remove this.setContainerComponentId() call in Component.js constructor
-    // * Remove Expression special logic in Component.prototype.setContainerComponentId
-    // If Final:
-    // * Remove methods in expressionRenderer.js
-    //"aura$expression": ExpressionComponent, 
+    "aura$html":HtmlComponent,
+    "aura$expression": ExpressionComponent
 
     // We have no yet implemented specific classes for these components.
     // Switching them to SimpleComponent should work. (Not tested though)

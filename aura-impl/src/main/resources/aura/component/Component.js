@@ -151,9 +151,6 @@ function Component(config, localCreation) {
     // sets up component level events
     this.setupComponentEvents(this, configAttributes);
 
-    // now that the def is set up, establish our parent id through any expression results
-    this.setContainerComponentId(this.containerComponentId);
-
     // instantiate super component(s)
     this.setupSuper(configAttributes, localCreation);
 
@@ -192,33 +189,6 @@ function Component(config, localCreation) {
  */
 Component.prototype.setContainerComponentId = function(containerComponentId) {
     this.containerComponentId = containerComponentId;
-
-    // Remove when ExpressionComponent is back.
-    if(this.isValid() && this.isInstanceOf("aura:expression")) {
-        // set the containerComponentId for expression values to the expression component itself
-        var context = $A.getContext();
-        var enableAccessChecks = context.enableAccessChecks;
-        try {
-            // JBA: turn off access checks so we can evaluate this expression
-            // safely just for this statement
-            context.enableAccessChecks = false;
-            var facetValue = this.get("v.value");
-            if($A.util.isArray(facetValue)){
-                for(var fidx = 0; fidx < facetValue.length; fidx++) {
-                    if(facetValue[fidx] instanceof Component) {
-                        facetValue[fidx].setContainerComponentId(this.globalId);
-                    }
-                }
-            }
-            else if(facetValue instanceof Component) {
-                facetValue.setContainerComponentId(this.globalId);
-            }
-        }
-        finally {
-            // flip access checks back to their initial value
-            context.enableAccessChecks = enableAccessChecks;
-        }
-    }
 };
 
 Component.currentComponentId = 0;

@@ -81,7 +81,6 @@ function ExpressionComponent(config, localCreation) {
     // create the globally unique id for this component
     this.setupGlobalId(config["globalId"], localCreation);
 
-
     var partialConfig;
     if (this.creationPath && this.creationPath !== "client created") {
         partialConfig = context.getComponentConfig(this.creationPath);
@@ -139,7 +138,7 @@ function ExpressionComponent(config, localCreation) {
     this.setupValueProviders(config["valueProviders"]);
     
     // initialize attributes
-    this.setupAttributes(this, configAttributes);
+    this.setupAttributes(this, configAttributes, localCreation);
 
     // index this component with its value provider (if it has a localid)
     this.doIndex(this);
@@ -203,11 +202,6 @@ ExpressionComponent.prototype.setupValueProviders = function(customValueProvider
     var vp=this.valueProviders;
 
     vp["v"]=this.attributeSet = new AttributeSet(this.componentDef.attributeDefs);
-    vp["this"]=this;
-    vp["globalid"]=this.globalId;
-    vp["def"]=this.componentDef;
-    vp["null"]=null;
-    vp["version"] = this.version ? this.version : this.getVersionInternal();
 
     if(customValueProviders) {
         for (var key in customValueProviders) {

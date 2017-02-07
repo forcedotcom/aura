@@ -32,7 +32,7 @@
     },
 
     onItemSelected: function(cmp, event, helper) {
-        var newItem = event.getParam('value');
+        var newItem = event.getParam("value");
         if (newItem) {
             helper.handleItemSelected(cmp, [newItem]);
         }
@@ -55,10 +55,27 @@
     },
 
     insertItems: function (cmp, event, helper) {
-        var newItems = event.getParam('arguments').items;
+        var args = event.getParam("arguments");
+        var newItems = args.items;
         if (newItems) {
-            helper.insertItems(cmp, newItems);
+            var fireInsertedEvent = args.fireInsertedEvent;
+            helper.insertItems(cmp, newItems, fireInsertedEvent);
         }
+    },
+
+    removeItems: function (cmp, event, helper) {
+        var args = event.getParam("arguments");
+        if (args) {
+            var newItems = args.items;
+            if (newItems) {
+                var fireRemovedEvent = args.fireRemovedEvent;
+                helper.deleteItem(cmp, newItems, fireRemovedEvent);
+            }
+        }
+    },
+
+    clear: function(cmp) {
+        cmp.set("v.items", []);
     },
 
     onItemsChanged: function(cmp, event, helper) {
@@ -78,13 +95,13 @@
     },
 
     onInputFocus: function(cmp) {
-        $A.util.addClass(cmp.getElement(), 'focused');
+        $A.util.addClass(cmp.getElement(), "focused");
         var element = cmp.find("list").getElement();
         element.scrollTop = element.scrollHeight;
     },
 
     onInputBlur: function(cmp) {
-        $A.util.removeClass(cmp.getElement(), 'focused');
+        $A.util.removeClass(cmp.getElement(), "focused");
         cmp.find("list").getElement().scrollTop = 0;
     },
 

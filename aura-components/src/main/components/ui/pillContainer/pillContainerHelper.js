@@ -20,8 +20,8 @@
 
     handleItemSelected: function(cmp, newItemList) {
         if (!$A.util.isEmpty(newItemList) && $A.util.isArray(newItemList)) {
-            this.insertItems(cmp, newItemList);
-
+            var fireInsertedEvent = true;
+            this.insertItems(cmp, newItemList, fireInsertedEvent);
 
             // when we've reached max pills
             // allow the iteration to rerender the pills before setting focus to th last pill
@@ -32,7 +32,7 @@
                 window.setTimeout(function () {
                     $A.run(function () {
                         if (cmp.isValid()) {
-                            var pillItems = cmp.find('pill');
+                            var pillItems = cmp.find("pill");
                             if (!$A.util.isEmpty(pillItems)) {
                                 if ($A.util.isArray(pillItems)) {
                                     pillItems[pillItems.length - 1].focus();
@@ -47,8 +47,8 @@
         }
     },
 
-    insertItems: function(cmp, newItems){
-        var curItems = cmp.get('v.items');
+    insertItems: function(cmp, newItems, fireInsertedEvent){
+        var curItems = cmp.get("v.items");
         var itemsIsUpdated = false;
         // 1.) Check if max has been reached. If so then don't try to insert.
         // 2.) Check to see if newItems[i] exists, if it does don't add it
@@ -62,12 +62,18 @@
             if (!this._itemExists(curItems, newItems[i])) {
                 itemsIsUpdated = true;
                 curItems.push(newItems[i]);
-                cmp.get("e.pillInserted").fire();
+                if (fireInsertedEvent) {
+                    var pillInsertedEvent = cmp.get("e.pillInserted");
+                    if (newItems[i].params) {
+                        pillInsertedEvent.setParams(newItems[i].params);
+                    }
+                    pillInsertedEvent.fire();
+                }
             }
         }
 
         if (itemsIsUpdated) {
-            cmp.set('v.items', curItems);
+            cmp.set("v.items", curItems);
         }
         this.focusOnInputBox(cmp);  // Always focus on the input after adding new pill (W-2529162)
     },
@@ -83,9 +89,9 @@
         }
 
         if (items.length === maxAllowed) {
-            $A.util.addClass(cmp.getElement(), 'maxAllowed');
+            $A.util.addClass(cmp.getElement(), "maxAllowed");
         } else {
-            $A.util.removeClass(cmp.getElement(), 'maxAllowed');
+            $A.util.removeClass(cmp.getElement(), "maxAllowed");
         }
         this._setActiveItem(cmp,0);
     },
@@ -97,18 +103,18 @@
         if (!action) {
             return;
         }
-        if (action === 'focusPrevItem') {
+        if (action === "focusPrevItem") {
             this.focusItem(cmp, data, -1);
-        } else if (action === 'focusNextItem') {
+        } else if (action === "focusNextItem") {
             this.focusItem(cmp, data, 1);
-        } else if (action === 'focusLastItem') {
+        } else if (action === "focusLastItem") {
             this.focusItem(cmp, data, 0);
-        } else if (action === 'delete') {
-            this.deleteItem(cmp, data);
+        } else if (action === "delete") {
+            this.deleteItem(cmp, data, true);
         }
     },
 
-    deleteItem: function(cmp, data) {
+    deleteItem: function(cmp, data, fireRemovedEvent) {
         if (cmp.get("v.allowRemove")) {
             // There is domEventHandlers attached to the pills that are invoked on afterRender and rerender.
             // Need to let aura run its course so that lingering handlers are invoked before its safe to update the list.
@@ -116,7 +122,7 @@
             window.setTimeout(function () {
                 $A.run(function () {
                     if (cmp.isValid()) {
-                        that._deleteItem(cmp, data);
+                        that._deleteItem(cmp, data, fireRemovedEvent);
                     }
                 });
             }, 0);
@@ -135,7 +141,7 @@
             return;
         }
 
-        var items = cmp.find('pill');
+        var items = cmp.find("pill");
         if ($A.util.isUndefinedOrNull(items)) {
             return;
         }
@@ -149,7 +155,7 @@
             index = itemsArray.length - 1;
         } else {
             for (var i = 0; i < itemsArray.length; i++) {
-                if (this._isEqual(data, {id:itemsArray[i].get('v.id'),label:itemsArray[i].get('v.label')})) {
+                if (this._isEqual(data, {id:itemsArray[i].get("v.id"),label:itemsArray[i].get("v.label")})) {
                     index = (i + direction) ;
                     break;
                 }
@@ -180,7 +186,7 @@
         var itemsLength = pillItemData.length;
         var maxAllowed = cmp.get("v.maxAllowed");
         if ($A.util.isEmpty(pillInput)) {
-            $A.util.addClass(cmp.getElement(), 'noinput');
+            $A.util.addClass(cmp.getElement(), "noinput");
         } else if (itemsLength<maxAllowed) {
             pillInput[0].focus();
             focused = true;
@@ -205,7 +211,7 @@
                 listElement = list.getElement();
             }
             if (maxLines > 0 && listElement) {
-                var listItems = listElement.querySelectorAll('li.pillContainerListItem');
+                var listItems = listElement.querySelectorAll("li.pillContainerListItem");
                 if (!$A.util.isEmpty(listItems)) {
 
                     //find the height of a pill
@@ -218,7 +224,7 @@
                         lastItem = firstItem = listItems[0];
                     }
                     if (firstItem) {
-                    	var pillHeight = this._getActualHeight(firstItem);
+                        var pillHeight = this._getActualHeight(firstItem);
 
                         //set the maximum height of the pill container based on maxLines attribute
                         var limitedHeight = pillHeight * maxLines;
@@ -233,9 +239,9 @@
                 }
             }
             if (hideShowMore) {
-                $A.util.addClass(cmp.find("showMore").getElement(), 'invisible');
+                $A.util.addClass(cmp.find("showMore").getElement(), "invisible");
             } else {
-                $A.util.removeClass(cmp.find("showMore").getElement(), 'invisible');
+                $A.util.removeClass(cmp.find("showMore").getElement(), "invisible");
             }
         }
     },
@@ -243,7 +249,7 @@
     expand: function(cmp) {
         var list = cmp.find("list");
         list.getElement().style.maxHeight = "";
-        $A.util.addClass(cmp.find("showMore").getElement(), 'invisible');
+        $A.util.addClass(cmp.find("showMore").getElement(), "invisible");
         cmp.set("v.expanded", true);
 
         var pillItemData = cmp.get("v.items");
@@ -275,7 +281,7 @@
     _itemExists: function(itemsList, newItem) {
         var found = false;
         for(var i=0;i < itemsList.length;i++) {
-            if(this._isEqual(itemsList[i], newItem)) {
+            if (this._isEqual(itemsList[i], newItem)) {
                 found = true;
                 break;
             }
@@ -294,8 +300,8 @@
         return (object1.label.toLowerCase() === object2.label.toLowerCase());
     },
 
-    _deleteItem: function(cmp, data) {
-        var items = cmp.get('v.items'),
+    _deleteItem: function(cmp, data, fireRemovedEvent) {
+        var items = cmp.get("v.items"),
             itemsLength = items.length,
             isContainerEmpty;
 
@@ -303,7 +309,7 @@
             if (this._isEqual(data, items[i])) {
                 // remove found item
                 items.splice(i, 1);
-                cmp.set('v.items', items);
+                cmp.set("v.items", items);
 
                 isContainerEmpty = items.length === 0;
 
@@ -312,14 +318,20 @@
                 } else {
                     this.setFocusRightPill(i, cmp);
                 }
-                cmp.get("e.pillRemoved").fire();
-                break;
+                if (fireRemovedEvent) {
+                    var pillRemovedEvent = cmp.get("e.pillRemoved");
+                    if (data.params) {
+                        pillRemovedEvent.setParams(data.params);
+                    }
+                    pillRemovedEvent.fire();
+                }
+				break;
             }
         }
     },
 
     setFocusRightPill : function (index, cmp) {
-        var pillItems = cmp.find('pill');
+        var pillItems = cmp.find("pill");
         var isIndexTheFirstPill = index === 0;
         var nextFocusIndex =  isIndexTheFirstPill ? 1 : index - 1;
 
@@ -328,7 +340,7 @@
     },
 
     _setActiveItem: function(cmp, index) {
-        var pillItems = cmp.find('pill');
+        var pillItems = cmp.find("pill");
         if (pillItems) {
             if (!$A.util.isArray(pillItems)) {
                 pillItems.set("v.active", index === 0);

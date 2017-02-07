@@ -32,18 +32,24 @@
     <aura:handler name="blur" event="ui:blur" action="{!c.onInputFocus}"/>
     <aura:handler name="focus" event="ui:focus" action="{!c.onInputBlur}"/>
     <aura:registerevent name="pillInserted"
-    					access="PRIVILEGED"
+                        access="PRIVILEGED"
                         type="ui:response"
                         description="Event fired when a pill is inserted in this container."/>
 
     <aura:registerevent name="pillRemoved"
-    					access="PRIVILEGED"
+                        access="PRIVILEGED"
                         type="ui:response"
                         description="Event fired when a pill is removed from this container."/>
 
     <aura:method name="insertItems" description="The method called to add new items. Takes in an array of object [{name:'name', id:'id'}, ...]">
         <aura:attribute name="items" type="List"/>
+        <aura:attribute name="fireInsertedEvent" type="Boolean" default="true"/>
     </aura:method>
+    <aura:method name="removeItems" description="The method called to remove items. Takes in an array of object [{name:'name', id:'id'}, ...]">
+        <aura:attribute name="items" type="List"/>
+        <aura:attribute name="fireRemovedEvent" type="Boolean" default="true"/>
+    </aura:method>
+    <aura:method name="clear" description="The method called to empty or clear the list" />
 
     <aura:method name="collapse" description="Collapses the pill list to the number of lines specified in the maxLines attribute"/>
     <aura:method name="expand" description="Expands the pill list after being collapsed from the collapse method"/>

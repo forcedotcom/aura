@@ -17,7 +17,7 @@ package org.auraframework.impl.root.parser.handler.design;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
-import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.design.DesignAttributeDefaultDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.design.DesignAttributeDefaultDefImpl;
@@ -50,7 +50,7 @@ public class DesignAttributeDefaultDefHandler extends ParentedTagHandler<DesignA
 
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
-        ComponentDefRef ref = getDefRefHandler(getParentHandler()).getElement();
+        DefinitionReference ref = getDefRefHandler(getParentHandler()).getElement();
         //For now we only accept adding components to the default.
         if (AURA_HTML.equals(ref.getDescriptor().getQualifiedName())) {
             error("HTML tags are disallowed in attribute defaults, only components may be set.");

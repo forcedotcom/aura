@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDef;
-import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.root.AttributeDefImpl;
@@ -60,7 +60,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
             ATTRIBUTE_SERIALIZE_TO).addAll(ALLOWED_ATTRIBUTES).build();
 
     private final AttributeDefImpl.Builder builder = new AttributeDefImpl.Builder();
-    private final List<ComponentDefRef> body = Lists.newArrayList();
+    private final List<DefinitionReference> body = Lists.newArrayList();
     private String defaultValue = null;
 
     private final Optional<String> defaultType;

@@ -18,8 +18,8 @@ package org.auraframework.impl.design;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.design.DesignAttributeDefaultDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -36,7 +36,7 @@ import java.util.Set;
 public class DesignAttributeDefaultDefImpl extends DefinitionImpl<DesignAttributeDefaultDef> implements DesignAttributeDefaultDef {
     private static final long serialVersionUID = 7728564360281471637L;
 
-    private final List<ComponentDefRef> defaultFacet;
+    private final List<DefinitionReference> defaultFacet;
 
     protected DesignAttributeDefaultDefImpl(Builder builder) {
         super(builder);
@@ -46,7 +46,7 @@ public class DesignAttributeDefaultDefImpl extends DefinitionImpl<DesignAttribut
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
-        for (ComponentDefRef ref : defaultFacet) {
+        for (DefinitionReference ref : defaultFacet) {
             dependencies.add(ref.getDescriptor());
         }
     }
@@ -54,13 +54,13 @@ public class DesignAttributeDefaultDefImpl extends DefinitionImpl<DesignAttribut
     @Override
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
-        for (ComponentDefRef ref : defaultFacet) {
+        for (DefinitionReference ref : defaultFacet) {
             ref.validateReferences();
         }
     }
 
     @Override
-    public List<ComponentDefRef> getComponentRefs() {
+    public List<DefinitionReference> getComponentRefs() {
         return ImmutableList.copyOf(defaultFacet);
     }
 
@@ -68,13 +68,13 @@ public class DesignAttributeDefaultDefImpl extends DefinitionImpl<DesignAttribut
     public void serialize(Json json) throws IOException {}
 
     public static class Builder extends DefinitionImpl.BuilderImpl<DesignAttributeDefaultDef> {
-        private List<ComponentDefRef> defaultFacet = Lists.newArrayList();
+        private List<DefinitionReference> defaultFacet = Lists.newArrayList();
 
         public Builder() {
             super(DesignAttributeDefaultDef.class);
         }
 
-        public void addComponentRef(ComponentDefRef def) {
+        public void addComponentRef(DefinitionReference def) {
             defaultFacet.add(def);
         }
 

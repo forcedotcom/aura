@@ -17,8 +17,8 @@
 package org.auraframework.integration.test.root.parser.handler.design;
 
 import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignAttributeDefaultDef;
 import org.auraframework.def.design.DesignDef;
@@ -41,7 +41,7 @@ public class DesignAttributeDefaultDefHandlerTest extends AuraImplTestCase {
         DesignAttributeDef attribute = createComponentAndDesignWithAttributeDefault("<ui:button label=\"test\"/>");
         DesignAttributeDefaultDef defaultDef = attribute.getAttributeDefault();
         assertNotNull(defaultDef);
-        List<ComponentDefRef> defaultComponents = defaultDef.getComponentRefs();
+        List<DefinitionReference> defaultComponents = defaultDef.getComponentRefs();
         assertEquals("Expected there to be one component ref in the list", 1, defaultComponents.size());
     }
 

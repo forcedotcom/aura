@@ -19,6 +19,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
@@ -62,11 +63,11 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends BaseDefRef
                     .getElement();
             builder.setAttribute(attributeDefRef.getDescriptor(), attributeDefRef);
         } else {
-            ComponentDefRef cdr = getDefRefHandler(getParentHandler()).getElement();
-            if (cdr.isFlavorable() || cdr.hasFlavorableChild()) {
+            DefinitionReference defRef = getDefRefHandler(getParentHandler()).getElement();
+            if (defRef.isFlavorable() || defRef.hasFlavorableChild()) {
                 builder.setHasFlavorableChild(true);
             }
-            body.add(cdr);
+            body.add(defRef);
         }
     }
 

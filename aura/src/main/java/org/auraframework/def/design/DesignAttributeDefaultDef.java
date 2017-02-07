@@ -15,8 +15,8 @@
  */
 package org.auraframework.def.design;
 
-import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionReference;
 
 import java.util.List;
 
@@ -26,5 +26,5 @@ public interface DesignAttributeDefaultDef extends Definition {
      * Returns a list of valid component refs that are listed.
      * @return A non null list. Empty is there are no components
      */
-    List<ComponentDefRef> getComponentRefs();
+    List<DefinitionReference> getComponentRefs();
 }

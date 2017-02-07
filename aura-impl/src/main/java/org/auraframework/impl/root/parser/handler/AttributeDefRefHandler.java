@@ -19,7 +19,7 @@ import com.google.common.collect.ImmutableSet;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDef;
-import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.util.TextTokenizer;
@@ -47,7 +47,7 @@ public class AttributeDefRefHandler<P extends RootDefinition> extends ParentedTa
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_VALUE, ATTRIBUTE_ATTRIBUTE);
 
     private final AttributeDefRefImpl.Builder builder = new AttributeDefRefImpl.Builder();
-    private final List<ComponentDefRef> children = new ArrayList<>();
+    private final List<DefinitionReference> children = new ArrayList<>();
     private String stringValue;
 
     public AttributeDefRefHandler() {

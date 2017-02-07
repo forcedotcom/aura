@@ -234,8 +234,12 @@
             return null;
         }
         itemsSection.iters = iterCmp.get("v.body");
+
+        // original index points to the currently highlighted item or -1 if we're not in item list
+        // highlightedIndex is used to determine the next item to highlight during traversal
         itemsSection.originalIndex = itemsSection.highlightedIndex = this.findHighlightedOptionIndex(itemsSection.iters);
         itemsSection.previous = itemsSection.next = topSection = bottomSection = itemsSection;
+        // if highlightedIndex is not -1, we're inside the item list
         if (itemsSection.highlightedIndex > -1) {
             selectedSection = itemsSection;
         }
@@ -292,6 +296,9 @@
         return selectedSection;
     },
 
+    /**
+     * Creates a basic linked list node for list traversal.
+     */
     _createBasicKeyboardTraversalSection: function () {
         return {
             increment: function () {
@@ -313,37 +320,65 @@
         };
     },
 
+    /**
+     * Creates a linked list node for the item section. For the header and footer,
+     * we use _createBasicKeyboardTraversalSection.
+     */
     _createKeyboardTraversalItemsSection: function (cmp) {
         var self = this;
         return {
-            visited : false,
+            // Counts how many times we have traversed the item section in increment/decrement.
+            // We should only visit the item Section for as many times as the number of items - 1
+            // (- 1 to not include original index).
+            // Since we're using recursion here and we need to wrap around the list when there's
+            // no header or footer, using a count is the most straightforward way to prevent infinite loop.
+            traversalCount: 0,
+
+            // select the next selectable item
+            // if go past the last item, go to the next selectable section (header/footer)
+            // if no selectale section, wrap around to the top and continue traversal
             increment: function () {
                 var resultSection = this;
-                if (!this.visited || this.highlightedIndex+1 <= this.originalIndex ) { //avoid infinite looping
-                    this.highlightedIndex++;
-                    if (this.highlightedIndex >= this.iters.length) {
+                var itemList = this.iters;
+
+                this.highlightedIndex++;
+
+                this.traversalCount++; // ++ before the check to loop only num of items-1 times
+                if (this.traversalCount < itemList.length && this.highlightedIndex !== this.originalIndex) { 
+                    // reached bottom
+                    if (this.highlightedIndex >= itemList.length) {
                         this.highlightedIndex = -1;
-                        this.visited = true;
+                        // go to the next section; if not exists, it'll recurse to wrap around the list
                         resultSection = this.next.incrementedTo();
-                    } else if (!this.iters[this.highlightedIndex].get("v.visible")) {
+                    // go to the current item if selectable
+                    } else if (!itemList[this.highlightedIndex].get("v.visible")) {
                         resultSection = this.incrementedTo();
                     }
                 }
                 return resultSection;
             },
 
+            // select the previous selectable item
+            // if go past the first item, go to the previous selectable section (header/footer)
+            // if no selectale section, wrap around to the bottom and continue traversal
             decrement: function () {
                 var resultSection = this;
-                if (!this.visited || this.highlightedIndex-1 >= this.originalIndex ) { //avoid infinite looping
-                    if (this.highlightedIndex === -1) {
-                        this.highlightedIndex = this.iters.length;
-                    }
-                    this.highlightedIndex--;
+                var itemList = this.iters;
+
+                if (this.highlightedIndex < 0) {
+                    this.highlightedIndex = itemList.length;
+                }
+                this.highlightedIndex--;
+
+                this.traversalCount++; // ++ before the check to loop only num of items-1 times
+                if (this.traversalCount < itemList.length && this.highlightedIndex !== this.originalIndex) {
+                    // reached top
                     if (this.highlightedIndex < 0) {
                         this.highlightedIndex = -1;
-                        this.visited = true;
+                        // go to the previous section; if not exists, it'll recurse to wrap around the list
                         resultSection = this.previous.decrementedTo();
-                    } else if (!this.iters[this.highlightedIndex].get("v.visible")) {
+                    // go to the current item if selectable
+                    } else if (!itemList[this.highlightedIndex].get("v.visible")) {
                         resultSection = this.decrementedTo();
                     }
                 }
@@ -365,8 +400,8 @@
             },
 
             select: function () {
-                if (this.highlightedIndex === -1) { //nothing selected
-                    return;
+                if (this.highlightedIndex < 0 || this.highlightedIndex >= this.iters.length) {
+                    return; // nothing selected
                 }
                 var highlightedCmp = this.iters[this.highlightedIndex];
                 highlightedCmp.set("v.highlighted", true);

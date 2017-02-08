@@ -22,9 +22,9 @@ import org.auraframework.annotations.Annotations.ServiceComponent;
  * Provides file location of aura modules dir
  */
 @ServiceComponent
-public class AuraModuleLocationAdapter extends ComponentLocationAdapter.Impl {
+public class AuraModulesLocationAdapter extends ComponentLocationAdapter.Impl {
 
-    public AuraModuleLocationAdapter() {
-        super(AuraModuleFiles.MODULES_DIR.asFile(), null, "aura_modules");
+    public AuraModulesLocationAdapter() {
+        super(AuraModulesFiles.MODULES_DIR.asFile(), null, "aura_modules");
     }
 }

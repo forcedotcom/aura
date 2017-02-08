@@ -23,15 +23,19 @@ import org.auraframework.util.AuraTextUtil;
 /**
  * Specifies file and paths for aura modules
  */
-public enum AuraModuleFiles {
+public enum AuraModulesFiles {
 
     MODULES_MODULE_DIR(AuraFiles.Core.getPath(), "aura-modules"),
 
-    MODULES_DIR(MODULES_MODULE_DIR.getPath(), "src", "main", "modules");
+    MODULES_DIR(MODULES_MODULE_DIR.getPath(), "src", "main", "modules"),
+
+    MODULES_TEST_MODULES_DIR(MODULES_MODULE_DIR.getPath(), "src", "test", "modules"),
+
+    MODULES_TEST_COMPONENTS_DIR(MODULES_MODULE_DIR.getPath(), "src", "test", "components");
 
     private final String path;
 
-    AuraModuleFiles(String... path) {
+    AuraModulesFiles(String... path) {
         this.path = AuraTextUtil.arrayToString(path, File.separator, -1, false);
     }
 

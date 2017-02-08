@@ -119,49 +119,49 @@
             <artifactId>spring-test</artifactId>
             <scope>test</scope>
         </dependency>
-       <!-- powermockito is picky about version of mockito, please be careful when upgrading any of them -->
-  	   <dependency>
-	      <groupId>org.mockito</groupId>
-	      <artifactId>mockito-core</artifactId>
-	      <version>1.10.16</version>
-	      <scope>test</scope>
-	   </dependency>
-	   <dependency>
-	      <groupId>org.powermock</groupId>
-	      <artifactId>powermock-api-mockito</artifactId>
-	      <version>1.6.4</version>
-	      <scope>test</scope>
-	    </dependency>
-	    <dependency>
-	      <groupId>org.powermock</groupId>
-	      <artifactId>powermock-module-junit4</artifactId>
-	      <version>1.6.4</version>
-	      <scope>test</scope>
-	    </dependency>
-	    <dependency>
-	      <groupId>org.powermock</groupId>
-	      <artifactId>powermock-module-junit4-common</artifactId>
-	      <version>1.6.4</version>
-	      <scope>test</scope>
-	    </dependency>
-	    <dependency>
-	      <groupId>org.powermock</groupId>
-	      <artifactId>powermock-api-support</artifactId>
-	      <version>1.6.4</version>
-	      <scope>test</scope>
-	    </dependency>
-	    <dependency>
-	      <groupId>org.powermock</groupId>
-	      <artifactId>powermock-core</artifactId>
-	      <version>1.6.4</version>
-	      <scope>test</scope>
-	    </dependency>
-	    <dependency>
-	      <groupId>org.powermock</groupId>
-	      <artifactId>powermock-reflect</artifactId>
-	      <version>1.6.4</version>
-	      <scope>test</scope>
-	    </dependency>
+        <!-- powermockito is picky about version of mockito, please be careful when upgrading any of them -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>1.10.16</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <version>1.6.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>1.6.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4-common</artifactId>
+            <version>1.6.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-support</artifactId>
+            <version>1.6.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-core</artifactId>
+            <version>1.6.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-reflect</artifactId>
+            <version>1.6.4</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
     <dependencyManagement>
@@ -202,6 +202,12 @@
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-modules</artifactId>
                 <version>0.5252-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.auraframework</groupId>
+                <artifactId>aura-modules</artifactId>
+                <version>0.5252-SNAPSHOT</version>
+                <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
@@ -575,6 +581,7 @@
                         <exclude>**/.index</exclude>
                         <exclude>**/version.prop</exclude>
                         <exclude>aura-resources/src/main/resources/**</exclude>
+                        <exclude>aura-modules/src/main/resources/**</exclude>
                         <exclude>aura-archetype/src/main/resources/archetype-resources/**</exclude>
                         <exclude>**/target/**</exclude>
                     </excludes>

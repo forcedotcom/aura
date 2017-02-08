@@ -35,6 +35,7 @@
     <aura:attribute name="optionVar" access="PRIVILEGED" type="String" description="The name by which to refer to the current data object inside of the template for each option."/>
     <aura:attribute name="propertyToMatch" type="String" default="label" description="The property name in the data object which is used to match typing in the input field."/>
     <aura:attribute name="matchFunc" access="PRIVILEGED" type="Aura.Action" description="Overrides default list item update behavior to allow custom text matching."/>
+    <aura:attribute name="disableMatch" type="boolean" default="false" description="Indicates whether to disable keyword matching. The default is false."/>
     <aura:attribute name="listOption" access="PRIVILEGED" type="Aura.ComponentDefRef[]" description="A ComponentDefRef to use as the template for each generated option in the list."/>
     <aura:attribute name="listHeader" type="Aura.Component[]" description="A facet above the rendered list, for use as a list header"/>
     <aura:attribute name="listFooter" type="Aura.Component[]" description="A facet below the rendered list, for use as a list footer"/>
@@ -123,6 +124,7 @@
                                      selectListOption="{!c.handleSelectOption}"
                                      updateAriaAttributes="{!c.updateAriaAttributes}"
                                      matchFunc="{!v.matchFunc}"
+                                     disableMatch="{!v.disableMatch}"
                                      setDefaultHighlight="{!v.setDefaultHighlight}"
                                      showEmptyList="{!v.showEmptyList}"/>
             </ui:autocompletePanel>
@@ -145,6 +147,7 @@
                                      selectListOption="{!c.handleSelectOption}"
                                      updateAriaAttributes="{!c.updateAriaAttributes}"
                                      matchFunc="{!v.matchFunc}"
+                                     disableMatch="{!v.disableMatch}"
                                      setDefaultHighlight="{!v.setDefaultHighlight}"
                                      showEmptyList="{!v.showEmptyList}"/>
             </aura:set>

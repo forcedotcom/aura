@@ -34,6 +34,7 @@
     <aura:attribute name="setDefaultHighlight" type="boolean" default="true" description="Specifies whether the first option item should be highlighted by default. The default is true."/>
     <aura:attribute name="listReferenceComponent" type="Aura.Component[]" description="Sets the component that the list is displayed under"/>
     <aura:attribute name="loadingIndicatorDelay" type="Integer" default="300" description="Amount of time (ms) to delay before displaying the loading indicator when fetching data. The default is 300ms."/>
+    <aura:attribute name="disableMatch" type="boolean" default="false" description="Indicates whether to disable keyword matching. The default is false."/>
     <aura:attribute name="showEmptyList" type="boolean" default="false" description="Indicates if an empty list is visible when the keyword attribute is empty. The default is false."/>
 
     <aura:registerEvent name="matchDone" type="ui:matchDone" description="The event fired when the matching is done."/>

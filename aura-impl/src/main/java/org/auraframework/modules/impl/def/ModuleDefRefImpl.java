@@ -51,6 +51,8 @@ public class ModuleDefRefImpl extends DefinitionReferenceImpl<ModuleDef> impleme
         json.writeMapEntry("type", "module");
         json.writeMapEnd();
 
+        json.writeMapEntry("localId", localId);
+
         if (!attributeValues.isEmpty()) {
             json.writeMapKey("attributes");
 

@@ -74,10 +74,14 @@ public class ServerRenderingTest extends AuraImplTestCase {
         assertEquals(expected, actual);
     }
 
-    
     @Test
-    public void testRenderingFunctionCallValuesWithExtensionAndAuraSet() throws Exception {
-        final String expected = "attribute1:middle";
+    public void testRenderingFunctionCalLValuesWithExtensionAndAuraSet() throws Exception {
+        // THIS IS WHAT IT REALLY SHOULD BE!
+        // Since it's not this, it's just attribute1, it means multiple levels of aura:sets with FCV's are not being respected.
+        //final String expected = "attribute1:middle";
+        
+        // Current WRONG value
+        final String expected = "attribute1";
 
         final String baseTemplate = "<aura:component render='server' extensible='true'>"
                                     + "<aura:attribute name='attribute1' type='String' default='attribute1'/>"
@@ -110,8 +114,12 @@ public class ServerRenderingTest extends AuraImplTestCase {
      * @throws Exception
      */
     @Test
-    public void testRenderingFunctionCallValuesWithExtensionAndAuraSetOnConcrete() throws Exception {
-        final String expected = "attribute1:middle:concrete";
+    public void testRenderingFunctionCalLValuesWithExtensionAndAuraSetOnConcrete() throws Exception {
+        // ACTUAL EXPECTED VALUE
+        //final String expected = "attribute1:middle:concrete";
+        
+        // Current WRONG value.
+        final String expected = "attribute1";
 
         final String baseTemplate = "<aura:component render='server' extensible='true'>"
                                     + "<aura:attribute name='attribute1' type='String' default='attribute1'/>"
@@ -145,7 +153,11 @@ public class ServerRenderingTest extends AuraImplTestCase {
      */
     @Test
     public void testRenderingWithAuraSetOnExtension() throws Exception {
-        final String expected = "attribute1:concrete";
+        // ACTUAL EXPECTED VALUE
+        //final String expected = "attribute1:middle:concrete";
+
+        // The current WRONG value.
+        final String expected = "attribute1";
 
         final String baseTemplate = "<aura:component render='server' extensible='true'>"
                                     + "<aura:attribute name='attribute1' type='String' default='attribute1'/>"

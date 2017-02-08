@@ -25,13 +25,13 @@
  * @constructor
  * @protected
  */
-function AttributeSet(attributeDefSet) {
+function AttributeSet(attributes, attributeDefSet) {
 	this.values = {};
     this.shadowValues={};
     this.decorators={};
 	this.attributeDefSet = attributeDefSet;
 
-	//this.initialize(attributes);
+	this.initialize(attributes);
 
 	// #if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 	this["values"] = this.values;

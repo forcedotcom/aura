@@ -81,11 +81,11 @@ function TextComponent(config, localCreation) {
     this.attributeValueProvider = configAttributes["valueProvider"];
     this.facetValueProvider = configAttributes["facetValueProvider"];
 
-    // create all value providers for this component m/v/c etc.
-    this.setupValueProviders(config["valueProviders"]);
-
     // initialize attributes
     this.setupAttributes(this, configAttributes);
+
+    // create all value providers for this component m/v/c etc.
+    this.setupValueProviders(config["valueProviders"]);
 
     // index this component with its value provider (if it has a localid)
     this.doIndex(this);
@@ -110,7 +110,7 @@ TextComponent.prototype.getSuperest = function(){ return this; };
 TextComponent.prototype.setupValueProviders = function(customValueProviders) {
     var vp=this.valueProviders;
 
-    vp["v"]=this.attributeSet = new AttributeSet(this.componentDef.attributeDefs);
+    vp["v"]=this.attributeSet;
     vp["this"]=this;
     vp["globalid"]=this.globalId;
     vp["def"]=this.componentDef;

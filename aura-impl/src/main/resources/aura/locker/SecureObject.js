@@ -328,7 +328,8 @@ function getArrayLikeThingProxyHandler(key) {
 		    				break;
 
 		    			default:
-		    				throw new Error("Unsupported " + raw + " method: " + property);
+		    				$A.warning("Unsupported " + raw + " method: " + property + ". Returning undefined");
+							return undefined;
 		    		}
 		    	} else {
 			        ret = getFromFiltered(handler, filtered, property);		    		

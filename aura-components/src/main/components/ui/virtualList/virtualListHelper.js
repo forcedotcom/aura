@@ -82,7 +82,8 @@
     ignorePTVChanges: function (cmp, ignore) {
         var templateMap = cmp._templateMap;
         
-        for (var templateData in templateMap) {
+        for (var key in templateMap) {
+            var templateData = templateMap[key];
             if (templateData.ptv) {
                 templateData.ptv.sync = ignore;
                 templateData.ptv.ignoreChanges = ignore;

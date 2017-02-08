@@ -41,6 +41,13 @@ ControllerDef.prototype.getDescriptor = function(){
 };
 
 /**
+ * Check if an action def exists.
+ */
+ControllerDef.prototype.hasActionDef = function(key){
+    return this.actionDefs.hasOwnProperty(key);
+};
+
+/**
  * Gets the Action Definition.
  * @param {String} key The data key to look up on the element.
  * @returns {Object}

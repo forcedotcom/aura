@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * Tests to verify AuraComponentService.newComponentAsync() or $A.newCmpAsync()
- */
 ({
     /**
      * Verify creation of a component whose definition is available at the client.
@@ -25,19 +22,19 @@
             var actionComplete = false;
             // block server requests to ensure this is run entirely on the client
             $A.test.blockRequests();
-            $A.test.addCleanup(function(){ $A.test.releaseRequests() });
-            $A.newCmpAsync(this, function(newCmp){
+            $A.test.addCleanup(function(){ $A.test.releaseRequests(); });
+            $A.createComponent("aura:text", null, function(newCmp, status){
+                $A.test.assertEquals("SUCCESS", status);
                 var body = cmp.get("v.body");
                 body.push(newCmp);
                 cmp.set("v.body", body);
                 actionComplete = true;
-            }, "markup://aura:text");
+            });
 
             $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
                 var body = cmp.get('v.body');
                 $A.test.assertEquals(1, body.length);
                 $A.test.assertEquals("markup://aura:text", body[0].getDef().getDescriptor().getQualifiedName());
-                $A.test.assertEquals("0:c", body[0].getGlobalId());
             });
         }
     },
@@ -51,20 +48,19 @@
             var actionComplete = false;
              // block server requests to ensure this is run entirely on the client
             $A.test.blockRequests();
-            $A.test.addCleanup(function(){ $A.test.releaseRequests() });
+            $A.test.addCleanup(function(){ $A.test.releaseRequests(); });
 
-            $A.newCmpAsync(this, function(newCmp){
+            $A.createComponent("loadLevelTest:clientComponent", null, function(newCmp){
                 var body = cmp.get("v.body");
                 body.push(newCmp);
                 cmp.set("v.body", body);
                 actionComplete = true;
-            }, "markup://loadLevelTest:clientComponent");
+            });
 
             $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
                 var body = cmp.get('v.body');
                 $A.test.assertEquals(1, body.length);
                 $A.test.assertEquals("markup://loadLevelTest:clientComponent", body[0].getDef().getDescriptor().getQualifiedName());
-                $A.test.assertEquals("0:c", body[0].getGlobalId());
             });
         }
     },
@@ -77,52 +73,39 @@
         test: [
         function(cmp) {
             var actionComplete = false;
-            $A.newCmpAsync(
-                    this,
-                    function(newCmp) {
-                        var body = cmp.get("v.body");
-                        body.push(newCmp);
-                        cmp.set("v.body", body);
-                        actionComplete = true;
-                    },
-                    {
-                        componentDef: "markup://loadLevelTest:displayNumber",
-                        attributes : { values : { number : 99 } }
-                    }
-            );
+            $A.createComponent("loadLevelTest:displayNumber", { number : 99 }, function(newCmp){
+                var body = cmp.get("v.body");
+                body.push(newCmp);
+                cmp.set("v.body", body);
+                actionComplete = true;
+            });
 
             $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
                 var textCmp = cmp.get('v.body')[0];
                 //Since this is created under root component and this is the first component from the server
-                $A.test.assertEquals("1:2;a",textCmp.getGlobalId(), "Expected global id to be 1:2;a");
-                $A.test.assertEquals(99,textCmp.get('v.number'), "Failed to pass attribute values to created component");
-                $A.test.assertEquals("99",$A.test.getTextByComponent(textCmp), "Failed to pass attribute values to created component");
+                $A.test.assertEquals("1:2;a", textCmp.getGlobalId(), "Expected global id to be 1:2;a");
+                $A.test.assertEquals(99, textCmp.get('v.number'), "Failed to pass attribute values to created component");
+                $A.test.assertEquals("99", $A.test.getTextByComponent(textCmp), "Failed to pass attribute values to created component");
             });
         },
         function(cmp) {
             var actionComplete = false;
             // After retrieving the cmp from the server, it should be saved on the client in the def registry
             $A.test.blockRequests(); // block server requests to ensure this is run entirely on the client
-            $A.test.addCleanup(function(){ $A.test.releaseRequests() });
-            $A.newCmpAsync(
-                this,
-                function(newCmp) {
-                    var body = cmp.get("v.body");
-                    body.push(newCmp);
-                    cmp.set("v.body", body);
-                    actionComplete = true;
-                },
-                {
-                    componentDef: "markup://loadLevelTest:displayNumber",
-                    attributes: { values: { number: 100 } }
-                }
-            );
+            $A.test.addCleanup(function(){ $A.test.releaseRequests(); });
+            $A.createComponent("loadLevelTest:displayNumber", { number : 100 }, function(newCmp){
+                var body = cmp.get("v.body");
+                body.push(newCmp);
+                cmp.set("v.body", body);
+                actionComplete = true;
+            });
+
             $A.test.addWaitFor(true, function(){ return actionComplete; });
         },
         function(cmp){
         	 var textCmp = cmp.get('v.body')[1];
-             $A.test.assertEquals(100,textCmp.get('v.number'), "Failed to pass attribute values to created component");
-             $A.test.assertEquals("100",$A.test.getTextByComponent(textCmp), "Failed to pass attribute values to created component");
+             $A.test.assertEquals(100, textCmp.get('v.number'), "Failed to pass attribute values to created component");
+             $A.test.assertEquals("100", $A.test.getTextByComponent(textCmp), "Failed to pass attribute values to created component");
         }]
     },
 
@@ -133,25 +116,18 @@
     testCreatePreloadedDefWithServerDependencies:{
         test:function(cmp){
             var actionComplete = false;
-            $A.newCmpAsync(
-                    this,
-                    function(newCmp) {
-                        var body = cmp.get("v.body");
-                        body.push(newCmp);
-                        cmp.set("v.body", body);
-                        actionComplete = true;
-                    },
-                    {
-                        componentDef: "markup://loadLevelTest:serverComponent",
-                        attributes: { values: { stringAttribute:'creatingComponentWithServerDependecies' } }
-                    }
-            );
+            $A.createComponent("loadLevelTest:serverComponent", { stringAttribute:"creatingComponentWithServerDependecies" }, function(newCmp){
+                var body = cmp.get("v.body");
+                body.push(newCmp);
+                cmp.set("v.body", body);
+                actionComplete = true;
+            });
 
             $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
                 var serverCmp = cmp.get('v.body')[0];
-                $A.test.assertEquals('creatingComponentWithServerDependecies',serverCmp.get("m.string"),
+                $A.test.assertEquals('creatingComponentWithServerDependecies', serverCmp.get("m.string"),
                         "Failed to send attribute with post action, model did not get the attribute required.");
-                $A.test.assertTrue($A.test.getTextByComponent(serverCmp).indexOf('creatingComponentWithServerDependecies')!=-1,
+                $A.test.assertTrue($A.test.getTextByComponent(serverCmp).indexOf('creatingComponentWithServerDependecies')!==-1,
                         "Failed to set model value for local component");
             });
         }
@@ -165,18 +141,12 @@
         test:function(cmp){
             var origCount = $A.test.getSentRequestCount();
             var actionComplete = false;
-            $A.newCmpAsync(
-                    this,
-                    function(newCmp) {
-                        var body = cmp.get("v.body");
-                        body.push(newCmp);
-                        cmp.set("v.body", body);
-                        actionComplete = true;
-                    },
-                    {
-                        componentDef: "markup://loadLevelTest:serverWithInnerServerCmp"
-                    }
-            );
+            $A.createComponent("loadLevelTest:serverWithInnerServerCmp", null, function(newCmp){
+                var body = cmp.get("v.body");
+                body.push(newCmp);
+                cmp.set("v.body", body);
+                actionComplete = true;
+            });
 
             $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
                 $A.test.assertEquals("markup://loadLevelTest:serverWithInnerServerCmp",
@@ -192,23 +162,19 @@
      * dependencies (in this case, a model).
      * TODO: W-2365060
      */
-    _testPreloadedDefWithNonPreloadedInnerCmp : {
+    testPreloadedDefWithNonPreloadedInnerCmp : {
         test : function(cmp) {
             var actionComplete = false;
-            $A.newCmpAsync(
-                this,
-                function(newCmp) {
-                	var body = cmp.get("v.body");
-                    body.push(newCmp);
-                    cmp.set("v.body", body);
-                    actionComplete = true;
-                },
-                "markup://loadLevelTest:clientWithServerChild"
-            );
+            $A.createComponent("loadLevelTest:clientWithServerChild", null, function(newCmp){
+                var body = cmp.get("v.body");
+                body.push(newCmp);
+                cmp.set("v.body", body);
+                actionComplete = true;
+            });
 
             $A.test.addWaitFor(true, function(){ return actionComplete; }, function() {
                 var body = cmp.get('v.body');
-                $A.test.assertEquals(1,body.length);
+                $A.test.assertEquals(1, body.length);
                 $A.test.assertEquals("markup://loadLevelTest:clientWithServerChild",
                         body[0].getDef().getDescriptor().getQualifiedName());
                 var cmpText = $A.test.getTextByComponent(body[0]);
@@ -225,127 +191,35 @@
     testCreateArrayOfComponents:{
         test: function(cmp){
             var actionComplete = false;
-            $A.newCmpAsync(
-                    this,
-                    function(newCmps) {
-                        $A.test.assertTrue($A.util.isArray(newCmps) && newCmps.length === 4,
-                            'Should be array of components of length 4');
-                        var body = cmp.get("v.body");
-                        body = body.concat(newCmps);
-                        cmp.set("v.body", body);
-                        actionComplete = true;
-                    },
-                    [{
-                        componentDef: "markup://aura:text",
-                        attributes:{
-                            values:{
-                                value:"TextComponent"
-                            }
-                        }
-                    },
+            $A.createComponents([
+                    ["aura:text", { value:"TextComponent" }],
                     // Component not available on the client, must go to server
-                    {
-                        componentDef: "markup://loadLevelTest:displayNumber",
-                        attributes: {
-                            values: {
-                                number: 99
-                            }
-                        }
-                    },
-                    {
-                        componentDef: "markup://aura:text",
-                        attributes:{
-                            values:{
-                                value:"TextComponent2"
-                            }
-                        }
-                    },
+                    ["loadLevelTest:displayNumber", { number:99 }],
+                    ["aura:text", { value:"TextComponent2" }],
                     // Component not available on the client, must go to server
-                    {
-                        componentDef: "markup://loadLevelTest:displayNumber",
-                        attributes: {
-                            values: {
-                                number: 100
-                            }
-                        }
-                    }]
+                    ["loadLevelTest:displayNumber", { number:100 }]
+                ], function(newCmps, status) {
+                    $A.test.assertTrue($A.util.isArray(newCmps) && newCmps.length === 4,
+                        'Should be array of components of length 4');
+                    var body = cmp.get("v.body");
+                    body = body.concat(newCmps);
+                    cmp.set("v.body", body);
+                    $A.test.assertEquals("SUCCESS", status);
+                    actionComplete = true;
+                }
             );
 
             $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
                 var body = cmp.get('v.body');
-                $A.test.assertEquals(4,body.length);
+                $A.test.assertEquals(4, body.length);
                 $A.test.assertEquals("markup://aura:text", body[0].getDef().getDescriptor().getQualifiedName());
-                $A.test.assertEquals("TextComponent",$A.test.getTextByComponent(body[0]));
+                $A.test.assertEquals("TextComponent", $A.test.getTextByComponent(body[0]));
                 $A.test.assertEquals("markup://loadLevelTest:displayNumber", body[1].getDef().getDescriptor().getQualifiedName());
-                $A.test.assertEquals("99",$A.test.getTextByComponent(body[1]));
+                $A.test.assertEquals("99", $A.test.getTextByComponent(body[1]));
                 $A.test.assertEquals("markup://aura:text", body[2].getDef().getDescriptor().getQualifiedName());
-                $A.test.assertEquals("TextComponent2",$A.test.getTextByComponent(body[2]));
+                $A.test.assertEquals("TextComponent2", $A.test.getTextByComponent(body[2]));
                 $A.test.assertEquals("markup://loadLevelTest:displayNumber", body[3].getDef().getDescriptor().getQualifiedName());
-                $A.test.assertEquals("100",$A.test.getTextByComponent(body[3]));
-            });
-        }
-    },
-
-    testReturnsSUCCESSStateForLocalComponentType:{
-        test: function(cmp){
-            var expected="SUCCESS";
-            var actual=null;
-            var actionComplete = false
-
-            $A.newCmpAsync(
-                    this,
-                    function(newCmps, status) {
-                        actual = status;
-                        actionComplete = true;
-                    },
-                    {
-                        componentDef: "markup://aura:text",
-                        attributes:{
-                            values:{
-                                value:"TextComponent"
-                            }
-                        }
-                    }
-            );
-
-            $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
-                $A.test.assertEquals(expected, actual);
-            });
-        }
-    },
-
-    testPassesSUCCESSIfNoErrorsWhenCreatingMultipleComponents: {
-        test: function(cmp) {
-            var expected="SUCCESS";
-            var actual;
-            var actionComplete = false;
-
-            $A.newCmpAsync(
-                    this,
-                    function(newCmps, overallStatus) {
-                        actual = overallStatus;
-                        actionComplete = true;
-                    },
-                    [{
-                        componentDef: "markup://aura:text",
-                        attributes:{ values:{ value:"TextComponent1" } }
-                    },
-                    {
-                        componentDef: "markup://aura:text",
-                        attributes:{ values:{ value:"TextComponent2" } }
-                    },
-                    {
-                        componentDef: "markup://aura:text",
-                        attributes:{ values:{ value:"TextComponent3" } }
-                    },
-                    {
-                        componentDef: "markup://aura:text",
-                        attributes:{ values:{ value:"TextComponent4" } }
-                    }]
-            );
-            
-            $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
-                $A.test.assertEquals(expected, actual);
+                $A.test.assertEquals("100", $A.test.getTextByComponent(body[3]));
             });
         }
     },
@@ -353,127 +227,64 @@
     testPassesERRORIfOneComponentErrorsWhenCreatingMultipleComponents: {
         test: function(cmp) {
             var expected="ERROR";
+            var expectedList="SUCCESS,SUCCESS,ERROR,SUCCESS,";
             var actual;
+            var actualList;
             var actionComplete = false;
 
-            $A.newCmpAsync(
-                    this,
-                    function(newCmps, overallStatus) {
-                        actual = overallStatus;
-                        actionComplete = true;
-                    },
-                    [{
-                        componentDef: "markup://aura:text",
-                        attributes:{ values:{ value:"TextComponent1" } }
-                    },
-                    {
-                        componentDef: "markup://ui:button",
-                        attributes:{ values:{ label: "Button1" } }
-                    },
-                    {
-                        componentDef: "markup://aura:text",
-                        attributes:{ values:{ value:"TextComponent2" } }
-                    },
-                    {
-                        componentDef: "markup://bogus:bogus",
-                        attributes:{ values:{ value:"merp" } }
-                    },
-                    {
-                        componentDef: "markup://aura:text",
-                        attributes:{ values:{ value:"TextComponent3" } }
-                    }]
-            );
-            
+            $A.createComponents([
+                [ "aura:text", { value:"TextComponent1" } ],
+                [ "aura:text", { value:"TextComponent2" } ],
+                [ "bogus:bogus", {} ],
+                [ "aura:text", { value:"TextComponent3" } ]
+            ], function(newCmps, overallStatus, statusList) {
+                actual = overallStatus;
+                actualList="";
+                statusList.forEach(function(item){
+                    actualList += item.status + ",";
+                });
+                actionComplete = true;
+            });
+
             $A.test.addWaitFor(true, function(){ return actionComplete; }, function() {
-                $A.test.assertEquals(expected,actual);
+                $A.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expectedList, actualList);
             });
         }
     },
-    
+
     testPassesINCOMPLETEIfOneComponentTimesoutWhenCreatingMultipleComponents: {
         // TODO(W-2537764): IE < 10 gives Access Denied error when trying to send XHRs after setServerReachable(false)
         browsers: ["-IE7", "-IE8", "-IE9"],
         test: function(cmp) {
             var expected="INCOMPLETE";
+            var expectedList="SUCCESS,SUCCESS,INCOMPLETE,";
             var actual;
+            var actualList;
             var actionComplete = false;
             $A.test.setServerReachable(false);
-            
-            $A.newCmpAsync(
-                    this,
-                    function(newCmps, overallStatus) {
-                        actual = overallStatus;
-                        $A.test.setServerReachable(true);
-                        actionComplete = true;
-                    },
-                    [{
-                        componentDef: "markup://aura:text",
-                        attributes:{ values:{ value:"TextComponent1" } }
-                    },
-                    {
-                        componentDef: "markup://ui:button",
-                        attributes:{ values:{ label: "Button1" } }
-                    },
-                    {
-                        componentDef: "markup://aura:text",
-                        attributes:{ values:{ value:"TextComponent2" } }
-                    },
-                    {
-                        componentDef: "markup://aura:text",
-                        attributes:{ values:{ value:"TextComponent3" } }
-                    },
-                    {
-                        componentDef: "markup://aura:text",
-                        attributes:{ values:{ value:"TextComponent4" } }
-                    }]
-            );
-            
+
+            $A.createComponents([
+                [ "aura:text", { value:"TextComponent1" } ],
+                [ "aura:text", { value:"TextComponent2" } ],
+                [ "ui:button", { label:"ButtonLabel" } ]
+            ], function(newCmps, status, statusList) {
+                actual = status;
+                actualList="";
+                statusList.forEach(function(item){
+                    actualList += item.status + ",";
+                });
+                $A.test.setServerReachable(true);
+                actionComplete = true;
+            });
+
             $A.test.addWaitFor(true, function(){ return actionComplete; }, function() {
-                $A.test.assertEquals(expected,actual);
+                $A.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expectedList, actualList);
             });
         }
     },
-    
-    testPassesStatusListWithDetailedInfoWhenCreatingMultipleComponents: {
-        test: function(cmp) {
-            var expected="SUCCESS,SUCCESS,SUCCESS,ERROR,SUCCESS";
-            var actual;
-            var actionComplete = false;
-            
-            $A.newCmpAsync(
-                    this,
-                    function(newCmps, overallStatus, statusList) {
-                        actual = statusList.join(',');
-                        actionComplete = true;
-                    },
-                    [{
-                        componentDef: "markup://aura:text",
-                        attributes:{ values:{ value:"TextComponent1" } }
-                    },
-                    {
-                        componentDef: "markup://ui:button",
-                        attributes:{ values:{ label: "Button1" } }
-                    },
-                    {
-                        componentDef: "markup://aura:text",
-                        attributes:{ values:{ value:"TextComponent2" } }
-                    },
-                    {
-                        componentDef: "markup://bogus:bogus",
-                        attributes:{ values:{ value:"merp" } }
-                    },
-                    {
-                        componentDef: "markup://aura:text",
-                        attributes:{ values:{ value:"TextComponent3" } }
-                    }]
-            );
-            
-            $A.test.addWaitFor(true, function(){ return actionComplete; }, function() {
-                $A.test.assertEquals(expected,actual);
-            });
-        }
-    },
-    
+
     /**
      * Test to verify creating an invalid component returns proper error.
      * test:test_Preload_BadCmp has two attributes with the same name.
@@ -481,122 +292,15 @@
     testCreateBadServerComponent:{
         test: function(cmp){
             var actionComplete = false;
-            $A.newCmpAsync(
-                    this,
-                    function(newCmp) {
-                    	var body = cmp.get("v.body");
-                        body.push(newCmp);
-                        cmp.set("v.body", body);
-                        actionComplete = true;
-                    },
-                    "test:test_Preload_BadCmp"
-            );
-
-            $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
-                var errorCmp = cmp.get('v.body')[0];
-                var errorMsg = errorCmp.get("v.value");
-                $A.test.assertTrue($A.test.contains(errorMsg, "There is already an attribute named 'dup' on component 'test:test_Preload_BadCmp'."),
+            $A.createComponent("test:test_Preload_BadCmp", null, function(newCmp, status, statusDetail) {
+                $A.test.assertNull(newCmp, "No component expected on error");
+                $A.test.assertEquals("ERROR", status, "Wrong status");
+                $A.test.assertTrue($A.test.contains(statusDetail, "There is already an attribute named 'dup' on component 'test:test_Preload_BadCmp'."),
                         "Incorrect error message returned in error component when trying to create invalid component");
-            });
-        }
-    },
-
-    /**
-     * Test to verify trying to create a non-existent component returns proper error.
-     */
-    testCreateNonExistingComponent:{
-        test: function(cmp){
-            var actionComplete = false;
-            $A.run(function(){
-                $A.newCmpAsync(
-                        this,
-                        function(newCmp) {
-                            var body = cmp.get("v.body");
-                            body.push(newCmp);
-                            cmp.set("v.body", body);
-                            actionComplete = true;
-                        },
-                        "foo:hallelujah"
-                );
+                actionComplete = true;
             });
 
-            $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
-                var errorCmp = cmp.get('v.body')[0];
-                var errorMsg = errorCmp.get("v.value");
-                $A.test.assertTrue($A.test.contains(errorMsg, 'No COMPONENT named markup://foo:hallelujah found'),
-                        "Incorrect error message returned in error component when trying to create invalid component");
-            });
-        }
-    },
-
-    /**
-     * Create a component and initialize it with simple attributes.
-     * This componentDef is available at the client registry.
-     */
-    testCreateComponentWithSimpleAttributes:{
-        test: [function(cmp){
-            var actionComplete = false;
-            $A.newCmpAsync(
-                    this,
-                    function(newCmp) {
-                        var body = cmp.get("v.body");
-                        body.push(newCmp);
-                        cmp.set("v.body", body);
-                        actionComplete = true;
-                    },
-                    {
-                        componentDef: "markup://aura:text",
-                        attributes: {
-                            values: {
-                                truncate: 6,
-                                value: "TextComponent"
-                            }
-                        }
-                    }
-            );
-
-            $A.test.addWaitFor(true, function(){ return actionComplete; });
-        }, function(cmp){
-            var body = cmp.get('v.body');
-            $A.test.assertEquals(1,body.length);
-            $A.test.assertEquals("markup://aura:text",body[0].getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals("TextComponent",body[0].get('v.value'));
-            $A.test.assertEquals(6,body[0].get('v.truncate'));
-            $A.test.assertEquals("Tex...",$A.test.getText(body[0].getElement()));
-        }]
-    },
-
-    /**
-     * Create a component and initialize it with string array type attribute.
-     * The definition in this case for the component is not available at the client yet.
-     *
-     */
-    testCreateComponentWithComplexAttributes:{
-        test: function(cmp){
-            var actionComplete = false;
-            $A.newCmpAsync(
-                    this,
-                    function(newCmp) {
-                        var body = cmp.get("v.body");
-                        body.push(newCmp);
-                        cmp.set("v.body", body);
-                        actionComplete = true;
-                    },
-                    {
-                        componentDef: "markup://loadLevelTest:displayStringArray",
-                        attributes:{
-                            values:{
-                                StringArray:['one','two']
-                            }
-                        }
-                    }
-            );
-
-            $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
-                var textCmp = cmp.get('v.body')[0];
-                $A.test.assertEquals("one,two", textCmp.get('v.StringArray').toString(), "Failed to pass array attribute values to placeholder");
-                $A.test.assertEquals('onetwo',$A.test.getTextByComponent(textCmp), "Failed to pass array attribute values to placeholder");
-            });
+            $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){});
         }
     },
 
@@ -606,16 +310,12 @@
     testCreateAbstractComponent: {
         test: function(cmp){
             var actionComplete = false;
-            $A.newCmpAsync(
-                this,
-                function(newCmp) {
-                	var body = cmp.get("v.body");
-                    body.push(newCmp);
-                    cmp.set("v.body", body);
-                    actionComplete = true;
-                },
-                "test:test_Provider_AbstractBasic"
-            );
+            $A.createComponent("test:test_Provider_AbstractBasic", null, function(newCmp) {
+            	var body = cmp.get("v.body");
+                body.push(newCmp);
+                cmp.set("v.body", body);
+                actionComplete = true;
+            });
 
             $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
                 var newCmp = cmp.get('v.body')[0];
@@ -626,251 +326,18 @@
         }
     },
 
-    testCreateCmpNoDescriptor: {
-        test:function(cmp){
-            aura.test.setTestTimeout(15000);
-            var config = {/*componentDef: "markup://loadLevelTest:displayNumber",*/
-                                attributes:{values:{number:{descriptor:'number', value:99}}}
-                            };
-            try{
-                $A.newCmpAsync(this, function(){},config);
-                $A.test.fail('Should have failed to create component without a descriptor.');
-            }catch(e){
-                $A.test.assertEquals("Assertion Failed!: No ComponentDef descriptor specified : undefined", e.message);
-            }
-        }
-    },
-
-    testNotFullyQualifiedNameInConfig: {
-        test: function(cmp){
-            aura.test.setTestTimeout(15000);
-            var config = {componentDef: "loadLevelTest:displayNumber"};
-            var cmpName;
-            var actionComplete = false;
-
-            $A.newCmpAsync(
-                this,
-                function(newCmp){
-                    cmpName = newCmp.getDef().getDescriptor().getQualifiedName();
-                    actionComplete = true;
-                },
-                config
-            );
-
-            $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
-                $A.test.assertEquals("markup://loadLevelTest:displayNumber", cmpName,
-                        "Failed to create component without fully qualified name in config's componenetDef field");
-            });
-        }
-    },
-
-    testStringConfigAsNotFullyQualifiedName: {
-        test: function(cmp){
-            aura.test.setTestTimeout(15000);
-            var config = "loadLevelTest:displayNumber";
-            var cmpName;
-            var actionComplete = false;
-
-            $A.newCmpAsync(
-                this,
-                function(newCmp){
-                    cmpName = newCmp.getDef().getDescriptor().getQualifiedName();
-                    actionComplete = true;
-                },
-                config
-            );
-            
-            $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
-                $A.test.assertEquals("markup://loadLevelTest:displayNumber", cmpName,
-                        "Failed to create component without fully qualified name as config");
-            });
-        }
-    },
-
-    testNoConfig: {
-        test: function(cmp){
-            aura.test.setTestTimeout(15000);
-            try{
-                $A.newCmpAsync(this, function(){},'');
-                $A.test.fail('Should have failed to create component without a descriptor.');
-            }catch(e){
-                $A.test.assertTrue(e.message.indexOf("Assertion Failed!: ComponentService.newComponentAsync(): 'config' must be a valid Object.")===0);
-            }
-        }
-    },
-
-    testAlternateConfigFormat: {
-        test: function(cmp){
-            aura.test.setTestTimeout(15000);
-            //Verify that this format for config is supported
-            var config = {componentDef:{descriptor:"markup://loadLevelTest:displayNumber"}};
-            var cmpName;
-            $A.run(function(){
-                $A.newCmpAsync(
-                    this,
-                    function(newCmp){
-                        cmpName = newCmp.getDef().getDescriptor().getQualifiedName();
-                    },
-                    config
-                );
-            });
-            $A.test.addWaitFor(false, $A.test.isActionPending, function(){
-                $A.test.assertEquals("markup://loadLevelTest:displayNumber", cmpName,
-                        "Alternative config format did not create proper component");
-            });
-        }
-    },
-
-    // TODO: W-2406307: remaining Halo test failure
-    _testMissingRequiredAttribute:{
-        test:function(cmp){
-            try{
-                $A.newCmpAsync(this, function(){}, "markup://aura:renderIf");
-                $A.test.fail('Should have failed to create component without a descriptor.');
-            }catch(e){
-                $A.test.assertEquals("Missing required attribute isTrue",e.message);
-            }
-        }
-    },
-
-    /**
-     * Passing null in for the callback scope should use the global context, and work as expected in this case.
-     */
-    testNullCallbackScope: {
-        test: function(cmp){
-            var actionComplete = false;
-            $A.newCmpAsync(
-                    null,
-                    function(newCmp){
-                        var body = cmp.get("v.body");
-                        body.push(newCmp);
-                        cmp.set("v.body", body);
-                        actionComplete = true;
-                    },
-                    { componentDef: "markup://loadLevelTest:displayNumber",
-                        attributes:{
-                            values:{number:99}
-                        }
-                    }
-            );
-
-            $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
-                var textCmp = cmp.get('v.body')[0];
-                //Since this is created under root component and this is the first component from the server
-                $A.test.assertEquals("1:2;a",textCmp.getGlobalId(), "Expected global id to be 1:4;a");
-                $A.test.assertEquals(99,textCmp.get('v.number'), "Failed to pass attribute values to created component");
-                $A.test.assertEquals("99",$A.test.getTextByComponent(textCmp), "Failed to pass attribute values to created component");
-            });
-        }
-    },
-
-    // TODO(W-2529066): Newly created component not indexed against component it's added to
-    _testSetLocalId:{
-        test: [function(cmp){
-            var actionComplete = false;
-            $A.newCmpAsync(
-                    this,
-                    function(newCmp){
-                    	var body = cmp.get("v.body");
-                        body.push(newCmp);
-                        cmp.set("v.body", body);
-                        actionComplete = true;
-                    },
-                    {
-                        componentDef: "markup://aura:text",
-                        localId: "userLocalId",
-                        attributes: {
-                            values: {
-                                truncate: 6,
-                                value:"TextComponent"
-                            }
-                        }
-                    }
-            );
-
-            $A.test.addWaitFor(true, function(){ return actionComplete; });
-        }, function(cmp){
-            var newCmp = cmp.find("userLocalId");
-            $A.test.assertEquals("markup://aura:text",newCmp.getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals("TextComponent",newCmp.get('v.value'));
-            $A.test.assertEquals(6,newCmp.get('v.truncate'));
-            $A.test.assertEquals("Tex...",$A.test.getText(newCmp.getElement()));
-        }]
-    },
-
-    testSetLocalIdServerDependencies:{
-        test: function(cmp){
-            var actionComplete = false;
-            $A.newCmpAsync(
-                    this,
-                    function(newCmp){
-                        var body = cmp.get("v.body");
-                        body.push(newCmp);
-                        cmp.set("v.body", body);
-                        actionComplete = true;
-                    },
-                    {
-                        componentDef: "markup://loadLevelTest:serverComponent",
-                        localId: "userLocalId",
-                        attributes: {
-                            values: {
-                                stringAttribute:'creatingComponentWithServerDependecies'
-                            }
-                        }
-                    }
-            );
-
-            $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
-                var body = cmp.get('v.body');
-                $A.test.assertEquals(1,body.length);
-                var newCmp = body[0].find("userLocalId");
-                $A.test.assertDefined(newCmp);
-                $A.test.assertEquals(body[0], newCmp);
-                $A.test.assertEquals("markup://loadLevelTest:serverComponent",newCmp.getDef().getDescriptor().getQualifiedName());
-                $A.test.assertTrue($A.test.getTextByComponent(newCmp).indexOf('creatingComponentWithServerDependecies')!=-1,
-                        "Failed to set model value for local component.");
-            });
-        }
-    },
-
-    /**
-     * Create a component with a provider which provides a component that contains an inner component with server
-     * dependencies. Verify error message stating that it cannot provide a component with server deps
-     * TODO: W-2365060
-     */
-    _testCreateComponentNotOnClientWithClientProvider: {
-        test: function(cmp) {
-            try {
-                $A.newCmpAsync(
-                    this,
-                    function () {
-                    },
-                    "markup://loadLevelTest:clientProvidesServerCmp"
-                );
-                $A.test.fail('Should have failed to create component with client provided server dependent component.');
-            } catch(e) {
-                $A.test.assertTrue(e.message.indexOf("Client provided component cannot have server dependencies") != -1,
-                    "Incorrect error message when creating client provided server dependent component");
-            }
-        }
-    },
-
     /**
      * test creating a component having model, client and server provider
      */
     testCreationOfKitchenSink:{
         test: function(cmp){
             var actionComplete = false;
-            $A.newCmpAsync(
-                this,
-                function(newCmp){
-                    var body = cmp.get("v.body");
-                    body.push(newCmp);
-                    cmp.set("v.body", body);
-                    actionComplete = true;
-                },
-                "markup://test:kitchenSink"
-            );
+            $A.createComponent("test:kitchenSink", null, function(newCmp){
+                var body = cmp.get("v.body");
+                body.push(newCmp);
+                cmp.set("v.body", body);
+                actionComplete = true;
+            });
 
             $A.test.addWaitFor(true, function(){ return actionComplete; }, function() {
                 var newCmp = cmp.get('v.body')[0];
@@ -887,16 +354,12 @@
     testCreateComponentWithLazyFacet:{
         test:[function(cmp){
             var helper = cmp.getDef().getHelper();
-            $A.newCmpAsync(
-                    this,
-                    function(newCmp) {
-                    	var body = cmp.get("v.body");
-                        body.push(newCmp);
-                        cmp.set("v.body", body);
-                    },
-                    "loadLevelTest:serverWithLazyChild"
-            );
-            
+            $A.createComponent("loadLevelTest:serverWithLazyChild", null, function(newCmp) {
+            	var body = cmp.get("v.body");
+                body.push(newCmp);
+                cmp.set("v.body", body);
+            });
+
             $A.test.addWaitFor(
                 true,
                 function(){
@@ -925,82 +388,6 @@
     },
 
     /**
-     * Create a component and mark it to be exclusively created,
-     *
-     */
-    testCreateComponentExclusively:{
-        test:function(cmp){
-            aura.test.setTestTimeout(15000);
-            var actionComplete = false;
-            $A.newCmpAsync(
-                    this,
-                    function(newCmp) {
-                        var body = cmp.get("v.body");
-                        body.push(newCmp);
-                        cmp.set("v.body", body);
-                        actionComplete = true;
-                    },
-                    {componentDef : "markup://loadLevelTest:serverComponent", load : "EXCLUSIVE"}
-            );
-            $A.newCmpAsync(
-                    this,
-                    function(newCmp) {
-                    	var body = cmp.get("v.body");
-                        body.push(newCmp);
-                        cmp.set("v.body", body);
-                    },
-                    {componentDef: "markup://loadLevelTest:displayBoolean", load:"LAZY"}
-            );
-            $A.newCmpAsync(
-                    this,
-                    function(newCmp) {
-                    	var body = cmp.get("v.body");
-                        body.push(newCmp);
-                        cmp.set("v.body", body);
-                    },
-                    {componentDef: "markup://loadLevelTest:displayNumber", load:"LAZY"}
-            );
-
-            $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
-                var body = cmp.get('v.body');
-                $A.test.assertEquals("markup://loadLevelTest:serverComponent", body[0].getDef().getDescriptor().getQualifiedName());
-                $A.test.assertEquals("markup://loadLevelTest:displayBoolean", body[1].getDef().getDescriptor().getQualifiedName());
-                $A.test.assertEquals("markup://loadLevelTest:displayNumber", body[2].getDef().getDescriptor().getQualifiedName());
-            });
-        }
-    },
-
-    /**
-     * Create a component and verify that actions with the new component work.
-     */
-    testVerifyActionsOnNewComponent:{
-        test: function(cmp){
-            $A.test.setTestTimeout(50000);
-            var actionComplete = false;
-            $A.newCmpAsync(
-                    this,
-                    function(newCmp) {
-                    	var body = cmp.get("v.body");
-                        body.push(newCmp);
-                        cmp.set("v.body", body);
-                        actionComplete = true;
-                    },
-                    {componentDef : "markup://loadLevelTest:clientWithLazyClientChild"}
-            );
-
-            $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
-                var serverCmp = cmp.get('v.body')[0];
-                serverCmp.find('makeServer').get('e.press').fire();
-                $A.test.addWaitFor(false, $A.test.isActionPending, function(){
-                    var innerCmpBody = serverCmp.get('v.body');
-                    $A.test.assertEquals("markup://loadLevelTest:serverComponent", innerCmpBody[0].getDef().getDescriptor().getQualifiedName(),
-                            "Could not create comopnent from action of newly created component");
-                });
-            });
-        }
-    },
-
-    /**
      * Create the same component multiple times using the same source of data for the created components attributes
      * and verify the destruction of the initial components does not affect future components. In other words,
      * verify attribute data is properly cloned when created new components.
@@ -1014,7 +401,7 @@
         function(cmp) {
             var oldBody = cmp.get("v.body");
             this.createClientCmp(cmp);
-            $A.test.addWaitFor(false, function(){return oldBody[0].isValid()});
+            $A.test.addWaitFor(false, function(){return oldBody[0].isValid();});
         },
         function(cmp) {
             $A.test.assertEquals("Doug", cmp.get("v.body")[0].get("v.first"), "Second component creation failure.");
@@ -1023,7 +410,7 @@
         function(cmp) {
             var oldBody = cmp.get("v.body");
             this.createClientCmp(cmp);
-            $A.test.addWaitFor(false, function(){return oldBody[0].isValid()});
+            $A.test.addWaitFor(false, function(){return oldBody[0].isValid();});
         },
         function(cmp) {
             $A.test.assertEquals("Doug", cmp.get("v.body")[0].get("v.first"), "Third component creation failure.");
@@ -1032,21 +419,16 @@
     },
 
     createClientCmp: function(cmp) {
-        $A.newCmpAsync(
-                this,
-                function(newCmp) {
-                    cmp.set("v.body", newCmp);
-                },
-                {
-                    componentDef : "markup://loadLevelTest:clientComponent",
-                    attributes: {
-                        values: {
-                            first: cmp.get("v.arrayOfMaps")[0].first,
-                            last: cmp.get("v.arrayOfMaps")[0].last,
-                            arrayOfMaps: cmp.get("v.arrayOfMaps")
-                        }
-                    }
-                }
+        $A.createComponent(
+            "loadLevelTest:clientComponent",
+            {
+                first: cmp.get("v.arrayOfMaps")[0].first,
+                last: cmp.get("v.arrayOfMaps")[0].last,
+                arrayOfMaps: cmp.get("v.arrayOfMaps")
+            },
+            function(newCmp) {
+                cmp.set("v.body", newCmp);
+            }
         );
     }
 })

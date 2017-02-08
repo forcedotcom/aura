@@ -37,15 +37,10 @@
                 $A.test.assertTrue(value.componentDef !== undefined);
                 $A.test.assertEquals("markup://ui:button", value.componentDef.descriptor);
                 //construct it.
-                $A.componentService.newComponentAsync(
-                    this,
-                    function(newCmp){
-                        $A.test.assertTrue($A.util.isComponent(newCmp));
-                        $A.test.assertEquals("markup://ui:button", newCmp.getDef().getDescriptor().toString());
-                        $A.test.assertEquals("hi", newCmp.get("v.label"));
-                    },
-                    value
-                );
+                var newCmp = $A.componentService.createComponentFromConfig(value);
+                $A.test.assertTrue($A.util.isComponent(newCmp));
+                $A.test.assertEquals("markup://ui:button", newCmp.getDef().getDescriptor().toString());
+                $A.test.assertEquals("hi", newCmp.get("v.label"));
             }
         ]
     }

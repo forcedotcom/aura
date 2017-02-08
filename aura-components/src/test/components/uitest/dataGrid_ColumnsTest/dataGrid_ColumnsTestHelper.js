@@ -68,14 +68,6 @@
     
     //Creating the columns and adding them into the array to put in the data grid
     createColumns : function(colInfo, funcToUse){
-    	$A.newCmpAsync(
-				this,
-				funcToUse,
-				{
-					"componentDef": "markup://ui:dataGridColumn",
-		            "attributes": {
-		                "values": colInfo
-		            }
-				});
+        $A.createComponent("ui:dataGridColumn", colInfo, funcToUse);
     }
 })

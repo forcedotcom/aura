@@ -19,14 +19,12 @@
     insertClientSide: function(cmp) {
         var finished = false;
 
-        $A.componentService.newComponentAsync(this, 
+        $A.createComponent("gvpTest:dynamicTypeTest", null, 
             function(newCmp) {
                 cmp.find("insertion").set("v.body", [ newCmp ]);
                 finished = true;
-            },
-            {
-                "componentDef": "gvpTest:dynamicTypeTest"
-            });
+            }
+        );
         // wait for our component to be inserted.
         $A.test.addWaitFor(true, function() { return finished});
     },

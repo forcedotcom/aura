@@ -16,7 +16,7 @@
 
 -->
 <aura:component render="client">
-    <aura:attribute name="stringAttribute" type="String" default="fooBar"/>
+    <aura:attribute name="stringAttribute" type="String" default="fooBar" access="GLOBAL"/>
     <aura:attribute name="nameAttribute" type="String" default="Washington"/>
     <aura:attribute type="Integer" name="numberAttribute"/>
     {!v.body}

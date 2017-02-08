@@ -172,6 +172,7 @@
     }
 
     function initFramework () {
+        window.Aura = window.Aura || {}; 
         window.Aura.beforeFrameworkInit = Aura.beforeFrameworkInit || [];
         window.Aura.beforeFrameworkInit.push(auraPreInitBlock);
         window.Aura.inlineJsReady = time();

@@ -304,24 +304,6 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     @Test
-    public void testGetClientRenderingAfterDependencyChange() throws Exception {
-        DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class,
-                String.format(baseComponentTag, "", "<aura:attribute name='val' type='String' default='initial'/>"));
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
-                ComponentDef.class,
-                String.format(baseComponentTag, "render='client'",
-                        String.format("<aura:dependency resource='%s'/>", depDesc.getQualifiedName())));
-        open(cmpDesc);
-        assertEquals("initial", getAuraUITestingUtil().getEval(String.format(
-                "return $A.componentService.newComponent('%s').get('v.val');", depDesc.getDescriptorName())));
-        updateStringSource(depDesc,
-                String.format(baseComponentTag, "", "<aura:attribute name='val' type='String' default='final'/>"));
-        open(cmpDesc);
-        assertEquals("final", getAuraUITestingUtil().getEval(String.format(
-                "return $A.componentService.newComponent('%s').get('v.val');", depDesc.getDescriptorName())));
-    }
-
-    @Test
     public void testPostAfterMarkupChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent("", "<div id='sample'>free</div>");
         open(cmpDesc);

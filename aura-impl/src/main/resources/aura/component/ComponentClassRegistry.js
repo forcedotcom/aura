@@ -38,13 +38,18 @@ ComponentClassRegistry.prototype.customConstructorMap = {
     /*eslint-disable no-undef*/
     "aura$text":TextComponent,
     "aura$html":HtmlComponent,
-    "aura$expression": ExpressionComponent
+    "aura$expression": ExpressionComponent,
+    "aura$if":IfComponent
 
-    // We have no yet implemented specific classes for these components.
-    // Switching them to SimpleComponent should work. (Not tested though)
-    //"aura$if":SimpleComponent,
-    //"aura$iteration":SimpleComponent, 
-    //"aura$component":SimpleComponent
+    // Just waiting to turn these on.
+    
+    // aura:iteration
+    //  - delete helper and controller.
+    //,"aura$iteration":IterationComponent
+
+    // aura:component
+    //  - DO NOT DELETE THE RENDERER. It's shared, so just leave it.
+    //,"aura$component":BaseComponent
 };
 
 /**

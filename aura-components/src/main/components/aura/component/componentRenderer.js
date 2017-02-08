@@ -14,6 +14,16 @@
  * limitations under the License.
  */
 ({
+    /** 
+        KRIS: These cannot be commented out, they are used by other components and applications. until they have their own renderer, this needs to stay. 
+        Todo:
+        1. Everyone who uses aura.component as it's renderer should get their own renderers.
+        2. Those renderers should be blank for simple compoments
+        3. Other renderers should basically be a copy of whats in here.
+        4. Remove these methods but keep this file since it's needed because of the server renderer.
+      **/
+
+
     render: function(component){
         var rendering = component.getRendering();
         return rendering||$A.renderingService.renderFacet(component,component.get("v.body"));

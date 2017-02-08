@@ -15,7 +15,7 @@
  */
 
 /**
- * Construct a new SimpleComponent.
+ * Construct a new BaseComponent.
  *
  * @public
  * @class
@@ -25,9 +25,9 @@
  *            config - component configuration
  * @param {Boolean}
  *            [localCreation] - local creation
- * @export
  */
-function SimpleComponent(config, localCreation) {
+function BaseComponent(config, localCreation) {
+    //Aura.Component.Component.call(this, config, localCreation);
     var context = $A.getContext();
 
     // setup some basic things
@@ -47,6 +47,7 @@ function SimpleComponent(config, localCreation) {
     this.version = config["version"];
     this.owner = context.getCurrentAccess();
     this.name='';
+    this.isRootComponent = true;
 
     // allows components to skip creation path checks if it's doing something weird
     // such as wrapping server created components in client created one
@@ -80,7 +81,6 @@ function SimpleComponent(config, localCreation) {
     // create the globally unique id for this component
     this.setupGlobalId(config["globalId"], localCreation);
 
-
     var partialConfig;
     if (this.creationPath && this.creationPath !== "client created") {
         partialConfig = context.getComponentConfig(this.creationPath);
@@ -107,9 +107,6 @@ function SimpleComponent(config, localCreation) {
     // sets this components definition, preferring partialconfig if it exists
     this.setupComponentDef(this.partialConfig || config);
 
-    // Saves a flag to indicate whether the component implements the root marker interface.
-    this.isRootComponent = true;
-
     // join attributes from partial config and config, preferring partial when overlapping
     var configAttributes = { "values": {} };
 
@@ -123,8 +120,6 @@ function SimpleComponent(config, localCreation) {
 
     if (partialConfig && partialConfig["attributes"]) {
         $A.util.apply(configAttributes["values"], partialConfig["attributes"]["values"], true);
-        // NOTE: IT USED TO BE SOME LOGIC HERE TO OVERRIDE THE VALUE PROVIDER BECAUSE OF PARTIAL CONFIGS
-        // IF WE RUN INTO ISSUES AT SOME POINT AFTER HALO, LOOK HERE FIRST!
     }
 
     if (!configAttributes["facetValueProvider"]) {
@@ -135,28 +130,11 @@ function SimpleComponent(config, localCreation) {
     this.attributeValueProvider = configAttributes["valueProvider"];
     this.facetValueProvider = configAttributes["facetValueProvider"];
 
-    // initialize attributes
-    this.setupAttributes(this, configAttributes);
-
     // create all value providers for this component m/v/c etc.
     this.setupValueProviders(config["valueProviders"]);
 
-    // runs component provider and replaces this component with the provided one
-    this.injectComponent(config, localCreation);
-
-    // sets up component level events
-    // Used in iteration
-    this.setupComponentEvents(this, configAttributes);
-
-    // index this component with its value provider (if it has a localid)
-    this.doIndex(this);
-
-    // starting watching all values for events
-    // Used in iteration
-    this.setupValueEventHandlers(this);
-
-    // setup flavors
-    this.setupFlavors(config, configAttributes);
+    // initialize attributes
+    this.setupAttributes(this, configAttributes);
 
     // clean up refs to partial config
     this.partialConfig = undefined;
@@ -166,38 +144,22 @@ function SimpleComponent(config, localCreation) {
     }
 
     this._destroying = false;
-
-    // Will need to bring back something like this for if and iteration.
-    if(this.getDef().hasInit()) {
-        this.fire("init");
-    }
 }
 
-SimpleComponent.prototype = Object.create(Component.prototype);
+BaseComponent.prototype = Object.create(Component.prototype);
 
 // Not returning anything in these since empty functions will not be called by the JS engine as an
-SimpleComponent.prototype.superRender = function(){};
-SimpleComponent.prototype.superAfterRender = function(){};
-SimpleComponent.prototype.superRerender = function(){};
-SimpleComponent.prototype.superUnrender = function(){};
-SimpleComponent.prototype.getSuper = function(){};
-SimpleComponent.prototype.getSuperest = function(){ return this; };
+BaseComponent.prototype.superRender = function(){};
+BaseComponent.prototype.superAfterRender = function(){};
+BaseComponent.prototype.superRerender = function(){};
+BaseComponent.prototype.superUnrender = function(){};
+BaseComponent.prototype.getSuper = function(){};
+BaseComponent.prototype.getSuperest = function(){ return this; };
 
-SimpleComponent.prototype.setupGlobalId = function(globalId, localCreation) {
-    this.globalId = globalId || this.nextGlobalId(localCreation);
-};
-
-SimpleComponent.prototype.setupValueProviders = function(customValueProviders) {
+BaseComponent.prototype.setupValueProviders = function(customValueProviders) {
     var vp=this.valueProviders;
 
-    vp["v"]=this.attributeSet;
-    vp["c"]=this.createActionValueProvider();
-    vp["e"]=this.createEventValueProvider();
-    vp["this"]=this;
-    vp["globalid"]=this.globalId;
-    vp["def"]=this.componentDef;
-    vp["null"]=null;
-    vp["version"] = this.version ? this.version : this.getVersionInternal();
+    vp["v"]=$A.componentService.get(this.concreteComponentId).attributeSet;
 
     if(customValueProviders) {
         for (var key in customValueProviders) {
@@ -206,5 +168,34 @@ SimpleComponent.prototype.setupValueProviders = function(customValueProviders) {
     }
 };
 
+BaseComponent.prototype.setupComponentDef = function() {
+    // TextComponent optimization, go straight to an internal API for the component def
+    this.componentDef = $A.componentService.getComponentDef({"descriptor":"markup://aura:component"});
 
-Aura.Component.SimpleComponent = SimpleComponent;
+    // propagating locker key when possible
+    $A.lockerService.trust(this.componentDef, this);
+};
+
+BaseComponent.prototype["renderer"] = {
+    "render": function(component){
+        var rendering = component.getRendering();
+        return rendering||$A.renderingService.renderFacet(component,component.get("v.body"));
+    },
+
+    "afterRender": function(component){
+        var body = component.get("v.body");
+        $A.afterRender(body);
+    },
+
+    "rerender": function(component){
+        var body = component.get("v.body");
+        return $A.renderingService.rerenderFacet(component,body);
+    },
+
+    "unrender" : function(component){
+        var body = component.get("v.body");
+        $A.renderingService.unrenderFacet(component,body);
+    }
+};
+
+Aura.Component.BaseComponent = BaseComponent;

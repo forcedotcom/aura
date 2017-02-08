@@ -15,7 +15,7 @@
  */
 
 /**
- * Construct a new ExpressionComponent.
+ * Construct a new IfComponent.
  *
  * @public
  * @class
@@ -26,7 +26,7 @@
  * @param {Boolean}
  *            [localCreation] - local creation
  */
-function ExpressionComponent(config, localCreation) {
+function IfComponent(config, localCreation) {
     var context = $A.getContext();
 
     // setup some basic things
@@ -46,6 +46,7 @@ function ExpressionComponent(config, localCreation) {
     this.version = config["version"];
     this.owner = context.getCurrentAccess();
     this.name='';
+    this.isRootComponent = true;
 
     // allows components to skip creation path checks if it's doing something weird
     // such as wrapping server created components in client created one
@@ -105,13 +106,11 @@ function ExpressionComponent(config, localCreation) {
     // sets this components definition, preferring partialconfig if it exists
     this.setupComponentDef(this.partialConfig || config);
 
-    // Saves a flag to indicate whether the component implements the root marker interface.
-    this.isRootComponent = true;
-
     // join attributes from partial config and config, preferring partial when overlapping
     var configAttributes = { "values": {} };
 
     if (config["attributes"]) {
+        //$A.util.apply(configAttributes["values"], config["attributes"]["values"], true);
         for(var key in config["attributes"]["values"]) {
             configAttributes["values"][key] = config["attributes"]["values"][key];
         }
@@ -134,12 +133,19 @@ function ExpressionComponent(config, localCreation) {
 
     // create all value providers for this component m/v/c etc.
     this.setupValueProviders(config["valueProviders"]);
-    
+
     // initialize attributes
-    this.setupAttributes(this, configAttributes, localCreation);
+    this.setupAttributes(this, configAttributes);
+
+    // runs component provider and replaces this component with the provided one
+    this.injectComponent(config, localCreation);
 
     // index this component with its value provider (if it has a localid)
     this.doIndex(this);
+
+    // starting watching all values for events
+    // Used in iteration
+    this.setupValueEventHandlers(this);
 
     // clean up refs to partial config
     this.partialConfig = undefined;
@@ -149,58 +155,36 @@ function ExpressionComponent(config, localCreation) {
     }
 
     this._destroying = false;
+
+    this.fire("init");
 }
 
-ExpressionComponent.prototype = Object.create(Component.prototype);
+IfComponent.prototype = Object.create(Component.prototype);
 
-/** The SuperRender calls are blank since we will never have a super, no need to ever do any logic to for them. */
-ExpressionComponent.prototype.superRender = function(){};
-ExpressionComponent.prototype.superAfterRender = function(){};
-ExpressionComponent.prototype.superRerender = function(){};
-ExpressionComponent.prototype.superUnrender = function(){};
+// Not returning anything in these since empty functions will not be called by the JS engine as an
+IfComponent.prototype.setupModel = function(){};
+IfComponent.prototype.superRender = function(){};
+IfComponent.prototype.superAfterRender = function(){};
+IfComponent.prototype.superRerender = function(){};
+IfComponent.prototype.superUnrender = function(){};
+IfComponent.prototype.getSuper = function(){};
+IfComponent.prototype.getModel = function(){};
+IfComponent.prototype.getSuperest = function(){ return this; };
 
-/** No Super, so just return undefined */
-ExpressionComponent.prototype.getSuper = function(){};
+IfComponent.prototype.setupComponentDef = function() {
+    // HtmlComponent optimization, go straight to an internal API for the component def
+    this.componentDef = $A.componentService.getComponentDef({"descriptor":"markup://aura:if"});
 
-/** Will always be Superest, so no need to check for a super */
-ExpressionComponent.prototype.getSuperest = function(){ return this; };
-
-ExpressionComponent.prototype.setContainerComponentId = function(containerComponentId) {
-    this.containerComponentId = containerComponentId;
-
-    // Specific to Expressions only.
-    if(this.isValid()) {
-        // set the containerComponentId for expression values to the expression component itself
-        var context = $A.getContext();
-        var enableAccessChecks = context.enableAccessChecks;
-        try {
-            // JBA: turn off access checks so we can evaluate this expression
-            // safely just for this statement
-            context.enableAccessChecks = false;
-            var facetValue = this.get("v.value");
-            if($A.util.isArray(facetValue)){
-                for(var fidx = 0; fidx < facetValue.length; fidx++) {
-                    if($A.util.isComponent(facetValue[fidx])) {
-                        facetValue[fidx].setContainerComponentId(this.globalId);
-                    }
-                }
-            }
-            else if($A.util.isComponent(facetValue)) {
-                facetValue.setContainerComponentId(this.globalId);
-            }
-        }
-        finally {
-            // flip access checks back to their initial value
-            context.enableAccessChecks = enableAccessChecks;
-        }
-    }
+    // propagating locker key when possible
+    $A.lockerService.trust(this.componentDef, this);
 };
 
-ExpressionComponent.prototype.setupValueProviders = function(customValueProviders) {
+IfComponent.prototype.setupValueProviders = function(customValueProviders) {
     var vp=this.valueProviders;
 
     vp["v"]=this.attributeSet = new AttributeSet(this.componentDef.attributeDefs);
-
+    vp["c"]=this.createActionValueProvider();
+    
     if(customValueProviders) {
         for (var key in customValueProviders) {
             this.addValueProvider(key,customValueProviders[key]);
@@ -208,78 +192,82 @@ ExpressionComponent.prototype.setupValueProviders = function(customValueProvider
     }
 };
 
-/** 
- * Component.js has logic that is specific to HtmlComponent. Great! So we can move that into here and out of Component.js
- * That logic is the LockerService part to assign trust to the owner.
- */
-ExpressionComponent.prototype.setupComponentDef = function() {
-    // HtmlComponent optimization, go straight to an internal API for the component def
-    this.componentDef = $A.componentService.getComponentDef({"descriptor":"markup://aura:expression"});
+IfComponent.prototype["controller"] = {
+    "init": function(cmp, evt, helper) {
+        var bodyTemplate  = cmp.get("v.body");
+        var isTrue        = $A.util.getBooleanValue(cmp.get("v.isTrue"));
+        var template      = cmp.get("v.template");
 
-    // propagating locker key when possible
-    $A.lockerService.trust(this.componentDef, this);
-};
-
-ExpressionComponent.prototype["renderer"] = {
-    "render" : function(component) {
-        var value = component.get("v.value");
-        if($A.util.isUndefinedOrNull(value)){
-            value = "";
+        if (bodyTemplate.length && !template.length) {
+            cmp.set("v.template", bodyTemplate, true);
+            cmp.set("v.body", [], true);
         }
 
-        if(!($A.util.isComponent(value) || $A.util.isArray(value))){
-            // JBUCH: HALO: TODO: MIGHT BE ABLE TO RETURN THIS TO SIMPLE TEXTNODE MANAGEMENT
-            var owner = component.getOwner();
-            var context = $A.getContext();      
-            context.setCurrentAccess(owner);
-            component._lastRenderedTextNode = value = $A.createComponentFromConfig({ "descriptor": "markup://aura:text", "attributes":{ value: value } });
-            context.releaseCurrentAccess();
-            
-            $A.lockerService.trust(owner, value);
-        }
-
-        return $A.renderingService.renderFacet(component,value);
+        var body = helper.createBody(cmp, isTrue);
+        cmp.set("v.body", body, true);
+        cmp._truth = isTrue;
     },
+    "handleTheTruth": function(cmp, evt, helper) {
+        var isTrue = $A.util.getBooleanValue(cmp.get("v.isTrue"));
+        if (cmp._truth !== isTrue) {
+            helper.clearUnrenderedBody(cmp);
 
-    "rerender" : function(component) {
-        var ret=[];
-        if (component.isRendered()) {
-            var value = component.get("v.value");
-            if(!($A.util.isComponent(value)||$A.util.isArray(value))){
-                if($A.util.isUndefinedOrNull(value)){
-                    value = "";
-                }
-                if(component._lastRenderedTextNode && component._lastRenderedTextNode.isValid()){
-                    // JBUCH: HALO: TODO: MIGHT BE ABLE TO RETURN THIS TO SIMPLE TEXTNODE MANAGEMENT
-                    component._lastRenderedTextNode.set("v.value",value,true);
-                    value=component._lastRenderedTextNode;
-                    return $A.rerender(value);
-                }else {
-                    value = $A.createComponentFromConfig({"descriptor": 'markup://aura:text', "attributes": {value: value}});
-                }
-            }
-            ret=$A.renderingService.rerenderFacet(component, value);
-        }
-        return ret;
-    },
-
-    "unrender" : function(component) {
-        $A.renderingService.unrenderFacet(component);
-        if (component._lastRenderedTextNode) {
-            component._lastRenderedTextNode.destroy();
-            delete component._lastRenderedTextNode;
-        }
-    },
-
-    "afterRender" : function(component) {
-        var value = component.get("v.value");
-        if ($A.util.isComponent(value)||$A.util.isArray(value)) {
-            $A.afterRender(value);
+            cmp.set("v.body", helper.createBody(cmp, isTrue, true));
+            cmp._truth = isTrue;
         }
     }
 };
 
 
+IfComponent.prototype["helper"] = {
+    createBody: function(cmp, isTrue) {
+        var body  = [];
+        var facet = isTrue ? cmp.get("v.template") : cmp.get("v.else");
+        
+        $A.pushCreationPath("body");
+        
+        for (var i = 0, length = facet.length; i < length; i++) {
+            $A.setCreationPathIndex(i);
+            var cdr = facet[i];
 
+            if (!cdr["attributes"]["valueProvider"]) {
+                cdr["attributes"]["valueProvider"] = cmp.getAttributeValueProvider();
+            }
 
-Aura.Component.ExpressionComponent = ExpressionComponent;
+            body.push($A.componentService.createComponentFromConfig(cdr));
+        }
+        
+        $A.popCreationPath("body");
+
+        return body;
+    },
+
+    clearUnrenderedBody: function(cmp) {
+        var hasUnrenderBody = false;        
+        var currentBody = cmp.get('v.body');
+
+        for (var i = 0 ; i < currentBody.length; i++) {
+            var child = currentBody[i];
+            if (!child.isRendered()) {
+                hasUnrenderBody = true;
+                child.destroy();
+            }
+        }
+        
+        if (hasUnrenderBody && $A.getContext().getMode() !== 'PROD') {
+            var owner = cmp.getOwner();
+            $A.warning([
+                '[Performance degradation] ',
+                'markup://aura:if ["' + cmp.getGlobalId() + '"] in ',
+                owner.getType() + ' ["' + owner.getGlobalId() + '"] ',
+                'needed to clear unrendered body.\n',
+                'More info: https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/perf_warnings_if.htm'
+            ].join(''));
+        }
+    }
+};
+
+// Shares the renderer
+IfComponent.prototype["renderer"] = Aura.Component.BaseComponent.prototype["renderer"];
+
+Aura.Component.IfComponent = IfComponent;

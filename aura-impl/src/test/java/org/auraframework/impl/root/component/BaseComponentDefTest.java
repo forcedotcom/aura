@@ -285,7 +285,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public void testHelperDefNotSerialized() throws Exception {
         List<DefDescriptor<HelperDef>> helperList = new ArrayList<>();
         DefDescriptor<HelperDef> helper = definitionService.getDefDescriptor(
-                "js://aura.if", HelperDef.class);
+                "js://aura.label", HelperDef.class);
         helperList.add(helper);
         Object cmpDef = vendor.makeBaseComponentDefWithNulls(getDefClass(),
                 "aura:if", null, null, null, null, null, null, null, null,

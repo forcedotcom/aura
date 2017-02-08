@@ -117,7 +117,6 @@
     },
 
     buildBody: function (component, itemHandler, completeHandler) {
-
         var items = component.get("v.items");
         var template = component.get("v.template");
         var startIndex = this.getStart(component);

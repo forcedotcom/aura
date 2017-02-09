@@ -31,6 +31,13 @@ Aura.Services.MetricsService = function MetricsService() {
     this.doneBootstrap             = false;
     this.pluginsInitialized        = false;
     this.clearCompleteTransactions = true; // In PTEST Mode this is set to false (see initialize method)
+    
+    // Public constants used for flagging page transactions
+    this["PAGE_IN_DOM"] = "PageInDOM";
+    this["PAGE_HAS_ERROR"] = "PageHasError";
+    this["PAGE_NOT_LOADED"] = "PageNotLoaded";
+    this["PREVIOUS_PAGE_NOT_LOADED"] = "PreviousPageNotLoaded";
+    this["INTERACTION_BEFORE_PAGE_LOADED"] = "InteractionBeforePageLoaded";
 };
 
 // Version
@@ -486,6 +493,18 @@ Aura.Services.MetricsService.prototype.getCurrentPageTransaction = function () {
         if (this.transactions[i]["config"]["pageTransaction"]) {
             return this.transactions[i];
         }
+    }
+};
+
+/**
+ * Merge the config of the current page transaction
+ * @export
+**/
+Aura.Services.MetricsService.prototype.updateCurrentPageTransaction = function (config) {
+    var trx = this.getCurrentPageTransaction();
+    if (trx) {
+        // i.e. override any values already present on existing config
+        trx["config"] = $A.util.apply(trx["config"], config, true /*forceCopy*/, true /*deepCopy*/);
     }
 };
 

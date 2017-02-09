@@ -1370,20 +1370,28 @@ AuraClientService.prototype.saveTokenToStorage = function() {
 
 /**
  * Loads the CSRF token from Actions storage.
- * @return {Promise} resolves or rejects based on data loading.
+ * 
+ * @return {Promise} Resolves with the token from storage, or undefined
+ *         otherwise. Rejects if there is an error.
  */
 AuraClientService.prototype.loadTokenFromStorage = function() {
+    var self = this;
     var storage = Action.getStorage();
     if (storage && storage.isPersistent()) {
         return storage.adapter.getItems([AuraClientService.TOKEN_KEY])
             .then(function(items) {
                 if (items[AuraClientService.TOKEN_KEY]) {
-                    return items[AuraClientService.TOKEN_KEY]["value"]["token"];
+                    var token = items[AuraClientService.TOKEN_KEY]["value"]["token"];
+                    self.setToken(token);
+                    $A.log("AuraClientService.loadTokenFromStorage(): token loaded");
+                    return token;
                 }
-                return Promise["reject"](new Error("no token found in storage"));
+                $A.log("AuraClientService.loadTokenFromStorage(): no token found");
+                return undefined;
             });
     }
-    return Promise["reject"](new Error("no Action storage"));
+    $A.log("AuraClientService.loadTokenFromStorage(): no Action storage");
+    return Promise["resolve"]();
 };
 
 /**

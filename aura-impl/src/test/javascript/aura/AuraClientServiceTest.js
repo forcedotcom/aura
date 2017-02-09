@@ -2431,4 +2431,223 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.True(actual);
         }
     }
+
+    [Fixture]
+    function loadTokenFromStorage() {
+        [Fact]
+        function ResolvesToTokenIfStored() {
+            var expected = "someToken";
+            var actual;
+            var target;
+
+            var mockAction = Mocks.GetMocks(Object.Global(), {
+                Action: {
+                    getStorage: function() {
+                        return {
+                            adapter:{
+                                getItems: function(keys) {
+                                    var items = {};
+                                    items[Aura.Services.AuraClientService.TOKEN_KEY] = {
+                                        value : {
+                                            token : expected
+                                        }
+                                    };
+                                    return ResolvePromise(items);
+                                }
+                            },
+                            isPersistent: function() {
+                                return true;
+                            }
+                        };
+                    }
+                }
+            });
+
+            mockGlobal(function() {
+                mockAction(function(){
+                    target = new Aura.Services.AuraClientService();
+                    target.loadTokenFromStorage().then(function(token){
+                        actual = token;
+                    });
+                });
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function SetsTokenIfStored() {
+            var expected = "someToken";
+            var actual;
+            var target;
+
+            var mockAction = Mocks.GetMocks(Object.Global(), {
+                Action: {
+                    getStorage: function() {
+                        return {
+                            adapter:{
+                                getItems: function(keys) {
+                                    var items = {};
+                                    items[Aura.Services.AuraClientService.TOKEN_KEY] = {
+                                        value : {
+                                            token : expected
+                                        }
+                                    };
+                                    return ResolvePromise(items);
+                                }
+                            },
+                            isPersistent: function() {
+                                return true;
+                            }
+                        };
+                    }
+                }
+            });
+
+            mockGlobal(function() {
+                mockAction(function(){
+                    target = new Aura.Services.AuraClientService();
+                    target.setToken = function(token){
+                        actual = token;
+                    };
+                    target.loadTokenFromStorage();
+                });
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ResolvesUndefinedIfTokenNotInStorage() {
+            var expected = undefined;
+            var actual;
+            var target;
+
+            var mockAction = Mocks.GetMocks(Object.Global(), {
+                Action: {
+                    getStorage: function() {
+                        return {
+                            adapter:{
+                                getItems: function(keys) {
+                                    var items = {};
+                                    return ResolvePromise(items);
+                                }
+                            },
+                            isPersistent: function() {
+                                return true;
+                            }
+                        };
+                    }
+                }
+            });
+
+            mockGlobal(function() {
+                mockAction(function(){
+                    target = new Aura.Services.AuraClientService();
+                    target.loadTokenFromStorage().then(function(token){
+                        actual = token;
+                    });
+                });
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ResolvesUndefinedIfNoStorage() {
+            var expected = undefined;
+            var actual;
+            var target;
+
+            var mockAction = Mocks.GetMocks(Object.Global(), {
+                Action: {
+                    getStorage: function() {
+                        return null;
+                    }
+                }
+            });
+
+            mockGlobal(function() {
+                mockAction(function(){
+                    target = new Aura.Services.AuraClientService();
+                    target.loadTokenFromStorage().then(function(token){
+                        actual = token;
+                    });
+                });
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ResolvesUndefinedIfStorageNotPersistent() {
+            var expected = undefined;
+            var actual;
+            var target;
+
+            var mockAction = Mocks.GetMocks(Object.Global(), {
+                Action: {
+                    getStorage: function() {
+                        return {
+                            isPersistent: function() {
+                                return false;
+                            }
+                        };
+                    }
+                }
+            });
+
+            mockGlobal(function() {
+                mockAction(function(){
+                    Promise["reject"] = function(reason){
+                        actual = reason;
+                    };
+                    target = new Aura.Services.AuraClientService();
+                    target.loadTokenFromStorage().then(function(token){
+                        actual = token;
+                    });
+                });
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function RejectsIfInvalidToken() {
+            var expected = "Cannot read property 'token' of undefined";
+            var actual;
+            var target;
+
+            var mockAction = Mocks.GetMocks(Object.Global(), {
+                Action: {
+                    getStorage: function() {
+                        return {
+                            adapter:{
+                                getItems: function(keys) {
+                                    var items = {};
+                                    items[Aura.Services.AuraClientService.TOKEN_KEY] = {
+                                    };
+                                    return ResolvePromise(items);
+                                }
+                            },
+                            isPersistent: function() {
+                                return true;
+                            }
+                        };
+                    }
+                }
+            });
+
+            mockGlobal(function() {
+                mockAction(function(){
+                    target = new Aura.Services.AuraClientService();
+                    target.loadTokenFromStorage().then(function(){},function(error){
+                        actual = error;
+                    });
+                });
+            });
+
+            Assert.Equal(expected, actual);
+        }
+    }
 }

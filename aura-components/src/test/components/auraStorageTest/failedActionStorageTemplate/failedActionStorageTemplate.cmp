@@ -17,6 +17,9 @@
             };
 
             MockStorageAdapter.prototype.getItems = function(keys) {
+                if("$AuraClientService.token$" === keys[0]) {
+                    return Promise.resolve({}); // allow token load to proceed without error
+                }
                 return Promise.reject(new Error("getItems(): mock always fails"));
             };
 

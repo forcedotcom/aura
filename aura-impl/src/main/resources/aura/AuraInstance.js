@@ -503,15 +503,6 @@ AuraInstance.prototype.initAsync = function(config) {
             $A.reportError("Error initializing the application", e);
         }
 
-        function loadStoredToken () {
-            return $A.clientService.loadTokenFromStorage().then(function setStoredToken(token){
-                $A.clientService.setToken(token);
-                $A.log("Aura.initAsync(): token loaded from storage");
-            }, function tokenNotFound(reason){
-                $A.log("Aura.initAsync(): token not loaded from storage: " + reason);
-            });
-        }
-
         function initializeApp () {
             return $A.clientService.initializeApplication().then(function (bootConfig) {
                 $A.run(function () {
@@ -532,10 +523,10 @@ AuraInstance.prototype.initAsync = function(config) {
 
         if (!$A.clientService.gvpsFromStorage) {
             $A.log("Aura.initAsync: GVP not loaded from storage so not loading defs or actions either");
-            loadStoredToken().then(initializeApp).then(undefined, reportError);
+            $A.clientService.loadTokenFromStorage().then(initializeApp).then(undefined, reportError);
         } else {
             Promise["all"]([
-                loadStoredToken(),
+                $A.clientService.loadTokenFromStorage(),
                 $A.clientService.loadBootstrapFromStorage(),
                 $A.componentService.restoreDefsFromStorage(context),
                 $A.clientService.populatePersistedActionsFilter()

@@ -94,7 +94,7 @@ IndexedDBAdapter.LOG_LEVEL = {
 IndexedDBAdapter.INITIALIZE_TIMEOUT = 30 * 1000;
 
 /** Threshold of time elapsed getting items from object store before a metric is logged */
-IndexedDBAdapter.OBJECTSTORE__GET_THRESHOLD = 500;
+IndexedDBAdapter.OBJECTSTORE__TRANSACTION_THRESHOLD = 500;
 
 /**
  * Returns the name of the adapter.
@@ -346,14 +346,13 @@ IndexedDBAdapter.prototype.initializeComplete = function(ready, error) {
  * @private
  */
 IndexedDBAdapter.prototype.getItemsInternal = function(keys, resolve, reject) {
+    var transactionTimer = this.thresholdMetricTimer("performance:storage-indexeddb-getItems-read-transaction");
     var transaction = this.db.transaction([this.tableName], "readonly");
     var objectStore = transaction.objectStore(this.tableName);
     var that = this;
 
     var results = {};
     var collected = 0;
-    var visibleAtBeginning = document.visibilityState === "visible";
-    var startTransaction = (new Date()).getTime();
 
     function collector(event) {
         var stored = event.target.result || {};
@@ -364,18 +363,12 @@ IndexedDBAdapter.prototype.getItemsInternal = function(keys, resolve, reject) {
             results[key] = item;
         }
         collected++;
-        var elapsedTime = (new Date()).getTime() - startTransaction;
-        if (visibleAtBeginning && document.visibilityState === "visible" && elapsedTime > IndexedDBAdapter.OBJECTSTORE__GET_THRESHOLD) {
-            $A.metricsService.transaction("aura", "performance:storage-indexdb-transaction", { "context": {
-                "attributes" : {
-                    "name"      : key,
-                    "keys"      : keys,
-                    "elapsed"   : elapsedTime,
-                    "collected" : collected
-                }
-            }});
-        }
         if (collected === keys.length) {
+            transactionTimer.end({
+                "name"      : key,
+                "keys"      : keys,
+                "collected" : collected
+            });
             resolve(results);
             return;
         }
@@ -410,6 +403,7 @@ IndexedDBAdapter.prototype.getItemsInternal = function(keys, resolve, reject) {
  * @private
  */
 IndexedDBAdapter.prototype.walkInternal = function(resolve, reject, sendResult) {
+    var transactionTimer = this.thresholdMetricTimer("performance:storage-indexeddb-walkInternal-read-transaction");
     var transaction = this.db.transaction([this.tableName], "readonly");
     var objectStore = transaction.objectStore(this.tableName);
     var cursor = objectStore.openCursor();
@@ -431,6 +425,7 @@ IndexedDBAdapter.prototype.walkInternal = function(resolve, reject, sendResult) 
             }
             icursor["continue"]();
         } else {
+            transactionTimer.end({'count':count, 'size':size});
             that.refreshSize(size, count);
 
             // async sweep
@@ -477,6 +472,7 @@ IndexedDBAdapter.prototype.setItems = function(tuples) {
         if (sizes + that.sizeGuess + that.sizeErrorBar > that.limitSweepHigh || that.sizeErrorBar > that.limitError) {
             that.expireCache(sizes);
         }
+        var transactionTimer = that.thresholdMetricTimer("performance:storage-indexeddb-setItems-write-transaction");
         var transaction = that.db.transaction([that.tableName], "readwrite");
         var objectStore = transaction.objectStore(that.tableName);
 
@@ -484,6 +480,7 @@ IndexedDBAdapter.prototype.setItems = function(tuples) {
         function collector() {
             collected++;
             if (collected === tuples.length) {
+                transactionTimer.end({'collected':collected, 'storables': storables.length, 'first_key': tuples[0][0]});
                 // transaction is done so update size then resolve.
                 that.updateSize(sizes/2, sizes/2);
                 resolve();
@@ -522,6 +519,7 @@ IndexedDBAdapter.prototype.removeItems = function(keys) {
     $A.assert(this.ready, "IndexedDBAdapter.removeItems() called with this.ready=" + this.ready);
     var that = this;
     return new Promise(function(resolve, reject) {
+        var transactionTimer = that.thresholdMetricTimer("performance:storage-indexeddb-removeItems-write-transaction");
         var transaction = that.db.transaction([that.tableName], "readwrite");
         var objectStore = transaction.objectStore(that.tableName);
 
@@ -531,6 +529,7 @@ IndexedDBAdapter.prototype.removeItems = function(keys) {
         function collector() {
             collected++;
             if (collected === keys.length) {
+                transactionTimer.end({'collected':collected, 'keys': keys});
                 // transaction is done so update size then resolve
                 that.updateSize(-sizeAvg, sizeAvg);
                 resolve();
@@ -566,6 +565,7 @@ IndexedDBAdapter.prototype.clear = function() {
     $A.assert(this.ready, "IndexedDBAdapter.clear() called with this.ready=" + this.ready);
     var that = this;
     return new Promise(function(resolve, reject) {
+        var transactionTimer = that.thresholdMetricTimer("performance:storage-indexeddb-clear-write-transaction");
         var transaction = that.db.transaction([that.tableName], "readwrite");
         var objectStore = transaction.objectStore(that.tableName);
 
@@ -576,6 +576,7 @@ IndexedDBAdapter.prototype.clear = function() {
             reject(new Error("IndexedDBAdapter.clear(): Transaction aborted: "+event.error));
         };
         transaction.oncomplete = function() {
+            transactionTimer.end({});
             resolve();
         };
         transaction.onerror = function(event) {
@@ -617,6 +618,7 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
 
     this.lastSweep = now;
     try {
+        var transactionTimer = this.thresholdMetricTimer("performance:storage-indexeddb-expireCache-read-transaction");
         var transaction = this.db.transaction([this.tableName], "readonly");
         var objectStore = transaction.objectStore(this.tableName);
         var index = objectStore.index("expires");
@@ -667,6 +669,7 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, resolve, reject
                 }
                 icursor["continue"]();
             } else {
+                transactionTimer.end({'size':size, 'count':count});
                 that.refreshSize(size, count);
 
                 if (keysToDelete.length > 0) {
@@ -798,6 +801,30 @@ IndexedDBAdapter.prototype.log = function (level, msg, obj) {
     if (this.debugLogging || level.id >= IndexedDBAdapter.LOG_LEVEL.WARNING.id) {
         $A[level.fn]("IndexedDBAdapter['"+this.instanceName+"'] "+msg, obj);
     }
+};
+
+/**
+ * Returns a timer object to emit a metric.
+ * @param name of the metricsService transaction.
+ * @return object with 'end' function to be called with an object, any keys/values will be logged in the metricsService transaction.
+ * @private
+ */
+IndexedDBAdapter.prototype.thresholdMetricTimer = function(name) {
+    var startTime = (new Date()).getTime();
+    var startVisibility = document.visibilityState === "visible";
+    return {
+      end: function(info) {
+          var elapsed = (new Date()).getTime() - startTime;
+          if (elapsed > IndexedDBAdapter.OBJECTSTORE__TRANSACTION_THRESHOLD) {
+              info['elapsed'] = elapsed;
+              info['visibilityStateStart'] = startVisibility;
+              info['visibilityStateEnd'] = document.visibilityState === "visible";
+              $A.metricsService.transaction("aura", name, { "context": {
+                  "attributes" : info
+              }});
+          }
+      }
+    };
 };
 
 

@@ -10,6 +10,8 @@
 
     setUp: function(cmp) {
     	function verifyRawStorage(storage, type, expectedNextSynthtic, expectedIndex) {
+    		storage = $A.lockerService.unwrap(storage, storage);
+    		
     		var nextSyntheticKey = "LSSNextSynthtic:" + type;		
     		var storedIndexKey = "LSSIndex:" + type + "{\"namespace\":\"lockerTest\"}";
     

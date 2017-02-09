@@ -216,5 +216,44 @@
             
             cmp.testLiveCollections();
         }
-    }
+    },
+
+    testFilteringProxy: {
+        test: function(cmp) {
+            function TestPrototype() {
+            	return this;
+            };
+                        
+            var o = Object.create(TestPrototype.prototype, {
+            	someProperty: {
+            		configurable: true,
+            		enumerable: true,
+            		value: "somePropertyValue",
+            	},
+
+            	nonEnumerableProperty: {
+            		configurable: true,
+            		value: "nonEnumerablePropertyValue",
+            	},
+            	
+            	foo: {
+            		enumerable: true,
+            		value: function() {
+            			return "fooValue";
+            		}
+            	}
+            });
+                                   
+            var otherNamespace = cmp.find("otherNamespace");
+            otherNamespace.set("v.obj", o);
+            otherNamespace.setupTestFilteringProxy();
+
+            helper = cmp.getDef().getHelper();
+            helper._o = o;
+            helper._TestPrototype = TestPrototype;
+            helper._po = otherNamespace.getDef().getHelper()._po;
+            
+            cmp.testFilteringProxy();
+        }
+    }   
 })

@@ -143,6 +143,7 @@ function SecureScriptElement(el, key) {
 	
     ls_setRef(o, el, key);
     ls_addToCache(el, o, key);
+    ls_registerProxy(o);
 
 	return o;
 }

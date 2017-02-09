@@ -58,7 +58,7 @@ function SecureMutationObserver(key) {
 				}
 			},
 			
-			"observe": SecureObject.createFilteredMethod(o, observer, "observe"),
+			"observe": SecureObject.createFilteredMethod(o, observer, "observe", { rawArguments: true }),
 			"disconnect": SecureObject.createFilteredMethod(o, observer, "disconnect"),
 
 			"takeRecords": {

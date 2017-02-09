@@ -327,8 +327,6 @@ function SecureElement(el, key) {
 						throw new $A.auraError("SecureElement.innerText cannot be used with " + raw.tagName + " elements!");
 					}
 
-					value = SecureObject.unfilterEverything(this, value);
-
 					raw.innerText = value;
 
 					trustChildNodes(this, raw);
@@ -347,8 +345,6 @@ function SecureElement(el, key) {
 					if (SecureElement.isSharedElement(raw)) {
 						throw new $A.auraError("SecureElement.innerHTML cannot be used with " + raw.tagName + " elements!");
 					}
-
-					value = SecureObject.unfilterEverything(this, value);
 
 					raw.innerHTML = DOMPurify["sanitize"](value, domPurifyConfig);
 
@@ -403,8 +399,9 @@ function SecureElement(el, key) {
     
 	ls_setRef(o, el, key);
 	ls_addToCache(el, o, key);
-	    
-	return o;
+    ls_registerProxy(o);
+
+    return o;
 }
 
 SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseInsensitiveAttributes) {
@@ -523,8 +520,6 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseIn
 					throw new $A.auraError("SecureElement.textContent cannot be used with " + raw.tagName + " elements!");
 				}
 
-				value = SecureObject.unfilterEverything(this, value);
-
 				raw.textContent = value;
 
 				trustChildNodes(this, raw);
@@ -559,7 +554,7 @@ SecureElement.createAttributeAccessMethodConfig = function(methodName, prototype
 SecureElement.addEventTargetMethods = function(se, raw, key) {
 	Object.defineProperties(se, {
 		addEventListener : SecureElement.createAddEventListenerDescriptor(se, raw, key),
-		dispatchEvent : SecureObject.createFilteredMethod(se, raw, "dispatchEvent"),
+		dispatchEvent : SecureObject.createFilteredMethod(se, raw, "dispatchEvent", { rawArguments: true }),
 
 		// removeEventListener() is special in that we do not want to
 		// unfilter/unwrap the listener argument or it will not match what
@@ -576,7 +571,7 @@ SecureElement.addEventTargetMethods = function(se, raw, key) {
 SecureElement.createEventTargetMethodsStateless = function(config, prototype) {
 	config["addEventListener"] = SecureElement.createAddEventListenerDescriptorStateless(prototype);
 
-	config["dispatchEvent"] = SecureObject.createFilteredMethodStateless("dispatchEvent", prototype);
+	config["dispatchEvent"] = SecureObject.createFilteredMethodStateless("dispatchEvent", prototype, { rawArguments: true });
 
 	// removeEventListener() is special in that we do not want to
 	// unfilter/unwrap the listener argument or it will not match what

@@ -30,13 +30,19 @@ function SecureAuraEvent(event, key) {
         }
     });
 
-	[ "fire", "getName", "getParam", "getParams", "getPhase", "getSource", "pause", "preventDefault", "resume", "setParam", "setParams", "stopPropagation" ]
+	[ "setParam", "setParams" ]
+	.forEach(function(name) {
+		Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, event, name, { defaultKey: key }));
+	});
+	
+	[ "fire", "getName", "getParam", "getParams", "getPhase", "getSource", "pause", "preventDefault", "resume", "stopPropagation" ]
 	.forEach(function(name) {
 		Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, event, name));
 	});
 
     ls_setRef(o, event, key);
     ls_addToCache(event, o, key);
+    ls_registerProxy(o);
 
     return Object.seal(o);
 }

@@ -256,6 +256,17 @@ function LockerService() {
 		unwrap : ls_unwrap,
 
 		trust : ls_trust,
+		
+		getRaw: function(value) {
+			if (value) {
+				var key = ls_getKey(value);
+				if (key) {
+					value = ls_getRef(value, key) || value;
+				}
+			}
+			
+			return value;
+		},
 
 		instanceOf : function(value, type) {
 			if (value instanceof type) {

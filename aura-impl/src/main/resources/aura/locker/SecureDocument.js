@@ -136,6 +136,7 @@ function SecureDocument(doc, key) {
 
     ls_setRef(o, doc, key);
     ls_addToCache(doc, o, key);
+    ls_registerProxy(o);
 
     return o;
 }

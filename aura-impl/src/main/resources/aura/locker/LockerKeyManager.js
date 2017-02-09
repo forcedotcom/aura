@@ -33,7 +33,9 @@ var ls_getKey,
     ls_isOpaque,
     ls_unwrap,
     ls_addToCache,
-    ls_getFromCache;
+    ls_getFromCache,
+    ls_isProxy,
+    ls_registerProxy;
 
 (function LockerKeyManager() {
 	var substituteMapForWeakMap = false;
@@ -74,6 +76,7 @@ var ls_getKey,
     var secureToRaw = newWeakMap(); 
     var opaqueSecure = newWeakMap();
     var objectToKeyedData = newWeakMap();  
+    var isSecureProxy = newWeakMap();
 
     // ALL METHODS BELOW USE KEY ONLY
 
@@ -218,6 +221,23 @@ var ls_getKey,
         return opaqueSecure.get(st) === true;
     };
 
+    /**
+     * LockerService internal API.
+     * Returns whether or not the provided object represents a secure proxy/wrapper.
+     */
+    ls_isProxy = function(st) {
+        return isSecureProxy.get(st) === true;
+    };
+    
+    /**
+     * LockerService internal API.
+     * Track the fact that st is a secure proxy or wrapper class.
+     */
+    ls_registerProxy = function(st) {
+        isSecureProxy.set(st, true);
+    };
+    
+    
     /**
      * LockerService internal API.
      * Verify access and retrieve the raw object,

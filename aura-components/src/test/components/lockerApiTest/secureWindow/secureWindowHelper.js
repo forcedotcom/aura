@@ -724,9 +724,9 @@
             "window":                               { type: "Window" }
         },
         "EventTarget": {
-            "addEventListener":                 {type: "function" },
-            "dispatchEvent":                    {type: "function" },
-            "removeEventListener":              {type: "function" }
+            "addEventListener":                 { type: "function" },
+            "dispatchEvent":                    { type: "function" },
+            "removeEventListener":              { type: "function" }
         }
     }
 })

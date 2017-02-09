@@ -31,14 +31,14 @@ function SecureAction(action, key) {
     });
 
     Object.defineProperties(o, {
-        "setCallback": SecureObject.createFilteredMethod(o, action, "setCallback"),
-        "setParams": SecureObject.createFilteredMethod(o, action, "setParams"),
-        "setParam": SecureObject.createFilteredMethod(o, action, "setParam"),
+        "setCallback": SecureObject.createFilteredMethod(o, action, "setCallback", { defaultKey: key }),
+        "setParams": SecureObject.createFilteredMethod(o, action, "setParams", { defaultKey: key }),
+        "setParam": SecureObject.createFilteredMethod(o, action, "setParam", { defaultKey: key }),
         "getParams": SecureObject.createFilteredMethod(o, action, "getParams"),
         "getParam": SecureObject.createFilteredMethod(o, action, "getParam"),
         "getCallback": SecureObject.createFilteredMethod(o, action, "getCallback"),
         "getState": SecureObject.createFilteredMethod(o, action, "getState"),
-        "getReturnValue": SecureObject.createFilteredMethod(o, action, "getReturnValue"),
+        "getReturnValue": SecureObject.createFilteredMethod(o, action, "getReturnValue", { defaultKey: key }),
         "getError": SecureObject.createFilteredMethod(o, action, "getError"),
         "isBackground": SecureObject.createFilteredMethod(o, action, "isBackground"),
         "setBackground": SecureObject.createFilteredMethod(o, action, "setBackground"),
@@ -48,6 +48,7 @@ function SecureAction(action, key) {
 
     ls_setRef(o, action, key);
     ls_addToCache(action, o, key);
+    ls_registerProxy(o);
 
     return Object.seal(o);
 }

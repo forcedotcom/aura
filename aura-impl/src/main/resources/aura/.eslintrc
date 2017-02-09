@@ -147,6 +147,8 @@
     "ls_getFromCache": true,
     "ls_getData": true,
     "ls_setData": true,
+    "ls_isProxy": true,
+    "ls_registerProxy": true,
     "lazyInitInlinedSafeEvalWorkaround": true
   },
 

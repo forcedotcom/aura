@@ -50,6 +50,7 @@ function SecureNavigator(navigator, key) {
 
     ls_setRef(o, navigator, key);
     ls_addToCache(navigator, o, key);
+    ls_registerProxy(o);
 
 	return o;
 }

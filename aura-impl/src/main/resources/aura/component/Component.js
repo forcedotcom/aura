@@ -1159,11 +1159,15 @@ Component.prototype.get = function(key) {
         if(!valueProvider){
             $A.assert(false, "Unable to get value for key '" + key + "'. No value provider was found for '" + root + "'.");
         }
+        
+        var value;
         if($A.util.isFunction(valueProvider.get)){
-            return valueProvider.get(path.join('.'),this);
+            value = valueProvider.get(path.join('.'),this);
         }else{
-            return $A.expressionService.resolve(path,valueProvider);
+            value = $A.expressionService.resolve(path,valueProvider);
         }
+
+        return value;
     } else {
         return valueProvider;
     }

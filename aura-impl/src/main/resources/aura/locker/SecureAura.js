@@ -56,11 +56,14 @@ function SecureAura(AuraInstance, key) {
 	});
 
 	// SecureAura methods and properties
-	[ "createComponent", "createComponents", "enqueueAction", "reportError", "get", "getComponent", "getReference", "getRoot", "log", "warning" ]
-			.forEach(function(name) {
-				Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, AuraInstance, name));
-			});
+	[ "createComponent", "createComponents", "enqueueAction" ].forEach(function(name) {
+		Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, AuraInstance, name, { rawArguments: true }));
+	});
 
+	[ "reportError", "get", "getComponent", "getReference", "getRoot", "log", "warning" ].forEach(function(name) {
+		Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, AuraInstance, name));
+	});
+	
     ls_setRef(o, AuraInstance, key);
 	Object.seal(o);
 
@@ -88,5 +91,7 @@ function SecureAura(AuraInstance, key) {
 	Object.seal(sls);
 
     ls_addToCache(AuraInstance, o, key);
+    ls_registerProxy(o);
+
 	return o;
 }

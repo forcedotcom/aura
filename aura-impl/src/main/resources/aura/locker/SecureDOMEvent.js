@@ -70,6 +70,7 @@ function SecureDOMEvent(event, key) {
 
     ls_setRef(o, event, key);
     ls_addToCache(event, o, key);
+    ls_registerProxy(o);
 
     return o;
 }

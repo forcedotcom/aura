@@ -430,6 +430,7 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
         calculatedPosition++;
         positionMarker=positionMarker.previousSibling;
     }
+    
     for(var i=0;i<components.length;i++){
         var info=components[i];
         var renderedElements=null;

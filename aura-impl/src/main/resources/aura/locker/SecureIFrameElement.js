@@ -17,23 +17,6 @@
 var SecureIFrameElement = {
 	addMethodsAndProperties: function(prototype) {
 	    "use strict";
-
-	    function SecureIFrameContentWindow(w, key) {
-	    	var sicw = Object.create(null, {
-	            toString: {
-	                value: function() {
-	                    return "SecureIFrameContentWindow: " + w + "{ key: " + JSON.stringify(key) + " }";
-	                }
-	            }
-	        });
-	
-	    	Object.defineProperties(sicw, {
-	            postMessage: SecureObject.createFilteredMethod(sicw, w, "postMessage")
-	    	});
-	
-	    	return sicw;
-	    }
-	
 	    Object.defineProperties(prototype, {
 	        // Standard HTMLElement methods
 	        // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
@@ -42,7 +25,7 @@ var SecureIFrameElement = {
 	        contentWindow: {
 	        	get: function() {
 					var raw = SecureObject.getRaw(this);
-	        		return raw.contentWindow ? SecureIFrameContentWindow(raw.contentWindow, ls_getKey(this)) : raw.contentWindow;
+	        		return raw.contentWindow ? SecureIFrameElement.SecureIFrameContentWindow(raw.contentWindow, ls_getKey(this)) : raw.contentWindow;
 	        	}
 	        }
 	    });
@@ -53,5 +36,25 @@ var SecureIFrameElement = {
 	    ["height", "width", "name", "src"].forEach(function (name) {
 			Object.defineProperty(prototype, name, SecureObject.createFilteredPropertyStateless(name, prototype));
 		});
+	},
+	
+	SecureIFrameContentWindow: function(w, key) {
+		var sicw = Object.create(null, {
+	        toString: {
+	            value: function() {
+	                return "SecureIFrameContentWindow: " + w + "{ key: " + JSON.stringify(key) + " }";
+	            }
+	        }
+	    });
+
+		Object.defineProperties(sicw, {
+	        postMessage: SecureObject.createFilteredMethod(sicw, w, "postMessage", { rawArguments: true })
+		});
+		
+		ls_setRef(sicw, w, key);
+		ls_addToCache(w, sicw, key);
+	    ls_registerProxy(sicw);
+
+		return sicw;
 	}
 };

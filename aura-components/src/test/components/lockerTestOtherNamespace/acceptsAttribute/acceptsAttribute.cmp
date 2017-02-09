@@ -16,9 +16,11 @@
 
 -->
 <aura:component implements="aura:requireLocker">
-    <aura:attribute access="GLOBAL" name="obj" type="Object" default="" />
+    <aura:attribute access="GLOBAL" name="obj" type="Object" default=""/>
     <aura:attribute name="output" type="String" default="Default output"/>
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
+    <aura:method name="setupTestFilteringProxy" action="{!c.setupTestFilteringProxy}"/>
 
     <div id="output">{!v.output}</div>
 </aura:component>

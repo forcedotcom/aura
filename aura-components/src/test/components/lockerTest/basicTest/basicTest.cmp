@@ -20,7 +20,8 @@
     <aura:attribute name="testRenderer" type="Boolean" default="false" description="Set to true to check Locker wrappers in renderer"/>
     <aura:attribute name="componentStore" type="Object"/>
     <aura:attribute name="thisAttribute" type="Object" default="{!this}"/>
-
+    <aura:attribute name="object" type="Object"/>
+    
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
     <aura:method name="testAuraLockerInController" action="{!c.testAuraLockerInController}"/>
@@ -44,6 +45,7 @@
     <aura:method name="testComponentPassedToOtherNamespaceViaCreateComponent" action="{!c.testComponentPassedToOtherNamespaceViaCreateComponent}"/>
     <aura:method name="testInstanceOf" action="{!c.testInstanceOf}"/>
     <aura:method name="testLiveCollections" action="{!c.testLiveCollections}"/>
+    <aura:method name="testFilteringProxy" action="{!c.testFilteringProxy}"/>
 
     <div>LockerService test</div>
     <div aura:id="content" id="content"/>
@@ -54,4 +56,6 @@
     </ul>
     
     <ui:outputText aura:id="outputText" value="Output Text here"/>
+    
+    <lockerTestOtherNamespace:acceptsAttribute aura:id="otherNamespace"/>
 </aura:component>

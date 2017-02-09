@@ -124,15 +124,18 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
                 return function() {
                     var args = SecureObject.ArrayPrototypeSlice.call(arguments);
                     // make sure we have access to any <form> passed in to constructor
+                    var form;
                     if (args.length > 0) {
-                        ls_verifyAccess(o, args[0]);
+                    	form = args[0];
+                        ls_verifyAccess(o, form);
                     }
-                    var unfilteredArgs = SecureObject.unfilterEverything(o, args);
+                    
+                    var rawArgs = form ? [ls_getRef(form, ls_getKey(form))] : [];
                     var cls = win["FormData"];
                     if (typeof cls === "function") {
-                        return new (Function.prototype.bind.apply(window["FormData"], [null].concat(unfilteredArgs)));
+                        return new (Function.prototype.bind.apply(window["FormData"], [null].concat(rawArgs)));
                     } else {
-                        return new cls(unfilteredArgs);
+                        return new cls(rawArgs);
                     }
                 };
             }
@@ -229,6 +232,7 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
 
     ls_setRef(o, win, key);
     ls_addToCache(win, o, key);
+    ls_registerProxy(o);
 
     return o;
 }

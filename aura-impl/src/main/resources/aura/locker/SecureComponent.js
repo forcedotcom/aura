@@ -32,10 +32,12 @@ function SecureComponent(component, key) {
                 if (typeof path[1] !== "string" || path[1] === "") {
                     throw new SyntaxError('Invalid key '+ name);
                 }
+                
                 var value = component["get"](name);
                 if (!value) {
                   return value;
                 }
+                
                 if (path[0] === 'c') {
                     return SecureAction(value, key);
                 } else {
@@ -89,7 +91,7 @@ function SecureComponent(component, key) {
         "isConcrete": SecureObject.createFilteredMethod(o, component, "isConcrete"),
         "getConcreteComponent": SecureObject.createFilteredMethod(o, component, "getConcreteComponent", filterOpaque),
         "find": SecureObject.createFilteredMethod(o, component, "find", filterOpaque),
-        "set": SecureObject.createFilteredMethod(o, component, "set"),
+        "set": SecureObject.createFilteredMethod(o, component, "set", { defaultKey: key, rawArguments: true }),
         "getElement": SecureObject.createFilteredMethod(o, component, "getElement", filterOpaque),
         "getElements": SecureObject.createFilteredMethod(o, component, "getElements", filterOpaque)
     });
@@ -105,6 +107,7 @@ function SecureComponent(component, key) {
 
     ls_setRef(o, component, key);
     ls_addToCache(component, o, key); // backpointer
+    ls_registerProxy(o);
 
     return o;
 }

@@ -214,8 +214,9 @@
                 },
                 "DOM element with return from createComponent never updated",
                 function assertReturnIsSecureComponentRef() {
-                    testUtils.assertStartsWith("SecureComponentRef", document.getElementById("content").textContent,
-                            "SecureComponent passed to another namespace should be filted to SecureComponentRef");
+                	var content = document.getElementById("content").textContent;
+                    testUtils.assertStartsWith("SecureComponentRef", content,
+                            "SecureComponent passed to another namespace should be filtered to SecureComponentRef");
                 });
     },
     
@@ -291,5 +292,34 @@
         
         testUtils.assertEquals(1, children.length);
         testUtils.assertStartsWith("SecureElement", children[0].toString(), "Expected children[0] to be a SecureElement");
+    },
+    
+    testFilteringProxy: function(cmp, event, helper) {
+        var testUtils = cmp.get("v.testUtils");
+                
+        var o = helper._o;
+        var po = helper._po;
+        var TestPrototype = helper._TestPrototype;
+    	
+        testUtils.assertEquals("fooValue", po.foo());
+        
+        testUtils.assertTrue(o instanceof TestPrototype);
+        testUtils.assertTrue(po instanceof TestPrototype);
+        
+        testUtils.assertTrue("foo" in po);
+        testUtils.assertEquals("fooValue", po.foo());
+
+        testUtils.assertEquals(JSON.stringify(Object.getOwnPropertyDescriptor(o, "someProperty")), JSON.stringify(Object.getOwnPropertyDescriptor(po, "someProperty")));
+
+        // Add a dynamic property and make sure its visible on the proxy
+        po.expando = "expandoValue";
+        testUtils.assertEquals("expandoValue", po.expando);    
+        
+        // Verify that an expando set on one reference is reflected in another reference from a different namespace
+        testUtils.assertEquals(JSON.stringify(Object.keys(o)), JSON.stringify(Object.keys(po)));
+        
+        delete po.expando;
+
+        testUtils.assertEquals(JSON.stringify(Object.keys(o)), JSON.stringify(Object.keys(po)));
     }
 })

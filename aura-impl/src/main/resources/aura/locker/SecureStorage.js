@@ -33,7 +33,7 @@ function SecureStorage(storage, type, key) {
     if (o) {
         return o;
     }
-
+    
     // Read existing key to synthetic key index from storage
     var stringizedKey = JSON.stringify(key);
     var nextSyntheticKey = "LSSNextSynthtic:" + type;
@@ -133,6 +133,7 @@ function SecureStorage(storage, type, key) {
 
     ls_setRef(o, storage, key);
     ls_addToCache(storage, o, key);
+    ls_registerProxy(o);
 
 	return o;
 }

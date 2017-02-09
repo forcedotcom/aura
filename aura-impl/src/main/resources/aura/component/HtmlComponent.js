@@ -135,11 +135,11 @@ function HtmlComponent(config, localCreation) {
     this.attributeValueProvider = configAttributes["valueProvider"];
     this.facetValueProvider = configAttributes["facetValueProvider"];
 
-    // initialize attributes
-    this.setupAttributes(this, configAttributes);
-
     // create all value providers for this component m/v/c etc.
     this.setupValueProviders(config["valueProviders"]);
+
+    // initialize attributes
+    this.setupAttributes(this, configAttributes);
 
     // index this component with its value provider (if it has a localid)
     this.doIndex(this);
@@ -201,7 +201,7 @@ HtmlComponent.prototype.setupComponentDef = function() {
 HtmlComponent.prototype.setupValueProviders = function(customValueProviders) {
     var vp=this.valueProviders;
 
-    vp["v"]=this.attributeSet;
+    vp["v"]=this.attributeSet = new AttributeSet(this.componentDef.attributeDefs);
     vp["this"]=this;
     vp["globalid"]=this.globalId;
     vp["def"]=this.componentDef;

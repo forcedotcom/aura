@@ -133,14 +133,14 @@ function Component(config, localCreation) {
     this.attributeValueProvider = configAttributes["valueProvider"];
     this.facetValueProvider = configAttributes["facetValueProvider"];
 
-    // initialize attributes
-    this.setupAttributes(this, configAttributes);
-
     // instantiates this components model
     this.setupModel(config["model"], this);
 
     // create all value providers for this component m/v/c etc.
     this.setupValueProviders(config["valueProviders"]);
+
+    // initialize attributes
+    this.setupAttributes(this, configAttributes);
 
     // runs component provider and replaces this component with the provided one
     this.injectComponent(config, localCreation);
@@ -1890,6 +1890,12 @@ Component.prototype.getValueProvider = function(key) {
  * Create the value providers
  */
 Component.prototype.setupValueProviders = function(customValueProviders) {
+        // Have to do before setup Attributes.
+    // Since it is a value provider, I'm adding it here.
+    if(!this.attributeSet) {
+        this.attributeSet = this.isConcrete() ? new AttributeSet(this.componentDef.attributeDefs) : this.getConcreteComponent().attributeSet;
+    }
+
     var vp=this.valueProviders;
 
     vp["v"]=this.attributeSet;
@@ -2226,7 +2232,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
         concreteComponent.attributeSet.merge(attributes);
         this.attributeSet=concreteComponent.attributeSet;
     }else{
-        this.attributeSet = new AttributeSet(attributes, this.componentDef.attributeDefs, cmp);
+        this.attributeSet.initialize(attributes);
     }
 };
 

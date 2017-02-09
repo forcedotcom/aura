@@ -78,9 +78,6 @@ import com.google.common.collect.Sets;
  */
 public final class StringSourceLoaderImpl implements StringSourceLoader {
     
-    public StringSourceLoaderImpl() {
-    }
-    
     @Configuration
     public static class BeanConfiguration {
         private static final StringSourceLoaderImpl INSTANCE = new StringSourceLoaderImpl();

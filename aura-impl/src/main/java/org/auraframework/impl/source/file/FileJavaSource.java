@@ -23,8 +23,6 @@ import org.auraframework.system.Parser.Format;
 
 public class FileJavaSource<D extends Definition> extends FileSource<D> {
 
-    private static final long serialVersionUID = 1774006473322879169L;
-
     public FileJavaSource(DefDescriptor<D> descriptor, String systemId, File file) {
         super(descriptor, systemId, file, Format.JAVA);
     }

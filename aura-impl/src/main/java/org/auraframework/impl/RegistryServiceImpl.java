@@ -135,7 +135,6 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
 
     private static class SourceLocationInfo {
         public final List<DefRegistry> staticLocationRegistries;
-        public final List<SourceLoader> javaSourceLoaders;
         public final List<DefRegistry> markupRegistries;
         public final String baseDir;
         private boolean changed;
@@ -149,7 +148,6 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             }
             this.staticLocationRegistries = slr_list;
             this.markupRegistries = markupRegistries;
-            this.javaSourceLoaders = javaSourceLoaders;
             this.baseDir = baseDir;
             this.changed = false;
         }

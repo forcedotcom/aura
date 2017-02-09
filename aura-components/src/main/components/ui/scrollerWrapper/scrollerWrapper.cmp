@@ -16,12 +16,22 @@
 
 -->
 <aura:component support="BETA" access="GLOBAL" extensible="false" description="Creates a container that enables native scrolling in Salesforce1.">
-    <!-- Attributes -->
-    <aura:attribute name="class" type="String" access="GLOBAL" description="A CSS class applied to the outer element. This style is in addition to base classes output by the component."/>
+
+    <!-- Private Attributes -->
     <aura:attribute name="privateStartY" type="Integer" access="private" description="Determines the user's mouse position in the vertical axis."/>
 
+    <!-- Global Attributes -->
+    <aura:attribute name="class" type="String" access="GLOBAL" description="A CSS class applied to the outer element. This style is in addition to base classes output by the component."/>
+
+    <aura:method name="scrollTo" action="{!c.scrollTo}" access="GLOBAL" description="Scrolls the content to a specified location.">
+ 	    <aura:attribute name="destination" type="String" description="Available options: custom, top, bottom, left, and right. For custom destination, xcoord and ycoord are used to determine the target location."/>
+ 	    <aura:attribute name="xcoord" type="Integer" default="0" description="x coordinate for custom destination"/>
+ 	    <aura:attribute name="ycoord" type="Integer" default="0" description="y coordinate for custom destination"/>
+     </aura:method>
+
     <!-- Markup -->
-    <div class="{! join(' ', 'scrollable', $Browser.isIOS ? 'scrollingOnIOS' : '', v.class) }"
+    <div aura:id="scrollerWrapper"
+         class="{! join(' ', 'scrollable', $Browser.isIOS ? 'scrollingOnIOS' : '', v.class) }"
          ontouchstart="{! c.handleTouchstart }"
          ontouchmove="{! c.handleTouchmove }">
         {! v.body }

@@ -165,7 +165,7 @@ BaseComponent<D, I> {
             final List<AttributeDefRef> facets = extender.getDescriptor().getDef().getFacets();
             final D definition = this.getDescriptor().getDef();
             for (AttributeDefRef facet : facets) {
-                if ((facet.getName() =="body" || facet.getValue() instanceof FunctionCall) && definition.getAttributeDef(facet.getName()) != null) {
+                if ((facet.getName().equals("body") || facet.getValue() instanceof FunctionCall) && definition.getAttributeDef(facet.getName()) != null) {
                     attributeSet.set(facet);
                 }
             }

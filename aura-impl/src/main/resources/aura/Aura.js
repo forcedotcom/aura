@@ -212,9 +212,7 @@ Aura.bootstrapMark = function (mark, value) {
      * @description This, $A, is supposed to be our ONLY window-polluting top-level variable. Everything else in Aura is
      *            attached to it.
      *
-     * @platform
      * @namespace
-     * @alias $A
      *
      * @borrows AuraComponentService#createComponent as $A.createComponent
      * @borrows AuraComponentService#createComponents as $A.createComponents

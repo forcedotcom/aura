@@ -33,8 +33,12 @@
    component.getEvent("blur").fire();
 }</pre>		
 		<h4>Methods</h4>
-		<p><code>insertItems()</code></p>
+		<p><code>insertItems(items, fireInsertedEvent)</code></p>
 		<p>Adds an array of pill items in the format <code>[{name:'name', id:'id'}, ...]</code>.</p>
+		<ul>
+		    <li>items: The list of pill items to add.</li>
+		    <li>fireInsertedEvent: Specifies whether pill items have been inserted. The default is true.</li>
+		</ul>
 <pre>initializePills: function (cmp) {
     var pills = [{id:'pill01',label:"HTML",icon: {url:'path/to/url'}},
             {id:'pill02',label:"CSS",icon: {url:'path/to/url'}}];
@@ -42,10 +46,18 @@
     var pillContainer = component.find("pillContainer");
     pillContainer.insertItems(pills);
 }</pre>		
+        <p><code>clear()</code></p>
+        <p>Clears the list of pill items.</p>
 		<p><code>collapse()</code></p>
 		<p>Collapses the pill list to the number of lines specified in the maxLines attribute.</p>
 		<p><code>expand()</code></p>
 		<p>Expands the pill list after being collapsed from the collapse method.</p> 
+		<p><code>removeItems(items, fireRemovedEvent)</code></p>
+		<p>Removes the list of pill items. Takes in an array of object in the format <code>[{name:'name', id:'id'}, ...]</code>.</p>
+		<ul>
+		    <li>items: The list of pill items to remove.</li>
+		    <li>fireRemovedEvent: Specifies whether pill items have been removed. The default is true.</li>
+		</ul>
 		<p>See the Examples tab for more information.</p>
 	</aura:description>	
 	<aura:example name="pillAutocompleteExample" ref="uitest:pillContainer_WithAutocomplete" label="Creating Pills using Autocomplete">

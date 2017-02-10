@@ -19,7 +19,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-
 import org.auraframework.components.ui.TreeNode;
 import org.auraframework.docs.ApiContentsModel;
 import org.auraframework.impl.AuraImplTestCase;

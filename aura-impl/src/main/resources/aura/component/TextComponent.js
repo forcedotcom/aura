@@ -25,7 +25,6 @@
  *            config - component configuration
  * @param {Boolean}
  *            [localCreation] - local creation
- * @platform
  * @export
  */
 function TextComponent(config, localCreation) {

@@ -35,7 +35,7 @@ function SecureAuraEvent(event, key) {
 		Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, event, name, { defaultKey: key }));
 	});
 	
-	[ "fire", "getName", "getParam", "getParams", "getPhase", "getSource", "pause", "preventDefault", "resume", "stopPropagation" ]
+	[ "fire", "getName", "getParam", "getParams", "getPhase", "getSource", "pause", "preventDefault", "resume", "stopPropagation", "getType", "getEventType" ]
 	.forEach(function(name) {
 		Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, event, name));
 	});

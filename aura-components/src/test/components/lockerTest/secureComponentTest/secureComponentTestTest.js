@@ -139,12 +139,18 @@
             }
         ]
     },
-    
+
     testMarkupComponentAccessToFacet: {
         test: function(cmp) {
             cmp.callFacetMethodFromMarkupComponent();
             $A.test.assertTrue(cmp.find("child").get("v.isSecureComponent"), 
             "Expected component in markup to get back SecureComponent when calling find() on markup element");
+        }
+    },
+
+    testGetName: {
+        test: function(cmp) {
+            cmp.testGetName();
         }
     }
 })

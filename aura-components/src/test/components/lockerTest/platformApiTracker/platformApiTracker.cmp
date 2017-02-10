@@ -15,17 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component implements="aura:requireLocker">
-    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
+<aura:component implements="aura:requireLocker" controller="java://org.auraframework.components.auradocs.LockerApiController">
+    <aura:attribute name="apiMap" type="Object" />
 
-    <div>SecureAuraEvent test</div>
-
-    <aura:method name="testGetEventSourceReturnsSecureComponent" />
-    <aura:method name="testExerciseEventAPIs" />
-    <aura:method name="testGetType" />
-    <aura:method name="testGetEventType" />
-
-    <ui:button label="press event" aura:id="button" press="c.testGetSourceReturnsSecureComponentRefWhenNoAccess"/>
-
-    <aura:registerevent name="debugLog" type="aura:debugLog"/>
+    <aura:method name="generateLockerApiMap" />
 </aura:component>

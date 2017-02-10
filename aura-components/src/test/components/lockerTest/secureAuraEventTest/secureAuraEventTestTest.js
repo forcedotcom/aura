@@ -32,5 +32,17 @@
         test: function(cmp) {
             cmp.testExerciseEventAPIs();
         }
+    },
+
+    testGetType: {
+        test: function(cmp) {
+            cmp.testGetType();
+        }
+    },
+
+    testGetEventType: {
+        test: function(cmp) {
+            cmp.testGetEventType();
+        }
     }
 })

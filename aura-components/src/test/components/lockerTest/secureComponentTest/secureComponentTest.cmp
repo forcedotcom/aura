@@ -38,6 +38,7 @@
     <aura:method name="testGet_ModelMemberValue" action="{!c.testGet_ModelMemberValue}"/>
     <aura:method name="testGet_ActionReturnsSecureAction" action="{!c.testGet_ActionReturnsSecureAction}"/>
     <aura:method name="testGet_ComponentEventReturnsSecureAuraEvent" action="{!c.testGet_ComponentEventReturnsSecureAuraEvent}"/>
+    <aura:method name="testGetName"/>
 
    	<aura:method name="testGet_InvalidAction" action="{!c.testGet_InvalidAction}"/>
    	<aura:method name="testGet_InvalidAttr" action="{!c.testGet_InvalidAttr}"/>

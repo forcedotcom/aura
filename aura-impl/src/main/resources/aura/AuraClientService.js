@@ -2931,24 +2931,35 @@ AuraClientService.prototype.buildActionNameList = function(actions) {
 
 
 /**
- * This function is only meant to be used for the corner case of preloading actions before Aura its available
+ * This function is only meant to be used for the corner case of preloading actions before Aura is available
  * It gets the actions that were preloaded ahead of time, a map with actionIds, and the prelaod XHR response object
  * Basically is like a regular server action but re-wiring the server results manually
  * @export
  */
 AuraClientService.prototype.hydrateActions = function(actions, preloadMapId, response) {
+    var i;
+    var action;
     var xhr = this.getAvailableXHR(true);
-    $A.assert(xhr, 'Error restoring preloaded actions due to unavailable XHR resources');
+
+    // If we don't have an XHR, that means we need to try to send later.
+    if (!xhr) {
+        for (i = 0; i < actions.length; i++) {
+            action = actions[i];
+            this.actionsDeferred.unshift(action);
+        }
+        return;
+    }
 
     xhr.request = response;
 
-    actions.forEach(function (action) {
+    for (i = 0; i < actions.length; i++) {
+        action = actions[i];
         var id = preloadMapId[action.getId()];
         if (id) {
             action.setId(id);
         }
         xhr.addAction(action);
-    });
+    }
 
     this.receive(xhr);
 };

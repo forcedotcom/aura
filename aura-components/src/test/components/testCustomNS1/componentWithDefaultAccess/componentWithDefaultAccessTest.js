@@ -45,6 +45,11 @@
         function cannotAccessPrivateAttribute(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var actual = this.componentCreated.get("v.privateAttribute");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://testCustomNS1:componentWithDefaultAccess2",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canAccessPublicAttribute(cmp) {
             var actual = this.componentCreated.get("v.publicAttribute");
@@ -58,6 +63,11 @@
         function canNotAccessPrivateMethod(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             this.componentCreated.privateMethod();
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.method():\'markup://testCustomNS1:privateMethod",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canAccessPublicMethod(cmp) {
             this.componentCreated.publicMethod();
@@ -89,6 +99,11 @@
         function cannotAccessPrivateAttribute(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var actual = this.componentCreated.get("v.privateAttribute");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! AttributeSet.get(): attribute 'privateAttribute' of component 'markup://testCustomNS1:componentWithPublicAccess",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canAccessPublicAttribute(cmp) {
             var actual = this.componentCreated.get("v.publicAttribute");
@@ -102,6 +117,11 @@
         function canNotAccessPrivateMethod(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             this.componentCreated.privateMethod();
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.method():'markup://testCustomNS1:privateMethod",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canAccessPublicMethod(cmp) {
             this.componentCreated.publicMethod();
@@ -133,6 +153,11 @@
         function cannotAccessPrivateAttribute(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var actual = this.componentCreated.get("v.privateAttribute");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://testCustomNS1:componentWithGlobalAccess",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canAccessPublicAttribute(cmp) {
             var actual = this.componentCreated.get("v.publicAttribute");
@@ -146,6 +171,11 @@
         function canNotAccessPrivateMethod(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             this.componentCreated.privateMethod();
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.method():\'markup://testCustomNS1:privateMethod",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canAccessPublicMethod(cmp) {
             this.componentCreated.publicMethod();
@@ -174,7 +204,13 @@
                     completed = true;
                 }
             );
-            $A.test.addWaitFor(true, function(){ return completed; });
+            $A.test.addWaitForWithFailureMessage(true, function() { return completed; },
+                    "Didn't get ACF error box",
+                    function(){
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                            "Access Check Failed! AuraComponentService.createComponentFromConfig(): \'markup://testCustomNS2:componentWithDefaultAccess",
+                            "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         }]
     },
 
@@ -190,7 +226,13 @@
                     completed = true;
                 }
             );
-            $A.test.addWaitFor(true, function(){ return completed; });
+            $A.test.addWaitForWithFailureMessage(true, function() { return completed; },
+                    "Didn't get ACF error box",
+                    function(){
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                            "AuraComponentService.createComponentFromConfig(): \'markup://testCustomNS2:componentWithPublicAccess",
+                            "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         }]
     },
 
@@ -213,10 +255,20 @@
         function cannotAccessPrivateAttribute(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var actual = this.componentCreated.get("v.privateAttribute");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://testCustomNS2:componentWithGlobalAccess",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canNotAccessPublicAttribute(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var actual = this.componentCreated.get("v.publicAttribute");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! AttributeSet.get(): attribute \'publicAttribute\' of component \'markup://testCustomNS2:componentWithGlobalAccess",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canAccessGlobalAttribute(cmp) {
             var actual = this.componentCreated.get("v.globalAttribute");
@@ -226,10 +278,20 @@
         function canNotAccessPrivateMethod(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             this.componentCreated.privateMethod();
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.method():\'markup://testCustomNS2:privateMethod",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canNotAccessPublicMethod(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             this.componentCreated.publicMethod();
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.method():\'markup://testCustomNS2:publicMethod",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canAccessGlobalMethod(cmp) {
             this.componentCreated.globalMethod();
@@ -262,14 +324,29 @@
         function cannotAccessPublicEventRegisteredWithDefaultAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("NS2eventWithPublicAccessRegisteredWithDefaultAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'NS2eventWithPublicAccessRegisteredWithDefaultAccess\' of component \'markup://testCustomNS2:componentWithGlobalAccess",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function cannotAccessPublicEventRegisteredWithPrivateAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("NS2eventWithPublicAccessRegisteredWithPrivateAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():'NS2eventWithPublicAccessRegisteredWithPrivateAccess' of component 'markup://testCustomNS2:componentWithGlobalAccess",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function cannotAccessPublicEventRegisteredWithPublicAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("NS2eventWithPublicAccessRegisteredWithPublicAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'NS2eventWithPublicAccessRegisteredWithPublicAccess\' of component \'markup://testCustomNS2:componentWithGlobalAccess",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         /*function canAccessPublicEventRegisteredWithGlobalAccess(cmp) {
             var evt = this.componentCreated.getEvent("NS2eventWithPublicAccessRegisteredWithGlobalAccess");
@@ -332,7 +409,13 @@
                     completed = true;
                 }
             );
-            $A.test.addWaitFor(true, function(){ return completed; });
+            $A.test.addWaitForWithFailureMessage(true, function() { return completed; },
+                    "Didn't get ACF error box",
+                    function(){
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                            "Access Check Failed! AuraComponentService.createComponentFromConfig(): 'markup://testPrivilegedNS1:componentWithDefaultAccess",
+                                "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         }]
     },
 
@@ -348,7 +431,13 @@
                     completed = true;
                 }
             );
-            $A.test.addWaitFor(true, function(){ return completed; });
+            $A.test.addWaitForWithFailureMessage(true, function() { return completed; },
+                    "Didn't get ACF error box",
+                    function(){
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                            "Access Check Failed! AuraComponentService.createComponentFromConfig(): \'markup://testPrivilegedNS1:componentWithPublicAccess",
+                                "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         }]
     },
 
@@ -364,7 +453,13 @@
                     completed = true;
                 }
             );
-            $A.test.addWaitFor(true, function(){ return completed; });
+            $A.test.addWaitForWithFailureMessage(true, function() { return completed; },
+                    "Didn't get ACF error box",
+                    function(){
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                            "Access Check Failed! AuraComponentService.createComponentFromConfig(): \'markup://testPrivilegedNS1:componentWithPrivilegedAccess",
+                                "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         }]
     },
 
@@ -387,14 +482,29 @@
         function cannotAccessPrivateAttribute(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var actual = this.componentCreated.get("v.privateAttribute");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://testPrivilegedNS1:componentWithGlobalAccess",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function cannotAccessPublicAttribute(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var actual = this.componentCreated.get("v.publicAttribute");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! AttributeSet.get(): attribute \'publicAttribute\' of component \'markup://testPrivilegedNS1:componentWithGlobalAccess",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function cannotAccessPrivilegedAttribute(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var actual = this.componentCreated.get("v.privilegedAttribute");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! AttributeSet.get(): attribute \'privilegedAttribute\' of component \'markup://testPrivilegedNS1:componentWithGlobalAccess",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canAccessGlobalAttribute(cmp) {
             var actual = this.componentCreated.get("v.globalAttribute");
@@ -404,10 +514,20 @@
         function canNotAccessPrivateMethod(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             this.componentCreated.privateMethod();
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.method():\'markup://testPrivilegedNS1:privateMethod",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canNotAccessPublicMethod(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             this.componentCreated.publicMethod();
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.method():\'markup://testPrivilegedNS1:publicMethod",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canAccessGlobalMethod(cmp) {
             this.componentCreated.globalMethod();
@@ -416,6 +536,11 @@
         function cannotAccessPrivilegedMethod(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             this.componentCreated.privilegedMethod();
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.method():\'markup://testPrivilegedNS1:privilegedMethod",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         }
         ]
     },
@@ -491,10 +616,20 @@
         function cannotAccessPrivateAttribute(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var actual = this.componentCreated.get("v.privateAttribute");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function cannotAccessPublicAttribute(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var actual = this.componentCreated.get("v.publicAttribute");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! AttributeSet.get(): attribute \'publicAttribute\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canAccessGlobalAttribute(cmp) {
             var actual = this.componentCreated.get("v.globalAttribute");
@@ -503,15 +638,30 @@
         function cannotAccessPrivilegedAttribute(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var actual = this.componentCreated.get("v.privilegedAttribute");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! AttributeSet.get(): attribute \'privilegedAttribute\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
          /*********************************** tests for method ******************************************/
         function canNotAccessPrivateMethod(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             this.componentCreated.privateMethod();
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.method():\'markup://auratest:privateMethod",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canNotAccessPublicMethod(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             this.componentCreated.publicMethod();
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.method():\'markup://auratest:publicMethod",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canAccessGlobalMethod(cmp) {
             this.componentCreated.globalMethod();
@@ -520,10 +670,20 @@
         function canNotAccessPrivilegedMethod(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             this.componentCreated.privilegedMethod();
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.method():\'markup://auratest:privilegedMethod",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canNotAccessInternalMethod(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             this.componentCreated.internalMethod();
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.method():\'markup://auratest:internalMethod",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         /*********************************** tests for component event ******************************************/
         //Some of these tests are comment out because of W-2999718
@@ -532,18 +692,38 @@
         function canNotAccessSystemNSDefaultAccessEventRegisteredWithDefaultAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithDefaultAccessInSystemNamespaceRegisteredWithDefaultAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'eventWithDefaultAccessInSystemNamespaceRegisteredWithDefaultAccess\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canNotAccessSystemNSDefaultAccessEventRegisteredWithPrivateAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithDefaultAccessInSystemNamespaceRegisteredWithPrivateAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'eventWithDefaultAccessInSystemNamespaceRegisteredWithPrivateAccess\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canNotAccessSystemNSDefaultAccessEventRegisteredWithPublicAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithDefaultAccessInSystemNamespaceRegisteredWithPublicAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'eventWithDefaultAccessInSystemNamespaceRegisteredWithPublicAccess\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function cannotAccessSystemNSDefaultAccessEventRegisteredWithPrivilegedAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithDefaultAccessInSystemNamespaceRegisteredWithPrivilegedAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'eventWithDefaultAccessInSystemNamespaceRegisteredWithPrivilegedAccess\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         /*function canAccessSystemNSDefaultAccessEventRegisteredWithGlobalAccess(cmp) {
             var evt = this.componentCreated.getEvent("eventWithDefaultAccessInSystemNamespaceRegisteredWithGlobalAccess");
@@ -554,18 +734,38 @@
         function canNotAccessSystemNSInternalAccessEventRegisteredWithDefaultAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithInternalAccessInSystemNamespaceRegisteredWithDefaultAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'eventWithInternalAccessInSystemNamespaceRegisteredWithDefaultAccess\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canNotAccessSystemNSInternalAccessEventRegisteredWithPrivateAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithInternalAccessInSystemNamespaceRegisteredWithPrivateAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'eventWithInternalAccessInSystemNamespaceRegisteredWithPrivateAccess\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canNotAccessSystemNSInternalAccessEventRegisteredWithPublicAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithInternalAccessInSystemNamespaceRegisteredWithPublicAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'eventWithInternalAccessInSystemNamespaceRegisteredWithPublicAccess\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canNotAccessSystemNSInternalAccessEventRegisteredWithPrivilegedAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithInternalAccessInSystemNamespaceRegisteredWithPrivilegedAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'eventWithInternalAccessInSystemNamespaceRegisteredWithPrivilegedAccess\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         /*function canAccessSystemNSInternalAccessEventRegisteredWithGlobalAccess(cmp) {
             //$A.test.expectAuraError("Access Check Failed!");
@@ -577,18 +777,38 @@
         function canNotAccessSystemNSPublicAccessEventRegisteredWithDefaultAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithPublicAccessInSystemNamespaceRegisteredWithDefaultAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'eventWithPublicAccessInSystemNamespaceRegisteredWithDefaultAccess\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canNotAccessSystemNSPublicAccessEventRegisteredWithPrivateAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithPublicAccessInSystemNamespaceRegisteredWithPrivateAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'eventWithPublicAccessInSystemNamespaceRegisteredWithPrivateAccess\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canNotAccessSystemNSPublicAccessEventRegisteredWithPublicAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithPublicAccessInSystemNamespaceRegisteredWithPublicAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'eventWithPublicAccessInSystemNamespaceRegisteredWithPublicAccess\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canNotAccessSystemNSPublicAccessEventRegisteredWithPrivilegedAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithPublicAccessInSystemNamespaceRegisteredWithPrivilegedAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'eventWithPublicAccessInSystemNamespaceRegisteredWithPrivilegedAccess\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         /*function canAccessSystemNSPublicAccessEventRegisteredWithGlobaldAccess(cmp) {
             var evt = this.componentCreated.getEvent("eventWithPublicAccessInSystemNamespaceRegisteredWithGlobalAccess");
@@ -599,18 +819,38 @@
         function canNotAccessSystemNSPrivilegedAccessEventRegisteredWithDefaultAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithPrivilegedAccessInSystemNamespaceRegisteredWithDefaultAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'eventWithPrivilegedAccessInSystemNamespaceRegisteredWithDefaultAccess\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canNotAccessSystemNSPrivilegedAccessEventRegisteredWithPrivateAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithPrivilegedAccessInSystemNamespaceRegisteredWithPrivateAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'eventWithPrivilegedAccessInSystemNamespaceRegisteredWithPrivateAccess\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canNotAccessSystemNSPrivilegedAccessEventRegisteredWithPublicAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithPrivilegedAccessInSystemNamespaceRegisteredWithPublicAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'eventWithPrivilegedAccessInSystemNamespaceRegisteredWithPublicAccess\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         function canNotAccessSystemNSPrivilegedAccessEventRegisteredWithPrivilegedAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithPrivilegedAccessInSystemNamespaceRegisteredWithPrivilegedAccess");
+            this.waitForErrorModal(function() {
+                $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! Component.getEvent():\'eventWithPrivilegedAccessInSystemNamespaceRegisteredWithPrivilegedAccess\' of component \'markup://auratest:accessGlobalComponent",
+                        "markup://testCustomNS1:componentWithDefaultAccess");
+            });
         },
         /*function canAccessSystemNSPrivilegedAccessEventRegisteredWithGlobalAccess(cmp) {
             var evt = this.componentCreated.getEvent("eventWithPrivilegedAccessInSystemNamespaceRegisteredWithGlobalAccess");
@@ -649,7 +889,7 @@
         test:[
             function(cmp) {
                 $A.test.expectAuraError("Access Check Failed! AuraComponentService.createComponentFromConfig():");
-
+                
                 // Access check failure
                 $A.createComponent("markup://testCustomNS2:componentWithDefaultAccess", {}, function(){});
 
@@ -659,6 +899,9 @@
 
                     var expected = cmp.getDef().getDescriptor().getQualifiedName();
                     $A.test.assertEquals(expected, failingDescriptor);
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                            "Access Check Failed! AuraComponentService.createComponentFromConfig(): \'markup://testCustomNS2:componentWithDefaultAccess",
+                                "markup://testCustomNS1:componentWithDefaultAccess");
                 });
             }
         ]
@@ -668,7 +911,7 @@
         test:[
             function(cmp){
                 $A.test.expectAuraError("Access Check Failed! AttributeSet.get():");
-
+                
                 var newCmpDescriptor = "testCustomNS1:componentWithDefaultAccess2";
                 $A.createComponent(newCmpDescriptor, {},
                     function(newCmp){
@@ -685,6 +928,9 @@
 
                     var expected = cmp.getDef().getDescriptor().getQualifiedName();
                     $A.test.assertEquals(expected, failingDescriptor);
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                            "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://testCustomNS1:componentWithDefaultAccess2",
+                                "markup://testCustomNS1:componentWithDefaultAccess");
                 });
             }
         ]
@@ -693,9 +939,8 @@
     testFailingDescriptorForSetAttributeAccessCheckFailure:{
         test:[
             function(cmp){
-                $A.test.expectAuraError("Access Check Failed! AttributeSet.get():");
+                $A.test.expectAuraError("Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://testCustomNS1:componentWithDefaultAccess2");
                 $A.test.expectAuraError("Access Check Failed! AttributeSet.set():");
-
                 var newCmpDescriptor = "testCustomNS1:componentWithDefaultAccess2";
                 $A.createComponent(newCmpDescriptor, {},
                     function(newCmp){
@@ -712,6 +957,9 @@
 
                     var expected = cmp.getDef().getDescriptor().getQualifiedName();
                     $A.test.assertEquals(expected, failingDescriptor);
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                            "Access Check Failed! AttributeSet.set(): \'privateAttribute\' of component \'markup://testCustomNS1:componentWithDefaultAccess2",
+                                "markup://testCustomNS1:componentWithDefaultAccess");
                 });
             }
         ]
@@ -737,6 +985,9 @@
 
                     var expected = cmp.getDef().getDescriptor().getQualifiedName();
                     $A.test.assertEquals(expected, failingDescriptor);
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                            "Access Check Failed! Component.method():\'markup://testCustomNS1:privateMethod",
+                                "markup://testCustomNS1:componentWithDefaultAccess");
                 });
             },
         ]
@@ -763,6 +1014,9 @@
 
                     var expected = cmp.getDef().getDescriptor().getQualifiedName();
                     $A.test.assertEquals(expected, failingDescriptor);
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                            "Access Check Failed! Component.getEvent():\'NS2eventWithPublicAccessRegisteredWithPublicAccess",
+                            "markup://testCustomNS1:componentWithDefaultAccess");
                 });
             },
         ]
@@ -844,7 +1098,6 @@
     testGetDefinitionForApplicationEventWithGlobalAccessInPrivilegedNamespace: {
         test: function(){
             var actionComplete = false;
-            debugger;
            $A.getDefinition("e.testPrivilegedNS1:applicationEventWithGlobalAccess", function(definition) {
                $A.test.assertNotNull(definition,"event definition requested is null");
                $A.test.assertEquals("markup://testPrivilegedNS1:applicationEventWithGlobalAccess", definition.getDescriptor().getQualifiedName());
@@ -887,7 +1140,7 @@
                 var style = $A.test.getStyle(element, 'display');
                 return style === 'block';
             },
-            "Error Model didn't show up.",
+            "Error Modal didn't show up.",
             callback);
     },
 

@@ -82,14 +82,47 @@
             function(cmp) {
                 $A.test.expectAuraError("Access Check Failed!");
                 $A.test.assertUndefined(cmp.get("v.StrAttributeWithDefaultValue"));
+                $A.test.addWaitForWithFailureMessage(true, 
+                        function() {
+                            return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
+                        },
+                        "Didn't get ACF error box",
+                        function(){
+                            $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                                    "Access Check Failed! AttributeSet.get(): attribute 'StrAttributeWithDefaultValue' of component 'markup://attributesTest:defaultValue",
+                                        "markup://attributesTest:defaultValue");
+                });
             },
             function(cmp) {
                 $A.test.expectAuraError("Access Check Failed!");
                 $A.test.assertUndefined(cmp.get("v.strATTRIBUTEWithDefaultValue"));
+                $A.test.addWaitForWithFailureMessage(true, 
+                        function() {
+                            return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
+                        },
+                        "Didn't get ACF error box",
+                        function(){
+                            $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                                    "Access Check Failed! AttributeSet.get(): attribute 'strATTRIBUTEWithDefaultValue' of component 'markup://attributesTest:defaultValue",
+                                        "markup://attributesTest:defaultValue");
+                });
+                
             },
             function(cmp) {
                 $A.test.expectAuraError("Access Check Failed!");
                 $A.test.assertUndefined(cmp.get("v.strATTRIBUTEWithNODefaultValue"));
+                $A.test.expectAuraError("Access Check Failed!");
+                $A.test.assertUndefined(cmp.get("v.strATTRIBUTEWithDefaultValue"));
+                $A.test.addWaitForWithFailureMessage(true, 
+                        function() {
+                            return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
+                        },
+                        "Didn't get ACF error box",
+                        function(){
+                            $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                                    "Access Check Failed! AttributeSet.get(): attribute 'strATTRIBUTEWithDefaultValue' of component 'markup://attributesTest:defaultValue",
+                                        "markup://attributesTest:defaultValue");
+                });
             }
         ]
     },

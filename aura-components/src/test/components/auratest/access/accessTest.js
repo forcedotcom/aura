@@ -78,15 +78,36 @@
                 // No access private attribute on facet
                 cmp.set("v.testType","Private");
                 $A.test.expectAuraError("Access Check Failed!");
-
+                
                 cmp.find("testRemoteAttributes").getElement().click();
+                $A.test.addWaitForWithFailureMessage(
+                        true, 
+                        function() {
+                            return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
+                        },
+                        "Didn't get ACF error box",
+                        function() {
+                            $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                                    "Access Check Failed! AttributeSet.get(): attribute \'Private\' of component \'markup://componentTest:accessAttributes",
+                                        "markup://auratest:access");
+                 });
             },
             function canNotUsePublicAttribute(cmp){
                 var expected="PUBLIC";
                 cmp.set("v.testType","Public");
                 $A.test.expectAuraError("Access Check Failed!");
-
                 cmp.find("testRemoteAttributes").getElement().click();
+                $A.test.addWaitForWithFailureMessage(
+                        true, 
+                        function() {
+                            return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
+                        },
+                        "Didn't get ACF error box",
+                        function() {
+                            $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                                    "Access Check Failed! AttributeSet.get(): attribute \'Public\' of component \'markup://componentTest:accessAttributes",
+                                        "markup://auratest:access");
+                 });
             },
             function canUseInternalAttribute(cmp){
                 var expected="INTERNAL";
@@ -324,6 +345,17 @@
         function cannotAccessPrivateAttribute(cmp) {
         	$A.test.expectAuraError("Access Check Failed!");
         	var actual = this.componentCreated.get("v.privateAttribute");
+        	 $A.test.addWaitForWithFailureMessage(
+                     true, 
+                     function() {
+                         return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
+                     },
+                     "Didn't get ACF error box",
+                     function() {
+                         $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                                 "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://testCustomNS2:componentWithDefaultAccess",
+                                     "markup://auratest:access");
+              });
         },
         function canAccessPublicAttribute(cmp) {
         	var actual = this.componentCreated.get("v.publicAttribute");
@@ -355,6 +387,17 @@
         function cannotAccessPrivateAttribute(cmp) {
         	$A.test.expectAuraError("Access Check Failed!");
         	var actual = this.componentCreated.get("v.privateAttribute");
+        	$A.test.addWaitForWithFailureMessage(
+                    true, 
+                    function() {
+                        return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
+                    },
+                    "Didn't get ACF error box",
+                    function() {
+                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                                "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://testCustomNS2:componentWithPublicAccess",
+                                    "markup://auratest:access");
+             });
         },
         function canAccessPublicAttribute(cmp) {
         	var actual = this.componentCreated.get("v.publicAttribute");
@@ -381,11 +424,22 @@
             		completed = true;
             	}
             );
-            $A.test.addWaitFor(true, function(){ return completed; });
+            $A.test.addWaitFor(true, function(){ return completed; });   
         },
         function cannotAccessPrivateAttribute(cmp) {
         	$A.test.expectAuraError("Access Check Failed!");
         	var actual = this.componentCreated.get("v.privateAttribute");
+        	$A.test.addWaitForWithFailureMessage(
+                    true, 
+                    function() {
+                        return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
+                    },
+                    "Didn't get ACF error box",
+                    function() {
+                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                                "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://testCustomNS2:componentWithGlobalAccess",
+                                    "markup://auratest:access");
+             });
         },
         function canAccessPublicAttribute(cmp) {
         	var actual = this.componentCreated.get("v.publicAttribute");
@@ -422,6 +476,17 @@
         function cannotAccessPrivateAttribute(cmp) {
         	$A.test.expectAuraError("Access Check Failed!");
         	var actual = this.componentCreated.get("v.privateAttribute");
+        	$A.test.addWaitForWithFailureMessage(
+                    true, 
+                    function() {
+                        return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
+                    },
+                    "Didn't get ACF error box",
+                    function() {
+                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                                "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://testPrivilegedNS1:componentWithDefaultAccess",
+                                    "markup://auratest:access");
+             });
         },
         function canAccessPublicAttribute(cmp) {
         	var actual = this.componentCreated.get("v.publicAttribute");
@@ -443,7 +508,7 @@
             	"markup://testPrivilegedNS1:componentWithPublicAccess", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getType(),"testPrivilegedNS1:componentWithPublicAccess");
+            		//$A.test.assertEquals(newCmp.getName(),"testPrivilegedNS1:componentWithPublicAccess");
             		that.componentCreated = newCmp;
             		completed = true;
             	}
@@ -453,6 +518,17 @@
         function cannotAccessPrivateAttribute(cmp) {
         	$A.test.expectAuraError("Access Check Failed!");
         	var actual = this.componentCreated.get("v.privateAttribute");
+        	$A.test.addWaitForWithFailureMessage(
+                    true, 
+                    function() {
+                        return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
+                    },
+                    "Didn't get ACF error box",
+                    function() {
+                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                                "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://testPrivilegedNS1:componentWithPublicAccess",
+                                    "markup://auratest:access");
+             });
         },
         function canAccessPublicAttribute(cmp) {
         	var actual = this.componentCreated.get("v.publicAttribute");
@@ -474,7 +550,7 @@
             	"markup://testPrivilegedNS1:componentWithGlobalAccess", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getType(),"testPrivilegedNS1:componentWithGlobalAccess");
+            		//$A.test.assertEquals(newCmp.getName(),"testPrivilegedNS1:componentWithGlobalAccess");
             		that.componentCreated = newCmp;
             		completed = true;
             	}
@@ -503,30 +579,52 @@
    testSetNonExistentAttribute: {
        test: function(cmp) {
            // One for the get old value on the set
-           $A.test.expectAuraError("Access Check Failed!");
+           $A.test.expectAuraError("Access Check Failed! AttributeSet.get(): attribute \'iDontExist\' of component \'markup://auratest:access");
            // One for the set new value
-           $A.test.expectAuraError("Access Check Failed!");
+           $A.test.expectAuraError("Access Check Failed! AttributeSet.set(): \'iDontExist\' of component \'markup://auratest:access");
            // One for the final read into v.output
            $A.test.expectAuraError("Access Check Failed!");
-
+           
            cmp.testSetNonExistentAttribute();
            $A.test.assertUndefined(cmp.get("v.output"), "Should not be able to set and retrieve attributes on a"
                    + " component that do not exist");
+           $A.test.addWaitForWithFailureMessage(
+                   true, 
+                   function() {
+                       return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
+                   },
+                   "Didn't get ACF error box",
+                   function() {
+                       $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                               "Access Check Failed! AttributeSet.get(): attribute \'iDontExist\' of component \'markup://auratest:access",
+                                   "markup://auratest:access");
+            });
        }
    },
 
    testSetNonExistentRemoteAttribute: {
        test: function(cmp) {
            // One for the get old value on the set
-           $A.test.expectAuraError("Access Check Failed!");
+           $A.test.expectAuraError("Access Check Failed! AttributeSet.get(): attribute \'iDontExist\' of component \'markup://componentTest:accessAttributes");
            // One for the set new value
-           $A.test.expectAuraError("Access Check Failed!");
+           $A.test.expectAuraError("Access Check Failed! AttributeSet.set(): \'iDontExist\' of component \'markup://componentTest:accessAttributes");
            // One for the final read into v.output
            $A.test.expectAuraError("Access Check Failed!");
-
+           
            cmp.testSetNonExistentRemoteAttribute();
            $A.test.assertUndefined(cmp.get("v.output"), "Should not be able to set and retrieve attributes on a"
                    + " component that do not exist");
+           $A.test.addWaitForWithFailureMessage(
+                   true, 
+                   function() {
+                       return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
+                   },
+                   "Didn't get ACF error box",
+                   function() {
+                       $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                               "Access Check Failed! AttributeSet.get(): attribute \'iDontExist\' of component \'markup://componentTest:accessAttributes",
+                                   "markup://auratest:access");
+            });
        }
    },
 
@@ -566,7 +664,18 @@
        },
        test: function(cmp) {
            $A.test.expectAuraError("Access Check Failed!");
-           cmp.find("testRemoteMethods").getElement().click();
+           cmp.find("testRemoteMethods").getElement().click(); 
+           $A.test.addWaitForWithFailureMessage(
+                   true, 
+                   function() {
+                       return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
+                   },
+                   "Didn't get ACF error box",
+                   function() {
+                       $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                               "Access Check Failed! Component.method():\'markup://componentTest:publicMethod",
+                                   "markup://auratest:access");
+            });
        }
    },
 
@@ -588,6 +697,18 @@
            $A.test.expectAuraError("Access Check Failed!");
            cmp.find("testRemoteMethods").getElement().click();
            $A.test.assertUndefined(cmp.find("remote").get("v.output"));
+           $A.test.addWaitForWithFailureMessage(
+                   true, 
+                   function() {
+                       return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
+                   },
+                   "Didn't get ACF error box",
+                   function() {
+                       $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                               "Access Check Failed! Component.method():\'markup://componentTest:privateMethod",
+                                   "markup://auratest:access");
+            });
+           
        }
    }
    

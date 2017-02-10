@@ -100,7 +100,6 @@
 		test: [function(cmp) {
 			cmp.find("optionsWithBody").set("v.options", this.OPTS);
 		}, function(cmp) {
-			debugger;
 			cmp.find("firstOption").set("v.text", "abcd");
 			this.verifyElements(cmp.find("optionsWithBody"), this.OPTS);
 		}]

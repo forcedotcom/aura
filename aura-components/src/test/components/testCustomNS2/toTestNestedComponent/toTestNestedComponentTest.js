@@ -44,11 +44,21 @@
          	$A.test.expectAuraError("Access Check Failed!");
         	 var componentWithDefaultAccess = this.componentCreated.find("componentWithDefaultAccess");
         	 componentWithDefaultAccess.get("v.publicAttribute");
+        	 this.waitForErrorModal(function() {
+                 $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                         "Access Check Failed! AttributeSet.get(): attribute 'publicAttribute' of component 'markup://testCustomNS1:componentWithDefaultAccess2",
+                         "markup://testCustomNS2:toTestNestedComponent");
+             });
          },
          function cannotAccessPrivateAttributeInComponentWithDefaultAccess(cmp) {
          	 $A.test.expectAuraError("Access Check Failed!");
         	 var componentWithDefaultAccess = this.componentCreated.find("componentWithDefaultAccess");
         	 componentWithDefaultAccess.get("v.privateAttribute");
+        	 this.waitForErrorModal(function() {
+                 $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                         "Access Check Failed! AttributeSet.get(): attribute 'privateAttribute' of component 'markup://testCustomNS1:componentWithDefaultAccess2",
+                         "markup://testCustomNS2:toTestNestedComponent");
+             });
          },
          /*********** access attribute of componentWithDefaultAccess via method in container component ********/
          function canAccessGlobalAttributeInComponentWithDefaultAccessViaMethodInOutsideCmp(cmp) {
@@ -76,11 +86,21 @@
         	 $A.test.expectAuraError("Access Check Failed!");
         	 var componentWithDefaultAccess = this.componentCreated.find("componentWithDefaultAccess");
         	 componentWithDefaultAccess.publicMethod();
+        	 this.waitForErrorModal(function() {
+                 $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                         "Access Check Failed! Component.method():'markup://testCustomNS1:publicMethod",
+                         "markup://testCustomNS2:toTestNestedComponent");
+             });
          },
          function cannotAccessPrivateMethodInComponenWithDefaultAccess(cmp) {
         	 $A.test.expectAuraError("Access Check Failed!");
         	 var componentWithDefaultAccess = this.componentCreated.find("componentWithDefaultAccess");
         	 componentWithDefaultAccess.privateMethod();
+        	 this.waitForErrorModal(function() {
+                 $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                         "Access Check Failed! Component.method():'markup://testCustomNS1:privateMethod",
+                         "markup://testCustomNS2:toTestNestedComponent");
+             });
          },
          /********* call method of componentWithDefaultAccess via container component's method **********/
          function canAccessGlobalMethodInComponentWithDefaultAccessViaMethodInOutsideCmp(cmp) {
@@ -92,6 +112,11 @@
          function cannotAccessPrivateMethodInComponentWithDefaultAccessViaMethodInOutsideCmp(cmp) {
          	 $A.test.expectAuraError("Access Check Failed!");
         	 this.componentCreated.callPrivateMethodInComponentWithDefaultAccess();
+        	 this.waitForErrorModal(function() {
+                 $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                         "Access Check Failed! Component.method():'markup://testCustomNS1:privateMethod",
+                         "markup://testCustomNS1:componentWithGlobalAccessHasComponentWithDefaultAccessInMarkup");
+             });
          }
          /************************************* tests for component event ********************************/
          //TODO : W-3015661
@@ -135,11 +160,23 @@
          	$A.test.expectAuraError("Access Check Failed!");
         	 var componentWithPublicAccess = this.componentCreated.find("componentWithPublicAccess");
         	 componentWithPublicAccess.get("v.publicAttribute");
+        	 this.waitForErrorModal(function() {
+                 $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                         "Access Check Failed! AttributeSet.get(): attribute 'publicAttribute' of component 'markup://testCustomNS1:componentWithPublicAccess",
+                         "markup://testCustomNS2:toTestNestedComponent");
+             });
+        	 
          },
          function cannotAccessPrivateAttributeInComponentWithPublicAccess(cmp) {
          	$A.test.expectAuraError("Access Check Failed!");
         	 var componentWithPublicAccess = this.componentCreated.find("componentWithPublicAccess");
         	 componentWithPublicAccess.get("v.privateAttribute");
+        	 this.waitForErrorModal(function() {
+                 $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                         "Access Check Failed! AttributeSet.get(): attribute 'privateAttribute' of component 'markup://testCustomNS1:componentWithPublicAccess",
+                         "markup://testCustomNS2:toTestNestedComponent");
+             });
+        	 
          },
          /*********** access attribute of componentWithPublicAccess via method in container component ********/
          function canAccessGlobalAttributeInComponentWithDefaultAccessViaMethodInOutsideCmp(cmp) {
@@ -167,11 +204,21 @@
         	 $A.test.expectAuraError("Access Check Failed!");
         	 var componentWithPublicAccess = this.componentCreated.find("componentWithPublicAccess");
         	 componentWithPublicAccess.publicMethod();
+        	 this.waitForErrorModal(function() {
+                 $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                         "Access Check Failed! Component.method():'markup://testCustomNS1:publicMethod",
+                         "markup://testCustomNS2:toTestNestedComponent");
+             });
          },
          function cannotAccessPrivateMethodInComponentWithPublicAccess(cmp) {
         	 $A.test.expectAuraError("Access Check Failed!");
         	 var componentWithPublicAccess = this.componentCreated.find("componentWithPublicAccess");
         	 componentWithPublicAccess.privateMethod();
+        	 this.waitForErrorModal(function() {
+                 $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                         "Access Check Failed! Component.method():'markup://testCustomNS1:privateMethod",
+                         "markup://testCustomNS2:toTestNestedComponent");
+             });
          },
          /***** call method in componentWithPublicAccess via container's method *****/
          function canAccessGlobalMethodInComponentWithPublicAccessViaMethodInOutsideCmp(cmp) {
@@ -183,6 +230,11 @@
          function cannotAccessPrivateMethodInComponentWithPublicAccessViaMethodInOutsideCmp(cmp) {
          	 $A.test.expectAuraError("Access Check Failed!");
         	 this.componentCreated.callPrivateMethodInComponentWithPublicAccess();
+        	 this.waitForErrorModal(function() {
+                 $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                         "Access Check Failed! Component.method():'markup://testCustomNS1:privateMethod",
+                         "markup://testCustomNS1:componentWithGlobalAccessHasComponentWithPublicAccessInMarkup");
+             });
          }
          /************************************* tests for component event ********************************/
          //TODO : W-3015661
@@ -226,11 +278,21 @@
          	$A.test.expectAuraError("Access Check Failed!");
         	 var componentWithGlobalAccess = this.componentCreated.find("componentWithGlobalAccess");
         	 componentWithGlobalAccess.get("v.publicAttribute");
+        	 this.waitForErrorModal(function() {
+                 $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                         "Access Check Failed! AttributeSet.get(): attribute 'publicAttribute' of component 'markup://testCustomNS1:componentWithGlobalAccess",
+                         "markup://testCustomNS2:toTestNestedComponent");
+             });
          },
          function cannotAccessPrivateAttributeInComponentWithGlobalAccess(cmp) {
          	$A.test.expectAuraError("Access Check Failed!");
         	 var componentWithGlobalAccess = this.componentCreated.find("componentWithGlobalAccess");
         	 componentWithGlobalAccess.get("v.privateAttribute");
+        	 this.waitForErrorModal(function() {
+                 $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                         "Access Check Failed! AttributeSet.get(): attribute 'privateAttribute' of component 'markup://testCustomNS1:componentWithGlobalAccess",
+                         "markup://testCustomNS2:toTestNestedComponent");
+             });
          },
          /*********** access attribute of componentWithGlobalAccess via method in container component ********/
          function canAccessGlobalAttributeInComponentWithGlobalAccessViaMethodInOutsideCmp(cmp) {
@@ -258,11 +320,21 @@
         	 $A.test.expectAuraError("Access Check Failed!");
         	 var componentWithGlobalAccess = this.componentCreated.find("componentWithGlobalAccess");
         	 componentWithGlobalAccess.publicMethod();
+        	 this.waitForErrorModal(function() {
+                 $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                         "Access Check Failed! Component.method():'markup://testCustomNS1:publicMethod",
+                         "markup://testCustomNS2:toTestNestedComponent");
+             });
          },
          function cannotAccessPrivateMethodInComponentWithGlobalAccess(cmp) {
         	 $A.test.expectAuraError("Access Check Failed!");
         	 var componentWithGlobalAccess = this.componentCreated.find("componentWithGlobalAccess");
         	 componentWithGlobalAccess.privateMethod();
+        	 this.waitForErrorModal(function() {
+                 $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                         "Access Check Failed! Component.method():'markup://testCustomNS1:privateMethod",
+                         "markup://testCustomNS2:toTestNestedComponent");
+             });
          },
          /********** call method of componentWithGlobalAccess via container's method **********/
          function canAccessGlobalMethodInComponentWithGlobalAccessViaMethodInOutsideCmp(cmp) {
@@ -274,10 +346,25 @@
          function cannotAccessPrivateMethodInComponentWithGlobalAccessViaMethodInOutsideCmp(cmp) {
          	 $A.test.expectAuraError("Access Check Failed!");
         	 this.componentCreated.callPrivateMethodInComponentWithGlobalAccess();
+        	 this.waitForErrorModal(function() {
+                 $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                         "Access Check Failed! Component.method():'markup://testCustomNS1:privateMethod",
+                         "markup://testCustomNS1:componentWithGlobalAccessHasComponentWithGlobalAccessInMarkup");
+             });
          }
          /************************************* tests for component event ********************************/
          //TODO : W-3015661
     ]
     },
+    waitForErrorModal: function(callback) {
+        $A.test.addWaitForWithFailureMessage(true,
+            function(){
+                var element = document.getElementById('auraErrorMask');
+                var style = $A.test.getStyle(element, 'display');
+                return style === 'block';
+            },
+            "Error Modal didn't show up.",
+            callback);
+    }
 
 })

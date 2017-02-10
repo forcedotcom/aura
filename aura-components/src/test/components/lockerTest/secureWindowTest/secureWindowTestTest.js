@@ -51,6 +51,12 @@
         }
     },
 
+    testModifyWindowLocation: {
+        test: function(cmp) {
+            cmp.testModifyWindowLocation();
+        }
+    },
+
     testNavigatorExposedOnWindow: {
         test: function(cmp) {
             cmp.testNavigatorExposedOnWindow();

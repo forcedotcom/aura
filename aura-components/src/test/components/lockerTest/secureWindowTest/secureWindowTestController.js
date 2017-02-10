@@ -34,6 +34,9 @@
     testLocationExposedOnWindow: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         testUtils.assertDefined(window.location);
+        testUtils.assertEquals("/lockerTest/secureWindowTest.cmp", window.location.pathname, "window.location not pointing to the right url");
+        testUtils.assertDefined(location, "location object not defined");
+        testUtils.assertEquals(location, window.location);
     },
 
     testNavigatorExposedOnWindow: function(cmp) {
@@ -198,5 +201,13 @@
                 testUtils.assertEquals("File creation failed: <script> tags are blocked", e.message);
             }
         });
+    },
+
+    testModifyWindowLocation: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        window.location.href = '#view';
+        testUtils.assertEquals(location, window.location);
+        testUtils.assertEquals("/lockerTest/secureWindowTest.cmp", window.location.pathname);
+        testUtils.assertEquals("#view", window.location.hash);
     }
 })

@@ -40,7 +40,9 @@
     <aura:method name="testBlob_WithScriptTagsBlocked" action="{!c.testBlob_WithScriptTagsBlocked}"/>
     <aura:method name="testFile" action="{!c.testFile}"/>
     <aura:method name="testFile_WithScriptTagsBlocked" action="{!c.testFile_WithScriptTagsBlocked}"/>
+    <aura:method name="testModifyWindowLocation"/>
 
+    <ui:button label="Modify Window Location" press="{!c.testModifyWindowLocation}"/>
 
     <div>SecureWindow test</div>
 </aura:component>

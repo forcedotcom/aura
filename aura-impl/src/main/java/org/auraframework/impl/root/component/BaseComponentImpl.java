@@ -62,6 +62,8 @@ import org.auraframework.util.json.Json;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +105,7 @@ BaseComponent<D, I> {
      * @throws QuickFixException
      */
     public BaseComponentImpl(DefDescriptor<D> descriptor, Map<String, Object> attributes) throws QuickFixException {
-        this(descriptor, null, (Map<String, Object>) null, null, null);
+        this(descriptor, null, (Map<String, Object>) null, null, null, null);
         loggingService.startTimer(LoggingService.TIMER_COMPONENT_CREATION);
         try {
             this.attributeSet.set(attributes);
@@ -116,7 +118,7 @@ BaseComponent<D, I> {
 
     @SuppressWarnings("unchecked")
     public <T extends D> BaseComponentImpl(T def, Map<String, Object> attributes) throws QuickFixException {
-        this((DefDescriptor<D>) def.getDescriptor(), null, (Map<String, Object>) null, null, def);
+        this((DefDescriptor<D>) def.getDescriptor(), null, (Map<String, Object>) null, null, def, null);
         loggingService.startTimer(LoggingService.TIMER_COMPONENT_CREATION);
         try {
             this.attributeSet.set(attributes);
@@ -135,7 +137,7 @@ BaseComponent<D, I> {
      */
     public BaseComponentImpl(DefDescriptor<D> descriptor, Collection<AttributeDefRef> attributeDefRefs,
             BaseComponent<?, ?> attributeValueProvider, String localId) throws QuickFixException {
-        this(descriptor, attributeValueProvider, null, null, null);
+        this(descriptor, attributeValueProvider, null, null, null, null);
         loggingService.startTimer(LoggingService.TIMER_COMPONENT_CREATION);
         try {
             this.attributeSet.set(attributeDefRefs);
@@ -153,17 +155,17 @@ BaseComponent<D, I> {
      * @throws QuickFixException
      */
     protected BaseComponentImpl(DefDescriptor<D> descriptor, I extender, BaseComponent<?, ?> attributeValueProvider, I concreteComponent) throws QuickFixException {
-        this(descriptor, attributeValueProvider, null, extender, null);
+        this(descriptor, attributeValueProvider, null, extender, null, concreteComponent);
         loggingService.startTimer(LoggingService.TIMER_COMPONENT_CREATION);
         try {
-            this.concreteComponent = concreteComponent;
+        	// KRIS: BAD TO COMMENT THIS OUT?
             attributeSet.set(extender.getAttributes());
             
             // may work better: descriptor.getDef().getFacets();
             final List<AttributeDefRef> facets = extender.getDescriptor().getDef().getFacets();
             final D definition = this.getDescriptor().getDef();
             for (AttributeDefRef facet : facets) {
-                if (definition.getAttributeDef(facet.getName()) != null) {
+                if ((facet.getName() =="body" || facet.getValue() instanceof FunctionCall) && definition.getAttributeDef(facet.getName()) != null) {
                     attributeSet.set(facet);
                 }
             }
@@ -184,7 +186,7 @@ BaseComponent<D, I> {
      * @throws QuickFixException
      */
     private BaseComponentImpl(DefDescriptor<D> descriptor, BaseComponent<?, ?> attributeValueProvider,
-            Map<String, Object> valueProviders, I extender, D def) throws QuickFixException {
+            Map<String, Object> valueProviders, I extender, D def, I concreteComponent) throws QuickFixException {
 
         this.contextService = Aura.getContextService();
         this.definitionService = Aura.getDefinitionService();
@@ -199,6 +201,7 @@ BaseComponent<D, I> {
         Instance<?> accessParent = instanceStack.getAccess();
 
         this.lexicalParent = accessParent;
+        this.concreteComponent = concreteComponent;
         this.descriptor = descriptor;
         this.originalDescriptor = descriptor;
         this.path = instanceStack.getPath();
@@ -236,7 +239,13 @@ BaseComponent<D, I> {
             }
 
             this.valueProviders.put(AuraValueProviderType.VIEW.getPrefix(), attributeSet);
-
+            
+            // Must be done after this.valueProviders.put("v", attributeSet)
+            // otherwise the expressions can't reference v. values
+            if(this.isConcreteComponent()) {
+            	this.attributeSet.setDefaults();
+            }
+            
             // def can be null if a definition not found exception was thrown for that definition. Odd.
             if (def != null) {
                 ControllerDef cd = def.getLocalControllerDef();
@@ -264,14 +273,15 @@ BaseComponent<D, I> {
 
     protected void finishInit() throws QuickFixException {
         AuraContext context = contextService.getCurrentContext();
-
+        
         injectComponent();
         
-        // At the base level, we go back up the inheritance stack and setup all the facets.
+//        // At the base level, we go back up the inheritance stack and setup all the facets.
         if (this.isConcreteComponent()) {
             List<AttributeDefRef> facets;
             final Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = this.getComponentDef().getAttributeDefs();
-
+            final Map<DefDescriptor<AttributeDef>, AttributeDefRef> facetMap = new HashMap<DefDescriptor<AttributeDef>, AttributeDefRef>();
+            
             List<BaseComponentDef> componentDefTree = Lists.newArrayList();
             BaseComponentDef definition = this.getDescriptor().getDef();
             componentDefTree.add(definition);
@@ -279,7 +289,7 @@ BaseComponent<D, I> {
                 definition = definition.getExtendsDescriptor().getDef();
                 componentDefTree.add(0, definition);
             }
-
+            
             for (BaseComponentDef def : componentDefTree) {
                 // Facets take precedence, so they should be done after attributes.
                 facets = def.getFacets();
@@ -297,16 +307,22 @@ BaseComponent<D, I> {
                                     return null;
                                 });
                             }
+                            this.getAttributes().set(facet, this);
+                        } else {
+	                        //this.getAttributes().set(facet, this);
+	                        facetMap.put(facet.getDescriptor(), facet);
                         }
-                        this.getAttributes().set(facet);
                     }
                 }
             }
-            // Do we really want to do this twice? That doesn't seem right.
-            // validateAttributes();
+
+            for(Map.Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : facetMap.entrySet()) {
+            	this.getAttributes().set(entry.getValue(), this);
+            }
         }
 
         createModel();
+        
 
         context.getInstanceStack().setAttributeName("$");
         createSuper();

@@ -15,17 +15,20 @@
  */
 package org.auraframework.impl.root;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.Expression;
+import org.auraframework.expression.FunctionCall;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.event.EventHandlerImpl;
@@ -55,6 +58,7 @@ import org.auraframework.util.json.Serialization.ReferenceType;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -81,7 +85,6 @@ public class AttributeSetImpl implements AttributeSet {
         this.rootDefDescriptor = componentDefDescriptor;
         this.valueProvider = valueProvider;
         this.parent = parent;
-        setDefaults();
     }
 
     @Override
@@ -95,13 +98,20 @@ public class AttributeSetImpl implements AttributeSet {
         return rootDefDescriptor;
     }
 
-    private void setDefaults() throws QuickFixException {
-        Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = rootDefDescriptor.getDef().getAttributeDefs();
+    @Override
+    public void setDefaults() throws QuickFixException {
+        final Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = rootDefDescriptor.getDef().getAttributeDefs();
+        
+        // See if the parent is a ComponentDef. (Could also be an EventDev).
+        BaseComponent<?, ?> facetValueProvider = null;
+        if(parent instanceof BaseComponent<?, ?>) {
+        	facetValueProvider = (BaseComponent<?, ?>)parent;
+        }
 
         for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> attr : attrs.entrySet()) {
             AttributeDefRef ref = attr.getValue().getDefaultValue();
             if (ref != null && !attributes.containsKey(attr.getKey())) {
-                set(ref);
+                set(ref, facetValueProvider);
             }
         }
     }
@@ -119,6 +129,11 @@ public class AttributeSetImpl implements AttributeSet {
 
     @Override
     public void set(AttributeDefRef attributeDefRef) throws QuickFixException {
+    	set(attributeDefRef, this.valueProvider);
+    }
+    
+    @Override
+    public void set(AttributeDefRef attributeDefRef, BaseComponent<?, ?> valueProvider) throws QuickFixException {
         RootDefinition def = rootDefDescriptor.getDef();
         Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = def.getAttributeDefs();
 
@@ -323,6 +338,9 @@ public class AttributeSetImpl implements AttributeSet {
             if (attributeDef == null) {
                 // no such attribute.
                 throw new NoAccessException("No attribute "+expr.getRoot()+" in "+rootDefDescriptor);
+            }
+            if(value == null) {
+            	return null;
             }
             value = attributeDef.getTypeDef().wrap(value);
             if (value instanceof ValueProvider) {

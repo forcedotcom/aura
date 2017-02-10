@@ -72,13 +72,27 @@ public interface AttributeSet extends ValueProvider, JsonSerializable, Iterable<
      * @throws QuickFixException
      */
     void set(Collection<AttributeDefRef> attributeDefRefs) throws QuickFixException;
-    
+
     /**
      * Link an attribute to be referenced in another component.
      * @param attributeDefRef
      * @throws QuickFixException
      */
     void set(AttributeDefRef attributeDefRef) throws QuickFixException;
+
+    /**
+     * Link an attribute to be referenced in another component.
+     * @param attributeDefRef
+     * @throws QuickFixException
+     */
+    void set(AttributeDefRef attributeDefRef, BaseComponent<?, ?> valueProvider) throws QuickFixException;
+    
+    /**
+     * Link an attribute to be referenced in another component.
+     * @param attributeDefRef
+     * @throws QuickFixException
+     */
+    //void set(AttributeDefRef attributeDefRef, Instance<?> parent) throws QuickFixException;
     
     /**
      * Set multiple values on the component via a key value map. 
@@ -143,4 +157,6 @@ public interface AttributeSet extends ValueProvider, JsonSerializable, Iterable<
     Set<AttributeDef> getMissingAttributes() throws QuickFixException;
 
     DefDescriptor<? extends RootDefinition> getRootDefDescriptor() throws QuickFixException;
+    
+    void setDefaults() throws QuickFixException;
 }

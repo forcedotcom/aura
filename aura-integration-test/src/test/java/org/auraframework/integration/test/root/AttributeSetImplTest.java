@@ -284,7 +284,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
 
         Component component = instanceService.getInstance(concrete);
         
-        final String actual = this.auraTesingMarkupUtil.renderComponent(component);
+        final String actual = this.auraTestingMarkupUtil.renderComponent(component);
 
         assertEquals(expected, actual);
     }
@@ -308,7 +308,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
         final DefDescriptor<ComponentDef> concrete = createComponentDef(concreteDef);
 
         Component component = instanceService.getInstance(concrete);
-        final String actual = this.auraTesingMarkupUtil.renderComponent(component);
+        final String actual = this.auraTestingMarkupUtil.renderComponent(component);
 
         assertEquals(expected, actual);
     }
@@ -336,7 +336,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
         final DefDescriptor<ComponentDef> concrete = createComponentDef(concreteDef);
 
         Component component = instanceService.getInstance(concrete);
-        final String actual = this.auraTesingMarkupUtil.renderComponent(component);
+        final String actual = this.auraTestingMarkupUtil.renderComponent(component);
 
         assertEquals(expected, actual);
     }
@@ -355,7 +355,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
         final DefDescriptor<ComponentDef> concrete = createComponentDef(concreteDef);
 
         Component component = instanceService.getInstance(concrete);
-        final String actual = this.auraTesingMarkupUtil.renderComponent(component);
+        final String actual = this.auraTestingMarkupUtil.renderComponent(component);
 
         assertEquals(expected, actual);
     }
@@ -433,7 +433,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
         final DefDescriptor<ComponentDef> concrete = createComponentDef(concreteDef);
 
         Component component = instanceService.getInstance(concrete);
-        final String actual = this.auraTesingMarkupUtil.renderComponent(component);
+        final String actual = this.auraTestingMarkupUtil.renderComponent(component);
 
         assertEquals(expected, actual);
     }    
@@ -455,7 +455,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
         final DefDescriptor<ComponentDef> concrete = createComponentDef(concreteDef);
 
         Component component = instanceService.getInstance(concrete);
-        final String actual = this.auraTesingMarkupUtil.renderComponent(component);
+        final String actual = this.auraTestingMarkupUtil.renderComponent(component);
 
         assertEquals(expected, actual);
     }   
@@ -480,7 +480,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
         final DefDescriptor<ComponentDef> concrete = createComponentDef(concreteDef);
 
         Component component = instanceService.getInstance(concrete);
-        final String actual = this.auraTesingMarkupUtil.renderComponent(component);
+        final String actual = this.auraTestingMarkupUtil.renderComponent(component);
 
         assertEquals(expected, actual);
     }
@@ -505,7 +505,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
         final DefDescriptor<ComponentDef> concrete = createComponentDef(concreteDef);
 
         Component component = instanceService.getInstance(concrete);
-        final String actual = this.auraTesingMarkupUtil.renderComponent(component);
+        final String actual = this.auraTestingMarkupUtil.renderComponent(component);
 
         assertEquals(expected, actual);
     }

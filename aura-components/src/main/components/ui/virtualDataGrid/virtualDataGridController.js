@@ -165,7 +165,7 @@
 	 */
     appendItems: function (cmp, event, helper) {
         var superCmp   = cmp.getSuper(),
-            isExtended = superCmp.getDef().getDescriptor().getName() !== 'component',
+            isExtended = superCmp.getType() !== 'aura:component',
             items      = event.getParam('arguments').items;
 
         if (isExtended) {

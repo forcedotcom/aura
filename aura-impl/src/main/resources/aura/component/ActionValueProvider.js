@@ -29,7 +29,7 @@ ActionValueProvider.prototype.get = function(key) {
         actionDef = this.component['controller'] && this.component['controller'][key];
         if (actionDef) {
             actionDef = new ActionDef({
-                "descriptor": this.component.getName() + "$controller$" + key,
+                "descriptor": this.component.getType() + "$controller$" + key,
                 "name": key,
                 "actionType": "CLIENT",
                 "code": actionDef
@@ -37,7 +37,7 @@ ActionValueProvider.prototype.get = function(key) {
 
             //#if {"excludeModes" : ["PRODUCTION"]}
             if (this.controllerDef && this.controllerDef.hasActionDef(key)) {
-                var message = "Component '" + this.component.getName() + "' has server and client action name conflicts: " + key;
+                var message = "Component '" + this.component.getType() + "' has server and client action name conflicts: " + key;
                 $A.warning(message);
             }
             //#end

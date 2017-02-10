@@ -100,7 +100,7 @@ Test.Aura.AuraErrorTest = function() {
         [Fact]
         function ReturnsMessageofMessageAndInnerError() {//when pass in both message and innerError, we construct message from them
             var actual;
-            var innerError = new TypeError("from inner error");
+            var innerError = "from inner error";
             var message = "from ctor";
             var expected = message + " [" + innerError.toString() + "]";
 

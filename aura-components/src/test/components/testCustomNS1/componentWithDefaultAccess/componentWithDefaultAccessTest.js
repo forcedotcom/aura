@@ -35,7 +35,7 @@
                 "markup://testCustomNS1:componentWithDefaultAccess2",
                 {},
                 function(newCmp){
-                    $A.test.assertEquals(newCmp.getName(),"testCustomNS1:componentWithDefaultAccess2");
+                    $A.test.assertEquals(newCmp.getType(),"testCustomNS1:componentWithDefaultAccess2");
                     that.componentCreated = newCmp;
                     completed = true;
                 }
@@ -79,7 +79,7 @@
                 "markup://testCustomNS1:componentWithPublicAccess",
                 {},
                 function(newCmp){
-                    $A.test.assertEquals(newCmp.getName(),"testCustomNS1:componentWithPublicAccess");
+                    $A.test.assertEquals(newCmp.getType(),"testCustomNS1:componentWithPublicAccess");
                     that.componentCreated = newCmp;
                     completed = true;
                 }
@@ -123,7 +123,7 @@
                 "markup://testCustomNS1:componentWithGlobalAccess",
                 {},
                 function(newCmp){
-                    $A.test.assertEquals(newCmp.getName(),"testCustomNS1:componentWithGlobalAccess");
+                    $A.test.assertEquals(newCmp.getType(),"testCustomNS1:componentWithGlobalAccess");
                     that.componentCreated = newCmp;
                     completed = true;
                 }
@@ -203,7 +203,7 @@
                 "markup://testCustomNS2:componentWithGlobalAccess",
                 {},
                 function(newCmp){
-                    $A.test.assertEquals(newCmp.getName(),"testCustomNS2:componentWithGlobalAccess");
+                    $A.test.assertEquals(newCmp.getType(),"testCustomNS2:componentWithGlobalAccess");
                     that.componentCreated = newCmp;
                     completed = true;
                 }
@@ -377,7 +377,7 @@
                 "markup://testPrivilegedNS1:componentWithGlobalAccess",
                 {},
                 function(newCmp){
-                    $A.test.assertEquals(newCmp.getName(),"testPrivilegedNS1:componentWithGlobalAccess");
+                    $A.test.assertEquals(newCmp.getType(),"testPrivilegedNS1:componentWithGlobalAccess");
                     that.componentCreated = newCmp;
                     completed = true;
                 }
@@ -481,7 +481,7 @@
                 "markup://auratest:accessGlobalComponent",
                 {},
                 function(newCmp){
-                    $A.test.assertEquals(newCmp.getName(),"auratest:accessGlobalComponent");
+                    $A.test.assertEquals(newCmp.getType(),"auratest:accessGlobalComponent");
                     that.componentCreated = newCmp;
                     completed = true;
                 }
@@ -672,7 +672,7 @@
                 var newCmpDescriptor = "testCustomNS1:componentWithDefaultAccess2";
                 $A.createComponent(newCmpDescriptor, {},
                     function(newCmp){
-                        $A.test.assertEquals(newCmpDescriptor, newCmp.getName(),
+                        $A.test.assertEquals(newCmpDescriptor, newCmp.getType(),
                                 "Test setup fails. Failed to create expected component.");
                         // Access check failure
                         newCmp.get("v.privateAttribute");
@@ -699,7 +699,7 @@
                 var newCmpDescriptor = "testCustomNS1:componentWithDefaultAccess2";
                 $A.createComponent(newCmpDescriptor, {},
                     function(newCmp){
-                        $A.test.assertEquals(newCmpDescriptor, newCmp.getName(),
+                        $A.test.assertEquals(newCmpDescriptor, newCmp.getType(),
                                 "Test setup fails. Failed to create expected component.");
                         // Access check failure
                         newCmp.set("v.privateAttribute", "value");
@@ -725,7 +725,7 @@
 
                 $A.createComponent(newCmpDescriptor, {},
                     function(newCmp){
-                        $A.test.assertEquals(newCmp.getName(),newCmpDescriptor);
+                        $A.test.assertEquals(newCmp.getType(),newCmpDescriptor);
                         // Access Check Failure
                         newCmp.privateMethod();
                     }
@@ -750,7 +750,7 @@
 
                 $A.createComponent(newCmpDescriptor, {},
                     function(newCmp){
-                        $A.test.assertEquals(newCmp.getName(),newCmpDescriptor,
+                        $A.test.assertEquals(newCmp.getType(),newCmpDescriptor,
                                 "Test setup fails. Failed to create expected component.");
                         // Access Check Failure
                         newCmp.getEvent("NS2eventWithPublicAccessRegisteredWithPublicAccess");

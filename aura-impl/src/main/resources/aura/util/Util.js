@@ -1551,6 +1551,19 @@ Aura.Utils.Util.prototype.hyphensToCamelCase = function(str) {
 };
 
 /**
+*  Converts words to camelCase, strips non-alphanumeric characters
+*
+* */
+Aura.Utils.Util.prototype.toCamelCase=function(str) {
+    return str.replace(/(?:^\w|[A-Z]|\b\w|\s+|[^\w]+)/g, function (match, index) {
+        if (/\s+|[^\w]+/.test(match)){
+            return "";
+        }
+        return index === 0 ? match.toLowerCase() : match.toUpperCase();
+    });
+};
+
+/**
  *
  * @description A map of nodeNames that cannot accept custom data attributes.
  * @private

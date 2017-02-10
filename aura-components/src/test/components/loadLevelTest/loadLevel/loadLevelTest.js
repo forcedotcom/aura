@@ -73,16 +73,16 @@
     testMissingRequiredAttribute: {
         attributes: {testMissingRequiredAttribute:"true"},
         test: function(cmp) {
-            var initCmpName = cmp.find("lazyWReqAttr").getName();
+            var initCmpName = cmp.find("lazyWReqAttr").getType();
             $A.test.assertEquals("aura:placeholder", initCmpName);
 
             cmp.helper.resumeGateId(cmp, "lazyWReqAttr");
 
             $A.test.addWaitForWithFailureMessage("aura:text",
                 function(){
-                    return cmp.find("lazyWReqAttr").getName();
+                    return cmp.find("lazyWReqAttr").getType();
                 },
-                "Failed to get Lazy loaded component. Actual Component: " + cmp.find("lazyWReqAttr").getName(),
+                "Failed to get Lazy loaded component. Actual Component: " + cmp.find("lazyWReqAttr").getType(),
                 function() {
                     var targetCmp = cmp.find("lazyWReqAttr");
                     $A.test.assertTrue(targetCmp.isRendered(), "Lazy loaded component didn't get rendered.");

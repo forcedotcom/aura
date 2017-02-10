@@ -17,7 +17,7 @@
 
 
     showResult: function (cmp, event) {
-        cmp.find("component").set("v.value",event.getSource().getName());
+        cmp.find("component").set("v.value",event.getSource().getType());
         cmp.find("event").set("v.value",event.getName());
     },
 

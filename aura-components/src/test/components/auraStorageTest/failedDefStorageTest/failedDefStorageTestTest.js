@@ -160,7 +160,7 @@
             // When storeDefs() fails, clear() will be called.
             window.mockComponentDefStorage.failSetItems = true;
             $A.createComponent("test:text", {}, function(newCmp){
-                    $A.test.assertEquals("test:text", newCmp.getName(),
+                    $A.test.assertEquals("test:text", newCmp.getType(),
                             "Unexpected component returned from createComponent()");
                 });
 
@@ -191,7 +191,7 @@
             window.mockComponentDefStorage.failClear = true;
 
             $A.createComponent("test:text", {}, function(newCmp){
-                    $A.test.assertEquals("test:text", newCmp.getName(),
+                    $A.test.assertEquals("test:text", newCmp.getType(),
                             "Unexpected component returned from createComponent()");
                 });
 
@@ -217,7 +217,7 @@
             window.mockComponentDefStorage.failAll = false;
 
             $A.createComponent("test:text", {}, function(newCmp){
-                    $A.test.assertEquals("test:text", newCmp.getName(),
+                    $A.test.assertEquals("test:text", newCmp.getType(),
                             "Unexpected component returned from createComponent()");
                 });
 

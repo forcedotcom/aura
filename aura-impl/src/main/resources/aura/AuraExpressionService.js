@@ -319,7 +319,7 @@ AuraExpressionService.prototype.getContainer = function (cmp) {
     //    or another API would always return the proper container.
     //    based on advice from jbuch
     var owner = cmp.getOwner();
-    var ownerName = owner.getName();
+    var ownerName = owner.getType();
     var prevOwner = undefined;
     while ( ownerName === AuraExpressionService.AURA_ITERATION ||
             ownerName === AuraExpressionService.AURA_IF ||
@@ -327,7 +327,7 @@ AuraExpressionService.prototype.getContainer = function (cmp) {
             owner.isInstanceOf('ui:abstractList') ||
             owner.isInstanceOf('ui:abstractDataGrid')) {
         owner = owner.getOwner();
-        ownerName = owner.getName();
+        ownerName = owner.getType();
         if (owner === prevOwner) {
             break;
         }

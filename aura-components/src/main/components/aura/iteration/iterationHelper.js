@@ -51,7 +51,7 @@
                 $A.warning([
                     '[Performance degradation] ',
                     'markup://aura:iteration [id:' + component.getGlobalId() + '] ',
-                    'in ', owner.getName() + ' ["' + owner.getGlobalId() + '"] ',
+                    'in ', owner.getType() + ' ["' + owner.getGlobalId() + '"] ',
                     'had multiple items set in the same Aura cycle.\n',
                     'More info: https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/perf_warnings_iteration.htm'
                 ].join(''));

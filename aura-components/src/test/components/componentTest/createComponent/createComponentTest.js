@@ -21,7 +21,7 @@
             var expected="aura:text";
 
             $A.createComponent(expected,null,function(targetComponent){
-                var actual=targetComponent.getName();
+                var actual=targetComponent.getType();
 
                 $A.test.assertEquals(expected,actual);
             })

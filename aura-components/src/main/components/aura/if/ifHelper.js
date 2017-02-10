@@ -53,7 +53,7 @@
             $A.warning([
                 '[Performance degradation] ',
                 'markup://aura:if ["' + cmp.getGlobalId() + '"] in ',
-                owner.getName() + ' ["' + owner.getGlobalId() + '"] ',
+                owner.getType() + ' ["' + owner.getGlobalId() + '"] ',
                 'needed to clear unrendered body.\n',
                 'More info: https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/perf_warnings_if.htm'
             ].join(''));

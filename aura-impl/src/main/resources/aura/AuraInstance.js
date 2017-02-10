@@ -1248,7 +1248,7 @@ AuraInstance.prototype.deprecated = function(message,workaround,sinceDate,dueDat
     // REMOVE WHEN VIEW LOGIC IS COMPILED WITH FRAMEWORK.
     var context=$A.getContext();
     context=context&&context.getCurrentAccess();
-    if(/^(ui|aura):\w+$/.test(context&&context.getName())){
+    if(/^(ui|aura):\w+$/.test(context&&context.getType())){
         $A.log("Framework component use of deprecated method: "+message);
         return;
     }

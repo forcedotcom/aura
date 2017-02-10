@@ -197,7 +197,7 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
 
         [Fact]
         function testBindError() {
-            var expected = "$A.util.bind called on non-function.";
+            var expected = new TypeError("$A.util.bind called on non-function.");
             var actual;
             utilMock(MockFunction, function(util) {
                 actual = Record.Exception(function(){

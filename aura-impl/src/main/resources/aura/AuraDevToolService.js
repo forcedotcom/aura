@@ -775,7 +775,7 @@ var AuraDevToolService = function() {
                              if(typeof cmp.getName !== "function"){
                                  cmp = cmp.getDef().getDescriptor().getFullName();
                              }else{
-                                 cmpName = cmp.getName();
+                                 cmpName = cmp.getType();
                              }
                              //Making sure that we have unique components
                              if(!(cmpName in cmpInfo)){

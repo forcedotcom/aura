@@ -48,6 +48,7 @@ function Component(config, localCreation) {
     this.version = config["version"];
     this.owner = context.getCurrentAccess();
     this.name='';
+    this.type='';
 
     // allows components to skip creation path checks if it's doing something weird
     // such as wrapping server created components in client created one
@@ -229,16 +230,29 @@ Component.prototype.setupGlobalId = function(globalId, localCreation) {
 
 
 /**
- * Returns the component's canonical name, e.g. 'ui:button'.
+ * Returns the component's code-compatible camelCase name, e.g. 'uiButton'.
  *
  * @export
  * @platform
  */
 Component.prototype.getName = function() {
     if(!this.name){
-        this.name=this.getDef().getDescriptor().getFullName();
+        this.name=$A.util.toCamelCase(this.getType());
     }
     return this.name;
+};
+
+/**
+ * Returns the component's canonical type, e.g. 'ui:button'.
+ *
+ * @export
+ * @platform
+ */
+Component.prototype.getType = function() {
+    if(!this.type){
+        this.type=this.getDef().getDescriptor().getFullName();
+    }
+    return this.type;
 };
 
 /**
@@ -420,7 +434,7 @@ Component.prototype.getSuperest = function() {
  * @private
  */
 Component.prototype.findInstanceOf = function(type) {
-    if (this.getName() === type) {
+    if (this.getType() === type) {
         return this;
     } else {
         var superComponent = this.getSuper();
@@ -1281,7 +1295,7 @@ Component.prototype.trackComponentReplacement = function(prevCmps, key) {
             if (actualLeak.length) {
                 $A.warning([
                     '[Performance degradation] ',
-                    actualLeak.length + ' component(s) in ' + owner.getName() + ' ["' + owner.getGlobalId() + '"] ',
+                    actualLeak.length + ' component(s) in ' + owner.getType() + ' ["' + owner.getGlobalId() + '"] ',
                     'have been created and removed before being rendered when calling cmp.set("' + key + '").\n',
                     'More info: https://sfdc.co/performance-aura-component-set'
                 ].join(''));

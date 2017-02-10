@@ -43,7 +43,7 @@
             	"markup://auratest:accessPrivilegedComponentWithAccessDefaultComponentInMarkup", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"auratest:accessPrivilegedComponentWithAccessDefaultComponentInMarkup");
+            		$A.test.assertEquals(newCmp.getType(),"auratest:accessPrivilegedComponentWithAccessDefaultComponentInMarkup");
             		completed = true;
             		that.componentCreated = newCmp;
             	}
@@ -160,7 +160,7 @@
             	"markup://auratest:accessPrivilegedComponentWithAccessPrivilegedComponentInMarkup", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"auratest:accessPrivilegedComponentWithAccessPrivilegedComponentInMarkup");
+            		$A.test.assertEquals(newCmp.getType(),"auratest:accessPrivilegedComponentWithAccessPrivilegedComponentInMarkup");
             		completed = true;
             		that.componentCreated = newCmp;
             	}
@@ -277,7 +277,7 @@
             	"markup://auratest:accessPrivilegedComponentWithAccessPublicComponentInMarkup", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"auratest:accessPrivilegedComponentWithAccessPublicComponentInMarkup");
+            		$A.test.assertEquals(newCmp.getType(),"auratest:accessPrivilegedComponentWithAccessPublicComponentInMarkup");
             		completed = true;
             		that.componentCreated = newCmp;
             	}
@@ -390,7 +390,7 @@
             	"markup://auratest:accessPrivilegedComponentWithAccessGlobalComponentInMarkup", 
             	{}, 
             	function(newCmp){
-            		$A.test.assertEquals(newCmp.getName(),"auratest:accessPrivilegedComponentWithAccessGlobalComponentInMarkup");
+            		$A.test.assertEquals(newCmp.getType(),"auratest:accessPrivilegedComponentWithAccessGlobalComponentInMarkup");
             		completed = true;
             		that.componentCreated = newCmp;
             	}

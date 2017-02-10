@@ -161,7 +161,7 @@ Aura.Context.AuraContext.prototype.getCurrentAccessCaller=function(){
 
 Aura.Context.AuraContext.prototype.getAccessStackHierarchy=function(){
     return this.accessStack ? this.accessStack.map(function(component) {
-        return "[" + component.getName() + "]";
+        return "[" + component.getType() + "]";
     }).join(" > ") : null;
 };
 

@@ -51,13 +51,13 @@
                     var globalId = targetComponent.getGlobalId();
                     var actual = globalId.split(":")[1];
                     $A.test.assertEquals(expected, actual,
-                            "Failed to find action Id in " + targetComponent.getName() + "'s global Id: " + globalId);
+                            "Failed to find action Id in " + targetComponent.getType() + "'s global Id: " + globalId);
 
                     targetComponent = targetComponents[1];
                     globalId = targetComponent.getGlobalId();
                     actual = globalId.split(":")[1];
                     $A.test.assertEquals(expected, actual,
-                            "Failed to find action Id in " + targetComponent.getName() + "'s global Id: " + globalId);
+                            "Failed to find action Id in " + targetComponent.getType() + "'s global Id: " + globalId);
                 });
         }
     },

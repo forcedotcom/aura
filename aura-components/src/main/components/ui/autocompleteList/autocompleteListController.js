@@ -29,7 +29,7 @@
 
     fetchData: function (component, event, helper) {
         var superCmp   = component.getSuper(),
-            isExtended = superCmp.getDef().getDescriptor().getName() !== 'component',
+            isExtended = superCmp.getType() !== 'aura:component',
             argumentsParam  = event.getParam('arguments'),
             options    = argumentsParam.options,
             index      = argumentsParam.index,

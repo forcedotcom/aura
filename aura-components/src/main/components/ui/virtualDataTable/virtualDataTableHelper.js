@@ -413,7 +413,7 @@
     },
     _getRootComponent: function (cmp) {
         var superCmp   = cmp.getSuper(),
-            isExtended = superCmp.getDef().getDescriptor().getName() !== 'component';
+            isExtended = superCmp.getType() !== 'aura:component';
 
         if (isExtended) {
             cmp = superCmp;

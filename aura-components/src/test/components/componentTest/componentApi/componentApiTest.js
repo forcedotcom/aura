@@ -2,7 +2,7 @@
     testGetComponentClassName: {
         test: function(cmp) {
             var expected = "componentTest:componentApi";
-            var actual = cmp.getName();
+            var actual = cmp.getType();
             $A.test.assertEquals(expected, actual);
         }
     },

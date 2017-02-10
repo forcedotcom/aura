@@ -13,22 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.expression;
+({
+	_testSelfReferencingFunctionCallValueIncludesDefaultValue: {
+		test: function(cmp) {
+			var expected = "[setFacet1_DefaultString]:setFacetFunctionCallValue";
 
-import java.util.List;
+			var actual = cmp.get("v.setFacet1_DefaultString");
 
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.TypeDef;
-import org.auraframework.instance.ValueProvider;
-
-/**
- * expression for a function call
- */
-public interface FunctionCall extends Expression {
-
-    List<DefDescriptor<TypeDef>> getArgumentTypeDefs();
-
-    void setValueProvider(ValueProvider valueProvider);
-
-    ValueProvider getValueProvider();
+			$A.test.assertEquals(expected, actual);
+		}
+	},
+	
+	_testSelfReferencingFunctionCallValueIncludesDefaultValue: {
+		test: function(cmp) {
+			var expected = "[setFacet1_DefaultString]:setFacetFunctionCallValue";
+	
+			var actual = cmp.get("v.setFacet1_DefaultString");
+	
+			$A.test.assertEquals(expected, actual);
+		}
 }
+
+})

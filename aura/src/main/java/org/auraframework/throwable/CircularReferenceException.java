@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.expression;
+package org.auraframework.throwable;
 
-import java.util.List;
+import org.auraframework.system.Location;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.TypeDef;
-import org.auraframework.instance.ValueProvider;
+public class CircularReferenceException extends QuickFixException {
 
-/**
- * expression for a function call
- */
-public interface FunctionCall extends Expression {
+    public CircularReferenceException(String msg, Location l) {
+        super(msg, l);
+    }
 
-    List<DefDescriptor<TypeDef>> getArgumentTypeDefs();
-
-    void setValueProvider(ValueProvider valueProvider);
-
-    ValueProvider getValueProvider();
+    public CircularReferenceException(String msg, Location l, Throwable t) {
+        super(msg, l, t);
+    }
 }

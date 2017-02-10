@@ -287,7 +287,7 @@ function SecureElement(el, key) {
 		// Conditionally add things that not all Node types support
 		if ("attributes" in el) {
 
-			// DCHASMAN TODO We need Proxy (208) to fully implement the syntax/semantics of Element.attributes!
+			// DCHASMAN TODO W-3158233 We need Proxy (208) to fully implement the syntax/semantics of Element.attributes!
 
 			tagNameSpecificConfig["attributes"] = SecureObject.createFilteredPropertyStateless("attributes", prototype, {
 				writable : false,
@@ -475,6 +475,7 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseIn
 		},
 
 		removeChild : SecureObject.createFilteredMethodStateless("removeChild", prototype, {
+		    rawArguments: true,
 			beforeCallback : function(child) {
 				// Verify that the passed in child is not opaque!
 				ls_verifyAccess(this, child, true);

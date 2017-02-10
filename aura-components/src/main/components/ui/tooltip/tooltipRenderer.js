@@ -37,7 +37,7 @@
     },
 
     unrender: function(component, helper) {
-        helper.cleanup(component);
         this.superUnrender();
+        helper.cleanup(component);
     }
 })// eslint-disable-line semi

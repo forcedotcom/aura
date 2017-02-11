@@ -32,6 +32,7 @@
 }
         </pre>
         <p>The Lightning Design System <code>scrollable</code> class isn't compatible with native scrolling on mobile devices. Use <code>ui:scrollerWrapper</code> if you want to enable scrolling in Salesforce1.</p>
+          
         <h4>Usage Considerations</h4>
         <p>In Google Chrome on mobile devices, nested <code>ui:scrollerWrapper</code> components are not scrollable when <code>border-radius</code> CSS property is set to a non-zero value.
         To enable scrolling in this case, set <code>border-radius</code> to a non-zero value on the outer <code>ui:scrollerWrapper</code> component.</p>
@@ -55,7 +56,14 @@
     /* make innerScroller rounded */
     border-radius: 10px;
 }</pre>
-        
+        <h4>Methods</h4>
+        <p>This component supports the following method.</p>
+        <p><code>scrollTo(destination, xcoord, ycoord)</code>: Scrolls the content to a specified location.</p>
+        <ul>
+            <li><code>destination</code> (String): The target location. Valid values: custom, top, bottom, left, and right. For custom destination, xcoord and ycoord are used to determine the target location.</li>
+            <li><code>xcoord</code> (Integer): X coordinate for custom destination. The default is 0.</li>
+            <li><code>ycoord</code> (Integer): Y coordinate for custom destination. The default is 0.</li>
+        </ul>
     </aura:description>
 </aura:documentation> 
 

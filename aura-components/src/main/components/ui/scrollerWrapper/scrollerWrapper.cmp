@@ -24,9 +24,9 @@
     <aura:attribute name="class" type="String" access="GLOBAL" description="A CSS class applied to the outer element. This style is in addition to base classes output by the component."/>
 
     <aura:method name="scrollTo" action="{!c.scrollTo}" access="GLOBAL" description="Scrolls the content to a specified location.">
- 	    <aura:attribute name="destination" type="String" description="Available options: custom, top, bottom, left, and right. For custom destination, xcoord and ycoord are used to determine the target location."/>
- 	    <aura:attribute name="xcoord" type="Integer" default="0" description="x coordinate for custom destination"/>
- 	    <aura:attribute name="ycoord" type="Integer" default="0" description="y coordinate for custom destination"/>
+ 	    <aura:attribute name="destination" type="String" description="The target location. Valid values: custom, top, bottom, left, and right. For custom destination, xcoord and ycoord are used to determine the target location."/>
+ 	    <aura:attribute name="xcoord" type="Integer" default="0" description="X coordinate for custom destination."/>
+ 	    <aura:attribute name="ycoord" type="Integer" default="0" description="Y coordinate for custom destination."/>
      </aura:method>
 
     <!-- Markup -->

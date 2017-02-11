@@ -94,7 +94,8 @@ function SecureComponent(component, key) {
         "set": SecureObject.createFilteredMethod(o, component, "set", { defaultKey: key, rawArguments: true }),
         "getElement": SecureObject.createFilteredMethod(o, component, "getElement", filterOpaque),
         "getElements": SecureObject.createFilteredMethod(o, component, "getElements", filterOpaque),
-        "getName": SecureObject.createFilteredMethod(o, component, "getName")
+        "getName": SecureObject.createFilteredMethod(o, component, "getName"),
+        "getType": SecureObject.createFilteredMethod(o, component, "getType")
     });
 
     // The shape of the component depends on the methods exposed in the definitions:

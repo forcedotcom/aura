@@ -152,5 +152,11 @@
         test: function(cmp) {
             cmp.testGetName();
         }
+    },
+
+    testGetType: {
+        test: function(cmp) {
+            cmp.testGetType();
+        }
     }
 })

@@ -165,8 +165,14 @@
 
     testGetName: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
-        var expected = "lockerTest:secureComponentTest";
+        var expected = "lockerTestSecureComponentTest";
         testUtils.assertEquals(expected, cmp.getName(), "Unexpected return from Component.js#getName");
+    },
+
+    testGetType: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var expected = "lockerTest:secureComponentTest";
+        testUtils.assertEquals(expected, cmp.getType(), "Unexpected return from Component.js#getType");
     },
 
     sayHello: function(cmp) {

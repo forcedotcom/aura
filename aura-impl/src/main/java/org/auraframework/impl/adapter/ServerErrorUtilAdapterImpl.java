@@ -48,12 +48,16 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
         // Process the error and get its id.
         final String errorId = processError(message, thrown);
 
-        // Create a new exception, add error id as a param.
+        // Create a new exception for the default error experience.
         final GenericEventException gee = new GenericEventException(EVENTNAME, thrown);
         gee.setDefault();
 
-        final ClientSideError customError = new ClientSideError(message, thrown != null ? AuraExceptionUtil.getStackTrace(thrown) : null, null, errorId);
-        gee.addParam("error", customError);
+        // If thrown is null, handleException is called as an assertion, so get the stack trace from gee.
+        // Otherwise use thrown's stack trace to build the client side error.
+        final String stackTrace = thrown != null ? AuraExceptionUtil.getStackTrace(thrown) : AuraExceptionUtil.getStackTrace(gee);
+
+        final ClientSideError error = new ClientSideError(message, stackTrace, null, errorId);
+        gee.addParam("error", error);
 
         throw gee;
     }
@@ -69,8 +73,8 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
         final String errorId = processError(message, thrown);
 
         final GenericEventException gee = new GenericEventException(EVENTNAME, thrown);
-        final ClientSideError customError = new ClientSideError(message, AuraExceptionUtil.getStackTrace(thrown), data, errorId);
-        gee.addParam("error", customError);
+        final ClientSideError error = new ClientSideError(message, AuraExceptionUtil.getStackTrace(thrown), data, errorId);
+        gee.addParam("error", error);
 
         throw gee;
     }
@@ -85,7 +89,7 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
      */
     protected String processError(String message, Throwable thrown) {
         // Log the error.
-        logger.warn(message, thrown);
+        logger.error(message, thrown);
 
         // Default implementation uses a random uuid for the error id.
         return UUID.randomUUID().toString();

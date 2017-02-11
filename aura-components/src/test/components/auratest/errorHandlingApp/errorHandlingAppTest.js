@@ -249,13 +249,59 @@
         ]
     },
 
-    testHandleException: {
+    testHandleExceptionAsAssertion: {
+        attributes: {"handleSystemError": true},
+        test: [
+            function (cmp) {
+                // arrange
+                var action = cmp.get("c.handleException");
+
+                // act
+                $A.enqueueAction(action);
+
+                $A.test.addWaitForWithFailureMessage(true, function () {
+                    return cmp.get("v.eventHandled");
+                }, "The expected error didn't get handled.");
+            },
+
+            // assert
+            function (cmp) {
+                cmp.set("v.handleSystemError", false);
+                this.checkActionError(cmp._auraError, "err", $A.severity.ALERT, "org.auraframework.throwable.GenericEventException");
+            }
+        ]
+    },
+
+    testHandleExceptionWithThrownArgument: {
+        attributes: {"handleSystemError": true},
+        test: [
+            function (cmp) {
+                // arrange
+                var action = cmp.get("c.handleExceptionWithThrownArgument");
+
+                // act
+                $A.enqueueAction(action);
+
+                $A.test.addWaitForWithFailureMessage(true, function () {
+                    return cmp.get("v.eventHandled");
+                }, "The expected error didn't get handled.");
+            },
+
+            // assert
+            function (cmp) {
+                cmp.set("v.handleSystemError", false);
+                this.checkActionError(cmp._auraError, "err", $A.severity.ALERT, "java.lang.RuntimeException");
+            }
+        ]
+    },
+
+    testHandleExceptionCallbackNotCalled: {
         test: [
             function(cmp) {
-                // arrage
+                // arrange
                 var action = cmp.get("c.handleException");
                 var called = false;
-                action.setCallback(cmp, function(response) {
+                action.setCallback(cmp, function() {
                     called = true;
                 });
 
@@ -274,13 +320,12 @@
         test: [
             function (cmp) {
                 // arrange
-                var actual;
-                var expected = "err";
+                var targetError;
                 var action = cmp.get("c.handleCustomException");
                 var called = false;
 
                 action.setCallback(cmp, function (response) {
-                    actual = response.error[0].message;
+                    targetError = response.error[0];
                     called = true;
                 });
 
@@ -294,7 +339,7 @@
                         return called;
                     },
                     function() {
-                        $A.test.assertEquals(expected, actual);
+                        this.checkActionError(targetError, "err", undefined, "java.lang.RuntimeException");
                     });
             }
         ]
@@ -304,13 +349,12 @@
         test: [
             function(cmp) {
                 // arrange
-                var actual;
-                var expected = "testCustomMessage";
+                var targetError;
                 var action = cmp.get("c.handleCustomExceptionWithData");
                 var called = false;
 
                 action.setCallback(cmp, function (response) {
-                    actual = response.error[0].data.customMessage;
+                    targetError = response.error[0];
                     called = true;
                 });
 
@@ -324,10 +368,26 @@
                         return called;
                     },
                     function() {
-                        $A.test.assertEquals(expected, actual);
+                        this.checkActionError(targetError, "err", undefined, "java.lang.RuntimeException");
+                        $A.test.assertEquals("testCustomMessage", targetError.data.customMessage);
                     });
             }
         ]
+    },
+
+    /**
+     * Checks the properties of an Action error object.
+     *
+     * @param error         Actual error object to check.
+     * @param message       Expected error message.
+     * @param severity      Expected severity.
+     * @param stackTrace    Expected stack trace.
+     */
+    checkActionError: function (error, message, severity, stackTrace) {
+        $A.test.assertTrue(typeof error.id === 'string' && error.id.length > 0, "Unexpected error id");
+        $A.test.assertEquals(message, error.message, "Unexpected error message");
+        $A.test.assertEquals(severity, error.severity, "Unexpected error severity");
+        $A.test.assertEquals(error.stackTrace.indexOf(stackTrace), 0, "Unexpected error stack trace");
     },
 
     waitForErrorModal: function(callback) {

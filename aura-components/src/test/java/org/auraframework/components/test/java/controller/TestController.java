@@ -119,6 +119,11 @@ public class TestController implements Controller {
     }
 
     @AuraEnabled
+    public void handleExceptionWithThrownArgument() {
+        serverErrorUtilAdapter.handleException("err", new RuntimeException());
+    }
+
+    @AuraEnabled
     public void handleCustomException() {
         serverErrorUtilAdapter.handleCustomException("err", new RuntimeException());
     }

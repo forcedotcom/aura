@@ -822,8 +822,12 @@ Action.prototype.updateFromResponse = function(response) {
             if (err["exceptionEvent"]) {
                 // default server action error handling, ignore action callback
                 if (err["useDefault"]) {
-                    var evtArgs = {"message":err["event"]["attributes"]["values"]["error"]["message"],"error":null,"auraError":null};
-                    // fire the event later so the funtion could return even if an error occurs in the event handler.
+                    // Get error attribute for systemError event.
+                    var error = err["event"]["attributes"]["values"]["error"];
+                    error.severity = $A.severity.ALERT;
+
+                    var evtArgs = {"message":error["message"],"error":null,"auraError":error};
+                    // fire the event later so the function could return even if an error occurs in the event handler.
                     window.setTimeout(function() {  //eslint-disable-line no-loop-func
                         $A.eventService.getNewEvent('markup://aura:systemError').fire(evtArgs);
                     }, 0);

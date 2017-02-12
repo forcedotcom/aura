@@ -23,7 +23,7 @@ import org.auraframework.def.ExampleDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.documentation.ExampleDefImpl;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -46,7 +46,7 @@ public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHand
 
     private final ExampleDefImpl.Builder builder = new ExampleDefImpl.Builder();
 
-    public ExampleDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public ExampleDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                              boolean isInInternalNamespace, DefinitionService definitionService,
                              ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

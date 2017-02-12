@@ -28,7 +28,7 @@ import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -54,7 +54,7 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
         super();
     }
 
-    public EventDefHandler(DefDescriptor<EventDef> eventDefDescriptor, Source<?> source, XMLStreamReader xmlReader,
+    public EventDefHandler(DefDescriptor<EventDef> eventDefDescriptor, TextSource<?> source, XMLStreamReader xmlReader,
                            boolean isInInternalNamespace, DefinitionService definitionService,
                            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(eventDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter,

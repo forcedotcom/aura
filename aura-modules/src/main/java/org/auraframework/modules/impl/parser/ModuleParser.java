@@ -35,7 +35,7 @@ import org.auraframework.modules.impl.def.ModuleDefImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.system.Parser;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -59,10 +59,10 @@ public class ModuleParser implements Parser<ModuleDef> {
     }
 
     @Override
-    public ModuleDef parse(DefDescriptor<ModuleDef> descriptor, Source<ModuleDef> templateSource) throws QuickFixException {
+    public ModuleDef parse(DefDescriptor<ModuleDef> descriptor, TextSource<ModuleDef> templateSource) throws QuickFixException {
         // this modules parser is special in that it needs multiple source files
         // for now we localize the logic for this in this class
-        Source<ModuleDef> classSource = makeClassSource(templateSource);
+        TextSource<ModuleDef> classSource = makeClassSource(templateSource);
 
         ModuleDefImpl.Builder builder = new ModuleDefImpl.Builder();
 
@@ -96,12 +96,12 @@ public class ModuleParser implements Parser<ModuleDef> {
     /**
      * @return classSource corresponding to templateSource
      */
-    private Source<ModuleDef> makeClassSource(Source<ModuleDef> templateSource) {
+    private TextSource<ModuleDef> makeClassSource(TextSource<ModuleDef> templateSource) {
         DefDescriptor<ModuleDef> templateDescriptor = templateSource.getDescriptor();
         DefDescriptor<ModuleDef> classDescriptor = makeClassDescriptor(templateDescriptor);
         
         if (templateSource instanceof FileSource) {
-            String templatePath = templateSource.getUrl().substring(7); // strip "file://"
+            String templatePath = templateSource.getSystemId(); // strip "file://"
             String classPath = templatePath.replace(".html", ".js");
             return new FileSource<>(classDescriptor, new File(classPath), Format.JS);
         } else if (templateSource instanceof ResourceSource) {

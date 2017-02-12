@@ -26,6 +26,7 @@ import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Sets;
@@ -53,8 +54,8 @@ public class PassThroughDefRegistry implements DefRegistry {
 
     @Override
     public <T extends Definition> T getDef(DefDescriptor<T> descriptor) throws QuickFixException {
-        Source<T> source = sourceLoader.getSource(descriptor);
-        if (source != null && source.exists()) {
+        TextSource<T> source = (TextSource<T>)sourceLoader.getSource(descriptor);
+        if (source != null) {
             descriptor = source.getDescriptor();
             Parser<T> parser = parserFactory.getParser(source.getFormat(), descriptor);
             return parser.parse(descriptor, source);
@@ -79,7 +80,7 @@ public class PassThroughDefRegistry implements DefRegistry {
     @Override
     public <T extends Definition> boolean exists(DefDescriptor<T> descriptor) {
         Source<T> source = sourceLoader.getSource(descriptor);
-        return source != null && source.exists();
+        return source != null;
     }
 
     @Override

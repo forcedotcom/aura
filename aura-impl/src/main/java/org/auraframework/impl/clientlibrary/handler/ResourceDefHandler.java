@@ -20,7 +20,7 @@ import org.auraframework.def.ResourceDef;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.clientlibrary.ResourceDefImpl;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -30,7 +30,7 @@ public class ResourceDefHandler {
 
     private ResourceDefImpl.Builder builder = new ResourceDefImpl.Builder();
 
-    public ResourceDefHandler(DefDescriptor<ResourceDef> descriptor, Source<ResourceDef> source) {
+    public ResourceDefHandler(DefDescriptor<ResourceDef> descriptor, TextSource<ResourceDef> source) {
 
         this.builder.setDescriptor(descriptor);
         this.builder.setLocation(source.getSystemId(), source.getLastModified());

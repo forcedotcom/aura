@@ -98,10 +98,11 @@ public class FileSourceLoader extends BaseSourceLoader implements InternalNamesp
                         file.getName());
             }
         }
+        if (!file.exists()) {
+            return null;
+        }
 
-        String id = (file.exists()) ? FileSource.getFilePath(file) : filename;
-
-        return new FileSource<>(descriptor, id, file, getFormat(descriptor));
+        return new FileSource<>(descriptor, file, getFormat(descriptor));
     }
 
     /**

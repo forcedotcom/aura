@@ -21,7 +21,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.ModelDef;
 import org.auraframework.impl.javascript.parser.handler.JavascriptModelDefHandler;
 import org.auraframework.system.Parser;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @ServiceComponent
@@ -38,7 +38,7 @@ public class JavascriptModelParser implements Parser<ModelDef> {
     }
     
     @Override
-    public ModelDef parse(DefDescriptor<ModelDef> descriptor, Source<ModelDef> source)
+    public ModelDef parse(DefDescriptor<ModelDef> descriptor, TextSource<ModelDef> source)
             throws QuickFixException {
         return new JavascriptModelDefHandler(descriptor, source).getDefinition();
     }

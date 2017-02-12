@@ -25,6 +25,7 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.ds.servicecomponent.ModelInstance;
 
@@ -52,9 +53,10 @@ public class EditorPanelModel implements ModelInstance {
             // Nominal case:
             DefDescriptor<? extends Definition> descriptor = definitionService.getDefDescriptor(desc, defType.getPrimaryInterface());
             Source<?> source = definitionService.getSource(descriptor);
-            if (source != null && source.exists()) {
-                code = source.getContents();
-                format = String.valueOf(source.getFormat());
+            if (source != null && source instanceof TextSource) {
+                TextSource<?> textsource = (TextSource<?>)source;
+                code = textsource.getContents();
+                format = String.valueOf(textsource.getFormat());
             } else {
                 code = null;
                 format = null;

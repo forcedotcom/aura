@@ -15,6 +15,13 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -23,20 +30,14 @@ import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
+import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.Source;
-import org.auraframework.test.source.StringSource;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-
-import javax.inject.Inject;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.List;
 
 public class LibraryDefHandlerTest extends AuraImplTestCase {
     @Inject
@@ -135,7 +136,7 @@ public class LibraryDefHandlerTest extends AuraImplTestCase {
         }
     }
 
-    private XMLStreamReader getReader(Source<?> source) throws XMLStreamException {
+    private XMLStreamReader getReader(TextSource<?> source) throws XMLStreamException {
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
         XMLStreamReader xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(),

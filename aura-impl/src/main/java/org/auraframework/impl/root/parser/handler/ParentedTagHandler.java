@@ -25,7 +25,7 @@ import org.auraframework.def.HtmlTag;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -46,13 +46,13 @@ public abstract class ParentedTagHandler<T extends Definition, P extends RootDef
         super();
     }
 
-    public ParentedTagHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public ParentedTagHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                               boolean isInInternalNamespace, DefinitionService definitionService,
                               ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         this(null, parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
     }
 
-    public ParentedTagHandler(DefDescriptor<T> defDescriptor, ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public ParentedTagHandler(DefDescriptor<T> defDescriptor, ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                               boolean isInInternalNamespace, DefinitionService definitionService,
                               ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(defDescriptor, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

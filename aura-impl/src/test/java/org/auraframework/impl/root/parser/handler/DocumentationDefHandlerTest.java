@@ -20,8 +20,8 @@ import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ExampleDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.DocumentationXMLParser;
+import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
@@ -83,13 +83,15 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
         assertEquals(1, descDefs.size());
 
         /* We want to make this a validation error in future
+        QuickFixException expected = null;
         try{
             dd.validateDefinition();
-            fail("Validation should have failed as 2 descriptions can't have same name");
         }
         catch(QuickFixException qfe){
-            assertEquals("Expected Message",qfe.getMessage());
+            expected = qfe;
         }
+        assertNotNull("Validation should have failed as 2 example can't have same name", expected);
+        assertEquals("Expected Message", expected.getMessage());
         */
 
     }
@@ -99,7 +101,7 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
         String[][] invalidMarkupsWithExpectedErrorMessages = {
                 //empty
                 {"",
-                        "<aura:documentation> must contain at least one <aura:description>"},
+                        "Premature end of file." },
                 //no description
                 {"<aura:documentation/>",
                         "<aura:documentation> must contain at least one <aura:description>"},
@@ -126,15 +128,18 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
         for (String[] invalidMarkupWithExpectedErrorMessage : invalidMarkupsWithExpectedErrorMessages) {
             DocumentationDef dd = parse(invalidMarkupWithExpectedErrorMessage[0]);
 
+            QuickFixException expected = null;
+
             try {
                 dd.validateDefinition();
-                fail("Validation should have failed as markup is not valid");
             } catch (QuickFixException qfe) {
-                String actualMessage = qfe.getMessage();
-                assertNotNull(actualMessage);
-                assertTrue("'" + actualMessage + "' doesn't contain '" + invalidMarkupWithExpectedErrorMessage[1] + "'",
-                        actualMessage.contains(invalidMarkupWithExpectedErrorMessage[1]));
+                expected = qfe;
             }
+            assertNotNull("Validation should have failed as markup is not valid", expected);
+            String actualMessage = expected.getMessage();
+            assertNotNull(actualMessage);
+            assertTrue("'" + actualMessage + "' doesn't contain '" + invalidMarkupWithExpectedErrorMessage[1] + "'",
+                    actualMessage.contains(invalidMarkupWithExpectedErrorMessage[1]));
         }
     }
 
@@ -178,13 +183,15 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
         assertEquals(1, exDefs.size());
 
         /* We want to make this a validation error in future
+        QuickFixException expected = null;
         try{
             dd.validateDefinition();
-            fail("Validation should have failed as 2 example can't have same name");
         }
         catch(QuickFixException qfe){
-            assertEquals("Expected Message",qfe.getMessage());
+            expected = qfe;
         }
+        assertNotNull("Validation should have failed as 2 example can't have same name", expected);
+        assertEquals("Expected Message", expected.getMessage());
         */
 
     }

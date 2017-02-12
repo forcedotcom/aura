@@ -16,6 +16,17 @@
 package org.auraframework.impl.svg.parser;
 
 
+import java.io.StringReader;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.regex.Pattern;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
@@ -24,20 +35,10 @@ import org.auraframework.def.SVGDef;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.handler.SVGDefHandler;
 import org.auraframework.system.Parser;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.SVGParserException;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.StringReader;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.regex.Pattern;
 
 @ServiceComponent
 public class SVGParser implements Parser<SVGDef> {
@@ -105,7 +106,7 @@ public class SVGParser implements Parser<SVGDef> {
     }
     
     @Override
-    public SVGDef parse(DefDescriptor<SVGDef> descriptor, Source<SVGDef> source) throws SVGParserException,
+    public SVGDef parse(DefDescriptor<SVGDef> descriptor, TextSource<SVGDef> source) throws SVGParserException,
     QuickFixException {
         if (descriptor.getDefType() == DefType.SVG) {
             XMLStreamReader reader = null;

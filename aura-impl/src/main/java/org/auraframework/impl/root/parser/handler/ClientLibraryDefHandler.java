@@ -26,7 +26,7 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.clientlibrary.ClientLibraryDefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -53,7 +53,7 @@ public class ClientLibraryDefHandler<P extends RootDefinition> extends ParentedT
 
     private ClientLibraryDefImpl.Builder builder;
 
-    public ClientLibraryDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public ClientLibraryDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                    boolean isInInternalNamespace, DefinitionService definitionService,
                                    ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) throws DefinitionNotFoundException {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

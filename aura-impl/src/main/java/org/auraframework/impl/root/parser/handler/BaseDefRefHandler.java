@@ -36,7 +36,7 @@ import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.DefinitionReferenceImpl.Builder;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -50,7 +50,7 @@ public abstract class BaseDefRefHandler<T extends DefinitionReference, P extends
     protected List<DefinitionReference> body;
     protected B builder;
 
-    public BaseDefRefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public BaseDefRefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                   boolean isInInternalNamespace, DefinitionService definitionService,
                                   ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

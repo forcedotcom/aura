@@ -26,7 +26,7 @@ import org.auraframework.def.LocatorDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.locator.LocatorDefImpl;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -45,7 +45,7 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
 
     private final LocatorDefImpl.Builder builder = new LocatorDefImpl.Builder();
 
-    public LocatorDefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public LocatorDefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                              boolean isInInternalNamespace, DefinitionService definitionService,
                              ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter,

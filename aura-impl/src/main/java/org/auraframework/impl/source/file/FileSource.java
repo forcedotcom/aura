@@ -26,16 +26,16 @@ import java.io.UnsupportedEncodingException;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.impl.source.AbstractTextSourceImpl;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.IOUtil;
 
-public class FileSource<D extends Definition> extends Source<D> {
+public class FileSource<D extends Definition> extends AbstractTextSourceImpl<D> {
     private final File file;
     private final long lastModified;
-    private final String url;
 
     public FileSource(DefDescriptor<D> descriptor, File file, Format format) {
         this(descriptor, getFilePath(file), file, format);
@@ -44,16 +44,7 @@ public class FileSource<D extends Definition> extends Source<D> {
     protected FileSource(DefDescriptor<D> descriptor, String systemId, File file, Format format) {
         super(descriptor, systemId, format);
         this.file = file;
-        this.url = "file://" + file.getAbsolutePath();
-
-        // Ensure that lastModified doesn't change after construction of this
-        // Source.
-        this.lastModified = file.lastModified();
-    }
-
-    @Override
-    public long getLastModified() {
-        return lastModified;
+        lastModified = file.lastModified();
     }
 
     @Override
@@ -67,12 +58,9 @@ public class FileSource<D extends Definition> extends Source<D> {
         }
     }
 
-    /**
-     * Provides an absolute {@code file://} URL for this source.
-     */
     @Override
-    public String getUrl() {
-        return url;
+    public long getLastModified() {
+        return lastModified;
     }
 
     public static String getFilePath(File file) {
@@ -98,13 +86,5 @@ public class FileSource<D extends Definition> extends Source<D> {
         } catch (IOException e) {
             throw new AuraRuntimeException(e);
         }
-    }
-
-    /**
-     * @see Source#exists()
-     */
-    @Override
-    public boolean exists() {
-        return file.exists();
     }
 }

@@ -22,7 +22,7 @@ import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -45,7 +45,7 @@ public class RequiredVersionDefHandler<P extends RootDefinition> extends Parente
 
     private final RequiredVersionDefImpl.Builder builder = new RequiredVersionDefImpl.Builder();
 
-    public RequiredVersionDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public RequiredVersionDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                      boolean isInInternalNamespace, DefinitionService definitionService,
                                      ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

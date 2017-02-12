@@ -15,6 +15,8 @@
  */
 package org.auraframework.impl.system;
 
+import java.util.Set;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
@@ -23,9 +25,8 @@ import org.auraframework.impl.source.SourceFactory;
 import org.auraframework.system.CacheableDefFactory;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
-import java.util.Set;
 
 public class CacheableDefFactoryImpl<D extends Definition> extends DefFactoryImpl<D> implements CacheableDefFactory<D> {
     private final SourceFactory sourceFactory;
@@ -38,8 +39,8 @@ public class CacheableDefFactoryImpl<D extends Definition> extends DefFactoryImp
 
     @Override
     public D getDef(DefDescriptor<D> descriptor) throws QuickFixException {
-        Source<D> source = sourceFactory.getSource(descriptor);
-        if (source != null && source.exists()) {
+        TextSource<D> source = (TextSource<D>)sourceFactory.getSource(descriptor);
+        if (source != null) {
 
             // Update the descriptor to respect the canonical case from the source.
             descriptor = source.getDescriptor();
@@ -65,7 +66,7 @@ public class CacheableDefFactoryImpl<D extends Definition> extends DefFactoryImp
     @Override
     public boolean exists(DefDescriptor<D> descriptor) {
         Source<D> s = getSource(descriptor);
-        return s != null && s.exists();
+        return s != null;
     }
 
     @Override

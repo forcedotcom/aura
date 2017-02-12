@@ -15,6 +15,9 @@
  */
 package org.auraframework.integration.test.css;
 
+import javax.inject.Inject;
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokensDef;
@@ -22,14 +25,11 @@ import org.auraframework.def.TokensImportDef;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.handler.TokensImportDefHandler;
+import org.auraframework.impl.source.StringSource;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.junit.Test;
-
-import javax.inject.Inject;
-import javax.xml.stream.XMLStreamReader;
 
 public class TokensImportDefHandlerTest extends StyleTestCase {
     @Inject

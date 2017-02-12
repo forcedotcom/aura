@@ -28,7 +28,7 @@ import org.auraframework.def.TokensImportDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.token.TokensDefImpl;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -64,7 +64,7 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
         super();
     }
 
-    public TokensDefHandler(DefDescriptor<TokensDef> defDescriptor, Source<TokensDef> source, XMLStreamReader xmlReader,
+    public TokensDefHandler(DefDescriptor<TokensDef> defDescriptor, TextSource<TokensDef> source, XMLStreamReader xmlReader,
                             boolean isInInternalNamespace, DefinitionService definitionService,
                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter)
             throws QuickFixException {

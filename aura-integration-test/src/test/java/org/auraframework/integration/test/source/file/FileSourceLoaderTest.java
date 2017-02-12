@@ -15,6 +15,12 @@
  */
 package org.auraframework.integration.test.source.file;
 
+import java.io.File;
+import java.io.Reader;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.auraframework.components.AuraComponentsFiles;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
@@ -25,15 +31,10 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.FileMonitor;
 import org.junit.Test;
-
-import javax.inject.Inject;
-import java.io.File;
-import java.io.Reader;
-import java.util.Set;
 
 public class FileSourceLoaderTest extends AuraImplTestCase {
     @Inject
@@ -85,7 +86,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
     public void testGetComponentSource() {
         FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile(), fileMonitor);
         DefDescriptor<ComponentDef> descriptor = definitionService.getDefDescriptor("test:parent", ComponentDef.class);
-        Source<?> src = loader.getSource(descriptor);
+        TextSource<?> src = loader.getSource(descriptor);
         assertNotNull(src);
         assertEquals(Format.XML, src.getFormat());
         assertEquals(new File(AuraComponentsFiles.TestComponents.asFile(), "test" + File.separator + "parent"
@@ -112,7 +113,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> nonDescriptor = definitionService.getDefDescriptor("test:nonExistent",
                 ComponentDef.class);
 
-        assertFalse(loader.getSource(nonDescriptor).exists());
+        assertNull(loader.getSource(nonDescriptor));
 
     }
 
@@ -120,7 +121,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
     public void testGetEventSource() {
         FileSourceLoader loader = new FileSourceLoader(AuraComponentsFiles.TestComponents.asFile(), fileMonitor);
         DefDescriptor<EventDef> descriptor = definitionService.getDefDescriptor("test:anevent", EventDef.class);
-        Source<EventDef> src = loader.getSource(descriptor);
+        TextSource<EventDef> src = loader.getSource(descriptor);
         assertNotNull(src);
         assertEquals(Format.XML, src.getFormat());
         assertEquals(new File(AuraComponentsFiles.TestComponents.asFile(), "test" + File.separator + "anevent"
@@ -145,7 +146,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
         }
 
         DefDescriptor<EventDef> nonDescriptor = definitionService.getDefDescriptor("test:nonExistentEvent", EventDef.class);
-        assertFalse(loader.getSource(nonDescriptor).exists());
+        assertNull(loader.getSource(nonDescriptor));
 
     }
 

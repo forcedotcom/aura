@@ -27,6 +27,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -52,7 +53,7 @@ public final class ValidationEngine {
      * Validates definition denoted by descriptor
      */
     public List<ValidationError> validate(DefDescriptor<? extends Definition> descriptor) {
-        Source<?> source = definitionService.getSource(descriptor);
+        TextSource<?> source = (TextSource<?>)definitionService.getSource(descriptor);
 
         if (source == null) {
             LOG.warn("cannot find source for " + descriptor);
@@ -64,7 +65,7 @@ public final class ValidationEngine {
             List<? extends ValidationError> errors = validate0(descriptor, source);
             return (errors != null) ? Lists.newArrayList(errors) : NO_ERRORS;
         } catch (Exception ex) {
-            LOG.warn(descriptor + " (" + source.getUrl() + ')', ex);
+            LOG.warn(descriptor + " (" + source.getSystemId() + ')', ex);
             // TODO: report analysis error
             return NO_ERRORS;
         }
@@ -90,7 +91,7 @@ public final class ValidationEngine {
 
     // private:
 
-    private List<ValidationError> validate0(DefDescriptor<? extends Definition> descriptor, Source<?> source)
+    private List<ValidationError> validate0(DefDescriptor<? extends Definition> descriptor, TextSource<?> source)
             throws Exception {
         List<ValidationError> errors = Lists.newArrayList();
         String prefix = descriptor.getPrefix();
@@ -100,13 +101,13 @@ public final class ValidationEngine {
         } catch (StyleParserException e) {
             if (prefix.equals(DefDescriptor.CSS_PREFIX)) {
                 // report css parser errors only when directly validating a .css def
-                errors.add(AuraValidationError.make(source.getUrl().toString(), e));
+                errors.add(AuraValidationError.make(source.getSystemId(), e));
             }
         } catch (DefinitionNotFoundException e) {
             // can happen if not analyzing all source and for .java not in classpath
             LOG.warn("exception loading definition for " + descriptor + ": " + e);
         } catch (AuraValidationException e) {
-            errors.add(AuraValidationError.make(source.getUrl().toString(), e));
+            errors.add(AuraValidationError.make(source.getSystemId(), e));
         } catch (Exception e) {
             LOG.warn("exception loading definition for " + descriptor + ": " + e);
         }
@@ -120,8 +121,8 @@ public final class ValidationEngine {
         return ValidationUtil.patchErrors(errors);
     }
 
-    private List<ValidationError> validateCSS(Source<?> source, DefType defType) throws IOException {
-        String sourceUrl = source.getUrl().toString();
+    private List<ValidationError> validateCSS(TextSource<?> source, DefType defType) throws IOException {
+        String sourceUrl = source.getSystemId();
         String sourceCode = source.getContents();
 
         return new CSSLintValidator().validate(sourceUrl, sourceCode, true);

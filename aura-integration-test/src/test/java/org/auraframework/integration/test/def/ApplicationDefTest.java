@@ -18,7 +18,10 @@ package org.auraframework.integration.test.def;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
-import com.google.common.collect.Sets;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -28,14 +31,13 @@ import org.auraframework.impl.root.component.BaseComponentDefTest;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
-import javax.inject.Inject;
-import java.util.Set;
+import com.google.common.collect.Sets;
 
 public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     @Inject
@@ -191,7 +193,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         String controllerCode = "({ function1: function(cmp) {var a = {k:}} })";
         addSourceAutoCleanup(controllerDesc, controllerCode);
 
-        Source<ApplicationDef> source = stringSourceLoader.getSource(appDesc);
+        TextSource<ApplicationDef> source = stringSourceLoader.getSource(appDesc);
         Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, appDesc);
         ApplicationDef appDef = parser.parse(appDesc, source);
 
@@ -214,7 +216,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         String controllerCode = "({ function1: function(cmp) {var a = {k:}} })";
         addSourceAutoCleanup(controllerDesc, controllerCode);
 
-        Source<ApplicationDef> source = stringSourceLoader.getSource(appDesc);
+        TextSource<ApplicationDef> source = stringSourceLoader.getSource(appDesc);
         Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, appDesc);
         ApplicationDef appDef = parser.parse(appDesc, source);
 
@@ -240,7 +242,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         String controllerCode = "({ function1: function(cmp) {var a = {k:}} })";
         addSourceAutoCleanup(controllerDesc, controllerCode);
 
-        Source<ApplicationDef> source = stringSourceLoader.getSource(appDesc);
+        TextSource<ApplicationDef> source = stringSourceLoader.getSource(appDesc);
         Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, appDesc);
         ApplicationDef appDef = parser.parse(appDesc, source);
 

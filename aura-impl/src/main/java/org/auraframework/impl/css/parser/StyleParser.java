@@ -29,7 +29,7 @@ import org.auraframework.impl.css.util.Styles;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.system.Parser;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableSet;
@@ -89,7 +89,7 @@ public abstract class StyleParser implements Parser<StyleDef> {
     }
 
     @Override
-    public StyleDef parse(DefDescriptor<StyleDef> descriptor, Source<StyleDef> source) throws QuickFixException {
+    public StyleDef parse(DefDescriptor<StyleDef> descriptor, TextSource<StyleDef> source) throws QuickFixException {
         boolean shouldValidate = validate
                 && !descriptor.getName().toLowerCase().endsWith("template")
                 && Aura.getConfigAdapter().validateCss();

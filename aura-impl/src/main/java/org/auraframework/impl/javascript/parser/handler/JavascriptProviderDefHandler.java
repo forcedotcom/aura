@@ -22,7 +22,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.impl.javascript.provider.JavascriptProviderDef.Builder;
 import org.auraframework.impl.util.JavascriptTokenizer;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonHandlerProvider;
@@ -37,7 +37,7 @@ public class JavascriptProviderDefHandler extends JavascriptHandler<ProviderDef,
 
     private final Builder builder = new Builder();
 
-    public JavascriptProviderDefHandler(DefDescriptor<ProviderDef> descriptor, Source<?> source) {
+    public JavascriptProviderDefHandler(DefDescriptor<ProviderDef> descriptor, TextSource<?> source) {
         super(descriptor, source);
     }
 

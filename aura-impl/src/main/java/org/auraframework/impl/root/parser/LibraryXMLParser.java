@@ -23,7 +23,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.root.parser.handler.LibraryDefHandler;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 
 import javax.xml.stream.XMLStreamReader;
 
@@ -41,7 +41,7 @@ public class LibraryXMLParser extends XMLParser<LibraryDef> {
     }
 
     @Override
-    protected LibraryDefHandler getHandler(DefDescriptor<LibraryDef> descriptor, Source<LibraryDef> source,
+    protected LibraryDefHandler getHandler(DefDescriptor<LibraryDef> descriptor, TextSource<LibraryDef> source,
                                            XMLStreamReader xmlReader, boolean isInInternalNamespace,
                                            DefinitionService definitionService,
                                            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {

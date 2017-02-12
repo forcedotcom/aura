@@ -15,9 +15,12 @@
  */
 package org.auraframework.integration.test.css;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokenDef;
 import org.auraframework.def.TokenDescriptorProviderDef;
@@ -26,18 +29,17 @@ import org.auraframework.def.TokensDef;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.java.provider.TestTokenDescriptorProvider;
 import org.auraframework.impl.java.provider.TestTokenMapProvider;
+import org.auraframework.impl.source.StringSource;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.TokenValueNotFoundException;
 import org.junit.Test;
 
-import javax.inject.Inject;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 
 public class TokensDefImplTest extends StyleTestCase {
 

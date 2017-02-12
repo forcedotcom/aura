@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.source;
+package org.auraframework.impl.source;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -55,6 +55,9 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
+import org.auraframework.system.TextSource;
+import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.util.FileMonitor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -389,7 +392,7 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
      * @param source the loaded definition to remove.
      */
     @Override
-    public final void removeSource(StringSource<?> source) {
+    public final void removeSource(TextSource<?> source) {
         removeSource(source.getDescriptor());
     }
 
@@ -441,7 +444,7 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
     }
 
     @Override
-    public <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
+    public <D extends Definition> TextSource<D> getSource(DefDescriptor<D> descriptor) {
         if (descriptor == null) {
             return null;
         }

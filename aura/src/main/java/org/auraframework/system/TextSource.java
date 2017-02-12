@@ -13,20 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.builder;
+package org.auraframework.system;
 
-import org.auraframework.def.ResourceDef;
-import org.auraframework.system.TextSource;
+import java.io.Reader;
+
+import org.auraframework.def.Definition;
 
 /**
- * Resource Def Builder
+ * A source that is for 'text'.
+ *
+ * FIXME: both the reader and hashing reader should probably be deprecated an removed.
  */
-public interface ResourceDefBuilder extends DefBuilder<ResourceDef, ResourceDef> {
+public interface TextSource<D extends Definition> extends Source<D> {
     /**
-     * Source used to get contents
-     *
-     * @param source source
-     * @return builder
+     * get the contents.
      */
-    ResourceDefBuilder setSource(TextSource<ResourceDef> source);
+    String getContents();
+
+    /**
+     * Get a reader for the contents.
+     */
+    Reader getReader();
+
+    /**
+     * Get a hashing reader.
+     */
+    Reader getHashingReader();
 }

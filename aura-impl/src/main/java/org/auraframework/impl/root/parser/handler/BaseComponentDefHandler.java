@@ -57,7 +57,7 @@ import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -111,7 +111,8 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
         super();
     }
 
-    public BaseComponentDefHandler(DefDescriptor<T> componentDefDescriptor, Source<?> source, XMLStreamReader xmlReader,
+    public BaseComponentDefHandler(DefDescriptor<T> componentDefDescriptor, TextSource<?> source,
+                                   XMLStreamReader xmlReader,
                                    boolean isInInternalNamespace, DefinitionService definitionService,
                                    ContextService contextService,
                                    ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {

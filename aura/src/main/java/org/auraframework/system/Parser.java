@@ -39,5 +39,5 @@ public interface Parser<D extends Definition> {
 
     DefType getDefType();
     
-    D parse(DefDescriptor<D> descriptor, Source<D> source) throws QuickFixException;
+    D parse(DefDescriptor<D> descriptor, TextSource<D> source) throws QuickFixException;
 }

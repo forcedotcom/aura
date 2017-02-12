@@ -28,6 +28,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -206,8 +207,8 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
         }
         //ApplicationDef ad = definitionService.getDefinition(root);
         //List<LibraryDefRef> aid = ad.getImports();
-        Source<?> source = null;
-        source = definitionService.getSource(lib);
+        TextSource<?> source = null;
+        source = (TextSource<?>)definitionService.getSource(lib);
         String originalContent = source.getContents();
         String newSource = originalContent.replace("basicFirst", "BASICFirst");
         if(source != null && newSource != null) {

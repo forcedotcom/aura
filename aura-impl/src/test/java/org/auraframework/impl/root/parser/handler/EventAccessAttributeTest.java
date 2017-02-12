@@ -24,7 +24,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.parser.ParserFactory;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
@@ -49,7 +49,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -64,7 +64,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -85,7 +85,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -106,7 +106,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -129,7 +129,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -151,7 +151,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                     getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                     eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-            Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+            TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
             
             Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
             Definition def = parser.parse(descriptor, source);
@@ -173,7 +173,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -198,7 +198,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -211,7 +211,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -224,7 +224,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -237,7 +237,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -250,7 +250,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -269,7 +269,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -282,7 +282,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -296,7 +296,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -309,7 +309,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -322,7 +322,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -341,7 +341,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -364,7 +364,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -382,7 +382,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -401,7 +401,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -426,7 +426,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -450,7 +450,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -473,7 +473,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -498,7 +498,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -517,7 +517,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -536,7 +536,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -555,7 +555,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -574,7 +574,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_NAMESPACE+":testEvent",
                         NamespaceAccess.INTERNAL);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -602,7 +602,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -617,7 +617,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -638,7 +638,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -659,7 +659,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -682,7 +682,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -704,7 +704,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                     getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                     eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-            Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+            TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
             
             Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
             Definition def = parser.parse(descriptor, source);
@@ -726,7 +726,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -752,7 +752,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -765,7 +765,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -778,7 +778,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -791,7 +791,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -811,7 +811,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -829,7 +829,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -848,7 +848,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -867,7 +867,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -886,7 +886,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -905,7 +905,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -930,7 +930,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -953,7 +953,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -971,7 +971,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -990,7 +990,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1015,7 +1015,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1039,7 +1039,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1062,7 +1062,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1086,7 +1086,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1105,7 +1105,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1124,7 +1124,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1143,7 +1143,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1162,7 +1162,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1193,7 +1193,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1208,7 +1208,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1229,7 +1229,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1250,7 +1250,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1273,7 +1273,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1295,7 +1295,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                     getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                     eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-            Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+            TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
             
             Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
             Definition def = parser.parse(descriptor, source);
@@ -1317,7 +1317,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1342,7 +1342,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1355,7 +1355,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                         eventSource, "customNS:testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1368,7 +1368,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1381,7 +1381,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1401,7 +1401,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1425,7 +1425,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1444,7 +1444,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1463,7 +1463,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1482,7 +1482,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1501,7 +1501,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1525,7 +1525,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1547,7 +1547,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1565,7 +1565,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1585,7 +1585,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, "privilegedNS:testEvent",
                         NamespaceAccess.PRIVILEGED);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1609,7 +1609,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1632,7 +1632,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1655,7 +1655,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1678,7 +1678,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1697,7 +1697,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1716,7 +1716,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1735,7 +1735,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1754,7 +1754,7 @@ public class EventAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(EventDef.class,
                 eventSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testEvent",
                         NamespaceAccess.CUSTOM);
-        Source<EventDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<EventDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<EventDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);

@@ -15,6 +15,17 @@
  */
 package org.auraframework.impl.root.parser;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.net.URL;
+
+import javax.inject.Inject;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
@@ -25,20 +36,11 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Location;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraExceptionInfo;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
-import javax.inject.Inject;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.net.URL;
 
 /**
  * Implementation of Parser. Parses XML Formatted Source to produce
@@ -86,26 +88,24 @@ public abstract class XMLParser<D extends RootDefinition> implements Parser<D> {
         }
     }
 
-    protected abstract RootTagHandler<D> getHandler(DefDescriptor<D>defDescriptor, Source<D> source,
+    protected abstract RootTagHandler<D> getHandler(DefDescriptor<D>defDescriptor, TextSource<D> source,
                                                     XMLStreamReader xmlReader, boolean isInInternalNamespace,
                                                     DefinitionService definitionService,
                                                     ConfigAdapter configAdapter,
                                                     DefinitionParserAdapter definitionParserAdapter) throws QuickFixException;
 
     @Override
-    public D parse(DefDescriptor<D> descriptor, Source<D> source) throws QuickFixException {
+    public D parse(DefDescriptor<D> descriptor, TextSource<D> source) throws QuickFixException {
         Reader reader = null;
         XMLStreamReader xmlReader = null;
         RootTagHandler<D> handler = null;
 
         D ret = null;
         try {
-            if (source.exists()) {
                 String contents = source.getContents();
                 reader = new HTMLReader(new StringReader(contents));
 
                 xmlReader = xmlInputFactory.createXMLStreamReader(reader);
-            }
             handler = getHandler(descriptor, source, xmlReader, isInInternalNamespace(descriptor),
                     definitionService, configAdapter, definitionParserAdapter);
             if (xmlReader != null) {
@@ -208,17 +208,13 @@ public abstract class XMLParser<D extends RootDefinition> implements Parser<D> {
             assert source != null;
             // xmlLocation provides column and line number.
             javax.xml.stream.Location xmlLocation = xmlReader.getLocation();
-            String location = source.getUrl();
+            String location = source.getSystemId();
             if (location == null) {
-                // Not a file (DB) so let's provide the component name
+                // If we can't find a name, use the descriptor.
                 location = source.getDescriptor().getQualifiedName();
             }
-            if (location.startsWith("file:")) {
-                location = location.substring(5);
-            }
-            URL cacheUrl = source.getCacheUrl();
             return new Location(location, xmlLocation.getLineNumber() - 1, xmlLocation.getColumnNumber(),
-                    source.getLastModified(), cacheUrl == null ? null : cacheUrl.toString());
+                    source.getLastModified(), null);
         } else if (source != null) {
             return new Location(source.getSystemId(), source.getLastModified());
         }

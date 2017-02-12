@@ -19,14 +19,14 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.impl.root.library.JavascriptIncludeDef.Builder;
 import org.auraframework.impl.util.JavascriptTokenizer;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class JavascriptIncludeDefHandler extends JavascriptHandler<IncludeDef, IncludeDef> {
 
     private final Builder builder = new Builder();
 
-    public JavascriptIncludeDefHandler(DefDescriptor<IncludeDef> descriptor, Source<?> source) {
+    public JavascriptIncludeDefHandler(DefDescriptor<IncludeDef> descriptor, TextSource<?> source) {
         super(descriptor, source);
     }
 

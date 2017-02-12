@@ -16,7 +16,7 @@
 package org.auraframework.builder;
 
 import org.auraframework.def.SVGDef;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 
 public interface SVGDefBuilder {
     /**
@@ -25,5 +25,5 @@ public interface SVGDefBuilder {
      * @param source source
      * @return builder
      */
-    SVGDefBuilder setSource(Source<SVGDef> source);
+    SVGDefBuilder setSource(TextSource<SVGDef> source);
 }

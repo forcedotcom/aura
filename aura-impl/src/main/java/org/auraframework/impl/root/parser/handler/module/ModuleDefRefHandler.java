@@ -27,7 +27,7 @@ import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.modules.impl.def.ModuleDefRefImpl;
 import org.auraframework.modules.impl.def.ModuleDefRefImpl.Builder;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 
 /**
  * Module definition reference handler.
@@ -37,7 +37,7 @@ public class ModuleDefRefHandler<P extends RootDefinition> extends BaseDefRefHan
 
     protected ModuleDefRefImpl.Builder builder = new ModuleDefRefImpl.Builder();
 
-    public ModuleDefRefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public ModuleDefRefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                boolean isInInternalNamespace, DefinitionService definitionService,
                                ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

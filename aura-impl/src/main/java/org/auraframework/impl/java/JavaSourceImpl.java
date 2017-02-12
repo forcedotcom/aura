@@ -15,42 +15,29 @@
  */
 package org.auraframework.impl.java;
 
-import java.io.Reader;
 import java.lang.annotation.Annotation;
+
+import javax.annotation.Nonnull;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.system.JavaSource;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.Source;
 
-public class JavaSourceImpl<D extends Definition> extends Source<D> {
+public class JavaSourceImpl<D extends Definition> implements JavaSource<D> {
     public static final String JAVA_MIME_TYPE = "application/x-java-class";
 
     private final Class<?> javaClass;
+    private final String systemId;
+    private final Format format;
+    private final DefDescriptor<D> descriptor;
 
-    public JavaSourceImpl(DefDescriptor<D> descriptor, Class<?> javaClass) {
-        super(descriptor, descriptor.getQualifiedName(), Format.JAVA);
+
+    public JavaSourceImpl(DefDescriptor<D> descriptor, @Nonnull Class<?> javaClass) {
         this.javaClass = javaClass;
-    }
-
-    @Override
-    public Reader getReader() {
-        return null;
-    }
-
-    @Override
-    public String getContents() {
-        return null;
-    }
-
-    @Override
-    public long getLastModified() {
-        return 0;
-    }
-
-    @Override
-    public boolean exists() {
-        return javaClass != null;
+        this.systemId = javaClass.getName();
+        this.format = Format.JAVA;
+        this.descriptor = descriptor;
     }
 
     @Override
@@ -58,8 +45,32 @@ public class JavaSourceImpl<D extends Definition> extends Source<D> {
         return JAVA_MIME_TYPE;
     }
 
+    @Override
     public Class<?> getJavaClass() {
         return javaClass;
+    }
+
+    @Override
+    public String getSystemId() {
+        return systemId;
+    }
+
+    /**
+     * Get the format of this source.
+     */
+    @Override
+    public Format getFormat() {
+        return format;
+    }
+
+    @Override
+    public DefDescriptor<D> getDescriptor() {
+        return descriptor;
+    }
+
+    @Override
+    public String getHash() {
+        return null;
     }
 
     /**
@@ -69,10 +80,8 @@ public class JavaSourceImpl<D extends Definition> extends Source<D> {
      * We do this to allow a single level of nesting for annotations. This maybe should be replaced by the
      * ability to get an annotation from the adapter instead of trying all of them.
      */
+    @Override
     public <T extends Annotation> T findAnnotation(Class<T> annClass) {
-        if (javaClass == null) {
-            return null;
-        }
         T ann = javaClass.getAnnotation(annClass);
         if (ann != null) {
             return ann;
@@ -85,5 +94,20 @@ public class JavaSourceImpl<D extends Definition> extends Source<D> {
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean isDefaultNamespaceSupported() {
+        return false;
+    }
+
+    @Override
+    public String getDefaultNamespace() {
+        return null;
+    }
+
+    @Override
+    public long getLastModified() {
+        return 0L;
     }
 }

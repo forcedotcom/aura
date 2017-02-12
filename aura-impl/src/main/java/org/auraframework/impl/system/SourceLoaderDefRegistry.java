@@ -72,7 +72,7 @@ public class SourceLoaderDefRegistry extends DefRegistryImpl {
 
     @Override
     public <T extends Definition> boolean exists(DefDescriptor<T> descriptor) {
-        return sourceLoader.getSource(descriptor).exists();
+        return sourceLoader.getSource(descriptor) != null;
     }
 
     @Override

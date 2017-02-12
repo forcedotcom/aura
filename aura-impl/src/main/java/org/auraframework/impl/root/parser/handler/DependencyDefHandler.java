@@ -24,7 +24,7 @@ import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.util.TypeParser;
 import org.auraframework.impl.util.TypeParser.Type;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -51,7 +51,7 @@ public class DependencyDefHandler<P extends RootDefinition> extends ParentedTagH
         super();
     }
 
-    public DependencyDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public DependencyDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                 boolean isInInternalNamespace, DefinitionService definitionService,
                                 ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) throws DefinitionNotFoundException {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

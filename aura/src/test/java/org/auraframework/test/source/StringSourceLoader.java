@@ -15,11 +15,14 @@
  */
 package org.auraframework.test.source;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.InternalNamespaceSourceLoader;
 import org.auraframework.system.SourceLoader;
-import javax.annotation.Nullable;
+import org.auraframework.system.TextSource;
 
 /**
  * This source loader allows tests to load and unload source from strings.
@@ -67,10 +70,10 @@ public interface StringSourceLoader extends SourceLoader, InternalNamespaceSourc
      * @param contents the source contents
      * @param namePrefix if non-null, then generate some name with the given prefix for the descriptor.
      * @param access the access type of the namespace.
-     * @return the created {@link StringSource}
+     * @return the created {@link TextSource}
      * @throws IllegalStateException when loading a definition that already exists with the same descriptor.
      */
-    <D extends Definition> StringSource<D> addSource(Class<D> defClass, String contents,
+    <D extends Definition> TextSource<D> addSource(Class<D> defClass, String contents,
                                                      @Nullable String namePrefix, NamespaceAccess type);
 
     /**
@@ -81,9 +84,9 @@ public interface StringSourceLoader extends SourceLoader, InternalNamespaceSourc
      * @param namePrefix if non-null, then generate some name with the given prefix for the descriptor.
      * @param overwrite if true, overwrite any previously loaded definition
      * @param access the access type of the namespace.
-     * @return the created {@link StringSource}
+     * @return the created {@link TextSource}
      */
-    <D extends Definition> StringSource<D> putSource(Class<D> defClass, String contents,
+    <D extends Definition> TextSource<D> putSource(Class<D> defClass, String contents,
                                                      @Nullable String namePrefix, boolean overwrite, NamespaceAccess access);
 
     /**
@@ -94,9 +97,9 @@ public interface StringSourceLoader extends SourceLoader, InternalNamespaceSourc
      * @param namePrefix if non-null, then generate some name with the given prefix for the descriptor.
      * @param overwrite if true, overwrite any previously loaded definition
      * @param access the access type of the namespace.
-     * @return the created {@link StringSource}
+     * @return the created {@link TextSource}
      */
-    <D extends Definition, B extends Definition> StringSource<D> putSource(Class<D> defClass, String contents,
+    <D extends Definition, B extends Definition> TextSource<D> putSource(Class<D> defClass, String contents,
                                                                            @Nullable String namePrefix,
                                                                            boolean overwrite, NamespaceAccess access,
                                                                            @Nullable DefDescriptor<B> bundle);
@@ -107,9 +110,9 @@ public interface StringSourceLoader extends SourceLoader, InternalNamespaceSourc
      * @param descriptor the DefDescriptor key for the loaded definition
      * @param contents the source contents
      * @param overwrite if true, overwrite any previously loaded definition
-     * @return the created {@link StringSource}
+     * @return the created {@link TextSource}
      */
-    <D extends Definition> StringSource<D> putSource(DefDescriptor<D> descriptor, String contents, boolean overwrite);
+    <D extends Definition> TextSource<D> putSource(DefDescriptor<D> descriptor, String contents, boolean overwrite);
 
     /**
      * Load a definition.
@@ -118,9 +121,9 @@ public interface StringSourceLoader extends SourceLoader, InternalNamespaceSourc
      * @param contents the source contents
      * @param overwrite if true, overwrite any previously loaded definition
      * @param access the access type for the namespace
-     * @return the created {@link StringSource}
+     * @return the created {@link TextSource}
      */
-    <D extends Definition> StringSource<D> putSource(DefDescriptor<D> descriptor, String contents,
+    <D extends Definition> TextSource<D> putSource(DefDescriptor<D> descriptor, String contents,
                                                      boolean overwrite, NamespaceAccess access);
 
     /**
@@ -135,10 +138,19 @@ public interface StringSourceLoader extends SourceLoader, InternalNamespaceSourc
      * 
      * @param source the loaded definition to remove.
      */
-    void removeSource(StringSource<?> source);
+    void removeSource(TextSource<?> source);
 
     /**
      * Is a given namespace privileged?
      */
     boolean isPrivilegedNamespace(String namespace);
+
+    /**
+     * Return the Source for the given descriptor.
+     * 
+     * @param descriptor
+     * @return Source referenced by descriptor
+     */
+    @Override
+    <D extends Definition> TextSource<D> getSource(@Nonnull DefDescriptor<D> descriptor);
 }

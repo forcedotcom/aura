@@ -21,11 +21,11 @@ import java.util.Set;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.parser.ParserFactory;
+import org.auraframework.impl.source.StringSource;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Parser;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
-import org.auraframework.test.source.StringSource;
 
 /**
  * Provides access to mocks for internal framework objects that would be difficult to mock traditionally in the context

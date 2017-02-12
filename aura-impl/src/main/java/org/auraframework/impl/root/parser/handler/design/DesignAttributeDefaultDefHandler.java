@@ -24,7 +24,7 @@ import org.auraframework.impl.design.DesignAttributeDefaultDefImpl;
 import org.auraframework.impl.root.parser.handler.ParentedTagHandler;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -41,7 +41,7 @@ public class DesignAttributeDefaultDefHandler extends ParentedTagHandler<DesignA
 
 
     public DesignAttributeDefaultDefHandler(RootTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader,
-                                            Source<?> source, boolean isInInternalNamespace,
+                                            TextSource<?> source, boolean isInInternalNamespace,
                                             DefinitionService definitionService,
                                             ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

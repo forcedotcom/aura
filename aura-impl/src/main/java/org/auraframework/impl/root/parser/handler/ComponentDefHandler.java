@@ -23,7 +23,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import javax.xml.stream.XMLStreamException;
@@ -51,7 +51,7 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef, C
         super();
     }
 
-    public ComponentDefHandler(DefDescriptor<ComponentDef> componentDefDescriptor, Source<?> source,
+    public ComponentDefHandler(DefDescriptor<ComponentDef> componentDefDescriptor, TextSource<?> source,
                                XMLStreamReader xmlReader, boolean isInInternalNamespace, DefinitionService definitionService,
                                ContextService contextService,
                                ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {

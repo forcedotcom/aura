@@ -24,7 +24,7 @@ import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.root.parser.handler.InterfaceDefHandler;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 
 import javax.inject.Inject;
 import javax.xml.stream.XMLStreamReader;
@@ -47,7 +47,7 @@ public class InterfaceXMLParser extends XMLParser<InterfaceDef> {
 
     @Override
     protected InterfaceDefHandler getHandler(DefDescriptor<InterfaceDef> descriptor,
-                                             Source<InterfaceDef> source, XMLStreamReader xmlReader,
+                                             TextSource<InterfaceDef> source, XMLStreamReader xmlReader,
                                              boolean isInInternalNamespace, DefinitionService definitionService,
                                              ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         return new InterfaceDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,

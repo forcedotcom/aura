@@ -94,7 +94,7 @@ public class CompilerServiceImpl implements CompilerService {
         @SuppressWarnings("unchecked")
         Class<D> clazz = (Class<D>)descriptor.getDefType().getPrimaryInterface();
         Source<D> source = sourceLoader.getSource(descriptor);
-        if (source == null || !source.exists()) {
+        if (source == null) {
             return null;
         }
         return getDefinitionTypeSafe(source, clazz);

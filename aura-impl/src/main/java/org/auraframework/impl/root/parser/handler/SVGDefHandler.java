@@ -21,7 +21,7 @@ import org.auraframework.def.SVGDef;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.svg.SVGDefImpl;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.SVGParserException;
 import org.auraframework.util.IOUtil;
@@ -39,7 +39,7 @@ public class SVGDefHandler<D extends Definition> {
     }
 
     @SuppressWarnings("unchecked")
-    public SVGDefHandler(DefDescriptor<D> defDescriptor, Source<SVGDef> source) throws SVGParserException {
+    public SVGDefHandler(DefDescriptor<D> defDescriptor, TextSource<SVGDef> source) throws SVGParserException {
         builder.setDescriptor((DefDescriptor<SVGDef>) defDescriptor);
         builder.setLocation(source.getSystemId(), source.getLastModified());
         builder.setOwnHash(source.getHash());

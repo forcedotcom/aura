@@ -23,7 +23,7 @@ import org.auraframework.def.TokensDef;
 import org.auraframework.def.TokensImportDef;
 import org.auraframework.impl.css.token.TokensImportDefImpl;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -43,7 +43,7 @@ public class TokensImportDefHandler<P extends RootDefinition> extends ParentedTa
         super();
     }
 
-    public TokensImportDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public TokensImportDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                   boolean isInInternalNamespace, DefinitionService definitionService,
                                   ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

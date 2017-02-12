@@ -32,7 +32,7 @@ import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.parser.handler.module.ModuleDefRefHandler;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
@@ -65,13 +65,13 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
         this.definitionParserAdapter = null;
     }
 
-    public ContainerTagHandler(XMLStreamReader xmlReader, Source<?> source, boolean isInInternalNamespace,
+    public ContainerTagHandler(XMLStreamReader xmlReader, TextSource<?> source, boolean isInInternalNamespace,
                                DefinitionService definitionService, ConfigAdapter configAdapter,
                                DefinitionParserAdapter definitionParserAdapter) {
         this(null, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
     }
 
-    public ContainerTagHandler(DefDescriptor<T> defDescriptor, XMLStreamReader xmlReader, Source<?> source,
+    public ContainerTagHandler(DefDescriptor<T> defDescriptor, XMLStreamReader xmlReader, TextSource<?> source,
                                boolean isInInternalNamespace, DefinitionService definitionService,
                                ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(xmlReader, source, definitionService);
@@ -99,9 +99,7 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
 
     @Override
     public final T getElement() throws XMLStreamException, QuickFixException {
-        if (source.exists()) {
-            readElement();
-        }
+        readElement();
         return createDefinition();
     }
 

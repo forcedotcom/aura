@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.builder;
+package org.auraframework.system;
 
-import org.auraframework.def.ResourceDef;
-import org.auraframework.system.TextSource;
+import java.lang.annotation.Annotation;
 
-/**
- * Resource Def Builder
- */
-public interface ResourceDefBuilder extends DefBuilder<ResourceDef, ResourceDef> {
+import org.auraframework.def.Definition;
+
+public interface JavaSource<D extends Definition> extends Source<D> {
     /**
-     * Source used to get contents
-     *
-     * @param source source
-     * @return builder
+     * get the java class associated with the source.
      */
-    ResourceDefBuilder setSource(TextSource<ResourceDef> source);
+    Class<?> getJavaClass();
+
+    /**
+     * Find an annotation on the class (looks recursively).
+     */
+    <T extends Annotation> T findAnnotation(Class<T> annClass);
 }

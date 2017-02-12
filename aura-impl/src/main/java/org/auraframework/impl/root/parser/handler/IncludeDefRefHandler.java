@@ -24,7 +24,7 @@ import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.library.IncludeDefRefImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Access;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -60,7 +60,7 @@ public class IncludeDefRefHandler extends XMLHandler<IncludeDefRefImpl> {
     }
 
     public IncludeDefRefHandler(RootTagHandler<? extends RootDefinition> parentHandler, XMLStreamReader xmlReader,
-                                Source<?> source, DefinitionService definitionService) {
+                                TextSource<?> source, DefinitionService definitionService) {
         super(xmlReader, source, definitionService);
         this.parentHandler = parentHandler;
     }

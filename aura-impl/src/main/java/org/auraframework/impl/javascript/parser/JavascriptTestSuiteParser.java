@@ -21,7 +21,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.javascript.parser.handler.JavascriptTestSuiteDefHandler;
 import org.auraframework.system.Parser;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @ServiceComponent
@@ -38,7 +38,7 @@ public class JavascriptTestSuiteParser implements Parser<TestSuiteDef> {
     }
     
     @Override
-    public TestSuiteDef parse(DefDescriptor<TestSuiteDef> descriptor, Source<TestSuiteDef> source)
+    public TestSuiteDef parse(DefDescriptor<TestSuiteDef> descriptor, TextSource<TestSuiteDef> source)
             throws QuickFixException {
         return new JavascriptTestSuiteDefHandler(descriptor, source).getDefinition();
     }

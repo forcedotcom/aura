@@ -30,7 +30,7 @@ import org.auraframework.impl.root.parser.handler.design.DesignTemplateDefHandle
 import org.auraframework.impl.root.parser.handler.design.DesignTemplateRegionDefHandler;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -54,7 +54,7 @@ public abstract class XMLHandler<T extends Definition> extends BaseXMLElementHan
 
     protected final DefinitionService definitionService;
 
-    protected XMLHandler(XMLStreamReader xmlReader, Source<?> source, DefinitionService definitionService) {
+    protected XMLHandler(XMLStreamReader xmlReader, TextSource<?> source, DefinitionService definitionService) {
         super(xmlReader, source);
         this.definitionService = definitionService;
     }

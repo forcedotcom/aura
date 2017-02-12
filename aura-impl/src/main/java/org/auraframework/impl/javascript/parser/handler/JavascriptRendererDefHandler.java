@@ -22,7 +22,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.javascript.renderer.JavascriptRendererDef.Builder;
 import org.auraframework.impl.util.JavascriptTokenizer;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonHandlerProvider;
 
@@ -33,7 +33,7 @@ public class JavascriptRendererDefHandler extends JavascriptHandler<RendererDef,
 
     private final Builder builder = new Builder();
 
-    public JavascriptRendererDefHandler(DefDescriptor<RendererDef> descriptor, Source<?> source) {
+    public JavascriptRendererDefHandler(DefDescriptor<RendererDef> descriptor, TextSource<?> source) {
         super(descriptor, source);
     }
 

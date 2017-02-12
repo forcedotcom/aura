@@ -20,7 +20,7 @@ import org.auraframework.def.genericxml.GenericXmlElement;
 import org.auraframework.def.genericxml.GenericXmlValidator;
 import org.auraframework.impl.root.GenericXmlElementImpl;
 import org.auraframework.impl.root.parser.handler.BaseXMLElementHandler;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -41,7 +41,7 @@ public class GenericXmlElementHandler extends BaseXMLElementHandler {
     /**
      * Should only be instantiated from the Factory
      */
-    GenericXmlElementHandler(XMLStreamReader xmlReader, Source<?> source, boolean isInInternalNamespace, GenericXmlValidator validator) {
+    GenericXmlElementHandler(XMLStreamReader xmlReader, TextSource<?> source, boolean isInInternalNamespace, GenericXmlValidator validator) {
         super(xmlReader, source);
         tagName = getTagName();
         builder = new GenericXmlElementImpl.Builder(validator.getImplementingDef(), tagName);

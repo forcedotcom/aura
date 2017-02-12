@@ -17,8 +17,11 @@ package org.auraframework.impl.source;
 
 import java.util.Set;
 
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.system.SourceLoader;
+import org.auraframework.system.TextSource;
 /**
  * Abstract superclass to {@link SourceLoader} implementations, providing common descriptor and filename utilities.
  */
@@ -33,4 +36,7 @@ public abstract class BaseSourceLoader extends DescriptorFileMapper implements S
     public Set<DefType> getDefTypes() {
         return super.getDefTypes();
     }
+
+    @Override
+    public abstract <D extends Definition> TextSource<D> getSource(DefDescriptor<D> descriptor);
 }

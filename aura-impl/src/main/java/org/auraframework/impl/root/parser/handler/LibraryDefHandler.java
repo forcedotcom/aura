@@ -26,7 +26,7 @@ import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.root.library.LibraryDefImpl;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -48,7 +48,7 @@ public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
         super();
     }
 
-    public LibraryDefHandler(DefDescriptor<LibraryDef> libraryDefDescriptor, Source<?> source, XMLStreamReader xmlReader,
+    public LibraryDefHandler(DefDescriptor<LibraryDef> libraryDefDescriptor, TextSource<?> source, XMLStreamReader xmlReader,
                              boolean isInInternalNamespace, DefinitionService definitionService,
                              ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(libraryDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

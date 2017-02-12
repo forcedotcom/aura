@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import org.auraframework.def.design.DesignLayoutAttributeDef;
 import org.auraframework.impl.design.DesignLayoutAttributeDefImpl;
 import org.auraframework.impl.root.parser.handler.BaseXMLElementHandler;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -38,7 +38,7 @@ public class DesignLayoutAttributeDefHandler extends BaseXMLElementHandler {
     private DesignLayoutAttributeDefImpl.Builder builder = new DesignLayoutAttributeDefImpl.Builder();
 
 
-    public DesignLayoutAttributeDefHandler(XMLStreamReader xmlReader, Source<?> source) {
+    public DesignLayoutAttributeDefHandler(XMLStreamReader xmlReader, TextSource<?> source) {
         super(xmlReader, source);
         builder.setTagName(getTagName());
     }

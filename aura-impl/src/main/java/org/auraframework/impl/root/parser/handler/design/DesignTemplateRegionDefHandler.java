@@ -26,7 +26,7 @@ import org.auraframework.impl.design.DesignTemplateRegionDefImpl;
 import org.auraframework.impl.root.parser.handler.ParentedTagHandler;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -50,7 +50,7 @@ public class DesignTemplateRegionDefHandler extends ParentedTagHandler<DesignTem
     }
 
     public DesignTemplateRegionDefHandler(RootTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader,
-                                          Source<?> source, boolean isInInternalNamespace,
+                                          TextSource<?> source, boolean isInInternalNamespace,
                                           DefinitionService definitionService,
                                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

@@ -30,7 +30,7 @@ import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ExampleDef;
 import org.auraframework.impl.documentation.DocumentationDefImpl;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -49,7 +49,7 @@ public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
         super();
     }
 
-    public DocumentationDefHandler(DefDescriptor<DocumentationDef> defDescriptor, Source<DocumentationDef> source,
+    public DocumentationDefHandler(DefDescriptor<DocumentationDef> defDescriptor, TextSource<DocumentationDef> source,
                                    XMLStreamReader xmlReader, boolean isInInternalNamespace, DefinitionService definitionService,
                                    ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(defDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

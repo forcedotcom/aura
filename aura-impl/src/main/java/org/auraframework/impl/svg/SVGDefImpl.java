@@ -28,7 +28,7 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.def.SVGDef;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -105,7 +105,7 @@ public class SVGDefImpl extends RootDefinitionImpl<SVGDef> implements SVGDef {
          * not simply be jamming contents on the def.
          */
         @Override
-        public SVGDefBuilder setSource(Source<SVGDef> source) {
+        public SVGDefBuilder setSource(TextSource<SVGDef> source) {
             if (source != null) {
                 this.contents = source.getContents();
             }

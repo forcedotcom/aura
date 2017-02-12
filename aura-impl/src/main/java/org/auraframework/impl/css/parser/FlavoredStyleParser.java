@@ -15,7 +15,8 @@
  */
 package org.auraframework.impl.css.parser;
 
-import com.google.common.collect.Iterables;
+import static org.auraframework.impl.css.parser.StyleParser.ALLOWED_CONDITIONS;
+
 import org.auraframework.Aura;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
@@ -26,10 +27,10 @@ import org.auraframework.impl.css.flavor.FlavoredStyleDefImpl;
 import org.auraframework.impl.css.parser.CssPreprocessor.ParserResult;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Parser;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import static org.auraframework.impl.css.parser.StyleParser.ALLOWED_CONDITIONS;
+import com.google.common.collect.Iterables;
 
 /**
  * Flavored CSS style parser.
@@ -48,7 +49,7 @@ public final class FlavoredStyleParser implements Parser<FlavoredStyleDef> {
     }
 
     @Override
-    public FlavoredStyleDef parse(DefDescriptor<FlavoredStyleDef> descriptor, Source<FlavoredStyleDef> source)
+    public FlavoredStyleDef parse(DefDescriptor<FlavoredStyleDef> descriptor, TextSource<FlavoredStyleDef> source)
             throws QuickFixException {
 
         ParserResult result = CssPreprocessor.initial()

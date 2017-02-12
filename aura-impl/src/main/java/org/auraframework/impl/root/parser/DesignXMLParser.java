@@ -24,7 +24,7 @@ import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.root.parser.handler.design.DesignDefHandler;
 import org.auraframework.impl.root.parser.handler.genericxml.GenericXmlElementHandlerProvider;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 
 import javax.inject.Inject;
 import javax.xml.stream.XMLStreamReader;
@@ -46,7 +46,7 @@ public class DesignXMLParser extends XMLParser<DesignDef> {
 
     @Override
     protected DesignDefHandler getHandler(DefDescriptor<DesignDef> descriptor,
-                                          Source<DesignDef> source, XMLStreamReader xmlReader,
+                                          TextSource<DesignDef> source, XMLStreamReader xmlReader,
                                           boolean isInInternalNamespace, DefinitionService definitionService,
                                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         return new DesignDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,

@@ -27,7 +27,7 @@ import org.auraframework.impl.root.event.EventHandlerDefImpl;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Access;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -59,7 +59,7 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
     }
 
     public EventHandlerDefHandler(RootTagHandler<? extends RootDefinition> parentHandler, XMLStreamReader xmlReader,
-                                  Source<?> source, DefinitionService definitionService) {
+                                  TextSource<?> source, DefinitionService definitionService) {
         super(xmlReader, source, definitionService);
         this.parentHandler = parentHandler;
     }

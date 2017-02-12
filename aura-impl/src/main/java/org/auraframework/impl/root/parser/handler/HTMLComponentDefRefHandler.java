@@ -24,7 +24,7 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.component.HTMLDefRefBuilderImpl;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import javax.xml.stream.XMLStreamReader;
@@ -39,7 +39,7 @@ public class HTMLComponentDefRefHandler<P extends RootDefinition> extends Compon
     protected HTMLDefRefBuilderImpl htmlBuilder = new HTMLDefRefBuilderImpl();
 
     protected HTMLComponentDefRefHandler(RootTagHandler<P> parentHandler, String tag, XMLStreamReader xmlReader,
-                                         Source<?> source, boolean isInInternalNamespace, DefinitionService definitionService,
+                                         TextSource<?> source, boolean isInInternalNamespace, DefinitionService definitionService,
                                          ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
         builder = htmlBuilder;

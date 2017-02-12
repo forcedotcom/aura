@@ -23,7 +23,7 @@ import org.auraframework.def.DocumentationDef;
 import org.auraframework.impl.documentation.DescriptionDefImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import javax.xml.stream.XMLStreamException;
@@ -41,7 +41,7 @@ public class DescriptionDefHandler<P> extends ParentedTagHandler<DescriptionDefI
     private final StringBuilder body = new StringBuilder();
     private final DescriptionDefImpl.Builder builder = new DescriptionDefImpl.Builder();
 
-    public DescriptionDefHandler(RootTagHandler<DocumentationDef> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public DescriptionDefHandler(RootTagHandler<DocumentationDef> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                  boolean isInInternalNamespace, DefinitionService definitionService,
                                  ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

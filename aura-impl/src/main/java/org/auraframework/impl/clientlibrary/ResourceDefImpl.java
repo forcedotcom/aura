@@ -23,6 +23,7 @@ import org.auraframework.clientlibrary.Combinable;
 import org.auraframework.def.ResourceDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -62,14 +63,14 @@ public class ResourceDefImpl extends DefinitionImpl<ResourceDef> implements Reso
 
     public static class Builder extends DefinitionImpl.BuilderImpl<ResourceDef> implements ResourceDefBuilder {
 
-        private Source<ResourceDef> source;
+        private TextSource<ResourceDef> source;
 
         public Builder() {
             super(ResourceDef.class);
         }
 
         @Override
-        public ResourceDefBuilder setSource(Source<ResourceDef> source) {
+        public ResourceDefBuilder setSource(TextSource<ResourceDef> source) {
             this.source = source;
             return this;
         }

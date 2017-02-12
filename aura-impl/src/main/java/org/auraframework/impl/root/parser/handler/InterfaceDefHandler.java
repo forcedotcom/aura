@@ -31,7 +31,7 @@ import org.auraframework.impl.root.intf.InterfaceDefImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -64,7 +64,7 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
         this.contextService = null;
     }
 
-    public InterfaceDefHandler(DefDescriptor<InterfaceDef> descriptor, Source<?> source, XMLStreamReader xmlReader,
+    public InterfaceDefHandler(DefDescriptor<InterfaceDef> descriptor, TextSource<?> source, XMLStreamReader xmlReader,
                                boolean isInInternalNamespace, DefinitionService definitionService,
                                ContextService contextService,
                                ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {

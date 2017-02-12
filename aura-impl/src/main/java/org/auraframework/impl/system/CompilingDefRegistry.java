@@ -27,6 +27,7 @@ import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Maps;
@@ -96,8 +97,8 @@ public class CompilingDefRegistry implements DefRegistry {
                 try {
                     @SuppressWarnings("unchecked")
                     DefDescriptor<Definition> canonical = (DefDescriptor<Definition>)holder.descriptor;
-                    Source<Definition> source = sourceLoader.getSource(canonical);
-                    if (source != null && source.exists()) {
+                    TextSource<Definition> source = (TextSource<Definition>)sourceLoader.getSource(canonical);
+                    if (source != null) {
                         Parser<Definition> parser = parserFactory.getParser(source.getFormat(), canonical);
                         holder.def = parser.parse(canonical, source);
                         holder.def.validateDefinition();

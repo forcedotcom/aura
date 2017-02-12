@@ -23,7 +23,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.design.DesignLayoutComponentDef;
 import org.auraframework.impl.design.DesignLayoutComponentDefImpl;
 import org.auraframework.impl.root.parser.handler.BaseXMLElementHandler;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -41,7 +41,7 @@ public class DesignLayoutComponentDefHandler extends BaseXMLElementHandler {
     private DesignLayoutComponentDefImpl.Builder builder = new DesignLayoutComponentDefImpl.Builder();
 
 
-    public DesignLayoutComponentDefHandler(XMLStreamReader xmlReader, Source<?> source) {
+    public DesignLayoutComponentDefHandler(XMLStreamReader xmlReader, TextSource<?> source) {
         super(xmlReader, source);
         builder.setTagName(getTagName());
     }

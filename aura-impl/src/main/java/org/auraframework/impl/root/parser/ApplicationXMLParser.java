@@ -24,7 +24,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.root.parser.handler.ApplicationDefHandler;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 
 import javax.inject.Inject;
 import javax.xml.stream.XMLStreamReader;
@@ -47,7 +47,7 @@ public class ApplicationXMLParser extends XMLParser<ApplicationDef> {
 
     @Override
     protected ApplicationDefHandler getHandler(DefDescriptor<ApplicationDef> descriptor,
-                                               Source<ApplicationDef> source, XMLStreamReader xmlReader,
+                                               TextSource<ApplicationDef> source, XMLStreamReader xmlReader,
                                                boolean isInInternalNamespace, DefinitionService definitionService,
                                                ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         return new ApplicationDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,

@@ -21,7 +21,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.impl.javascript.parser.handler.JavascriptIncludeDefHandler;
 import org.auraframework.system.Parser;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @ServiceComponent
@@ -38,7 +38,7 @@ public class JavascriptIncludeParser implements Parser<IncludeDef> {
     }
     
     @Override
-    public IncludeDef parse(DefDescriptor<IncludeDef> descriptor, Source<IncludeDef> source)
+    public IncludeDef parse(DefDescriptor<IncludeDef> descriptor, TextSource<IncludeDef> source)
             throws QuickFixException {
         return new JavascriptIncludeDefHandler(descriptor, source).getDefinition();
     }

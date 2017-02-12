@@ -15,21 +15,22 @@
  */
 package org.auraframework.integration.test.system;
 
-import com.google.common.collect.Lists;
+import java.util.List;
+
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
+import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.CachingDefRegistryImpl;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.source.StringSource;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
-import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  * This class has automation to verify behavior of {@link CachingDefRegistryImpl}.

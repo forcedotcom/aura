@@ -16,19 +16,19 @@
 
 package org.auraframework.integration.test.javascript.parser;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
+
+import javax.inject.Inject;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.javascript.parser.JavascriptRendererParser;
 import org.auraframework.impl.javascript.renderer.JavascriptRendererDef;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.test.source.StringSourceLoader;
 import org.junit.Test;
-
-import javax.inject.Inject;
-
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertThat;
 
 public class JavascriptRendererParserTest extends AuraImplTestCase {
     @Inject
@@ -47,7 +47,7 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
                 "    rerender:function() {}\n" +
                 "})";
         DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
-        Source<RendererDef> source = loader.getSource(rendererDesc);
+        TextSource<RendererDef> source = loader.getSource(rendererDesc);
 
         RendererDef rendererDef = new JavascriptRendererParser().parse(rendererDesc, source);
 
@@ -68,7 +68,7 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
                 "    rerender:function() {}\n" +
                 "})";
         DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
-        Source<RendererDef> source = loader.getSource(rendererDesc);
+        TextSource<RendererDef> source = loader.getSource(rendererDesc);
 
         RendererDef rendererDef = new JavascriptRendererParser().parse(rendererDesc, source);
 
@@ -87,7 +87,7 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
                 "    render: function(cmp) {var v = 2;}\n" +
                 "})";
         DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
-        Source<RendererDef> source = loader.getSource(rendererDesc);
+        TextSource<RendererDef> source = loader.getSource(rendererDesc);
 
         RendererDef rendererDef = new JavascriptRendererParser().parse(rendererDesc, source);
 
@@ -107,7 +107,7 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
                 "    bar: function(cmp) {var v = 2;}\n"+
                 "})";
         DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
-        Source<RendererDef> source = loader.getSource(rendererDesc);
+        TextSource<RendererDef> source = loader.getSource(rendererDesc);
 
         RendererDef rendererDef = new JavascriptRendererParser().parse(rendererDesc, source);
 

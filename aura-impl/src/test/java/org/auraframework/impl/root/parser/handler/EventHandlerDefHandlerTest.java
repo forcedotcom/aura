@@ -21,8 +21,8 @@ import org.auraframework.def.EventDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.ComponentXMLParser;
 import org.auraframework.impl.root.parser.EventXMLParser;
+import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 

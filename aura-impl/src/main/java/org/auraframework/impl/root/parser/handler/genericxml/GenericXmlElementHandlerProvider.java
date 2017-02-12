@@ -20,7 +20,7 @@ import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.genericxml.GenericXmlCapableDef;
 import org.auraframework.def.genericxml.GenericXmlValidator;
 import org.auraframework.def.genericxml.RootLevelGenericXmlValidator;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 
 import javax.inject.Inject;
 import javax.xml.stream.XMLStreamReader;
@@ -48,8 +48,9 @@ public class GenericXmlElementHandlerProvider {
      * @return a handler or null if unable to handle the tag.
      */
     public GenericXmlElementHandler getHandler(XMLStreamReader xmlReader,
-                                                      Source<?> source, Class<? extends GenericXmlCapableDef> currentDefinition,
-                                                      String tag, boolean isInternalNamespace) {
+                                               TextSource<?> source,
+                                               Class<? extends GenericXmlCapableDef> currentDefinition,
+                                               String tag, boolean isInternalNamespace) {
         GenericXmlValidator validator = getValidator(currentDefinition, tag, isInternalNamespace);
         return validator == null ? null : new GenericXmlElementHandler(xmlReader, source, isInternalNamespace, validator);
     }

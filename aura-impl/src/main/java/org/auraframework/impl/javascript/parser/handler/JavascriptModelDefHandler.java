@@ -22,14 +22,14 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ModelDef;
 import org.auraframework.impl.javascript.model.JavascriptModelDef;
 import org.auraframework.impl.javascript.model.JavascriptModelDef.Builder;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class JavascriptModelDefHandler extends JavascriptHandler<ModelDef, ModelDef> {
 
     private Builder builder = new Builder();
 
-    public JavascriptModelDefHandler(DefDescriptor<ModelDef> descriptor, Source<?> source) {
+    public JavascriptModelDefHandler(DefDescriptor<ModelDef> descriptor, TextSource<?> source) {
         super(descriptor, source);
     }
 

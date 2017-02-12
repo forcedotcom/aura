@@ -15,29 +15,30 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import org.auraframework.impl.root.parser.XMLParser;
-import org.auraframework.system.Location;
-import org.auraframework.system.Source;
-import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
+import java.util.Collections;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.util.Collections;
-import java.util.Set;
+
+import org.auraframework.impl.root.parser.XMLParser;
+import org.auraframework.system.Location;
+import org.auraframework.system.TextSource;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 
 /**
  * Superclass for all xml handlers.
  */
 public abstract class BaseXMLElementHandler {
     protected final XMLStreamReader xmlReader;
-    protected final Source<?> source;
+    protected final TextSource<?> source;
     protected Location startLocation;
 
-    protected BaseXMLElementHandler(XMLStreamReader xmlReader, Source<?> source) {
+    protected BaseXMLElementHandler(XMLStreamReader xmlReader, TextSource<?> source) {
         this.xmlReader = xmlReader;
         this.source = source;
     }

@@ -15,16 +15,15 @@
  */
 package org.auraframework.impl.svg.parser;
 
-import org.auraframework.def.ComponentDef;
+import javax.inject.Inject;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.SVGDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.system.Source;
-import org.auraframework.test.source.StringSource;
+import org.auraframework.impl.source.StringSource;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
-
-import javax.inject.Inject;
 
 public class SVGParserTest extends AuraImplTestCase {
     private static final String INVALID_ATTR = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"+
@@ -167,7 +166,7 @@ public class SVGParserTest extends AuraImplTestCase {
     @Test
     public void testValidTags() throws QuickFixException {
         DefDescriptor<SVGDef> descriptor = getAuraTestingUtil().createStringSourceDescriptor(null, SVGDef.class, null);
-        Source<SVGDef> source = new StringSource<>(descriptor, VALID_SVG, "test", null);
+        TextSource<SVGDef> source = new StringSource<>(descriptor, VALID_SVG, "test", null);
         parser.parse(descriptor,source);
     }
 
@@ -175,7 +174,7 @@ public class SVGParserTest extends AuraImplTestCase {
     public void testInvalidTags() {
         QuickFixException qfe = null;
         DefDescriptor<SVGDef> descriptor = getAuraTestingUtil().createStringSourceDescriptor(null, SVGDef.class, null);
-        Source<SVGDef> source = new StringSource<>(descriptor, INVALID_SCRIPT, "test", null);
+        TextSource<SVGDef> source = new StringSource<>(descriptor, INVALID_SCRIPT, "test", null);
         try {
             parser.parse(descriptor,source);
         } catch (QuickFixException e) {
@@ -189,7 +188,7 @@ public class SVGParserTest extends AuraImplTestCase {
     public void testInvalidCharacters() {
         QuickFixException qfe = null;
         DefDescriptor<SVGDef> descriptor = getAuraTestingUtil().createStringSourceDescriptor(null, SVGDef.class, null);
-        Source<SVGDef> source = new StringSource<>(descriptor, INVALID_CHAR, "test", null);
+        TextSource<SVGDef> source = new StringSource<>(descriptor, INVALID_CHAR, "test", null);
         try {
             parser.parse(descriptor,source);
         } catch (QuickFixException e) {
@@ -203,7 +202,7 @@ public class SVGParserTest extends AuraImplTestCase {
     public void testInvalidXML() {
         QuickFixException qfe = null;
         DefDescriptor<SVGDef> descriptor = getAuraTestingUtil().createStringSourceDescriptor(null, SVGDef.class, null);
-        Source<SVGDef> source = new StringSource<>(descriptor, INVALID_XML, "test", null);
+        TextSource<SVGDef> source = new StringSource<>(descriptor, INVALID_XML, "test", null);
         try {
             parser.parse(descriptor,source);
         } catch (QuickFixException e) {
@@ -217,7 +216,7 @@ public class SVGParserTest extends AuraImplTestCase {
     public void testInvalidAttribute() {
         QuickFixException qfe = null;
         DefDescriptor<SVGDef> descriptor = getAuraTestingUtil().createStringSourceDescriptor(null, SVGDef.class, null);
-        Source<SVGDef> source = new StringSource<>(descriptor, INVALID_ATTR, "test", null);
+        TextSource<SVGDef> source = new StringSource<>(descriptor, INVALID_ATTR, "test", null);
         try {
             parser.parse(descriptor,source);
         } catch (QuickFixException e) {

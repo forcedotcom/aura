@@ -21,7 +21,7 @@ import org.auraframework.def.design.DesignLayoutDef;
 import org.auraframework.def.design.DesignSectionDef;
 import org.auraframework.impl.design.DesignLayoutDefImpl;
 import org.auraframework.impl.root.parser.handler.BaseXMLElementHandler;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -38,7 +38,7 @@ public class DesignLayoutDefHandler extends BaseXMLElementHandler {
 
 
     public DesignLayoutDefHandler(XMLStreamReader xmlReader,
-                                  Source<?> source, boolean isInternalNamespace) {
+                                  TextSource<?> source, boolean isInternalNamespace) {
         super(xmlReader, source);
         builder.setTagName(getTagName());
         this.isInternalNamespace = isInternalNamespace;

@@ -22,7 +22,7 @@ import org.auraframework.def.FlavorIncludeDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.css.flavor.FlavorIncludeDefImpl;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -41,7 +41,7 @@ public class FlavorIncludeDefHandler<P extends RootDefinition> extends ParentedT
 
     private final FlavorIncludeDefImpl.Builder builder = new FlavorIncludeDefImpl.Builder();
 
-    public FlavorIncludeDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public FlavorIncludeDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                    boolean isInInternalNamespace, DefinitionService definitionService,
                                    ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

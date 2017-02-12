@@ -23,7 +23,7 @@ import org.auraframework.def.TokenDef;
 import org.auraframework.impl.css.token.TokenDefImpl;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -56,7 +56,7 @@ public final class TokenDefHandler<P extends RootDefinition> extends ParentedTag
         super();
     }
 
-    public TokenDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public TokenDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                            boolean isInInternalNamespace, DefinitionService definitionService,
                            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

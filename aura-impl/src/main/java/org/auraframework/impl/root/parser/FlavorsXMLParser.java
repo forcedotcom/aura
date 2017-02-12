@@ -23,7 +23,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.root.parser.handler.FlavorsDefHandler;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import javax.xml.stream.XMLStreamReader;
@@ -43,7 +43,7 @@ public class FlavorsXMLParser extends XMLParser<FlavorsDef> {
 
     @Override
     protected FlavorsDefHandler getHandler(DefDescriptor<FlavorsDef> descriptor,
-                                           Source<FlavorsDef> source, XMLStreamReader xmlReader,
+                                           TextSource<FlavorsDef> source, XMLStreamReader xmlReader,
                                            boolean isInInternalNamespace, DefinitionService definitionService,
                                            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) throws QuickFixException {
         return new FlavorsDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,

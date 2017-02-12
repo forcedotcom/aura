@@ -15,6 +15,9 @@
  */
 package org.auraframework.integration.test.root.parser.handler;
 
+import javax.inject.Inject;
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ApplicationDef;
@@ -26,18 +29,15 @@ import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.parser.ApplicationXMLParser;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.handler.ApplicationDefHandler;
+import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.Source;
-import org.auraframework.test.source.StringSource;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
-
-import javax.inject.Inject;
-import javax.xml.stream.XMLStreamReader;
 
 public class ApplicationDefHandlerTest extends AuraImplTestCase {
     @Inject
@@ -54,7 +54,7 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
 
     private class ApplicationDefHandlerOverride extends ApplicationDefHandler {
         public ApplicationDefHandlerOverride(DefDescriptor<ApplicationDef> applicationDefDescriptor,
-                                             Source<ApplicationDef> source, XMLStreamReader xmlReader,
+                                             TextSource<ApplicationDef> source, XMLStreamReader xmlReader,
                                              boolean isInInternalNamespace, DefinitionService definitionService,
                                              ContextService contextService,
                                              ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {

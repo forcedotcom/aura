@@ -26,7 +26,7 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.def.RootDefinition.SupportLevel;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -50,7 +50,7 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
         super();
     }
 
-    protected RootTagHandler(DefDescriptor<T> defDescriptor, Source<?> source, XMLStreamReader xmlReader,
+    protected RootTagHandler(DefDescriptor<T> defDescriptor, TextSource<?> source, XMLStreamReader xmlReader,
                              boolean isInInternalNamespace, DefinitionService definitionService,
                              ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(defDescriptor, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

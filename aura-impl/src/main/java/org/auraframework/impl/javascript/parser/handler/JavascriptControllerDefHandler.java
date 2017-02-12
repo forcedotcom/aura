@@ -30,7 +30,7 @@ import org.auraframework.impl.javascript.controller.JavascriptControllerDef.Buil
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.JavascriptTokenizer;
 import org.auraframework.system.AuraContext.Access;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.JsonHandlerProvider;
@@ -42,7 +42,7 @@ public class JavascriptControllerDefHandler extends JavascriptHandler<Controller
 
     private final Builder builder = new Builder();
 
-    public JavascriptControllerDefHandler(DefDescriptor<ControllerDef> descriptor, Source<?> source) {
+    public JavascriptControllerDefHandler(DefDescriptor<ControllerDef> descriptor, TextSource<?> source) {
         super(descriptor, source);
     }
 

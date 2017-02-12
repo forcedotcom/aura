@@ -32,6 +32,7 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.source.BaseSourceLoader;
 import org.auraframework.system.InternalNamespaceSourceLoader;
 import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.IOUtil;
@@ -69,60 +70,60 @@ public class ResourceSourceLoader extends BaseSourceLoader implements InternalNa
         if (basePackage == null) {
             return;
         }
-            try {
-                is = resourceLoader.getResourceAsStream(resourcePrefix + "/.index");
-                if (is != null) {
-                    reader = new InputStreamReader(is);
-                    StringWriter sw = new StringWriter();
-                    IOUtil.copyStream(reader, sw);
-                    String list = sw.toString();
-                    files = AuraTextUtil.splitSimple(",", list, list.length() / 10);
-                } else {
-                    // TODO: local modification: read components from the classpath
-                    files = new ArrayList<>();
-                    PathMatchingResourcePatternResolver p = new PathMatchingResourcePatternResolver(resourceLoader);
-                    Resource[] res = p.getResources("classpath*:/" + resourcePrefix + "/*/*/*.*");
-                    for (Resource r : res) {
-                        //
-                        // TOTAL HACK: Move this to getAllDescriptors later.
-                        //
-                        String filename = r.getURL().toString();
-                        List<String> names = AuraTextUtil.splitSimple("/", filename);
-                        if (names.size() < 3) {
-                            continue;
-                        }
-                        String last = names.get(names.size() - 1);
-                        String name = names.get(names.size() - 2);
-                        String ns = names.get(names.size() - 3);
+        try {
+            is = resourceLoader.getResourceAsStream(resourcePrefix + "/.index");
+            if (is != null) {
+                reader = new InputStreamReader(is);
+                StringWriter sw = new StringWriter();
+                IOUtil.copyStream(reader, sw);
+                String list = sw.toString();
+                files = AuraTextUtil.splitSimple(",", list, list.length() / 10);
+            } else {
+                // TODO: local modification: read components from the classpath
+                files = new ArrayList<>();
+                PathMatchingResourcePatternResolver p = new PathMatchingResourcePatternResolver(resourceLoader);
+                Resource[] res = p.getResources("classpath*:/" + resourcePrefix + "/*/*/*.*");
+                for (Resource r : res) {
+                    //
+                    // TOTAL HACK: Move this to getAllDescriptors later.
+                    //
+                    String filename = r.getURL().toString();
+                    List<String> names = AuraTextUtil.splitSimple("/", filename);
+                    if (names.size() < 3) {
+                        continue;
+                    }
+                    String last = names.get(names.size() - 1);
+                    String name = names.get(names.size() - 2);
+                    String ns = names.get(names.size() - 3);
 
-                        //
-                        // This is needed to match case, because, surprise, people have different case
-                        // on different files in the same directory, and they differ from the directory too.
-                        //
-                        files.add(ns+"/"+name+'/'+last);
-                    }
-                }
-        } catch (IOException x) {
-            throw new AuraRuntimeException(x);
-            } finally {
-                //
-                // Make sure we close everything out.
-                //
-                try {
-                    if (reader != null) {
-                        reader.close();
-                    }
-                } catch (Throwable t) {
-                    // ignore exceptions on close.
-                }
-                try {
-                    if (is != null) {
-                        is.close();
-                    }
-                } catch (Throwable t) {
-                    // ignore exceptions on close.
+                    //
+                    // This is needed to match case, because, surprise, people have different case
+                    // on different files in the same directory, and they differ from the directory too.
+                    //
+                    files.add(ns+"/"+name+'/'+last);
                 }
             }
+        } catch (IOException x) {
+            throw new AuraRuntimeException(x);
+        } finally {
+            //
+            // Make sure we close everything out.
+            //
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (Throwable t) {
+                // ignore exceptions on close.
+            }
+            try {
+                if (is != null) {
+                    is.close();
+                }
+            } catch (Throwable t) {
+                // ignore exceptions on close.
+            }
+        }
         if (files == null) {
             _log.warn("Unused base: "+basePackage);
             return;
@@ -176,9 +177,9 @@ public class ResourceSourceLoader extends BaseSourceLoader implements InternalNa
     }
 
     @Override
-    public <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
+    public <D extends Definition> TextSource<D> getSource(DefDescriptor<D> descriptor) {
         String path = index.get(descriptor);
-        if (path == null) {
+        if (path == null || resourceLoader.getRawResourceUrl(resourcePrefix+"/"+path) == null) {
             return null;
         }
         return new ResourceSource<>(descriptor, resourcePrefix+"/"+path, getFormat(descriptor));

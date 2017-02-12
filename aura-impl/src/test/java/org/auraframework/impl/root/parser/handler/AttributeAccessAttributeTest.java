@@ -15,6 +15,8 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import javax.inject.Inject;
+
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -22,14 +24,12 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.parser.ParserFactory;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
-import org.junit.Test;
-
-import javax.inject.Inject;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Test;
 
 
 @UnAdaptableTest("when run in core, we throw error with different type.")
@@ -49,7 +49,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -62,7 +62,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -81,7 +81,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -101,7 +101,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -121,7 +121,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -141,7 +141,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -161,7 +161,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -186,7 +186,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -200,7 +200,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -214,7 +214,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -228,7 +228,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -249,7 +249,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -273,7 +273,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -293,7 +293,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -313,7 +313,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -333,7 +333,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -353,7 +353,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -376,7 +376,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -399,7 +399,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -416,7 +416,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -437,7 +437,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -460,7 +460,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -483,7 +483,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -506,7 +506,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -529,7 +529,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -549,7 +549,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -569,7 +569,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -589,7 +589,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -609,7 +609,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
                         NamespaceAccess.CUSTOM);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -632,7 +632,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -645,7 +645,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -664,7 +664,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -684,7 +684,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -704,7 +704,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -724,7 +724,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -744,7 +744,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -769,7 +769,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -783,7 +783,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -797,7 +797,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -811,7 +811,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -832,7 +832,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -849,7 +849,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponnet",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -869,7 +869,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponnet",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -889,7 +889,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponnet",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -909,7 +909,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponnet",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -929,7 +929,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponnet",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -952,7 +952,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -975,7 +975,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -992,7 +992,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1013,7 +1013,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1036,7 +1036,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1059,7 +1059,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1082,7 +1082,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1105,7 +1105,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1125,7 +1125,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1145,7 +1145,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1165,7 +1165,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1185,7 +1185,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
         		cmpSource, "privilegedNS:testcomponent",
                         NamespaceAccess.PRIVILEGED);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1208,7 +1208,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1221,7 +1221,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1240,7 +1240,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1260,7 +1260,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1280,7 +1280,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1300,7 +1300,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1320,7 +1320,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1345,7 +1345,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1358,7 +1358,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1371,7 +1371,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1384,7 +1384,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1397,7 +1397,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1415,7 +1415,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1428,7 +1428,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1441,7 +1441,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1454,7 +1454,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1467,7 +1467,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1484,7 +1484,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1506,7 +1506,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1523,7 +1523,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1543,7 +1543,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1566,7 +1566,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1589,7 +1589,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1612,7 +1612,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1635,7 +1635,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1654,7 +1654,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1673,7 +1673,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1692,7 +1692,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);
@@ -1711,7 +1711,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
                         NamespaceAccess.INTERNAL);
-        Source<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
         
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, descriptor);
         Definition def = parser.parse(descriptor, source);

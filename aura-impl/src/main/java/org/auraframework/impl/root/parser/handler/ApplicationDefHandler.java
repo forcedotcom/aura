@@ -28,7 +28,7 @@ import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -42,7 +42,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         super();
     }
 
-    public ApplicationDefHandler(DefDescriptor<ApplicationDef> applicationDefDescriptor, Source<ApplicationDef> source,
+    public ApplicationDefHandler(DefDescriptor<ApplicationDef> applicationDefDescriptor, TextSource<ApplicationDef> source,
                                  XMLStreamReader xmlReader, boolean isInInternalNamespace, DefinitionService definitionService,
                                  ContextService contextService,
                                  ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {

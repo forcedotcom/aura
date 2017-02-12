@@ -23,7 +23,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.impl.root.parser.handler.DocumentationDefHandler;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 
 import javax.xml.stream.XMLStreamReader;
 
@@ -42,7 +42,7 @@ public class DocumentationXMLParser extends XMLParser<DocumentationDef> {
 
     @Override
     protected DocumentationDefHandler getHandler(DefDescriptor<DocumentationDef> descriptor,
-                                                 Source<DocumentationDef> source, XMLStreamReader xmlReader,
+                                                 TextSource<DocumentationDef> source, XMLStreamReader xmlReader,
                                                  boolean isInInternalNamespace, DefinitionService definitionService,
                                                  ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         return new DocumentationDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,

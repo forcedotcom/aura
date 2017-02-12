@@ -26,9 +26,9 @@ import org.auraframework.def.LibraryDef;
 import org.auraframework.def.LibraryDefRef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
+import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.Source;
-import org.auraframework.test.source.StringSource;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
     @Mock
     RootTagHandler<ComponentDef> parentHandler;
 
-    private XMLStreamReader getReader(Source<?> source) throws XMLStreamException {
+    private XMLStreamReader getReader(TextSource<?> source) throws XMLStreamException {
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
         XMLStreamReader xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(),

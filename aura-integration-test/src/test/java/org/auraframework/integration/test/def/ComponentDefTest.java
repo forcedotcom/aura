@@ -32,7 +32,7 @@ import org.auraframework.impl.parser.ParserFactory;
 import org.auraframework.impl.root.component.BaseComponentDefTest;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
@@ -319,7 +319,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         String controllerCode = "({ function1: function(cmp) {var a = {k:}} })";
         addSourceAutoCleanup(controllerDesc, controllerCode);
 
-        Source<ComponentDef> source = stringSourceLoader.getSource(cmpDesc);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(cmpDesc);
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, cmpDesc);
         ComponentDef cmpDef = parser.parse(cmpDesc, source);
 
@@ -342,7 +342,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         String controllerCode = "({ function1: function(cmp) {var a = {k:}} })";
         addSourceAutoCleanup(controllerDesc, controllerCode);
 
-        Source<ComponentDef> source = stringSourceLoader.getSource(cmpDesc);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(cmpDesc);
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, cmpDesc);
         ComponentDef appDef = parser.parse(cmpDesc, source);
 
@@ -368,7 +368,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         String controllerCode = "({ function1: function(cmp) {var a = {k:}} })";
         addSourceAutoCleanup(controllerDesc, controllerCode);
 
-        Source<ComponentDef> source = stringSourceLoader.getSource(cmpDesc);
+        TextSource<ComponentDef> source = stringSourceLoader.getSource(cmpDesc);
         Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, cmpDesc);
         ComponentDef appDef = parser.parse(cmpDesc, source);
 

@@ -21,7 +21,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.ResourceDef;
 import org.auraframework.impl.clientlibrary.handler.ResourceDefHandler;
 import org.auraframework.system.Parser;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -42,7 +42,7 @@ public final class ResourceCSSParser implements Parser<ResourceDef> {
     
     @Override
     public ResourceDef parse(DefDescriptor<ResourceDef> descriptor,
-            Source<ResourceDef> source) throws QuickFixException {
+            TextSource<ResourceDef> source) throws QuickFixException {
         return new ResourceDefHandler(descriptor, source).createDefinition();
     }
 }

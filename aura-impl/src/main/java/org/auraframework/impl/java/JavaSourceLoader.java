@@ -117,7 +117,11 @@ public class JavaSourceLoader implements SourceLoader {
 
     @Override
     public <D extends Definition> JavaSourceImpl<D> getSource(DefDescriptor<D> descriptor) {
-        return new JavaSourceImpl<D>(descriptor, getClazz(descriptor));
+        Class<?> clazz = getClazz(descriptor);
+        if (clazz == null) {
+        	return null;
+        }
+    	return new JavaSourceImpl<D>(descriptor, clazz);
     }
 
     @Override

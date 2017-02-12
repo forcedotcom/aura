@@ -112,27 +112,6 @@ public abstract class AuraTestCase extends UnitTestCase {
         return getClass().getCanonicalName() + "." + getName();
     }
 
-    /*protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents,
-            String namePrefix) {
-        return getAuraTestingUtil().addSourceAutoCleanup(defClass, contents, namePrefix);
-    }
-
-    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents) {
-        return getAuraTestingUtil().addSourceAutoCleanup(defClass, contents);
-    }
-
-    protected void updateStringSource(DefDescriptor<?> desc, String content) {
-        getAuraTestingUtil().updateSource(desc, content);
-    }
-
-    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents) {
-        return getAuraTestingUtil().addSourceAutoCleanup(descriptor, contents);
-    }
-
-    protected <T extends Definition> Source<T> getSource(DefDescriptor<T> descriptor) {
-        return getAuraTestingUtil().getSource(descriptor);
-    }*/
-
     /**
      * Useful for restoring a context in case a test needs to temporarily switch contexts.
      */
@@ -308,6 +287,7 @@ public abstract class AuraTestCase extends UnitTestCase {
      * Verify Throwable is from the expected Location. Handles differences between running from jars or source.
      */
     private void assertLocation(Throwable e, Source<?> src) {
+        /**
         String fileUrl = src.getUrl();
         if (fileUrl.startsWith("jar")) {
             assertLocation(e, fileUrl);
@@ -316,6 +296,7 @@ public abstract class AuraTestCase extends UnitTestCase {
             String filePath = fileUrl.substring(5);
             assertLocation(e, filePath);
         }
+        */
     }
 
     protected void endContextIfEstablished() {

@@ -21,7 +21,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.javascript.parser.handler.JavascriptRendererDefHandler;
 import org.auraframework.system.Parser;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @ServiceComponent
@@ -38,7 +38,7 @@ public class JavascriptRendererParser implements Parser<RendererDef> {
     }
     
     @Override
-    public RendererDef parse(DefDescriptor<RendererDef> descriptor, Source<RendererDef> source)
+    public RendererDef parse(DefDescriptor<RendererDef> descriptor, TextSource<RendererDef> source)
             throws QuickFixException {
         return new JavascriptRendererDefHandler(descriptor, source).getDefinition();
     }

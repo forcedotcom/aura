@@ -21,7 +21,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.javascript.parser.handler.JavascriptControllerDefHandler;
 import org.auraframework.system.Parser;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @ServiceComponent
@@ -38,7 +38,7 @@ public class JavascriptControllerParser implements Parser<ControllerDef> {
     }
     
     @Override
-    public ControllerDef parse(DefDescriptor<ControllerDef> descriptor, Source<ControllerDef> source)
+    public ControllerDef parse(DefDescriptor<ControllerDef> descriptor, TextSource<ControllerDef> source)
             throws QuickFixException {
         return new JavascriptControllerDefHandler(descriptor, source).getDefinition();
     }

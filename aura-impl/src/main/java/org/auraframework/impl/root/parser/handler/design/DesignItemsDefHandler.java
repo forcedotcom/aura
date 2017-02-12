@@ -23,7 +23,7 @@ import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.design.DesignItemsDefImpl;
 import org.auraframework.impl.root.parser.handler.BaseXMLElementHandler;
 import org.auraframework.system.AuraContext.Access;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -39,7 +39,7 @@ public class DesignItemsDefHandler extends BaseXMLElementHandler {
 
     private DesignItemsDefImpl.Builder builder = new DesignItemsDefImpl.Builder();
 
-    public DesignItemsDefHandler(XMLStreamReader xmlReader, Source<?> source, boolean isInInternalNamespace) {
+    public DesignItemsDefHandler(XMLStreamReader xmlReader, TextSource<?> source, boolean isInInternalNamespace) {
         super(xmlReader, source);
         this.isInInternalNamespace = isInInternalNamespace;
         builder.setTagName(getTagName());

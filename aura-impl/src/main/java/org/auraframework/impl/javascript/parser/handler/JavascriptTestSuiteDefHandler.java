@@ -35,7 +35,7 @@ import org.auraframework.impl.javascript.testsuite.JavascriptTestSuiteDef;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestSuiteDef.Builder;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsFunction;
@@ -55,7 +55,7 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
 
     private final Builder builder = new Builder();
 
-    public JavascriptTestSuiteDefHandler(DefDescriptor<TestSuiteDef> descriptor, Source<?> source) {
+    public JavascriptTestSuiteDefHandler(DefDescriptor<TestSuiteDef> descriptor, TextSource<?> source) {
         super(descriptor, source);
         builder.code = source.getContents();
     }

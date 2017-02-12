@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.source;
+package org.auraframework.impl.source;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -23,13 +23,12 @@ import java.io.StringWriter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.IOUtil;
 
-public class StringSource<D extends Definition> extends Source<D> {
+public class StringSource<D extends Definition> extends AbstractTextSourceImpl<D> {
     private final SourceListener sourceListener;
     private final transient StringData data;
 
@@ -83,11 +82,6 @@ public class StringSource<D extends Definition> extends Source<D> {
     }
 
     @Override
-    public long getLastModified() {
-        return data.lastModified;
-    }
-
-    @Override
     public Reader getReader() {
         return new StringReader(data.getBuffer().toString());
     }
@@ -109,15 +103,9 @@ public class StringSource<D extends Definition> extends Source<D> {
         }
     }
 
-    /** StringSource returns a "URL" like "markup://string:foo". */
     @Override
-    public String getUrl() {
-        return getSystemId(); // e.g. "markup://string:thing"
-    }
-
-    @Override
-    public boolean exists() {
-        return data.getBuffer().length() > 0;
+    public long getLastModified() {
+        return data.lastModified;
     }
 
     public boolean addOrUpdate(CharSequence newContents) {

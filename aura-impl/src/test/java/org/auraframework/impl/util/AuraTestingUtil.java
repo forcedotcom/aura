@@ -28,6 +28,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.impl.source.StringSource;
 import org.auraframework.def.Definition;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -37,7 +38,6 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener;
-import org.auraframework.test.source.StringSource;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -263,18 +263,6 @@ public class AuraTestingUtil {
         String uid = definitionService.getUid(null, desc);
         ctxt.addLoaded(desc, uid);
         return ctxt;
-    }
-
-    /**
-     * restart context.
-     */
-    public void restartContext() throws QuickFixException {
-        AuraContext context = contextService.getCurrentContext();
-        DefDescriptor<? extends BaseComponentDef> cmp = context.getApplicationDescriptor();
-        String uid = context.getUid(cmp);
-        contextService.endContext();
-        AuraContext newctxt = setupContext(context.getMode(), context.getFormat(), cmp);
-        newctxt.addLoaded(cmp, uid);
     }
 
     /**

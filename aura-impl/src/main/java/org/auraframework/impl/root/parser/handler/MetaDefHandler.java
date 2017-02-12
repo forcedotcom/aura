@@ -25,7 +25,7 @@ import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.MetaDefImpl;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -45,7 +45,7 @@ public class MetaDefHandler<P extends RootDefinition> extends ParentedTagHandler
 
     private final MetaDefImpl.Builder builder = new MetaDefImpl.Builder();
 
-    public MetaDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public MetaDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                           boolean isInInternalNamespace, DefinitionService definitionService,
                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter,

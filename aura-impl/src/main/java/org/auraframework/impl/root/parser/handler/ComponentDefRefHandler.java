@@ -25,7 +25,7 @@ import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl.Builder;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import javax.xml.stream.XMLStreamException;
@@ -37,7 +37,7 @@ import javax.xml.stream.XMLStreamReader;
  */
 public class ComponentDefRefHandler<P extends RootDefinition> extends BaseDefRefHandler<ComponentDefRef, P, ComponentDef, ComponentDefRefImpl.Builder> {
 
-    public ComponentDefRefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public ComponentDefRefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                   boolean isInInternalNamespace, DefinitionService definitionService,
                                   ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

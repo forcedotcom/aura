@@ -28,7 +28,7 @@ import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -76,13 +76,13 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
      * @param xmlReader The XMLStreamReader that the handler should read from. It is expected to be queued up to the
      *            appropriate position before getElement() is invoked.
      */
-    public AttributeDefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public AttributeDefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                boolean isInInternalNamespace, DefinitionService definitionService,
                                ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         this(parentHandler, xmlReader, source, null, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
     }
 
-    public AttributeDefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+    public AttributeDefHandler(ContainerTagHandler<P> parentHandler, XMLStreamReader xmlReader, TextSource<?> source,
                                String defaultType, boolean isInInternalNamespace, DefinitionService definitionService,
                                ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(parentHandler, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);

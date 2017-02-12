@@ -15,16 +15,16 @@
  */
 package org.auraframework.integration.test.root.parser;
 
+import javax.inject.Inject;
+
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.ComponentXMLParser;
+import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
-
-import javax.inject.Inject;
 
 public class ComponentXMLParserTest extends AuraImplTestCase {
     @Inject

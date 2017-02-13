@@ -537,14 +537,11 @@
         items = items || component.get('v.items');
         var keyword = component.get("v.keyword");
         var propertyToMatch = component.get("v.propertyToMatch");
-        var regex;
         try {
-            regex = new RegExp(keyword, "i");
             for (var j = 0; j < items.length; j++) {
                 items[j].keyword = keyword;
                 var label = items[j][propertyToMatch];
-                var searchResult = regex.exec(label);
-                if (searchResult && searchResult[0].length > 0) { // Has a match
+                if (label.toLowerCase().indexOf(keyword.toLowerCase()) >= 0) { // Has a match
                     items[j].visible = true;
                 } else {
                     items[j].visible = false;

@@ -90,13 +90,18 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
         }
     });
 
+    SecureObject.addMethodIfSupported(o, win, "getComputedStyle", {
+	    rawArguments: true,
+        filterOpaque : true
+    });
+    
     [ "outerHeight", "outerWidth" ].forEach(function(name) {
         SecureObject.addPropertyIfSupported(o, win, name, {
             filterOpaque : true
         });
     });
 
-    [ "getComputedStyle", "scroll", "scrollBy", "scrollTo" ].forEach(function(name) {
+    [ "scroll", "scrollBy", "scrollTo" ].forEach(function(name) {
         SecureObject.addMethodIfSupported(o, win, name, {
             filterOpaque : true
         });

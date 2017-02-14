@@ -45,6 +45,30 @@
 	    cmp.set("v.templateMap", itemTemplates);
 	},
 	
+	getButtonTemplate: function(cmp) {
+	    var buttonTemplate = cmp.get("v.buttonTemplate");
+	    
+	    if (!buttonTemplate) {
+	        buttonTemplate = {
+	                "ui:button": {
+	                    "componentDef": {
+	                        descriptor: "markup://ui:button"
+	                    },
+	                    "attributes": {
+	                        "values": {
+	                            "class": "listItem",
+	                            "label": $A.expressionService.create(null, "{!item.record.label}")
+	                        }
+	                    }
+	                }
+	        };
+	        
+	        cmp.set("v.buttonTemplate", buttonTemplate);
+	    }
+
+	    return buttonTemplate;
+	},
+	
 	initializeLists: function(cmp) {
 	    var list = cmp.find("multiTemplate");
 	    list.set("v.templateMap", cmp.get("v.templateMap"));
@@ -53,12 +77,15 @@
 	    this.refreshItems(cmp, "multiTemplate");
 	},
 	
-	generateItems: function(count, startIndex) {
+	generateItems: function(count, startIndex, isButton) {
 	    var items = [];
 	    
 	    startIndex = startIndex || 0;
 	    
 	    for (var i = 0; i < count; i++) {
+	        var key = (isButton ? 'ui:button' : 
+	                    (((startIndex + i) % 3 === 0) ? 'ui:outputURL' : 'ui:outputText'));
+	        
 	        items.push({
 	            record: {
 	                id: startIndex + i,
@@ -68,7 +95,7 @@
 	                label: "Google " + (startIndex + i)
 	            },
 	            actions: {},
-	            key: ((startIndex + i) % 3 === 0) ? 'ui:outputURL' : 'ui:outputText'
+	            key: key
 	        });
 	    }
 	    return items;
@@ -85,7 +112,10 @@
 	
 	updateItem: function(cmp, index, targetId) {
 	    var list = cmp.find(targetId);
-	    var item = this.generateItems(1, 990)[0];
+	    var item = this.generateItems(1, 990, true)[0];
+	    var buttonTemplate = this.getButtonTemplate(cmp);
+	    
+	    list.addTemplate('ui:button', buttonTemplate['ui:button']);
 	    list.updateItem(item, index);
 	}
 })

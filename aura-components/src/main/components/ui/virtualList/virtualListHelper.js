@@ -111,6 +111,15 @@
         }
     },
 
+    addTemplate: function(cmp, key, template) {
+        var ref = cmp.get('v.itemVar');
+        
+        // Check validity of key
+        if (!this._templateCacheContains(cmp, key)) {
+            this._setTemplateCache(cmp, key, this.createTemplateData(cmp, template, ref));
+        }
+    },
+    
     createTemplateData: function(cmp, template, ref) {
         var templateData = {};
         
@@ -401,6 +410,10 @@
         }
         
         return template;
+    },
+    
+    _templateCacheContains: function(cmp, key) {
+        return !!cmp._templateMap[key];
     },
     
     _destroyShapes: function(cmp) {

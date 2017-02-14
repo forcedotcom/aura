@@ -17,10 +17,10 @@
 -->
 <aura:component description="Examples for ui:virtualList">
 	<aura:attribute name="templateMap" type="Object" access="PRIVATE"/>
+    <aura:attribute name="buttonTemplate" type="Object" access="PRIVATE"/>
     
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 	
-    
 	<div>
         <div class="inline">
             <div>

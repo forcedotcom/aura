@@ -26,6 +26,11 @@
     
     <!-- For multi-template lists -->
     <aura:attribute name="templateMap" type="Object" />
+    
+    <aura:method name="addTemplate">
+        <aura:attribute name="key" type="object" required="true" description="" />
+        <aura:attribute name="template" type="Object" required="true" description="" />
+    </aura:method>
 
     <aura:method name="rerenderList"/>
     <aura:method name="appendItems">

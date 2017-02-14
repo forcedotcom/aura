@@ -32,6 +32,11 @@
     handleTemplateMapChange: function(cmp, event, helper) {
         helper.handleTemplateChange(cmp, 'templateMap');
     },
+    
+    addTemplate: function(cmp, event, helper) {
+        var params = event.getParam('arguments');
+        helper.addTemplate(cmp, params.key, params.template);
+    },
     handleItemsChange: function (cmp, event, helper) {
     	if (cmp._initializing || cmp._appending || cmp._updating) {
     		return;

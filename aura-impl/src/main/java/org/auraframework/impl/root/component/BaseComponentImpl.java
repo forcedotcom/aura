@@ -280,8 +280,7 @@ BaseComponent<D, I> {
         if (this.isConcreteComponent()) {
             List<AttributeDefRef> facets;
             final Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = this.getComponentDef().getAttributeDefs();
-            final Map<DefDescriptor<AttributeDef>, AttributeDefRef> facetMap = new HashMap<DefDescriptor<AttributeDef>, AttributeDefRef>();
-            
+
             List<BaseComponentDef> componentDefTree = Lists.newArrayList();
             BaseComponentDef definition = this.getDescriptor().getDef();
             componentDefTree.add(definition);
@@ -307,17 +306,10 @@ BaseComponent<D, I> {
                                     return null;
                                 });
                             }
-                            this.getAttributes().set(facet, this);
-                        } else {
-	                        //this.getAttributes().set(facet, this);
-	                        facetMap.put(facet.getDescriptor(), facet);
                         }
+                        this.getAttributes().set(facet, this);
                     }
                 }
-            }
-
-            for(Map.Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : facetMap.entrySet()) {
-            	this.getAttributes().set(entry.getValue(), this);
             }
         }
 

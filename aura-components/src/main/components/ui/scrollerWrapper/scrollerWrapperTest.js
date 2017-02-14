@@ -50,5 +50,61 @@
 			$A.test.assertFalse($A.util.hasClass(component, "scrollingOnIOS"),
 					"There should NOT be a scrollingOnIOS class");
 		}
+	},
+
+	/**
+	 * Check scroll container's dimensions when it's initialized with width and height
+	 */
+	testInitWithHeightWidth : {
+		attributes : { "height" : "100px", "width" : "200px" },
+		test : function(component) {
+			var wrapperElement = component.find("scrollerWrapper").getElement();
+			var actualHeight = wrapperElement.style.height;
+			var actualWidth = wrapperElement.style.width;
+			var expectedHeight = "100px";
+			var expectedWidth  = "200px";
+
+			$A.test.assertEquals(expectedHeight, actualHeight,
+				"Scroll container's height should be set to " + expectedHeight + ", but it's " + actualHeight);
+			$A.test.assertEquals(expectedWidth, actualWidth,
+				"Scroll container's height should be set to " + expectedWidth + ", but it's " + actualWidth);
+		}
+	},
+
+	/**
+	 * Check scroll container's dimensions when width and height are set
+	 */
+	testSetHeightWidth : {
+		test : [function(component) {			
+			this.expectedHeight = "50vh";
+			this.expectedWidth  = "50%";
+
+			component.set("v.height", this.expectedHeight);
+			component.set("v.width", this.expectedWidth);
+		}, function(component) {
+			var wrapperElement = component.find("scrollerWrapper").getElement();
+			var actualHeight = wrapperElement.style.height;
+			var actualWidth = wrapperElement.style.width;
+
+			$A.test.assertEquals(this.expectedHeight, actualHeight,
+				"Scroll container's height should be set to " + this.expectedHeight + ", but it's " + actualHeight);
+			$A.test.assertEquals(this.expectedWidth, actualWidth,
+				"Scroll container's height should be set to " + this.expectedWidth + ", but it's " + actualWidth);
+		}]
+	},
+
+	/**
+	 * Check scroll container's dimensions when the width and height are not set
+	 * Expected values for both are empty strings
+	 */
+	testNoHeightWidth : {
+		test : function(component) {
+			var wrapperElement = component.find("scrollerWrapper").getElement();
+			var actualHeight = wrapperElement.style.height;
+			var actualWidth = wrapperElement.style.width;
+
+			$A.test.assertEquals('', actualHeight, "Scroll container should not have height and width set");
+			$A.test.assertEquals('', actualWidth, "Scroll container should not have height and width set");
+		}
 	}
 })// eslint-disable-line semi

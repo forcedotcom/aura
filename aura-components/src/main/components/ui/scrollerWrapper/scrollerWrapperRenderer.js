@@ -13,14 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS {
-	font-size: 3rem;
-}
-
-.THIS .border {
-	border: solid 3px blue;
-}
-
-.THIS .widebox {
-    width: 200vw;
-}
+ ({
+    render: function(cmp, helper) {
+        helper.updateStyle(cmp);
+        return this.superRender();
+    }
+ })//eslint-disable-line semi

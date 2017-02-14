@@ -1,0 +1,188 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.THIS {
+    height: 100%;
+}
+
+.THIS .header {
+    height: 20%;
+    border: 1px solid #CFCFCF
+}
+
+.THIS .body {
+    height: 80%;
+    position:relative;
+    padding-top:32px;
+    overflow:hidden;
+}
+
+.THIS .scrollWrapper {
+    height: 100%;
+    width: 100%;
+    transform:initial;
+    position:static;
+}
+
+.THIS .scroller {
+    transform:initial;
+    position:static;
+}
+
+.THIS table {
+    background: #CFCFCF;
+}
+
+.THIS td {
+    position:relative;
+    padding: .5em;
+}
+
+.THIS th > div {
+    position: absolute;
+    top: 0;
+    background:white;
+    padding: 0.5rem;
+    box-sizing: border-box;
+}
+
+.THIS .changed {
+    background: #CFCFCF;
+}
+
+.THIS .icon {
+    width: 16px;
+    height:16px;
+    background-color:blue;
+}
+
+/** Sorting styles **/
+.THIS .descending {
+    background: red;
+}
+
+.THIS .ascending {
+    background: green;
+}
+
+.THIS .indicator {
+    width: 0.25rem;
+    background: #0070d2;
+    top: 0;
+}
+
+.THIS .indicator .divider {
+    width: 1px;
+    background: #0070d2;
+}
+
+/** SLDS classes **/
+.THIS .slds-is-resizable .slds-th__action:hover,
+.THIS .slds-is-resizable .slds-th__action:focus {
+  box-shadow: #d8dde6 -0.25rem 0 0 inset; }
+
+.THIS .slds-resizable {
+  max-width: 100%; }
+
+.THIS .slds-resizable__handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 0.25rem;
+  height: 100%;
+  background: #0070d2;
+  display: block;
+  cursor: col-resize;
+  opacity: 0;
+  z-index: 5000; }
+
+.THIS .slds-resizable__handle:hover,
+.THIS .slds-resizable__handle:focus,
+.THIS .slds-resizable__handle:active {
+  opacity: 1; }
+
+.THIS .slds-resizable__divider {
+  position: absolute;
+  right: 0;
+  height: 100vh;
+  width: 1px;
+  background: #0070d2; }
+
+.THIS .slds-resizable__input:focus ~ .slds-resizable__handle,
+.THIS .active {
+  opacity: 1; }
+  
+.THIS .slds-assistive-text {
+  position: absolute !important;
+  margin: -1px !important;
+  border: 0 !important;
+  padding: 0 !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important; }
+
+.THIS .slds-assistive-text--focus:focus {
+  margin: inherit !important;
+  border: inherit !important;
+  padding: inherit !important;
+  width: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+  clip: auto !important; }
+
+.THIS .slds-th__action {
+  display: -ms-flexbox;
+  display: flex;
+  /*padding: 0.5rem;*/ }
+
+.THIS .slds-th__action:focus,
+.THIS .slds-th__action:hover {
+  outline: 0;
+  background-color: #f4f6f9; }
+
+.THIS .slds-th__action:focus .slds-is-sortable__icon,
+.THIS .slds-th__action:hover .slds-is-sortable__icon {
+  display: inline-block; }
+
+.THIS .slds-is-sortable__icon {
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-left: 0.25rem;
+  display: none; }
+
+.THIS .slds-is-sorted .slds-is-sortable__icon {
+  display: inline-block; }
+
+.THIS .slds-is-sorted--asc .slds-is-sortable__icon {
+  transform: rotate(180deg); }
+
+.THIS .slds-is-resizable .slds-th__action:hover,
+.THIS .slds-is-resizable .slds-th__action:focus {
+  box-shadow: #d8dde6 -0.25rem 0 0 inset; }
+  
+.THIS .slds-truncate {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; }
+  
+.THIS .slds-text-title--caps {
+    font-size: .75rem;
+    line-height: 1.25;
+    color: rgb(84, 105, 141);
+    text-transform: uppercase;
+    letter-spacing: .0625rem;
+}

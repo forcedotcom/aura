@@ -1,0 +1,38 @@
+<!-- tests ui:virtualDataGrid using a data provider -->
+
+<aura:component implements="performance:test">
+<div>
+   <div class="body">
+   <ui:scroller aura:id="scroller"
+                         class="scrollWrapper"
+                         
+                         useNativeScroller="true"
+                         infiniteLoading="true"
+                         infiniteLoadingThreshold="10">
+                         
+        <ui:virtualDataTable aura:id="grid" enableResizableColumns="true">
+          <aura:set attribute="headerColumns">
+            <ui:dataTableHeader name="id" label="Id"/>
+            <ui:dataTableHeader name="subject" label="Subject" resizable="true"/>
+            <ui:dataTableHeader name="who.name" label="Name" resizable="true"/>
+            <ui:dataTableHeader name="what.name" label="Related To" resizable="true"/>
+            <ui:dataTableHeader name="activityDate" label="Due Date" resizable="true"/>
+          </aura:set>
+          
+          <aura:set attribute="columns">
+                        <div class="slds-truncate">{!item.id}</div>
+                        <div class="slds-truncate">{!item.subject}</div>
+                        <div class="slds-truncate">{!item.who.name}</div>
+                        <div class="slds-truncate">{!item.what.name}</div>
+                        <div class="slds-truncate">{!item.activityDate}</div>
+           </aura:set>
+          
+          <aura:set attribute="dataModel">
+            <uiExamples:dataGridKitchenSinkDataProvider aura:id="data"
+                                  totalItems="400" pageSize="400"/>
+          </aura:set>
+        </ui:virtualDataTable>
+        </ui:scroller>    
+        </div>
+    </div>
+</aura:component>

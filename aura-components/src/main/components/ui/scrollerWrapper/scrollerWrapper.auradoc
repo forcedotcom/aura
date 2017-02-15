@@ -18,19 +18,26 @@
 <aura:documentation> 
     <aura:description>
         <p>A <code>ui:scrollerWrapper</code> creates a container that enables native scrolling in Salesforce1. This component enables you to nest more than one scroller inside the container.
-        Use the <code>class</code> attribute to define the height and width of the container. To enable scrolling, specify a height that's smaller than its content.</p>
-        <p>This example creates a scrollable area with a height of 300px.</p>
+        To enable scrolling, specify a height that's smaller than its content using the <code>height</code> attribute.</p>
+        <p>This example creates an outer scrollable area with a height of 300px and an inner scrollable area with a height of 200px.</p>
         <pre>&lt;aura:component>
-    &lt;ui:scrollerWrapper class="scrollerSize">
-        &lt;!--Scrollable content here -->
+    &lt;aura:attribute name="content" type="String" default="This is a sentence that goes on and on and on..."/>        
+    &lt;ui:scrollerWrapper aura:id="outer" height="300px">
+        {!v.content}
+        &lt;ui:scrollerWrapper aura:id="inner" height="200px">
+            {!v.content}
+        &lt;/ui:scrollerWrapper>
     &lt;/ui:scrollerWrapper>
-&lt;/aura:component>
-
-/** CSS **/
-.THIS.scrollerSize {
-    height: 300px;
-}
-        </pre>
+    
+    &lt;ui:button press="{!c.scrollToTop}" label="Scroll" />
+&lt;/aura:component></pre>
+        <p>The button in the example calls the following client-side controller to scroll to the top of the content.</p>
+        <pre>({
+    scrollToTop: function(cmp, event, helper) {
+        var outer = cmp.find("outer");
+        outer.scrollTo("top");
+    }
+})</pre>
         <p>The Lightning Design System <code>scrollable</code> class isn't compatible with native scrolling on mobile devices. Use <code>ui:scrollerWrapper</code> if you want to enable scrolling in Salesforce1.</p>
           
         <h4>Usage Considerations</h4>

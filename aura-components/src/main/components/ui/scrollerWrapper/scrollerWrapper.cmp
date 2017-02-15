@@ -23,8 +23,8 @@
 
     <!-- Global Attributes -->
     <aura:attribute name="class" type="String" access="GLOBAL" description="A CSS class applied to the outer element. This style is in addition to base classes output by the component."/>
-    <aura:attribute name="width" type="String" access="GLOBAL" description="The width of the scroll area. Units such as px, em, or % need to be included."/>
-    <aura:attribute name="height" type="String" access="GLOBAL" description="The height of the scroll area. Units such as px, em, or % need to be included."/>
+    <aura:attribute name="width" type="String" access="GLOBAL" description="The width of the scroll area, for example, 300px. Valid units: px, em, vh, and %."/>
+    <aura:attribute name="height" type="String" access="GLOBAL" description="The height of the scroll area, for example, 300px. Valid units: px, em, vh, and %."/>
 
     <aura:method name="scrollTo" action="{!c.scrollTo}" access="GLOBAL" description="Scrolls the content to a specified location.">
  	    <aura:attribute name="destination" type="String" description="The target location. Valid values: custom, top, bottom, left, and right. For custom destination, xcoord and ycoord are used to determine the target location."/>

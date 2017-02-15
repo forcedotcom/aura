@@ -312,7 +312,7 @@ SecureWindow.metadata = {
             "CredentialsContainer":                 FUNCTION,
             "Crypto":                               FUNCTION,
             "CryptoKey":                            FUNCTION,
-            "CustomEvent":                          FUNCTION,
+            "CustomEvent":                          CTOR,
             "DOMError":                             FUNCTION,
             "DOMException":                         FUNCTION,
             "DOMImplementation":                    FUNCTION,

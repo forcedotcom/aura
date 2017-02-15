@@ -184,6 +184,8 @@ IfComponent.prototype.setupValueProviders = function(customValueProviders) {
 
     vp["v"]=this.attributeSet = new AttributeSet(this.componentDef.attributeDefs);
     vp["c"]=this.createActionValueProvider();
+    vp["this"] = this;
+    vp["globalid"]=this.globalid;
     
     if(customValueProviders) {
         for (var key in customValueProviders) {
@@ -264,6 +266,13 @@ IfComponent.prototype["helper"] = {
                 'More info: https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/perf_warnings_if.htm'
             ].join(''));
         }
+    }
+};
+
+
+IfComponent.prototype["provider"] = {
+    "provide" : function(component) {
+        return component;
     }
 };
 

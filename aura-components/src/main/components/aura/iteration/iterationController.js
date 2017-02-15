@@ -14,26 +14,6 @@
  * limitations under the License.
  */
 ({
-    rangeChange: function(component, evt, helper) {
-        helper.updateBody(component);
-    },
-
-    itemsChange: function(component, evt, helper) {
-        helper.updateBody(component);
-    },
-
-    templateChange:function(component, evt, helper){
-        helper.createBody(component,false);
-    },
-
-    init: function(component, evt, helper) {
-        var bodyTemplate = component.get("v.body");
-        var template = component.get("v.template");
-
-        if (bodyTemplate.length && !template.length) {
-            component.set("v.body", [], true);
-            component.set("v.template", bodyTemplate, true);
-        }
-        helper.createBody(component,true);
-    }
+   // The logic for the iteration controller is in IterationComponent.js. 
+   // We still need a blank controller file though so the server knows that we have client side dependencies.
 })// eslint-disable-line semi

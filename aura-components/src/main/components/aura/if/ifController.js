@@ -13,14 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-Function.RegisterNamespace("Test.Aura.Iteration");
-
-[Fixture, Skip("Rewrite")]
-Test.Aura.Iteration.ControllerTest = function(){
-	var targetController;
-
-	// Aura Files need to be loaded as Json, to catch the object they contain
-	ImportJson("aura-components/src/main/components/aura/iteration/iterationController.js",function(path,result){
-		targetController=result;
-	});
-}
+({
+   // The logic for the if controller is in IfComponent.js. 
+   // We still need a blank controller file though so the server knows that we have client side dependencies.
+})// eslint-disable-line semi

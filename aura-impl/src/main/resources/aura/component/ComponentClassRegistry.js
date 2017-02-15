@@ -39,17 +39,9 @@ ComponentClassRegistry.prototype.customConstructorMap = {
     "aura$text":TextComponent,
     "aura$html":HtmlComponent,
     "aura$expression": ExpressionComponent,
-    "aura$if":IfComponent
-
-    // Just waiting to turn these on.
-    
-    // aura:iteration
-    //  - delete helper and controller.
-    //,"aura$iteration":IterationComponent
-
-    // aura:component
-    //  - DO NOT DELETE THE RENDERER. It's shared, so just leave it.
-    //,"aura$component":BaseComponent
+    "aura$if":IfComponent,
+    "aura$iteration":IterationComponent,
+    "aura$component":BaseComponent
 };
 
 /**

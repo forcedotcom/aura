@@ -159,7 +159,14 @@ BaseComponent.prototype.getSuperest = function(){ return this; };
 BaseComponent.prototype.setupValueProviders = function(customValueProviders) {
     var vp=this.valueProviders;
 
-    vp["v"]=$A.componentService.get(this.concreteComponentId).attributeSet;
+    vp["v"]=this.attribureSet=$A.componentService.get(this.concreteComponentId).attributeSet;
+    vp["m"]=this.model;
+    vp["this"]=this;
+    vp["globalid"]=this.concreteComponentId;
+    vp["def"]=this.componentDef;
+    vp["super"]=this.superComponent;
+    vp["null"]=null;
+    vp["version"] = this.version ? this.version : this.getVersionInternal();
 
     if(customValueProviders) {
         for (var key in customValueProviders) {

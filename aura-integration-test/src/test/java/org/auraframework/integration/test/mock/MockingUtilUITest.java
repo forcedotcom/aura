@@ -73,7 +73,8 @@ public class MockingUtilUITest extends WebDriverTestCase {
                         "{!m.string}<aura:iteration items='{!m.stringList}' var='i'>{!i}</aura:iteration>"));
         // sanity without mocks
         open(appDescriptor);
-        assertEquals("Modelonetwothree", getText(By.cssSelector("body")));
+        String actual = getText(By.cssSelector("body"));
+        assertEquals("Modelonetwothree", actual);
     }
 
     @Ignore

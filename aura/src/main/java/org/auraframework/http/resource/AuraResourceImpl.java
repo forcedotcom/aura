@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,7 +29,9 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.http.ManifestUtil;
 import org.auraframework.http.RequestParam.StringParam;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.ServerService;
@@ -45,12 +48,14 @@ public abstract class AuraResourceImpl implements AuraResource {
     private final String name;
     private final Format format;
 
+    protected ContextService contextService;
     protected DefinitionService definitionService;
     protected ServletUtilAdapter servletUtilAdapter;
     protected ConfigAdapter configAdapter;
     protected ServerService serverService;
     protected InstanceService instanceService;
     protected ExceptionAdapter exceptionAdapter;
+    protected ManifestUtil manifestUtil;
 
     public AuraResourceImpl(String name, Format format) {
         this(name, format, false);
@@ -144,6 +149,16 @@ public abstract class AuraResourceImpl implements AuraResource {
     @Inject
     public void setExceptionAdapter(ExceptionAdapter exceptionAdapter) {
         this.exceptionAdapter = exceptionAdapter;
+    }
+
+    @Inject
+    public void setContextService(ContextService contextService) {
+        this.contextService = contextService;
+    }
+
+    @PostConstruct
+    public void initManifest() {
+        this.manifestUtil = new ManifestUtil(definitionService, contextService, configAdapter);
     }
 
     private final StringParam attributesParam = new StringParam("aura.attributes", 0, false);

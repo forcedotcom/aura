@@ -22,7 +22,6 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -33,10 +32,8 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.Component;
 import org.auraframework.javascript.PreInitJavascript;
-import org.auraframework.service.ContextService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
@@ -59,25 +56,13 @@ public class InlineJs extends AuraResourceImpl {
         super("inline.js", Format.JS);
     }
 
-    private ContextService contextService;
     private RenderingService renderingService;
-    private ManifestUtil manifestUtil;
 
     private List<PreInitJavascript> preInitJavascripts;
 
     @Inject
-    public void setContextService(ContextService contextService) {
-        this.contextService = contextService;
-    }
-
-    @Inject
     public void setRenderingService(RenderingService renderingService) {
         this.renderingService = renderingService;
-    }
-
-    @PostConstruct
-    public void initManifest() {
-        this.manifestUtil = new ManifestUtil(definitionService, contextService, configAdapter);
     }
 
     private void appendInlineJS(Component template, Appendable out) throws IOException, QuickFixException {
@@ -198,12 +183,12 @@ public class InlineJs extends AuraResourceImpl {
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context)
             throws IOException {
         try {
-        	// For appcached apps, inline is not expected to return a CSRF token
-        	if (!manifestUtil.isManifestEnabled()) {
-	        	String token = request.getParameter("jwt");
-	            if (!configAdapter.validateBootstrap(token)) {
-            		throw new AuraJWTError("Invalid jwt parameter");
-            	}
+            // For appcached apps, inline is not expected to return a CSRF token
+            if (!manifestUtil.isManifestEnabled()) {
+                String token = request.getParameter("jwt");
+                if (!configAdapter.validateBootstrap(token)) {
+                    throw new AuraJWTError("Invalid jwt parameter");
+                }
             }
             DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getLoadingApplicationDescriptor();
             internalWrite(request, response, appDefDesc, context);

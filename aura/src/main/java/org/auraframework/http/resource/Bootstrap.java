@@ -22,7 +22,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,7 +33,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.instance.Instance;
-import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.throwable.AuraJWTError;
@@ -47,8 +45,6 @@ import org.auraframework.util.json.JsonSerializationContext;
  */
 @ServiceComponent
 public class Bootstrap extends AuraResourceImpl {
-
-    private ContextService contextService;
 
     public Bootstrap() {
         super("bootstrap.js", Format.JS);
@@ -111,15 +107,13 @@ public class Bootstrap extends AuraResourceImpl {
             DefDescriptor<?> desc = definitionService.getDefDescriptor(app.getDescriptorName(),
                     type.getPrimaryInterface());
             servletUtilAdapter.checkFrameworkUID(context);
-            
-            // CSRF token is usually handled in inline.js, but in the few cases
-            // where inline.js may be cached, bootstrap may need to be able to
-            // return a current token.
+
+            // need to guard bootstrap.js request because it returns user sensitive information.
             String jwtToken = request.getParameter("jwt");
-            if (jwtToken != null && !configAdapter.validateBootstrap(jwtToken)) {
+            if (!configAdapter.validateBootstrap(jwtToken)) {
                 throw new AuraJWTError("Invalid jwt parameter");
-	        }
-            
+            }
+
             setCacheHeaders(response, app);
             Instance<?> appInstance = instanceService.getInstance(desc, getComponentAttributes(request));
             definitionService.updateLoaded(desc);
@@ -138,11 +132,14 @@ public class Bootstrap extends AuraResourceImpl {
             json.writeMapEnd();
             json.writeMapEntry("md5", out.getMD5());
             json.writeMapEntry("context", context);
-            
-            if (jwtToken != null) {
+
+            // CSRF token is usually handled in inline.js, but in the few cases
+            // where inline.js may be cached, bootstrap may need to be able to
+            // return a current token.
+            if (manifestUtil.isManifestEnabled()) {
                 json.writeMapEntry("token", configAdapter.getCSRFToken());
-	        }
-            
+            }
+
             json.writeMapEnd();
             out.append(APPEND_JS);
         } catch (Throwable t) {
@@ -214,16 +211,6 @@ public class Bootstrap extends AuraResourceImpl {
         json.writeMapEntry("error", t);
         json.writeMapEnd();
         out.print(APPEND_JS);
-    }
-
-    /**
-     * Injection override.
-     *
-     * @param contextService the ContextService to set
-     */
-    @Inject
-    public void setContextService(ContextService contextService) {
-        this.contextService = contextService;
     }
 
 }

@@ -1781,14 +1781,17 @@ Component.prototype.render = function() {
     if(render){
         var context = $A.getContext();
         context.setCurrentAccess(this);
+        
         var secureThis = $A.lockerService.wrapComponent(this);
         var result = render(secureThis, this["helper"]);
+        
         // Locker: anytime framework receive DOM elements from a locked down component
         // it should unwrap them before using them. For regular components, this is
         // a non-opt:
         if (secureThis !== this) {
             result = $A.lockerService.unwrap(this, result);
         }
+        
         context.releaseCurrentAccess();
 
         return result;

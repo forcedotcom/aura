@@ -104,6 +104,8 @@
 
   	<div aura:id="cacheTestA" id="cacheTestA"></div>
   	<div aura:id="cacheTestB" id="cacheTestB"></div>
+    
+    <ui:stamp aura:id="sentinel" severity="success">Sentinel For Rendering Tests</ui:stamp>
 
     <div id="outsideFacet">
         <lockerTestOtherNamespace:facetLocked aura:id="facetLocked">

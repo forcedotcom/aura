@@ -240,11 +240,10 @@ var ls_getKey,
     
     /**
      * LockerService internal API.
-     * Verify access and retrieve the raw object,
-     * optionally verifying whether the object is opaque.
+     * Verify access and retrieve the raw object.
      * This method is used when the key is not known.
      */
-    ls_unwrap = function(from, st, skipOpaque) {
+    ls_unwrap = function(from, st) {
     	if (!st) {
     		return st;
     	}
@@ -252,17 +251,27 @@ var ls_getKey,
         var key = keychain.get(from);        
         var ref;
         
-        // If this is an array then write back to the raw object
         if (Array.isArray(st)) {
         	// Only getRef on "secure" arrays
-        	ref = secureToRaw.get(st) ? ls_getRef(st, key, skipOpaque) : [];
-        	ref.length = 0;
-        	
-        	for (var n = 0; n < st.length; n++) {
-        		ref.push(ls_unwrap(from, st[n], skipOpaque));
+        	if (secureToRaw.get(st)) {
+                // Secure array - reconcile modifications to the filtered clone with the actual array
+        		ref = ls_getRef(st, key);
+        		
+        		var originalLength = ref.length;
+        		var insertIndex = 0;
+        		for (var n = 0; n < st.length; n++) {
+        			// Find the next available location that corresponds to the filtered projection of the array
+        			while (insertIndex < originalLength && ls_getKey(ref[insertIndex]) !== key) {
+        				insertIndex++;
+        			}
+        			
+        			ref[insertIndex++] = ls_unwrap(from, st[n]);
+        		}
+        	} else {
+        		ref = [];
         	}
         } else {
-        	ref = ls_getRef(st, key, skipOpaque);
+        	ref = ls_getRef(st, key);
         }
         
         return ref;

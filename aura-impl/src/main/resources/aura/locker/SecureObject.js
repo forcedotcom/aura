@@ -74,14 +74,10 @@ SecureObject.filterEverything = function(st, raw, options) {
 		}
 	}
 
-	function filterOpaque(opts, so) {
-		return opts && opts.filterOpaque === true && ls_isOpaque(so);
-	}
-
 	var key = ls_getKey(st);
 	var cached = ls_getFromCache(raw, key);
 	if (cached) {
-		return !filterOpaque(options, cached) ? cached : undefined;
+		return cached;
 	}
 
 	// Handle already proxied things
@@ -136,7 +132,7 @@ SecureObject.filterEverything = function(st, raw, options) {
 					for (var n = 0; n < raw.length; n++) {
 						var newValue = SecureObject.filterEverything(st, raw[n]);
 		
-						if (!filterOpaque(options, newValue)) {
+						if (!ls_isOpaque(newValue)) {
 							swallowed.push(newValue);
 						}
 		
@@ -161,7 +157,7 @@ SecureObject.filterEverything = function(st, raw, options) {
 			} else if (SecureObject.isDOMElementOrNode(raw)) {
 				if (belongsToLocker || SecureElement.isSharedElement(raw)) {
 					swallowed = SecureElement(raw, key);
-				} else if (!options || options.filterOpaque !== true) {
+				} else if (!options) {
 					swallowed = SecureObject(raw, key);
 				} else {
 					swallowed = options.defaultValue;
@@ -333,7 +329,7 @@ var filteringProxyHandler = (function() {
 		return Object.preventExtensions(raw);
     };    
     
-	return new FilteringProxyHandler();
+	return Object.freeze(new FilteringProxyHandler());
 })();
 
 // Prototype to make debugging and identification of direct exposure of the surrogate (should not happen) easier
@@ -462,6 +458,8 @@ function getArrayLikeThingProxyHandler(key) {
 		ls_setKey(handler, key);
 		
 		KEY_TO_ARRAY_LIKE_THING_HANLDER.set(key, handler);
+		
+		Object.freeze(handler);
     }
     
     return handler;
@@ -798,7 +796,6 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata, so, raw, key)
 
 		if (!(name in so) && (name in raw)) {
 			var options = {
-                filterOpaque: item.filterOpaque || true,
 	            skipOpaque: item.skipOpaque || false,
 	            defaultValue: item.defaultValue || null,
 	            trustReturnValue: item.trustReturnValue || false
@@ -879,7 +876,6 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(name, prototype, protot
 	
 	if (!prototypeForValidation.hasOwnProperty(name) && (name in rawPrototypicalInstance)) {
 		var options = {
-            filterOpaque: item.filterOpaque || true,
             skipOpaque: item.skipOpaque || false,
             defaultValue: item.defaultValue || null,
             trustReturnValue: item.trustReturnValue || false

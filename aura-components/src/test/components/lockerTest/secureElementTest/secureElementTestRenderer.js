@@ -1,39 +1,29 @@
 ({
-    render : function(cmp, helper) {
+    render: function(cmp, helper) {
         var ret = cmp.superRender();
 
-        var testInRenderer = cmp.get("v.testInRenderer");
-
-        if (testInRenderer === "testCallAppendChildWithOpaqueReference") {
-            // SecureObject is marked as opaque
-            var opaqueRef = helper.findSecureObject(ret);
-            if(!opaqueRef) {
-                throw new Error("Expecting a SecureObject for test setup.");
-            }
-
-            var element = document.createElement("div");
-            try {
-                element.appendChild(opaqueRef);
-                throw new Error("Expecting an access denied error.");
-            } catch(e) {
-                cmp.set("v.text", e.toString());
-            }
+        var opaqueRef = helper.findSecureObject(ret);
+        if (opaqueRef) {
+            throw new Error("SecureObject leaked from superRender().");
         }
+                
+        // Add in a div
+        var secondSentinel = document.createElement("div");
+        secondSentinel.id = "secondSentinel";
+        secondSentinel.style.color = "blue";
+        secondSentinel.innerHTML = "Second Sentinel";
+        
+        ret.push(secondSentinel);
 
-        else if(testInRenderer === "testCallRemoveChildWithOpaqueReference") {
-            // SecureObject is marked as opaque
-            var opaqueRef = helper.findSecureObject(ret);
-            if(!opaqueRef) {
-                throw new Error("Expecting a SecureObject for test setup.");
-            }
+        return ret;
+    },
+    
+    rerender: function(cmp, helper) {
+    	var ret = cmp.superRerender();
 
-            var element = document.createElement("div");
-            try {
-                element.removeChild(opaqueRef);
-                throw new Error("Expecting an access denied error.");
-            } catch(e) {
-                cmp.set("v.text", e.toString());
-            }
+        var opaqueRef = helper.findSecureObject(ret);
+        if (opaqueRef) {
+            throw new Error("SecureObject leaked from superRerender().");
         }
 
         return ret;

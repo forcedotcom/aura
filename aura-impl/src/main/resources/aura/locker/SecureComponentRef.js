@@ -57,7 +57,7 @@ function SecureComponentRef(component, key) {
     if (defs) {
         defs.forEach(function(method) {
         	var descriptor = new DefDescriptor(method.name);
-    		SecureObject.addMethodIfSupported(o, component, descriptor.getName());
+    		SecureObject.addMethodIfSupported(o, component, descriptor.getName(), { defaultKey: key });
         }, o);
     }
 

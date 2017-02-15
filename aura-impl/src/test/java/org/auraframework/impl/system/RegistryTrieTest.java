@@ -235,8 +235,7 @@ public class RegistryTrieTest extends AuraTestCase {
         DefDescriptor<?> descriptor = new DefDescriptorImpl<>("markup://otherNamespace:*", ComponentDef.class);
         DefRegistry actual = trie.getRegistryFor(descriptor);
         
-        // normally would expect null, but reg1 will ultimately return null for the specific descriptor requested anyways
-        assertEquals(reg1, actual);
+        assertNull(actual);
     }
 
     @Test

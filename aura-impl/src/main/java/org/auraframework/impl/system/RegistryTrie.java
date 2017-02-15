@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,7 +33,6 @@ import org.auraframework.system.RegistrySet;
 import org.auraframework.throwable.AuraError;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
@@ -43,92 +41,36 @@ import com.google.common.collect.Sets;
 public class RegistryTrie implements RegistrySet {
 
     private final Collection<DefRegistry> allRegistries;
-    private final Set<String> allNamespaces = new HashSet<>();
+
     // a map of map of maps
-    private final HashMap<String,Object> root = Maps.newHashMap();
-
-    private EnumMap<DefType, DefRegistry> insertDefTypeReg(EnumMap<DefType, DefRegistry> defTypeMap, DefRegistry reg) {
-        if (defTypeMap == null) {
-            defTypeMap = new EnumMap<>(DefType.class);
-        }
-        for (DefType dt : reg.getDefTypes()) {
-            if (defTypeMap.containsKey(dt)) {
-                DefRegistry existing = defTypeMap.get(dt);
-                throw new AuraError(String.format(
-                        "Duplicate DefType/Prefix/Namespace combination claimed by 2 DefRegistries : {%s/%s/%s} and {%s/%s/%s}",
-                        existing.getDefTypes(), existing.getPrefixes(), existing.getNamespaces(), reg.getDefTypes(),
-                        reg.getPrefixes(), reg.getNamespaces()));
-            }
-            defTypeMap.put(dt, reg);
-        }
-        return defTypeMap;
-    }
-
-    private Map<String, Object> insertPrefixReg(Map<String, Object> prefixMap, DefRegistry reg) {
-        if (prefixMap == null) {
-            prefixMap = Maps.newHashMap();
-        }
-        // We expect getPrefixes() to always return lower case values here
-        for (String prefix : reg.getPrefixes()) {
-            Object orig = prefixMap.get(prefix);
-            Map<String, Object> namespaceMap;
-
-            if (orig == null) {
-                prefixMap.put(prefix, reg);
-            } else {
-                if (orig instanceof DefRegistry) {
-                    namespaceMap = insertNamespaceReg(null, (DefRegistry)orig);
-                } else {
-                    @SuppressWarnings("unchecked")
-                    Map<String,Object> t = (Map<String,Object>)orig;
-                    namespaceMap = t;
-                }
-                namespaceMap = insertNamespaceReg(namespaceMap, reg);
-                prefixMap.put(prefix, namespaceMap);
-            }
-        }
-        return prefixMap;
-    }
-
-    private String getNamespaceKey(String namespace) {
+    private final Map<DefType, Map<String, PrefixNode>> root = new EnumMap<>(DefType.class);
+    
+    private static String getNamespaceKey(String namespace) {
         // W-3676967: temporarily allow a case-sensitive "duplicate" namespace, should be lower-cased otherwise
     	return "ONE".equals(namespace) ? namespace : namespace.toLowerCase();
     }
-    
-    private Map<String,Object> insertNamespaceReg(Map<String, Object> namespaceMap, DefRegistry reg) {
-        if (namespaceMap == null) {
-            namespaceMap = Maps.newHashMap();
-        }
-        for (String namespaceUnknown : reg.getNamespaces()) {
-            String namespace = getNamespaceKey(namespaceUnknown);
-            Object orig = namespaceMap.get(namespace);
-            EnumMap<DefType, DefRegistry> defTypeMap;
-
-            if (orig == null) {
-                namespaceMap.put(namespace, reg);
-            } else {
-                if (orig instanceof DefRegistry) {
-                    defTypeMap = insertDefTypeReg(null, (DefRegistry)orig);
-                } else {
-                    @SuppressWarnings("unchecked")
-                    EnumMap<DefType,DefRegistry> t = (EnumMap<DefType,DefRegistry>)orig;
-                    defTypeMap = t;
-                }
-                defTypeMap = insertDefTypeReg(defTypeMap, reg);
-                namespaceMap.put(namespace, defTypeMap);
-            }
-        }
-        return namespaceMap;
-    }
 
     private void initializeHashes() {
-        for (DefRegistry reg : allRegistries) {
-            insertPrefixReg(root, reg);
-            for (String ns : reg.getNamespaces()) {
-                allNamespaces.add(getNamespaceKey(ns));
+        for (DefRegistry reg : this.allRegistries) {
+            for (DefType defType : reg.getDefTypes()) {
+                Map<String, PrefixNode> dtn = this.root.get(defType);
+                if (dtn == null) {
+                    dtn = new HashMap<String, PrefixNode>(8);
+                    this.root.put(defType, dtn);
+                }
+                for (String p : reg.getPrefixes()) {
+                    String prefix = p.toLowerCase();
+                    PrefixNode pn = dtn.get(prefix);
+                    if (pn == null) {
+                        pn = new PrefixNode();
+                        dtn.put(prefix, pn);
+                    }
+                    for (String namespace : reg.getNamespaces()) {
+                        pn.put(namespace, reg);
+                    }
+                }
             }
         }
-        allNamespaces.remove("*");
     }
 
     public RegistryTrie(Collection<DefRegistry> registries) {
@@ -154,9 +96,7 @@ public class RegistryTrie implements RegistrySet {
      */
     @Override
     public Collection<DefRegistry> getRegistries(DescriptorFilter matcher) {
-        Set<DefRegistry> matched;
-
-        matched = Sets.newHashSet();
+        Set<DefRegistry> matched = Sets.newHashSet();
 
         for (DefRegistry reg : this.allRegistries) {
             boolean found = false;
@@ -180,42 +120,46 @@ public class RegistryTrie implements RegistrySet {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T extends Definition> DefRegistry getRegistryFor(DefDescriptor<T> descriptor) {
-        if (descriptor == null) {
-            return null;
+        Map<String, PrefixNode> dt = this.root.get(descriptor.getDefType());
+        if (dt != null) {
+            PrefixNode pn = dt.get(descriptor.getPrefix().toLowerCase());
+            if (pn != null) {
+                return pn.get(descriptor.getNamespace());
+            }
         }
-        //System.out.println("GET_REGISTRY_FOR: "+descriptor+"@"+descriptor.getDefType());
-        String ns = descriptor.getNamespace();
-        String prefix = descriptor.getPrefix().toLowerCase();
+        return null;
+    }
 
-        if (ns == null) {
-            ns = "*";
-        } else {
-            ns = getNamespaceKey(ns);
-        }
-        Object top = root.get(prefix);
-        if (top == null) {
-            return null;
-        }
-        if (top instanceof DefRegistry) {
-            return (DefRegistry)top;
-        }
-        Map<String,Object> namespaceMap = (Map<String,Object>)top;
+    /**
+     * Special class for the final path, which has a default built in.
+     */
+    private static final class PrefixNode {
 
-        Object nsObj = namespaceMap.get(ns);
+        // the registry to use if there is no mapping for the specified namespace, can be null
+        private DefRegistry catchAllRegistry;
 
-        if (nsObj == null) {
-            nsObj = namespaceMap.get("*");
-        }
-        if (nsObj == null) {
-            return null;
-        }
-        if (nsObj instanceof DefRegistry) {
-            return (DefRegistry) nsObj;
+        // registries to use for specific namespaces
+        private final Map<String, DefRegistry> registries = new HashMap<>(8);
+
+        private void put(String namespace, DefRegistry registry) {
+            DefRegistry r = registries.put(getNamespaceKey(namespace), registry);
+            if (r != null) { 
+                throw new AuraError(String.format(
+                        "Duplicate DefType/Prefix/Namespace combination claimed by 2 DefRegistries : %s and %s", r,
+                            registry)); 
+            }
+            if ("*".equals(namespace)) {
+                this.catchAllRegistry = registry;
+            }
         }
 
-            Map<DefType,DefRegistry> defTypeMap = (Map<DefType,DefRegistry>)nsObj;
-            return defTypeMap.get(descriptor.getDefType());
+        private DefRegistry get(String ns) {
+            DefRegistry reg = this.registries.get(ns != null ? getNamespaceKey(ns) : "*");
+            if (reg == null) {
+                reg = this.catchAllRegistry;
+            }
+            return reg;
         }
+    }
 }

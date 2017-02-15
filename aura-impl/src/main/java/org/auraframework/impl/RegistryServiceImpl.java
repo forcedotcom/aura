@@ -315,7 +315,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             if (!loaders.isEmpty()) {
                 markupLoaders.addAll(loaders);
                 for (SourceLoader loader : loaders) {
-                    markupRegistries.add(new PassThroughDefRegistry(loader, markupDefTypes, prefixes, true, compilerService));
+                    markupRegistries.add(new PassThroughDefRegistry(loader, allMarkupDefTypes, prefixes, true, compilerService));
                 }
             }
         }

@@ -59,23 +59,11 @@
     },
     
     handleMouseover: function(component) {
-        var optionCmp = component.find("option");
-        var elem = optionCmp ? optionCmp.getElement() : null;
-        if (elem) {
-            $A.util.addClass(optionCmp, "mouseovered");
-        }
-        
         var highlightEvent = component.get("e.listHighlight");
         highlightEvent.fire({ activeOption: component });
     },
     
     handleMouseout: function(component) {
-        var optionCmp = component.find("option");
-        var elem = optionCmp ? optionCmp.getElement() : null;
-        if (elem) {
-            $A.util.removeClass(optionCmp, "mouseovered");
-        }
-        
         component.set("v.highlighted", false);
     },
     

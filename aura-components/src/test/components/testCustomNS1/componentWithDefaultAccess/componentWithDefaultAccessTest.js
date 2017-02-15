@@ -767,6 +767,80 @@
             },
         ]
     },
+    
+    testGetDefinitionForComponentWithAccessSameNS:{
+        test:[
+              function(cmp){
+                  var descriptor = "testCustomNS1:componentWithDefaultAccess2";
+                  var complete = false;
+                  $A.getDefinition(descriptor, function(definition) {
+                      $A.test.assertNotNull(definition);
+                      $A.test.assertEquals("markup://testCustomNS1:componentWithDefaultAccess2", definition.getDescriptor().getQualifiedName());
+                      complete = true;
+                  });
+                  $A.test.addWaitFor(true, function(){ return complete; });       
+                  
+              },     
+        ]
+    },
+ 
+    //Access check test for $A.getDefinition - component def (testPrivilegedNS1) requested is not on client
+    testGetDefinitionForComponentWithoutAccessPrivilegedNS1:{
+        test:[
+              function(cmp){
+                  $A.test.expectAuraError("Access Check Failed!");
+                  var descriptor = "testPrivilegedNS1:componentWithDefaultAccess";
+                  var complete = false;
+
+                  $A.getDefinition(descriptor, function(definition) {
+                      $A.test.assertNull(definition);
+                      complete = true;
+                  });
+                  
+                  $A.test.addWaitForWithFailureMessage(
+                          complete = true, 
+                          function() {
+                              return $A.test.getAuraErrorMessage().includes("Access Check Failed!");
+                              return false;
+                          },
+                          "Didn't get ACF error box",
+                          function() {
+                              $A.test.verifyDetailedErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                                      "Access Check Failed! ComponentService.getDef():'markup://testPrivilegedNS1:componentWithDefaultAccess",
+                                          "markup://testCustomNS1:componentWithDefaultAccess");
+                   });  
+              },     
+        ]  
+    },
+    
+    //Access check test for $A.getDefinition - component def (testCustomNS2) requested is not on client
+    testGetDefinitionForComponentWithoutAccessCustomNS2:{
+        test:[
+              function(cmp){
+                  $A.test.expectAuraError("Access Check Failed!");
+                  var descriptor = "testCustomNS2:componentWithDefaultAccess";
+                  var complete = false;
+
+                  $A.getDefinition(descriptor, function(definition) {
+                      $A.test.assertNull(definition);
+                      complete = true;
+                  });
+                  
+                  $A.test.addWaitForWithFailureMessage(
+                          complete = true, 
+                          function() {
+                              return $A.test.getAuraErrorMessage().includes("Access Check Failed!");
+                              return false;
+                          },
+                          "Didn't get ACF error box",
+                          function() {
+                              $A.test.verifyDetailedErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                                      "Access Check Failed! ComponentService.getDef():'markup://testCustomNS2:componentWithDefaultAccess",
+                                          "markup://testCustomNS1:componentWithDefaultAccess");
+                   });  
+              },     
+        ]  
+    },
 
     waitForErrorModal: function(callback) {
         $A.test.addWaitForWithFailureMessage(true,

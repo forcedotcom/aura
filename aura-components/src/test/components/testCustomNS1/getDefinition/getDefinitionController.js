@@ -12,7 +12,6 @@
 
     getComponentDefinitionWithoutAccess: function(cmp) {
         var descriptor = "auratest:accessInternalComponent";
-
         $A.getDefinition(descriptor, function(definition){
             var name = definition===null? "null":definition.getDescriptor().getQualifiedName();
             cmp.set("v.definitionNames", [name]);

@@ -1652,6 +1652,32 @@ TestInstance.prototype.getAuraErrorMessage = function() {
 };
 
 /**
+ * Assert that the Access check failure message is as expected
+ * 
+ * @param {String}
+ *      errorMessage An Aura Error Message
+ * @param {String}
+ *      delimiter split input error message
+ * @param {String}
+ *      targetCmp A string containing component being accessed
+ * @param {String}
+ *      accessingCmp A string containing accessing component details
+ * 
+ * @export
+ * @function Test#verifyDetailedErrorMessage
+ */
+TestInstance.prototype.verifyDetailedErrorMessage = function(errorMessage, delimiter, targetCmp, accessingCmp) {
+    if (this.contains(errorMessage,delimiter)) {
+        var errorMsgACF = errorMessage.split(delimiter);
+        if (!(this.contains(errorMsgACF[0],targetCmp) && this.contains(errorMsgACF[1],accessingCmp))) {
+            this.fail("Access check error message verification failed. Did not receive expected error");
+        }
+    } else {
+        throw new Error("TestInstance:verifyAccessCheckFailureErrorMessage  Did not receive expected error");
+    }
+};
+
+/**
  * Override function for client service get XHR.
  *
  * @private

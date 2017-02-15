@@ -1378,7 +1378,6 @@ Test.Aura.AuraLocalizationServiceTest = function(){
 
     	var mockGetUTCFromWallTime = Mocks.GetMock(targetService, "getUTCFromWallTime", function(dateObj, timezone){
     		if(dateObj == mockDateTime) return dateObj;
-
         });
 
     	[Fact]

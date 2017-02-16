@@ -117,9 +117,9 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "clientLibraryTest:clientLibraryTest", ApplicationDef.class);
         Set<String> jsUrls = getClientLibraryUrls(appDesc, Type.JS);
-        assertEquals(2, jsUrls.size());
-        Iterator<String> it = jsUrls.iterator();
-        assertEquals(getResolver("CkEditor", Type.JS).getUrl(), it.next());
+        assertEquals(1, jsUrls.size());
+        String url = getResolver("CkEditor", Type.JS).getUrl();
+        assertTrue(jsUrls.contains(url));
     }
 
     // Should we do this with a simple string source?
@@ -140,12 +140,10 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(
                 "clientLibraryTest:testDependencies", ApplicationDef.class);
         String url = getResolver("CkEditor", Type.JS).getUrl();
-        System.out.println(url);
 
         contextService.endContext();
         contextService.startContext(Mode.PTEST, Format.JSON, Authentication.AUTHENTICATED, appDesc);
         Set<String> jsUrls = getClientLibraryUrls(appDesc, Type.JS);
-        System.out.println(jsUrls);
         assertTrue("Missing library for PTEST mode", jsUrls.contains(url));
 
         contextService.endContext();
@@ -176,7 +174,7 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
                 "clientLibraryTest:testDependencies", ApplicationDef.class);
         Set<String> jsUrls = getClientLibraryUrls(appDesc, Type.JS);
         String url = getResolver("CkEditor", Type.JS).getUrl();
-        assertEquals(2, jsUrls.size());
+        assertEquals(1, jsUrls.size());
         assertTrue(jsUrls.contains(url));
     }
 

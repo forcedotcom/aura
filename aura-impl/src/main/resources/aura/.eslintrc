@@ -99,7 +99,6 @@
     "TypeDef": true,
     "valueFactory": true,
     "ValueDef": true,
-    "WallTime": true,
     "NodeList": true,
     "HTMLCollection": true,
     "HTMLDocument": true,

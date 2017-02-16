@@ -64,7 +64,7 @@
 
             $A.localizationService.UTCToWallTime(dateOutOfDST, "America/New_York", function(walltime) {
                 var actual = $A.localizationService.formatDateTimeUTC(walltime, format, "en_US");
-                $A.test.assertEquals(expected, actual
+                $A.test.assertEquals(expected, actual,
                         "Incorrect time from UTCToWallTime when given time is right after DST ends");
             });
         }
@@ -204,7 +204,7 @@
         }
     },
 
-    testParseDateTimeISO8601:{
+    testParseDateTimeISO8601: {
         test: function() {
             var format =  "MMM DD, YYYY h:mm:ss A";
             var expected = "Sep 23, 2014 4:30:00 PM";
@@ -217,4 +217,25 @@
             $A.test.assertEquals(actual, expected, "ParseDateTimeISO8601() returns a incorrect date");
         }
     },
+
+    testGetDateStringBasedOnTimezoneForSameZone: {
+        test: function() {
+            var expected = "2015-7-6";
+            var date = $A.localizationService.parseDateTimeISO8601("2015-07-06T00:00:00+02:00");
+            $A.localizationService.getDateStringBasedOnTimezone("Europe/Berlin", date, function(dateString){
+                $A.test.assertEquals(expected, dateString);
+            });
+        }
+    },
+
+    testGetDateStringBasedOnTimezoneForDifferentZones: {
+        test: function() {
+            var expected = "2015-7-5";
+            var date = $A.localizationService.parseDateTimeISO8601("2015-07-06T00:00:00+02:00");
+            // Zone "America/Los_Angeles" is still on 2015-7-5
+            $A.localizationService.getDateStringBasedOnTimezone("America/Los_Angeles", date, function(dateString){
+                $A.test.assertEquals(expected, dateString);
+            });
+        }
+    }
 })

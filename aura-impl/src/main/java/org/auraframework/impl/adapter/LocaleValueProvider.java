@@ -69,7 +69,6 @@ public class LocaleValueProvider implements GlobalValueProvider {
     public static String DATETIME_FORMAT = "datetimeFormat";
     public static String TIME_FORMAT = "timeFormat";
     public static String TIME_ZONE = "timezone";
-    public static String TIME_ZONE_FILE_NAME = "timezoneFileName";
     public static String CURRENCY_CODE = "currencyCode";
 
     // symbols
@@ -135,9 +134,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
         }
 
         String timezoneId = al.getTimeZone().getID();
-        String availableTimezoneId = configAdapter.getAvailableTimezone(timezoneId);
-        builder.put(TIME_ZONE, availableTimezoneId);
-        builder.put(TIME_ZONE_FILE_NAME, availableTimezoneId.replace("/", "-"));
+        builder.put(TIME_ZONE, timezoneId);
 
         builder.put(IS_EASTERN_NAME_STYLE, al.isEasternNameStyle());
 

@@ -71,8 +71,6 @@ public interface ConfigAdapter extends AuraAdapter {
      */
     String getSessionCacheKey();
     
-    String getAvailableTimezone(String timezone);
-
     /**
      * Timezone from current context or GMT
      * @return timezone

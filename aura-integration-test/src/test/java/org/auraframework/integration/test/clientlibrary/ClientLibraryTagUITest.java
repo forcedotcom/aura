@@ -32,13 +32,6 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
     public void testModeDependentResources() throws Exception {
         open("/clientLibraryTest/clientLibraryTest.app", Mode.PTEST);
 
-        // Mode independent resources
-        Object minuteThruMoment = getAuraUITestingUtil().getEval("return moment(new Date()).minutes()");
-        assertNotNull(minuteThruMoment);
-
-        Boolean walltime = (Boolean)getAuraUITestingUtil().getEval("return !!WallTime");
-        assertTrue(walltime);
-
         assertEquals("awesome", getAuraUITestingUtil().getEval("return clientLibraryTest.cool;"));
     }
 }

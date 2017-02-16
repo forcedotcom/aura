@@ -222,7 +222,6 @@ public class InlineJsUnitTest {
 
         InlineJs inlineSpy = PowerMockito.spy(inline);
         PowerMockito.doReturn(false).when(inlineSpy, "shouldCacheHTMLTemplate", anyObject(), anyObject(), anyObject());
-        PowerMockito.doNothing().when(inlineSpy, "appendInlineJS", anyObject(), anyObject());
         inlineSpy.initManifest();
 
         return inlineSpy;

@@ -48,13 +48,12 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
         datetimeFormat(LocaleValueProvider.DATETIME_FORMAT),
         timeFormat(LocaleValueProvider.TIME_FORMAT),
         timezone(LocaleValueProvider.TIME_ZONE),
-        timezoneFileName(LocaleValueProvider.TIME_ZONE_FILE_NAME),
         currencyCode(LocaleValueProvider.CURRENCY_CODE),
         decimal(LocaleValueProvider.DECIMAL),
         grouping(LocaleValueProvider.GROUPING),
         currency(LocaleValueProvider.CURRENCY),
         zero(LocaleValueProvider.ZERO_DIGIT);
-         
+
         private PropertyReferenceImpl propRef;
 
         LocaleProperty(String name) {
@@ -70,7 +69,7 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
     private LocalizationAdapter localizationAdapter;
 
     private ConfigAdapter configAdapter;
-    
+
     @Inject
     DefinitionService definitionService;
 
@@ -103,7 +102,7 @@ public class LocaleValueProviderTest extends AuraImplTestCase {
         } catch (NullPointerException expected) {
         }
     }
-    
+
     // semi-integration test checks that value provider is created and validated
     // on component
     @Test

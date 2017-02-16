@@ -15,92 +15,17 @@
  */
 package org.auraframework.integration.test.adapter;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.inject.Inject;
-
-import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.AuraContext;
-import org.auraframework.util.IOUtil;
-import org.auraframework.util.test.annotation.UnAdaptableTest;
-import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.junit.Test;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
-import test.org.auraframework.impl.adapter.ConfigAdapterImpl;
 
 /**
  * Tests for ConfigAdapterImpl requiring Aura services to be available
  */
 public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
-    @Inject
-    LocalizationAdapter localizationAdapter;
-
-
-    @Test
-    public void testGetEquivalentTimezoneSamples() throws Exception {
-        ConfigAdapterImpl impl = new ConfigAdapterImpl(IOUtil.newTempDir(getName()), localizationAdapter, instanceService, contextService, fileMonitor);
-        String tz = impl.getAvailableTimezone("US/Pacific");
-        assertEquals("US/Pacific should return America/Los_Angeles as available equivalent",
-                "America/Los_Angeles", tz);
-        tz = impl.getAvailableTimezone("Zulu");
-        assertEquals("Zulu should return Etc/UTC as available equivalent",
-                "Etc/UTC", tz);
-        tz = impl.getAvailableTimezone("US/Central");
-        assertEquals("US/Central should return America/Chicago as available equivalent",
-                "America/Chicago", tz);
-        tz = impl.getAvailableTimezone("Canada/Newfoundland");
-        assertEquals("Canada/Newfoundland should return America/St_Johns as available equivalent",
-                "America/St_Johns", tz);
-        tz = impl.getAvailableTimezone("Cuba");
-        assertEquals("Cuba should return America/Havana as available equivalent",
-                "America/Havana", tz);
-        tz = impl.getAvailableTimezone("America/Los_Angeles");
-        assertEquals("America/Los_Angeles should be the same",
-                "America/Los_Angeles", tz);
-        tz = impl.getAvailableTimezone("GMT");
-        assertEquals("GMT should be the same",
-                "GMT", tz);
-        tz = impl.getAvailableTimezone("Unknown");
-        assertEquals("Default GMT timezone should be return if no matches",
-                "GMT", tz);
-        tz = impl.getAvailableTimezone("America/Unknown");
-        assertEquals("Default GMT timezone should be return if no matches",
-                "GMT", tz);
-    }
-
-    @UnAdaptableTest("filesystem access")
-    @Test
-    public void testAllWalltimeMapped() throws Exception {
-        Set<String> timezones = Sets.newHashSet();
-        Map<String, String> timezonesMap = AuraPrivateAccessor.<Map<String, String>>invoke(new ConfigAdapterImpl(IOUtil.newTempDir(getName()), localizationAdapter, instanceService, contextService, fileMonitor), "readEquivalentTimezones");
-        for (String equivalent : timezonesMap.values()) {
-            timezones.add(equivalent.replace("/", "-"));
-        }
-        File resDir = new File(AuraImplFiles.AuraResourcesClassDirectory.getPath());
-        List<String> unmappedTimezones = Lists.newLinkedList();
-        for (File file : resDir.listFiles()) {
-            String filename = file.getName();
-            if (filename.startsWith("libs_") && filename.endsWith(".min.js")) {
-                String tz = filename.substring(5, filename.length() - 7);
-                if (!timezones.contains(tz)) {
-                    unmappedTimezones.add(filename);
-                }
-            }
-        }
-        if (!unmappedTimezones.isEmpty()) {
-            fail("The following resource files are not mapped as equivalent timezones: " + unmappedTimezones);
-        }
-    }
 
     @Test
     public void testGetResetCssUrlDefaultsToReset(){

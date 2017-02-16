@@ -107,11 +107,11 @@ public interface LocalizationAdapter extends AuraAdapter {
     AuraLocale getAuraLocale(Locale defaultLocale, Locale currencyLocale, Locale dateLocale, Locale languageLocale,
             Locale numberLocale, Locale systemLocale, TimeZone timeZone);
 
-	/**
-	 * Sets requested locales that must be considered when creating default
-	 * AuraLocale.
-	 * 
-	 * @param requestedLocales
-	 */
-	void setRequestedLocales(List<Locale> requestedLocales);
+    /**
+     * Sets requested locales that must be considered when creating default
+     * AuraLocale.
+     * 
+     * @param requestedLocales
+     */
+    void setRequestedLocales(List<Locale> requestedLocales);
 }

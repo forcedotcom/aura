@@ -23,7 +23,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.NoContextException;
 import org.junit.Test;
 
-public class ClientLibraryServiceImplTest extends AuraImplTestCase{
+public class ClientLibraryServiceImplUnitTest extends AuraImplTestCase{
 
     private ClientLibraryService clientLibraryService;
 

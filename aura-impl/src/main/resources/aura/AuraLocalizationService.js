@@ -24,7 +24,7 @@ function AuraLocalizationService() {
     this.numberFormat = undefined;
     this.percentFormat = undefined;
     this.currencyFormat = undefined;
-    // moment.js and walltime-js must be loaded before we can use date/time related APIs
+    // moment.js, moment-timezone.js and timezone data must be loaded before we can use date/time related APIs
 
     this.ZERO = "0";
 
@@ -33,8 +33,6 @@ function AuraLocalizationService() {
         strictModeFormat : {},
         langLocale : {}
     };
-
-    this.pendingTimezone = {};
 }
 
 /**
@@ -573,7 +571,6 @@ AuraLocalizationService.prototype.getToday = function(timezone, callback) {
  * @param {String} timezone - A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
  * @param {Date} dateObj - A date object
  * @param {Function} callback - A function to be called after the "today" value is obtained
- * @return {String} the ISO8601 date string (yyyy-MM-dd).
  * @memberOf AuraLocalizationService
  * @example
  * var timezone = $A.get("$Locale.timezone");
@@ -1020,17 +1017,35 @@ AuraLocalizationService.prototype.translateToOtherCalendar = function(date) {
 AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callback) {
     $A.assert(callback, 'Callback is required');
 
-    if (!timezone) {
+    if (typeof callback !== 'function') {
+        $A.warning("AuraLocalizationService.UTCToWallTime(): callback must be a function.");
+        return;
+    }
+
+    if (!timezone || !moment["tz"]["zone"](timezone)) {
+        $A.warning("AuraLocalizationService.UTCToWallTime(): unsupported time zone: " +
+            timezone + ". Fallback to default timezone.");
         timezone = $A.get("$Locale.timezone");
     }
+
     if (timezone === "GMT" || timezone === "UTC") {
         callback(date);
         return;
     }
 
-    this.lazyInitTimeZoneInfo(timezone, function() {
-        callback(this.getWallTimeFromUTC(date, timezone));
-    }.bind(this));
+    var walltimeDate = date;
+    try {
+        var zone = moment["tz"]["zone"](timezone);
+        var offset = zone["offset"](date.getTime());
+        var walltime = moment(date)["subtract"](offset, "minutes");
+        walltimeDate = walltime["toDate"]();
+    } catch (e) {
+        // the try-catch block is just for backward compatibility, so that there is no any error
+        // thrown during date time conversion.
+        $A.warning("AuraLocalizationService.UTCToWallTime(): error occurred during time conversion", e);
+    }
+
+    callback(walltimeDate);
 };
 
 /**
@@ -1040,8 +1055,8 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
  * @param {Function} callback - A function to be called after the conversion is done
  * @memberOf AuraLocalizationService
  * @example
- * $A.localizationService.WallTimeToUTC(d, timezone, function(walltime) {
- *     displayDate = $A.localizationService.formatDateTime(walltime, format, langLocale);
+ * $A.localizationService.WallTimeToUTC(d, timezone, function(utc) {
+ *     displayDate = $A.localizationService.formatDateTime(utc, format, langLocale);
  * })
  * @public
  * @export
@@ -1050,19 +1065,35 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
 AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callback) {
     $A.assert(callback, 'Callback is required');
 
-    if (typeof callback === 'function') {
-        if (!timezone) {
-            timezone = $A.get("$Locale.timezone");
-        }
-        if (timezone === "GMT" || timezone === "UTC") {
-            callback(date);
-            return;
-        }
-
-        this.lazyInitTimeZoneInfo(timezone, function() {
-            callback(this.getUTCFromWallTime(date, timezone));
-        }.bind(this));
+    if (typeof callback !== 'function') {
+        $A.warning("AuraLocalizationService.WallTimeToUTC(): callback must be a function.");
+        return;
     }
+
+    if (!timezone || !moment["tz"]["zone"](timezone)) {
+        $A.warning("AuraLocalizationService.WallTimeToUTC(): unsupported time zone: " +
+            timezone + ". Fallback to default timezone.");
+        timezone = $A.get("$Locale.timezone");
+    }
+
+    if (timezone === "GMT" || timezone === "UTC") {
+        callback(date);
+        return;
+    }
+
+    var utcDate = date;
+    try {
+        var zone = moment["tz"]["zone"](timezone);
+        var offset = zone["offset"](date.getTime());
+        var utc = moment(date)["add"](offset, "minutes");
+        utcDate = utc["toDate"]();
+    } catch (e) {
+        // the try-catch block is just for backward compatibility, so that there is no any error
+        // thrown during date time conversion.
+        $A.warning("AuraLocalizationService.WallTimeToUTC(): error occurred during time conversion", e);
+    }
+
+    callback(utcDate);
 };
 
 /**---------- Private functions ----------*/
@@ -1181,109 +1212,6 @@ AuraLocalizationService.prototype.getNormalizedLangLocale = function(langLocale)
         this.cache.langLocale[langLocale] = ret;
     }
     return this.cache.langLocale[langLocale];
-};
-
-/**
- * Initializes WallTime for a timezone by retrieving timezone info from the server
- * @param timezone timezone to initialize
- * @param afterInit callback to execute after timezone is initialized
- * @private
- */
-AuraLocalizationService.prototype.initTimeZoneInfo = function(timezone, afterInit) {
-    var a = $A.get("c.aura://TimeZoneInfoController.getTimeZoneInfo");
-    a.setParams({
-        "timezoneId": timezone
-    });
-    a.setCallback(this, function(action) {
-        var state = action.getState();
-        if (state === "SUCCESS") {
-            var ret = action.returnValue;
-            if (ret) {
-                WallTime["data"] = ret;
-                if (WallTime["zones"]) {
-                    WallTime["addRulesZones"](WallTime["data"]["rules"], WallTime["data"]["zones"]);
-                } else { // initialize walltime-js if it doesn't yet
-                    WallTime["autoinit"] = true;
-                    WallTime["init"](WallTime["data"]["rules"], WallTime["data"]["zones"]);
-                }
-            }
-        } else if (state === "INCOMPLETE" || state === "ERROR") {
-            var errors = action.getError().map(function(e){return e.message;}).toString();
-            $A.warning("Failed to get Time Zone Info from server: " + errors);
-        }
-        afterInit();
-    });
-    $A.enqueueAction(a);
-};
-
-/**
- * Ensures initTimeZoneInfo is called (and only once) and executes callback afterwards
- * All pending callbacks will be executed after timezone initialization is completed
- * @private
- */
-AuraLocalizationService.prototype.lazyInitTimeZoneInfo = function(timezone, callback) {
-    if (WallTime["zones"] && WallTime["zones"][timezone]) {
-        // timezone already initialize, invoke callback directly
-        callback();
-        return;
-    }
-
-    if (!this.pendingTimezone[timezone]) {
-        // first init call for timezone, initialize pending callbacks list and call init method
-        this.pendingTimezone[timezone] = [callback]; // add first callback bef calling initTimeZoneInfo
-        var afterInit = function () {
-            for (var i = 0; i < this.pendingTimezone[timezone].length; i++) {
-                this.pendingTimezone[timezone][i]();
-            }
-            this.pendingTimezone[timezone] = [];
-        }.bind(this);
-        this.initTimeZoneInfo(timezone, afterInit);
-    } else {
-        // add callback to pending list for timezone
-        this.pendingTimezone[timezone].push(callback);
-    }
-};
-
-/**
- * @private
- */
-AuraLocalizationService.prototype.getUTCFromWallTime = function(d, timezone) {
-    var ret = d;
-    try {
-        ret = WallTime["WallTimeToUTC"](timezone, d);
-    } catch (e) {
-        // The timezone id is invalid or for some reason, we can't get timezone info.
-        // use default timezone
-        timezone = $A.get("$Locale.timezone");
-        if (timezone === "GMT" || timezone === "UTC") {
-            return d;
-        }
-        try {
-            ret = WallTime["WallTimeToUTC"](timezone, d);
-            } catch (ignore) {/*we just ignore it*/}
-        }
-        return ret;
-    };
-
-/**
- * @private
- */
-AuraLocalizationService.prototype.getWallTimeFromUTC = function(d, timezone) {
-    var ret = d;
-    try {
-        ret = WallTime["UTCToWallTime"](d, timezone)["wallTime"];
-    } catch (e) {
-        // The timezone id is invalid or for some reason, we can't get timezone info.
-        // use default timezone
-        timezone = $A.get("$Locale.timezone");
-        if (timezone === "GMT" || timezone === "UTC") {
-            return d;
-        }
-        try {
-            ret = WallTime["UTCToWallTime"](d, timezone)["wallTime"];
-        } catch (ignore) {/*we just ignore it*/}
-    }
-    return ret;
 };
 
 /**

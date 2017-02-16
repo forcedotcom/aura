@@ -94,7 +94,6 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
     
     // Caching for resources
     private static final String LIB_CACHE_TEMP_DIR = IOUtil.newTempDir("auracache");
-    
 
     // name for threads that compress and write the output
     public static final String THREAD_NAME = "jsgen.";
@@ -213,8 +212,9 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                 writer.write("\n Aura.externalLibraries = function() {\n");
                 try {
                     appendResourceToWriter(writer, "momentWithLocales", rl.getResource("aura/resources/momentWithLocales/momentWithLocales" + minified + ".js"));
+                    // 1999 is selected since it's when SFDC starts
+                    appendResourceToWriter(writer, "moment-timezone-with-data-1999-2020", rl.getResource("aura/resources/moment-timezone/moment-timezone-with-data-1999-2020" + minified + ".js"));
                     appendResourceToWriter(writer, "DOMPurify", rl.getResource("aura/resources/domPurify/DOMPurify" + minified + ".js"));
-                    appendResourceToWriter(writer, "walltime-js", rl.getResource("aura/resources/walltime-js/walltime" + minified + ".js"));
                 } catch (Exception ignored) {
                 }
 

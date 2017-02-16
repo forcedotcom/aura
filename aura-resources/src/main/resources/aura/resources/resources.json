@@ -1,5 +1,4 @@
 {
-    "walltimeLocaleDir": "walltime-js/olson",
     "cdn": {
         "host": "https://sfdc.azureedge.net/assetsblob/%s",
         "files": {

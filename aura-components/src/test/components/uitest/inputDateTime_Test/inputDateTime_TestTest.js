@@ -135,7 +135,6 @@
         browsers: ['DESKTOP'],
         attributes: {value: '2015-10-23T16:30:00.000Z', dateFormat: 'MM-dd-yyyy', timeFormat: 'HH:mm', timezone: 'GMT'},
         test: [
-            // Walltime is loaded asyncly
             function setup(cmp) {
                 this.waitForInputTimeIsSet();
             },
@@ -374,8 +373,6 @@
 
     /**
      * Wait for input time value is set in input filed.
-     * Since Walltime is loaded asynchronously, it needs to wait for the given value is ready
-     * before testing.
      */
     waitForInputTimeIsSet: function() {
         var inputElements = $A.test.getElementByClass("date_input_box input");

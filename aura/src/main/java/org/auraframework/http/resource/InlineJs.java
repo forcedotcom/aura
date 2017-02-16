@@ -15,12 +15,9 @@
  */
 package org.auraframework.http.resource;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -40,17 +37,10 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraJWTError;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.resource.ResourceLoader;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.google.common.collect.Maps;
 
 @ServiceComponent
 public class InlineJs extends AuraResourceImpl {
-
-    private static final String WALLTIME_FILE_PATH = "/aura/resources/walltime-js/olson/walltime-data_";
-    private static final String WALLTIME_INIT_JS = ";(function(){ if(window.WallTime.init) { window.WallTime.init(window.WallTime.data.rules, window.WallTime.data.zones); } }).call(this);";
-    private static final Map<String, String> WALLTIME_TZ_CONTENT = Maps.newConcurrentMap();
 
     public InlineJs() {
         super("inline.js", Format.JS);
@@ -63,45 +53,6 @@ public class InlineJs extends AuraResourceImpl {
     @Inject
     public void setRenderingService(RenderingService renderingService) {
         this.renderingService = renderingService;
-    }
-
-    private void appendInlineJS(Component template, Appendable out) throws IOException, QuickFixException {
-
-        // write walltime tz data
-        String tz = configAdapter.getCurrentTimezone();
-        tz = tz.replace("/", "-");
-        if (!"GMT".equals(tz)) {
-            String tzContent = WALLTIME_TZ_CONTENT.get(tz);
-
-            if (tzContent == null) {
-                ResourceLoader resourceLoader = configAdapter.getResourceLoader();
-                String tzPath = WALLTIME_FILE_PATH + tz;
-                String minFile = tzPath + ".min.js";
-                String devFile = tzPath + tz + ".js";
-
-                // use min file if exists, otherwise use dev version
-                String filePath = resourceLoader.getResource(minFile) != null ? minFile :
-                        (resourceLoader.getResource(devFile) != null ? devFile : null);
-
-                if (filePath != null) {
-                    try (InputStream is = resourceLoader.getResourceAsStream(filePath);
-                         ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-                        byte[] buffer = new byte[1024];
-                        int length;
-                        while ((length = is.read(buffer)) != -1) {
-                            os.write(buffer, 0, length);
-                        }
-                        tzContent = os.toString();
-                        WALLTIME_TZ_CONTENT.put(tz, tzContent);
-                        os.close();
-                    }
-                }
-            }
-
-            if (tzContent != null) {
-                out.append(tzContent).append(WALLTIME_INIT_JS);
-            }
-        }
     }
 
     private <T extends BaseComponentDef> void internalWrite(HttpServletRequest request,
@@ -138,7 +89,6 @@ public class InlineJs extends AuraResourceImpl {
         out.write("\n    ");
 
         Component template = serverService.writeTemplate(context, def, getComponentAttributes(request), out);
-        appendInlineJS(template, out);
         appendPreInitJavascripts(def, context.getMode(), out);
         renderingService.render(template, null, out);
     }

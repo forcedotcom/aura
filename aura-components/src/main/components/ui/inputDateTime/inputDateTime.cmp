@@ -16,8 +16,7 @@
 
 -->
 <aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputDateTimeComponent, ui:handlesDateSelected, ui:hasManager" extensible="true" defaultFlavor="default, input, datetime"
-                provider="js://ui.inputDateTime" controller="java://org.auraframework.impl.controller.TimeZoneInfoController"
-                description="An input field for entering a date and time.">
+                provider="js://ui.inputDateTime" description="An input field for entering a date and time.">
 
     <aura:import library="ui:dateTimeLib" property="dateTimeLib"/>
 

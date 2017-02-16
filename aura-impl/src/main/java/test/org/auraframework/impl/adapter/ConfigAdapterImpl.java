@@ -21,11 +21,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.io.StringReader;
-import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -78,16 +75,15 @@ import org.auraframework.util.text.Hash;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 @ServiceComponent
 public class ConfigAdapterImpl implements ConfigAdapter {
+    Logger logger = Logger.getLogger(ConfigAdapterImpl.class);
+
     private static final String LOCKERSERVICE_SAFE_EVAL_HTML = "/lockerservice/safeEval.html";
 
-	private static final ImmutableSortedSet<String> cacheDependencyExceptions = ImmutableSortedSet.of(
+    private static final ImmutableSortedSet<String> cacheDependencyExceptions = ImmutableSortedSet.of(
             //
             // FIXME: these following 16 lines (applauncher) should be removed ASAP. They are here because
             // we do not detect file backed apex, and we probably don't really want to.
@@ -130,7 +126,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             "apex://time"
             );
 
-
     private static final String TIMESTAMP_FORMAT_PROPERTY = "aura.build.timestamp.format";
     private static final String TIMESTAMP_PROPERTY = "aura.build.timestamp";
     private static final String VERSION_PROPERTY = "aura.build.version";
@@ -162,7 +157,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private String auraVersionString;
     private boolean lastGenerationHadCompilationErrors = false;
     private boolean validateCss;
-    private Map<String, String> effectiveTimezones;
 
     @Inject
     private LocalizationAdapter localizationAdapter;
@@ -191,9 +185,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
      */
     public ConfigAdapterImpl(final String resourceCacheDir) {
         this.resourceCacheDir = resourceCacheDir;
-
     }
-
 
     public ConfigAdapterImpl(String resourceCacheDir, LocalizationAdapter localizationAdapter, InstanceService instanceService, ContextService contextService, FileMonitor fileMonitor) {
         this.resourceCacheDir = resourceCacheDir;
@@ -206,7 +198,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @PostConstruct
     public void initialize() {
-        // can this initialization move to some sort of common initialization dealy?
+        // can this initialization move to some sort of common initialization delay?
         try {
             this.resourceLoader = new ResourceLoader(resourceCacheDir, true);
         } catch (MalformedURLException e) {
@@ -265,8 +257,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         String validateCssString = config.getProperty(VALIDATE_CSS_CONFIG);
         validateCss = AuraTextUtil.isNullEmptyOrWhitespace(validateCssString)
                 || Boolean.parseBoolean(validateCssString.trim());
-
-        effectiveTimezones = readEquivalentTimezones();
 
         contextService.registerGlobal("isVoiceOver", true, false);
         contextService.registerGlobal("dynamicTypeSize", true, "");
@@ -345,7 +335,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
          */
         if (!isProduction() && jsGroup != null && (jsGroup.isStale() || lastGenerationHadCompilationErrors)) {
             try {
-                Logger logger = Logger.getLogger(ConfigAdapterImpl.class);
                 logger.info("Regenerating framework javascript");
                 File dest = AuraImplFiles.AuraResourceJavascriptDirectory.asFile();
                 File resourceDest = AuraImplFiles.AuraResourceJavascriptClassDirectory.asFile();
@@ -442,44 +431,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public String getCurrentTimezone() {
         AuraLocale al = localizationAdapter.getAuraLocale();
-        String tz = al.getTimeZone().getID();
-        return getAvailableTimezone(tz);
-    }
-
-    /**
-     * walltime.js data does not provide all timezones due to duplicates so we return the
-     * one that is equivalent and available.
-     *
-     * @param timezoneId timezone
-     * @return available equivalent timezone
-     */
-    @Override
-    public String getAvailableTimezone(String timezoneId) {
-        String effectiveTimezone = effectiveTimezones.get(timezoneId);
-        if (effectiveTimezone != null) {
-            return effectiveTimezone;
-        }
-        // return default if no matches
-        return "GMT";
-    }
-
-    /**
-     * Reads timezones json that contains all timezones and its available equivalents
-     *
-     * @return map of all timezones with its available equivalent
-     */
-    Map<String, String> readEquivalentTimezones() {
-        String timezonesJsonPath = "/aura/resources/timezones.json";
-        Map<String, String> equivalents = Maps.newHashMap();
-
-        if (resourceLoader.getResource(timezonesJsonPath) != null) {
-            Gson gson = new Gson();
-            Type mapType = new TypeToken<Map<String, String>>() {}.getType();
-            InputStream is = resourceLoader.getResourceAsStream(timezonesJsonPath);
-            Reader reader = new InputStreamReader(is);
-            equivalents = gson.fromJson(reader, mapType);
-        }
-        return equivalents;
+        return al.getTimeZone().getID();
     }
 
     @Override

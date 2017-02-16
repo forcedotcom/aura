@@ -129,6 +129,11 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         }
 
         @Override
+        public boolean hasSwitchableReference() {
+            return false;
+        }
+
+        @Override
         public void retrieveLabels() throws QuickFixException {
         }
 

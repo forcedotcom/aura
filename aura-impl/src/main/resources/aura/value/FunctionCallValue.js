@@ -73,19 +73,17 @@ FunctionCallValue.prototype.evaluate = function(valueProvider){
  * @export
  */
 FunctionCallValue.prototype.addChangeHandler=function(cmp, key, fcv) {
-    if(this.byValue){
+    if (this.byValue) {
         return;
     }
-    if(!fcv){
-        fcv=this;
-    }
+
     for (var i = 0; i < this.args.length; i++) {
         var arg = this.args[i];
         if (aura.util.isExpression(arg)) {
-            if(arg instanceof PropertyReferenceValue) {
-                arg.addChangeHandler(cmp, key, this.getChangeHandler(cmp, key, fcv));
+            if (arg instanceof PropertyReferenceValue) {
+                arg.addChangeHandler(cmp, key, fcv ? fcv : this.getChangeHandler(cmp, key, this));
             } else {
-                arg.addChangeHandler(cmp, key, fcv);
+                arg.addChangeHandler(cmp, key, fcv || this);
             }
         }
     }

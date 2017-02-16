@@ -15,6 +15,8 @@
  */
 package org.auraframework.builder;
 
+import java.util.Map;
+
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.DefDescriptor;
@@ -37,6 +39,11 @@ public interface DefinitionReferenceBuilder<T extends DefinitionReference, P ext
      * @param value the value to set (must be appropriate for the attribute).
      */
     DefinitionReferenceBuilder<T, P> setAttribute(String key, Object value);
+
+    /**
+     * Sets entire attribute map
+     */
+    DefinitionReferenceBuilder<T, P> setAttributes(Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes);
 
     /**
      * Get the attribute value for a descriptor.

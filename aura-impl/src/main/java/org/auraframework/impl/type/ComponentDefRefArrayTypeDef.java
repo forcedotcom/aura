@@ -19,6 +19,7 @@ package org.auraframework.impl.type;
 
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.component.ComponentDefRefArrayImpl;
@@ -85,7 +86,7 @@ public class ComponentDefRefArrayTypeDef extends DefinitionImpl<TypeDef> impleme
     @Override
     public Object initialize(Object config, BaseComponent<?, ?> valueProvider) throws QuickFixException {
         if (config != null && config instanceof List) {
-            return new ComponentDefRefArrayImpl((List<ComponentDefRef>)config, valueProvider);
+            return new ComponentDefRefArrayImpl((List<DefinitionReference>)config, valueProvider);
         }
         return config;
     }

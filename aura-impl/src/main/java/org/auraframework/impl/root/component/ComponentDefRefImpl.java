@@ -29,6 +29,8 @@ import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.impl.root.DefinitionReferenceImpl;
 import org.auraframework.service.DefinitionService;
@@ -178,6 +180,16 @@ public class ComponentDefRefImpl extends DefinitionReferenceImpl<ComponentDef> i
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
         }
+    }
+
+    @Override
+    public DefinitionReference get() {
+        return this;
+    }
+
+    @Override
+    public DefType type() {
+        return DefType.COMPONENT;
     }
 
     @Override

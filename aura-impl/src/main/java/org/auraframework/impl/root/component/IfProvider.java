@@ -27,6 +27,7 @@ import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.instance.ComponentConfig;
+import org.auraframework.instance.Instance;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
@@ -49,7 +50,7 @@ public class IfProvider implements ComponentConfigProvider {
         BaseComponent<?, ?> component = context.getCurrentComponent();
         InstanceStack iStack = context.getInstanceStack();
         ComponentConfig cc = new ComponentConfig();
-        List<Component> components = new ArrayList<>();
+        List<Instance> components = new ArrayList<>();
         Map<String, Object> m = Maps.newHashMapWithExpectedSize(1);
         m.put("body", components);
         cc.setAttributes(m);

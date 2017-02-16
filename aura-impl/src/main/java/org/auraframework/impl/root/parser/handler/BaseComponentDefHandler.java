@@ -162,7 +162,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                     "%s","%s"
                 );
             }
-
+            builder.setHasSwitchableReference(attributeDef.hasSwitchableReference());
             builder.getAttributeDefs().put(attributeDef.getDescriptor(),attributeDef);
         } else if (isInInternalNamespace && RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
             RequiredVersionDefHandler<T> handler = new RequiredVersionDefHandler<>(this, xmlReader, source,
@@ -259,10 +259,12 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
         } else {
 
             // if it wasn't one of the above, it must be a defref, or an error
-            DefinitionReference cdr = getDefRefHandler(this).getElement();
+            DefinitionReference cdr = createDefRefDelegate(this);
             if (cdr.isFlavorable() || cdr.hasFlavorableChild()) {
                 builder.setHasFlavorableChild(true);
             }
+            // bubble up switchable reference flag to indicate recompilation required for modules
+            builder.setHasSwitchableReference(cdr.hasSwitchableReference());
             body.add(cdr);
         }
     }

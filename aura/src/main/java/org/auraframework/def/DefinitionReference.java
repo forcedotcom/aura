@@ -15,7 +15,11 @@
  */
 package org.auraframework.def;
 
+import java.util.List;
 import java.util.Map;
+
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Definition Reference
@@ -48,4 +52,10 @@ public interface DefinitionReference extends Definition {
      * Gets the flavor.
      */
     Object getFlavor();
+
+    List<AttributeDefRef> getAttributeValueList() throws QuickFixException;
+
+    DefinitionReference get();
+
+    DefType type();
 }

@@ -22,6 +22,7 @@ import javax.inject.Inject;
 
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.SourceLoader;
 import org.springframework.context.annotation.Lazy;
 
@@ -60,5 +61,10 @@ public class StringComponentLocationAdapter implements ComponentLocationAdapter 
             theSet = Sets.newHashSet(loader);
         }
         return theSet;
+    }
+
+    @Override
+    public DefType type() {
+        return DefType.COMPONENT;
     }
 }

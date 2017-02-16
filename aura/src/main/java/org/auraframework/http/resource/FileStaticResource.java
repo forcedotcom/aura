@@ -76,7 +76,7 @@ public class FileStaticResource implements StaticResource {
     public InputStream getResourceStream() {
         // Checks for a minified version of the external resource file
         // Uses the minified version if in production mode.
-        if (path.startsWith("/aura/resources/") && isProduction) {
+        if (path.startsWith("/aura/resources/") && isProduction && !path.contains(".min.")) {
             int extIndex = path.lastIndexOf(".");
             if (extIndex > 0) {
                 String minFile = path.substring(0, extIndex) + MINIFIED_FILE_SUFFIX + path.substring(extIndex);

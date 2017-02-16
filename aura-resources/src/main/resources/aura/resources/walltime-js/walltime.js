@@ -343,14 +343,8 @@
     }
   };
 
-  if (typeof window === 'undefined') {
-    module.exports = helpers;
-  } else if (typeof define !== 'undefined') {
-    define('olson/helpers',[],helpers);
-  } else {
     this.WallTime || (this.WallTime = {});
     this.WallTime.helpers = helpers;
-  }
 
 }).call(this);
 
@@ -537,15 +531,8 @@
     return TimeZoneTime;
   };
 
-  if (typeof window === 'undefined') {
-    req_helpers = require("./helpers");
-    module.exports = init(req_helpers);
-  } else if (typeof define !== 'undefined') {
-    define('olson/timezonetime',["olson/helpers"], init);
-  } else {
     this.WallTime || (this.WallTime = {});
     this.WallTime.TimeZoneTime = init(this.WallTime.helpers);
-  }
 
 }).call(this);
 
@@ -997,16 +984,8 @@
     return lib;
   };
 
-  if (typeof window === 'undefined') {
-    req_helpers = require("./helpers");
-    req_TimeZoneTime = require("./timezonetime");
-    module.exports = init(req_helpers, req_TimeZoneTime);
-  } else if (typeof define !== 'undefined') {
-    define('olson/rule',["olson/helpers", "olson/timezonetime"], init);
-  } else {
     this.WallTime || (this.WallTime = {});
     this.WallTime.rule = init(this.WallTime.helpers, this.WallTime.TimeZoneTime);
-  }
 
 }).call(this);
 
@@ -1238,17 +1217,8 @@
     };
   };
 
-  if (typeof window === 'undefined') {
-    req_helpers = require("./helpers");
-    req_rule = require("./rule");
-    req_TimeZoneTime = require("./timezonetime");
-    module.exports = init(req_helpers, req_rule, req_TimeZoneTime);
-  } else if (typeof define !== 'undefined') {
-    define('olson/zone',["olson/helpers", "olson/rule", "olson/timezonetime"], init);
-  } else {
     this.WallTime || (this.WallTime = {});
     this.WallTime.zone = init(this.WallTime.helpers, this.WallTime.rule, this.WallTime.TimeZoneTime);
-  }
 
 }).call(this);
 
@@ -1424,14 +1394,6 @@
     return new WallTime;
   };
 
-  if (typeof window === 'undefined') {
-    req_zone = require("./olson/zone");
-    req_rule = require("./olson/rule");
-    req_help = require("./olson/helpers");
-    module.exports = init(req_help, req_rule, req_zone);
-  } else if (typeof define !== 'undefined') {
-    define('walltime',['olson/helpers', 'olson/rule', 'olson/zone'], init);
-  } else {
     this.WallTime || (this.WallTime = {});
     api = init(this.WallTime.helpers, this.WallTime.rule, this.WallTime.zone);
     _ref = this.WallTime;
@@ -1444,6 +1406,5 @@
     if (this.WallTime.autoinit && ((_ref1 = this.WallTime.data) != null ? _ref1.rules : void 0) && ((_ref2 = this.WallTime.data) != null ? _ref2.zones : void 0)) {
       this.WallTime.init(this.WallTime.data.rules, this.WallTime.data.zones);
     }
-  }
 
 }).call(this);

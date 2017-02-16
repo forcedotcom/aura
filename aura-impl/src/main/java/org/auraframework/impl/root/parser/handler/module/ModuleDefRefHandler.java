@@ -24,8 +24,8 @@ import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDefRef;
 import org.auraframework.impl.root.parser.handler.BaseDefRefHandler;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
-import org.auraframework.modules.impl.def.ModuleDefRefImpl;
-import org.auraframework.modules.impl.def.ModuleDefRefImpl.Builder;
+import org.auraframework.impl.root.component.ModuleDefRefImpl;
+import org.auraframework.impl.root.component.ModuleDefRefImpl.Builder;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 

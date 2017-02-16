@@ -60,4 +60,6 @@ public interface Definition extends JsonSerializable, BaseXmlElement {
      * @return the definition that matches the descriptor.
      */
     <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> descriptor);
+
+    boolean hasSwitchableReference();
 }

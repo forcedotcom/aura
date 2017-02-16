@@ -31,7 +31,7 @@ import com.eclipsesource.v8.V8Object;
 
 final class ModulesCompilerUtil {
 
-    static final String COMPILER_JS_PATH = pathToLocalTempFile("modules/compiler.js");
+    static final String COMPILER_JS_PATH = pathToLocalTempFile("modules/compiler.min.js");
     static final String COMPILER_CLI_JS_PATH = pathToLocalTempFile("modules/compiler-cli.js");
 
     private static String pathToLocalTempFile(String classpathResource) {

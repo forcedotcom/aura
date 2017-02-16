@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.modules.impl.def;
+package org.auraframework.impl.root.component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +24,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDefRef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.modules.impl.def.ModuleDefRefImpl.Builder;
+import org.auraframework.impl.root.component.ModuleDefRefImpl.Builder;
 import org.auraframework.system.Location;
 import org.junit.Test;
 

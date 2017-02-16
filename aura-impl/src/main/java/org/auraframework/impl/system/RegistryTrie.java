@@ -210,7 +210,7 @@ public class RegistryTrie implements RegistrySet {
             return (DefRegistry) nsObj;
         }
 
-        Map<DefType,DefRegistry> defTypeMap = (Map<DefType,DefRegistry>)nsObj;
-        return defTypeMap.get(descriptor.getDefType());
-    }
+            Map<DefType,DefRegistry> defTypeMap = (Map<DefType,DefRegistry>)nsObj;
+            return defTypeMap.get(descriptor.getDefType());
+        }
 }

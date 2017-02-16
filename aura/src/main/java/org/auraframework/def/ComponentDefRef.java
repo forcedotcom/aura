@@ -15,10 +15,6 @@
  */
 package org.auraframework.def;
 
-import java.util.List;
-
-import org.auraframework.throwable.quickfix.QuickFixException;
-
 /**
  * Interface for component definition references.
  */
@@ -34,6 +30,4 @@ public interface ComponentDefRef extends DefinitionReference {
      */
     @Override
     DefDescriptor<ComponentDef> getDescriptor();
-
-    List<AttributeDefRef> getAttributeValueList() throws QuickFixException;
 }

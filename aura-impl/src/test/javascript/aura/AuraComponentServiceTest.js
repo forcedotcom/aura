@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 Function.RegisterNamespace("Test.Aura");
 
-[Fixture]
+[Fixture, Skip("TODO include Engine")]
 Test.Aura.AuraComponentServiceTest = function(){
     var $A = {
-        assert: function(condition, message) {
+        assert: function(condition, message7) {
             if (!condition) {
                 var error = new Error(message);
                 throw error;
@@ -43,6 +44,8 @@ Test.Aura.AuraComponentServiceTest = function(){
         },
 
     };
+    var Engine = {
+    };
 
     Mocks.GetMocks(Object.Global(), {
         "LibraryRegistry": function(){},
@@ -50,7 +53,8 @@ Test.Aura.AuraComponentServiceTest = function(){
         "ComponentClassRegistry": function(){},
         "AuraComponentService": function(){},
         "ComponentDefStorage": function(){},
-        "Aura": Aura
+        "Aura": Aura,
+        "Engine": Engine
     })(function(){
         [Import("aura-impl/src/main/resources/aura/component/ComponentDefStorage.js")]
         [Import("aura-impl/src/main/resources/aura/AuraComponentService.js")]
@@ -61,7 +65,8 @@ Test.Aura.AuraComponentServiceTest = function(){
         "$A": $A,
         "window": function(){},
         "Components": function(){},
-        Aura: Aura
+        Aura: Aura,
+        Engine: Engine
     });
 
     var targetService;

@@ -19,6 +19,7 @@ import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.DefinitionReference.Load;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
@@ -82,7 +83,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         xmlReader.next();
         cdrHandler.handleChildTag();
         ComponentDefRef cdr = cdrHandler.createDefinition();
-        ArrayList<ComponentDefRef> compDefs = (ArrayList<ComponentDefRef>) cdr.getAttributeDefRef(
+        ArrayList<DefinitionReference> compDefs = (ArrayList<DefinitionReference>) cdr.getAttributeDefRef(
                 AttributeDefRefImpl.BODY_ATTRIBUTE_NAME).getValue();
         assertEquals("foo", compDefs.get(0).getDescriptor().getName());
     }

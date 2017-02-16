@@ -16,6 +16,8 @@
 package org.auraframework.modules.impl.parser;
 
 import java.io.File;
+import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -31,13 +33,16 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.modules.ModulesCompiler;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.modules.impl.ModulesCompilerJ2V8;
-import org.auraframework.modules.impl.def.ModuleDefImpl;
+import org.auraframework.impl.root.component.ModuleDefImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.system.Parser;
 import org.auraframework.system.TextSource;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.collect.Sets;
 
 /**
  * Provides ModuleDef implementation
@@ -47,6 +52,9 @@ public class ModuleParser implements Parser<ModuleDef> {
 
     @Inject
     private ConfigAdapter configAdapter;
+
+    @Inject
+    private DefinitionService definitionService;
 
     @Override
     public Format getFormat() {
@@ -87,10 +95,23 @@ public class ModuleParser implements Parser<ModuleDef> {
             ModulesCompiler compiler = new ModulesCompilerJ2V8();
             ModulesCompilerData compilerData = compiler.compile(componentPath, sourceTemplate, sourceClass);
             builder.setCompiledCode(compilerData.code);
+            builder.setDependencies(getDependencyDescriptors(compilerData.bundleDependencies));
             return builder.build();
         } catch (Exception e) {
-            throw new DefinitionNotFoundException(descriptor, location);
+            throw new InvalidDefinitionException(descriptor.toString(), location, e);
         }
+    }
+
+    private Set<DefDescriptor<ModuleDef>> getDependencyDescriptors(List<String> dependencies) {
+        Set<DefDescriptor<ModuleDef>> results = Sets.newHashSet();
+        for(String dep : dependencies) {
+            if (dep.contains("-")) {
+                // TODO remove when compiler is updated to return ':'
+                dep = dep.replace("-", ":");
+            }
+            results.add(definitionService.getDefDescriptor(dep, ModuleDef.class));
+        }
+        return results;
     }
 
     /**

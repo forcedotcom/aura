@@ -35,6 +35,7 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.HelperDef;
@@ -1615,8 +1616,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         assertTrue(body.getValue() instanceof List);
         List<?> bodyCmps = (List<?>) body.getValue();
         assertEquals(1, bodyCmps.size());
-        assertTrue(bodyCmps.get(0) instanceof LazyComponentDefRef);
-        assertEquals("markup://aura:text", ((DefDescriptor<?>) ((LazyComponentDefRef) bodyCmps.get(0))
+        assertTrue(bodyCmps.get(0) instanceof DefinitionReference);
+        assertEquals("markup://aura:text", ((DefDescriptor<?>) ((DefinitionReference) bodyCmps.get(0))
                 .getAttributeDefRef("refDescriptor").getValue()).getQualifiedName());
     }
 
@@ -1632,8 +1633,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         assertTrue(body.getValue() instanceof List);
         List<?> bodyCmps = (List<?>) body.getValue();
         assertEquals(1, bodyCmps.size());
-        assertTrue(bodyCmps.get(0) instanceof LazyComponentDefRef);
-        assertEquals(true, ((LazyComponentDefRef) bodyCmps.get(0)).getAttributeDefRef("exclusive").getValue());
+        assertTrue(bodyCmps.get(0) instanceof DefinitionReference);
+        assertEquals(true, ((DefinitionReference    ) bodyCmps.get(0)).getAttributeDefRef("exclusive").getValue());
     }
 
     /**

@@ -275,6 +275,11 @@ public class AuraContextImplTest extends AuraImplTestCase {
         public <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> descriptor) {
             return null;
         }
+
+        @Override
+        public boolean hasSwitchableReference() {
+            return false;
+        }
     }
 
     @Test

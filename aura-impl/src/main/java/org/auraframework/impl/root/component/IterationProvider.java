@@ -28,6 +28,7 @@ import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.instance.ComponentConfig;
+import org.auraframework.instance.Instance;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
@@ -53,7 +54,7 @@ public class IterationProvider implements ComponentConfigProvider {
         AuraContext context = contextService.getCurrentContext();
         BaseComponent<?, ?> component = context.getCurrentComponent();
         ComponentConfig cc = new ComponentConfig();
-        List<Component> components = Lists.newArrayList();
+        List<Instance> components = Lists.newArrayList();
         InstanceStack iStack = context.getInstanceStack();
         Map<String, Object> m = Maps.newHashMapWithExpectedSize(1);
         m.put("body", components);

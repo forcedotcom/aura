@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.modules.impl.adapter.format.json;
+package org.auraframework.impl.adapter.format.json;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -23,7 +23,6 @@ import javax.inject.Inject;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.module.ModuleDef;
-import org.auraframework.impl.adapter.format.json.JSONFormatAdapter;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;

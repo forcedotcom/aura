@@ -18,8 +18,9 @@ package org.auraframework.impl.type;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.TypeDef;
-import org.auraframework.def.module.ModuleDefRef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.java.type.JavaValueProvider;
@@ -106,14 +107,16 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
             for (Object defRef : list) {
                 if (defRef instanceof BaseComponent) {
                     components.add((BaseComponent<?, ?>) defRef);
-                } else if (defRef instanceof ComponentDefRef) {
-                    context.getInstanceStack().setAttributeIndex(idx);
-                    //components.add(((ComponentDefRef) defRef).newInstance(valueProvider));
-                    components.add((BaseComponent<?, ?>) instanceService.getInstance((ComponentDefRef) defRef, valueProvider));
-                    context.getInstanceStack().clearAttributeIndex(idx);
-                    idx += 1;
-                } else if (defRef instanceof ModuleDefRef) {
-                    // TODO MODULE
+                } else if (defRef instanceof DefinitionReference) {
+                    DefinitionReference dr = (DefinitionReference) defRef;
+                    if (dr.type() == DefType.COMPONENT) {
+                        context.getInstanceStack().setAttributeIndex(idx);
+                        //components.add(((ComponentDefRef) defRef).newInstance(valueProvider));
+                        components.add((BaseComponent<?, ?>) instanceService.getInstance((ComponentDefRef) dr.get(), valueProvider));
+                        context.getInstanceStack().clearAttributeIndex(idx);
+                        idx += 1;
+                    }
+                    // TODO ModuleDefRef
                 } else {
                     throw new InvalidDefinitionException(String.format("Expected Component, received %s", defRef
                             .getClass().getName()), getLocation());

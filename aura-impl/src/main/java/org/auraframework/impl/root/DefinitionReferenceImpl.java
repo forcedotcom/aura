@@ -166,6 +166,11 @@ public abstract class DefinitionReferenceImpl<T extends Definition> extends Defi
             return this;
         }
 
+        public DefinitionReferenceBuilder<T, P> setAttributes(Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes) {
+            this.attributeValues = attributes;
+            return this;
+        }
+
         /**
          * Gets the attributeValues for this instance.
          *

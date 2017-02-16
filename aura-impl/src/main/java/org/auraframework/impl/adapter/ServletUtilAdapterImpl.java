@@ -41,6 +41,7 @@ import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
+import org.auraframework.def.ClientLibraryDef.Type;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.CSP;
@@ -406,10 +407,15 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     @Override
     public void writeScriptUrls(AuraContext context, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException {
         templateUtil.writeHtmlScripts(context, this.getJsClientLibraryUrls(context), Script.LAZY, sb);
+        templateUtil.writeHtmlScript(context, this.getInteropEngineUrl(context), Script.SYNC, sb);
         templateUtil.writeHtmlScript(context, this.getInlineJsUrl(context, componentAttributes), Script.SYNC, sb);
         templateUtil.writeHtmlScript(context, this.getFrameworkUrl(), Script.SYNC, sb);
         templateUtil.writeHtmlScript(context, this.getAppJsUrl(context, null), Script.SYNC, sb);
         templateUtil.writeHtmlScript(context, this.getBootstrapUrl(context, componentAttributes), Script.SYNC, sb);
+    }
+
+    public String getInteropEngineUrl(AuraContext context) {
+        return clientLibraryService.getResolverRegistry().get("engine", Type.JS).getUrl();
     }
 
     @Override

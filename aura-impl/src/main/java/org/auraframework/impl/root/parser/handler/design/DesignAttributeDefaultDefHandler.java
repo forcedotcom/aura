@@ -50,7 +50,7 @@ public class DesignAttributeDefaultDefHandler extends ParentedTagHandler<DesignA
 
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
-        DefinitionReference ref = getDefRefHandler(getParentHandler()).getElement();
+        DefinitionReference ref = createDefRefDelegate(getParentHandler());
         //For now we only accept adding components to the default.
         if (AURA_HTML.equals(ref.getDescriptor().getQualifiedName())) {
             error("HTML tags are disallowed in attribute defaults, only components may be set.");

@@ -359,18 +359,17 @@ public class ServerServiceImpl implements ServerService {
         final String mKey = minify ? "MIN:" : "DEV:";
         final String uid = context.getUid(appDesc);
         final String lockerServiceCacheBuster  = configAdapter.getLockerServiceCacheBuster();
-        final String key = "JS:" + mKey + uid + ":" + lockerServiceCacheBuster;
+        // modules definitions will be present with modules enabled so needs to be cached separately
+        final String modules = context.isModulesEnabled() ? ":m" : "";
+        final String key = "JS:" + mKey + uid + ":" + lockerServiceCacheBuster + modules;
                 
         String cached = getAltCachedString(uid, appDesc, key,
-               new Callable<String>() {
-                   @Override
-                   public String call() throws Exception {
-                       String res = getDefinitionsString(dependencies, key);
-                       //log the cache miss here
-                       cachingService.getAltStringsCache().logCacheStatus("cache miss for key: "+key+";");
-                       return res;
-                   }
-               });
+                () -> {
+                    String res = getDefinitionsString(dependencies, key);
+                    //log the cache miss here
+                    cachingService.getAltStringsCache().logCacheStatus("cache miss for key: "+key+";");
+                    return res;
+                });
 
         if (out != null) {
            out.append(cached);
@@ -441,11 +440,13 @@ public class ServerServiceImpl implements ServerService {
         serializationService.writeCollection(controllers, ControllerDef.class, sb, "JSON");
         sb.append(");\n");
 
-        // MODULE
-        sb.append("$A.componentService.initModuleDefs(");
-        Collection<ModuleDef> modules = filterAndLoad(ModuleDef.class, dependencies, null);
-        serializationService.writeCollection(modules, ModuleDef.class, sb, "JSON");
-        sb.append(");\n");
+        if (context.isModulesEnabled()) { // Prevents caching of module defs when modules are disabled.
+            // modules
+            sb.append("$A.componentService.initModuleDefs(");
+            Collection<ModuleDef> modules = filterAndLoad(ModuleDef.class, dependencies, null);
+            serializationService.writeCollection(modules, ModuleDef.class, sb, "JSON");
+            sb.append(");\n");
+        }
 
         return sb.toString();
     }

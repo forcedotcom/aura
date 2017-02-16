@@ -48,4 +48,9 @@ public class MockProviderDef extends MockDefinition<ProviderDef> implements Prov
     public Class<?> getJavaType() {
         return null;
     }
+
+    @Override
+    public boolean hasSwitchableReference() {
+        return false;
+    }
 }

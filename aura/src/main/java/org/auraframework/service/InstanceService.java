@@ -18,6 +18,7 @@ package org.auraframework.service;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Instance;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -38,7 +39,7 @@ public interface InstanceService extends AuraService {
     /**
      * Get the an Instance of the Definition associated with the descriptor
      * passed in.
-     * 
+     *
      * @return The named definition
      * @throws DefinitionNotFoundException if definition does not exist
      */
@@ -48,7 +49,7 @@ public interface InstanceService extends AuraService {
     /**
      * Get the an Instance of the Definition associated with the descriptor
      * passed in, using the map of attributes to initialize the instance.
-     * 
+     *
      * @return The named definition
      * @throws DefinitionNotFoundException if definition does not exist
      */
@@ -57,7 +58,7 @@ public interface InstanceService extends AuraService {
 
     /**
      * Get the an Instance of the Definition passed in.
-     * 
+     *
      * @return The named definition
      * @throws DefinitionNotFoundException if definition does not exist
      */
@@ -67,7 +68,7 @@ public interface InstanceService extends AuraService {
     /**
      * Get the an Instance of the Definition passed in, using the map of
      * attributes to initialize the instance.
-     * 
+     *
      * @return The named definition
      * @throws DefinitionNotFoundException if definition does not exist
      */
@@ -77,7 +78,7 @@ public interface InstanceService extends AuraService {
     /**
      * Creates a {@link DefDescriptor} from the qualified name passed in,
      * retrieves the named Definition and then returns an in Instance of it.
-     * 
+     *
      * @return The named definition
      * @throws DefinitionNotFoundException if definition does not exist
      * @throws QuickFixException
@@ -90,7 +91,7 @@ public interface InstanceService extends AuraService {
      * Creates a {@link DefDescriptor} from the qualified name passed in,
      * retrieves the named Definition and then returns an in Instance of it,
      * using the map of Attributes to initialize the instance.
-     * 
+     *
      * @return The named definition
      * @throws DefinitionNotFoundException if definition does not exist
      */
@@ -104,5 +105,13 @@ public interface InstanceService extends AuraService {
      * @return
      */
     Instance<?> getInstance(ComponentDefRef defRef, BaseComponent<?, ?> valueProvider) throws QuickFixException;
-    
+
+    /**
+     * Create a new instance of a component using a passed in Component Definition Reference.
+     *
+     * @param defRef
+     * @return
+     */
+    Instance<?> getInstance(DefinitionReference defRef, BaseComponent<?, ?> valueProvider) throws QuickFixException;
+
 }

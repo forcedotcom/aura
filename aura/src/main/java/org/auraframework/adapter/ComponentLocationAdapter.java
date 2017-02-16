@@ -18,6 +18,7 @@ package org.auraframework.adapter;
 import java.io.File;
 import java.util.Set;
 
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.SourceLoader;
 
 import com.google.common.collect.Sets;
@@ -34,7 +35,9 @@ public interface ComponentLocationAdapter extends AuraAdapter {
 
     Set<SourceLoader> getSourceLoaders();
 
-    public static class Impl implements ComponentLocationAdapter {
+    DefType type();
+
+    class Impl implements ComponentLocationAdapter {
 
         private final File componentSourceDir;
         private final File javaGeneratedSourceDir;
@@ -98,6 +101,18 @@ public interface ComponentLocationAdapter extends AuraAdapter {
         @Override
         public Set<SourceLoader> getSourceLoaders() {
             return loaders;
+        }
+
+        /**
+         * Distinguish between Aura component and modules locations.
+         * Module require separate registry that handles its own def type to allow
+         * coexistence of components and modules of the same name
+         *
+         * @return DEFAULT DefType.COMPONENT for Aura components
+         */
+        @Override
+        public DefType type() {
+            return DefType.COMPONENT;
         }
 
         @Override

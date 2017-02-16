@@ -18,8 +18,10 @@ package org.auraframework.integration.test.root.component.attributes;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.ComponentDefRefArrayImpl;
+import org.auraframework.impl.root.component.DefRefDelegate;
 import org.auraframework.impl.type.ComponentDefRefArrayTypeDef;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -49,17 +51,23 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
         assertNotNull(value);
         assertTrue(value instanceof ComponentDefRefArrayImpl);
         ComponentDefRefArrayImpl cdra = (ComponentDefRefArrayImpl) value;
-        List<ComponentDefRef> cmpDefRefs = cdra.getList();
+        List<DefinitionReference> cmpDefRefs = cdra.getList();
         assertEquals("Unexpected items in componentDefRef array attribute", 2, cmpDefRefs.size());
         // assertTrue(cmpDefRefs.get(0) instanceof ComponentDefRef);
         // assertTrue(cmpDefRefs.get(1) instanceof ComponentDefRef);
         // Also verifies the order of components
         assertEquals("markup://test:text", cmpDefRefs.get(0).getDescriptor().getQualifiedName());
         assertEquals("markup://aura:text", cmpDefRefs.get(1).getDescriptor().getQualifiedName());
-        ComponentDefRef ref = cmpDefRefs.get(1);
+        DefinitionReference ref = cmpDefRefs.get(1);
+
+        assertTrue("Definition reference should be DefRefDelegate", ref instanceof DefRefDelegate);
+        DefinitionReference selected = ref.get();
+        assertTrue("Selected DefRef delegate should be ComponentDefRef", selected instanceof ComponentDefRef);
+        ComponentDefRef cdr = (ComponentDefRef) selected;
+
         // Verify that the inner component def ref has the right value
-        assertEquals("ComponentDefRef does not have the expected attribute value", "aura", ((Component) instanceService.getInstance(ref, cmp))
-                .getAttributes().getValue("value"));
+        assertEquals("ComponentDefRef does not have the expected attribute value", "aura",
+                ((Component) instanceService.getInstance(cdr, cmp)).getAttributes().getValue("value"));
     }
 
     /**
@@ -104,10 +112,16 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
         assertNotNull(value);
         assertTrue(value instanceof ComponentDefRefArrayImpl);
         ComponentDefRefArrayImpl cdra = (ComponentDefRefArrayImpl) value;
-        List<ComponentDefRef> cmpDefRefs = cdra.getList();
-        ComponentDefRef ref = cmpDefRefs.get(0);
+        List<DefinitionReference> cmpDefRefs = cdra.getList();
+        DefinitionReference defRef = cmpDefRefs.get(0);
+
+        assertTrue("Definition reference should be DefRefDelegate", defRef instanceof DefRefDelegate);
+        DefinitionReference selected = defRef.get();
+        assertTrue("Selected DefRef delegate should be ComponentDefRef", selected instanceof ComponentDefRef);
+        ComponentDefRef cdr = (ComponentDefRef) selected;
+
         assertEquals("Failed to use attribute value of outer component in ComponentDefRef array items.", "auraemulp",
-                ((Component) instanceService.getInstance(ref, cmp)).getAttributes().getValue("value"));
+                ((Component) instanceService.getInstance(cdr, cmp)).getAttributes().getValue("value"));
     }
 
     /**

@@ -72,7 +72,7 @@ ComponentClassRegistry.prototype.addComponentClass = function(descriptor, export
  * @returns Either the class that defines the component you are requesting, or undefined if not found.
  * @export
  */
-ComponentClassRegistry.prototype.getComponentClass = function(descriptor) {
+ComponentClassRegistry.prototype.getComponentClass = function(descriptor, def) {
     var storedConstructor = this.classConstructors[descriptor];
     var url;
 
@@ -87,11 +87,19 @@ ComponentClassRegistry.prototype.getComponentClass = function(descriptor) {
             storedConstructor = this.buildComponentClass(componentProperties);
             this.classConstructors[descriptor] = storedConstructor;
             // No need to keep the exporter in memory.
-            delete this.classExporter[descriptor];
+            this.classExporter[descriptor] = null;
+        } else if (def && def.interop) {
+            return this.buildInteropComponentClass(descriptor, def);
         }
     }
 
     return storedConstructor;
+};
+
+ComponentClassRegistry.prototype.buildInteropComponentClass = function(descriptor, def) {
+    var interopCmpClass = this.buildConstructor({ "interopClass" : def.interopClass }, def.interopClassName, Aura.Component.InteropComponent);
+    this.classConstructors[descriptor] = interopCmpClass;
+    return interopCmpClass;
 };
 
 /**
@@ -164,29 +172,30 @@ ComponentClassRegistry.prototype.buildLibraries = function(componentProperties) 
  * @param {Object} componentProperties The pre-built component properties.
  * @returns {Function} The component class.
  */
-ComponentClassRegistry.prototype.buildConstructor = function(componentProperties) {
+
+ComponentClassRegistry.prototype.buildConstructor = function(componentProperties, name, Ctor) {
     // Create a named function dynamically to use as a constructor.
     // TODO: Update to the following line when all browsers have support for dynamic function names.
     // (only supported in IE11+).
     // var componentConstructor = function [className](){ Component.apply(this, arguments); };
     var componentConstructor;
-    var className = componentProperties["meta"]["name"];
-    var FrameworkConstructor = this.customConstructorMap[className] || Component;
+    var className = name || componentProperties["meta"]["name"];
+    Ctor = Ctor || this.customConstructorMap[className] || Component;
 
     //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    componentConstructor = function(config, localCreation) {
-        FrameworkConstructor.call(this, config, localCreation);
+    componentConstructor = function(config) {
+        Ctor.call(this, config);
     };
     //#end
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    componentConstructor = $A.util.globalEval("(function " + className + "(config, localCreation) { Component.call(this, config, localCreation); });", {
-        "Component": FrameworkConstructor
+    componentConstructor = $A.util.globalEval("(function " + className + "(config) { Ctor.call(this, config); });", {
+        "Ctor": Ctor
     });
     //#end
     
     // Extends from Component (and restore constructor).
-    componentConstructor.prototype = Object.create(FrameworkConstructor.prototype);
+    componentConstructor.prototype = Object.create(Ctor.prototype);
     componentConstructor.prototype.constructor = componentConstructor;
 
     // Mixin inner classes (controller, helper, renderer, provider) and meta properties.

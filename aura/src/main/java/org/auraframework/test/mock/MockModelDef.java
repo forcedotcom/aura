@@ -89,4 +89,9 @@ public class MockModelDef extends MockDefinition<ModelDef> implements ModelDef {
     public TypeDef getType(String s) throws QuickFixException {
         return getMemberByName(s).getType();
     }
+
+    @Override
+    public boolean hasSwitchableReference() {
+        return false;
+    }
 }

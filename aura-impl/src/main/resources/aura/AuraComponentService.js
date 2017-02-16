@@ -20,8 +20,10 @@
  * @constructor
  * @export
  */
-function AuraComponentService () {
+function AuraComponentService() {
     // Def registries
+    this.moduleDefRegistry      = {};
+    this.moduleRegistry         = {};
     this.componentDefRegistry   = {};
     this.controllerDefRegistry  = {};
     this.actionDefRegistry      = {};
@@ -49,6 +51,10 @@ function AuraComponentService () {
     this.flavorable    = "auraFlavorable";
     this.renderedBy    = "auraRenderedBy";
     this["renderedBy"] = this.renderedBy;   // originally exposed using exp()
+
+    // Initialize module
+    this.addModule("raptor", [], null, window["Engine"]);
+    this.addModule("aura", [], null, window["Engine"]);
 }
 
 /**
@@ -612,13 +618,49 @@ AuraComponentService.prototype.addComponentClass = function(descriptor, exporter
 };
 
 /**
+ * Initialize modules
+ * @param {String} descriptor Uses the pattern of namespace:componentName.
+ * @param {Function} exporter A function that when executed will return the component object litteral.
+ * @export
+ */
+AuraComponentService.prototype.initModuleDefs = function(modules) {
+    var moduleDefRegistry = this.moduleDefRegistry;
+
+    modules.forEach(function (module) {
+        moduleDefRegistry[module["descriptor"]] = { "exporter": module["code"] };
+    });
+};
+
+
+/**
+ * Use the specified constructor as the definition of the Module descriptor.
+ * @param {String} descriptor Uses the pattern of namespace:componentName.
+ * @param {Function} exporter A function that when executed will return the component object litteral.
+ * @export
+ */
+AuraComponentService.prototype.addModule = function(name, dependencies, exporterClass, nsexports) {
+    if (exporterClass === undefined) {
+        return this.addModule(name, [], dependencies);
+    }
+
+    var descriptor = 'markup://' + name;
+    var entry = this.moduleDefRegistry[descriptor] || (this.moduleDefRegistry[descriptor] = {});
+
+    entry.dependencies = dependencies;
+    entry.definition = exporterClass;
+    entry.descriptor = descriptor;
+    entry.moduleName = name;
+    entry.ns = nsexports;
+};
+
+/**
  * Get the class constructor for the specified component.
  * @param {String} descriptor use either the fqn markup://prefix:name or just prefix:name of the component to get a constructor for.
  * @returns Either the class that defines the component you are requesting, or undefined if not found.
  * @export
  */
-AuraComponentService.prototype.getComponentClass = function(descriptor) {
-    return this.componentClassRegistry.getComponentClass(descriptor);
+AuraComponentService.prototype.getComponentClass = function(descriptor, def) {
+    return this.componentClassRegistry.getComponentClass(descriptor, def);
 };
 
 /**
@@ -649,16 +691,6 @@ AuraComponentService.prototype.initControllerDefs = function(controllerConfigs) 
     for (var i = 0; i < controllerConfigs.length; i++) {
         $A.componentService.createControllerDef(controllerConfigs[i]);
     }
-};
-
-/**
- * Init module defs
- * @export
- */
-AuraComponentService.prototype.initModuleDefs = function(moduleDefs) {
-	for (var i = 0; i < moduleDefs.length; i++) {
-		// console.log("TODO: add ModuleDef: " + moduleDefs[i]["descriptor"]);
-	}
 };
 
 /**
@@ -1057,7 +1089,9 @@ AuraComponentService.prototype.getComponentDef = function(config) {
     var definition = this.componentDefRegistry[descriptor];
 
     if (!definition && this.savedComponentConfigs[descriptor]) {
-        definition = this.createFromSavedComponentConfigs(config);
+        return this.createFromSavedComponentConfigs(config);
+    } else if (!definition && this.moduleDefRegistry[descriptor]) {
+        return this.createInteropComponentDef(descriptor);
     }
 
     return definition;
@@ -1141,6 +1175,57 @@ AuraComponentService.prototype.createFromSavedComponentConfigs = function(config
     return def;
 };
 
+
+AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
+    var entry = this.moduleDefRegistry[descriptor];
+    var factory;
+    var exportns;
+    var url;
+
+    if (!entry.dependencies) {
+        //#if {"excludeModes" : ["PRODUCTION"]}
+            url = $A.clientService.getSourceMapsUrl(descriptor);
+        //#end
+        factory = $A.util.globalEval(entry["exporter"], null, url);
+        factory();
+    }
+
+    var deps = entry.dependencies.map(function (name) {
+        if (name === 'export') {
+            exportns = {};
+            return exportns;
+        }
+
+        var depDescriptor = 'markup://' + name;
+        var depEntry = this.moduleDefRegistry[depDescriptor];
+        if (depEntry && depEntry.dependencies) {
+            return this.moduleDefRegistry[depDescriptor].ns;
+        }
+
+        return this.evaluateModuleDef(depDescriptor);
+    }, this);
+
+    var Ctor = entry.definition.apply(undefined, deps) || exportns;
+    entry.ns = Ctor;
+
+    return Ctor;
+
+};
+
+AuraComponentService.prototype.createInteropComponentDef = function (descriptor) {
+    var Ctor = this.evaluateModuleDef(descriptor);
+    var module = this.moduleDefRegistry[descriptor];
+    var interOpCmpDef = new Aura.Component.InteropComponentDef({
+        dependencies : module.dependencies,
+        definition   : module.definition,
+        descriptor   : module.descriptor,
+        moduleName   : module.moduleName,
+        interopClass : Ctor
+    });
+
+    this.componentDefRegistry[descriptor] = interOpCmpDef;
+    return interOpCmpDef;
+};
 
 /**
  * Creates ComponentDef from provided config
@@ -1571,7 +1656,7 @@ AuraComponentService.prototype.createComponentPriv = function (config) {
     var def = this.getComponentDef({ "descriptor" : descriptor });
 
     if($A.clientService.allowAccess(def)) {
-        var classConstructor = this.getComponentClass(descriptor);
+        var classConstructor = this.getComponentClass(descriptor, def);
         return new classConstructor(config);
     }else{
         var context=$A.getContext();

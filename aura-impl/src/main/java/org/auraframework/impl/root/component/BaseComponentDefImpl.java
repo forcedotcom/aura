@@ -41,11 +41,11 @@ import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.FlavoredStyleDef;
@@ -272,13 +272,16 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         if (!facets.isEmpty()) {
             for (AttributeDefRef facet : facets) {
                 Object v = facet.getValue();
-                if(v instanceof ArrayList){
-                    for(Object fl : ((ArrayList)v)){
-                        if(fl instanceof ComponentDefRef){
-                            ComponentDefRef cdr=(ComponentDefRef)fl;
-                            BaseComponentDefImpl def=(BaseComponentDefImpl)cdr.getDescriptor().getDef();
-                            if(def.hasLocalDependencies()||def.hasFacetLocalDependencies()){
-                                return true;
+                if (v instanceof ArrayList) {
+                    for (Object fl : ((ArrayList) v)) {
+                        if (fl instanceof DefinitionReference) {
+                            DefinitionReference cdr = (DefinitionReference) fl;
+                            DefType defType = cdr.getDescriptor().getDefType();
+                            if (defType == DefType.APPLICATION || defType == DefType.COMPONENT) {
+                                BaseComponentDefImpl def = (BaseComponentDefImpl) cdr.getDescriptor().getDef();
+                                if (def.hasLocalDependencies() || def.hasFacetLocalDependencies()) {
+                                    return true;
+                                }
                             }
                         }
                     }

@@ -23,7 +23,10 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionReference;
+import org.auraframework.def.module.ModuleDefRef;
 import org.auraframework.impl.root.component.ComponentImpl;
+import org.auraframework.impl.root.component.ModuleImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Instance;
 import org.auraframework.instance.InstanceBuilder;
@@ -147,5 +150,18 @@ public class InstanceServiceImpl implements InstanceService {
     @Override
     public Instance<?> getInstance(ComponentDefRef defRef, BaseComponent<?, ?> valueProvider) throws QuickFixException {
         return new ComponentImpl(defRef.getDescriptor(), defRef.getAttributeValueList(), valueProvider, defRef.getLocalId());
+    }
+
+    @Override
+    public Instance<?> getInstance(DefinitionReference defRef, BaseComponent<?, ?> valueProvider) throws QuickFixException {
+        Instance<?> instance = null;
+        if (defRef.type() == DefType.COMPONENT) {
+            instance = getInstance((ComponentDefRef) defRef.get(), valueProvider);
+        } else if (defRef.type() == DefType.MODULE) {
+            instance = new ModuleImpl((ModuleDefRef) defRef.get(), valueProvider);
+        }
+        // server side creation of component requires building component or module instance.
+        // for modules, serialization only requires descriptor and attribute information
+        return instance;
     }
 }

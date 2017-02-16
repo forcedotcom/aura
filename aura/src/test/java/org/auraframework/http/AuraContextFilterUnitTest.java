@@ -78,8 +78,9 @@ public class AuraContextFilterUnitTest {
         AuraContextFilter contextFilter = new AuraContextFilter();
         contextFilter.setConfigAdapter(configAdapter);
 
-        Map<String, Object> configMap = Maps.newHashMap();
+        Map<String, Object> configMap = null;
         if (configMapValue != null) {
+            configMap = Maps.newHashMap();
             configMap.put("m", configMapValue);
         }
 

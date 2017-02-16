@@ -168,7 +168,9 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         ContainerTagHandler<?> parentHandler = getParentHandler();
         if(parentHandler!=null) {
-            body.add(getDefRefHandler(getParentHandler()).getElement());
+            DefinitionReference dr = createDefRefDelegate(getParentHandler());
+            builder.setHasSwitchableReference(dr.hasSwitchableReference());
+            body.add(dr);
         }
     }
 

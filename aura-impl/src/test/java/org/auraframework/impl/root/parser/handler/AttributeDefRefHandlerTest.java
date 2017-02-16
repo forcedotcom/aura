@@ -20,6 +20,7 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.parser.ComponentXMLParser;
@@ -84,7 +85,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<>(null, xmlReader,
                 source, true, definitionService, configAdapter, definitionParserAdapter);
         AttributeDefRefImpl adr = adrHandler.getElement();
-        ComponentDefRef value = (ComponentDefRef) ((List<?>) adr.getValue()).get(0);
+        DefinitionReference value = (DefinitionReference) ((List<?>) adr.getValue()).get(0);
         assertEquals("foo", value.getName());
     }
 

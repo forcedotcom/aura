@@ -13,21 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.modules.impl.def;
+package org.auraframework.impl.root.component;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.auraframework.builder.ModuleDefRefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDefRef;
 import org.auraframework.impl.root.DefinitionReferenceImpl;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import com.google.common.collect.Lists;
 
 /**
  * ModuleDefRef implementation.
@@ -86,6 +91,21 @@ public class ModuleDefRefImpl extends DefinitionReferenceImpl<ModuleDef> impleme
             return descriptor.equals(other.getDescriptor()) && location.equals(other.getLocation());
         }
         return false;
+    }
+
+    @Override
+    public List<AttributeDefRef> getAttributeValueList() throws QuickFixException {
+        return Lists.newArrayList(this.attributeValues.values());
+    }
+
+    @Override
+    public DefinitionReference get() {
+        return this;
+    }
+
+    @Override
+    public DefType type() {
+        return DefType.MODULE;
     }
 
     public static class Builder extends DefinitionReferenceImpl.Builder<ModuleDefRef, ModuleDef> implements

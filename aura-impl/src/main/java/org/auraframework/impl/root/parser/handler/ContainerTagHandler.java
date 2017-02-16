@@ -19,6 +19,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
+import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.DefinitionReference.Load;
 import org.auraframework.def.DefDescriptor;
@@ -26,10 +27,9 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.HtmlTag;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.def.module.ModuleDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.DefinitionAccessImpl;
-import org.auraframework.impl.root.parser.handler.module.ModuleDefRefHandler;
+import org.auraframework.impl.root.component.DefRefDelegate;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.TextSource;
@@ -149,7 +149,7 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
      */
     protected abstract T createDefinition() throws QuickFixException;
 
-    protected <P extends RootDefinition> ParentedTagHandler<? extends DefinitionReference, ?> getDefRefHandler(
+    protected <P extends RootDefinition> ParentedTagHandler<? extends ComponentDefRef, ?> getDefRefHandler(
             RootTagHandler<P> parentHandler) throws DefinitionNotFoundException {
         String tag = getTagName();
         if (HtmlTag.allowed(tag)) {
@@ -174,17 +174,18 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
                 }
             }
 
-            if(configAdapter.isModulesEnabled()) {
-                DefDescriptor<ModuleDef> moduleDefDescriptor = definitionService.getDefDescriptor(getTagName(), ModuleDef.class);
-                if (definitionService.exists(moduleDefDescriptor)) {
-                    return new ModuleDefRefHandler<>(parentHandler, xmlReader, source, isInInternalNamespace,
-                            definitionService, configAdapter, definitionParserAdapter);
-                }
-            }
-
             return new ComponentDefRefHandler<>(parentHandler, xmlReader, source, isInInternalNamespace,
                     definitionService, configAdapter, definitionParserAdapter);
         }
+    }
+
+    protected DefinitionReference createDefRefDelegate(ComponentDefRef defRef) throws DefinitionNotFoundException {
+        return new DefRefDelegate(defRef);
+    }
+
+    protected <P extends RootDefinition> DefinitionReference createDefRefDelegate(RootTagHandler<P> parentHandler)
+            throws QuickFixException, XMLStreamException {
+        return createDefRefDelegate(getDefRefHandler(parentHandler).getElement());
     }
 
     /**

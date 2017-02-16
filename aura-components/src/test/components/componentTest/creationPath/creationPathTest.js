@@ -162,8 +162,6 @@
             	cmp.set("v.list", list);
             });
             $A.test.addWaitForWithFailureMessage(false, function(){return $A.util.isUndefined(cmp.find("iterinst"))}, "iteration is still empty");
-        }, function(cmp) {
-        	this.assertCreationPath(cmp.find("iterinst"), "client created");
         }]
     },
 
@@ -180,8 +178,6 @@
         }, function(cmp) {
             this.assertCreationPath(cmp.find("iterinst")[0], "/*[0]/$/*[3]/*[0]/*[0]");
             this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[3]/*[0]/*[0]/$/*[0]");
-            
-            this.assertCreationPath(cmp.find("iterinst")[1], "client created");
         }]
     },
 

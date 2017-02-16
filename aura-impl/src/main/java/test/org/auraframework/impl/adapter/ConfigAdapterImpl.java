@@ -149,6 +149,8 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     private final Set<String> CACHEABLE_PREFIXES = ImmutableSet.of("aura", "java", "compound");
 
+    private final Set<String> moduleNamespaces = Sets.newHashSet();
+
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
     private JavascriptGroup jsGroup;
     private FileGroup resourcesGroup;
@@ -880,14 +882,26 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
-    public boolean isModulesEnabled() {
-        return Boolean.parseBoolean(System.getProperty("aura.modules"));
-    }
-
-    @Override
     public String getSessionCacheKey() {
         // return a static session key here, to ensure we always cache unless overriden.
         return "aura.sessionCacheKey";
     }
 
+    @Override
+    public boolean isModulesEnabled() {
+        if (System.getProperty("aura.modules") == null) {
+            return true;  // default to true for raptor-master branch
+        }
+        return Boolean.parseBoolean(System.getProperty("aura.modules"));
+    }
+
+    @Override
+    public Set<String> getModuleNamespaces() {
+        return this.moduleNamespaces;
+    }
+
+    @Override
+    public void addModuleNamespaces(Set<String> namespaces) {
+        this.moduleNamespaces.addAll(namespaces);
+    }
 }

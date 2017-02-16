@@ -42,6 +42,7 @@ public enum ClientLibraryResolverRegistryImpl implements ClientLibraryResolverRe
         register(new AuraResourceResolver("DOMPurify", ClientLibraryDef.Type.JS, "domPurify/DOMPurify.js", "domPurify/DOMPurify.min.js"));
         register(new AuraResourceResolver("momentWithLocales", ClientLibraryDef.Type.JS, "momentWithLocales/momentWithLocales.js", "momentWithLocales/momentWithLocales.min.js"));
         register(new AuraResourceResolver("Walltime", ClientLibraryDef.Type.JS, "walltime-js/walltime.js", "walltime-js/walltime.min.js"));
+        register(new AuraResourceResolver("engine", ClientLibraryDef.Type.JS, "engine/engine.min.js", "engine/engine.min.js"));
     }
 
 

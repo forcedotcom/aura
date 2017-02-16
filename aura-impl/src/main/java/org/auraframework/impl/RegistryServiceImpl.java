@@ -138,8 +138,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             DefType.STYLE,
             DefType.SVG,
             DefType.TESTSUITE,
-            DefType.TOKENS,
-            DefType.MODULE
+            DefType.TOKENS
             );
 
     private static class SourceLocationInfo {
@@ -335,7 +334,9 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         regBuild.add(AuraStaticTypeDefRegistry.INSTANCE);
         regBuild.add(AuraStaticControllerDefRegistry.getInstance(definitionService));
         for (ComponentLocationAdapter location : markupLocations) {
-            if (location != null) {
+            if (location != null && location.type() == DefType.COMPONENT) {
+                // added type to component location adapter to differentiate type.
+                // separate registries are required due to namespace clashes with modules
                 SourceLocationInfo sli = getSourceLocationInfo(location);
                 if (!sli.isChanged() && sli.staticLocationRegistries != null) {
                     regBuild.addAll(sli.staticLocationRegistries);

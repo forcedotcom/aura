@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.modules.impl.def;
+package org.auraframework.impl.root.component;
 
 import java.io.IOException;
 import java.util.Set;
@@ -34,11 +34,13 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     private static final long serialVersionUID = 5154640929496754931L;
     private String path;
     private String compiledCode;
+    private Set<DefDescriptor<ModuleDef>> dependencies;
 
     private ModuleDefImpl(Builder builder) {
         super(builder);
         this.path = builder.path;
         this.compiledCode = builder.compiledCode;
+        this.dependencies =  builder.dependencies;
     }
 
     @Override
@@ -54,21 +56,24 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     @Override
     public void serialize(Json json) throws IOException {
         StringBuilder code = new StringBuilder();
-        code.append("return function (define) {\n//raptor\n");
+        code.append("function () {\n");
         code.append(compiledCode);
-        code.append("\n//end-raptor\n};");
-        json.writeMap(ImmutableMap.of("descriptor", getDescriptor().getQualifiedName(), "code", code.toString()));
+        code.append("\n};");
+        json.writeMap(ImmutableMap.of("descriptor", getDescriptor().getQualifiedName().toLowerCase(), "code", code.toString()));
     }
 
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        // TODO MODULES: append dependencies
+        if (!this.dependencies.isEmpty()) {
+            dependencies.addAll(this.dependencies);
+        }
     }
 
     public static final class Builder extends DefinitionImpl.BuilderImpl<ModuleDef> {
 
         private String path;
         private String compiledCode;
+        private Set<DefDescriptor<ModuleDef>> dependencies;
 
         public Builder() {
             super(ModuleDef.class);
@@ -80,6 +85,10 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
 
         public void setPath(String path) {
             this.path = path;
+        }
+
+        public void setDependencies(Set<DefDescriptor<ModuleDef>> dependencies) {
+            this.dependencies = dependencies;
         }
 
         @Override

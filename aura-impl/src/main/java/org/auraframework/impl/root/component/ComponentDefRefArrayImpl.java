@@ -17,10 +17,10 @@ package org.auraframework.impl.root.component;
 
 import com.google.common.collect.Lists;
 import org.auraframework.Aura;
-import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ComponentDefRefArray;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.instance.BaseComponent;
-import org.auraframework.instance.Component;
+import org.auraframework.instance.Instance;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -37,28 +37,28 @@ import java.util.Map;
  * @since 0.22
  */
 public class ComponentDefRefArrayImpl implements JsonSerializable, ComponentDefRefArray {
-    private final List<ComponentDefRef> cdrs;
+    private final List<DefinitionReference> drs;
     private final BaseComponent<?, ?> vp;
 
-    public ComponentDefRefArrayImpl(List<ComponentDefRef> cdrs, BaseComponent<?, ?> vp) {
-        this.cdrs = cdrs;
+    public ComponentDefRefArrayImpl(List<DefinitionReference> cdrs, BaseComponent<?, ?> vp) {
+        this.drs = cdrs;
         this.vp = vp;
     }
 
     @Override
-    public List<ComponentDefRef> getList() {
-        return this.cdrs;
+    public List<DefinitionReference> getList() {
+        return this.drs;
     }
 
     @Override
-    public List<Component> newInstance(BaseComponent<?, ?> fallbackValueProvider) throws QuickFixException {
+    public List<Instance> newInstance(BaseComponent<?, ?> fallbackValueProvider) throws QuickFixException {
         return newInstance(fallbackValueProvider, null);
     }
 
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public List<Component> newInstance(BaseComponent<?, ?> fallbackValueProvider, Map<String, Object> extraProviders) throws QuickFixException {
-        List<Component> components = Lists.newArrayListWithExpectedSize(cdrs.size());
+    public List<Instance> newInstance(BaseComponent<?, ?> fallbackValueProvider, Map<String, Object> extraProviders) throws QuickFixException {
+        List<Instance> components = Lists.newArrayListWithExpectedSize(drs.size());
         BaseComponent<?, ?> valueProvider = this.vp != null ? this.vp : fallbackValueProvider;
         InstanceService instanceService = Aura.getInstanceService();
         
@@ -68,10 +68,10 @@ public class ComponentDefRefArrayImpl implements JsonSerializable, ComponentDefR
         }
         AuraContext context = Aura.getContextService().getCurrentContext();
         int idx = 0;
-        for (ComponentDefRef cdr : this.cdrs) {
+        for (DefinitionReference cdr : this.drs) {
             context.getInstanceStack().setAttributeIndex(idx);
             //components.add(cdr.newInstance(valueProvider));
-            components.add((Component) instanceService.getInstance(cdr, valueProvider));
+            components.add(instanceService.getInstance(cdr, valueProvider));
             context.getInstanceStack().clearAttributeIndex(idx);
             idx += 1;
         }
@@ -80,6 +80,6 @@ public class ComponentDefRefArrayImpl implements JsonSerializable, ComponentDefR
 
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeArray(cdrs);
+        json.writeArray(drs);
     }
 }

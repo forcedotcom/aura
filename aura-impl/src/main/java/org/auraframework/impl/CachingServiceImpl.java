@@ -54,7 +54,7 @@ public class CachingServiceImpl implements CachingService {
     private final static int DEFINITION_CACHE_SIZE = 100 * 1024;
 
     /** Default size of dependency caches, in number of entries */
-    private final static int DEPENDENCY_CACHE_SIZE = 4 * 1024;
+    private final static int DEPENDENCY_CACHE_SIZE = 8 * 1024;
 
     /** Default size of descriptor filter caches, in number of entries */
     private final static int FILTER_CACHE_SIZE = 4608;
@@ -95,6 +95,12 @@ public class CachingServiceImpl implements CachingService {
     private Cache<String, String> stringsCache;
     private Cache<String, String> altStringsCache;
     private Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache;
+    /**
+     * depsCache contains multiple entries for dependencies.
+     * One entry for component dependencies and another for module
+     * plus with and without uid for faster lookups
+     * However, most values will point to the same DependencyEntry where modules are not used.
+     */
     private Cache<String, DependencyEntry> depsCache;
     private Cache<String, String> clientLibraryOutputCache;
     private Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> defDescriptorByNameCache;

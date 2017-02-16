@@ -364,9 +364,13 @@ public class AuraContextFilter implements Filter {
      */
     protected boolean isModulesEnabled(HttpServletRequest request, Map<String, Object> configMap, Mode mode) {
         boolean isModulesEnabled = configAdapter.isModulesEnabled(); // TODO is this costly ?
-        if (configMap != null && configMap.containsKey("m")) {
-            String configValue = String.valueOf(configMap.get("m"));
-            isModulesEnabled = "1".equals(configValue);
+        if (configMap != null) {
+            if (configMap.containsKey("m")) {
+                String configValue = String.valueOf(configMap.get("m"));
+                isModulesEnabled = "1".equals(configValue);
+            } else {
+                isModulesEnabled = false;
+            }
         }
 
         if (mode != Mode.PROD) {

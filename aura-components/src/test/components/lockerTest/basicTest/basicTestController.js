@@ -233,6 +233,11 @@
         o = {};
         testUtils.assertTrue(o instanceof Object, "Object created via object literal should be an instance of Object");
         
+        // Pull object through the locker membrane
+        cmp.set("v.object", o);
+        var oFromMembrane = cmp.get("v.object");
+        testUtils.assertTrue(oFromMembrane instanceof Object, "Object created via object literal should be an instance of Object");
+        
         // Test Function
         function foo() {
             return "foo";

@@ -16,6 +16,7 @@
 package org.auraframework.modules.impl;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -27,8 +28,6 @@ import org.auraframework.util.IOUtil;
 
 import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Object;
-import com.google.common.io.ByteStreams;
-import com.google.common.io.Files;
 
 final class ModulesCompilerUtil {
 
@@ -40,7 +39,7 @@ final class ModulesCompilerUtil {
             ClassLoader classLoader = ModulesCompilerUtil.class.getClassLoader();
             InputStream input = classLoader.getResourceAsStream(classpathResource);
             File tempFile = new File(IOUtil.newTempDir("modules"), new File(classpathResource).getName());
-            ByteStreams.copy(input, Files.newOutputStreamSupplier(tempFile));
+            IOUtil.copyStream(input, new FileOutputStream(tempFile));
             return tempFile.getAbsolutePath();
         } catch (IOException x) {
             throw new Error(x);

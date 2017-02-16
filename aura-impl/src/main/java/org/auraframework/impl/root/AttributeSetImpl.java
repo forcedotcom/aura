@@ -190,6 +190,7 @@ public class AttributeSetImpl implements AttributeSet {
         iStack.clearAttributeName(attributeDef.getDescriptor().toString());
         iStack.clearParent(parent);
         attribute.setValue(value);
+        attribute.setValueProvider(valueProvider);
 
         set(attribute);
     }
@@ -293,6 +294,16 @@ public class AttributeSetImpl implements AttributeSet {
         return null;
     }
 
+    private ValueProvider getAttributesValueProvider(String name) {
+        DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor(name, AttributeDef.class);
+
+        Attribute at = attributes.get(desc);
+        if (at != null) {
+            return at.getValueProvider();
+        }
+        return null;
+    }
+
     private void setExpression(DefDescriptor<AttributeDef> desc, Object value) throws QuickFixException {
         RootDefinition rd = rootDefDescriptor.getDef();
         AttributeDef ad = rd.getAttributeDefs().get(desc);
@@ -329,7 +340,11 @@ public class AttributeSetImpl implements AttributeSet {
         PropertyReference stem = expr.getStem();
 
         if (value instanceof Expression) {
-            value = ((Expression) value).evaluate(valueProvider);
+            ValueProvider valuesValueProvider = getAttributesValueProvider(expr.getRoot());
+            if (valuesValueProvider == null) {
+                valuesValueProvider = valueProvider;
+            }
+            value = ((Expression) value).evaluate(valuesValueProvider);
         }
         if (value instanceof ValueProvider && stem != null) {
             value = ((ValueProvider) value).getValue(stem);

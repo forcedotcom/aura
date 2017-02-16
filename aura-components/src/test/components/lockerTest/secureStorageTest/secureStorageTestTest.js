@@ -9,8 +9,8 @@
     browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
 
     setUp: function(cmp) {
-    	function verifyRawStorage(storage, type, expectedNextSynthtic, expectedIndex) {
-    		storage = $A.lockerService.unwrap(storage, storage);
+    	function verifyRawStorage(type, expectedNextSynthtic, expectedIndex) {
+    		var storage = type === "LOCAL" ? localStorage : sessionStorage;
     		
     		var nextSyntheticKey = "LSSNextSynthtic:" + type;		
     		var storedIndexKey = "LSSIndex:" + type + "{\"namespace\":\"lockerTest\"}";

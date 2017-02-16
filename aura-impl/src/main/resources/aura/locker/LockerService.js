@@ -272,36 +272,14 @@ function LockerService() {
 				var otherRealmType = typeToOtherRealmType && typeToOtherRealmType.get(type);
 				return otherRealmType && value instanceof otherRealmType;
 			}
-		},
-
-		showLockedNodes : function showLockedNodes(root) {
-			if (!root) {
-				root = document;
-			}
-
-			if (ls_getKey(root)) {
-				$A.util.addClass(root, "lockerizedNode");
-			}
-
-			var children = root.childNodes;
-			for (var i = 0; i < children.length; i++) {
-				showLockedNodes(children[i]);
-			}
 		}
-
 	};
 
 	// Exports
 	service["create"] = service.create;
 	service["createForDef"] = service.createForDef;
-	service["getEnv"] = service.getEnv;
 	service["getEnvForSecureObject"] = service.getEnvForSecureObject;
 	service["getKeyForNamespace"] = service.getKeyForNamespace;
-	service["trust"] = service.trust;
-	service["showLockedNodes"] = service.showLockedNodes;
-	service["wrapComponent"] = service.wrapComponent;
-	service["unwrap"] = service.unwrap;
-	service["instanceOf"] = service.instanceOf;
 
 	Object.freeze(service);
 

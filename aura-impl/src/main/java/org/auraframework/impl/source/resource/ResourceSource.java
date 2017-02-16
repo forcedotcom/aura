@@ -38,6 +38,10 @@ import org.auraframework.util.resource.ResourceLoader;
 public class ResourceSource<D extends Definition> extends AbstractTextSourceImpl<D> {
     private static final ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
 
+    public ResourceSource(DefDescriptor<D> descriptor, String systemId) {
+        super(descriptor, systemId, getMimeTypeFromExtension(systemId));
+    }
+
     public ResourceSource(DefDescriptor<D> descriptor, String systemId, Format format) {
         super(descriptor, systemId, format);
     }

@@ -16,6 +16,7 @@
 package org.auraframework.impl.source;
 
 import java.io.Reader;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.def.DefDescriptor;
@@ -24,6 +25,8 @@ import org.auraframework.system.Parser.Format;
 import org.auraframework.system.TextSource;
 import org.auraframework.util.text.Hash;
 import org.auraframework.util.text.HashingReader;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Abstract base class for providing access to source code and metadata.
@@ -34,14 +37,40 @@ import org.auraframework.util.text.HashingReader;
  * contract.
  */
 public abstract class AbstractTextSourceImpl<D extends Definition> implements TextSource<D> {
+    public final static String MIME_JAVASCRIPT = "application/javascript";
+    public final static String MIME_HTML = "text/html";
+    public final static String MIME_XML = "application/xml";
+    public final static String MIME_CSS = "text/css";
+    public final static String MIME_SVG = "image/svg+xml";
+
     private final String systemId;
     private final Format format;
+    private final String mimeType;
     private final DefDescriptor<D> descriptor;
     private final Hash hash;
+
+    protected AbstractTextSourceImpl(DefDescriptor<D> descriptor, String systemId, String mimeType) {
+        this.systemId = systemId;
+        this.format = null;
+        this.descriptor = descriptor;
+        this.hash = Hash.createPromise();
+        this.mimeType = mimeType;
+    }
+
+    private Map<Format,String> formatMimeMap = new ImmutableMap.Builder<Format,String>()
+        .put(Format.APEX, "application/apex")
+        .put(Format.CSS, MIME_CSS)
+        .put(Format.JS, MIME_JAVASCRIPT)
+        .put(Format.SVG, MIME_SVG)
+        .put(Format.TEMPLATE_CSS, MIME_CSS)
+        .put(Format.XML, MIME_XML)
+        .build();
+        
 
     protected AbstractTextSourceImpl(DefDescriptor<D> descriptor, String systemId, Format format) {
         this.systemId = systemId;
         this.format = format;
+        this.mimeType = formatMimeMap.get(format);
         this.descriptor = descriptor;
         this.hash = Hash.createPromise();
     }
@@ -75,7 +104,7 @@ public abstract class AbstractTextSourceImpl<D extends Definition> implements Te
      */
     @Override
     public String getMimeType() {
-        return "";
+        return mimeType;
     }
 
     /**
@@ -146,5 +175,42 @@ public abstract class AbstractTextSourceImpl<D extends Definition> implements Te
     @Override
     public String getDefaultNamespace() {
         return null;
+    }
+
+    private final static Map<String,String> mimeMap;
+
+    static {
+        mimeMap = new ImmutableMap.Builder<String,String>()
+            .put("js", MIME_JAVASCRIPT)
+            .put("html", MIME_HTML)
+            .put("cmp", MIME_XML)
+            .put("lib", MIME_XML)
+            .put("app", MIME_XML)
+            .put("css", MIME_CSS)
+            .put("evt", MIME_XML)
+            .put("intf", MIME_XML)
+            .put("svg", MIME_SVG)
+            .build();
+    }
+
+    /**
+     * Get an aura mime type based on the extension.
+     *
+     * This is used to figure out mime types for files.
+     *
+     * @param name the file name to use.
+     * @return a mime type for the file, "X-application/unknown" for anything we don't understand.
+     */
+    public static String getMimeTypeFromExtension(String name) {
+        int idx = name.lastIndexOf('.');
+        String mimetype = null;
+        if (idx != -1) {
+            String ext = name.substring(idx+1);
+            mimetype = mimeMap.get(ext);
+        }
+        if (mimetype != null) {
+            return mimetype;
+        }
+        return "X-application/unknown";
     }
 }

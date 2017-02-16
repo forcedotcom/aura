@@ -37,6 +37,22 @@ public class FileSource<D extends Definition> extends AbstractTextSourceImpl<D> 
     private final File file;
     private final long lastModified;
 
+    /**
+     * The 'normal' constructor for a file source.
+     *
+     * This constructor gets both the file path and the mime type from the file given.
+     * The file must exist prior to constructing the source. Behaviour is undefined
+     * if the file does not exist, please do not test this case.
+     *
+     * @param descriptor the descriptor for the source.
+     * @param file the file that contains the source.
+     */
+    public FileSource(DefDescriptor<D> descriptor, File file) throws IOException {
+        super(descriptor, getFilePath(file), getMimeTypeFromExtension(file.getName()));
+        this.file = file;
+        this.lastModified = file.lastModified();
+    }
+
     public FileSource(DefDescriptor<D> descriptor, File file, Format format) {
         this(descriptor, getFilePath(file), file, format);
     }
@@ -44,7 +60,7 @@ public class FileSource<D extends Definition> extends AbstractTextSourceImpl<D> 
     protected FileSource(DefDescriptor<D> descriptor, String systemId, File file, Format format) {
         super(descriptor, systemId, format);
         this.file = file;
-        lastModified = file.lastModified();
+        this.lastModified = file.lastModified();
     }
 
     @Override

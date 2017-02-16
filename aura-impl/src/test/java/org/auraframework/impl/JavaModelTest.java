@@ -35,7 +35,7 @@ public class JavaModelTest extends AuraImplTestCase {
     public void testSerializeMetadata() throws Exception {
         JavaSourceLoader loader = new JavaSourceLoader();
         JavaModelDefFactory factory = new JavaModelDefFactory();
-        ModelDef def = factory.getDefinition(loader.getSource(descriptor));
+        ModelDef def = factory.getDefinition(descriptor, loader.getSource(descriptor));
         serializeAndGoldFile(def);
     }
 
@@ -43,7 +43,7 @@ public class JavaModelTest extends AuraImplTestCase {
     public void testSerializeData() throws Exception {
         JavaSourceLoader loader = new JavaSourceLoader();
         JavaModelDefFactory factory = new JavaModelDefFactory();
-        ModelDef def = factory.getDefinition(loader.getSource(descriptor));
+        ModelDef def = factory.getDefinition(descriptor, loader.getSource(descriptor));
         Model model = instanceService.getInstance(def, null);
         serializeAndGoldFile(model);
     }

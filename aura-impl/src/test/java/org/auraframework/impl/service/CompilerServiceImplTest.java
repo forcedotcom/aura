@@ -69,7 +69,7 @@ public class CompilerServiceImplTest extends AuraImplTestCase {
         }
 
         @Override
-        public D getDefinition(S source) throws QuickFixException {
+        public D getDefinition(DefDescriptor<D> descriptor, S source) throws QuickFixException {
             return defs.get(source);
         }
     }

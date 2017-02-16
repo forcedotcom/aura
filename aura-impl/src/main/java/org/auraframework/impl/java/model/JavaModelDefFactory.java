@@ -32,9 +32,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 @ServiceComponent
 public class JavaModelDefFactory implements DefinitionFactory<JavaSourceImpl<ModelDef>, ModelDef> {
     @Override
-    public ModelDef getDefinition(JavaSourceImpl<ModelDef> source) throws QuickFixException {
+    public ModelDef getDefinition(DefDescriptor<ModelDef> descriptor, JavaSourceImpl<ModelDef> source) throws QuickFixException {
         JavaModelDefImpl.Builder builder = new JavaModelDefImpl.Builder();
-        DefDescriptor<ModelDef> descriptor = source.getDescriptor();
         Class<?> clazz = source.getJavaClass();
 
         builder.setDescriptor(descriptor);

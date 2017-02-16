@@ -194,11 +194,11 @@ public class JavaControllerDefFactory implements DefinitionFactory<JavaSourceImp
     }
 
     @Override
-    public ControllerDef getDefinition(JavaSourceImpl<ControllerDef> source) throws QuickFixException {
+    public ControllerDef getDefinition(DefDescriptor<ControllerDef> descriptor, JavaSourceImpl<ControllerDef> source) throws QuickFixException {
         JavaControllerDefImpl.Builder builder = new JavaControllerDefImpl.Builder();
         Class<?> clazz = source.getJavaClass();
 
-        builder.setDescriptor(source.getDescriptor());
+        builder.setDescriptor(descriptor);
         builder.setControllerClass(clazz);
         builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
         builder.setLocation(clazz.getCanonicalName(), -1);
@@ -217,7 +217,7 @@ public class JavaControllerDefFactory implements DefinitionFactory<JavaSourceImp
 
     public ControllerDef getDef_DONOTUSE(DefDescriptor<ControllerDef> descriptor, Class<?> clazz)
             throws QuickFixException {
-        return getDefinition(new JavaSourceImpl<ControllerDef>(descriptor, clazz));
+        return getDefinition(descriptor, new JavaSourceImpl<>(descriptor, clazz));
     }
 
     @Override

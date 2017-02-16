@@ -76,7 +76,7 @@ public class CompilerServiceImpl implements CompilerService {
         if (factory == null) {
             return null;
         }
-        D def = factory.getDefinition(source);
+        D def = factory.getDefinition(source.getDescriptor(), source);
         def.validateDefinition();
         return def;
     }

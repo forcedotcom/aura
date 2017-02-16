@@ -16,6 +16,7 @@
 package org.auraframework.impl.java.type;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.java.JavaSourceImpl;
@@ -28,12 +29,12 @@ import org.auraframework.system.DefinitionFactory;
 @ServiceComponent
 public class JavaTypeDefFactory implements DefinitionFactory<JavaSourceImpl<TypeDef>, TypeDef> {
     @Override
-    public TypeDef getDefinition(JavaSourceImpl<TypeDef> source) {
+    public TypeDef getDefinition(DefDescriptor<TypeDef> descriptor, JavaSourceImpl<TypeDef> source) {
         JavaTypeDef.Builder builder;
         Class<?> clazz = source.getJavaClass();
 
         builder = new JavaTypeDef.Builder();
-        builder.setDescriptor(source.getDescriptor());
+        builder.setDescriptor(descriptor);
         builder.setLocation(clazz.getCanonicalName(), 0);
         builder.setTypeClass(clazz);
         builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.GLOBAL));

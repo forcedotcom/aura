@@ -16,6 +16,7 @@
 package org.auraframework.impl.java.provider;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokenDescriptorProviderDef;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.java.JavaSourceImpl;
@@ -31,19 +32,21 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 @ServiceComponent
 public final class JavaTokenDescriptorProviderDefFactory
         implements DefinitionFactory<JavaSourceImpl<TokenDescriptorProviderDef>, TokenDescriptorProviderDef> {
-    public TokenDescriptorProviderDef getDefinition(JavaSourceImpl<TokenDescriptorProviderDef> source)
-            throws QuickFixException {
+
+    @Override
+    public TokenDescriptorProviderDef getDefinition(DefDescriptor<TokenDescriptorProviderDef> descriptor, 
+            JavaSourceImpl<TokenDescriptorProviderDef> source) throws QuickFixException {
         Class<?> providerClass = source.getJavaClass();
         JavaTokenDescriptorProviderDef.Builder builder = new JavaTokenDescriptorProviderDef.Builder();
 
-        builder.setDescriptor(source.getDescriptor());
+        builder.setDescriptor(descriptor);
         builder.setLocation(providerClass.getCanonicalName(), 0);
         builder.setProviderClass(providerClass);
         builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
         Provider ann = source.findAnnotation(Provider.class);
         if (ann == null) {
             throw new InvalidDefinitionException(String.format(
-                    "@Provider annotation is required on all Providers.  Not found on %s", source.getDescriptor()),
+                    "@Provider annotation is required on all Providers.  Not found on %s", descriptor),
                     builder.getLocation());
         }
         return builder.build();

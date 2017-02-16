@@ -51,7 +51,7 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
     public void testDefGeneration() throws Exception {
         DefDescriptor<RendererDef> descriptor = definitionService.getDefDescriptor(
                 "java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer", RendererDef.class);
-        RendererDef def = factory.getDefinition(loader.getSource(descriptor));
+        RendererDef def = factory.getDefinition(descriptor, loader.getSource(descriptor));
         assertTrue("JavaRendererDefFactory should always generate JavaRendererDefs", def instanceof JavaRendererDef);
     }
 
@@ -63,7 +63,7 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
     public void testClassNotFound() throws Exception {
         DefDescriptor<RendererDef> descriptor = definitionService
                 .getDefDescriptor("java://ClassNotFound", RendererDef.class);
-        assertNull(factory.getDefinition(loader.getSource(descriptor)));
+        assertNull(factory.getDefinition(descriptor, loader.getSource(descriptor)));
 
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component renderer='java://ClassNotFound'></aura:component>");

@@ -15,8 +15,10 @@
  */
 package org.auraframework.system;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -55,5 +57,5 @@ public interface DefinitionFactory<S extends Source<D>, D extends Definition> {
      * 
      * @throws QuickFixException
      */
-    D getDefinition(@Nonnull S source) throws QuickFixException;
+    D getDefinition(@CheckForNull DefDescriptor<D> descriptor, @Nonnull S source) throws QuickFixException;
 }

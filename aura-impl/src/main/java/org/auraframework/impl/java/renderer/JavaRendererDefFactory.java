@@ -16,6 +16,7 @@
 package org.auraframework.impl.java.renderer;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.java.JavaSourceImpl;
@@ -26,11 +27,12 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 @ServiceComponent
 public class JavaRendererDefFactory implements DefinitionFactory<JavaSourceImpl<RendererDef>, RendererDef> {
     @Override
-    public RendererDef getDefinition(JavaSourceImpl<RendererDef> source) throws QuickFixException {
+    public RendererDef getDefinition(DefDescriptor<RendererDef> descriptor,
+            JavaSourceImpl<RendererDef> source) throws QuickFixException {
         JavaRendererDef.Builder builder = new JavaRendererDef.Builder();
         Class<?> rendererClass = source.getJavaClass();
 
-        builder.setDescriptor(source.getDescriptor());
+        builder.setDescriptor(descriptor);
         builder.setLocation(rendererClass.getCanonicalName(), -1);
         builder.setRendererClass(rendererClass);
         builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));

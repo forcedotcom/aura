@@ -96,11 +96,11 @@ AttributeSet.prototype.get = function(key, component) {
         var context=$A.getContext();
         var contextCmp = context && context.getCurrentAccess();
         var message="Access Check Failed! AttributeSet.get(): attribute '"+attribute+"' of component '"+component+"' is not visible to '"+contextCmp+"'.";
-        var ae = new $A.auraError(message);
-        ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
-        ae["componentStack"] = context && context.getAccessStackHierarchy();
         if(context.enableAccessChecks){
             if(context.logAccessFailures){
+                var ae = new $A.auraError(message);
+                ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+                ae["componentStack"] = context && context.getAccessStackHierarchy();
                 $A.error(null, ae);
             }
             return undefined;
@@ -188,11 +188,11 @@ AttributeSet.prototype.set = function(key, value, component) {
         var context=$A.getContext();
         var contextCmp = context && context.getCurrentAccess();
         var message="Access Check Failed! AttributeSet.set(): '"+attribute+"' of component '"+component+"' is not visible to '"+contextCmp+"'.";
-        var ae = new $A.auraError(message);
-        ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
-        ae["componentStack"] = context && context.getAccessStackHierarchy();
         if(context.enableAccessChecks){
             if(context.logAccessFailures){
+                var ae = new $A.auraError(message);
+                ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+                ae["componentStack"] = context && context.getAccessStackHierarchy();
                 $A.error(null, ae);
             }
             return;

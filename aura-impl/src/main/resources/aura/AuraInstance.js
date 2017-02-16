@@ -897,11 +897,16 @@ AuraInstance.prototype.getCallback = function(callback) {
                         }
                     }
                     var actionComponent = arguments[1];
+                    var actionComponentDefDescriptor = null;
                     if (actionComponent) {
                         var actionComponentDef = actionComponent.getDef();
-                        if (actionComponentDef && syntheticStackFrame) {
-                            syntheticStackFrame += "@" + actionComponentDef.getDescriptor().toString() + "\n";
+                        if (actionComponentDef) {
+                            actionComponentDefDescriptor = actionComponentDef.getDescriptor().toString();
                         }
+                    }
+
+                    if (syntheticStackFrame) {
+                        syntheticStackFrame = syntheticStackFrame + (actionComponentDefDescriptor ? ("@" + actionComponentDefDescriptor) : "") + "\n";
                     }
                 }
 

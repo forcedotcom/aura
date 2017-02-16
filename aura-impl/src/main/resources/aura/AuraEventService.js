@@ -1146,11 +1146,11 @@ AuraEventService.prototype.getDef = function(descriptor) {
         var context=$A.getContext();
         var contextCmp = context&&context.getCurrentAccess();
         var message="Access Check Failed! EventService.getEventDef():'" + definition.getDescriptor().toString() + "' is not visible to '" + contextCmp + "'.";
-        var ae = new $A.auraError(message);
-        ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
-        ae["componentStack"] = context && context.getAccessStackHierarchy();
         if(context.enableAccessChecks) {
             if(context.logAccessFailures){
+                var ae = new $A.auraError(message);
+                ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+                ae["componentStack"] = context && context.getAccessStackHierarchy();
                 $A.error(null, ae);
            }
             return null;
@@ -1180,14 +1180,15 @@ AuraEventService.prototype.hasDefinition = function(descriptor) {
         var context=$A.getContext();
         var contextCmp = context&&context.getCurrentAccess();
         var message="Access Check Failed! EventService.hasDefinition():'" + definition.getDescriptor().toString() + "' is not visible to '" + contextCmp + "'.";
-        var ae = new $A.auraError(message);
-        ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
-        ae["componentStack"] = context && context.getAccessStackHierarchy();
+
         if(context.enableAccessChecks) {
-           if(context.logAccessFailures){
-               $A.error(null, ae);
-           }
-           return false;
+            if(context.logAccessFailures){
+                var ae = new $A.auraError(message);
+                ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+                ae["componentStack"] = context && context.getAccessStackHierarchy();
+                $A.error(null, ae);
+            }
+            return false;
         }else{
             if(context.logAccessFailures){
                 $A.warning(message);

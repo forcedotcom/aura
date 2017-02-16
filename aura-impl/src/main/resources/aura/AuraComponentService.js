@@ -501,11 +501,11 @@ AuraComponentService.prototype.newComponentDeprecated = function(config, attribu
             var message="Access Check Failed! AuraComponentService.newComponentDeprecated(): '" +
                     (def && def.getDescriptor().getQualifiedName()) + "' is not visible to '" +
                     contextCmp + "'.";
-            var ae = new $A.auraError(message);
-            ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
-            ae["componentStack"] = context && context.getAccessStackHierarchy();
             if(context.enableAccessChecks) {
                 if(context.logAccessFailures){
+                    var ae = new $A.auraError(message);
+                    ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+                    ae["componentStack"] = context && context.getAccessStackHierarchy();
                     $A.error(null, ae);
                 }
                 return null;
@@ -754,11 +754,11 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
                     var context=$A.getContext();
                     var contextCmp = context && context.getCurrentAccess();
                     var message="Access Check Failed! AuraComponentService.newComponentAsync(): '" + def.getDescriptor().getQualifiedName() + "' is not visible to '" + contextCmp + "'.";
-                    var ae = new $A.auraError(message);
-                    ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
-                    ae["componentStack"] = context && context.getAccessStackHierarchy();
                     if(context.enableAccessChecks) {
                         if(context.logAccessFailures){
+                            var ae = new $A.auraError(message);
+                            ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+                            ae["componentStack"] = context && context.getAccessStackHierarchy();
                             $A.error(null, ae);
                         }
                         collectComponent(null, "ERROR", "Unknown component '" + desc + "'.", i);
@@ -1003,11 +1003,11 @@ AuraComponentService.prototype.getDefinition = function(descriptor, callback) {
             var context=$A.getContext();
             var contextCmp = context&&context.getCurrentAccess();
             var message="Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + contextCmp + "'.";
-            var ae = new $A.auraError(message);
-            ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
-            ae["componentStack"] = context && context.getAccessStackHierarchy();
             if(context.enableAccessChecks) {
                 if(context.logAccessFailures){
+                    var ae = new $A.auraError(message);
+                    ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+                    ae["componentStack"] = context && context.getAccessStackHierarchy();
                     $A.error(null, ae);
                 }
                 callback(null);
@@ -1086,11 +1086,11 @@ AuraComponentService.prototype.getDef = function(descriptor) {
         var context=$A.getContext();
         var contextCmp = context&&context.getCurrentAccess();
         var message="Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + contextCmp + "'.";
-        var ae = new $A.auraError(message);
-        ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
-        ae["componentStack"] = context && context.getAccessStackHierarchy();
         if(context.enableAccessChecks){
             if(context.logAccessFailures){
+                var ae = new $A.auraError(message);
+                ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+                ae["componentStack"] = context && context.getAccessStackHierarchy();
                 $A.error(null, ae);
             }
             return null;
@@ -1543,11 +1543,11 @@ AuraComponentService.prototype.createComponentPrivAsync = function (config, call
             var context=$A.getContext();
             var contextCmp = context && context.getCurrentAccess();
             var message="Access Check Failed! AuraComponentService.createComponent(): '" + descriptor + "' is not visible to '" + contextCmp + "'.";
-            var ae = new $A.auraError(message);
-            ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
-            ae["componentStack"] = context && context.getAccessStackHierarchy();
             if(context.enableAccessChecks) {
                 if(context.logAccessFailures){
+                    var ae = new $A.auraError(message);
+                    ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+                    ae["componentStack"] = context && context.getAccessStackHierarchy();
                     $A.error(null, ae);
                 }
                 callback(null, "ERROR", "Unknown component '" + descriptor + "'.");
@@ -1577,11 +1577,11 @@ AuraComponentService.prototype.createComponentPriv = function (config) {
         var context=$A.getContext();
         var contextCmp = context && context.getCurrentAccess();
         var message="Access Check Failed! AuraComponentService.createComponentFromConfig(): '" + descriptor + "' is not visible to '" + contextCmp + "'.";
-        var ae = new $A.auraError(message);
-        ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
-        ae["componentStack"] = context && context.getAccessStackHierarchy();
         if(context.enableAccessChecks) {
             if(context.logAccessFailures){
+                var ae = new $A.auraError(message);
+                ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+                ae["componentStack"] = context && context.getAccessStackHierarchy();
                 $A.error(null, ae);
             }
         }else{

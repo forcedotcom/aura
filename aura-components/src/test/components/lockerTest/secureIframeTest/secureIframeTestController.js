@@ -76,10 +76,60 @@
                             "Message from iframe: Message from parent",
                             function() {
                                 // timing issues on slower builds so keep re-sending message until we get a response
-                                cw.postMessage({ msg: "Message from parent" }, "*");
+                                cw.postMessage({msg: "Message from parent" }, "*");
                                 return cmp.get("v.messageReceived");
                             },
                             "Never received message back from iframe");
+                });
+    },
+
+    testParentWindowIsWindowForTopLevelWindow: function(cmp, event, handler) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertStartsWith("SecureWindow", window.parent.toString(), "window.parent expected to be a SecureWindow");
+        testUtils.assertEquals(window, window.parent, "For top level window, window.parent should be equal to window");
+
+        testUtils.assertStartsWith("SecureWindow", window.top.toString(), "window.parent expected to be a SecureWindow");
+        testUtils.assertEquals(window, window.top, "For top level window, window.top should be equal to window");
+    },
+
+    testParentWindowIsSecureIFrameContentWindowForIframedWindow: function(cmp, event, handler) {
+        var testUtils = cmp.get("v.testUtils");
+        var iframeLoaded = false;
+        var iframe = cmp.find("iframe").getElement();
+        var cw = iframe.contentWindow;
+
+        // setup message handler on main frame
+        function iframeHandler(event) {
+            cmp.set("v.messageData", event.data);
+            cmp.set("v.messageReceived", event.data.msg);
+        }
+        window.addEventListener("message", iframeHandler, false);
+        testUtils.assertDefined(cw.postMessage);
+
+        iframe.addEventListener("load", function() {
+            iframeLoaded = true;
+          });
+
+        testUtils.addWaitForWithFailureMessage(
+                true,
+                function() {
+                    return iframeLoaded;
+                },
+                "iFrame component never initialized",
+                function() {
+                    // iframe will echo back original message along with value of window.top/window.parent
+                    testUtils.addWaitForWithFailureMessage(
+                            "pingParent",
+                            function() {
+                                // timing issues on slower builds so keep re-sending message until we get a response
+                                cw.postMessage({ msg: "pingParent"}, "*");
+                                return cmp.get("v.messageReceived");
+                            },
+                            "Never received message back from iframe",
+                            function(){
+                                testUtils.assertStartsWith("SecureIFrameContentWindow", cmp.get("v.messageData").parentWindow, "window.parent expected be a SecureIFrameContentWindow");
+                                testUtils.assertStartsWith("SecureIFrameContentWindow", cmp.get("v.messageData").topWindow, "window.top expected be a SecureIFrameContentWindow");
+                            });
                 });
     },
 

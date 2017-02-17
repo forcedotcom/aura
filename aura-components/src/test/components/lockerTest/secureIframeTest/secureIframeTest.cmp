@@ -18,6 +18,7 @@
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
     <aura:attribute name="messageReceived" type="String"/>
+    <aura:attribute name="messageData" type="Object"/>
 
     <aura:method name="testIframeAttributes" action="{!c.testIframeAttributes}">
         <aura:attribute name="attributesWhitelist" type="List"/>
@@ -27,6 +28,8 @@
         <aura:attribute name="methodsWhitelist" type="List"/>
     </aura:method>
     <aura:method name="testContentWindow" action="{!c.testContentWindow}"/>
+    <aura:method name="testParentWindowIsSecureIFrameContentWindowForIframedWindow" action="{!c.testParentWindowIsSecureIFrameContentWindowForIframedWindow}"/>
+    <aura:method name="testParentWindowIsWindowForTopLevelWindow" action="{!c.testParentWindowIsWindowForTopLevelWindow}"/>
     <aura:method name="testMessageChannel" action="{!c.testMessageChannel}"/>
 
     <div aura:id="title">SecureIFrameElement test</div>

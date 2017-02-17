@@ -837,6 +837,7 @@ SecureWindow.metadata = {
             "pageStartTime":                        DEFAULT,
             "pageXOffset":                          DEFAULT,
             "pageYOffset":                          DEFAULT,
+            "parent":                               DEFAULT,
             "parseFloat":                           FUNCTION,
             "parseInt":                             FUNCTION,
             "performance":                          DEFAULT,
@@ -869,6 +870,7 @@ SecureWindow.metadata = {
             "stop":                                 FUNCTION,
             "styleMedia":                           DEFAULT,
             "toolbar":                              DEFAULT,
+            "top":                                  DEFAULT,
             "undefined":                            DEFAULT,
             "unescape":                             FUNCTION,
             "window":                               DEFAULT

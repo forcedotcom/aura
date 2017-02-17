@@ -39,6 +39,19 @@
         }
     },
 
+    testParentWindow: {
+        test: function(cmp) {
+            // When lockerized component is loaded in the top level window, we want to ensure that window, window.parent and window.top resolve
+            // to the exact same SecureWindow.
+            //This can only be done when running in AUTO modes as for manual runs component under test loads inside an iframe.
+            if(window === window.parent){
+                cmp.testParentWindowIsWindowForTopLevelWindow();
+            }
+            // When component is loaded inside an iframe, window.parent and window.top should resolve to SecureIFrameContentWindow
+            cmp.testParentWindowIsSecureIFrameContentWindowForIframedWindow();
+        }
+    },
+
     testMessageChannel: {
         test: function(cmp) {
             cmp.testMessageChannel();

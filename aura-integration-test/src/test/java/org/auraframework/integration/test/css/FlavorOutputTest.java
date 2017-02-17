@@ -15,8 +15,6 @@
  */
 package org.auraframework.integration.test.css;
 
-import com.salesforce.omakase.broadcast.emitter.SubscriptionException;
-
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;

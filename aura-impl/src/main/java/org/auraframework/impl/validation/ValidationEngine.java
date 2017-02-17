@@ -26,7 +26,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Source;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;

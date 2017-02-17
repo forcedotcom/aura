@@ -47,12 +47,12 @@ public class JavaProviderDefFactory implements DefinitionFactory<JavaSourceImpl<
     }
 
     @Override
-    public Class<?> getReferenceInterface() {
+    public Class<?> getSourceInterface() {
         return JavaSourceImpl.class;
     }
 
     @Override
-    public Class<JavaProviderDef> getReferenceType() {
+    public Class<JavaProviderDef> getDefinitionClass() {
         return JavaProviderDef.class;
     }
 

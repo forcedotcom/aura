@@ -19,7 +19,7 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.css.parser.StyleParser;
+import org.auraframework.impl.factory.StyleParser;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;

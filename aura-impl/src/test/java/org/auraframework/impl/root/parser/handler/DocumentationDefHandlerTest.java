@@ -19,7 +19,7 @@ import org.auraframework.def.DescriptionDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ExampleDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.parser.DocumentationXMLParser;
+import org.auraframework.impl.factory.DocumentationXMLParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -223,6 +223,6 @@ public class DocumentationDefHandlerTest extends AuraImplTestCase {
     private DocumentationDef parse(String markup) throws QuickFixException {
         StringSource<DocumentationDef> source = new StringSource<>(vendor.getDocumentationDefDescriptor(), markup, "myID", Format.XML);
 
-        return documentationXMLParser.parse(vendor.getDocumentationDefDescriptor(), source);
+        return documentationXMLParser.getDefinition(vendor.getDocumentationDefDescriptor(), source);
     }
 }

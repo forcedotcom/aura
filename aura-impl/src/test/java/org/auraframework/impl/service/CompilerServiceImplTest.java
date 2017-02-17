@@ -48,12 +48,12 @@ public class CompilerServiceImplTest extends AuraImplTestCase {
         }
 
         @Override
-        public Class<?> getReferenceInterface() {
+        public Class<?> getSourceInterface() {
             return ifc;
         }
 
         @Override
-        public Class<D> getReferenceType() {
+        public Class<D> getDefinitionClass() {
             return type;
         }
 
@@ -90,7 +90,7 @@ public class CompilerServiceImplTest extends AuraImplTestCase {
         factory.putDefinition(source, def);
         service.setFactories(Lists.newArrayList(factory));
 
-        assertEquals("should compile a source with no factory", def, service.compile(source));
+        assertEquals("should compile a source with no factory", def, service.compile(descriptor, source));
     }
 
     @Test
@@ -106,7 +106,7 @@ public class CompilerServiceImplTest extends AuraImplTestCase {
         Mockito.when(descriptor.getDefType()).thenReturn(DefType.PROVIDER);
         service.setFactories(Lists.newArrayList());
 
-        assertNull("should not compile a source with no factory", service.compile(source));
+        assertNull("should not compile a source with no factory", service.compile(descriptor, source));
     }
 
     @Test

@@ -13,33 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.javascript.parser;
+package org.auraframework.impl.factory;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.HelperDef;
-import org.auraframework.impl.javascript.parser.handler.JavascriptHelperDefHandler;
-import org.auraframework.system.Parser;
+import org.auraframework.impl.javascript.parser.handler.JavascriptControllerDefHandler;
+import org.auraframework.impl.source.AbstractTextSourceImpl;
+import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @ServiceComponent
-public class JavascriptHelperParser implements Parser<HelperDef> {
-
+public class JavascriptControllerParser implements DefinitionFactory<TextSource<ControllerDef>, ControllerDef> {
     @Override
-    public Format getFormat() {
-        return Format.JS;
-    }
-
-    @Override
-    public DefType getDefType() {
-        return DefType.HELPER;
-    }
-    
-    @Override
-    public HelperDef parse(DefDescriptor<HelperDef> descriptor, TextSource<HelperDef> source)
+    public ControllerDef getDefinition(DefDescriptor<ControllerDef> descriptor, TextSource<ControllerDef> source)
             throws QuickFixException {
-        return new JavascriptHelperDefHandler(descriptor, source).getDefinition();
+        return new JavascriptControllerDefHandler(descriptor, source).getDefinition();
+    }
+
+    @Override
+    public Class<?> getSourceInterface() {
+        return TextSource.class;
+    }
+
+    @Override
+    public Class<ControllerDef> getDefinitionClass() {
+        return ControllerDef.class;
+    }
+
+    @Override
+    public String getMimeType() {
+        return AbstractTextSourceImpl.MIME_JAVASCRIPT;
     }
 }

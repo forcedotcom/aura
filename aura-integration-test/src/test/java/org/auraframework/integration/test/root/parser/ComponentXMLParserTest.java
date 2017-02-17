@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.parser.ComponentXMLParser;
+import org.auraframework.impl.factory.ComponentXMLParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -41,7 +41,7 @@ public class ComponentXMLParserTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<>(
                 descriptor, "<aura:component><aura:attribute name=\"implNumber\" type=\"String\"/>"
                 + "<aura:attribute name=\"implNumber\" type=\"String\"/></aura:component>", "myID", Format.XML);
-        ComponentDef cd = parser.parse(descriptor, source);
+        ComponentDef cd = parser.getDefinition(descriptor, source);
         try {
             cd.validateDefinition();
             fail("Should have thrown Exception. Two attributes with the same name cannot exist");
@@ -62,7 +62,7 @@ public class ComponentXMLParserTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<>(
                 descriptor,
                 "<aura:component extends='test:fakeAbstract' extends='test:fakeAbstractParent'></aura:component>", "myID", Format.XML);
-        ComponentDef cd = parser.parse(descriptor, source);
+        ComponentDef cd = parser.getDefinition(descriptor, source);
         try {
             cd.validateDefinition();
             fail("Should have thrown Exception. Same attribute specified twice on aura:component tag.");
@@ -78,7 +78,7 @@ public class ComponentXMLParserTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> descriptor = definitionService.getDefDescriptor("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
                 descriptor, "<aura:component extends=''></aura:component>", "myID", Format.XML);
-        ComponentDef cd = parser.parse(descriptor, source);
+        ComponentDef cd = parser.getDefinition(descriptor, source);
         try {
             cd.validateDefinition();
             fail("Should have thrown Exception. Attribute value cannot be blank.");
@@ -91,7 +91,7 @@ public class ComponentXMLParserTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> descriptor = definitionService.getDefDescriptor("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
                 descriptor, "<aura:component></aura:component>", "myID", Format.XML);
-        ComponentDef cd = parser.parse(descriptor, source);
+        ComponentDef cd = parser.getDefinition(descriptor, source);
         assertFalse(cd.hasFlavorableChild());
     }
 
@@ -100,7 +100,7 @@ public class ComponentXMLParserTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> descriptor = definitionService.getDefDescriptor("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
                 descriptor, "<aura:component><div aura:flavorable='true'></div></aura:component>", "myID", Format.XML);
-        ComponentDef cd = parser.parse(descriptor, source);
+        ComponentDef cd = parser.getDefinition(descriptor, source);
         assertTrue(cd.hasFlavorableChild());
     }
 
@@ -109,7 +109,7 @@ public class ComponentXMLParserTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> descriptor = definitionService.getDefDescriptor("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
                 descriptor, "<aura:component><div><div aura:flavorable='true'></div></div></aura:component>", "myID", Format.XML);
-        ComponentDef cd = parser.parse(descriptor, source);
+        ComponentDef cd = parser.getDefinition(descriptor, source);
         assertTrue(cd.hasFlavorableChild());
     }
 
@@ -119,7 +119,7 @@ public class ComponentXMLParserTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<>(
                 descriptor,
                 "<aura:component><div><div><div><div aura:flavorable='true'></div></div></div></div></aura:component>", "myID", Format.XML);
-        ComponentDef cd = parser.parse(descriptor, source);
+        ComponentDef cd = parser.getDefinition(descriptor, source);
         assertTrue(cd.hasFlavorableChild());
     }
 
@@ -150,7 +150,7 @@ public class ComponentXMLParserTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> descriptor = definitionService.getDefDescriptor("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
                 descriptor, "<aura:component defaultFlavor='test'></aura:component>", "myID", Format.XML);
-        ComponentDef cd = parser.parse(descriptor, source);
+        ComponentDef cd = parser.getDefinition(descriptor, source);
         assertEquals("test", cd.getDefaultFlavorOrImplicit());
     }
 
@@ -159,7 +159,7 @@ public class ComponentXMLParserTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> descriptor = definitionService.getDefDescriptor("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(
                 descriptor, "<aura:component dynamicallyFlavorable='true'></aura:component>", "myID", Format.XML);
-        ComponentDef cd = parser.parse(descriptor, source);
+        ComponentDef cd = parser.getDefinition(descriptor, source);
         assertTrue(cd.isDynamicallyFlavorable());
     }
 

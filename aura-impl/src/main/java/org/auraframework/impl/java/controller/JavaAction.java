@@ -31,7 +31,6 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.AuraUnhandledException;
-import org.auraframework.throwable.GenericEventException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;

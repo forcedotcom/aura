@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.root.parser;
+package org.auraframework.impl.factory;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.root.parser.handler.LibraryDefHandler;
 import org.auraframework.service.DefinitionService;
@@ -29,22 +28,16 @@ import javax.xml.stream.XMLStreamReader;
 
 @ServiceComponent
 public class LibraryXMLParser extends XMLParser<LibraryDef> {
-
-    @Override
-    public Format getFormat() {
-        return Format.XML;
-    }
-
-    @Override
-    public DefType getDefType() {
-        return DefType.LIBRARY;
-    }
-
     @Override
     protected LibraryDefHandler getHandler(DefDescriptor<LibraryDef> descriptor, TextSource<LibraryDef> source,
                                            XMLStreamReader xmlReader, boolean isInInternalNamespace,
                                            DefinitionService definitionService,
                                            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         return new LibraryDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    }
+
+    @Override
+    public Class<LibraryDef> getDefinitionClass() {
+        return LibraryDef.class;
     }
 }

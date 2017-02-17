@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.svg.parser;
+package org.auraframework.impl.factory;
 
 
 import java.io.StringReader;
@@ -32,16 +32,16 @@ import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.SVGDef;
-import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.handler.SVGDefHandler;
-import org.auraframework.system.Parser;
+import org.auraframework.impl.source.AbstractTextSourceImpl;
+import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.SVGParserException;
 
 @ServiceComponent
-public class SVGParser implements Parser<SVGDef> {
+public class SVGParser implements DefinitionFactory<TextSource<SVGDef>, SVGDef> {
     private static final XMLInputFactory xmlInputFactory;
     private static final Pattern DISSALOWED_LIST = Pattern.compile(".*(&|/|<|>).*", Pattern.DOTALL | Pattern.MULTILINE);
 
@@ -94,20 +94,10 @@ public class SVGParser implements Parser<SVGDef> {
             // is implementation specific. NO-OP
         }
     }
-
-    @Override
-    public Format getFormat() {
-        return Format.SVG;
-    }
-
-    @Override
-    public DefType getDefType() {
-        return DefType.SVG;
-    }
     
     @Override
-    public SVGDef parse(DefDescriptor<SVGDef> descriptor, TextSource<SVGDef> source) throws SVGParserException,
-    QuickFixException {
+    public SVGDef getDefinition(DefDescriptor<SVGDef> descriptor, TextSource<SVGDef> source)
+            throws SVGParserException, QuickFixException {
         if (descriptor.getDefType() == DefType.SVG) {
             XMLStreamReader reader = null;
             String contents = source.getContents();
@@ -171,5 +161,20 @@ public class SVGParser implements Parser<SVGDef> {
             return ret;
         }
         return null;
+    }
+
+    @Override
+    public Class<?> getSourceInterface() {
+        return TextSource.class;
+    }
+
+    @Override
+    public Class<SVGDef> getDefinitionClass() {
+        return SVGDef.class;
+    }
+
+    @Override
+    public String getMimeType() {
+        return AbstractTextSourceImpl.MIME_SVG;
     }
 }

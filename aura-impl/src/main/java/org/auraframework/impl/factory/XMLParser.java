@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.root.parser;
+package org.auraframework.impl.factory;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.net.URL;
 
 import javax.inject.Inject;
 import javax.xml.stream.XMLInputFactory;
@@ -32,9 +31,10 @@ import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
+import org.auraframework.impl.source.AbstractTextSourceImpl;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.Location;
-import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraExceptionInfo;
@@ -49,7 +49,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * Objects.
  */
 @ServiceComponent
-public abstract class XMLParser<D extends RootDefinition> implements Parser<D> {
+public abstract class XMLParser<D extends RootDefinition> implements DefinitionFactory<TextSource<D>,D> {
 
     @Inject
     private ConfigAdapter configAdapter;
@@ -95,17 +95,27 @@ public abstract class XMLParser<D extends RootDefinition> implements Parser<D> {
                                                     DefinitionParserAdapter definitionParserAdapter) throws QuickFixException;
 
     @Override
-    public D parse(DefDescriptor<D> descriptor, TextSource<D> source) throws QuickFixException {
+    public Class<?> getSourceInterface() {
+        return TextSource.class;
+    }
+
+    @Override
+    public String getMimeType() {
+        return AbstractTextSourceImpl.MIME_XML;
+    }
+
+    @Override
+    public D getDefinition(DefDescriptor<D> descriptor, TextSource<D> source) throws QuickFixException {
         Reader reader = null;
         XMLStreamReader xmlReader = null;
         RootTagHandler<D> handler = null;
 
         D ret = null;
         try {
-                String contents = source.getContents();
-                reader = new HTMLReader(new StringReader(contents));
+            String contents = source.getContents();
+            reader = new HTMLReader(new StringReader(contents));
 
-                xmlReader = xmlInputFactory.createXMLStreamReader(reader);
+            xmlReader = xmlInputFactory.createXMLStreamReader(reader);
             handler = getHandler(descriptor, source, xmlReader, isInInternalNamespace(descriptor),
                     definitionService, configAdapter, definitionParserAdapter);
             if (xmlReader != null) {

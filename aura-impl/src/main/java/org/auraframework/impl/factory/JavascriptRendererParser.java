@@ -13,33 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.javascript.parser;
+package org.auraframework.impl.factory;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.TestSuiteDef;
-import org.auraframework.impl.javascript.parser.handler.JavascriptTestSuiteDefHandler;
-import org.auraframework.system.Parser;
+import org.auraframework.def.RendererDef;
+import org.auraframework.impl.javascript.parser.handler.JavascriptRendererDefHandler;
+import org.auraframework.impl.source.AbstractTextSourceImpl;
+import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @ServiceComponent
-public class JavascriptTestSuiteParser implements Parser<TestSuiteDef> {
-
+public class JavascriptRendererParser implements DefinitionFactory<TextSource<RendererDef>, RendererDef> {
     @Override
-    public Format getFormat() {
-        return Format.JS;
-    }
-
-    @Override
-    public DefType getDefType() {
-        return DefType.TESTSUITE;
-    }
-    
-    @Override
-    public TestSuiteDef parse(DefDescriptor<TestSuiteDef> descriptor, TextSource<TestSuiteDef> source)
+    public RendererDef getDefinition(DefDescriptor<RendererDef> descriptor, TextSource<RendererDef> source)
             throws QuickFixException {
-        return new JavascriptTestSuiteDefHandler(descriptor, source).getDefinition();
+        return new JavascriptRendererDefHandler(descriptor, source).getDefinition();
+    }
+
+    @Override
+    public Class<?> getSourceInterface() {
+        return TextSource.class;
+    }
+
+    @Override
+    public Class<RendererDef> getDefinitionClass() {
+        return RendererDef.class;
+    }
+
+    @Override
+    public String getMimeType() {
+        return AbstractTextSourceImpl.MIME_JAVASCRIPT;
     }
 }

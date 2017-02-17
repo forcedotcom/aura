@@ -24,7 +24,7 @@ import javax.inject.Inject;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.javascript.parser.JavascriptRendererParser;
+import org.auraframework.impl.factory.JavascriptRendererParser;
 import org.auraframework.impl.javascript.renderer.JavascriptRendererDef;
 import org.auraframework.system.TextSource;
 import org.auraframework.test.source.StringSourceLoader;
@@ -49,7 +49,7 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
         DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
         TextSource<RendererDef> source = loader.getSource(rendererDesc);
 
-        RendererDef rendererDef = new JavascriptRendererParser().parse(rendererDesc, source);
+        RendererDef rendererDef = new JavascriptRendererParser().getDefinition(rendererDesc, source);
 
         assertThat(rendererDef, instanceOf(JavascriptRendererDef.class));
         rendererDef.validateDefinition();
@@ -70,7 +70,7 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
         DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
         TextSource<RendererDef> source = loader.getSource(rendererDesc);
 
-        RendererDef rendererDef = new JavascriptRendererParser().parse(rendererDesc, source);
+        RendererDef rendererDef = new JavascriptRendererParser().getDefinition(rendererDesc, source);
 
         assertThat(rendererDef, instanceOf(JavascriptRendererDef.class));
         rendererDef.validateDefinition();
@@ -89,7 +89,7 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
         DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
         TextSource<RendererDef> source = loader.getSource(rendererDesc);
 
-        RendererDef rendererDef = new JavascriptRendererParser().parse(rendererDesc, source);
+        RendererDef rendererDef = new JavascriptRendererParser().getDefinition(rendererDesc, source);
 
         assertThat(rendererDef, instanceOf(JavascriptRendererDef.class));
         rendererDef.validateDefinition();
@@ -109,7 +109,7 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
         DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
         TextSource<RendererDef> source = loader.getSource(rendererDesc);
 
-        RendererDef rendererDef = new JavascriptRendererParser().parse(rendererDesc, source);
+        RendererDef rendererDef = new JavascriptRendererParser().getDefinition(rendererDesc, source);
 
         String code = rendererDef.getCode();
         assertEquals("Renderer parser should ignore non renderer function elements.",

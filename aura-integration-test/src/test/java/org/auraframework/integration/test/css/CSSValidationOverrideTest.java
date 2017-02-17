@@ -21,7 +21,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.css.parser.StyleParser;
+import org.auraframework.impl.factory.StyleParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.TextSource;
@@ -55,7 +55,7 @@ public class CSSValidationOverrideTest extends AuraImplTestCase {
         assertTrue("By default all component CSS should be validated", configAdapter.validateCss());
         TextSource<StyleDef> source = getInvalidStyleSource();
         try {
-            new StyleParser.WithValidation().parse(source.getDescriptor(), source).validateDefinition();
+            new StyleParser.WithValidation().getDefinition(source.getDescriptor(), source).validateDefinition();
             fail("Expected CSS validation to be turned on and catch the invalid CSS");
         } catch (StyleParserException expected) {
             assertTrue("Unexpected error message in StyleParserException",
@@ -72,6 +72,6 @@ public class CSSValidationOverrideTest extends AuraImplTestCase {
         getMockConfigAdapter().setValidateCss(false);
         assertFalse("Expected CSS validation to be overriden.", configAdapter.validateCss());
         TextSource<StyleDef> source = getInvalidStyleSource();
-        new StyleParser.WithValidation().parse(source.getDescriptor(), source);
+        new StyleParser.WithValidation().getDefinition(source.getDescriptor(), source);
     }
 }

@@ -27,7 +27,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.Source;
 import org.auraframework.system.TextSource;
 import org.junit.Assert;
 import org.junit.Test;
@@ -211,7 +210,7 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
         source = (TextSource<?>)definitionService.getSource(lib);
         String originalContent = source.getContents();
         String newSource = originalContent.replace("basicFirst", "BASICFirst");
-        if(source != null && newSource != null) {
+        if(newSource != null) {
             //update the test_Library.lib source, then refresh
             getAuraTestingUtil().updateSource(lib, newSource);
             //refresh the testApp, until it pick up the source change in test_Library.lib

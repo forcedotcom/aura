@@ -13,33 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.javascript.parser;
+package org.auraframework.impl.factory;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.RendererDef;
-import org.auraframework.impl.javascript.parser.handler.JavascriptRendererDefHandler;
-import org.auraframework.system.Parser;
+import org.auraframework.def.ResourceDef;
+import org.auraframework.impl.clientlibrary.handler.ResourceDefHandler;
+import org.auraframework.impl.source.AbstractTextSourceImpl;
+import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @ServiceComponent
-public class JavascriptRendererParser implements Parser<RendererDef> {
-
+public class JavascriptResourceParser implements DefinitionFactory<TextSource<ResourceDef>, ResourceDef> {
     @Override
-    public Format getFormat() {
-        return Format.JS;
-    }
-
-    @Override
-    public DefType getDefType() {
-        return DefType.RENDERER;
-    }
-    
-    @Override
-    public RendererDef parse(DefDescriptor<RendererDef> descriptor, TextSource<RendererDef> source)
+    public ResourceDef getDefinition(DefDescriptor<ResourceDef> descriptor, TextSource<ResourceDef> source)
             throws QuickFixException {
-        return new JavascriptRendererDefHandler(descriptor, source).getDefinition();
+        return new ResourceDefHandler(descriptor, source).createDefinition();
+    }
+
+    @Override
+    public Class<?> getSourceInterface() {
+        return TextSource.class;
+    }
+
+    @Override
+    public Class<ResourceDef> getDefinitionClass() {
+        return ResourceDef.class;
+    }
+
+    @Override
+    public String getMimeType() {
+        return AbstractTextSourceImpl.MIME_JAVASCRIPT;
     }
 }

@@ -21,12 +21,10 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.impl.parser.ParserFactory;
+import org.auraframework.service.CompilerService;
 import org.auraframework.system.DefRegistry;
-import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
-import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Sets;
@@ -38,10 +36,10 @@ public class PassThroughDefRegistry implements DefRegistry {
     private final Set<DefType> defTypes;
     private final Set<String> prefixes;
     private final boolean cacheable;
-    private final ParserFactory parserFactory;
+    private final CompilerService compilerService;
 
     public PassThroughDefRegistry(SourceLoader sourceLoader, Set<DefType> defTypes, Set<String> prefixes,
-            boolean cacheable, ParserFactory parserFactory) {
+            boolean cacheable, CompilerService compilerService) {
         this.sourceLoader = sourceLoader;
         this.prefixes = Sets.newHashSet();
         for (String prefix : prefixes) {
@@ -49,16 +47,15 @@ public class PassThroughDefRegistry implements DefRegistry {
         }
         this.defTypes = defTypes;
         this.cacheable = cacheable;
-        this.parserFactory = parserFactory;
+        this.compilerService = compilerService;
     }
 
     @Override
     public <T extends Definition> T getDef(DefDescriptor<T> descriptor) throws QuickFixException {
-        TextSource<T> source = (TextSource<T>)sourceLoader.getSource(descriptor);
+        Source<T> source = sourceLoader.getSource(descriptor);
         if (source != null) {
             descriptor = source.getDescriptor();
-            Parser<T> parser = parserFactory.getParser(source.getFormat(), descriptor);
-            return parser.parse(descriptor, source);
+            return compilerService.compile(descriptor, source);
         }
         return null;
     }

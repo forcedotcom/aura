@@ -28,7 +28,7 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.javascript.controller.JavascriptControllerDef;
-import org.auraframework.impl.javascript.parser.JavascriptControllerParser;
+import org.auraframework.impl.factory.JavascriptControllerParser;
 import org.auraframework.system.TextSource;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -56,7 +56,7 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
         TextSource<ControllerDef> source = loader.getSource(controllerDesc);
 
-        ControllerDef controllerDef = new JavascriptControllerParser().parse(controllerDesc, source);
+        ControllerDef controllerDef = new JavascriptControllerParser().getDefinition(controllerDesc, source);
 
         assertThat(controllerDef, instanceOf(JavascriptControllerDef.class));
         controllerDef.validateDefinition();
@@ -82,7 +82,7 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
         TextSource<ControllerDef> source = loader.getSource(controllerDesc);
 
-        ControllerDef controllerDef = new JavascriptControllerParser().parse(controllerDesc, source);
+        ControllerDef controllerDef = new JavascriptControllerParser().getDefinition(controllerDesc, source);
 
         assertThat(controllerDef, instanceOf(JavascriptControllerDef.class));
         controllerDef.validateDefinition();
@@ -101,7 +101,7 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
         TextSource<ControllerDef> source = loader.getSource(controllerDesc);
 
-        ControllerDef controllerDef = new JavascriptControllerParser().parse(controllerDesc, source);
+        ControllerDef controllerDef = new JavascriptControllerParser().getDefinition(controllerDesc, source);
 
         assertThat(controllerDef, instanceOf(JavascriptControllerDef.class));
         controllerDef.validateDefinition();
@@ -127,7 +127,7 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
         TextSource<ControllerDef> source = loader.getSource(controllerDesc);
 
-        ControllerDef controllerDef = new JavascriptControllerParser().parse(controllerDesc, source);
+        ControllerDef controllerDef = new JavascriptControllerParser().getDefinition(controllerDesc, source);
         try {
             controllerDef.validateDefinition();
             fail("InvalidDefinitionException should be thrown.");
@@ -149,7 +149,7 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
         TextSource<ControllerDef> source = loader.getSource(controllerDesc);
 
-        ControllerDef controllerDef = new JavascriptControllerParser().parse(controllerDesc, source);
+        ControllerDef controllerDef = new JavascriptControllerParser().getDefinition(controllerDesc, source);
         try {
             controllerDef.validateDefinition();
             fail("InvalidDefinitionException should be thrown.");

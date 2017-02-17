@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.root.parser;
+package org.auraframework.impl.factory;
+
+import javax.inject.Inject;
+import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
-
-import javax.inject.Inject;
-import javax.xml.stream.XMLStreamReader;
 
 @ServiceComponent
 public class ComponentXMLParser extends XMLParser<ComponentDef> {
@@ -36,21 +35,16 @@ public class ComponentXMLParser extends XMLParser<ComponentDef> {
     private ContextService contextService;
 
     @Override
-    public Format getFormat() {
-        return Format.XML;
-    }
-
-    @Override
-    public DefType getDefType() {
-        return DefType.COMPONENT;
-    }
-
-    @Override
     protected ComponentDefHandler getHandler(DefDescriptor<ComponentDef> descriptor, TextSource<ComponentDef> source,
                                              XMLStreamReader xmlReader, boolean isInInternalNamespace,
                                              DefinitionService definitionService,
                                              ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         return new ComponentDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
                 contextService, configAdapter, definitionParserAdapter);
+    }
+
+    @Override
+    public Class<ComponentDef> getDefinitionClass() {
+        return ComponentDef.class;
     }
 }

@@ -13,36 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.css.parser;
+package org.auraframework.impl.factory;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.ResourceDef;
-import org.auraframework.impl.clientlibrary.handler.ResourceDefHandler;
-import org.auraframework.system.Parser;
+import org.auraframework.def.ModelDef;
+import org.auraframework.impl.javascript.parser.handler.JavascriptModelDefHandler;
+import org.auraframework.impl.source.AbstractTextSourceImpl;
+import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-/**
- * Class to handle resource CSS parsing.
- */
 @ServiceComponent
-public final class ResourceCSSParser implements Parser<ResourceDef> {
-
+public class JavascriptModelParser implements DefinitionFactory<TextSource<ModelDef>, ModelDef> {
     @Override
-    public Format getFormat() {
-        return Format.CSS;
+    public ModelDef getDefinition(DefDescriptor<ModelDef> descriptor, TextSource<ModelDef> source)
+            throws QuickFixException {
+        return new JavascriptModelDefHandler(descriptor, source).getDefinition();
     }
 
     @Override
-    public DefType getDefType() {
-        return DefType.RESOURCE;
+    public Class<?> getSourceInterface() {
+        return TextSource.class;
     }
-    
+
     @Override
-    public ResourceDef parse(DefDescriptor<ResourceDef> descriptor,
-            TextSource<ResourceDef> source) throws QuickFixException {
-        return new ResourceDefHandler(descriptor, source).createDefinition();
+    public Class<ModelDef> getDefinitionClass() {
+        return ModelDef.class;
+    }
+
+    @Override
+    public String getMimeType() {
+        return AbstractTextSourceImpl.MIME_JAVASCRIPT;
     }
 }

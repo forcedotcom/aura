@@ -53,12 +53,12 @@ public final class JavaTokenMapProviderDefFactory
     }
 
     @Override
-    public Class<?> getReferenceInterface() {
+    public Class<?> getSourceInterface() {
         return JavaSourceImpl.class;
     }
 
     @Override
-    public Class<TokenMapProviderDef> getReferenceType() {
+    public Class<TokenMapProviderDef> getDefinitionClass() {
         return TokenMapProviderDef.class;
     }
 

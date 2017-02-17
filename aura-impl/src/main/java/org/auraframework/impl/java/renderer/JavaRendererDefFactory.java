@@ -40,12 +40,12 @@ public class JavaRendererDefFactory implements DefinitionFactory<JavaSourceImpl<
     }
 
     @Override
-    public Class<?> getReferenceInterface() {
+    public Class<?> getSourceInterface() {
         return JavaSourceImpl.class;
     }
 
     @Override
-    public Class<RendererDef> getReferenceType() {
+    public Class<RendererDef> getDefinitionClass() {
         return RendererDef.class;
     }
 

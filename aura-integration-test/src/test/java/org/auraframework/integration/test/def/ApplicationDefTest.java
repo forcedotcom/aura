@@ -26,11 +26,9 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokensDef;
-import org.auraframework.impl.parser.ParserFactory;
 import org.auraframework.impl.root.component.BaseComponentDefTest;
+import org.auraframework.service.CompilerService;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Parser;
-import org.auraframework.system.Parser.Format;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -44,7 +42,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     DefinitionService definitionService;
 
     @Inject
-    protected ParserFactory parserFactory;
+    protected CompilerService compilerService;
 
     public ApplicationDefTest() {
         super(ApplicationDef.class, "aura:application");
@@ -194,8 +192,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         addSourceAutoCleanup(controllerDesc, controllerCode);
 
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(appDesc);
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, appDesc);
-        ApplicationDef appDef = parser.parse(appDesc, source);
+        ApplicationDef appDef = compilerService.compile(appDesc, source);
 
         try {
             appDef.validateReferences(true);
@@ -217,8 +214,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         addSourceAutoCleanup(controllerDesc, controllerCode);
 
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(appDesc);
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, appDesc);
-        ApplicationDef appDef = parser.parse(appDesc, source);
+        ApplicationDef appDef = compilerService.compile(appDesc, source);
 
         try {
             appDef.validateReferences(false);
@@ -243,8 +239,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         addSourceAutoCleanup(controllerDesc, controllerCode);
 
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(appDesc);
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, appDesc);
-        ApplicationDef appDef = parser.parse(appDesc, source);
+        ApplicationDef appDef = compilerService.compile(appDesc, source);
 
         String actual = appDef.getCode(true);
 

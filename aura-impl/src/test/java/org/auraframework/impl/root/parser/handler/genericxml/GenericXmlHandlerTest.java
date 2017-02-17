@@ -21,7 +21,7 @@ import com.google.common.collect.Sets;
 import org.auraframework.def.genericxml.GenericXmlElement;
 import org.auraframework.def.genericxml.GenericXmlValidator;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.parser.XMLParser;
+import org.auraframework.impl.factory.XMLParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser;
 import org.junit.Test;

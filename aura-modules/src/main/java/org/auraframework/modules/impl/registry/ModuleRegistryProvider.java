@@ -36,7 +36,7 @@ import org.auraframework.impl.source.SourceFactory;
 import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.impl.source.resource.ResourceSourceLoader;
 import org.auraframework.impl.system.CompilingDefRegistry;
-import org.auraframework.impl.parser.ParserFactory;
+import org.auraframework.service.CompilerService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
@@ -68,7 +68,7 @@ public class ModuleRegistryProvider implements RegistryAdapter, SourceListener {
     private ConfigAdapter configAdapter;
 
     @Inject
-    private ParserFactory parserFactory;
+    private CompilerService compilerService;
 
     @Inject
     private List<ComponentLocationAdapter> locationAdapters;
@@ -93,7 +93,7 @@ public class ModuleRegistryProvider implements RegistryAdapter, SourceListener {
 
                 moduleLoaders.add(sourceLoader);
                 CompilingDefRegistry defRegistry = new CompilingDefRegistry(sourceLoader, PREFIXES, DEF_TYPES,
-                        parserFactory);
+                        compilerService);
                 registries.add(defRegistry);
 
                 // register namespaces to optimize processing of definition references

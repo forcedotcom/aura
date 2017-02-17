@@ -53,12 +53,12 @@ public final class JavaTokenDescriptorProviderDefFactory
     }
 
     @Override
-    public Class<?> getReferenceInterface() {
+    public Class<?> getSourceInterface() {
         return JavaSourceImpl.class;
     }
 
     @Override
-    public Class<TokenDescriptorProviderDef> getReferenceType() {
+    public Class<TokenDescriptorProviderDef> getDefinitionClass() {
         return TokenDescriptorProviderDef.class;
     }
 

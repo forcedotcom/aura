@@ -22,7 +22,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.parser.ComponentXMLParser;
+import org.auraframework.impl.factory.ComponentXMLParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -38,7 +38,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<>(
                 descriptor,
                 "<aura:component><aura:registerevent name='click' type='aura:click' description='The Description' access='global'/></aura:component>", "myID", Format.XML);
-        ComponentDef def2 = componentXMLParser.parse(descriptor, source);
+        ComponentDef def2 = componentXMLParser.getDefinition(descriptor, source);
         RegisterEventDef red = def2.getRegisterEventDefs().get("click");
         assertNotNull(red);
         assertEquals("click", red.getName());
@@ -51,7 +51,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<>(
                 descriptor,
                 "<aura:component><aura:registerevent name='aura:click' description='The Description' access='fakeAccessLevel'/></aura:component>", "myID", Format.XML);
-        ComponentDef cd = componentXMLParser.parse(descriptor, source);
+        ComponentDef cd = componentXMLParser.getDefinition(descriptor, source);
         try {
             cd.validateDefinition();
             fail("Should have thrown AuraException because access level isn't public or global");
@@ -66,7 +66,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<>(
                 descriptor,
                 "<aura:component><aura:registerevent name='aura:click' description='The Description' access='global'>invalidtext</aura:registerevent></aura:component>", "myID", Format.XML);
-        ComponentDef cd = componentXMLParser.parse(descriptor, source);
+        ComponentDef cd = componentXMLParser.getDefinition(descriptor, source);
         try {
             cd.validateDefinition();
             fail("Should have thrown AuraException because text is between aura:registerevent tags");
@@ -81,7 +81,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<>(
                 descriptor,
                 "<aura:component><aura:registerevent name='wheresthetype'/></aura:component>", "myID", Format.XML);
-        ComponentDef def = componentXMLParser.parse(descriptor, source);
+        ComponentDef def = componentXMLParser.getDefinition(descriptor, source);
         try {
         	def.validateDefinition();
             fail("Missing type for event should be flagged");
@@ -97,7 +97,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<>(
                 descriptor,
                 String.format("<aura:component><aura:registerevent type='%s'/></aura:component>", eventDesc.getDescriptorName()), "myID", Format.XML);
-        ComponentDef def = componentXMLParser.parse(descriptor, source);
+        ComponentDef def = componentXMLParser.getDefinition(descriptor, source);
         try {
         	def.validateDefinition();
             fail("Missing name for component event should be flagged");
@@ -113,7 +113,7 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<>(
                 descriptor,
                 String.format("<aura:component><aura:registerevent type='%s'/></aura:component>", eventDesc.getDescriptorName()), "myID", Format.XML);
-        ComponentDef def = componentXMLParser.parse(descriptor, source);
+        ComponentDef def = componentXMLParser.getDefinition(descriptor, source);
         try {
         	def.validateDefinition();
             fail("Missing name for application event should be flagged");

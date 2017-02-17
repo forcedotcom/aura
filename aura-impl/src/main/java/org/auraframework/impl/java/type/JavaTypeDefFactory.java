@@ -42,12 +42,12 @@ public class JavaTypeDefFactory implements DefinitionFactory<JavaSourceImpl<Type
     }
 
     @Override
-    public Class<?> getReferenceInterface() {
+    public Class<?> getSourceInterface() {
         return JavaSourceImpl.class;
     }
 
     @Override
-    public Class<TypeDef> getReferenceType() {
+    public Class<TypeDef> getDefinitionClass() {
         return TypeDef.class;
     }
 

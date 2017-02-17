@@ -26,8 +26,8 @@ import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
-import org.auraframework.impl.root.parser.ApplicationXMLParser;
-import org.auraframework.impl.root.parser.XMLParser;
+import org.auraframework.impl.factory.ApplicationXMLParser;
+import org.auraframework.impl.factory.XMLParser;
 import org.auraframework.impl.root.parser.handler.ApplicationDefHandler;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -110,7 +110,7 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
                 descriptor, "<aura:application><aura:attribute name=\"implNumber\" type=\"String\"/>"
                 + "<aura:attribute name=\"implNumber\" type=\"String\"/></aura:application>",
                 "myID", Format.XML);
-        ApplicationDef ad = applicationXMLParser.parse(descriptor, source);
+        ApplicationDef ad = applicationXMLParser.getDefinition(descriptor, source);
         try {
             ad.validateDefinition();
             fail("Should have thrown Exception. Two attributes with the same name cannot exist");

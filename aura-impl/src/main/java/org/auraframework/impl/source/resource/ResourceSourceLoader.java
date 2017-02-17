@@ -31,7 +31,6 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.source.BaseSourceLoader;
 import org.auraframework.system.InternalNamespaceSourceLoader;
-import org.auraframework.system.Source;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;

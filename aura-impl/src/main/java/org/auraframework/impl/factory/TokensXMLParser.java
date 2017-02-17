@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.root.parser;
+package org.auraframework.impl.factory;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.FlavorsDef;
-import org.auraframework.impl.root.parser.handler.FlavorsDefHandler;
+import org.auraframework.def.TokensDef;
+import org.auraframework.impl.root.parser.handler.TokensDefHandler;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -29,24 +28,18 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import javax.xml.stream.XMLStreamReader;
 
 @ServiceComponent
-public class FlavorsXMLParser extends XMLParser<FlavorsDef> {
-
+public class TokensXMLParser extends XMLParser<TokensDef> {
     @Override
-    public Format getFormat() {
-        return Format.XML;
-    }
-
-    @Override
-    public DefType getDefType() {
-        return DefType.FLAVORS;
-    }
-
-    @Override
-    protected FlavorsDefHandler getHandler(DefDescriptor<FlavorsDef> descriptor,
-                                           TextSource<FlavorsDef> source, XMLStreamReader xmlReader,
-                                           boolean isInInternalNamespace, DefinitionService definitionService,
-                                           ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) throws QuickFixException {
-        return new FlavorsDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
+    protected TokensDefHandler getHandler(DefDescriptor<TokensDef> descriptor,
+                                          TextSource<TokensDef> source, XMLStreamReader xmlReader, boolean isInInternalNamespace,
+                                          DefinitionService definitionService,
+                                          ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) throws QuickFixException {
+        return new TokensDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
                 configAdapter, definitionParserAdapter);
+    }
+
+    @Override
+    public Class<TokensDef> getDefinitionClass() {
+        return TokensDef.class;
     }
 }

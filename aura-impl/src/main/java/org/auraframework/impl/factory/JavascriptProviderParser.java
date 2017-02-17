@@ -13,33 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.javascript.parser;
+package org.auraframework.impl.factory;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.IncludeDef;
-import org.auraframework.impl.javascript.parser.handler.JavascriptIncludeDefHandler;
-import org.auraframework.system.Parser;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.impl.javascript.parser.handler.JavascriptProviderDefHandler;
+import org.auraframework.impl.source.AbstractTextSourceImpl;
+import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @ServiceComponent
-public class JavascriptIncludeParser implements Parser<IncludeDef> {
-
+public class JavascriptProviderParser implements DefinitionFactory<TextSource<ProviderDef>, ProviderDef> {
     @Override
-    public Format getFormat() {
-        return Format.JS;
-    }
-
-    @Override
-    public DefType getDefType() {
-        return DefType.INCLUDE;
-    }
-    
-    @Override
-    public IncludeDef parse(DefDescriptor<IncludeDef> descriptor, TextSource<IncludeDef> source)
+    public ProviderDef getDefinition(DefDescriptor<ProviderDef> descriptor, TextSource<ProviderDef> source)
             throws QuickFixException {
-        return new JavascriptIncludeDefHandler(descriptor, source).getDefinition();
+        return new JavascriptProviderDefHandler(descriptor, source).getDefinition();
+    }
+
+    @Override
+    public Class<?> getSourceInterface() {
+        return TextSource.class;
+    }
+
+    @Override
+    public Class<ProviderDef> getDefinitionClass() {
+        return ProviderDef.class;
+    }
+
+    @Override
+    public String getMimeType() {
+        return AbstractTextSourceImpl.MIME_JAVASCRIPT;
     }
 }

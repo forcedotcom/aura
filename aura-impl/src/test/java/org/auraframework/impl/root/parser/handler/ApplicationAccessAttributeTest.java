@@ -19,11 +19,8 @@ import javax.inject.Inject;
 
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.parser.ParserFactory;
-import org.auraframework.system.Parser;
-import org.auraframework.system.Parser.Format;
+import org.auraframework.service.CompilerService;
 import org.auraframework.system.TextSource;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
@@ -35,7 +32,7 @@ import org.junit.Test;
 public class ApplicationAccessAttributeTest extends AuraImplTestCase {
 
     @Inject
-    private ParserFactory parserFactory;
+    private CompilerService compilerService;
 
     /***********************************************************************************
      ******************* Tests for Internal Namespace start ****************************
@@ -51,9 +48,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     
     //testEmptyAccess
@@ -65,16 +60,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_NAMESPACE+":testapplication",
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            assertTrue(e.getMessage().contains("Invalid access attribute value \"\""));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     //testInvalidAccess
@@ -85,17 +80,18 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 getAuraTestingUtil().addSourceAutoCleanup(ApplicationDef.class,
                 appSource, StringSourceLoader.DEFAULT_NAMESPACE+":testapplication",
                         NamespaceAccess.INTERNAL);
-        TextSource<ApplicationDef> source = (TextSource<ApplicationDef>)stringSourceLoader.getSource(descriptor);
+        TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"BLAH\"";
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
+        InvalidAccessValueException qfe = null;
+        
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            assertTrue(e.getMessage().contains("Invalid access attribute value \"BLAH\""));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     //testInvalidAccessDynamic
@@ -107,17 +103,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_NAMESPACE+":testapplication",
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.invalid\" must return a result of type org.auraframework.system.AuraContext$Access";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.invalid\" must return a result of type org.auraframework.system.AuraContext$Access";
-            assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     //testInvalidValidAccess
@@ -130,17 +125,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_NAMESPACE+":testapplication",
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"BLAH\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            String expectedMsg = "Invalid access attribute value \"BLAH\"";
-            assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     //testAccessValueAndStaticMethod
@@ -152,17 +146,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                     appSource, StringSourceLoader.DEFAULT_NAMESPACE+":testapplication",
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute may not specify \"GLOBAL\" when a static method is also specified";
+        InvalidAccessValueException qfe = null;
             
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-            Definition def = parser.parse(descriptor, source);
             try {
-                def.validateDefinition();
-                fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
             } catch (InvalidAccessValueException e) {
-                //expected
-                String expectedMsg = "Access attribute may not specify \"GLOBAL\" when a static method is also specified";
-                assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
             }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     //testStaticMethodAndAuthentication
@@ -175,9 +168,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     
     /*
@@ -194,9 +185,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
 
     @Test
@@ -208,9 +197,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
 
     //the only invalid case among 5
@@ -222,17 +209,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_NAMESPACE+":testapplication",
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"PRIVATE\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            String expectedMsg = "Invalid access attribute value \"PRIVATE\"";
-            assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
 
     @Test
@@ -244,9 +230,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
 
     @Test
@@ -258,9 +242,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     
     /*
@@ -277,9 +259,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
 
     @Test
@@ -291,9 +271,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
 
     //TODO: whey private is ok here?
@@ -306,9 +284,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
 
     @Test
@@ -320,9 +296,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
 
     @Test
@@ -334,9 +308,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     
     
@@ -352,16 +324,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_NAMESPACE+":testapplication",
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute can only specify one of GLOBAL, PUBLIC, or PRIVATE";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Access attribute can only specify one of GLOBAL, PUBLIC, or PRIVATE";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     /*
      * testCombinationAccessInSystemNamespace
@@ -376,9 +348,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     
 
@@ -394,9 +364,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
 
     @Test
@@ -408,9 +376,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     
     
@@ -426,16 +392,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_NAMESPACE+":testapplication",
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated\" must return a result of type org.auraframework.system.AuraContext$Access";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch(InvalidAccessValueException e) {
-            String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated\" must return a result of type org.auraframework.system.AuraContext$Access";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     /*
@@ -450,16 +416,17 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_NAMESPACE+":testapplication",
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute cannot specify both AUTHENTICATED and UNAUTHENTICATED";
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
+        InvalidAccessValueException qfe = null;
+        
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch(InvalidAccessValueException e) {
-            String expectedMsg = "Access attribute cannot specify both AUTHENTICATED and UNAUTHENTICATED";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     /*
@@ -474,9 +441,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     
     /*
@@ -493,9 +458,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     @Test
     public void testApplicationWithAuthenticatedAndPrivateAccessInternalNamespace() throws Exception {
@@ -505,17 +468,18 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_NAMESPACE+":testapplication",
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"PRIVATE\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            assertTrue(e.getMessage().contains("Invalid access attribute value \"PRIVATE\""));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
+
     @Test
     public void testApplicationWithAuthenticatedAndPublicAccessInternalNamespace() throws Exception {
         String appSource = "<aura:application access='AUTHENTICATED,PUBLIC'/>";
@@ -525,9 +489,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     @Test
     public void testApplicationWithAuthenticatedAndPrivilegedAccessInternalNamespace() throws Exception {
@@ -538,9 +500,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     @Test
     public void testApplicationWithAuthenticatedAndInternalAccessInternalNamespace() throws Exception {
@@ -551,9 +511,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     
     
@@ -573,9 +531,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     
     //testEmptyAccess
@@ -587,16 +543,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            assertTrue(e.getMessage().contains("Invalid access attribute value \"\""));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     //testInvalidAccess
@@ -608,16 +564,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"BLAH\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            assertTrue(e.getMessage().contains("Invalid access attribute value \"BLAH\""));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     //testInvalidAccessDynamic
@@ -629,17 +585,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.invalid\" must return a result of type org.auraframework.system.AuraContext$Access";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.invalid\" must return a result of type org.auraframework.system.AuraContext$Access";
-            assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     //testInvalidValidAccess
@@ -652,17 +607,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"BLAH\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            String expectedMsg = "Invalid access attribute value \"BLAH\"";
-            assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     //testAccessValueAndStaticMethod
@@ -674,17 +628,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                     appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute may not specify \"GLOBAL\" when a static method is also specified";
+        InvalidAccessValueException qfe = null;
             
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-            Definition def = parser.parse(descriptor, source);
             try {
-                def.validateDefinition();
-                fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
             } catch (InvalidAccessValueException e) {
-                //expected
-                String expectedMsg = "Access attribute may not specify \"GLOBAL\" when a static method is also specified";
-                assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
             }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     //testStaticMethodAndAuthentication
@@ -696,17 +649,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
-            assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     /*
@@ -723,9 +675,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     @Test
     public void testApplicationWithPublicAccessPrivilegedNamespace() throws Exception {
@@ -736,9 +686,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     @Test
     public void testApplicationWithPrivateAccessPrivilegedNamespace() throws Exception {
@@ -748,17 +696,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"PRIVATE\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            String expectedMsg = "Invalid access attribute value \"PRIVATE\"";
-            assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     @Test
     public void testApplicationWithInternalAccessPrivilegedNamespace() throws Exception {
@@ -768,18 +715,18 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"INTERNAL\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-               fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            String expectedMsg = "Invalid access attribute value \"INTERNAL\"";
-            assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
+
     @Test
     public void testApplicationWithPrivilegedAccessPrivilegedNamespace() throws Exception {
         String appSource = "<aura:application access='PRIVILEGED'/>";
@@ -789,9 +736,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     
     /*
@@ -806,17 +751,18 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute may not use a static method";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Access attribute may not use a static method";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
+
     @Test
     public void testApplicationWithPublicAccessMethodPrivilegedNamespace() throws Exception {
         String appSource = "<aura:application access='org.auraframework.impl.test.util.TestAccessMethods.allowPublic'/>";
@@ -825,17 +771,18 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute may not use a static method";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Access attribute may not use a static method";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
+
     @Test
     public void testApplicationWithPrivateAccessMethodPrivilegedNamespace() throws Exception {
         String appSource = "<aura:application access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivate'/>";
@@ -844,17 +791,18 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute may not use a static method";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Access attribute may not use a static method";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
+
     @Test
     public void testApplicationWithPrivilegedAccessMethodPrivilegedNamespace() throws Exception {
         String appSource = "<aura:application access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivileged'/>";
@@ -863,17 +811,19 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute may not use a static method";
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
+        InvalidAccessValueException qfe = null;
+        
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Access attribute may not use a static method";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
+
     @Test
     public void testApplicationWithInternalAccessMethodPrivilegedNamespace() throws Exception {
         String appSource = "<aura:application access='org.auraframework.impl.test.util.TestAccessMethods.allowInternal'/>";
@@ -882,16 +832,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute may not use a static method";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Access attribute may not use a static method";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     
@@ -907,17 +857,18 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute can only specify one of GLOBAL, PUBLIC, or PRIVATE";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Access attribute can only specify one of GLOBAL, PUBLIC, or PRIVATE";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
+
     /*
      * testCombinationAccessInSystemNamespace
      * this verify we can put two same valid access value together 
@@ -931,9 +882,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     
 
@@ -948,17 +897,18 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
+
     @Test
     public void testApplicationWithUnAuthenticationPrivilegedNamespace() throws Exception {
         String appSource = "<aura:application access='UNAUTHENTICATED'/>";
@@ -967,16 +917,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"UNAUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Invalid access attribute value \"UNAUTHENTICATED\"";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     
@@ -992,16 +942,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated\" must return a result of type org.auraframework.system.AuraContext$Access";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch(InvalidAccessValueException e) {
-            String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated\" must return a result of type org.auraframework.system.AuraContext$Access";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     /*
@@ -1016,16 +966,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute cannot specify both AUTHENTICATED and UNAUTHENTICATED";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch(InvalidAccessValueException e) {
-            String expectedMsg = "Access attribute cannot specify both AUTHENTICATED and UNAUTHENTICATED";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     /*
@@ -1039,16 +989,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("expect to see InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch(InvalidAccessValueException e) {
-            String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     /*
@@ -1063,16 +1013,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try{
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
 
     @Test
@@ -1083,17 +1033,18 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
+
     @Test
     public void testApplicationWithAuthenticatedAndPublicAccessPrivilegedNamespace() throws Exception {
         String appSource = "<aura:application access='AUTHENTICATED,PUBLIC'/>";
@@ -1102,17 +1053,18 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
+
     @Test
     public void testApplicationWithAuthenticatedAndPrivilegedAccessPrivilegedNamespace() throws Exception {
         String appSource = "<aura:application access='AUTHENTICATED,PRIVILEGED'/>";
@@ -1121,17 +1073,18 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
+
     @Test
     public void testApplicationWithAuthenticatedAndInternalAccessPrivilegedNamespace() throws Exception {
         String appSource = "<aura:application access='AUTHENTICATED,INTERNAL'/>";
@@ -1140,19 +1093,17 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, "privilegedNS:testapplication",
                         NamespaceAccess.PRIVILEGED);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
-    
-    
     
     
     
@@ -1172,9 +1123,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     
     //testEmptyAccess
@@ -1186,16 +1135,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            assertTrue(e.getMessage().contains("Invalid access attribute value \"\""));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     //testInvalidAccess
@@ -1207,16 +1156,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"BLAH\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            assertTrue(e.getMessage().contains("Invalid access attribute value \"BLAH\""));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     //testInvalidAccessDynamic
@@ -1228,17 +1177,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.invalid\" must return a result of type org.auraframework.system.AuraContext$Access";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.invalid\" must return a result of type org.auraframework.system.AuraContext$Access";
-            assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     //testInvalidValidAccess
@@ -1251,17 +1199,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"BLAH\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            String expectedMsg = "Invalid access attribute value \"BLAH\"";
-            assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     //testAccessValueAndStaticMethod
@@ -1273,17 +1220,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                     appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute may not specify \"GLOBAL\" when a static method is also specified";
+        InvalidAccessValueException qfe = null;
             
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-            Definition def = parser.parse(descriptor, source);
             try {
-                def.validateDefinition();
-                fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
             } catch (InvalidAccessValueException e) {
-                //expected
-                String expectedMsg = "Access attribute may not specify \"GLOBAL\" when a static method is also specified";
-                assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
             }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     //testStaticMethodAndAuthentication
@@ -1295,17 +1241,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
-            assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     /*
@@ -1321,10 +1266,9 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
+
     @Test
     public void testApplicationWithPublicAccessCustomNamespace() throws Exception {
         String appSource = "<aura:application access='PUBLIC'/>";
@@ -1334,9 +1278,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     @Test
     public void testApplicationWithPrivateAccessCustomNamespace() throws Exception {
@@ -1346,18 +1288,18 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"PRIVATE\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            String expectedMsg = "Invalid access attribute value \"PRIVATE\"";
-            assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
+
     @Test
     public void testApplicationWithInternalAccessCustomNamespace() throws Exception {
         String appSource = "<aura:application access='INTERNAL'/>";
@@ -1366,18 +1308,18 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"INTERNAL\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-             fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            String expectedMsg = "Invalid access attribute value \"INTERNAL\"";
-            assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
+
     @Test
     public void testApplicationWithPrivilegedAccessCustomNamespace() throws Exception {
         String appSource = "<aura:application access='PRIVILEGED'/>";
@@ -1386,17 +1328,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"PRIVILEGED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            String expectedMsg = "Invalid access attribute value \"PRIVILEGED\"";
-            assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     /*
@@ -1410,17 +1351,18 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute may not use a static method";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Access attribute may not use a static method";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
+
     @Test
     public void testApplicationWithPublicAccessMethodCustomNamespace() throws Exception {
         String appSource = "<aura:application access='org.auraframework.impl.test.util.TestAccessMethods.allowPublic'/>";
@@ -1429,17 +1371,18 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute may not use a static method";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Access attribute may not use a static method";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
+
     @Test
     public void testApplicationWithPrivateAccessMethodCustomNamespace() throws Exception {
         String appSource = "<aura:application access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivate'/>";
@@ -1448,16 +1391,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute may not use a static method";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Access attribute may not use a static method";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     @Test
     public void testApplicationWithPrivilegedAccessMethodCustomNamespace() throws Exception {
@@ -1467,16 +1410,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute may not use a static method";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Access attribute may not use a static method";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     @Test
     public void testApplicationWithInternalAccessMethodCustomNamespace() throws Exception {
@@ -1486,16 +1429,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute may not use a static method";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Access attribute may not use a static method";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     
@@ -1510,16 +1453,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute can only specify one of GLOBAL, PUBLIC, or PRIVATE";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Access attribute can only specify one of GLOBAL, PUBLIC, or PRIVATE";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     /*
      * this verify we can put two same valid access value together 
@@ -1533,9 +1476,7 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
-        def.validateDefinition();
+        compilerService.compile(descriptor, source);
     }
     
 
@@ -1550,17 +1491,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            //expected
-            String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
-            assertTrue(e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     @Test
     public void testApplicationWithUnAuthenticationCustomNamespace() throws Exception {
@@ -1570,16 +1510,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                 NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"UNAUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("expect to see InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch(InvalidAccessValueException e) {
-            String expectedMsg = "Invalid access attribute value \"UNAUTHENTICATED\"";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     
@@ -1594,16 +1534,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated\" must return a result of type org.auraframework.system.AuraContext$Access";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch(InvalidAccessValueException e) {
-            String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated\" must return a result of type org.auraframework.system.AuraContext$Access";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     /*
@@ -1617,16 +1557,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Access attribute cannot specify both AUTHENTICATED and UNAUTHENTICATED";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch(InvalidAccessValueException e) {
-            String expectedMsg = "Access attribute cannot specify both AUTHENTICATED and UNAUTHENTICATED";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     /*
@@ -1640,16 +1580,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("expect to see InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch(InvalidAccessValueException e) {
-            String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     
     /*
@@ -1663,16 +1603,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     @Test
     public void testApplicationWithAuthenticatedAndPrivateAccessCustomNamespace() throws Exception {
@@ -1682,16 +1622,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     @Test
     public void testApplicationWithAuthenticatedAndPublicAccessCustomNamespace() throws Exception {
@@ -1701,16 +1641,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     @Test
     public void testApplicationWithAuthenticatedAndPrivilegedAccessCustomNamespace() throws Exception {
@@ -1720,16 +1660,16 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     @Test
     public void testApplicationWithAuthenticatedAndInternalAccessCustomNamespace() throws Exception {
@@ -1739,15 +1679,15 @@ public class ApplicationAccessAttributeTest extends AuraImplTestCase {
                 appSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testapplication",
                         NamespaceAccess.CUSTOM);
         TextSource<ApplicationDef> source = stringSourceLoader.getSource(descriptor);
+        String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
+        InvalidAccessValueException qfe = null;
         
-        Parser<ApplicationDef> parser = parserFactory.getParser(Format.XML, descriptor);
-        Definition def = parser.parse(descriptor, source);
         try {
-            def.validateDefinition();
-            fail("Expect to die with InvalidAccessValueException");
+            compilerService.compile(descriptor, source);
         } catch (InvalidAccessValueException e) {
-            String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
-            assertTrue("Getting this message instead:"+e.getMessage(), e.getMessage().contains(expectedMsg));
+            qfe = e;
         }
+        assertNotNull("Expect to die with InvalidAccessValueException", qfe);
+        assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
 }

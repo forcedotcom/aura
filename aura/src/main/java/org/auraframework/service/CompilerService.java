@@ -45,5 +45,5 @@ public interface CompilerService {
      * @return the definition, null if not found.
      * @throws QuickFixException if theere was a problem loading the def.
      */
-    <D extends Definition> D compile(@Nonnull Source<D> source) throws QuickFixException;
+    <D extends Definition> D compile(DefDescriptor<D> descriptor, @Nonnull Source<D> source) throws QuickFixException;
 }

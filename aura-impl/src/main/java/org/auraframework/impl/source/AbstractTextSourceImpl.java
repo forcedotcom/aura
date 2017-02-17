@@ -41,6 +41,7 @@ public abstract class AbstractTextSourceImpl<D extends Definition> implements Te
     public final static String MIME_HTML = "text/html";
     public final static String MIME_XML = "application/xml";
     public final static String MIME_CSS = "text/css";
+    public final static String MIME_TEMPLATE_CSS = "x-text/template-css";
     public final static String MIME_SVG = "image/svg+xml";
 
     private final String systemId;
@@ -62,7 +63,7 @@ public abstract class AbstractTextSourceImpl<D extends Definition> implements Te
         .put(Format.CSS, MIME_CSS)
         .put(Format.JS, MIME_JAVASCRIPT)
         .put(Format.SVG, MIME_SVG)
-        .put(Format.TEMPLATE_CSS, MIME_CSS)
+        .put(Format.TEMPLATE_CSS, MIME_TEMPLATE_CSS)
         .put(Format.XML, MIME_XML)
         .build();
         

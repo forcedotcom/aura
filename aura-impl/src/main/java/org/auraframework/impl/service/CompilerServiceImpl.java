@@ -50,11 +50,11 @@ public class CompilerServiceImpl implements CompilerService {
 
         for (DefinitionFactory<?,?> factory : factories) {
             if (source.getMimeType().equals(factory.getMimeType())
-                    && type.isAssignableFrom(factory.getReferenceType())
-                    && (found == null || found.getReferenceType().isAssignableFrom(factory.getReferenceType()))
-                    && factory.getReferenceInterface().isAssignableFrom(sourceClass)
+                    && type.isAssignableFrom(factory.getDefinitionClass())
+                    && (found == null || found.getDefinitionClass().isAssignableFrom(factory.getDefinitionClass()))
+                    && factory.getSourceInterface().isAssignableFrom(sourceClass)
                     && (found == null
-                        || found.getReferenceInterface().isAssignableFrom(factory.getReferenceInterface()))) {
+                        || found.getSourceInterface().isAssignableFrom(factory.getSourceInterface()))) {
                 @SuppressWarnings("unchecked")
                 DefinitionFactory<S,D> t = (DefinitionFactory<S,D>)factory;
 
@@ -64,8 +64,8 @@ public class CompilerServiceImpl implements CompilerService {
         return found;
     }
 
-    private <S extends Source<D>, D extends Definition> D getDefinitionTypeSafe(S source, Class<D> type)
-            throws QuickFixException {
+    private <S extends Source<D>, D extends Definition> D getDefinitionTypeSafe(DefDescriptor<D> descriptor,
+            S source, Class<D> type) throws QuickFixException {
         String key = source.getClass().getName()+":"+type.getName()+":"+source.getMimeType();
         @SuppressWarnings("unchecked")
         DefinitionFactory<S,D> factory = (DefinitionFactory<S,D>)factoryMap.get(key);
@@ -76,16 +76,16 @@ public class CompilerServiceImpl implements CompilerService {
         if (factory == null) {
             return null;
         }
-        D def = factory.getDefinition(source.getDescriptor(), source);
+        D def = factory.getDefinition(descriptor, source);
         def.validateDefinition();
         return def;
     }
 
     @Override
-    public <D extends Definition> D compile(Source<D> source) throws QuickFixException {
+    public <D extends Definition> D compile(DefDescriptor<D> descriptor, Source<D> source) throws QuickFixException {
         @SuppressWarnings("unchecked")
         Class<D> clazz = (Class<D>)source.getDescriptor().getDefType().getPrimaryInterface();
-        return getDefinitionTypeSafe(source, clazz);
+        return getDefinitionTypeSafe(descriptor, source, clazz);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class CompilerServiceImpl implements CompilerService {
         if (source == null) {
             return null;
         }
-        return getDefinitionTypeSafe(source, clazz);
+        return getDefinitionTypeSafe(descriptor, source, clazz);
     }
 
     /**

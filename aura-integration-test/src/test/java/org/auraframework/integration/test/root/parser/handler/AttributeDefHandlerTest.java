@@ -32,7 +32,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefImpl;
-import org.auraframework.impl.root.parser.XMLParser;
+import org.auraframework.impl.factory.XMLParser;
 import org.auraframework.impl.root.parser.handler.AttributeDefHandler;
 import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;

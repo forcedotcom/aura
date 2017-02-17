@@ -25,9 +25,9 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ModelDef;
 import org.auraframework.ds.servicecomponent.Controller;
-import org.auraframework.impl.parser.ParserFactory;
 import org.auraframework.impl.test.mock.MockingUtil;
 import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.service.CompilerService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -47,12 +47,12 @@ public class MockingUtilUITest extends WebDriverTestCase {
     private MockingUtil mockingUtil;
 
     @Inject
-    private ParserFactory parserFactory;
+    private CompilerService compilerService;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        mockingUtil = new MockingUtil(testContextAdapter, definitionService, parserFactory);
+        mockingUtil = new MockingUtil(testContextAdapter, definitionService, compilerService);
     }
 
     @Override

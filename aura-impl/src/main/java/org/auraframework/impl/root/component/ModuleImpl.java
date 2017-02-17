@@ -22,25 +22,18 @@ import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.TypeDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDefRef;
-import org.auraframework.impl.type.ComponentArrayTypeDef;
-import org.auraframework.impl.type.ComponentTypeDef;
 import org.auraframework.instance.Action;
-import org.auraframework.instance.Attribute;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.Module;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Serialization;
 import org.auraframework.util.json.Serialization.ReferenceType;
-
-import com.google.common.collect.Maps;
 
 /**
  * Created by byao on 2/10/17.

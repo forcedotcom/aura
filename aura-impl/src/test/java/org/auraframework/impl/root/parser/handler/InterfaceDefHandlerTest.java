@@ -19,7 +19,7 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.parser.InterfaceXMLParser;
+import org.auraframework.impl.factory.InterfaceXMLParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -46,7 +46,7 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
         StringSource<InterfaceDef> source = new StringSource<>(
                 descriptor,
                 "<aura:interface support='PROTO' description='some description'><aura:attribute name='mystring' type='String'/><aura:registerevent name='click' type='aura:click' description='The Description'/></aura:interface>", "myID", Format.XML);
-        InterfaceDef def = interfaceXMLParser.parse(descriptor, source);
+        InterfaceDef def = interfaceXMLParser.getDefinition(descriptor, source);
         assertEquals(1, def.getAttributeDefs().size());
         assertTrue(def.getAttributeDefs().containsKey(definitionService.getDefDescriptor("mystring", AttributeDef.class)));
         assertEquals(1, def.getRegisterEventDefs().size());
@@ -63,7 +63,7 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = definitionService.getDefDescriptor("test:fakeparser", InterfaceDef.class);
         StringSource<InterfaceDef> source = new StringSource<>(
                 descriptor, "<aura:interface extends='aura:testinterfaceparent'></aura:interface>", "myID", Format.XML);
-        InterfaceDef def = interfaceXMLParser.parse(descriptor, source);
+        InterfaceDef def = interfaceXMLParser.getDefinition(descriptor, source);
         assertEquals(1, def.getExtendsDescriptors().size());
         assertEquals("testinterfaceparent", def.getExtendsDescriptors().iterator().next().getName());
     }
@@ -78,7 +78,7 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = definitionService.getDefDescriptor("test:fakeparser", InterfaceDef.class);
         StringSource<InterfaceDef> source = new StringSource<>(
                 descriptor, "<aura:interface><aura:foo/></aura:interface>", "myID", Format.XML);
-        InterfaceDef id = interfaceXMLParser.parse(descriptor, source);
+        InterfaceDef id = interfaceXMLParser.getDefinition(descriptor, source);
         try {
             id.validateDefinition();
             fail("Should have thrown AuraException aura:foo isn't a valid child tag for aura:interface");
@@ -98,7 +98,7 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
         DefDescriptor<InterfaceDef> descriptor = definitionService.getDefDescriptor("test:fakeparser", InterfaceDef.class);
         StringSource<InterfaceDef> source = new StringSource<>(
                 descriptor, "<aura:interface>Invalid text</aura:interface>", "myID", Format.XML);
-        InterfaceDef id = interfaceXMLParser.parse(descriptor, source);
+        InterfaceDef id = interfaceXMLParser.getDefinition(descriptor, source);
         try {
             id.validateDefinition();
             fail("Should have thrown AuraException because text is between aura:interface tags");
@@ -120,7 +120,7 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
                 descriptor,
                 "<aura:interface support='PROTO'></aura:interface>",
                 "myID", Format.XML);
-    	InterfaceDef def = interfaceXMLParser.parse(descriptor, source);
+    	InterfaceDef def = interfaceXMLParser.getDefinition(descriptor, source);
     	try {
     		def.validateDefinition(); 
     		fail("we don't allow 'support' with non-internal namespace");

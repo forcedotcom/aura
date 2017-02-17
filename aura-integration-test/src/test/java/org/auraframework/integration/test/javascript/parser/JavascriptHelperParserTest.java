@@ -25,7 +25,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.javascript.helper.JavascriptHelperDef;
-import org.auraframework.impl.javascript.parser.JavascriptHelperParser;
+import org.auraframework.impl.factory.JavascriptHelperParser;
 import org.auraframework.system.TextSource;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -52,7 +52,7 @@ public class JavascriptHelperParserTest extends AuraImplTestCase {
         DefDescriptor<HelperDef> helperDesc = addSourceAutoCleanup(HelperDef.class, helperJs);
         TextSource<HelperDef> source = loader.getSource(helperDesc);
 
-        HelperDef helperDef = new JavascriptHelperParser().parse(helperDesc, source);
+        HelperDef helperDef = new JavascriptHelperParser().getDefinition(helperDesc, source);
 
         assertThat(helperDef, instanceOf(JavascriptHelperDef.class));
         helperDef.validateDefinition();
@@ -78,7 +78,7 @@ public class JavascriptHelperParserTest extends AuraImplTestCase {
         DefDescriptor<HelperDef> helperDesc = addSourceAutoCleanup(HelperDef.class, helperJs);
         TextSource<HelperDef> source = loader.getSource(helperDesc);
 
-        HelperDef helperDef = new JavascriptHelperParser().parse(helperDesc, source);
+        HelperDef helperDef = new JavascriptHelperParser().getDefinition(helperDesc, source);
 
         assertThat(helperDef, instanceOf(JavascriptHelperDef.class));
         helperDef.validateDefinition();
@@ -97,7 +97,7 @@ public class JavascriptHelperParserTest extends AuraImplTestCase {
         DefDescriptor<HelperDef> helperDesc = addSourceAutoCleanup(HelperDef.class, helperJs);
         TextSource<HelperDef> source = loader.getSource(helperDesc);
 
-        HelperDef helperDef = new JavascriptHelperParser().parse(helperDesc, source);
+        HelperDef helperDef = new JavascriptHelperParser().getDefinition(helperDesc, source);
 
         assertThat(helperDef, instanceOf(JavascriptHelperDef.class));
         helperDef.validateDefinition();
@@ -115,7 +115,7 @@ public class JavascriptHelperParserTest extends AuraImplTestCase {
         DefDescriptor<HelperDef> helperDesc = addSourceAutoCleanup(HelperDef.class, helperJs);
         TextSource<HelperDef> source = loader.getSource(helperDesc);
 
-        HelperDef helperDef = new JavascriptHelperParser().parse(helperDesc, source);
+        HelperDef helperDef = new JavascriptHelperParser().getDefinition(helperDesc, source);
         
         assertThat(helperDef, instanceOf(JavascriptHelperDef.class));
         helperDef.validateDefinition();
@@ -137,7 +137,7 @@ public class JavascriptHelperParserTest extends AuraImplTestCase {
         DefDescriptor<HelperDef> helperDesc = addSourceAutoCleanup(HelperDef.class, helperJs);
         TextSource<HelperDef> source = loader.getSource(helperDesc);
 
-        HelperDef helperDef = new JavascriptHelperParser().parse(helperDesc, source);
+        HelperDef helperDef = new JavascriptHelperParser().getDefinition(helperDesc, source);
         try {
             helperDef.validateDefinition();
             fail("InvalidDefinitionException should be thrown.");

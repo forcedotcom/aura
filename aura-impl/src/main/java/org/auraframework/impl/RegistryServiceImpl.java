@@ -43,21 +43,16 @@ import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.cache.Cache;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
 import org.auraframework.impl.compound.controller.CompoundControllerDefFactory;
 import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
 import org.auraframework.impl.java.JavaSourceLoader;
-import org.auraframework.impl.parser.ParserFactory;
 import org.auraframework.impl.source.SourceFactory;
 import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.impl.source.resource.ResourceSourceLoader;
-import org.auraframework.impl.system.CacheableDefFactoryImpl;
-import org.auraframework.impl.system.CachingDefRegistryImpl;
 import org.auraframework.impl.system.CompilingDefRegistry;
 import org.auraframework.impl.system.NonCachingDefRegistryImpl;
 import org.auraframework.impl.system.PassThroughDefRegistry;
 import org.auraframework.impl.system.RegistryTrie;
-import org.auraframework.impl.system.SourceLoaderDefRegistry;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
 import org.auraframework.service.CachingService;
@@ -89,8 +84,6 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     private ConfigAdapter configAdapter;
 
     private ExceptionAdapter exceptionAdapter;
-
-    private ParserFactory parserFactory;
 
     @Inject
     private CompilerService compilerService;
@@ -260,7 +253,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             ResourceSourceLoader rsl = new ResourceSourceLoader(pkg);
             markupLoaders.add(rsl);
             javaLoaders.add(rsl);
-            markupRegistries.add(new CompilingDefRegistry(rsl, markupPrefixes, markupDefTypes, parserFactory));
+            markupRegistries.add(new CompilingDefRegistry(rsl, markupPrefixes, markupDefTypes, compilerService));
         } else if (location.getComponentSourceDir() != null) {
             File components = location.getComponentSourceDir();
             if (!components.canRead() || !components.canExecute() || !components.isDirectory()) {
@@ -268,7 +261,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             } else {
                 FileSourceLoader fsl = new FileSourceLoader(components, fileMonitor);
                 markupLoaders.add(fsl);
-                markupRegistries.add(new CompilingDefRegistry(fsl, markupPrefixes, markupDefTypes, parserFactory));
+                markupRegistries.add(new CompilingDefRegistry(fsl, markupPrefixes, markupDefTypes, compilerService));
                 File javaBase = new File(components.getParent(), "java");
                 if (javaBase.exists()) {
                     javaLoaders.add(new FileSourceLoader(javaBase, fileMonitor));
@@ -277,7 +270,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
                 if (generatedJavaBase != null && generatedJavaBase.exists()) {
                     fsl = new FileSourceLoader(generatedJavaBase, fileMonitor);
                     markupLoaders.add(fsl);
-                    markupRegistries.add(new CompilingDefRegistry(fsl, markupPrefixes, markupDefTypes, parserFactory));
+                    markupRegistries.add(new CompilingDefRegistry(fsl, markupPrefixes, markupDefTypes, compilerService));
                     javaLoaders.add(fsl);
                 }
                 try {
@@ -292,7 +285,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             if (!loaders.isEmpty()) {
                 markupLoaders.addAll(loaders);
                 for (SourceLoader loader : loaders) {
-                    markupRegistries.add(new PassThroughDefRegistry(loader, markupDefTypes, markupPrefixes, true, parserFactory));
+                    markupRegistries.add(new PassThroughDefRegistry(loader, markupDefTypes, markupPrefixes, true, compilerService));
                 }
             }
         }
@@ -328,7 +321,6 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
      */
     private List<DefRegistry> getCLARegistries() {
         Collection<ComponentLocationAdapter> markupLocations = getAllComponentLocationAdapters();
-        List<SourceLoader> markupLoaders = Lists.newArrayList();
         List<DefRegistry> regBuild = Lists.newArrayList();
 
         regBuild.add(AuraStaticTypeDefRegistry.INSTANCE);
@@ -345,21 +337,14 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
                 }
             }
         }
-
-        if (markupLoaders.size() > 0) {
-            SourceFactory markupSourceFactory = new SourceFactory(markupLoaders, configAdapter);
-            CacheableDefFactoryImpl<Definition> factory = new CacheableDefFactoryImpl<>(markupSourceFactory, parserFactory);
-            regBuild.add(new CachingDefRegistryImpl(factory, markupDefTypes, markupPrefixes));
-        }
-
         regBuild.add(new NonCachingDefRegistryImpl(new CompoundControllerDefFactory(exceptionAdapter),
                 DefType.CONTROLLER, DefDescriptor.COMPOUND_PREFIX));
 
-        regBuild.add(new SourceLoaderDefRegistry(compilerService, new JavaSourceLoader(),
+        regBuild.add(new PassThroughDefRegistry(new JavaSourceLoader(),
                     Sets.newHashSet(DefType.CONTROLLER, DefType.RENDERER, DefType.TYPE, DefType.MODEL,
                         DefType.PROVIDER, DefType.TOKEN_DESCRIPTOR_PROVIDER, DefType.TOKEN_MAP_PROVIDER),
                     Sets.newHashSet(DefDescriptor.JAVA_PREFIX, SERVICECOMPONENT_PREFIX),
-                    Sets.newHashSet("*"), false));
+                    true, compilerService));
         return regBuild;
     }
 
@@ -511,18 +496,18 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     }
 
     /**
-     * @return the parserFactory
+     * @return the compilerService
      */
-    public ParserFactory getParserFactory() {
-        return parserFactory;
+    public CompilerService getCompilerService() {
+        return compilerService;
     }
 
     /**
-     * @param parserFactory the parserFactory to set
+     * @param compilerService the compilerService to set
      */
     @Inject
-    public void setParserFactory(ParserFactory parserFactory) {
-        this.parserFactory = parserFactory;
+    public void setCompilerService(CompilerService compilerService) {
+        this.compilerService = compilerService;
     }
 
     /**

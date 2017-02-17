@@ -38,12 +38,12 @@ public interface DefinitionFactory<S extends Source<D>, D extends Definition> {
     /**
      * Get the reference interface for this factory.
      */
-    Class<?> getReferenceInterface();
+    Class<?> getSourceInterface();
 
     /**
      * Get the reference type for this factory.
      */
-    Class<D> getReferenceType();
+    Class<D> getDefinitionClass();
 
     /**
      * Get the mime type that is handled by this factory.

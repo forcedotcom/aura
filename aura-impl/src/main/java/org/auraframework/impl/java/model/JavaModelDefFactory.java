@@ -50,12 +50,12 @@ public class JavaModelDefFactory implements DefinitionFactory<JavaSourceImpl<Mod
     }
 
     @Override
-    public Class<?> getReferenceInterface() {
+    public Class<?> getSourceInterface() {
         return JavaSourceImpl.class;
     }
 
     @Override
-    public Class<ModelDef> getReferenceType() {
+    public Class<ModelDef> getDefinitionClass() {
         return ModelDef.class;
     }
 

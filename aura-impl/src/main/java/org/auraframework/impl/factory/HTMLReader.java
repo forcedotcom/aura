@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.root.parser;
+package org.auraframework.impl.factory;
 
 import java.io.FilterReader;
 import java.io.IOException;

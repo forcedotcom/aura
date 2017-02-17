@@ -23,7 +23,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.impl.root.parser.XMLParser;
+import org.auraframework.impl.factory.XMLParser;
 import org.auraframework.system.Location;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;

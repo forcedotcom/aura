@@ -22,7 +22,7 @@ import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.parser.XMLParser;
+import org.auraframework.impl.factory.XMLParser;
 import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;

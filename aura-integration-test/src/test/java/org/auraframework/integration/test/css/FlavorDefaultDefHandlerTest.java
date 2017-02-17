@@ -24,7 +24,7 @@ import org.auraframework.def.FlavorDefaultDef;
 import org.auraframework.def.FlavorIncludeDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.css.StyleTestCase;
-import org.auraframework.impl.root.parser.XMLParser;
+import org.auraframework.impl.factory.XMLParser;
 import org.auraframework.impl.root.parser.handler.FlavorDefaultDefHandler;
 import org.auraframework.impl.root.parser.handler.FlavorsDefHandler;
 import org.auraframework.impl.source.StringSource;

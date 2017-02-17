@@ -36,7 +36,7 @@ public class JavaSourceLoader implements SourceLoader {
 
     @Override
     public Set<String> getNamespaces() {
-        return null;
+        return Sets.newHashSet("*");
     }
 
     @Override

@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.css.parser;
+package org.auraframework.impl.factory;
 
-import static org.auraframework.impl.css.parser.StyleParser.ALLOWED_CONDITIONS;
+import static org.auraframework.impl.factory.StyleParser.ALLOWED_CONDITIONS;
 
 import org.auraframework.Aura;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.css.flavor.FlavoredStyleDefImpl;
+import org.auraframework.impl.css.parser.CssPreprocessor;
 import org.auraframework.impl.css.parser.CssPreprocessor.ParserResult;
+import org.auraframework.impl.source.AbstractTextSourceImpl;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.Parser;
+import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -36,20 +37,9 @@ import com.google.common.collect.Iterables;
  * Flavored CSS style parser.
  */
 @ServiceComponent
-public final class FlavoredStyleParser implements Parser<FlavoredStyleDef> {
-
+public final class FlavoredStyleParser implements DefinitionFactory<TextSource<FlavoredStyleDef>, FlavoredStyleDef> {
     @Override
-    public Format getFormat() {
-        return Format.CSS;
-    }
-
-    @Override
-    public DefType getDefType() {
-        return DefType.FLAVORED_STYLE;
-    }
-
-    @Override
-    public FlavoredStyleDef parse(DefDescriptor<FlavoredStyleDef> descriptor, TextSource<FlavoredStyleDef> source)
+    public FlavoredStyleDef getDefinition(DefDescriptor<FlavoredStyleDef> descriptor, TextSource<FlavoredStyleDef> source)
             throws QuickFixException {
 
         ParserResult result = CssPreprocessor.initial()
@@ -70,5 +60,20 @@ public final class FlavoredStyleParser implements Parser<FlavoredStyleDef> {
         builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
 
         return builder.build();
+    }
+
+    @Override
+    public Class<?> getSourceInterface() {
+        return TextSource.class;
+    }
+
+    @Override
+    public Class<FlavoredStyleDef> getDefinitionClass() {
+        return FlavoredStyleDef.class;
+    }
+
+    @Override
+    public String getMimeType() {
+        return AbstractTextSourceImpl.MIME_CSS;
     }
 }

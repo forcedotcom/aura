@@ -25,7 +25,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokensDef;
 import org.auraframework.def.TokensImportDef;
 import org.auraframework.impl.css.StyleTestCase;
-import org.auraframework.impl.root.parser.XMLParser;
+import org.auraframework.impl.factory.XMLParser;
 import org.auraframework.impl.root.parser.handler.TokensImportDefHandler;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.service.DefinitionService;

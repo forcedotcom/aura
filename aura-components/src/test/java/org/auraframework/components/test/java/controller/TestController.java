@@ -32,8 +32,6 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.throwable.ClientSideError;
-import org.auraframework.throwable.GenericEventException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 

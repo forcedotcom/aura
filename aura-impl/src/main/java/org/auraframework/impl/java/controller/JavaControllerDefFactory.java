@@ -221,12 +221,12 @@ public class JavaControllerDefFactory implements DefinitionFactory<JavaSourceImp
     }
 
     @Override
-    public Class<?> getReferenceInterface() {
+    public Class<?> getSourceInterface() {
         return JavaSourceImpl.class;
     }
 
     @Override
-    public Class<ControllerDef> getReferenceType() {
+    public Class<ControllerDef> getDefinitionClass() {
         return ControllerDef.class;
     }
 

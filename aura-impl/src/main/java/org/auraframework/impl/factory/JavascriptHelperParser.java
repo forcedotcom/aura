@@ -13,33 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.javascript.parser;
+package org.auraframework.impl.factory;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.impl.javascript.parser.handler.JavascriptControllerDefHandler;
-import org.auraframework.system.Parser;
+import org.auraframework.def.HelperDef;
+import org.auraframework.impl.javascript.parser.handler.JavascriptHelperDefHandler;
+import org.auraframework.impl.source.AbstractTextSourceImpl;
+import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @ServiceComponent
-public class JavascriptControllerParser implements Parser<ControllerDef> {
-
+public class JavascriptHelperParser implements DefinitionFactory<TextSource<HelperDef>, HelperDef> {
     @Override
-    public Format getFormat() {
-        return Format.JS;
-    }
-
-    @Override
-    public DefType getDefType() {
-        return DefType.CONTROLLER;
-    }
-    
-    @Override
-    public ControllerDef parse(DefDescriptor<ControllerDef> descriptor, TextSource<ControllerDef> source)
+    public HelperDef getDefinition(DefDescriptor<HelperDef> descriptor, TextSource<HelperDef> source)
             throws QuickFixException {
-        return new JavascriptControllerDefHandler(descriptor, source).getDefinition();
+        return new JavascriptHelperDefHandler(descriptor, source).getDefinition();
+    }
+
+    @Override
+    public Class<?> getSourceInterface() {
+        return TextSource.class;
+    }
+
+    @Override
+    public Class<HelperDef> getDefinitionClass() {
+        return HelperDef.class;
+    }
+
+    @Override
+    public String getMimeType() {
+        return AbstractTextSourceImpl.MIME_JAVASCRIPT;
     }
 }

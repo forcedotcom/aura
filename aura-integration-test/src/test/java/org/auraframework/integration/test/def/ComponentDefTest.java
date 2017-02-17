@@ -28,10 +28,8 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.impl.css.util.Flavors;
-import org.auraframework.impl.parser.ParserFactory;
 import org.auraframework.impl.root.component.BaseComponentDefTest;
-import org.auraframework.system.Parser;
-import org.auraframework.system.Parser.Format;
+import org.auraframework.service.CompilerService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -39,7 +37,7 @@ import org.junit.Test;
 
 public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
     @Inject
-    protected ParserFactory parserFactory;
+    protected CompilerService compilerService;
 
     public ComponentDefTest() {
         super(ComponentDef.class, "aura:component");
@@ -320,8 +318,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         addSourceAutoCleanup(controllerDesc, controllerCode);
 
         TextSource<ComponentDef> source = stringSourceLoader.getSource(cmpDesc);
-        Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, cmpDesc);
-        ComponentDef cmpDef = parser.parse(cmpDesc, source);
+        ComponentDef cmpDef = compilerService.compile(cmpDesc, source);
 
         try {
             cmpDef.validateReferences(true);
@@ -343,8 +340,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         addSourceAutoCleanup(controllerDesc, controllerCode);
 
         TextSource<ComponentDef> source = stringSourceLoader.getSource(cmpDesc);
-        Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, cmpDesc);
-        ComponentDef appDef = parser.parse(cmpDesc, source);
+        ComponentDef appDef = compilerService.compile(cmpDesc, source);
 
         try {
             appDef.validateReferences(false);
@@ -369,8 +365,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         addSourceAutoCleanup(controllerDesc, controllerCode);
 
         TextSource<ComponentDef> source = stringSourceLoader.getSource(cmpDesc);
-        Parser<ComponentDef> parser = parserFactory.getParser(Format.XML, cmpDesc);
-        ComponentDef appDef = parser.parse(cmpDesc, source);
+        ComponentDef appDef = compilerService.compile(cmpDesc, source);
 
         String actual = appDef.getCode(true);
 

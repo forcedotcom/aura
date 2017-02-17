@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.root.parser;
+package org.auraframework.impl.factory;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.root.parser.handler.InterfaceDefHandler;
 import org.auraframework.service.ContextService;
@@ -36,21 +35,16 @@ public class InterfaceXMLParser extends XMLParser<InterfaceDef> {
     private ContextService contextService;
 
     @Override
-    public Format getFormat() {
-        return Format.XML;
-    }
-
-    @Override
-    public DefType getDefType() {
-        return DefType.INTERFACE;
-    }
-
-    @Override
     protected InterfaceDefHandler getHandler(DefDescriptor<InterfaceDef> descriptor,
                                              TextSource<InterfaceDef> source, XMLStreamReader xmlReader,
                                              boolean isInInternalNamespace, DefinitionService definitionService,
                                              ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         return new InterfaceDefHandler(descriptor, source, xmlReader, isInInternalNamespace, definitionService,
                 contextService, configAdapter, definitionParserAdapter);
+    }
+
+    @Override
+    public Class<InterfaceDef> getDefinitionClass() {
+        return InterfaceDef.class;
     }
 }

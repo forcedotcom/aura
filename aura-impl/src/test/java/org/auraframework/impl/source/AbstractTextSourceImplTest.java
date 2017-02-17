@@ -118,7 +118,7 @@ public class AbstractTextSourceImplTest extends AuraImplTestCase {
     @Test
     public void testMimeTypeFromFormatTEMPLATE_CSS() throws Exception {
         TestTextSourceImpl source = new TestTextSourceImpl(null, "hi", Format.TEMPLATE_CSS);
-        assertEquals("text/css", source.getMimeType());
+        assertEquals("x-text/template-css", source.getMimeType());
     }
 
     @Test

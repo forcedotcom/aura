@@ -20,10 +20,9 @@ import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.impl.parser.ParserFactory;
 import org.auraframework.impl.source.StringSource;
+import org.auraframework.service.CompilerService;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Parser;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
 
@@ -37,12 +36,12 @@ public class MockingUtil {
 
     private final TestContextAdapter testContextAdapter;
     private final DefinitionService definitionService;
-    private final ParserFactory parserFactory;
+    private final CompilerService compilerService;
 
-    public MockingUtil(TestContextAdapter testContextAdapter, DefinitionService definitionService, ParserFactory parserFactory) {
+    public MockingUtil(TestContextAdapter testContextAdapter, DefinitionService definitionService, CompilerService compilerService) {
         this.testContextAdapter = testContextAdapter;
         this.definitionService = definitionService;
-        this.parserFactory = parserFactory;
+        this.compilerService = compilerService;
     }
     
     /**
@@ -91,8 +90,7 @@ public class MockingUtil {
      */
     @SuppressWarnings("unchecked")
     public <D extends Definition> D mockDefMarkup(DefDescriptor<D> descriptor, String markup) throws Exception {
-        Parser<D> parser = parserFactory.getParser(Parser.Format.XML, descriptor);
-        D def = parser.parse(descriptor,
+        D def = compilerService.compile(descriptor,
                 new StringSource<>(descriptor, markup, descriptor.getQualifiedName(), org.auraframework.system.Parser.Format.XML));
         mockDef(def);
         return def;

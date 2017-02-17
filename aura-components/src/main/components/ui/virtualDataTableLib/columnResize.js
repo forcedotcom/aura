@@ -196,8 +196,8 @@ function lib(w) { //eslint-disable-line no-unused-vars
                             initialWidth = column.style.width.replace('px','');
                         } else {
                             initialWidth = initialWidths[i] || column.clientWidth;
-                            if (initialWidth < this.config.minWidth) {
-                                initialWidth = this.config.minWidth;
+                            if (initialWidth < that.config.minWidth) {
+                                initialWidth = that.config.minWidth;
                             }
                         }
                         

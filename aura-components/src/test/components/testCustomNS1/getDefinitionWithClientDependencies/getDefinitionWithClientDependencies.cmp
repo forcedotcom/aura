@@ -20,7 +20,7 @@
     <aura:dependency resource="markup://auratest:accessPrivilegedComponent" type="COMPONENT"/>
     <aura:dependency resource="markup://auratest:accessInternalEvent" type="EVENT"/>
     <div class='whoAmI'>
-        testCustomNS1:getDefinition2.cmp
+        testCustomNS1:getDefinitionWithClientDependencies.cmp
     </div>
     
 </aura:component>

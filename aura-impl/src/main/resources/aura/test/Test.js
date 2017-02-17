@@ -1664,16 +1664,16 @@ TestInstance.prototype.getAuraErrorMessage = function() {
  *      accessingCmp A string containing accessing component details
  * 
  * @export
- * @function Test#verifyDetailedErrorMessage
+ * @function Test#getPopOverErrorMessage
  */
-TestInstance.prototype.verifyDetailedErrorMessage = function(errorMessage, delimiter, targetCmp, accessingCmp) {
+TestInstance.prototype.getPopOverErrorMessage = function(errorMessage, delimiter, targetCmp, accessingCmp) {
     if (this.contains(errorMessage,delimiter)) {
         var errorMsgACF = errorMessage.split(delimiter);
         if (!(this.contains(errorMsgACF[0],targetCmp) && this.contains(errorMsgACF[1],accessingCmp))) {
             this.fail("Access check error message verification failed. Did not receive expected error");
         }
     } else {
-        throw new Error("TestInstance:verifyAccessCheckFailureErrorMessage  Did not receive expected error");
+        throw new Error("TestInstance:getPopOverErrorMessage  Did not receive expected error");
     }
 };
 

@@ -66,6 +66,10 @@
         testUtils.assertStartsWith("Global window via " + testCase.toString() + ": SecureWindow", this.testExpression(testCase));
     },
 
+    doTestEvalForSecureIFrameContentWindow: function(cmp, testCase, testUtils) {
+        testUtils.assertStartsWith("Global window via " + testCase.toString() + ": SecureIFrameContentWindow", this.testExpression(testCase));
+    },
+
     testExpression : function(testCase) {
         var result = testCase();
         return "Global window via " + testCase.toString() + ": " + result;

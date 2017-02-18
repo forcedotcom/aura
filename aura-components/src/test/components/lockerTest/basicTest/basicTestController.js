@@ -86,16 +86,20 @@
     },
 
 	testEvalBlocking : function(cmp, event, helper) {
-		var testUtils = cmp.get("v.testUtils");		
+		var testUtils = cmp.get("v.testUtils");
+		var inIframe = event.getParam("arguments").inIframe;
 
 		// eval attempts that return a SecureWindow object
 		helper.doTestEvalForSecureWindow(cmp, function() { return window }, testUtils);
 		helper.doTestEvalForSecureWindow(cmp, function() { return self }, testUtils);
 
-	    // eval attempts that return undefined
-		helper.doTestEvalForUndefined(cmp, function() { return top }, testUtils);
-		helper.doTestEvalForUndefined(cmp, function() { return parent }, testUtils);
-
+	    if(inIframe){
+	        helper.doTestEvalForSecureIFrameContentWindow(cmp, function() { return top }, testUtils);
+		    helper.doTestEvalForSecureIFrameContentWindow(cmp, function() { return parent }, testUtils);
+	    }else{
+	        helper.doTestEvalForSecureWindow(cmp, function() { return top }, testUtils);
+		    helper.doTestEvalForSecureWindow(cmp, function() { return parent }, testUtils);
+	    }
 		// DCHASMAN TODO Here is where things go south: basically it looks like aura.mode=JSTESTDEBUG results in an aura doc iframed and missing the CSP header entirely
 		// so that needs to be addressed (results in failures of things that should be blocked by unsafe-inoine etc)
 

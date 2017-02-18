@@ -126,7 +126,8 @@
         // TODO(W-3674741,W-3674751): FF and iOS browser versions in autobuilds are too far behind
         browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],
         test: function(cmp) {
-            cmp.testEvalBlocking();
+            //Taking into account if its a manual run (which runs inside an iframe) or an auto run
+            cmp.testEvalBlocking(window !== window.parent);
 
             // DCHASMAN TOOD Port these to cmp.testEvalBlocking()
 

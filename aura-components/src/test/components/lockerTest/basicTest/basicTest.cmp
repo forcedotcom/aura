@@ -29,7 +29,9 @@
     <aura:method name="testDocumentLockerInController" action="{!c.testDocumentLockerInController}"/>
     <aura:method name="testWindowLockerInController" action="{!c.testWindowLockerInController}"/>
     <aura:method name="testAppendDynamicallyCreatedDivToMarkup" action="{!c.testAppendDynamicallyCreatedDivToMarkup}"/>
-    <aura:method name="testEvalBlocking" action="{!c.testEvalBlocking}"/>
+    <aura:method name="testEvalBlocking" action="{!c.testEvalBlocking}">
+        <aura:attribute name="inIframe" type="boolean"/>
+    </aura:method>
     <aura:method name="testContextOfController" action="{!c.testContextOfController}"/>
     <aura:method name="testDefineGetterExploit" action="{!c.testDefineGetterExploit}"/>
     <aura:method name="testSetTimeoutNonFunctionParamExploit" action="{!c.testSetTimeoutNonFunctionParamExploit}"/>

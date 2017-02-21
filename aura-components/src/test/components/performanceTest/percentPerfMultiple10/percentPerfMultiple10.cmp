@@ -1,0 +1,12 @@
+<aura:component>
+    <ui:inputPercent label="Input Percent1" value="0.5" format="#,###.00%"/>
+    <ui:inputPercent label="Input Percent2" value="0.5" format="#,###.00%"/>
+    <ui:inputPercent label="Input Percent3" value="0.5" format="#,###.00%"/>
+    <ui:inputPercent label="Input Percent4" value="0.5" format="#,###.00%"/>
+    <ui:inputPercent label="Input Percent5" value="0.5" format="#,###.00%"/>
+    <ui:inputPercent label="Input Percent6" value="0.5" format="#,###.00%"/>
+    <ui:inputPercent label="Input Percent7" value="0.5" format="#,###.00%"/>
+    <ui:inputPercent label="Input Percent8" value="0.5" format="#,###.00%"/>
+    <ui:inputPercent label="Input Percent9" value="0.5" format="#,###.00%"/>
+    <ui:inputPercent label="Input Percent10" value="0.5" format="#,###.00%"/>
+</aura:component>

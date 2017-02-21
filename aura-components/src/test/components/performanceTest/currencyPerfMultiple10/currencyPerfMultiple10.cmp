@@ -1,0 +1,12 @@
+<aura:component>
+    <ui:inputCurrency label="Input Currency" value="1234.56" format="$#,###.00"/>
+    <ui:inputCurrency label="Input Currency" value="1234.56" format="$#,###.00"/>
+    <ui:inputCurrency label="Input Currency" value="1234.56" format="$#,###.00"/>
+    <ui:inputCurrency label="Input Currency" value="1234.56" format="$#,###.00"/>
+    <ui:inputCurrency label="Input Currency" value="1234.56" format="$#,###.00"/>
+    <ui:inputCurrency label="Input Currency" value="1234.56" format="$#,###.00"/>
+    <ui:inputCurrency label="Input Currency" value="1234.56" format="$#,###.00"/>
+    <ui:inputCurrency label="Input Currency" value="1234.56" format="$#,###.00"/>
+    <ui:inputCurrency label="Input Currency" value="1234.56" format="$#,###.00"/>
+    <ui:inputCurrency label="Input Currency" value="1234.56" format="$#,###.00"/>
+</aura:component>

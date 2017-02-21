@@ -1,0 +1,12 @@
+<aura:component>
+    <ui:inputCheckbox value="true" label="inCheckbox1"/>
+    <ui:inputCheckbox value="true" label="inCheckbox2"/>
+    <ui:inputCheckbox value="true" label="inCheckbox3"/>
+    <ui:inputCheckbox value="true" label="inCheckbox4"/>
+    <ui:inputCheckbox value="true" label="inCheckbox5"/>
+    <ui:inputCheckbox value="true" label="inCheckbox6"/>
+    <ui:inputCheckbox value="true" label="inCheckbox7"/>
+    <ui:inputCheckbox value="true" label="inCheckbox8"/>
+    <ui:inputCheckbox value="true" label="inCheckbox9"/>
+    <ui:inputCheckbox value="true" label="inCheckbox10"/>
+</aura:component>

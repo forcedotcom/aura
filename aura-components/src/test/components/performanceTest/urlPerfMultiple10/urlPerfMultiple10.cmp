@@ -1,0 +1,12 @@
+<aura:component>
+    <ui:inputURL label="Input URL" value="http://www.google.com"/>
+    <ui:inputURL label="Input URL" value="http://www.google.com"/>
+    <ui:inputURL label="Input URL" value="http://www.google.com"/>
+    <ui:inputURL label="Input URL" value="http://www.google.com"/>
+    <ui:inputURL label="Input URL" value="http://www.google.com"/>
+    <ui:inputURL label="Input URL" value="http://www.google.com"/>
+    <ui:inputURL label="Input URL" value="http://www.google.com"/>
+    <ui:inputURL label="Input URL" value="http://www.google.com"/>
+    <ui:inputURL label="Input URL" value="http://www.google.com"/>
+    <ui:inputURL label="Input URL" value="http://www.google.com"/>
+</aura:component>

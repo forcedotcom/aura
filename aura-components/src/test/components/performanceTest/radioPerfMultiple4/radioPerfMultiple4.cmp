@@ -1,0 +1,6 @@
+<aura:component>
+    <ui:inputRadio value="1" name="options" label="Input One"/>
+    <ui:inputRadio  value="2" name="options" label="Input Two"/>
+    <ui:inputRadio value="3" name="options" label="Input Three"/>
+    <ui:inputRadio value="4" name="options" label="Input Four"/>
+</aura:component>

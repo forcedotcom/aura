@@ -1,0 +1,8 @@
+<aura:component>
+    <ui:inputSelect label="How many tickets?" required="true" name="select1">
+            <ui:inputSelectOption text="choose one..."/>
+            <ui:inputSelectOption text="one"/>
+            <ui:inputSelectOption text="two"/>
+            <ui:inputSelectOption text="three"/>
+    </ui:inputSelect>
+</aura:component>

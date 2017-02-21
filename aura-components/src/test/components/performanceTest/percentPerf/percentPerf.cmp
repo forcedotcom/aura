@@ -1,0 +1,3 @@
+<aura:component>
+    <ui:inputPercent label="Input Percent" value="0.5" format="#,###.00%"/>
+</aura:component>

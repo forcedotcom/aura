@@ -1,0 +1,6 @@
+<aura:component>
+    <aura:attribute name="options" type="List" description="The options to populate the select list with." />
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <ui:inputSelect aura:id="inputSelect" label="How many tickets?" required="true" name="select1" options="{!v.options}"/>
+</aura:component>

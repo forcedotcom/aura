@@ -1,0 +1,12 @@
+<aura:component>
+    <ui:inputNumber label="Input Number1" value="12345" format="#,#"/>
+    <ui:inputNumber label="Input Number2" value="12345" format="#,#"/>
+    <ui:inputNumber label="Input Number3" value="12345" format="#,#"/>
+    <ui:inputNumber label="Input Number4" value="12345" format="#,#"/>
+    <ui:inputNumber label="Input Number5" value="12345" format="#,#"/>
+    <ui:inputNumber label="Input Number6" value="12345" format="#,#"/>
+    <ui:inputNumber label="Input Number7" value="12345" format="#,#"/>
+    <ui:inputNumber label="Input Number8" value="12345" format="#,#"/>
+    <ui:inputNumber label="Input Number9" value="12345" format="#,#"/>
+    <ui:inputNumber label="Input Number10" value="12345" format="#,#"/>
+</aura:component>

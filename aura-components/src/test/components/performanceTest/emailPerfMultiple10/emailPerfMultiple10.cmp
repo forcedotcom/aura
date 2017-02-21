@@ -1,0 +1,12 @@
+<aura:component>
+    <ui:inputEmail value="abc@domain.com" label="Input Email"/>
+    <ui:inputEmail value="abc@domain.com" label="Input Email"/>
+    <ui:inputEmail value="abc@domain.com" label="Input Email"/>
+    <ui:inputEmail value="abc@domain.com" label="Input Email"/>
+    <ui:inputEmail value="abc@domain.com" label="Input Email"/>
+    <ui:inputEmail value="abc@domain.com" label="Input Email"/>
+    <ui:inputEmail value="abc@domain.com" label="Input Email"/>
+    <ui:inputEmail value="abc@domain.com" label="Input Email"/>
+    <ui:inputEmail value="abc@domain.com" label="Input Email"/>
+    <ui:inputEmail value="abc@domain.com" label="Input Email"/>
+</aura:component>

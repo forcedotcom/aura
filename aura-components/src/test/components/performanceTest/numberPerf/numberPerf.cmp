@@ -1,0 +1,3 @@
+<aura:component>
+    <ui:inputNumber label="Input Number" value="12345" format="#,#"/>
+</aura:component>

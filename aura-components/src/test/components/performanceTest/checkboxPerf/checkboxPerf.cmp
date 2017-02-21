@@ -1,0 +1,3 @@
+<aura:component>
+    <ui:inputCheckbox aura:id="inCheckbox" value="true" label="inCheckbox"/>
+</aura:component>

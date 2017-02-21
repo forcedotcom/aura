@@ -1,0 +1,12 @@
+<aura:component>
+    <ui:inputTextArea label="Input Textarea" placeholder="type here..."/>
+    <ui:inputTextArea label="Input Textarea" placeholder="type here..."/>
+    <ui:inputTextArea label="Input Textarea" placeholder="type here..."/>
+    <ui:inputTextArea label="Input Textarea" placeholder="type here..."/>
+    <ui:inputTextArea label="Input Textarea" placeholder="type here..."/>
+    <ui:inputTextArea label="Input Textarea" placeholder="type here..."/>
+    <ui:inputTextArea label="Input Textarea" placeholder="type here..."/>
+    <ui:inputTextArea label="Input Textarea" placeholder="type here..."/>
+    <ui:inputTextArea label="Input Textarea" placeholder="type here..."/>
+    <ui:inputTextArea label="Input Textarea" placeholder="type here..."/>
+</aura:component>

@@ -60,6 +60,7 @@ public class TestJavaModel implements ModelInstance {
     static List<Item> items;
     static List<Item> itemsEmpty = new ArrayList<>();
     static List<Item> itemsLarge;
+    static List<Item> itemsSplChar;
     static List<LoadColumn> columns;
     static List<LoadColumn> noColumns = Collections.emptyList();
     static List<LoadColumn> maxColumns;
@@ -159,6 +160,9 @@ public class TestJavaModel implements ModelInstance {
         for (int i = 1; i <= 50; i++) {
             itemsLarge.add(new Item("some one " + i, "id" + i));
         }
+        itemsSplChar = new ArrayList<>(2);
+        itemsSplChar.add(new Item("!@#$%^*()", null));
+        itemsSplChar.add(new Item("1#5∫œ¥¬®∑", null));
     }
 
     static {
@@ -762,6 +766,8 @@ public class TestJavaModel implements ModelInstance {
             return itemsLarge;
         } else if (dataType.equals("emptyList")) {
             return itemsEmpty;
+        } else if (dataType.equals("splChar")) {
+            return itemsSplChar;
         }
         return items;
     }

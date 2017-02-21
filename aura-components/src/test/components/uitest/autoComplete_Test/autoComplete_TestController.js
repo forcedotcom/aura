@@ -17,6 +17,10 @@
     handleInputChangeAutoComplete: function(cmp, event, helper) {
         helper.handleInputChange(cmp, event, "autoComplete");
     },
+    
+    handleInputChangeAutoCompleteSplChar: function(cmp, event, helper) {
+        helper.handleInputChange(cmp, event, "autoCompleteSplChar");
+    },
 
     handleInputChangeAutoCompleteHeaderFooter: function(cmp, event, helper) {
         helper.handleInputChange(cmp, event, "autoCompleteHeaderFooter");
@@ -89,9 +93,17 @@
     handleSelectOptionToggle: function(cmp, event, helper) {
         helper.handleSelectOption(cmp, event, "autoCompleteToggle");
     },
+    
+    handleSelectOptionAutoCompleteSplChar: function(cmp, event, helper) {
+        helper.handleSelectOption(cmp, event, "autoCompleteSplChar");
+    },
 
     handleInputChangeAutoCompleteMatchDone: function(cmp, event, helper) {
         helper.handleMatchDone(cmp, event, "autoComplete");
+    },
+    
+    handleInputChangeAutoCompleteMatchDoneSplChar: function(cmp, event, helper) {
+        helper.handleMatchDone(cmp, event, "autoCompleteSplChar");
     },
 
     handleInputChangeAutoCompleteMatchDoneHeaderFooter: function(cmp, event, helper) {

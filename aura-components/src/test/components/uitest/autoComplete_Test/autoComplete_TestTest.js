@@ -201,6 +201,65 @@
 				}]
 	},
 	
+	/**
+     * Test if autocomplete matches special characters like '$', '#' etc
+     */
+    testMatchSpecialCharacters: {
+        browsers : ["-IE7", "-IE8"],
+        test : [function(cmp){
+                this._changeInputSplChar(cmp, "$");
+            }, function(cmp){
+                // check that matching is done correctly and click on option
+                var autoList = cmp.find("autoCompleteSplChar").find("list");
+                var ul = autoList.getElement().getElementsByTagName("ul")[0];
+                $A.test.assertTrue($A.util.hasClass(ul,"visible"), "Class name should contain visible");
+                var listAnchors = ul.getElementsByTagName("a");
+                $A.test.clickOrTouch(listAnchors[0]);
+            }, function(cmp) {
+                $A.test.addWaitForWithFailureMessage(true, function(){
+                    var actual = cmp.find("autoCompleteSplChar").find("input").find("txt").getElement().value;
+                    return actual === "!@#$%^*()";
+                }, "The expected option was not selected");
+            }]
+        },
+        
+        /**
+         * Test Case:
+         * 1. Enter a character to make autocomplete match options
+         * 2. Hover over a random option to highlight it
+         * 3. Move to next option using the down arrow
+         * 4. Check that this next option is highlighted
+         */
+        testHoverAndKeyboardHighlight : {
+            browsers : ["-IE7", "-IE8"],
+            RANDOM_OPTION : 3,
+            test : [function(cmp){
+                this._changeInput(cmp, "h");
+            }, function(cmp){
+                var randomOption = this.testHoverAndKeyboardHighlight.RANDOM_OPTION;
+                var autoList = cmp.find("autoComplete").find("list");
+                var ul = autoList.getElement().getElementsByTagName("ul")[0];
+                $A.test.assertTrue($A.util.hasClass(ul, "visible"), "Class name should contain visible");
+                var listOption = ul.getElementsByTagName("a")[randomOption];
+                $A.test.fireDomEvent(listOption, "mouseover");
+            }, function(cmp){
+                var self = this;
+                $A.test.addWaitForWithFailureMessage(true, function(){
+                    var expectedOption = self.testHoverAndKeyboardHighlight.RANDOM_OPTION;
+                    return self._validateItemHighlighted(cmp, expectedOption, "autoComplete");
+                }, "The expected option was not highlighted");
+            }, function(cmp){
+                var input = this._getInput(cmp, "autoComplete");
+                this._fireKeydownEvent(input, this.DOWNARROW_KEY);
+            }, function(cmp){
+                var self = this;
+                $A.test.addWaitForWithFailureMessage(true, function(){
+                    var expectedOption = self.testHoverAndKeyboardHighlight.RANDOM_OPTION + 1;
+                    return self._validateItemHighlighted(cmp, expectedOption, "autoComplete");
+                }, "The expected option was not highlighted");
+            }]
+        },
+	
 	_validateItemSelected: function(cmp, id, expectedText) {
 		var actual = cmp.find(id).find("input").find("txt").getElement().value;
 		$A.test.assertEquals(expectedText, actual, "Expected item not selected");
@@ -209,6 +268,13 @@
 	_validateSelectEventFired: function(cmp, expectedText) {
 		var actual = cmp.find("autoCompleteSelectedEventResult").get("v.value");
 		$A.test.assertEquals(expectedText, actual, "Expected item not selected");
+	},
+	
+	_validateItemHighlighted: function(cmp, option, autocompleteCmp) {
+        var autoList = cmp.find(autocompleteCmp).find("list");
+        var ul = autoList.getElement().getElementsByTagName("ul")[0];
+        var expectedListElement = ul.getElementsByTagName("li")[option];
+        return $A.util.hasClass(expectedListElement,"highlighted");
 	},
 
 	_getInput: function(cmp, id) {
@@ -222,6 +288,10 @@
 	_changeInputHeaderFooter: function(cmp,inputValue) {
 		cmp.get('c.handleInputChangeAutoCompleteHeaderFooter').runDeprecated({"getParam":function(value){return inputValue;}});
 	},
+	
+	_changeInputSplChar: function(cmp,inputValue) {
+        cmp.get('c.handleInputChangeAutoCompleteSplChar').runDeprecated({"getParam":function(value){return inputValue;}});
+    },
 
 	_fireKeydownEvent: function(cmp, keycode) {
 		cmp.getEvent("keydown").setParams({

@@ -18,14 +18,13 @@
     	var data;
 
     	$A.log("provide");
-        if (component.get("v.dataType") == "largeList") {
-        	$A.log("listOf500Items");
+        if (component.get("v.dataType") === "largeList") {
             data = component.get("m.listOf500Items");
-        } else if (component.get("v.dataType") == "emptyList") {
-        	$A.log("emptyList");
+        } else if (component.get("v.dataType") === "emptyList") {
             data = component.get("m.emptyList");
+        } else if (component.get("v.dataType") === "splChar") {
+            data = component.get("m.splChar");
         } else {
-        	$A.log("listOfData");
             data = component.get("m.listOfData");
         }
 		$A.log(data);

@@ -26,7 +26,7 @@ const outputPath = process.argv[4];
 const compiler = require(compilerJs);
 const fs = require('fs');
 
-const promise = compiler.compile(componentPath, {format: 'aura'});
+const promise = compiler.compile(componentPath, {format: 'aura', mapNamespaceFromPath: true });
 
 promise.then((result) => {
     fs.writeFile(outputPath, result.code, function(err) {

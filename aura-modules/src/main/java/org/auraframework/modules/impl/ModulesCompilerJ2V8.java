@@ -41,7 +41,7 @@ public final class ModulesCompilerJ2V8 implements ModulesCompiler {
 
         String options = "{ sourceTemplate: `" + sourceTemplate
                 + "`\n, sourceClass: `" + sourceClass + "`\n"
-                + ", format: 'aura'}";
+                + ", format: 'aura', mapNamespaceFromPath: true }";
         return compile(entry, options);
     }
 

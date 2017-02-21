@@ -1124,16 +1124,19 @@ public class DefinitionServiceImpl implements DefinitionService {
         cc.addMap(AuraStaticControllerDefRegistry.getInstance(this).getAll());
         // invert modules enabled to get switchable DefRefDelegates to return other references
         context.setModulesEnabled(!modulesEnabled);
-        compileDef(descriptor, cc, false);
+        try {
+            compileDef(descriptor, cc, false);
 
-        if (modulesEnabled) {
-            // this recompile yields component defs if modules enabled
-            cc.compiledComponent = Collections.unmodifiableMap(cc.compiled);
-        } else {
-            cc.compiledModule = Collections.unmodifiableMap(cc.compiled);
+            if (modulesEnabled) {
+                // this recompile yields component defs if modules enabled
+                cc.compiledComponent = Collections.unmodifiableMap(cc.compiled);
+            } else {
+                cc.compiledModule = Collections.unmodifiableMap(cc.compiled);
+            }
+        } finally {
+            // reset modules enabled flag
+            context.setModulesEnabled(modulesEnabled);
         }
-        // reset modules enabled flag
-        context.setModulesEnabled(modulesEnabled);
 
         // compiled now holds all defs of both component and module to be used in UID calculation
         cc.compiled = Maps.newHashMap();

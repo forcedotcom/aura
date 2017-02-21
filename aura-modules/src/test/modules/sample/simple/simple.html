@@ -1,0 +1,14 @@
+<template>
+    <section class="modules-container" data-time="12:42">
+        <p class="i-am-modules">I'm modules!</p>
+        <ul>
+            <li class="m-literal">Literal: <span>{literal}</span></li>
+            <li class="m-bound">Bound: <span>{bound}</span> </li>
+            <li class="m-unbound">Unbound: <span>{unbound}</span></li>
+            <li class="m-expr">Expression: <span>{expression}</span></li>  
+        </ul>
+
+        <p><button bind:onclick="handleFireAction">FireCallbackAction</button></p>
+        <p><button bind:onclick="handlePressEvent">FirePressEvent</button></p>
+    </section>
+</template>

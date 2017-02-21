@@ -53,7 +53,18 @@
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
+            <artifactId>aura-modules</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura-components</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-modules</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

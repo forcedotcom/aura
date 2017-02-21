@@ -36,7 +36,7 @@ public final class ModulesCompilerNode implements ModulesCompiler {
     private static final String PATH_TO_NODE = AuraFiles.Core.getPath() + "/node/node";
 
     public ModulesCompilerData compile(File file) throws Exception {
-        // executes: node .../raptor-compiler-cli.js .../compiler.js input.js output.js
+        // executes: node .../compiler-cli.js .../compiler.js input.js output.js
         String filePath = file.getAbsolutePath();
         File output = ModulesCompilerUtil.createTempFile("out");
         List<String> command = new ArrayList<>();

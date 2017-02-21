@@ -1,0 +1,19 @@
+<aura:component>
+    <aura:attribute name="literal" type="String" default="some Literal" access="GLOBAL" />
+    <aura:attribute name="bound" type="String" default="some Bound" access="GLOBAL" />
+    <aura:attribute name="unbound" type="String" default="some Unbound" access="GLOBAL" />
+    <aura:attribute name="expression" type="String" default="some Expression" access="GLOBAL" />
+
+    <aura:registerevent name="onpress" type="ui:press" access="GLOBAL" description="The event fired when the button is clicked."/>
+    <aura:registerevent name="callbackaction" type="ui:response" access="GLOBAL" description="Responds"  />
+
+    <div>
+        <p>I'm an Aura component!</p>
+        <ul>
+            <li>Literal: <span>{!v.literal}</span></li>
+            <li>Bound: <span>{!v.bound}</span></li>
+            <li>Unbound: <span>{!v.unbound}</span></li>
+            <li>Expression: <span>{!v.expression}</span></li>
+        </ul>
+    </div>
+</aura:component>

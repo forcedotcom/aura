@@ -103,15 +103,6 @@ public interface AttributeSet extends ValueProvider, JsonSerializable, Iterable<
     void set(Map<String, Object> attributeMap) throws QuickFixException;
     
     /**
-     * Set a single value of the component.
-     * 
-     * @param attribute The attribute name. Do not include the "v." portion.
-     * @param value
-     * @throws QuickFixException
-     */
-    void set(String attribute, Object value) throws QuickFixException;
-    
-    /**
      * Map the values of one attribute set into the current compnent. 
      * 
      * @param attributeSet One components attributeset

@@ -201,16 +201,6 @@ public class AttributeSetImpl implements AttributeSet {
             set(attributeDefRef);
         }
     }
-    
-    @Override
-    public void set(final String descriptor, final Object attributeValue) throws QuickFixException {
-        final RootDefinition rootDef = rootDefDescriptor.getDef();
-        final Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = rootDef.getAttributeDefs();
-        final DefDescriptor<AttributeDef> desc = Aura.getInstanceService().getInstance(descriptor, AttributeDef.class);
-        if (attrs.containsKey(desc)) {
-            setExpression(desc, attributeValue);
-        }
-    }
 
     @Override
     public void set(AttributeSet attributeSet) throws QuickFixException {

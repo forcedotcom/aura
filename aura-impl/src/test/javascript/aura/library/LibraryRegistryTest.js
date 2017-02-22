@@ -33,7 +33,8 @@ Test.Aura.Library.LibraryRegistryTest = function () {
                 "isEmpty": function(obj){ return Object.keys(obj).length === {} }
             },
             "componentService": {
-                "getLibraryInclude": function(descriptor) { return descriptor }
+                "getLibraryInclude": function(descriptor) { return descriptor },
+                "addModule": function () {}
             }
         }
     });

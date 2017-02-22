@@ -643,7 +643,7 @@ AuraComponentService.prototype.addModule = function(name, dependencies, exporter
         return this.addModule(name, [], dependencies);
     }
 
-    var descriptor = 'markup://' + name;
+    var descriptor = name.indexOf('markup://') === 0 ? name : 'markup://' + name;
     var entry = this.moduleDefRegistry[descriptor] || (this.moduleDefRegistry[descriptor] = {});
 
     entry.dependencies = dependencies;
@@ -1177,10 +1177,17 @@ AuraComponentService.prototype.createFromSavedComponentConfigs = function(config
 
 
 AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
-    var entry = this.moduleDefRegistry[descriptor];
+    var entry = this.moduleDefRegistry[descriptor] || this.getLibraryAsModule(descriptor);
     var factory;
     var exportns;
     var url;
+
+    $A.assert(entry, 'We couldn\'t found the definition for dependency: ' + descriptor);
+
+    // If we have resolved already the exports (libraries case), return them
+    if (entry.ns) {
+        return entry.ns;
+    }
 
     if (!entry.dependencies) {
         //#if {"excludeModes" : ["PRODUCTION"]}
@@ -1372,6 +1379,16 @@ AuraComponentService.prototype.addLibraryExporter = function(descriptor, exporte
  */
 AuraComponentService.prototype.getLibrary = function(descriptor) {
     return this.libraryRegistry.getLibrary(descriptor);
+};
+
+/**
+ * Get a library as a module from the registry.
+ * @param {String} descriptor library descriptor.
+ * @returns {Object} library from registry.
+ * @private
+ */
+AuraComponentService.prototype.getLibraryAsModule = function(descriptor) {
+    return this.libraryRegistry.getLibrary(descriptor) && this.moduleDefRegistry[descriptor];
 };
 
 /**

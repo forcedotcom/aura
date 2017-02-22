@@ -787,4 +787,200 @@ public class EventAccessAttributeEnforcementTest extends AuraImplTestCase {
                         NamespaceAccess.INTERNAL);
         	definitionService.getDefinition(descriptor);
     }
+    
+    /**
+     * Verify PUBLIC Access Enforcement
+     * VerifyAccess for Application Event in Other Custom Namespace with Public access, Cmp in Custom Namespace
+     */
+    @Test
+    public void testComponentWithCustomNamespaceRegisterEventWithAnotherCustomNamespaceInMarkupAccessPublic() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='APPLICATION' access='PUBLIC'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testevent",
+                        NamespaceAccess.CUSTOM);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.ANOTHER_CUSTOM_NAMESPACE + ":testcomponent",
+                        NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
+        try {
+        	definitionService.getDefinition(descriptor);
+        } catch(Exception e) {
+            caught = e;
+        }
+        assertNotNull("component of a custom namespace shouldn't be able to register event of other custom namespace", caught);
+        //Access to event 'cstring1:testevent57' with access 'PUBLIC' from namespace 'cstring2' in 'markup://cstring2:testcomponent58(COMPONENT)' is not allowed
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
+    }
+    
+    /**
+     * Verify DEFAULT Access Enforcement
+     * VerifyAccess for Application Event in Other Custom Namespace with Default access, Cmp in Custom Namespace
+     */
+    @Test
+    public void testComponentWithCustomNamespaceRegisterEventWithOtherCustomNamespaceInMarkupAccessDefault() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='APPLICATION'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testevent",
+                        NamespaceAccess.CUSTOM);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testcomponent",
+                        NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
+        try {
+        	definitionService.getDefinition(descriptor);
+        } catch(Exception e) {
+            caught = e;
+        }
+        assertNotNull("component of a custom namespace shouldn't be able to register event of other custom namespace", caught);
+        //Access to event 'cstring:testevent13' with access 'PUBLIC' from namespace 'cstring1' in 'markup://cstring1:testcomponent14(COMPONENT)' is not allowed
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
+    }
+    
+    /**
+     * Verify PUBLIC Access Enforcement
+     * VerifyAccess for Application Event in Privileged Namespace with Public access, Cmp in Custom Namespace
+     */
+    @Test
+    public void testComponentWithCustomNamespaceRegisterEventWithPrivilegedNamespaceInMarkupAccessPublic() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='APPLICATION' access='PUBLIC'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testevent",
+                        NamespaceAccess.PRIVILEGED);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent",
+                        NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
+        try {
+        	definitionService.getDefinition(descriptor);
+        } catch(Exception e) {
+            caught = e;
+        }
+        assertNotNull("component of a custom namespace shouldn't be able to register event of other custom namespace", caught);
+        //Access to event 'privilegedNS:testevent39' with access 'PUBLIC' from namespace 'cstring' in 'markup://cstring:testcomponent40(COMPONENT)' is not allowed
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
+    }
+    
+    /**
+     * Verify DEFAULT Access Enforcement
+     * VerifyAccess for Application Event in Other Privileged with Default access, Cmp in Custom Namespace
+     */
+    @Test
+    public void testComponentWithCustomNamespaceRegisterEventWithPrivilegedNamespaceInMarkupAccessDefault() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='APPLICATION'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testevent",
+                        NamespaceAccess.PRIVILEGED);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":testcomponent",
+                        NamespaceAccess.CUSTOM);
+
+        Exception caught = null;
+        try {
+        	definitionService.getDefinition(descriptor);
+        } catch(Exception e) {
+            caught = e;
+        }
+        assertNotNull("component of a custom namespace shouldn't be able to register event of other custom namespace", caught);
+        //Access to event 'privilegedNS:testevent73' with access 'PUBLIC' from namespace 'cstring' in 'markup://cstring:testcomponent74(COMPONENT)' is not allowed
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
+    }
+    
+    /**
+     * Verify PUBLIC Access Enforcement
+     * VerifyAccess for Application Event in Other Custom namespace with Public access, Cmp in Privileged Namespace
+     */
+    @Test
+    public void testComponentWithPrivilegedNamespaceRegisterEventWithOtherCustomNamespaceInMarkupAccessPublic() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='APPLICATION' access='PUBLIC'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testevent",
+                        NamespaceAccess.CUSTOM);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent",
+                        NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
+        try {
+        	definitionService.getDefinition(descriptor);
+        } catch(Exception e) {
+            caught = e;
+        }
+        assertNotNull("component of a custom namespace shouldn't be able to register event of other custom namespace", caught);
+        //Access to event 'cstring1:testevent3' with access 'PUBLIC' from namespace 'privilegedNS' in 'markup://privilegedNS:testcomponent4(COMPONENT)' is not allowed
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
+    }
+    
+    /**
+     * Verify DEFAULT Access Enforcement
+     * VerifyAccess for Application Event in Other Custom namespace with Default access, Cmp in Privileged Namespace
+     */
+    @Test
+    public void testComponentWithPrivilegedNamespaceRegisterEventWithOtherCustomNamespaceInMarkupAccessDefault() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='APPLICATION'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.OTHER_CUSTOM_NAMESPACE + ":testevent",
+                        NamespaceAccess.CUSTOM);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent",
+                        NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
+        try {
+        	definitionService.getDefinition(descriptor);
+        } catch(Exception e) {
+            caught = e;
+        }
+        assertNotNull("component of a custom namespace shouldn't be able to register event of other custom namespace", caught);
+        //Access to event 'cstring1:testevent83' with access 'PUBLIC' from namespace 'privilegedNS' in 'markup://privilegedNS:testcomponent84(COMPONENT)' is not allowed
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
+    }
+    
+    /**
+     * Verify DEFAULT Access Enforcement
+     * VerifyAccess for Application Event in Other Privileged namespace with Default access, Cmp in Privileged Namespace
+     */
+    @Test
+    public void testComponentWithPrivilegedNamespaceRegisterEventWithOtherPrivilegedNamespaceInMarkupAccessDefault() throws QuickFixException {
+        //create event with custom namespace
+        String eventSource = "<aura:event type='APPLICATION'/>";
+        DefDescriptor<? extends Definition> eventDescriptor = getAuraTestingUtil().addSourceAutoCleanup(EventDef.class, eventSource,
+                StringSourceLoader.OTHER_PRIVILEGED_NAMESPACE + ":testevent",
+                        NamespaceAccess.PRIVILEGED);
+        //create component register the event above
+        String source = "<aura:component> <aura:registerEvent name='testevent' type='" + eventDescriptor.getNamespace() + ":" + eventDescriptor.getName() + "' /></aura:component> ";
+        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, source,
+                StringSourceLoader.DEFAULT_PRIVILEGED_NAMESPACE + ":testcomponent",
+                        NamespaceAccess.PRIVILEGED);
+
+        Exception caught = null;
+        try {
+        	definitionService.getDefinition(descriptor);
+        } catch(Exception e) {
+            caught = e;
+        }
+        assertNotNull("component of a custom namespace shouldn't be able to register event of other custom namespace", caught);
+        //Access to event 'privilegedNS1:testevent31' with access 'PUBLIC' from namespace 'privilegedNS' in 'markup://privilegedNS:testcomponent32(COMPONENT)' is not allowed
+        assertTrue("got unexpected message:"+caught.getMessage(), caught.getMessage().contains("is not allowed"));
+    }
 }

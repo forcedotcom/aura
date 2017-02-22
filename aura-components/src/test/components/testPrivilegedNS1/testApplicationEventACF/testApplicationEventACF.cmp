@@ -1,0 +1,38 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:attribute name="message1" type="String" description="hold attribute from event fired in privileged namespace" />
+    <aura:attribute name="message2" type="String" description="hold attribute from event fired in internal namespace" />
+    <aura:attribute name="message3" type="String" description="hold attribute from event fired in custom namespace" />
+    <aura:attribute name="message4" type="String" description="hold attribute from event fired in privileged namespace" />
+    
+    <div class='whoAmI'>
+        testPrivilegedNS1:testApplicationEventACF.cmp
+    </div>
+    <!-- Access Check Failure on client expected -->
+    <aura:registerEvent name="appEventInternalNSPublicAccess" type="auratest:applicationEventWithPublicAccess"/>
+    <aura:registerEvent name="appEventInternalNSDefaultAccess" type="auratest:applicationEventWithDefaultAccess"/>
+    <aura:registerEvent name="appEventInternalNSInternalAccess" type="auratest:applicationEventWithInternalAccess"/>
+    
+    <!-- event handler for verification of set attribute on application event -->
+    <aura:handler event="testPrivilegedNS1:applicationEventWithGlobalAccess" action="{!c.handleEventinPrivilegedNamespaceWithGlobalAccess}"/>
+    <aura:handler event="auratest:applicationEventWithGlobalAccess" action="{!c.handleEventinInternalNamespaceWithGlobalAccess}"/>
+    <aura:handler event="testCustomNS2:applicationEventWithGlobalAccess" action="{!c.handleEventinCustomNamespaceWithGlobalAccess}"/>
+    <aura:handler event="testPrivilegedNS1:applicationEventWithPublicAccess" action="{!c.handleEventinPrivilegedNamespaceWithPublicAccess}"/>
+    
+</aura:component>

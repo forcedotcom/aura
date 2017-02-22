@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="APPLICATION" description="Application event under privilegedNS1" access="Global">
+<aura:event type="APPLICATION" description="Application event under Internal Namespace" access="Public">
     <aura:attribute name="message" type="String"/>
 </aura:event>

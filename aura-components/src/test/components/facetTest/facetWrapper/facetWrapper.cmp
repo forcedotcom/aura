@@ -1,0 +1,37 @@
+<aura:component>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="toggle" type="Boolean" default="true"/>
+    <aura:attribute name="foo" type="String" default="test"/>
+    <aura:attribute name="facet" type="Aura.Component[]">
+        <ui:label label="{!v.foo}"></ui:label>
+    </aura:attribute>
+
+    <section>
+        <aura:if isTrue="{!v.toggle}">
+            <div>
+                <div>
+                    <facetTest:facetChild aura:id="f1">
+                        <aura:set attribute="title">
+                            <ui:label label="Via label component"/>
+                        </aura:set>
+                    </facetTest:facetChild>
+                </div>
+
+                <div>
+                    <facetTest:facetChild aura:id="f2" title="{!v.foo}"/>
+                </div>
+
+                <div>
+                    <facetTest:facetChild aura:id="f3">
+                        <aura:set attribute="title">
+                            <ui:label label="{!v.foo}"/>
+                        </aura:set>
+                    </facetTest:facetChild>
+                </div>
+                <div aura:id="container"></div>
+            </div>
+        </aura:if>
+        <ui:button label="ToggleIf" press="{!c.toggle}" />
+        <ui:button label="ToggleFoo" press="{!c.changeFoo}" />
+    </section>
+</aura:component>

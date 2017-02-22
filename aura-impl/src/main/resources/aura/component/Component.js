@@ -2081,6 +2081,20 @@ Component.prototype.setSuperComponent = function(component) {
     }
 };
 
+Component.prototype.isCollectionOfAuraComponentDefs = function (facetValueConfig) {
+    if ($A.util.isArray(facetValueConfig)) {
+        for (var i in facetValueConfig) {
+            var facetItem = facetValueConfig[i];
+            if (!facetItem["componentDef"] || !facetItem["componentDef"]["descriptor"]) {
+                return false;
+            }
+        }
+        return true;
+    } else {
+        return false;
+    }
+};
+
 Component.prototype.setupAttributes = function(cmp, config, localCreation) {
     //JBUCH: HALO: TODO: NOTE TO SELF: I THINK THERE IS SOMETHING STILL WRONG HERE.
     // I THINK THAT THE ORDER OF THE VALUES IS INCORRECT NOW
@@ -2132,13 +2146,16 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
             //JBUCH: HALO: TODO: DOES THIS MEAN CASE-MISMATCH OR UNKNOWN? ALSO, EVENTS!?!?
             continue;
         }
-        var isFacet = attributeDef.getTypeDefDescriptor() === "aura://Aura.Component[]";
-        var isDefRef = attributeDef.getTypeDefDescriptor() === "aura://Aura.ComponentDefRef[]";
 
         // JBUCH: HALO: TODO: WHY DO WE NEED/ALLOW THIS?
         if ($A.componentService.isConfigDescriptor(value)) {
             value = value["value"];
         }
+
+        var attributeType = attributeDef.getTypeDefDescriptor();
+        var isFacet = attributeType === "aura://Aura.Component[]" || (attributeType === 'aura://Object' && this.isCollectionOfAuraComponentDefs(value));
+        var isDefRef = attributeType === "aura://Aura.ComponentDefRef[]";
+        
         if (!setByDefault[attribute]){
             var def=AttributeSet.getDef(attribute,cmp.getDef());
             if(!$A.clientService.allowAccess(def[0],def[1])) {

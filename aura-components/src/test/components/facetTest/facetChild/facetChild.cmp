@@ -1,0 +1,11 @@
+<aura:component>
+    <aura:attribute name="title" type="Object" default="Default title string"/>
+    <aura:attribute name="footer" type="Object" default="Default footer string"/>
+
+    <section>
+        <div><span>Title Facet: </span>{!v.title}</div>
+        <div><span>Body Facet: </span>{!v.body}</div>
+        <div><span>Footer Facet: </span>{!v.footer}</div>
+    </section>
+
+</aura:component>

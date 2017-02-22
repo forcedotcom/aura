@@ -76,7 +76,7 @@
         function canAccessGlobalMethod(cmp) {
             this.componentCreated.globalMethod();
             $A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'globalMethod', "get unexpected outcome from calling global method");
-        },
+        }
         ]
     },
 
@@ -130,7 +130,7 @@
         function canAccessGlobalMethod(cmp) {
             this.componentCreated.globalMethod();
             $A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'globalMethod', "get unexpected outcome from calling global method");
-        },
+        }
         ]
     },
 
@@ -184,7 +184,7 @@
         function canAccessGlobalMethod(cmp) {
             this.componentCreated.globalMethod();
             $A.test.assertTrue(this.componentCreated.get("v.globalAttribute") === 'globalMethod', "get unexpected outcome from calling global method");
-        },
+        }
         ]
     },
 
@@ -302,10 +302,17 @@
 
         //we register event(testCustomNS2:componentEventWithDefaultAccess) in component we just created (testCustomNS2:componentWithGlobalAccess)
         //the event itself is defined with default access
-        /*function canAccessDefaultEventRegisteredWithDefaultAccess(cmp) {
+        /* Below test is same as canAccessDefaultEventRegisteredWithGlobalAccess, should be deleted.
+           //TODO(W-3722142): Issues changing access level during event registration
+        function canAccessDefaultEventRegisteredWithDefaultAccess(cmp) {
             var evt = this.componentCreated.getEvent("NS2eventWithDefaultAccessRegisteredWithGlobalAccess");
             $A.test.assertTrue(evt.getName() === 'NS2eventWithDefaultAccessRegisteredWithGlobalAccess', "get unexpected event name");
         },
+        //TODO(W-3722142): Issues changing access level during event registration
+        function canAccessDefaultEventRegisteredWithDefaultAccess(cmp) {
+            var evt = this.componentCreated.getEvent("NS2eventWithDefaultAccessRegisteredWithDefaultAccess");
+            $A.test.assertTrue(evt.getName() === 'NS2eventWithDefaultAccessRegisteredWithDefaultAccess', "get unexpected event name");
+        },*/
         function cannotAccessDefaultEventRegisteredWithPrivateAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("NS2eventWithDefaultAccessRegisteredWithPrivateAccess");
@@ -314,6 +321,8 @@
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("NS2eventWithDefaultAccessRegisteredWithPublicAccess");
         },
+        /* 
+        //TODO(W-3722142): Issues changing access level during event registration
         function canAccessDefaultEventRegisteredWithGlobalAccess(cmp) {
             var evt = this.componentCreated.getEvent("NS2eventWithDefaultAccessRegisteredWithGlobalAccess");
             $A.test.assertTrue(evt.getName() === 'NS2eventWithDefaultAccessRegisteredWithGlobalAccess', "get unexpected event name");
@@ -348,7 +357,9 @@
                         "markup://testCustomNS1:componentWithDefaultAccess");
             });
         },
-        /*function canAccessPublicEventRegisteredWithGlobalAccess(cmp) {
+        /* 
+         //TODO(W-3722142): Issues changing access level during event registration
+        function canAccessPublicEventRegisteredWithGlobalAccess(cmp) {
             var evt = this.componentCreated.getEvent("NS2eventWithPublicAccessRegisteredWithGlobalAccess");
             $A.test.assertTrue(evt.getName() === 'NS2eventWithPublicAccessRegisteredWithGlobalAccess', "get unexpected event name");
         },*/
@@ -363,15 +374,22 @@
             var evt = this.componentCreated.getEvent("NS2eventWithGlobalAccessRegisteredWithGlobalAccess");
             $A.test.assertTrue(evt.getName() === 'NS2eventWithGlobalAccessRegisteredWithGlobalAccess', "get unexpected event name");
         },
-        /*function cannotAccessGlobalEventRegisteredWithPublicAccess(cmp) {
-            $A.test.expectAuraError("Access Check Failed!");
+        function cannotAccessGlobalEventRegisteredWithPublicAccess(cmp) {
             var evt = this.componentCreated.getEvent("NS2eventWithGlobalAccessRegisteredWithPublicAccess");
+            $A.test.assertTrue(evt.getName() === 'NS2eventWithGlobalAccessRegisteredWithPublicAccess', "get unexpected event name");
         },
         function cannotAccessGlobalEventRegisteredWithPrivateAccess(cmp) {
-            $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("NS2eventWithGlobalAccessRegisteredWithPrivateAccess");
-        },*/
-
+            $A.test.assertTrue(evt.getName() === 'NS2eventWithGlobalAccessRegisteredWithPrivateAccess', "get unexpected event name");
+        },
+        function cannotAccessGlobalEventRegisteredWithPublicAccess(cmp) {
+            var evt = this.componentCreated.getEvent("NS2eventWithGlobalAccessRegisteredWithPublicAccess");
+            $A.test.assertTrue(evt.getName() === 'NS2eventWithGlobalAccessRegisteredWithPublicAccess', "get unexpected event name");
+        },
+        function cannotAccessGlobalEventRegisteredWithPrivateAccess(cmp) {
+            var evt = this.componentCreated.getEvent("NS2eventWithGlobalAccessRegisteredWithPrivateAccess");
+            $A.test.assertTrue(evt.getName() === 'NS2eventWithGlobalAccessRegisteredWithPrivateAccess', "get unexpected event name");
+        },
         //we register event(testCustomNS1:componentEventWithGlobalAccess) in component we just created (testCustomNS2:componentWithGlobalAccess)
         //the event itself is defined with global access
         function canAccessGlobalEventRegisteredWithDefaultAccess(cmp) {
@@ -381,15 +399,23 @@
         function canAccessGlobalEventRegisteredWithGlobalAccess(cmp) {
             var evt = this.componentCreated.getEvent("NS1eventWithGlobalAccessRegisteredWithGlobalAccess");
             $A.test.assertTrue(evt.getName() === 'NS1eventWithGlobalAccessRegisteredWithGlobalAccess', "get unexpected event name");
-        },
-        /*function canAccessGlobalEventRegisteredWithPublicAccess(cmp) {
-            $A.test.expectAuraError("Access Check Failed!");
+        }, 
+        function canAccessGlobalEventRegisteredWithPublicAccess(cmp) {
             var evt = this.componentCreated.getEvent("NS1eventWithGlobalAccessRegisteredWithPublicAccess");
+            $A.test.assertTrue(evt.getName() === 'NS1eventWithGlobalAccessRegisteredWithPublicAccess', "get unexpected event name");
+        }, 
+        function canAccessGlobalEventRegisteredWithPrivateAccess(cmp) {
+            var evt = this.componentCreated.getEvent("NS1eventWithGlobalAccessRegisteredWithPrivateAccess");
+            $A.test.assertTrue(evt.getName() === 'NS1eventWithGlobalAccessRegisteredWithPrivateAccess', "get unexpected event name");
+        }, 
+        function canAccessGlobalEventRegisteredWithPublicAccess(cmp) {
+            var evt = this.componentCreated.getEvent("NS1eventWithGlobalAccessRegisteredWithPublicAccess");
+            $A.test.assertTrue(evt.getName() === 'NS1eventWithGlobalAccessRegisteredWithPublicAccess', "get unexpected event name");
         },
         function canAccessGlobalEventRegisteredWithPrivateAccess(cmp) {
-            $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("NS1eventWithGlobalAccessRegisteredWithPrivateAccess");
-        }*/
+            $A.test.assertTrue(evt.getName() === 'NS1eventWithGlobalAccessRegisteredWithPrivateAccess', "get unexpected event name");
+        }
         ]
     },
 
@@ -725,12 +751,14 @@
                         "markup://testCustomNS1:componentWithDefaultAccess");
             });
         },
-        /*function canAccessSystemNSDefaultAccessEventRegisteredWithGlobalAccess(cmp) {
+        /* 
+           //TODO(W-3722142): Issues changing access level during event registration 
+           function canAccessSystemNSDefaultAccessEventRegisteredWithGlobalAccess(cmp) {
             var evt = this.componentCreated.getEvent("eventWithDefaultAccessInSystemNamespaceRegisteredWithGlobalAccess");
             $A.test.assertTrue(evt.getName() === "eventWithDefaultAccessInSameSystemNamespaceRegisteredWithGlobalAccess", "get unexpected event name:"+evt.getName());
         },*/
 
-      //tests for accessing event "accessInternalEvent" in system namespace "auratest", the event itself is defined with internal access
+        //tests for accessing event "accessInternalEvent" in system namespace "auratest", the event itself is defined with internal access
         function canNotAccessSystemNSInternalAccessEventRegisteredWithDefaultAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithInternalAccessInSystemNamespaceRegisteredWithDefaultAccess");
@@ -767,12 +795,10 @@
                         "markup://testCustomNS1:componentWithDefaultAccess");
             });
         },
-        /*function canAccessSystemNSInternalAccessEventRegisteredWithGlobalAccess(cmp) {
-            //$A.test.expectAuraError("Access Check Failed!");
+        function canAccessSystemNSInternalAccessEventRegisteredWithGlobalAccess(cmp) {
+            $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithInternalAccessInSystemNamespaceRegisteredWithGlobalAccess");
-            $A.test.assertTrue(evt.getName() === "eventWithInternalAccessInSystemNamespaceRegisteredWithGlobalAccess", "get unexpected event name:"+evt.getName());
-        },*/
-
+        },
         //tests for accessing event "accessPublicEvent" in system namespace "auratest", the event itself is defined with public access
         function canNotAccessSystemNSPublicAccessEventRegisteredWithDefaultAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
@@ -810,7 +836,9 @@
                         "markup://testCustomNS1:componentWithDefaultAccess");
             });
         },
-        /*function canAccessSystemNSPublicAccessEventRegisteredWithGlobaldAccess(cmp) {
+        /* 
+           //TODO(W-3722142): Issues changing access level during event registration
+           function canAccessSystemNSPublicAccessEventRegisteredWithGlobaldAccess(cmp) {
             var evt = this.componentCreated.getEvent("eventWithPublicAccessInSystemNamespaceRegisteredWithGlobalAccess");
             $A.test.assertTrue(evt.getName() === "eventWithPublicAccessInSystemNamespaceRegisteredWithGlobalAccess", "get unexpected event name:"+evt.getName());
         },*/
@@ -852,7 +880,9 @@
                         "markup://testCustomNS1:componentWithDefaultAccess");
             });
         },
-        /*function canAccessSystemNSPrivilegedAccessEventRegisteredWithGlobalAccess(cmp) {
+        /* 
+           //TODO(W-3722142): Issues changing access level during event registration
+           function canAccessSystemNSPrivilegedAccessEventRegisteredWithGlobalAccess(cmp) {
             var evt = this.componentCreated.getEvent("eventWithPrivilegedAccessInSystemNamespaceRegisteredWithGlobalAccess");
             $A.test.assertTrue(evt.getName() === "eventWithPrivilegedAccessInSystemNamespaceRegisteredWithGlobalAccess", "get unexpected event name:"+evt.getName());
         },*/
@@ -862,19 +892,31 @@
             var evt = this.componentCreated.getEvent("eventWithGlobalAccessInSystemNamespaceRegisteredWithDefaultAccess");
             $A.test.assertTrue(evt.getName() === "eventWithGlobalAccessInSystemNamespaceRegisteredWithDefaultAccess", "get unexpected event name:"+evt.getName());
         },
-        /*function canNotAccessSystemNSGLobalEventRegisteredWithPrivateAccess(cmp) {
+        /* Below test is incorrect: It should not ACF
+        function canNotAccessSystemNSGLobalEventRegisteredWithPrivateAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithGlobalAccessInSystemNamespaceRegisteredWithPrivateAccess");
-        },
+        },  Below test is incorrect: It should not ACF
         function canNotAccessSystemNSGLobalEventRegisteredWithPublicAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithGlobalAccessInSystemNamespaceRegisteredWithPublicAccess");
-        },
+        },  Below test is incorrect: It should not ACF
         function canNotAccessSystemNSGLobalEventRegisteredWithPrivilegedAccess(cmp) {
             $A.test.expectAuraError("Access Check Failed!");
             var evt = this.componentCreated.getEvent("eventWithGlobalAccessInSystemNamespaceRegisteredWithPrivilegedAccess");
+        },*/
+        function canNotAccessSystemNSGLobalEventRegisteredWithPrivateAccess(cmp) {
+            var evt = this.componentCreated.getEvent("eventWithGlobalAccessInSystemNamespaceRegisteredWithPrivateAccess");
+            $A.test.assertTrue(evt.getName() === "eventWithGlobalAccessInSystemNamespaceRegisteredWithPrivateAccess", "get unexpected event name:"+evt.getName());
         },
-        */
+        function canNotAccessSystemNSGLobalEventRegisteredWithPublicAccess(cmp) {
+            var evt = this.componentCreated.getEvent("eventWithGlobalAccessInSystemNamespaceRegisteredWithPublicAccess");
+            $A.test.assertTrue(evt.getName() === "eventWithGlobalAccessInSystemNamespaceRegisteredWithPublicAccess", "get unexpected event name:"+evt.getName());
+        }, 
+        function canNotAccessSystemNSGLobalEventRegisteredWithPrivilegedAccess(cmp) {
+            var evt = this.componentCreated.getEvent("eventWithGlobalAccessInSystemNamespaceRegisteredWithPrivilegedAccess");
+            $A.test.assertTrue(evt.getName() === "eventWithGlobalAccessInSystemNamespaceRegisteredWithPrivilegedAccess", "get unexpected event name:"+evt.getName());
+        },
         function canAccessSystemNSGLobalEventRegisteredWithGlobalAccess(cmp) {
             var evt = this.componentCreated.getEvent("eventWithGlobalAccessInSystemNamespaceRegisteredWithGlobalAccess");
             $A.test.assertTrue(evt.getName() === "eventWithGlobalAccessInSystemNamespaceRegisteredWithGlobalAccess", "get unexpected event name:"+evt.getName());

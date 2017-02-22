@@ -1,0 +1,49 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" extends="ui:abstractDataGrid"
+				implements="aura:requireLocker"
+				support="PROTO" description="Represents a table containing dynamic rows of data with inline edit support">
+    <aura:attribute name="lastCall" type="String" description="Retrieved value of _lastCall from SecureComponent"/>
+
+
+    <aura:method name="handleRefresh" action="{!c.handleRefresh}">
+        <aura:attribute name="component" type="Object"/>
+        <aura:attribute name="param" type="Object"/>
+    </aura:method>
+
+    <aura:method name="getLastCall" action="{!c.getLastCall}">
+    </aura:method>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+	<!--
+	 ~ Default implementation is a table. Consider moving this logic to ui:dataTable
+	 ~ A dataTable is potentially a concrete of a dataGrid.
+	 -->
+	<table  aura:flavorable="true">
+		<thead>
+			<tr aura:id="headerRow">
+				{!v.columns}
+			</tr>
+		</thead>
+		<tfoot aura:id="tfoot"></tfoot>
+		<tbody aura:id="tbody"></tbody>
+	</table>
+
+</aura:component>
+

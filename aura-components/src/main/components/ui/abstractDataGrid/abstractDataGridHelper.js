@@ -20,7 +20,34 @@
 		}).fire();
 	},
 
-	/**
+    /**
+     * Securely call the given method of concrete component, or fallback to concrete component helper handler.
+     *
+     * Check whether given handler name is defined as method of concrete component.
+     * If not found, fallback to the compatible routine which will invoke method from concrete
+     * component helper, but instead, wrap the concrete component with LockerService as a SecureComponent.
+     *
+     * The method can be defined as below in concrete component.
+     *    <aura:method name="handleRefresh" action="{!c.handleRefresh}">
+     *       <aura:attribute name="component" type="Object"/>
+     *       <aura:attribute name="param" type="Object"/>
+     *    </aura:method>
+     *
+     * @param {Component} component
+     * @param {String} handler name
+     * @param {Object} params from event
+     */
+    secureCallHandler: function(cmp, handlerName, param) {
+        var concrete = cmp.getConcreteComponent();
+        if (concrete[handlerName]) {
+            concrete[handlerName](cmp, param);
+        } else {
+            var helper = concrete.getDef().getHelper();
+            helper[handlerName]($A.lockerService.wrapComponent(concrete), param);
+        }
+    },
+
+    /**
 	 * @param {Component} concrete component
 	 */
 	fireProvide: function (concrete) {

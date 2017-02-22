@@ -280,6 +280,7 @@ function LockerService() {
 	service["createForDef"] = service.createForDef;
 	service["getEnvForSecureObject"] = service.getEnvForSecureObject;
 	service["getKeyForNamespace"] = service.getKeyForNamespace;
+    service["wrapComponent"] = service.wrapComponent;
 
 	Object.freeze(service);
 

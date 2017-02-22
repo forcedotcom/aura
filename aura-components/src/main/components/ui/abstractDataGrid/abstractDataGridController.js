@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 ({
-	init: function (cmp, evt, hlp) {
-		hlp.initialize(cmp);
+	init: function (cmp, evt, helper) {
+        helper.initialize(cmp);
 	},
 
-	handleDataChange: function (cmp, evt, hlp) {
-		var concrete = cmp.getConcreteComponent();
-		hlp = concrete.getDef().getHelper(); 
-		hlp.handleDataChange(concrete, evt.getParam('data'));
+	handleDataChange: function (cmp, evt, helper) {
+        helper.secureCallHandler(cmp, "handleDataChange", evt.getParam('data'));
 	},
 
-	handleModeChange: function (cmp, evt, hlp) {
-		var concrete = cmp.getConcreteComponent(),
-			mode = cmp.get('v.mode'),
+	handleModeChange: function (cmp, evt, helper) {
+		var mode = cmp.get('v.mode'),
 			isViewOnly = cmp.get('v.viewOnly');
 
 		if (mode === 'EDIT' && isViewOnly) {
@@ -34,25 +31,18 @@
 			return;
 		}
 
-		hlp = concrete.getDef().getHelper();
-		hlp.handleModeChange(cmp); 	
+        helper.secureCallHandler(cmp, "handleModeChange");
 	},
 
-	handleSortByChange: function (cmp, evt, hlp) {
-		var concrete = cmp.getConcreteComponent();
-		hlp = concrete.getDef().getHelper();
-		hlp.handleSortByChange(concrete); 
+	handleSortByChange: function (cmp, evt, helper) {
+		helper.secureCallHandler(cmp, "handleSortByChange");
 	},
 
-	handleRefresh: function (cmp, evt, hlp) {
-		var concrete = cmp.getConcreteComponent();
-		hlp = concrete.getDef().getHelper();
-		hlp.handleRefresh(concrete); 	
+	handleRefresh: function (cmp, evt, helper) {
+		helper.secureCallHandler(cmp, "handleRefresh");
 	},
 
-	handleAddRemove: function (cmp, evt, hlp) {
-		var concrete = cmp.getConcreteComponent();
-		hlp = concrete.getDef().getHelper();
-		hlp.handleAddRemove(cmp, evt.getParams()); 	
+	handleAddRemove: function (cmp, evt, helper) {
+        helper.secureCallHandler(cmp, "handleAddRemove", evt.getParams());
 	}
 })// eslint-disable-line semi

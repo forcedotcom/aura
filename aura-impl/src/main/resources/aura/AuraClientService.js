@@ -2993,6 +2993,8 @@ AuraClientService.prototype.receive = function(auraXHR, timedOut) {
             this.processIncompletes(auraXHR);
         } else if (responseMessage["status"] === "ERROR") {
             this.processErrors(auraXHR, responseMessage["message"]);
+        } else if (responseMessage["status"] === AuraClientService.SYSTEM_EXCEPTION_EVENT_RETURN_STATUS) {
+            this.processSystemError(auraXHR);
         }
         this.fireDoneWaiting();
     } catch (e) {
@@ -3022,6 +3024,25 @@ AuraClientService.prototype.processErrors = function(auraXHR, errorMessage) {
             var error = new Error(errorMessage);
             $A.warning("Error in the server action response:" + errorMessage);
             action.markError($A.getContext(), [error]);
+        }
+    }
+};
+
+/**
+ * Remove actions from storeMap when the response is SYSTEMERROR
+ * 
+ * @private
+ */
+AuraClientService.prototype.processSystemError = function(auraXHR) {
+    var action;
+    var actions = auraXHR.actions;
+    for (var id in actions) {
+        if (actions.hasOwnProperty(id)) {
+            if (this.actionStoreMap[id]) {
+                action = actions[id];
+                delete this.actionStoreMap[id];
+                delete this.actionStoreMap[action.getStorageKey()];
+            }
         }
     }
 };

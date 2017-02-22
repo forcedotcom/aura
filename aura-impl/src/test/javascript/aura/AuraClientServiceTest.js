@@ -1917,20 +1917,21 @@ Test.Aura.AuraClientServiceTest = function() {
             var target;
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
-            });
-            target.decode = function(response, noStrip, timedOut) {
-                actual = timedOut;
-                return response;
-            };
-            target.fireDoneWaiting = function(){};
-            target.auraStack = {
-                    push: function(){},
-                    pop: function(){}
-            };
-            target.releaseXHR = function(){};
-            target.process = function(){};
 
-            target.receive({request:{status: "nothing"}}, expected);
+                target.decode = function(response, noStrip, timedOut) {
+                    actual = timedOut;
+                    return response;
+                };
+                target.fireDoneWaiting = function(){};
+                target.auraStack = {
+                        push: function(){},
+                        pop: function(){}
+                };
+                target.releaseXHR = function(){};
+                target.process = function(){};
+
+                target.receive({request:{status: "nothing"}}, expected);
+            });
 
             Assert.Equal(expected, actual);
         }

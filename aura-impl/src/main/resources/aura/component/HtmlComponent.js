@@ -220,7 +220,7 @@ HtmlComponent.prototype.setupValueProviders = function(customValueProviders) {
  */
 HtmlComponent.prototype["renderer"] = {
     "render" : function(component, helper) {
-        var tag = component.get("v.tag");
+        var tag = component.attributeSet.getValue("tag");
         if ($A.util.isUndefinedOrNull(tag)) {
             throw new Error("Undefined tag attribute for " + component.getGlobalId());
         }
@@ -229,7 +229,7 @@ HtmlComponent.prototype["renderer"] = {
             throw new Error("The HTML tag '"+tag+"' is not allowed.");
         }
 
-        var HTMLAttributes = component.get("v.HTMLAttributes");
+        var HTMLAttributes = component.attributeSet.getValue("HTMLAttributes");
 
         var element = document.createElement(tag);
 
@@ -240,7 +240,7 @@ HtmlComponent.prototype["renderer"] = {
         helper.processJavascriptHref(element);
 
         if (helper.canHaveBody(component)) {
-            var body=component.get("v.body");
+            var body=component.attributeSet.getBody(component.globalId);
             $A.renderingService.renderFacet(component,body,element);
         }
 
@@ -259,10 +259,8 @@ HtmlComponent.prototype["renderer"] = {
         return element;
     },
 
-
     "rerender" : function(component, helper) {
-        var element = component.getElement(),
-            htmlAttr = "v.HTMLAttributes";
+        var element = component.getElement();
 
         if (!element) {
             return;
@@ -274,7 +272,7 @@ HtmlComponent.prototype["renderer"] = {
             "class" : true
         };
 
-        var HTMLAttributes = component.get(htmlAttr);
+        var HTMLAttributes = component.attributeSet.getValue("HTMLAttributes");
         if (HTMLAttributes) {
             for (var name in HTMLAttributes) {
                 var lowerName = name.toLowerCase();
@@ -321,23 +319,23 @@ HtmlComponent.prototype["renderer"] = {
         helper.processJavascriptHref(element);
 
         if (helper.canHaveBody(component)) {
-            $A.renderingService.rerenderFacet(component,component.get("v.body"),element);
+            $A.renderingService.rerenderFacet(component,component.attributeSet.getBody(component.globalId),element);
         }
     },
 
     "afterRender" : function(component, helper) {
         if (helper.canHaveBody(component)) {
-            $A.afterRender(component.get("v.body"));
+            $A.afterRender(component.attributeSet.getBody(component.globalId));
         }
     },
 
     "unrender" : function(component, helper) {
-        var HTMLAttributes = component.get("v.HTMLAttributes");
+        var HTMLAttributes = component.attributeSet.getValue("HTMLAttributes");
         for ( var attribute in HTMLAttributes) {
             helper.destroyHtmlAttribute(component, attribute, HTMLAttributes[attribute]);
         }
         // Even if we don't have body we need to deattach the elements from the component itself
-        $A.renderingService.unrenderFacet(component, component.get("v.body"));
+        $A.renderingService.unrenderFacet(component, component.attributeSet.getBody(component.globalId));
     }
 };
 
@@ -578,7 +576,7 @@ HtmlComponent.prototype["helper"] = {
     },
 
     canHaveBody: function (component) {
-        var tag = component.get("v.tag");
+        var tag = component.attributeSet.getValue("tag");
         if ($A.util.isUndefinedOrNull(tag)) {
             throw new Error("Undefined tag attribute for " + component.getGlobalId());
         }
@@ -617,7 +615,7 @@ HtmlComponent.prototype["helper"] = {
             }
 
             if (lowerName === "href" && element.tagName === "A" && value && $A.util.supportsTouchEvents()) {
-                var HTMLAttributes = component.get("v.HTMLAttributes");
+                var HTMLAttributes = component.attributeSet.getValue("HTMLAttributes");
                 var target = HTMLAttributes["target"];
 
                 if ($A.util.isExpression(target)) {

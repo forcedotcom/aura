@@ -136,12 +136,12 @@ TextComponent.prototype.setupComponentDef = function() {
 
 TextComponent.prototype["renderer"] = {
     "render": function(component){
-        var value = component.get("v.value");
-        var trunc = component.get("v.truncate");
+        var value = component.attributeSet.getValue("value");
+        var trunc = component.attributeSet.getValue("truncate");
         
         if(trunc){
-            var truncateByWord = $A.util.getBooleanValue(component.get("v.truncateByWord"));
-            var ellipsis = $A.util.getBooleanValue(component.get("v.ellipsis"));
+            var truncateByWord = $A.util.getBooleanValue(component.attributeSet.getValue("truncateByWord"));
+            var ellipsis = $A.util.getBooleanValue(component.attributeSet.getValue("ellipsis"));
 
             trunc = 1 * trunc;
             value = $A.util.truncate(value, trunc, ellipsis, truncateByWord);
@@ -160,7 +160,7 @@ TextComponent.prototype["renderer"] = {
         var element=component.getElement();
         // Check for unowned node so IE doesn't crash
         if (element && element.parentNode) {
-            var textValue = component.get("v.value");
+            var textValue = component.attributeSet.getValue("value");
             textValue = $A.util.isUndefinedOrNull(textValue) ? '' : textValue;
             
             if (element.nodeValue !== textValue) {

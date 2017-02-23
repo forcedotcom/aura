@@ -197,7 +197,7 @@ InteropComponent.prototype.render = function () {
     var cmp = this;
 
     Object.keys(this.attributes).forEach(function (p) {
-        var attr = cmp.get('v.' + p);
+        var attr = cmp.attributeSet.getValue(p);
         if (attr !== undefined) {
             if (p.indexOf('on') === 0) {
                 elmt.addEventListener(p.substring(2), attr, false);

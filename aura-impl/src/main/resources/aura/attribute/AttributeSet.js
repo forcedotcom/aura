@@ -143,6 +143,66 @@ AttributeSet.prototype.get = function(key, component) {
     return value;
 };
 
+/**
+ * simplified version of component.get('v.body'),
+ * only supposed to be used by simple components.
+ * 
+ * @private
+ *
+ */
+AttributeSet.prototype.getBody = function(globalId) {
+    var key = "body."+globalId;
+    var value = this.values["body"][globalId];
+
+    if (aura.util.isExpression(value)) {
+        value = value.evaluate();
+    }
+
+    if(this.shadowValues.hasOwnProperty(key)) {
+        value += this.getShadowValue(key);
+    }
+
+    return value;
+};
+
+/**
+ * simplified version of component.get('v.key'),
+ * only supposed to be used by simple components.
+ *
+ * @private
+ *
+ */
+AttributeSet.prototype.getValue = function(key) {
+    var value = undefined;
+    var decorators=this.decorators[key];
+    if(decorators&&decorators.length){
+        if(decorators.decorating){
+            value=decorators.value;
+        }else{
+            decorators.decorating=true;
+            decorators.value=this.values[key];
+            for(var i=0;i<decorators.length;i++){
+                var decorator=decorators[i];
+                value=decorator.value=decorators[i].evaluate();
+            }
+            decorators.decorating=false;
+            decorators.value=null;
+        }
+    }else{
+        value = this.values[key];
+    }
+
+    if (aura.util.isExpression(value)) {
+        value = value.evaluate();
+    }
+
+    if(this.shadowValues.hasOwnProperty(key)) {
+        value += this.getShadowValue(key);
+    }
+
+    return value;
+};
+
 AttributeSet.prototype.getShadowValue=function(key){
     var value = aura.expressionService.resolve(key, this.values, true);
     if(value instanceof FunctionCallValue){

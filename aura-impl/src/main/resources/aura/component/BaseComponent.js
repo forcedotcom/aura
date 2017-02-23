@@ -186,22 +186,19 @@ BaseComponent.prototype.setupComponentDef = function() {
 BaseComponent.prototype["renderer"] = {
     "render": function(component){
         var rendering = component.getRendering();
-        return rendering||$A.renderingService.renderFacet(component,component.get("v.body"));
+        return rendering||$A.renderingService.renderFacet(component,component.attributeSet.getBody(component.globalId));
     },
 
     "afterRender": function(component){
-        var body = component.get("v.body");
-        $A.afterRender(body);
+        $A.afterRender(component.attributeSet.getBody(component.globalId));
     },
 
     "rerender": function(component){
-        var body = component.get("v.body");
-        return $A.renderingService.rerenderFacet(component,body);
+        return $A.renderingService.rerenderFacet(component,component.attributeSet.getBody(component.globalId));
     },
 
     "unrender" : function(component){
-        var body = component.get("v.body");
-        $A.renderingService.unrenderFacet(component,body);
+        $A.renderingService.unrenderFacet(component,component.attributeSet.getBody(component.globalId));
     }
 };
 

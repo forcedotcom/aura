@@ -222,7 +222,7 @@ ExpressionComponent.prototype.setupComponentDef = function() {
 
 ExpressionComponent.prototype["renderer"] = {
     "render" : function(component) {
-        var value = component.get("v.value");
+        var value = component.attributeSet.getValue("value");
         if($A.util.isUndefinedOrNull(value)){
             value = "";
         }
@@ -244,7 +244,7 @@ ExpressionComponent.prototype["renderer"] = {
     "rerender" : function(component) {
         var ret=[];
         if (component.isRendered()) {
-            var value = component.get("v.value");
+            var value = component.attributeSet.getValue("value");
             if(!($A.util.isComponent(value)||$A.util.isArray(value))){
                 if($A.util.isUndefinedOrNull(value)){
                     value = "";
@@ -272,7 +272,7 @@ ExpressionComponent.prototype["renderer"] = {
     },
 
     "afterRender" : function(component) {
-        var value = component.get("v.value");
+        var value = component.attributeSet.getValue("value");
         if ($A.util.isComponent(value)||$A.util.isArray(value)) {
             $A.afterRender(value);
         }

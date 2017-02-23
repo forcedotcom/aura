@@ -216,8 +216,8 @@ IterationComponent.prototype["controller"] = {
     },
 
     "init": function(component, evt, helper) {
-        var bodyTemplate = component.get("v.body");
-        var template = component.get("v.template");
+        var bodyTemplate = component.attributeSet.getBody(component.globalId);
+        var template = component.attributeSet.getValue("template");
 
         if (bodyTemplate.length && !template.length) {
             component.set("v.body", [], true);
@@ -249,7 +249,7 @@ IterationComponent.prototype["helper"] = {
         );
     },
     clearUnrenderedBody: function (component) {
-        var currentBody = component.get('v.body');
+        var currentBody = component.attributeSet.getBody(component.globalId);
         var cleanedCmps = 0;
         if (currentBody.length) {
             for (var i = 0; i < currentBody.length; i++) {
@@ -273,7 +273,7 @@ IterationComponent.prototype["helper"] = {
         }
     },
     updateBody: function (component) {
-        if (component.get("v.loaded") === false) {
+        if (component.attributeSet.getValue("loaded") === false) {
             component._queueUpdate = true;
             return component._queueUpdate;
         }
@@ -332,8 +332,8 @@ IterationComponent.prototype["helper"] = {
 
     buildBody: function (component, itemHandler, completeHandler) {
 
-        var items = component.get("v.items");
-        var template = component.get("v.template");
+        var items = component.attributeSet.getValue("items");
+        var template = component.attributeSet.getValue("template");
         var startIndex = this.getStart(component);
         var endIndex = this.getEnd(component);
         var expectedCalls=endIndex-startIndex;
@@ -355,9 +355,9 @@ IterationComponent.prototype["helper"] = {
         }
 
         if (items && items.length && template && template.length && expectedCalls > 0) {
-            var itemVar = component.get("v.var");
-            var indexVar = component.get("v.indexVar");
-            var forceServer = component.get("v.forceServer");
+            var itemVar = component.attributeSet.getValue("var");
+            var indexVar = component.attributeSet.getValue("indexVar");
+            var forceServer = component.attributeSet.getValue("forceServer");
             var templateValueProvider = component.getComponentValueProvider();
 
 
@@ -408,13 +408,13 @@ IterationComponent.prototype["helper"] = {
     },
 
     getStart: function (cmp) {
-        return Math.max(0, parseInt(cmp.get("v.start") || 0, 10));
+        return Math.max(0, parseInt(cmp.attributeSet.getValue("start") || 0, 10));
     },
 
     getEnd: function (cmp) {
-        var items = cmp.get("v.items");
+        var items = cmp.attributeSet.getValue("items");
         if(items&&items.length){
-            var end=parseInt(cmp.get("v.end"), 10);
+            var end=parseInt(cmp.attributeSet.getValue("end"), 10);
             return isNaN(end)?items.length:Math.min(items.length, end);
         }
         return 0;

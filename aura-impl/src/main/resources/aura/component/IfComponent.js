@@ -196,9 +196,9 @@ IfComponent.prototype.setupValueProviders = function(customValueProviders) {
 
 IfComponent.prototype["controller"] = {
     "init": function(cmp, evt, helper) {
-        var bodyTemplate  = cmp.get("v.body");
-        var isTrue        = $A.util.getBooleanValue(cmp.get("v.isTrue"));
-        var template      = cmp.get("v.template");
+        var bodyTemplate  = cmp.attributeSet.getBody(cmp.globalId);
+        var isTrue        = $A.util.getBooleanValue(cmp.attributeSet.getValue("isTrue"));
+        var template      = cmp.attributeSet.getValue("template");
 
         if (bodyTemplate.length && !template.length) {
             cmp.set("v.template", bodyTemplate, true);
@@ -210,7 +210,7 @@ IfComponent.prototype["controller"] = {
         cmp._truth = isTrue;
     },
     "handleTheTruth": function(cmp, evt, helper) {
-        var isTrue = $A.util.getBooleanValue(cmp.get("v.isTrue"));
+        var isTrue = $A.util.getBooleanValue(cmp.attributeSet.getValue("isTrue"));
         if (cmp._truth !== isTrue) {
             helper.clearUnrenderedBody(cmp);
 
@@ -224,7 +224,7 @@ IfComponent.prototype["controller"] = {
 IfComponent.prototype["helper"] = {
     createBody: function(cmp, isTrue) {
         var body  = [];
-        var facet = isTrue ? cmp.get("v.template") : cmp.get("v.else");
+        var facet = isTrue ? cmp.attributeSet.getValue("template") : cmp.attributeSet.getValue("else");
         
         $A.pushCreationPath("body");
         
@@ -245,8 +245,8 @@ IfComponent.prototype["helper"] = {
     },
 
     clearUnrenderedBody: function(cmp) {
-        var hasUnrenderBody = false;        
-        var currentBody = cmp.get('v.body');
+        var hasUnrenderBody = false;
+        var currentBody = cmp.attributeSet.getBody(cmp.globalId);
 
         for (var i = 0 ; i < currentBody.length; i++) {
             var child = currentBody[i];

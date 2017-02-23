@@ -1,0 +1,39 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!-- Currently only supported within a ui:virtualList component -->
+<aura:component description="Wrapper component to lazily load a menu within a virtualList component">
+    <aura:attribute name="class" type="String" description="Class for the virtualMenuWrapper" />
+    <aura:attribute name="triggerLabel" type="String" description="Label for the menu trigger" />
+    <aura:attribute name="triggerTitle" type="String" description="Title for the menu trigger" />
+    <aura:attribute name="triggerClass" type="String" description="Classes for the menu trigger" />
+    <aura:attribute name="triggerBody" type="Aura.ComponentDefRef[]" description="Optional body to be used for the menu trigger" />
+    <aura:attribute name="menu" type="Aura.ComponentDefRef[]" description="Menu to replace the trigger with. Trigger link must stop click propagation" />
+    
+    <div class="{! v.class + ' virtualMenuContainer'}">
+        <a class="{!v.triggerClass}" title="{!v.triggerTitle}" onclick="{!c.handleClick}" onkeydown="{!c.handleKeydown}"
+                aria-haspopup="true" role="button">
+                
+            <aura:renderIf isTrue="{!v.triggerBody.length == 0}">
+                {!v.triggerLabel}
+                <aura:set attribute="else">
+                    {!v.triggerBody}
+                </aura:set>
+            </aura:renderIf>
+        </a>
+    </div>
+</aura:component>

@@ -39,5 +39,15 @@
     },
     salary: function (cmp) {
         alert('$' + cmp.get('v.balance'));
+    },
+    
+    menuTrigger: function(cmp, evt) {
+        console.log("Hello Trigger");
+        console.log(evt);
+    },
+    
+    menuSelect: function(cmp, evt) {
+        console.log("Selected: ");
+        console.log(evt.getParam("selectedItem").get("v.label"));
     }
 })

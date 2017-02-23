@@ -40,7 +40,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 // CSRF is only stored in persistent storage. indexedDB is not supported on Safari,
 // so persistent storage is not able to be created on Safari.
-@ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+@ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE, BrowserType.IE9, BrowserType.IE10, BrowserType.IE11 })
 public class AuraClientServiceUITest extends WebDriverTestCase {
 	@Inject
 	private MockConfigAdapter configAdapter;

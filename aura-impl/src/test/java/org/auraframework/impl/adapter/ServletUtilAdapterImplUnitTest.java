@@ -448,7 +448,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
         AuraContext context = Mockito.mock(AuraContext.class);
         Map<String,Object> attributes = Maps.newLinkedHashMap();
-        String expected = "contextPath/l/nonce/bootstrap.js?aura.attributes=%7B%22first%22%3A%22fv%22%2C%22second%22%3A%22sv%22%7D";
+        String expected = "contextPath/l/nonce/bootstrap.js?aura.attributes=%7B%22first%22%3A%22fv%22%2C%22second%22%3A%22sv%22%7D&jwt=thisjwt";
         String actual;
         sua.setConfigAdapter(configAdapter);
 
@@ -457,7 +457,9 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
 
         Mockito.doReturn("contextPath").when(context).getContextPath();
         Mockito.doReturn("nonce").when(context).getEncodedURL(AuraContext.EncodingStyle.Normal);
+        Mockito.doReturn("thisjwt").when(configAdapter).generateJwtToken();
 
+        sua.createManifestUtil(); // Post-construct step
         actual = sua.getBootstrapUrl(context, attributes);
         assertEquals(expected, actual);
     }
@@ -468,13 +470,15 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
         AuraContext context = Mockito.mock(AuraContext.class);
         Map<String,Object> attributes = Maps.newLinkedHashMap();
-        String expected = "contextPath/l/nonce/bootstrap.js";
+        String expected = "contextPath/l/nonce/bootstrap.js?jwt=thisjwt";
         String actual;
         sua.setConfigAdapter(configAdapter);
 
         Mockito.doReturn("contextPath").when(context).getContextPath();
         Mockito.doReturn("nonce").when(context).getEncodedURL(AuraContext.EncodingStyle.Normal);
+        Mockito.doReturn("thisjwt").when(configAdapter).generateJwtToken();
 
+        sua.createManifestUtil(); // Post-construct step
         actual = sua.getBootstrapUrl(context, attributes);
         assertEquals(expected, actual);
     }
@@ -487,7 +491,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
         AuraContext context = Mockito.mock(AuraContext.class);
         Map<String,Object> attributes = Maps.newLinkedHashMap();
-        String expected = "contextPath/l/nonce/inline.js?aura.attributes=%7B%22first%22%3A%22fv%22%2C%22second%22%3A%22sv%22%7D";
+        String expected = "contextPath/l/nonce/inline.js?aura.attributes=%7B%22first%22%3A%22fv%22%2C%22second%22%3A%22sv%22%7D&jwt=thisjwt";
         String actual;
         sua.setConfigAdapter(configAdapter);
 
@@ -496,7 +500,9 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
 
         Mockito.doReturn("contextPath").when(context).getContextPath();
         Mockito.doReturn("nonce").when(context).getEncodedURL(AuraContext.EncodingStyle.Normal);
+        Mockito.doReturn("thisjwt").when(configAdapter).generateJwtToken();
 
+        sua.createManifestUtil(); // Post-construct step
         actual = sua.getInlineJsUrl(context, attributes);
         assertEquals(expected, actual);
     }
@@ -507,13 +513,15 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
         AuraContext context = Mockito.mock(AuraContext.class);
         Map<String,Object> attributes = Maps.newLinkedHashMap();
-        String expected = "contextPath/l/nonce/inline.js";
+        String expected = "contextPath/l/nonce/inline.js?jwt=thisjwt";
         String actual;
         sua.setConfigAdapter(configAdapter);
 
         Mockito.doReturn("contextPath").when(context).getContextPath();
         Mockito.doReturn("nonce").when(context).getEncodedURL(AuraContext.EncodingStyle.Normal);
+        Mockito.doReturn("thisjwt").when(configAdapter).generateJwtToken();
 
+        sua.createManifestUtil(); // Post-construct step
         actual = sua.getInlineJsUrl(context, attributes);
         assertEquals(expected, actual);
     }

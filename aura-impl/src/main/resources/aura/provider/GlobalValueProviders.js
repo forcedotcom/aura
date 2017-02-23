@@ -126,7 +126,7 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
             $A.expressionService.updateGlobalReferences(type,newGvp["values"]);
         } catch(e) {
             var auraError = new $A.auraError("Merging GVP '" + type + "' failed", e);
-            auraError["component"] = type;
+            auraError.setComponent(type);
             throw auraError;
         }
     }

@@ -1520,7 +1520,7 @@ AuraClientService.prototype.init = function(config, token, container) {
             throw e;
         } else {
             var ae = new $A.auraError("Error during rendering in init", e, $A.severity.QUIET);
-            ae['component'] = component.getDef().getDescriptor().toString();
+            ae.setComponent(component.getDef().getDescriptor().toString());
             ae['componentStack'] = context.getAccessStackHierarchy();
             throw ae;
         }

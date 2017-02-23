@@ -1282,7 +1282,7 @@ AuraEventService.prototype.getDef = function(descriptor) {
         if(context.enableAccessChecks) {
             if(context.logAccessFailures){
                 var ae = new $A.auraError(message);
-                ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+                ae.setComponent(contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName());
                 ae["componentStack"] = context && context.getAccessStackHierarchy();
                 $A.error(null, ae);
            }
@@ -1317,7 +1317,7 @@ AuraEventService.prototype.hasDefinition = function(descriptor) {
         if(context.enableAccessChecks) {
             if(context.logAccessFailures){
                 var ae = new $A.auraError(message);
-                ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+                ae.setComponent(contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName());
                 ae["componentStack"] = context && context.getAccessStackHierarchy();
                 $A.error(null, ae);
             }

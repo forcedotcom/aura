@@ -156,10 +156,26 @@ public class ComponentController implements GlobalController {
      *      string describing the component hierarchy stack for the error.
      */
     @AuraEnabled
-    public void reportFailedAction(@Key(value = "failedAction") String desc, @Key("failedId") String id,
-                                   @Key("clientError") String error, @Key("clientStack") String stack, @Key("componentStack") String componentStack) {
+    public void reportFailedAction(
+            @Key(value = "failedAction") String desc,
+            @Key("failedId") String id,
+            @Key("clientError") String error,
+            @Key("clientStack") String stack,
+            @Key("componentStack") String componentStack,
+            @Key("stacktraceIdGen") String stacktraceIdGen) {
         // Error reporting (of errors in prior client-side actions) are handled specially
-        AuraClientException ace = new AuraClientException(desc, id, error, stack, componentStack, instanceService, exceptionAdapter, configAdapter, contextService, definitionService);
+        AuraClientException ace = new AuraClientException(
+                                    desc,
+                                    id,
+                                    error,
+                                    stack,
+                                    componentStack,
+                                    stacktraceIdGen,
+                                    instanceService,
+                                    exceptionAdapter,
+                                    configAdapter,
+                                    contextService,
+                                    definitionService);
         exceptionAdapter.handleException(ace, ace.getOriginalAction());
     }
 

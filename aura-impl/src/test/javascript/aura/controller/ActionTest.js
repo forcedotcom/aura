@@ -733,7 +733,8 @@ Test.Aura.Controller.ActionTest = function() {
                         return Stubs.Aura.GetContext();
                     },
                     assert: function (param) {},
-                    auraError:function() {},
+                    auraError:function() {return { setComponent: function(){} }},
+                    auraFriendlyError: function() {},
                     warning: function () {},
                     get: function (actDesc) {
                         return {

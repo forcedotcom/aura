@@ -165,7 +165,8 @@ Logger.prototype.reportError = function(e, action, foreground){
         // and our parser on the server will gack on more than a million characters 
         // for the entire json package.
         "clientStack": (e.stackTrace || e.stack || "").toString().substr(0, Aura.Utils.Logger.MAX_STACKTRACE_SIZE),
-        "componentStack": e["componentStack"] || ""
+        "componentStack": e["componentStack"] || "",
+        "stacktraceIdGen": e["stacktraceIdGen"]
     });
     reportAction.setCallback(this, function() { /* do nothing */ });
     $A.clientService.enqueueAction(reportAction);

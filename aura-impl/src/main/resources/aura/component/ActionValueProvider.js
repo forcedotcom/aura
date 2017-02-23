@@ -47,7 +47,7 @@ ActionValueProvider.prototype.get = function(key) {
 
         if (!actionDef) {
             var auraError = new $A.auraError("Unknown controller action '"+key+"'");
-            auraError["component"] = this.component.getDef().getDescriptor().toString();
+            auraError.setComponent(this.component.getDef().getDescriptor().toString());
             auraError["componentStack"] = $A.util.getComponentHierarchy(this.component);
             throw auraError;
         }

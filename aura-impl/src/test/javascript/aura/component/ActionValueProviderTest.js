@@ -39,7 +39,10 @@ Test.Aura.Component.ActionValueProviderTest = function() {
             "$A": {
                 "warning": function() {},
                 "auraError" : function(msg) {
-                    return new Error(msg);
+                    return {
+                        message: msg,
+                        setComponent: function(){}
+                    };
                 },
                 "util" : {
                     "getComponentHierarchy": function() {}

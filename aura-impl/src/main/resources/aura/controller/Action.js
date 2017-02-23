@@ -1267,13 +1267,16 @@ Action.prototype.toJSON = function() {
 Action.prototype.markException = function(e) {
     var descriptor = this.def ? this.def.toString() : "";
 
+    if (e instanceof $A.auraError || e instanceof $A.auraFriendlyError) {
+        // keep the root cause failing descriptor
+        e.setComponent(e["component"] || descriptor);
+    }
+
     // if the error doesn't have id, we wrap it with auraError so that when displaying UI, it will have an id
     if (!e.id) {
         e = new $A.auraError(descriptor ? "Action failed: " + descriptor : "", e);
-        e["component"] = descriptor;
-    } else if (e instanceof $A.auraError) {
-        // keep the root cause failing descriptor
-        e["component"] = e["component"] || descriptor;
+        // id is set when a component is set to error
+        e.setComponent(descriptor);
     }
 
     if (!e['componentStack']) {

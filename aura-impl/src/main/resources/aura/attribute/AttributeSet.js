@@ -100,7 +100,7 @@ AttributeSet.prototype.get = function(key, component) {
         if(context.enableAccessChecks){
             if(context.logAccessFailures){
                 var ae = new $A.auraError(message);
-                ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+                ae.setComponent(contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName());
                 ae["componentStack"] = context && context.getAccessStackHierarchy();
                 $A.error(null, ae);
             }
@@ -147,7 +147,7 @@ AttributeSet.prototype.get = function(key, component) {
 /**
  * simplified version of component.get('v.body'),
  * only supposed to be used by simple components.
- * 
+ *
  * @private
  *
  */
@@ -252,7 +252,7 @@ AttributeSet.prototype.set = function(key, value, component) {
         if(context.enableAccessChecks){
             if(context.logAccessFailures){
                 var ae = new $A.auraError(message);
-                ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+                ae.setComponent(contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName());
                 ae["componentStack"] = context && context.getAccessStackHierarchy();
                 $A.error(null, ae);
             }

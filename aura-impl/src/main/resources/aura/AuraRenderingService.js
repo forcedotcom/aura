@@ -83,8 +83,9 @@ AuraRenderingService.prototype.render = function(components, parent) {
                 if (e instanceof $A.auraError && e["component"]) {
                     throw e;
                 } else {
-                    var ae = new $A.auraError("render threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
-                    ae["component"] = cmp.getDef().getDescriptor().toString();
+                    var descriptor = cmp.getDef().getDescriptor().toString();
+                    var ae = new $A.auraError("render threw an error in '" + descriptor + "'", e);
+                    ae.setComponent(descriptor);
                     ae["componentStack"] = $A.util.getComponentHierarchy(cmp);
                     $A.lastKnownError = ae;
                     throw ae;
@@ -156,8 +157,9 @@ AuraRenderingService.prototype.rerender = function(components) {
                     if (e instanceof $A.auraError && e["component"]) {
                         throw e;
                     } else {
-                        var ae = new $A.auraError("rerender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
-                        ae["component"] = cmp.getDef().getDescriptor().toString();
+                        var descriptor = cmp.getDef().getDescriptor().toString();
+                        var ae = new $A.auraError("rerender threw an error in '" + descriptor + "'", e);
+                        ae.setComponent(descriptor);
                         ae["componentStack"] = $A.util.getComponentHierarchy(cmp);
                         $A.lastKnownError = ae;
                         throw ae;
@@ -231,8 +233,9 @@ AuraRenderingService.prototype.afterRender = function(components) {
                 if (e instanceof $A.auraError && e["component"]) {
                         throw e;
                 } else {
-                    var ae = new $A.auraError("afterRender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
-                    ae["component"] = cmp.getDef().getDescriptor().toString();
+                    var descriptor = cmp.getDef().getDescriptor().toString();
+                    var ae = new $A.auraError("afterRender threw an error in '" + descriptor + "'", e);
+                    ae.setComponent(descriptor);
                     ae["componentStack"] = $A.util.getComponentHierarchy(cmp);
                     $A.lastKnownError = ae;
                     throw ae;
@@ -307,8 +310,9 @@ AuraRenderingService.prototype.unrender = function(components) {
                 if (e instanceof $A.auraError && e["component"]) {
                     throw e;
                 } else {
-                    var ae = new $A.auraError("unrender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
-                    ae["component"] = cmp.getDef().getDescriptor().toString();
+                    var descriptor = cmp.getDef().getDescriptor().toString();
+                    var ae = new $A.auraError("unrender threw an error in '" + descriptor + "'", e);
+                    ae.setComponent(descriptor);
                     ae["componentStack"] = $A.util.getComponentHierarchy(cmp);
                     $A.lastKnownError = ae;
                     throw ae;

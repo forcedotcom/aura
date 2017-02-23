@@ -122,18 +122,18 @@ LibraryIncludeRegistry.prototype.getLibraryInclude = function(descriptor) {
 LibraryIncludeRegistry.prototype.hydrateLibrary = function(descriptor, exporter) {
     var tmp = exporter.toString();
     var pos = [tmp.indexOf('/*') + 2, tmp.indexOf('*/')];
-    
+
     tmp = tmp.substr(pos[0], pos[1] - pos[0]);
     exporter = $A.util.globalEval("function () {" + tmp + " }", undefined, $A.clientService.getSourceMapsUrl(descriptor, 'lib'));
-    
+
     if(!exporter) {
         var defDescriptor = new Aura.System.DefDescriptor(descriptor);
         var includeComponentSource = $A.clientService.isInternalNamespace(defDescriptor.getNamespace());
-        var errorMessage = (!includeComponentSource) ? 
-            "Hydrating the component" + descriptor + " failed." : 
+        var errorMessage = (!includeComponentSource) ?
+            "Hydrating the component" + descriptor + " failed." :
             "Hydrating the component" + descriptor + " failed.\n Exporter code: " + tmp;
         var auraError = new $A.auraError(errorMessage, null, $A.severity.QUIET);
-        auraError["component"] = descriptor;
+        auraError.setComponent(descriptor);
         throw auraError;
     }
 

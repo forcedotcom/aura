@@ -56,7 +56,7 @@ function ComponentDef(config) {
             componentClass();
         } catch (e) {
             var auraError = new $A.auraError("ComponentDef initialization error", e);
-            auraError["component"] = descriptor.getQualifiedName();
+            auraError.setComponent(descriptor.getQualifiedName());
             throw auraError;
         }
     }

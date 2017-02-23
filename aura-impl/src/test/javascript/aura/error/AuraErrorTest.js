@@ -20,6 +20,9 @@ Test.Aura.AuraErrorTest = function() {
     var _AuraError;
     var _StackFrame;
     var _ErrorStackParser;
+    var _murmurHash3;
+    var _generateErrorId;
+    var _generateErrorIdHashGen;
 
     Mocks.GetMocks(Object.Global(), {
         "Aura": {Errors: {}},
@@ -30,6 +33,9 @@ Test.Aura.AuraErrorTest = function() {
         _StackFrame = StackFrame;
         _ErrorStackParser = ErrorStackParser;
         _AuraError = AuraError;
+        _murmurHash3 = Aura.Errors.MurmurHash3;
+        _generateErrorId = Aura.Errors.GenerateErrorId;
+        _generateErrorIdHashGen = Aura.Errors.GenerateErrorIdHashGen;
         delete StackFrame;
         delete ErrorStackParser;
         delete AuraError;
@@ -41,7 +47,10 @@ Test.Aura.AuraErrorTest = function() {
                 Errors: {
                     AuraError: _AuraError,
                     StackFrame: _StackFrame,
-                    StackParser: _ErrorStackParser
+                    StackParser: _ErrorStackParser,
+                    MurmurHash3: _murmurHash3,
+                    GenerateErrorId: _generateErrorId,
+                    GenerateErrorIdHashGen: _generateErrorIdHashGen,
                 }
             }
         })(during);
@@ -60,7 +69,7 @@ Test.Aura.AuraErrorTest = function() {
 
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         function ReturnsNameofInnerError() {//when innerError has name, we just use that
             var actual;
@@ -96,7 +105,7 @@ Test.Aura.AuraErrorTest = function() {
 
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         function ReturnsMessageofMessageAndInnerError() {//when pass in both message and innerError, we construct message from them
             var actual;
@@ -135,23 +144,12 @@ Test.Aura.AuraErrorTest = function() {
         }
 
         [Fact]
-        function ReturnsId() {
-            var actual;
-
-            getAuraMock(function() {
-                actual = new Aura.Errors.AuraError().id;
-            });
-
-            Assert.True(actual != 0);
-        }
-
-        [Fact]
         function ReturnsStackTrace_StrangeMessage() {
-        	var actual = "";
-        	var innerError = undefined;// new Error();
+            var actual = "";
+            var innerError = undefined;// new Error();
             //innerError.message = "innerErrorMessage";
             var expected = "SomeMessage";
-            
+
             getAuraMock(function() {
                 actual = new Aura.Errors.AuraError("SomeMessage", innerError).message;
             });
@@ -165,7 +163,7 @@ Test.Aura.AuraErrorTest = function() {
             var innerError = new Error();
             innerError.stack = "innerErrorStack";
             var expected = "innerErrorStack()";
-            
+
             getAuraMock(function() {
                 actual = new Aura.Errors.AuraError("SomeMessage", innerError).stackTrace;
             });
@@ -173,31 +171,7 @@ Test.Aura.AuraErrorTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [Fact]
-        function ReturnsIdTheSameAsGackStackTraceId() {
-            var actual;
-            var innerError = new Error();
-            innerError.message = "Error from app client controller";
-            innerError.stack = "Error: Error from app client controller\n\
-    at throwErrorFromClientController (http://localhost:9090/components/auratest/errorHandlingApp.js:42:15)\n\
-    at Action.$runDeprecated$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8469:36)\n\
-    at Object.Component$getActionCaller [as $handler$] (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:6695:20)\n\
-    at Aura.$Event$.$Event$.$executeHandlerIterator$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8100:15)\n\
-    at Aura.$Event$.$Event$.$executeHandlers$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8078:8)\n\
-    at http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8130:10\n\
-    at AuraInstance.$run$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:18350:12)\n\
-    at Aura.$Event$.$Event$.$fire$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8128:6)\n\
-    at Object.catchAndFireEvent (http://localhost:9090/components/ui/button.js:90:33)\n\
-    at press (http://localhost:9090/components/ui/button.js:34:16)";
-            // Murmur32 hash with stacktraceIdGen
-            var expected = -2111460059;
 
-            getAuraMock(function() {
-                actual = new Aura.Errors.AuraError(null, innerError).id;
-            });
-
-            Assert.Equal(expected, actual);
-        }
 
         [Fact]
         function ReturnsNoFrameworkStackTrace() {
@@ -281,7 +255,7 @@ press()@http://localhost:9090/components/ui/button.js:34:16";
 
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         function ReturnsReported() {//reported is set to false
             var actual;
@@ -293,6 +267,52 @@ press()@http://localhost:9090/components/ui/button.js:34:16";
 
             Assert.Equal(expected, actual);
         }
+    }
+
+    [Fixture]
+    function SetComponent() {
+
+        [Fact]
+        function SetsErrorId() {
+            var actual;
+
+            getAuraMock(function() {
+                var auraError = new Aura.Errors.AuraError();
+                auraError.setComponent("test");
+                actual = auraError.id;
+            });
+
+            Assert.NotNull(actual);
+        }
+
+        [Fact]
+        function ReturnsIdTheSameAsGackStackTraceId() {
+            var actual;
+            var innerError = new Error();
+            innerError.message = "Error from app client controller";
+            innerError.stack = "Error: Error from app client controller\n\
+    at throwErrorFromClientController (http://localhost:9090/components/auratest/errorHandlingApp.js:42:15)\n\
+    at Action.$runDeprecated$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8469:36)\n\
+    at Object.Component$getActionCaller [as $handler$] (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:6695:20)\n\
+    at Aura.$Event$.$Event$.$executeHandlerIterator$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8100:15)\n\
+    at Aura.$Event$.$Event$.$executeHandlers$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8078:8)\n\
+    at http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8130:10\n\
+    at AuraInstance.$run$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:18350:12)\n\
+    at Aura.$Event$.$Event$.$fire$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8128:6)\n\
+    at Object.catchAndFireEvent (http://localhost:9090/components/ui/button.js:90:33)\n\
+    at press (http://localhost:9090/components/ui/button.js:34:16)";
+            // Murmur32 hash with stacktraceIdGen
+            var expected = 4611780;
+
+            getAuraMock(function() {
+                var auraError = new Aura.Errors.AuraError(null, innerError);
+                auraError.setComponent("auratest:errorHandlingApp");
+                actual = auraError.id;
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
     }
 
     [Fixture]
@@ -318,10 +338,11 @@ press()@http://localhost:9090/components/ui/button.js:34:16";
             });
             Assert.Equal('', target.toString());
         }
-        
+
     }
     [Fixture]
     function setStackTrace() {
+
         [Fact]
         function SetsStackTrace() {
             var actual;
@@ -335,20 +356,86 @@ press()@http://localhost:9090/components/ui/button.js:34:16";
             Assert.Equal(actual.stackTrace, expected);
         }
 
+    }
+
+    [Fixture]
+    function GenerateErrorIdHashGen() {
+
         [Fact]
-        function GeneratesDifferentErrorId() {
-            var target;
+        function HashGenStringWhenCmpIsNotSet() {
+            var innerError = new Error();
+            innerError.stack = innerError.stack = "Error: Error from app client controller\n\
+    at throwErrorFromClientController (http://localhost:9090/components/auratest/errorHandlingApp.js:42:15)\n\
+    at Action.$runDeprecated$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8469:36)\n\
+    at Object.Component$getActionCaller [as $handler$] (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:6695:20)\n\
+    at Aura.$Event$.$Event$.$executeHandlerIterator$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8100:15)\n\
+    at Aura.$Event$.$Event$.$executeHandlers$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8078:8)\n\
+    at http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8130:10\n\
+    at AuraInstance.$run$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:18350:12)\n\
+    at Aura.$Event$.$Event$.$fire$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8128:6)\n\
+    at Object.catchAndFireEvent (http://localhost:9090/components/ui/button.js:90:33)\n\
+    at press (http://localhost:9090/components/ui/button.js:34:16)";
+
+            var expected = "undefined$throwErrorFromClientController";
             var actual;
-            var expected;
 
             getAuraMock(function() {
-                target = new Aura.Errors.AuraError();
-                actual = target.id;
-                target.setStackTrace("test");
-                expected = target.id;
+                var auraError = new Aura.Errors.AuraError(null, innerError);
+                actual = Aura.Errors.GenerateErrorIdHashGen(undefined, auraError.stackFrames);
             });
 
-            Assert.NotEqual(actual, expected);
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function HashGenStringUsesComponentAndFunction() {
+            var innerError = new Error();
+            innerError.stack = innerError.stack = "Error: Error from app client controller\n\
+    at throwErrorFromClientController (http://localhost:9090/components/auratest/errorHandlingApp.js:42:15)\n\
+    at Action.$runDeprecated$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8469:36)\n\
+    at Object.Component$getActionCaller [as $handler$] (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:6695:20)\n\
+    at Aura.$Event$.$Event$.$executeHandlerIterator$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8100:15)\n\
+    at Aura.$Event$.$Event$.$executeHandlers$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8078:8)\n\
+    at http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8130:10\n\
+    at AuraInstance.$run$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:18350:12)\n\
+    at Aura.$Event$.$Event$.$fire$ (http://localhost:9090/auraFW/javascript/iMVf5-orschKyiiWELafJg/aura_dev.js:8128:6)\n\
+    at Object.catchAndFireEvent (http://localhost:9090/components/ui/button.js:90:33)\n\
+    at press (http://localhost:9090/components/ui/button.js:34:16)";
+
+            var expected = "auratest:errorHandlingApp$throwErrorFromClientController";
+            var actual;
+
+            getAuraMock(function() {
+                var auraError = new Aura.Errors.AuraError(null, innerError);
+                auraError["component"] = "auratest:errorHandlingApp";
+                actual = Aura.Errors.GenerateErrorIdHashGen(auraError.component, auraError.stackFrames);
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function HashGenStringWhenComponentIsAction() {
+            var innerError = new Error();
+            innerError.stack = "Object.getElement()@https://gus.lightning.force.com/libraries/ui/panelPositioningLib/elementProxyFactory.js:4:161\n\
+Object.createRelationship()@https://gus.lightning.force.com/libraries/ui/panelPositioningLib/panelPositioning.js:6:480\n\
+Object._createRelationship()@https://gus.lightning.force.com/components/ui/panel.js:17:418\n\
+Object._createConstraints()@https://gus.lightning.force.com/components/ui/panel.js:17:515\n\
+Object.position()@https://gus.lightning.force.com/components/ui/panel.js:15:21\n\
+Object.position()@https://gus.lightning.force.com/components/force/hoverPanel.js:7:86\n\
+Object.show()@https://gus.lightning.force.com/components/ui/panel.js:12:177\n\
+show()@https://gus.lightning.force.com/components/ui/panel.js:3:398";
+
+            var expected = "force:hoverPanel$controller$show$Object.getElement()";
+            var actual;
+
+            getAuraMock(function() {
+                var auraError = new Aura.Errors.AuraError(null, innerError);
+                auraError["component"] = "force:hoverPanel$controller$show";
+                actual = Aura.Errors.GenerateErrorIdHashGen(auraError.component, auraError.stackFrames);
+            });
+
+            Assert.Equal(expected, actual);
         }
     }
 }

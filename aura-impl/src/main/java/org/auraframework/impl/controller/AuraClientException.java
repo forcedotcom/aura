@@ -40,6 +40,7 @@ public class AuraClientException extends Exception {
     private String methodName;
     private String cmpStack;
     private String sourceCode;
+    private final String stacktraceIdGen;
 
     public AuraClientException(
             String desc,
@@ -47,6 +48,7 @@ public class AuraClientException extends Exception {
             String message,
             String jsStack,
             String cmpStack,
+            String stacktraceIdGen,
             InstanceService instanceService,
             ExceptionAdapter exceptionAdapter,
             ConfigAdapter configAdapter,
@@ -87,6 +89,7 @@ public class AuraClientException extends Exception {
         this.action = action;
         this.jsStack = jsStack;
         this.cmpStack = cmpStack;
+        this.stacktraceIdGen = stacktraceIdGen;
     }
 
     public Action getOriginalAction() {
@@ -146,17 +149,6 @@ public class AuraClientException extends Exception {
     }
 
     public String getStackTraceIdGen() {
-        String[] traces = jsStack.split("\n");
-        StringBuilder sb = new StringBuilder();
-        for (String trace : traces) {
-            // remove domain and url parts except filename
-            trace = trace.replaceAll("https?://([^/]*/)+", "");
-            // remove line and column number
-            trace = trace.replaceAll(":[0-9]+:[0-9]+", "");
-            // remove trailing part of filename
-            trace = trace.replaceAll("[.]js.+$", ".js");
-            sb.append(trace+'\n');
-        }
-        return sb.toString();
+        return this.stacktraceIdGen;
     }
 }

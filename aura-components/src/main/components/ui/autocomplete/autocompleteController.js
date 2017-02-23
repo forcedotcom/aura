@@ -143,13 +143,13 @@
         var panel = component.find('panel');
         
         if(usePanel) {
-            panel.set('v.visible', true);
             var listReferenceComponent = component.get("v.listReferenceComponent");
             if (!$A.util.isEmpty(listReferenceComponent) && !$A.util.isUndefinedOrNull(listReferenceComponent[0])) {
                 panel.set('v.referenceElement', listReferenceComponent[0].getElement());
             } else {
                 panel.set('v.referenceElement', component.find('input').getElement());
             }
+            panel.set('v.visible', true);
             $A.getEvt("markup://ui:stackPanel").setParams({
                 callback: function(zIndex) {
                     panel.set('v.zIndex', zIndex);

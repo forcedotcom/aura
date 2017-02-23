@@ -51,7 +51,7 @@ public interface DefinitionFactory<S extends Source<D>, D extends Definition> {
     String getMimeType();
 
     /**
-     * Return the definition for a souce.
+     * Return the definition for a source.
      *
      * The source should be non-null and exist.
      * 

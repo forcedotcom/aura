@@ -114,13 +114,6 @@ public class StringSourceLoaderController implements Controller {
     }
 
     @AuraEnabled
-    public <T extends Definition> Set<DefDescriptor<T>> find(
-            @Key("primaryInterface") Class<T> primaryInterface,
-            @Key("prefix") String prefix, @Key("namespace") String namespace) {
-        return stringSourceLoader.find(primaryInterface, prefix, namespace);
-    }
-
-    @AuraEnabled
     boolean isInternalNamespace(@Key("namespace") String namespace) {
         return stringSourceLoader.isInternalNamespace(namespace);
     }

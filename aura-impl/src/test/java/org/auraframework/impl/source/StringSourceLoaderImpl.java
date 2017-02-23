@@ -409,23 +409,6 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
         return ret;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <D extends Definition> Set<DefDescriptor<D>> find(Class<D> primaryInterface, String prefix,
-            String namespace) {
-        Set<DefDescriptor<D>> ret = Sets.newHashSet();
-        NamespaceInfo namespaceInfo = namespaces.get(namespace);
-
-        if (namespaceInfo != null) {
-            for (DefDescriptor<? extends Definition> desc : namespaceInfo.defs.keySet()) {
-                if (desc.getDefType().getPrimaryInterface() == primaryInterface && desc.getPrefix().equals(prefix)) {
-                    ret.add((DefDescriptor<D>) desc);
-                }
-            }
-        }
-        return ret;
-    }
-
     @Override
     public Set<DefType> getDefTypes() {
         return DEFTYPES;

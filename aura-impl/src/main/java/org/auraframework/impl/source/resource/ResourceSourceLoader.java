@@ -26,7 +26,6 @@ import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.source.BaseSourceLoader;
@@ -141,21 +140,6 @@ public class ResourceSourceLoader extends BaseSourceLoader implements InternalNa
                 index.put(desc, file);
             }
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends Definition> Set<DefDescriptor<T>> find(Class<T> primaryInterface, String prefix, String namespace) {
-        Set<DefDescriptor<T>> ret = Sets.newHashSet();
-        DefType dt = DefType.getDefType(primaryInterface);
-
-        for (DefDescriptor<?> descriptor : index.keySet()) {
-            if (descriptor.getNamespace().equals(namespace) && descriptor.getPrefix().equals(prefix)
-                    && descriptor.getDefType() == dt) {
-                ret.add((DefDescriptor<T>) descriptor);
-            }
-        }
-        return ret;
     }
 
     @Override

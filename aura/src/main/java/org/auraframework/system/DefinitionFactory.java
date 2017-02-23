@@ -25,14 +25,20 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * A factory that produces Definitions of a particular type.
  *
+ * This interface is an internally/externally implemented interface for consumption by Aura. It is not meant
+ * to be consumed by external users.
+ *
  * This definition factory if selected by 3 parameters,
  * <ul>
- *   <li>The reference 'interface' which is an interface that defines
+ *   <li>The source 'interface' which is an interface that defines
  *       the type of source that the factory uses. It really should be of type 'S", but java does not do well with
  *       generics. 
- *   <li>The Reference 'Type', which defines what the factory produces.
+ *   <li>The Definition class for the type of definition produced.
  *   <li>The mime type from the source, which tells you what is in the source for types that can be different data.
  * </ul>
+ *
+ * These factories are spring injected into the CompilerService, and they are selected to compile based on the
+ * most specific version of each interface. I.e. a more specific factory will be selected over a less specific one.
  */
 public interface DefinitionFactory<S extends Source<D>, D extends Definition> {
     /**
@@ -53,9 +59,10 @@ public interface DefinitionFactory<S extends Source<D>, D extends Definition> {
     /**
      * Return the definition for a source.
      *
-     * The source should be non-null and exist.
+     * The source should be non-null and exist. The definition returned by this call will not have had
+     * validateDefinition called on it, and it may have a hidden quick fix exception. 
      * 
-     * @throws QuickFixException
+     * @throws QuickFixException if there is any error reading the definition.
      */
     D getDefinition(@CheckForNull DefDescriptor<D> descriptor, @Nonnull S source) throws QuickFixException;
 }

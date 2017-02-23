@@ -121,16 +121,11 @@ public class JavaSourceLoader implements SourceLoader {
         if (clazz == null) {
         	return null;
         }
-    	return new JavaSourceImpl<D>(descriptor, clazz);
+    	return new JavaSourceImpl<>(descriptor, clazz);
     }
 
     @Override
     public Set<DefDescriptor<?>> find(DescriptorFilter dm) {
-        return Sets.newHashSet();
-    }
-
-    @Override
-    public <T extends Definition> Set<DefDescriptor<T>> find(Class<T> primaryInterface,String prefix,String namespace) {
         return Sets.newHashSet();
     }
 }

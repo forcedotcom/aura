@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
@@ -141,6 +142,8 @@ public class AuraContextImpl implements AuraContext {
     private boolean isSystem = false;
 
     private boolean isModulesEnabled = false;
+
+    private Collection<String> scriptSources = new ArrayList<String>();
     /**
      * The set of defs that are thread local.
      *
@@ -876,7 +879,9 @@ public class AuraContextImpl implements AuraContext {
             if (this.isModulesEnabled) {
                 json.writeMapEntry("m", 1);
             }
-            
+
+            json.writeMapEntry("script-src", this.getScriptSources());
+
             json.writeMapEnd();
         } catch (IOException ioe) {
             // This can't possibly happen.
@@ -968,5 +973,15 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public boolean isModulesEnabled() {
         return this.isModulesEnabled;
+    }
+
+    @Override
+    public void setScriptSources(Collection<String> scriptSources) {
+        this.scriptSources = scriptSources;
+    }
+
+    @Override
+    public Collection<String> getScriptSources() {
+        return scriptSources;
     }
 }

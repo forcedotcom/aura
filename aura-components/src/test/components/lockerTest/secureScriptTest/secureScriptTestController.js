@@ -49,5 +49,20 @@
 
         script.removeAttributeNode(attrNode);
         testUtils.assertNull(script.getAttribute(attrName), "Unexpected attribute value, should be null after removing attribute node")
+    },
+
+    testScriptsFromUnsafeSourceBlocked: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var scriptSrcsToBlock = ['http://badjs.com/fooBar.js', '//badjs.com/fooBar.js'];
+        scriptSrcsToBlock.forEach(function(scriptSrcToBlock){
+            try {
+                var scriptTag = document.createElement("script");
+                scriptTag.src = scriptSrcToBlock;
+                cmp.getElement().appendChild(scriptTag);
+                testUtils.fail("Should have blocked loading script from unsafe sources");
+            } catch(e) {
+                testUtils.assertStartsWith("SecureScriptElement: External script loading blocked, CSP restrictions:", e.message);
+            }
+        });
     }
 })

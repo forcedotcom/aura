@@ -51,6 +51,8 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.globals = config["globals"];
     this.enableAccessChecks=true;
     this.isLockerServiceEnabled = this["isLockerServiceEnabled"] = false;
+    // Safe sources for loading scripts: Same origin + everything else that the CSP policy sets
+    this.safeScriptSources = [window.location.origin].concat(config["script-src"]?config["script-src"]:[]);
 
     // JBUCH: TOGGLE LOGGING OFF BY DEFAULT IN PROD MODE
     this.logAccessFailures= true

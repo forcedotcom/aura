@@ -16,6 +16,7 @@
 package org.auraframework.system;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -727,4 +728,16 @@ public interface AuraContext {
     void setModulesEnabled(boolean isModulesEnabled);
 
     boolean isModulesEnabled();
+
+    /**
+     * Set the sources allowed to supply script for this current application.
+     * @param scriptSources
+     */
+    void setScriptSources(Collection<String> scriptSources);
+
+    /**
+     * Get the sources allowed to supply script for this current application.
+     * @return
+     */
+    Collection<String> getScriptSources();
 }

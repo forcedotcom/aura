@@ -420,7 +420,7 @@ InteropComponent.prototype.getFacets = function() {
  * @private
  */
 InteropComponent.prototype.raiseInvalidComponentError = function(func, args) {
-    var error = 'Invalid component tried calling function [' + func + ']';
+    var error = 'Interop component tried calling function [' + func + ']';
     var argsArr = Array.prototype.slice.call(args);
     if (argsArr.length) {
         error += ' with arguments [' + argsArr.join(',') + ']';

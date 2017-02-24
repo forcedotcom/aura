@@ -134,29 +134,6 @@
         }
     },
 
-    verifyInvalidComponentErrorMessage: function(msg, func, params, cmpFQN, globalId) {
-        var index = 0;
-
-        var opening = "Invalid component tried calling function [" + func + "]";
-        var chunk = msg.substr(index, opening.length);
-        $A.test.assertEquals(opening, chunk, "InvalidComponent error message did not display expected function info.");
-
-        var paramsMsg = " with arguments [" + params + "]";
-        index += opening.length;
-        chunk = msg.substr(index, paramsMsg.length);
-        $A.test.assertEquals(paramsMsg, chunk, "InvalidComponent error message did not display expected parameter info.");
-
-        var cmpMsg = ", " + cmpFQN;
-        index += paramsMsg.length;
-        chunk = msg.substr(index, cmpMsg.length);
-        $A.test.assertEquals(cmpMsg, chunk, "InvalidComponent error message did not display expected component name.");
-
-        var globalIdMsg = " [" + globalId + "]";
-        index += cmpMsg.length;
-        chunk = msg.substr(index, globalIdMsg.length);
-        $A.test.assertEquals(globalIdMsg, chunk, "InvalidComponent error message did not display expected globalId.");
-    },
-
     /**
      * Verify component in attribute will be destroyed when parent component is destroyed.
      */

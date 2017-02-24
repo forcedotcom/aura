@@ -31,15 +31,13 @@ Test.Aura.Component.ComponentTest=function(){
     Mocks.GetMocks(Object.Global(), {
         "Aura": Aura,
         "Component": function(){}, // Prevent Global
-        "InvalidComponent": function(){}, // Prevent Global
         "AttributeSet": function(){} // Prevent Global
     })(function(){
         [Import("aura-impl/src/main/resources/aura/component/Component.js"),
          Import("aura-impl/src/main/resources/aura/component/EventValueProvider.js"),
          Import("aura-impl/src/main/resources/aura/component/StyleValueProvider.js"),
          Import("aura-impl/src/main/resources/aura/component/ActionValueProvider.js"),
-         Import("aura-impl/src/main/resources/aura/attribute/AttributeSet.js"),
-         Import("aura-impl/src/main/resources/aura/component/InvalidComponent.js")]
+         Import("aura-impl/src/main/resources/aura/attribute/AttributeSet.js")]
     });
 
     delete StyleValueProvider;
@@ -49,7 +47,6 @@ Test.Aura.Component.ComponentTest=function(){
     function mockFramework(during){
         var mock = {
             "Component": Aura.Component.Component,
-            "InvalidComponent": Aura.Component.InvalidComponent,
             "AttributeSet": Aura.Attribute.AttributeSet,
             "StyleValueProvider": Aura.Component.StyleValueProvider,
             "ActionValueProvider": Aura.Component.ActionValueProvider,
@@ -155,21 +152,6 @@ Test.Aura.Component.ComponentTest=function(){
     }
     [Fixture]
     function DeIndex() {
-        //this cover when component is invalid
-        [Fact]
-        function ReturnsNullForInvalidComponent() {
-            //Arrange
-            var target = null;
-            mockFramework(function(){
-                target = new Aura.Component.Component({},true);
-                target.isValid = function() {return false};
-            });
-            //Act
-            var actual = target.deIndex(null,null);
-            //Assert
-            Assert.Null(actual);
-        }
-
         //this cover when localIndex does not exist
         [Fact]
         function ReturnsNullForNullIndex() {
@@ -309,21 +291,6 @@ Test.Aura.Component.ComponentTest=function(){
 
     [Fixture]
     function Index() {
-        //this cover when component is invalid
-        [Fact]
-        function ReturnsNullForInvalidComponent() {
-            //Arrange
-            var target = null;
-            mockFramework(function(){
-                target = new Aura.Component.Component({},true);
-                target.assertValid = function(){return false};
-            });
-            //Act
-            var actual = target.index(null,null);
-            //Assert
-            Assert.Null(actual);
-        }
-
         //this cover when index[locaid] does not exist
         [Fact]
         function InitLocalIdWithGlobalId() {

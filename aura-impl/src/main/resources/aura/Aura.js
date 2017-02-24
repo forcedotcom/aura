@@ -136,7 +136,6 @@ Aura.bootstrapMark = function (mark, value) {
 // #include aura.component.IterationComponent
 // #include aura.component.TextComponent
 // #include aura.component.InteropComponent
-// #include aura.component.InvalidComponent
 // #include aura.component.ComponentDef
 // #include aura.component.InteropComponentDef
 // #include aura.component.ActionValueProvider

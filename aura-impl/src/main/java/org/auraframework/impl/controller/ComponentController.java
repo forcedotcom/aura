@@ -103,7 +103,7 @@ public class ComponentController implements Controller {
             }
 
             if (this.causeDescriptor != null && !this.causeDescriptor.isEmpty()) {
-                // "markup://foo:bar" or "InvalidComponent markup://foo:bar {10:149;a}"
+                // "markup://foo:bar"
                 int markupIndex = this.causeDescriptor.indexOf("markup://");
                 if (markupIndex > -1) {
                     String markup = this.causeDescriptor.substring(markupIndex).split(" ")[0];

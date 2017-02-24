@@ -150,15 +150,6 @@
         </td>
     </tr>
     <tr>
-        <td>Error from invalid component: </td>
-        <td>
-          <ui:button label="Throw"
-                     press="{!c.throwErrorFromInvalidComponent}"
-                     class="errorFromInvalidComponentButton"
-                     aura:id="errorFromInvalidComponentButton"/>
-        </td>
-    </tr>
-    <tr>
         <td>Fire Test Event: </td>
         <td>
           <ui:button label="Fire"

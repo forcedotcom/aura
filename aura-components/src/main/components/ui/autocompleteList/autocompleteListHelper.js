@@ -541,7 +541,7 @@
             for (var j = 0; j < items.length; j++) {
                 items[j].keyword = keyword;
                 var label = items[j][propertyToMatch];
-                if (label.toLowerCase().indexOf(keyword.toLowerCase()) >= 0) { // Has a match
+                if (keyword && label.toLowerCase().indexOf(keyword.toLowerCase()) >= 0) { // Has a match
                     items[j].visible = true;
                 } else {
                     items[j].visible = false;

@@ -3,7 +3,7 @@
     <parent>
         <artifactId>aura-framework</artifactId>
         <groupId>org.auraframework</groupId>
-        <version>0.5316-SNAPSHOT</version>
+        <version>0.5316</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

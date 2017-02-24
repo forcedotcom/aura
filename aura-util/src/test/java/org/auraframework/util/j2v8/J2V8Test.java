@@ -56,6 +56,11 @@ public class J2V8Test extends UnitTestCase {
     // examples from http://eclipsesource.com/blogs/getting-started-with-j2v8/
 
     @Test
+    public void testIsAvailable() {
+        assertTrue(J2V8Util.isJ2V8Available());
+    }
+    
+    @Test
     public void testHelloWorld() {
         int result = v8
                 .executeIntegerScript("" + "var hello = 'hello, ';\n" + "var world = 'world!';\n" + "hello.length;\n");

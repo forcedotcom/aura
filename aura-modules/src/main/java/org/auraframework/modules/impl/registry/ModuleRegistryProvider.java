@@ -43,6 +43,7 @@ import org.auraframework.system.DefRegistry;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.util.FileMonitor;
+import org.auraframework.util.j2v8.J2V8Util;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -77,6 +78,10 @@ public class ModuleRegistryProvider implements RegistryAdapter, SourceListener {
 
     @Override
     public DefRegistry[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders) {
+    	if (!J2V8Util.isJ2V8Available()) { 
+    		return new DefRegistry[0];
+    	}
+    	
         List<DefRegistry> registries = new ArrayList<>();
         List<SourceLoader> moduleLoaders = new ArrayList<>();
 

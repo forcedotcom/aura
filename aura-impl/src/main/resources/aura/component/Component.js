@@ -44,7 +44,7 @@ function Component(config, localCreation) {
     this.references={};
     this.handlers = {};
     this.localIndex = {};
-    this.destroyed=false;
+    this.destroyed=0;
     this.version = config["version"];
     this.owner = context.getCurrentAccess();
     this.name='';
@@ -135,7 +135,7 @@ function Component(config, localCreation) {
     this.facetValueProvider = configAttributes["facetValueProvider"];
 
     // instantiates this components model
-    this.setupModel(config["model"], this);
+    this.setupModel(config["model"]);
 
     // create all value providers for this component m/v/c etc.
     this.setupValueProviders(config["valueProviders"]);
@@ -176,7 +176,6 @@ function Component(config, localCreation) {
         act.releaseCreationPath(this.creationPath);
     }
 
-    this._destroying = false;
     if(this.getDef().hasInit()) {
         this.fire("init");
     }
@@ -638,218 +637,146 @@ Component.prototype.removeDocumentLevelHandler = function(dlh) {
 };
 
 /**
- * Forces the final destroy of a component (after async).
- */
-Component.prototype.finishDestroy = function() {
-    this._scheduledForAsyncDestruction = false;
-    this.destroy(false);
-};
-
-/**
  * Destroys the component and cleans up memory.
  * After a component that is declared in markup is no longer in use, the framework automatically destroys it
  * and frees up its memory.
  * If you create a component dynamically in JavaScript and that component isn't added to a facet (v.body or another
  * attribute of type Aura.Component[]), you have to destroy it manually using destroy() to avoid memory leaks.
  *
- * <code>destroy()</code> destroys the component immediately while
- * <code>destroy(true)</code> destroys it asynchronously.
- * <p>
- * Note that when this is called with async = true, it makes a specific race
- * condition (i.e. calling functions after destroy) harder to trigger. This
- * means that we really would like to be able to for synchronous behaviour here,
- * or do something to make the destroy function appear much more like it is
- * doing a synchronous destroy. Unfortunately, the act
- * of doing an asynchronous destroy creates false 'races' because it leaves all
- * of the events wired up.
- * </p>
+ * <code>destroy()</code> destroys the component.
  *
- * @param {Boolean}
- *            async - Set to true if component should be destroyed asynchronously.
- *            The default value is false.
- * @public
  * @platform
  * @export
  */
-Component.prototype.destroy = function(async) {
-    var concrete = this.getConcreteComponent();
-    if (concrete && this !== concrete && concrete.isValid()) {
-        return concrete.destroy(async);
+Component.prototype.destroy = function() {
+    if(arguments.length){
+        $A.deprecated("Component.destroy() no longer supports asynchronous destruction.","Please remove any arguments passed to destroy().","2017/02/07","2018/02/07");
     }
 
+    // NoOp if we've already been through here, or if we're returning via circular reference; 1, -1
+    if(this.destroyed){
+        return;
+    }
+
+    // Destroy from the most concrete component up the chain
+    if(this.concreteComponentId){
+        var concrete = this.getConcreteComponent();
+        // If the concrete component is not already destroying, exit and re-enter
+        if (concrete&&!concrete.destroyed){
+            concrete.destroy();
+            return;
+        }
+    }
+
+    // Mark destroying; This will cause isValid to return false, but still allow .get() and .set()
+    this.destroyed=-1;
+
+    // Fire component event for developer cleanup
     this.fire("destroy");
 
-    if (!this.destroyed && !this._destroying) {
-        // DCHASMAN TODO W-1879487 Reverted in 188 because of hard to diagnose
-        // rerendering weirdness in a couple of tests and one:'s mru/lists view
-        // Default to async destroy
-        /*
-         * if (async === undefined) { async = true; }
-         */
-
-        var key;
-
-        if (this.docLevelHandlers !== undefined) {
-            for (key in this.docLevelHandlers) {
-                var dlh = this.docLevelHandlers[key];
-                if (dlh && dlh.setEnabled) {
-                    dlh.setEnabled(false);
-                }
+    // Disable and remove document level handlers
+    if (this.docLevelHandlers !== undefined) {
+        for (var handler in this.docLevelHandlers) {
+            if(this.docLevelHandlers.hasOwnProperty(handler)){
+                this.docLevelHandlers[handler].setEnabled(false);
             }
         }
-
-        if (async) {
-            this._scheduledForAsyncDestruction = true;
-
-            if (this.elements) {
-                for (var i = 0; i < this.elements.length; i++) {
-                    var element = this.elements[i];
-                    if (element && element.style) {
-                        element.style.display = "none";
-                    }
-                }
-            }
-
-            $A.util.destroyAsync(this);
-
-            return null;
-        }
-
-        // call unrender before setting _destroying
-        // so that _destroying could be used for isValid check.
-        $A.renderingService.unrender(this);
-        this._destroying = true;
-
-        var componentDef = this.getDef();
-        var superComponent = this.getSuper();
-        var globalId = this.globalId;
-
-        // Track some useful debugging information for InvalidComponent's use
-        this._globalId = globalId;
-        this._componentDef = componentDef;
-        if(!this._description){this.toString();}
-
-        if (this.attributeSet) {
-            var expressions=this.attributeSet.destroy(async);
-            for(var x in expressions){
-                expressions[x].removeChangeHandler(this,"v."+x);
-            }
-        }
-
-        this.elements = undefined;
-
-        this.doDeIndex();
-        $A.componentService.deIndex(globalId);
-
-        var vp = this.valueProviders;
-        if(vp) {
-            for ( var k in vp) {
-                var v = vp[k];
-                if (v&&v!==this) {
-                    if ($A.util.isFunction(v.destroy)) {
-                        v.destroy(async);
-                    }
-                    delete vp[k];
-                }
-            }
-        }
-
-        var eventDispatcher = this.getEventDispatcher();
-        if (eventDispatcher) {
-            for (key in eventDispatcher) {
-                var vals = eventDispatcher[key];
-                if (vals) {
-                    for(var phase in vals) {
-                        var arr = vals[phase];
-                        if(arr) {
-                            for (var j = 0; j < arr.length; j++) {
-                                delete arr[j];
-                            }
-                        }
-                    }
-
-                    delete eventDispatcher[key];
-                }
-            }
-        }
-
-        $A.eventService.removeHandlersByComponentId(globalId);
-
-        if (this.model) {
-            this.model.destroy(async);
-        }
-
-        var ar = this.actionRefs;
-        if (ar) {
-            for (k in ar) {
-                ar[k].destroy(async);
-            }
-        }
-
-        if (componentDef) {
-            var handlerDefs = componentDef.getAppHandlerDefs();
-            if (handlerDefs) {
-                for (i = 0; i < handlerDefs.length; i++) {
-                    var handlerDef = handlerDefs[i];
-                    var handlerConfig = {};
-                    handlerConfig["globalId"] = globalId;
-                    handlerConfig["event"] = handlerDef["eventDef"].getDescriptor().getQualifiedName();
-                    $A.eventService.removeHandler(handlerConfig);
-                }
-            }
-        }
-
-        if (superComponent) {
-            superComponent.destroy(async);
-        }
-
-        var references=this.references;
-        for(key in references){
-            if(references[key]){
-                for(var access in references[key]){
-                    references[key][access].destroy();
-                    delete references[key][access];
-                }
-            }
-            delete references[key];
-        }
-
-        // Swap in InvalidComponent prototype to keep us from having to add
-        // validity checks all over the place
-        $A.util.apply(this, InvalidComponent.prototype, true);
-        // Fix for <= IE8 DontEnum bug.
-        this.toString=InvalidComponent.prototype.toString;
-
-        this._marker=null;
-        this.superComponent = null;
-        this.model = null;
-        this.attributeSet = null;
-        this.valueProviders = null;
-        this["renderer"] = null;
-        this.actionRefs = null;
-        this.handlers=null;
-        this.eventDispatcher = null;
-        this.localIndex = null;
-        this.componentDef = null;
-
-        this.destroyed = true;
-        this._destroying = false;
-
-        return globalId;
+        this.docLevelHandlers=undefined;
     }
 
-    return null;
-};
+    // Unrender component and facet stack.
+    $A.renderingService.unrender(this);
+    this._marker=undefined;
+    this.elements=undefined;
 
-/**
- * Returns true if this component has been rendered and valid.
- *
- * @protected
- */
-Component.prototype.isRenderedAndValid = function() {
-    return !this.destroyed && !this._destroying && this.rendered;
-};
+    // Reset all attributes and clear expressions;
+    // Don't do this until the topmost parent, to allow customer code to read attributes in destroy events
+    if (this.attributeSet && !this.superComponent) {
+        var expressions=this.attributeSet.destroy();
+        for(var x in expressions){
+            expressions[x].removeChangeHandler(this,"v."+x);
+        }
+    }
+    var references=this.references;
+    for(var key in references){
+        if(references[key]){
+            for(var access in references[key]){
+                references[key][access].destroy();
+                delete references[key][access];
+            }
+        }
+        delete references[key];
+    }
 
+    // Destroy model
+    if (this.model) {
+        this.model.destroy();
+    }
+
+    // Destroy valueproviders
+    // JBUCH: THIS SHOULDN'T BE NECESSARY
+    // var vp = this.valueProviders;
+    // if(vp) {
+    //     for(var k in vp) {
+    //         var v = vp[k];
+    //         if (v&&v!==this) {
+    //             if ($A.util.isFunction(v.destroy)) {
+    //                 v.destroy();
+    //             }
+    //             delete vp[k];
+    //         }
+    //     }
+    // }
+
+    // Detach all application event handlers
+    $A.eventService.removeHandlersByComponentId(this.globalId);
+    // JBUCH: TODO: CONFIRM REDUNDANT TO THE LINE ABOVE:
+    var componentDef=this.getDef();
+    var handlerDefs = componentDef.getAppHandlerDefs();
+    if (handlerDefs) {
+        for (var i = 0; i < handlerDefs.length; i++) {
+            var handlerDef = handlerDefs[i];
+            var handlerConfig = {};
+            handlerConfig["globalId"] = this.globalId;
+            handlerConfig["event"] = handlerDef["eventDef"].getDescriptor().getQualifiedName();
+            $A.eventService.removeHandler(handlerConfig);
+        }
+    }
+
+    // Detach all event handlers
+    var eventDispatcher = this.getEventDispatcher();
+    if (eventDispatcher) {
+        for(var event in eventDispatcher) {
+            var vals = eventDispatcher[event];
+            if (vals) {
+                for(var phase in vals) {
+                    var arr = vals[phase];
+                    if(arr) {
+                        for (var j = 0; j < arr.length; j++) {
+                            delete arr[j];
+                        }
+                    }
+                }
+
+                delete eventDispatcher[event];
+            }
+        }
+    }
+
+    // Deindex all child components
+    this.doDeIndex();
+
+    // Deindex self
+    $A.componentService.deIndex(this.globalId);
+
+    // Destroy immediate parent
+    if(this.superComponent){
+        this.superComponent.destroy();
+    }
+
+    // Destroyed. Mark invalid
+    this.destroyed=1;
+};
 
 /**
  * Execute the super component's render method.
@@ -1117,6 +1044,9 @@ Component.prototype.getElement = function() {
  * @export
  */
 Component.prototype.getReference = function(key) {
+    if(this.destroyed===1){
+        return null;
+    }
     key = $A.expressionService.normalize(key);
     var access=$A.getContext().getCurrentAccess();
     var accessId=access&&access.getGlobalId();
@@ -1141,16 +1071,18 @@ Component.prototype.getReference = function(key) {
  * @export
  */
 Component.prototype.clearReference = function(key) {
-    key = $A.expressionService.normalize(key);
-    $A.assert(key.indexOf('.') > -1, "Unable to clear reference for key '" + key + "'. No value provider was specified. Did you mean 'v." + key + "'?");
-    var path = key.split('.');
-    var valueProvider = this.getValueProvider(path.shift(), this);
-    $A.assert(valueProvider, "Unknown value provider for key '" + key + "'.");
-    $A.assert(valueProvider.clearReference, "Value provider does not implement clearReference() method.");
-    var subPath=path.join('.');
-    var value=valueProvider.clearReference(subPath);
-    if($A.util.isExpression(value)){
-        value.removeChangeHandler(this,key);
+    if(!this.destroyed) {
+        key = $A.expressionService.normalize(key);
+        $A.assert(key.indexOf('.') > -1, "Unable to clear reference for key '" + key + "'. No value provider was specified. Did you mean 'v." + key + "'?");
+        var path = key.split('.');
+        var valueProvider = this.getValueProvider(path.shift(), this);
+        $A.assert(valueProvider, "Unknown value provider for key '" + key + "'.");
+        $A.assert(valueProvider.clearReference, "Value provider does not implement clearReference() method.");
+        var subPath = path.join('.');
+        var value = valueProvider.clearReference(subPath);
+        if ($A.util.isExpression(value)) {
+            value.removeChangeHandler(this, key);
+        }
     }
 };
 
@@ -1165,6 +1097,9 @@ Component.prototype.clearReference = function(key) {
  * @export
  */
 Component.prototype.get = function(key) {
+    if(this.destroyed===1){
+        return undefined;
+    }
     key = $A.expressionService.normalize(key);
     var path = key.split('.');
     var root = path.shift();
@@ -1216,52 +1151,54 @@ Component.prototype.getShadowAttribute = function(key) {
  * @export
  */
 Component.prototype.set = function(key, value, ignoreChanges) {
-    key = $A.expressionService.normalize(key);
-    $A.assert(key.indexOf('.') > -1, "Unable to set value for key '" + key + "'. No value provider was specified. Did you mean 'v." + key + "'?");
+    if(this.destroyed!==1) {
+        key = $A.expressionService.normalize(key);
+        $A.assert(key.indexOf('.') > -1, "Unable to set value for key '" + key + "'. No value provider was specified. Did you mean 'v." + key + "'?");
 
-    var path = key.split('.');
-    var root = path.shift();
-    var valueProvider = this.getValueProvider(root, this);
+        var path = key.split('.');
+        var root = path.shift();
+        var valueProvider = this.getValueProvider(root, this);
 
-    if(!valueProvider){
-        $A.assert(false, "Unable to set value for key '" + key + "'. No value provider was found for '" + root + "'.");
-    }
-    if(!valueProvider.set){
-        $A.assert(false, "Unable to set value for key '" + key + "'. Value provider does not implement 'set(key, value)'.");
-    }
-    var subPath=path.join('.');
+        if (!valueProvider) {
+            $A.assert(false, "Unable to set value for key '" + key + "'. No value provider was found for '" + root + "'.");
+        }
+        if (!valueProvider.set) {
+            $A.assert(false, "Unable to set value for key '" + key + "'. Value provider does not implement 'set(key, value)'.");
+        }
+        var subPath = path.join('.');
 
-    var oldValue=valueProvider.get(subPath,this);
+        var oldValue = valueProvider.get(subPath, this);
 
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    // Check if the previous value contains only components
-    if ($A.util.isArray(oldValue) && oldValue.length) {
-        var containsOnlyComponents = true;
-        for (var i = 0; i < oldValue.length && containsOnlyComponents; i++) {
-            containsOnlyComponents = $A.util.isComponent(oldValue[i]);
+        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+        // Check if the previous value contains only components
+        if ($A.util.isArray(oldValue) && oldValue.length) {
+            var containsOnlyComponents = true;
+            for (var i = 0; i < oldValue.length && containsOnlyComponents; i++) {
+                containsOnlyComponents = $A.util.isComponent(oldValue[i]);
+            }
+
+            if (containsOnlyComponents) {
+                this.trackComponentReplacement(oldValue, key);
+            }
+        }
+        //#end
+
+        var returnValue = valueProvider.set(subPath, value, this);
+        if ($A.util.isExpression(value)) {
+            value.addChangeHandler(this, key);
+            if (!ignoreChanges) {
+                value = value.evaluate();
+            }
         }
 
-        if (containsOnlyComponents) {
-            this.trackComponentReplacement(oldValue, key);
+        var changed = $A.util.isArray(value) || $A.util.isObject(value) || oldValue !== value;
+        if (changed && !ignoreChanges) {
+            $A.renderingService.addDirtyValue(key, this);
+            var index = path.length > 1 ? path[path.length - 1] : undefined;
+            this.fireChangeEvent(key, oldValue, value, index);
         }
+        return returnValue;
     }
-    //#end
-
-    var returnValue=valueProvider.set(subPath, value, this);
-    if($A.util.isExpression(value)){
-        value.addChangeHandler(this,key);
-        if(!ignoreChanges){
-            value=value.evaluate();
-        }
-    }
-
-    var changed=$A.util.isArray(value)||$A.util.isObject(value)||oldValue!==value;
-    if(changed&&!ignoreChanges) {
-        $A.renderingService.addDirtyValue(key, this);
-        var index=path.length>1?path[path.length-1]:undefined;
-        this.fireChangeEvent(key,oldValue,value,index);
-    }
-    return returnValue;
 };
 
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
@@ -1338,7 +1275,9 @@ Component.prototype.setShadowAttribute = function(key,value) {
  * @export
  */
 Component.prototype.markDirty=function(reason){
-    $A.renderingService.addDirtyValue(reason||"Component.markDirty()",this);
+    if(!this.destroyed) {
+        $A.renderingService.addDirtyValue(reason || "Component.markDirty()", this);
+    }
 };
 
 /**
@@ -1501,10 +1440,12 @@ Component.prototype.getContainerComponent = function() {
  * @export
  */
 Component.prototype.addValueProvider=function(key,valueProvider){
-    $A.assert($A.util.isString(key),"Component.addValueProvider(): 'key' must be a valid String.");
-    $A.assert(",v,m,c,e,this,globalid,def,super,null,version,".indexOf(","+key.toLowerCase()+",")===-1,"Component.addValueProvider(): '"+key+"' is a reserved valueProvider.");
-    $A.assert(!$A.util.isUndefinedOrNull(valueProvider),"Component.addValueProvider(): 'valueProvider' is required.");
-    this.valueProviders[key]=valueProvider;
+    if(!this.destroyed) {
+        $A.assert($A.util.isString(key), "Component.addValueProvider(): 'key' must be a valid String.");
+        $A.assert(",v,m,c,e,this,globalid,def,super,null,version,".indexOf("," + key.toLowerCase() + ",") === -1, "Component.addValueProvider(): '" + key + "' is a reserved valueProvider.");
+        $A.assert(!$A.util.isUndefinedOrNull(valueProvider), "Component.addValueProvider(): 'valueProvider' is required.");
+        this.valueProviders[key] = valueProvider;
+    }
 };
 
 /**
@@ -1513,9 +1454,11 @@ Component.prototype.addValueProvider=function(key,valueProvider){
  * @public
  */
 Component.prototype.removeValueProvider=function(key){
-    $A.assert($A.util.isString(key),"Component.removeValueProvider(): 'key' must be a valid String.");
-    $A.assert(",v,m,c,e,this,globalid,def,super,null,version,".indexOf(","+key.toLowerCase()+",")===-1,"Component.removeValueProvider(): '"+key+"' is a reserved valueProvider and can not be removed.");
-    delete this.valueProviders[key];
+    if(!this.destroyed) {
+        $A.assert($A.util.isString(key), "Component.removeValueProvider(): 'key' must be a valid String.");
+        $A.assert(",v,m,c,e,this,globalid,def,super,null,version,".indexOf("," + key.toLowerCase() + ",") === -1, "Component.removeValueProvider(): '" + key + "' is a reserved valueProvider and can not be removed.");
+        delete this.valueProviders[key];
+    }
 };
 
 /**
@@ -1543,7 +1486,7 @@ Component.prototype.getModel = function() {
  */
 Component.prototype.getEvent = function(name) {
     var eventDef = this.getDef().getEventDef(name);
-    if(!eventDef){
+    if(!eventDef || this.destroyed){
         return null;
     }
     if (!$A.clientService.allowAccess(eventDef,this)) {
@@ -1637,9 +1580,7 @@ Component.prototype.isDirty = function(expression) {
  * @export
  */
 Component.prototype.isValid = function() {
-    return !this._scheduledForAsyncDestruction && !this._destroying && !this.destroyed
-        && (!this.attributeValueProvider || !this.attributeValueProvider.isValid
-            || this.attributeValueProvider.isValid());
+    return !this.destroyed;
 };
 
 /**
@@ -1655,7 +1596,7 @@ Component.prototype.toString = function() {
     var attributesOutput = [];
     // Debug Info
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    var attributeSet = this.get("v");
+    var attributeSet = this.attributeSet;
     if(attributeSet){
         for(var key in attributeSet.values) {
             attributesOutput.push(" "+ key + " = \"" + attributeSet.values[key] +"\"");
@@ -1777,6 +1718,9 @@ Component.prototype.getFlavor = function() {
  * @export
  */
 Component.prototype.render = function() {
+    if(this.destroyed){
+        return null;
+    }
     var render = this["renderer"] && this["renderer"]["render"];
     if(render){
         var context = $A.getContext();
@@ -1805,6 +1749,9 @@ Component.prototype.render = function() {
  * @export
  */
 Component.prototype.afterRender = function() {
+    if(this.destroyed){
+        return;
+    }
     var afterRender = this["renderer"] && this["renderer"]["afterRender"];
     if(afterRender){
         var context=$A.getContext();
@@ -1824,6 +1771,9 @@ Component.prototype.afterRender = function() {
  * @export
  */
 Component.prototype.rerender = function() {
+    if(this.destroyed){
+        return null;
+    }
     var rerender = this["renderer"] && this["renderer"]["rerender"];
     if(rerender){
         var context=$A.getContext();
@@ -1848,6 +1798,9 @@ Component.prototype.rerender = function() {
  * @export
  */
 Component.prototype.unrender = function() {
+    if(this.destroyed===1){
+        return;
+    }
     // Clean any dirty values so we don't attempt to rerender.
     $A.renderingService.cleanComponent(this.globalId);
 
@@ -1883,7 +1836,7 @@ Component.prototype.unrender = function() {
  * @export
  */
 Component.prototype.getVersion = function() {
-    if (!this.isValid()) {
+    if (this.destroyed) {
         return null;
     }
 
@@ -2374,7 +2327,7 @@ Component.prototype.getActionCaller = function(valueProvider, actionExpression) 
     }
 
     var actionCaller = function Component$getActionCaller(event) {
-        if (valueProvider.isValid && !valueProvider.isValid() && event.getDef().getDescriptor().getName() !== "valueDestroy") {
+        if (valueProvider.destroyed===1 && event.getDef().getDescriptor().getName() !== "valueDestroy") {
             return;
         }
 
@@ -2478,7 +2431,7 @@ Component.prototype.setupComponentEvents = function(cmp, config) {
 
 Component.prototype.getHandler=function(cmp, actionExpression) {
     return function ComponentPriv$getActionHandler(event) {
-        if (cmp.isValid && !cmp.isValid()) {
+        if (cmp.destroyed) {
             return;
         }
 
@@ -2534,13 +2487,13 @@ Component.prototype.setupMethods = function() {
     }
 };
 
-Component.prototype.setupModel = function(config, cmp) {
+Component.prototype.setupModel = function(config) {
     var def = this.componentDef.getModelDef();
     if (def) {
         if (!config && this.partialConfig) {
             config = this.partialConfig["model"];
         }
-        this.model = def.newInstance(config || {}, cmp);
+        this.model = def.newInstance(config || {});
     }
 };
 
@@ -2618,7 +2571,7 @@ Component.prototype.injectComponent = function(config, localCreation) {
             this.setProvided($A.componentService.getDef(this.partialConfig["componentDef"]), null);
         }
 
-        this.setupModel(config["model"],this);
+        this.setupModel(config["model"]);
         this.valueProviders["m"]=this.model;
         this.valueProviders["c"]=this.createActionValueProvider();
     }

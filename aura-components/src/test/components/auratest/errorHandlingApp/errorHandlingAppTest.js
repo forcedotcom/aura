@@ -1,5 +1,5 @@
 ({
-    testErrorFromInvalidComponent : {
+    _testErrorFromInvalidComponent : {
         attributes: {"handleSystemError": true},
         test: [
             function(cmp) {

@@ -26,14 +26,11 @@
             cmp.set('v.data.elements[0].changes[0].newValue', 'test new value');
             cmp.set('v.innerClassName', 'bar');
 
-            $A.test.addWaitFor(target.getGlobalId(), function() {
-                // invalid the first inner iteration
-                var ret =  target.destroy();
-                $A.test.assertFalse(target.isValid());
-                return ret;
-            }, function() {
-                $A.test.assertEquals(1, cmp.find('innerCmp').length, "there should only be one inner iteration after the other is destroyed.")
-            })
+            // invalidate the first inner iteration
+            target.destroy();
+
+            $A.test.assertFalse(target.isValid());
+            $A.test.assertEquals(1, cmp.find('innerCmp').length, "there should only be one inner iteration after the other is destroyed.")
         }, function(cmp) {
             var newData = [
                 {"changes": [ 

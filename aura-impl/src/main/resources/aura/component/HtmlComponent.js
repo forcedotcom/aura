@@ -152,8 +152,6 @@ function HtmlComponent(config, localCreation) {
     if (forcedPath && act && this.creationPath) {
         act.releaseCreationPath(this.creationPath);
     }
-
-    this._destroying = false;
 }
 
 HtmlComponent.prototype = Object.create(Component.prototype);

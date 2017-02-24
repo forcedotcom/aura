@@ -147,8 +147,6 @@ function ExpressionComponent(config, localCreation) {
     if (forcedPath && act && this.creationPath) {
         act.releaseCreationPath(this.creationPath);
     }
-
-    this._destroying = false;
 }
 
 ExpressionComponent.prototype = Object.create(Component.prototype);

@@ -92,7 +92,7 @@
 
     throwErrorFromUnrender: function(cmp) {
         cmp.set("v.throwErrorFromUnrender", true);
-        cmp.destroy(false);
+        cmp.destroy();
     },
 
     throwErrorFromAuraMethodHandler: function(cmp) {
@@ -128,8 +128,8 @@
     doServerAction: function(cmp) {
         var action = cmp.get("c.doSomething");
         action.setCallback(this, function() {
-                cmp.set("v.actionDone", true);
-            });
+            cmp.set("v.actionDone", true);
+        });
         $A.enqueueAction(action);
     },
 

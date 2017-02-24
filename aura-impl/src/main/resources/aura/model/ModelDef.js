@@ -40,11 +40,10 @@ ModelDef.prototype.getDescriptor = function(){
 /**
  * Returns a new Model instance for this component.
  * @param {Object} config
- * @param {Component} component
  * @returns {Model}
  */
-ModelDef.prototype.newInstance = function(config, component){
-    return new Model(this, config, component);
+ModelDef.prototype.newInstance = function(config){
+    return new Model(this, config);
 };
 
 /**

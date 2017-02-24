@@ -34,7 +34,7 @@
             console.log("stressTest.app Component Creation: ", end - start);
 
              for(var c=0;c<components.length;c++) {
-                 components[c].destroy(false);
+                 components[c].destroy();
              }
         });
 	}

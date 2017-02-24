@@ -181,6 +181,7 @@
      */
     removeTabBody: function (cmp, index) {
         var tabToRemove = cmp._tabCollection.getTab(index);
+        var tabName = tabToRemove&&tabToRemove.get("v.name");
         var activeIndex = cmp._tabCollection.getTabIndex({"tab": cmp._activeTab});
         cmp._tabCollection.removeTab(index);
         var size = cmp._tabCollection.getSize();
@@ -192,9 +193,8 @@
         // Fire remove event if the tab is removed via the removeTab event or if the tab is closed
         if (tabToRemove) {
             var attrs = { "index": index };
-            var name = tabToRemove.get("v.name");
-            if (name) {
-                attrs["name"] = name;
+            if (tabName) {
+                attrs["name"] = tabName;
             }
             cmp.get("e.onRemove").setComponentEvent().fire(attrs);
         }
@@ -441,8 +441,8 @@
             removeTab: function (index) {
                 if ($A.util.isNumber(index) && index >= 0 && index < this.tabIds.length) {
                     var id = this.tabIds.splice(index, 1);
-                    var tab = this.tabComponents[id[0]];
-                    tab.destroy(true);
+                    this.tabComponents[id[0]].destroy();
+                    delete this.tabComponents[id[0]];
                 }
             },
             insertTab: function (index, tab) {

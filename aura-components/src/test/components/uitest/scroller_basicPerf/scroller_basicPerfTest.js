@@ -18,8 +18,7 @@
 		browsers: ["-IE7","-IE8"],
 		attributes: {},
         test: function(component){
-        	var destroyed,
-        		totalScrollerComponentsInDOM,
+        	var totalScrollerComponentsInDOM,
         		totalOutputURLComponentsInDOM,
         		queryString = $A.getQueryStatement().from("component")
 							.field("descriptor", "getDef().getDescriptor().toString()")
@@ -38,7 +37,7 @@
         	var body = $A.getRoot().find("scrollContainer").get("v.body");
         	var toDestroy = body.splice(0,1);
         	$A.getRoot().find("scrollContainer").set("v.body", body);
-        	destroyed = toDestroy[0].destroy();
+        	toDestroy[0].destroy();
     		totalScrollerComponentsInDOM  = queryString.query().groups['markup://ui:scroller'];
         	totalOutputURLComponentsInDOM  = queryString.query().groups['markup://ui:outputURL'];
         	

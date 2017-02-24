@@ -358,7 +358,7 @@
 	shiftRowData: function(concrete, index, count, remove) {
 
         function destroyComponent(cmp) {
-            cmp.destroy(true);
+            cmp.destroy();
         }
 
 		var rowData = concrete._rowData,

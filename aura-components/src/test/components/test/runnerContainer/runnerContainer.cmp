@@ -28,7 +28,7 @@
 				<span>Search:</span>
 				<select class="search-ops">
 					<option>AND</option>
-					<option>OR</option>
+					<option selected="selected">OR</option>
 				</select>
 				<input class="search" type="text" placeholder="Type to filter tests (multiple searches: keyword1, keyword2)" value="{!v.keyword}" />
 				<button class="run" title="Run Selected Tests">

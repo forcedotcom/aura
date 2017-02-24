@@ -266,11 +266,11 @@ AuraRenderingService.prototype.unrender = function(components) {
     var context=$A.getContext();
     for (var i = 0; i < components.length; i++){
         var cmp = components[i];
-        if ($A.util.isComponent(cmp) && cmp.isValid() && cmp.isRendered()) {
+        if ($A.util.isComponent(cmp) && cmp.destroyed!==1 && cmp.isRendered()) {
             //var renderer = cmp.getRenderer();
             cmp.setUnrendering(true);
             try {
-                if(cmp.isValid()&&cmp.isRendered()) {
+                if(cmp.destroyed!==1&&cmp.isRendered()) {
                     try {
                         context.setCurrentAccess(cmp);
                         cmp["unrender"]();
@@ -293,7 +293,7 @@ AuraRenderingService.prototype.unrender = function(components) {
                     }
                 }
             } finally {
-                if (cmp.isValid()) {
+                if (cmp.destroyed!==1) {
                     cmp.setUnrendering(false);
                 }
             }

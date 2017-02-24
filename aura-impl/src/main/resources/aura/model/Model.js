@@ -18,13 +18,11 @@
  * @constructor
  * @param {Object} def
  * @param {Object} data
- * @param {Component} component
  * @returns {Function}
  */
-function Model(def, data, component){
+function Model(def, data){
     this.def=def;
     this.data=$A.util.apply({}, data, true, true);
-    this.component=component;
     if(def){
         var members=def.getMembers();
         for(var i=0;i<members.length;i++){
@@ -68,7 +66,11 @@ Model.prototype.set=function(key,value){
 };
 
 Model.prototype.destroy = function(){
-    this.data = this.def = this.component = null;
+    for(var x in this.data){
+        if(this.data.hasOwnProperty(x)){
+            this.data[x]=undefined;
+        }
+    }
 };
 
 Aura.Model.Model = Model;

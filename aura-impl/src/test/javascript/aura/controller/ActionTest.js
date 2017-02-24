@@ -1905,7 +1905,7 @@ Test.Aura.Controller.ActionTest = function() {
             var target = newAction();
             target.abortable = true;
             target.abort = function() {};
-            target.cmp = { isValid : function() { return false; } };
+            target.cmp = { destroyed:1 };
 
             //Act
             var actual = target.abortIfComponentInvalid(true);
@@ -1922,7 +1922,7 @@ Test.Aura.Controller.ActionTest = function() {
             var actual = null;
             target.abortable = true;
             target.abort = function() { actual = expected; };
-            target.cmp = { isValid : function() { return false; } };
+            target.cmp = { destroyed:1 };
 
             //Act
             target.abortIfComponentInvalid(true);
@@ -1937,7 +1937,7 @@ Test.Aura.Controller.ActionTest = function() {
             var target = newAction();
             target.abortable = false;
             target.abort = function() {};
-            target.cmp = { isValid : function() { return false; } };
+            target.cmp = { destroyed:1 };
 
             //Act
             var actual = target.abortIfComponentInvalid(false);
@@ -1954,7 +1954,7 @@ Test.Aura.Controller.ActionTest = function() {
             var actual = null;
             target.abortable = false;
             target.abort = function() { actual = expected; };
-            target.cmp = { isValid : function() { return false; } };
+            target.cmp = { destroyed:1 };
 
             //Act
             target.abortIfComponentInvalid(false);
@@ -1969,7 +1969,7 @@ Test.Aura.Controller.ActionTest = function() {
             var target = newAction();
             target.abortable = true;
             target.abort = function() {};
-            target.cmp = { isValid : function() { return false; } };
+            target.cmp = { destroyed:1 };
 
             //Act
             var actual = target.abortIfComponentInvalid(false);
@@ -1986,7 +1986,7 @@ Test.Aura.Controller.ActionTest = function() {
             var actual = null;
             target.abortable = true;
             target.abort = function() { actual = expected; };
-            target.cmp = { isValid : function() { return false; } };
+            target.cmp = { destroyed:1 };
 
             //Act
             target.abortIfComponentInvalid(false);

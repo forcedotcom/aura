@@ -939,7 +939,7 @@ Action.prototype.finishAction = function(context) {
         $A.showErrors(false);
     }
     try {
-        if (this.cmp === undefined || this.cmp.isValid()) {
+        if (this.cmp === undefined || this.cmp.destroyed!==1) {
             // Add in any Action scoped components /or partial configs
             if (this.components) {
                 context.joinComponentConfigs(this.components, id);
@@ -1018,7 +1018,7 @@ Action.prototype.finishAction = function(context) {
  * @private
  */
 Action.prototype.abortIfComponentInvalid = function(beforeSend) {
-    if ((!beforeSend || this.abortable) && this.cmp !== undefined && !this.cmp.isValid()) {
+    if ((!beforeSend || this.abortable) && this.cmp !== undefined && this.cmp.destroyed===1) {
         this.abort();
         return true;
     }

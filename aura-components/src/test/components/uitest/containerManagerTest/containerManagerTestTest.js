@@ -137,19 +137,13 @@
             var panel_2 = panelRefs[1];
 
             //delete panel_2 and assert newly assigned zIndexes
-            var globalId = panel_2.getGlobalId();
-            var destroyedId = panel_2.destroy();
+            panel_2.destroy();
 
             //1-5, 3-7, 4-8, 5-9
             //after you destroy panel_2, z-indexes will get recomputed
             //only if you call sendToBack or bringToFront
-            var self = this;
-            $A.test.addWaitForWithFailureMessage(globalId, function () {
-                return destroyedId;
-            }, "Failed to destroy panel", function(){
-                panelRefs.splice(1,1);
-                self.verifyZIndices(panelRefs, ['5', '7', '8', '9']);
-            });
+            panelRefs.splice(1,1);
+            this.verifyZIndices(panelRefs, ['5', '7', '8', '9']);
         }]
     },
 
@@ -169,11 +163,7 @@
                 .groupBy("descriptor");
 
             //destroy container manager
-            var globalId = containerManager.getGlobalId();
-            var destroyedId = containerManager.destroy();
-            $A.test.addWaitForWithFailureMessage(globalId, function(){
-                return (destroyedId);
-            }, "Failed to destroy containerManager");
+            containerManager.destroy();
 
             var actual = queryString.query().groups['markup://ui:panel'];
             $A.test.assertUndefined(actual, "Failed to destroy the panels contained in containerManager");
@@ -198,7 +188,7 @@
     },
 
     /**
-     * Verify destroyPanel event removes panel from global panel refs
+     * Verify destroyPanel event destroys panel
      */
     testDestroyPanel: {
         attributes: {"useContainer": true},
@@ -207,12 +197,12 @@
         }, function(cmp) {
             var panelRefs = this.getPanelRefs(cmp);
 
-            $A.test.assertDefined(panelRefs[0].getGlobalId());
+            $A.test.assertTrue(panelRefs[0].isValid());
 
             this.destroyPanel(panelRefs[0]);
 
-            $A.test.assertUndefined(panelRefs[0].getGlobalId());
-            $A.test.assertEquals(this.getPanelCount(), 4);
+            $A.test.assertFalse(panelRefs[0].isValid());
+            $A.test.assertEquals(4, this.getPanelCount());
         }]
     },
 

@@ -140,23 +140,23 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
 
-    @Test
-    public void testClientErrorFromUnrerender() throws Exception {
-        open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
-        // generate a client error in rerender()
-        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromUnrenderButton"));
-        // Client error is sent via Caboose Actions, force a foreground action to sent error to server
-        findAndClickElement(By.className("serverActionButton"));
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
-
-        List<String> logs = getClientErrorLogs(appender, 1);
-        String log = logs.get(0);
-
-        boolean requireErrorId = true;
-        String failingDescriptor = "markup://auratest:errorHandlingApp";
-        String expectedMessage = String.format("unrender threw an error in '%s' [Error from app unrender]", failingDescriptor);
-        assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
-    }
+    // Test -- THIS IS TESTING TOO MUCH; IT CALLS DESTROY ON THE APP, THROWS AN ERROR IN UNRENDER, TRIES TO THEN FIRE ANOTHER ACTION ON THE APP MID-DESTROY, THEN EXPECTS A BROKEN APP TO RERENDER A VALUE. NO.
+//    public void testClientErrorFromUnrerender() throws Exception {
+//        open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+//        // generate a client error in rerender()
+//        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromUnrenderButton"));
+//        // Client error is sent via Caboose Actions, force a foreground action to sent error to server
+//        findAndClickElement(By.className("serverActionButton"));
+//        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+//
+//        List<String> logs = getClientErrorLogs(appender, 1);
+//        String log = logs.get(0);
+//
+//        boolean requireErrorId = true;
+//        String failingDescriptor = "markup://auratest:errorHandlingApp";
+//        String expectedMessage = String.format("unrender threw an error in '%s' [Error from app unrender]", failingDescriptor);
+//        assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
+//    }
 
     @Test
     public void testClientErrorFromContainedCmpClientController() throws Exception {

@@ -30,6 +30,7 @@ function AttributeSet(attributeDefSet) {
     this.shadowValues={};
     this.decorators={};
 	this.attributeDefSet = attributeDefSet;
+	this.destroyed=false;
 
 	//this.initialize(attributes);
 
@@ -480,61 +481,53 @@ AttributeSet.prototype.getDefault = function(name) {
 /**
  * Destroys the attributeset.
  *
- * @param {Boolean}
- *            async - whether to put in our own trashcan
  * @private
  */
-AttributeSet.prototype.destroy = function(async) {
-    var values = this.values;
-    var expressions={};
-    for (var k in values) {
-        var v = values[k];
+AttributeSet.prototype.destroy = function() {
+    var expressions = {};
+    if(!this.destroyed) {
+        var values = this.values;
+        for (var k in values) {
+            var v = values[k];
 
-        // Body is special because it's a map
-        // of bodies for each inheritance level
-        // so we need to do a for( var in ) {} loop
-        if(k === "body") {
-        	for(var globalId in v) {
-                var body = v[globalId];
-                if(body) {
-            		for(var j=0;j<body.length;j++) {
-                        var bodyCmp = body[j];
-                        if (bodyCmp && bodyCmp.destroy) {
-                            bodyCmp.destroy(async);
+            // Body is special because it's a map
+            // of bodies for each inheritance level
+            // so we need to do a for-in loop
+            if (k === "body") {
+                for (var globalId in v) {
+                    var body = v[globalId];
+                    if (body) {
+                        for (var j = 0; j < body.length; j++) {
+                            var bodyCmp = body[j];
+                            if ($A.util.isComponent(bodyCmp) && bodyCmp.autoDestroy()) {
+                                bodyCmp.destroy();
+                            }
                         }
-            		}
+                    }
                 }
-        	}
-        	continue;
-        }
-
-        // KRIS: HALO:
-        // HTML Elements store their attributes in the HTMLAttributes map.
-        // Since we don't go recursively down the attributes we don't clean these.
-        // We should at least destroy them, PRV's still don't release their references.
-        // if(k === "HTMLAttributes") {
-        //     for(var attribute in v) {
-        //         if(v[attribute] && v[attribute].destroy) {
-        //             v[attribute].destroy(async);
-        //         }
-        //     }
-        // }
-
-        if(!$A.util.isArray(v)){
-            v=[v];
-        }
-
-        for(var i=0,value;i<v.length;i++){
-            value = v[i];
-            if($A.util.isExpression(value)){
-                expressions[k]=value;
-            } else if ($A.util.isComponent(value)) {
-                value.destroy(async);
+                continue;
             }
-        }
-    }
 
-    this.values = this.attributeDefSet = undefined;
+            if ($A.util.isArray(v)) {
+                for (var i = 0, value; i < v.length; i++) {
+                    value = v[i];
+                    if ($A.util.isExpression(value)) {
+                        expressions[k] = value;
+                    } else if ($A.util.isComponent(value) && value.autoDestroy()) {
+                        value.destroy();
+                    }
+                }
+            } else {
+                if ($A.util.isExpression(v)) {
+                    expressions[k] = v;
+                } else if ($A.util.isComponent(v) && v.autoDestroy()) {
+                    v.destroy();
+                }
+            }
+            values[k] = undefined;
+        }
+        this.destroyed = true;
+    }
     return expressions;
 };
 

@@ -720,7 +720,7 @@ AuraEventService.prototype.getPhasedApplicationEventHandlers = function(evt, cmp
     var globalId = cmp.globalId;
     var phasedEvtHandlers = [];
 
-    if(cmp.isValid()) {
+    if(cmp.destroyed!==1) {
         // collect handlers for the entire event definition hierarchy
         while (evtDef) {
             var qname = evtDef.getDescriptor().getQualifiedName();
@@ -818,7 +818,7 @@ AuraEventService.prototype.getAppEventHandlerIterator = (function() {
                             // Some handlers may be added programmatically with a globalId that is
                             // not a valid component id. If the handler is associated with a component,
                             // make sure the component is still valid.
-                            if(cmp && !cmp.isValid()) {
+                            if(cmp && cmp.destroyed===1) {
                                 delete defaultHandlersMap[globalId];
                                 continue;
                             }

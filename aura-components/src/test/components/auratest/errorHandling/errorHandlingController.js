@@ -60,6 +60,6 @@
 
     throwErrorFromUnrender: function(cmp) {
         cmp.set("v.throwErrorFromUnrender", true);
-        cmp.destroy(false);
+        cmp.destroy();
     }
 })

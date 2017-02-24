@@ -35,7 +35,7 @@ Aura.Utils.DocLevelHandler = function DocLevelHandler(eventName, callback, compo
     this.enabled = false;
     var that = this;
     this.callback = function(eventObj) {
-        if (that.component.isRenderedAndValid()) {
+        if (that.component.isValid()&&that.component.isRendered()) {
             callback(eventObj);
         }
     };

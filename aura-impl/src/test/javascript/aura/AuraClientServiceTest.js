@@ -2615,7 +2615,7 @@ Test.Aura.AuraClientServiceTest = function() {
 
         [Fact]
         function RejectsIfInvalidToken() {
-            var expected = "Cannot read property 'token' of undefined";
+            var expected = new TypeError("Cannot read property 'token' of undefined");
             var actual;
             var target;
 

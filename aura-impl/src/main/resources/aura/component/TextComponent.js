@@ -87,8 +87,6 @@ function TextComponent(config, localCreation) {
 
     // index this component with its value provider (if it has a localid)
     this.doIndex(this);
-
-    this._destroying = false;
 }
 
 TextComponent.prototype = Object.create(Component.prototype);

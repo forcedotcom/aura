@@ -509,22 +509,6 @@ Test.Aura.Component.ComponentTest=function(){
     [Fixture]
     function GetDef() {
         [Fact]
-        function ReturnsNullForInvalidComponent() {
-            // Arrange
-            var target = null;
-            mockFramework(function() {
-                target = new Aura.Component.Component({},true);
-                target.destroy(false);
-            });
-
-            // Act
-            var actual = target.getDef();
-
-            // Assert
-            Assert.Null(actual);
-        }
-
-        [Fact]
         function ReturnsComponentDef() {
             // Arrange
             var expected = "Expected ComponentDef";

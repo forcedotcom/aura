@@ -32,7 +32,7 @@
                 //Destroy
                 var outerFacet = cmp.find("outerFacet");
                 try{
-                    outerFacet.destroy(false);
+                    outerFacet.destroy();
                 }catch(e){
                     $A.test.fail("Component destroy() failed destroying chained facets with body:"+e)
                 }
@@ -58,7 +58,7 @@
 	        function(cmp){
 	            var facet = cmp.find("informFacet");
 	            try{
-	                facet.destroy(false);
+	                facet.destroy();
 	            }catch(e){
 	                $A.test.fail("Component destroy() failed to handle reference loops in facet:"+e)
 	            }
@@ -71,88 +71,14 @@
     },
 
     /**
-     * Verify Component.isValid() returns false after a component has been synchronously destroyed.
+     * Verify Component.isValid() returns false after a component has been destroyed.
      */
     testIsValidSynchronousDestroy: {
         test: function(cmp) {
             var facet = cmp.find("knowParent");
             $A.test.assertTrue(facet.isValid());
-            facet.destroy(false);
+            facet.destroy();
             $A.test.assertFalse(facet.isValid());
-        }
-    },
-
-    /**
-     * Verify Component.isValid() returns false after a component has been asynchronously destroyed.
-     * note that we force destroy to be sync under test mode : W-1927159. this test is the same as above one now
-     */
-    testIsValidAsynchronousDestroy: {
-        test: function(cmp) {
-            var facet = cmp.find("knowParent");
-            $A.test.assertTrue(facet.isValid());
-            facet.destroy(true);
-            $A.test.assertFalse(facet.isValid());
-        }
-    },
-
-    /**
-     * Verify asynchronously destroy a component.
-     */
-    testAsyncDestroyComponent: {
-        test: function(cmp) {
-            $A.test.assertDefined(cmp.find("outerFacet"));
-            $A.test.assertDefined(cmp.find("players"));
-            // on load the 'players' div should not have it's display property set
-            var playersDisplay = cmp.find("players").getElement().style.display;
-            $A.test.assertEquals("", playersDisplay);
-
-            try{
-                cmp.find("outerFacet").destroy(true);
-            }catch(e){
-                $A.test.fail("Component.destroy(true) failed: " + e);
-            }
-
-            // 'players' div should still exist, but the style.display will be set to 'none' while we destroy
-            $A.test.assertDefined(cmp.find("players"));
-            playersDisplay = cmp.find("players").getElement().style.display;
-            $A.test.assertEquals("none", playersDisplay);
-
-            var component = cmp;
-            $A.test.addWaitFor(
-                true,
-                function() { return $A.util.isUndefinedOrNull(component.find("outerFacet")); },
-                function() { this.verifyOuterFacetComponentDestroyed(cmp); }
-            );
-        }
-    },
-
-    /**
-     * Verify asynchronously destroy a html element by destroy its
-     * containing component.
-     * There was a bug that the elements' child nodes are removed from
-     * dom, the element itself is not.
-     */
-    testAsyncDestroyHtmlElement: {
-        test: function(cmp) {
-            var element = document.getElementsByClassName("team")[0];
-            $A.test.assertDefined(element);
-            // 'team' should not contain display property
-            $A.test.assertEquals("", element.style.display);
-
-            try{
-                $A.getComponent(element).destroy(true);
-            }catch(e){
-                $A.test.fail("Component.destroy(true) failed: " + e);
-            }
-
-            $A.test.assertDefined(element);
-            // set display property first during destroying
-            $A.test.assertEquals("none", element.style.display);
-            $A.test.addWaitFor(
-                true,
-                function() {return document.getElementsByClassName("team").length===0;},
-                function() {this.verifyTeamDivDestroyed(cmp);}
-            );
         }
     },
 
@@ -162,8 +88,6 @@
             outerFacet.destroy();
             this.verifyOuterFacetComponentDestroyed(cmp);
 
-            // Already destroyed components will call destroy on InvalidComponent, which is a no-op
-            $A.test.assertTrue(outerFacet.toString().indexOf("InvalidComponent") === 0);
             outerFacet.destroy();
             this.verifyOuterFacetComponentDestroyed(cmp);
         }
@@ -175,7 +99,7 @@
     testCustomizedDestroyHanlder : {
         test : function(cmp) {
                 component = cmp.find("cmpWithDestroyHandlerWrapper");
-                component.destroy(false);
+                component.destroy();
 
                 $A.test.assertTrue(cmp.get("v.cmpDestroyed"),
                         "Destroy handler didn't get called when component gets destroyed");
@@ -185,23 +109,28 @@
      },
 
     /**
-     * After a component is destroyed it's prototype is swapped with InvalidComponent to display error messages if
-     * the user tries to execute furthur operations. Verify we get that error with the correct info.
+     * After a component is destroyed it no longer performs set or get operations.
      */
-    testInvalidComponentError: {
+    testGetReturnsUndefinedAfterDestroy: {
         test: function(cmp) {
             var textCmp = cmp.find("textInOuterFacet");
-            var globalId = textCmp.getGlobalId();
-            $A.test.assertTrue(textCmp.toString().indexOf("InvalidComponent") === -1,
-                    "Component should not be an InvalidComponent before being destroyed.");
+            $A.test.assertTrue(textCmp.get("v.value")!==undefined);
+
             textCmp.destroy();
-            $A.test.assertTrue(textCmp.toString().indexOf("InvalidComponent") === 0,
-                    "Component prototype was not swapped with InvalidComponent after being destroyed.");
-            try {
-                textCmp.set("v.value", "New value");
-            } catch (e) {
-                this.verifyInvalidComponentErrorMessage(e.message, "set", "v.value,New value", "markup://aura:text", globalId);
-            }
+
+            $A.test.assertFalse(textCmp.get("v.value")!==undefined);
+        }
+    },
+
+    testSetDoesNothingAfterDestroy: {
+        test: function(cmp) {
+            var textCmp = cmp.find("textInOuterFacet");
+            $A.test.assertTrue(textCmp.get("v.value")!==undefined);
+
+            textCmp.destroy();
+            textCmp.set("v.value","New Value");
+
+            $A.test.assertFalse(textCmp.get("v.value")!==undefined);
         }
     },
 
@@ -236,7 +165,7 @@
             var newCmp = this.createComponent("markup://aura:text");
             cmp.set("v.cmpAttribute", newCmp);
 
-            cmp.destroy(false);
+            cmp.destroy();
 
             $A.test.assertFalse(newCmp.isValid());
         }
@@ -251,7 +180,7 @@
             var cmpArray = [newCmp];
             cmp.set("v.cmpArrayAttribute", cmpArray);
 
-            cmp.destroy(false);
+            cmp.destroy();
 
             $A.test.assertFalse(newCmp.isValid());
         }
@@ -273,7 +202,7 @@
                 }
             }
             cmp.set("v.objWithDestroy", obj);
-            cmp.destroy(false);
+            cmp.destroy();
 
             $A.test.assertFalse(destroyed,
                     "Non Aura Component attribute's destroy method should not be called when destroying component.");
@@ -292,7 +221,7 @@
             });
 
             // Delete component
-            cmp.destroy(false);
+            cmp.destroy();
 
             // Verify handler is no longer present on the component.
             $A.test.assertFalse($A.eventService.hasHandlers(uniqueEventName), "The handler (" + uniqueEventName + ") should have been removed on delete of the component it was referencing.");
@@ -308,8 +237,8 @@
             });
             destroy.addHandler("markup://aura:valueDestroy", cmp, reference, true, "default");
 
-            destroy.destroy(false);
-            cmp.destroy(false);
+            destroy.destroy();
+            cmp.destroy();
             
             // toJSON on an inValid reference is null
             $A.test.assertUndefinedOrNull(reference.toJSON());
@@ -328,10 +257,10 @@
             toDestroy[0].addHandler("markup://aura:valueDestroy", cmp, "{!c.handler}", true, "default");
             toDestroy[1].addHandler("markup://aura:valueDestroy", cmp, "{!c.handler}", true, "default");
 
-            toDestroy[0].destroy(false);
-            toDestroy[1].destroy(false);
+            toDestroy[0].destroy();
+            toDestroy[1].destroy();
 
-            cmp.destroy(false);
+            cmp.destroy();
             
             // toJSON on an inValid reference is null
             $A.test.assertUndefinedOrNull(reference.toJSON());
@@ -351,10 +280,10 @@
             toDestroy[0].addHandler("markup://aura:valueDestroy", cmp, reference, true, "default");
             toDestroy[1].addHandler("markup://aura:valueDestroy", cmp, reference, true, "default");
 
-            toDestroy[0].destroy(false);
-            toDestroy[1].destroy(false);
+            toDestroy[0].destroy();
+            toDestroy[1].destroy();
 
-            cmp.destroy(false);
+            cmp.destroy();
             
             // toJSON on an inValid reference is null
             $A.test.assertUndefinedOrNull(reference.toJSON());

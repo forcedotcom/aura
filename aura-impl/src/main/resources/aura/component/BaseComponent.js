@@ -143,7 +143,6 @@ function BaseComponent(config, localCreation) {
         act.releaseCreationPath(this.creationPath);
     }
 
-    this._destroying = false;
 }
 
 BaseComponent.prototype = Object.create(Component.prototype);

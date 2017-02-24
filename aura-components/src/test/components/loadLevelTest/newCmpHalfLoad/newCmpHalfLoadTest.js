@@ -42,7 +42,8 @@
      * kill receiverCmp BEFORE the request is send. 
      * 
      */
-    testCmpCreatedByFetchingMapFromServer:{
+    // JBUCH: TEST NO LONGER VALID; REWRITE OR DELETE
+    _testCmpCreatedByFetchingMapFromServer:{
         attributes:{ 
             receiverCmp: "loadLevelTest:newCmpWithValueProvider",
             receiverCmpAuraId: "receiverCmp",
@@ -109,7 +110,8 @@
      * ask receiverCmp(newCmpWithValueProvider) to replace its body with couple new component(auratest:text) 
      * kill receiverCmp BEFORE the request is send. 
      */
-    testCmpCreatedByFetchingMapFromServerWatchSingleAction:{
+    // JBUCH: TEST NO LONGER VALID; REWRITE OR DELETE
+    _testCmpCreatedByFetchingMapFromServerWatchSingleAction:{
         attributes:{ 
             receiverCmp: "loadLevelTest:newCmpWithValueProvider",
             receiverCmpAuraId: "receiverCmp",

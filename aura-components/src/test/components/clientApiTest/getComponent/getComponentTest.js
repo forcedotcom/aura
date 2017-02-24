@@ -93,7 +93,7 @@
             var tempCmp = $A.getComponent(globalId);
             $A.test.assertEquals(component, tempCmp);
             try {
-                component.destroy(false);
+                component.destroy();
             } catch(e) {
                 $A.test.fail("Component destroy() failed:" + e);
             }
@@ -115,7 +115,7 @@
             var tempCmp = $A.getComponent(element);
             $A.test.assertEquals(component, tempCmp);
 
-            component.destroy(false);
+            component.destroy();
             var actual = $A.getComponent(element);
 
             $A.test.assertUndefinedOrNull(actual);

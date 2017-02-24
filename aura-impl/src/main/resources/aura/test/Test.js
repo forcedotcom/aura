@@ -2393,14 +2393,3 @@ window.onerror = (function() {
         return newHandler.apply(this, arguments);
     };
 })();
-
-/**
- * Should try to remove this hack
- *
- * @ignore
- */
-(function(originalDestroy) {
-    Component.prototype.destroy = function() {
-        return originalDestroy.call(this, false);
-    };
-})(Component.prototype.destroy);

@@ -23,7 +23,7 @@
     </div>
 
     <div>Input Date</div>
-    enter Date: <ui:inputDate aura:id="inDate" value="{!m.dateOnly}"/> <br/>
+    enter Date: <ui:inputDate aura:id="inDate" displayDatePicker="true" value="{!m.dateOnly}"/> <br/>
     <ui:button buttonTitle="Date" label="submit" press="{!c.submit}"/> <br/>
     your Date value is: <ui:outputDate aura:id="outDate" value="{!m.dateOnly}"/> <br/>
     <br/>

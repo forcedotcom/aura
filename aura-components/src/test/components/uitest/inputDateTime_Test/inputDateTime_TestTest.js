@@ -100,7 +100,7 @@
         browsers: ['DESKTOP'],
         attributes: {value: '2015-10-23T16:30:00.000Z', dateFormat: 'MM-dd-yyyy', timeFormat: '', timezone: 'GMT'},
         test: function (cmp) {
-            this.checkInputTimeValue(cmp, '4:30:00 PM');
+            this.checkInputTimeValue(cmp, '4:30 PM');
         }
     },
 

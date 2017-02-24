@@ -20,11 +20,17 @@
     <aura:attribute name="timeFormat" type="String" description="The java.text.SimpleDateFormat style format for the time."/>
     <aura:attribute name="langLocale" type="String" description="The language locale used to format time."/>
     <aura:attribute name="hours" type="Integer" default="12" description="The hour value."/>
-    <aura:attribute name="minutes" type="Integer" default="00" description="The miniue value."/>
+    <aura:attribute name="minutes" type="Integer" default="00" description="The minute value."/>
     <aura:attribute name="interval" type="Integer" default="30" description="The interval in minutes."/>
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if this time picker list is displayed. Defaults to false."/>
     <aura:attribute name="referenceElement" type="Object" description="The reference node which this datePicker should be positioned to. Usually it is a inputDate element." />
     <aura:attribute name="_timeListInitialized" access="private" type="Boolean" default="false" description="Indicates if the time list is initialized or not."/>
+
+    <aura:method name="show" description="show the time dropdown">
+        <aura:attribute name="hours" type="Integer" description="The hour value."/>
+        <aura:attribute name="minutes" type="Integer" description="the minutes value."/>
+        <aura:attribute name="focus" type="Boolean" default="false" description="Indicates if the calendar should get the focus after displaying the datepicker."/>
+    </aura:method>
 
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
 

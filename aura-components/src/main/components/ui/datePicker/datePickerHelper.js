@@ -14,309 +14,117 @@
  * limitations under the License.
  */
 ({
-    MonthLabels: [{
-        fullName: "January",
-        shortName: "Jan"
-    }, {
-        fullName: "February",
-        shortName: "Feb"
-    }, {
-        fullName: "March",
-        shortName: "Mar"
-    }, {
-        fullName: "April",
-        shortName: "Apr"
-    }, {
-        fullName: "May",
-        shortName: "May"
-    }, {
-        fullName: "June",
-        shortName: "Jun"
-    }, {
-        fullName: "July",
-        shortName: "Jul"
-    }, {
-        fullName: "August",
-        shortName: "Aug"
-    }, {
-        fullName: "September",
-        shortName: "Sep"
-    }, {
-        fullName: "October",
-        shortName: "Oct"
-    }, {
-        fullName: "November",
-        shortName: "Nov"
-    }, {
-        fullName: "December",
-        shortName: "Dec"
-    }],
-
-
-    attachToDocumentBody: function(component) {
+    attachToDocumentBody: function (component) {
         var body = document.getElementsByTagName("body")[0];
         var elem = component.getElement();
         body.appendChild(elem);
     },
 
-    focusDate: function(component) {
-        var grid = component.find("grid");
-        var e = grid.get("e.focus");
-        e.fire();
-    },
+    show: function (component, event) {
+        var params = event.getParam("arguments");
+        if (params) {
+            component.set("v.value", params.value);
 
-    getOnClickEndFunction : function(component) {
-        if ($A.util.isUndefined(component._onClickEndFunc)) {
-            var helper = this;
-            var f = function(event) {
-                // ignore gestures/swipes; only run the click handler if it's a click or tap
-                var clickEndEvent;
-
-                if (helper.getOnClickEventProp("isTouchDevice") && event.changedTouches) {
-
-                    var touchIdFound = false;
-                    for (var i = 0; i < event.changedTouches.length; i++) {
-                        clickEndEvent = event.changedTouches[i];
-                        if (clickEndEvent.identifier === component._onStartId) {
-                            touchIdFound = true;
-                            break;
-                        }
-                    }
-
-                    if (helper.getOnClickEventProp("isTouchDevice") && !touchIdFound) {
-                        return;
-                    }
-                } else {
-                    clickEndEvent = event;
-                }
-
-                var startX = component._onStartX, startY = component._onStartY;
-                var endX = clickEndEvent.clientX, endY = clickEndEvent.clientY;
-
-                if (Math.abs(endX - startX) > 0 || Math.abs(endY - startY) > 0) {
-                    return;
-                }
-
-                if (!helper.isElementInComponent(component, event.target)) {
-
-
-                    //Since we are no longer going into the rerender function, updateGlobalEventListeners does not get called and the listeners will never get turned off
-                    var concreteCmp = component.getConcreteComponent();
-                    concreteCmp._clickStart.setEnabled(false);
-                    concreteCmp._clickEnd.setEnabled(false);
-
-
-                    // Hide the component
-                    helper.hide(component, false);
-
-                    var divCmp = component.find("datePicker");
-                    if (divCmp) {
-                        var elem = divCmp.getElement();
-                        $A.util.removeClass(elem, "visible");
-                    }
-
-
-
-                }
-            };
-            component._onClickEndFunc = f;
-        }
-        return component._onClickEndFunc;
-    },
-
-    getOnClickEventProp: function(prop) {
-        // create the cache
-        if ($A.util.isUndefined(this.getOnClickEventProp.cache)) {
-            this.getOnClickEventProp.cache = {};
-        }
-
-        // check the cache
-        var cached = this.getOnClickEventProp.cache[prop];
-        if (!$A.util.isUndefined(cached)) {
-            return cached;
-        }
-
-        // fill the cache
-        this.getOnClickEventProp.cache["isTouchDevice"] = $A.util.supportsTouchEvents();
-        if (this.getOnClickEventProp.cache["isTouchDevice"]) {
-        	if (window["navigator"]["pointerEnabled"]) {
-        		this.getOnClickEventProp.cache["onClickStartEvent"] = "pointerdown";
-                this.getOnClickEventProp.cache["onClickEndEvent"] = "pointerup";
-            } else if (window["navigator"]["msPointerEnabled"]) {
-                this.getOnClickEventProp.cache["onClickStartEvent"] = "MSPointerDown";
-                this.getOnClickEventProp.cache["onClickEndEvent"] = "MSPointerUp";
-            } else {
-                this.getOnClickEventProp.cache["onClickStartEvent"] = "touchstart";
-                this.getOnClickEventProp.cache["onClickEndEvent"] = "touchend";
+            if (params.referenceElement) {
+                component.set("v.referenceElement", params.referenceElement);
             }
-        } else {
-            this.getOnClickEventProp.cache["onClickStartEvent"] = "mousedown";
-            this.getOnClickEventProp.cache["onClickEndEvent"] = "mouseup";
+
+            component.set("v.visible", true);
+
+            if (params.focus) {
+                this.focusDate(component);
+            }
         }
-        return this.getOnClickEventProp.cache[prop];
     },
 
-    getOnClickStartFunction: function(component) {
-        if ($A.util.isUndefined(component._onClickStartFunc)) {
-            var helper = this;
-            var f = function(event) {
-                if (helper.getOnClickEventProp("isTouchDevice") && event.changedTouches) {
-                    var touch = event.changedTouches[0];
-                    // record the ID to ensure it's the same finger on a multi-touch device
-                    component._onStartId = touch.identifier;
-                    component._onStartX = touch.clientX;
-                    component._onStartY = touch.clientY;
-                } else {
-                    component._onStartX = event.clientX;
-                    component._onStartY = event.clientY;
-                }
-            };
-            component._onClickStartFunc = f;
-        }
-        return component._onClickStartFunc;
+    focusDate: function (component) {
+        //TODO make sure the datepicker is actually visible
+        window.requestAnimationFrame($A.getCallback(function () {
+            component.find("grid").focus();
+        }));
+
     },
 
-    goToNextYear: function(component) {
+    goToPrevMonth: function (component) {
+        this.changeCalendar(component, -1, 0);
+    },
+
+    goToNextMonth: function (component) {
+        this.changeCalendar(component, 1, 0);
+    },
+
+    changeCalendar: function (component, monthChange, yearChange) {
         var grid = component.find("grid");
-        var e = grid.get("e.updateCalendar");
-        if (e) {
-            e.setParams({monthChange: 0, yearChange: 1, setFocus: false});
-            e.fire();
-        }
+        grid.changeCalendar(monthChange, yearChange);
     },
 
-    goToPrevYear: function(component) {
-	    var grid = component.find("grid");
-	    var e = grid.get("e.updateCalendar");
-	    if (e) {
-	        e.setParams({monthChange: 0, yearChange: -1, setFocus: false});
-	        e.fire();
-	    }
-	},
-
-    handleKeydown: function(component, event) {
-        if (component.get('v.closeOnClickOut')) {
+    handleKeydown: function (component, event) {
+        if (component.get("v.closeOnClickOut")) {
             var keyCode = event.keyCode;
             var elem = event.target || event.srcElement;
             if (keyCode === 9 && event.shiftKey === true) { // shift + tab
-                if ($A.util.hasClass(elem, 'prevMonth')) {
+                if ($A.util.hasClass(elem, "prevMonth")) {
                     $A.util.squash(event, true);
-                    this.hide(component, true);
+                    this.closeOnClickOut(component);
                 }
             } else if (keyCode === 27) { // Esc key is pressed
-                this.hide(component, true);
+                this.closeOnClickOut(component);
             }
         }
     },
 
-    isElementInComponent : function(component, targetElem) {
-        var componentElements = component.getElements();
+    updateGlobalEventListeners: function (component) {
+        var visible = component.get("v.visible");
+        if (component.get("v.closeOnClickOut")) {
+            if (!component._clickHandler) {
+                component._clickHandler = component.addDocumentLevelHandler("mouseup", this.getOnClickFunction(component), visible);
+            } else {
+                component._clickHandler.setEnabled(visible);
+            }
+        }
+    },
 
+    getOnClickFunction: function (component) {
+        var f = function (event) {
+            if (!this.isElementInComponent(component, event.target)) {
+                this.hide(component, false);
+            }
+        }.bind(this);
+        return f;
+    },
+
+    isElementInComponent: function (component, targetElem) {
+        var componentElements = component.getElements();
         //go up the chain until it hits either a sibling or the root
         var currentNode = targetElem;
-
         do {
-            for (var index = 0; index < componentElements.length ; index++) {
-                if (componentElements[index] === currentNode) { return true; }
+            for (var index = 0; index < componentElements.length; index++) {
+                if (componentElements[index] === currentNode) {
+                    return true;
+                }
             }
 
             currentNode = currentNode.parentNode;
-        } while(currentNode);
-
+        } while (currentNode);
         return false;
     },
 
-    localizeToday: function(component) {
-    	// Get today's date based on the time zone
-        $A.localizationService.getToday($A.get("$Locale.timezone"), function(dateString) {
-            if (component.isValid()) {
-    		    component.set("v._today", dateString);
-            }
-        });
-
-        // Get the localized "Today" label
-    	var todayCmp = component.find("today");
-        if (!todayCmp) {
-            return;
-        }
-        var todayLabel = $A.get("$Locale.labelForToday");
-        if (!todayLabel) {
-            todayLabel = "Today";
-        }
-        todayCmp.set("v.label", todayLabel);
-    },
-
-    getNormalizedLang: function() {
-        var ret = 'en';
-        var lang = [];
-        var token = "";
-        var langLocale = $A.get("$Locale.langLocale");
-        //var langLocale = component.get("m.langLocale");
-        if (langLocale) {
-            var index = langLocale.indexOf("_");
-            while (index > 0) {
-                token = langLocale.substring(0, index);
-                langLocale = langLocale.substring(index + 1);
-                lang.push(token.toLowerCase());
-                index = langLocale.indexOf("_");
-            }
-            langLocale = langLocale.substring(index + 1);
-            if (!$A.util.isEmpty(langLocale)) {
-                lang.push(langLocale.toLowerCase());
-            }
-        } else {
-            lang.push("en");
-        }
-
-        if (lang[0] === "zh") {
-            ret = lang[0] + "-" + lang[1];
-        } else {
-            ret = lang[0];
-        }
-        return ret;
-    },
-
-    handleWinResize: function(component) {
-        if (!component || !component.isValid()) {
-            return;
-        }
-        var elem = component.getElement();
-        if (elem) {
-            var origWinHeight = component._windowSize.height;
-            var currWinHeight = $A.util.getWindowSize().height;
-            if (currWinHeight < origWinHeight - 20) { // soft keyboard up
-                elem.style.top = currWinHeight - origWinHeight + "px";
-            } else {
-                elem.style.top = 0 + "px";
-            }
-        }
-    },
-
-    position: function(component) {
+    position: function (component) {
         var divCmp = component.find("datePicker");
         var elem = divCmp ? divCmp.getElement() : null;
         var visible = component.get("v.visible");
-        var self = this;
         var referenceElem = component.getConcreteComponent().get("v.referenceElement");
 
         if (elem && visible) {
-            var isPhone = $A.get("$Browser.isPhone");
-
-            if (isPhone === true) {
+            if ($A.get("$Browser.isPhone")) {
                 this.attachToDocumentBody(component);
                 var scrollerDivCmp = component.find("scroller");
                 var scrollerElem = scrollerDivCmp ? scrollerDivCmp.getElement() : null;
                 if (scrollerElem) { // Set scroller div height to make it scrollable.
-                    var isAndroid = $A.get("$Browser.isAndroid");
-                    if (isAndroid === true) {
-                        scrollerElem.style.height = component._windowSize.height + "px";
-                    } else {
-                        scrollerElem.style.height = $A.util.getWindowSize().height + "px";
-                    }
+                    scrollerElem.style.height = $A.util.getWindowSize().height + "px";
                 }
 
-            // Scoping this to desktop to prevent regressions
-            } else if (!$A.util.isUndefinedOrNull(referenceElem) && $A.get("$Browser.formFactor") === "DESKTOP") {
+            } else if (!$A.util.isUndefinedOrNull(referenceElem)) {
 
                 if ($A.util.isEmpty(elem.style.top)) {
                     // this is just an approximation for the initial position of the datepicker. The positioning library
@@ -328,7 +136,7 @@
                     elem.style.left = referenceElem.getBoundingClientRect().left + "px";
                 }
 
-                if(!component.positionConstraint) {
+                if (!component.positionConstraint) {
                     var referenceVerticalAlign = "bottom";
                     var elementVerticalAlign = "top";
                     var horizontalAlign = "left";
@@ -346,63 +154,19 @@
                     var elementAlign = horizontalAlign + " " + elementVerticalAlign;
 
                     component.positionConstraint = this.lib.panelPositioning.createRelationship({
-                        element:elem,
-                        target:referenceElem,
+                        element: elem,
+                        target: referenceElem,
                         appendToBody: true,
                         align: elementAlign,
                         targetAlign: referenceElementAlign
                     });
                 }
-                this.lib.panelPositioning.reposition(function() {
-                    //attaching to the body causes the date to lose focus so we need to add the focus back
-                    self.focusDate(component);
-                });
-
-            } else {
-                var viewPort = $A.util.getWindowSize();
-                var elemRect = elem.getBoundingClientRect();
-                if (!$A.util.isUndefinedOrNull(referenceElem)) {
-                    $A.util.attachToDocumentBody(component.getElement());
-                    var referenceElemRect = referenceElem.getBoundingClientRect();
-
-                    // Vertical alignment
-                    // getBoundingClientRect method does not return height and width in IE7 and Ie8
-                    var height = typeof elemRect.height !== 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
-                    var scrollY = document.documentElement.scrollTop;
-                    if ((viewPort.height - referenceElemRect.bottom) < height) { // no enough space below
-                        if (referenceElemRect.top < height) { // no enough space above either. Put it in the middle then
-                            elem.style.top = scrollY + "px";
-                        } else { // put it above
-                            elem.style.top = (referenceElemRect.top - height) + scrollY + "px";
-                        }
-                    } else { // put it below
-                        elem.style.top = referenceElemRect.bottom + scrollY + "px";
-                    }
-
-                    // Horizontal alignment
-                    // getBoundingClientRect method does not return height and width in IE7 and Ie8
-                    var width = typeof elemRect.width !== 'undefined' ? elemRect.width : elemRect.right - elemRect.left;
-                    if (referenceElemRect.right < width) {
-                        elem.style.left = document.documentElement.scrollLeft + "px";
-                    } else {
-                        elem.style.left = referenceElemRect.right - width + document.documentElement.scrollLeft + "px";
-                    }
-
-                    //attaching to the body causes the date to lose focus so we need to add the focus back
-                    this.focusDate(component);
-                } else {
-                    if (elemRect.bottom > viewPort.height) { // no enough space below
-                        elem.style.top = 0 - (elemRect.bottom - viewPort.height) + "px"; // Move it up a bit
-                    }
-                    else {
-                        elem.style.top = "auto";
-                    }
-                }
+                this.lib.panelPositioning.reposition();
             }
         }
     },
 
-    shouldFlip: function(element, targetElement) {
+    shouldFlip: function (element, targetElement) {
         var viewPort = $A.util.getWindowSize();
         var elemRect = element.getBoundingClientRect();
         var referenceElemRect = targetElement.getBoundingClientRect();
@@ -415,7 +179,7 @@
         return false;
     },
 
-    shouldAlignToRight: function(element, targetElement) {
+    shouldAlignToRight: function (element, targetElement) {
         var viewPort = $A.util.getWindowSize();
         var elemRect = element.getBoundingClientRect();
         var referenceElemRect = targetElement.getBoundingClientRect();
@@ -428,47 +192,56 @@
         return false;
     },
 
-    refreshYearSelection: function(component) {
-        var minY = component.get("v.minYear");
-        if (!minY) {
-            minY = (new Date()).getFullYear() - 100;
-        }
-        var maxY = component.get("v.maxYear");
-        if (!maxY) {
-            maxY = (new Date()).getFullYear() + 30;
-        }
-        var yearTitleCmp = component.find("yearTitle");
-        var selectElem = yearTitleCmp ? yearTitleCmp.getElement() : null;
-        if (selectElem) {
-        	selectElem.setAttribute("id", yearTitleCmp.getGlobalId());
-            for (var i = minY; i <= maxY; i++) {
-                selectElem.options[selectElem.options.length] = new Option(i+"", i+"");
+    refreshYearSelection: function (component) {
+        if (!$A.util.getBooleanValue(component._yearListInitialized)) {
+            var minY = component.get("v.minYear");
+            var maxY = component.get("v.maxYear");
+
+            var sampleDate = new Date();
+            var currentYear = sampleDate.getFullYear();
+
+            if (!minY) {
+                minY = currentYear - 100;
             }
+            sampleDate.setFullYear(minY);
+            minY = $A.localizationService.translateToOtherCalendar(sampleDate).getFullYear();
+
+            if (!maxY) {
+                maxY = currentYear + 30;
+            }
+            sampleDate.setFullYear(maxY);
+            maxY = $A.localizationService.translateToOtherCalendar(sampleDate).getFullYear();
+
+            var yearTitleCmp = component.find("yearTitle");
+            var selectElem = yearTitleCmp ? yearTitleCmp.getElement() : null;
+            if (selectElem) {
+                selectElem.setAttribute("id", yearTitleCmp.getGlobalId());
+                for (var i = minY; i <= maxY; i++) {
+                    selectElem.options[selectElem.options.length] = new Option(i + "", i + "");
+                }
+            }
+            component._yearListInitialized = true;
         }
     },
 
-    setGridInitialValue: function(component) {
-        var initialDate = new Date();
-        var initialDateStr = component.get("v._today");
+    setInitialValuesOnChildren: function (component) {
         var value = component.get("v.value");
-        if (!$A.util.isEmpty(value)) {
-            var d = moment(value, "YYYY-MM-DD");
-            initialDate = d.toDate();
-        } else {
-        	if (initialDateStr) {
-        		initialDate = (moment(initialDateStr, "YYYY-MM-DD")).toDate();
-        	}
-        }
-        var grid = component.find("grid");
-        if (grid) {
-            grid.set("v.selectedDate", initialDate.getFullYear() + "-" + (initialDate.getMonth() + 1) + "-" + initialDate.getDate());
-            grid.set("v.date", initialDate.getDate());
-            grid.set("v.month", initialDate.getMonth());
-            grid.set("v.year", initialDate.getFullYear());
-            grid.set("v._today", initialDateStr);
-        }
+        this.setGridValue(component, value);
+        this.setTimePickerInitialValues(component);
+    },
 
-        // set initial value to time picker if hasTime is true
+    setGridValue: function (component, value) {
+        component.find("grid").setSelectedDate(value);
+    },
+
+    setInitialFocus: function (component) {
+        if (component.get("v.setFocus")) {
+            this.focusDate(component);
+        }
+    },
+
+    // set initial value to time picker if hasTime is true
+    setTimePickerInitialValues: function (component) {
         var hasTime = $A.util.getBooleanValue(component.get("v.hasTime"));
         if (hasTime) {
             var timePickerCmp = component.find("time");
@@ -480,105 +253,147 @@
         }
     },
 
-    setTitleTag: function(component) {
-    	var headingLevel = component.get("v.titleHeadingLevel");
-    	if ($A.util.isEmpty(headingLevel)) {
-    		return;
-    	}
-        var calTitle = component.find("calTitle");
-        if (calTitle) {
-        	calTitle.set("v.tag", headingLevel);
+    initializeMonthYear: function (component, value) {
+        if ($A.util.isEmpty(value)) {
+            value = this.getDateStringFromGrid(component);
+        }
+
+        var date = $A.localizationService.parseDateTime(value, "YYYY-MM-DD");
+
+        if (date) {
+            this.updateMonthYear(component, date);
         }
     },
 
-    updateGlobalEventListeners: function(component) {
-        var concreteCmp = component.getConcreteComponent();
-        var visible = concreteCmp.get("v.visible");
-        if (!concreteCmp._clickStart) {
-            concreteCmp._clickStart = concreteCmp.addDocumentLevelHandler(this.getOnClickEventProp("onClickStartEvent"),
-                this.getOnClickStartFunction(component), visible);
-            concreteCmp._clickEnd = concreteCmp.addDocumentLevelHandler(this.getOnClickEventProp("onClickEndEvent"),
-                this.getOnClickEndFunction(component), visible);
-        } else {
-            concreteCmp._clickStart.setEnabled(visible);
-            concreteCmp._clickEnd.setEnabled(visible);
-        }
-    },
-
-    updateMonthYear: function(component, value) {
+    updateMonthYear: function (component, date) {
+        date = $A.localizationService.translateToOtherCalendar(date);
         var isDesktop = $A.get("$Browser.formFactor") === "DESKTOP";
-        if (!isDesktop) { // mobile
-            this.updateMobileMonthYear(component, value);
-            return;
-        }
-        var grid = component.find("grid");
-        if (grid) {
-            var m = grid.get("v.month");
-            var y = grid.get("v.year");
-            var titleCmp = component.find("calTitle");
-            if (titleCmp) {
-            	var elem = titleCmp.getElement();
-                if (elem) {
-                	var monthLabels = $A.get("$Locale.nameOfMonths");
-                    var title = monthLabels ? monthLabels[m].fullName : this.MonthLabels[m].fullName;
-                    var textContent = elem.textContent || elem.innerText;
-                    if(textContent !== title){
-                    	$A.util.setText(elem, title);
-                    }
+        if (!isDesktop) {
+            this.updateMobileMonth(component, date);
+        } else {
+            var titleElem = component.find("calTitle").getElement();
+            if (titleElem) {
+                var monthLabels = $A.get("$Locale.nameOfMonths");
+                var title = monthLabels[date.getMonth()].fullName;
+                var textContent = titleElem.textContent || titleElem.innerText;
+                if (textContent !== title) {
+                    $A.util.setText(titleElem, title);
                 }
             }
-            var yearTitleCmp = component.find("yearTitle");
-            var selectElem = yearTitleCmp ? yearTitleCmp.getElement() : null;
-            if (selectElem) {
-                selectElem.value = y + "";
-            }
+        }
+        //TODO maybe shouldn't even get here if the element is undefined
+        var selectElem = component.find("yearTitle").getElement();
+        if (selectElem) {
+            selectElem.value = date.getFullYear() + "";
         }
     },
 
-    updateMobileMonthYear: function(component) {
-        var grid = component.find("grid");
-        if (grid) {
-            var m = grid.get("v.month");
-            var y = grid.get("v.year");
-            var monthTitleCmp = component.find("monthTitle");
-            if (monthTitleCmp) {
-                var monthLabels = $A.get("$Locale.nameOfMonths");
-                monthTitleCmp.set("v.value", monthLabels ? monthLabels[m].fullName : this.MonthLabels[m].fullName);
-            }
-            var yearTitleCmp = component.find("yearTitle");
-            var selectElem = yearTitleCmp ? yearTitleCmp.getElement() : null;
-            if (selectElem) {
-                selectElem.value = y + "";
-            }
-        }
+    updateMobileMonth: function (component, date) {
+        var monthTitleCmp = component.find("monthTitle");
+        var monthLabels = $A.get("$Locale.nameOfMonths");
+        monthTitleCmp.set("v.value", monthLabels[date.getMonth()].fullName);
     },
 
-    yearChange: function(component) {
+    yearChange: function (component) {
         var grid = component.find("grid");
         var yearCmp = component.find("yearTitle");
+        //TODO is this needed
         if (grid && yearCmp) {
-            var e = grid.get("e.updateCalendar");
-            if (e) {
-                var y = parseInt(grid.get("v.year"),10);
-                var selectedYear = parseInt(yearCmp.getElement().value,10);
-                e.setParams({monthChange: 0, yearChange: selectedYear - y, setFocus: false});
-                e.fire();
-            }
+            var year = parseInt(grid.get("v.year"), 10);
+
+            var selectedYear = parseInt(yearCmp.getElement().value, 10);
+            var sampleDate = new Date();
+            sampleDate.setFullYear(selectedYear);
+            selectedYear = $A.localizationService.translateFromOtherCalendar(sampleDate).getFullYear();
+
+            grid.changeCalendar(0, selectedYear - year);
         }
     },
 
-    hide: function(component, shouldFocusReferenceElem) {
+    toggleVisibility: function (component) {
+        var helper = this;
+        this.lib.panelPositioning.reposition();
+        if (component.get("v.visible") === true) {
+            var element = component.getElement();
+            if (element) {
+                element.style.opacity = 0;
+            }
+            setTimeout($A.getCallback(function () {
+                if (component.isValid()) {
+                    helper.position(component);
+                    component.getElement().style.opacity = 1;
+                }
+            }), 10);
+        }
+    },
+
+    closeOnClickOut: function (component) {
+        if (component.get("v.closeOnClickOut")) {
+            this.hide(component, true);
+        }
+    },
+
+    hideOnSelect: function (component) {
+        if (component.get("v.hideOnSelect")) {
+            this.hide(component, true);
+        }
+    },
+
+    hide: function (component, shouldFocusReferenceElem) {
+        if (component._clickHandler) {
+            component._clickHandler.setEnabled(false);
+        }
         component.set("v.visible", false);
 
-        if(component.positionConstraint) {
-            component.positionConstraint.destroy();
-            delete component.positionConstraint;
-        }
+        this.unposition(component);
         if ($A.get("$Browser.formFactor") === "DESKTOP" && shouldFocusReferenceElem) {
             var referenceElem = component.get("v.referenceElement");
             if (!$A.util.isUndefinedOrNull(referenceElem)) {
                 referenceElem.focus();
             }
+        }
+    },
+
+    getDateStringFromGrid: function (component) {
+        var gridCmp = component.find("grid");
+        return gridCmp.get("v.year") + "-" + (gridCmp.get("v.month") + 1) + "-" + gridCmp.get("v.date");
+    },
+
+    // re-fire the date selected from the grid, and maybe hide the picker
+    setDate: function (component, event) {
+        component.getEvent("selectDate").fire({
+            "value": event.getParam("value")
+        });
+        this.hideOnSelect(component);
+    },
+
+    // fire the date selected from the grid, when datepicker has time.
+    setDateTime: function (component) {
+        // Get date value
+        var gridCmp = component.find("grid");
+        if (!gridCmp) {
+            return;
+        }
+        var date = this.getDateStringFromGrid(component);
+
+        // Get time value
+        var timeCmp = component.find("time");
+        if (!timeCmp || ($A.util.getBooleanValue(timeCmp.get("v.isValid")) === false)) {
+            return;
+        }
+        component.getEvent("selectDate").fire({
+            "value": date,
+            "hours": timeCmp.get("v.hours"),
+            "minutes": timeCmp.get("v.minutes")
+        });
+
+        this.hide(component, true);
+    },
+
+    unposition: function (component) {
+        if (component.positionConstraint) {
+            component.positionConstraint.destroy();
+            component.positionConstraint = undefined;
         }
     }
 })// eslint-disable-line semi

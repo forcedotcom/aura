@@ -52,38 +52,6 @@
         }]
     },
 
-
-    /**
-     * test which makes sure that in SFX, we can set a custom cal title
-     * tag level
-     */
-    testSFXAccessibiltyCustomHeaderTag: {
-        attributes : {"renderItem" : "testSFXAccessibiltyCustomHeaderTag"},
-        test: [function(cmp) {
-            var self = this;
-            var dpCmp = cmp.find('standAloneDatepicker');
-            var calTitleCmp = dpCmp.find('calTitle');
-
-
-            // //get the titleHeadingLevel
-            var datepicker_calTitle_v_tag = calTitleCmp.get('v.tag').toUpperCase();
-            var datepicker_calTitle_TagName = self.getTagName(calTitleCmp.getElement());
-
-            //assertion of title tag name
-            $A.test.assertEquals(
-                'H3',
-                datepicker_calTitle_TagName,
-                'calTitle tag name should be an "H3"'
-            )
-
-            $A.test.assertEquals(
-                'H3',
-                datepicker_calTitle_v_tag,
-                'datepicker_calTitle_v_tag should be H3'
-            );
-        }]
-    },
-
     //test to see if we have useSingleInputFlagSet=true or false
     testUseSingleInputFlag: {
         attributes : {"renderItem" : "testSingleInputFlag"},
@@ -149,17 +117,14 @@
         test: [function(cmp) {
             var self = this;
 
-            if(self.isViewDesktop()){
+            if (self.isViewDesktop()) {
                 //assert that the datepicker is visible
                 self.verifyDatepickerVisibility(
                     '.uiDatePicker',//css selector
                     true//visible
                 );
-
-
                 //click
                 $A.test.fireDomEvent(cmp.find("btnPressMe").getElement(), 'mouseup')
-
 
                 //assert that the datepicker is closed
                 self.verifyDatepickerVisibility(
@@ -202,7 +167,7 @@
         attributes: {"renderItem": "testDatepickerSetFocus", "setFocus": "false"},
         test: function(cmp) {
 
-            $A.test.addWaitFor(true, function(){return !!document.querySelector("td.is-today.is-selected")},
+            $A.test.addWaitFor(true, function(){return !!document.querySelector("td.slds-is-today.slds-is-selected")},
                 function() {
                     var activeElement = $A.test.getActiveElement();
                     $A.test.assertEquals('BODY', activeElement.tagName,
@@ -217,8 +182,8 @@
         attributes: {"renderItem": "testDatepickerSetFocus", "setFocus": "true"},
         test: [function(cmp) {
             var tagName = $A.test.getActiveElement().tagName;
-            $A.test.assertEquals('A', tagName,
-                'with SetFocus=true, focused elm should be an "A" tag'
+            $A.test.assertEquals('TD', tagName,
+                'with SetFocus=true, focused elm should be a "TD" tag'
             );
         }]
     },
@@ -298,10 +263,9 @@
             )
         }
         else{
-            $A.test.assertFalse(
-                $A.util.hasClass(el, 'visible'),
-                'Datepicker should be CLOSED : class="' + classListString + '"'// failureMessage
-            )
+            $A.test.addWaitForWithFailureMessage(false, function(){
+                return $A.util.hasClass(el, 'visible');
+            }, 'Datepicker should be CLOSED : class="' + classListString + '"');
         }
     },
 

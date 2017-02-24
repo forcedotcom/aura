@@ -14,22 +14,27 @@
  * limitations under the License.
  */
 ({
-    updateCell: function(component) {
+    updateCell: function (component) {
         var elem = component.getElement();
         if (elem) {
-            var value = component.get("v.value");
-            if (!$A.util.isUndefinedOrNull(value)) {
-                var date = new Date(value);
-                var mDate = moment(value, "YYYY-MM-DD");
-                if (mDate.isValid()) {
-                    date = mDate.toDate();
-                }
-                elem.setAttribute("data-datevalue", date.toLocaleDateString());
-            }
-            var tabIndex = component.get("v.tabIndex");
-            if (parseInt(tabIndex,10) > -1) {
-                elem.removeAttribute("tabindex");
-            }
+            elem.setAttribute("data-datevalue", component.get("v.value"));
         }
+    },
+
+    setCalendarAttributes: function (component, config) {
+        component.set("v.ariaSelected", config.ariaSelected);
+        component.set("v.value", config.value);
+        component.set("v.label", config.label);
+        component.set("v.class", config.class);
+        component.set("v.tdClass", config.tdClass);
+        component.set("v.tabIndex", config.tabIndex);
+    },
+
+    dateCellSelected: function (component) {
+        component.set("v.ariaSelected", true);
+
+        component.getEvent("selectDate").fire({
+            "value": component.get("v.value")
+        });
     }
 })// eslint-disable-line semi

@@ -43,8 +43,8 @@ function SecureAura(AuraInstance, key) {
 		},
 		"getCallback" : {
 			value : function(f) {
-				// If the results of $A.getCallback() is wired up to an event handler, passed as an attribute or aura event attribute etc it will get 
-				// filtered and wrapped with the caller's perspective at that time. 
+				// If the results of $A.getCallback() is wired up to an event handler, passed as an attribute or aura event attribute etc it will get
+				// filtered and wrapped with the caller's perspective at that time.
 				return AuraInstance.getCallback(f);
 			}
 		},
@@ -63,7 +63,7 @@ function SecureAura(AuraInstance, key) {
 	[ "reportError", "get", "getComponent", "getReference", "getRoot", "log", "warning" ].forEach(function(name) {
 		Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, AuraInstance, name));
 	});
-	
+
     ls_setRef(o, AuraInstance, key);
 	Object.seal(o);
 
@@ -81,7 +81,7 @@ function SecureAura(AuraInstance, key) {
 			"formatDateUTC", "formatNumber", "formatPercent", "formatTime", "formatTimeUTC", "getDateStringBasedOnTimezone", "getDaysInDuration",
 			"getDefaultCurrencyFormat", "getDefaultNumberFormat", "getDefaultPercentFormat", "getHoursInDuration", "getLocalizedDateTimeLabels",
 			"getMillisecondsInDuration", "getMinutesInDuration", "getMonthsInDuration", "getNumberFormat", "getSecondsInDuration", "getToday",
-			"getYearsInDuration", "isAfter", "isBefore", "isPeriodTimeView", "isSame", "parseDateTime", "parseDateTimeISO8601", "parseDateTimeUTC", "startOf",
+			"getYearsInDuration", "isAfter", "isBefore", "isBetween", "isPeriodTimeView", "isSame", "parseDateTime", "parseDateTimeISO8601", "parseDateTimeUTC", "startOf",
 			"toISOString", "translateFromLocalizedDigits", "translateFromOtherCalendar", "translateToLocalizedDigits", "translateToOtherCalendar",
 			"UTCToWallTime", "WallTimeToUTC" ].forEach(function(name) {
 		Object.defineProperty(sls, name, SecureObject.createFilteredMethod(sls, AuraInstance["localizationService"], name));

@@ -21,6 +21,6 @@
     <aura:attribute name="loadDatePicker" type="Boolean" default="false" description="Set to true to load the date picker. The default is false."/>
 
     <aura:if isTrue="{!v.loadDatePicker}">
-	    <ui:datePicker aura:id="datePicker" managed="true" selectDate="{!c.handleDateSelected}" hideOnSelect="true" closeOnClickOut="true" showToday="false"/>
+	    <ui:datePicker aura:id="datePicker" managed="true" selectDate="{!c.handleDateSelected}" hideOnSelect="true" closeOnClickOut="true" showToday="true"/>
     </aura:if>
 </aura:component>

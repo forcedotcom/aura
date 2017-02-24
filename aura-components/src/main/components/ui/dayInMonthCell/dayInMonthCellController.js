@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 ({
-    afterRender: function (component) {
-        var _helper = component.getConcreteComponent().getDef().getHelper();
-
-        _helper.displayValue(component);
-        _helper.togglePickerIcon(component);
-        _helper.initializeDatePicker(component);
-
-        return this.superAfterRender();
+    dateCellSelected: function (component, event, helper) {
+        helper.dateCellSelected(component);
     },
 
-    rerender: function (component) {
-        var _helper = component.getConcreteComponent().getDef().getHelper();
-
-        _helper.displayValue(component);
-        _helper.togglePickerIcon(component);
-
-        return this.superRerender();
+    updateCell: function (component, event, helper) {
+        var attributes = event.getParam('arguments').config;
+        helper.setCalendarAttributes(component, attributes);
     }
 })// eslint-disable-line semi

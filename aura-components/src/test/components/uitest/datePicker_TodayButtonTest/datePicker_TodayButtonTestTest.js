@@ -17,7 +17,7 @@
     owner:"ctatlah",
 
     CSS_SELECTOR:{
-        todayButton : '.calToday.uiButton',
+        todayButton : 'span.today',
         uiDatePicker : '.uiDatePicker'
     },
 
@@ -29,7 +29,7 @@
         test: [
             function waitForTodayIsSet(cmp) {
                 var datepickerCmp = cmp.find('datePicker');
-                $A.test.addWaitFor(true, function() { return !!datepickerCmp.get('v._today'); });
+                $A.test.addWaitFor(true, function() { return !!datepickerCmp.find("grid").get('v._today'); });
             },
             function(cmp) {
                 var el = cmp.getElement();
@@ -77,7 +77,7 @@
         test: [
             function waitForTodayIsSet(cmp) {
                 var datepickerCmp = cmp.find('datePicker');
-                $A.test.addWaitFor(true, function() { return !!datepickerCmp.get('v._today'); });
+                $A.test.addWaitFor(true, function() { return !!datepickerCmp.find("grid").get('v._today'); });
             },
             function(cmp) {
                 var el = cmp.getElement();
@@ -95,7 +95,7 @@
         test: [
             function waitForTodayIsSet(cmp) {
                 var datepickerCmp = cmp.find('datePicker');
-                $A.test.addWaitFor(true, function() { return !!datepickerCmp.get('v._today'); });
+                $A.test.addWaitFor(true, function() { return !!datepickerCmp.find("grid").get('v._today'); });
             },
             function(cmp) {
                 var el = cmp.getElement();
@@ -465,7 +465,7 @@
 
     verifyDatepickerTodayAttr: function(cmp, expectedDay, expectedMonth_StartFromZero, expectedYear){
         var datepickerCmp = cmp.find('datePicker');
-        var todayStr = datepickerCmp.get('v._today');//yyyy-MM-dd
+        var todayStr = datepickerCmp.find("grid").get('v._today');//yyyy-MM-dd
         var todayObj = this.verifyValidDateString(todayStr);
 
         $A.test.assertEquals(

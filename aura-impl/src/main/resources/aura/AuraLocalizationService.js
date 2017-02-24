@@ -772,6 +772,23 @@ AuraLocalizationService.prototype.isSame = function(date1, date2, unit) {
 };
 
 /**
+ * Checks if date is between fromDate and toDate, inclusive.
+ * @param {String|Number|Date} date - A date format that the JavaScript Date object can parse
+ * @param {String|Number|Date} fromDate - A date format that the JavaScript Date object can parse
+ * @param {String|Number|Date} toDate - A date format that the JavaScript Date object can parse
+ * @param {String} unit - The unit to limit the granularity, that is, year, month, week, day, hour, minute and second.
+ *                 By default, millisecond is used.
+ * @return {Boolean} Returns true if date is between fromDate and toDate, or false otherwise.
+ * @memberOf AuraLocalizationService
+ * @public
+ * @export
+ * @platform
+ */
+AuraLocalizationService.prototype.isBetween = function(date, fromDate, toDate, unit) {
+    return moment(date)["isBetween"](fromDate, toDate, unit, '[]');
+};
+
+/**
  * Parses a string to a JavaScript Date.
  * @param {String} dateTimeString - The datetime string to be parsed.
  * @param {String} targetFormat - A Java format string which is used to parse datetime. The default is from LocaleValueProvider.

@@ -15,12 +15,22 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:interactive" extensible="true" description="Provides the date in a ui:datePickerGrid component.">
+<aura:component implements="ui:tableCell, ui:hasGridEvents, ui:visible" extensible="true" description="Provides the date in a ui:datePickerGrid component.">
     <aura:attribute name="label" type="String" description="The text displayed on the component."/>
     <aura:attribute name="ariaSelected" type="Boolean" default="false" description="The date highlighted."/>
     <aura:attribute name="tabIndex" type="Integer" default="-1" description="The tab index of the anchor element."/>
-    <aura:attribute name="value" type="Date" description="The date this component renders."/>
-    <a aura:flavorable="true" class="{!v.class + ($Browser.formFactor == 'DESKTOP' ? ' desktop' : '')}"
-       aria-selected="{!v.ariaSelected}" 
-       tabindex="{!v.tabIndex}">{!v.label}</a>
+    <aura:attribute name="value" type="String" description="The date string this component renders."/>
+    <aura:attribute name="tdClass" type="String" description="The CSS style to be attached to the td element"/>
+
+    <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
+
+    <aura:method name="updateCell" description="update the cell to reflect new attribute values.">
+        <aura:attribute name="config" type="Object"/>
+    </aura:method>
+
+    <td class="{!v.tdClass}" aria-selected="{!v.ariaSelected}" role="gridcell" tabindex="{!v.tabIndex}" onclick="{!c.dateCellSelected}">
+        <span aura:id="day" aura:flavorable="true" class="{!v.class + ' ' + $Browser.formFactor}">
+            {!v.label}
+        </span>
+    </td>
 </aura:component>

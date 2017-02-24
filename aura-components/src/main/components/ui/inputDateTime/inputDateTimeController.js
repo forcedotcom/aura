@@ -14,43 +14,47 @@
  * limitations under the License.
  */
 ({
-	clearValue: function(component) {
-		component.set("v.value", "");
-	},
+    clearValue: function (component) {
+        component.set("v.value", "");
+    },
 
-    doInit: function(component, event, helper) {
+    doInit: function (component, event, helper) {
         helper.init(component);
     },
 
-    openDatePicker: function(component, event, helper) {
-        helper.displayDatePicker(component);
+    openDatePicker: function (component, event, helper) {
+        helper.displayDatePicker(component, true);
     },
 
-    openTimePicker: function(component, event, helper) {
+    openTimePicker: function (component, event, helper) {
         event.stopPropagation();
-        helper.displayTimePicker(component);
+        helper.displayTimePicker(component, true);
     },
 
-    inputDateFocus: function(component, event, helper) {
-        helper.handleInputDateFocused(component);
+    inputDateClick: function (component, event, helper) {
+        helper.displayDatePicker(component, false);
     },
 
-    inputTimeFocus: function(component, event, helper) {
+    inputTimeFocus: function (component, event, helper) {
         event.stopPropagation();
-        helper.handleInputTimeFocused(component);
+        helper.displayTimePicker(component, false);
+    },
+
+    pickerKeydown: function (component, event, helper) {
+        helper.handlePickerTab(component, event);
     },
 
     // override ui:handlesDateSelected, used by ui:datePickerManager
-    onDateSelected: function(component, event, helper) {
-	    helper.handleDateSelectionByManager(component, event);
+    onDateSelected: function (component, event, helper) {
+        helper.handleDateSelectionByManager(component, event);
     },
 
     // override ui:hasManager
-    registerManager: function(component, event, helper) {
+    registerManager: function (component, event, helper) {
         helper.registerManager(component, event);
     },
 
-    setDateTime: function(component, event, helper) {
-	    helper.handleDateTimeSelection(component, event);
+    setDateTime: function (component, event, helper) {
+        helper.handleDateTimeSelection(component, event);
     }
 })// eslint-disable-line semi

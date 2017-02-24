@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    doInit: function(cmp) {
+    doInit: function (cmp) {
         var timezone = cmp.get("v.timezone");
         if ($A.util.isEmpty(timezone)) {
             cmp.set("v.timezone", $A.get("$Locale.timezone"));
@@ -25,7 +25,7 @@
         // iOS does the opposite, when you change anything with the wheels, a 'change' will be fired.
         // As soon as you press the done button, a 'blur' event will fire.
         if ($A.get("$Browser.isAndroid")) {
-            cmp.set('v.updateOn','change');
+            cmp.set('v.updateOn', 'change');
         }
     }
 });

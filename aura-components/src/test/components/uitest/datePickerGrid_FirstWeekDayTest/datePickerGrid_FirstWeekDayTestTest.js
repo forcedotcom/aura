@@ -33,9 +33,9 @@
                     this.WEEKDAYS_3CHARS.SUN,
                     this.WEEKDAYS_3CHARS.MON,
                     this.WEEKDAYS_3CHARS.TUE,
-                    this.WEEKDAYS_3CHARS.WED, 
-                    this.WEEKDAYS_3CHARS.THU, 
-                    this.WEEKDAYS_3CHARS.FRI, 
+                    this.WEEKDAYS_3CHARS.WED,
+                    this.WEEKDAYS_3CHARS.THU,
+                    this.WEEKDAYS_3CHARS.FRI,
                     this.WEEKDAYS_3CHARS.SAT
                 ] //expected dates of week
             );
@@ -50,9 +50,9 @@
                     this.WEEKDAYS_3CHARS.MON,
                     this.WEEKDAYS_3CHARS.TUE,
                     this.WEEKDAYS_3CHARS.WED,
-                    this.WEEKDAYS_3CHARS.THU, 
-                    this.WEEKDAYS_3CHARS.FRI, 
-                    this.WEEKDAYS_3CHARS.SAT, 
+                    this.WEEKDAYS_3CHARS.THU,
+                    this.WEEKDAYS_3CHARS.FRI,
+                    this.WEEKDAYS_3CHARS.SAT,
                     this.WEEKDAYS_3CHARS.SUN
                 ] //expected dates of week
             );
@@ -67,9 +67,9 @@
                     this.WEEKDAYS_3CHARS.TUE,
                     this.WEEKDAYS_3CHARS.WED,
                     this.WEEKDAYS_3CHARS.THU,
-                    this.WEEKDAYS_3CHARS.FRI, 
-                    this.WEEKDAYS_3CHARS.SAT, 
-                    this.WEEKDAYS_3CHARS.SUN, 
+                    this.WEEKDAYS_3CHARS.FRI,
+                    this.WEEKDAYS_3CHARS.SAT,
+                    this.WEEKDAYS_3CHARS.SUN,
                     this.WEEKDAYS_3CHARS.MON
                 ] //expected dates of week
             );
@@ -84,9 +84,9 @@
                     this.WEEKDAYS_3CHARS.WED,
                     this.WEEKDAYS_3CHARS.THU,
                     this.WEEKDAYS_3CHARS.FRI,
-                    this.WEEKDAYS_3CHARS.SAT, 
-                    this.WEEKDAYS_3CHARS.SUN, 
-                    this.WEEKDAYS_3CHARS.MON, 
+                    this.WEEKDAYS_3CHARS.SAT,
+                    this.WEEKDAYS_3CHARS.SUN,
+                    this.WEEKDAYS_3CHARS.MON,
                     this.WEEKDAYS_3CHARS.TUE
                 ] //expected dates of week
             );
@@ -101,9 +101,9 @@
                     this.WEEKDAYS_3CHARS.THU,
                     this.WEEKDAYS_3CHARS.FRI,
                     this.WEEKDAYS_3CHARS.SAT,
-                    this.WEEKDAYS_3CHARS.SUN, 
-                    this.WEEKDAYS_3CHARS.MON, 
-                    this.WEEKDAYS_3CHARS.TUE, 
+                    this.WEEKDAYS_3CHARS.SUN,
+                    this.WEEKDAYS_3CHARS.MON,
+                    this.WEEKDAYS_3CHARS.TUE,
                     this.WEEKDAYS_3CHARS.WED
                 ] //expected dates of week
             );
@@ -118,9 +118,9 @@
                     this.WEEKDAYS_3CHARS.FRI,
                     this.WEEKDAYS_3CHARS.SAT,
                     this.WEEKDAYS_3CHARS.SUN,
-                    this.WEEKDAYS_3CHARS.MON, 
-                    this.WEEKDAYS_3CHARS.TUE, 
-                    this.WEEKDAYS_3CHARS.WED, 
+                    this.WEEKDAYS_3CHARS.MON,
+                    this.WEEKDAYS_3CHARS.TUE,
+                    this.WEEKDAYS_3CHARS.WED,
                     this.WEEKDAYS_3CHARS.THU
                 ] //expected dates of week
             );
@@ -135,9 +135,9 @@
                     this.WEEKDAYS_3CHARS.SAT,
                     this.WEEKDAYS_3CHARS.SUN,
                     this.WEEKDAYS_3CHARS.MON,
-                    this.WEEKDAYS_3CHARS.TUE, 
-                    this.WEEKDAYS_3CHARS.WED, 
-                    this.WEEKDAYS_3CHARS.THU, 
+                    this.WEEKDAYS_3CHARS.TUE,
+                    this.WEEKDAYS_3CHARS.WED,
+                    this.WEEKDAYS_3CHARS.THU,
                     this.WEEKDAYS_3CHARS.FRI
                 ] //expected dates of week
             );
@@ -147,9 +147,6 @@
     //helper
     _getDatepickerGridCmp: function(cmp){
         return cmp.find('grid');
-    },
-    _getNamesOfWeekDays: function(cmp) {
-        return this._getDatepickerGridCmp(cmp).get('v._namesOfWeekdays');
     },
     _serializeShortNameOfWeekdays: function(weekDaysArray) {
         var arr = [];
@@ -225,11 +222,8 @@
         //trigger grid update name of weekdays
         var grid = this._getDatepickerGridCmp(cmp);
         var helper = grid.getDef().getHelper();
-        helper.updateNameOfWeekDays(grid);
-        helper.renderGrid(grid);
-
-        //get weekdays array object
-        var weekdaysArray = this._getNamesOfWeekDays(cmp);
+        var weekdaysArray = helper.getNameOfWeekDays();
+        helper.createCalendarHeader(grid);
 
         // verify date of weeks
         this.verifyDateOfWeeks(

@@ -60,7 +60,7 @@
         browsers: ['DESKTOP'],
         attributes: {displayDatePicker: 'true', format: 'KKKKKK', loadDatePicker: 'true'},
         test: [function (cmp) {
-            cmp.find("datePicker").get('c.selectToday').runDeprecated();
+            cmp.find("datePicker").find("grid").selectToday();
         }, function (cmp) {
             var inputDateStr = cmp.find("inputText").getElement().value;
             var dt = moment().format('KKKKKK');
@@ -119,30 +119,32 @@
     /**
      * Verify behavior of Today() with default 'format' value.
      */
-    // TODO(W-2671175): Fails due to GMT/PST timezone difference for user.timezone and actual timezone
-    _testToday: {
-        attributes: {displayDatePicker: 'true', format: 'MMM dd, yyyy'},
+    testToday: {
+        attributes: {displayDatePicker: 'true', format: 'MMM dd, yyyy', loadDatePicker: 'true'},
         test: [function (cmp) {
-            cmp.find("datePicker").get('c.selectToday').runDeprecated();
+            cmp.find("datePicker").find("grid").selectToday();
         }, function (cmp) {
             var inputDateStr = cmp.find("inputText").getElement().value;
-            var dt = moment().format('MMM DD, YYYY');
-            $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
+            $A.localizationService.getToday($A.get("$Locale.timezone"), function(dateString) {
+                var dt = moment(dateString).format('MMM DD, YYYY');
+                $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
+            });
         }]
     },
 
     /**
      * Verify behavior of Today() when 'format' is assigned a valid value.
      */
-    // TODO(W-2671175): Fails due to GMT/PST timezone difference for user.timezone and actual timezone
-    _testTodayDifferentFormat: {
-        attributes: {displayDatePicker: 'true', format: 'DD/MM/YYYY'},
+    testTodayDifferentFormat: {
+        attributes: {displayDatePicker: 'true', format: 'DD/MM/YYYY',  loadDatePicker: 'true'},
         test: [function (cmp) {
-            cmp.find("datePicker").get('c.selectToday').runDeprecated();
+            cmp.find("datePicker").find("grid").selectToday();
         }, function (cmp) {
             var inputDateStr = cmp.find("inputText").getElement().value;
-            var dt = moment().format('DD/MM/YYYY');
-            $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
+            $A.localizationService.getToday($A.get("$Locale.timezone"), function(dateString) {
+                var dt = moment(dateString).format('DD/MM/YYYY');
+                $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
+            });
         }]
     },
 

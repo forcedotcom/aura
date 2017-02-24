@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    afterRender: function(component, helper) {
+    afterRender: function (component, helper) {
         var visible = component.get("v.visible");
         if (visible === true) {
             if (component.get("v._timeListInitialized") === false) {
@@ -29,7 +29,7 @@
         this.superAfterRender();
     },
 
-    rerender: function(component, helper) {
+    rerender: function (component, helper) {
         this.superRerender();
         var visible = component.get("v.visible");
         if (visible === true) {
@@ -43,8 +43,8 @@
         helper.updateGlobalEventListeners(component);
     },
 
-    unrender: function(component, helper) {
-        if(component.positionConstraint) {
+    unrender: function (component, helper) {
+        if (component.positionConstraint) {
             component.positionConstraint.destroy();
         }
         helper.removeEventHandlers(component);

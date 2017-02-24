@@ -17,42 +17,48 @@
 -->
 <aura:component extensible="true" implements="ui:visible" description="Represents a date picker, which can be used in input components such as ui:inputDate and ui:inputDateTime.">
     <aura:import library="ui:panelPositioningLib" property="lib" />
-    <aura:attribute name="hasTime" type="Boolean" default="false" description="Indicate if the parent datePicker component supports time picker. This also works as a flag for S1 vs SFX view."/>
+
+    <!-- These are only needed to support windows phone with IE11 -->
+    <aura:attribute name="hasTime" type="Boolean" default="false" description="Indicate if the parent datePicker component supports time picker."/>
     <aura:attribute name="hours" type="Integer" description="The hour value of a date object, which is always in 24 hour format."/>
+    <aura:attribute name="minutes" type="Integer" description="The minute value of a date object."/>
     <aura:attribute name="is24HourFormat" type="Boolean" default="true" description="Indicate if it is set to 24 hour or 12-hour with am/pm."/>
+
     <aura:attribute name="maxYear" type="Integer" description="The maximal year for year selection. The default is the current year plus 30."/>
     <aura:attribute name="minYear" type="Integer" description="The minimum year for year selection. The default is the current year minus 100."/>
-    <aura:attribute name="minutes" type="Integer" description="The minute value of a date object."/>
     <aura:attribute name="value" type="String" description="A date string corresponding to a calendar day in the format yyyy-mm-dd."/>
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if the date picker is displayed. Defaults to false, which hides the date picker."/>
-    <aura:attribute name="_yearListInitialized" type="Boolean" default="false" description="Indicates if the year list is initialized or not."/>
     <aura:attribute name="managed" type="Boolean" default="false" description="Indicates whether this component is managed by ui:datePickerManager. Defaults to 'false'."/>
     <aura:attribute name="referenceElement" type="Object" description="The reference node which this datePicker should be positioned to. Usually it is a inputDate element." />
     <aura:attribute name="showToday" type="Boolean" default="true" description="Indicates whether a Today link should display at the bottom. If there is a time portion, the Today link wouldn't show up even this is set to true."/>
     <aura:attribute name="hideOnSelect" type="Boolean" default="false" description="Close the datePicker after a date is selected"/>
-    <aura:attribute name="setFocus" type="Boolean" default="true" description="Control if we should focus any date when we render the month."/>
-    <aura:attribute name="titleHeadingLevel" type="String" description="The heading level for the title. The default is h2."/>
-    <aura:attribute name="closeOnClickOut" access="INTERNAL" type="Boolean" default="false" description="true if used with input date, work around for 198 REMOVE in 200"/>
-
-    <!-- private attributes -->
-    <aura:attribute name="_today" type="String" description="The date string (yyyy-MM-dd) of today based on the Aura time zone."/>
+    <aura:attribute name="setFocus" type="Boolean" default="false" description="Control if we should focus any date when we first render the month."/>
+    <aura:attribute name="closeOnClickOut" type="Boolean" default="false" description="true if used with input date"/>
 
     <aura:method name="highlightRange" action="{!c.highlightRange}"
                  description="highlight the dates between rangeStart and rangeEnd inclusive">
         <aura:attribute name="rangeStart" type="String" description="Start date of the range in the format yyyy-mm-dd"/>
         <aura:attribute name="rangeEnd" type="String" description="End date of the range in the format yyyy-mm-dd"/>
-        <aura:attribute name="rangeClass" type="String" description="A CSS class to be applied when a range is selected"/>
+        <aura:attribute name="highlightClass" type="String" description="A CSS class to be applied when a range is selected"/>
     </aura:method>
 
+    <aura:method name="show" description="show the calendar">
+        <aura:attribute name="value" type="String" description="A date string corresponding to a calendar day in the format yyyy-mm-dd."/>
+        <aura:attribute name="focus" type="Boolean" default="false" description="Indicates if the calendar should get the focus after displaying the datepicker."/>
+        <aura:attribute name="referenceElement" type="Object" description="The calendar will appear under or above the reference element depending on whether it fits in the viewport." />
+    </aura:method>
+
+    <aura:method name="focus" description="focus the calendar"/>
+
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
-    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:handler name="change" value="{!v.visible}" action="{!c.handleVisible}"/>
+
     <div aura:id="datePicker" aura:flavorable="true" class="{!v.class + (v.visible == true ? ' visible ' : ' ') + $Browser.formFactor}">
-        <div class="scroller" aura:id="scroller" onclick="{!c.trapClicks}">
+        <div class="scroller slds-datepicker" aura:id="scroller" onclick="{!c.trapClicks}">
             <aura:if isTrue="{!v.hasTime}">
                 <div class="headerBar">
                     <a aura:id="cancel" onclick="{!c.cancel}" class="calCancel button">Cancel</a>
-                    <a aura:id="set" onclick="{!c.set}" class="calSet button">Set</a>
+                    <a aura:id="set" onclick="{!c.setDateTime}" class="calSet button">Set</a>
                 </div>
             </aura:if>
             <div class="dateBar">
@@ -67,12 +73,13 @@
                             <span class="assistiveText">Go to next month</span>
                         </a>
                     </div>
+                    <!-- This will only match windows phone -->
                     <aura:if isTrue="{!$Browser.formFactor != 'DESKTOP'}">
                         <h2 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle">
-                            <ui:outputText aura:id="monthTitle" value=""/>
+                            <ui:outputText aura:id="monthTitle"/>
                             <label>
-                                <span class="assistiveText">year</span>
-                                <select aura:id="yearTitle" onchange="{!c.yearChange}"/>
+                                <span class="assistiveText">Pick a Year</span>
+                                <select aura:id="yearTitle" class="slds-select" onchange="{!c.yearChange}"/>
                             </label>
                         </h2>
                         <aura:set attribute="else">
@@ -83,28 +90,25 @@
                 <aura:if isTrue="{!$Browser.formFactor == 'DESKTOP'}">
                     <div class="picklist datepicker__filter--year">
                         <label>
-                            <span class="assistiveText">year</span>
-                            <select class="select picklist__label" aura:id="yearTitle" onchange="{!c.yearChange}" onkeydown="{!c.handleKeydown}"/>
+                            <span class="assistiveText">Pick a Year</span>
+                            <select class="slds-select picklist__label" aura:id="yearTitle" onchange="{!c.yearChange}" onkeydown="{!c.handleKeydown}"/>
                         </label>
                     </div>
                 </aura:if>
             </div>
-            <ui:datePickerGrid aura:id="grid" hasTime ="{!v.hasTime}"
-                                              setFocus="{!v.setFocus}"
-                                              hide="{!c.hide}"
-                                              selectDate="{!c.selectDate}"
-                                              updateCalendarTitle="{!c.updateCalendarTitle}"/>
+
+            <ui:datePickerGrid aura:id="grid"
+                               selectedDate="{#v.value}"
+                               hasTime="{!v.hasTime}"
+                               hide="{!c.hide}"
+                               selectDate="{!c.setDate}"
+                               updateCalendarTitle="{!c.updateCalendarTitle}"
+                               showToday="{!v.showToday}"/>
+
             <aura:if isTrue="{!v.hasTime}">
                 <div class="timeBar">
                     <ui:timePicker aura:id="time" is24HourFormat="{!v.is24HourFormat}"/>
                 </div>
-                <aura:set attribute="else">
-                    <aura:if isTrue="{!v.showToday}">
-                        <div class="buttonBar">
-                            <ui:button aura:id="today" press="{!c.selectToday}" keydown="{!c.handleTabToday}" class="calToday" label="Today"/>
-                        </div>
-                    </aura:if>
-                </aura:set>
             </aura:if>
         </div><!-- scroller -->
     </div><!-- datePicker -->

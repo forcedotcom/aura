@@ -15,11 +15,6 @@
  */
 package org.auraframework.integration.test.components.ui.inputDate;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
@@ -28,6 +23,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class InputDateWithLabelUITest extends WebDriverTestCase {
 
@@ -38,8 +38,8 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
     private final String DATE_INPUT_BOX_SEL = "input[class*='date_input_box']";
     private final String DATE_ICON_SEL = "a[class*='datePicker-openIcon']";
-    private final String ARIA_SELECTED_SEL = "a[aria-selected*='true']";
-    private final String SELECTED_DATE = "a[class*='selectedDate']";
+    private final String ARIA_SELECTED_SEL = "td[aria-selected*='true']";
+    private final String SELECTED_DATE = "td[class*='is-selected']";
     private final String OUTPUT_ST = "span[class*='outputStatus']";
 
     private final String DATEPICKER_SEL = "div.uiDatePicker.visible";
@@ -87,7 +87,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         openDatePicker();
 
         String classOfActiveElem = "" + getAuraUITestingUtil().getEval(CLASSNAME);
-        element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
+        element = findDomElement(By.cssSelector("td[class*='" + classOfActiveElem + "']"));
 
         element = loopThroughKeys(element, keyString, iterCondition, ARIA_SELECTED_SEL, "Shift+Page Up/Down");
 
@@ -138,7 +138,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     }
 
     public void gotToNextElem(WebDriver driver, String shftTab) {
-        String classOfActiveElem = "a[class*='" + getAuraUITestingUtil().getEval(CLASSNAME) + "']";
+        String classOfActiveElem = "td[class*='" + getAuraUITestingUtil().getEval(CLASSNAME) + "']";
         findDomElement(By.cssSelector(classOfActiveElem)).sendKeys(shftTab);
 
     }
@@ -268,7 +268,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         getAuraUITestingUtil().pressTab(element);
 
         String classOfActiveElem = "" + getAuraUITestingUtil().getEval(CLASSNAME);
-        element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
+        element = findDomElement(By.cssSelector("td[class*='" + classOfActiveElem + "']"));
         String elementClass = element.getAttribute("class");
         assertTrue("Tabbing did not take us to the date picker icon",
                 elementClass.indexOf("datePicker-openIcon") >= 0);
@@ -279,7 +279,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         // Todays date should be on focus, Grabbing that element. Pressing tab with WebDriver after clicking on the icon
         // will move to the move month to the left
         classOfActiveElem = "" + getAuraUITestingUtil().getEval(CLASSNAME);
-        element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
+        element = findDomElement(By.cssSelector("td[class*='" + classOfActiveElem + "']"));
         elementClass = element.getAttribute("class");
         assertTrue("Tabbing did not take us to today's date",
                 elementClass.indexOf("todayDate") >= 0);
@@ -306,7 +306,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         // Todays date should be on focus, Grabbing that element. Pressing tab with WebDriver after clicking on the icon
         // will move to the move month to the left
         String classOfActiveElem = "" + getAuraUITestingUtil().getEval(CLASSNAME);
-        element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
+        element = findDomElement(By.cssSelector("td[class*='" + classOfActiveElem + "']"));
 
         // Moving from the on focus element to the today link
         // Keys.Enter does not work with chrome v40.0.2214.91
@@ -343,7 +343,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         element.click();
 
         // Focused on Today's date
-        classOfActiveElem = "a[class*='" + getAuraUITestingUtil().getEval(CLASSNAME) + "']";
+        classOfActiveElem = "td[class*='" + getAuraUITestingUtil().getEval(CLASSNAME) + "']";
         element = findDomElement(By.cssSelector(classOfActiveElem));
         elementClass = element.getAttribute("class");
         assertTrue("Tabbing did not take us to the selected date",
@@ -464,7 +464,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
         String classOfActiveElem = "" + getAuraUITestingUtil().getEval(CLASSNAME);
 
-        element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
+        element = findDomElement(By.cssSelector("td[class*='" + classOfActiveElem + "']"));
 
         // Loop through 151 days
         element = loopThroughKeys(element, "" + Keys.ARROW_RIGHT, 151, ARIA_SELECTED_SEL, "Arrow-Right ");
@@ -488,7 +488,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         openDatePicker();
 
         // Find todays date, which should be focused
-        By activeElmLoc = By.cssSelector("a[class*='" + getAuraUITestingUtil().getEval(CLASSNAME) + "']");
+        By activeElmLoc = By.cssSelector("td[class*='" + getAuraUITestingUtil().getEval(CLASSNAME) + "']");
         element = findDomElement(activeElmLoc);
 
         // Move from todays date, to the todays date +41
@@ -520,7 +520,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
         // Find todays date, which should be focused
         String classOfActiveElem = "" + getAuraUITestingUtil().getEval(CLASSNAME);
-        element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
+        element = findDomElement(By.cssSelector("td[class*='" + classOfActiveElem + "']"));
 
         // Move 4 months up
         element = loopThroughKeys(element, "" + Keys.ARROW_UP, 4, ARIA_SELECTED_SEL, "Arrow-Up key");

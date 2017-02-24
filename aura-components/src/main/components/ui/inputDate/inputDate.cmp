@@ -41,10 +41,10 @@
                placeholder="{!v.placeholder}"
                aria-describedby="{!v.ariaDescribedBy}"
                disabled="{!v.disabled}"
-               onclick="{!c.inputDateFocus}"/>
+               onclick="{!c.inputDateClick}"/>
 
         <aura:if isTrue="{!v.displayDatePicker}">
-            <a aura:id="datePickerOpener" class="datePicker-openIcon display" aria-haspopup="true" onclick="{!c.openDatePicker}">
+            <a aura:id="datePickerOpener" class="datePicker-openIcon display" aria-haspopup="true" onclick="{!c.openDatePicker}" onkeydown="{!c.pickerKeydown}">
                 <span class="assistiveText">Date Picker</span>
             </a>
         </aura:if>
@@ -57,7 +57,7 @@
         </aura:if>
 
         <aura:if isTrue="{!v.loadDatePicker}">
-            <ui:datePicker aura:id="datePicker" hideOnSelect="true" closeOnClickOut="true" selectDate="{!c.onDateSelected}" showToday="{!v._isPhoneOrTablet}"/>
+            <ui:datePicker aura:id="datePicker" hideOnSelect="true" closeOnClickOut="true" selectDate="{!c.onDateSelected}" showToday="true"/>
         </aura:if>
     </div>
 </aura:component>

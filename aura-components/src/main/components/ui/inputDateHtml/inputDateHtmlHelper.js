@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 ({
-    formatValue: function(component) {
+    formatValue: function (component) {
         var config = {
-            format : "YYYY-MM-DD",
-            timezone : component.get("v.timezone") || $A.get("$Locale.timezone"),
-            validateString : false
+            format: "YYYY-MM-DD",
+            timezone: component.get("v.timezone") || $A.get("$Locale.timezone"),
+            validateString: false
         };
 
-        var helper = this;
         var displayValue = function (returnValue) {
-            helper.setInputValue(component, returnValue);
-        };
+            this.setInputValue(component, returnValue);
+        }.bind(this);
 
         var value = component.get("v.value");
         this.dateTimeLib.dateTimeService.getDisplayValue(value, config, displayValue);
     },
 
-    setInputValue: function(component, displayValue) {
+    setInputValue: function (component, displayValue) {
         var inputElement = component.find("inputDateHtml").getElement();
         if (!$A.util.isUndefinedOrNull(inputElement)) {
             inputElement.value = displayValue ? displayValue : "";

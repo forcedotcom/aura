@@ -54,6 +54,23 @@
         }
     },
 
+    testInitialValueThenClear: {
+        attributes : {value: "2016-01-22T01:00:00.000Z", timezone: 'America/Toronto'},
+        test: [function(cmp){
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var inputDateStr = cmp.find("inputDateHtml").getElement().value;
+                return $A.test.contains(inputDateStr, "2016-01-21");
+            }, "Initial value for input was not set properly");
+        }, function (cmp) {
+            cmp.set("v.value", "");
+        }, function(cmp) {
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var inputDateStr = cmp.find("inputDateHtml").getElement().value;
+                return $A.util.isEmpty(inputDateStr);
+            }, "Dates are not the same and they should be");
+        }]
+    },
+
     testEmptyValue: {
         test: function(cmp){
             var inputDateStr = cmp.find("inputDateHtml").getElement().value;

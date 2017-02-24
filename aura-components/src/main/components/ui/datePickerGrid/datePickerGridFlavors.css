@@ -41,3 +41,19 @@
         height: 100%;
     }
 }
+
+.THIS .calGrid  td {
+    text-align: center;
+}
+.THIS .slds-show--inline-block {
+    display: inline-block;
+}
+
+.THIS .slds-text-link {
+    color: #0070d2;
+    text-decoration: none;
+    transition: color .1s linear;
+    height: 50px;
+    line-height: 50px;
+    cursor: pointer;
+}

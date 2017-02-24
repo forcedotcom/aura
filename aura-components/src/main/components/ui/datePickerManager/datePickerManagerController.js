@@ -34,16 +34,19 @@
 		var datePicker = cmp.find('datePicker'),
 			params = evt.getParams();
 
+		// if the datepicker for the same source component is still being displayed, then just re-focus if necessary
+		var isSameSourceComponent = cmp._sourceComponentId === params.sourceComponentId;
+		if (datePicker.get("v.visible") === true && isSameSourceComponent && params.focusDatePicker) {
+			datePicker.focus();
+			return;
+		}
+
 		// Keep reference to the source component's globalId.
 		cmp._sourceComponentId = params.sourceComponentId;
 
-		// Set value and show datePicker.
-		var value = params.value;
-		if (!$A.util.isUndefinedOrNull(value)) {
-			datePicker.set('v.value', value);
+		if (params.toggleVisibility) {
+            datePicker.show(params.value, params.focusDatePicker, params.element);
 		}
-		datePicker.set("v.referenceElement", params.element);
-		datePicker.set('v.visible', true);
 	},
 
 	handleDateSelected: function (cmp, evt) {

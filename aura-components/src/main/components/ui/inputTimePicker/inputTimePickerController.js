@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 ({
-    selectTime: function(component, event, helper) {
+    selectTime: function (component, event, helper) {
         helper.selectTime(component, event);
     },
 
-    handleMouseover: function(component, event) {
+    handleMouseover: function (component, event) {
         var elem = event.target || event.srcElement;
         if (!$A.util.isUndefinedOrNull(elem)) {
             elem.focus();
         }
+    },
+
+    show: function (component, event, helper) {
+        helper.show(component, event);
     }
 })// eslint-disable-line semi

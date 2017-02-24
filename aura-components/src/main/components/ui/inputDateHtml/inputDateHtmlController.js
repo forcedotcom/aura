@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 ({
-    doInit: function(cmp) {
+    doInit: function (cmp) {
         // On android If you select the date and press the done button, a 'change' will be fired.
         // But the input still has focus so 'blur' will fire after you touched something else.
         // iOS does the opposite, when you change anything with the wheels, a 'change' will be fired.
         // As soon as you press the done button, a 'blur' event will fire.
         if ($A.get("$Browser.isAndroid")) {
-            cmp.set('v.updateOn','change');
+            cmp.set('v.updateOn', 'change');
         }
     }
 });

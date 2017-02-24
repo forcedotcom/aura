@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    afterRender: function(component) {
+    afterRender: function (component) {
         var _helper = component.getConcreteComponent().getDef().getHelper();
 
         _helper.displayValue(component);
@@ -25,7 +25,7 @@
         return this.superAfterRender();
     },
 
-    rerender: function(component) {
+    rerender: function (component) {
         var _helper = component.getConcreteComponent().getDef().getHelper();
 
         if (component.isDirty("v.value") && _helper.shouldUpdateDisplayValue(component)) {

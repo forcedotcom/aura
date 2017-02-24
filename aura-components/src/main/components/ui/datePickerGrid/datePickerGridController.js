@@ -14,47 +14,34 @@
  * limitations under the License.
  */
 ({
-    doInit: function(component, event, helper) {
-        for (var i = 0; i < 42; i++) {
-            var cellCmp = component.find(i);
-            if (cellCmp) {
-                cellCmp.addHandler("click", component, "c.handleClick");
-                cellCmp.addHandler("keydown", component, "c.handleKeydown");
-            }
-        }
-
-        // Set the first day of week
-        helper.updateNameOfWeekDays(component);
-
-        var setFocus = component.get("v.setFocus");
-        if (!setFocus) {
-            component.set("v._setFocus", false);
-        }
-    },
-  
-    focus: function(component, event, helper) {
-        helper.setFocus(component);
+    focus: function (component, event, helper) {
+        helper.focusDate(component, helper.getHighlightedDate(component));
     },
 
-    handleClick: function(component, event, helper) {
-        helper.selectDate(component, event);
-    },
-
-    handleKeydown: function(component, event, helper) {
-        helper.handleKeydown(component, event);
-    },
-
-    updateCalendar: function(component, event, helper) {
+    changeCalendar: function (component, event, helper) {
         var date = component.get("v.date");
         if (!date) {
             date = 1;
         }
-        var monthChange = event.getParam("monthChange");
-        var yearChange = event.getParam("yearChange");
-        var setFocus = event.getParam("setFocus");
-        if (setFocus === false) {
-            component.set("v._setFocus", setFocus);
-        }
-        helper.changeMonthYear(component, monthChange, yearChange, date);
+        var params = event.getParam('arguments');
+        helper.changeMonthYear(component, params.monthChange, params.yearChange, date);
+    },
+
+    dateCellSelected: function (component, event, helper) {
+        helper.handleDateCellSelected(component, event.getParam("value"));
+    },
+
+    selectToday: function (component, event, helper) {
+        helper.handleDateCellSelected(component, component.get("v._today"));
+    },
+
+    setSelectedDate: function (component, event, helper) {
+        var selectedDate = event.getParam('arguments').selectedDate;
+        helper.selectDate(component, selectedDate);
+    },
+
+    highlightRange: function (component, event, helper) {
+        var params = event.getParam('arguments');
+        helper.highlightRange(component, params.rangeStart, params.rangeEnd, params.highlightClass);
     }
 });

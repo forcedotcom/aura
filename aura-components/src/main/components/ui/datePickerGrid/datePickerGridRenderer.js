@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 ({
-    afterRender: function() {
+    render: function (component, helper) {
+        var ret = this.superRender();
+        helper.createCalendar(component);
+        return ret;
+    },
+
+    afterRender: function (component, helper) {
+        helper.setKeyboardEventHandlers(component);
         return this.superAfterRender();
     },
 
-    rerender: function(component, helper) {
-        var shouldRender = false;
-        var attributes = component.getDef().getAttributeDefs();
-        attributes.each(function(attributeDef) {
-            var name = attributeDef.getDescriptor().getName();
-            if (name !== "date" && name !== "hasTime" && component.isDirty("v." + name)) { // if only date changes, no need to rerender
-                shouldRender = true;
-            }
-        });
-
-        if (shouldRender) {
-            component.set("v._setFocus", component.get("v.setFocus"));
-
-            helper.renderGrid(component);
-            this.superRerender();
+    unrender: function (component, helper) {
+        try {
+            helper.removeKeyboardEventHandlers(component);
+        } finally {
+            return this.superUnrender();
         }
     }
 })// eslint-disable-line semi

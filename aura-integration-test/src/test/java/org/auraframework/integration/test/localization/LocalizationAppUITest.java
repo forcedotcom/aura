@@ -21,6 +21,7 @@ import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 @CheckAccessibility(false)
@@ -57,6 +58,10 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         elementInput.click();
         elementInput.clear();
         elementInput.sendKeys("Sep 23, 2006");
+        // Hide the datepicker
+        WebElement yearSelector = findDomElement(By.cssSelector(".visible select"));
+        yearSelector.sendKeys(Keys.ESCAPE);
+
         WebElement elementButton = findDomElement(By.cssSelector("button[title~='Date']"));
         elementButton.click();
 

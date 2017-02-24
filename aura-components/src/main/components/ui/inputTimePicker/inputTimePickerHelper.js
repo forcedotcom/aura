@@ -14,19 +14,34 @@
  * limitations under the License.
  */
 ({
-    position: function(component) {
+    show: function (component, event) {
+        var params = event.getParam('arguments');
+        if (params) {
+            if (params.hours) {
+                component.set("v.hours", params.hours);
+                component.set("v.minutes", params.minutes);
+            }
+
+            //will be used after rerender to determine if we should set focus
+            component._focus = params.focus;
+
+            component.set("v.visible", true);
+        }
+    },
+
+    position: function (component) {
         var element = component.find("timeDropdown").getElement();
         var target = component.get("v.referenceElement");
         var self = this;
         if (target && element) {
             var scrollableParent = this._getScrollableParent(element);
-            this._handleScroll = function() {
+            this._handleScroll = function () {
                 self.lib.panelPositioning.reposition();
             };
 
-            this._handleWheel = function(e) {
+            this._handleWheel = function (e) {
                 var elScrollableParent = self._getScrollableParent(element);
-                if(elScrollableParent && elScrollableParent.scrollTop) {
+                if (elScrollableParent && elScrollableParent.scrollTop) {
                     elScrollableParent.scrollTop += e.deltaY;
                 }
 
@@ -36,7 +51,7 @@
             // scrollable element, we need to make sure
             // scroll events move that element,
             // not the parent, also we need to reposition on scroll
-            if(scrollableParent) {
+            if (scrollableParent) {
                 scrollableParent.addEventListener('scroll', this._handleScroll);
                 element.addEventListener('wheel', this._handleWheel);
             }
@@ -56,7 +71,7 @@
                 align: elementAlign,
                 targetAlign: referenceElementAlign
             });
-            this.lib.panelPositioning.reposition($A.getCallback(function(){
+            this.lib.panelPositioning.reposition($A.getCallback(function () {
                 self.scrollToSelectedTime(component);
             }));
         } else {
@@ -70,9 +85,9 @@
      * @param  {HTMLElement} elem The element to check
      * @return {Mixed}      Returns an HTMLElement if one is found, otherwise null
      */
-    _getScrollableParent: function(elem) {
+    _getScrollableParent: function (elem) {
 
-        if(this._scrollableParent) {
+        if (this._scrollableParent) {
             return this._scrollableParent;
         }
 
@@ -80,12 +95,12 @@
         // however in firefox the opposite is not true
         var overflow = getComputedStyle(elem)['overflow-y'];
 
-        if(overflow === 'auto') {
+        if (overflow === 'auto') {
             this._scrollableParent = elem;
             return elem;
         }
 
-        if(elem === document.body) {
+        if (elem === document.body) {
             this._scrollableParent = null;
             return null;
         }
@@ -94,7 +109,7 @@
 
     },
 
-    shouldFlip: function(element, targetElement) {
+    shouldFlip: function (element, targetElement) {
         var viewPort = $A.util.getWindowSize();
         var elemRect = element.getBoundingClientRect();
         var referenceElemRect = targetElement.getBoundingClientRect();
@@ -107,8 +122,8 @@
         return false;
     },
 
-    selectTime: function(component, event) {
-    	event.stopPropagation();
+    selectTime: function (component, event) {
+        event.stopPropagation();
         var li = event.target || event.srcElement;
         var hours = li.getAttribute("data-hours"),
             minutes = li.getAttribute("data-minutes");
@@ -126,7 +141,7 @@
         this.hide(component, true);
     },
 
-    hide: function(component, shouldFocusReferenceElem) {
+    hide: function (component, shouldFocusReferenceElem) {
         component.set("v.visible", false);
         if ($A.get("$Browser.formFactor") === "DESKTOP" && shouldFocusReferenceElem) {
             var referenceElem = component.get("v.referenceElement");
@@ -136,7 +151,7 @@
         }
     },
 
-    renderList: function(component) {
+    renderList: function (component) {
         var listCmp = component.find("timeList");
         var listElem = listCmp ? listCmp.getElement() : null;
         if (listElem) {
@@ -150,7 +165,7 @@
                 currentMinutes = component.get("v.minutes");
 
             for (var hour = 0; hour < 24; hour++) {
-                for (var minutes = 0; minutes < 60; minutes+=minIncrement) {
+                for (var minutes = 0; minutes < 60; minutes += minIncrement) {
                     date.setHours(hour, minutes);
                     var displayValue = $A.localizationService.formatTime(date, timeFormat, langLocale);
                     var selected = currentHour === hour && currentMinutes === minutes;
@@ -160,7 +175,7 @@
         }
     },
 
-    updateGlobalEventListeners: function(component) {
+    updateGlobalEventListeners: function (component) {
         var visible = component.get("v.visible");
         if (!component._clickHandler) {
             component._clickHandler = component.addDocumentLevelHandler("mouseup", this.getOnClickFunction(component), visible);
@@ -169,31 +184,32 @@
         }
     },
 
-    getOnClickFunction: function(component) {
-        var helper = this;
-        var f = function(event) {
-            if (!helper.isElementInComponent(component, event.target)) {
-                helper.hide(component, false);
+    getOnClickFunction: function (component) {
+        var f = function (event) {
+            if (!this.isElementInComponent(component, event.target)) {
+                this.hide(component, false);
             }
-        };
+        }.bind(this);
         return f;
     },
 
-    isElementInComponent : function(component, targetElem) {
+    isElementInComponent: function (component, targetElem) {
         var componentElements = component.getElements();
         //go up the chain until it hits either a sibling or the root
         var currentNode = targetElem;
         do {
-            for (var index = 0; index < componentElements.length ; index++) {
-                if (componentElements[index] === currentNode) { return true; }
+            for (var index = 0; index < componentElements.length; index++) {
+                if (componentElements[index] === currentNode) {
+                    return true;
+                }
             }
             currentNode = currentNode.parentNode;
-        } while(currentNode);
+        } while (currentNode);
 
         return false;
     },
 
-    appendListElement: function(listElem, displayValue, hourValue, minuteValue) {
+    appendListElement: function (listElem, displayValue, hourValue, minuteValue) {
         var entry = document.createElement('li');
         entry.appendChild(document.createTextNode(displayValue));
         // set localId to double digit hour/minute in 24h format, e.g. 2330
@@ -207,8 +223,9 @@
         listElem.appendChild(entry);
     },
 
-    scrollToSelectedTime: function(component) {
-        window.setTimeout(function () {
+    scrollToSelectedTime: function (component) {
+        var helper = this;
+        window.requestAnimationFrame($A.getCallback(function () {
             $A.run(function () {
                 var hours = component.get("v.hours"),
                     minutes = component.get("v.minutes"),
@@ -235,21 +252,32 @@
                 if (!$A.util.isUndefinedOrNull(time)) {
                     var elem = document.querySelector(".visible li[id = '" + time + "']");
                     if (!$A.util.isUndefinedOrNull(elem)) {
-                        //elem.scrollIntoView();
-                        elem.focus();
+                        helper.focusElement(component, elem);
                     }
                 }
             });
-        }, 0);
+        }));
     },
 
-    setEventHandlers: function(component) {
+    focusElement: function (component, element) {
+        if (!$A.util.isUndefinedOrNull(component._focus) && component._focus === false) {
+            element.scrollIntoView();
+            var referenceElement = component.get("v.referenceElement");
+            if (referenceElement) {
+                referenceElement.focus();
+            }
+        } else {
+            element.focus();
+        }
+    },
+
+    setEventHandlers: function (component) {
         var el = component.find("timeList").getElement();
         $A.util.on(el, "keydown", this.getKeyboardInteractionHandler(component));
         $A.util.on(el, "mousewheel", this.getMousewheelHandler(component));
     },
 
-    removeEventHandlers: function(component) {
+    removeEventHandlers: function (component) {
         var el = component.find("timeList").getElement();
         $A.util.removeOn(el, "keydown", this.getKeyboardInteractionHandler(component));
         $A.util.removeOn(el, "mousewheel", this.getMousewheelHandler(component));
@@ -257,20 +285,21 @@
         delete component._mousewheelEventHandler;
     },
 
-    getMousewheelHandler: function(component) {
+    getMousewheelHandler: function (component) {
         if (!component._mousewheelEventHandler) {
             component._mousewheelEventHandler = function (event) {
-                // modal panel scopes scroll events which results in weird behavior when scrolling the time picker inside it
+                // modal panel scopes scroll events which results in weird behavior when scrolling the time picker
+                // inside it
                 event.stopPropagation();
             };
         }
         return component._mousewheelEventHandler;
     },
 
-    getKeyboardInteractionHandler: function(component) {
+    getKeyboardInteractionHandler: function (component) {
         var helper = this;
         if (!component._keyboardEventHandler) {
-            component._keyboardEventHandler = function(event) {
+            component._keyboardEventHandler = function (event) {
                 if (event.type === "keydown") {
                     if (event.keyCode === 39 || event.keyCode === 40) { // right or down arrow key
                         event.preventDefault();
@@ -296,7 +325,7 @@
         return component._keyboardEventHandler;
     },
 
-    setFocusToNextItem: function(component, event) {
+    setFocusToNextItem: function (component, event) {
         var li = event.target || event.srcElement;
         var hours = parseInt(li.getAttribute("data-hours")),
             minutes = parseInt(li.getAttribute("data-minutes")),
@@ -320,7 +349,7 @@
         }
     },
 
-    setFocusToPreviousItem: function(component, event) {
+    setFocusToPreviousItem: function (component, event) {
         var li = event.target || event.srcElement;
         var hours = parseInt(li.getAttribute("data-hours")),
             minutes = parseInt(li.getAttribute("data-minutes")),

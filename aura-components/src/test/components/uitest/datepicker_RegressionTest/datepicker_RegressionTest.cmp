@@ -22,7 +22,7 @@
 	<aura:attribute name="tpLeftDelta" type="Integer"/>
 
 	<div class="block">
-		<aura:if isTrue="{! v.renderItem == 'testSFXAccessibiltyHeaderTagDefValue'}">	
+		<aura:if isTrue="{! v.renderItem == 'testSFXAccessibiltyHeaderTagDefValue'}">
 		    <div>
 		        <h1>Test Default Header Tag (h2)</h1>
 		    </div>
@@ -31,17 +31,7 @@
 		    </div>
 		</aura:if>
 
-
-		<aura:if isTrue="{! v.renderItem == 'testSFXAccessibiltyCustomHeaderTag'}">	
-		    <div>
-		        <h1>Test Custom Header Tag h3 and datepicker.helper.setTitleTag API</h1>
-		    </div>
-		    <div>
-		        <ui:datePicker aura:id="standAloneDatepicker" visible="true" titleHeadingLevel="h3"></ui:datePicker>
-		    </div>
-		</aura:if>
-
-		<aura:if isTrue="{! v.renderItem == 'testDatepickerSetFocus'}">	
+		<aura:if isTrue="{! v.renderItem == 'testDatepickerSetFocus'}">
 		    <div>
 		        <h1>Test Set Focus Attribute</h1>
 		    </div>
@@ -54,7 +44,7 @@
 		</aura:if>
 
 
-		<aura:if isTrue="{! v.renderItem == 'testSingleInputFlag'}">	
+		<aura:if isTrue="{! v.renderItem == 'testSingleInputFlag'}">
 			<div id="singleInputField">
 				<b>singleInputField:</b><br />
 				<ui:inputDateTime aura:id="inputDatetime" useSingleInput="true" displayDatePicker="true" /><br />
@@ -66,21 +56,21 @@
 		</aura:if>
 
 
-		<aura:if isTrue="{! v.renderItem == 'testDisabledInputDate'}">	
+		<aura:if isTrue="{! v.renderItem == 'testDisabledInputDate'}">
 			<ui:inputDate aura:id="inputDate" disabled="true" />
 		</aura:if>
 
-		<aura:if isTrue="{! v.renderItem == 'testCloseOnClickOut'}">	
+		<aura:if isTrue="{! v.renderItem == 'testCloseOnClickOut'}">
 			<ui:button aura:id="btnPressMe" label="Press Me and The Datepicker will disappear"></ui:button>
 			<ui:datePicker aura:id="standAloneDatepicker" visible="true" closeOnClickOut="true" ></ui:datePicker>
 		</aura:if>
 
-		<aura:if isTrue="{! v.renderItem == 'testOpenOnClickOut'}">	
+		<aura:if isTrue="{! v.renderItem == 'testOpenOnClickOut'}">
 			<ui:button aura:id="btnPressMe" label="Press Me and the Datepicker still stays opened"></ui:button>
 			<ui:datePicker aura:id="standAloneDatepicker" visible="true" closeOnClickOut="false"></ui:datePicker>
 		</aura:if>
 
-		<aura:if isTrue="{! v.renderItem == 'simpleInputDateTime'}">	
+		<aura:if isTrue="{! v.renderItem == 'simpleInputDateTime'}">
 			<pre>
 Acceptable Delta: {!v.acceptableDelta}
 Datepicker Top,Left Delta: {!v.dpTopDelta},	{!v.dpLeftDelta}

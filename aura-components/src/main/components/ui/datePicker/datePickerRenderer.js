@@ -14,73 +14,41 @@
  * limitations under the License.
  */
 ({
-    afterRender: function(component, helper) {
-        var visible = component.get("v.visible"),
-            managed = component.get('v.managed');
-
-        if (visible === true) {
-            if (component.get("v._yearListInitialized") === false) {
-                helper.refreshYearSelection(component);
-                component.set("v._yearListInitialized", true);
-            }
-
-            helper.setGridInitialValue(component);
-            helper.updateMonthYear(component, component.get("v.value"));
-            if(component.get('v.closeOnClickOut')) {
-                helper.updateGlobalEventListeners(component);
-            }
-        }
-
-        // If this picker is not 'managed' (consumed by ui:dataPickerManager),
-        // then positioning should be taken into account.
-        if (visible === true && !managed) {
-            helper.position(component);
-        }
-
+    afterRender: function (component, helper) {
         this.superAfterRender();
-    },
-
-    rerender: function(component, helper) {
         var visible = component.get("v.visible");
+        var managed = component.get('v.managed');
 
-        if (visible === true) {
-            if (component.get("v._yearListInitialized") === false) {
-                helper.refreshYearSelection(component);
-                component.set("v._yearListInitialized", true);
-            }
+        if (visible) {
+            helper.refreshYearSelection(component);
+            helper.setInitialValuesOnChildren(component);
+            helper.initializeMonthYear(component, component.get("v.value"));
+            helper.updateGlobalEventListeners(component);
+            helper.setInitialFocus(component);
 
-            helper.setGridInitialValue(component);
-            helper.updateMonthYear(component, component.get("v.value"));
-            if(component.get('v.closeOnClickOut')) {
-                helper.updateGlobalEventListeners(component);
+            // If this picker is not 'managed' (consumed by ui:dataPickerManager),
+            // then positioning should be taken into account.
+            if (!managed) {
+                helper.position(component);
             }
         }
+    },
 
+    rerender: function (component, helper) {
         this.superRerender();
-
-        if (visible === true) {
+        var visible = component.get("v.visible");
+        if (visible) {
+            helper.refreshYearSelection(component);
+            helper.setInitialValuesOnChildren(component);
+            helper.initializeMonthYear(component, component.get("v.value"));
+            helper.updateGlobalEventListeners(component);
             helper.position(component);
         }
-
-        var isAndroid = $A.get("$Browser.isAndroid");
-
-        if (isAndroid === true) {
-            var f = function(e) {
-                helper.handleWinResize(component, e);
-            };
-            if (visible === true) {
-                $A.util.on(window, "resize", f);
-            } else {
-                $A.util.removeOn(window, "resize", f);
-            }
-        }
     },
 
-    unrender: function(component) {
-        if(component.positionConstraint) {
-            component.positionConstraint.destroy();
-            delete component.positionConstraint;
-        }
+    unrender: function (component, helper) {
+        helper.unposition(component);
+        helper.removeDocumentLevelHandler(component._clickHandler);
         this.superUnrender();
     }
 })// eslint-disable-line semi

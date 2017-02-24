@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 ({
-    afterRender: function(component, helper) {
+    afterRender: function (component, helper) {
         helper.updateCell(component);
         return this.superAfterRender();
     },
 
-    rerender: function(component, helper) {
+    rerender: function (component, helper) {
         helper.updateCell(component);
         this.superRerender();
     }

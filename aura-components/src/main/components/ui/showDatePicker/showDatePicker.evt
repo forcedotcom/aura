@@ -19,4 +19,6 @@
 	<aura:attribute name="element" type="Object" description="DOM HTMLElement for positioning."/>
 	<aura:attribute name="value" type="String" description="Initial value for ui:datePicker."/>
     <aura:attribute name="sourceComponentId" type="String" description="GlobalId of the inputDate or inputDateTime component firing the event"/>
+    <aura:attribute name="focusDatePicker" type="Boolean" default="false" description="Indicates if the calendar should get the focus after displaying the datepicker."/>
+    <aura:attribute name="toggleVisibility" type="Boolean" default="true" description="Indicates if we should change the datepicker's v.visible."/>
 </aura:event>

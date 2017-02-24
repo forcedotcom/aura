@@ -14,30 +14,34 @@
  * limitations under the License.
  */
 ({
-	clearValue: function(component) {
-		component.set("v.value", "");
-	},
+    clearValue: function (component) {
+        component.set("v.value", "");
+    },
 
-    doInit: function(component, event, helper) {
+    doInit: function (component, event, helper) {
         helper.init(component);
     },
 
-    openDatePicker: function(component, event, helper) {
-        helper.displayDatePicker(component);
+    openDatePicker: function (component, event, helper) {
+        helper.displayDatePicker(component, true);
     },
 
-    inputDateFocus: function(component, event, helper) {
-	    helper.handleInputDateFocused(component);
+    pickerKeydown: function (component, event, helper) {
+        helper.handlePickerTab(component, event);
+    },
+
+    inputDateClick: function (component, event, helper) {
+        helper.displayDatePicker(component, false);
     },
 
     // override ui:handlesDateSelected
-    onDateSelected: function(component, event, helper) {
+    onDateSelected: function (component, event, helper) {
         helper.handleDateSelectionByManager(component, event);
     },
 
     // override ui:hasManager
-    registerManager: function(component, event, helper) {
-	    helper.registerManager(component, event);
+    registerManager: function (component, event, helper) {
+        helper.registerManager(component, event);
     }
 
 })// eslint-disable-line semi

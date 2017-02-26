@@ -268,7 +268,7 @@ public class FileSourceLoader extends BaseSourceLoader implements InternalNamesp
 
     @Override
     public String toString() {
-        return super.toString() + '[' + base.getAbsolutePath() + ']';
+        return getClass().getSimpleName() + '[' + base.getAbsolutePath() + ']';
     }
 
     @Override
@@ -278,9 +278,13 @@ public class FileSourceLoader extends BaseSourceLoader implements InternalNamesp
         // for creation/deletion. There is a race condition whereby this will cause odd failures if files
         // are added/removed while something is running. caveat emptor
         if (filePath != null && filePath.startsWith(base.getPath()) && event != SourceMonitorEvent.CHANGED) {
-            synchronized (this) {
-                namespaces = null;
-            }
+            reset();
+        }
+    }
+
+    public void reset() {
+        synchronized (this) {
+            namespaces = null;
         }
     }
 }

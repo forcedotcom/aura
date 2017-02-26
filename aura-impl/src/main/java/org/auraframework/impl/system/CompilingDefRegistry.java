@@ -70,6 +70,7 @@ public class CompilingDefRegistry implements DefRegistry {
     public void reset() {
         namespaces.clear();
         registry.clear();
+        sourceLoader.reset();
 
         namespaces.addAll(sourceLoader.getNamespaces());
         Set<DefDescriptor<?>> descriptors = sourceLoader.find(new DescriptorFilter("*://*:*"));

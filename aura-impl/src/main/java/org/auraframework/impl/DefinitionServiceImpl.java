@@ -55,6 +55,7 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.system.BundleSource;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.Location;
@@ -373,7 +374,15 @@ public class DefinitionServiceImpl implements DefinitionService {
         AuraContext context = contextService.getCurrentContext();
         DefRegistry reg = context.getRegistries().getRegistryFor(descriptor);
         if (reg != null) {
-            return reg.getSource(descriptor);
+            Source<T> source = reg.getSource(descriptor);
+            // This is a bit of a hack.
+            if (source instanceof BundleSource) {
+                Map<DefDescriptor<?>,Source<?>> sources = ((BundleSource<T>)source).getBundledParts();
+                @SuppressWarnings("unchecked")
+                Source<T> newSource = (Source<T>)sources.get(descriptor);
+                return newSource;
+            }
+            return source;
         }
         return null;
     }

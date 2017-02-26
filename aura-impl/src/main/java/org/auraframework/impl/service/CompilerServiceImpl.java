@@ -66,6 +66,9 @@ public class CompilerServiceImpl implements CompilerService {
 
     private <S extends Source<D>, D extends Definition> D getDefinitionTypeSafe(DefDescriptor<D> descriptor,
             S source, Class<D> type) throws QuickFixException {
+        if (source == null) {
+            return null;
+        }
         String key = source.getClass().getName()+":"+type.getName()+":"+source.getMimeType();
         @SuppressWarnings("unchecked")
         DefinitionFactory<S,D> factory = (DefinitionFactory<S,D>)factoryMap.get(key);
@@ -77,14 +80,16 @@ public class CompilerServiceImpl implements CompilerService {
             return null;
         }
         D def = factory.getDefinition(descriptor, source);
-        def.validateDefinition();
+        if (def != null) {
+            def.validateDefinition();
+        }
         return def;
     }
 
     @Override
     public <D extends Definition> D compile(DefDescriptor<D> descriptor, Source<D> source) throws QuickFixException {
         @SuppressWarnings("unchecked")
-        Class<D> clazz = (Class<D>)source.getDescriptor().getDefType().getPrimaryInterface();
+        Class<D> clazz = (Class<D>)descriptor.getDefType().getPrimaryInterface();
         return getDefinitionTypeSafe(descriptor, source, clazz);
     }
 

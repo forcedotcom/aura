@@ -173,4 +173,8 @@ public class ResourceSourceLoader extends BaseSourceLoader implements InternalNa
         // All resource based namespaces are considered internal by default
         return true;
     }
+
+    @Override
+    public void reset() {
+    }
 }

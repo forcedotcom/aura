@@ -39,6 +39,8 @@ import com.google.common.collect.Lists;
 
 /**
  * Engine for Aura validations
+ *
+ * FIXME: This is completely busted.
  */
 public final class ValidationEngine {
 

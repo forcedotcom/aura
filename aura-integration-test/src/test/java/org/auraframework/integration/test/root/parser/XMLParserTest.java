@@ -15,172 +15,90 @@
  */
 package org.auraframework.integration.test.root.parser;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Map;
+import java.security.SecureRandom;
 
-import javax.inject.Inject;
-
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.EventType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.event.EventDefImpl;
-import org.auraframework.impl.factory.ComponentXMLParser;
-import org.auraframework.impl.factory.EventXMLParser;
 import org.auraframework.impl.factory.XMLParser;
-import org.auraframework.impl.source.file.FileSource;
+import org.auraframework.impl.source.StringSource;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.TextSource;
-import org.auraframework.throwable.AuraException;
-import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
-public class XMLParserTest extends AuraImplTestCase {
+/**
+ * A base class that does some simple generic tests that should pass for all XML parsers.
+ */
+public abstract class XMLParserTest<T extends RootDefinition> extends AuraImplTestCase {
 
-    private DefDescriptor<ComponentDef> descriptor;
-    private ComponentDef def;
+    protected abstract XMLParser<T> getParser();
 
-    @Inject
-    private ComponentXMLParser componentXMLParser;
+    protected abstract Class<T> getDefinitionClass();
 
-    @Inject
-    private EventXMLParser eventXMLParser;
+    private SecureRandom random = new SecureRandom();
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        try {
-            descriptor = definitionService.getDefDescriptor("test:parser", ComponentDef.class);
-            TextSource<ComponentDef> source = (TextSource<ComponentDef>)getSource(descriptor);
-            def = componentXMLParser.getDefinition(descriptor, source);
-        } catch (Exception e) {
-            tearDown();
-            throw e;
-        }
+    <D extends Definition> DefDescriptor<D> makeUniqueMarkupDescriptor(Class<D> clazz) {
+        String namespace = "myreallyuniquenamespace"+random.nextLong();
+        String name = "myreallyunique"+random.nextLong();
+        return new DefDescriptorImpl<D>("markup", namespace, name, clazz);
     }
 
-    @Test
-    public void testParseDescriptor() throws Exception {
-        assertEquals("Unexpected Descriptor", descriptor, def.getDescriptor());
-    }
-
-    @Test
-    public void testParseInvalid() throws Exception {
-        descriptor = definitionService.getDefDescriptor("test:parserInvalid", ComponentDef.class);
-        TextSource<ComponentDef> source = (TextSource<ComponentDef>)getSource(descriptor);
-        ComponentDef cd = componentXMLParser.getDefinition(descriptor, source);
-        try {
-            cd.validateDefinition();
-            fail("Parsing invalid source should throw exception");
-        } catch (InvalidDefinitionException e) {
-            Location location = e.getLocation();
-            assertTrue("Wrong filename.", location.getFileName().endsWith("parserInvalid.cmp"));
-            assertEquals(19, location.getLine());
-            assertEquals(5, location.getColumn());
-        }
-    }
-
-    @Test
-    public void testParseFragment() throws Exception {
-        descriptor = definitionService.getDefDescriptor("test:parserFragment", ComponentDef.class);
-        TextSource<ComponentDef> source = (TextSource<ComponentDef>)getSource(descriptor);
-        ComponentDef cd = componentXMLParser.getDefinition(descriptor, source);
-        try {
-            cd.validateDefinition();
-            fail("Parsing invalid source should throw exception");
-        } catch (AuraException e) {
-            Location location = e.getLocation();
-            assertTrue("Wrong filename.", location.getFileName().endsWith("parserFragment.cmp"));
-            checkExceptionContains(e, InvalidDefinitionException.class,
-                    "Expected start tag <aura:component> but found aura:parent");
-            assertEquals(18, location.getLine());
-        }
-    }
-
-    @Test
-    public void testParseNonexistent() throws Exception {
-        
-        // Cannot use Mockito on JDK7 because the File class has been changed to directly access File.path data member
-        File tmpFile = new File("") {
-            @Override
-            public String getPath() {
-                return "";
-            }
-
-            @Override
-            public String getCanonicalPath() throws IOException {
-                return "";
-            }
-
-            @Override
-            public boolean exists() {
-                return true;
-            }
-
-            @Override
-            public long lastModified() {
-                return 0L;
-            }
-
-            private static final long serialVersionUID = 1L;
-        };
-        
-        TextSource<ComponentDef> source = new FileSource<>(descriptor, tmpFile, Format.XML);
-        try {
-            componentXMLParser.getDefinition(null, source);
-            fail("Parsing nonexistent source should throw exception");
-        } catch (AuraUnhandledException e) {
-            assertEquals(FileNotFoundException.class, e.getCause().getCause().getClass());
-        }
+    <D extends Definition> TextSource<D> makeTextSource(DefDescriptor<D> descriptor, String contents, Format format) {
+        return new StringSource<D>(descriptor, contents, descriptor.getName()+".randomExtension", format);
     }
 
     @Test
     public void testParseNull() throws Exception {
-        descriptor = definitionService.getDefDescriptor("test:parserNonexistent", ComponentDef.class);
-        TextSource<ComponentDef> source = null;
+        DefDescriptor<T> descriptor = makeUniqueMarkupDescriptor(getDefinitionClass());
+        Throwable expected = null;
+
         try {
-            componentXMLParser.getDefinition(descriptor, source);
-            fail("Parsing null source should throw exception");
-        } catch (AuraUnhandledException e) {
-            assertEquals(NullPointerException.class, e.getCause().getClass());
-            // good!
+            getParser().getDefinition(descriptor, null);
+        } catch (Throwable t) {
+            expected = t;
         }
+        // Do not test anything other than we get an exception. Specifically never require it to
+        // be a particular type.
+        assertNotNull("Should have failed to parse with some exception when source is null", expected);
     }
 
     @Test
-    public void testGetLocationNull() throws Exception {
-        assertNull(XMLParser.getLocation(null, null));
+    public void testParseInvalid() throws Exception {
+        DefDescriptor<T> descriptor = makeUniqueMarkupDescriptor(getDefinitionClass());
+        TextSource<T> source = makeTextSource(descriptor, "\n\n   invalid.", Format.XML);
+        InvalidDefinitionException expected = null;
+        T def = getParser().getDefinition(descriptor, source);
+
+        try {
+            def.validateDefinition();
+        } catch (InvalidDefinitionException e) {
+            expected = e;
+        }
+        Location location = expected.getLocation();
+        assertTrue("Wrong filename.", location.getFileName().endsWith(descriptor.getName()+".randomExtension"));
+        assertEquals(3, location.getLine());
+        assertEquals(4, location.getColumn());
     }
 
     @Test
-    public void testParseEvent() throws Exception {
-        DefDescriptor<EventDef> eventDescriptor = definitionService.getDefDescriptor("test:anevent", EventDef.class);
-        TextSource<EventDef> source = (TextSource<EventDef>)getSource(eventDescriptor);
-        EventDefImpl eventDef = (EventDefImpl) eventXMLParser.getDefinition(eventDescriptor, source);
-        assertNotNull(eventDef);
-        assertEquals("Unexpected Descriptor", eventDescriptor, eventDef.getDescriptor());
-        assertEquals("Wrong event type", EventType.COMPONENT, eventDef.getEventType());
-        Map<DefDescriptor<AttributeDef>, AttributeDef> atts = eventDef.getDeclaredAttributeDefs();
-        assertEquals("Wrong number of attributes", 3, atts.size());
-    }
+    public void testParseFragment() throws Exception {
+        DefDescriptor<T> descriptor = makeUniqueMarkupDescriptor(getDefinitionClass());
+        TextSource<T> source = makeTextSource(descriptor, "<aura:parent />.", Format.XML);
+        InvalidDefinitionException expected = null;
 
-    /**
-     * Positive test: Parse a component with comments, new line character after
-     * the end tag.
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testParseComments() throws Exception {
-        descriptor = definitionService.getDefDescriptor("test:test_Parser_Comments", ComponentDef.class);
-        TextSource<ComponentDef> source = (TextSource<ComponentDef>)getSource(descriptor);
-        def = componentXMLParser.getDefinition(descriptor, source);
-        assertEquals("Unexpected Descriptor", descriptor, def.getDescriptor());
+        try {
+            T def = getParser().getDefinition(descriptor, source);
+            def.validateDefinition();
+        } catch (InvalidDefinitionException e) {
+            expected = e;
+        }
+        Location location = expected.getLocation();
+        assertTrue("Wrong filename.", location.getFileName().endsWith(descriptor.getName()+".randomExtension"));
+        assertEquals(1, location.getLine());
+        assertEquals(16, location.getColumn());
     }
 }

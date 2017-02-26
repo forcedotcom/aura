@@ -23,6 +23,7 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.impl.validation.AuraValidationTestCase;
 import org.auraframework.impl.validation.ValidationEngine;
 import org.auraframework.util.validation.ValidationError;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public final class ValidationEngineTest extends AuraValidationTestCase {
@@ -55,6 +56,7 @@ public final class ValidationEngineTest extends AuraValidationTestCase {
     }
 
     @Test
+    @Ignore("this is not a valid thing to test")
     public void testValidateCmp() {
         DefDescriptor<?> descriptor = definitionService
                 .getDefDescriptor("markup://validationTest:basic", ComponentDef.class);

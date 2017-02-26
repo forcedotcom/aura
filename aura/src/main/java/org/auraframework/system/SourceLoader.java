@@ -69,4 +69,9 @@ public interface SourceLoader {
      * Match descriptors against a matcher.
      */
     Set<DefDescriptor<?>> find(@Nonnull DescriptorFilter dm);
+
+    /**
+     * Reset the internals of the source loader (for filesystem changed for example).
+     */
+    void reset();
 }

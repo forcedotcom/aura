@@ -19,21 +19,43 @@ import javax.inject.Inject;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.factory.ComponentXMLParser;
+import org.auraframework.impl.factory.XMLParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
 
-public class ComponentXMLParserTest extends AuraImplTestCase {
+public class ComponentXMLParserTest extends XMLParserTest<ComponentDef> {
     @Inject
     private ComponentXMLParser parser;
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
+    protected XMLParser<ComponentDef> getParser() {
+        return parser;
     }
+
+    protected Class<ComponentDef> getDefinitionClass() {
+        return ComponentDef.class;
+    }
+
+    /**
+     * Positive test: Parse a component with comments, new line character after
+     * the end tag.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testParseComments() throws Exception {
+        String contents = "\n<!--Comments at the beginning. New line at the begining of the file-->\n"
+             +"<aura:component><!-- Comment in between tags --><aura:button label='foo' />\n"
+             +"</aura:component><!-- Comment at the enf of a file -->\n";
+        DefDescriptor<ComponentDef> descriptor = makeUniqueMarkupDescriptor(ComponentDef.class);
+        TextSource<ComponentDef> source = makeTextSource(descriptor, contents, Format.XML);
+        ComponentDef def = parser.getDefinition(descriptor, source);
+        assertEquals("Unexpected Descriptor", descriptor, def.getDescriptor());
+    }
+
 
     @Test
     public void testDuplicateAttributeNames() throws Exception {

@@ -128,4 +128,8 @@ public class JavaSourceLoader implements SourceLoader {
     public Set<DefDescriptor<?>> find(DescriptorFilter dm) {
         return Sets.newHashSet();
     }
+
+    @Override
+    public void reset() {
+    }
 }

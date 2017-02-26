@@ -47,6 +47,7 @@ import org.auraframework.impl.compound.controller.CompoundControllerDefFactory;
 import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
 import org.auraframework.impl.java.JavaSourceLoader;
 import org.auraframework.impl.source.SourceFactory;
+import org.auraframework.impl.source.file.FileBundleSourceLoader;
 import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.impl.source.resource.ResourceSourceLoader;
 import org.auraframework.impl.system.CompilingDefRegistry;
@@ -61,7 +62,9 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.service.RegistryService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.BundleSource;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.RegistrySet;
 import org.auraframework.system.RegistrySet.RegistrySetKey;
 import org.auraframework.system.SourceListener;
@@ -91,6 +94,9 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     @Inject
     private Optional<Collection<RegistryAdapter>> adaptersInject;
 
+    @Inject
+    Collection<FileBundleSourceBuilder> builders;
+
     private Collection<RegistryAdapter> adapters;
 
     private CachingService cachingService;
@@ -110,20 +116,21 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             DefDescriptor.CUSTOM_FLAVOR_PREFIX,
             DefDescriptor.JAVASCRIPT_PREFIX);
 
-    private static final Set<DefType> markupDefTypes = EnumSet.of(
+    private static final Set<DefType> allMarkupDefTypes = EnumSet.of(
             DefType.APPLICATION,
             DefType.COMPONENT,
+            DefType.EVENT,
+            DefType.INTERFACE,
+            DefType.LIBRARY,
+
             DefType.CONTROLLER,
             DefType.DESIGN,
             DefType.DOCUMENTATION,
-            DefType.EVENT,
             DefType.FLAVOR_BUNDLE,
             DefType.FLAVORED_STYLE,
             DefType.FLAVORS,
             DefType.HELPER,
             DefType.INCLUDE,
-            DefType.INTERFACE,
-            DefType.LIBRARY,
             DefType.MODEL,
             DefType.PROVIDER,
             DefType.RENDERER,
@@ -133,6 +140,8 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             DefType.TOKENS
             );
 
+    private static final Set<DefType> markupDefTypes = Sets.difference(allMarkupDefTypes, BundleSource.bundleDefTypes);
+
     private static class SourceLocationInfo {
         public final List<DefRegistry> staticLocationRegistries;
         public final List<DefRegistry> markupRegistries;
@@ -140,8 +149,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         private boolean changed;
 
         public SourceLocationInfo(DefRegistry[] staticLocationRegistries, String baseDir,
-                List<DefRegistry> markupRegistries,
-                List<SourceLoader> javaSourceLoaders) {
+                List<DefRegistry> markupRegistries) {
             List<DefRegistry> slr_list = null;
             if (staticLocationRegistries != null) {
                 slr_list = Arrays.asList(staticLocationRegistries);
@@ -246,13 +254,11 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         String pkg = location.getComponentSourcePackage();
         String canonical = null;
         List<SourceLoader> markupLoaders = Lists.newArrayList();
-        List<SourceLoader> javaLoaders = Lists.newArrayList();
         List<DefRegistry> markupRegistries = Lists.newArrayList();
         if (pkg != null) {
             ResourceSourceLoader rsl = new ResourceSourceLoader(pkg);
             markupLoaders.add(rsl);
-            javaLoaders.add(rsl);
-            markupRegistries.add(new CompilingDefRegistry(rsl, markupPrefixes, markupDefTypes, compilerService));
+            markupRegistries.add(new CompilingDefRegistry(rsl, markupPrefixes, allMarkupDefTypes, compilerService));
         } else if (location.getComponentSourceDir() != null) {
             File components = location.getComponentSourceDir();
             if (!components.canRead() || !components.canExecute() || !components.isDirectory()) {
@@ -261,16 +267,14 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
                 FileSourceLoader fsl = new FileSourceLoader(components, fileMonitor);
                 markupLoaders.add(fsl);
                 markupRegistries.add(new CompilingDefRegistry(fsl, markupPrefixes, markupDefTypes, compilerService));
-                File javaBase = new File(components.getParent(), "java");
-                if (javaBase.exists()) {
-                    javaLoaders.add(new FileSourceLoader(javaBase, fileMonitor));
-                }
+                markupRegistries.add(new CompilingDefRegistry(
+                            new FileBundleSourceLoader(components, fileMonitor, builders),
+                            markupPrefixes, BundleSource.bundleDefTypes, compilerService));
                 File generatedJavaBase = location.getJavaGeneratedSourceDir();
                 if (generatedJavaBase != null && generatedJavaBase.exists()) {
                     fsl = new FileSourceLoader(generatedJavaBase, fileMonitor);
                     markupLoaders.add(fsl);
                     markupRegistries.add(new CompilingDefRegistry(fsl, markupPrefixes, markupDefTypes, compilerService));
-                    javaLoaders.add(fsl);
                 }
                 try {
                     canonical = components.getCanonicalPath();
@@ -302,7 +306,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
                 }
             }
         }
-        return new SourceLocationInfo(staticRegs, canonical, markupRegistries, javaLoaders);
+        return new SourceLocationInfo(staticRegs, canonical, markupRegistries);
     }
 
     private SourceLocationInfo getSourceLocationInfo(ComponentLocationAdapter location) {

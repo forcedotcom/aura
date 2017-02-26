@@ -92,6 +92,7 @@ public class SourceFactoryTest extends AuraImplTestCase {
         public <D extends Definition> TextSource<D> getSource(DefDescriptor<D> descriptor) {return null;}
         @Override
         public Set<DefDescriptor<?>> find(DescriptorFilter dm) {return null;}
+        @Override public void reset() {}
     }
     
     //FriendlySourceLoader considered everything as internal namespace
@@ -108,6 +109,7 @@ public class SourceFactoryTest extends AuraImplTestCase {
         public <D extends Definition> TextSource<D> getSource(DefDescriptor<D> descriptor) {return null;}
         @Override
         public Set<DefDescriptor<?>> find(DescriptorFilter dm) {return null;}
+        @Override public void reset() {}
     }
     //ExternalSourceLoader considered everything as non-internal namespace
     private class ExternalSourceLoader extends BaseSourceLoader{
@@ -119,5 +121,6 @@ public class SourceFactoryTest extends AuraImplTestCase {
         public <D extends Definition> TextSource<D> getSource(DefDescriptor<D> descriptor) {return null;}
         @Override
         public Set<DefDescriptor<?>> find(DescriptorFilter dm) {return null;}
+        @Override public void reset() {}
     }
 }

@@ -10,6 +10,7 @@
     
     <properties>
         <j2v8.platform>macosx</j2v8.platform>
+        <j2v8.groupId>com.eclipsesource.j2v8</j2v8.groupId>
         <aura.home>${basedir}/..</aura.home>
     </properties>
     
@@ -96,7 +97,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.eclipsesource.j2v8</groupId>
+            <groupId>${j2v8.groupId}</groupId>
             <artifactId>j2v8_${j2v8.platform}_x86_64</artifactId>
         </dependency>
     </dependencies>
@@ -148,6 +149,7 @@
             </activation>
             <properties>
                 <j2v8.platform>linux</j2v8.platform>
+                <j2v8.groupId>com.salesforce.uitier.j2v8</j2v8.groupId>
             </properties>
         </profile>
         <profile>
@@ -159,6 +161,7 @@
             </activation>
             <properties>
                 <j2v8.platform>macosx</j2v8.platform>
+                <j2v8.groupId>com.eclipsesource.j2v8</j2v8.groupId>
             </properties>
         </profile>
     </profiles>

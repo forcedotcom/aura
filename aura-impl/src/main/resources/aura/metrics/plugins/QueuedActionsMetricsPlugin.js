@@ -55,14 +55,18 @@ QueuedActionsMetricsPlugin.prototype.disable = function () {
 QueuedActionsMetricsPlugin.prototype.enqueueActionOverride = function() {
     var config = Array.prototype.shift.apply(arguments);
     var action = arguments[0];
+    var cmp = action.getComponent();
 
-    this.metricsService["mark"](QueuedActionsMetricsPlugin.NAME, 'enqueue', {
-        "id"         : action.getId(),
-        "abortable"  : action.isAbortable(),
-        "storable"   : action.isStorable(),
-        "background" : action.isBackground(),
-        "def"        : action.getDef().toString()
-    });
+    if (action.getDef().isServerAction()) {
+        this.metricsService["mark"](QueuedActionsMetricsPlugin.NAME, 'enqueue', {
+            "id"           : action.getId(),
+            "abortable"    : action.isAbortable(),
+            "storable"     : action.isStorable(),
+            "background"   : action.isBackground(),
+            "cmp"          : (cmp && cmp.getType()) || "none",
+            "def"          : action.getDef().toString()
+        });
+    }
 
     //console.log('>>> ActionEnqueue :: %s [%s]', action.getId(), action.getDef()+'');
 
@@ -70,12 +74,21 @@ QueuedActionsMetricsPlugin.prototype.enqueueActionOverride = function() {
     return ret;
 };
 
+QueuedActionsMetricsPlugin.prototype.collectServerActionOverride = function() {
+    var config = Array.prototype.shift.apply(arguments);
+    var action = arguments[0];
+    this.metricsService["mark"](QueuedActionsMetricsPlugin.NAME, 'sendQueued', {
+        "id"    : action.getId()
+    });
+    return config["fn"].apply(config["scope"], arguments);
+};
+
 QueuedActionsMetricsPlugin.prototype.actionSendOverride = function() {
     var config = Array.prototype.shift.apply(arguments);
     var actions = arguments[1];
 
     for (var i = 0; i < actions.length; i++) {
-        this.metricsService["markStart"](QueuedActionsMetricsPlugin.NAME, 'send', {
+        this.metricsService["mark"](QueuedActionsMetricsPlugin.NAME, 'sendStart', {
             "id" : actions[i].getId()
         });
     }
@@ -86,20 +99,32 @@ QueuedActionsMetricsPlugin.prototype.actionSendOverride = function() {
 
 QueuedActionsMetricsPlugin.prototype.actionFinishOverride = function() {
     var config = Array.prototype.shift.apply(arguments);
-    this.metricsService["markEnd"](QueuedActionsMetricsPlugin.NAME, 'send', {
-        "id"    : config["self"].getId(),
-        "state" : config["self"].getState(),
-        "cache" : config["self"].isFromStorage()
+    var action = config["self"];
+    // we don't want to log client side actions
+    var shouldLog = action.getDef().isServerAction();
+    shouldLog && this.metricsService["mark"](QueuedActionsMetricsPlugin.NAME, 'finishStart', {
+        "id"    : action.getId(),
+        "state" : action.getState(),
+        "cache" : action.isFromStorage()
     });
-    
+    var ret = undefined;
     //console.log('>>> ActionFinish :: ', config["self"].getId());
-
-    return config["fn"].apply(config["scope"], arguments);
+    try {
+        ret = config["fn"].apply(config["scope"], arguments);
+    } finally {
+        shouldLog && this.metricsService["mark"](QueuedActionsMetricsPlugin.NAME, 'finishEnd', {
+            "id"    : action.getId()
+        });
+    }
+    return ret;
 };
 
 QueuedActionsMetricsPlugin.prototype.bind = function () {
     // Time of $A.enqueue
     $A.installOverride("enqueueAction", this.enqueueActionOverride, this);
+
+    // Time when action is immediately ready to send
+    $A.installOverride("ClientService.collectServerAction", this.collectServerActionOverride, this);
 
     // Time when the action is sent
     $A.installOverride("ClientService.send", this.actionSendOverride, this);
@@ -117,18 +142,39 @@ QueuedActionsMetricsPlugin.prototype.postProcess = function (actionMarks /*, trx
     for (var i = 0; i < actionMarks.length; i++) {
         var actionMark = actionMarks[i];
         var id = actionMark["context"]["id"];
-        var phase = actionMark["phase"];
         var mark = queue[id];
-
-        if (phase === 'stamp') {
+        var name = actionMark["name"];
+        
+        if (name === 'enqueue') {
             queue[id] = $A.util.apply({}, actionMark);
-        } else if (phase === 'start' && mark) {
-            mark["enqueueWait"] = parseInt(actionMark["ts"] - mark["ts"]);
-        } else if (phase === 'end' && mark) {
-            $A.util.apply(mark["context"], actionMark["context"]);
-            mark["duration"] = parseInt(actionMark["ts"] - mark["ts"]);
-            processedMarks.push(mark);
-            delete queue[id];
+        }
+        
+        if (mark) {
+            switch (name) {
+            case "sendQueued":
+                mark["xhrWait"] = Math.floor(actionMark["ts"]);
+                mark["enqueueWait"] = Math.floor(actionMark["ts"] - mark["ts"]);
+                break;
+            case "sendStart":
+                mark["xhrWait"] = Math.floor(actionMark["ts"] - mark["xhrWait"]);
+                break;
+            case "finishStart":
+                $A.util.apply(mark["context"], actionMark["context"]);
+                mark["callbackTime"] = actionMark["ts"];
+                // these actions can come from storage too, so enqueueWait wouldn't normally be marked
+                // because we won't go through the sendQueued step
+                if (mark["enqueueWait"] === undefined) {
+                    mark["enqueueWait"] = Math.floor(actionMark["ts"] - mark["ts"]);
+                }
+                break;
+            case "finishEnd":
+                mark["callbackTime"] = Math.floor(actionMark["ts"] - mark["callbackTime"]);
+                mark["duration"] = Math.floor(actionMark["ts"] - mark["ts"]);
+                mark["phase"] = "processed";
+                processedMarks.push(mark);
+                delete queue[id];
+                break;
+            }
         }
     }
 
@@ -137,6 +183,7 @@ QueuedActionsMetricsPlugin.prototype.postProcess = function (actionMarks /*, trx
 
 QueuedActionsMetricsPlugin.prototype.unbind = function () {
     $A.uninstallOverride("enqueueAction", this.enqueueActionOverride);
+    $A.uninstallOverride("ClientService.collectServerAction", this.collectServerActionOverride);
     $A.uninstallOverride("ClientService.send", this.actionSendOverride, this);
     $A.uninstallOverride("Action.finishAction", this.actionFinishOverride);
 };

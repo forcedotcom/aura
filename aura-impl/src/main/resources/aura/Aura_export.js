@@ -102,6 +102,15 @@ Aura.OverrideMap = function OverrideMap() {
             }
         ),
 
+        "ClientService.collectServerAction" : new Aura.Utils.Override($A.clientService, $A.clientService.collectServerAction, false,
+            function(bound) {
+                $A.clientService.collectServerAction = bound;
+            },
+            function(orig) {
+                $A.clientService.collectServerAction = orig;
+            }
+        ),
+
         "ClientService.receive" : new Aura.Utils.Override($A.clientService, $A.clientService.receive, false,
             function(bound) {
                 $A.clientService.receive = bound;

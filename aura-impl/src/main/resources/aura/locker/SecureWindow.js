@@ -229,7 +229,7 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
         SecureObject.addPropertyIfSupported(o, win, name);
     });
 
-    var workerFrame = win.document.getElementById("safeEvalWorker");
+    var workerFrame = win.document.getElementById("safeEvalWorkerCustom");
     var safeEvalWindow = workerFrame && workerFrame.contentWindow;            
     var globalScope = safeEvalWindow || win;
 

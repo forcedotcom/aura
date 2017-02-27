@@ -27,7 +27,6 @@ import org.auraframework.system.DefRegistry;
 import org.auraframework.util.resource.ResourceLoader;
 
 public interface ConfigAdapter extends AuraAdapter {
-
     boolean isTestAllowed();
 
     boolean isProduction();

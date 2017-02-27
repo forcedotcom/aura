@@ -975,7 +975,7 @@ SecureObject.addPrototypeMethodsAndPropertiesStateless = function(metadata, prot
     return config;
 };
 
-var workerFrame = window.document.getElementById("safeEvalWorker");
+var workerFrame = window.document.getElementById("safeEvalWorkerCustom");
 var safeEvalScope = workerFrame && workerFrame.contentWindow;
 
 function getUnfilteredTypes() {

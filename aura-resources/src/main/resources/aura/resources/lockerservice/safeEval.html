@@ -2,176 +2,195 @@
 <html>
 <head></head>
 <body>
-<script>
-(function (window, placeholder, parent) {
-    'use strict';
+  <script>
+  // eval() needs to be outside of the strict mode code to be able to support the use of with() statements
+  function internalEval(source) {
+      return eval(source);
+  }
+  
+  (function (window, placeholder, parent) {
+      "use strict"
+      
+      // TODO: improve returnable detection. `function (...` is a trick used today
+      //       to return arbitrary code from actions, it should be legacy in the future.
+      var returnableEx = /^(\s*)([{(["']|function\s*\()/;
+      // TODO: improve first comment removal
+      var trimFirstMultilineCommentEx = /^\/\*([\s\S]*?)\*\//;
+      var trimFirstLineCommentEx = /^\/\/.*\n?/;
+      var hookFn = '$globalEvalIIFE$';
+      var brackets;
 
-    // TODO: improve returnable detection. `function (...` is a trick used today
-    //       to return arbitrary code from actions, it should be legacy in the future.
-    var returnableEx = /^(\s*)([{(["']|function\s*\()/;
-    // TODO: improve first comment removal
-    var trimFirstMultilineCommentEx = /^\/\*([\s\S]*?)\*\//;
-    var trimFirstLineCommentEx = /^\/\/.*\n?/;
-    var hookFn = '$globalEvalIIFE$';
-    var brackets;
+      // wrapping the source with `with` statements create a new lexical scope,
+      // that can prevent access to the globals in the worker by shodowing them
+      // with the members of new scopes passed as arguments into the `hookFn` call.
+      // additionally, when specified, strict mode will be enforced to avoid leaking
+      // global variables into the worker.
+      function addLexicalScopesToSource(src, options) {
+          if (options.skipPreprocessing !== true) {
+              // removing first line CSFR protection and other comments to facilitate
+              // the detection of returnable code
+              src = src.replace(trimFirstMultilineCommentEx, '');
+              src = src.replace(trimFirstLineCommentEx, '');
+              // only add return statement if source it starts with [, {, or (
+              var match = src.match(returnableEx);
+              if (match) src = src.replace(match[1], 'return ');
+          }
 
-    // wrapping the source with `with` statements create a new lexical scope,
-    // that can prevent access to the globals in the worker by shodowing them
-    // with the members of new scopes passed as arguments into the `hookFn` call.
-    // additionally, when specified, strict mode will be enforced to avoid leaking
-    // global variables into the worker.
-    function addLexicalScopesToSource(src, options) {
-        if (options.skipPreprocessing !== true) {
-            // removing first line CSFR protection and other comments to facilitate
-            // the detection of returnable code
-            src = src.replace(trimFirstMultilineCommentEx, '');
-            src = src.replace(trimFirstLineCommentEx, '');
-            // only add return statement if source it starts with [, {, or (
-            var match = src.match(returnableEx);
-            if (match) src = src.replace(match[1], 'return ');
-        }
+          if (options.lockerize) {
+              // forcing strict mode
+              src = '"use strict";\n' + src;
 
-        if (options.useStrict) {
-            // forcing strict mode
-            src = '"use strict";\n' + src;
-        }
-
-        if(options.wrapInBrackets){
-            //cache brackets string once calculated
-            if(!brackets){
+              // cache brackets string once calculated
+              if (!brackets){
                 brackets = ['',''];
                 var array = new Uint8Array(128);
                 crypto.getRandomValues(array);
 
                 array.forEach(function(number){
-                    if(number % 2){
+                    if (number % 2){
                         brackets[0] = brackets[0] + '(';
                         brackets[1] = ')' + brackets[1];
-                    }
-                    else{
+                    } else {
                         brackets[0] = brackets[0] + '[';
                         brackets[1] = '][0]' + brackets[1];
                     }
                 });
             }
+            
             src = 'return ' + brackets[0] + '(function(window){\n' + src + '\n})' + brackets[1] + '.call(arguments[0], arguments[0])';
-        }
-        else{
+          } else {
             src = 'return (function(window){\n' + src + '\n}).call(arguments[0], arguments[0])';
-        }
+          }
+          
+          for (var i = 0; i < options.levels; i++) {
+              src = 'with(arguments[' + i + ']||{}){' + src + '}';
+          }
+          
+          var code = 'function ' + hookFn + '(){' + src + '}';
+          
+          if (options.sourceURL) {
+              code += '\n//# sourceURL=' + options.sourceURL;
+          }
+          
+          return code;
+      }
 
-        for (var i = 0; i < options.levels; i++) {
-            src = 'with(arguments[' + i + ']||{}){' + src + '}';
-        }
+      function evalAndReturn(src, useEval) {
+          var result;
+          
+          if (useEval) {
+              result = internalEval("(\n" + src + "\n)");
+          } else {
+              var tmp = window[hookFn];
+              try {
+                  var script = document.createElement('script');
+                  script.type = 'text/javascript';
+                  window[hookFn] = undefined;
+                  script.appendChild(document.createTextNode(src));
+                  placeholder.appendChild(script);
+                  placeholder.removeChild(script);
+              } finally {
+                  result = window[hookFn];
+                  window[hookFn] = tmp;
+              }
+          }
+          
+          return result;
+      }
+      
+      function safeEval(src, sourceURL, skipPreprocessing, lockerize, originalThis, originalArguments) {
+          if (!src) {
+              return undefined;
+          }
+          
+          var args = Array.prototype.slice.call(originalArguments, 3);
+          
+          var scoped = addLexicalScopesToSource(src, {
+              levels: args.length,
+              lockerize: lockerize,
+              sourceURL: sourceURL, 
+              skipPreprocessing: skipPreprocessing
+          });
+          
+          var fn = evalAndReturn(scoped, !lockerize);
+          
+          return fn.apply(originalThis, args);
+      }
+      
+      // adding non-configurable hook into parent window.
+      var id = window.location.search.toLowerCase();
+      switch (id) {
+          case "?id=custom":
+              Object.defineProperty(parent, "$$safe-eval$$", {
+                  value: function(src, sourceURL, skipPreprocessing) {
+                      return safeEval(src, sourceURL, skipPreprocessing, true, undefined, arguments);
+                  }
+              });
+              break;
+          case "?id=system":
+              Object.defineProperty(parent, "$$safe-eval-compat$$", {
+                  value: function(src, sourceURL, skipPreprocessing) {
+                      return safeEval(src, sourceURL, skipPreprocessing, false, arguments[0], arguments);
+                  }
+              });
+              break;
+              
+          default:
+              throw new Error("Aura(): Unknown safeEval ID: " + id);
+      }
 
-        var code = 'function ' + hookFn + '(){' + src + '}';
+      // locking down the environment
+      try {
+          // @W-2961201: fixing properties of Object to comply with strict mode
+          // and ES2016 semantics, we do this by redefining them while in 'use strict'
+          // https://tc39.github.io/ecma262/#sec-object.prototype.__defineGetter__
+          [Object, parent.Object, Array].forEach(function (o) {
+              Object.defineProperty(o.prototype, '__defineGetter__', {
+                  value: function (key, fn) {
+                      return o.defineProperty(this, key, {
+                          get: fn
+                      });
+                  }
+              });
+              Object.defineProperty(o.prototype, '__defineSetter__', {
+                  value: function (key, fn) {
+                      return o.defineProperty(this, key, {
+                          set: fn
+                      });
+                  }
+              });
+              Object.defineProperty(o.prototype, '__lookupGetter__', {
+                  value: function (key) {
+                      var d, p = this;
+                      while (p && !(d = o.getOwnPropertyDescriptor(p, key))) {
+                          p = o.getPrototypeOf(this);
+                      }
+                      return d ? d.get : undefined;
+                  }
+              });
+              Object.defineProperty(o.prototype, '__lookupSetter__', {
+                  value: function (key) {
+                      var d, p = this;
+                      while (p && !(d = o.getOwnPropertyDescriptor(p, key))) {
+                          p = o.getPrototypeOf(this);
+                      }
+                      return d ? d.set : undefined;
+                  }
+              });
+              
+              // Immutable Prototype Exotic Objects
+              // https://github.com/tc39/ecma262/issues/272
+              Object.seal(o.prototype);
+          });
+      } catch (ignoring_bleaching_errors) {
+          // Ignore
+      }
 
-        if (options.sourceURL) {
-            code += '\n//# sourceURL=' + options.sourceURL;
-        }
+      // TODO: Extra guarding:
+      // - protect against unexpected navigation events
+      // - protect against reloads
 
-        return code;
-    }
-
-    function evalAndReturn(src) {
-        var tmp =  window[hookFn];
-        try {
-            var script = document.createElement('script');
-            script.type = 'text/javascript';
-            window[hookFn] = undefined;
-            script.appendChild(document.createTextNode(src));
-            placeholder.appendChild(script);
-            placeholder.removeChild(script);
-        } finally {
-            var result = window[hookFn];
-            window[hookFn] = tmp;
-            return result;
-        }
-    }
-
-    function safeEval(src, sourceURL, skipPreprocessing, useStrict, wrapInBrackets, originalThis, originalArguments) {
-        if (!src) {
-            return undefined;
-        }
-
-        var args = Array.prototype.slice.call(originalArguments, 3);
-
-        var scoped = addLexicalScopesToSource(src, {
-            levels: args.length,
-            useStrict: useStrict,
-            sourceURL: sourceURL,
-            wrapInBrackets: wrapInBrackets,
-            skipPreprocessing: skipPreprocessing
-        });
-
-        var fn = evalAndReturn(scoped);
-
-        return fn.apply(originalThis, args);
-    }
-
-    // adding non-configurable hooks into parent window.
-    Object.defineProperties(parent, {
-        '$$safe-eval$$': {
-            value: function(src, sourceURL, skipPreprocessing) {
-                return safeEval(src, sourceURL, skipPreprocessing, true, true, undefined, arguments);
-            }
-        },
-        '$$safe-eval-compat$$': {
-            value: function(src, sourceURL, skipPreprocessing) {
-                return safeEval(src, sourceURL, skipPreprocessing, false, false, arguments[0], arguments);
-            }
-        }
-    });
-
-    // locking down the environment
-    try {
-        // @W-2961201: fixing properties of Object to comply with strict mode
-        // and ES2016 semantics, we do this by redefining them while in 'use strict'
-        // https://tc39.github.io/ecma262/#sec-object.prototype.__defineGetter__
-        [Object, parent.Object].forEach(function (o) {
-            o.defineProperty(o.prototype, '__defineGetter__', {
-                value: function (key, fn) {
-                    return o.defineProperty(this, key, {
-                        get: fn
-                    });
-                }
-            });
-            o.defineProperty(o.prototype, '__defineSetter__', {
-                value: function (key, fn) {
-                    return o.defineProperty(this, key, {
-                        set: fn
-                    });
-                }
-            });
-            o.defineProperty(o.prototype, '__lookupGetter__', {
-                value: function (key) {
-                    var d, p = this;
-                    while (p && !(d = o.getOwnPropertyDescriptor(p, key))) {
-                        p = o.getPrototypeOf(this);
-                    }
-                    return d ? d.get : undefined;
-                }
-            });
-            o.defineProperty(o.prototype, '__lookupSetter__', {
-                value: function (key) {
-                    var d, p = this;
-                    while (p && !(d = o.getOwnPropertyDescriptor(p, key))) {
-                        p = o.getPrototypeOf(this);
-                    }
-                    return d ? d.set : undefined;
-                }
-            });
-            // Immutable Prototype Exotic Objects
-            // https://github.com/tc39/ecma262/issues/272
-            o.seal(o.prototype);
-        });
-    } catch (ignoring_bleaching_errors) {}
-
-    // TODO: Extra guarding:
-    // - protect against unexpected navigation events
-    // - protect against reloads
-
-})(window, document.body, window.parent);
-</script>
+  })(window, document.body, window.parent);
+  </script>
 </body>
 </html>

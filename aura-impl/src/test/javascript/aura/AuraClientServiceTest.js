@@ -21,7 +21,7 @@ Test.Aura.AuraClientServiceTest = function() {
     var Aura = {Services: {}, Controller: {}, Utils: {Util:{prototype:{on:function(){}}}}};
     var document = {
         getElementById : function(id) {
-            return id === "safeEvalWorker" ? {} : undefined;
+            return id === "safeEvalWorkerCustom" ? {} : undefined;
         }
     };
 

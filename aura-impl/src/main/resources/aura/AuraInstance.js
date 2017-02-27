@@ -491,8 +491,8 @@ AuraInstance.prototype.initAsync = function(config) {
             return;
         }
 
-        if (Aura["initSafeEvalWorker"] && !window["$$safe-eval$$"]) {
-            throw new $A.auraError("Aura(): Failed to initialize locker worker.", null, $A.severity.QUIET);
+        if (Aura["initSafeEvalWorker"] && !window["$$safe-eval$$"] && !window["$$safe-eval-compat$$"]) {
+            throw new $A.auraError("Aura(): Failed to initialize safeEval workers.", null, $A.severity.QUIET);
         }
 
         $A.clientService.initHost(config["host"]);

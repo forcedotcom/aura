@@ -122,12 +122,18 @@
     function initLocker () {
         if (auraConfig["safeEvalWorker"] &amp;&amp; !window['$$safe-eval$$'] &amp;&amp; !/^(.*?:)?\/\//.test(auraConfig["host"])) {
             initSafeEvalWorker = true;
-            //Check if strict-csp is being enforced by the browser
+            
+            // Check if strict-csp is being enforced by the browser
             var isEvalAllowed = true;
-            try{ eval("(function(){})();");}catch(e){isEvalAllowed = false;}
+            try { 
+                eval("(function(){})();");
+            }catch (e) {
+                isEvalAllowed = false;
+            }
+            
             var isInlineAllowed;
-            if(isEvalAllowed){
-                var  inlineAllowedProp = "$unsafeInlineAllowed$";
+            if (isEvalAllowed){
+                var inlineAllowedProp = "$unsafeInlineAllowed$";
                 var script = document.createElement("script");
                 script.type = "text/javascript";
                 script.appendChild(document.createTextNode("(function(){ window['"+inlineAllowedProp+"']=true; })();"));
@@ -137,30 +143,51 @@
                 isInlineAllowed = window[inlineAllowedProp] || false;
                 window[inlineAllowedProp] = undefined;
             }
+            
             if(isEvalAllowed &amp;&amp; isInlineAllowed){
-                //no need for the worker as main frame has no restriction
+                // No need for the worker as main frame has no restriction
                 initSafeEvalWorker = false;
             }
         }
 
         if (initSafeEvalWorker) {
-            var props = {
-                src: auraConfig.safeEvalWorker,
-                id: "safeEvalWorker", width: "0", height: "0", tabIndex: "-1", "aura-hidden": "true", title:"sctipts"
-            };
-
-            var el = document.getElementById("safeEvalWorker");
-            if (!el) {
-                if (!auraConfig["safeEvalWorker"]) {
-                    throw new Error("Aura(): Missing 'safeEvalWorker' configuration.");
+            var safeEvalWorkerLoaded = {};
+                        
+            function rendezvousWorkersThenInitFramework() {
+                var id = this;
+                
+                safeEvalWorkerLoaded[id] = true;
+                
+                if (safeEvalWorkerLoaded.System &amp;&amp; safeEvalWorkerLoaded.Custom) {
+                    initFramework();
                 }
-                el = document.createElement("iframe");
-                el.style.display = "none";
-                for (var i in props) { el.setAttribute(i, props[i]); }
-                document.body.appendChild(el);
             }
-            el.addEventListener('load', initFramework);
-            el.addEventListener("error", function () { throw new Error("Aura(): Failed to load locker worker.");});
+            
+            function createWorker(id) {
+                var workerId = "safeEvalWorker" + id;
+                var props = {
+                    src: auraConfig.safeEvalWorker + "?id=" + id,
+                    id: workerId, width: "0", height: "0", tabIndex: "-1", "aura-hidden": "true", title:"scripts" + id
+                };
+    
+                var el = document.getElementById(workerId);
+                if (!el) {
+                    if (!auraConfig["safeEvalWorker"]) {
+                        throw new Error("Aura(): Missing 'safeEvalWorker' configuration.");
+                    }
+                    
+                    el = document.createElement("iframe");
+                    el.style.display = "none";
+                    for (var i in props) { el.setAttribute(i, props[i]); }
+                    document.body.appendChild(el);
+
+                    el.addEventListener('load', rendezvousWorkersThenInitFramework.bind(id));
+                    el.addEventListener("error", function () { throw new Error("Aura(): Failed to load locker worker.");});
+                }
+            }
+            
+            createWorker("System");
+            createWorker("Custom");
         } else {
             setTimeout(initFramework, 0); // ensure async
         }

@@ -396,7 +396,9 @@ public class AppCacheResourcesLoggingUITest extends AbstractLoggingUITest {
                     expectedRequests.remove(idx);
                 }
             } else {
-                unexpectedRequests.add(r);
+            	if (!r.get("URI").endsWith("/lockerservice/safeEval.html")) {
+            		unexpectedRequests.add(r);
+            	}
             }
         }
         for (Request r : expectedRequests) {

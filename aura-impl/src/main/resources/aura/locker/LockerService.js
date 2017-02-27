@@ -66,7 +66,7 @@ function LockerService() {
 
 	var nsKeys = {};
 
-	var workerFrame = window.document.getElementById("safeEvalWorker");
+	var workerFrame = window.document.getElementById("safeEvalWorkerCustom");
 	var safeEvalWindow = workerFrame && workerFrame.contentWindow;
 	var typeToOtherRealmType;
 

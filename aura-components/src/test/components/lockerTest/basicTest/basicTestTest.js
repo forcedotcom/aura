@@ -248,5 +248,5 @@
             
             cmp.testFilteringProxy();
         }
-    }   
+    }
 })

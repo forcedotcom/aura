@@ -35,6 +35,7 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
+import org.auraframework.adapter.DefaultContentSecurityPolicy;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
@@ -515,9 +516,8 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      * Sets mandatory headers, notably for anti-clickjacking.
      */
     @Override
-    public void setCSPHeaders(DefDescriptor<?> top, HttpServletRequest req, HttpServletResponse rsp) {
-
-        if(canSkipCSPHeader(top, req)) {
+    public final void setCSPHeaders(DefDescriptor<?> top, HttpServletRequest req, HttpServletResponse rsp) {
+        if (canSkipCSPHeader(top, req)) {
             return;
         }
 
@@ -525,6 +525,14 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 top == null ? null : top.getQualifiedName(), req);
 
         if (csp != null) {
+            // Allow unsafe-eval if this is the system safeEval worker
+            if (req.getRequestURI().endsWith(SAFE_EVAL_HTML_URI)) {
+                String qs = req.getQueryString();
+                if (qs != null && qs.equalsIgnoreCase("id=system")) {
+                    csp = new SystemModeSafeEvalSecurityPolicy(csp);
+                }
+            }
+            
             rsp.addHeader(CSP.Header.SECURE, csp.getCspHeaderValue());
             Collection<String> terms = csp.getFrameAncestors();
             if (terms != null) {
@@ -548,6 +556,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                     }
                 }
             }
+            
             // Store the script-src allowed to be retrieved later when serializing the template to initialize locker
             this.contextService.getCurrentContext().setScriptSources(csp.getScriptSources());
         }
@@ -864,4 +873,77 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     public void setManifestUtil(ManifestUtil manifestUtil) {
         this.manifestUtil = manifestUtil;
     }
+    
+    
+    private static class SystemModeSafeEvalSecurityPolicy implements ContentSecurityPolicy {
+        SystemModeSafeEvalSecurityPolicy(ContentSecurityPolicy delegate) {
+            this.delegate = delegate;
+        }
+        
+		@Override
+		public String getCspHeaderValue() {
+			return DefaultContentSecurityPolicy.buildHeaderNormally(this);
+		}
+
+		@Override
+		public Collection<String> getFrameAncestors() {
+			return delegate.getFrameAncestors();
+		}
+
+		@Override
+		public Collection<String> getFrameSources() {
+			return delegate.getFrameSources();
+		}
+
+		@Override
+		public Collection<String> getScriptSources() {
+		    Collection<String> sources = Lists.newArrayList(delegate.getScriptSources());
+		    sources.add(CSP.UNSAFE_EVAL);
+			return sources;
+		}
+
+		@Override
+		public Collection<String> getStyleSources() {
+			return delegate.getStyleSources();
+		}
+
+		@Override
+		public Collection<String> getFontSources() {
+			return delegate.getFontSources();
+		}
+
+		@Override
+		public Collection<String> getConnectSources() {
+			return delegate.getConnectSources();
+		}
+
+		@Override
+		public Collection<String> getDefaultSources() {
+			return delegate.getDefaultSources();
+		}
+
+		@Override
+		public Collection<String> getImageSources() {
+			return delegate.getImageSources();
+		}
+
+		@Override
+		public Collection<String> getObjectSources() {
+			return delegate.getObjectSources();
+		}
+
+		@Override
+		public Collection<String> getMediaSources() {
+			return delegate.getMediaSources();
+		}
+
+		@Override
+		public String getReportUrl() {
+			return delegate.getReportUrl();
+		}
+		
+		private final ContentSecurityPolicy delegate;
+    }
+    
+    private static final String SAFE_EVAL_HTML_URI = "/lockerservice/safeEval.html";
 }

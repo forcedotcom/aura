@@ -27,6 +27,7 @@
     				value: "First panel body\nClick on the ChangeRefElem button to change the reference element"
     			}
     		}});
+        
         $A.get('e.ui:createPanel').setParams({
             panelType   :'panel',
             visible: true,
@@ -45,14 +46,16 @@
     changeReferenceElement: function(cmp){
     	var panel = cmp.find("pm").find("panel");
     	var refElement1 = cmp.find("refElement1").getElement();
+
     	panel.set("v.referenceElement", refElement1);
+    	
     	panel.set("v.body", $A.createComponentFromConfig({componentDef: { descriptor: "markup://ui:outputText"},
     		attributes: {
     			values: {
     				value: "New panel body\nHere is some more text!"
     			}
-    		}}));
-    	
+    		}
+    	}));
     },
 
     onSelectChange: function(cmp){

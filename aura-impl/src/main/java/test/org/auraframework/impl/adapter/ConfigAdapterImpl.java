@@ -81,7 +81,7 @@ import com.google.common.collect.Sets;
 public class ConfigAdapterImpl implements ConfigAdapter {
     Logger logger = Logger.getLogger(ConfigAdapterImpl.class);
 
-    private static final String LOCKERSERVICE_SAFE_EVAL_HTML = "/lockerservice/safeEval.html";
+    private static final String SAFE_EVAL_HTML_URI = "/lockerservice/safeEval.html";
 
     private static final ImmutableSortedSet<String> cacheDependencyExceptions = ImmutableSortedSet.of(
             //
@@ -448,7 +448,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         AuraContext context = contextService.getCurrentContext();
         String contextPath = context.getContextPath();
         String nonce = context.getFrameworkUID();
-        return String.format("%s/auraFW/resources/%s" + LOCKERSERVICE_SAFE_EVAL_HTML, contextPath, nonce);
+        return String.format("%s/auraFW/resources/%s" + SAFE_EVAL_HTML_URI, contextPath, nonce);
     }
 
     /**
@@ -709,18 +709,18 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public ContentSecurityPolicy getContentSecurityPolicy(String app, HttpServletRequest request) {
         // For some (too many!) URIs, we allow inline style.  Note that the request has already gone
         // through {@link AuraRewriteFilter}, so its URI may be surprising.
-        boolean inlineStyle = false;  // unless we know we should, we don't want inlines
+        boolean allowInline = false;  // unless we know we should, we don't want inlines
         String format = request.getParameter("aura.format");
         if ("HTML".equals(format)) {
             String defType = request.getParameter("aura.deftype");
             if ("APPLICATION".equals(defType) || "COMPONENT".equals(defType)) {
-                inlineStyle = !isLockerServiceEnabled();
+                allowInline = !isLockerServiceEnabled();
             }
         } else {
-            inlineStyle = isSafeEvalWorkerURI(request.getRequestURI());
+            allowInline = isSafeEvalWorkerURI(request.getRequestURI());
         }
 
-        return new DefaultContentSecurityPolicy(inlineStyle);
+        return new DefaultContentSecurityPolicy(allowInline);
     }
 
     public void setLocalizationAdapter(LocalizationAdapter adapter) {
@@ -761,7 +761,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 	}
 
 	protected boolean isSafeEvalWorkerURI(String uri) {
-        return uri.endsWith(LOCKERSERVICE_SAFE_EVAL_HTML);
+        return uri.endsWith(SAFE_EVAL_HTML_URI);
 	}
 
     /**

@@ -1,0 +1,3 @@
+<aura:component extends="performance:perfTest">
+    <ui:inputDate label="date picker with label" displayDatePicker ="true"/>
+</aura:component>

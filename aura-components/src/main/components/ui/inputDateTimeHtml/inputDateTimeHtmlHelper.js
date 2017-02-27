@@ -15,9 +15,8 @@
  */
 ({
     formatValue: function (component) {
-        var value = component.get("v.value"),
-            displayValue = value,
-            inputElement = component.find("inputDateTimeHtml").getElement();
+        var value = component.get("v.value");
+        var inputElement = component.find("inputDateTimeHtml").getElement();
 
         if (!$A.util.isEmpty(value)) {
             var isoDate = $A.localizationService.parseDateTimeISO8601(value);
@@ -29,7 +28,7 @@
 
                 // datetime-local input doesn't support any time zone offset information,
                 // so we need to remove the 'Z' off of the end.
-                displayValue = walltimeISO.split("Z", 1)[0] || walltimeISO;
+                var displayValue = walltimeISO.split("Z", 1)[0] || walltimeISO;
                 inputElement.value = displayValue;
             });
         } else {

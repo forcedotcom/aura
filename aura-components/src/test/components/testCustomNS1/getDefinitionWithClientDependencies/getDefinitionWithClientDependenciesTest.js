@@ -17,18 +17,10 @@
                       $A.test.assertNull(definition,"component definition requested is not null");
                       complete = true;
                   });
-                  $A.test.addWaitForWithFailureMessage(
-                          completed = true, 
-                          function() {
-                              return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                          },
-                          "Didn't get ACF error box",
-                          function() {
-                              $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
-                                      "Access Check Failed!",
-                                          "markup://testCustomNS1:getDefinitionWithClientDependencies");
-                   });
-                  
+                  this.waitForErrorModal(function() {
+                      $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                              "Access Check Failed!", "markup://testCustomNS1:getDefinitionWithClientDependencies");
+                  });      
               },     
         ]
         
@@ -44,17 +36,11 @@
                $A.test.assertNull(definition,"application event definition requested is not null");
                actionComplete = true;
            });
-           $A.test.addWaitForWithFailureMessage(
-                   actionComplete = true, 
-                   function() {
-                       return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                   },
-                   "Didn't get ACF error box",
-                   function() {
-                       $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
-                               "Access Check Failed! EventService.getEventDef():'markup://testCustomNS2:applicationEventWithDefaultAccess",
-                                   "markup://testCustomNS1:getDefinitionWithClientDependencies");
-            });
+           this.waitForErrorModal(function() {
+               $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                       "Access Check Failed! EventService.getEventDef():'markup://testCustomNS2:applicationEventWithDefaultAccess",
+                           "markup://testCustomNS1:getDefinitionWithClientDependencies");
+           });
        }
    
    },
@@ -69,18 +55,11 @@
               $A.test.assertNull(definition,"application event definition requested is not null");
               actionComplete = true;
           });
-
-          $A.test.addWaitForWithFailureMessage(
-                  actionComplete = true, 
-                  function() {
-                      return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                  },
-                  "Didn't get ACF error box",
-                  function() {
-                      $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
-                              "Access Check Failed! EventService.getEventDef():'markup://testPrivilegedNS1:applicationEventWithPrivilegedAccess",
-                                  "markup://testCustomNS1:getDefinitionWithClientDependencies");
-           });
+          this.waitForErrorModal(function() {
+              $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                      "Access Check Failed! EventService.getEventDef():'markup://testPrivilegedNS1:applicationEventWithPrivilegedAccess",
+                          "markup://testCustomNS1:getDefinitionWithClientDependencies");
+          });
       }
   
   },
@@ -95,18 +74,11 @@
               $A.test.assertNull(definition,"application event definition requested is not null");
               actionComplete = true;
           });
-
-          $A.test.addWaitForWithFailureMessage(
-                  actionComplete = true, 
-                  function() {
-                      return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                  },
-                  "Didn't get ACF error box",
-                  function() {
-                      $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
-                              "Access Check Failed! EventService.getEventDef():'markup://auratest:accessInternalEvent",
-                                  "markup://testCustomNS1:getDefinitionWithClientDependencies");
-           });
+          this.waitForErrorModal(function() {
+              $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                      "Access Check Failed! EventService.getEventDef():'markup://auratest:accessInternalEvent",
+                          "markup://testCustomNS1:getDefinitionWithClientDependencies");
+          });
       }
   
    },
@@ -123,21 +95,26 @@
                       $A.test.assertNull(definition,"component definition requested is not null");
                       complete = true;
                   });
-                  $A.test.addWaitForWithFailureMessage(
-                          completed = true, 
-                          function() {
-                              return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                          },
-                          "Didn't get ACF error box",
-                          function() {
-                              $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
-                                      "Access Check Failed! ComponentService.getDef():'markup://auratest:accessPrivilegedComponent",
-                                          "markup://testCustomNS1:getDefinitionWithClientDependencies");
-                   });
-                  
+                  this.waitForErrorModal(function() {
+                      $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                              "Access Check Failed! ComponentService.getDef():'markup://auratest:accessPrivilegedComponent",
+                                  "markup://testCustomNS1:getDefinitionWithClientDependencies");
+                  });   
               },     
         ]
         
+    },
+    
+    //TODO(W-3736608): Put waitForErrorModal logic and ACF error verification in Test.js in library 
+    waitForErrorModal: function(callback) {
+        $A.test.addWaitForWithFailureMessage(true,
+            function(){
+                var element = document.getElementById('auraErrorMask');
+                var style = $A.test.getStyle(element, 'display');
+                return style === 'block';
+            },
+            "Error Modal didn't show up.",
+            callback);
     }
     
 })

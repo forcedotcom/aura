@@ -15,13 +15,13 @@
  */
 ({
 	onRadio: function(cmp, evt) {
-		 var selected = evt.source.get("v.label");
+		 var selected = evt.getSource().get("v.label");
 		 resultCmp = cmp.find("radioResult");
 		 resultCmp.set("v.value", selected);
 	 },
 
 	 onGroup: function(cmp, evt) {
-		 var selected = evt.source.get("v.label");
+		 var selected = evt.getSource().get("v.label");
 		 resultCmp = cmp.find("radioGroupResult");
 		 resultCmp.set("v.value", selected);
 	 }

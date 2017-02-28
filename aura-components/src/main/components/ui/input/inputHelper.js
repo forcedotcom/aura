@@ -344,9 +344,7 @@
      * Returns the input dom element in the component. If there are multiple input elements, only the first one is return.
      */
     getInputElement: function (component) {
-        var element = component.getElement();
-        return element.getElementsByTagName('input')[0] || element.getElementsByTagName('a')[0] || element.getElementsByTagName('select')[0] || element.getElementsByTagName('textarea')[0] || element;
-
+        return this.lib.interactive.getInputElement(component.getElement());
     },
 
     /**

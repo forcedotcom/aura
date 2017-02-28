@@ -129,9 +129,7 @@ function lib() { //eslint-disable-line no-unused-vars
             if (!elementId) {
                 // component.getElement() doesn't return an input|textarea|select element
                 // need to find the input|textarea|select element in childNodes
-                var inputElement = element.getElementsByTagName('input')[0] ||
-                                   element.getElementsByTagName('textarea')[0] ||
-                                   element.getElementsByTagName('select')[0];
+                var inputElement = this.getInputElement(element);
                 if (inputElement) {
                     elementId = this.getUid(inputElement);
                     element = inputElement;
@@ -297,6 +295,22 @@ function lib() { //eslint-disable-line no-unused-vars
                     $A.util.removeClass(component.getElement(), disabledCss);
                 }
             }
+        },
+
+        /**
+         * For input* components, the root level element is often not an input. We wrap the input component in spans and anchors for
+         * accessibility and then return that. So we use this helper method to reach into the elements of the input* component, and
+         * get the actual input element.
+         * We want this in sync with inputHelper.js so that we are always attaching and detaching events to the proper element.
+         * This helps us avoid memory leaks and other maintenance issues.
+         * @example
+         * var button = this.getInputElement(component.getElement());
+         */
+        getInputElement: function(element) {
+            if(!element) {
+                return element;
+            }
+            return element.getElementsByTagName('input')[0] || element.getElementsByTagName('a')[0] || element.getElementsByTagName('select')[0] || element.getElementsByTagName('textarea')[0] || element;
         }
     };
 

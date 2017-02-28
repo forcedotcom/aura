@@ -16,13 +16,8 @@
 package org.auraframework.util.type.converter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.type.Converter;
 import org.springframework.context.annotation.Lazy;
 

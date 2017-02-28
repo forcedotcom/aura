@@ -17,7 +17,6 @@ package org.auraframework.impl.root;
 
 import java.io.IOException;
 
-import javafx.scene.shape.VLineTo;
 import org.auraframework.Aura;
 
 import org.auraframework.def.AttributeDef;

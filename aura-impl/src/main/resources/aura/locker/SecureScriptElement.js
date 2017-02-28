@@ -63,7 +63,7 @@ function SecureScriptElement(el, key) {
 			}
 		},
 
-		// dataset can only change `data-` attributes, thus, it safe to expose.
+		// dataset can only change `data-` attributes, thus, it is safe to expose.
 		dataset : {
 			get: function () {
 				return o.dataset;

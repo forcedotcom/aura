@@ -107,6 +107,8 @@ public interface BaseComponentDef extends RootDefinition, HasJavascriptReference
     Set<PropertyReference> getExpressionRefs();
 
     List<AttributeDefRef> getFacets();
+    
+    AttributeDefRef getFacet(String name);
 
     Map<DefDescriptor<MethodDef>, MethodDef> getMethodDefs() throws QuickFixException;
 

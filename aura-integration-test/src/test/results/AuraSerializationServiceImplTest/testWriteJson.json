@@ -1,23 +1,17 @@
 {
-  "s":1,
-  "v":{
-    "componentDef":{
-      "descriptor":"markup://test:child1"
-    },
-    "creationPath":"/*[0]",
-    "attributes":{
-      "s":2,
-      "v":{
-        "values":{
-          "attr":"yo"
-        }
-      }
-    },
-    "model":{
-      "itemList":[
-
-      ],
-      "value":"yo"
+  "componentDef":{
+    "descriptor":"markup://test:child1"
+  },
+  "creationPath":"/*[0]",
+  "attributes":{
+    "values":{
+      "attr":"yo"
     }
+  },
+  "model":{
+    "itemList":[
+
+    ],
+    "value":"yo"
   }
 }

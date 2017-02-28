@@ -148,7 +148,10 @@ public class JavaModel implements Model {
                     } catch (NumberFormatException nfe) {
                         throw makeException(nfe.getMessage(), nfe, def);
                     }
-                    ret = ((List<?>) root).get(i);
+                    if(i >= l.size()) {
+                    	return null;
+                    }
+                    ret = l.get(i);
                 }
             } else if(root instanceof JavascriptMockHandler.Returns) {
                 try {

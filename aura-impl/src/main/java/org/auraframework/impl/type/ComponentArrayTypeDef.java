@@ -111,7 +111,6 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
                     DefinitionReference dr = (DefinitionReference) defRef;
                     if (dr.type() == DefType.COMPONENT) {
                         context.getInstanceStack().setAttributeIndex(idx);
-                        //components.add(((ComponentDefRef) defRef).newInstance(valueProvider));
                         components.add((BaseComponent<?, ?>) instanceService.getInstance((ComponentDefRef) dr.get(), valueProvider));
                         context.getInstanceStack().clearAttributeIndex(idx);
                         idx += 1;

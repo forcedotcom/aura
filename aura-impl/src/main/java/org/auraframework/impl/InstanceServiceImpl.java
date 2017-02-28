@@ -75,8 +75,6 @@ public class InstanceServiceImpl implements InstanceService {
     public <T extends Instance<D>, D extends Definition> T getInstance(DefDescriptor<D> descriptor)
             throws QuickFixException {
 
-        contextService.assertEstablished();
-
         return this.<T, D> getInstance(descriptor, null);
     }
 

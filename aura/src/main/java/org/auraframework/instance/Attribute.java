@@ -40,4 +40,6 @@ public interface Attribute extends Instance<AttributeDef> {
 
     boolean isDirty();
 
+    ValueProvider getValueProvider();
+
 }

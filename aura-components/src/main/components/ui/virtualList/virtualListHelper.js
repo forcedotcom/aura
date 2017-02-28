@@ -19,6 +19,7 @@
         { type: 'mouseover', useCapture: false },
         { type: 'mouseout', useCapture: false },
         { type: 'keypress', useCapture: false },
+        { type: 'keydown', useCapture: false },
         { type: 'dragstart', useCapture: false },
         { type: 'dragend', useCapture: false },
         { type: 'dragenter', useCapture: false },

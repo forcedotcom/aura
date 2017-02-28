@@ -23,7 +23,7 @@
     <aura:attribute name="friends" type="Object"/>
     <aura:attribute name="counter" default="0" type="Integer"/>
 
-    <div onclick="{!c.count}" class="item" style="margin:8px;padding: 14px; border: 1px solid #333">
+    <div class="item" style="margin:8px;padding: 14px; border: 1px solid #333">
         <p class="id">Id: <span>{!v.id}</span></p>
         <p class="index">Index: <span style="color:blue">{!v.index}</span></p>
         <p class="name" >Name: <span>{!v.name}</span></p>
@@ -38,6 +38,41 @@
         <ui:outputText class="outputItemInfo" aura:id="outputItemInfo" value=""/> <br/><br/>
         <p class="counter" style="text-align:right">Click counter: <span>{!v.counter}</span></p>
         <test:testVirtualListTemplateChild name="{!v.name}"/>
+        <ui:virtualMenuWrapper triggerLabel="Label for Menu">
+            <aura:set attribute="menu">
+                <ui:menu>
+                    <ui:menuTriggerLink label="Label for Menu" stopClickPropagation="true"/>
+                    <ui:menuList class="checkPosition" aura:id="checkPosition" menuSelect="{!c.menuSelect}">
+                        <aura:iteration items="{!v.friends}" var="i">
+                            <ui:actionMenuItem label="{!'Menu Item for ' + i.name}" />
+                        </aura:iteration>
+                    </ui:menuList>
+                </ui:menu>
+            </aura:set>
+        </ui:virtualMenuWrapper>
+        
+        <ui:virtualMenuWrapper>
+            <aura:set attribute="triggerBody">
+                <div style="background-color:red; width:16px; height:16px"/>
+            </aura:set>
+            <aura:set attribute="menu">
+                <ui:menu>
+                    <ui:menuTriggerLink stopClickPropagation="true">
+                        <div style="background-color:red; width:16px; height:16px"/>
+                    </ui:menuTriggerLink>
+                    <ui:menuList class="checkPosition" aura:id="checkPosition">
+                        <ui:actionMenuItem label="Menu Item #1" click="{!c.menuTrigger}">
+                            <div style="display:inline-block; background-color:blue; width:16px; height:16px"/>
+                            <span>Menu Item #1 for {!v.name}</span>
+                        </ui:actionMenuItem>
+                        <ui:actionMenuItem label="Menu Item #2" click="{!c.menuTrigger}">
+                            <div style="display:inline-block; background-color:blue; width:16px; height:16px"/>
+                            <span>Menu Item #2 for {!v.name}</span>
+                        </ui:actionMenuItem>
+                    </ui:menuList>
+                </ui:menu>
+            </aura:set>
+        </ui:virtualMenuWrapper>
     </div>
 
 </aura:component>

@@ -22,6 +22,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.Attribute;
+import org.auraframework.instance.ValueProvider;
 import org.auraframework.util.json.Json;
 
 public class AttributeImpl implements Attribute {
@@ -75,8 +76,18 @@ public class AttributeImpl implements Attribute {
         return path;
     }
 
+    @Override
+    public ValueProvider getValueProvider() {
+        return valueProvider;
+    }
+
+    public void setValueProvider(ValueProvider vp) {
+        valueProvider = vp;
+    }
+
     private final DefDescriptor<AttributeDef> descriptor;
     private Object value;
     private boolean dirty = false;
     private final String path;
+    private ValueProvider valueProvider;
 }

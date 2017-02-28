@@ -11,7 +11,7 @@
     // from AuraClientService.TOKEN_KEY
     CSRF_STORAGE_KEY: "$AuraClientService.token$",
 
-    testBootstrapMd5ConsistentAcrossReloads: {
+    _testBootstrapMd5ConsistentAcrossReloads: {
         test: [
             function loadIframe(cmp) {
                 var iframeSrc = "/bootstrapTest/bootTest.app";
@@ -72,7 +72,7 @@
     },
 
     // TODO(W-3231791): Update test accordingly when work to handle md5 mismatches is complete
-    testDifferentBootstrapMd5OnReload: {
+    _testDifferentBootstrapMd5OnReload: {
         test: [
             function loadIframe(cmp) {
                 var iframeSrc = "/bootstrapTest/bootTest.app";

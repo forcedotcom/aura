@@ -24,6 +24,12 @@
         }
     },
 
+    testGetSetDataset: {
+        test: function(cmp) {
+            cmp.testGetSetDataset();
+        }
+    },
+
     testGetSetAttributeNode: {
         test: function(cmp) {
             cmp.testGetSetAttributeNode();

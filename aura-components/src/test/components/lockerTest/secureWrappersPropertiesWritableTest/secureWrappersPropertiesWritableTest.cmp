@@ -1,0 +1,7 @@
+<aura:component implements="aura:requireLocker">
+    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
+    <aura:method name="testPropertiesOnSecureWrappersWritable" />
+    <aura:method name="testPropertiesOverridesLocalizedToLocker" />
+
+    <lockerTestOtherNamespace:secureWrappersPropertiesWritable aura:id="propertyOverriderOtherNs"/>
+</aura:component>

@@ -40,6 +40,7 @@ function SecureComponentRef(component, key) {
         "isValid": SecureObject.createFilteredMethod(o, component, "isValid"),
         "set": SecureObject.createFilteredMethod(o, component, "set", { defaultKey: key, rawArguments: true }),
         "get": {
+            writable: true,
             enumerable: true,
             value: function(name) {
                 // protection against anything other then `cmp.get('v.something')`
@@ -56,14 +57,14 @@ function SecureComponentRef(component, key) {
     var defs = component.getDef().methodDefs;
     if (defs) {
         defs.forEach(function(method) {
-        	var descriptor = new DefDescriptor(method.name);
-    		SecureObject.addMethodIfSupported(o, component, descriptor.getName(), { defaultKey: key });
+            var descriptor = new DefDescriptor(method.name);
+            SecureObject.addMethodIfSupported(o, component, descriptor.getName(), { defaultKey: key });
         }, o);
     }
 
     // DCHASMAN TODO Workaround for ui:button redefining addHandler using aura:method!!!
     if (!("addHandler" in o)) {
-		SecureObject.addMethodIfSupported(o, component, "addHandler", { rawArguments: true });
+        SecureObject.addMethodIfSupported(o, component, "addHandler", { rawArguments: true });
     }
 
     ls_setRef(o, component, key);

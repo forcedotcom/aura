@@ -31,31 +31,31 @@ function SecureDOMEvent(event, key) {
     });
 
     var DOMEventSecureDescriptors = {
-        // Events properties that are DOM Elements were compiled from
-        // https://developer.mozilla.org/en-US/docs/Web/Events
-        target: SecureObject.createFilteredProperty(o, event, "target"),
-        currentTarget: SecureObject.createFilteredProperty(o, event, "currentTarget"),
+            // Events properties that are DOM Elements were compiled from
+            // https://developer.mozilla.org/en-US/docs/Web/Events
+            target: SecureObject.createFilteredProperty(o, event, "target"),
+            currentTarget: SecureObject.createFilteredProperty(o, event, "currentTarget"),
 
-        initEvent: SecureObject.createFilteredMethod(o, event, "initEvent"),
+            initEvent: SecureObject.createFilteredMethod(o, event, "initEvent"),
 
-        // Touch Events are special on their own:
-        // https://developer.mozilla.org/en-US/docs/Web/API/Touch
-        touches: SecureDOMEvent.filterTouchesDescriptor(o, event, "touches"),
-        targetTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, "targetTouches"),
-        changedTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, "changedTouches"),
+            // Touch Events are special on their own:
+            // https://developer.mozilla.org/en-US/docs/Web/API/Touch
+            touches: SecureDOMEvent.filterTouchesDescriptor(o, event, "touches"),
+            targetTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, "targetTouches"),
+            changedTouches: SecureDOMEvent.filterTouchesDescriptor(o, event, "changedTouches"),
 
-        view: {
-            get: function() {
-            	var swin = $A.lockerService.getEnvForSecureObject(o);
-            	var win = ls_getRef(swin, key);
-                return win === event.view ? swin : undefined;
+            view: {
+                get: function() {
+                    var swin = $A.lockerService.getEnvForSecureObject(o);
+                    var win = ls_getRef(swin, key);
+                    return win === event.view ? swin : undefined;
+                }
             }
-        }
     };
 
     // non-standard properties and aliases
     ["relatedTarget", "srcElement", "explicitOriginalTarget", "originalTarget"].forEach(function(property) {
-    	SecureObject.addPropertyIfSupported(o, event, property);
+        SecureObject.addPropertyIfSupported(o, event, property);
     });
 
     // re-exposing externals
@@ -78,10 +78,14 @@ function SecureDOMEvent(event, key) {
 SecureDOMEvent.filterTouchesDescriptor = function (se, event, propName) {
     "use strict";
 
+    var valueOverride;
     // descriptor to produce a new collection of touches where the target of each
     // touch is a secure element
     return {
         get: function() {
+            if(valueOverride){
+                return valueOverride;
+            }
             // perf hard-wired in case there is not a touches to wrap
             var touches = event[propName];
             if (!touches) {
@@ -99,17 +103,20 @@ SecureDOMEvent.filterTouchesDescriptor = function (se, event, propName) {
                 do {
                     keys = keys.concat(Object.keys(touchShape));
                 }while((touchShape = Object.getPrototypeOf(touchShape)) && touchShape !== Object.prototype)
-                // Create a stub object with all the properties
-                return keys.reduce(function(o, p) {
-                    return Object.defineProperty(o, p, {
-                        // all props in a touch object are readonly by spec:
-                        // https://developer.mozilla.org/en-US/docs/Web/API/Touch
-                        get: function() {
-                            return SecureObject.filterEverything(se, touch[p]);
-                        }
-                    });
-                }, {});
+                    // Create a stub object with all the properties
+                    return keys.reduce(function(o, p) {
+                        return Object.defineProperty(o, p, {
+                            // all props in a touch object are readonly by spec:
+                            // https://developer.mozilla.org/en-US/docs/Web/API/Touch
+                            get: function() {
+                                return SecureObject.filterEverything(se, touch[p]);
+                            }
+                        });
+                    }, {});
             });
+        },
+        set: function(value){
+            valueOverride = value;
         }
     };
 };

@@ -25,6 +25,7 @@ function SecureComponent(component, key) {
     // special methods that require some extra work
     o = Object.create(null, {
         "get": {
+            writable: true,
             enumerable: true,
             value: function(name) {
                 var path = name.split('.');
@@ -32,12 +33,12 @@ function SecureComponent(component, key) {
                 if (typeof path[1] !== "string" || path[1] === "") {
                     throw new SyntaxError('Invalid key '+ name);
                 }
-                
+
                 var value = component["get"](name);
                 if (!value) {
-                  return value;
+                    return value;
                 }
-                
+
                 if (path[0] === 'c') {
                     return SecureAction(value, key);
                 } else {
@@ -46,6 +47,7 @@ function SecureComponent(component, key) {
             }
         },
         "getEvent": {
+            writable: true,
             enumerable: true,
             value: function(name) {
                 var event = component["getEvent"](name);
@@ -98,8 +100,8 @@ function SecureComponent(component, key) {
     var defs = component.getDef().methodDefs;
     if (defs) {
         defs.forEach(function(method) {
-        	var descriptor = new DefDescriptor(method.name);
-    		SecureObject.addMethodIfSupported(o, component, descriptor.getName(), { defaultKey: key });
+            var descriptor = new DefDescriptor(method.name);
+            SecureObject.addMethodIfSupported(o, component, descriptor.getName(), { defaultKey: key });
         }, o);
     }
 

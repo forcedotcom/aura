@@ -120,6 +120,7 @@
         $A.getDefinition(menuItemComponentName, function() {
             for (var i = 0; i < options.length; i++) {
                 $A.createComponent(menuItemComponentName, {
+                    "class": options[i].class,
                     "label": options[i].label,
                     "value": options[i].value,
                     "selected": $A.util.getBooleanValue(options[i].selected),

@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
-import org.auraframework.instance.ValueProvider;
 
 /**
  * expression for a function call
@@ -27,8 +26,4 @@ import org.auraframework.instance.ValueProvider;
 public interface FunctionCall extends Expression {
 
     List<DefDescriptor<TypeDef>> getArgumentTypeDefs();
-
-    void setValueProvider(ValueProvider valueProvider);
-
-    ValueProvider getValueProvider();
 }

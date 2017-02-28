@@ -46,7 +46,6 @@ public class EventImpl implements Event {
         this.eventDefDescriptor = eventDefDescriptor;
         this.contextService = Aura.getContextService();
         this.attributeSet = new AttributeSetImpl(eventDefDescriptor, valueProvider, this);
-        this.attributeSet.setDefaults();
         this.attributeSet.set(attributes);
         iStack.popInstance(this);
     }

@@ -122,7 +122,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     private final Map<DefDescriptor<MethodDef>,MethodDef> methodDefs;
     private final List<LibraryDefRef> imports;
     private final List<AttributeDefRef> facets;
-    private final Map<String, AttributeDefRef> facetsMap;
     private final Set<PropertyReference> expressionRefs;
 
 
@@ -182,9 +181,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         } else {
             this.compoundControllerDescriptor = null;
         }
-        
-        facetsMap = new HashMap<>();
-        
         this.hashCode = AuraUtil.hashCode(super.hashCode(), events, controllerDescriptors, modelDefDescriptor,
                 extendsDescriptor, interfaces, methodDefs, providerDescriptors, rendererDescriptors, helperDescriptors, resourceDescriptors,
                 imports);
@@ -1380,7 +1376,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             atBuilder.setLocation(getLocation());
             atBuilder.setValue(value);
             atBuilder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
-            AttributeDefRef facet = atBuilder.build();
             facets.add(atBuilder.build());
             return this;
         }
@@ -1628,19 +1623,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     @Override
     public List<AttributeDefRef> getFacets() {
         return facets;
-    }
-    
-    /**
-     * Gets a facet for the component from the getFacets() list.
-     * Does a lazy instantiation of a map for performance optimization since this is called quite often by AttributeSet.serialize()
-     */
-    public AttributeDefRef getFacet(String name) {
-    	if(facetsMap.size() != facets.size()) {
-    		for(AttributeDefRef facet : facets) {
-    			facetsMap.put(facet.getName(), facet);
-    		}
-    	}
-    	return facetsMap.get(name);
     }
 
     @Override

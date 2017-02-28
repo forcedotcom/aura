@@ -68,7 +68,7 @@ public abstract class AuraTestCase extends UnitTestCase {
     protected FileMonitor fileMonitor;
 
     @Inject
-    protected AuraTestingMarkupUtil auraTestingMarkupUtil;
+    protected AuraTestingMarkupUtil auraTesingMarkupUtil;
 
     @Override
     public void setUp() throws Exception {

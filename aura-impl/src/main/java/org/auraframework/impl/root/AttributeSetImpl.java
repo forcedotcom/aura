@@ -15,17 +15,10 @@
  */
 package org.auraframework.impl.root;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Maps;
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
-import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.RegisterEventDef;
@@ -59,7 +52,12 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Serialization;
 import org.auraframework.util.json.Serialization.ReferenceType;
 
-import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  */
@@ -81,6 +79,7 @@ public class AttributeSetImpl implements AttributeSet {
         this.rootDefDescriptor = componentDefDescriptor;
         this.valueProvider = valueProvider;
         this.parent = parent;
+        setDefaults();
     }
 
     @Override
@@ -94,20 +93,13 @@ public class AttributeSetImpl implements AttributeSet {
         return rootDefDescriptor;
     }
 
-    @Override
-    public void setDefaults() throws QuickFixException {
-        final Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = rootDefDescriptor.getDef().getAttributeDefs();
-        
-        // See if the parent is a ComponentDef. (Could also be an EventDev).
-        BaseComponent<?, ?> facetValueProvider = null;
-        if(parent instanceof BaseComponent<?, ?>) {
-        	facetValueProvider = (BaseComponent<?, ?>)parent;
-        }
+    private void setDefaults() throws QuickFixException {
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = rootDefDescriptor.getDef().getAttributeDefs();
 
         for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> attr : attrs.entrySet()) {
             AttributeDefRef ref = attr.getValue().getDefaultValue();
             if (ref != null && !attributes.containsKey(attr.getKey())) {
-                set(ref, facetValueProvider);
+                set(ref);
             }
         }
     }
@@ -116,20 +108,14 @@ public class AttributeSetImpl implements AttributeSet {
         events.put(eventHandler.getDescriptor(), eventHandler);
     }
 
-    private void set(Attribute attribute) throws QuickFixException {
+    private void set(Attribute attribute) {
         if (trackDirty) {
-        	attribute.markDirty();
+            attribute.markDirty();
         }
         attributes.put(attribute.getDescriptor(), attribute);
     }
 
-    @Override
-    public void set(AttributeDefRef attributeDefRef) throws QuickFixException {
-    	set(attributeDefRef, this.valueProvider);
-    }
-    
-    @Override
-    public void set(AttributeDefRef attributeDefRef, BaseComponent<?, ?> valueProvider) throws QuickFixException {
+    private void set(AttributeDefRef attributeDefRef) throws QuickFixException {
         RootDefinition def = rootDefDescriptor.getDef();
         Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = def.getAttributeDefs();
 
@@ -186,7 +172,6 @@ public class AttributeSetImpl implements AttributeSet {
         iStack.clearAttributeName(attributeDef.getDescriptor().toString());
         iStack.clearParent(parent);
         attribute.setValue(value);
-        attribute.setValueProvider(valueProvider);
 
         set(attribute);
     }
@@ -199,13 +184,17 @@ public class AttributeSetImpl implements AttributeSet {
     }
 
     @Override
-    public void set(AttributeSet attributeSet) throws QuickFixException {
+    public void set(Collection<AttributeDefRef> facetDefRefs, AttributeSet attributeSet) throws QuickFixException {
         RootDefinition rootDef = rootDefDescriptor.getDef();
         Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = rootDef.getAttributeDefs();
         Map<DefDescriptor<?>, Object> lookup = Maps.newHashMap();
 
         for (Attribute attribute : attributeSet) {
             lookup.put(Aura.getDefinitionService().getDefDescriptor(attribute.getName(), AttributeDef.class), attribute);
+        }
+
+        for (AttributeDefRef attributeDefRef : facetDefRefs) {
+            lookup.put(attributeDefRef.getDescriptor(), attributeDefRef);
         }
 
         for (DefDescriptor<AttributeDef> desc : attrs.keySet()) {
@@ -280,16 +269,6 @@ public class AttributeSetImpl implements AttributeSet {
         return null;
     }
 
-    private ValueProvider getAttributesValueProvider(String name) {
-        DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor(name, AttributeDef.class);
-
-        Attribute at = attributes.get(desc);
-        if (at != null) {
-            return at.getValueProvider();
-        }
-        return null;
-    }
-
     private void setExpression(DefDescriptor<AttributeDef> desc, Object value) throws QuickFixException {
         RootDefinition rd = rootDefDescriptor.getDef();
         AttributeDef ad = rd.getAttributeDefs().get(desc);
@@ -326,11 +305,7 @@ public class AttributeSetImpl implements AttributeSet {
         PropertyReference stem = expr.getStem();
 
         if (value instanceof Expression) {
-            ValueProvider valuesValueProvider = getAttributesValueProvider(expr.getRoot());
-            if (valuesValueProvider == null) {
-                valuesValueProvider = valueProvider;
-            }
-            value = ((Expression) value).evaluate(valuesValueProvider);
+            value = ((Expression) value).evaluate(valueProvider);
         }
         if (value instanceof ValueProvider && stem != null) {
             value = ((ValueProvider) value).getValue(stem);
@@ -339,9 +314,6 @@ public class AttributeSetImpl implements AttributeSet {
             if (attributeDef == null) {
                 // no such attribute.
                 throw new NoAccessException("No attribute "+expr.getRoot()+" in "+rootDefDescriptor);
-            }
-            if(value == null) {
-            	return null;
             }
             value = attributeDef.getTypeDef().wrap(value);
             if (value instanceof ValueProvider) {
@@ -358,11 +330,7 @@ public class AttributeSetImpl implements AttributeSet {
     public void serialize(Json json) throws IOException {
         try {
             json.writeMapBegin();
-            
-            if(this.valueProvider != null && !this.valueProvider.isConcreteComponent()) {
-            	json.writeMapEntry("valueProvider", valueProvider);
-            }
-            
+            json.writeMapEntry("valueProvider", valueProvider);
             if (!attributes.isEmpty()) {
                 RootDefinition def = rootDefDescriptor.getDef();
                 json.writeMapKey("values");
@@ -377,12 +345,9 @@ public class AttributeSetImpl implements AttributeSet {
 
                     if (attributeDef.getSerializeTo() == AttributeDef.SerializeToType.BOTH) {
                         TypeDef typeDef = attributeDef.getTypeDef();
-                        // Actions have null valueProviders. In that case, we still want to output their values.
-                        boolean validValueProvider = valueProvider == null || valueProvider.isConcreteComponent();
-                        if (validValueProvider && !(typeDef instanceof ComponentArrayTypeDef || typeDef instanceof ComponentTypeDef) || attribute.isDirty()) {
-                    	    if(!isAttributeValueEqualToDefinitionValue(attribute)) {
-                    	    	json.writeMapEntry(name, attribute.getValue());
-                    	    }
+                        if ((valueProvider == null && !((typeDef instanceof ComponentArrayTypeDef) || (typeDef instanceof ComponentTypeDef)))
+                                || attribute.isDirty()) {
+                            json.writeMapEntry(name, attribute.getValue());
                         }
                     }
                 }
@@ -398,62 +363,6 @@ public class AttributeSetImpl implements AttributeSet {
         } catch (QuickFixException e) {
             throw new AuraUnhandledException("unhandled exception", e);
         }
-    }
-
-    /**
-     * If the value of an attribute on the instance is the same as it's definition value, do not serialize it to the client. 
-     * When we re-create the component on the client, we'll use the value from the definition.
-     *  
-     * Does it have a facet?
-	 * Does it equal the facet?
-	 * Does it have a default value but not a facet value?
-   	 * Does it equal the defaultValue?
-   	 * 
-     * @param attribute
-     * @return true if the value is equal and should not be serialized.
-     * @throws QuickFixException
-     */
-    private boolean isAttributeValueEqualToDefinitionValue(Attribute attribute) throws QuickFixException {
-    	
-    	RootDefinition def = rootDefDescriptor.getDef();
-        String name = attribute.getName();
-    	
-
-		AttributeDefRef definitionValueRef;
-    	Object attributeValue = attribute.getValue();
-    	Object facetValue = null;
-    	
-
-    	// Empty, let the serializer decide what to do with it. Doesn't usually serialize nulls.
-    	if(attributeValue == null) {
-    		return false;
-    	}
-        
-		// Check for Facet equality
-    	if(def instanceof BaseComponentDef) {
-    		BaseComponentDef baseComponentDef = (BaseComponentDef) def;
-    		
-    		definitionValueRef = baseComponentDef.getFacet(name);
-    		// Is the attributeValue the same as the aura:set value?
-    		if(definitionValueRef != null) {
-    			facetValue = definitionValueRef.getValue();
-    			if(attributeValue.equals(facetValue)) {
-    				return true;
-    			}
-    		}
-    		// We have an aura:set, and the value does not currently equal it. So send it down.
-    		if(facetValue != null) {
-    			return false;
-    		}
-    	}
-    	
-    	definitionValueRef = def.getAttributeDef(name).getDefaultValue();
-    	// hasDefaultValue && value is the same as that defaultValue
-    	if(definitionValueRef != null && attributeValue.equals(definitionValueRef.getValue())) {
-    		return true;
-    	}
-    	
-    	return false;
     }
 
     @Override

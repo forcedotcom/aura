@@ -65,82 +65,20 @@ public interface AttributeSet extends ValueProvider, JsonSerializable, Iterable<
      */
     <T> T  getValue(@Nonnull String s, @Nonnull Class<T> clazz) throws QuickFixException;
 
-    /**
-     * Link attributes from one component to another. Used in inheritance levels.
-     * 
-     * @param attributeDefRefs A set of attributes resolved in another component.
-     * @throws QuickFixException
-     */
     void set(Collection<AttributeDefRef> attributeDefRefs) throws QuickFixException;
 
-    /**
-     * Link an attribute to be referenced in another component.
-     * @param attributeDefRef
-     * @throws QuickFixException
-     */
-    void set(AttributeDefRef attributeDefRef) throws QuickFixException;
+    void set(Collection<AttributeDefRef> facetDefRefs, AttributeSet attributeSet) throws QuickFixException;
 
-    /**
-     * Link an attribute to be referenced in another component.
-     * @param attributeDefRef
-     * @throws QuickFixException
-     */
-    void set(AttributeDefRef attributeDefRef, BaseComponent<?, ?> valueProvider) throws QuickFixException;
-    
-    /**
-     * Link an attribute to be referenced in another component.
-     * @param attributeDefRef
-     * @throws QuickFixException
-     */
-    //void set(AttributeDefRef attributeDefRef, Instance<?> parent) throws QuickFixException;
-    
-    /**
-     * Set multiple values on the component via a key value map. 
-     * 
-     * @param attributeMap A key value mapping of values to apply to the component. 
-     * @throws QuickFixException
-     */
     void set(Map<String, Object> attributeMap) throws QuickFixException;
-    
-    /**
-     * Map the values of one attribute set into the current compnent. 
-     * 
-     * @param attributeSet One components attributeset
-     * @throws QuickFixException
-     */
-    void set(AttributeSet attributeSet) throws QuickFixException;
 
-    /**
-     * Allows for components to change their descriptor after their creation. 
-     * Happens usually after a provider call. 
-     * @param descriptor
-     * @throws QuickFixException
-     */
     void setRootDefDescriptor(DefDescriptor<? extends RootDefinition> descriptor) throws QuickFixException;
 
-    /**
-     * Count of the amount of attributes in the set.
-     * @return
-     */
     int size();
 
-    /**
-     * What component do we resolve against for our attributes.
-     * 
-     * @return
-     */
     BaseComponent<?, ?> getValueProvider();
 
-    /**
-     * Does the attribute set have any values set on it.
-     * 
-     * @return
-     */
     boolean isEmpty();
 
-    /**
-     * We wouldn't necessarily want to track dirtiness during setup.
-     */
     void startTrackingDirtyValues();
 
     void validate() throws QuickFixException;
@@ -148,6 +86,5 @@ public interface AttributeSet extends ValueProvider, JsonSerializable, Iterable<
     Set<AttributeDef> getMissingAttributes() throws QuickFixException;
 
     DefDescriptor<? extends RootDefinition> getRootDefDescriptor() throws QuickFixException;
-    
-    void setDefaults() throws QuickFixException;
+
 }

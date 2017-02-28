@@ -21,12 +21,10 @@ import org.auraframework.def.TypeDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.ExpressionType;
 import org.auraframework.expression.FunctionCall;
-import org.auraframework.expression.Literal;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.functions.Function;
 import org.auraframework.instance.ValueProvider;
 import org.auraframework.system.Location;
-import org.auraframework.throwable.CircularReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
@@ -34,9 +32,7 @@ import org.auraframework.util.json.JsonSerializers.NoneSerializer;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -51,8 +47,6 @@ public class FunctionCallImpl implements FunctionCall {
     private final Function f;
     private final Location l;
     private boolean byValue = false;
-    private ValueProvider valueProvider = null;
-    private Map<ValueProvider, Boolean> circularReferenceDetector = new HashMap<>();
 
     public FunctionCallImpl(Function f, List<Expression> args, Location l) {
         this.args = args;
@@ -73,22 +67,9 @@ public class FunctionCallImpl implements FunctionCall {
     @Override
     public Object evaluate(ValueProvider vp) throws QuickFixException {
         List<Object> list = new ArrayList<>(args.size());
-        if (circularReferenceDetector.getOrDefault(vp, false)) {
-            throw new CircularReferenceException("A circular reference was detected", null);
-        }
-        circularReferenceDetector.put(vp, true);
         for (Expression e : args) {
-            if (valueProvider != null && !(e instanceof Literal)) {
-                Object result = e.evaluate(valueProvider);
-                if (result == null) {
-                    result = e.evaluate(vp);
-                }
-                list.add(result);
-            } else {
-                list.add(e.evaluate(vp));
-            }
+            list.add(e.evaluate(vp));
         }
-        circularReferenceDetector.put(vp, false);
         return f.evaluate(list);
     }
 
@@ -120,14 +101,6 @@ public class FunctionCallImpl implements FunctionCall {
         for (Expression e : args) {
             e.gatherPropertyReferences(propRefs);
         }
-    }
-
-    public void setValueProvider(ValueProvider valueProvider) {
-        this.valueProvider = valueProvider;
-    }
-
-    public ValueProvider getValueProvider() {
-        return valueProvider;
     }
 
     public static final Serializer SERIALIZER = new Serializer();

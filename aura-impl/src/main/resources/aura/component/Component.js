@@ -545,7 +545,7 @@ Component.prototype.addValueHandler = function(config) {
         config["method"]=this.getActionCaller(this, config["action"].getExpression());
     }
 
-    var component=this.concreteComponentId?this.getConcreteComponent():this;
+    var component=this.getConcreteComponent();
     var event = config["event"];
     var handlers = component.handlers[event];
     if (!handlers) {
@@ -572,7 +572,7 @@ Component.prototype.addValueHandler = function(config) {
  * @export
  */
 Component.prototype.removeValueHandler = function(config) {
-    var component = this.concreteComponentId ? this.getConcreteComponent() : this;
+    var component = this.getConcreteComponent();
     var event = config["event"];
     var handlers = component.handlers[event];
     if (handlers) {
@@ -663,7 +663,8 @@ Component.prototype.destroy = function() {
     if(this.concreteComponentId){
         var concrete = this.getConcreteComponent();
         // If the concrete component is not already destroying, exit and re-enter
-        if (concrete&&!concrete.destroyed){
+        // getConcreteComponent() turns into the super after we've destroyed their concretes.
+        if (concrete&&concrete!==this&&!concrete.destroyed){
             concrete.destroy();
             return;
         }
@@ -1354,7 +1355,9 @@ Component.prototype.autoDestroy = function(destroy) {
  * @export
  */
 Component.prototype.getConcreteComponent = function() {
-    return this.concreteComponentId ? $A.componentService.get(this.concreteComponentId) : this;
+    // Using && and || vs ? and : so that if the get of the get of the id fails, we still return a component instance.
+    // If you destroy the concrete, then the concrete of the super becomes itself.
+    return this.concreteComponentId && $A.componentService.get(this.concreteComponentId) || this;
 };
 
 /**

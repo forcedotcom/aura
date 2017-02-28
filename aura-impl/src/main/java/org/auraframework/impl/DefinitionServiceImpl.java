@@ -987,6 +987,7 @@ public class DefinitionServiceImpl implements DefinitionService {
 
             if (currentCC.hasSwitchableReference) {
                 // when switchable reference detected from dependencies, recompile for other reference to get other DE
+                loggingService.info("mdb7: recompiling descriptor for modules: " + descriptor);
                 recompile(descriptor, currentCC, context);
             }
 

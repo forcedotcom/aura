@@ -37,6 +37,7 @@ import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.impl.source.resource.ResourceSourceLoader;
 import org.auraframework.impl.system.CompilingDefRegistry;
 import org.auraframework.service.CompilerService;
+import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
@@ -61,6 +62,9 @@ public class ModuleRegistryProvider implements RegistryAdapter, SourceListener {
     private static final Set<DefType> DEF_TYPES = EnumSet.of(
             DefType.MODULE
     );
+    
+    @Inject
+    private LoggingService loggingService;
 
     @Inject
     private FileMonitor fileMonitor;
@@ -78,7 +82,8 @@ public class ModuleRegistryProvider implements RegistryAdapter, SourceListener {
 
     @Override
     public DefRegistry[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders) {
-    	if (!J2V8Util.isJ2V8Available()) { 
+    	if (!J2V8Util.isJ2V8Available()) {
+    	    loggingService.error("mdb7: ModuleRegistryProvider: J2V8 not available");
     		return new DefRegistry[0];
     	}
     	
@@ -103,6 +108,7 @@ public class ModuleRegistryProvider implements RegistryAdapter, SourceListener {
 
                 // register namespaces to optimize processing of definition references
                 configAdapter.addModuleNamespaces(defRegistry.getNamespaces());
+                loggingService.info("mdb7: ModuleRegistryProvider: adding module namespace: " + defRegistry.getNamespaces());
 
                 locationMap.putIfAbsent(location, defRegistry);
             }

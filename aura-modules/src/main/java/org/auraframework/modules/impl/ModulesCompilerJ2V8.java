@@ -17,6 +17,7 @@ package org.auraframework.modules.impl;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
 
 import org.auraframework.modules.ModulesCompiler;
 import org.auraframework.modules.ModulesCompilerData;
@@ -33,6 +34,8 @@ import com.eclipsesource.v8.utils.MemoryManager;
  * ModulesCompiler implementation using https://github.com/eclipsesource/J2V8
  */
 public final class ModulesCompilerJ2V8 implements ModulesCompiler {
+    
+    private static final Logger logger = Logger.getLogger(ModulesCompilerJ2V8.class.getName());
     
     @Override
     public ModulesCompilerData compile(String entry, String sourceTemplate, String sourceClass) throws Exception {
@@ -54,6 +57,8 @@ public final class ModulesCompilerJ2V8 implements ModulesCompiler {
                 + "promise.then(onResultCallback).catch(onErrorCallback);";
 
         CompletableFuture<ModulesCompilerData> future = new CompletableFuture<>();
+        
+        logger.info("mdb7: ModulesCompilerJ2v8: compiling " + entry);
 
         JavaVoidCallback onErrorCallback = new JavaVoidCallback() {
             @Override
@@ -67,6 +72,7 @@ public final class ModulesCompilerJ2V8 implements ModulesCompiler {
             public void invoke(final V8Object receiver, final V8Array parameters) {
                 ModulesCompilerData data = ModulesCompilerUtil.parseCompilerOutput(parameters.getObject(0));
                 future.complete(data);
+                logger.info("mdb7: ModulesCompilerJ2v8: compiled " + entry + ": " + data.code);
             }
         };
 

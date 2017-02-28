@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
@@ -37,6 +38,7 @@ import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.j2v8.J2V8Util;
 import org.auraframework.util.json.Json;
 
 /**
@@ -46,6 +48,8 @@ import org.auraframework.util.json.Json;
 public class DefRefDelegate implements DefinitionReference {
 
     private static final long serialVersionUID = 781643093362675129L;
+    
+    private static final Logger logger = Logger.getLogger(J2V8Util.class.getName());
 
     private DefinitionReference componentDefRef;
     private DefinitionReference moduleDefRef = null;
@@ -75,6 +79,8 @@ public class DefRefDelegate implements DefinitionReference {
             }
 
             boolean componentExists = definitionService.exists(this.componentDefRef.getDescriptor());
+            
+            logger.info("mdb7: DefRefDelegate: " + moduleDefDescriptor + ", moduleExists/componentExists: " + moduleExists + '/' + componentExists);
 
             if (!componentExists && !moduleExists) {
                 throw new DefinitionNotFoundException(this.componentDefRef.getDescriptor());

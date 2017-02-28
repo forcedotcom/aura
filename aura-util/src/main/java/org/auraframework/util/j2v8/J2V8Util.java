@@ -36,13 +36,14 @@ public class J2V8Util {
     private static boolean isJ2V8AvailableCheck() {
         String env = "os.name:" + System.getProperty("os.name") + ",os.version:" + System.getProperty("os.version")
         + ",os.arch:" + System.getProperty("os.arch");
+        boolean enabled = false;
         try {
-            logger.info("J2V8Util running in: " + env);
             V8.createV8Runtime().release();
-            return true;
+            enabled = true;
         } catch (Throwable t) {
             logger.log(Level.SEVERE, "J2V8 not available in current env (" + env + "), disabling modules", t);
-            return false;
         }
+        logger.info("J2V8Util running in: " + env + ", enabled=" + enabled);
+        return enabled;
     }
 }

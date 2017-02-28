@@ -26,6 +26,10 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
+    <aura:locator target="anchor" alias="select-radioMenuItem" description="Radio menu item action">
+        <aura:locatorContext key="body" value="{!v.body}"/>
+    </aura:locator>
+    
     <li aura:id="listitem" class="{!v.class}" role="presentation">
         <a aura:id="anchor" onclick="{!c.onClick}"/>
     </li>

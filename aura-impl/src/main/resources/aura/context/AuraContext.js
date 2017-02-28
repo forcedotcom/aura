@@ -62,6 +62,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
                             ;
     this.accessStack=[];
     this.tokens={};
+    this.isModulesEnabled = !!config["m"];
 
     var that = this;
 
@@ -276,6 +277,9 @@ Aura.Context.AuraContext.prototype.encodeForServer = function(includeDynamic) {
         contextToSend["dn"] = $A.services.component.getDynamicNamespaces();
         contextToSend["globals"] = this.globalValueProviders.getValueProvider("$Global").serializeForServer();
     }
+    if(this.isModulesEnabled) {
+        contextToSend["m"] = 1;
+    }
     return $A.util.json.encode(contextToSend);
 };
 
@@ -299,6 +303,7 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
 
     this.enableAccessChecks=otherContext["enableAccessChecks"];
     this.isLockerServiceEnabled = this["isLockerServiceEnabled"] = $A.lockerService.containerSupportsRequiredFeatures() && otherContext["lockerEnabled"];
+    this.isModulesEnabled = !!otherContext["m"];
 
     this.globalValueProviders.merge(otherContext["globalValueProviders"]);
 

@@ -43,6 +43,7 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.http.RequestParam.BooleanParam;
 import org.auraframework.http.RequestParam.EnumParam;
 import org.auraframework.http.RequestParam.InvalidParamException;
 import org.auraframework.http.RequestParam.StringParam;
@@ -69,12 +70,12 @@ public class AuraContextFilter implements Filter {
             Format.class);
 
     private static final EnumParam<Authentication> access = new EnumParam<>(AuraServlet.AURA_PREFIX
-            + "access", false,
-            Authentication.class);
+            + "access", false, Authentication.class);
 
     private static final StringParam app = new StringParam(AuraServlet.AURA_PREFIX + "app", 0, false);
     private static final StringParam num = new StringParam(AuraServlet.AURA_PREFIX + "num", 0, false);
     private static final StringParam contextConfig = new StringParam(AuraServlet.AURA_PREFIX + "context", 0, false);
+    protected static final BooleanParam modulesParam = new BooleanParam(AuraServlet.AURA_PREFIX + "modules", false);
 
     private String componentDir = null;
 
@@ -87,7 +88,7 @@ public class AuraContextFilter implements Filter {
     private ContextService contextService;
     private LoggingService loggingService;
     private DefinitionService definitionService;
-    private ConfigAdapter configAdapter;
+    protected ConfigAdapter configAdapter;
     protected SerializationService serializationService;
     private LocalizationAdapter localizationAdapter;
 
@@ -97,27 +98,27 @@ public class AuraContextFilter implements Filter {
     }
 
     protected ContextService getContextService() {
-    	return contextService;
+        return contextService;
     }
-    
+
     @Inject
     public void setLoggingService(LoggingService service) {
         loggingService = service;
     }
 
     protected LoggingService getLoggingService() {
-    	return loggingService;
+        return loggingService;
     }
-    
+
     @Inject
     public void setDefinitionService(DefinitionService service) {
         definitionService = service;
     }
 
     protected DefinitionService getDefinitionService() {
-    	return definitionService;
+        return definitionService;
     }
-    
+
     @Inject
     public void setConfigAdapter(ConfigAdapter adapter) {
         configAdapter = adapter;
@@ -213,21 +214,21 @@ public class AuraContextFilter implements Filter {
 
         List<Locale> requestedLocales = Collections.list(request.getLocales());
 
-		//
-		// When a context is starting, LocalizationAdapter does not have a valid
-		// context to get the requested locales to create appropriate
-		// AuraLocale.
-		// So, we pass the locales to LocalizationAdapter
-		//
+        //
+        // When a context is starting, LocalizationAdapter does not have a valid
+        // context to get the requested locales to create appropriate
+        // AuraLocale.
+        // So, we pass the locales to LocalizationAdapter
+        //
         localizationAdapter.setRequestedLocales(requestedLocales);
-        
+
         AuraContext context = contextService.startContext(m, f, a, appDesc);
-        
+
         //
         // Reset it after the context is started (created)
         //
         localizationAdapter.setRequestedLocales(null);
- 
+
         String contextPath = request.getContextPath();
         // some appservers (like tomcat) use "/" as the root path, others ""
         if (contextPath == null || "/".equals(contextPath)) {
@@ -363,13 +364,15 @@ public class AuraContextFilter implements Filter {
      * @return whether modules should be enabled
      */
     protected boolean isModulesEnabled(HttpServletRequest request, Map<String, Object> configMap, Mode mode) {
-        boolean isModulesEnabled = configAdapter.isModulesEnabled(); // TODO is this costly ?
         if (configMap != null) {
+            // configMap is present when processing requests with url encoded AuraContext ie app.js
             if (configMap.containsKey("m")) {
+                // when m is present, it's a request to fetch module enabled content
+                // hence, this AuraContext should also be module enabled
                 String configValue = String.valueOf(configMap.get("m"));
-                isModulesEnabled = "1".equals(configValue);
+                return "1".equals(configValue);
             } else {
-                isModulesEnabled = false;
+                return false;
             }
         }
 
@@ -377,11 +380,12 @@ public class AuraContextFilter implements Filter {
             // DO NOT allow url param override in prod
             String modulesEnabledParam = request.getParameter(AuraServlet.AURA_PREFIX + "modules");
             if (modulesEnabledParam != null) {
-                isModulesEnabled = "1".equals(modulesEnabledParam);
+                // Uses BooleanParam which is true for "1", "true", "yes". Anything else is false.
+                return modulesParam.get(request);
             }
         }
 
-        return isModulesEnabled;
+        return configAdapter.isModulesEnabled();
     }
 
     private DefDescriptor<? extends BaseComponentDef> getAppParam(HttpServletRequest request, Map<String, Object> configMap) {
@@ -427,7 +431,7 @@ public class AuraContextFilter implements Filter {
             testFilter.init(filterConfig);
         }
     }
-    
+
     public void processInjection(FilterConfig filterConfig) {
         SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, filterConfig.getServletContext());
     }
@@ -435,7 +439,7 @@ public class AuraContextFilter implements Filter {
     public AuraDeprecated getAuraDeprecated() {
         return auraDeprecated;
     }
-    
+
     @Inject
     public void setAuraDeprecated(AuraDeprecated auraDeprecated) {
         this.auraDeprecated = auraDeprecated;

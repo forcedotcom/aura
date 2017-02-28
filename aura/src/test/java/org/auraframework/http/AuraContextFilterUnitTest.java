@@ -15,6 +15,7 @@
  */
 package org.auraframework.http;
 
+import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
@@ -34,38 +35,68 @@ import static org.junit.Assert.assertFalse;
 public class AuraContextFilterUnitTest {
 
     @Test
-    public void testModulesEnabledWithConfigAdapterDEV() throws Exception {
-        assertTrue("modules should be enabled with config adapter enabled", isModulesEnabledSetup(true, null, null, Mode.DEV));
+    public void testConfigAdapterEnabled() throws Exception {
+        assertTrue("modules should be enabled with config adapter enabled", isModulesEnabledSetup(true, null, null, Mode.PROD));
     }
 
     @Test
-    public void testModulesEnabledWithConfigAdapterParamDisablePROD() throws Exception {
-        assertTrue("modules should be enabled with config adapter enabled", isModulesEnabledSetup(true, "0", null, Mode.PROD));
+    public void testURLParamEnabledDEV() throws Exception {
+        assertTrue("modules should be enabled with url param 1 in DEV", isModulesEnabledSetup(false, "1", null, Mode.DEV));
     }
 
     @Test
-    public void testModulesEnabledWithURLParamDEV() throws Exception {
-        assertTrue("modules should be enabled with url param", isModulesEnabledSetup(false, "1", null, Mode.DEV));
+    public void testURLParamEnabledTrueDEV() throws Exception {
+        assertTrue("modules should be enabled with url param 1 in DEV", isModulesEnabledSetup(false, "true", null, Mode.DEV));
     }
 
     @Test
-    public void testModulesEnabledWithURLParamInvalidValueDEV() throws Exception {
-        assertFalse("modules should not be enabled with wrong url param value", isModulesEnabledSetup(false, "yes", null, Mode.DEV));
+    public void testURLParamEnabledYesDEV() throws Exception {
+        assertTrue("modules should be enabled with url param 1 in DEV", isModulesEnabledSetup(false, "yes", null, Mode.DEV));
     }
 
     @Test
-    public void testModulesEnabledWithConfigMapDEV() throws Exception {
-        assertTrue("modules should be enabled with correct config map", isModulesEnabledSetup(false, null, 1, Mode.DEV));
+    public void testURLParamDisabledPROD() throws Exception {
+        assertFalse("modules should not be enabled with url param 1 in DEV", isModulesEnabledSetup(false, "1", null, Mode.PROD));
     }
 
     @Test
-    public void testModulesEnabledURLParamOverridesDEV() throws Exception {
-        assertFalse("modules should not be enabled with URL param override", isModulesEnabledSetup(true, "0", true, Mode.DEV));
+    public void testConfigAdapterEnabledURLParamDisabledDEV() throws Exception {
+        assertFalse("modules should not be enabled with url param other than 'truly' in DEV", isModulesEnabledSetup(true, "false", null, Mode.DEV));
     }
 
     @Test
-    public void testModulesEnabledURLParamOverridePROD() throws Exception {
-        assertFalse("modules should not be enabled with URL param override in PROD", isModulesEnabledSetup(false, "1", false, Mode.PROD));
+    public void testConfigAdapterEnabledURLParamDisabledPROD() throws Exception {
+        assertTrue("modules should be enabled with config adapter enabled in PROD", isModulesEnabledSetup(true, "0", null, Mode.PROD));
+    }
+
+    @Test
+    public void testConfigAdapterDisabledURLParamDisabledPROD() throws Exception {
+        assertFalse("modules should not be enabled with config adapter enabled in PROD", isModulesEnabledSetup(false, "true", null, Mode.PROD));
+    }
+
+    @Test
+    public void testURLParamInvalidValue() throws Exception {
+        assertFalse("modules should not be enabled with wrong url param value", isModulesEnabledSetup(false, "on", null, Mode.DEV));
+    }
+
+    @Test
+    public void testConfigMapValidValue() throws Exception {
+        assertTrue("modules should be enabled with config map (1)", isModulesEnabledSetup(false, null, 1, Mode.DEV));
+    }
+
+    @Test
+    public void testConfigMapInvalidValue() throws Exception {
+        assertFalse("modules should not be enabled with invalid (disabled) config map value", isModulesEnabledSetup(true, "0", true, Mode.DEV));
+    }
+
+    @Test
+    public void testConfigMapFalse() throws Exception {
+        assertFalse("modules should not be enabled with config map (false)", isModulesEnabledSetup(false, "1", false, Mode.PROD));
+    }
+
+    @Test
+    public void testConfigMapWithoutModulesValue() throws Exception {
+        assertFalse("modules should not be enabled with config map without modules value", isModulesEnabledSetup(false, "1", new HashMap<String, Object>(), Mode.PROD));
     }
 
     private boolean isModulesEnabledSetup(boolean configAdapterValue, String urlParamValue, Object configMapValue, Mode mode) {
@@ -74,14 +105,19 @@ public class AuraContextFilterUnitTest {
 
         Mockito.when(configAdapter.isModulesEnabled()).thenReturn(configAdapterValue);
         Mockito.when(request.getParameter(AuraServlet.AURA_PREFIX + "modules")).thenReturn(urlParamValue);
-
+        
         AuraContextFilter contextFilter = new AuraContextFilter();
         contextFilter.setConfigAdapter(configAdapter);
 
         Map<String, Object> configMap = null;
+
         if (configMapValue != null) {
-            configMap = Maps.newHashMap();
-            configMap.put("m", configMapValue);
+            if (configMapValue instanceof Map) {
+                configMap = (Map<String, Object>) configMapValue;
+            } else {
+                configMap = Maps.newHashMap();
+                configMap.put("m", configMapValue);
+            }
         }
 
         return contextFilter.isModulesEnabled(request, configMap, mode);

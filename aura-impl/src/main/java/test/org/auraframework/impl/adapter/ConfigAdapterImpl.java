@@ -841,10 +841,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public boolean isModulesEnabled() {
-        if (System.getProperty("aura.modules") == null) {
-            return true;  // default to true for raptor-master branch
-        }
-        return Boolean.parseBoolean(System.getProperty("aura.modules"));
+        return true;
     }
 
     @Override

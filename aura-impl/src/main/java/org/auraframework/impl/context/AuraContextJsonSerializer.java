@@ -223,7 +223,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         }
 
         if (ctx.isModulesEnabled()) {
-            json.writeMapEntry("modulesEnabled", true);
+            json.writeMapEntry("m", 1);
         }
 
         json.writeMapEnd();

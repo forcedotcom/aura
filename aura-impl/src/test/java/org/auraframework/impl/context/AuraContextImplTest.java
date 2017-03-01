@@ -216,6 +216,11 @@ public class AuraContextImplTest extends AuraImplTestCase {
         }
 
         @Override
+        public void appendDependenciesByType(Set<DefDescriptor<?>> dependencies, DefType type) {
+            this.appendDependencies(dependencies);
+        }
+
+        @Override
         public void validateReferences() throws QuickFixException {
         }
 

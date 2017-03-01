@@ -106,6 +106,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
                 configAdapter,
                 service,
                 null /* testContextAdapter */);
+        context.setModulesEnabled(false);
         Mockito.when(contextService.getCurrentContext()).thenReturn(context);
         return context;
     }
@@ -178,6 +179,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
     @Test
     public void testGetDefinitionReturnsNullForNull() throws Exception {
         DefinitionService definitionService = createDefinitionServiceWithMocks();
+        setupContext(definitionService);
         assertNull(definitionService.getDefinition(null));
     }
 
@@ -814,6 +816,11 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
             if (localDeps != null) {
                 dependencies.addAll(localDeps);
             }
+        }
+
+        @Override
+        public void appendDependenciesByType(Set<DefDescriptor<?>> dependencies, DefType type) {
+            this.appendDependencies(dependencies);
         }
 
         @Override

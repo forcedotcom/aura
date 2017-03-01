@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.system.Location;
@@ -84,6 +85,16 @@ public abstract class MockDefinition<D extends Definition> implements Definition
 
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies){
+    }
+
+    @Override
+    public void appendDependenciesByType(Set<DefDescriptor<?>> dependencies, DefType type) {
+
+    }
+
+    @Override
+    public boolean hasSwitchableReference() {
+        return false;
     }
 
     @Override

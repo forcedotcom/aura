@@ -187,6 +187,21 @@ public class DefRefDelegate implements DefinitionReference {
         select().appendDependencies(dependencies);
     }
 
+    /**
+     * Add dependencies for modules or components
+     *
+     * @param dependencies the set to which we should append.
+     * @param type dependencies based on def type
+     */
+    @Override
+    public void appendDependenciesByType(Set<DefDescriptor<?>> dependencies, DefType type) {
+        if (type == DefType.MODULE) {
+            moduleDefRef.appendDependencies(dependencies);
+        } else {
+            componentDefRef.appendDependencies(dependencies);
+        }
+    }
+
     @Override
     public void validateReferences() throws QuickFixException {
         select().validateReferences();

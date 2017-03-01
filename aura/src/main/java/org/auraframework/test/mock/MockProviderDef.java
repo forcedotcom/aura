@@ -49,8 +49,4 @@ public class MockProviderDef extends MockDefinition<ProviderDef> implements Prov
         return null;
     }
 
-    @Override
-    public boolean hasSwitchableReference() {
-        return false;
-    }
 }

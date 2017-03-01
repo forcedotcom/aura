@@ -16,6 +16,7 @@
 
 package org.auraframework.def;
 
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -51,6 +52,14 @@ public interface BaseXmlElement extends Serializable {
      * @param dependencies the set to which we should append.
      */
     void appendDependencies(Set<DefDescriptor<?>> dependencies);
+
+    /**
+     * Add descriptor dependencies based on DefType
+     *
+     * @param dependencies the set to which we should append.
+     * @param type dependencies based on def type
+     */
+    void appendDependenciesByType(Set<DefDescriptor<?>> dependencies, DefType type);
 
     /**
      * Adds all the descriptors for all definitions this depends on to the set.

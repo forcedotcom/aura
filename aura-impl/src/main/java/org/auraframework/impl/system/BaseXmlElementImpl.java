@@ -20,6 +20,7 @@ import org.auraframework.Aura;
 import org.auraframework.builder.ElementBuilder;
 import org.auraframework.def.BaseXmlElement;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.expression.PropertyReference;
@@ -105,6 +106,19 @@ public abstract class BaseXmlElementImpl implements BaseXmlElement {
      */
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+    }
+
+    /**
+     * Default implementation appends dependencies regardless of type.
+     * When type specific dependencies are required, actual concrete class
+     * will override and implement.
+     *
+     * @param dependencies the set to which we should append.
+     * @param type dependencies based on def type
+     */
+    @Override
+    public void appendDependenciesByType(Set<DefDescriptor<?>> dependencies, DefType type) {
+        this.appendDependencies(dependencies);
     }
 
     /**

@@ -88,6 +88,7 @@ public class AuraTestFilter {
     private static final String BASE_URI = "/aura";
     private static final String GET_URI = BASE_URI
             + "?aura.tag=%s%%3A%s&aura.deftype=%s&aura.mode=%s&aura.format=%s&aura.access=%s&aura.jstestrun=%s";
+    private static final String NO_RUN = "_NONE";
 
     private static final StringParam contextConfig = new StringParam(AuraServlet.AURA_PREFIX + "context", 0, false);
 
@@ -198,7 +199,7 @@ public class AuraTestFilter {
             if (targetDescriptor != null) {
                 // Check if a single jstest is being requested.
                 String testToRun = jstestToRun.get(request);
-                if (testToRun != null && !testToRun.isEmpty()) {
+                if (testToRun != null && !testToRun.isEmpty() && !NO_RUN.equals(testToRun)) {
                     AuraContext context = contextService.getCurrentContext();
                     Format format = context.getFormat();
                     switch (format) {
@@ -286,7 +287,7 @@ public class AuraTestFilter {
                     }
 
                     String newUri = createURI("aurajstest", "jstest", DefType.APPLICATION, mode,
-                            Format.HTML, Authentication.AUTHENTICATED.name(), "", qs);
+                            Format.HTML, Authentication.AUTHENTICATED.name(), NO_RUN, qs);
                     RequestDispatcher dispatcher = request.getServletContext().getContext(newUri).getRequestDispatcher(newUri);
                     if (dispatcher != null) {
                         dispatcher.forward(request, response);
@@ -315,7 +316,6 @@ public class AuraTestFilter {
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {
-    	LOG.info(this + " init()", new Error());
         processInjection(filterConfig);
     }
     
@@ -384,13 +384,6 @@ public class AuraTestFilter {
             }
         }
         
-        if (testName == null) {
-            // This must be set in a forwarded request because the query string is merged and a non-empty value would
-            // cause a loop
-        	LOG.info(this + " createURI(): null testName", new Error());
-            testName = "";
-        }
-        
         String ret = String.format(GET_URI, namespace, name, defType.name(), mode.toString(), format, access, testName);
         if (qs != null) {
             ret = String.format("%s&%s", ret, qs);
@@ -451,7 +444,7 @@ public class AuraTestFilter {
             }
             String qs = URLEncodedUtils.format(newParams, "UTF-8") + hash;
             return createURI(targetDescriptor.getNamespace(), targetDescriptor.getName(),
-                    targetDescriptor.getDefType(), null, Format.HTML, Authentication.AUTHENTICATED.name(), "", qs);
+                    targetDescriptor.getDefType(), null, Format.HTML, Authentication.AUTHENTICATED.name(), NO_RUN, qs);
         } else {
             // Free-form tests will load only the target component's template.
             // TODO: Allow specifying the template on the test.
@@ -486,7 +479,7 @@ public class AuraTestFilter {
             TestContext testContext = testContextAdapter.getTestContext(testDef.getQualifiedName());
             testContext.getLocalDefs().add(targetDef);
             return createURI(newDescriptor.getNamespace(), newDescriptor.getName(),
-                    newDescriptor.getDefType(), null, Format.HTML, Authentication.AUTHENTICATED.name(), "", null);
+                    newDescriptor.getDefType(), null, Format.HTML, Authentication.AUTHENTICATED.name(), NO_RUN, null);
         }
     }
 
@@ -498,7 +491,14 @@ public class AuraTestFilter {
             return null;
         }
         dispatcher.forward(req, responseWrapper);
-        return responseWrapper.getCapturedResponseString();
+        
+        String redirectUrl = responseWrapper.getRedirectUrl();
+		if (redirectUrl != null) {
+            LOG.info(this + " Target request got redirected from " + uri + " to " + redirectUrl, new Error());
+			return captureResponse(req, res, redirectUrl);
+		} else {
+			return responseWrapper.getCapturedResponseString();
+		}
     }
 
     private String buildJsTestScriptTag(DefDescriptor<?> targetDescriptor, String testName, int timeout, String original) {

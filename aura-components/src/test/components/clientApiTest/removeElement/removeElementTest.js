@@ -111,27 +111,29 @@
 			var trash = elem.parentNode;
 			var log = [];
 			var logRemove = [];
-
 			var override = $A.test.addFunctionHandler(trash, "appendChild", function() {
 				var elem = arguments[0];
-				if(elem.nodeType != 8) { // Don't include comments as the rendering engine uses them for tracking.
-					log.push(elem);
-				}
+				log.push(elem);
 			});
 			try {
 				var container = component.find("container");
-				var expected = container.getElements();
+				var expected = [];
+				(function getElements(el) {
+					expected.push(el);
+					var children = el.childNodes;
+					for ( var c = 0; c < children.length; c++) {
+						getElements(children[c]);
+					}
+				})(container.getElement());
+
 				container.destroy();
-				
-				// Should be 2 elements removed, and only 1 of those are being tracked since the other is a comment node.
-				// The parent container and a comment marker.
+
 				$A.test.assertEquals(expected.length, log.length, "each element should have been removed only once");
 				for ( var e = 0; e < expected.length; e++) {
 					$A.test.assertTrue(-1 < log.indexOf(expected[e]), "element was not removed: "
 							+ expected[e]);
 				}
 			} catch (e) {
-
 			} finally {
 				override.restore();
 			}

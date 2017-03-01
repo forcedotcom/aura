@@ -35,8 +35,7 @@
      * Close given tab item
      */
     closeTab: function (cmp, index) {
-        var closed = false;
-        var tabItems = cmp.get("v.tabHeaders");
+        var closed = false, tabItems = cmp.get("v.tabHeaders");
         if ($A.util.isNumber(index) && index >= 0 && index < tabItems.length) {
             tabItems.splice(index, 1);
             cmp.set("v.tabHeaders",tabItems);

@@ -229,7 +229,7 @@ AuraComponentService.prototype.contains = (function() {
 
         // check parent (non-value provider)
         if(!answer.result) {
-            answer = contains(container, cmp.getContainer(), visited, false);
+            answer = contains(container, cmp.getContainerComponent(), visited, false);
         }
 
         return answer;

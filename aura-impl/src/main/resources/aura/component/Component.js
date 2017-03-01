@@ -49,7 +49,6 @@ function Component(config, localCreation) {
     this.owner = context.getCurrentAccess();
     this.name='';
     this.type='';
-    this._marker = null;
 
     // allows components to skip creation path checks if it's doing something weird
     // such as wrapping server created components in client created one
@@ -686,15 +685,10 @@ Component.prototype.destroy = function() {
         this.docLevelHandlers=undefined;
     }
 
-    // call unrender before setting _destroying
-    // so that _destroying could be used for isValid check.
+    // Unrender component and facet stack.
     $A.renderingService.unrender(this);
-    if(this._marker) {
-        $A.renderingService.removeMarkerReference(this._marker, this.getGlobalId());
-        $A.renderingService.removeElement(this._marker, this.getContainer());
-        this._marker = null;
-    }
-	this.elements=undefined;
+    this._marker=undefined;
+    this.elements=undefined;
 
     // Reset all attributes and clear expressions;
     // Don't do this until the topmost parent, to allow customer code to read attributes in destroy events
@@ -1025,6 +1019,7 @@ Component.prototype.getElement = function() {
     }
     return null;
 };
+
 /**
  * Returns a live reference to the value indicated using property syntax.
  * This is useful when you dynamically create a component.
@@ -1432,10 +1427,10 @@ Component.prototype.getOwner = function() {
  * component was transcluded into its container and not created
  * directly by its container.
  *
- * @return {Object} Containing component
+ * @return {Object} component
  * @private
  */
-Component.prototype.getContainer = function() {
+Component.prototype.getContainerComponent = function() {
     return $A.getComponent(this.containerComponentId);
 };
 
@@ -1820,9 +1815,16 @@ Component.prototype.unrender = function() {
         context.releaseCurrentAccess();
      } else {
         // If a component extends the root component and doesn't implement it's own
-        // unrender function then we need to execute this default unrender. See aura:text.
+        // unrender function then we need to execute this default unrender.
         if (this.isRootComponent) {
-            $A.renderingService.unrenderFacet(this);
+            // TODO: iterate over components attributes and recursively unrender facets
+            var elements = this.getElements();
+            if(elements) {
+                while(elements.length){
+                    $A.util.removeElement(elements.pop());
+                }
+            }
+            this.disassociateElements();
         }
 
         this.superUnrender();

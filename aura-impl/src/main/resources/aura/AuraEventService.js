@@ -160,11 +160,11 @@ AuraEventService.prototype.collectBubblePath = function(cmp, queue, visited, isO
     }
 
     if(cmp.isConcrete()) {
-        // After collecting the owner chain, check if this level's concrete component's containing component
+        // After collecting the owner chain, check if this level's concrete component's containerComponent
         // is from a different level itself. This occurs when cmp is passed as the facet value
-        // to its containing component (transcluded) by the containing component's value provider.
-        // e.g. <container><cur/></container>
-        var concreteCmpContainerComponent = cmp.getContainer();
+        // to its containerComponent (transcluded) by the containerComponent's value provider.
+        // e.g. <containerComponent><cur/></containerComponent>
+        var concreteCmpContainerComponent = cmp.getContainerComponent();
         if(concreteCmpContainerComponent) {
             // this containerComponent may be from a different component inheritance level
             // so collect its bubble path and insert it into the queue at queueIndex

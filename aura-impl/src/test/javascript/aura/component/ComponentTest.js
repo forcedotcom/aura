@@ -119,8 +119,7 @@ Test.Aura.Component.ComponentTest=function(){
                     normalize:function(target){return target}
                 },
                 renderingService:{
-                    unrender:function(){},
-                    getMarker:function(){}
+                    unrender:function(){}
                 },
                 util:{
                     apply:function(){

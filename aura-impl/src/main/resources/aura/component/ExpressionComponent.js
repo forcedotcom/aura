@@ -179,9 +179,6 @@ ExpressionComponent.prototype.setContainerComponentId = function(containerCompon
             if($A.util.isArray(facetValue)){
                 for(var fidx = 0; fidx < facetValue.length; fidx++) {
                     if($A.util.isComponent(facetValue[fidx])) {
-                        while (facetValue instanceof PassthroughValue) {
-                            facetValue = facetValue.getComponent();
-                        }
                         facetValue[fidx].setContainerComponentId(this.globalId);
                     }
                 }
@@ -233,8 +230,7 @@ ExpressionComponent.prototype["renderer"] = {
             var owner = component.getOwner();
             var context = $A.getContext();      
             context.setCurrentAccess(owner);
-            value = component._lastRenderedTextNode = $A.createComponentFromConfig({ "descriptor": "markup://aura:text", "attributes":{ value: value } });
-            value.setContainerComponentId(component.globalId);
+            component._lastRenderedTextNode = value = $A.createComponentFromConfig({ "descriptor": "markup://aura:text", "attributes":{ value: value } });
             context.releaseCurrentAccess();
             
             $A.lockerService.trust(owner, value);
@@ -257,12 +253,8 @@ ExpressionComponent.prototype["renderer"] = {
                     value=component._lastRenderedTextNode;
                     return $A.rerender(value);
                 }else {
-                    value = component._lastRenderedTextNode = $A.createComponentFromConfig({"descriptor": 'markup://aura:text', "attributes": {"value": value }});
-                    value.setContainerComponentId(component.globalId);
+                    value = $A.createComponentFromConfig({"descriptor": 'markup://aura:text', "attributes": {value: value}});
                 }
-            }else if (component._lastRenderedTextNode) {
-                component._lastRenderedTextNode.destroy();
-                delete component._lastRenderedTextNode;
             }
             ret=$A.renderingService.rerenderFacet(component, value);
         }
@@ -270,11 +262,7 @@ ExpressionComponent.prototype["renderer"] = {
     },
 
     "unrender" : function(component) {
-        var value=component.get("v.value");
-        if(!($A.util.isComponent(value)||$A.util.isArray(value))){
-            value=null;
-        }
-        $A.renderingService.unrenderFacet(component,value);
+        $A.renderingService.unrenderFacet(component);
         if (component._lastRenderedTextNode) {
             component._lastRenderedTextNode.destroy();
             delete component._lastRenderedTextNode;

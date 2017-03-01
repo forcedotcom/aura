@@ -35,10 +35,6 @@
         }
     },
 
-    init : function(cmp, event, helper) {
-        helper.buildBody(cmp);
-    },
-
     handleLabelChange : function (cmp) {
         var labelComponent = cmp.find("inputLabel");
         if (!$A.util.isUndefinedOrNull(labelComponent)) {

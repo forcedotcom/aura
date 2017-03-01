@@ -16,6 +16,7 @@
 ({
 
 	render: function(component, helper) {
+	    helper.buildBody(component);
         var domId = component.get('v.domId');
 		if (!domId) {
             var globalId = component.getGlobalId();

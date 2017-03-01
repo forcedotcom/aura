@@ -59,7 +59,6 @@
 
 
     <aura:handler name="updateError"                            action="{!c.updateError}"/>
-    <aura:handler name="init"        value="{!this}"            action="{!c.init}"/>
 
     <aura:handler name="change"      value="{!v.errors}"        action="{!c.updateError}"/>
     <aura:handler name="change"      value="{!v.label}"         action="{!c.handleLabelChange}"/>

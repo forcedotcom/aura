@@ -135,7 +135,7 @@ function IfComponent(config, localCreation) {
     this.setupValueProviders(config["valueProviders"]);
 
     // initialize attributes
-    this.setupAttributes(this, configAttributes);
+    this.setupAttributes(configAttributes);
 
     // runs component provider and replaces this component with the provided one
     this.injectComponent(config, localCreation);
@@ -156,6 +156,7 @@ function IfComponent(config, localCreation) {
 
     this._destroying = false;
 
+    // No need to go through the full event cycle.
     this.fire("init");
 }
 
@@ -256,7 +257,9 @@ IfComponent.prototype["helper"] = {
             }
         }
         
-        if (hasUnrenderBody && $A.getContext().getMode() !== 'PROD') {
+
+        //#if {"excludeModes" : ["PRODUCTION"]}
+        if (hasUnrenderBody) {
             var owner = cmp.getOwner();
             $A.warning([
                 '[Performance degradation] ',
@@ -266,6 +269,7 @@ IfComponent.prototype["helper"] = {
                 'More info: https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/perf_warnings_if.htm'
             ].join(''));
         }
+        //#end
     }
 };
 

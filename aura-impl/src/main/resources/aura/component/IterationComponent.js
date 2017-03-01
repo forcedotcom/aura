@@ -136,7 +136,7 @@ function IterationComponent(config, localCreation) {
     this.setupValueProviders(config["valueProviders"]);
 
     // initialize attributes
-    this.setupAttributes(this, configAttributes);
+    this.setupAttributes(configAttributes);
 
     // runs component provider and replaces this component with the provided one
     this.injectComponent(config, localCreation);
@@ -161,6 +161,7 @@ function IterationComponent(config, localCreation) {
 
     this._destroying = false;
     
+    // No need to go through the full event cycle.
     this.fire("init");
 }
 
@@ -260,7 +261,8 @@ IterationComponent.prototype["helper"] = {
                 }
             }
             
-            if (cleanedCmps && $A.getContext().getMode() !== 'PROD') {
+            //#if {"excludeModes" : ["PRODUCTION"]}
+            if (cleanedCmps) {
                 var owner = component.getOwner();
                 $A.warning([
                     '[Performance degradation] ',
@@ -270,6 +272,7 @@ IterationComponent.prototype["helper"] = {
                     'More info: https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/perf_warnings_iteration.htm'
                 ].join(''));
             }
+            //#end
         }
     },
     updateBody: function (component) {
@@ -342,7 +345,7 @@ IterationComponent.prototype["helper"] = {
         var currentCall=0;
 
         function getCollector(index){
-            return function(itemComponents){
+            return function iteration$getCollector(itemComponents){
                 collector[index]=itemComponents;
                 if(++currentCall===expectedCalls){
                     var components=[];

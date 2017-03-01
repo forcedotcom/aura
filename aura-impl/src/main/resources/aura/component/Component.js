@@ -142,7 +142,7 @@ function Component(config, localCreation) {
     this.setupValueProviders(config["valueProviders"]);
 
     // initialize attributes
-    this.setupAttributes(this, configAttributes);
+    this.setupAttributes(configAttributes);
 
     // runs component provider and replaces this component with the provided one
     this.injectComponent(config, localCreation);
@@ -1678,13 +1678,18 @@ Component.prototype.getFacets = function() {
         // grab the names of each of the facets from the ComponentDef
         var facetNames = [];
         var attributeDefs = this.getDef().getAttributeDefs();
+        var values = attributeDefs.getValues();
 
-        //JBUCH: HALO: TODO: UNNECESSARY PERF HIT WITH .each() USING NEW STACKFRAME ON *EVERY* COMPONENT THAT HAS ATTRIBUTES (MOST COMPONENTS)
-        attributeDefs.each(function(attrDef) {
-            if (attrDef.getTypeDefDescriptor() === "aura://Aura.Component[]") {
-                facetNames.push(attrDef.getDescriptor().getName());
+        if(values) {
+            var valueNames = attributeDefs.getNames();
+            var attributeDef;
+            for(var c=0,length=valueNames.length;c<length;c++) {
+                attributeDef = values[valueNames[c]];
+                if (attributeDef.getTypeDefDescriptor() === "aura://Aura.Component[]") {
+                    facetNames.push(attributeDef.getDescriptor().getName());
+                }
             }
-        });
+        }
 
         // cache the names--they're not going to change
         this._cachedFacetNames = facetNames;
@@ -1858,7 +1863,7 @@ Component.prototype.getVersionInternal = function() {
 
 Component.prototype.getValueProvider = function(key) {
     $A.assert($A.util.isString(key), "Component.getValueProvider(): 'key' must be a valid String.");
-    return this.valueProviders[key.toLowerCase()];
+    return this.valueProviders[key]||this.valueProviders[key.toLowerCase()];
 };
 
 /**
@@ -1933,6 +1938,7 @@ Component.prototype.createComponentStack = function(facets, valueProvider){
         if (action) {
             action.pushCreationPath(facetName);
         }
+        var context = $A.getContext();
         var components = [];
         for (var index = 0; index < facetConfig.length; index++) {
             var config = facetConfig[index];
@@ -1944,7 +1950,7 @@ Component.prototype.createComponentStack = function(facets, valueProvider){
                     action.setCreationPathIndex(index);
                 }
 
-                $A.getContext().setCurrentAccess(valueProvider);
+                context.setCurrentAccess(valueProvider);
 
                 var facetConfigAttr = { "values": {} };
                 var facetConfigClone = $A.util.apply({}, config);
@@ -1959,7 +1965,7 @@ Component.prototype.createComponentStack = function(facets, valueProvider){
                 facetConfigClone["attributes"] = facetConfigAttr;
                 facetConfigClone["containerComponentId"] = this.globalId;
                 components.push($A.componentService.createComponentPriv(facetConfigClone));
-                $A.getContext().releaseCurrentAccess();
+                context.releaseCurrentAccess();
             } else {
                 // KRIS: HALO: This is hit, when you create a newComponentDeprec and use raw values, vs configs on the attribute values.
                 throw new $A.auraError("Component.createComponentStack: invalid config. Expected component definition, found '"+config+"'.", null, $A.severity.QUIET);
@@ -2049,7 +2055,7 @@ Component.prototype.isCollectionOfAuraComponentDefs = function (facetValueConfig
     }
 };
 
-Component.prototype.setupAttributes = function(cmp, config, localCreation) {
+Component.prototype.setupAttributes = function(config, localCreation) {
     //JBUCH: HALO: TODO: NOTE TO SELF: I THINK THERE IS SOMETHING STILL WRONG HERE.
     // I THINK THAT THE ORDER OF THE VALUES IS INCORRECT NOW
     // THIS MIGHT ALSO BE WHERE WE NEED TO DEREFERENCE CONFIG COPIES
@@ -2084,7 +2090,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
                         configValues[defaultDef.getDescriptor().getName()] = defaultValue;
                     } else {
                         //JBUCH: HALO: FIXME: FIND A BETTER WAY TO HANDLE DEFAULT EXPRESSIONS
-                        configValues[defaultDef.getDescriptor().getName()] = valueFactory.create(defaultValue, cmp);
+                        configValues[defaultDef.getDescriptor().getName()] = valueFactory.create(defaultValue, this);
                     }
                 }
             }
@@ -2111,11 +2117,11 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
         var isDefRef = attributeType === "aura://Aura.ComponentDefRef[]";
         
         if (!setByDefault[attribute]){
-            var def=AttributeSet.getDef(attribute,cmp.getDef());
+            var def=AttributeSet.getDef(attribute,this.getDef());
             if(!$A.clientService.allowAccess(def[0],def[1])) {
                 var context=$A.getContext();
                 var contextCmp = context && context.getCurrentAccess();
-                var message="Access Check Failed! Component.setupAttributes():'" + attribute + "' of component '" + cmp + "' is not visible to '" + contextCmp + "'.";
+                var message="Access Check Failed! Component.setupAttributes():'" + attribute + "' of component '" + this + "' is not visible to '" + contextCmp + "'.";
                 if(context.enableAccessChecks){
                     if(context.logAccessFailures){
                         var ae = new $A.auraError(message);
@@ -2137,12 +2143,12 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
                 continue;
             }
             // If we don't setup the attributesValueProvider on the config, use the components.
-            var attributeValueProvider = (config&&config["valueProvider"])||cmp.getAttributeValueProvider();
+            var attributeValueProvider = (config&&config["valueProvider"])||this.getAttributeValueProvider();
 
             // JBUCH: HALO: DIEGO: TODO: Revisit to code is a bit ugly
             value = valueFactory.create(value, config["valueProvider"]);
             if($A.util.isExpression(value)){
-                value.addChangeHandler(cmp,"v."+attribute);
+                value.addChangeHandler(this,"v."+attribute);
                 value = value.evaluate();
             }
             if($A.util.isString(value)){
@@ -2152,8 +2158,8 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
 
             // JBUCH: HALO: TODO: DEDUPE THIS AGAINST lines 462 - 467 AFTER CONFIRMING IT WORKS
             if (attribute === "body") {
-                attributes[attribute]=(this.concreteComponentId&&cmp.getConcreteComponent().attributeSet.values["body"])||{};
-                attributes[attribute][cmp.globalId] = facetStack["body"] || [];
+                attributes[attribute]=(this.concreteComponentId&&this.getConcreteComponent().attributeSet.values["body"])||{};
+                attributes[attribute][this.globalId] = facetStack["body"] || [];
             } else {
                 attributes[attribute] = facetStack[attribute];
             }
@@ -2171,7 +2177,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
                 // which could and should be a ComponentDefRef[]
                 var reference = valueFactory.create(value, config["valueProvider"]);
                 if($A.util.isExpression(reference)) {
-                    reference.addChangeHandler(cmp,"v."+attribute,null,true);
+                    reference.addChangeHandler(this,"v."+attribute,null,true);
                     value = reference.evaluate();
                 }
                 // KRIS
@@ -2206,21 +2212,21 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
                 cdrs.push(cdr);
             }
             if (attribute === "body") {
-                attributes[attribute]=(this.concreteComponentId&&cmp.getConcreteComponent().attributeSet.values["body"])||{};
-                attributes[attribute][cmp.globalId] = cdrs;
+                attributes[attribute]=(this.concreteComponentId&&this.getConcreteComponent().attributeSet.values["body"])||{};
+                attributes[attribute][this.globalId] = cdrs;
             } else {
                 attributes[attribute] = cdrs;
             }
         } else {
-            attributes[attribute] = valueFactory.create(value, config["valueProvider"] || cmp);
+            attributes[attribute] = valueFactory.create(value, config["valueProvider"] || this);
             if($A.util.isExpression(attributes[attribute])){
-                attributes[attribute].addChangeHandler(cmp,"v."+attribute);
+                attributes[attribute].addChangeHandler(this,"v."+attribute);
             }
         }
     }
 
     if(this.concreteComponentId) {
-        var concreteComponent=cmp.getConcreteComponent();
+        var concreteComponent=this.getConcreteComponent();
         concreteComponent.attributeSet.merge(attributes);
         this.attributeSet=concreteComponent.attributeSet;
     }else{
@@ -2272,7 +2278,7 @@ Component.prototype.validatePartialConfig=function(config, partialConfig){
 Component.prototype.getMethodHandler = function(methodDef){
     var component=this;
     var observer=this.getActionCaller(this,methodDef.action||("c."+methodDef.getDescriptor().name));
-    return function(/*param1,param2,paramN*/){
+    return function Component$getMethodHandler(/*param1,param2,paramN*/){
         if(!$A.clientService.allowAccess(methodDef,component)) {
             var context = $A.getContext();
             var contextCmp = context && context.getCurrentAccess();

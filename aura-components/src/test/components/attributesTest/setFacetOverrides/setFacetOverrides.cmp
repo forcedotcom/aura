@@ -1,0 +1,155 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component render="client" extensible="true" extends="attributesTest:setFacet2">
+    <aura:attribute name="setFacet3_String" type="String"/>
+    <aura:attribute name="setFacet3_Facet" type="Aura.Component[]"/>
+    <aura:attribute name="setFacet3_DefRef" type="Aura.ComponentDefRef[]"/>
+    <aura:attribute name="setFacet3_DefaultString" type="String" default="[setFacet3_String]"/>
+
+    <aura:attribute name="setFacet1_DefaultFacet" type="Aura.Component[]">
+        [setFacet3_Facet]{!v.setFacet1_DefaultString}[/setFacet3_Facet]
+    </aura:attribute>
+
+    <aura:attribute name="setFacet1_DefaultDefRef" type="Aura.ComponentDefRef[]">
+        [setFacet3_DefRef]{!v.setFacet1_DefaultString}[/setFacet3_DefRef]
+    </aura:attribute>
+
+    <aura:attribute name="setFacet2_DefaultFacet" type="Aura.Component[]">
+        [setFacet3_Facet]{!v.setFacet2_DefaultString}[/setFacet3_Facet]
+    </aura:attribute>
+
+    <aura:attribute name="setFacet2_DefaultDefRef" type="Aura.ComponentDefRef[]">
+        [setFacet3_DefRef]{!v.setFacet2_DefaultString}[/setFacet3_DefRef]
+    </aura:attribute>
+
+    <aura:attribute name="setFacet3_DefaultFacet" type="Aura.Component[]">
+        [setFacet3_Facet]{!v.setFacet3_DefaultString}[/setFacet3_Facet]
+    </aura:attribute>
+
+    <aura:attribute name="setFacet3_DefaultDefRef" type="Aura.ComponentDefRef[]">
+        [setFacet3_DefRef]{!v.setFacet3_DefaultString}[/setFacet3_DefRef]
+    </aura:attribute>
+
+
+    <aura:set attribute="setFacet1_String" value="[setFacet3_String]" />
+    <aura:set attribute="setFacet2_String" value="[setFacet3_String]" />
+    <aura:set attribute="setFacet3_String" value="[setFacet3_String]" />
+
+    <aura:set attribute="setFacet1_DefaultString" value="[setFacet3_String]" />
+    <aura:set attribute="setFacet2_DefaultString" value="[setFacet3_String]" />
+
+    <aura:set attribute="setFacet1_Facet">
+        [setFacet3_Facet]{!v.setFacet1_String}[/setFacet3_Facet]
+    </aura:set>
+
+    <aura:set attribute="setFacet1_DefRef">
+        [setFacet3_DefRef]{!v.setFacet1_String}[/setFacet3_DefRef]
+    </aura:set>
+
+    <aura:set attribute="setFacet2_Facet">
+        [setFacet3_Facet]{!v.setFacet2_String}[/setFacet3_Facet]
+    </aura:set>
+
+    <aura:set attribute="setFacet2_DefRef">
+        [setFacet3_DefRef]{!v.setFacet2_String}[/setFacet3_DefRef]
+    </aura:set>
+
+    <aura:set attribute="setFacet3_Facet">
+        [setFacet3_Facet]{!v.setFacet3_String}[/setFacet3_Facet]
+    </aura:set>
+
+    <aura:set attribute="setFacet3_DefRef">
+        [setFacet3_DefRef]{!v.setFacet3_String}[/setFacet3_DefRef]
+    </aura:set>
+
+    <h1>setFacetOverrides</h1>
+    <p>
+        <b>v.setFacet1_Facet</b><br/>
+        <i>Expected:</i> <div>[setFacet3_Facet][setFacet3_String][/setFacet3_Facet]</div>
+        <i>Actual:</i> <div aura:id="setFacet1_Facet_Output">{!v.setFacet1_Facet}</div>
+    </p>
+    <br/>
+    <p>
+        <b>v.setFacet1_DefRef</b><br/>
+        <i>Expected:</i> <div>[setFacet3_DefRef][setFacet3_String][/setFacet3_DefRef]</div>
+        <i>Actual:</i> <div aura:id="setFacet1_DefRef_Output">{!v.setFacet1_DefRef}</div>
+    </p>
+    <br/>
+    <p>
+        <b>v.setFacet2_Facet</b><br/>
+        <i>Expected:</i> <div>[setFacet3_Facet][setFacet3_String][/setFacet3_Facet]</div>
+        <i>Actual:</i> <div aura:id="setFacet2_Facet_Output">{!v.setFacet2_Facet}</div>
+    </p>
+    <br/>
+    <p>
+        <b>v.setFacet2_DefRef</b><br/>
+        <i>Expected:</i> <div>[setFacet3_DefRef][setFacet3_String][/setFacet3_DefRef]</div>
+        <i>Actual:</i> <div aura:id="setFacet2_DefRef_Output">{!v.setFacet2_DefRef}</div>
+    </p>
+    <br/>
+    <p>
+        <b>v.setFacet3_Facet</b><br/>
+        <i>Expected:</i> <div>[setFacet3_Facet][setFacet3_String][/setFacet3_Facet]</div>
+        <i>Actual:</i> <div aura:id="setFacet3_Facet_Output">{!v.setFacet3_Facet}</div>
+    </p>
+    <br/>
+    <p>
+        <b>v.setFacet3_DefRef</b><br/>
+        <i>Expected:</i> <div>[setFacet3_DefRef][setFacet3_String][/setFacet3_DefRef]</div>
+        <i>Actual:</i> <div aura:id="setFacet3_DefRef_Output">{!v.setFacet3_DefRef}</div>
+    </p>
+    <br/>
+    <p>
+        <b>v.setFacet1_DefaultFacet</b><br/>
+        <i>Expected:</i> <div>[setFacet3_Facet][setFacet3_String][/setFacet3_Facet]</div>
+        <i>Actual:</i> <div aura:id="setFacet1_DefaultFacet_Output">{!v.setFacet1_DefaultFacet}</div>
+    </p>
+    <br/>
+    <p>
+        <b>v.setFacet1_DefaultDefRef</b><br/>
+        <i>Expected:</i> <div>[setFacet3_DefRef][setFacet3_String][/setFacet3_DefRef]</div>
+        <i>Actual:</i> <div aura:id="setFacet1_DefaultDefRef_Output">{!v.setFacet1_DefaultDefRef}</div>
+    </p>
+    <br/>
+    <p>
+        <b>v.setFacet2_DefaultFacet</b><br/>
+        <i>Expected:</i> <div>[setFacet3_Facet][setFacet3_String][/setFacet3_Facet]</div>
+        <i>Actual:</i> <div aura:id="setFacet2_DefaultFacet_Output">{!v.setFacet2_DefaultFacet}</div>
+    </p>
+    <br/>
+    <p>
+        <b>v.setFacet2_DefaultDefRef</b><br/>
+        <i>Expected:</i> <div>[setFacet3_DefRef][setFacet3_String][/setFacet3_DefRef]</div>
+        <i>Actual:</i> <div aura:id="setFacet2_DefaultDefRef_Output">{!v.setFacet2_DefaultDefRef}</div>
+    </p>
+    <br/>
+    <p>
+        <b>v.setFacet3_DefaultFacet</b><br/>
+        <i>Expected:</i> <div>[setFacet3_Facet][setFacet3_String][/setFacet3_Facet]</div>
+        <i>Actual:</i> <div aura:id="setFacet3_DefaultFacet_Output">{!v.setFacet3_DefaultFacet}</div>
+    </p>
+    <br/>
+    <p>
+        <b>v.setFacet3_DefaultDefRef</b><br/>
+        <i>Expected:</i> <div>[setFacet3_DefRef][setFacet3_String][/setFacet3_DefRef]</div>
+        <i>Actual:</i> <div aura:id="setFacet3_DefaultDefRef_Output">{!v.setFacet3_DefaultDefRef}</div>
+    </p>
+    <br/>
+
+    {!v.body}
+</aura:component>

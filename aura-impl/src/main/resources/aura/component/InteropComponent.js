@@ -42,7 +42,7 @@ function InteropComponent(config) {
         this.doIndex(this);
     }
 
-    this.attributes = this.setupAttributes(this, config['attributes']);
+    this.attributes = this.setupAttributes(config['attributes']);
     this.setupMethods();
     
 }
@@ -65,7 +65,7 @@ InteropComponent.prototype.bridgeAction = function (prv, isEvent) {
 
 };
 
-InteropComponent.prototype.setupAttributes = function(cmp, config) {
+InteropComponent.prototype.setupAttributes = function(config) {
     var configValues = config && config['values'] || {};
     var attributes = {};
     var self = this;
@@ -79,7 +79,7 @@ InteropComponent.prototype.setupAttributes = function(cmp, config) {
     for (var attribute in configValues) {
         var isEvent = false;
         var value = configValues[attribute];
-        var valueConfig = valueFactory.create(value, config['valueProvider'] || cmp);
+        var valueConfig = valueFactory.create(value, config['valueProvider'] || this);
 
         // Check typeof PRV | FCV
         if ($A.util.isExpression(valueConfig.value)) {
@@ -91,14 +91,14 @@ InteropComponent.prototype.setupAttributes = function(cmp, config) {
 
                 // For "v" add change handler, for "c" add bridging
                 if (provider === 'v') {
-                    valueConfig.value.addChangeHandler(cmp, attribute, changeHandlerPRV);
+                    valueConfig.value.addChangeHandler(this, attribute, changeHandlerPRV);
                 } else {
                     isEvent = value['descriptor'].indexOf('on') === 0;
                     valueConfig = this.bridgeAction(valueConfig.value, isEvent);
                 }
             // FCV attribute
             } else {
-                valueConfig.value.addChangeHandler(cmp, attribute, changeHandlerFCV.bind(self, attribute, valueConfig.value));
+                valueConfig.value.addChangeHandler(this, attribute, changeHandlerFCV.bind(self, attribute, valueConfig.value));
             }
 
         // Is a plain object or a literal, just use the raw value

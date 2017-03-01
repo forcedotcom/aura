@@ -136,7 +136,7 @@ function ExpressionComponent(config, localCreation) {
     this.setupValueProviders(config["valueProviders"]);
     
     // initialize attributes
-    this.setupAttributes(this, configAttributes, localCreation);
+    this.setupAttributes(configAttributes, localCreation);
 
     // index this component with its value provider (if it has a localid)
     this.doIndex(this);

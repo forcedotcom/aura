@@ -1379,7 +1379,7 @@ AuraInstance.prototype.getDefinitions = function(descriptors, callback) {
         action.setParams({
             "names": requestDefinitions
         });
-        action.setCallback(this, function () {
+        action.setCallback(this, function getDefintions$callback() {
             //$A.assert(action.getState() === 'SUCCESS', "Definition '" + descriptor + "' was not found on the client or the server.");
             // We use getDef at the moment so we do the access check.
             //executeCallbackcallback(this.getDef(descriptor));

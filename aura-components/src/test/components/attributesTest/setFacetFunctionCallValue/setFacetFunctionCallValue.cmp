@@ -1,0 +1,13 @@
+<aura:component extends="attributesTest:setFacet1">
+	<aura:attribute name="setFacetFunctionCallValue_String" type="String" default="String"/>
+	
+    <aura:set attribute="setFacet1_DefaultString" value="{!v.setFacet1_DefaultString + ':setFacetFunctionCallValue'}"/>
+    <aura:set attribute="setFacet1_String" value="{!v.setFacet1_String + ':setFacetFunctionCallValue'}"/>
+    
+<!--     <aura:set attribute="setFacetFunctionCallValue_String" value="{!v.setFacetFunctionCallValue_String}"/> -->
+    
+    <br/>
+    v.setFacet1_DefaultString: {!v.setFacet1_DefaultString}
+    <br/>
+    v.setFacet1_String: {!v.setFacet1_String}
+</aura:component>

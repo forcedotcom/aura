@@ -138,7 +138,7 @@ function HtmlComponent(config, localCreation) {
     this.setupValueProviders(config["valueProviders"]);
 
     // initialize attributes
-    this.setupAttributes(this, configAttributes);
+    this.setupAttributes(configAttributes);
 
     // index this component with its value provider (if it has a localid)
     this.doIndex(this);

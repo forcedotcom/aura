@@ -134,7 +134,7 @@ function BaseComponent(config, localCreation) {
     this.setupValueProviders(config["valueProviders"]);
 
     // initialize attributes
-    this.setupAttributes(this, configAttributes);
+    this.setupAttributes(configAttributes);
 
     // clean up refs to partial config
     this.partialConfig = undefined;

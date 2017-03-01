@@ -27,7 +27,7 @@
         &lt;ui:menuTriggerLink class="radioMenuLabel" aura:id="radioMenuLabel" label="Select a status"/>
         &lt;ui:menuList class="radioMenu" aura:id="radioMenu">
             &lt;aura:iteration items="{!v.status}" var="s">
-                &lt;ui:radioMenuItem label="{!s}" value="{!s}"/>
+                &lt;ui:radioMenuItem label="{!s}"/>
             &lt;/aura:iteration>
         &lt;/ui:menuList>
     &lt;/ui:menu></pre>

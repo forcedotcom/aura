@@ -29,9 +29,15 @@
     <aura:method name="testMethodWithParams" action="{!c.testMethodWithParams}"/>
     <aura:method name="testRawObjectsConstructorAndProperties" action="{!c.testRawObjectsConstructorAndProperties}"/>
     <aura:method name="testUnfilteringOfArrayBuffer" />
+    <aura:method name="verifyInputBindingToNewPropOnBackingObject" />
 
     <div id="title">SecureObject test</div>
     <lockerTest:wrapUnwrapFacet aura:id="wrapUnwrapFacet" obj="{!v.wrapUnwrapTestObj}" value1="{!v.wrapUnwrapTestObj.value1}" value2="{!v.wrapUnwrapTestObj.sub.value2}" />
+    <div id="wrapUnwrapTestObj">{!v.wrapUnwrapTestObj.value1},{!v.wrapUnwrapTestObj.sub.value2},{!v.wrapUnwrapTestObj.value3}</div>
+
+    <ui:inputText aura:id="in_inputValue1" value="{!v.wrapUnwrapTestObj.inputValue1}"/>
+    <div id="out_inputValue1">{!v.wrapUnwrapTestObj.inputValue1}</div>
+
     <lockerTest:facet aura:id="facet"/>
     <div aura:id="content"></div>
 </aura:component>

@@ -5,6 +5,7 @@
         cmp.set('v.value1', 'Value 1');
         cmp.set('v.value2', 'Value 2'); 
         obj = cmp.get('v.obj');
+        obj.value3 = 'Value 3';
         cmp.set('v.obj', obj);
     }
 })

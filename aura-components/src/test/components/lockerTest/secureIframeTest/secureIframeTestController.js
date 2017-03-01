@@ -135,7 +135,6 @@
 
     testMessageChannel: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
-        var iframeLoaded = false;
         var iframe = cmp.find("iframeMessageChannel").getElement();
         var cw = iframe.contentWindow;
         var messageChannel = new MessageChannel();
@@ -145,26 +144,15 @@
             cmp.set("v.messageReceived", e.data);
         }
 
-        iframe.addEventListener("load", function() {
-            iframeLoaded = true;
-          });
+        // waiting for iframe to be loaded be handled in *Test.js file
+        cw.postMessage("Message from parent", "*", [messageChannel.port2]);
 
+        // iframe will echo back original message with some additional text prepended
         testUtils.addWaitForWithFailureMessage(
-                true,
+                "Message from iframe: Message from parent",
                 function() {
-                    return iframeLoaded;
+                    return cmp.get("v.messageReceived");
                 },
-                "iFrame component never initialized",
-                function() {
-                    cw.postMessage("Message from parent", "*", [messageChannel.port2]);
-
-                    // iframe will echo back original message with some additional text prepended
-                    testUtils.addWaitForWithFailureMessage(
-                            "Message from iframe: Message from parent",
-                            function() {
-                                return cmp.get("v.messageReceived");
-                            },
-                            "Never received message back from iframe");
-                });
+                "Never received message back from iframe");
     }
 })

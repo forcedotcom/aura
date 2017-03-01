@@ -19,6 +19,8 @@
     implements="aura:requireLocker"
     description="Simple component to be used inside an iframe that echos a message back to the sender via MessageChannel port">
 
+    <aura:attribute name="loaded" type="Boolean" default="{!false}"/>
+
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
 </aura:component>

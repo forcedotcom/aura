@@ -230,6 +230,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassChild's render
     @Test
+    @Flapper // occassionally gets StaleElementReferenceException getting error message
     public void testServerProvidedGrandChildClientErrorOutFromChildRender() throws Exception {
         String expectContainedMessage = "blahFromChildRerender is not defined";
         String url = "/auratest/componentClassServerProvider.cmp?" +

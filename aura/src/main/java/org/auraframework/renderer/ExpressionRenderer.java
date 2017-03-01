@@ -22,6 +22,8 @@ import javax.inject.Inject;
 
 import org.auraframework.annotations.Annotations.ServiceComponentRenderer;
 import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Wrapper;
@@ -67,10 +69,13 @@ public class ExpressionRenderer implements Renderer {
             for (Object kid : kids) {
                 if (kid instanceof BaseComponent) {
                     this.renderingService.render((BaseComponent<?, ?>) kid, rc);
-                } else if (kid instanceof ComponentDefRef) {
-                    BaseComponent cmp = (BaseComponent) this.instanceService.getInstance((ComponentDefRef) kid,
-                            component);
-                    this.renderingService.render(cmp, rc);
+                } else if (kid instanceof DefinitionReference) {
+                    DefinitionReference defRef = ((DefinitionReference) kid).get();
+                    if (defRef.type() == DefType.COMPONENT) {
+                        BaseComponent cmp = (BaseComponent) this.instanceService.getInstance((ComponentDefRef) defRef,
+                                component);
+                        this.renderingService.render(cmp, rc);
+                    }
                 }
             }
         } else if (value != null) {

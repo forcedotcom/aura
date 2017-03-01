@@ -34,7 +34,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     private static final long serialVersionUID = 5154640929496754931L;
     private String path;
     private String compiledCode;
-    private Set<DefDescriptor<ModuleDef>> dependencies;
+    private Set<DefDescriptor<?>> dependencies;
 
     private ModuleDefImpl(Builder builder) {
         super(builder);
@@ -73,7 +73,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
 
         private String path;
         private String compiledCode;
-        private Set<DefDescriptor<ModuleDef>> dependencies;
+        private Set<DefDescriptor<?>> dependencies;
 
         public Builder() {
             super(ModuleDef.class);
@@ -87,7 +87,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
             this.path = path;
         }
 
-        public void setDependencies(Set<DefDescriptor<ModuleDef>> dependencies) {
+        public void setDependencies(Set<DefDescriptor<?>> dependencies) {
             this.dependencies = dependencies;
         }
 

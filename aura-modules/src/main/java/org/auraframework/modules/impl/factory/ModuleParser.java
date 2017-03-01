@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.LibraryDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl;
@@ -112,14 +113,33 @@ public class ModuleParser implements DefinitionFactory<TextSource<ModuleDef>, Mo
         }
     }
 
-    private Set<DefDescriptor<ModuleDef>> getDependencyDescriptors(List<String> dependencies) {
-        Set<DefDescriptor<ModuleDef>> results = Sets.newHashSet();
+    /**
+     * Process dependencies from compiler in the form of DefDescriptor names (namespace:module)
+     * into DefDescriptor.
+     *
+     * Module dependencies may include other modules and aura libraries
+     *
+     * @param dependencies list of descriptor names
+     * @return dependencies as DefDescriptors
+     */
+    private Set<DefDescriptor<?>> getDependencyDescriptors(List<String> dependencies) {
+        Set<DefDescriptor<?>> results = Sets.newHashSet();
         for (String dep : dependencies) {
             if (dep.contains("-")) {
                 // TODO remove when compiler is updated to return ':'
                 dep = dep.replace("-", ":");
             }
-            results.add(definitionService.getDefDescriptor(dep, ModuleDef.class));
+            DefDescriptor<ModuleDef> moduleDefDefDescriptor = definitionService.getDefDescriptor(dep, ModuleDef.class);
+            if (definitionService.exists(moduleDefDefDescriptor)) {
+                // if module exists, then add module dependency and continue
+                results.add(moduleDefDefDescriptor);
+            } else {
+                // otherwise check for library usage
+                DefDescriptor<LibraryDef> libraryDefDescriptor = definitionService.getDefDescriptor(dep, LibraryDef.class);
+                if (definitionService.exists(libraryDefDescriptor)) {
+                    results.add(libraryDefDescriptor);
+                }
+            }
         }
         return results;
     }

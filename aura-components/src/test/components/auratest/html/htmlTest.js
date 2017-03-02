@@ -214,41 +214,6 @@
         }
     },
 
-    /**
-     * Verify that touchend event handlers is used if present before using onclick.
-     * Automation for W-1564377
-     */
-    testTouchEndHandlerUsedWhenPresent:{
-    	browsers:["IPAD"],
-    	labels : ["UnAdaptableTest"],
-    	test: [
-    	  //Both click handler and touch end handler defined
-    	  function(component){
-    	    component._TouchEndHandler = false;
-    	    component._OnClickHandler = false;
-    	    var targetElement = component.find("bothTouchEndAndClickHandlers").getElement();
-    	    this.fireTouchEndEventOnElement(component, targetElement);
-    	    $A.test.addWaitFor(true,
-    		    function(){return component._TouchEndHandler},
-    		    function(){ $A.test.assertFalse(component._OnClickHandler); });
-    	},
-    	  //Both touch end handler defined
-    	  function(component){
-    	    var targetElement = component.find("onlyTouchEndHandler").getElement();
-    	    this.fireTouchEndEventOnElement(component, targetElement);
-    	    $A.test.addWaitFor(true, function(){return component._TouchEndHandler;},
-    		    function(){$A.test.assertFalse(component._OnClickHandler);})
-    	}
-    	 //Only click handler defined
-    //	 function(component){
-    //	    var targetElement = component.find("onlyClickHandler").getElement();
-    //	    this.fireTouchEndEventOnElement(component, targetElement);
-    //	    $A.test.addWaitFor(true, function(){return component._OnClickHandler;},
-    //		    function(){$A.test.assertFalse(component._TouchEndHandler);})
-    //	}
-        ]
-    },
-
     testIFrame: {
         test: function(cmp) {
             var frame = cmp.find("frame").getElement();

@@ -31,6 +31,11 @@ function AuraRenderingService() {
     // Ideally, we shouldn't care what order we rerender in, but that's a more difficult bug to track down in 194/patch
     this.dirtyComponentIds = [];
     this.needsCleaning = false;
+    this.markerToReferencesMap = {};
+
+    // For elements that do not have a data-aura-rendered-by attribute, we'll add a unique identifier.
+    this.DATA_UID_KEY = "data-rendering-service-uid";
+    this.uid = 1;
 }
 
 /**
@@ -89,7 +94,9 @@ AuraRenderingService.prototype.render = function(components, parent) {
         }
     }
 
-    this.insertElements(elements, parent);
+    if(parent) {
+        $A.util.appendChild(elements, parent);
+    }
 
     //#if {"modes" : ["STATS"]}
     this.statsIndex["render"].push({
@@ -165,7 +172,7 @@ AuraRenderingService.prototype.rerender = function(components) {
                 visited[id] = true;
             }
             if(addExistingElements){
-                renderedElements=renderedElements.concat(cmp.getElements());
+                renderedElements=renderedElements.concat(this.getElements(cmp));
             }
             elements=elements.concat(renderedElements);
         }
@@ -264,39 +271,49 @@ AuraRenderingService.prototype.unrender = function(components) {
 
     components = this.getArray(components);
     var context=$A.getContext();
-    for (var i = 0; i < components.length; i++){
-        var cmp = components[i];
+    var cmp;
+    var container;
+    for (var i = 0,length=components.length; i < length; i++){
+        cmp = components[i];
         if ($A.util.isComponent(cmp) && cmp.destroyed!==1 && cmp.isRendered()) {
-            //var renderer = cmp.getRenderer();
             cmp.setUnrendering(true);
+            // Use the container to check if we're in the middle of unrendering a parent component.
+            // Sometimes that is not available, so otherwise move to considering the owner. 
+            container = cmp.getContainer() || cmp.getOwner();
+            
+            this.removeElement(this.getMarker(cmp), container);
+
+            // If the parent is NOT unrendering, then remove these and unrender it's children.
+            // In the unrenderFacets function, those elements won't be removed from the DOM since their parents here 
+            // are getting removed.
+            if(container && !container.getConcreteComponent().isUnrendering()) {
+                // Disconnect a components elements
+                this.disconnectComponent(cmp);
+            }
+             
             try {
-                if(cmp.destroyed!==1&&cmp.isRendered()) {
-                    try {
-                        context.setCurrentAccess(cmp);
-                        cmp["unrender"]();
-                        context.releaseCurrentAccess(cmp);
-                    } catch (e) {
-                        if (e instanceof $A.auraError && e["component"]) {
-                            throw e;
-                        } else {
-                            var ae = new $A.auraError("unrender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
-                            ae["component"] = cmp.getDef().getDescriptor().toString();
-                            ae["componentStack"] = $A.getContext().getAccessStackHierarchy();
-                            $A.lastKnownError = ae;
-                            throw ae;
-                        }
-                    } finally {
-                        cmp.setRendered(false);
-                        if (visited) {
-                            visited[cmp.getGlobalId()] = true;
-                        }
-                    }
+                context.setCurrentAccess(cmp);
+                cmp["unrender"]();
+                context.releaseCurrentAccess(cmp);
+            } catch (e) {
+                if (e instanceof $A.auraError && e["component"]) {
+                    throw e;
+                } else {
+                    var ae = new $A.auraError("unrender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
+                    ae["component"] = cmp.getDef().getDescriptor().toString();
+                    ae["componentStack"] = $A.getContext().getAccessStackHierarchy();
+                    $A.lastKnownError = ae;
+                    throw ae;
                 }
             } finally {
                 if (cmp.destroyed!==1) {
+                    cmp.setRendered(false);
+                    if (visited) {
+                        visited[cmp.getGlobalId()] = true;
+                    }
                     cmp.setUnrendering(false);
                 }
-            }
+            }            
         }
     }
 
@@ -404,9 +421,15 @@ AuraRenderingService.prototype.renderFacet = function(component, facet, parent) 
     this.storeFacetInfo(component, facet);
     var ret=this.render(facet,parent);
     if(!ret.length){
-        component._marker=ret[0]=this.createMarker(null,"render facet: " + component.getGlobalId());
-    }else{
-        component._marker=ret[0];
+        if(parent) {
+            this.setMarker(component, parent);
+        } else {
+            this.setMarker(component, ret[0]=this.createMarker(null,"render facet: " + component.getGlobalId()));
+        }
+    }else if(parent) {
+        this.setMarker(component, parent);
+    } else {
+        this.setMarker(component, ret[0]);
     }
     return ret;
 };
@@ -421,16 +444,19 @@ AuraRenderingService.prototype.renderFacet = function(component, facet, parent) 
 AuraRenderingService.prototype.rerenderFacet = function(component, facet, referenceNode) {
     var updatedFacet=this.getUpdatedFacetInfo(component,facet);
     var ret=[];
+    var marker = this.getMarker(component);
     var components=updatedFacet.components;
-    var target=referenceNode||component._marker.parentNode;
+    var target=referenceNode||marker.parentNode;
     var calculatedPosition=0;
-    var positionMarker=component._marker;
+    var positionMarker=marker;
     var nextSibling=null;
-    while(positionMarker.previousSibling){
-        calculatedPosition++;
-        positionMarker=positionMarker.previousSibling;
+    // If the parent is NOT my marker then look inside to find it's position.
+    if(positionMarker !== target) {
+        while(positionMarker.previousSibling){
+            calculatedPosition++;
+            positionMarker=positionMarker.previousSibling;
+        }
     }
-    
     for(var i=0;i<components.length;i++){
         var info=components[i];
         var renderedElements=null;
@@ -444,10 +470,12 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
                     ret=ret.concat(renderedElements);
                 }else if(renderedElements.length){
                     ret=ret.concat(renderedElements);
-                    if(this.isMarker(component._marker)){
-                        $A.util.removeElement(component._marker);
+                    marker = this.getMarker(component);
+                    if(this.isCommentMarker(marker)){
+
+                        this.removeElement(marker);
                     }
-                    component._marker=ret[0];
+                    this.setMarker(component, ret[0]);
                     nextSibling=target.childNodes[calculatedPosition];
                     this.insertElements(renderedElements,nextSibling||target,nextSibling,nextSibling);
                 }
@@ -458,38 +486,22 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
                 if(this.hasDirtyValue(info.component)){
                     renderedElements=this.rerender(info.component);
                 }else{
+                    // This must use component.getElements() not this.getElements()
+                    // Since we need a copy of the array.
                     renderedElements=info.component.getElements();
                 }
-                // KRIS: HALO:
-                // I anticipate this code going away when JohnBuch refactors the markers
-                // to support nested renderIf.
-                // The reason it is necessary is because when we rerender something like an iteration, it
-                // can have it's original marker unrendered, and thus it moves to the next element. Which
-                // can then be unrendered too, and so on and so on. Eventually the marker moves to the last element
-                // but there may at this point be new elements in the iteration. So if you unrender the last element
-                // and you rerender it's sub-components resulting in new elements, change its marker to the new elements
-                //if(renderedElements.length && this.isMarker(component._marker)) {
-                        // KRIS: HALO:
-                        // We can't do this, some components share markers, and this can potentially
-                        // remove the marker for another component.
-                    //$A.util.removeElement(component._marker);
-
-                        // KRIS: HALO:
-                        // Still failing things. Bleh.
-                    //component._marker = renderedElements[0];
-                //}
-
                 info.component.disassociateElements();
                 this.associateElements(info.component, renderedElements);
                 ret = ret.concat(renderedElements);
                 calculatedPosition+=renderedElements.length;
                 break;
             case "unrender":
-                if (!this.isMarker(component._marker)) {
-                    if (updatedFacet.fullUnrender || !component._marker.nextSibling) {
-                        component._marker = this.createMarker(component._marker,"unrender facet: " + component.getGlobalId());
-                    } else if (info.component.isValid() && info.component.getElement() === component._marker) {
-                        component._marker = component._marker.nextSibling;
+                marker = this.getMarker(component);
+                if (!this.isCommentMarker(marker)) {
+                    if (updatedFacet.fullUnrender || !marker.nextSibling) {
+                        this.setMarker(component, this.createMarker(marker,"unrender facet: " + component.getGlobalId()));
+                    } else if (info.component.isValid() && this.getElements(info.component)[0] === marker) {
+                        this.setMarker(component, marker.nextSibling);
                     }
                 }
 
@@ -531,14 +543,21 @@ AuraRenderingService.prototype.unrenderFacet = function(cmp,facet){
         cmp._facetInfo = null;
     }
 
-    this.unrender(facet);
+    if(facet) {
+        this.unrender(facet);
+    }
 
-    var elements = cmp.getElements();
+    var elements = this.getElements(cmp);
+    var element;
     if(elements) {
-        while(elements.length){
-            $A.util.removeElement(elements.pop());
+        var globalId = cmp.getGlobalId();
+        for(var c=elements.length-1;c>=0;c--) {
+            element = elements[c];
+            this.removeMarkerReference(element, globalId);
+            this.removeElement(element, cmp);
         }
     }
+
     cmp.disassociateElements();
 };
 
@@ -551,7 +570,37 @@ AuraRenderingService.prototype.unrenderFacet = function(cmp,facet){
  * @export
  */
 AuraRenderingService.prototype.getMarker = function(cmp){
-    return cmp && cmp._marker;
+    if(!cmp||cmp.destroyed) { return null; }
+
+    return cmp.getConcreteComponent()._marker;
+};
+
+AuraRenderingService.prototype.setMarker = function(cmp, newMarker) {
+    if(!cmp) { return; }
+    var concrete = cmp.getConcreteComponent();
+    var oldMarker = this.getMarker(concrete);
+    
+    // Shouldn't hit this. I can't hit it anymore.
+    if(oldMarker === newMarker) {
+        return;
+    }
+
+    // Html Markers are added in the render phase. 
+    // They always have a 1 to 1 mapping from component to element, and will never
+    // use a comment marker. So no need to add overhead of tracking html element markers.
+    if(!cmp.isInstanceOf("aura:html")) {
+        $A.renderingService.addMarkerReference(newMarker, concrete.getGlobalId());
+    }
+    if(oldMarker) {
+        $A.renderingService.removeMarkerReference(oldMarker, concrete.getGlobalId());
+    }
+
+    // Clear it out!
+    if(!newMarker) {
+        concrete._marker = null;
+    } else {
+        concrete._marker = newMarker;
+    }
 };
 
 /**
@@ -767,6 +816,7 @@ AuraRenderingService.prototype.finishRender = function(cmp, elements) {
     this.associateElements(cmp, elements);
 
     cmp.setRendered(true);
+
     this.cleanComponent(cmp.getGlobalId());
 
     return elements;
@@ -878,7 +928,7 @@ AuraRenderingService.prototype.associateElements = function(cmp, elements) {
     var len = elements.length;
     for (var i = 0; i < len; i++) {
         var element = elements[i];
-        if(this.isMarker(element)){
+        if(this.isCommentMarker(element)){
             continue;
         }
         this.addAuraClass(cmp,element);
@@ -895,8 +945,216 @@ AuraRenderingService.prototype.createMarker = function(target,reason){
     return node;
 };
 
-AuraRenderingService.prototype.isMarker = function(node){
+AuraRenderingService.prototype.isCommentMarker = function(node){
     return node&&node.aura_marker;
+};
+
+AuraRenderingService.prototype.getElements = function(component) {
+    // avoid a slice of the elements collection
+    return component.getConcreteComponent().elements || [];
+};
+
+AuraRenderingService.prototype.disconnectComponent = function(component) {
+    var elements = this.getElements(component);
+    if(elements && elements.length) {
+        for(var c=0,length=elements.length;c<length;c++) {
+            $A.util.removeElement(elements[c]);
+        }
+    }
+};
+
+AuraRenderingService.prototype.getUid = function(element) {
+    if(element.nodeType === 1) {
+        // Try to use the rendered-by attribute which should be on almost everything
+        // The times it won't will probably be elements generated in the renderer by the component developer
+        var id = $A.util.getDataAttribute(element, $A.componentService.renderedBy);
+        if(id !== null) {
+            return id;
+        }
+
+        // Try to use data attributes for our unique ID
+        id = $A.util.getDataAttribute(element, this.DATA_UID_KEY);
+        if(id!==null) {
+            return id;
+        }
+    }
+    return element[this.DATA_UID_KEY];
+};
+
+AuraRenderingService.prototype.newUid = function(element) {
+    var nextUid = this.uid++;
+    var success = null;
+    
+    if(element.nodeType === 1) {
+        success = $A.util.setDataAttribute(element, this.DATA_UID_KEY, nextUid);
+    }
+
+    // Couldn't set the data attribute, happens for some HTML elements.
+    if(success === null) {
+        element[this.DATA_UID_KEY] = nextUid;
+    }
+
+    return nextUid;
+};
+
+AuraRenderingService.prototype.resolveUid = function(element) {
+    var uid = this.getUid(element);
+    if(uid === null || uid === undefined) {
+        return this.newUid(element);
+    }
+    return uid;
+};
+
+AuraRenderingService.prototype.addMarkerReference = function(marker, globalId) {
+    if(!marker||!globalId) { 
+        return;
+    }
+    var uid = this.resolveUid(marker);
+    var existing = this.markerToReferencesMap[uid];
+    if(!existing) {
+        this.markerToReferencesMap[uid] = existing = new this.ReferenceCollection();
+    }
+    existing.add(globalId);
+};
+
+AuraRenderingService.prototype.removeMarkerReference = function(marker, globalId) {
+    if(!marker||!globalId) { return; }
+    var references = this.markerToReferencesMap[this.resolveUid(marker)];
+
+    if(references) { 
+        references.delete(globalId);
+    }
+};
+
+AuraRenderingService.prototype.getMarkerReferences = function(marker) {
+    if(!marker) { 
+        return null;
+    }
+    return this.markerToReferencesMap[this.resolveUid(marker)];
+};
+
+AuraRenderingService.prototype.removeElement = function(marker, container) {
+    //var container = component.getConcreteComponent().getContainer();
+    //if(!container || !container.getConcreteComponent().isUnrendering()) {
+    var concrete = container && container.getConcreteComponent();
+    if(!concrete || !concrete.isUnrendering()) {
+        if(this.isSharedMarker(marker)) {
+            // No point in moving everything to another comment marker.
+            if(this.isCommentMarker(marker)) { return; }
+
+            // Move all the past references to a comment!
+            this.moveReferencesToMarker(marker);
+        } else if(concrete && concrete.destroyed===-1 && !this.isCommentMarker(marker)) {
+            // this element is going away anyway since the container is being destroyed.
+            return;
+        }
+        
+        $A.util.removeElement(marker);
+    }
+};
+
+AuraRenderingService.prototype.moveReferencesToMarker = function(marker) {
+    var references = this.getMarkerReferences(marker);
+    var newMarker = this.createMarker(null, "unrender marker: " + marker.nodeValue);
+
+    if(references) {
+        var collection = references.get();
+        for(var c=length;c>=0;c--) {
+            var cmp = $A.getComponent(collection[c]);
+            if(cmp && !cmp.destroyed) {
+                this.setMarker(cmp, newMarker);
+            }
+        }
+    }
+
+    // If the marker is actually being used by others, then go ahead and put it in the dom.
+    if(this.isSharedMarker(newMarker)) {
+        $A.util.insertBefore(newMarker, marker);
+    }
+};
+
+AuraRenderingService.prototype.isSharedMarker = function(marker) {
+    var references = this.getMarkerReferences(marker);
+    if(references) {
+        return references.size() > 0;
+    }
+    return false;
+};
+
+
+AuraRenderingService.prototype.ReferenceCollection = function() {
+    // this.references = "" || [];
+};
+
+AuraRenderingService.prototype.ReferenceCollection.prototype.isCollection = false;
+
+AuraRenderingService.prototype.ReferenceCollection.prototype.add = function(value){
+    // Only track references
+    if(typeof value !== "string") { return; }
+
+    if(this.has(value)) {
+        // Either we act like a set, or we make sure it doesn't dupe in consumption.
+        // Latter is better for perf, maybe throw and track if its an issue?
+        return;
+    }
+
+    if(!this.references) {
+        this.references = value;
+    } else if(!this.isCollection) {
+        if(this.references !== value) {
+            this.references = [this.references, value];
+            this.isCollection = true;
+        }
+    } else {
+        this.references.push(value);
+    }
+};
+
+AuraRenderingService.prototype.ReferenceCollection.prototype.delete = function(value){
+    if(typeof value !== "string") {
+        return;
+    }
+    if(this.isCollection) {
+        var index = this.references.indexOf(value);
+        if(index > -1) {
+            this.references.splice(index, 1);
+        }
+    }
+    if(this.references === value) {
+        this.references = null;
+    }
+};
+
+AuraRenderingService.prototype.ReferenceCollection.prototype.has = function(value){
+    if(!this.isCollection) {
+        return this.references === value;
+    }
+    if(this.references) {
+        return this.references.indexOf(value) !== -1;
+    }
+    return false;
+};
+
+AuraRenderingService.prototype.ReferenceCollection.prototype.size = function(){
+    if(this.references) {
+        if(typeof this.references === "string") {
+            return 1;
+        } else {
+            return this.references.length;
+        }
+    }
+    return 0;
+};
+
+AuraRenderingService.prototype.ReferenceCollection.prototype.get = function(index) {
+    if(index === undefined) {
+        if(this.isCollection) {
+            return this.references;
+        } else {
+            return [this.references];
+        }
+    } 
+    return this.references[index];
 };
 
 Aura.Services.AuraRenderingService = AuraRenderingService;

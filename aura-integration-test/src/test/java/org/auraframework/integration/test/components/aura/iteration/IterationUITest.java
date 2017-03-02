@@ -52,6 +52,7 @@ public class IterationUITest extends WebDriverTestCase {
         clientHtml = clientHtml.replaceAll("\"\\s*\"", ""); // join separated text
         clientHtml = clientHtml.replaceAll("\\s+", " "); // replace whitespace with a single space
         clientHtml = clientHtml.replaceAll(" data-aura-rendered-by=\"[^\"]+\"", ""); // remove client data tags
+        //clientHtml = clientHtml.replaceAll(" data-interactive-lib-uid=\"[^\"]+\"", ""); // remove client data tags
 
         // Should we maybe just disable this test for ie8?
         // For ie8 className does not have quotes so get rid of them everywhere.
@@ -110,6 +111,7 @@ public class IterationUITest extends WebDriverTestCase {
                                                                                      // client
                                                                                      // data
                                                                                      // tags
+        //clientHtml = clientHtml.replaceAll(" data-interactive-lib-uid=\"[^\"]+\"", "");
         serverHtml = serverHtml.replaceAll("\\s+", " "); // replace whitespace
                                                          // with a single space
         serverHtml = serverHtml.replaceAll(";\"", "\""); // replace semicolon

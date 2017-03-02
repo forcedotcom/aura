@@ -19,6 +19,8 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Component;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.junit.Test;
 
@@ -46,7 +48,7 @@ public class ServerRenderingTest extends AuraImplTestCase {
         final DefDescriptor<ComponentDef> concrete = createComponentDef(template);
 
         final Component component = instanceService.getInstance(concrete);
-        final String actual = auraTesingMarkupUtil.renderComponent(component);
+        final String actual = auraTestingMarkupUtil.renderComponent(component);
 
         assertEquals(expected, actual);
     }
@@ -69,7 +71,7 @@ public class ServerRenderingTest extends AuraImplTestCase {
         final DefDescriptor<ComponentDef> concrete = createComponentDef(String.format(concreteTemplate, base.getDescriptorName()));
 
         final Component component = instanceService.getInstance(concrete);
-        final String actual = auraTesingMarkupUtil.renderComponent(component);
+        final String actual = auraTestingMarkupUtil.renderComponent(component);
 
         assertEquals(expected, actual);
     }
@@ -102,7 +104,7 @@ public class ServerRenderingTest extends AuraImplTestCase {
         final DefDescriptor<ComponentDef> concrete = createComponentDef(String.format(concreteTemplate, middle.getDescriptorName()));
 
         final Component component = instanceService.getInstance(concrete);
-        final String actual = auraTesingMarkupUtil.renderComponent(component);
+        final String actual = auraTestingMarkupUtil.renderComponent(component);
 
         assertEquals(expected, actual);
     }
@@ -141,7 +143,7 @@ public class ServerRenderingTest extends AuraImplTestCase {
         final DefDescriptor<ComponentDef> concrete = createComponentDef(String.format(concreteTemplate, middle.getDescriptorName()));
 
         final Component component = instanceService.getInstance(concrete);
-        final String actual = auraTesingMarkupUtil.renderComponent(component);
+        final String actual = auraTestingMarkupUtil.renderComponent(component);
 
         assertEquals(expected, actual);
     }
@@ -179,12 +181,29 @@ public class ServerRenderingTest extends AuraImplTestCase {
         final DefDescriptor<ComponentDef> concrete = createComponentDef(String.format(concreteTemplate, middle.getDescriptorName()));
 
         final Component component = instanceService.getInstance(concrete);
-        final String actual = auraTesingMarkupUtil.renderComponent(component);
+        final String actual = auraTestingMarkupUtil.renderComponent(component);
 
         assertEquals(expected, actual);
     }
-
     
+    @Test
+    public void testRenderIfInTemplate() throws DefinitionNotFoundException, QuickFixException {
+        final String expected = "expected";
+        
+        final String template = "<aura:component render='server' isTemplate='true'>"
+                +   "<aura:renderIf isTrue='{!true}'>"
+                +       "expected"
+                +   "</aura:renderIf>"
+                + "</aura:component>";
+        
+        final DefDescriptor<ComponentDef> templateDef = createComponentDef(template);
+        
+        final Component component = instanceService.getInstance(templateDef);
+        final String actual = auraTestingMarkupUtil.renderComponent(component);
+        
+        assertEquals(expected, actual);
+    }
+
     private DefDescriptor<ComponentDef> createComponentDef(final String template) {
         return addSourceAutoCleanup(ComponentDef.class, template);
     }

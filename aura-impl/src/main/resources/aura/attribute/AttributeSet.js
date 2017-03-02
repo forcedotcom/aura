@@ -305,30 +305,24 @@ AttributeSet.prototype.set = function(key, value, component) {
     var attrType = defs[0] && defs[0].getTypeDefDescriptor();
     var isFacet = attrType === "aura://Aura.Component[]";
     if(isFacet && value) {
-        var facetValue = value;
+        var facet = value;
+        if(!$A.util.isArray(facet)){
+            facet = [facet];
+        }
         // Change the parentId back pointer for each facet value.
         // Some facetValues are component def objects; ignore these
         // as the parent is irrelevant and its value provider will be
         // "component".
-        if($A.util.isArray(facetValue)) {
-            for(var i = 0; i < value.length; i++) {
-                facetValue = value[i];
-                if(facetValue) {
-                    while (facetValue instanceof PassthroughValue) {
-                        facetValue = facetValue.getComponent();
-                    }
-                    if(facetValue.setContainerComponentId) {
-                        facetValue.setContainerComponentId(component.globalId);
-                    }
+        var facetValue=null;
+        for(var i = 0; i < facet.length; i++) {
+            facetValue = facet[i];
+            if(facetValue) {
+                while (facetValue instanceof PassthroughValue) {
+                    facetValue = facetValue.getComponent();
                 }
-            }
-        }
-        else if(facetValue) {
-            while (facetValue instanceof PassthroughValue) {
-                facetValue = facetValue.getComponent();
-            }
-            if(facetValue.setContainerComponentId) {
-                facetValue.setContainerComponentId(component.globalId);
+                if(facetValue.setContainerComponentId) {
+                    facetValue.setContainerComponentId(component.globalId);
+                }
             }
         }
     }

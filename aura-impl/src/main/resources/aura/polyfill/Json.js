@@ -151,7 +151,7 @@ Json.prototype._resolveRefs = function(config, cache, parent, property, collecto
 
             } else {
                 var serId = config[Json.ApplicationKey.SERIAL_ID];
-                if (serId !== undefined) {
+                if (serId !== undefined  && config.hasOwnProperty(Json.ApplicationKey.VALUE)) {
                     value = config[Json.ApplicationKey.VALUE];
 
                     if (typeof value === "object" && value !== null && (value[Json.ApplicationKey.SERIAL_ID] || value[Json.ApplicationKey.SERIAL_REFID])) {

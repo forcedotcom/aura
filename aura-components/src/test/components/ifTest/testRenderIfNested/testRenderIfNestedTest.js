@@ -43,7 +43,7 @@
     // where a parent is unrendering and re-rendering without confusing the
     // child state.
     // TODO: W-2406307: remaining Halo test failure
-    _testWalkUpAndDown: {
+    testWalkUpAndDown: {
         test: [ function(cmp) {
             this.clickAndCheck(cmp, "oi", "FT");
         }, function(cmp) {
@@ -61,7 +61,7 @@
 
     // Same, but set the inner condition before the outer coundition.
     // TODO: W-2406307: remaining Halo test failure
-    _testWalkUpAndDownInverse: {
+    testWalkUpAndDownInverse: {
         test: [ function(cmp) {
             this.clickAndCheck(cmp, "io", "FT");
         }, function(cmp) {
@@ -80,7 +80,7 @@
     // Tests some "random" skipping around, and especially all the
     // double-change permutations.
     // TODO: W-2406307: remaining Halo test failure
-    _testSkipAround: {
+    testSkipAround: {
         test: [ function(cmp) {
             this.clickAndCheck(cmp, "oi", "TT");
         }, function(cmp) {
@@ -98,7 +98,7 @@
 
     // Same, but set the inner condition before the outer coundition.
     // TODO: W-2406307: remaining Halo test failure
-    _testSkipAroundInverse: {
+    testSkipAroundInverse: {
         test: [ function(cmp) {
             this.clickAndCheck(cmp, "io", "TT");
         }, function(cmp) {

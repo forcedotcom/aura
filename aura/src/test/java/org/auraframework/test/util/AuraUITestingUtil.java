@@ -254,14 +254,12 @@ public class AuraUITestingUtil {
     public boolean waitForElementNotPresent(String msg, final By locator) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
         return wait.withMessage(msg)
-                .ignoring(StaleElementReferenceException.class).until(new ExpectedCondition<Boolean>() {
-
-                    @Override
-                    public Boolean apply(WebDriver d) {
-                        WebElement element = driver.findElement(locator);
-                        return element == null ? true : false;
-                    }
-                });
+            .ignoring(StaleElementReferenceException.class).until(new ExpectedCondition<Boolean>() {
+                @Override
+                public Boolean apply(WebDriver d) {
+                    return d.findElements(locator).isEmpty();
+                }
+            });
     }
 
     public WebElement findElementAndTypeEventNameInIt(String event) {
@@ -920,6 +918,35 @@ public class AuraUITestingUtil {
 
     public <R> R waitForElementFunction(final By locator, final Function<WebElement, R> function) {
         return waitForElementFunction(locator, function, "Timeout waiting for element");
+    }
+
+    
+    /**
+     * Finds the WebElement identified by locator and waits for the element to be displayed, ignoring
+     * StaleElementReferenceException.
+     * 
+     * @param locator By locator to find WebElement in the DOM.
+     * @param message Message to display to user on timeout.
+     */
+    public void waitForElementDisplayed(final By locator, String message) {
+        waitForElementDisplayed(locator, true, message);
+    }
+    
+    /**
+     * Finds the WebElement identified by locator and waits for the element to not be displayed, ignoring
+     * StaleElementReferenceException.
+     * 
+     * @param locator By locator to find WebElement in the DOM.
+     * @param message Message to display to user on timeout.
+     */
+    public void waitForElementNotDisplayed(final By locator, String message) {
+        waitForElementDisplayed(locator, false, message);
+    }
+
+    private void waitForElementDisplayed(final By locator, boolean isDisplayed, String message) {
+        waitForElementFunction(locator, (element) -> {
+            return element != null && isDisplayed == element.isDisplayed();
+        }, message);
     }
 
     /**

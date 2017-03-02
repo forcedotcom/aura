@@ -35,7 +35,7 @@ public class AbstractErrorUITestCase extends WebDriverTestCase {
      * @return a string of displayed error message
      */
     protected String findErrorMessage() {
-        waitForElement("Error mask is not visible.", findDomElement(ERROR_MASK_LOCATOR), true);
+        getAuraUITestingUtil().waitForElementDisplayed(ERROR_MASK_LOCATOR, "Error mask is not visible.");
         return getText(ERROR_MSG_LOCATOR) + getText(ERROR_STACKTRACE_LOCATOR);
     }
 

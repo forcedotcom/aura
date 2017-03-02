@@ -86,7 +86,7 @@ public class LockerServiceAPIShapeUITest extends WebDriverTestCase {
         AuraUITestingUtil auraUITestingUtil = getAuraUITestingUtil();
         
 		auraUITestingUtil.waitForDocumentReady();
-        waitForAuraFrameworkReady();
+        auraUITestingUtil.waitForAuraFrameworkReady(getAuraErrorsExpectedDuringInit());
         
         waitForCondition("return window.__lsTesterReport !== undefined;");
         

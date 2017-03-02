@@ -55,7 +55,8 @@ public class AccessChecksUITest extends WebDriverTestCase {
 
         // Component create will fail on the client due to access checks so wait for error dialog to be displayed
         // and then assert no new component on page.
-        waitForElementTextContains(getDriver().findElement(By.id("auraErrorMessage")), "Access Check Failed");
+        getAuraUITestingUtil().waitForElementText(By.id("auraErrorMessage"), "Access Check Failed", true,
+                "Didn't find ACF on page", false);
         assertEquals("No new component should be present", "null",
                 getDriver().findElement(By.className("output")).getText());
     }
@@ -82,8 +83,8 @@ public class AccessChecksUITest extends WebDriverTestCase {
         //getMockConfigAdapter().setNonInternalNamespace("auratest");
         open("/componentTest/accessExternalNamespace.cmp?cmpToCreate=componentTest:accessExtendsPublic");
         clickCreateComponentButton();
-        waitForElementTextContains(getDriver().findElement(By.className("output")),
-                "componentTest:accessExtendsPublic");
+        getAuraUITestingUtil().waitForElementText(By.className("output"),
+                "componentTest:accessExtendsPublic", true, "missing component", false);
     }
 
     /**
@@ -158,7 +159,8 @@ public class AccessChecksUITest extends WebDriverTestCase {
         openNoAura("/testCustomNS1/accessInternalAttribute.cmp");
 
         String errorMsg = "org.auraframework.throwable.quickfix.InvalidAccessValueException: Invalid access attribute value \"INTERNAL\"";
-        waitForElementTextContains(getDriver().findElement(By.id("auraErrorMessage")), errorMsg);
+        getAuraUITestingUtil().waitForElementText(By.id("auraErrorMessage"), errorMsg, true,
+                "Didn't find expected error", false);
     }
 
     /**
@@ -169,8 +171,8 @@ public class AccessChecksUITest extends WebDriverTestCase {
     @Test
     public void testAccessGlobalProvidesInternalComponent() throws Exception {
         open("/testCustomNS1/accessGlobalProvidesInternal.cmp");
-        waitForElementTextContains(
-                getDriver().findElement(By.className("accessInternalComponent")), "auratest:accessInternalComponent");
+        getAuraUITestingUtil().waitForElementText(By.className("accessInternalComponent"),
+                "auratest:accessInternalComponent", true, "Missing component", false);
     }
 
     @Test
@@ -178,8 +180,8 @@ public class AccessChecksUITest extends WebDriverTestCase {
     public void testAccessExternalProvidesInternalComponent() throws Exception {
         //getMockConfigAdapter().setNonInternalNamespace("provider");
         open("/componentTest/accessGlobalProvidesInternal.cmp");
-        waitForElementTextContains(
-                getDriver().findElement(By.className("accessInternalComponent")), "auratest:accessInternalComponent");
+        getAuraUITestingUtil().waitForElementText(By.className("accessInternalComponent"),
+                "auratest:accessInternalComponent", true, "Missing component", false);
     }
 
     @Test
@@ -187,7 +189,8 @@ public class AccessChecksUITest extends WebDriverTestCase {
     public void testAccessExternalProvidesPublicComponent() throws Exception {
         //getMockConfigAdapter().setNonInternalNamespace("provider");
         open("/componentTest/accessGlobalProvidesPublic.cmp");
-        waitForElementTextContains(getDriver().findElement(By.className("output")), "auratest:accessPublicComponent");
+        getAuraUITestingUtil().waitForElementText(By.className("output"),
+                "auratest:accessPublicComponent", true, "Missing component", false);
     }
 
     @Test
@@ -195,25 +198,26 @@ public class AccessChecksUITest extends WebDriverTestCase {
     public void testAccessExternalProvidesGlobalComponent() throws Exception {
         //getMockConfigAdapter().setNonInternalNamespace("provider");
         open("/componentTest/accessGlobalProvidesGlobal.cmp");
-        waitForElementTextContains(
-                getDriver().findElement(By.className("accessGlobalComponent")), "auratest:accessGlobalComponent");
+        getAuraUITestingUtil().waitForElementText(By.className("accessGlobalComponent"),
+                "auratest:accessGlobalComponent", true, "Missing component", false);
     }
 
     @Test
     public void testAccessInternalProvidesPublicComponent() throws Exception {
         open("/componentTest/accessGlobalProvidesCustom.cmp");
-        waitForElementTextContains(getDriver().findElement(By.className("output")), "testCustomNS1:accessPublicComponent");
+        getAuraUITestingUtil().waitForElementText(By.className("output"),
+                "testCustomNS1:accessPublicComponent", true, "Missing component", false);
     }
 
     private void doAttributeAccessTest(String expected) {
         clickCreateComponentButton();
-        waitForElementTextPresent(getDriver().findElement(By.className("completed")), "true");
+        getAuraUITestingUtil().waitForElementText(By.className("completed"), "true", true);
         getDriver().findElement(By.className("getAttribute")).click();
-        waitForElementTextPresent(getDriver().findElement(By.className("attrValue")), expected);
+        getAuraUITestingUtil().waitForElementText(By.className("attrValue"), expected, true);
     }
 
     private void clickCreateComponentButton() {
-        waitForElementAppear(By.className("testComponentAccess"));
+        getAuraUITestingUtil().waitForElement(By.className("testComponentAccess"));
         // Workaround for Webdriver tests run on Firefox. Calling WebElement.click() fails to click the button in some
         // situations but executing a javascript click like so seems to work.
         WebElement webElement = getDriver().findElement(By.className("testComponentAccess"));
@@ -221,15 +225,12 @@ public class AccessChecksUITest extends WebDriverTestCase {
         executor.executeScript("arguments[0].click();", webElement);
     }
 
-//    private void verifyComponentCreated(String expected) {
-//        waitForElementTextPresent(getDriver().findElement(By.className("output")), expected);
-//    }
-
     private void verifyComponentCreated(String expected, boolean exactMatch) {
         if(exactMatch == true) {
-            waitForElementTextPresent(getDriver().findElement(By.className("output")), expected);
+            getAuraUITestingUtil().waitForElementText(By.className("output"), expected, true);
         } else {
-            this.waitForElementTextContains(getDriver().findElement(By.className("output")), expected);
+            getAuraUITestingUtil().waitForElementText(By.className("output"),
+                    expected, true, "Missing text", false);
         }
         
     }

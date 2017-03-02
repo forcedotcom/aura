@@ -119,7 +119,7 @@ public class InputRichTextUITest extends WebDriverTestCase {
         WebElement ckEditor = getAuraUITestingUtil().waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));
         WebElement ckEditorInput = ckEditor.findElement(By.tagName("iframe"));
         driver.switchTo().frame(ckEditorInput);
-        waitForElementPresent(driver.findElement(By.cssSelector(IN_RICHTEXT_BODY)));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(IN_RICHTEXT_BODY), "no richtext body");
         getAuraUITestingUtil().waitForElementText(By.cssSelector(IN_RICHTEXT_BODY), defaultText, true);
         driver.switchTo().defaultContent();
     }

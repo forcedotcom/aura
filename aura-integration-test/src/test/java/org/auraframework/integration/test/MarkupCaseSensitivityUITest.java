@@ -196,7 +196,7 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
         util.addSourceAutoCleanup(rootHelperDesc, rootHelper);
         String url = "/"+root.getNamespace()+"/"+root.getName()+".app";
         open(url, Mode.DEV);
-        waitForElementAppear(By.className(testLibButtonClass));
+        getAuraUITestingUtil().waitForElement(By.className(testLibButtonClass));
         findDomElement(By.className(testLibButtonClass)).click();
         //change lib source
         AuraContext context = contextService.getCurrentContext();
@@ -220,10 +220,10 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
                         public Integer apply(WebDriver driver) {
                             driver.navigate().refresh();
                             //click the button
-                            waitForElementAppear(By.className(testLibButtonClass));
+                            getAuraUITestingUtil().waitForElement(By.className(testLibButtonClass));
                             findDomElement(By.className(testLibButtonClass)).click();
                             //get the text from output div
-                            waitForElementAppear(By.className(testLibButtonClass));
+                            getAuraUITestingUtil().waitForElement(By.className(testLibButtonClass));
                             String text = findDomElement(By.className(outputDivClass)).getText();
                             if(text.contains("BASICFirst")) {
                                 return 1;

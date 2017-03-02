@@ -26,6 +26,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
  * Non-supported browsers:
@@ -83,6 +84,32 @@ public class DialogUITest extends WebDriverTestCase {
         String dialogDivClass = driver.findElement(By.cssSelector("div[class*='medium uiDialog']"))
                 .getAttribute("className");
         assertTrue("DialogBox did not appear on the screen", !dialogDivClass.contains("hidden"));
+    }
+
+    /**
+     * Overriding wait to wait until the dialog box closes, Since we are using the class variable to check for the
+     * Dialog box, it changes from dialog modal medium uiDialog slideUp -> dialog modal medium uiDialog-> dialog hidden
+     * modal medium uiDialog (this is the state that we want to make sure to grab)
+     *
+     * @param selectorToFindCmp way to find componenet (ex: "div[class*='dialog']")
+     * @param attr components attribute that we want to find
+     * @param itemAttrShouldContain Keyword that we are looking for in the attribute
+     * @param useBangOperator Whether we want to use the bang operator or not
+     */
+    private void waitForComponentToChangeStatus(final String selectorToFindCmp, final String attr,
+            final String itemAttrShouldContain, final boolean useBangOperator) {
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                if (useBangOperator) {
+                    return !d.findElement(By.cssSelector(selectorToFindCmp)).getAttribute(attr)
+                            .contains(itemAttrShouldContain);
+                } else {
+                    return d.findElement(By.cssSelector(selectorToFindCmp)).getAttribute(attr)
+                            .contains(itemAttrShouldContain);
+                }
+            }
+        }, getAuraUITestingUtil().getTimeout(), "fail on waiting for component to change status");
     }
 
     /*

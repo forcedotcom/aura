@@ -60,14 +60,16 @@ public class PopupUITest extends WebDriverTestCase {
         // Click the trigger and verify popup launches
         WebElement trigger = driver.findElement(By.cssSelector(triggerLocator));
         trigger.click();
-        waitForElementPresent("Popup did not launch", driver.findElement(By.cssSelector(POPUP_CONTAINER_TARGET)));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(POPUP_CONTAINER_TARGET),
+                "Popup did not launch");
         verifyPopupSize(POPUP_CONTAINER, popupHeight, popupWidth);
         WebElement popupTarget = driver.findElement(By.cssSelector(POPUP_CONTAINER_TARGET));
         assertTrue("Popup does not contain specified text", popupTarget.getText().contains(popupText));
 
         // Click outside popup and verify it closes
         clickOutsidePopup(POPUP_CONTAINER);
-        waitForElementAbsent("Popup did not close", driver.findElement(By.cssSelector(POPUP_CONTAINER_TARGET)));
+        getAuraUITestingUtil().waitForElementNotDisplayed(By.cssSelector(POPUP_CONTAINER_TARGET),
+                "Popup did not close");
     }
 
     private String randString(int len) {
@@ -104,13 +106,14 @@ public class PopupUITest extends WebDriverTestCase {
         WebElement trigger = driver.findElement(By.cssSelector(triggerLocator));
         trigger.click();
 
-        waitForElementPresent("Popup did not launch", driver.findElement(By.cssSelector(POPUP_CONTAINER)));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(POPUP_CONTAINER),
+                "Popup did not launch");
         WebElement popupContainer = driver.findElement(By.cssSelector(POPUP_CONTAINER));
         assertTrue("Popup does not contain specified text", popupContainer.getText().contains(popupText));
 
         // Click outside popup and verify it closes
         clickOutsidePopup(POPUP_CONTAINER);
-        waitForElementAbsent("Popup did not close", popupContainer);
+        getAuraUITestingUtil().waitForElementNotDisplayed(By.cssSelector(POPUP_CONTAINER), "Popup did not close");
     }
 
     /**
@@ -145,19 +148,21 @@ public class PopupUITest extends WebDriverTestCase {
         DefDescriptor<ApplicationDef> appDef = addSourceAutoCleanup(ApplicationDef.class, appMarkup);
         String appUrl = String.format("/%s/%s.app", appDef.getNamespace(), appDef.getName());
         open(appUrl);
-        waitForElementPresent(driver.findElement(By.cssSelector("iframe")));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector("iframe"),
+                "iframe not found");
         WebElement iframeElement = driver.findElement(By.cssSelector("iframe"));
 
         // Click the trigger and verify popup launches
         WebElement trigger = driver.findElement(By.cssSelector(triggerLocator));
         trigger.click();
-        waitForElementPresent("Popup did not launch", driver.findElement(By.cssSelector(POPUP_CONTAINER)));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(POPUP_CONTAINER),
+                "Popup did not launch");
         WebElement popupContainer = driver.findElement(By.cssSelector(POPUP_CONTAINER));
         assertTrue("Popup does not contain specified text", popupContainer.getText().contains(popupText));
 
         // Click outside popup in the iFrame and verify the popup closes
         iframeElement.click();
-        waitForElementAbsent("Popup did not close", popupContainer);
+        getAuraUITestingUtil().waitForElementNotDisplayed(By.cssSelector(POPUP_CONTAINER), "Popup did not close");
     }
 
     /**
@@ -275,7 +280,8 @@ public class PopupUITest extends WebDriverTestCase {
         // Click the trigger and verify popup launches
         WebElement trigger = driver.findElement(By.cssSelector(triggerLocator));
         trigger.click();
-        waitForElementPresent("Popup did not launch", driver.findElement(By.cssSelector(POPUP_CONTAINER_TARGET)));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(POPUP_CONTAINER_TARGET),
+                "Popup did not launch");
         WebElement containerTgt = driver.findElement(By.cssSelector(POPUP_CONTAINER_TARGET));
         assertTrue("Popup does not contain specified text", containerTgt.getText().contains(popupText));
 
@@ -309,12 +315,12 @@ public class PopupUITest extends WebDriverTestCase {
         // Click the trigger and verify popup launches
         WebElement trigger = driver.findElement(By.cssSelector(triggerLocator));
         trigger.click();
-        WebElement popCurtain = driver.findElement(By.cssSelector(popupLocator));
-        waitForElementPresent("Popup with curtain did not launch", popCurtain);
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(popupLocator),
+                "Popup with curtain did not launch");
 
         // Click outside popup and verify it closes
         clickOutsidePopup(POPUP_CONTAINER);
-        waitForElementAbsent("Popup did not close", popCurtain);
+        getAuraUITestingUtil().waitForElementNotDisplayed(By.cssSelector(popupLocator), "Popup did not close");
     }
 
     /**
@@ -335,11 +341,12 @@ public class PopupUITest extends WebDriverTestCase {
         open(appUrl);
 
         // Click on the trigger and verify the popup opens
-        waitForElementPresent("Trigger input box not present", driver.findElement(By.className(triggerLocator)));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(triggerLocator),
+                "Trigger input box not present");
         WebElement triggerInput = driver.findElement(By.className(triggerLocator));
         triggerInput.click();
-        WebElement popContainerTgtElem = driver.findElement(By.className(targetLocator));
-        waitForElementPresent("Popup did not launch", popContainerTgtElem);
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(targetLocator),
+                "Popup did not launch");
         // Close the popup either by the TAB key or the close button
         if (closeOnTabKey) {
             Actions builder = new Actions(this.getDriver());
@@ -349,7 +356,7 @@ public class PopupUITest extends WebDriverTestCase {
             customTriggerButton.click();
         }
 
-        waitForElementAbsent("Popup did not close", popContainerTgtElem);
+        getAuraUITestingUtil().waitForElementNotDisplayed(By.cssSelector(targetLocator), "Popup did not close");
     }
 
     /**
@@ -399,10 +406,12 @@ public class PopupUITest extends WebDriverTestCase {
             if (closeOnClickInside) {
                 // Verify popup closes when mouse is clicked inside
                 clickInsidePopup(POPUP_CONTAINER);
-                waitForElementAbsent("Popup did not close", popContainerTgtElem);
+                getAuraUITestingUtil().waitForElementNotDisplayed(By.cssSelector(POPUP_CONTAINER_TARGET),
+                        "Popup did not close");
                 WebElement trgLocatorElemt = driver.findElement(By.cssSelector(triggerLocator));
                 trgLocatorElemt.click();
-                waitForElementPresent("Popup did not launch", popContainerTgtElem);
+                getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(POPUP_CONTAINER_TARGET),
+                        "Popup did not launch");
 
                 // Verify popup closes when mouse is clicked outside
                 clickOutsidePopup(POPUP_CONTAINER);
@@ -416,7 +425,8 @@ public class PopupUITest extends WebDriverTestCase {
                 clickOutsidePopup(POPUP_CONTAINER);
             }
         }
-        waitForElementAbsent("Popup did not close", popContainerTgtElem);
+        getAuraUITestingUtil().waitForElementNotDisplayed(By.cssSelector(POPUP_CONTAINER_TARGET),
+                "Popup did not close");
     }
 
     /**
@@ -440,13 +450,17 @@ public class PopupUITest extends WebDriverTestCase {
      * @throws Exception
      */
     private void verifyPopupNotClosed(String popupLocator) throws Exception {
+        int originalTimeout = getAuraUITestingUtil().getTimeout();
         try {
-            WebDriver driver = this.getDriver();
             // wait 2s to see if popup closes
-            waitForElement("", driver.findElement(By.cssSelector(popupLocator)), false, 2);
-            fail("Popup closed when it shouldn't");
+            getAuraUITestingUtil().setTimeoutInSecs(2);
+			getAuraUITestingUtil().waitForElementNotDisplayed(By.cssSelector(popupLocator),
+					"expected to not close");
+			fail("Popup closed when it shouldn't");
         } catch (Exception e) {
             //Continue with no failure if the popup didn't close
+        } finally {
+            getAuraUITestingUtil().setTimeoutInSecs(originalTimeout);
         }
     }
 

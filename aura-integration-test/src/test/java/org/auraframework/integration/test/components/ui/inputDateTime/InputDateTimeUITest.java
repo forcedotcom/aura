@@ -292,11 +292,11 @@ public class InputDateTimeUITest extends WebDriverTestCase {
     }
 
     private void waitForTimePickerAppear() {
-        waitForElementAppear("TimePicker should appear", By.cssSelector(TIME_PICKER_SEL));
+        getAuraUITestingUtil().waitForElement("TimePicker should appear", By.cssSelector(TIME_PICKER_SEL));
     }
 
     private void waitForTimePickerDisappear() {
-        waitForElementDisappear("TimePicker should disappear", By.cssSelector(TIME_PICKER_SEL));
+        getAuraUITestingUtil().waitForElementNotPresent("TimePicker should disappear", By.cssSelector(TIME_PICKER_SEL));
     }
 }
 

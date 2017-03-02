@@ -815,7 +815,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         openNoAura(url);
 
         getAuraUITestingUtil().waitForDocumentReady();
-        waitForAuraFrameworkReady();
+        getAuraUITestingUtil().waitForAuraFrameworkReady(getAuraErrorsExpectedDuringInit());
     }
 
     private void openIntegrationStub(DefDescriptor<ComponentDef> stub, DefDescriptor<ComponentDef> toInject,

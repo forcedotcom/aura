@@ -301,7 +301,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
 
         // make a client-side change to the page
         findDomElement(By.cssSelector(".update")).click();
-        waitForElementText(findDomElement(By.cssSelector(".uiOutputText")), "modified", true, 3000);
+        getAuraUITestingUtil().waitForElementText(By.cssSelector(".uiOutputText"), "modified", true);
         assertTrue("Page was not changed after client action",
                 getAuraUITestingUtil().getBooleanEval("return !!document.__PageModifiedTestFlag"));
 
@@ -319,7 +319,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         });
         // Wait for page to reload and aura framework initialization
         getAuraUITestingUtil().waitForAuraInit();
-        waitForElementText(findDomElement(By.cssSelector(".uiOutputText")), "initial", true, 3000);
+        getAuraUITestingUtil().waitForElementText(By.cssSelector(".uiOutputText"), "initial", true);
     }
 
     /**

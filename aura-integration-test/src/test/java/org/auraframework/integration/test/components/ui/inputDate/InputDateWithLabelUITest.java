@@ -133,7 +133,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         // Grabbing the Date Icon and click on it to open the calendar
         WebElement element = findDomElement(By.cssSelector(DATE_ICON_SEL));
         element.click();
-        waitForElementAppear("DatePicker doesn't appear after clicking on the calendar icon!",
+        getAuraUITestingUtil().waitForElement("DatePicker doesn't appear after clicking on the calendar icon!",
             By.cssSelector(DATEPICKER_SEL));
     }
 
@@ -432,14 +432,14 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
             activeElement.sendKeys(Keys.ENTER);
 
             //datePicker should be open
-            waitForElementAppear("datePicker should been present, but its not", By.cssSelector(".uiDatePicker.visible"));
+            getAuraUITestingUtil().waitForElement("datePicker should been present, but its not", By.cssSelector(".uiDatePicker.visible"));
 
             //use key to close the datePicker
             WebElement selectedDate = findDomElement(By.cssSelector(SELECTED_DATE));
             selectedDate.sendKeys(keysToClose[i]);
 
             //check if datePicker is closed
-            waitForElementDisappear("datePicker should not be present, but it is", By.cssSelector(".uiDatePicker.visible"));
+            getAuraUITestingUtil().waitForElementNotPresent("datePicker should not be present, but it is", By.cssSelector(".uiDatePicker.visible"));
 
             //check if active element is the inputDate
             activeElement = (WebElement)getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);

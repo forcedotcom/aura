@@ -190,8 +190,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
         WebElement input = getAutoCompleteInput(driver, AUTOCOMPLETE_COMPONENT.get("Empty"));
         input.click();
         input.sendKeys("o");
-        WebElement output = driver.findElement(By.cssSelector(EVENT_OUTPUT_SELECTOR));
-        waitForElementTextPresent(output, "KeyDown Event Fired");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector(EVENT_OUTPUT_SELECTOR), "KeyDown Event Fired", true);
     }
 
     /**
@@ -440,6 +439,16 @@ public class BaseAutoComplete extends WebDriverTestCase {
                 return expectedOption.equals(input.getAttribute("value"));
             }
         }, "fail on waiting for option '" + expectedOption + "' to be selected");
+    }
+
+    private void waitForAutoCompleteListVisible(final WebElement list, final boolean isVisible) {
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                boolean isInvisible = hasCssClass(list, "invisible");
+                return isVisible != isInvisible;
+            }
+        }, getAuraUITestingUtil().getTimeout(), "fail on waiting AutoCompleteList to be visible");
     }
 
     private void doTestMatch(int autoCompleteCmpNum, String searchString, String target, int expectedMatched,

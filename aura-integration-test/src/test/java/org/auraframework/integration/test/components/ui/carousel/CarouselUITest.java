@@ -255,6 +255,22 @@ public class CarouselUITest extends WebDriverTestCase {
         }
     }
 
+    /**
+     * Wait for the carousel page to change. Asserts the expectedText appears in the innerHTML of page element
+     *
+     * @param page - the next page that should be loaded on carousel.
+     * @param expectedText - the expected text on that page.
+     */
+    private void waitForCarouselPageToChange(final WebElement page, final String expectedText) {
+        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                String pageContent = page.getAttribute("innerHTML");
+                return pageContent.contains(expectedText);
+            }
+        }, getAuraUITestingUtil().getTimeout(), "fail on waiting for Carousel Page to Change");
+    }
+
     private WebElement getCarousel(WebDriver d, int carouselNum) {
         List<WebElement> carousels = d.findElements(By.xpath(CAROUSEL_XPATH));
         WebElement carousel = carousels.get(--carouselNum);

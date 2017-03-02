@@ -158,7 +158,6 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
 	}
 	
 	private void waitForText(By locator, String expected) {
-		WebElement element = getDriver().findElement(locator);
-        waitForElementTextPresent(element, expected);
+        getAuraUITestingUtil().waitForElementText(locator, expected, true);
 	}
 }

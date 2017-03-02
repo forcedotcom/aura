@@ -50,12 +50,12 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
         // generate an error on the client side
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='eventHandledOnApp']"), "true", true, "not handled", false);
         String clientErrorId = getText(By.cssSelector("div[id='appErrorIdOutput']"));
 
         // Client error is sent via Caboose Actions, force a foreground action to sent error to server
         findAndClickElement(By.className("serverActionButton"));
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='actionDone']"), "true", true, "not handled", false);
         List<String> logs = getClientErrorLogs(appender, 1);
         String log = logs.get(0);
 
@@ -72,7 +72,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
         // Client error is sent via Caboose Actions, force a foreground action to sent error to server
         findAndClickElement(By.className("serverActionButton"));
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='actionDone']"), "true", true, "not handled", false);
 
         List<String> logs = getClientErrorLogs(appender, 1);
         String log = logs.get(0);
@@ -90,7 +90,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromServerActionCallbackButton"));
         // Client error is sent via Caboose Actions, force a foreground action to sent error to server
         findAndClickElement(By.className("serverActionButton"));
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='actionDone']"), "true", true, "not handled", false);
 
         List<String> logs = getClientErrorLogs(appender, 1);
         String log = logs.get(0);
@@ -111,7 +111,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromFunctionWrappedInGetCallbackButton"));
         // Client error is sent via Caboose Actions, force a foreground action to sent error to server
         findAndClickElement(By.className("serverActionButton"));
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='actionDone']"), "true", true, "not handled", false);
 
         List<String> logs = getClientErrorLogs(appender, 1);
         String log = logs.get(0);
@@ -129,7 +129,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromRerenderButton"));
         // Client error is sent via Caboose Actions, force a foreground action to sent error to server
         findAndClickElement(By.className("serverActionButton"));
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='actionDone']"), "true", true, "not handled", false);
 
         List<String> logs = getClientErrorLogs(appender, 1);
         String log = logs.get(0);
@@ -147,7 +147,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
 //        findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromUnrenderButton"));
 //        // Client error is sent via Caboose Actions, force a foreground action to sent error to server
 //        findAndClickElement(By.className("serverActionButton"));
-//        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+//        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='actionDone']"), "true", true, "not handled", false);
 //
 //        List<String> logs = getClientErrorLogs(appender, 1);
 //        String log = logs.get(0);
@@ -163,7 +163,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));
         findAndClickElement(By.className("serverActionButton"));
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='actionDone']"), "true", true, "not handled", false);
 
         List<String> logs = getClientErrorLogs(appender, 1);
         String log = logs.get(0);
@@ -179,7 +179,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromServerActionCallbackButton"));
         findAndClickElement(By.className("serverActionButton"));
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='actionDone']"), "true", true, "not handled", false);
 
         List<String> logs = getClientErrorLogs(appender, 1);
         String log = logs.get(0);
@@ -195,7 +195,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromFunctionWrappedInGetCallbackButton"));
         findAndClickElement(By.className("serverActionButton"));
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='actionDone']"), "true", true, "not handled", false);
 
         List<String> logs = getClientErrorLogs(appender, 1);
         String log = logs.get(0);
@@ -211,7 +211,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromRerenderButton"));
         findAndClickElement(By.className("serverActionButton"));
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='actionDone']"), "true", true, "not handled", false);
 
         List<String> logs = getClientErrorLogs(appender, 1);
         String log = logs.get(0);
@@ -227,7 +227,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromUnrenderButton"));
         findAndClickElement(By.className("serverActionButton"));
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='actionDone']"), "true", true, "not handled", false);
 
         List<String> logs = getClientErrorLogs(appender, 1);
         String log = logs.get(0);
@@ -247,7 +247,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         open("/auratest/errorHandlingApp.app?handleSystemError=true&throwErrorInHandler=true", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));
         findAndClickElement(By.className("serverActionButton"));
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='actionDone']"), "true", true, "not handled", false);
 
         // expecting two error logs
         List<String> logs = getClientErrorLogs(appender, 2);
@@ -275,7 +275,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         open("/auratest/errorHandlingApp.app?handleSystemError=true&throwErrorInHandler=true", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));
         findAndClickElement(By.className("serverActionButton"));
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='actionDone']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='actionDone']"), "true", true, "not handled", false);
 
         // expecting two error logs, one for the original error and one for the handler's error
         List<String> logs = getClientErrorLogs(appender, 2);
@@ -336,7 +336,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
      * This is a workaround for click on Firefox Webdriver tests.
      */
     private void findAndClickElement(By locator) {
-        waitForElementAppear(locator);
+        getAuraUITestingUtil().waitForElement(locator);
         // Workaround for Webdriver tests run on Firefox. Calling WebElement.click() fails to click the button in some
         // situations but executing a javascript click like so seems to work.
         WebElement webElement = getDriver().findElement(locator);

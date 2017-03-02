@@ -53,7 +53,6 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
@@ -111,7 +110,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     private static int FLAPPER_NUM_RETRIES = 1;
 
     private static final Logger logger = Logger.getLogger("WebDriverTestCase");
-    private final String LOADING_INDICATOR = "div.loadingIndicator";
 
     /** Checks whether {@code oneClass} is mentioned as a class on {@code elem}. */
     public boolean hasCssClass(WebElement elem, String oneClass) {
@@ -1030,10 +1028,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         }
     }
 
-    public void waitForAuraFrameworkReady() {
-        getAuraUITestingUtil().waitForAuraFrameworkReady(getAuraErrorsExpectedDuringInit());
-    }
-
     protected Set<String> getAuraErrorsExpectedDuringInit() {
         return Collections.emptySet();
     }
@@ -1074,190 +1068,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         } catch (TimeoutException expected) {
             return;
         }
-    }
-
-    /**
-     * Wait for the exact text to be present for element.
-     */
-    public void waitForElementTextPresent(WebElement e, String text) {
-        waitForElementText(e, text, true, getAuraUITestingUtil().getTimeout(), true);
-    }
-
-    /**
-     * Wait for element to contains the text.
-     */
-    public void waitForElementTextContains(WebElement e, String text) {
-        waitForElementText(e, text, true, getAuraUITestingUtil().getTimeout(), false);
-    }
-
-    /**
-     * Wait for text to be absent for element.
-     */
-    public void waitForElementTextAbsent(WebElement e, String text) {
-        waitForElementText(e, text, false, getAuraUITestingUtil().getTimeout());
-    }
-
-    /**
-     * Wait for text on element to be either cleared or present. This will check the exact match of text. If we wish to
-     * only check it contains some text, use waitForElementTextContains instead
-     */
-    protected void waitForElementText(final WebElement e, final String text, final boolean isPresent, long timeout) {
-        waitForElementText(e, text, isPresent, timeout, true);
-    }
-
-    private void waitForElementText(final WebElement e, final String text, final boolean isPresent, long timeout,
-            final boolean checkFullText) {
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                if (checkFullText == true) {
-                    return isPresent == text.equals(e.getText());
-                } else {
-                    return isPresent == ((e.getText() != null) && e.getText().contains(text));
-                }
-            }
-        }, timeout, "fail on waiting for element text:" + text);
-    }
-
-    protected void waitForElementAbsent(String msg, final WebElement e) {
-        waitForElement(msg, e, false, getAuraUITestingUtil().getTimeout());
-    }
-
-    protected void waitForElementAbsent(final WebElement e) {
-        waitForElement("Timed out (" + getAuraUITestingUtil().getTimeout() + "s) waiting for " + e + "to disappear.", e,
-                false,
-                getAuraUITestingUtil().getTimeout());
-    }
-
-    protected void waitForElementPresent(String msg, final WebElement e) {
-        waitForElement(msg, e, true, getAuraUITestingUtil().getTimeout());
-    }
-
-    protected void waitForElementPresent(final WebElement e) {
-        waitForElement("Timed out (" + getAuraUITestingUtil().getTimeout() + "s) waiting for " + e, e, true,
-                getAuraUITestingUtil().getTimeout());
-    }
-
-    /**
-     * short waitForElement to present or absent before executing the next command
-     */
-    protected void waitForElement(String msg, final WebElement e, final boolean isDisplayed) {
-        waitForElement(msg, e, isDisplayed, getAuraUITestingUtil().getTimeout());
-    }
-
-    /**
-     * waitForElement to present or absent before executing the next command
-     *
-     * @param msg Error message
-     * @param e WebElement to look for
-     * @param isDisplayed if set to true, will wait till the element is displayed else will wait till element is not
-     *            visible.
-     * @param timeoutInSecs number of seconds to wait before erroring out
-     */
-    protected void waitForElement(String msg, final WebElement e, final boolean isDisplayed, int timeoutInSecs) {
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                return isDisplayed == e.isDisplayed();
-            }
-        }, timeoutInSecs, msg);
-    }
-
-    /**
-     * Waits for element with matching locator to appear on screen.
-     *
-     * @param msg Error message on timeout.
-     * @param locator By of element waiting for.
-     */
-    public void waitForElementAppear(String msg, final By locator) {
-        WebDriverWait wait = new WebDriverWait(getDriver(), getAuraUITestingUtil().getTimeout());
-        wait.withMessage(msg);
-        wait.ignoring(NoSuchElementException.class);
-        wait.until(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                return isElementPresent(locator);
-            }
-        });
-    }
-
-    public void waitForElementAppear(By locator) {
-        String msg = "Element with locator \'" + locator.toString() + "\' never appeared";
-        waitForElementAppear(msg, locator);
-    }
-
-    /**
-     * Waits for element with matching locator to disappear from the screen.
-     *
-     * @param msg Error message on timeout.
-     * @param locator By of element waiting for.
-     */
-    public void waitForElementDisappear(String msg, final By locator) {
-        WebDriverWait wait = new WebDriverWait(getDriver(), getAuraUITestingUtil().getTimeout());
-        wait.withMessage(msg);
-        wait.until(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                return !isElementPresent(locator);
-            }
-        });
-    }
-
-    public void waitForElementDisappear(By locator) {
-        String msg = "Element with locator \'" + locator.toString() + "\' never disappeared";
-        waitForElementDisappear(msg, locator);
-    }
-
-    /**
-     * Overriding wait to wait until the dialog box closes, Since we are using the class variable to check for the
-     * Dialog box, it changes from dialog modal medium uiDialog slideUp -> dialog modal medium uiDialog-> dialog hidden
-     * modal medium uiDialog (this is the state that we want to make sure to grab)
-     *
-     * @param selectorToFindCmp way to find componenet (ex: "div[class*='dialog']")
-     * @param attr components attribute that we want to find
-     * @param itemAttrShouldContain Keyword that we are looking for in the attribute
-     * @param useBangOperator Whether we want to use the bang operator or not
-     */
-    public void waitForComponentToChangeStatus(final String selectorToFindCmp, final String attr,
-            final String itemAttrShouldContain, final boolean useBangOperator) {
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                if (useBangOperator) {
-                    return !d.findElement(By.cssSelector(selectorToFindCmp)).getAttribute(attr)
-                            .contains(itemAttrShouldContain);
-                } else {
-                    return d.findElement(By.cssSelector(selectorToFindCmp)).getAttribute(attr)
-                            .contains(itemAttrShouldContain);
-                }
-            }
-        }, getAuraUITestingUtil().getTimeout(), "fail on waiting for component to change status");
-    }
-
-    /**
-     * Wait for the carousel page to change. Asserts the expectedText appears in the innerHTML of page element
-     *
-     * @param page - the next page that should be loaded on carousel.
-     * @param expectedText - the expected text on that page.
-     */
-    public void waitForCarouselPageToChange(final WebElement page, final String expectedText) {
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                String pageContent = page.getAttribute("innerHTML");
-                return pageContent.contains(expectedText);
-            }
-        }, getAuraUITestingUtil().getTimeout(), "fail on waiting for Carousel Page to Change");
-    }
-
-    public void waitForAutoCompleteListVisible(final WebElement list, final boolean isVisible) {
-        getAuraUITestingUtil().waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                boolean isInvisible = hasCssClass(list, "invisible");
-                return isVisible != isInvisible;
-            }
-        }, getAuraUITestingUtil().getTimeout(), "fail on waiting AutoCompleteList to be visible");
     }
 
     /**
@@ -1304,7 +1114,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @param yOffset
      */
     public void flick(By locator, int xOffset, int yOffset) {
-        waitForElementAppear("Cannot locate element to flick: " + locator, locator);
+        getAuraUITestingUtil().waitForElement("Cannot locate element to flick: " + locator, locator);
         WebElement element = getAuraUITestingUtil().findDomElement(locator);
         flick(element, xOffset, yOffset, FlickAction.SPEED_NORMAL);
     }
@@ -1348,16 +1158,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
         Action flick = (new TouchActions(driver)).flick(xOffset, yOffsetByDevice).build();
         flick.perform();
-    }
-
-    /*
-     * Waits for the "loading" and spinner to disappear
-     */
-    public void waitForLoadingIndicatorToDisappear() {
-        if (isElementPresent(By.cssSelector(LOADING_INDICATOR))) {
-            waitForElementAbsent("The 'loadingIndicator' never disappeared.",
-                    findDomElement(By.cssSelector(LOADING_INDICATOR)));
-        }
     }
 
     private RemoteIOSDriver augmentDriver() {

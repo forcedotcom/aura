@@ -98,7 +98,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         open("/auratest/errorHandlingApp.app?useFriendlyErrorMessageFromData=true&handleSystemError=true", Mode.PROD);
 
         findAndClickElement(By.cssSelector(".errorFromAppTable .auraFriendlyErrorFromClientControllerButton"));
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='eventHandledOnApp']"), "true", true, "not handled", false);
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
         assertThat("Did not find expected error in error message element.", actualMessage,
@@ -113,7 +113,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
         findAndClickElement(By.cssSelector(".errorFromAppTable .failAssertInClientControllerButton"));
         // wait for custom handler on App handled the event.
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='eventHandledOnApp']"), "true", true, "not handled", false);
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
         assertThat("Did not find expected error in error message element.", actualMessage,
@@ -146,7 +146,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
 
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='eventHandledOnApp']"), "true", true, "not handled", false);
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
         assertThat("Did not find expected error in error message element.", actualMessage,
@@ -179,7 +179,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));
         // wait for custom handler on App handled the event.
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnCmp']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='eventHandledOnCmp']"), "true", true, "not handled", false);
 
         String actualMessage = getText(By.cssSelector("div[id='cmpErrorOutput']"));
         assertThat("Did not find expected error in error message element.", actualMessage,
@@ -198,7 +198,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton"));
         // wait for custom handler on App handled the event.
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnCmp']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='eventHandledOnCmp']"), "true", true, "not handled", false);
 
         String actualMessage = getText(By.cssSelector("div[id='cmpErrorOutput']"));
         assertThat("Did not find expected error in error message element.", actualMessage,
@@ -217,7 +217,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton"));
         // wait for custom handler on App handled the event.
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnCmp']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='eventHandledOnCmp']"), "true", true, "not handled", false);
 
         String actualMessage = getText(By.cssSelector("div[id='cmpErrorOutput']"));
         assertThat("Did not find expected error in error message element.", actualMessage,
@@ -249,7 +249,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromServerActionCallbackButton"));
         // wait for custom handler on App handled the event.
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='eventHandledOnApp']"), "true", true, "not handled", false);
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
         assertThat("Did not find expected error in error message element.", actualMessage,
@@ -281,7 +281,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromCreateComponentCallbackButton"));
         // wait for custom handler on App handled the event.
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='eventHandledOnApp']"), "true", true, "not handled", false);
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
         assertThat("Did not find expected error in error message element.", actualMessage,
@@ -315,7 +315,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromFunctionWrappedInGetCallbackButton"));
         // wait for custom handler on App handled the event.
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='eventHandledOnApp']"), "true", true, "not handled", false);
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
         assertThat("Did not find expected error in error message element.", actualMessage,
@@ -347,7 +347,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromLibraryCodeButton"));
         // wait for custom handler on App handled the event.
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='eventHandledOnApp']"), "true", true, "not handled", false);
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
         assertThat("Did not find expected error in error message element.", actualMessage,
@@ -407,7 +407,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         // click throw Error in rerender() on Component and handle it in app.
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromRerenderButton"));
         // wait for custom handler on App handled the event.
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='eventHandledOnApp']"), "true", true, "not handled", false);
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
         assertThat("Did not find expected error in error message element.", actualMessage,
@@ -439,7 +439,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromUnrenderButton"));
         // wait for custom handler on App handled the event.
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='eventHandledOnApp']"), "true", true, "not handled", false);
 
         String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
         assertThat("Did not find expected error in error message element.", actualMessage,
@@ -498,7 +498,7 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * This is a workaround for Webdriver tests run on Firefox.
      */
     private void findAndClickElement(By locator) {
-        waitForElementAppear(locator);
+        getAuraUITestingUtil().waitForElement(locator);
         // Workaround for Webdriver tests run on Firefox. Calling WebElement.click() fails to click the button in some
         // situations but executing a javascript click like so seems to work.
         WebElement webElement = getDriver().findElement(locator);

@@ -121,7 +121,7 @@ public class BaseInputSmartNumber extends WebDriverTestCase {
 
         // clear events to check the next step
         clearEventsBtn.click();
-        waitForElementDisappear("Event list should be cleared", By.cssSelector(EVENTLIST_SEL));
+        getAuraUITestingUtil().waitForElementNotPresent("Event list should be cleared", By.cssSelector(EVENTLIST_SEL));
 
         // change event should be fired if value has not changed
         inputElm.sendKeys("1", Keys.BACK_SPACE);
@@ -168,7 +168,7 @@ public class BaseInputSmartNumber extends WebDriverTestCase {
     private void verifyEvents(String eventsSel, Boolean expectEvents, String ... events)
             throws Exception {
         By eventListSel = By.cssSelector(eventsSel);
-        waitForElementAppear("Event list should be cleared", eventListSel);
+        getAuraUITestingUtil().waitForElement("Event list should be cleared", eventListSel);
 
         // get the actual events and lowercase their names just in case
         List<WebElement> eventListElm = findDomElements(eventListSel);

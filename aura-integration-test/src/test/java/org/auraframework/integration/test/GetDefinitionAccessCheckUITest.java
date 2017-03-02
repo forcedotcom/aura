@@ -38,7 +38,8 @@ public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
     public void testGetEventDefinitionWithoutAccess() throws Exception {
         open("/testCustomNS1/getDefinition.cmp");
         findDomElement(By.cssSelector(".getEventDefinitionWithoutAccessButton")).click();
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='complete']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='complete']"), "true", true,
+                "did not complete", false);
 
         String actual = getText(By.cssSelector(".definitionNameOutput .element0"));
         assertEquals("null", actual);
@@ -48,7 +49,8 @@ public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
     public void testGetComponentDefinitionWithoutAccess() throws Exception {
         open("/testCustomNS1/getDefinition.cmp");
         findDomElement(By.cssSelector(".getComponentDefinitionWithoutAccessButton")).click();
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='complete']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='complete']"), "true", true,
+                "did not complete", false);
 
         String actual = getText(By.cssSelector(".definitionNameOutput .element0"));
         assertEquals("null", actual);
@@ -58,7 +60,8 @@ public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
     public void testGetMultipleDefinitionsWithoutAccess() throws Exception {
         open("/testCustomNS1/getDefinition.cmp");
         findDomElement(By.cssSelector(".getDefinitionsWithoutAccessButton")).click();
-        waitForElementTextContains(findDomElement(By.cssSelector("div[id='complete']")), "true");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='complete']"), "true", true,
+                "did not complete", false);
 
         String actual = getText(By.cssSelector(".definitionNameOutput .element0"));
         assertEquals("The definition with index 0 should be null when access check failed.", "null", actual);

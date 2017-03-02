@@ -322,7 +322,7 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement menuLabel = driver.findElement(By.className(label));
         WebElement menu = driver.findElement(By.className(menuName));
         WebElement button = driver.findElement(By.className("checkboxButton"));
-        WebElement result = driver.findElement(By.className("checkboxMenuResult"));
+        By resultLocator = By.className("checkboxMenuResult");
 
         // check for default label present
         assertEquals("label is wrong", "NFC West Teams", menuLabel.getText());
@@ -389,7 +389,7 @@ public class MenuUITest extends WebDriverTestCase {
         // click on submit button and verify the results
         assertEquals("label value should not get updated", "NFC West Teams", menuLabel.getText());
         button.click();
-        waitForElementTextPresent(result, "St. Louis Rams,Arizona Cardinals");
+        getAuraUITestingUtil().waitForElementText(resultLocator, "St. Louis Rams,Arizona Cardinals", true);
     }
 
     @ExcludeBrowsers({BrowserType.IE11})

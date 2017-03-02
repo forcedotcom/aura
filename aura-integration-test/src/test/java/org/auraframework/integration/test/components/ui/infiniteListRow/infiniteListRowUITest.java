@@ -25,7 +25,6 @@ import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 @UnAdaptableTest
@@ -39,6 +38,7 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	private final String ROW_OPENED_SPAN = "span[class*='rowOpened']";
 	private final String ROW_CLOSED_SPAN = "span[class*='rowClosed']";
 	private final String INFINITE_LISTROW_OPEN = ".uiInfiniteListRow.open";	
+    private final String LOADING_INDICATOR = "div.loadingIndicator";
 	private int container_x_coordinate;
 	private int swipeBody_x_coordinate;
 	
@@ -291,7 +291,12 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 		waitForLoadingIndicatorToDisappear();
 	}
 
-	/**
+	private void waitForLoadingIndicatorToDisappear() {
+        getAuraUITestingUtil().waitForElementNotDisplayed(By.cssSelector(LOADING_INDICATOR),
+                "The 'loadingIndicator' never disappeared.");
+    }
+
+    /**
 	 * Set x-coordinate of the container and x-coordinate for swipeBody to some variables for future reference
 	 * Helpful to check if element is within the viewport after swipe gestures
 	 */
@@ -320,7 +325,9 @@ public class infiniteListRowUITest extends WebDriverTestCase{
         	elm = getListRowElement(elmRow);
         	swipBody = getListRowSwipeBody(elm);
         	eleBody = getListRowBody(elm);
-        	waitForElementPresent(String.format("Swipe body for %s should be visible on the page after horizontal swipe",swipBody.getText()), swipBody);
+            getAuraUITestingUtil().waitUntil((driver) -> {
+                return swipBody.isDisplayed();
+            }, String.format("Swipe body for %s should be visible on the page after horizontal swipe", swipBody.getText()));
         	int swipeBody_xPos_SL = swipBody.getLocation().getX();
     		int eleBody_xPos_SL = eleBody.getLocation().getX();
             boolean viewPortConditionForSwipeBody_SL = container_x_coordinate <= swipeBody_xPos_SL && swipeBody_xPos_SL <= swipeBody_x_coordinate;
@@ -333,7 +340,10 @@ public class infiniteListRowUITest extends WebDriverTestCase{
         	performFlick(swipBody, 10000, 0);
         	elm = getListRowElement(elmRow);
         	eleBody = getListRowBody(elm);
-        	waitForElementPresent(String.format("%s should be visible on the page",eleBody.getText()), elm);
+        	WebElement rowElement = elm;
+            getAuraUITestingUtil().waitUntil((driver) -> {
+                return rowElement.isDisplayed();
+            }, String.format("%s should be visible on the page", eleBody.getText()));
             int swipeBody_xPos_SR = swipBody.getLocation().getX();
     		int eleBody_xPos_SR = eleBody.getLocation().getX();
             boolean viewPortConditionForListBody_SR =  container_x_coordinate <= eleBody_xPos_SR && eleBody_xPos_SR <= swipeBody_x_coordinate;
@@ -345,7 +355,9 @@ public class infiniteListRowUITest extends WebDriverTestCase{
         	int totalElementBeforeFlick = getAllListRows().size();
         	performFlick(elm, 0, -200);
         	WebElement lastElement = getListRowElement(totalElementBeforeFlick);
-        	waitForElementPresent(String.format("Last Element %s should be visible on the page",getListRowBody(lastElement).getText()), lastElement);
+            getAuraUITestingUtil().waitUntil((driver) -> {
+                return lastElement.isDisplayed();
+            }, String.format("Last Element %s should be visible on the page",getListRowBody(lastElement).getText()));
             break;
         case SWIPE_VERTICAL_UP:
         	performFlick(elm, 0, 200);
@@ -405,8 +417,8 @@ public class infiniteListRowUITest extends WebDriverTestCase{
 	 */
 	private WebElement getListRowElement(int rowNumber) {
 		String locator = "li:nth-child(" + rowNumber +")";
-		WebDriver driver = this.getDriver();
-		waitForElementPresent(String.format("ListViewRow%s not visible on the screen", rowNumber), driver.findElement(By.cssSelector(locator)));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(locator),
+                String.format("ListViewRow%s not visible on the screen", rowNumber));
 		return findDomElement(By.cssSelector(locator));
 	}
 

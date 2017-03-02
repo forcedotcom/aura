@@ -215,7 +215,7 @@ public class MockingUtilUITest extends WebDriverTestCase {
         open(cmpDefDescriptor);
         assertEquals("", getText(By.cssSelector("div.result")));
         findDomElement(By.cssSelector("button.button")).click();
-        waitForElementTextPresent(findDomElement(By.cssSelector("div.result")), "not so interesting");
+        getAuraUITestingUtil().waitForElementText(By.cssSelector("div.result"), "not so interesting", true);
     }
 
     @Ignore

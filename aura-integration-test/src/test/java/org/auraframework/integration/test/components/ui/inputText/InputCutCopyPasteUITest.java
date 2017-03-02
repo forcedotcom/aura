@@ -44,7 +44,7 @@ public class InputCutCopyPasteUITest extends WebDriverTestCase {
         WebDriver d = getDriver();
         open("/uitest/inputText_CutCopyPasteEventTest.cmp");
         WebElement input = d.findElement(By.xpath("//input"));
-        WebElement output = d.findElement(By.xpath("//span[@class='uiOutputText']"));
+        By outputLocator = By.xpath("//span[@class='uiOutputText']");
         input.click();
         input.sendKeys(Keys.CONTROL, "a");
 
@@ -55,7 +55,7 @@ public class InputCutCopyPasteUITest extends WebDriverTestCase {
                 getAuraUITestingUtil().getBooleanEval(copyValueExpression));
         input.sendKeys(Keys.CONTROL, "c");
         assertTrue("Copy event should have been triggered", getAuraUITestingUtil().getBooleanEval(copyValueExpression));
-        waitForElementTextPresent(output, "Copy Event Fired");
+        getAuraUITestingUtil().waitForElementText(By.xpath("//span[@class='uiOutputText']"), "Copy Event Fired", true);
 
         // Fire Cut Event
         String cutValueExpression = getAuraUITestingUtil().getValueFromRootExpr("v.cutEventFired");
@@ -65,7 +65,7 @@ public class InputCutCopyPasteUITest extends WebDriverTestCase {
         input.sendKeys(Keys.CONTROL, "a");
         input.sendKeys(Keys.CONTROL, "x");
         assertTrue("Cut event should have been triggered", getAuraUITestingUtil().getBooleanEval(cutValueExpression));
-        waitForElementTextPresent(output, "Cut Event Fired");
+        getAuraUITestingUtil().waitForElementText(By.xpath("//span[@class='uiOutputText']"), "Cut Event Fired", true);
 
         // Fire Paste Event
         String pasteValueExpression = getAuraUITestingUtil().getValueFromRootExpr("v.pasteEventFired");
@@ -75,6 +75,6 @@ public class InputCutCopyPasteUITest extends WebDriverTestCase {
         input.click();
         input.sendKeys(Keys.CONTROL, "v");
         assertTrue("Paste event should have been triggered", getAuraUITestingUtil().getBooleanEval(pasteValueExpression));
-        waitForElementTextPresent(output, "Paste Event Fired");
+        getAuraUITestingUtil().waitForElementText(outputLocator, "Paste Event Fired", true);
     }
 }

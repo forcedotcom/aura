@@ -126,7 +126,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
             }
         }, "Page failed to refresh after server action triggered.");
         getAuraUITestingUtil().waitForDocumentReady();
-        waitForAuraFrameworkReady();
+        getAuraUITestingUtil().waitForAuraFrameworkReady(getAuraErrorsExpectedDuringInit());
     }
 
     @Test

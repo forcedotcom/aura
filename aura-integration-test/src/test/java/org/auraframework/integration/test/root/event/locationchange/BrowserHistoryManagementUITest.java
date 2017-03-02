@@ -150,34 +150,40 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
         findByCssSelector(backLocator).click();
         i--;
         // 3
-        waitForElementPresent(findByCssSelector(locationChangeIndicator));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(locationChangeIndicator),
+                "location change indicator not found");
         assertEquals("ButtonClicked", getAuraUITestingUtil().getEval("return window.aura.historyService.get().token"));
         assertEquals(Integer.toString(i), getAuraUITestingUtil().getEval("return window.aura.historyService.get().num"));
         assertEquals(Integer.toString(i), findByCssSelector(displayLocator).getText());
         findByCssSelector(backLocator).click();
         i--;
         // 2
-        waitForElementPresent(findByCssSelector(locationChangeIndicator));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(locationChangeIndicator),
+                "location change indicator not found");
         assertEquals(Integer.toString(i), findByCssSelector(displayLocator).getText());
         findByCssSelector(nextLocator).click();
         i++;
         // 3
-        waitForElementPresent(findByCssSelector(locationChangeIndicator));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(locationChangeIndicator),
+                "location change indicator not found");
         assertEquals(Integer.toString(i), findByCssSelector(displayLocator).getText());
         findByCssSelector(backLocator).click();
         i--;
         // 2
-        waitForElementPresent(findByCssSelector(locationChangeIndicator));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(locationChangeIndicator),
+                "location change indicator not found");
         assertEquals(Integer.toString(i), findByCssSelector(displayLocator).getText());
         findByCssSelector(nextLocator).click();
         i++;
         // 3
-        waitForElementPresent(findByCssSelector(locationChangeIndicator));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(locationChangeIndicator),
+                "location change indicator not found");
         assertEquals(Integer.toString(i), findByCssSelector(displayLocator).getText());
         findByCssSelector(nextLocator).click();
         i++;
         // 4
-        waitForElementPresent(findByCssSelector(locationChangeIndicator));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(locationChangeIndicator),
+                "location change indicator not found");
         assertEquals(Integer.toString(i), findByCssSelector(displayLocator).getText());
 
         // The user hasn't navigated further. So clicking next should still be
@@ -194,17 +200,20 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
         findByCssSelector(backLocator).click();
         i--;
         // 3
-        waitForElementPresent(findByCssSelector(locationChangeIndicator));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(locationChangeIndicator),
+                "location change indicator not found");
         assertEquals(Integer.toString(i), findByCssSelector(displayLocator).getText());
         findByCssSelector(backLocator).click();
         i--;
         // 2
-        waitForElementPresent(findByCssSelector(locationChangeIndicator));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(locationChangeIndicator),
+                "location change indicator not found");
         assertEquals(Integer.toString(i), findByCssSelector(displayLocator).getText());
         findByCssSelector(backLocator).click();
         i--;
         // 1
-        waitForElementPresent(findByCssSelector(locationChangeIndicator));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(locationChangeIndicator),
+                "location change indicator not found");
         assertEquals(Integer.toString(i), findByCssSelector(displayLocator).getText());
         // Pressing back now only changes the URL to the starting location, when
         // there was don't click me.
@@ -213,23 +222,27 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
         // about it
         findByCssSelector(backLocator).click();
         // 1
-        waitForElementPresent(findByCssSelector(locationChangeIndicator));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(locationChangeIndicator),
+                "location change indicator not found");
         assertEquals(Integer.toString(i), findByCssSelector(displayLocator).getText());
 
         findByCssSelector(nextLocator).click();
         // 1
-        waitForElementPresent(findByCssSelector(locationChangeIndicator));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(locationChangeIndicator),
+                "location change indicator not found");
         assertEquals(Integer.toString(i), findByCssSelector(displayLocator).getText());
         findByCssSelector(nextLocator).click();
         i++;
         // 2
-        waitForElementPresent(findByCssSelector(locationChangeIndicator));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(locationChangeIndicator),
+                "location change indicator not found");
         assertEquals(Integer.toString(i), findByCssSelector(displayLocator).getText());
         // Using the browser's back button
         getAuraUITestingUtil().getEval("window.history.back()");
         i--;
         // 1
-        waitForElementPresent(findByCssSelector(locationChangeIndicator));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(locationChangeIndicator),
+                "location change indicator not found");
         assertEquals(Integer.toString(i), findByCssSelector(displayLocator).getText());
     }
 
@@ -240,7 +253,8 @@ public class BrowserHistoryManagementUITest extends WebDriverTestCase {
     private int navigateForwardWithClientActionAndVerify(int index) throws Exception {
         findByCssSelector(".SimpleComponent").click();
         index++;
-        waitForElementPresent(findByCssSelector(".complete"));
+        getAuraUITestingUtil().waitForElementDisplayed(By.cssSelector(".complete"),
+                "location change indicator not found");
         assertEquals("ButtonClicked", getAuraUITestingUtil().getEval("return window.aura.historyService.get().token"));
         assertEquals(Integer.toString(index), getAuraUITestingUtil().getEval("return window.aura.historyService.get().num"));
         assertEquals(Integer.toString(index), findByCssSelector(".id").getText());

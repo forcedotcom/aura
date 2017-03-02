@@ -47,7 +47,6 @@ public class ModuleImpl implements Module {
     private final String localId;
 
     private final Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeValues;
-    private final BaseComponent<?, ?> valueProvider;
 
     private final ContextService contextService;
 
@@ -57,7 +56,6 @@ public class ModuleImpl implements Module {
 
         this.descriptor = moduleDefRef.getDescriptor();
         this.attributeValues = moduleDefRef.getAttributeValues();
-        this.valueProvider = attributeValueProvider;
         this.localId = moduleDefRef.getLocalId();
 
         AuraContext context = contextService.getCurrentContext();

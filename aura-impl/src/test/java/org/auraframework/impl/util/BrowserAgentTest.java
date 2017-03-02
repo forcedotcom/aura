@@ -17,7 +17,6 @@ package org.auraframework.impl.util;
 
 import com.google.common.collect.Lists;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
-import org.auraframework.util.test.annotation.UnitTest;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +35,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 @UnAdaptableTest
-@UnitTest
 @RunWith(Parameterized.class)
 public class BrowserAgentTest extends UnitTestCase {
 

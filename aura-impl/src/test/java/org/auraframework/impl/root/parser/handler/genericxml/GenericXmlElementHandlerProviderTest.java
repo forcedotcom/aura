@@ -122,7 +122,7 @@ public class GenericXmlElementHandlerProviderTest extends AuraImplTestCase {
 
         @Nonnull
         @Override
-        public Set<GenericXmlElement> getGenericTags(Class implementingDef) {
+        public Set<GenericXmlElement> getGenericTags(@SuppressWarnings("rawtypes") Class implementingDef) {
             return null;
         }
     }
@@ -137,7 +137,7 @@ public class GenericXmlElementHandlerProviderTest extends AuraImplTestCase {
 
         @Nonnull
         @Override
-        public Set<GenericXmlElement> getGenericTags(Class implementingDef) {
+        public Set<GenericXmlElement> getGenericTags(@SuppressWarnings("rawtypes") Class implementingDef) {
             return null;
         }
     }

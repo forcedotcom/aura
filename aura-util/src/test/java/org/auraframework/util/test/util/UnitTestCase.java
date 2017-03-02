@@ -61,7 +61,6 @@ import junit.framework.TestCase;
 /**
  * Base class for all aura tests.
  */
-@UnitTest
 @RunWith(AuraUnitTestRunner.class)
 @ContextConfiguration(locations = {"/applicationContext.xml"})
 @TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class})

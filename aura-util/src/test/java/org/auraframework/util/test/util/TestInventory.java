@@ -35,7 +35,6 @@ import org.auraframework.util.test.annotation.PerfCmpTest;
 import org.auraframework.util.test.annotation.PerfCustomTest;
 import org.auraframework.util.test.annotation.PerfFrameworkTest;
 import org.auraframework.util.test.annotation.PerfTestSuite;
-import org.auraframework.util.test.annotation.UnitTest;
 import org.auraframework.util.test.annotation.WebDriverTest;
 
 import com.google.common.collect.Maps;
@@ -44,10 +43,10 @@ public class TestInventory implements AuraServiceProvider {
     public final static String TEST_CLASS_SUFFIX = "Test";
     public static final EnumSet<Type> ALL_TESTS = EnumSet.allOf(Type.class);
     public static final EnumSet<Type> PERF_TESTS = EnumSet.of(Type.PERFSUITE, Type.PERFCMP, Type.PERFFRAMEWORK, Type.PERFCUSTOM);
-    public static final EnumSet<Type> FUNC_TESTS = EnumSet.of(Type.UNIT, Type.JSTEST, Type.WEBDRIVER, Type.INTEGRATION);
+    public static final EnumSet<Type> FUNC_TESTS = EnumSet.of(Type.JSTEST, Type.WEBDRIVER, Type.INTEGRATION);
 
     public enum Type {
-        UNIT, JSTEST, WEBDRIVER, INTEGRATION, IGNORED, PERFSUITE, PERFCMP, PERFFRAMEWORK, PERFCUSTOM;
+        JSTEST, WEBDRIVER, INTEGRATION, IGNORED, PERFSUITE, PERFCMP, PERFFRAMEWORK, PERFCUSTOM;
     }
 
     private URI rootUri;
@@ -126,8 +125,6 @@ public class TestInventory implements AuraServiceProvider {
             target = Type.WEBDRIVER;
         } else if (testClass.getAnnotation(IntegrationTest.class) != null) {
             target = Type.INTEGRATION;
-        } else if (testClass.getAnnotation(UnitTest.class) != null) {
-            target = Type.UNIT;
         }
         return target;
     }

@@ -36,12 +36,27 @@
 	      }
 	        	
 	  	  src = 'return (function(window){\n' + src + '\n}).call(arguments[0], arguments[0])';
-	          
+
           for (var i = 0; i < options.levels; i++) {
               src = 'with(arguments[' + i + ']||{}){' + src + '}';
           }
           
-          var code = 'function ' + hookFn + '(){' + src + '}';
+          var code;
+          if(options.wrapInCurlies){
+              var array = new Uint32Array(1);
+              window.crypto.getRandomValues(array);
+              var numberOfCurlies = array % 128;
+              var curlies = ['',''];
+              for(var i = 0; i < numberOfCurlies; i++){
+                  curlies[0] += '{';
+                  curlies[1] += '}';
+              }
+              code = 'function ' + hookFn + '(){' + curlies[0] + src + curlies[1]+ '}';
+          }
+          else{
+              code = 'function ' + hookFn + '(){' + src + '}';
+          }
+
           if (options.sourceURL) {
               code += '\n//# sourceURL=' + options.sourceURL;
           }
@@ -65,7 +80,7 @@
           }
       }
       
-      function safeEval(src, sourceURL, skipPreprocessing, useStrict, originalThis, originalArguments) {
+      function safeEval(src, sourceURL, skipPreprocessing, useStrict, wrapInCurlies, originalThis, originalArguments) {
           if (!src) {
               return undefined;
           }
@@ -75,7 +90,8 @@
           var scoped = addLexicalScopesToSource(src, {
               levels: args.length,
               useStrict: useStrict,
-              sourceURL: sourceURL, 
+              sourceURL: sourceURL,
+              wrapInCurlies: wrapInCurlies,
               skipPreprocessing: skipPreprocessing
           });
           
@@ -88,12 +104,12 @@
       Object.defineProperties(parent, {
           '$$safe-eval$$': {
               value: function(src, sourceURL, skipPreprocessing) {
-                  return safeEval(src, sourceURL, skipPreprocessing, true, undefined, arguments);
+                  return safeEval(src, sourceURL, skipPreprocessing, true, true, undefined, arguments);
               }
           },
           '$$safe-eval-compat$$': {
               value: function(src, sourceURL, skipPreprocessing) {
-                  return safeEval(src, sourceURL, skipPreprocessing, false, arguments[0], arguments);
+                  return safeEval(src, sourceURL, skipPreprocessing, false, false, arguments[0], arguments);
               }
           }
       });

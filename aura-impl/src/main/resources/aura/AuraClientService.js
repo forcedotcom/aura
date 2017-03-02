@@ -1352,16 +1352,19 @@ AuraClientService.prototype.saveTokenToStorage = function() {
              $A.util.estimateSize(AuraClientService.TOKEN_KEY) + $A.util.estimateSize(this._token)
          ];
 
-        return storage.adapter.setItems([tuple]).then(
-            function() {
-                $A.log("AuraClientService.saveTokenToStorage(): token persisted");
-                return token;
-            },
-            function(err) {
-                $A.warning("AuraClientService.saveTokenToStorage(): failed to persist token: " + err);
-                return token;
-            }
-        );
+        // saves token when storage's adapter is ready
+        return storage.enqueue(function(resolve) {
+            storage.adapter.setItems([tuple]).then(
+                function() {
+                    $A.log("AuraClientService.saveTokenToStorage(): token persisted");
+                    resolve(token);
+                },
+                function(err) {
+                    $A.warning("AuraClientService.saveTokenToStorage(): failed to persist token: " + err);
+                    resolve(token);
+                }
+            );
+        });
     }
 
     return Promise["resolve"](this._token);
@@ -1369,7 +1372,7 @@ AuraClientService.prototype.saveTokenToStorage = function() {
 
 /**
  * Loads the CSRF token from Actions storage.
- * 
+ *
  * @return {Promise} Resolves with the token from storage, or undefined
  *         otherwise. Rejects if there is an error.
  */
@@ -1377,18 +1380,31 @@ AuraClientService.prototype.loadTokenFromStorage = function() {
     var self = this;
     var storage = Action.getStorage();
     if (storage && storage.isPersistent()) {
-        return storage.adapter.getItems([AuraClientService.TOKEN_KEY])
-            .then(function(items) {
-                if (items[AuraClientService.TOKEN_KEY]) {
-                    var token = items[AuraClientService.TOKEN_KEY]["value"]["token"];
-                    self.setToken(token);
-                    $A.log("AuraClientService.loadTokenFromStorage(): token loaded");
-                    return token;
-                }
-                $A.log("AuraClientService.loadTokenFromStorage(): no token found");
-                return undefined;
-            });
+        // loads token when storage's adapter is ready
+        return storage.enqueue(function(resolve, reject) {
+            storage.adapter.getItems([AuraClientService.TOKEN_KEY])
+                .then(
+                    function(items) {
+                        if (items[AuraClientService.TOKEN_KEY]) {
+                            var token = items[AuraClientService.TOKEN_KEY]["value"]["token"];
+                            self.setToken(token);
+                            $A.log("AuraClientService.loadTokenFromStorage(): token loaded");
+                            resolve(token);
+                        } else {
+                            $A.log("AuraClientService.loadTokenFromStorage(): no token found");
+                            resolve(undefined);
+                        }
+                    }
+                ).then(
+                    undefined,
+                    function(err) {
+                        $A.warning("AuraClientService.loadTokenFromStorage(): failed to load token: " + err);
+                        reject(err);
+                    }
+                );
+        });
     }
+
     $A.log("AuraClientService.loadTokenFromStorage(): no Action storage");
     return Promise["resolve"]();
 };
@@ -3030,7 +3046,7 @@ AuraClientService.prototype.processErrors = function(auraXHR, errorMessage) {
 
 /**
  * Remove actions from storeMap when the response is SYSTEMERROR
- * 
+ *
  * @private
  */
 AuraClientService.prototype.processSystemError = function(auraXHR) {

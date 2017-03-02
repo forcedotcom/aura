@@ -81,7 +81,8 @@ Test.Aura.AuraClientServiceTest = function() {
             },
             clientService: {
                 hardRefresh: function(){}
-            }
+            },
+            warning: function() {}
         },
         window:{},
         document:document,
@@ -897,6 +898,9 @@ Test.Aura.AuraClientServiceTest = function() {
                             },
                             isPersistent: function() {
                                 return true;
+                            },
+                            enqueue: function(fn) {
+                                fn();
                             }
                         }
                     }
@@ -932,6 +936,9 @@ Test.Aura.AuraClientServiceTest = function() {
                             },
                             isPersistent: function() {
                                 return true;
+                            },
+                            enqueue: function(fn) {
+                                fn();
                             }
                         }
                     }
@@ -2458,6 +2465,15 @@ Test.Aura.AuraClientServiceTest = function() {
                             },
                             isPersistent: function() {
                                 return true;
+                            },
+                            enqueue: function(fn) {
+                                var token;
+                                var resolve = function(value) {
+                                    token = value;
+                                }
+
+                                fn(resolve);
+                                return ResolvePromise(token);
                             }
                         };
                     }
@@ -2499,6 +2515,9 @@ Test.Aura.AuraClientServiceTest = function() {
                             },
                             isPersistent: function() {
                                 return true;
+                            },
+                            enqueue: function(fn) {
+                                fn();
                             }
                         };
                     }
@@ -2536,6 +2555,15 @@ Test.Aura.AuraClientServiceTest = function() {
                             },
                             isPersistent: function() {
                                 return true;
+                            },
+                            enqueue: function(fn) {
+                                var token;
+                                var resolve = function(value) {
+                                    token = value;
+                                }
+
+                                fn(resolve);
+                                return ResolvePromise(token);
                             }
                         };
                     }
@@ -2633,6 +2661,15 @@ Test.Aura.AuraClientServiceTest = function() {
                             },
                             isPersistent: function() {
                                 return true;
+                            },
+                            enqueue: function(fn) {
+                                var error;
+                                var reject = function(err) {
+                                    error = err;
+                                }
+
+                                fn(undefined, reject);
+                                return RejectPromise(error);
                             }
                         };
                     }

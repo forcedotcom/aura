@@ -16,7 +16,7 @@
 
     /**
      * Verifies that storable actions work when all storage operations fail.
-     * 
+     *
      * This test leverages a server-side static counter in AuraStorageTestController.java to verify the server is hit.
      */
     testStorableAction: {

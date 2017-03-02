@@ -64,9 +64,7 @@
                 curItems.push(newItems[i]);
                 if (fireInsertedEvent) {
                     var pillInsertedEvent = cmp.get("e.pillInserted");
-                    if (newItems[i].params) {
-                        pillInsertedEvent.setParams(newItems[i].params);
-                    }
+                    pillInsertedEvent.setParams({'value': newItems[i]});
                     pillInsertedEvent.fire();
                 }
             }
@@ -320,12 +318,10 @@
                 }
                 if (fireRemovedEvent) {
                     var pillRemovedEvent = cmp.get("e.pillRemoved");
-                    if (data.params) {
-                        pillRemovedEvent.setParams(data.params);
-                    }
+                    pillRemovedEvent.setParams({'value': data});
                     pillRemovedEvent.fire();
                 }
-				break;
+                break;
             }
         }
     },

@@ -189,18 +189,25 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             return name;
         }
         if (namespace == null) {
-            return String.format("%s://%s", prefix, name);
+            return prefix + "://" + name;
         }
-        String format = MARKUP_PREFIX.equals(prefix) ? "%s://%s:%s" : "%s://%s.%s";
-        return String.format(format, prefix, namespace, name);
+        if (MARKUP_PREFIX.equals(prefix)) {
+            return prefix + "://" + namespace + ":" + name;
+        } else {
+            return prefix + "://" + namespace + "." + name;
+        }
+
     }
 
     private static String buildDescriptorName(String prefix, String namespace, String name) {
         if (namespace == null) {
-            return String.format("%s", name);
+            return name;
         }
-        String format = MARKUP_PREFIX.equals(prefix) ? "%s:%s" : "%s.%s";
-        return String.format(format, namespace, name);
+        if (MARKUP_PREFIX.equals(prefix)) {
+            return namespace + ":" + name;
+        } else {
+            return namespace + "." + name;
+        }
     }
 
     /**

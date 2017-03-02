@@ -127,7 +127,7 @@ public class ModuleParser implements DefinitionFactory<TextSource<ModuleDef>, Mo
         for (String dep : dependencies) {
             if (dep.contains("-")) {
                 // TODO remove when compiler is updated to return ':'
-                dep = dep.replace("-", ":");
+                dep = dep.replaceFirst("-", ":");
             }
             DefDescriptor<ModuleDef> moduleDefDefDescriptor = definitionService.getDefDescriptor(dep, ModuleDef.class);
             if (definitionService.exists(moduleDefDefDescriptor)) {

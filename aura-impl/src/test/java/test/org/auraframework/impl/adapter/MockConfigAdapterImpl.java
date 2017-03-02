@@ -117,6 +117,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
                 // Webdriver's executeScript() needs unsafe-eval. We should find an alternative for
                 //our test-utils (e.g. AuraUITestingUtil.getRawEval()) and then remove this.
                 if(mode == Mode.AUTOJSTEST || mode == Mode.AUTOJSTESTDEBUG ||
+                		mode == Mode.STATS ||
                         mode == Mode.SELENIUM || mode == Mode.SELENIUMDEBUG){
                     list.add(CSP.UNSAFE_EVAL);
                 }

@@ -342,6 +342,39 @@
     },
 
     /**
+     * Clear date and time by setting the value passed to the component to empty string
+     */
+    testClearDateTimeWithValue: {
+        browsers: ['DESKTOP'],
+        attributes: {
+            value: '2015-10-23T16:30:00.000Z',
+        },
+        test: [
+            function() {
+                this.waitForInputTimeIsSet();
+            },
+            function(cmp) {
+                var inputDateTimeCmp = cmp.find("dateTimePickerTest");
+                var inputDateElement = inputDateTimeCmp.find("inputDate").getElement();
+                var inputTimeElement = inputDateTimeCmp.find("inputTime").getElement();
+
+                $A.test.assertNotEquals("", inputDateElement.value, "Date value should not be empty");
+                $A.test.assertNotEquals("", inputTimeElement.value, "Time value should not be empty");
+
+                cmp.set("v.value", "");
+
+                $A.test.addWaitForWithFailureMessage("", function() {
+                    return inputDateElement.value;
+                }, "Date value should be empty");
+
+                $A.test.addWaitForWithFailureMessage("", function() {
+                    return inputTimeElement.value;
+                }, "Time value should be empty");
+            }
+        ]
+    },
+
+    /**
      * We have to ways that we need to get elements. Either from a output/select combo or from a header tag
      */
     getTextFromElm: function (cmp) {

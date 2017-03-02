@@ -43,6 +43,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceLoader;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.FileMonitor;
 import org.auraframework.util.j2v8.J2V8Util;
 
@@ -94,6 +95,19 @@ public class ModuleRegistryProvider implements RegistryAdapter, SourceListener {
             if (location.type() == DefType.MODULE) {
                 File modules = location.getComponentSourceDir();
                 SourceLoader sourceLoader;
+                if (modules != null) {
+                    try {
+                        modules = modules.getCanonicalFile();
+                    } catch (IOException ioe) {
+                        // ignore, not sure what we can do.
+                        throw new AuraRuntimeException("unable to get canonical path for " + modules.getAbsolutePath(), ioe);
+                    }
+                    loggingService.info("mdb7: ModuleRegistryProvider: modules:" + modules.getAbsolutePath()
+                            + ", canRead/canExecute/isDirectory:" + modules.canRead() + '/' + modules.canExecute() + '/'
+                            + modules.isDirectory());
+                } else {
+                    loggingService.info("mdb7: ModuleRegistryProvider: null modules");
+                }
                 if (modules != null && modules.canRead() && modules.canExecute() && modules.isDirectory()) {
                     sourceLoader = new FileSourceLoader(modules, fileMonitor);
                 } else {
@@ -105,6 +119,7 @@ public class ModuleRegistryProvider implements RegistryAdapter, SourceListener {
                 CompilingDefRegistry defRegistry = new CompilingDefRegistry(sourceLoader, PREFIXES, DEF_TYPES,
                         compilerService);
                 registries.add(defRegistry);
+                loggingService.info("mdb7: ModuleRegistryProvider: sourceLoader:" + sourceLoader + ", defRegistry:" + defRegistry);
 
                 // register namespaces to optimize processing of definition references
                 configAdapter.addModuleNamespaces(defRegistry.getNamespaces());

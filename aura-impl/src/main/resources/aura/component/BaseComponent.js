@@ -43,7 +43,7 @@ function BaseComponent(config, localCreation) {
     this.references={};
     this.handlers = {};
     this.localIndex = {};
-    this.destroyed=false;
+    this.destroyed=0;
     this.version = config["version"];
     this.owner = context.getCurrentAccess();
     this.name='';
@@ -158,7 +158,7 @@ BaseComponent.prototype.getSuperest = function(){ return this; };
 BaseComponent.prototype.setupValueProviders = function(customValueProviders) {
     var vp=this.valueProviders;
 
-    vp["v"]=this.attribureSet=$A.componentService.get(this.concreteComponentId).attributeSet;
+    vp["v"]=this.attributeSet=$A.componentService.get(this.concreteComponentId).attributeSet;
     vp["m"]=this.model;
     vp["this"]=this;
     vp["globalid"]=this.concreteComponentId;

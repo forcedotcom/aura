@@ -570,7 +570,7 @@ AuraRenderingService.prototype.unrenderFacet = function(cmp,facet){
  * @export
  */
 AuraRenderingService.prototype.getMarker = function(cmp){
-    if(!cmp||cmp.destroyed) { return null; }
+    if(!cmp||cmp.destroyed===1) { return null; }
 
     return cmp.getConcreteComponent()._marker;
 };

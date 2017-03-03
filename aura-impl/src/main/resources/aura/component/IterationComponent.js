@@ -42,7 +42,7 @@ function IterationComponent(config, localCreation) {
     this.references={};
     this.handlers = {};
     this.localIndex = {};
-    this.destroyed=false;
+    this.destroyed=0;
     this.version = config["version"];
     this.owner = context.getCurrentAccess();
     this.name='';

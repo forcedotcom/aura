@@ -483,7 +483,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public boolean validateBootstrap(String jwtToken) {
-    	String expected = generateJwtToken();
+        String expected = generateJwtToken();
         return expected.equals(jwtToken);
     }
 
@@ -735,34 +735,35 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         this.fileMonitor = fileMonitor;
     }
 
-	@Override
-	public boolean isLockerServiceEnabled() {
-		return true;
-	}
+    @Override
+    public boolean isLockerServiceEnabled() {
+        return true;
+    }
 
-	@Override
-	public boolean requireLocker(RootDefinition def) {
+    @Override
+    public boolean requireLocker(RootDefinition def) {
         boolean requireLocker = !isInternalNamespace(def.getDescriptor().getNamespace());
-		if (!requireLocker) {
+        if (!requireLocker) {
             DefDescriptor<InterfaceDef> requireLockerDescr = definitionService.getDefDescriptor("aura:requireLocker", InterfaceDef.class);
-        	try {
-				requireLocker = def.isInstanceOf(requireLockerDescr);
-			} catch (QuickFixException e) {
-				throw new AuraRuntimeException(e);
-			}
-    	}
 
-		return requireLocker;
-	}
+            try {
+                requireLocker = def.isInstanceOf(requireLockerDescr);
+            } catch (QuickFixException e) {
+                throw new AuraRuntimeException(e);
+            }
+        }
 
-	@Override
-	public String getLockerServiceCacheBuster() {
-		return isLockerServiceEnabled() ? "Y" : "N";
-	}
+        return requireLocker;
+    }
 
-	protected boolean isSafeEvalWorkerURI(String uri) {
+    @Override
+    public String getLockerServiceCacheBuster() {
+        return isLockerServiceEnabled() ? "Y" : "N";
+    }
+
+    protected boolean isSafeEvalWorkerURI(String uri) {
         return uri.endsWith(SAFE_EVAL_HTML_URI);
-	}
+    }
 
     /**
      * Return true if the namespace of the provided descriptor supports caching.

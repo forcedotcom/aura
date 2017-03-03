@@ -130,7 +130,6 @@ public class LocalizationAdapterImpl implements LocalizationAdapter, TestableLoc
         return new AuraLocaleImpl();
     }
 
-
     @Override
     public AuraLocale getAuraLocale(Locale defaultLocale) {
         return new AuraLocaleImpl(defaultLocale);
@@ -152,7 +151,7 @@ public class LocalizationAdapterImpl implements LocalizationAdapter, TestableLoc
     public void setRequestedLocales(List<Locale> requestedLocales) {
         this.requestedLocales = requestedLocales;
     }
-    
+
    @Override
     public void setTestLabel(String section, String name, String value) {
         testLabels.put(getLabelKey(section, name), value);

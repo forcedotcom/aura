@@ -235,29 +235,6 @@
         }
     },
 
-    testIsSame:{
-        test:function(component){
-            var format =  'MMM DD, YYYY h:mm:ss A';
-            var testCmp = component.find('myOutputDateTimeComp');
-            $A.test.assertNotNull(testCmp);
-            $A.test.addWaitFor(true, function(){return $A.test.getText(testCmp.find('span').getElement()).length > 0;},
-                function(){
-                    var outputDateStr = $A.test.getText(testCmp.find('span').getElement());
-                    var dateObj1 = $A.localizationService.parseDateTime(outputDateStr, format, 'en');
-                    var dateObj2 = $A.localizationService.parseDateTime('Sep 23, 2014 4:30:00 PM', format, 'en');
-
-                    $A.test.assertEquals(true, $A.localizationService.isSame(dateObj1, dateObj2), "Both dates are same.");
-                    $A.test.assertEquals(true, $A.localizationService.isSame(dateObj1, dateObj2, 'seconds'), "Both dates are same.");
-                    $A.test.assertEquals(true, $A.localizationService.isSame(dateObj1, dateObj2, 'minutes'), "Both dates are same.");
-                    $A.test.assertEquals(true, $A.localizationService.isSame(dateObj1, dateObj2, 'hours'), "Both dates are same.");
-                    $A.test.assertEquals(true, $A.localizationService.isSame(dateObj1, dateObj2, 'days'), "Both dates are same.");
-                    $A.test.assertEquals(true, $A.localizationService.isSame(dateObj1, dateObj2, 'weeks'), "Both dates are same.");
-                    $A.test.assertEquals(true, $A.localizationService.isSame(dateObj1, dateObj2, 'months'), "Both dates are same.");
-                    $A.test.assertEquals(true, $A.localizationService.isSame(dateObj1, dateObj2, 'years'), "Both dates are same.");
-            });
-        }
-    },
-
     testEndOf:{
         test:function(component){
             var format =  'MMM DD, YYYY h:mm:ss A';
@@ -319,62 +296,6 @@
         }
     },
 
-    testFormatDate:{
-        test:function(component){
-            var testCmp = component.find('myOutputDateComp');
-            $A.test.assertNotNull(testCmp);
-            $A.test.addWaitFor(true, function(){return $A.test.getText(testCmp.find('span').getElement()).length > 0;},
-                function(){
-                    // Sep 23, 2014
-                    var expected = $A.test.getText(testCmp.find('span').getElement());
-                    $A.test.assertEquals(expected, $A.localizationService.formatDate('Sep 23, 2014', 'MMM DD, YYYY', 'en'), "Both dates should be same.");
-                    $A.test.assertEquals(expected, $A.localizationService.formatDate('Sep 23, 2014', '', 'en'), "Both dates should be same.");
-                });
-
-            var helper = component.getDef().getHelper();
-            helper.testInvalidDateAndTime($A.localizationService.formatDate,'','','en',"Invalid date value","testFormatDate fail, Expected:Invalid date value");
-            helper.testInvalidDateAndTime($A.localizationService.formatDate,'a','','en',"Invalid date value","testFormatDate fail, Expected:Invalid date value");
-        }
-    },
-
-    testFormatDateUTC:{
-        test:function(component){
-            var testCmp = component.find('myOutputDateComp');
-            $A.test.assertNotNull(testCmp);
-            $A.test.addWaitFor(true, function(){return $A.test.getText(testCmp.find('span').getElement()).length > 0;},
-                function() {
-                    var outputDateStr = $A.test.getText(testCmp.find('span').getElement());
-                    $A.test.assertEquals($A.localizationService.formatDateUTC('Sep 23, 2014', 'MMM DD, YYYY', 'en'),
-                        'Sep 23, 2014', "formatDateUTC should keep the date constant");
-                    $A.test.assertEquals($A.localizationService.formatDateUTC('Sep 23, 2014', 'MMM DD, YYYY', 'en'),
-                         outputDateStr, "date should be the same as Fixed format UTC.");
-                    $A.test.assertEquals($A.localizationService.formatDateUTC('Sep 23, 2014', '', 'en'), outputDateStr,
-                        "date should be the same as Default [en] format UTC.");
-                });
-            var helper = component.getDef().getHelper();
-            helper.testInvalidDateAndTime($A.localizationService.formatDateUTC,'','','en',"Invalid date value","testFormatDateUTC fail, Expected:Invalid date value");
-            helper.testInvalidDateAndTime($A.localizationService.formatDateUTC,'a','','en',"Invalid date value","testFormatDateUTC fail, Expected:Invalid date value");
-        }
-    },
-
-
-    testFormatDateTime:{
-        test:function(component){
-            var format =  'MMM DD, YYYY h:mm:ss A';
-            var testCmp = component.find('myOutputDateTimeComp');
-            $A.test.assertNotNull(testCmp);
-            $A.test.addWaitFor(true, function(){return $A.test.getText(testCmp.find('span').getElement()).length > 0;},
-                function(){
-                    var outputDateStr = $A.test.getText(testCmp.find('span').getElement());
-                    $A.test.assertEquals($A.localizationService.formatDateTime('Sep 23, 2014 4:30:00 PM', format, 'en'), outputDateStr, "Both datetimes should be same.");
-                    $A.test.assertEquals($A.localizationService.formatDateTime('Sep 23, 2014 4:30:00 PM', '', 'en'), outputDateStr, "Both datetimes should be same.");
-            });
-            var helper = component.getDef().getHelper();
-            helper.testInvalidDateAndTime($A.localizationService.formatDateTime,'','','en',"Invalid date time value","testFormatDateTime fail, Expected:Invalid date time value");
-            helper.testInvalidDateAndTime($A.localizationService.formatDateTime,'a','','en',"Invalid date time value","testFormatDateTime fail, Expected:Invalid date time value");
-        }
-    },
-
     /*
      * This test is excluded from ipad and iphone because safari on them treat daylight saving differently. as a result,
      * we get "invalid date time" error on autobuild safari-ios (W-2123968)
@@ -394,88 +315,6 @@
             helper.verifyDateAndTime(component,"myOutputDateTimeCompNewYork1",expected1);
             helper.verifyDateAndTime(component,"myOutputDateTimeCompNewYork2",expected2);
             helper.verifyDateAndTime(component,"myOutputDateTimeCompNewYork3",expected2);
-        }
-    },
-
-    testFormatDateTimeUTC24HR:{
-        test:function(component) {
-            var lang = 'en';
-            var format = 'MMM DD, YYYY H:mm:ss A';
-            //test end of summer time, 2014-10-31
-            var dateAndTimeAMSummerTime = 'Oct 31, 2014 0:59:00 AM';
-            var expectedAMSummerTime = dateAndTimeAMSummerTime;
-            var actualAMSummerTime = $A.localizationService.formatDateTimeUTC(dateAndTimeAMSummerTime,format,lang);
-            $A.test.assertEquals(expectedAMSummerTime,actualAMSummerTime,"get unexpected AMSummerTime in testFormatDateTimeUTC24HR of LocalizationService_TestTest");
-            //test start of winter time
-            var dateAndTimeAMWinterTime = 'Oct 31, 2014 1:01:00 AM';
-            var expectedAMWinterTime = dateAndTimeAMWinterTime;
-            var actualAMWinterTime = $A.localizationService.formatDateTimeUTC(dateAndTimeAMWinterTime,format,lang);
-            $A.test.assertEquals(expectedAMWinterTime,actualAMWinterTime,"get unexpected AMWinterTime in testFormatDateTimeUTC24HR of LocalizationService_TestTest");
-        }
-    },
-
-    testFormatDateTimeUTC12HR:{
-        test:function(component) {
-            var lang = 'en';
-            var format = 'MMM DD, YYYY h:mm:ss A';
-            //test end of summer time
-            var dateAndTimeAMSummerTime = 'Oct 31, 2014 0:59:00 AM';
-            //we parse hour=0 to 12 because moment.js->formatTokenFunctions->h does this.hours() % 12 || 12
-            var expectedAMSummerTime = 'Oct 31, 2014 12:59:00 AM';
-            var actualAMSummerTime = $A.localizationService.formatDateTimeUTC(dateAndTimeAMSummerTime,format,lang);
-            $A.test.assertEquals(expectedAMSummerTime,actualAMSummerTime,"get unexpected AMSummerTime in testFormatDateTimeUTC12HR of LocalizationService_TestTest");
-            //test start of winter time
-            var dateAndTimeAMWinterTime = 'Oct 31, 2014 1:01:00 AM';
-            var expectedAMWinterTime = dateAndTimeAMWinterTime;
-            var actualAMWinterTime = $A.localizationService.formatDateTimeUTC(dateAndTimeAMWinterTime,format,lang);
-            $A.test.assertEquals(expectedAMWinterTime,actualAMWinterTime,"get unexpected AMWinterTime in testFormatDateTimeUTC12HR of LocalizationService_TestTest");
-        }
-    },
-
-    testFormatDateTimeUTC:{
-        test:function(component){
-            var format = 'MMM DD, YYYY h:mm:ss A';
-            var testCmp = component.find('myOutputDateTimeComp');
-            $A.test.assertNotNull(testCmp);
-            $A.test.addWaitFor(true, function(){return $A.test.getText(testCmp.find('span').getElement()).length > 0;},
-                function(){
-                    var outputDateStr = $A.test.getText(testCmp.find('span').getElement());
-                    var str = 'Sep 23, 2014 4:30:00 PM';
-                    $A.test.assertEquals($A.localizationService.formatDateTimeUTC(str, format, 'en'), outputDateStr, "Both datetimes should be same.");
-                    $A.test.assertEquals($A.localizationService.formatDateTimeUTC(str, '', 'en'), outputDateStr, "Both datetimes should be same.");
-            });
-            var helper = component.getDef().getHelper();
-            helper.testInvalidDateAndTime($A.localizationService.formatDateTimeUTC,'','','en',"Invalid date time value","testFormatDateTimeUTC fail, Expected:Invalid date time value");
-            helper.testInvalidDateAndTime($A.localizationService.formatDateTimeUTC,'a','','en',"Invalid date time value","testFormatDateTimeUTC fail, Expected:Invalid date time value");
-        }
-    },
-
-    testFormatTime:{
-        test:function(component){
-            var testCmp = component.find('myOutputTextComp');
-            $A.test.assertNotNull(testCmp);
-            var outputDateStr = $A.test.getText(testCmp.find('span').getElement());
-            $A.test.assertEquals($A.localizationService.formatTime('Sep 23, 2014 4:30:00 PM', 'h:mm:ss A', 'en'), outputDateStr, "Both times should be same.");
-            $A.test.assertEquals($A.localizationService.formatTime('Sep 23, 2014 4:30:00 PM', '', 'en'), outputDateStr, "Both times should be same.");
-            var helper = component.getDef().getHelper();
-            helper.testInvalidDateAndTime($A.localizationService.formatTime,'','','en',"Invalid time value","testFormatTime fail, Expected:Invalid time value");
-            helper.testInvalidDateAndTime($A.localizationService.formatTime,'a','','en',"Invalid time value","testFormatTime fail, Expected:Invalid time value");
-        }
-    },
-
-    testFormatTimeUTC:{
-        test:function(component){
-            var testCmp = component.find('myOutputTextComp');
-            $A.test.assertNotNull(testCmp);
-            var outputDateStr = $A.test.getText(testCmp.find('span').getElement());
-
-            str = 'Sep 23, 2014 4:30:00 PM';
-            $A.test.assertEquals($A.localizationService.formatTimeUTC(str, 'h:mm:ss A', 'en'), outputDateStr, "Both times should be same.");
-            $A.test.assertEquals($A.localizationService.formatTimeUTC(str, '', 'en'), outputDateStr, "Both times should be same.");
-            var helper = component.getDef().getHelper();
-            helper.testInvalidDateAndTime($A.localizationService.formatTimeUTC,'','','en',"Invalid time value","testFormatTimeUTC fail, Expected:Invalid time value");
-            helper.testInvalidDateAndTime($A.localizationService.formatTimeUTC,'a','','en',"Invalid time value","testFormatTimeUTC fail, Expected:Invalid time value");
-
         }
     },
 

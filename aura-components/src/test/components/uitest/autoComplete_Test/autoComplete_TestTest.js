@@ -259,6 +259,19 @@
                 }, "The expected option was not highlighted");
             }]
         },
+        
+        testListClosedWhenInputCleared: {
+	        browsers : ["-IE7", "-IE8"],
+	        test : [function(cmp){
+	                this._changeInput(cmp, "h");
+	            }, function(cmp){
+					this._validateAutocompleteListVisiblity(cmp, "autoComplete", true);
+	            }, function(cmp) {
+					this._changeInput(cmp, "");
+	            }, function(cmp) {
+	            	this._validateAutocompleteListVisiblity(cmp, "autoComplete", false);
+	            }]
+        },
 	
 	_validateItemSelected: function(cmp, id, expectedText) {
 		var actual = cmp.find(id).find("input").find("txt").getElement().value;
@@ -275,6 +288,14 @@
         var ul = autoList.getElement().getElementsByTagName("ul")[0];
         var expectedListElement = ul.getElementsByTagName("li")[option];
         return $A.util.hasClass(expectedListElement,"highlighted");
+	},
+	
+	_validateAutocompleteListVisiblity: function(cmp, input, visibility) {
+		var autoList = cmp.find(input).find("list");
+		var ul = autoList.getElement().getElementsByTagName("ul")[0];
+		$A.test.addWaitForWithFailureMessage(visibility, function(){
+        	return $A.util.hasClass(ul,"visible");
+		}, "Class name should contain visible");
 	},
 
 	_getInput: function(cmp, id) {

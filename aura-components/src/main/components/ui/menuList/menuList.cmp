@@ -18,7 +18,7 @@
 <aura:component access="GLOBAL" support="GA" extensible="true" implements="ui:visible" extends="ui:popupTarget"
                 dynamicallyFlavorable="true" description="A menu component that contains menu items.">
     <aura:attribute access="GLOBAL" name="menuItems" type="List" description="A list of menu items set explicitly using instances of the Java class: aura.​components.​ui.MenuItem."/>
-    <aura:attribute access="GLOBAL" name="visible" type="Boolean" default="{!false}" description="Controls the visibility of the menu. The default is false, which hides the menu."/>
+    <aura:attribute access="GLOBAL" name="visible" type="Boolean" default="false" description="Controls the visibility of the menu. The default is false, which hides the menu."/>
     <!-- TODO: Remove the below attribute -->
     <aura:attribute name="focusItemIndex" type="Integer" default="0"
                     description="The index of the item which should be on focus when the menu displays. 0 means the first item and -1 refers to the last."/>
@@ -29,6 +29,8 @@
 
     <aura:attribute name="role" type="String" default="menu" description="Defines the accessibility role of the menu. Defaults to 'menu'."/>
     <aura:attribute name="triggerTypeAhead" type="Boolean" default="false" description="If true when closed and a character is typed on the trigger, opens the menu and focuses on the first match."/>
+
+    <aura:attribute access="PRIVATE" name="hasMenuOpened" type="Boolean" default="false"/>
 
     <aura:registerEvent access="GLOBAL" name="menuCollapse" type="ui:collapse" description="The event fired when the menu list collapses."/>
     <aura:registerEvent access="GLOBAL" name="menuExpand" type="ui:expand" description="The event fired when the menu list displays."/>
@@ -41,6 +43,7 @@
 
     <aura:handler name="refresh" action="{!c.update}"/>
     <aura:handler name="change" value="{!v.body}" action="{!c.update}"/>
+    <aura:handler name="change" value="{!v.visible}" action="{!c.handleVisibilityChange}"/>
 
     <div class="{!v.class}" aura:id="menu" role="{!v.role}">
         <aura:if isTrue="{!v.headerText != null}">
@@ -50,12 +53,14 @@
         </aura:if>
 
         <ul aura:id="datalist" class="scrollable" role="presentation">
-             <aura:iteration items="{!v.menuItems}" var="item">
-                <ui:menuItem aura:id="item" class="{!item.className}" disabled="{!item.disabled}" label="{!item.label}"
-                             selected="{!item.selected}" type="{!item.type}" value="{!item.value}"
-                             hideMenuAfterSelected="{!item.hideMenuAfterSelected}"/>
-             </aura:iteration>
-            {!v.body}
+            <aura:if isTrue="{!v.hasMenuOpened}">
+                <aura:iteration items="{!v.menuItems}" var="item">
+                    <ui:menuItem aura:id="item" class="{!item.className}" disabled="{!item.disabled}" label="{!item.label}"
+                        selected="{!item.selected}" type="{!item.type}" value="{!item.value}"
+                        hideMenuAfterSelected="{!item.hideMenuAfterSelected}"/>
+                </aura:iteration>
+                {!v.body}
+            </aura:if>
         </ul>
     </div>
 </aura:component>

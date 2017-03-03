@@ -262,6 +262,8 @@
 
     waitForOverflowTabsLoaded: function(cmp, containerName) {
         var overflowMenu = this.getOverflowMenu(cmp, containerName);
+        // Open the menu, so that the elements get rendered
+        overflowMenu.getElement().getElementsByTagName("a")[0].click();
         $A.test.addWaitForWithFailureMessage(true, function() {
             return overflowMenu.getElement().getElementsByTagName("li").length > 0;
         }, "No tabs in overflow are loaded!");

@@ -429,7 +429,6 @@
             trigger = cmp.find("triggercheckPosition");
             menuList = cmp.find("checkPosition");
             menuListElement = menuList.getElement();
-            item1 = cmp.find("checkPositionItem1").getElement();
             this.clickAnchor(trigger);
             $A.test.setTestTimeout(10000);
             $A.test.addWaitForWithFailureMessage(true, function () {
@@ -445,6 +444,7 @@
             $A.test.assertTrue(parseInt(topPropertyValue) >= 0 || topPropertyValue == "auto", "CSS property of MenuList should be auto or a positive value");
             viewPort = $A.util.getWindowSize();
             //change the height for item1 such that not enough space below
+            item1 = cmp.find("checkPositionItem1").getElement();
             item1.style.height = viewPort.height * 2 + "px";
             this.clickAnchor(trigger);
             $A.test.addWaitForWithFailureMessage(false, function () {

@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 ({
+    handleVisibilityChange: function (component) {
+        if (!component.get("v.hasMenuOpened") && component.get("v.visible")) {
+            component.set("v.hasMenuOpened", true);
+        }
+    },
+
     onMenuItemSelected: function (component, event, helper) {
         helper.onMenuItemSelected(component, event);
     },

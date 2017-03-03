@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.def.ValueDef;
@@ -91,4 +90,8 @@ public class MockModelDef extends MockDefinition<ModelDef> implements ModelDef {
         return getMemberByName(s).getType();
     }
 
+    @Override
+    public boolean hasSwitchableReference() {
+        return false;
+    }
 }

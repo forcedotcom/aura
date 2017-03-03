@@ -36,7 +36,6 @@ import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.TypeDef;
@@ -99,11 +98,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
         @Override
         public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        }
-
-        @Override
-        public void appendDependenciesByType(Set<DefDescriptor<?>> dependencies, DefType type) {
-            this.appendDependencies(dependencies);
         }
 
         @Override

@@ -177,7 +177,6 @@ public class DefinitionServiceImpl implements DefinitionService {
         contextService.assertEstablished();
 
         AuraContext context = contextService.getCurrentContext();
-        boolean modulesEnabled = context.isModulesEnabled();
         T def = null;
 
         if (descriptor == null) {
@@ -218,8 +217,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                 // If we are nested, compileDef will do the right thing.
                 // This is a bit ugly though.
                 //
-                DefType currentType = modulesEnabled ? DefType.MODULE : DefType.COMPONENT;
-                def = compileDef(descriptor, currentCC, true, currentType);
+                def = compileDef(descriptor, currentCC, true);
             }
         } else {
             // Case 3: Have to find the def.
@@ -985,15 +983,12 @@ public class DefinitionServiceImpl implements DefinitionService {
         threadContext.set(currentCC);
         try {
             currentCC.addMap(AuraStaticControllerDefRegistry.getInstance(this).getAll());
-            DefType currentCompileType = modulesEnabled ? DefType.MODULE : DefType.COMPONENT;
-            Definition def = compileDef(descriptor, currentCC, false, currentCompileType);
+            Definition def = compileDef(descriptor, currentCC, false);
 
             if (currentCC.hasSwitchableReference) {
-                // when switchable reference detected from initial dependencies,
-                // swap and recompile for other reference to get other DE
-                DefType recompileType = currentCompileType == DefType.COMPONENT ? DefType.MODULE : DefType.COMPONENT;
+                // when switchable reference detected from dependencies, recompile for other reference to get other DE
                 loggingService.info("mdb7: recompiling descriptor for modules: " + descriptor);
-                recompile(descriptor, currentCC, recompileType);
+                recompile(descriptor, currentCC, context);
             }
 
             if (def == null) {
@@ -1101,12 +1096,13 @@ public class DefinitionServiceImpl implements DefinitionService {
      *
      * @param descriptor descriptor to recompile
      * @param cc current compile context
-     * @param recompileType DefType for recompilation
+     * @param context AuraContext
      * @throws QuickFixException
      */
-    private void recompile(DefDescriptor descriptor, CompileContext cc, DefType recompileType) throws QuickFixException {
-        if (recompileType == DefType.COMPONENT) {
-            // if recompiling for components, we should have just compiled for module references
+    private void recompile(DefDescriptor descriptor, CompileContext cc, AuraContext context) throws QuickFixException {
+        boolean modulesEnabled = context.isModulesEnabled();
+        if (modulesEnabled) {
+            // if modules currently enabled, we should have just compiled for module references
             cc.compiledModule = Collections.unmodifiableMap(cc.compiled);
         } else {
             // otherwise, compiled component references
@@ -1117,15 +1113,18 @@ public class DefinitionServiceImpl implements DefinitionService {
         cc.compiled = Maps.newHashMap();
         cc.level = 0;
         cc.addMap(AuraStaticControllerDefRegistry.getInstance(this).getAll());
-        // recompileType sets type to pass to appendDependencies to retrieve the other dependencies
-        compileDef(descriptor, cc, false, recompileType);
+        // invert modules enabled to get switchable DefRefDelegates to return other references
+        context.setModulesEnabled(!modulesEnabled);
+        compileDef(descriptor, cc, false);
 
-        if (recompileType == DefType.COMPONENT) {
-            // this recompile yields component defs
+        if (modulesEnabled) {
+            // this recompile yields component defs if modules enabled
             cc.compiledComponent = Collections.unmodifiableMap(cc.compiled);
         } else {
             cc.compiledModule = Collections.unmodifiableMap(cc.compiled);
         }
+        // reset modules enabled flag
+        context.setModulesEnabled(modulesEnabled);
 
         // compiled now holds all defs of both component and module to be used in UID calculation
         cc.compiled = Maps.newHashMap();
@@ -1506,7 +1505,7 @@ public class DefinitionServiceImpl implements DefinitionService {
      */
     private <D extends Definition> D getHelper(@Nonnull DefDescriptor<D> descriptor,
             @Nonnull CompileContext cc, @Nonnull Set<DefDescriptor<?>> stack,
-            @CheckForNull Definition parent, DefType type) throws QuickFixException {
+            @CheckForNull Definition parent) throws QuickFixException {
         loggingService.incrementNum(LoggingService.DEF_VISIT_COUNT);
         CompilingDef<D> cd = cc.getCompiling(descriptor);
         try {
@@ -1550,10 +1549,10 @@ public class DefinitionServiceImpl implements DefinitionService {
                 }
 
                 Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
-                cd.def.appendDependenciesByType(newDeps, type);
+                cd.def.appendDependencies(newDeps);
 
                 for (DefDescriptor<?> dep : newDeps) {
-                    getHelper(dep, cc, stack, cd.def, type);
+                    getHelper(dep, cc, stack, cd.def);
                 }
 
                 return cd.def;
@@ -1656,7 +1655,7 @@ public class DefinitionServiceImpl implements DefinitionService {
      */
     @CheckForNull
     private <D extends Definition> D compileDef(@Nonnull DefDescriptor<D> descriptor,
-            @Nonnull CompileContext currentCC, boolean nested, DefType type) throws QuickFixException {
+            @Nonnull CompileContext currentCC, boolean nested) throws QuickFixException {
         D def;
 
         if (!nested) {
@@ -1664,7 +1663,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         }
         try {
             Set<DefDescriptor<?>> stack = Sets.newLinkedHashSet();
-            def = getHelper(descriptor, currentCC, stack, null, type);
+            def = getHelper(descriptor, currentCC, stack, null);
             if (!nested) {
                 finishValidation(currentCC);
             }

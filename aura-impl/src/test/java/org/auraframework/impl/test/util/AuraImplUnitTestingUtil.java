@@ -26,7 +26,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DependencyDef;
@@ -189,11 +188,6 @@ public class AuraImplUnitTestingUtil {
 
             @Override
             public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-            }
-
-            @Override
-            public void appendDependenciesByType(Set<DefDescriptor<?>> dependencies, DefType type) {
-                this.appendDependencies(dependencies);
             }
 
             @Override

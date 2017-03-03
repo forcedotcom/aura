@@ -19,14 +19,17 @@
 
 	<aura:import library="ui:panelPositioningLib" property="lib" />
 
-    <aura:attribute name="visible" type="Boolean" default="false" description="Controls the visibility of the popup target. The default is false, which hides the menu."/>
-    <aura:attribute access="GLOBAL" name="closeOnTabKey" type="Boolean" default="true" description="Indicates whether to close the target list on tab key or not." />
-    <aura:attribute access="GLOBAL" name="autoPosition" type="Boolean" default="true" description="Move the popup target up when there is not enough space at the bottom to display. Note: even if autoPosition is set to false, popup will still position the menu relative to the trigger. To override default positioning, use manualPosition attribute."/>
-	<aura:attribute name="manualPosition" type="Boolean" default="false" description="Flag to override auto position." />
-    <aura:attribute access="PRIVILEGED" name="attachToBody" type="Boolean" default="false" description="Move the target up to HTML body level to make sure it is not blocked by others. "/>
-    <aura:attribute name="referenceElement" type="Object" description="The reference node which this target list should be positioned to. Usually it is a trigger element." />
+	<aura:attribute access="GLOBAL" name="closeOnTabKey" type="Boolean" default="true" description="Indicates whether to close the target list on tab key or not." />
+	<aura:attribute access="GLOBAL" name="autoPosition" type="Boolean" default="true" description="Move the popup target up when there is not enough space at the bottom to display. Note: even if autoPosition is set to false, popup will still position the menu relative to the trigger. To override default positioning, use manualPosition attribute."/>
 	<aura:attribute access="GLOBAL" name="curtain" type="Boolean" default="false" description="Whether or not to apply an overlay under the target." />
 	<aura:attribute access="GLOBAL" name="closeOnClickOutside" type="Boolean" default="true" description="Close target when user clicks or taps outside of the target" />
+
+	<aura:attribute access="PRIVILEGED" name="attachToBody" type="Boolean" default="false" description="Move the target up to HTML body level to make sure it is not blocked by others. "/>
+
+    <aura:attribute name="visible" type="Boolean" default="false" description="Controls the visibility of the popup target. The default is false, which hides the menu."/>
+	<aura:attribute name="manualPosition" type="Boolean" default="false" description="Flag to override auto position." />
+    <aura:attribute name="smartAttachToBody" type="Boolean" default="false" description="Move the target up to HTML body level to make sure it is not blocked by others. "/>
+    <aura:attribute name="referenceElement" type="Object" description="The reference node which this target list should be positioned to. Usually it is a trigger element." />
 	<aura:attribute name="closeOnClickInside" type="Boolean" default="false" description="Close target when user clicks or taps inside of the target" />
 	<aura:attribute name="preTransitionClass" type="String" default="" description="This CSS class is initially applied to the target then removed prior to toggling the visible class. This is to allow for CSS transitions." />
 

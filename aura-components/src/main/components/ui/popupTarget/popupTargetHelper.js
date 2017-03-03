@@ -150,9 +150,10 @@
                     var referenceElemRect = target.getBoundingClientRect();
                     var horizontalCornerAlignment = this.rightCornerFitsInViewport(viewPort, elemRect, referenceElemRect) ? "left" : "right";
                     var verticalCornerAlignment = this.bottomCornerFitsInViewport(viewPort, elemRect, referenceElemRect) ? "top" : "bottom";
-                    component._constraint = component.positionConstraint = this.lib.panelPositioning.createRelationship({
+                    component._constraint = this.lib.panelPositioning.createRelationship({
                         element: element,
                         target: target,
+                        scrollableParentBound: true,
                         align: horizontalCornerAlignment + " " + verticalCornerAlignment,
                         targetAlign: horizontalCornerAlignment + " " + (verticalCornerAlignment === "top" ? "bottom" : "top"),
                         padTop: 2

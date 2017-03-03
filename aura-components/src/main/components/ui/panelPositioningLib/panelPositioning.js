@@ -31,7 +31,7 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
     var timeoutId = 0;
 
     var repositionCallbacks = [];
-    
+
 
     var directionMap = {
         vert: {
@@ -52,8 +52,8 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
     }
 
 
-    function dispatchRespositionCallbacks() {
-        while(repositionCallbacks.length > 0) {
+    function dispatchRepositionCallbacks() {
+        while (repositionCallbacks.length > 0) {
             repositionCallbacks.shift()();
         }
     }
@@ -63,10 +63,10 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
         var toSplice = [];
 
         // all the callbacks will be called
-        if(typeof callback === 'function') {
+        if (typeof callback === 'function') {
             repositionCallbacks.push(callback);
         }
-        
+
 
         // this is for throttling
         clearTimeout(timeoutId);
@@ -76,14 +76,14 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
         // this semaphore is to make sure
         // if reposition is called twice within one frame
         // we only run this once
-        if(!repositionScheduled) {
-            w.requestAnimationFrame(function() {
+        if (!repositionScheduled) {
+            w.requestAnimationFrame(function () {
                 repositionScheduled = false;
 
                 // this must be executed in order or constraints
                 // will behave oddly
                 for (var i = 0; i < constraints.length; i++) {
-                     if(!constraints[i].destroyed) {
+                    if (!constraints[i].destroyed) {
                         constraints[i].updateValues();
                         constraints[i].reposition();
                     } else {
@@ -92,12 +92,12 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
                     }
                 }
 
-                while(toSplice.length > 0) {
+                while (toSplice.length > 0) {
                     constraints.splice(toSplice.pop(), 1);
                 }
 
                 elementProxyFactory.bakeOff();
-                dispatchRespositionCallbacks();
+                dispatchRepositionCallbacks();
             });
             repositionScheduled = true;
         }
@@ -109,7 +109,7 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
     // that should still support 30fps updates
     // on most machines
     function handleRepositionEvents() {
-        if(timeoutId === 0) {
+        if (timeoutId === 0) {
             timeoutId = setTimeout(reposition, 10);
         }
     }
@@ -133,12 +133,12 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
     function containsScrollingElement(list) {
         var len = list.length;
 
-        if(!len) {
+        if (!len) {
             return false;
         }
 
         for (var i = 0; i < len; i++) {
-            if(isScrolling(list[i])) {
+            if (isScrolling(list[i])) {
                 return true;
             }
         }
@@ -152,29 +152,34 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
         /**
          * Create a positioning relationship
          * @param  {Object} config
-         * @property {HTMLElement} config.element The element being positioned
-         * @property {HTMLElement} config.target The target element
-         * @property {Sring} config.type The type of constraint, options:
+         * @property {HTMLElement} config.element       The element being positioned
+         * @property {HTMLElement} config.target        The target element
+         * @property {String}      config.type          The type of constraint, options:
          *                               default: position the element based on align and target align properties
-         *                               bounding box: position the elment inside the target
-         * @property {Number} config.pad A number (in pixels) to pad the constraint. (default is 0)
-         *  * @property {Number} config.topPad A number (in pixels) to pad only top top constraint.
-         * @property {Boolean} config.enable If enable is false the constraint will have no effect. (default is true)
-         * @property {String} config.align How to align the element being positioned. This can have one or two words the first specifies
-         *                          the vertical alignment, the second the horizontal alignments.
-         *                          acceptable values: right, left, center
-         * @property {String} config.targetAlign where on the target to align to.
-         * @property {Boolean} config.appendToDom If true, config.element will be appended to document.body
-         *                                               (removed from current context)
+         *                                        (and bound by modal if modalBound is specified)
+         *                               bounding box: position the element inside the target
+         *
+         * @property {Boolean}     config.enable        If enable is false the constraint will have no effect. (default is true)
+         * @property {Number}      config.pad           A number (in pixels) to pad the constraint. (default is 0)
+         * @property {Number}      config.topPad        A number (in pixels) to pad only top top constraint.
+         * @property {String}      config.align         How to align the element being positioned. This can have one or two words the first specifies
+         *                               the vertical alignment, the second the horizontal alignments.
+         *                               acceptable values: right, left, center
+         *
+         * @property {String}      config.targetAlign   Where on the target to align to.
+         * @property {Boolean}     config.appendToDom   If true, config.element will be appended to document.body (removed from current context)
+
+         * @property {Boolean}     config.scrollableParentBound    If true, config.element will be constrained to the immediate parent modal.
          *
          * @return {Object} constraintHandle
+         *
          * @property {Function} constraintHandle.disable Disable the constraint
          * @property {Function} constraintHandle.enable Enable the constraint
          * @property {Function} constraintHandle.destroy Destroy the constraint, cleaning up
          *                                               element references.
          */
-    	createRelationship: function(config) {
-            if(!eventsBound) {
+        createRelationship: function (config) {
+            if (!eventsBound) {
                 bindEvents();
             }
 
@@ -189,19 +194,19 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
             // This observer and the test for scrolling children 
             // is so that if a panel contains a scrol we do not 
             // proxy the events to the "parent"  (actually the target's parent)
-            if(w.MutationObserver) { // phantomjs :(
+            if (w.MutationObserver) { // phantomjs :(
 
                 var scrollableChildren = domHandle.querySelectorAll('[data-scoped-scroll="true"]');
 
 
-                observer = new MutationObserver(function() {
+                observer = new MutationObserver(function () {
                     scrollableChildren = domHandle.querySelectorAll('[data-scoped-scroll="true"]');
 
                     proxyWheelEvents = !containsScrollingElement(scrollableChildren);
 
                 });
 
-                if(containsScrollingElement(scrollableChildren)) {
+                if (containsScrollingElement(scrollableChildren)) {
                     proxyWheelEvents = false;
                 }
 
@@ -214,7 +219,7 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
             }
 
 
-            if(scrollableParent) {
+            if (scrollableParent) {
                 // because this always uses the same listener function
                 // it will not be added multiple times to the same element
                 scrollableParent.addEventListener('scroll', handleRepositionEvents);
@@ -223,8 +228,8 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
                 // scrollable element, we need to make sure
                 // scroll events move that element,
                 // not the parent, also we need to reposition on scroll
-                handleWheel = function(e) {
-                    if(proxyWheelEvents && scrollableParent && typeof scrollableParent.scrollTop !== 'undefined') {
+                handleWheel = function (e) {
+                    if (proxyWheelEvents && scrollableParent && typeof scrollableParent.scrollTop !== 'undefined') {
                         scrollableParent.scrollTop += e.deltaY;
                     }
                 };
@@ -235,31 +240,30 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
             $A.assert(config.element && isDomNode(config.element), 'Element is undefined or missing');
             $A.assert(config.target && (utils.isWindow(config.target) || isDomNode(config.target)), 'Target is undefined or missing');
 
-            if(config.appendToBody) {
+            if (config.appendToBody) {
                 document.body.appendChild(config.element);
             }
 
-            if(config.align) {
+            if (config.align) {
                 $A.assert(!!config.align.match(ALIGN_REGEX), 'Invalid align string');
             }
-            if(!config.type && config.targetAlign) {
+            if (!config.type && config.targetAlign) {
                 $A.assert(!!config.targetAlign.match(ALIGN_REGEX), 'Invalid targetAlign string');
             }
 
 
-
             config.element = elementProxyFactory.getElement(config.element);
             config.target = elementProxyFactory.getElement(config.target);
-            if(!config.type) {
+            if (!config.type) {
                 $A.assert(config.align, 'Required align string missing');
                 var constraintDirections = config.align.split(/\s/);
                 var vertConfig = $A.util.copy(config);
-                
+
                 //the vertical config is exactly the same, except if there is a topPad we use that value for pad
-                if(vertConfig.padTop !== undefined) {
+                if (vertConfig.padTop !== undefined) {
                     vertConfig.pad = vertConfig.padTop;
                 }
-                
+
                 constraintList.push(new Constraint(directionMap.horiz[constraintDirections[0]], config));
                 constraintList.push(new Constraint(directionMap.vert[constraintDirections[1]], vertConfig));
 
@@ -267,36 +271,44 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
                 constraintList.push(new Constraint(config.type, config));
             }
 
-
-
+            if (config.scrollableParentBound && scrollableParent) {
+                var boxConfig = {
+                    element: config.element,
+                    enabled: config.enabled,
+                    target: elementProxyFactory.getElement(scrollableParent),
+                    type: 'bounding box',
+                    pad: 5,
+                    boxDirections: {top: true, bottom: true, left: true, right: true}
+                };
+                constraintList.push(new Constraint(boxConfig.type, boxConfig));
+            }
 
             constraints = constraints.concat(constraintList);
             reposition();
 
-
-    		return (function() {
+            return (function () {
 
 
                 return {
 
-                    disable: function() {
-                        constraintList.forEach(function(constraintToDisable) {
+                    disable: function () {
+                        constraintList.forEach(function (constraintToDisable) {
                             constraintToDisable.detach();
                         });
                     },
 
-                    enable: function() {
-                        constraintList.forEach(function(constraintToEnable) {
+                    enable: function () {
+                        constraintList.forEach(function (constraintToEnable) {
                             constraintToEnable.attach();
                         });
                     },
 
-                    destroy: function() {
-                        if(scrollableParent) {
+                    destroy: function () {
+                        if (scrollableParent) {
                             scrollableParent.removeEventListener('scroll', handleRepositionEvents);
                         }
-                        
-                        while(constraintList.length > 0) {
+
+                        while (constraintList.length > 0) {
                             constraintList.pop().destroy();
                         }
                     }
@@ -304,9 +316,9 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
 
             })();
 
-    	},
+        },
 
-    	reposition: reposition
+        reposition: reposition
     };
 
 }

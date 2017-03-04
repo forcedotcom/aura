@@ -270,11 +270,7 @@ ExpressionComponent.prototype["renderer"] = {
     },
 
     "unrender" : function(component) {
-        var value=component.get("v.value");
-        if(!($A.util.isComponent(value)||$A.util.isArray(value))){
-            value=null;
-        }
-        $A.renderingService.unrenderFacet(component,value);
+        $A.renderingService.unrenderFacet(component);
         if (component._lastRenderedTextNode) {
             component._lastRenderedTextNode.destroy();
             delete component._lastRenderedTextNode;

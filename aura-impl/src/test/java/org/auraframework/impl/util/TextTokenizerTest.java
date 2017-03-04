@@ -18,7 +18,6 @@ package org.auraframework.impl.util;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
-import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
@@ -125,37 +124,6 @@ public class TextTokenizerTest extends AuraImplTestCase {
     }
 
     @Test
-    public void testWhitespacePreserve() throws Exception {
-        String[] descNames = new String[] { //
-        		"text", //
-                "expression", //
-                "text", //
-                "expression", //
-                "text" };
-        String[] testResults = new String[] { //
-        		"[value=     ]", //
-                "[value=org.auraframework.impl.expression.LiteralImpl", //
-                "[value=     ]", //
-                "[value=org.auraframework.impl.expression.LiteralImpl", //
-                "[value=     five spaces]" };
-
-        ComponentDefHandler cdh = new ComponentDefHandler(null, null, null, true, definitionService, contextService,
-                configAdapter, definitionParserAdapter);
-        List<ComponentDefRef> compList = TextTokenizer.tokenize(testWhitespace, null, WhitespaceBehavior.PRESERVE)
-                .asComponentDefRefs(cdh);
-        assertEquals("Wrong number of ComponentDefRefs returned", descNames.length, compList.size());
-        int i = 0;
-        for (ComponentDefRef cdf : compList) {
-            assertEquals("Wrong Token Type", descNames[i], cdf.getName());
-            Set<Entry<DefDescriptor<AttributeDef>, AttributeDefRef>> attributes = cdf.getAttributeValues().entrySet();
-            // Truncate at expected result size
-            String test = attributes.toString().substring(0, testResults[i].length());
-            assertEquals("Did not preserve whitespace", testResults[i], test);
-            i++;
-        }
-    }
-
-    @Test
     public void testWhitespaceOptimize() throws Exception {
         String[] descNames = new String[] { "expression", "expression", "text" };
         String[] testResults = new String[] { "[value=org.auraframework.impl.expression.LiteralImpl",
@@ -163,8 +131,7 @@ public class TextTokenizerTest extends AuraImplTestCase {
 
         ComponentDefHandler cdh = new ComponentDefHandler(null, null, null, true, definitionService, contextService,
                 configAdapter, definitionParserAdapter);
-        List<ComponentDefRef> compList = TextTokenizer.tokenize(testWhitespace, null, WhitespaceBehavior.OPTIMIZE)
-                .asComponentDefRefs(cdh);
+        List<ComponentDefRef> compList = TextTokenizer.tokenize(testWhitespace, null).asComponentDefRefs(cdh);
         assertEquals("Wrong number of ComponentDefRefs returned", descNames.length, compList.size());
         int i = 0;
         for (ComponentDefRef cdf : compList) {

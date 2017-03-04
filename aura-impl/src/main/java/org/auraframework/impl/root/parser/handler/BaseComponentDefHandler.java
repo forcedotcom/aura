@@ -25,7 +25,6 @@ import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -83,7 +82,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
     private static final String ATTRIBUTE_RENDERER = "renderer";
     private static final String ATTRIBUTE_MODEL = "model";
     private static final String ATTRIBUTE_CONTROLLER = "controller";
-    private static final String ATTRIBUTE_WHITESPACE = "whitespace";
     private static final String ATTRIBUTE_DEFAULT_FLAVOR = "defaultFlavor";
     private static final String ATTRIBUTE_DYNAMICALLY_FLAVORABLE = "dynamicallyFlavorable";
 
@@ -95,8 +93,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
     protected static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
             ATTRIBUTE_RENDER, ATTRIBUTE_TEMPLATE, ATTRIBUTE_PROVIDER,
             ATTRIBUTE_STYLE, ATTRIBUTE_HELPER, ATTRIBUTE_RENDERER,
-            ATTRIBUTE_WHITESPACE, ATTRIBUTE_DEFAULT_FLAVOR,
-            ATTRIBUTE_DYNAMICALLY_FLAVORABLE)
+            ATTRIBUTE_DEFAULT_FLAVOR, ATTRIBUTE_DYNAMICALLY_FLAVORABLE)
             .addAll(ALLOWED_ATTRIBUTES).addAll(RootTagHandler.INTERNAL_ALLOWED_ATTRIBUTES)
             .build();
 
@@ -278,12 +275,9 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
         String text = xmlReader.getText();
-        boolean skip = getWhitespaceBehavior() == WhitespaceBehavior.OPTIMIZE ? AuraTextUtil
-                .isNullEmptyOrWhitespace(text) : AuraTextUtil
-                .isNullOrEmpty(text);
+        boolean skip = AuraTextUtil.isNullEmptyOrWhitespace(text);
         if (!skip) {
-            TextTokenizer tokenizer = TextTokenizer.tokenize(text,
-                    getLocation(), getWhitespaceBehavior());
+            TextTokenizer tokenizer = TextTokenizer.tokenize(text, getLocation());
             body.addAll(tokenizer.asComponentDefRefs(this));
         }
     }
@@ -455,10 +449,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
 
             builder.render = getAttributeValue(ATTRIBUTE_RENDER);
 
-            String whitespaceVal = getAttributeValue(ATTRIBUTE_WHITESPACE);
-            builder.whitespaceBehavior = whitespaceVal == null ? WhitespaceBehavior.OPTIMIZE
-                    : WhitespaceBehavior.valueOf(whitespaceVal.toUpperCase());
-
             builder.setAccess(readAccessAttribute());
 
             String defaultFlavor = getAttributeValue(ATTRIBUTE_DEFAULT_FLAVOR);
@@ -476,16 +466,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
 
     public void setRender(String val) {
         builder.render = val;
-    }
-
-    @Override
-    public void setWhitespaceBehavior(WhitespaceBehavior val) {
-        builder.whitespaceBehavior = val;
-    }
-
-    @Override
-    public WhitespaceBehavior getWhitespaceBehavior() {
-        return builder.whitespaceBehavior;
     }
 
     public SubDefDescriptor<ComponentDef, T> createSubComponentDefDescriptor(

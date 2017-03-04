@@ -17,7 +17,6 @@ package org.auraframework.builder;
 
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseComponentDef.RenderType;
-import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
@@ -57,8 +56,6 @@ public interface BaseComponentDefBuilder<T extends BaseComponentDef> extends Roo
     BaseComponentDefBuilder<T> addInterfaceDef(InterfaceDef interfaceDef);
 
     BaseComponentDefBuilder<T> setRenderType(RenderType renderType);
-
-    BaseComponentDefBuilder<T> setWhitespaceBehavior(WhitespaceBehavior whitespaceBehavior);
 
     BaseComponentDefBuilder<T> setFacet(String key, Object value);
 

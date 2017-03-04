@@ -21,7 +21,6 @@ import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -91,7 +90,6 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
     protected List<AttributeDefRef> facets;
     protected Set<PropertyReference> expressionRefs;
     protected String render;
-    protected WhitespaceBehavior whitespaceBehavior;
     protected List<DependencyDef> dependencies;
     @Mock
     protected DefDescriptor<ControllerDef> mockControllerDesc;
@@ -232,7 +230,6 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
         builder.facets = this.facets;
         builder.expressionRefs = this.expressionRefs;
         builder.render = this.render;
-        builder.setWhitespaceBehavior(this.whitespaceBehavior);
         builder.dependencies = this.dependencies;
         return super.buildDefinition(builder);
     }

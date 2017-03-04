@@ -157,19 +157,6 @@ public interface BaseComponentDef extends RootDefinition, HasJavascriptReference
 
     boolean hasLocalDependencies() throws QuickFixException;
 
-    public static enum WhitespaceBehavior {
-        /**
-         * < keep or eliminate insignificant whitespace as the framework determines is best
-         */
-        OPTIMIZE,
-        /** < treat all whitespace as significant, hence preserving it */
-        PRESERVE
-    };
-
-    public static final WhitespaceBehavior DefaultWhitespaceBehavior = WhitespaceBehavior.OPTIMIZE;
-
-    WhitespaceBehavior getWhitespaceBehavior();
-
     /**
      * Adds specified client libraries to definition
      *

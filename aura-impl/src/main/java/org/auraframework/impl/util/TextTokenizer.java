@@ -18,8 +18,6 @@ package org.auraframework.impl.util;
 import com.google.common.collect.Sets;
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.expression.Expression;
@@ -80,20 +78,14 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
     private final List<Token> tokens = new ArrayList<>();
     private final Location location;
     private final String text;
-    private final WhitespaceBehavior whitespaceBehavior;
 
     public static TextTokenizer tokenize(String value, Location location) throws AuraValidationException {
-        return tokenize(value, location, BaseComponentDef.DefaultWhitespaceBehavior);
-    }
-
-    public static TextTokenizer tokenize(String value, Location location, WhitespaceBehavior whitespaceBehavior)
-            throws AuraValidationException {
-        TextTokenizer tokenizer = new TextTokenizer(value, location, whitespaceBehavior);
+        TextTokenizer tokenizer = new TextTokenizer(value, location);
         tokenizer.doTokenize();
         return tokenizer;
     }
 
-    private TextTokenizer(String text, Location location, WhitespaceBehavior whitespaceBehavior) {
+    private TextTokenizer(String text, Location location) {
         if (text != null && !text.isEmpty()) {
             String trimmedValue = text.trim();
             if (trimmedValue.isEmpty()) {
@@ -103,7 +95,6 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
 
         this.text = text;
         this.location = location;
-        this.whitespaceBehavior = whitespaceBehavior;
     }
 
     /**
@@ -290,8 +281,7 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
                 throws AuraValidationException {
             Object value = createValue(cmpHandler);
 
-            boolean IsUndesiredWhitespace = (whitespaceBehavior == WhitespaceBehavior.OPTIMIZE)
-                    && (value instanceof String && ((String) value).trim().length() == 0);
+            boolean IsUndesiredWhitespace = (value instanceof String && ((String) value).trim().length() == 0);
 
             if (value == null || IsUndesiredWhitespace) {
                 return null;

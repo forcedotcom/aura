@@ -17,8 +17,6 @@ package org.auraframework.impl.root.parser.handler;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.DefinitionReference.Load;
@@ -51,7 +49,6 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
     public static final String SCRIPT_TAG = "script";
     public static final String ATTRIBUTE_ACCESS = "access";
     protected final boolean isInInternalNamespace;
-    protected WhitespaceBehavior whitespaceBehavior = BaseComponentDef.DefaultWhitespaceBehavior;
     protected DefDescriptor<T> defDescriptor;
 
     protected final ConfigAdapter configAdapter;
@@ -105,14 +102,6 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
 
     public final T getErrorElement() throws QuickFixException {
         return createDefinition();
-    }
-
-    public WhitespaceBehavior getWhitespaceBehavior() {
-        return whitespaceBehavior;
-    }
-
-    public void setWhitespaceBehavior(WhitespaceBehavior val) {
-        whitespaceBehavior = val;
     }
 
     protected DefinitionAccess readAccessAttribute() throws InvalidAccessValueException {

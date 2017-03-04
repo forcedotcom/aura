@@ -124,7 +124,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
 
     private final RenderType render;
-    private final WhitespaceBehavior whitespaceBehavior;
 
     private final List<DependencyDef> dependencies;
     private final List<ClientLibraryDef> clientLibraries;
@@ -164,7 +163,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.clientLibraries = AuraUtil.immutableList(builder.clientLibraries);
         this.locatorDefs = AuraUtil.immutableMap(builder.locatorDefs);
         this.render = builder.renderType;
-        this.whitespaceBehavior = builder.whitespaceBehavior;
         this.designDefDescriptor = builder.designDefDescriptor;
         this.svgDefDescriptor = builder.svgDefDescriptor;
         this.defaultFlavor = builder.defaultFlavor;
@@ -1337,7 +1335,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         public Set<PropertyReference> expressionRefs;
 
         public String render;
-        public WhitespaceBehavior whitespaceBehavior;
         public List<DependencyDef> dependencies;
         public List<ClientLibraryDef> clientLibraries;
         private RenderType renderType;
@@ -1422,12 +1419,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         @Override
         public Builder<T> setRenderType(RenderType renderType) {
             this.render = renderType.name();
-            return this;
-        }
-
-        @Override
-        public Builder<T> setWhitespaceBehavior(WhitespaceBehavior whitespaceBehavior) {
-            this.whitespaceBehavior = whitespaceBehavior;
             return this;
         }
 
@@ -1723,11 +1714,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     @Override
     public RenderType getRender() {
         return render;
-    }
-
-    @Override
-    public WhitespaceBehavior getWhitespaceBehavior() {
-        return whitespaceBehavior;
     }
 
     // TODO: Separate Java/JS in distinct class fields. The current system is too ambiguous.

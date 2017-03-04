@@ -28,7 +28,6 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseComponentDef.RenderType;
-import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ControllerDef;
@@ -1073,54 +1072,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         assertFalse("A component which wishes to be rendered client side can be locally renderable?",
                 clientRenderedComponentDef.isLocallyRenderable());
 
-    }
-
-    /**
-     * InvalidDefinitionException thrown for invalid whitespace attribute.
-     */
-    @Test
-    public void testWhitespaceInvalid() throws QuickFixException {
-        try {
-            define(baseTag, " whitespace='bogus'", "");
-            fail("IllegalArgumentException should have been thrown for bad whitespace value.");
-        } catch (Exception e) {
-            checkExceptionRegex(e, InvalidDefinitionException.class,
-                    "No enum const(ant)? (class )?org\\.auraframework\\.def\\.BaseComponentDef.WhitespaceBehavior\\.BOGUS");
-        }
-    }
-
-    /**
-     * Verify the whitespace attribute specified on a component tag. By default the whitespace logic is optimize, which
-     * removes all non-necessary whitespace. Test method for
-     * {@link org.auraframework.def.BaseComponentDef#getWhitespaceBehavior()}.
-     */
-    @Test
-    public void testGetWhitespaceDefault() throws QuickFixException {
-        WhitespaceBehavior defaultWhitespaceBehavior = define(baseTag, "", "").getWhitespaceBehavior();
-        assertEquals("By default, whitespace optimize should be true.", BaseComponentDef.DefaultWhitespaceBehavior,
-                defaultWhitespaceBehavior);
-    }
-
-    /**
-     * Verify the whitespace attribute specified as preserve. Test method for
-     * {@link org.auraframework.def.BaseComponentDef#getWhitespaceBehavior()}.
-     */
-    @Test
-    public void testGetWhitespacePreserve() throws QuickFixException {
-        T preserveWhitespaceComponentDef = define(baseTag, " whitespace='preserve'", "");
-        assertEquals("Whitespace behavior was expected to be forced to be preserve.", WhitespaceBehavior.PRESERVE,
-                preserveWhitespaceComponentDef.getWhitespaceBehavior());
-    }
-
-    /**
-     * Verify the whitespace attribute specified as optimize. Test method for
-     * {@link org.auraframework.def.BaseComponentDef#getWhitespaceBehavior()}.
-     */
-    @Test
-    public void testGetWhitespaceOptimize() throws QuickFixException {
-        T optimizeWhitespaceComponentDef = define(baseTag, " whitespace='optimize'", "");
-        assertEquals("Whitespace behavior was expected to be forced to be optimize.", WhitespaceBehavior.OPTIMIZE,
-                optimizeWhitespaceComponentDef.getWhitespaceBehavior());
     }
 
     /**

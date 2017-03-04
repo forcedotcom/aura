@@ -21,6 +21,7 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.TypeDef;
+import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
@@ -289,6 +290,11 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
     @Test
     public void testFunkyDescriptor() {
         definitionService.getDefDescriptor("layout://rl-Case-EDIT-FULL-----_1-0-6c5936744658364d59726d6c6a4d7a31654d697872673d3d.c", ComponentDef.class);
+    }
+
+    @Test
+    public void testHyphenUnderscoreInName() throws Exception {
+        definitionService.getDefDescriptor("markup://test:hyphened-underscored_name-component", ModuleDef.class);
     }
 
 }

@@ -2741,7 +2741,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     url = this._host + "/aura?r=" + marker;
 
     //#if {"excludeModes" : ["PRODUCTION"]}
-    url = this._host + "/aura?" + this.buildActionNameList(actionsToSend);
+    url = url + "&" + this.buildActionNameList(actionsToSend);
     //#end
 
     auraXHR.background = options && options.background;

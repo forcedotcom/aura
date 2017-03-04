@@ -149,7 +149,6 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         TESTCASE(TestCaseDef.class), //
         PROVIDER(ProviderDef.class), //
         REQUIRED_VERSION(RequiredVersionDef.class), //
-        RESOURCE(ResourceDef.class),
         DESIGN(DesignDef.class),
         ATTRIBUTE_DESIGN(DesignAttributeDef.class),
         DESIGN_TEMPLATE(DesignTemplateDef.class),

@@ -143,7 +143,6 @@ public class DescriptorFileMapper {
         addExtension("Provider.js", NameFormat.BUNDLE, "js", DefType.PROVIDER, Format.JS);
         addExtension("Helper.js", NameFormat.BUNDLE, "js", DefType.HELPER, Format.JS);
         addExtension("Model.js", NameFormat.BUNDLE, "js", DefType.MODEL, Format.JS);
-        addExtension("Resource.js", NameFormat.BUNDLE, "js", DefType.RESOURCE, Format.JS);
         addExtension("Test.js", NameFormat.BUNDLE, "js", DefType.TESTSUITE, Format.JS);
         addExtension(".js", NameFormat.BUNDLED_EXTRA, "js", DefType.INCLUDE, Format.JS, DefType.LIBRARY);
 
@@ -151,7 +150,6 @@ public class DescriptorFileMapper {
         addExtension("Flavors.css", NameFormat.BUNDLE, DefDescriptor.CSS_PREFIX, DefType.FLAVORED_STYLE, Format.CSS);
         addExtension(".css", NameFormat.BUNDLE, "templateCss", DefType.STYLE, Format.TEMPLATE_CSS);
         addExtension(".css", NameFormat.BUNDLE, "css", DefType.STYLE, Format.CSS);
-        addExtension("Resource.css", NameFormat.BUNDLE, "css", DefType.RESOURCE, Format.CSS);
     }
 
     public static DefDescriptor<? extends Definition> getDescriptor(String filename) {

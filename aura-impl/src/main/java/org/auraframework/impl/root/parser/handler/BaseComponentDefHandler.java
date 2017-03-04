@@ -39,7 +39,6 @@ import org.auraframework.def.MethodDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.RequiredVersionDef;
-import org.auraframework.def.ResourceDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.design.DesignDef;
@@ -377,12 +376,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                 }
             }
 
-            DefDescriptor<ResourceDef> jsResourceDescriptor = definitionService
-                    .getDefDescriptor(jsDescriptorName, ResourceDef.class);
-            if (definitionService.exists(jsResourceDescriptor)) {
-                builder.addResource(jsResourceDescriptor.getQualifiedName());
-            }
-
             // See if there is a style that has the same qname.
             String styleName = getAttributeValue(ATTRIBUTE_STYLE);
             if (AuraTextUtil.isNullEmptyOrWhitespace(styleName)) {
@@ -393,12 +386,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                     styleName, StyleDef.class);
             if (definitionService.exists(cssDescriptor)) {
                 builder.styleDescriptor = cssDescriptor;
-            }
-
-            DefDescriptor<ResourceDef> cssResourceDescriptor = definitionService.getDefDescriptor(styleName,
-                    ResourceDef.class);
-            if (definitionService.exists(cssResourceDescriptor)) {
-                builder.addResource(cssResourceDescriptor.getQualifiedName());
             }
 
             // see if there is a flavored style def that has the same qname

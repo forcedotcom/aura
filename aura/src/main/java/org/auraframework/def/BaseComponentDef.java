@@ -15,7 +15,10 @@
  */
 package org.auraframework.def;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.expression.PropertyReference;
@@ -29,10 +32,27 @@ public interface BaseComponentDef extends RootDefinition, HasJavascriptReference
     @Override
     DefDescriptor<? extends BaseComponentDef> getDescriptor();
 
+    /**
+     * is the component extensible?
+     *
+     * @return true if this component can be extended
+     */
     boolean isExtensible();
 
+    /**
+     * Is this component abstract.
+     *
+     * @return true if this component cannot be instantiated.
+     */
     boolean isAbstract();
 
+    /**
+     * Is this component a template.
+     *
+     * FIXME: this should really be a different type.
+     *
+     * @return true if this component is a template.
+     */
     boolean isTemplate();
 
     /**
@@ -76,6 +96,9 @@ public interface BaseComponentDef extends RootDefinition, HasJavascriptReference
      */
     Map<String, LocatorDef> getLocators();
 
+    /**
+     * Get a server side model descriptor.
+     */
     DefDescriptor<ModelDef> getLocalModelDefDescriptor();
 
     List<DefDescriptor<ModelDef>> getModelDefDescriptors()
@@ -154,8 +177,6 @@ public interface BaseComponentDef extends RootDefinition, HasJavascriptReference
      */
     void addClientLibs(List<ClientLibraryDef> clientLibs);
 
-    Set<ResourceDef> getResourceDefs() throws QuickFixException;
-
     /**
      * Gets the default flavor name, or if an explicit defaultFlavor is not specified, and a {@link FlavoredStyleDef}
      * exists in the bundle with a flavor named "default", then "default" will be returned.
@@ -199,8 +220,8 @@ public interface BaseComponentDef extends RootDefinition, HasJavascriptReference
      */
     Set<String> getAllFlavorNames() throws QuickFixException;
 
-	ControllerDef getRemoteControllerDef() throws QuickFixException;
-	HelperDef getRemoteHelperDef() throws QuickFixException;
-	ProviderDef getRemoteProviderDef() throws QuickFixException;
-	RendererDef getRemoteRendererDef() throws QuickFixException;
+    ControllerDef getRemoteControllerDef() throws QuickFixException;
+    HelperDef getRemoteHelperDef() throws QuickFixException;
+    ProviderDef getRemoteProviderDef() throws QuickFixException;
+    RendererDef getRemoteRendererDef() throws QuickFixException;
 }

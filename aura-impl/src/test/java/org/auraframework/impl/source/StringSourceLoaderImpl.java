@@ -110,7 +110,7 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
             DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT, DefType.LIBRARY,
             DefType.INCLUDE, DefType.INTERFACE, DefType.CONTROLLER,
             DefType.HELPER, DefType.RENDERER, DefType.STYLE,
-            DefType.TESTSUITE, DefType.RESOURCE, DefType.DESIGN, DefType.FLAVORED_STYLE);
+            DefType.TESTSUITE, DefType.DESIGN, DefType.FLAVORED_STYLE);
 
     /**
      * A counter that we can use to guarantee unique names across multiple calls to add a source.

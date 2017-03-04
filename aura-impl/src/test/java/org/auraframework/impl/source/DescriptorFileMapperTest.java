@@ -172,15 +172,6 @@ public class DescriptorFileMapperTest extends AuraImplTestCase {
     }
 
     @Test
-    public void testJavascriptResource() {
-        DefDescriptor<?> desc = DescriptorFileMapper.getDescriptor("/foo/bar/namespace/name/nameResource.js");
-        assertNotNull(desc);
-        assertEquals("namespace", desc.getNamespace());
-        assertEquals("name", desc.getName());
-        assertEquals(DefType.RESOURCE, desc.getDefType());
-    }
-
-    @Test
     public void testJavascriptTestDescriptor() {
         DefDescriptor<?> desc = DescriptorFileMapper.getDescriptor("/foo/bar/namespace/name/nameTest.js");
         assertNotNull(desc);
@@ -225,16 +216,6 @@ public class DescriptorFileMapperTest extends AuraImplTestCase {
         assertEquals("namespace", desc.getNamespace());
         assertEquals("name", desc.getName());
         assertEquals(DefType.STYLE, desc.getDefType());
-    }
-
-    @Test
-    public void testResourceCss() {
-        DefDescriptor<?> desc = DescriptorFileMapper.getDescriptor("/foo/bar/namespace/name/nameResource.css");
-        assertNotNull(desc);
-        assertEquals(DefDescriptor.CSS_PREFIX, desc.getPrefix());
-        assertEquals("namespace", desc.getNamespace());
-        assertEquals("name", desc.getName());
-        assertEquals(DefType.RESOURCE, desc.getDefType());
     }
 
     @Test

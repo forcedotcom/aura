@@ -157,7 +157,6 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
         case HELPER:
         case STYLE:
         case FLAVORED_STYLE:
-        case RESOURCE:
         case TYPE:
         case PROVIDER:
         case TOKEN_DESCRIPTOR_PROVIDER:

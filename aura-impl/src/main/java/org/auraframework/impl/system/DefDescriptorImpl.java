@@ -96,7 +96,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case HELPER:
             case STYLE:
             case FLAVORED_STYLE:
-            case RESOURCE:
             case TYPE:
             case PROVIDER:
             case TOKEN_DESCRIPTOR_PROVIDER:

@@ -127,7 +127,6 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             DefType.MODEL,
             DefType.PROVIDER,
             DefType.RENDERER,
-            DefType.RESOURCE,
             DefType.STYLE,
             DefType.SVG,
             DefType.TESTSUITE,

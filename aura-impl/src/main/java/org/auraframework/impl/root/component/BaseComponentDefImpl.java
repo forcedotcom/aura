@@ -59,7 +59,6 @@ import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.RequiredVersionDef;
-import org.auraframework.def.ResourceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
@@ -109,7 +108,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     private final DefDescriptor<FlavoredStyleDef> flavoredStyleDescriptor;
     private final List<DefDescriptor<RendererDef>> rendererDescriptors;
     private final List<DefDescriptor<HelperDef>> helperDescriptors;
-    private final List<DefDescriptor<ResourceDef>> resourceDescriptors;
     private final DefDescriptor<ControllerDef> compoundControllerDescriptor;
     private final DefDescriptor<DesignDef> designDefDescriptor;
     private final DefDescriptor<SVGDef> svgDefDescriptor;
@@ -158,7 +156,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.flavoredStyleDescriptor = builder.flavoredStyleDescriptor;
         this.rendererDescriptors = builder.rendererDescriptors;
         this.helperDescriptors = builder.helperDescriptors;
-        this.resourceDescriptors = builder.resourceDescriptors;
         this.isAbstract = builder.isAbstract;
         this.isExtensible = builder.isExtensible;
         this.isTemplate = builder.isTemplate;
@@ -182,7 +179,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             this.compoundControllerDescriptor = null;
         }
         this.hashCode = AuraUtil.hashCode(super.hashCode(), events, controllerDescriptors, modelDefDescriptor,
-                extendsDescriptor, interfaces, methodDefs, providerDescriptors, rendererDescriptors, helperDescriptors, resourceDescriptors,
+                extendsDescriptor, interfaces, methodDefs, providerDescriptors, rendererDescriptors, helperDescriptors,
                 imports);
     }
 
@@ -588,10 +585,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             dependencies.addAll(helperDescriptors);
         }
 
-        if (resourceDescriptors != null) {
-            dependencies.addAll(resourceDescriptors);
-        }
-
         if (styleDescriptor != null) {
             dependencies.add(styleDescriptor);
         }
@@ -637,18 +630,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     @Override
     public void addClientLibs(List<ClientLibraryDef> clientLibs) {
         clientLibs.addAll(this.clientLibraries);
-    }
-
-    @Override
-    public Set<ResourceDef> getResourceDefs() throws QuickFixException {
-        Set<ResourceDef> resourceDefs = Sets.newHashSet();
-        for (DefDescriptor<ResourceDef> resourceDesc : this.resourceDescriptors) {
-            if (resourceDesc.getDef() != null) {
-                resourceDefs.add(resourceDesc.getDef());
-            }
-        }
-
-        return resourceDefs;
     }
 
     /**
@@ -1342,7 +1323,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         public DefDescriptor<SVGDef> svgDefDescriptor;
         public List<DefDescriptor<RendererDef>> rendererDescriptors;
         public List<DefDescriptor<HelperDef>> helperDescriptors;
-        public List<DefDescriptor<ResourceDef>> resourceDescriptors;
         public List<AttributeDefRef> facets;
 
         public Set<DefDescriptor<InterfaceDef>> interfaces;
@@ -1392,13 +1372,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 this.helperDescriptors = Lists.newArrayList();
             }
             this.helperDescriptors.add(Aura.getDefinitionService().getDefDescriptor(name, HelperDef.class));
-        }
-
-        public void addResource(String name) {
-            if (this.resourceDescriptors == null) {
-                this.resourceDescriptors = Lists.newArrayList();
-            }
-            this.resourceDescriptors.add(Aura.getDefinitionService().getDefDescriptor(name, ResourceDef.class));
         }
 
         @Override

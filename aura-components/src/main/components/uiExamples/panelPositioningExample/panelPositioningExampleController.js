@@ -27,6 +27,10 @@
         cmp.set('v.advanced', advanced);
     },
 
+    handleShowPointer: function(cmp, evt, helper) {
+        cmp.set("v.showPointer", evt.source.get('v.value'));
+    },
+
     handlePress: function(cmp, evt, helper) {
         var advanced = cmp.get('v.advanced');
         var body = $A.createComponentFromConfig({descriptor: 'markup://aura:unescapedHtml', attributes: {value: '<div class="panel-content">This is the panel</div>'}})
@@ -45,6 +49,7 @@
             referenceElement: isInside ? bigTarget : littleTarget,
             showCloseButton: false,
             closeOnClickOut: true,
+            flavor: 'default, error',
             useTransition: false,
             body  : body,
             direction: value,
@@ -55,7 +60,9 @@
             padTop: padTop !== undefined ? parseInt(padTop, 10) : undefined,
             pointerPad: pointerPad,
             bundingBoxPad: bundingBoxPad,
-            boxDirectionPad: boxDirectionPad
+            boxDirectionPad: boxDirectionPad,
+            showPointer: cmp.get("v.showPointer"),
+            classNames: "slds-theme--warning,good"
         };
 
         if(cmp.find('isAdvanced').get('v.value')) {

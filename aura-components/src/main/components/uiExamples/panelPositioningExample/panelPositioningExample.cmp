@@ -20,6 +20,7 @@
     <aura:import library="ui:panelPositioningLib" property="positioningLib" />
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:attribute name="advanced" default="false" type="Boolean" />
+    <aura:attribute name="showPointer" default="false" type="Boolean" />
     <div class="vp">
         <h1>Panel Positioning</h1>
         <div class="make-panel">
@@ -46,6 +47,7 @@
                     <ui:inputNumber aura:id="pointerPad" label="pointerPad" value="-15"  />
                 </fieldset>
                 <ui:inputCheckbox change="{!c.handleChange}" label="Use Advanced" value="false" aura:id="isAdvanced" />
+                <ui:inputCheckbox change="{!c.handleShowPointer}" label="Show Pointer" value="false" aura:id="showPointer" />
 
                 <aura:if isTrue="{!v.advanced}">
                     <fieldset class="advanced">

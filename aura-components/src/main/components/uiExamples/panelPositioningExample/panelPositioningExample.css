@@ -131,3 +131,10 @@
 	border: 1px solid #ccc;
 	padding: 4px;
 }
+
+.THIS .slds-theme--warning {
+	background-color: red;
+}
+.THIS .slds-theme--warning .pointer {
+    background-color: red;
+}

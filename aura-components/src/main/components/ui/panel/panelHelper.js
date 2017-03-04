@@ -335,8 +335,7 @@
     position: function(cmp, referenceEl, callback) {
         var config = this._buildConfig(cmp, referenceEl);
 
-        cmp.getElement().classList.add('positioned');
-        cmp.getElement().classList.add(config.direction);
+        this._buildClassList(cmp, config);
 
         if(!cmp.constraints) {
             this._createConstraints(cmp, config);
@@ -381,6 +380,20 @@
         config.align = cmp.get('v.inside')? config.targetAlign : config.align;
 
         return config;
+    },
+
+    _buildClassList: function(cmp, config) {
+        var classList = cmp.getElement().classList;
+        classList.add('positioned');
+        classList.add(config.direction);
+
+        var extras = cmp.get("v.classNames").split(',');
+
+        for(var i = 0; i < extras.length; i++) {
+            if(!$A.util.isEmpty(extras[i])) {
+                classList.add(extras[i]);
+            }
+        }
     },
 
     _mapRelativeToCardinal: function(config) {

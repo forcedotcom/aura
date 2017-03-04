@@ -157,6 +157,7 @@
                         element: elem,
                         target: referenceElem,
                         appendToBody: true,
+                        scrollableParentBound: true,
                         align: elementAlign,
                         targetAlign: referenceElementAlign
                     });

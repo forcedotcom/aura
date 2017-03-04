@@ -60,8 +60,9 @@
 			element: listElement,
 			target: referenceElement,
 			appendToBody: true,
+            scrollableParentBound: true,
 			align: listAlign,
-			targetAlign: targetAlign,
+            targetAlign: targetAlign,
 			padTop: 2
 		});
 

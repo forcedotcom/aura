@@ -127,7 +127,15 @@ Logger.prototype.error = function(msg, e){
     this.log(this.ERROR, logMsg, e);
 };
 
-Logger.prototype.reportError = function(e, action){
+/**
+ * Report an error to the server to be logged.
+ *
+ * @param {AuraError} e exception to report upon.
+ * @param {Action} [action] the action being performed when the exception occurred.
+ * @param {boolean} [foreground] don't set the report action as a caboose, should only be used for catastrophic failures where no futher actions will be called.
+ * @private
+ */
+Logger.prototype.reportError = function(e, action, foreground){
     if (!e || e["reported"]) {
         return;
     }
@@ -145,7 +153,9 @@ Logger.prototype.reportError = function(e, action){
     // But don't keep re-posting if the report of failure fails.  Do we want this to be production
     // mode only or similar?
     var reportAction = $A.get("c.aura://ComponentController.reportFailedAction");
-    reportAction.setCaboose();
+    if (!foreground) {
+        reportAction.setCaboose();
+    }
     reportAction.setParams({
         "failedAction": action || actionName || e["component"],
         "failedId": e.id && e.id.toString(),
@@ -154,7 +164,7 @@ Logger.prototype.reportError = function(e, action){
         // Also we only take the first 25k characters because stacks can get very large
         // and our parser on the server will gack on more than a million characters 
         // for the entire json package.
-        "clientStack": (e.stackTrace || e.stack || "").toString().substr(0, 25000),
+        "clientStack": (e.stackTrace || e.stack || "").toString().substr(0, Aura.Utils.Logger.MAX_STACKTRACE_SIZE),
         "componentStack": e["componentStack"] || ""
     });
     reportAction.setCallback(this, function() { /* do nothing */ });
@@ -452,3 +462,10 @@ Logger.prototype.devDebugConsoleLog = function(level, message, error) {
 //#end
 
 Aura.Utils.Logger = Logger;
+
+/**
+ * Maximum size for a stacktrace to be logged.
+ *
+ * @private
+ */
+Aura.Utils.Logger.MAX_STACKTRACE_SIZE = 25000;

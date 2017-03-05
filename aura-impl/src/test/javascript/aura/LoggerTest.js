@@ -404,7 +404,7 @@ Test.Aura.LoggerTest = function() {
                 setCaboose: function() {}
             };
 
-        var mockDeps = Mocks.GetMock(Object.Global(), "$A", {
+        var mockDeps = Mocks.GetMocks(Object.Global(), {"$A": {
                 get: function() { return mockAction; },
                 clientService: {
                     enqueueAction: function(reportAction) {
@@ -415,7 +415,8 @@ Test.Aura.LoggerTest = function() {
                     	}
                     }
                 }
-            });
+            }, Aura:{Utils:{Logger:{MAX_STACKTRACE_SIZE:25000}}}
+        });
 
         [Fact]
         function earlyReturnsIfReported() {

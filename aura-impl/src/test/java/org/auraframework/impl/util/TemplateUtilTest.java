@@ -101,8 +101,7 @@ public class TemplateUtilTest extends UnitTestCase {
 
             templateUtil.writeHtmlScripts(context, Lists.newArrayList("a", "b"), Script.SYNC, buffer);
 
-            if (!buffer.toString().contains("<script src=\"a\"></script>")
-                    || !buffer.toString().contains("<script src=\"b\"></script>")) {
+            if (buffer.toString().contains(" defer>")) {
                 fail(String.format("Unexpected 'async' or 'defer' for %s: %s", type, buffer));
             }
         }

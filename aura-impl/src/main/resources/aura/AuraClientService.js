@@ -272,6 +272,10 @@ AuraClientService.SYSTEM_EXCEPTION_EVENT_RETURN_STATUS = "SYSTEMERROR";
  */
 AuraClientService.CONSECUTIVE_RELOAD_COUNTER_KEY = "__RELOAD_COUNT";
 
+/**
+ * fwuid used when logging a bootstrap error and context was not initialized
+ */
+AuraClientService.UNKNOWN_FRAMEWORK_UID = "UNKNOWN";
 
 /**
  * set the XHR queue size.
@@ -850,7 +854,12 @@ AuraClientService.prototype.hardRefresh = function() {
 
     var url = this.getHardRefreshURL();
 
-    // TODO why do we use pushState() then location.href?
+    // use history.pushState to change the url of current page without actually loading it.
+    // AuraServlet will force the reload when GET request with current url contains '?nocache=someUrl'
+    // after reload, someUrl will become the current url.
+    // state is null: don't need to track the state with popstate
+    // title is null: don't want to set the page title.
+    // also ensures loading a 'nocache' url if the user hits "back" button.
     history.pushState(null /* state */, null /* title */, url);
     location.href = url;
 };
@@ -894,7 +903,9 @@ AuraClientService.prototype.dumpCachesAndReload = function(force) {
 
     if (this.reloadPointPassed || force) {
         if (this.shouldPreventReload()) {
-            this.showErrorDialogWithReload(new AuraError("We can't load the page. Please click Refresh."));
+            var err = new AuraError("We can't load the page. Please click Refresh.");
+            var extraMessage = "Bootstrap state: " + JSON.stringify(this.getBootstrapState());
+            this.showErrorDialogWithReload(err, extraMessage);
         } else {
             this.reloadFunction();
         }
@@ -963,18 +974,51 @@ AuraClientService.prototype.clearReloadCount = function() {
  * Shows error dialog with reload button
  *
  * @param {AuraError} e error object
+ * @param {String} [additionalLoggedMessage] additional text to log to the server, without being displayed to the user.
  * @private
  */
-AuraClientService.prototype.showErrorDialogWithReload = function(e) {
+AuraClientService.prototype.showErrorDialogWithReload = function(e, additionalLoggedMessage) {
     if (e && e.message) {
         $A.message(e.message, e, true);
 
-        // if aura hasn't finished init'ing then reporting the error to the server
-        // via an action will fail. catch the failure and fallback to a hand-crafted XHR.
         try {
-            $A.logger.reportError(e);
+            // report the error, set foreground to make the action run now, not as a caboose.
+            if (additionalLoggedMessage) {
+                e.message = e.message + " " + additionalLoggedMessage;
+            }
+            $A.logger.reportError(e, undefined, true);
         } catch (e2) {
-            // TODO W-3462566 report error to server despite aura not being booted. see this.sendBeacon().
+            // we've failed utterly. One possible scenario is if inline.js failed to load, since it defines the context / fwuid, which reportError relies upon
+            // Let's try to manually send an XHR down, since we don't care about the response format
+            // we can just use XMLHttpRequest which is available in IE too.
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/aura?r=0", true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=ISO-8859-13');
+            var payload = {
+                "actions": [
+                    {
+                        "id": "1;a",
+                        "descriptor": "aura://ComponentController/ACTION$reportFailedAction",
+                        "callingDescriptor": "UNKNOWN",
+                        "params": {
+                            "failedId": e.id && e.id.toString() || "",
+                            "failedAction": e["component"] || "",
+                            "clientError": e.message,
+                            "clientStack": (e.stackTrace || e.stack || "").toString().substr(0, Aura.Utils.Logger.MAX_STACKTRACE_SIZE),
+                            "componentStack": ""
+                        },
+                        "version": null
+                    }]
+            };
+
+            var context;
+            try {
+                context = $A.getContext().encodeForServer(true);
+            } catch (ce) {
+                // special "UNKNOWN" case will allow reportFailedAction's to be logged, but nothing else. This will return a COOSE, but we don't check the response here and there's little more we can do about it.
+                context = {"fwuid": AuraClientService.UNKNOWN_FRAMEWORK_UID};
+            }
+            xhr.send("message=" + encodeURIComponent(JSON.stringify(payload)) + "&aura.context=" + encodeURIComponent(JSON.stringify(context)));
         }
     }
 };

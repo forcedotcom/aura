@@ -22,23 +22,23 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client.Type;
 
 public class TemplateUtil {
-	public enum Script {
-		SYNC("<script src=\"%s\"></script>"), 
-		ASYNC("<script src=\"%s\" async defer></script>"), 
-		DEFER("<script src=\"%s\" defer></script>"), 
-		LAZY("<script data-src=\"%s\"></script>");
-		
-		private final String tag;
-		
-		Script (String tag) {
-			this.tag = tag;
-		}
-		public String toHTML (String url) {
-			return String.format(tag, url);
-		}
-	} 
-	
-	
+    public enum Script {
+        SYNC("<script src=\"%s\"></script>"),
+        ASYNC("<script src=\"%s\" async defer></script>"),
+        DEFER("<script src=\"%s\" defer></script>"),
+        LAZY("<script data-src=\"%s\"></script>");
+
+        private final String tag;
+
+        Script(String tag) {
+            this.tag = tag;
+        }
+
+        public String toHTML(String url) {
+            return String.format(tag, url);
+        }
+    }
+
     private static final String HTML_STYLE = "<link href=\"%s\" rel=\"stylesheet\" type=\"text/css\"/>\n";
 
     public void writeHtmlStyle(String url, Appendable out) throws IOException {
@@ -66,9 +66,9 @@ public class TemplateUtil {
     public void writeHtmlScript(AuraContext context, String scriptUrl, Script scriptLoadingType, Appendable out)
             throws IOException {
         if (scriptUrl != null) {
-        	Type type = context.getClient().getType();
+            Type type = context.getClient().getType();
             if (type == Type.IE9 || type == Type.IE8 || type == Type.IE7 || type == Type.IE6) {
-            	scriptLoadingType = Script.DEFER;
+                scriptLoadingType = Script.DEFER;
             }
             out.append(scriptLoadingType.toHTML(scriptUrl));
         }
@@ -77,12 +77,12 @@ public class TemplateUtil {
     public void writeHtmlScripts(AuraContext context, List <String> scripts, Script scriptLoadingType, Appendable out)
             throws IOException {
         if (scripts != null && !scripts.isEmpty()) {
-        	Type type = context.getClient().getType();
+            Type type = context.getClient().getType();
             if (type == Type.IE9 || type == Type.IE8 || type == Type.IE7 || type == Type.IE6) {
-            	scriptLoadingType = Script.DEFER;
+                scriptLoadingType = Script.DEFER;
             }
             for (String src : scripts) {
-            	out.append(scriptLoadingType.toHTML(src));
+                out.append(scriptLoadingType.toHTML(src));
             }
         }
     }

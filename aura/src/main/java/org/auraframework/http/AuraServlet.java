@@ -21,7 +21,11 @@ import java.io.StringReader;
 import java.net.URI;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.ServletConfig;
@@ -102,6 +106,8 @@ public class AuraServlet extends AuraBaseServlet {
 
     public final static String AURA_PREFIX = "aura.";
     private final static String CSRF_PROTECT = "while(1);\n";
+    private final static String UNKNOWN_FRAMEWORK_UID = "UNKNOWN";
+    private final static String REPORT_ERROR_ACTION = "ComponentController/ACTION$reportFailedAction";
 
     /**
      * "Long" pages (such as resources and cached HTML templates) expire in 45 days. We also use this to "pre-expire"
@@ -436,6 +442,26 @@ public class AuraServlet extends AuraBaseServlet {
 
             String fwUID = configAdapter.getAuraFrameworkNonce();
             if (!fwUID.equals(context.getFrameworkUID())) {
+                if (UNKNOWN_FRAMEWORK_UID.equals(context.getFrameworkUID()) && msg.contains(REPORT_ERROR_ACTION)) {
+                    // we had a serious boostrap issue and want to log the failed action (5x reload)
+                    Message message = serializationService.read(new StringReader(msg), Message.class);
+                    List<Action> actions = message.getActions();
+                    // with an unknown fwuid, only execute failed actions. we don't want anything else potentially creeping in.
+                    // at this point the sid should have already been checked and the user is authenticated, but their browser is in a hosed state
+                    Iterator<Action> actionsIterator = actions.iterator();
+                    while(actionsIterator.hasNext()) {
+                        Action action = actionsIterator.next();
+                        if (action == null || action.getDescriptor() == null || !REPORT_ERROR_ACTION.equals(action.getDescriptor().getDescriptorName())) {
+                            // since actions was a reference from message, we're actually modifying the list of actions in 'message'
+                            actionsIterator.remove();
+                        }
+                    }
+                    // this will write the response to the output, and then the COOS will be appended, so the resulting json response will be invalid
+                    // but this case should only happen when the code isn't even checking for a response.
+                    if (actions.size() > 0) {
+                        serverService.run(message, context, response.getWriter(), null);
+                    }
+                }
                 throw new ClientOutOfSyncException("Framework has been updated. Expected: " + fwUID +
                         " Actual: " + context.getFrameworkUID());
             }

@@ -48,7 +48,7 @@
 
     unrender: function (component, helper) {
         helper.unposition(component);
-        helper.removeDocumentLevelHandler(component._clickHandler);
+        component.removeDocumentLevelHandler(component._clickHandler);
         this.superUnrender();
     }
 })// eslint-disable-line semi

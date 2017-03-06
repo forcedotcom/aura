@@ -212,9 +212,9 @@
             // loaded before running
             var scripts = window.Aura.inlineJsLocker;
             if (scripts) {
-                scripts.forEach(function(script) {
-                    $A.lockerService.runScript(script["callback"], script["namespace"]);
-                });
+                for (var i = 0; i &lt; scripts.length; i++) {
+                    $A.lockerService.runScript(scripts[i]["callback"], scripts[i]["namespace"]);
+                }
                 delete window.Aura.inlineJsLocker;
             }
 

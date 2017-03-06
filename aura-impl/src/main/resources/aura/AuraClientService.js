@@ -1443,47 +1443,41 @@ AuraClientService.prototype.initHost = function(host) {
  * @export
  */
 AuraClientService.prototype.init = function(config, token, container) {
+    if (token) {
+        this._token = token;
+    }
 
-    //
-    // not on in dev modes to preserve stacktrace in debug tools
-    // Why? - goliver
-    // I think this should be done in all cases, the error can be more
-    // instructive than an uncaught exception.
-    //
-    //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    var context=$A.getContext();
+
+    // Load Tokens from Application Def
+    var rootDef = $A.componentService.getComponentDef(config["componentDef"]);
+    context.setTokens(rootDef.tokens);
+
+    // Create Root (Application) Component
+    Aura.bootstrapMark("appCreationStart");
+    var component = $A.componentService.createComponentPriv(config);
+    Aura.bootstrapMark("appCreationEnd");
+
     try {
-        //#end
-
-        if (token) {
-            this._token = token;
-        }
-
-        var context=$A.getContext();
-
-        // Load Tokens from Application Def
-        var rootDef = $A.componentService.getComponentDef(config["componentDef"]);
-        context.setTokens(rootDef.tokens);
-
-        // Create Root (Application) Component
-        Aura.bootstrapMark("appCreationStart");
-        var component = $A.componentService.createComponentPriv(config);
-        Aura.bootstrapMark("appCreationEnd");
-
         context.setCurrentAccess(component);
         Aura.bootstrapMark("appRenderingStart");
         $A.renderingService.render(component, container || document.body);
         $A.renderingService.afterRender(component);
-        Aura.bootstrapMark("appRenderingEnd");
-        context.releaseCurrentAccess();
-
-        return component;
-
-        // not on in dev modes to preserve stacktrace in debug tools
-        //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     } catch (e) {
-        throw new $A.auraError("Error during init", e, $A.severity.QUIET);
+        if (e instanceof $A.auraError) {
+            throw e;
+        } else {
+            var ae = new $A.auraError("Error during rendering in init", e, $A.severity.QUIET);
+            ae['component'] = component.getDef().getDescriptor().toString();
+            ae['componentStack'] = context.getAccessStackHierarchy();
+            throw ae;
+        }
+    } finally {
+        context.releaseCurrentAccess();
+        Aura.bootstrapMark("appRenderingEnd");
     }
-    //#end
+
+    return component;
 };
 
 /**

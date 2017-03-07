@@ -18,6 +18,8 @@ package org.auraframework.http;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.FilterChain;
 import javax.servlet.RequestDispatcher;
@@ -160,7 +162,41 @@ public class AuraTestFilterUnitTest extends UnitTestCase {
     }
 
     @Test
-    public void testDoFilterCapturesRedirection() throws Exception {
+    public void testDoFilterHandlesRedirectionWithJstestrun() throws Exception {
+		doRedirectionTest("https://host:80/namespace/name.app?attr=val&aura.jstestrun=willbeoverwritten",
+				"https://host:80/namespace/name.app?attr=val&aura.jstestrun=someTest");
+    }
+    
+    @Test
+    public void testDoFilterHandlesRedirectionWithAnchor() throws Exception {
+		doRedirectionTest("/x/y.app?aura.jstestrun=jst#anchor", "/x/y.app?aura.jstestrun=someTest#anchor");
+    }
+    @Test
+    public void testDoFilterHandlesRedirectionWithOnlyJstestrun() throws Exception {
+		doRedirectionTest("/x/y.app?aura.jstestrun=_NONE", "/x/y.app?aura.jstestrun=someTest");
+    }
+    
+    @Test
+    public void testDoFilterHandlesRedirectionWithEmptyJstestrun() throws Exception {
+		doRedirectionTest("/x/y.app?aura.jstestrun=&attr=val", "/x/y.app?aura.jstestrun=someTest&attr=val");
+    }
+    
+    @Test
+    public void testDoFilterHandlesRedirectionWithEmptyJstestrunAtEnd() throws Exception {
+		doRedirectionTest("/x/y.app?aura.jstestrun=", "/x/y.app?aura.jstestrun=someTest");
+    }
+    
+    @Test
+    public void testDoFilterHandlesRedirectionWithoutJstestrun() throws Exception {
+    	doRedirectionTest("/x/y.app?attr=val", "/x/y.app?attr=val&aura.jstestrun=someTest");
+    }
+    
+    @Test
+    public void testDoFilterHandlesRedirectionWithoutAnyParams() throws Exception {
+    	doRedirectionTest("/x/y.app", "/x/y.app?aura.jstestrun=someTest");
+    }
+    
+    private void doRedirectionTest(String redirectionUrl, String expectedUrl) throws Exception {
     	AuraTestFilter filter = new AuraTestFilter();
     	filter.setTestContextAdapter(testContextAdapter);
     	filter.setConfigAdapter(configAdapter);
@@ -201,24 +237,13 @@ public class AuraTestFilterUnitTest extends UnitTestCase {
 		Mockito.doReturn(new SimpleTestRequestDispatcher() {
 			@Override
 			public void forward(ServletRequest req, ServletResponse res) throws ServletException, IOException {
-				((HttpServletResponse)res).sendRedirect("/other/app.app");
+				((HttpServletResponse)res).sendRedirect(redirectionUrl);
 			}
 		}).when(testServletContext).getRequestDispatcher(Mockito.startsWith("/aura?"));
-
-    	String renderedTargetComponent = "RENDEREDTARGETCOMPONENT";
-		Mockito.doReturn(new SimpleTestRequestDispatcher() {
-			@Override
-			public void forward(ServletRequest req, ServletResponse res) throws ServletException, IOException {
-				res.getWriter().write(renderedTargetComponent);
-			}
-		}).when(testServletContext).getRequestDispatcher(Mockito.startsWith("/other/app.app"));
 
 		FilterChain chain = (req, res) -> {};
 		filter.doFilter(request, response, chain);
 		
-		String responseString = writer.toString();
-		assertEquals(true, responseString.startsWith(renderedTargetComponent));
-		responseString = responseString.substring(renderedTargetComponent.length());
-		assertEquals(true, responseString.contains("<script src='/aura?aura.tag=namespace%3Aname&aura.deftype=APPLICATION&aura.mode=AUTOJSTEST&aura.format=JS&aura.access=AUTHENTICATED&aura.jstestrun=someTest"));
+		Mockito.verify(response, Mockito.times(1)).sendRedirect(expectedUrl);
     }
 }

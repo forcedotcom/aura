@@ -41,7 +41,7 @@ public class CapturingResponseWrapper extends HttpServletResponseWrapper {
     }
 
     public String getRedirectUrl() {
-    	return this.redirectUrl;
+        return this.redirectUrl;
     }
     
     @Override
@@ -68,6 +68,7 @@ public class CapturingResponseWrapper extends HttpServletResponseWrapper {
     
     @Override
     public void sendRedirect(String location) throws IOException{
-    	this.redirectUrl = location;
+        this.redirectUrl = location;
+        super.sendRedirect(location);
     }
 }

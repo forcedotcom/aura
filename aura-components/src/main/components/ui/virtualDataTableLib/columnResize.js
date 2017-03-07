@@ -411,7 +411,9 @@ function lib(w) { //eslint-disable-line no-unused-vars
          * @private
          */
         _updateRange : function(range, value) {
-            range.value = value;
+            if (range) {
+                range.value = value;
+            }
         },
 
         /**

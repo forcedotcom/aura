@@ -261,9 +261,11 @@
     testFormatDateForDateWithTimezone: {
         test: function() {
             var expected = "Sep 22, 2004";
+            // the formatDate() uses browser's timezone
+            var timeZoneOffset = moment().format("Z");
+            var dateString = "2004-09-22T18:00:00" + timeZoneOffset;
 
-            var actual = $A.localizationService.formatDate("2004-09-22T18:00:00-07:00", "MMM DD, YYYY");
-
+            var actual = $A.localizationService.formatDate(dateString, "MMM DD, YYYY");
             $A.test.assertEquals(expected, actual, "formatDate() returns an unexpected date string");
         }
     },

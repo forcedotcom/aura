@@ -91,9 +91,9 @@ public class DefinitionServiceImpl implements DefinitionService {
     private CachingService cachingService;
 
     private LoggingService loggingService;
-    
+
     private ConfigAdapter configAdapter;
-    
+
     @Override
     public <T extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName, Class<T> defClass) {
         return getDefDescriptor(qualifiedName, defClass, null);
@@ -102,7 +102,7 @@ public class DefinitionServiceImpl implements DefinitionService {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Definition, B extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName,
-            Class<T> defClass, DefDescriptor<B> bundle) {
+                                                                                          Class<T> defClass, DefDescriptor<B> bundle) {
         if (defClass == ActionDef.class) {
             return SubDefDescriptorImpl.getInstance(qualifiedName, defClass, ControllerDef.class);
         }
@@ -157,7 +157,7 @@ public class DefinitionServiceImpl implements DefinitionService {
 
     @Override
     public <T extends Definition> DefDescriptor<T> getDefDescriptor(DefDescriptor<?> desc, String prefix,
-            Class<T> defClass) {
+                                                                    Class<T> defClass) {
 
         return DefDescriptorImpl.getAssociateDescriptor(desc, defClass, prefix);
     }
@@ -183,7 +183,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         if (descriptor == null) {
             return null;
         }
-            
+
         // TODO: Clean up so that we just walk up descriptor trees and back down them.
         Optional<T> optLocalDef = null;
         if (descriptor instanceof SubDefDescriptor) {
@@ -793,7 +793,7 @@ public class DefinitionServiceImpl implements DefinitionService {
             DefDescriptor<? extends Definition> descriptor = def.getDescriptor();
             String message = configAdapter.isProduction() ? DefinitionNotFoundException.getMessage(
                     descriptor.getDefType(), descriptor.getName()) : status;
-                    throw new NoAccessException(message);
+            throw new NoAccessException(message);
         }
     }
 
@@ -994,12 +994,6 @@ public class DefinitionServiceImpl implements DefinitionService {
             currentCC.addMap(AuraStaticControllerDefRegistry.getInstance(this).getAll());
             Definition def = compileDef(descriptor, currentCC, false);
 
-            if (currentCC.hasSwitchableReference) {
-                // when switchable reference detected from dependencies, recompile for other reference to get other DE
-                loggingService.info("mdb7: recompiling descriptor for modules: " + descriptor);
-                recompile(descriptor, currentCC, context);
-            }
-
             if (def == null) {
                 return null;
             }
@@ -1049,43 +1043,33 @@ public class DefinitionServiceImpl implements DefinitionService {
                 return de;
             }
 
-            DependencyEntry cde;
-            DependencyEntry mde;
-
-            if (!currentCC.recompiled) {
-                // didn't recompile so DE is the same for modules or components
-                cde = createDependencyEntry(compiled, uid, clientLibs);
-                mde = cde;
-            } else {
-                // recompiled so separate DEs
-                cde = createDependencyEntry(currentCC.compiledComponent.values(), uid, clientLibs);
-                mde = createDependencyEntry(currentCC.compiledModule.values(), uid, clientLibs);
-            }
+            de = createDependencyEntry(compiled, uid, clientLibs);
 
             CompilingDef<T> cd = currentCC.getCompiling(descriptor);
             Cache<String, DependencyEntry> depsCache = cachingService.getDepsCache();
             if (cd.cacheable) {
                 // put UID-qualified descriptor key for dependency
-                // one entry for component dependencies and another for module dependencies.
-                depsCache.put(makeGlobalKey(cde.uid, descriptor, false), cde);
-                depsCache.put(makeGlobalKey(mde.uid, descriptor, true), mde);
+                depsCache.put(makeGlobalKey(de.uid, descriptor, modulesEnabled), de);
+
+                if (!currentCC.hasSwitchableReference) {
+                    // if no switchable references detected, DE is the same for both aura or modules
+                    // so save so that the other doesn't have to go through compilation again.
+                    depsCache.put(makeGlobalKey(de.uid, descriptor, !modulesEnabled), de);
+                }
 
                 // put unqualified descriptor key for dependency
                 if (currentCC.shouldCacheDependencies) {
-                    depsCache.put(makeNonUidGlobalKey(descriptor, false), cde);
-                    depsCache.put(makeNonUidGlobalKey(descriptor, true), mde);
+                    depsCache.put(makeNonUidGlobalKey(descriptor, modulesEnabled), de);
+
+                    if (!currentCC.hasSwitchableReference) {
+                        // if no switchable references detected, DE is the same for both aura or modules
+                        depsCache.put(makeNonUidGlobalKey(descriptor, !modulesEnabled), de);
+                    }
                 }
             }
 
             // See localDependencies comment
-            if (modulesEnabled) {
-                context.addLocalDependencyEntry(key, mde);
-                de = mde;
-            } else {
-                context.addLocalDependencyEntry(key, cde);
-                de = cde;
-            }
-
+            context.addLocalDependencyEntry(key, de);
             return de;
         } catch (QuickFixException qfe) {
             DependencyEntry de = new DependencyEntry(qfe);
@@ -1095,55 +1079,6 @@ public class DefinitionServiceImpl implements DefinitionService {
         } finally {
             threadContext.set(null);
         }
-    }
-
-    /**
-     * Recompiles current descriptor to produce defs for other reference (component vs module).
-     * This process will use not actually recompile existing defs but retrieve defs from cache
-     * as they are still the same. However, new and different dependencies will be found and compiled
-     * for the other reference (ComponentDefRef vs ModuleDefRef).
-     *
-     * @param descriptor descriptor to recompile
-     * @param cc current compile context
-     * @param context AuraContext
-     * @throws QuickFixException
-     */
-    private void recompile(DefDescriptor descriptor, CompileContext cc, AuraContext context) throws QuickFixException {
-        boolean modulesEnabled = context.isModulesEnabled();
-        if (modulesEnabled) {
-            // if modules currently enabled, we should have just compiled for module references
-            cc.compiledModule = Collections.unmodifiableMap(cc.compiled);
-        } else {
-            // otherwise, compiled component references
-            cc.compiledComponent = Collections.unmodifiableMap(cc.compiled);
-        }
-
-        // reset
-        cc.compiled = Maps.newHashMap();
-        cc.level = 0;
-        cc.addMap(AuraStaticControllerDefRegistry.getInstance(this).getAll());
-        // invert modules enabled to get switchable DefRefDelegates to return other references
-        context.setModulesEnabled(!modulesEnabled);
-        try {
-            compileDef(descriptor, cc, false);
-
-            if (modulesEnabled) {
-                // this recompile yields component defs if modules enabled
-                cc.compiledComponent = Collections.unmodifiableMap(cc.compiled);
-            } else {
-                cc.compiledModule = Collections.unmodifiableMap(cc.compiled);
-            }
-        } finally {
-            // reset modules enabled flag
-            context.setModulesEnabled(modulesEnabled);
-        }
-
-        // compiled now holds all defs of both component and module to be used in UID calculation
-        cc.compiled = Maps.newHashMap();
-        cc.compiled.putAll(cc.compiledComponent);
-        cc.compiled.putAll(cc.compiledModule);
-
-        cc.recompiled = true;
     }
 
     private DependencyEntry createDependencyEntry(List<CompilingDef<?>> compiled, String uid,
@@ -1157,11 +1092,6 @@ public class DefinitionServiceImpl implements DefinitionService {
         }
 
         return new DependencyEntry(uid, Collections.unmodifiableSet(deps), clientLibs);
-    }
-
-    private DependencyEntry createDependencyEntry(Collection<CompilingDef<?>> compilingDefs, String uid,
-                                                  List<ClientLibraryDef> clientLibs) {
-        return createDependencyEntry(Lists.newArrayList(compilingDefs), uid, clientLibs);
     }
 
     /**
@@ -1246,7 +1176,7 @@ public class DefinitionServiceImpl implements DefinitionService {
      * @throws QuickFixException if something has gone terribly wrong.
      */
     private <D extends Definition> void validateHelper(@Nonnull CompileContext currentCC,
-            @Nonnull DefDescriptor<D> descriptor) throws QuickFixException {
+                                                       @Nonnull DefDescriptor<D> descriptor) throws QuickFixException {
         CompilingDef<D> compiling = new CompilingDef<>(descriptor);
         currentCC.compiled.put(descriptor, compiling);
         if (compiling.def == null && !fillCompilingDef(compiling, currentCC)) {
@@ -1340,8 +1270,6 @@ public class DefinitionServiceImpl implements DefinitionService {
     private static class CompileContext {
         public final AuraContext context;
         public Map<DefDescriptor<? extends Definition>, CompilingDef<?>> compiled = Maps.newHashMap();
-        public Map<DefDescriptor<? extends Definition>, CompilingDef<?>> compiledComponent = Maps.newHashMap();
-        public Map<DefDescriptor<? extends Definition>, CompilingDef<?>> compiledModule = Maps.newHashMap();
         public final Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache;
         public final List<ClientLibraryDef> clientLibs;
         public final DefDescriptor<? extends Definition> topLevel;
@@ -1349,14 +1277,13 @@ public class DefinitionServiceImpl implements DefinitionService {
         public final boolean compiling;
         public int level;
         public boolean hasSwitchableReference;
-        public boolean recompiled;
 
         /** Is this def's dependencies cacheable? */
         public boolean shouldCacheDependencies;
 
         public CompileContext(DefDescriptor<? extends Definition> topLevel, AuraContext context,
-                Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache,
-                List<ClientLibraryDef> clientLibs) {
+                              Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache,
+                              List<ClientLibraryDef> clientLibs) {
             this.defsCache = defsCache;
             this.context = context;
             this.registries = context.getRegistries();
@@ -1366,7 +1293,6 @@ public class DefinitionServiceImpl implements DefinitionService {
             this.shouldCacheDependencies = true;
             this.compiling = true;
             this.hasSwitchableReference = false;
-            this.recompiled = false;
         }
 
         public <D extends Definition> CompilingDef<D> getCompiling(DefDescriptor<D> descriptor) {
@@ -1409,7 +1335,7 @@ public class DefinitionServiceImpl implements DefinitionService {
      * @throws QuickFixException if validateDefinition caused a quickfix.
      */
     private <D extends Definition> boolean fillCompilingDef(CompilingDef<D> compiling,
-            CompileContext currentCC) throws QuickFixException {
+                                                            CompileContext currentCC) throws QuickFixException {
         assert compiling.def == null;
 
         //
@@ -1516,8 +1442,8 @@ public class DefinitionServiceImpl implements DefinitionService {
      * @throws QuickFixException if the definition is not found, or validateDefinition() throws one.
      */
     private <D extends Definition> D getHelper(@Nonnull DefDescriptor<D> descriptor,
-            @Nonnull CompileContext cc, @Nonnull Set<DefDescriptor<?>> stack,
-            @CheckForNull Definition parent) throws QuickFixException {
+                                               @Nonnull CompileContext cc, @Nonnull Set<DefDescriptor<?>> stack,
+                                               @CheckForNull Definition parent) throws QuickFixException {
         loggingService.incrementNum(LoggingService.DEF_VISIT_COUNT);
         CompilingDef<D> cd = cc.getCompiling(descriptor);
         try {
@@ -1667,7 +1593,7 @@ public class DefinitionServiceImpl implements DefinitionService {
      */
     @CheckForNull
     private <D extends Definition> D compileDef(@Nonnull DefDescriptor<D> descriptor,
-            @Nonnull CompileContext currentCC, boolean nested) throws QuickFixException {
+                                                @Nonnull CompileContext currentCC, boolean nested) throws QuickFixException {
         D def;
 
         if (!nested) {

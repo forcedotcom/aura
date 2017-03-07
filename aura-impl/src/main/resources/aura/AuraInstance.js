@@ -644,6 +644,15 @@ AuraInstance.prototype.addDefaultErrorHandler = function (app) {
             event["handled"] = true;
         }
     });
+    $A.eventService.addHandler({
+        "event": "aura:customerError",
+        "globalId": app.getGlobalId(),
+        "handler": function(event) {
+            if (event["handled"]) { return; }
+            $A.message(event.getParam("message"), event.getParam("auraError"));
+            event["handled"] = true;
+        }
+    });
 };
 
 /**
@@ -743,13 +752,39 @@ AuraInstance.prototype.handleError = function(message, e) {
     if ($A.initialized) {
         // fire the event later so the current handleError could return even if an error occurs in the event handler.
         window.setTimeout(function() {
-            $A.eventService.getNewEvent('markup://aura:systemError').fire(evtArgs);
+            // Determine if error pertains to customer component and fire the appropriate error event
+            if ($A.isCustomerError(e)) {
+                $A.eventService.getNewEvent('markup://aura:customerError').fire(evtArgs);
+            } else {
+                $A.eventService.getNewEvent('markup://aura:systemError').fire(evtArgs);
+            }
         }, 0);
     } else {
         if ($A.showErrors()) {
             $A.message(dispMsg, e);
         }
     }
+};
+
+/**
+ * @private
+ */
+AuraInstance.prototype.isCustomerError = function(e) {
+    if (e && e instanceof $A.auraError) {
+        if (e["component"]) {
+            var descriptor = e["component"].split("$",1);
+            var componentDef = $A.componentService.getComponentDef($A.componentService.createDescriptorConfig(descriptor[0]));
+            if (componentDef != null) {
+                var namespace = componentDef.getDescriptor().getNamespace();
+                var internal = $A.clientService.isInternalNamespace(namespace);
+                var privileged = $A.clientService.isPrivilegedNamespace(namespace);
+                if (namespace && !internal && !privileged) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 };
 
 /**

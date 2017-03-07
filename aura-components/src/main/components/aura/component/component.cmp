@@ -31,6 +31,7 @@
     <aura:dependency resource="markup://aura:componentEvent" type="EVENT" />
     <aura:dependency resource="markup://aura:connectionLost" type="EVENT" />
     <aura:dependency resource="markup://aura:connectionResumed" type="EVENT" />
+    <aura:dependency resource="markup://aura:customerError" type="EVENT" />
     <aura:dependency resource="markup://aura:debugLog" type="EVENT" />
     <aura:dependency resource="markup://aura:doneRendering" type="EVENT" />
     <aura:dependency resource="markup://aura:doneWaiting" type="EVENT" />

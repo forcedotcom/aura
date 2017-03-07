@@ -304,6 +304,7 @@ Aura.Event.Event.prototype.executeHandlerIterator = function(handlerIterator) {
     var value;
 
     var isSystemError = this.eventDef.getDescriptor().toString() === "markup://aura:systemError";
+    var isCustomerError = this.eventDef.getDescriptor().toString() === "markup://aura:customerError";
     var isComponentEventType = this.getEventExecutionType() === "COMPONENT";
 
     while(!this.paused && !res.done) {
@@ -321,7 +322,7 @@ Aura.Event.Event.prototype.executeHandlerIterator = function(handlerIterator) {
             // update our phase
             this.phase = value.phase;
 
-            if(isSystemError) {
+            if(isSystemError || isCustomerError) {
                 // Special case... only wrap in try-catch for this type of event
                 try {
                     value.handler(this);
@@ -331,7 +332,7 @@ Aura.Event.Event.prototype.executeHandlerIterator = function(handlerIterator) {
 
                     // TODO: unregister this particular event handler here!
                     // cmpHandlers[j] = null;
-                    $A.warning("aura:systemError event handler failed", e);
+                    $A.warning("aura:systemError | aura:customerError event handler failed", e);
                     $A.logger.reportError(e);
                 }
             }

@@ -28,10 +28,11 @@ function AuraLocalizationService() {
 
     this.ZERO = "0";
 
+    this.localeCache = {};
+
     this.cache = {
         format : {},
-        strictModeFormat : {},
-        langLocale : {}
+        strictModeFormat : {}
     };
 }
 
@@ -340,7 +341,7 @@ AuraLocalizationService.prototype.endOf = function(date, unit) {
  * Formats a date.
  * @param {String|Number|Date} date - The date format that the JavaScript Date object can parse.
  * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
- * @param {String} locale - A Java locale string. The default is from LocaleValueProvider.
+ * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
  * @return {String} A formatted and localized date string
  * @memberOf AuraLocalizationService
  * @example
@@ -353,22 +354,38 @@ AuraLocalizationService.prototype.endOf = function(date, unit) {
  */
 AuraLocalizationService.prototype.formatDate = function(date, formatString, locale) {
     var mDate = moment(date);
-    if (mDate && mDate["isValid"]()) {
-        var format = formatString;
-        if (!format) { // use default format
-            format = $A.get("$Locale.dateFormat");
-        }
-        return this.displayDateTime(mDate, format, locale);
-    } else {
-        throw {message: "Invalid date value"};
+    if (!mDate || !mDate["isValid"]()) {
+        throw { message: "Invalid date value" };
     }
+
+    if (!formatString) { // use default format
+        formatString = $A.get("$Locale.dateFormat");
+    }
+
+    var langLocale = locale;
+    if (locale !== undefined) {
+        $A.deprecated("$A.localizationService.formatDate(date, formatString, locale) is deprecated. " +
+                "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
+                "by Locale Value Provider. It will be removed in an upcoming release.",
+                "Use $A.localizationService.formatDate(date, formatString)", "2017-02-26", "2018-03-30");
+
+        if (!this.isAvailableLocale(locale)) {
+            langLocale = $A.get("$Locale.langLocale");
+            $A.warning("AuraLocalizationService.formatDateUTC(): Locale '" + locale + "' is not available. " +
+                    "Falls back to the locale in $Locale.langLocale: " + langLocale);
+        }
+    } else {
+        langLocale = $A.get("$Locale.langLocale");
+    }
+
+    return this.displayDateTime(mDate, formatString, langLocale);
 };
 
 /**
  * Formats a date in UTC.
  * @param {String|Number|Date} date - The date format that JS Date object can parse.
  * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
- * @param {String} locale - A Java locale string. The default is from LocaleValueProvider.
+ * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
  * @return {String} A formatted and localized date string
  * @memberOf AuraLocalizationService
  * @example
@@ -381,22 +398,38 @@ AuraLocalizationService.prototype.formatDate = function(date, formatString, loca
  */
 AuraLocalizationService.prototype.formatDateUTC = function(date, formatString, locale) {
     var mDate = moment["utc"](date);
-    if (mDate && mDate["isValid"]()) {
-        var format = formatString;
-        if (!format) { // use default format
-            format = $A.get("$Locale.dateFormat");
-        }
-        return this.displayDateTime(mDate, format, locale);
-    } else {
-        throw {message: "Invalid date value"};
+    if (!mDate || !mDate["isValid"]()) {
+        throw { message: "Invalid date value" };
     }
+
+    if (!formatString) { // use default format
+        formatString = $A.get("$Locale.dateFormat");
+    }
+
+    var langLocale = locale;
+    if (locale !== undefined) {
+        $A.deprecated("$A.localizationService.formatDateUTC(date, formatString, locale) is deprecated. " +
+                "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
+                "by Locale Value Provider. It will be removed in an upcoming release.",
+                "Use $A.localizationService.formatDateUTC(date, formatString)", "2017-02-26", "2018-03-30");
+
+        if (!this.isAvailableLocale(locale)) {
+            langLocale = $A.get("$Locale.langLocale");
+            $A.warning("AuraLocalizationService.formatDateUTC(): Locale '" + locale + "' is not available. " +
+                    "Falls back to the locale in $Locale.langLocale: " + langLocale);
+        }
+    } else {
+        langLocale = $A.get("$Locale.langLocale");
+    }
+
+    return this.displayDateTime(mDate, formatString, langLocale);
 };
 
 /**
  * Formats a datetime.
  * @param {String|Number|Date} date - The datetime format that the JavaScript Date object can parse.
  * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
- * @param {String} locale - A Java locale string. The default is from LocaleValueProvider.
+ * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
  * @return {String} A formatted and localized datetime string
  * @memberOf AuraLocalizationService
  * @example
@@ -409,22 +442,38 @@ AuraLocalizationService.prototype.formatDateUTC = function(date, formatString, l
  */
 AuraLocalizationService.prototype.formatDateTime = function(date, formatString, locale) {
     var mDate = moment(date);
-    if (mDate && mDate["isValid"]()) {
-        var format = formatString;
-        if (!format) { // use default format
-            format = $A.get("$Locale.datetimeFormat");
-        }
-        return this.displayDateTime(mDate, format, locale);
-    } else {
-        throw {message: "Invalid date time value"};
+    if (!mDate || !mDate["isValid"]()) {
+        throw { message: "Invalid date time value" };
     }
+
+    if (!formatString) { // use default format
+        formatString = $A.get("$Locale.datetimeFormat");
+    }
+
+    var langLocale = locale;
+    if (locale !== undefined) {
+        $A.deprecated("$A.localizationService.formatDateTime(date, formatString, locale) is deprecated. " +
+                "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
+                "by Locale Value Provider. It will be removed in an upcoming release.",
+                "Use $A.localizationService.formatDateTime(date, formatString)", "2017-02-26", "2018-03-30");
+
+        if (!this.isAvailableLocale(locale)) {
+            langLocale = $A.get("$Locale.langLocale");
+            $A.warning("AuraLocalizationService.formatDateTime(): Locale '" + locale + "' is not available. " +
+                    "Falls back to the locale in $Locale.langLocale: " + langLocale);
+        }
+    } else {
+        langLocale = $A.get("$Locale.langLocale");
+    }
+
+    return this.displayDateTime(mDate, formatString, langLocale);
 };
 
 /**
  * Formats a datetime in UTC.
  * @param {String|Number|Date} date - The datetime format that the JavaScript Date object can parse.
  * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
- * @param {String} locale - A Java locale string. The default is from LocaleValueProvider.
+ * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
  * @return {String} A formatted and localized datetime string
  * @example
  * var d = new Date();
@@ -436,22 +485,38 @@ AuraLocalizationService.prototype.formatDateTime = function(date, formatString, 
  */
 AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatString, locale) {
     var mDate = moment["utc"](date);
-    if (mDate && mDate["isValid"]()) {
-        var format = formatString;
-        if (!format) { // use default format
-            format = $A.get("$Locale.datetimeFormat");
-        }
-        return this.displayDateTime(mDate, format, locale);
-    } else {
-        throw {message: "Invalid date time value"};
+    if (!mDate || !mDate["isValid"]()) {
+        throw { message: "Invalid date time value" };
     }
+
+    if (!formatString) { // use default format
+        formatString = $A.get("$Locale.datetimeFormat");
+    }
+
+    var langLocale = locale;
+    if (locale !== undefined) {
+        $A.deprecated("$A.localizationService.formatDateTimeUTC(date, formatString, locale) is deprecated. " +
+                "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
+                "by Locale Value Provider. It will be removed in an upcoming release.",
+                "Use $A.localizationService.formatDateTimeUTC(date, formatString)", "2017-02-26", "2018-03-30");
+
+        if (!this.isAvailableLocale(locale)) {
+            langLocale = $A.get("$Locale.langLocale");
+            $A.warning("AuraLocalizationService.formatDateTimeUTC(): Locale '" + locale + "' is not available. " +
+                    "Falls back to the locale in $Locale.langLocale: " + langLocale);
+        }
+    } else {
+        langLocale = $A.get("$Locale.langLocale");
+    }
+
+    return this.displayDateTime(mDate, formatString, langLocale);
 };
 
 /**
  * Formats a time.
  * @param {String|Number|Date} date - The time format that JavaScript Date object can parse
  * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
- * @param {String} locale - A Java locale string. The default is from LocaleValueProvider.
+ * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
  * @return {String} A formatted and localized time string
  * @memberOf AuraLocalizationService
  * @example
@@ -464,22 +529,38 @@ AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatStrin
  */
 AuraLocalizationService.prototype.formatTime = function(date, formatString, locale) {
     var mDate = moment(date);
-    if (mDate && mDate["isValid"]()) {
-        var format = formatString;
-        if (!format) { // use default format
-            format = $A.get("$Locale.timeFormat");
-        }
-        return this.displayDateTime(mDate, format, locale);
-    } else {
-        throw {message: "Invalid time value"};
+    if (!mDate || !mDate["isValid"]()) {
+        throw { message: "Invalid time value" };
     }
+
+    if (!formatString) { // use default format
+        formatString = $A.get("$Locale.timeFormat");
+    }
+
+    var langLocale = locale;
+    if (locale !== undefined) {
+        $A.deprecated("$A.localizationService.formatTime(date, formatString, locale) is deprecated. " +
+                "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
+                "by Locale Value Provider. It will be removed in an upcoming release.",
+                "Use $A.localizationService.formatTime(date, formatString)", "2017-02-26", "2018-03-30");
+
+        if (!this.isAvailableLocale(locale)) {
+            langLocale = $A.get("$Locale.langLocale");
+            $A.warning("AuraLocalizationService.formatTime(): Locale '" + locale + "' is not available. " +
+                    "Falls back to the locale in $Locale.langLocale: " + langLocale);
+        }
+    } else {
+        langLocale = $A.get("$Locale.langLocale");
+    }
+
+    return this.displayDateTime(mDate, formatString, langLocale);
 };
 
 /**
  * Formats a time in UTC.
  * @param {String|Number|Date} date - The time format that JavaScript Date object can parse.
  * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
- * @param {String} locale - A Java locale string. The default is from LocaleValueProvider.
+ * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
  * @return {String} a formatted and localized time string
  * @memberOf AuraLocalizationService
  * @example
@@ -492,15 +573,31 @@ AuraLocalizationService.prototype.formatTime = function(date, formatString, loca
  */
 AuraLocalizationService.prototype.formatTimeUTC = function(date, formatString, locale) {
     var mDate = moment["utc"](date);
-    if (mDate && mDate["isValid"]()) {
-        var format = formatString;
-        if (!format) { // use default format
-            format = $A.get("$Locale.timeFormat");
-        }
-        return this.displayDateTime(mDate, format, locale);
-    } else {
-        throw {message: "Invalid time value"};
+    if (!mDate || !mDate["isValid"]()) {
+        throw { message: "Invalid time value" };
     }
+
+    if (!formatString) { // use default format
+        formatString = $A.get("$Locale.timeFormat");
+    }
+
+    var langLocale = locale;
+    if (locale !== undefined) {
+        $A.deprecated("$A.localizationService.formatTimeUTC(date, formatString, locale) is deprecated. " +
+                "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
+                "by Locale Value Provider. It will be removed in an upcoming release.",
+                "Use $A.localizationService.formatTimeUTC(date, formatString)", "2017-02-26", "2018-03-30");
+
+        if (!this.isAvailableLocale(locale)) {
+            langLocale = $A.get("$Locale.langLocale");
+            $A.warning("AuraLocalizationService.formatTimeUTC(): Locale '" + locale + "' is not available. " +
+                    "Falls back to the locale in $Locale.langLocale: " + langLocale);
+        }
+    } else {
+        langLocale = $A.get("$Locale.langLocale");
+    }
+
+    return this.displayDateTime(mDate, formatString, langLocale);
 };
 
 /**
@@ -547,7 +644,7 @@ AuraLocalizationService.prototype.getHoursInDuration = function(d) {
  */
 AuraLocalizationService.prototype.getLocalizedDateTimeLabels = function() {
     var langLocale = $A.get("$Locale.langLocale");
-    var l = this.getNormalizedLangLocale(langLocale);
+    var l = this.getAvailableMomentLocale(langLocale);
     return moment["localeData"](l);
 };
 
@@ -791,32 +888,56 @@ AuraLocalizationService.prototype.isBetween = function(date, fromDate, toDate, u
 /**
  * Parses a string to a JavaScript Date.
  * @param {String} dateTimeString - The datetime string to be parsed.
- * @param {String} targetFormat - A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
- * @param {String} locale - A Java locale string used to parse datetime. The default is from LocaleValueProvider.
- * @param {Boolean} strictParsing - set to true to turn off moment's forgiving parsing and use strict validation
- * @return {Date} A JavaScript Date object
+ * @param {String} parseFormat - A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
+ * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
+ * @param {Boolean} [strictParsing] - (optional) Set to true to turn off moment's forgiving parsing and use strict validation.
+ * @return {Date} A JavaScript Date object, or null if dateTimeString is invalid
  * @memberOf AuraLocalizationService
  * @public
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.parseDateTime = function(dateTimeString, targetFormat, locale, strictParsing) {
+AuraLocalizationService.prototype.parseDateTime = function(dateTimeString, parseFormat, locale, strictParsing) {
     if (!dateTimeString) {
         return null;
     }
-    var format = strictParsing ? this.getStrictModeFormat(targetFormat) : this.getNormalizedFormat(targetFormat);
-    var value = strictParsing ? this.getStrictModeDateTimeString(dateTimeString) : dateTimeString;
-    var mDate = moment(value, format, this.getNormalizedLangLocale(locale), strictParsing);
-    if (mDate && mDate["isValid"]()) {
-        return mDate["toDate"]();
+
+    var langLocale = locale;
+    // recommended signature
+    if (typeof locale === 'boolean') {
+        strictParsing = locale;
+        langLocale = $A.get("$Locale.langLocale");
+    } else if (locale !== undefined || strictParsing !== undefined) {
+        $A.deprecated("$A.localizationService.parseDateTime(dateTimeString, parseFormat, locale, strictParsing) is deprecated. " +
+                "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
+                "by Locale Value Provider. It will be removed in an upcoming release.",
+                "Use $A.localizationService.parseDateTime(dateTimeString, parseFormat, strictParsing)", "2017-02-26", "2018-03-30");
+
+        if (!this.isAvailableLocale(locale)) {
+            langLocale = $A.get("$Locale.langLocale");
+            $A.warning("AuraLocalizationService.parseDateTime(): Locale '" + locale + "' is not available. " +
+                    "Falls back to the locale in $Locale.langLocale: " + langLocale);
+        }
     }
-    return null;
+
+    if (!langLocale) {
+        langLocale = $A.get("$Locale.langLocale");
+    }
+
+    var format = strictParsing ? this.getStrictModeFormat(parseFormat) : this.getNormalizedFormat(parseFormat);
+    var value = strictParsing ? this.getStrictModeDateTimeString(dateTimeString) : dateTimeString;
+    var mDate = moment(value, format, this.getAvailableMomentLocale(langLocale), strictParsing);
+    if (!mDate || !mDate["isValid"]()) {
+        return null;
+    }
+
+    return mDate["toDate"]();
 };
 
 /**
  * Parses a date time string in an ISO-8601 format.
- * @param {String} dateTimeString - The datetime string in an ISO-8601 format
- * @return {Date} A JavaScript Date object
+ * @param {String} dateTimeString - The datetime string in an ISO-8601 format.
+ * @return {Date} A JavaScript Date object, or null if dateTimeString is invalid.
  * @memberOf AuraLocalizationService
  * @public
  * @export
@@ -837,10 +958,10 @@ AuraLocalizationService.prototype.parseDateTimeISO8601 = function(dateTimeString
 /**
  * Parses a string to a JavaScript Date in UTC.
  * @param {String} dateTimeString - The datetime string to be parsed
- * @param {String} targetFormat - A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
- * @param {String} locale - A Java locale string used to parse datetime. The default is from LocaleValueProvider.
- * @param {Boolean} strictParsing - Set to true to turn off moment's forgiving parsing and use strict validation
- * @return {Date} A JavaScript Date object
+ * @param {String} parseFormat - A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
+ * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
+ * @param {Boolean} [strictParsing] - (optional) Set to true to turn off moment's forgiving parsing and use strict validation.
+ * @return {Date} A JavaScript Date object, or null if dateTimeString is invalid
  * @memberOf AuraLocalizationService
  * @example
  * var d = "2015-10-9";
@@ -850,18 +971,41 @@ AuraLocalizationService.prototype.parseDateTimeISO8601 = function(dateTimeString
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, targetFormat, locale, strictParsing) {
+AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, parseFormat, locale, strictParsing) {
     if (!dateTimeString) {
         return null;
     }
 
-    var format = strictParsing ? this.getStrictModeFormat(targetFormat) : this.getNormalizedFormat(targetFormat);
-    var value = strictParsing ? this.getStrictModeDateTimeString(dateTimeString) : dateTimeString;
-    var mDate = moment["utc"](value, format, this.getNormalizedLangLocale(locale), strictParsing);
-    if (mDate && mDate["isValid"]()) {
-        return mDate["toDate"]();
+    var langLocale = locale;
+    // recommended signature
+    if (typeof locale === 'boolean') {
+        strictParsing = locale;
+        langLocale = $A.get("$Locale.langLocale");
+    } else if (locale !== undefined || strictParsing !== undefined) {
+        $A.deprecated("$A.localizationService.parseDateTimeUTC(dateTimeString, parseFormat, locale, strictParsing) is deprecated. " +
+                "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
+                "by Locale Value Provider. It will be removed in an upcoming release.",
+                "Use $A.localizationService.parseDateTime(dateTimeString, parseFormat, strictParsing)", "2017-02-26", "2018-03-30");
+
+        if (!this.isAvailableLocale(locale)) {
+            langLocale = $A.get("$Locale.langLocale");
+            $A.warning("AuraLocalizationService.parseDateTimeUTC(): Locale '" + locale + "' is not available. " +
+                    "Falls back to the locale in $Locale.langLocale: " + langLocale);
+        }
     }
-    return null;
+
+    if (!langLocale) {
+        langLocale = $A.get("$Locale.langLocale");
+    }
+
+    var format = strictParsing ? this.getStrictModeFormat(parseFormat) : this.getNormalizedFormat(parseFormat);
+    var value = strictParsing ? this.getStrictModeDateTimeString(dateTimeString) : dateTimeString;
+    var mDate = moment["utc"](value, format, this.getAvailableMomentLocale(langLocale), strictParsing);
+    if (!mDate || !mDate["isValid"]()) {
+        return null;
+    }
+
+    return mDate["toDate"]();
 };
 
 /**
@@ -1116,13 +1260,110 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
 /**---------- Private functions ----------*/
 
 /**
+ * Initialize localization service.
+ * @private
+ */
+AuraLocalizationService.prototype.init = function() {
+    if (typeof moment === "undefined") {
+        $A.warning("moment is required to initialize Localization Service.");
+        return;
+    }
+
+    // If locale data didn't get added in inline.js, then adding the locale data.
+    if (Aura["loadLocaleData"]) {
+        Aura["loadLocaleData"]();
+        Aura["loadLocaleData"] = undefined;
+    }
+
+    // TODO: remove this when locales are consolidated.
+    // Caching all available locales. This is for backward compatibility. At this moment, there are three locales
+    // in Locale Value Provider. Keep them all available for now to avoid breaking consumers.
+
+    // Refer to LocaleValueProvider.java
+    var langLocale = $A.get("$Locale.langLocale");
+    var userLocale = $A.get("$Locale.userLocaleLang") + "_" + $A.get("$Locale.userLocaleCountry");
+    var ltngLocale = $A.get("$Locale.language") + "_" + $A.get("$Locale.userLocaleCountry");
+
+    this.localeCache[langLocale] = this.normalizeToMomentLocale(langLocale);
+    this.localeCache[userLocale] = this.normalizeToMomentLocale(userLocale);
+    this.localeCache[ltngLocale] = this.normalizeToMomentLocale(ltngLocale);
+
+    // set moment default locale
+    moment.locale(this.localeCache[langLocale]);
+};
+
+/**
+ * Normalize the specified Java locale string to moment.js compatible one.
+ *
+ * This function only normalizes locales which have available data on the client.
+ *
+ * @private
+ */
+AuraLocalizationService.prototype.normalizeToMomentLocale = function(locale) {
+    if (!locale) {
+        return locale;
+    }
+
+    // all locales that have been loaded in moment
+    var locales = moment["locales"]();
+    var momentLocale;
+
+    var normalized = locale.toLowerCase().replace("_", "-");
+    var tokens = normalized.split("-", 2);
+
+    if (tokens.length > 1) {
+        momentLocale = tokens.join("-");
+        if (locales.indexOf(momentLocale) > -1) {
+            return momentLocale;
+        }
+    }
+
+    momentLocale = tokens[0];
+    if (locales.indexOf(momentLocale) > -1) {
+        return momentLocale;
+    }
+
+    // no matching, falls back to en
+    return "en";
+};
+
+/**
+ * Get available moment locale from cache based on specified Java locale.
+ *
+ * This function assumes all available locales are added to cache during init().
+ *
+ * @param {String} locale - a Java locale
+ * @return {String} corresponding momnet locale string, or 'en' if Java locale doesn't exists in cache.
+ *
+ * @private
+ */
+AuraLocalizationService.prototype.getAvailableMomentLocale = function(locale) {
+    var momentLocale = this.localeCache[locale];
+    return momentLocale? momentLocale : "en";
+};
+
+/**
+ * Check if a Java locale is available in localization service.
+ *
+ * This function assumes all available locales are added to cache during init().
+ *
+ * @param {String} locale - a Java locale
+ * @return {Boolean} true if locale is available, false otherwise
+ *
+ * @private
+ */
+AuraLocalizationService.prototype.isAvailableLocale = function(locale) {
+    return this.localeCache.hasOwnProperty(locale);
+};
+
+/**
  * Display date, datetime or time based on the format string.
  *
  * @private
  */
 AuraLocalizationService.prototype.displayDateTime = function(mDate, format, locale) {
     if (locale) { // set locale locally
-        mDate["locale"](this.getNormalizedLangLocale(locale));
+        mDate["locale"](this.getAvailableMomentLocale(locale));
     }
     return mDate["format"](this.getNormalizedFormat(format));
 };
@@ -1175,10 +1416,8 @@ AuraLocalizationService.prototype.getStrictModeFormat = function(format) {
     return format;
 };
 
-
 /**
  * Modifying the date time string so that moment's strict parsing doesn't break on minor deviations
- *
  *
  * @private
  */
@@ -1187,60 +1426,6 @@ AuraLocalizationService.prototype.getStrictModeDateTimeString = function(dateTim
         return dateTimeString.replace(/(\d)([AaPp][Mm])/g, "$1 $2");
     }
     return dateTimeString;
-};
-
-/**
- * Normalize the input Java locale string to moment.js compatible one.
- *
- * @private
- */
-AuraLocalizationService.prototype.getNormalizedLangLocale = function(langLocale) {
-    if (!langLocale) {
-        return langLocale;
-    }
-
-    if (!this.cache.langLocale[langLocale]) {
-        var lang = [];
-        var token = "";
-
-        var index = langLocale.indexOf("_");
-        while (index > 0) {
-            token = langLocale.substring(0, index);
-            langLocale = langLocale.substring(index + 1);
-            lang.push(token.toLowerCase());
-            index = langLocale.indexOf("_");
-        }
-
-        langLocale = langLocale.substring(index + 1);
-        if (!$A.util.isEmpty(langLocale)) {
-            lang.push(langLocale.toLowerCase());
-        }
-
-        var ret = lang[0];
-        if (lang[1]) {
-            var langAndCountry = lang[0] + "-" + lang[1];
-            if (moment["localeData"](langAndCountry)) {
-                ret = langAndCountry;
-            }
-        }
-        if (!moment["localeData"](ret)) {
-            ret = "en";
-        }
-        this.cache.langLocale[langLocale] = ret;
-    }
-    return this.cache.langLocale[langLocale];
-};
-
-/**
- * Initialize localization service.
- * @private
- */
-AuraLocalizationService.prototype.init = function() {
-    // Set global default language locale
-    var defaultLangLocale = $A.get("$Locale.langLocale");
-    if (typeof moment !== "undefined" && defaultLangLocale) {
-        moment.locale(this.getNormalizedLangLocale(defaultLangLocale));
-    }
 };
 
 /**

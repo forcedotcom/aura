@@ -78,8 +78,9 @@
 
     /**
      * Verify AM/PM in a non-English language.
+     * TODO: The usage is not valid anymore. Needs to change the app's locale on the server side.
      */
-    testLanguage: {
+    _testLanguage: {
         attributes: {value : '2004-09-23T16:30:00.000Z', format: 'M/dd/yy h:mm A', langLocale: 'zh_CN', timezone: 'Asia/Shanghai'},
         test: function(component){
             $A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
@@ -91,9 +92,10 @@
 
     /**
      * Verify behavior when 'langLocale' attribute is changed and component is rerendered.
+     * TODO: The usage is not valid anymore. Needs to change the app's locale on the server side.
      */
-    testChangeLangLocale:{
-    	attributes: {value : '2004-09-23T16:30:00.000Z', format: 'M/dd/yy h:mm A', langLocale: 'zh_CN', timezone: 'Asia/Shanghai'},
+    _testChangeLangLocale: {
+      attributes: {value : '2004-09-23T16:30:00.000Z', format: 'M/dd/yy h:mm A', langLocale: 'zh_CN', timezone: 'Asia/Shanghai'},
         doNotWrapInAuraRun : true,
         test: function(component){
             $A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){

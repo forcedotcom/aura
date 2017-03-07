@@ -69,7 +69,9 @@ public interface ConfigAdapter extends AuraAdapter {
      * @return a String, may be null
      */
     String getSessionCacheKey();
-    
+
+    // TODO: This shouldn't be a API of config adapter.
+    // check reference. Remove it if not needed.
     /**
      * Timezone from current context or GMT
      * @return timezone

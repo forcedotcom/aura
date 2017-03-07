@@ -16,14 +16,27 @@
 package org.auraframework.http.resource;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.Reader;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
+import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -37,22 +50,37 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraJWTError;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraLocale;
+import org.auraframework.util.resource.ResourceLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @ServiceComponent
 public class InlineJs extends AuraResourceImpl {
 
-    public InlineJs() {
-        super("inline.js", Format.JS);
-    }
-
+    private LocalizationAdapter localizationAdapter;
     private RenderingService renderingService;
 
     private List<PreInitJavascript> preInitJavascripts;
 
+    private Map<String, String> localeData;
+
+    public InlineJs() {
+        super("inline.js", Format.JS);
+    }
+
+    @PostConstruct
+    public void initialize() {
+        localeData = readLocaleData();
+    }
+
     @Inject
     public void setRenderingService(RenderingService renderingService) {
         this.renderingService = renderingService;
+    }
+
+    @Inject
+    public void setLocalizationAdapter(LocalizationAdapter localizationAdapter) {
+        this.localizationAdapter = localizationAdapter;
     }
 
     private <T extends BaseComponentDef> void internalWrite(HttpServletRequest request,
@@ -90,7 +118,50 @@ public class InlineJs extends AuraResourceImpl {
 
         Component template = serverService.writeTemplate(context, def, getComponentAttributes(request), out);
         appendPreInitJavascripts(def, context.getMode(), out);
+        appendLocaleDataJavascripts(out);
         renderingService.render(template, null, out);
+    }
+
+    private void appendLocaleDataJavascripts(PrintWriter out) {
+        AuraLocale auraLocale = localizationAdapter.getAuraLocale();
+
+        // Refer to the locale in LocaleValueProvider
+        Locale langLocale = auraLocale.getLanguageLocale();
+        Locale userLocale = auraLocale.getLocale();
+
+        // This is for backward compatibility. At this moment, there are three locales
+        // in Locale Value Provider. Keep them all available for now to avoid breaking consumers.
+        String langMomentLocale = this.getMomentLocale(langLocale.toString());
+        String userMomentLocale = this.getMomentLocale(userLocale.toString());
+        String ltngMomentLocale = this.getMomentLocale(langLocale.getLanguage() + "_" + userLocale.getCountry());
+
+        StringBuilder defineLocaleJs = new StringBuilder();
+        // "en" data has been included in moment lib, no need to load locale data
+        if (!"en".equals(langMomentLocale)) {
+            String content = this.localeData.get(langMomentLocale);
+            defineLocaleJs.append(content).append("\n");
+        }
+
+        // if user locale is same as language locale, not need to load again
+        if (!"en".equals(userMomentLocale) && userMomentLocale != null && !userMomentLocale.equals(langMomentLocale)) {
+            String content = this.localeData.get(userMomentLocale);
+            defineLocaleJs.append(content);
+        }
+
+        if (!"en".equals(ltngMomentLocale) && ltngMomentLocale != null && !ltngMomentLocale.equals(langMomentLocale) && !ltngMomentLocale.equals(userMomentLocale)) {
+            String content = this.localeData.get(ltngMomentLocale);
+            defineLocaleJs.append(content);
+        }
+
+        if (defineLocaleJs.length() > 0) {
+            String loadLocaleDataJs = String.format(
+                    "\n(function(){\n" +
+                    "    function loadLocaleData(){\n%s}\n" +
+                    "    window.moment? loadLocaleData() : (window.Aura || (window.Aura = {}), window.Aura.loadLocaleData=loadLocaleData);\n" +
+                    "})();\n", defineLocaleJs.toString());
+
+            out.append(loadLocaleDataJs);
+        }
     }
 
     /**
@@ -155,6 +226,68 @@ public class InlineJs extends AuraResourceImpl {
                 exceptionAdapter.handleException(new AuraResourceException(getName(), response.getStatus(), t));
             }
         }
+    }
+
+    private Map<String, String> readLocaleData() {
+        String localeDataPath = "aura/resources/moment/locales.js";
+
+        ResourceLoader resourceLoader = configAdapter.getResourceLoader();
+        Map<String, String> localeData = new HashMap<>();
+        try (InputStream is = resourceLoader.getResourceAsStream(localeDataPath)) {
+            if (is == null) {
+                throw new IOException("Locale file doesn't exist: " + localeDataPath);
+            }
+
+            Reader reader = new InputStreamReader(is);
+            String content = IOUtils.toString(reader);
+            // parse out all locale's code
+            String[] blocks = content.split("(//! moment.js locale configuration)|(moment.locale\\(\\'en\\'\\);)");
+
+            // ignore the first and the last code block
+            for (int i = 1; i < blocks.length - 1; i++) {
+                String block = blocks[i];
+                // parse out the locale id from comment
+                Pattern pattern = Pattern.compile("//! locale.*\\[([\\w-]*)\\]");
+                Matcher matcher = pattern.matcher(block);
+                if (matcher.find()) {
+                    String locale = matcher.group(1).trim();
+                    localeData.put(locale, block);
+                }
+            }
+        } catch (Exception e) {
+            exceptionAdapter.handleException(e);
+        }
+
+        return Collections.unmodifiableMap(localeData);
+    }
+
+    private String getMomentLocale(String locale) {
+        if(locale == null) {
+            return "en";
+        }
+
+        // normalize Java locale string to moment locale
+        String normalized = locale.toLowerCase().replace("_", "-");
+        String[] tokens = normalized.split("-");
+
+        String momentLocale = null;
+        if (tokens.length > 1) {
+            momentLocale = tokens[0] + "-" + tokens[1];
+            if (this.localeData.containsKey(momentLocale)) {
+                return momentLocale;
+            }
+        }
+
+        momentLocale = tokens[0];
+        if (this.localeData.containsKey(momentLocale)) {
+            return momentLocale;
+        }
+
+        return "en";
+    }
+
+    public Set<String> getMomentLocales() {
+        return this.localeData.keySet();
     }
 
     @Autowired(required = false) // only clean way to allow no bean vs using Optional

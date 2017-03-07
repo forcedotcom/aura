@@ -341,8 +341,9 @@
 
     /**
      * Verify a value in other language.
+     * TODO: The usage is not valid anymore. Needs to change the app's locale on the server side.
      */
-    testLanguage: {
+    _testLanguage: {
         browsers: ['DESKTOP'],
         attributes: {value: '2004-09-23T16:30:00.000Z', displayDatePicker: 'true', timezone: 'GMT', langLocale: 'fr'},
         test: function (cmp) {

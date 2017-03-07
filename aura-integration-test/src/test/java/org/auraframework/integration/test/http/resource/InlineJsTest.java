@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.http.HttpStatus;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
+import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
@@ -63,6 +64,9 @@ public class InlineJsTest extends AuraImplTestCase {
     private ServletUtilAdapter servletUtilAdapter;
 
     @Inject
+    private LocalizationAdapter localizationAdapter;
+
+    @Inject
     private ServerService serverService;
 
     @Inject
@@ -78,7 +82,9 @@ public class InlineJsTest extends AuraImplTestCase {
         inlineJs.setServerService(serverService);
         inlineJs.setRenderingService(renderingService);
         inlineJs.setExceptionAdapter(exceptionAdapter);
+        inlineJs.setLocalizationAdapter(localizationAdapter);
         inlineJs.initManifest();
+        inlineJs.initialize();
         return inlineJs;
     }
 
@@ -277,5 +283,15 @@ public class InlineJsTest extends AuraImplTestCase {
         // Assert
         // JWT token failure returns 404 response code
         assertEquals(HttpStatus.SC_NOT_FOUND, response.getStatus());
+    }
+
+    /**
+     * Verify all moment locale data are correctly parsed into map.
+     * For current version of moment, it has 108 locales.
+     */
+    @Test
+    public void testInitializeLoadsAllMomentLocaleData() {
+        InlineJs inlineJs = getInlineJs();
+        assertEquals(108, inlineJs.getMomentLocales().size());
     }
 }

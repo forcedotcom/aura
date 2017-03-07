@@ -82,8 +82,9 @@
 
     /**
      * Verify behavior when 'langLocale' attribute is assigned a different value.
+     * TODO: The usage is not valid anymore. Needs to change the app's locale on the server side.
      */
-    testLangLocale: {
+    _testLangLocale: {
         browsers: ['DESKTOP'],
         attributes: {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10', langLocale: 'es'},
         test: function (cmp) {

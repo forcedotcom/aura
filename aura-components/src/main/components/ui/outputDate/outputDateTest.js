@@ -117,25 +117,27 @@
 
     /**
      * Verify behavior when 'langLocale' attribute is assigned a value.
+     * TODO: The usage is not valid anymore. Needs to change the app's locale on the server side.
      */
-    testLangLocale: {
+    _testLangLocale: {
         attributes: {value : '2004-09-23', format: 'MMM d, yyyy', langLocale: 'fr'},
-        test: function(component){
+        test: function(component) {
             $A.test.assertEquals("sept. 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
-      }
+        }
     },
 
     /**
      * Verify behavior when 'langLocale' attribute is changed and component is rerendered.
+     * TODO: The usage is not valid anymore. Needs to change the app's locale on the server side.
      */
-    testChangeLangLocale: {
+    _testChangeLangLocale: {
         attributes: {value : '2004-09-23', format: 'MMM d, yyyy', langLocale: 'en'},
         test: function(component){
             $A.test.assertEquals("Sep 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
             component.set("v.langLocale", "fr");
             $A.rerender(component);
             $A.test.assertEquals("sept. 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
-      }
+        }
     },
 
     /**

@@ -46,7 +46,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-
 public class LocaleValueProvider implements GlobalValueProvider {
     public static String USER_LOCALE_LANGUAGE = "userLocaleLang";
     public static String USER_LOCALE_COUNTRY = "userLocaleCountry";
@@ -87,15 +86,15 @@ public class LocaleValueProvider implements GlobalValueProvider {
     private final DefinitionService definitionService;
 
     public LocaleValueProvider(ConfigAdapter configAdapter, LocalizationAdapter localizationAdapter, DefinitionService definitionService) {
-    	this.definitionService = definitionService;
-    	
+        this.definitionService = definitionService;
+
         Builder<String, Object> builder = ImmutableMap.builder();
 
-        AuraLocale al = localizationAdapter.getAuraLocale();
+        AuraLocale auraLocale = localizationAdapter.getAuraLocale();
 
-        Locale userLocale = al.getLocale();
-        Locale lang = al.getLanguageLocale();
-        Locale dateLocale = al.getDateLocale();
+        Locale userLocale = auraLocale.getLocale();
+        Locale lang = auraLocale.getLanguageLocale();
+        Locale dateLocale = auraLocale.getDateLocale();
 
         builder.put(USER_LOCALE_LANGUAGE, userLocale.getLanguage());
         builder.put(USER_LOCALE_COUNTRY, userLocale.getCountry());
@@ -105,14 +104,14 @@ public class LocaleValueProvider implements GlobalValueProvider {
         builder.put(LANGUAGE_LOCALE, lang.toString());
 
         try {
-            builder.put(MONTH_NAME, this.getNameOfMonths(al));
-            builder.put(WEEKDAY_NAME, this.getNameOfWeekdays(al));
+            builder.put(MONTH_NAME, this.getNameOfMonths(auraLocale));
+            builder.put(WEEKDAY_NAME, this.getNameOfWeekdays(auraLocale));
             builder.put(TODAY_LABEL, this.getLabelForToday(localizationAdapter));
         } catch (QuickFixException qfe) {
             // Ignore
         }
 
-        builder.put(FIRST_DAY_OF_WEEK, Calendar.getInstance(al.getTimeZone(), userLocale).getFirstDayOfWeek());
+        builder.put(FIRST_DAY_OF_WEEK, Calendar.getInstance(auraLocale.getTimeZone(), userLocale).getFirstDayOfWeek());
 
         // using java DateFormat because the year pattern "MMM d, y" (although valid) isn't understood by moment.js
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, dateLocale);
@@ -133,13 +132,13 @@ public class LocaleValueProvider implements GlobalValueProvider {
             builder.put(TIME_FORMAT, DEFAULT_TIME_FORMAT);
         }
 
-        String timezoneId = al.getTimeZone().getID();
+        String timezoneId = auraLocale.getTimeZone().getID();
         builder.put(TIME_ZONE, timezoneId);
 
-        builder.put(IS_EASTERN_NAME_STYLE, al.isEasternNameStyle());
+        builder.put(IS_EASTERN_NAME_STYLE, auraLocale.isEasternNameStyle());
 
         // DecimalFormat is expected
-        DecimalFormat df = (DecimalFormat) DecimalFormat.getNumberInstance(al.getNumberLocale());
+        DecimalFormat df = (DecimalFormat) DecimalFormat.getNumberInstance(auraLocale.getNumberLocale());
 
         // Patterns are not localized; the "." means "locale decimal" not "dot"
         builder.put(NUMBER_FORMAT, df.toPattern());
@@ -148,12 +147,12 @@ public class LocaleValueProvider implements GlobalValueProvider {
         builder.put(GROUPING, dfs.getGroupingSeparator());
         builder.put(ZERO_DIGIT, dfs.getZeroDigit());
 
-        df = (DecimalFormat) DecimalFormat.getPercentInstance(al.getNumberLocale());
+        df = (DecimalFormat) DecimalFormat.getPercentInstance(auraLocale.getNumberLocale());
 
         // Don't localize the patterns
         builder.put(PERCENT_FORMAT, df.toPattern());
 
-        df = (DecimalFormat) DecimalFormat.getCurrencyInstance(al.getCurrencyLocale());
+        df = (DecimalFormat) DecimalFormat.getCurrencyInstance(auraLocale.getCurrencyLocale());
 
         // Don't localize the patterns
         builder.put(CURRENCY_FORMAT, df.toPattern());
@@ -194,7 +193,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
 
     @Override
     public boolean refSupport() {
-    	// $Locale has no serialization references.
+        // $Locale has no serialization references.
         return false;
     }
 

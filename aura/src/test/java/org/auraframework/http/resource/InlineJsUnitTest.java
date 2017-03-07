@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
+import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.http.resource.AuraResourceImpl.AuraResourceException;
 import org.auraframework.javascript.PreInitJavascript;
@@ -208,6 +209,7 @@ public class InlineJsUnitTest {
         DefinitionService definitionService = PowerMockito.mock(DefinitionService.class);
         ServerService serverService = PowerMockito.mock(ServerService.class);
         RenderingService renderingService = PowerMockito.mock(RenderingService.class);
+        LocalizationAdapter localizationAdapter = PowerMockito.mock(LocalizationAdapter.class);
 
         ConfigAdapter configAdapter = mock(ConfigAdapter.class);
         Mockito.when(configAdapter.validateBootstrap(Mockito.anyString())).thenReturn(true);
@@ -219,9 +221,11 @@ public class InlineJsUnitTest {
         inline.setServerService(serverService);
         inline.setRenderingService(renderingService);
         inline.setConfigAdapter(configAdapter);
+        inline.setLocalizationAdapter(localizationAdapter);
 
         InlineJs inlineSpy = PowerMockito.spy(inline);
         PowerMockito.doReturn(false).when(inlineSpy, "shouldCacheHTMLTemplate", anyObject(), anyObject(), anyObject());
+        PowerMockito.doNothing().when(inlineSpy, "appendLocaleDataJavascripts", anyObject());
         inlineSpy.initManifest();
 
         return inlineSpy;

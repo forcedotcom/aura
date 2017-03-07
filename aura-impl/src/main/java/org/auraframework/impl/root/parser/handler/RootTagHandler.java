@@ -71,7 +71,12 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
         return false;
     }
 
-    protected abstract RootDefinitionBuilder<T> getBuilder();
+    public abstract RootDefinitionBuilder<T> getBuilder();
+
+    @Override
+    protected T createDefinition() throws QuickFixException {
+        return getBuilder().build();
+    }
 
     public void setParseError(Throwable t) {
         RootDefinitionBuilder<T> builder = getBuilder();

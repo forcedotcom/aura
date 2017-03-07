@@ -97,7 +97,7 @@ public class RegisterEventHandler<P extends RootDefinition> extends ParentedTagH
     protected boolean allowPrivateAttribute() {
         return true;
     }
-	
+
     @Override
     protected RegisterEventDefImpl createDefinition() throws QuickFixException {
         return builder.build();

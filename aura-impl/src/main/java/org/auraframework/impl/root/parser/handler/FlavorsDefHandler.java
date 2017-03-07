@@ -68,7 +68,7 @@ public class FlavorsDefHandler extends RootTagHandler<FlavorsDef> {
     }
 
     @Override
-    protected RootDefinitionBuilder<FlavorsDef> getBuilder() {
+    public RootDefinitionBuilder<FlavorsDef> getBuilder() {
         return builder;
     }
 

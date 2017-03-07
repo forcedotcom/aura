@@ -106,11 +106,15 @@ public abstract class XMLParser<D extends RootDefinition> implements DefinitionF
 
     @Override
     public D getDefinition(DefDescriptor<D> descriptor, TextSource<D> source) throws QuickFixException {
+        return getDefinitionBuilder(descriptor, source).getBuilder().build();
+    }
+
+    protected RootTagHandler<D> getDefinitionBuilder(DefDescriptor<D> descriptor, TextSource<D> source)
+            throws QuickFixException {
         Reader reader = null;
         XMLStreamReader xmlReader = null;
         RootTagHandler<D> handler = null;
 
-        D ret = null;
         try {
             String contents = source.getContents();
             reader = new HTMLReader(new StringReader(contents));
@@ -140,7 +144,7 @@ public abstract class XMLParser<D extends RootDefinition> implements DefinitionF
                     throw new InvalidDefinitionException("Empty file", getLocation(xmlReader, source));
                 }
             }
-            ret = handler.getElement();
+            handler.process();
             if (xmlReader != null) {
                 LOOP: while (xmlReader.hasNext()) {
                     int type = xmlReader.next();
@@ -165,12 +169,7 @@ public abstract class XMLParser<D extends RootDefinition> implements DefinitionF
                     handler.setParseError(new AuraUnhandledException(e.getLocalizedMessage(),
                         getLocation(xmlReader, source), e));
                 }
-                try {
-                    ret = handler.getErrorElement();
-                } catch (Throwable t) {
-                    // rethrow our original error, what else can we do?
-                    throw new AuraUnhandledException(e.getLocalizedMessage(), getLocation(xmlReader, source), e);
-                }
+                return handler;
             } else {
                 throw new AuraUnhandledException(e.getLocalizedMessage(), getLocation(xmlReader, source), e);
             }
@@ -199,8 +198,7 @@ public abstract class XMLParser<D extends RootDefinition> implements DefinitionF
                 }
             }
         }
-
-        return ret;
+        return handler;
     }
 
     /**

@@ -72,7 +72,7 @@ public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
     }
 
     @Override
-    protected RootDefinitionBuilder<DocumentationDef> getBuilder() {
+    public RootDefinitionBuilder<DocumentationDef> getBuilder() {
         return builder;
     }
 

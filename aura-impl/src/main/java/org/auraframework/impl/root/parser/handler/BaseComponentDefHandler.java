@@ -111,9 +111,11 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                                    XMLStreamReader xmlReader,
                                    boolean isInInternalNamespace, DefinitionService definitionService,
                                    ContextService contextService,
-                                   ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
+                                   ConfigAdapter configAdapter,
+                                   DefinitionParserAdapter definitionParserAdapter,
+                                   B builder) {
         super(componentDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
-        builder = createBuilder();
+        this.builder = builder;
         builder.setLocation(getLocation());
         builder.setDescriptor(componentDefDescriptor);
         if (source != null) {
@@ -265,10 +267,8 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
         }
     }
 
-    protected abstract B createBuilder();
-
     @Override
-    protected RootDefinitionBuilder<T> getBuilder() {
+    public RootDefinitionBuilder<T> getBuilder() {
         return builder;
     }
 
@@ -482,8 +482,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
     }
 
     @Override
-    protected T createDefinition() throws QuickFixException {
-
+    protected void finishDefinition() throws QuickFixException {
         if (!body.isEmpty()) {
             AttributeDefRefImpl.Builder atBuilder = new AttributeDefRefImpl.Builder();
             atBuilder.setDescriptor(definitionService.getDefDescriptor(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME,
@@ -496,10 +495,9 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
         }
         Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs = readRequiredVersionDefs(defDescriptor);
         if(requiredVersionDefs != null) {
-        	builder.setRequiredVersionDefs(requiredVersionDefs);
+            builder.setRequiredVersionDefs(requiredVersionDefs);
         }
 
-        return builder.build();
     }
 
     @Override

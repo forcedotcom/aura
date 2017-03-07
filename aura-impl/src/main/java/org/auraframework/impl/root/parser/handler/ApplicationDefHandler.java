@@ -46,7 +46,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
                                  XMLStreamReader xmlReader, boolean isInInternalNamespace, DefinitionService definitionService,
                                  ContextService contextService,
                                  ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(applicationDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, contextService, configAdapter, definitionParserAdapter);
+        super(applicationDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, contextService, configAdapter, definitionParserAdapter, new ApplicationDefImpl.Builder());
     }
 
     @Override
@@ -59,11 +59,6 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         }
         
         return allowed;
-    }
-
-    @Override
-    protected ApplicationDefImpl.Builder createBuilder() {
-        return new ApplicationDefImpl.Builder();
     }
 
     @Override

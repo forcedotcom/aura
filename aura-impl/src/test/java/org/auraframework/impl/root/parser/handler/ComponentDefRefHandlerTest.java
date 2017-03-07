@@ -69,6 +69,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
     public void testHandleChildText() throws Exception {
         xmlReader.next();
         cdrHandler.handleChildText();
+        cdrHandler.finishDefinition();
         ComponentDefRef cdr = cdrHandler.createDefinition();
         ArrayList<ComponentDefRef> compDefs = (ArrayList<ComponentDefRef>) cdr.getAttributeDefRef(
                 AttributeDefRefImpl.BODY_ATTRIBUTE_NAME).getValue();
@@ -82,6 +83,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         xmlReader.next();
         xmlReader.next();
         cdrHandler.handleChildTag();
+        cdrHandler.finishDefinition();
         ComponentDefRef cdr = cdrHandler.createDefinition();
         ArrayList<DefinitionReference> compDefs = (ArrayList<DefinitionReference>) cdr.getAttributeDefRef(
                 AttributeDefRefImpl.BODY_ATTRIBUTE_NAME).getValue();

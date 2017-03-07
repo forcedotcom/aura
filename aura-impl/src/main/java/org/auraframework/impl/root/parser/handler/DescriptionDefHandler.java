@@ -80,9 +80,12 @@ public class DescriptionDefHandler<P> extends ParentedTagHandler<DescriptionDefI
     }
 
     @Override
-    protected DescriptionDefImpl createDefinition() throws QuickFixException {
+    protected void finishDefinition() throws QuickFixException {
         builder.setDescription(body.toString());
-        
+    }
+
+    @Override
+    protected DescriptionDefImpl createDefinition() throws QuickFixException {
         return builder.build();
     }
 }

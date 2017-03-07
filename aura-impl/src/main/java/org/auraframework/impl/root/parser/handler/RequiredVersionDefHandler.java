@@ -89,8 +89,7 @@ public class RequiredVersionDefHandler<P extends RootDefinition> extends Parente
     }
 
     @Override
-    protected RequiredVersionDefImpl createDefinition()
-            throws QuickFixException {
+    protected RequiredVersionDefImpl createDefinition() throws QuickFixException {
         return builder.build();
     }
 }

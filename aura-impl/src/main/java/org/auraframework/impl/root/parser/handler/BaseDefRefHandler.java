@@ -133,10 +133,14 @@ public abstract class BaseDefRefHandler<T extends DefinitionReference, P extends
     }
 
     @Override
-    protected T createDefinition() throws QuickFixException {
+    protected void finishDefinition() throws QuickFixException {
         if (!body.isEmpty()) {
             setBody(body);
         }
+    }
+
+    @Override
+    protected T createDefinition() throws QuickFixException {
         return builder.build();
     }
 

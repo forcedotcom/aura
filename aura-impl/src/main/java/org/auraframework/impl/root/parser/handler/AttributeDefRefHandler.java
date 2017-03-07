@@ -74,7 +74,7 @@ public class AttributeDefRefHandler<P extends RootDefinition> extends ParentedTa
     }
 
     @Override
-    protected AttributeDefRefImpl createDefinition() throws QuickFixException {
+    protected void finishDefinition() throws QuickFixException {
         if (AuraTextUtil.isNullEmptyOrWhitespace(stringValue)) {
             if(!children.isEmpty()) {
                 builder.setValue(children);
@@ -85,7 +85,9 @@ public class AttributeDefRefHandler<P extends RootDefinition> extends ParentedTa
             TextTokenizer tt = TextTokenizer.tokenize(stringValue, getLocation());
             builder.setValue(tt.asValue(getParentHandler()));
         }
+    }
 
+    protected AttributeDefRefImpl createDefinition() throws QuickFixException {
         return builder.build();
     }
 

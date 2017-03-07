@@ -94,7 +94,7 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
     }
 
     @Override
-    protected RootDefinitionBuilder<DesignDef> getBuilder() {
+    public RootDefinitionBuilder<DesignDef> getBuilder() {
         return builder;
     }
 

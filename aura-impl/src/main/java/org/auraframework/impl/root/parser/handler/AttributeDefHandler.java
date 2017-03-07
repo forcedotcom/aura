@@ -134,8 +134,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     }
 
     @Override
-    protected AttributeDefImpl createDefinition() throws QuickFixException {
-
+    protected void finishDefinition() throws QuickFixException {
         Object defaultObj = null;
         if (defaultValue != null) { // even it is an empty string or whitespace,
             // we should still set it in order to
@@ -155,7 +154,9 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
             atBuilder.setAccess(getAccess(isInInternalNamespace));
             builder.setDefaultValue(atBuilder.build());
         }
+    }
 
+    public AttributeDefImpl createDefinition() throws QuickFixException {
         return builder.build();
     }
 

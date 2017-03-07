@@ -61,6 +61,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
     public void testHandleChildText() throws Exception {
         xmlReader.next();
         htmlHandler.handleChildText();
+        htmlHandler.finishDefinition();
         ArrayList<ComponentDefRefImpl> compDefs = (ArrayList<ComponentDefRefImpl>) htmlHandler.createDefinition()
                 .getAttributeDefRef("body").getValue();
         AttributeDefRef attDef = compDefs.get(0).getAttributeDefRef("value");
@@ -73,6 +74,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
         xmlReader.next();
         xmlReader.next();
         htmlHandler.handleChildTag();
+        htmlHandler.finishDefinition();
         ArrayList<DefinitionReference> cd = (ArrayList<DefinitionReference>) htmlHandler.createDefinition()
                 .getAttributeDefRef("body").getValue();
         assertEquals(1, cd.size());

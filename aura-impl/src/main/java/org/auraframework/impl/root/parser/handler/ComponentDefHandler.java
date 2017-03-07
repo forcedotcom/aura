@@ -55,12 +55,7 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef, C
                                XMLStreamReader xmlReader, boolean isInInternalNamespace, DefinitionService definitionService,
                                ContextService contextService,
                                ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
-        super(componentDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, contextService, configAdapter, definitionParserAdapter);
-    }
-
-    @Override
-    protected ComponentDefImpl.Builder createBuilder() {
-        return new ComponentDefImpl.Builder();
+        super(componentDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, contextService, configAdapter, definitionParserAdapter, new ComponentDefImpl.Builder());
     }
 
     @Override

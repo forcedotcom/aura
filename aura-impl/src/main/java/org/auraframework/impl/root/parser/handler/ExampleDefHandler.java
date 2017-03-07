@@ -104,9 +104,12 @@ public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHand
     }
 
     @Override
-    protected ExampleDefImpl createDefinition() throws QuickFixException {
+    protected void finishDefinition() throws QuickFixException {
         builder.setDescription(body.toString());
+    }
 
+    @Override
+    protected ExampleDefImpl createDefinition() throws QuickFixException {
         return builder.build();
     }
 }

@@ -75,6 +75,7 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
             builder.setOwnHash(source.getHash());
         }
         builder.extendsDescriptors = new HashSet<>();
+        builder.setDescriptor(descriptor);
         this.contextService = contextService;
     }
 
@@ -151,10 +152,8 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
     }
 
     @Override
-    protected InterfaceDef createDefinition() {
-        builder.setDescriptor(getDefDescriptor());
+    protected void finishDefinition() {
         builder.setLocation(startLocation);
-        return builder.build();
     }
 
     @Override
@@ -166,7 +165,7 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
     }
 
     @Override
-    protected RootDefinitionBuilder<InterfaceDef> getBuilder() {
+    public RootDefinitionBuilder<InterfaceDef> getBuilder() {
         return builder;
     }
 

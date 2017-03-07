@@ -52,6 +52,7 @@ public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
                              boolean isInInternalNamespace, DefinitionService definitionService,
                              ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(libraryDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+        builder.setDescriptor(libraryDefDescriptor);
     }
 
     @Override
@@ -61,12 +62,10 @@ public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
     }
 
     @Override
-    protected LibraryDefImpl createDefinition() throws QuickFixException {
-        builder.setDescriptor(getDefDescriptor());
-        builder.setLocation(startLocation);
+    protected void finishDefinition() throws QuickFixException {
         builder.setOwnHash(source.getHash());
+        builder.setLocation(startLocation);
         builder.setIncludes(includes);
-        return builder.build();
     }
 
     @Override
@@ -99,7 +98,7 @@ public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
     }
 
     @Override
-    protected RootDefinitionBuilder<LibraryDef> getBuilder() {
+    public RootDefinitionBuilder<LibraryDef> getBuilder() {
         return builder;
     }
 

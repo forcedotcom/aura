@@ -101,9 +101,12 @@ public final class TokenDefHandler<P extends RootDefinition> extends ParentedTag
     }
 
     @Override
-    protected TokenDef createDefinition() throws QuickFixException {
+    protected void finishDefinition() throws QuickFixException {
         TextTokenizer tt = TextTokenizer.tokenize(value, getLocation());
         builder.setValue(tt.asValue(getParentHandler()));
+    }
+
+    protected TokenDef createDefinition() throws QuickFixException {
         return builder.build();
     }
 

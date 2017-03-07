@@ -59,6 +59,7 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
                            ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(eventDefDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter,
                 definitionParserAdapter);
+        builder.setDescriptor(eventDefDescriptor);
     }
 
     @Override
@@ -67,11 +68,9 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
     }
 
     @Override
-    protected EventDefImpl createDefinition() {
-        builder.setDescriptor(getDefDescriptor());
+    protected void finishDefinition() {
         builder.setLocation(startLocation);
         builder.setOwnHash(source.getHash());
-        return builder.build();
     }
 
     @Override
@@ -132,7 +131,7 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
     }
 
     @Override
-    protected RootDefinitionBuilder<EventDef> getBuilder() {
+    public RootDefinitionBuilder<EventDef> getBuilder() {
         return builder;
     }
 

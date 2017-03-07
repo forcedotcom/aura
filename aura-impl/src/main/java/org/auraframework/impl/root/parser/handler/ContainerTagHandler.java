@@ -86,7 +86,6 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
         return defDescriptor;
     }
 
-
     @Override
     public void addExpressionReferences(Set<PropertyReference> propRefs) {
         // TODO: this should be a typed exception
@@ -94,13 +93,17 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
                 + " definition", propRefs.iterator().next().getLocation());
     }
 
-    @Override
-    public final T getElement() throws XMLStreamException, QuickFixException {
-        readElement();
-        return createDefinition();
+    public final void process() throws XMLStreamException, QuickFixException {
+        try {
+            readElement();
+        } finally {
+            finishDefinition();
+        }
     }
 
-    public final T getErrorElement() throws QuickFixException {
+    @Override
+    public final T getElement() throws QuickFixException, XMLStreamException {
+        process();
         return createDefinition();
     }
 
@@ -137,6 +140,15 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
      * @throws QuickFixException
      */
     protected abstract T createDefinition() throws QuickFixException;
+
+    /**
+     * A place to put on any finishing touches that are needed.
+     *
+     * this will always be called prior to creating the definition.
+     * Defined here as empty to allow extenders to not implement this at all.
+     */
+    protected void finishDefinition() throws QuickFixException {
+    }
 
     protected <P extends RootDefinition> ParentedTagHandler<? extends ComponentDefRef, ?> getDefRefHandler(
             RootTagHandler<P> parentHandler) throws DefinitionNotFoundException {

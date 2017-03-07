@@ -70,6 +70,8 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
             throws QuickFixException {
         super(defDescriptor, source, xmlReader, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
         builder.setOwnHash(source.getHash());
+        builder.setDescriptor(defDescriptor);
+        builder.setLocation(startLocation);
     }
 
     @Override
@@ -83,7 +85,7 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
     }
 
     @Override
-    protected RootDefinitionBuilder<TokensDef> getBuilder() {
+    public RootDefinitionBuilder<TokensDef> getBuilder() {
         return builder;
     }
 
@@ -163,13 +165,5 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
     @Override
     public void addExpressionReferences(Set<PropertyReference> propRefs) {
         builder.addAllExpressionRefs(propRefs);
-    }
-
-    @Override
-    protected TokensDef createDefinition() throws QuickFixException {
-        builder.setDescriptor(getDefDescriptor());
-        builder.setLocation(startLocation);
-
-        return builder.build();
     }
 }

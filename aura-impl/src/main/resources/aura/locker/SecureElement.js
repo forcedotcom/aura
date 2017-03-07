@@ -15,13 +15,11 @@
  */
 
 function runIfRunnable(st) {
-    var isRunnable = st.$run;
-    if (isRunnable) {
-        // special case for SecureScriptElement to execute without
-        // insertion.
-        st.$run();
+    if (st instanceof HTMLScriptElement) {
+        SecureScriptElement.run(st);
+        return true;
     }
-    return isRunnable;
+    return false;
 }
 
 function trustChildNodes(from, node) {
@@ -38,34 +36,6 @@ function _trustChildNodes(node, key) {
         ls_setKey(child, key);
         _trustChildNodes(child, key);
     }
-}
-
-function isValidAttributeName(raw, name, prototype, caseInsensitiveAttributes) {
-    // Always allow names with the form a-b.* (e.g. data-foo, x-foo, ng-repeat, etc) 
-    if (name.indexOf("-") >= 0) {
-        return true;
-    }
-
-    if (name in caseInsensitiveAttributes) {
-        return true;
-    }
-
-    // Allow SVG elements free reign
-    if (raw instanceof SVGElement) {
-        return true;
-    }
-
-    if (name in prototype) {
-        return true;
-    }
-
-    // Special case Label element's 'for' attribute. It called 'htmlFor' on prototype but
-    // needs to be addressable as 'for' via accessors like .attributes/getAttribute()/setAtribute()
-    if(raw.tagName === "LABEL"  && name.toLowerCase() === "for"){
-        return true;
-    }
-
-    return false;
 }
 
 var KEY_TO_PROTOTYPES = typeof Map !== "undefined" ? new Map() : undefined;
@@ -134,9 +104,6 @@ function SecureElement(el, key) {
     switch (tagName) {
     case "FRAME":
         throw new $A.auraError("The deprecated FRAME element is not supported in LockerService!");
-
-    case "SCRIPT":
-        return SecureScriptElement(el, key);
     }
 
     // SecureElement is it then!
@@ -303,7 +270,7 @@ function SecureElement(el, key) {
                         var attribute = attributes[i];
 
                         // Only add supported attributes
-                        if (isValidAttributeName(raw, attribute.name, prototype, caseInsensitiveAttributes)) {
+                        if (SecureElement.isValidAttributeName(raw, attribute.name, prototype, caseInsensitiveAttributes)) {
                             secureAttributes.push({
                                 name : attribute.name,
                                 value : SecureObject.filterEverything(this, attribute.value)
@@ -372,6 +339,10 @@ function SecureElement(el, key) {
 
         SecureElement.createEventTargetMethodsStateless(tagNameSpecificConfig, prototype);
 
+        if (tagName === "SCRIPT") {
+            SecureScriptElement.setOverrides(tagNameSpecificConfig, prototype);
+        }
+
         Object.defineProperties(prototype, tagNameSpecificConfig);
 
         // Build case insensitive index for attribute validation
@@ -403,6 +374,34 @@ function SecureElement(el, key) {
 
     return o;
 }
+
+SecureElement.isValidAttributeName = function(raw, name, prototype, caseInsensitiveAttributes) {
+    // Always allow names with the form a-b.* (e.g. data-foo, x-foo, ng-repeat, etc)
+    if (name.indexOf("-") >= 0) {
+        return true;
+    }
+
+    if (name in caseInsensitiveAttributes) {
+        return true;
+    }
+
+    // Allow SVG elements free reign
+    if (raw instanceof SVGElement) {
+        return true;
+    }
+
+    if (name in prototype) {
+        return true;
+    }
+
+    // Special case Label element's 'for' attribute. It called 'htmlFor' on prototype but
+    // needs to be addressable as 'for' via accessors like .attributes/getAttribute()/setAtribute()
+    if(raw.tagName === "LABEL"  && name.toLowerCase() === "for"){
+        return true;
+    }
+
+    return false;
+};
 
 SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseInsensitiveAttributes) {
     Object.defineProperties(prototype, {
@@ -533,15 +532,22 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseIn
             }
         },
 
-        getAttribute: SecureElement.createAttributeAccessMethodConfig("getAttribute", prototype, caseInsensitiveAttributes, null),
-        getAttributeNS: SecureElement.createAttributeAccessMethodConfig("getAttributeNS", prototype, caseInsensitiveAttributes, null, true),
+        getAttribute: SecureElement.createAttributeAccessMethodConfig("getAttribute", prototype, caseInsensitiveAttributes, null, undefined, undefined),
+        getAttributeNS: SecureElement.createAttributeAccessMethodConfig("getAttributeNS", prototype, caseInsensitiveAttributes, null, true, undefined),
+        getAttributeNode: SecureElement.createAttributeAccessMethodConfig("getAttributeNode", prototype, caseInsensitiveAttributes, null, undefined, undefined),
+        getAttributeNodeNS: SecureElement.createAttributeAccessMethodConfig("getAttributeNodeNS", prototype, caseInsensitiveAttributes, null, true, undefined),
 
-        setAttribute: SecureElement.createAttributeAccessMethodConfig("setAttribute", prototype, caseInsensitiveAttributes, undefined),
-        setAttributeNS: SecureElement.createAttributeAccessMethodConfig("setAttributeNS", prototype, caseInsensitiveAttributes, undefined, true)
+        setAttribute: SecureElement.createAttributeAccessMethodConfig("setAttribute", prototype, caseInsensitiveAttributes, undefined, undefined, undefined),
+        setAttributeNS: SecureElement.createAttributeAccessMethodConfig("setAttributeNS", prototype, caseInsensitiveAttributes, undefined, true, undefined),
+        setAttributeNode: SecureElement.createAttributeAccessMethodConfig("setAttributeNode", prototype, caseInsensitiveAttributes, undefined, undefined, "name"),
+        setAttributeNodeNS: SecureElement.createAttributeAccessMethodConfig("setAttributeNodeNS", prototype, caseInsensitiveAttributes, undefined, true, "name"),
+
+        removeAttributeNode: SecureElement.createAttributeAccessMethodConfig("removeAttributeNode", prototype, caseInsensitiveAttributes, undefined, undefined, "name"),
+        removeAttributeNodeNS: SecureElement.createAttributeAccessMethodConfig("removeAttributeNodeNS", prototype, caseInsensitiveAttributes, undefined, true, "name")
     });
 };
 
-SecureElement.createAttributeAccessMethodConfig = function(methodName, prototype, caseInsensitiveAttributes, invalidAttributeReturnValue, namespaced) {
+SecureElement.createAttributeAccessMethodConfig = function(methodName, prototype, caseInsensitiveAttributes, invalidAttributeReturnValue, namespaced, nameProp) {
     return {
         writable: true,
         value: function() {
@@ -549,7 +555,10 @@ SecureElement.createAttributeAccessMethodConfig = function(methodName, prototype
             var args = SecureObject.ArrayPrototypeSlice.call(arguments);
 
             var name = args[namespaced ? 1 : 0];
-            if (!isValidAttributeName(raw, name, prototype, caseInsensitiveAttributes)) {
+            if(nameProp){
+                name = name[nameProp];
+            }
+            if (!SecureElement.isValidAttributeName(raw, name, prototype, caseInsensitiveAttributes)) {
                 $A.warning(this + " does not allow getting/setting the " + name.toLowerCase() + " attribute, ignoring!");
                 return invalidAttributeReturnValue;
             }
@@ -1148,6 +1157,10 @@ SecureElement.metadata = {
             },
             "HTMLQuoteElement": {
                 "cite":                           DEFAULT
+            },
+            "HTMLScriptElement": {
+                "src":                            DEFAULT,
+                "type":                           DEFAULT
             },
             "HTMLSelectElement": {
                 "add":                            FUNCTION,

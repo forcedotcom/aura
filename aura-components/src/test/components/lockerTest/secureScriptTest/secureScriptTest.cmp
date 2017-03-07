@@ -21,6 +21,7 @@
     <aura:method name="testScriptSrcExposed"/>
     <aura:method name="testGetSetAttribute"/>
     <aura:method name="testGetSetAttributeNode"/>
+	<aura:method name="testLoadScript"/>
 
     <div aura:id="title">SecureScriptElement test</div>
 </aura:component>

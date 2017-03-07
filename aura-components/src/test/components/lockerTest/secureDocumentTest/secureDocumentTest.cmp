@@ -20,7 +20,7 @@
 
     <aura:method name="testCreateDocumentFragmentReturnsSecureElement"/>
     <aura:method name="testCreateDocumentFragmentAndVerifyShape"/>
-    <aura:method name="testCreateScriptElementReturnsSecureScript"/>
+    <aura:method name="testCreateScriptElementReturnsSecureElement"/>
     <aura:method name="testCreateTextNodeReturnsSecureElement"/>
     <aura:method name="testCreateElementsAndPushToMarkup"/>
     <aura:method name="testGetElementByIdReturnsSecureElement"/>

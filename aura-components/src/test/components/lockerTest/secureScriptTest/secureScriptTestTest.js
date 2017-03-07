@@ -17,7 +17,7 @@
             cmp.testScriptSrcExposed();
         }
     },
-    
+
     testGetSetAttribute: {
         test: function(cmp) {
             cmp.testGetSetAttribute();
@@ -27,6 +27,12 @@
     testGetSetAttributeNode: {
         test: function(cmp) {
             cmp.testGetSetAttributeNode();
+        }
+    },
+
+    testLoadScript: {
+        test: function(cmp) {
+            cmp.testLoadScript();
         }
     }
 })

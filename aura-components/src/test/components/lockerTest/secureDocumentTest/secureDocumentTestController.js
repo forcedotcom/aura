@@ -19,11 +19,11 @@
         testUtils.assertEquals(0, children.length);
     },
 
-    testCreateScriptElementReturnsSecureScript: function(cmp) {
+    testCreateScriptElementReturnsSecureElement: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var scriptElement = document.createElement("script");
-        testUtils.assertStartsWith("SecureScript", scriptElement.toString(), "Expected document.createElement(script)"
-                + " to return a SecureScript");
+        testUtils.assertStartsWith("SecureElement", scriptElement.toString(), "Expected document.createElement(script)"
+                + " to return a SecureElement");
     },
 
     testCreateTextNodeReturnsSecureElement: function(cmp) {
@@ -122,8 +122,8 @@
             toLowerCase: function() { return 'a' },
             toString: function() { return 'script' }
         });
-        testUtils.assertStartsWith("SecureScriptElement", el.toString(), "createElement string coersion exploit should be blocked" +
-                " and a SecureScriptElement should be returned, but got " + el.toString());
+        testUtils.assertStartsWith("SecureElement", el.toString(), "createElement string coersion exploit should be blocked" +
+                " and a SecureElement should be returned, but got " + el.toString());
     },
 
     testCreateElementNSForSVGElement: function(cmp) {

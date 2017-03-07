@@ -750,7 +750,9 @@ function getSupportedInterfaces(o) {
                 interfaces.push("HTMLProgressElement");
             } else if (o instanceof HTMLQuoteElement) {
                 interfaces.push("HTMLQuoteElement");
-            } else if (o instanceof HTMLSelectElement) {
+            }else if (o instanceof HTMLScriptElement) {
+                interfaces.push("HTMLScriptElement");
+            }else if (o instanceof HTMLSelectElement) {
                 interfaces.push("HTMLSelectElement");
             } else if (o instanceof HTMLSourceElement) {
                 interfaces.push("HTMLSourceElement");

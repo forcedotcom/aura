@@ -24,9 +24,9 @@
         }
     },
 
-    testCreateScriptElementReturnsSecureScript: {
+    testCreateScriptElementReturnsSecureElement: {
         test: function(cmp) {
-            cmp.testCreateScriptElementReturnsSecureScript();
+            cmp.testCreateScriptElementReturnsSecureElement();
         }
     },
 

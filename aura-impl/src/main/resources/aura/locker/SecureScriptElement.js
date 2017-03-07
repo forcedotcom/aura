@@ -14,136 +14,126 @@
  * limitations under the License.
  */
 
+function SecureScriptElement(){}
 
-function SecureScriptElement(el, key) {
-	"use strict";
-
-    var o = ls_getFromCache(el, key);
-    if (o) {
-        return o;
+SecureScriptElement.setOverrides = function(elementOverrides, prototype){
+    function getAttributeName(name) {
+        return name.toLowerCase() === "src" ? "data-locker-src" : name;
     }
 
-	function getAttributeName(name) {
-		return name.toLowerCase() === "src" ? "data-locker-src" : name;
-	}
+    elementOverrides["src"] = {
+            enumerable: true,
+            get: function () {
+                return this.getAttribute.apply(this, ["src"]);
+            },
+            set: function (value) {
+                this.setAttribute.apply(this, ["src", value]);
+            }
+    };
 
-	var eventListeners = {};
+    var orignalGetAttribute = prototype.getAttribute;
+    elementOverrides["getAttribute"]= {
+            value: function (name) { 
+                return orignalGetAttribute.apply(this, [getAttributeName(name)]);
+            }
+    };
 
-	// Create a placeholder script element in the doc
-	el = el || document.createElement("SCRIPT");
+    var orignalSetAttribute = prototype.setAttribute;
+    elementOverrides["setAttribute"]= { 
+            value: function (name, value) {
+                orignalSetAttribute.apply(this, [getAttributeName(name), value]);
+            }
+    };
 
-	ls_setKey(el, key);
+    var orignalGetAttributeNS = prototype.getAttributeNS;
+    elementOverrides["getAttributeNS"]= {
+            value: function (ns, name) { 
+                return orignalGetAttributeNS.apply(this, [ns, getAttributeName(name)]);
+            }
+    };
 
-	o = Object.create(null, {
-		src : {
-			enumerable: true,
-			get: function () {
-				return o.getAttribute("src");
-			},
-			set: function (value) {
-				o.setAttribute("src", value);
-			}
-		},
+    var orignalSetAttributeNS = prototype.setAttributeNS;
+    elementOverrides["setAttributeNS"]= { 
+            value: function (ns, name, value) {
+                orignalSetAttributeNS.apply(this, [ns, getAttributeName(name), value]);
+            }
+    };
 
-		getAttribute : {
-			value: function(name) {
-				return el.getAttribute(getAttributeName(name));
-			}
-		},
+    var orignalGetAttributeNode = prototype.getAttributeNode;
+    elementOverrides["getAttributeNode"]= {
+            value: function (name) { 
+                return orignalGetAttributeNode.apply(this, [getAttributeName(name)]);
+            }
+    };
 
-		setAttribute : {
-			value: function(name, value) {
-				el.setAttribute(getAttributeName(name), value);
-			}
-		},
+    var orignalGetAttributeNodeNS = prototype.getAttributeNodeNS;
+    elementOverrides["getAttributeNodeNS"]= {
+            value: function (ns, name) { 
+                return orignalGetAttributeNodeNS.apply(this, [ns, getAttributeName(name)]);
+            }
+    };
 
-		removeAttribute : {
-			value: function(name, value) {
-				el.removeAttribute(getAttributeName(name), value);
-			}
-		},
+    elementOverrides["attributes"] = SecureObject.createFilteredPropertyStateless("attributes", prototype, {
+        writable : false,
+        afterGetCallback : function(attributes) {
+            if (!attributes) {
+                return attribute;
+            }
+            // Secure attributes
+            var secureAttributes = [];
+            var raw = SecureObject.getRaw(this);
+            for (var i = 0; i < attributes.length; i++) {
+                var attribute = attributes[i];
 
-		getAttributeNode : {
-			value: function(name) {
-				return el.getAttributeNode(getAttributeName(name));
-			}
-		},
+                // Only add supported attributes
+                if (SecureElement.isValidAttributeName(raw, attribute.name, prototype)) {
+                    var attributeName = attribute.name;
+                    if(attribute.name === "src"){
+                        continue;
+                    }
+                    if(attribute.name === "data-locker-src"){
+                        attributeName = "src";
+                    }                   
+                    secureAttributes.push({
+                        name : attributeName,
+                        value : SecureObject.filterEverything(this, attribute.value)
+                    });
+                }
+            }
+            return secureAttributes;
+        }
+    });
+};
 
-		setAttributeNode : {
-			value: function(value) {
-				el.setAttributeNode(value);
-			}
-		},
+SecureScriptElement.run = function(st) {
 
-		removeAttributeNode : {
-			value: function(value) {
-				el.removeAttributeNode(value);
-			}
-		},
+    var src = st.getAttribute("src");
+    if (!src) {
+        return;
+    }
 
-		$run : {
-			value : function() {
-				var src = o.getAttribute("src");
-				if (!src) {
-					return;
-				}
+    var el = SecureObject.getRaw(st);
+    document.head.appendChild(el);
 
-				document.head.appendChild(el);
+    // XHR in source and secure it using $A.lockerService.create()
+    var xhr = $A.services.client.createXHR();
 
-				// XHR in source and secure it using $A.lockerService.create()
-				var xhr = $A.services.client.createXHR();
+    xhr.onreadystatechange = function() {
+        var key = ls_getKey(st);
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            $A.lockerService.create(xhr.responseText, key, src, true);
 
-				xhr.onreadystatechange = function() {
-					if (xhr.readyState === 4 && xhr.status === 200) {
-						$A.lockerService.create(xhr.responseText, key, src, true);
+            el.dispatchEvent(new Event("load"));
+        }
 
-						// Fire onload event
-						var listeners = eventListeners["load"];
-						if (listeners) {
-							listeners.forEach(function(listener) {
-								listener.call(o);
-							});
-						}
-					}
+        // DCHASMAN TODO W-2837800 Add in error handling for 404's etc
+    };
 
-					// DCHASMAN TODO W-2837800 Add in error handling for 404's etc
-				};
+    xhr.open("GET", src, true);
 
-				xhr.open("GET", src, true);
-				
-				//for relative urls enable sending credentials
-				if(src.indexOf("/") === 0){
-					xhr.withCredentials = true;
-				}
-				xhr.send();
-			}
-		},
-
-		toString : {
-			value : function() {
-				return "SecureScriptElement: " + o.getAttribute("src") + "{ key: " + JSON.stringify(key) + " }";
-			}
-		},
-
-		addEventListener : {
-			value : function(event, callback) {
-				if (!callback) {
-					return; // by spec, missing callback argument does not throw, just ignores it.
-				}
-
-				var listeners = eventListeners[event];
-				if (!listeners) {
-					eventListeners[event] = [callback];
-				} else {
-					listeners.push(callback);
-				}
-			}
-		}
-	});
-	
-    ls_setRef(o, el, key);
-    ls_addToCache(el, o, key);
-    ls_registerProxy(o);
-
-	return o;
-}
+    //for relative urls enable sending credentials
+    if(src.indexOf("/") === 0){
+        xhr.withCredentials = true;
+    }
+    xhr.send();
+};

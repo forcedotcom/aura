@@ -52,6 +52,7 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.util.AuraImplFiles;
+import org.auraframework.impl.util.BrowserInfo;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -826,7 +827,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public int getMaxParallelXHRCount() {
-        return 4;
+        // 4 for mobile, 6 for desktop
+        AuraContext context = contextService.getCurrentContext();
+        String ua = context != null ? context.getClient().getUserAgent() : null;
+        BrowserInfo b = new BrowserInfo(ua);
+        return b.isBrowserMobile() ? 4 : 6;
     }
 
     @Override

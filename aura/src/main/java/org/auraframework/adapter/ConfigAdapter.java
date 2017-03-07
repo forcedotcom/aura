@@ -190,20 +190,19 @@ public interface ConfigAdapter extends AuraAdapter {
     boolean getXHRExclusivity();
 
     /**
-     *
      * @return whether modules is enabled through configuration
      */
     boolean isModulesEnabled();
 
     /**
-     *
      * @return Set of registered module namespaces
      */
     Set<String> getModuleNamespaces();
 
     /**
-     *
      * @param namespaces module namespaces
      */
     void addModuleNamespaces(Set<String> namespaces);
+    
+    boolean cdnEnabled();
 }

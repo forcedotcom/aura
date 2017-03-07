@@ -859,4 +859,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public void addModuleNamespaces(Set<String> namespaces) {
         this.moduleNamespaces.addAll(namespaces);
     }
+
+    @Override
+    public boolean cdnEnabled() {
+        return false;
+    }
 }

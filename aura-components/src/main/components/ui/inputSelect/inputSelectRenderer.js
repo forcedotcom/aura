@@ -15,6 +15,8 @@
  */
 ({
 	afterRender: function(cmp, helper) {
+        this.superAfterRender();
+
 		var options = cmp.get("v.options");
 
 		if (!cmp.get("v.useMenu") && (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body")))) {
@@ -23,10 +25,11 @@
 			cmp.find("select").getElement().appendChild(optionElements);
 		}
 
-		this.superAfterRender();
 	},
 
 	rerender: function(cmp, helper) {
+        this.superRerender();
+
 		var options = cmp.get("v.options");
 
 		if (!cmp.get("v.useMenu") && (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body")))) {
@@ -49,10 +52,9 @@
 			if (index < options.length) {
 				var newElements = helper.renderOptions(cmp, options.slice(index));
 
-				cmp.find("select").getElement().appendChild(newElements);
+				select.appendChild(newElements);
 			}
 		}
 
-		this.superRerender();
 	}
 })// eslint-disable-line semi

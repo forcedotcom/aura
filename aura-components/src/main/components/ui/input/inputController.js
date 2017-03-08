@@ -14,6 +14,27 @@
  * limitations under the License.
  */
 ({
+    init : function(cmp) {
+        var indicator = cmp.get('v.requiredIndicator');
+        if (indicator && indicator.length > 0) {
+            var indicatorCmp = indicator[0];
+            if (indicatorCmp && indicatorCmp.isValid && indicatorCmp.isValid()) {
+                indicatorCmp.autoDestroy(false);
+            }
+        }
+    },
+
+    onDestroy : function (cmp) {
+        var indicator = cmp.get('v.requiredIndicator');
+
+        if (indicator && indicator.length > 0) {
+            var indicatorCmp = indicator[0];
+            if (indicatorCmp && indicatorCmp.isValid()) {
+                indicatorCmp.destroy();
+            }
+        }
+    },
+
     updateError : function(cmp, event, helper){
         var errors = event.getParam("value");
 
@@ -60,6 +81,17 @@
         var inputElement = helper.getInputElement(cmp);
         if (inputElement) {
             inputElement.focus();
+        }
+    },
+
+    updateRequired : function(cmp) {
+        var labelComponent = cmp.find("inputLabel");
+
+        if (labelComponent) {
+            var labelDisplay = labelComponent.get("v.labelDisplay");
+            var indicator = labelDisplay && cmp.get("v.required") ? cmp.get("v.requiredIndicator") : null;
+
+            labelComponent.set("v.requiredIndicator", indicator);
         }
     }
 

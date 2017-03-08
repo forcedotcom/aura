@@ -63,6 +63,9 @@
     <aura:handler name="change"      value="{!v.errors}"        action="{!c.updateError}"/>
     <aura:handler name="change"      value="{!v.label}"         action="{!c.handleLabelChange}"/>
     <aura:handler name="change"      value="{!v.labelPosition}" action="{!c.handleLabelPositionChange}"/>
+    <aura:handler name="change"      value="{!v.required}"      action="{!c.updateRequired}"/>
+    <aura:handler name="init"        value="{!this}"            action="{!c.init}"/>
+    <aura:handler name="destroy"     value="{!this}"            action="{!c.onDestroy}"/>
 
 
     <aura:method name="focus" description="Sets the focus to this component"/>

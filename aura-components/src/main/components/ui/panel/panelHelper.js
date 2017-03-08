@@ -301,6 +301,10 @@
         if (!cmp.isValid()) {
             return;
         }
+        // shouldReturnFocus defaults to true if it is not explicitly passed in.
+        if ($A.util.isUndefinedOrNull(shouldReturnFocus) || shouldReturnFocus) {
+            this.focusLib.stackUtil.unstackFocus(cmp);
+        }
 
         var self = this;
 

@@ -190,7 +190,7 @@
             panelObj   = this.PANELS_INSTANCE[panelId],
             panel      = panelObj.panel;
 
-        cmp.returnFocus = this.getReturnFocusElement(panel);
+        this.setReturnFocusElement(panel);
                 
         $A.assert(panelObj, 'Couldnt find instance to show');
 
@@ -214,44 +214,44 @@
         // shouldReturnFocus should default to true if it is not explicitly passed in.
         if ($A.util.isUndefinedOrNull(shouldReturnFocus)) {
             shouldReturnFocus = true;
-        } 
+        }
 
         $A.assert(panelObj, 'Couldnt find instance to destroy');
         $A.assert(index > -1, 'Couldnt find the reference in the stack');
-        
+
         stack.splice(index, 1);
-        
+
         // Update the return focus element if the panel has a selector specified.
         var returnFocusElementSelector = panel.get("v.returnFocusElementSelector");
         if (returnFocusElementSelector) {
             cmp.returnFocus = document.querySelector(returnFocusElementSelector);
         }
-        
+
         this.containerManager.destroyContainer(panel);
-        
+
         delete this.PANELS_OWNER[panelId];
         delete this.PANELS_INSTANCE[panelId];
-        
+
         // Notify the destroy
         config.onDestroy && config.onDestroy();
         if (panelObj.destroyCallback) {
             panelObj.destroyCallback(panelId);
         }
-        
+
         if (doActivateNext !== false) {
             this.activateNextPanel(cmp);
         }
         
         // Set the return focus. This has to happen after activating the next panel (above), otherwise activate will steal the focus.
-        if (panel.closedBy !== "closeOnClickOut" && 
+        if (panel.closedBy !== "closeOnClickOut" &&
             shouldReturnFocus === true && cmp.returnFocus) {
             cmp.returnFocus.focus();
             cmp.returnFocus = null;
         }
-        
+
         // this will happen if a panel is destroyed
         // without being closed first
-        
+
         if(!panelObj.panel._transitionEndFired) {
             // listeners still need to know the panel is gone
             $A.getEvt("markup://ui:panelTransitionEnd").setParams({
@@ -259,7 +259,7 @@
                 panelId: panelId
             }).fire();
         }
-        
+
     },
 
     /**
@@ -323,7 +323,7 @@
                 if (currentTarget !== panel.getGlobalId()) { // Dont notify itself
                 	content = panel.get('v.body')[0];
                     this.notifyPanelContent(content, config);
-                } 
+                }
             }
         } else if (scope === 'self') {
         	if (currentTarget) {
@@ -357,7 +357,7 @@
         } else {
             closeOnLocationChange = $A.util.getBooleanValue(closeOnLocationChange);
         }
-        
+
         // add a handler if needed
         if (closeOnLocationChange === true && this.hasLocationChangeHandler === false) {
             var that = this;
@@ -376,22 +376,22 @@
             });
             this.hasLocationChangeHandler = true;
         }
-        
+
         return closeOnLocationChange;
     },
-    
+
     /**
      * returns the element to be focused when the panel is destroyed.
      * @param panelComponent
-     * @private 
+     * @private
      */
-    getReturnFocusElement: function(panelComponent) {
+    setReturnFocusElement: function(panelComponent) {
         var returnFocusElement = panelComponent.get('v.returnFocusElement');
-        
+
         if ($A.util.isUndefinedOrNull(returnFocusElement)) {
         	returnFocusElement = document.activeElement;
         }
-        
-        return returnFocusElement;
+
+        this.focusLib.stackUtil.stackFocus(returnFocusElement);
     }
 })// eslint-disable-line semi

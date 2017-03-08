@@ -117,6 +117,11 @@
     },
 
     close: function (cmp, callback, shouldReturnFocus) {
+        // shouldReturnFocus defaults to true if it is not explicitly passed in.
+        if ($A.util.isUndefinedOrNull(shouldReturnFocus) || shouldReturnFocus) {
+            this.focusLib.stackUtil.unstackFocus(cmp);
+        }
+
         cmp.hide(function () {
             if (cmp.isValid()) {
                 cmp.getEvent('notify').setParams({

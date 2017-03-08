@@ -22,9 +22,7 @@
 
     <aura:import library="ui:containerManagerLib" property="cmLib"/>
     <aura:import library="ui:stackManagerLib"     property="smLib" />
-
-    <!-- To be integrated -->
-    <!--<aura:import library="ui:focusManagerLib" property="focusLib" />-->
+    <aura:import library="ui:focusManagerLib" property="focusLib" />
     
     <aura:handler name="init"   value="{!this}"   action="{!c.init}"/>
     <aura:handler name="notify" event="ui:notify" action="{!c.handleNotify}"/>

@@ -153,7 +153,11 @@
         }, function(cmp) {
             this.createPanel(cmp);
         }, function(cmp) {
-            this.waitForPanelDialogOpen()
+            this.waitForPanelDialogOpen();
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var activeElement = $A.test.getActiveElement();
+                return $A.util.hasClass(activeElement, "inputPanelTypeClass");
+            }, "Panel was never opened and the focus was never at the first input element.");
         }, function(cmp) {	
         	// We must programmatically close the panel and force it to return focus because we
         	// cannot simulate an ESC or SHIFT+TAB key press which is the only
@@ -180,7 +184,11 @@
         }, function(cmp) {
             this.createPanel(cmp);
         }, function(cmp) {
-            this.waitForModalOpen()
+            this.waitForModalOpen();
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var activeElement = $A.test.getActiveElement();
+                return $A.util.hasClass(activeElement, "inputPanelTypeClass");
+            }, "Modal was never opened and the focus was never at the first input element.");
         }, function(cmp) {	
         	// We must programmatically close the panel and force it to return focus because we
         	// cannot simulate an ESC or SHIFT+TAB key press which is the only
@@ -257,6 +265,10 @@
             this.createPanel(cmp);
         }, function(cmp) {
             this.waitForPanelDialogOpen()
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var activeElement = $A.test.getActiveElement();
+                return $A.util.hasClass(activeElement, "inputPanelTypeClass");
+            }, "Panel was never opened and the focus was never at the first input element.");
         }, function(cmp) {	        	
         	// We must programmatically close the panel and force it to return focus because we
         	// cannot simulate an ESC or SHIFT+TAB key press which is the only
@@ -282,7 +294,11 @@
         }, function(cmp) {
             this.createPanel(cmp);
         }, function(cmp) {
-            this.waitForModalOpen()
+            this.waitForModalOpen();
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var activeElement = $A.test.getActiveElement();
+                return $A.util.hasClass(activeElement, "inputPanelTypeClass");
+            }, "Modal was never opened and the focus was never at the first input element.");
         }, function(cmp) {	        	
         	// We must programmatically close the panel and force it to return focus because we
         	// cannot simulate an ESC or SHIFT+TAB key press which is the only

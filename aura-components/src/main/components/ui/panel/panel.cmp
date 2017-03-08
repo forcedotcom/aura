@@ -18,6 +18,7 @@
 <aura:component extensible="true" implements="ui:panelType" description="A panel slides out to display a form for input or other information over the main UI, and it can be full screen or not. Use only one instance of ui:panelManager2 to manage your panels.">
     <aura:import library="ui:panelLib" property="lib"/>
     <aura:import library="ui:panelPositioningLib" property="positioningLib" />
+    <aura:import library="ui:focusManagerLib" property="focusLib" />
 
     <aura:attribute name="title" type="String" description="The title of the dialog window" />
     <aura:attribute name="devNameOrId" type="String" description="Id or alias for the panel" />

@@ -5,6 +5,9 @@
     <aura:method name="testScriptsInTemplateExecuted"/>
     <aura:method name="testScriptsInTemplatePreInitBlock"/>
 
-    <!--  this will get blocked by CSP rules-->
+     <!--  this will get blocked by CSP rules-->
     <script>window._appWindow = window + ""</script>
+
+    <div aura:id="appHtml">In .app</div>
+
 </aura:application>

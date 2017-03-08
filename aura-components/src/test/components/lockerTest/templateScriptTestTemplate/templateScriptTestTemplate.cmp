@@ -4,15 +4,26 @@
 
     <div class="templateDiv">Some HTML before scripts</div>
 
-    <script>window._templateWindow = window + "";</script>
+    <script>
+        /* random comments for test */
+        window._templateWindow = window + ""; // single line comment
+        /* another multiline comment */window._templateDocument = document + "";
+    </script>
 
     <div class="templateDiv" id="betweenScripts">Some HTML inbetween scripts</div>
 
-    <script>(function(global) { global._iifeWindow = window + "";})(window);</script>
+    <script>
+        (function(global) { 
+            global._iifeWindow = window + "";
+        })(window);
+    </script>
 
     <aura:set attribute="auraPreInitBlock">
         <script>window._preInitBlockWindow = window + "";</script>
     </aura:set>
 
     <div class="templateDiv">Some HTML after scripts</div>
+
+    <!-- empty script to test -->
+    <script></script>
 </aura:component>

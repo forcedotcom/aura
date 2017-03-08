@@ -153,7 +153,7 @@ function LockerService() {
         runScript : function(code, namespace) {
             var key = this.getKeyForNamespace(namespace);
             // force Locker because scripts may be run before context is established
-            var ret = this.createInternal(code, key, undefined, undefined, true);
+            var ret = this.createInternal(code.toString(), key, undefined, undefined, true);
             ret["returnValue"]();
         },
 

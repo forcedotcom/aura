@@ -18,6 +18,9 @@ package org.auraframework.renderer;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -61,6 +64,7 @@ public class HtmlRenderer implements Renderer {
         boolean script = (tag != null && tag.equals("script") && body != null && body.size() > 0);
 
         if (script) {
+            int numParens = new Random().nextInt(128) + 1;
             boolean lockerRequired = false;
             String namespace = "";
             Instance<?> parent = component.getLexicalParent();
@@ -83,15 +87,29 @@ public class HtmlRenderer implements Renderer {
                         "    } else {\n" +
                         "        Aura.inlineJsLocker.push({namespace: namespace, callback: customerJs});\n" +
                         "    }\n" +
-                        "})('function() {"
+                        "})"
+                );
+                for (int i = 0; i < numParens; i++) {
+                    rc.getCurrent().append("(");
+                }
+                rc.getCurrent().append(
+                        "(function(){"
                 );
             }
+
             for (Component nested: body) {
                 renderingService.render(nested, rc);
             }
+
             if (lockerRequired) {
                 rc.getCurrent().append(
-                        "}', '" + namespace + "');\n"
+                        "}"
+                );
+                for (int i = 0; i < numParens; i++) {
+                    rc.getCurrent().append(")");
+                }
+                rc.getCurrent().append(
+                        ", '" + namespace + "');\n"
                 );
             }
             rc.popScript();

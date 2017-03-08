@@ -43,5 +43,12 @@
             $A.test.assertEquals(3, templateDivs.length, "Not all divs inside custom template available in DOM");
             $A.test.assertEquals("Some HTML inbetween scripts", div.textContent, "Unexpected text on div in custom template");
         }
+    },
+
+    testAppHtmlRendered: {
+        test: function(cmp) {
+            var html = cmp.find("appHtml").getElement();
+            $A.test.assertEquals("In .app", html.textContent);
+        }
     }
 })

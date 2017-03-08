@@ -870,15 +870,16 @@ AuraComponentService.prototype.requestComponent = function(callback, config, avp
             returnedConfig["localId"] = config["localId"];
             returnedConfig["flavor"] = config["flavor"];
 
-
+            var error;
             try {
                 newComp = self.createComponentPriv(returnedConfig);
             } catch(e) {
                 status = "ERROR";
                 statusMessage = e.message;
+                error = e;
             }
             if ( $A.util.isFunction(callback) ) {
-                callback(newComp, status, statusMessage, index);
+                callback(newComp, status, statusMessage, index, error);
             }
         }else{
             var errors = a.getError();

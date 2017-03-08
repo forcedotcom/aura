@@ -107,9 +107,7 @@ public enum JavascriptWriter {
     WITHOUT_CLOSURE {
         @Override
         public void setClosureOptions(CompilerOptions options) {
-            // This could be a no-op, but if you're even asking about closure
-            // options here, you're in the wrong place, so it throws instead.
-            throw new UnsupportedOperationException();
+            // No options since we don't actually do anything.
         }
 
         @Override

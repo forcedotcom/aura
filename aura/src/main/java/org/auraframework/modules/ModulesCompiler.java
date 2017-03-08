@@ -15,9 +15,15 @@
  */
 package org.auraframework.modules;
 
+import java.util.Map;
+
 /**
  * Interface to compile modules
  */
 public interface ModulesCompiler {
+    
+    ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception;
+    
+    @Deprecated  // use another compile() method
     ModulesCompilerData compile(String entry, String sourceTemplate, String sourceClass) throws Exception;
 }

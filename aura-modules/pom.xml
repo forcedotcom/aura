@@ -10,9 +10,12 @@
     <artifactId>aura-modules</artifactId>
    
     <properties>
-        <modules.dir>aura_modules</modules.dir>
-        <modules.test.modules.dir>aura_modules_test_modules</modules.test.modules.dir>
-        <modules.test.components.dir>aura_modules_test_components</modules.test.components.dir>
+        <module.dir>modules_aura_modules</module.dir>
+        <component.dir>components_aura_modules</component.dir>
+        <module.test.dir>modules_aura_modules_test</module.test.dir>
+        <component.test.dir>components_aura_modules_test</component.test.dir>
+        <component.compile.phase>process-classes</component.compile.phase>
+        <component.test.compile.phase>process-test-classes</component.test.compile.phase>
     </properties>
 
     <dependencies>
@@ -50,6 +53,15 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+        <!-- to compile modules at build time -->
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-tools</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-components</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -68,6 +80,131 @@
                     <execution>
                         <id>npm-install</id>
                         <phase>pre-clean</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>clean-registries</id>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <phase>clean</phase>
+                        <configuration>
+                            <filesets>
+                                <fileset>
+                                    <directory>src/main/modules</directory>
+                                    <includes>
+                                        <include>.registries</include>
+                                    </includes>
+                                </fileset>
+                                <fileset>
+                                    <directory>src/main/components</directory>
+                                    <includes>
+                                        <include>.registries</include>
+                                    </includes>
+                                </fileset>
+                                <fileset>
+                                    <directory>src/test/modules</directory>
+                                    <includes>
+                                        <include>.registries</include>
+                                    </includes>
+                                </fileset>
+                                <fileset>
+                                    <directory>src/test/components</directory>
+                                    <includes>
+                                        <include>.registries</include>
+                                    </includes>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>compile-components</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>${component.compile.phase}</phase>
+                        <configuration>
+                            <executable>${java.home}/bin/java</executable>
+                            <classpathScope>runtime</classpathScope>
+                            <arguments>
+                                <argument>-Daura.home=${basedir}/..</argument>
+                                <argument>-classpath</argument>
+                                <classpath />
+                                <argument>org.auraframework.tools.definition.AuraCompiler</argument>
+                                <argument>${basedir}/src/main/components</argument>
+                                <argument>${project.build.outputDirectory}/${component.dir}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>compile-modules</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>${component.compile.phase}</phase>
+                        <configuration>
+                            <executable>${java.home}/bin/java</executable>
+                            <classpathScope>runtime</classpathScope>
+                            <arguments>
+                                <argument>-Daura.home=${basedir}/..</argument>
+                                <argument>-Daura.modules=true</argument>
+                                <argument>-classpath</argument>
+                                <classpath />
+                                <argument>org.auraframework.tools.definition.AuraCompiler</argument>
+                                <argument>${basedir}/src/main/modules</argument>
+                                <argument>${project.build.outputDirectory}/${module.dir}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>compile-test-components</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>${component.test.compile.phase}</phase>
+                        <configuration>
+                            <executable>${java.home}/bin/java</executable>
+                            <classpathScope>test</classpathScope>
+                            <arguments>
+                                <argument>-Daura.home=${basedir}/..</argument>
+                                <argument>-classpath</argument>
+                                <classpath />
+                                <argument>org.auraframework.tools.definition.AuraCompiler</argument>
+                                <argument>${basedir}/src/test/components</argument>
+                                <argument>${project.build.testOutputDirectory}/${component.test.dir}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>compile-test-modules</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>${component.test.compile.phase}</phase>
+                        <configuration>
+                            <executable>${java.home}/bin/java</executable>
+                            <classpathScope>test</classpathScope>
+                            <arguments>
+                                <argument>-Daura.home=${basedir}/..</argument>
+                                <argument>-Daura.modules=true</argument>
+                                <argument>-classpath</argument>
+                                <classpath />
+                                <argument>org.auraframework.tools.definition.AuraCompiler</argument>
+                                <argument>${basedir}/src/test/modules</argument>
+                                <argument>${project.build.testOutputDirectory}/${module.test.dir}</argument>
+                            </arguments>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -99,7 +236,34 @@
                                     </includes>
                                 </resource>
                             </resources>
-                            <outputDirectory>${project.build.outputDirectory}/${modules.dir}</outputDirectory>
+                            <outputDirectory>${project.build.outputDirectory}/${module.dir}</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-components</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/components</directory>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                    <excludes>
+                                        <exclude>**/.gitignore</exclude>
+                                    </excludes>
+                                </resource>
+                                <resource>
+                                    <directory>target/src-gen/main/components</directory>
+                                    <includes>
+                                        <include>.index</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.outputDirectory}/${component.dir}</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -126,7 +290,7 @@
                                     </includes>
                                 </resource>
                             </resources>
-                            <outputDirectory>${project.build.testOutputDirectory}/${modules.test.modules.dir}</outputDirectory>
+                            <outputDirectory>${project.build.testOutputDirectory}/${module.test.dir}</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -153,7 +317,84 @@
                                     </includes>
                                 </resource>
                             </resources>
-                            <outputDirectory>${project.build.testOutputDirectory}/${modules.test.components.dir}</outputDirectory>
+                            <outputDirectory>${project.build.testOutputDirectory}/${component.test.dir}</outputDirectory>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <!-- copy back .registries to source tree -->
+                        <id>copy-component-registries</id>
+                        <phase>${component.compile.phase}</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.outputDirectory}/${component.dir}</directory>
+                                    <includes>
+                                        <include>.registries</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>src/main/components</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- copy back .registries to source tree -->
+                        <id>copy-module-registries</id>
+                        <phase>${component.compile.phase}</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.outputDirectory}/${module.dir}</directory>
+                                    <includes>
+                                        <include>.registries</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>src/main/modules</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- copy back .registries to source tree -->
+                        <id>copy-component-test-registries</id>
+                        <phase>${component.test.compile.phase}</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.testOutputDirectory}/${component.test.dir}</directory>
+                                    <includes>
+                                        <include>.registries</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>src/test/components</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- copy back .registries to source tree -->
+                        <id>copy-module-test-registries</id>
+                        <phase>${component.test.compile.phase}</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.testOutputDirectory}/${module.test.dir}</directory>
+                                    <includes>
+                                        <include>.registries</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>src/test/modules</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -178,6 +419,38 @@
                                     <regexpmapper from=".*[/\\]([^/\\]*)[/\\]([^/\\]*)[/\\](.*)" to="\1/\2/\3" />
                                 </pathconvert>
                                 <echo file="target/src-gen/main/modules/.index">${definitionList}</echo>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>index-components</id>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <target>
+                                <path id="definitions">
+                                    <fileset dir="src/main/components">
+                                        <include name="**/*.app" />
+                                        <include name="**/*.auradoc" />
+                                        <include name="**/*.cmp" />
+                                        <include name="**/*.css" />
+                                        <include name="**/*.design" />
+                                        <include name="**/*.evt" />
+                                        <include name="**/*.flavors" />
+                                        <include name="**/*.intf" />
+                                        <include name="**/*.js" />
+                                        <include name="**/*.lib" />
+                                        <include name="**/*.svg" />
+                                        <include name="**/*.tokens" />
+                                    </fileset>
+                                </path>
+                                <pathconvert property="definitionList" refid="definitions" pathsep=",">
+                                    <!-- Allow either slash (Windows actually uses both) -->
+                                    <regexpmapper from=".*[/\\]([^/\\]*)[/\\]([^/\\]*)[/\\](.*)" to="\1/\2/\3" />
+                                </pathconvert>
+                                <echo file="target/src-gen/main/components/.index">${definitionList}</echo>
                             </target>
                         </configuration>
                         <goals>

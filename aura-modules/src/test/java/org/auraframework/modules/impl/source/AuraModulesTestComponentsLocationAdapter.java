@@ -17,13 +17,15 @@ package org.auraframework.modules.impl.source;
 
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Provides location of test Aura components for aura modules
  */
+@Lazy
 @ServiceComponent
 public class AuraModulesTestComponentsLocationAdapter extends ComponentLocationAdapter.Impl {
     public AuraModulesTestComponentsLocationAdapter() {
-        super(AuraModulesFiles.MODULES_TEST_COMPONENTS_DIR.asFile(), null, "aura_modules_test_components");
+        super(AuraModulesFiles.MODULES_TEST_COMPONENTS_DIR.asFile(), null, "components_aura_modules_test");
     }
 }

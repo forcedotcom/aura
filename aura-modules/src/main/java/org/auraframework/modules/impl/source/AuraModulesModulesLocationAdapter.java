@@ -21,13 +21,13 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.springframework.context.annotation.Lazy;
 
 /**
- * Provides location of test components for aura modules
+ * Provides location of components for aura-modules
  */
 @Lazy
 @ServiceComponent
-public class AuraModulesTestModulesLocationAdapter extends ComponentLocationAdapter.Impl {
-    public AuraModulesTestModulesLocationAdapter() {
-        super(AuraModulesFiles.MODULES_TEST_MODULES_DIR.asFile(), null, "modules_aura_modules_test");
+public class AuraModulesModulesLocationAdapter extends ComponentLocationAdapter.Impl {
+    public AuraModulesModulesLocationAdapter() {
+        super(AuraModulesFiles.MODULES_DIR.asFile(), null, "modules_aura_modules");
     }
 
     /**

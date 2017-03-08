@@ -28,11 +28,13 @@ public enum AuraModulesFiles {
     MODULES_MODULE_DIR(AuraFiles.Core.getPath(), "aura-modules"),
 
     MODULES_DIR(MODULES_MODULE_DIR.getPath(), "src", "main", "modules"),
+    
+    COMPONENTS_DIR(MODULES_MODULE_DIR.getPath(), "src", "main", "components"),
 
     MODULES_TEST_MODULES_DIR(MODULES_MODULE_DIR.getPath(), "src", "test", "modules"),
 
     MODULES_TEST_COMPONENTS_DIR(MODULES_MODULE_DIR.getPath(), "src", "test", "components");
-
+    
     private final String path;
 
     AuraModulesFiles(String... path) {

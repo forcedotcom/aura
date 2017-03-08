@@ -17,6 +17,8 @@ package org.auraframework.modules.impl;
  */
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.auraframework.modules.ModulesCompiler;
 import org.auraframework.modules.ModulesCompilerData;
@@ -32,6 +34,32 @@ import com.google.common.io.Files;
  */
 public class ModulesCompilerTest extends UnitTestCase {
 
+    /**
+     * Test the compile method that takes the sources map
+     */
+    @Test
+    public void testModulesCompilerJ2V8Sources() throws Exception {
+        ModulesCompiler compiler = new ModulesCompilerJ2V8();
+
+        String componentPath = "modules/classAndTemplate/classAndTemplate.js";
+        String sourceTemplate = Files
+                .toString(getResourceFile("/testdata/modules/classAndTemplate/classAndTemplate.html"), Charsets.UTF_8);
+        String sourceClass = Files.toString(getResourceFile("/testdata/modules/classAndTemplate/classAndTemplate.js"),
+                Charsets.UTF_8);
+        
+        Map<String,String> sources = new HashMap<>();
+        sources.put("classAndTemplate.js", sourceClass);
+        sources.put("classAndTemplate.html", sourceTemplate);
+
+        ModulesCompilerData compilerData = compiler.compile(componentPath, sources);
+        String expected = Files.toString(getResourceFile("/testdata/modules/classAndTemplate/expected.js"),
+                Charsets.UTF_8);
+
+        assertEquals(expected, compilerData.code);
+        assertEquals("[a:b]", compilerData.bundleDependencies.toString());
+        assertEquals("[myList, items, last]", compilerData.templateUsedIds.toString());
+    }
+    
     @Test
     public void testModulesCompilerJ2V8() throws Exception {
         ModulesCompiler compiler = new ModulesCompilerJ2V8();

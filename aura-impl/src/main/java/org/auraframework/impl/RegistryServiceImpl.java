@@ -139,7 +139,14 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             DefType.TESTSUITE,
             DefType.TOKENS
             );
+    
+    private static final Set<String> moduleMarkupPrefixes = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX,
+            DefDescriptor.JAVASCRIPT_PREFIX, DefDescriptor.CSS_PREFIX);
 
+    private static final Set<DefType> moduleDefTypes = EnumSet.of(DefType.MODULE);
+
+    // Subtracts supported bundle source DefTypes in order to create two separate registries
+    // for FileSourceLoader and FileBundleSourceLoader
     private static final Set<DefType> markupDefTypes = Sets.difference(allMarkupDefTypes, BundleSource.bundleDefTypes);
 
     private static class SourceLocationInfo {
@@ -208,7 +215,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
 
         String pkg = location.getComponentSourcePackage();
         if (pkg != null) {
-            ris = location.getClass().getResourceAsStream(pkg + "/.registries");
+            ris = location.getClass().getClassLoader().getResourceAsStream(pkg + "/.registries");
         } else {
             File compSource = location.getComponentSourceDir();
             if (compSource != null && compSource.canRead()) {
@@ -250,15 +257,19 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     }
 
     private SourceLocationInfo createSourceLocationInfo(ComponentLocationAdapter location) {
+        boolean modules = location.type() == DefType.MODULE;
         DefRegistry[] staticRegs = getStaticRegistries(location);
         String pkg = location.getComponentSourcePackage();
         String canonical = null;
         List<SourceLoader> markupLoaders = Lists.newArrayList();
         List<DefRegistry> markupRegistries = Lists.newArrayList();
+        Set<String> prefixes = modules? moduleMarkupPrefixes : markupPrefixes;
+        DefRegistry defRegistry = null;
         if (pkg != null) {
             ResourceSourceLoader rsl = new ResourceSourceLoader(pkg);
             markupLoaders.add(rsl);
-            markupRegistries.add(new CompilingDefRegistry(rsl, markupPrefixes, allMarkupDefTypes, compilerService));
+            defRegistry = new CompilingDefRegistry(rsl, prefixes, modules ? moduleDefTypes : allMarkupDefTypes, compilerService);
+            markupRegistries.add(defRegistry);
         } else if (location.getComponentSourceDir() != null) {
             File components = location.getComponentSourceDir();
             if (!components.canRead() || !components.canExecute() || !components.isDirectory()) {
@@ -266,15 +277,23 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             } else {
                 FileSourceLoader fsl = new FileSourceLoader(components, fileMonitor);
                 markupLoaders.add(fsl);
-                markupRegistries.add(new CompilingDefRegistry(fsl, markupPrefixes, markupDefTypes, compilerService));
-                markupRegistries.add(new CompilingDefRegistry(
-                            new FileBundleSourceLoader(components, fileMonitor, builders),
-                            markupPrefixes, BundleSource.bundleDefTypes, compilerService));
+                if (!modules) { // modules requires BundleSource to allow multiple js/css files so skip FileSourceLoader
+
+                    // markupDefTypes is the difference between all and BundleSource DefTypes
+                    // Thus, creating two CompilingDefRegistry, FileSourceLoader and FileBundleSourceLoader
+                    // works without DefType registry conflicts
+                    defRegistry = new CompilingDefRegistry(fsl, prefixes, markupDefTypes, compilerService);
+                    markupRegistries.add(defRegistry);
+                }
+                defRegistry = new CompilingDefRegistry(
+                        new FileBundleSourceLoader(components, fileMonitor, builders),
+                        prefixes, modules ? moduleDefTypes : BundleSource.bundleDefTypes, compilerService);
+                markupRegistries.add(defRegistry);
                 File generatedJavaBase = location.getJavaGeneratedSourceDir();
                 if (generatedJavaBase != null && generatedJavaBase.exists()) {
                     fsl = new FileSourceLoader(generatedJavaBase, fileMonitor);
                     markupLoaders.add(fsl);
-                    markupRegistries.add(new CompilingDefRegistry(fsl, markupPrefixes, markupDefTypes, compilerService));
+                    markupRegistries.add(new CompilingDefRegistry(fsl, prefixes, markupDefTypes, compilerService));
                 }
                 try {
                     canonical = components.getCanonicalPath();
@@ -288,10 +307,16 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             if (!loaders.isEmpty()) {
                 markupLoaders.addAll(loaders);
                 for (SourceLoader loader : loaders) {
-                    markupRegistries.add(new PassThroughDefRegistry(loader, markupDefTypes, markupPrefixes, true, compilerService));
+                    markupRegistries.add(new PassThroughDefRegistry(loader, markupDefTypes, prefixes, true, compilerService));
                 }
             }
         }
+        
+        if (modules && defRegistry != null) {
+            // register namespaces to optimize processing of definition references
+            configAdapter.addModuleNamespaces(defRegistry.getNamespaces());
+        }
+        
         //
         // Ooh, now _this_ is ugly. Because internal namespaces are tracked by the
         // SourceFactory constructor, we'd best build a source factory for every loader.
@@ -329,9 +354,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         regBuild.add(AuraStaticTypeDefRegistry.INSTANCE);
         regBuild.add(AuraStaticControllerDefRegistry.getInstance(definitionService));
         for (ComponentLocationAdapter location : markupLocations) {
-            if (location != null && location.type() == DefType.COMPONENT) {
-                // added type to component location adapter to differentiate type.
-                // separate registries are required due to namespace clashes with modules
+            if (location != null) {
                 SourceLocationInfo sli = getSourceLocationInfo(location);
                 if (!sli.isChanged() && sli.staticLocationRegistries != null) {
                     regBuild.addAll(sli.staticLocationRegistries);

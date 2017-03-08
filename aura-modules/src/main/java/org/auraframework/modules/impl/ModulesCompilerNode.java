@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.auraframework.modules.ModulesCompiler;
 import org.auraframework.modules.ModulesCompilerData;
@@ -65,6 +66,11 @@ public final class ModulesCompilerNode implements ModulesCompiler {
 
     @Override
     public ModulesCompilerData compile(String componentPath, String sourceTemplate, String sourceClass) {
+        throw new Error("NYI");
+    }
+
+    @Override
+    public ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception {
         throw new Error("NYI");
     }
 }

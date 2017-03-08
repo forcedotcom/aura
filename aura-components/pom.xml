@@ -31,10 +31,6 @@
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
-            <artifactId>aura-modules</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
             <artifactId>aura-spring</artifactId>
         </dependency>
         <dependency>

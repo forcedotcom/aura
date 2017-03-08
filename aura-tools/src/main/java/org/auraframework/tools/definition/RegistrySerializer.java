@@ -27,6 +27,7 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -243,14 +244,27 @@ public class RegistrySerializer {
         DescriptorFilter root_nsf = new DescriptorFilter(namespace, "*");
         Map<DefDescriptor<?>, Definition> filtered;
         Set<String> namespaces = Sets.newHashSet(namespace);
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        boolean modulesEnabled = context.isModulesEnabled();
         //
         // Fetch all matching descriptors for our 'root' definitions.
         //
         descriptors = definitionService.find(root_nsf);
         for (DefDescriptor<?> desc : descriptors) {
-            Definition def = null;
+            if (modulesEnabled) {
+                if (desc.getDefType() != DefType.MODULE) {
+                    System.out.println("---> skipping non-module desc: " + desc);
+                    continue;
+                }
+            } else {
+                if (desc.getDefType() == DefType.MODULE) {
+                    System.out.println("---> skipping module desc: " + desc);
+                    continue;
+                }
+                // TODO: skip also JS in modules dirs
+            }
             try {
-                def = definitionService.getDefinition(desc);
+                Definition def = definitionService.getDefinition(desc);
                 if (def == null) {
                     logger.error("Unable to find "+desc+"@"+desc.getDefType());
                     error = true;
@@ -337,7 +351,8 @@ public class RegistrySerializer {
             throw new RegistrySerializerException("Unable to create "+outputFile, fnfe);
         }
         try {
-            Aura.getContextService().startContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED, null);
+            AuraContext context = Aura.getContextService().startContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED, null);
+            context.setModulesEnabled(Boolean.valueOf(System.getProperty("aura.modules")));
             try {
                 write(namespaces, out);
             } finally {

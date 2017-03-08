@@ -18,21 +18,27 @@ package org.auraframework.impl.source.file;
 import java.io.File;
 import java.util.Map;
 
+import org.apache.commons.io.FilenameUtils;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.LoggingService;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.Parser.Format;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.auraframework.system.Source;
 
 import com.google.common.collect.Maps;
 
 @ServiceComponent
 public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
+    
+    @Autowired
+    private LoggingService loggingService;
 
     @Override
     public boolean isBundleMatch(File base) {
@@ -84,10 +90,18 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
                     break;
                 }
             }
+            if (descriptor == null && file.getName().toLowerCase().endsWith(".js")) {
+                descriptor = new DefDescriptorImpl<>("js", namespace, FilenameUtils.getBaseName(file.getName()), ModuleDef.class, modDesc);
+                format = Format.JS;
+            }
+            if (descriptor == null && file.getName().toLowerCase().endsWith(".css")) {
+                descriptor = new DefDescriptorImpl<>("css", namespace, FilenameUtils.getBaseName(file.getName()), ModuleDef.class, modDesc);
+                format = Format.CSS;
+            }
             if (descriptor != null) {
                 sourceMap.put(descriptor, new FileSource<>(descriptor, file, format));
-            } else {
-                // error
+            } else if (!file.isDirectory()){
+                loggingService.warn("unhandled file in MODULE bundle: " + file.getAbsolutePath());
             }
         }
         return new BundleSourceImpl<ModuleDef>(modDesc, sourceMap);

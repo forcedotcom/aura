@@ -17,30 +17,15 @@ package org.auraframework.modules.impl.source;
 
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.springframework.context.annotation.Lazy;
 
 /**
- * Provides location of test components for aura modules
+ * Provides location of Aura components for aura-modules
  */
 @Lazy
 @ServiceComponent
-public class AuraModulesTestModulesLocationAdapter extends ComponentLocationAdapter.Impl {
-    public AuraModulesTestModulesLocationAdapter() {
-        super(AuraModulesFiles.MODULES_TEST_MODULES_DIR.asFile(), null, "modules_aura_modules_test");
-    }
-
-    /**
-     * Distinguish between Aura component and modules locations.
-     * Module require separate registry that handles its own def type to allow
-     * coexistence of components and modules of the same name.
-     *
-     * Overrides default with MODULE
-     *
-     * @return DefType.MODULE for module
-     */
-    @Override
-    public DefType type() {
-        return DefType.MODULE;
+public class AuraModulesComponentsLocationAdapter extends ComponentLocationAdapter.Impl {
+    public AuraModulesComponentsLocationAdapter() {
+        super(AuraModulesFiles.COMPONENTS_DIR.asFile(), null, "components_aura_modules");
     }
 }

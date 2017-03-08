@@ -31,7 +31,8 @@
         <ui:button aura:id="t1" class="button-set1" label="Set v.test" buttonTitle="x" press="{!c.updateTest}" />
         <ui:button aura:id="t2" class="button-set2" label="Set v.test2" buttonTitle="x" press="{!c.updateTest2}" />
         <ui:button aura:id="t3" class="button-set3" label="Set v.test3" buttonTitle="x" press="{!c.updateTest3}" />
-
+        <module:marker></module:marker>
+        
         <section style="margin: 10px; border: 1px solid #333">
             <h3>Aura land</h3>
             <p>[v.test]: <span class="a-res1">{!v.test}</span></p>
@@ -39,7 +40,7 @@
             <p>[v.test3]: <span class="a-res3">{!v.test3}</span></p>
             <p>[expression]: <span class="a-expr">{! v.test3 + '!!' }</span></p>
         </section>
-
+        
         <aura:if isTrue="{!v.branch}">
             <section class="aura" aura:id="container">
                 <sample:simple 

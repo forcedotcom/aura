@@ -15,11 +15,14 @@
  */
 package org.auraframework.modules.impl.factory;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import org.auraframework.adapter.ConfigAdapter;
@@ -29,17 +32,15 @@ import org.auraframework.def.LibraryDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl;
-import org.auraframework.impl.source.AbstractTextSourceImpl;
-import org.auraframework.impl.source.file.FileSource;
-import org.auraframework.impl.source.resource.ResourceSource;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.modules.ModulesCompiler;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.modules.impl.ModulesCompilerJ2V8;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.BundleSource;
 import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.Location;
+import org.auraframework.system.Source;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -50,7 +51,7 @@ import com.google.common.collect.Sets;
  * Provides ModuleDef implementation
  */
 @ServiceComponent
-public class ModuleParser implements DefinitionFactory<TextSource<ModuleDef>, ModuleDef> {
+public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<ModuleDef>, ModuleDef> {
 
     @Inject
     private ConfigAdapter configAdapter;
@@ -60,7 +61,7 @@ public class ModuleParser implements DefinitionFactory<TextSource<ModuleDef>, Mo
 
     @Override
     public Class<?> getSourceInterface() {
-        return TextSource.class;
+        return BundleSource.class;
     }
 
     @Override
@@ -70,22 +71,58 @@ public class ModuleParser implements DefinitionFactory<TextSource<ModuleDef>, Mo
 
     @Override
     public String getMimeType() {
-        return AbstractTextSourceImpl.MIME_XML;
+        return "";
     }
 
     @Override
-    public ModuleDef getDefinition(DefDescriptor<ModuleDef> descriptor, TextSource<ModuleDef> templateSource)
-            throws QuickFixException {
+    public ModuleDef getDefinition(@CheckForNull DefDescriptor<ModuleDef> descriptor,
+                                   @Nonnull BundleSource<ModuleDef> source) throws QuickFixException {
         Location location = null;
         try {
-            // this modules parser is special in that it needs multiple source files
-            // for now we localize the logic for this in this class
-            TextSource<ModuleDef> classSource = makeClassSource(templateSource);
+            Map<DefDescriptor<?>, Source<?>> sourceMap = source.getBundledParts();
+
+            // loop and get contents of all files in the bundle
+            Source<?> rootClassSource = null;
+            // source map of sources with absolute file paths as keys
+            Map<String,String> fullPathSources = new HashMap<>();
+            String componentPath = null;
+            
+            for (Map.Entry<DefDescriptor<?>, Source<?>> entry : sourceMap.entrySet()) {
+                DefDescriptor<?> entryDescriptor = entry.getKey();
+                Source<?> entrySource = entry.getValue();
+                String path = entrySource.getSystemId();
+                if (entryDescriptor.getPrefix().equals(DefDescriptor.JAVASCRIPT_PREFIX)) {
+                    if (entryDescriptor.getName().equals(descriptor.getName())) {
+                        rootClassSource = entrySource;
+                        // extract "namespace/name/name.js"
+                        int start = path.lastIndexOf('/', path.lastIndexOf('/', path.lastIndexOf('/') - 1) - 1);
+                        componentPath = path.substring(start + 1);
+                    }
+                }
+                if (entrySource instanceof TextSource) {
+                    fullPathSources.put(path, ((TextSource<?>) entrySource).getContents());
+                }
+            }
+            
+            if (componentPath == null) {
+                throw new InvalidDefinitionException("No base javascript for " + descriptor,
+                        new Location(sourceMap.get(descriptor)));
+            }
+            
+            // make source paths relative to the folder that contains the bundle
+            // i.e. "component.js", "utils/util.js"
+            String namespaceAndName = componentPath.substring(0, componentPath.lastIndexOf('/') + 1);
+            Map<String,String> sources = new HashMap<>();
+            for (Entry<String, String> fullPathSource: fullPathSources.entrySet()) {
+                String fullPath = fullPathSource.getKey();
+                String relativePath = fullPath.substring(fullPath.indexOf(namespaceAndName) + namespaceAndName.length());
+                sources.put(relativePath, fullPathSource.getValue());
+            }
 
             ModuleDefImpl.Builder builder = new ModuleDefImpl.Builder();
 
             // base definition
-            location = new Location(classSource);
+            location = new Location(rootClassSource);
             builder.setDescriptor(descriptor);
             builder.setTagName(descriptor.getDescriptorName());
             builder.setLocation(location);
@@ -96,15 +133,10 @@ public class ModuleParser implements DefinitionFactory<TextSource<ModuleDef>, Mo
                     isInInternalNamespace ? AuraContext.Access.INTERNAL : AuraContext.Access.PUBLIC));
 
             // module
-            builder.setPath(classSource.getSystemId());
+            builder.setPath(rootClassSource.getSystemId());
 
-            // gets the .html+.js source contents and passes them to the modules compiler
-            String sourceTemplate = templateSource.getContents();
-            String sourceClass = classSource.getContents();
-            String componentPath = descriptor.getNamespace() + '/' + descriptor.getName() + '/' + descriptor.getName()
-                    + ".js";
             ModulesCompiler compiler = new ModulesCompilerJ2V8();
-            ModulesCompilerData compilerData = compiler.compile(componentPath, sourceTemplate, sourceClass);
+            ModulesCompilerData compilerData = compiler.compile(componentPath, sources);
             builder.setCompiledCode(compilerData.code);
             builder.setDependencies(getDependencyDescriptors(compilerData.bundleDependencies));
             return builder.build();
@@ -142,29 +174,5 @@ public class ModuleParser implements DefinitionFactory<TextSource<ModuleDef>, Mo
             }
         }
         return results;
-    }
-
-    /**
-     * @return classSource corresponding to templateSource
-     */
-    private TextSource<ModuleDef> makeClassSource(TextSource<ModuleDef> templateSource) throws IOException {
-        DefDescriptor<ModuleDef> templateDescriptor = templateSource.getDescriptor();
-        DefDescriptor<ModuleDef> classDescriptor = makeClassDescriptor(templateDescriptor);
-
-        if (templateSource instanceof FileSource) {
-            String templatePath = templateSource.getSystemId(); // strip "file://"
-            String classPath = templatePath.replace(".html", ".js");
-            return new FileSource<>(classDescriptor, new File(classPath));
-        } else if (templateSource instanceof ResourceSource) {
-            String classSystemId = templateSource.getSystemId().replace(".html", ".js");
-            return new ResourceSource<>(classDescriptor, classSystemId);
-        }
-
-        throw new RuntimeException("TODO: " + templateSource.getClass().getName());
-    }
-
-    private DefDescriptor<ModuleDef> makeClassDescriptor(DefDescriptor<ModuleDef> templateDescriptor) {
-        return new DefDescriptorImpl<>("js", templateDescriptor.getNamespace(), templateDescriptor.getName(),
-                ModuleDef.class);
     }
 }

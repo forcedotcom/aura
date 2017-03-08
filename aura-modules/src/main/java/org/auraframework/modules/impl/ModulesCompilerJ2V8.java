@@ -16,6 +16,8 @@
 package org.auraframework.modules.impl;
 
 import java.io.File;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
@@ -36,6 +38,39 @@ import com.eclipsesource.v8.utils.MemoryManager;
 public final class ModulesCompilerJ2V8 implements ModulesCompiler {
     
     private static final Logger logger = Logger.getLogger(ModulesCompilerJ2V8.class.getName());
+    
+    @Override
+    public ModulesCompilerData compile(String entry, Map<String,String> sources) throws Exception {
+        String options = "{ format: 'aura', mapNamespaceFromPath: true,\n"
+                + "sources : {\n";
+        
+        String sourceClass = null;
+        
+        // add entries for all files in the bundle
+        for (Entry<String, String> sourceEntry: sources.entrySet()) {
+            String name = sourceEntry.getKey();
+            String source = StringUtils.replace(sourceEntry.getValue(), "`", "\\`");
+            
+            options += '"' + name + "\": ";
+            options += '`' + source + '`';
+            options += ",\n";
+            
+            if (entry.endsWith(name.substring(1))) {
+                sourceClass = source;
+            }
+        }
+        
+        if (sourceClass == null) {
+            throw new IllegalArgumentException("could not find entry in sources: " + entry);
+        }
+        
+        // add entry for sourceClass .js
+        options += '"' + entry + "\": ";
+        options += '`' + sourceClass + '`';
+        options += "}}";
+        
+        return compile(entry, options);
+    }
     
     @Override
     public ModulesCompilerData compile(String entry, String sourceTemplate, String sourceClass) throws Exception {

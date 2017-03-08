@@ -1,4 +1,4 @@
-import { HTMLElement } from "aura";
+import { HTMLElement } from "engine";
 import { module1, const1 } from "modules:testLib";
 
 export default class Simple extends HTMLElement {

@@ -53,8 +53,7 @@ function AuraComponentService() {
     this["renderedBy"] = this.renderedBy;   // originally exposed using exp()
 
     // Initialize module
-    this.addModule("modules", [], null, window["Engine"]);
-    this.addModule("aura", [], null, window["Engine"]);
+    this.addModule("engine", [], null, window["Engine"]);
 }
 
 /**

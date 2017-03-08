@@ -248,11 +248,7 @@
     },
 
     onMenuItemSelected: function(component, event) {
-        if (!component.isValid()) {
-            return;
-        }
-
-    	var concrete = component.getConcreteComponent();
+        var concrete = component.getConcreteComponent();
 
         var deselectSiblings = event.getParam("deselectSiblings");
         if (deselectSiblings === true) {
@@ -269,7 +265,9 @@
             this.setFocusToTrigger(component);
         }
 
-    	component.get("e.menuSelect").fire(event.getParams());
+        if (component.isValid()) {
+            component.get("e.menuSelect").fire(event.getParams());
+        }
     },
 
     /**

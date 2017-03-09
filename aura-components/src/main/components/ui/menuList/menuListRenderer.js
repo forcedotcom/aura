@@ -15,10 +15,14 @@
  */
 ({
     afterRender: function(component, helper) {
+        this.superAfterRender();
+
     	helper.setKeyboardEventHandlers(component);
         helper.setEventHandlersOnChildren(component);
 
-        return this.superAfterRender();
+        if (component.get("v.visible")) {
+            component.set("v.hasMenuOpened", true);
+        }
     },
 
     rerender: function(component, helper) {

@@ -95,7 +95,7 @@ public class RegistryTrie implements RegistrySet {
             namespaceMap = Maps.newHashMap();
         }
         for (String namespaceUnknown : reg.getNamespaces()) {
-            String namespace = namespaceUnknown.toLowerCase();
+            String namespace = namespaceUnknown;
             Object orig = namespaceMap.get(namespace);
             EnumMap<DefType, DefRegistry> defTypeMap;
 
@@ -119,9 +119,7 @@ public class RegistryTrie implements RegistrySet {
     private void initializeHashes() {
         for (DefRegistry reg : allRegistries) {
             insertPrefixReg(root, reg);
-            for (String ns : reg.getNamespaces()) {
-                allNamespaces.add(ns.toLowerCase());
-            }
+            allNamespaces.addAll(reg.getNamespaces());
         }
         allNamespaces.remove("*");
     }
@@ -186,9 +184,8 @@ public class RegistryTrie implements RegistrySet {
 
         if (ns == null) {
             ns = "*";
-        } else {
-            ns = ns.toLowerCase();
         }
+        
         Object top = root.get(prefix);
         if (top == null) {
             return null;
@@ -200,8 +197,12 @@ public class RegistryTrie implements RegistrySet {
 
         Object nsObj = namespaceMap.get(ns);
 
-        if (nsObj == null) {
-            nsObj = namespaceMap.get("*");
+        if (nsObj == null && !"*".equals(ns)) {
+        	nsObj = namespaceMap.get(ns.toLowerCase());
+
+        	if (nsObj == null) {
+                nsObj = namespaceMap.get("*");
+            }
         }
         if (nsObj == null) {
             return null;

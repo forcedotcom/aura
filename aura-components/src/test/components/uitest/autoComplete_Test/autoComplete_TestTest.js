@@ -59,8 +59,6 @@
         testFocusOnEmptyListDoesNotTriggerInfinteloop: {
     		test : [function(cmp){
     			autoComplete = cmp.find("autoCompleteNoData");
-    			var input = this._getInput(cmp,"autoCompleteNoData");
-    			this._fireFocusEvent(input);
     			autoList = autoComplete.find("list");
     			$A.test.assertFalse(autoList.get("v.visible"), "Autocomplete list should not be visible");
     			autoList.set("v.visible",true);
@@ -321,15 +319,6 @@
 			keyCode: keycode,
 			domEvent: {
 				type: "keydown",
-				preventDefault: function(){}
-			}
-		}).fire();
-	},
-	
-	_fireFocusEvent: function(cmp) {
-		cmp.getEvent("focus").setParams({
-			domEvent: {
-				type: "focus",
 				preventDefault: function(){}
 			}
 		}).fire();

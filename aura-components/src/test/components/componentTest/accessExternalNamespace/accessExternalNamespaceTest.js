@@ -100,7 +100,7 @@
                         "Didn't get ACF error box",
                         function() {
                             $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
-                                    "Access Check Failed! AuraComponentService.createComponent(): \'markup://auratest:accessPublicComponent",
+                                    "Access Check Failed! AuraComponentService.createComponentFromConfig(): \'markup://auratest:accessPublicComponent",
                                         "markup://componentTest:accessExternalNamespace");
                 });
             }

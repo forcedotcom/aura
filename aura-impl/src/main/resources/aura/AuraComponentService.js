@@ -1638,39 +1638,14 @@ AuraComponentService.prototype.saveDefsToStorage = function (config, context) {
 };
 
 
-AuraComponentService.prototype.createComponentPrivAsync = function (config, callback, forceClientCreation) {
+AuraComponentService.prototype.createComponentPrivAsync = function (config, callback) {
     var descriptor = this.getDescriptorFromConfig(config["componentDef"]);
     var def = this.getComponentDef({ "descriptor" : descriptor });
     var action;
     $A.assert(callback && typeof callback === 'function' , 'Callback');
 
-    if (def && (!def.hasRemoteDependencies() || forceClientCreation)) {
-        var classConstructor = this.getComponentClass(descriptor);
-        if (!classConstructor) {
-            throw new $A.auraError("Component class not found: " + descriptor, null, $A.severity.QUIET);
-        }
-
-        if($A.clientService.allowAccess(def)) {
-            callback(new classConstructor(config, forceClientCreation), 'SUCCESS');
-        }else{
-            var context=$A.getContext();
-            var contextCmp = context && context.getCurrentAccess();
-            var message="Access Check Failed! AuraComponentService.createComponent(): '" + descriptor + "' is not visible to '" + contextCmp + "'.";
-            if(context.enableAccessChecks) {
-                if(context.logAccessFailures){
-                    var ae = new $A.auraError(message);
-                    ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
-                    ae["componentStack"] = context && context.getAccessStackHierarchy();
-                    $A.error(null, ae);
-                }
-                callback(null, "ERROR", "Unknown component '" + descriptor + "'.");
-            }else{
-                if(context.logAccessFailures){
-                    $A.warning(message);
-                }
-                callback(new classConstructor(config, forceClientCreation), 'SUCCESS');
-            }
-        }
+    if (def && !def.hasRemoteDependencies()) {
+        this.createComponentPriv(config, callback);
         return;
     }
 
@@ -1679,10 +1654,10 @@ AuraComponentService.prototype.createComponentPrivAsync = function (config, call
     $A.enqueueAction(action);
 };
 
-AuraComponentService.prototype.createComponentPriv = function (config) {
+AuraComponentService.prototype.createComponentPriv = function (config, callback) {
     var descriptor = this.getDescriptorFromConfig(config["componentDef"]);
     var def = this.getComponentDef({ "descriptor" : descriptor });
-
+    var cmp = null;
     if($A.clientService.allowAccess(def)) {
         var classConstructor = this.getComponentClass(descriptor, def);
 
@@ -1697,8 +1672,7 @@ AuraComponentService.prototype.createComponentPriv = function (config) {
             auraError["component"] = descriptor;
             throw auraError;
         }
-
-        return new classConstructor(config);
+        cmp = new classConstructor(config);
     }else{
         var context=$A.getContext();
         var contextCmp = context && context.getCurrentAccess();
@@ -1715,9 +1689,19 @@ AuraComponentService.prototype.createComponentPriv = function (config) {
                 $A.warning(message);
             }
             if(def) {
-                return new (this.getComponentClass(descriptor))(config);
+               cmp = new (this.getComponentClass(descriptor))(config);
             }
         }
+    }
+    if (callback && $A.util.isFunction(callback)) {
+        if (cmp !== null) {
+            callback(cmp, "SUCCESS");
+        } else {
+            callback(null, "ERROR", "Unknown component '" + descriptor + "'.");
+        }
+        return undefined;
+    } else if (cmp !== null) {
+        return cmp;
     }
     throw new Error('Definition does not exist on the client for descriptor:'+descriptor);
 };

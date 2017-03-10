@@ -63,7 +63,7 @@ public final class ModulesCompilerJ2V8 implements ModulesCompiler {
             public void invoke(final V8Object receiver, final V8Array parameters) {
                 String error = parameters.toString();
                 future.completeExceptionally(new RuntimeException(error));
-                logger.warning("mdb7: ModulesCompilerJ2v8: error " + entry + ": " + error);
+                logger.warning("ModulesCompilerJ2v8: error " + entry + ": " + error);
             }
         };
         JavaVoidCallback onResultCallback = new JavaVoidCallback() {
@@ -71,7 +71,6 @@ public final class ModulesCompilerJ2V8 implements ModulesCompiler {
             public void invoke(final V8Object receiver, final V8Array parameters) {
                 ModulesCompilerData data = ModulesCompilerUtil.parseCompilerOutput(parameters.getObject(0));
                 future.complete(data);
-                logger.info("mdb7: ModulesCompilerJ2v8: compiled " + entry);
             }
         };
 

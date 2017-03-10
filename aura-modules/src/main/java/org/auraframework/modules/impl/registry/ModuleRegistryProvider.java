@@ -37,7 +37,6 @@ import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.impl.source.resource.ResourceSourceLoader;
 import org.auraframework.impl.system.CompilingDefRegistry;
 import org.auraframework.service.CompilerService;
-import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
@@ -63,9 +62,6 @@ public class ModuleRegistryProvider implements RegistryAdapter, SourceListener {
     private static final Set<DefType> DEF_TYPES = EnumSet.of(
             DefType.MODULE
     );
-    
-    @Inject
-    private LoggingService loggingService;
 
     @Inject
     private FileMonitor fileMonitor;
@@ -84,7 +80,6 @@ public class ModuleRegistryProvider implements RegistryAdapter, SourceListener {
     @Override
     public DefRegistry[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders) {
     	if (!J2V8Util.isJ2V8Available()) {
-    	    loggingService.error("mdb7: ModuleRegistryProvider: J2V8 not available");
     		return new DefRegistry[0];
     	}
     	
@@ -102,11 +97,6 @@ public class ModuleRegistryProvider implements RegistryAdapter, SourceListener {
                         // ignore, not sure what we can do.
                         throw new AuraRuntimeException("unable to get canonical path for " + modules.getAbsolutePath(), ioe);
                     }
-                    loggingService.info("mdb7: ModuleRegistryProvider: modules:" + modules.getAbsolutePath()
-                            + ", canRead/canExecute/isDirectory:" + modules.canRead() + '/' + modules.canExecute() + '/'
-                            + modules.isDirectory());
-                } else {
-                    loggingService.info("mdb7: ModuleRegistryProvider: null modules");
                 }
                 if (modules != null && modules.canRead() && modules.canExecute() && modules.isDirectory()) {
                     sourceLoader = new FileSourceLoader(modules, fileMonitor);
@@ -119,11 +109,9 @@ public class ModuleRegistryProvider implements RegistryAdapter, SourceListener {
                 CompilingDefRegistry defRegistry = new CompilingDefRegistry(sourceLoader, PREFIXES, DEF_TYPES,
                         compilerService);
                 registries.add(defRegistry);
-                loggingService.info("mdb7: ModuleRegistryProvider: sourceLoader:" + sourceLoader + ", defRegistry:" + defRegistry);
 
                 // register namespaces to optimize processing of definition references
                 configAdapter.addModuleNamespaces(defRegistry.getNamespaces());
-                loggingService.info("mdb7: ModuleRegistryProvider: adding module namespace: " + defRegistry.getNamespaces());
 
                 locationMap.putIfAbsent(location, defRegistry);
             }

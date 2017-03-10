@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.auraframework.Aura;
 import org.auraframework.builder.ModuleDefRefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
@@ -30,7 +29,6 @@ import org.auraframework.def.DefinitionReference;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDefRef;
 import org.auraframework.impl.root.DefinitionReferenceImpl;
-import org.auraframework.service.LoggingService;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -42,8 +40,6 @@ import com.google.common.collect.Lists;
  * Uses same base impl as ComponentDefRef
  */
 public class ModuleDefRefImpl extends DefinitionReferenceImpl<ModuleDef> implements ModuleDefRef {
-
-    private static final LoggingService loggingService = Aura.getLoggingService();
 
     private static final long serialVersionUID = 2121381558446216947L;
 
@@ -84,7 +80,6 @@ public class ModuleDefRefImpl extends DefinitionReferenceImpl<ModuleDef> impleme
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
-        loggingService.info("mdb7: ModuleDefRefImpl.appendDependencies: " + dependencies);
     }
 
     @Override

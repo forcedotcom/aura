@@ -1155,6 +1155,18 @@ AuraComponentService.prototype.hydrateComponent = function(descriptor, exporter)
     var pos = [tmp.indexOf('/*') + 2, tmp.indexOf('*/')];
     tmp = tmp.substr(pos[0], pos[1] - pos[0]);
     exporter = $A.util.globalEval("function () {" + tmp + " }");
+
+    if(!exporter) {
+        var defDescriptor = new Aura.System.DefDescriptor(descriptor);
+        var includeComponentSource = defDescriptor.getPrefix() === "layout" || $A.clientService.isInternalNamespace(defDescriptor.getNamespace());
+        var errorMessage = (!includeComponentSource) ? 
+            "Hydrating the component" + descriptor + " failed." : 
+            "Hydrating the component" + descriptor + " failed.\n Exporter code: " + tmp;
+        var auraError = new $A.auraError(errorMessage, null, $A.severity.QUIET);
+        auraError["component"] = descriptor;
+        throw auraError;
+    }
+
     return exporter();
 };
 
@@ -1674,6 +1686,19 @@ AuraComponentService.prototype.createComponentPriv = function (config) {
 
     if($A.clientService.allowAccess(def)) {
         var classConstructor = this.getComponentClass(descriptor, def);
+
+        if (!classConstructor) {
+            var errorMessage = $A.util.format("Component class not found: {0}\n hasClassConstructor: {1}\n hasClassExporter: {2}\n hasSavedComponentConfigs: {3}\n hasComponentDefCreated: {4}", 
+                descriptor, 
+                !!$A.componentService.componentClassRegistry.classConstructors[descriptor],
+                !!$A.componentService.componentClassRegistry.classExporter[descriptor],
+                !!$A.componentService.savedComponentConfigs[descriptor],
+                !!$A.componentService.componentDefRegistry[descriptor]);
+            var auraError = new $A.auraError(errorMessage, null, $A.severity.QUIET);
+            auraError["component"] = descriptor;
+            throw auraError;
+        }
+
         return new classConstructor(config);
     }else{
         var context=$A.getContext();

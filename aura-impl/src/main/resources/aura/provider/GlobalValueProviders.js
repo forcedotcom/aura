@@ -105,19 +105,25 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
     var valueProvider, i, type, newGvp, values;
 
     for (i = 0; i < gvps.length; i++) {
-        newGvp = gvps[i];
-        type = newGvp["type"];
-        if (!this.valueProviders[type]) {
-            this.valueProviders[type] = new Aura.Provider.ObjectValueProvider();
+        try { 
+            newGvp = gvps[i];
+            type = newGvp["type"];
+            if (!this.valueProviders[type]) {
+                this.valueProviders[type] = new Aura.Provider.ObjectValueProvider();
+            }
+            valueProvider = this.valueProviders[type];
+            if (valueProvider.merge) {
+                // set values into its value provider
+                valueProvider.merge(newGvp["values"]);
+            }else{
+                $A.util.apply(valueProvider,newGvp["values"],true);
+            }
+            $A.expressionService.updateGlobalReferences(type,newGvp["values"]);
+        } catch(e) {
+            var auraError = new $A.auraError("Merging GVP '" + type + "' failed", e);
+            auraError["component"] = type;
+            throw auraError;
         }
-        valueProvider = this.valueProviders[type];
-        if (valueProvider.merge) {
-            // set values into its value provider
-            valueProvider.merge(newGvp["values"]);
-        }else{
-            $A.util.apply(valueProvider,newGvp["values"],true);
-        }
-        $A.expressionService.updateGlobalReferences(type,newGvp["values"]);
     }
 
     if (doNotPersist) {

@@ -178,7 +178,6 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
                             map[value[j]["type"]] = value[j]["values"];
                         }
 
-
                         for (j in toStore) {
                             type = toStore[j]["type"];
                             if (!map[type]) {
@@ -200,7 +199,12 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
                     that.mutexUnlock();
                 },
                 function(err) {
-                    $A.warning("GlobalValueProvider.merge(), failed to put, error:" + err);
+                    var message = "GlobalValueProvider.merge(): failed to store merged GVP values to storage. ";
+                    $A.warning(message + err);
+
+                    // The error could protentially cause missing labels if a new loading page restores
+                    // GVPs from storage. Logging the error to server.
+                    $A.logger.reportError(new $A.auraError(message, err));
                     that.mutexUnlock();
                 }
             );

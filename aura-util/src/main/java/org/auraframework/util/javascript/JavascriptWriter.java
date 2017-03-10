@@ -119,8 +119,21 @@ public enum JavascriptWriter {
         @Override
         public List<JavascriptProcessingError> compress(InputStream in, Writer out, String filename)
                 throws IOException {
-            IOUtil.copyStream(new InputStreamReader(in), out);
+        	IOUtil.copyStream(new InputStreamReader(in), out);
             return new ArrayList<>();
+        }
+        
+        @Override
+        public List<JavascriptProcessingError> compress(Reader in, Writer out, String filename) throws IOException {
+            IOUtil.copyStream(in, out);
+            return Collections.emptyList();
+        }
+
+        @Override
+        public List<JavascriptProcessingError> compress(Reader sourceFileReader, Writer compressedFileWriter,
+                Writer sourceMapWriter, String filename, Map<String, String> sourceMapLocationMapping) throws IOException {
+            IOUtil.copyStream(sourceFileReader, compressedFileWriter);
+            return Collections.emptyList();
         }
     };
 

@@ -12,11 +12,6 @@
         "xs":"G"
       },
       {
-        "name":"slot",
-        "type":"aura://String",
-        "xs":"G"
-      },
-      {
         "name":"value",
         "type":"aura://String",
         "xs":"I"

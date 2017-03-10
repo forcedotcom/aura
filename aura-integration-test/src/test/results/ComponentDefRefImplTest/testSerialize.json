@@ -12,11 +12,6 @@
         "xs":"G"
       },
       {
-        "name":"slot",
-        "type":"aura://String",
-        "xs":"G"
-      },
-      {
         "name":"value",
         "type":"aura://String",
         "xs":"I"
@@ -119,11 +114,6 @@
                 {
                   "name":"body",
                   "type":"aura://Aura.Component[]",
-                  "xs":"G"
-                },
-                {
-                  "name":"slot",
-                  "type":"aura://String",
                   "xs":"G"
                 },
                 {

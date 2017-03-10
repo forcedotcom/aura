@@ -9,11 +9,6 @@
       "name":"body",
       "type":"aura://Aura.Component[]",
       "xs":"G"
-    },
-    {
-      "name":"slot",
-      "type":"aura://String",
-      "xs":"G"
     }
   ],
   "componentClass":"function(){$A.componentService.addComponentClass(\"markup://aura:test\",function() {\nvar aura$test = {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\nreturn aura$test;\n});\n}"

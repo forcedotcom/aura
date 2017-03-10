@@ -11,11 +11,6 @@
       "xs":"G"
     },
     {
-      "name":"slot",
-      "type":"aura://String",
-      "xs":"G"
-    },
-    {
       "name":"testAttributeDescriptorName",
       "type":"aura://String",
       "default":"testValue"

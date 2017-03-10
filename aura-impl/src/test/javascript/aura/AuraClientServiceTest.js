@@ -1030,7 +1030,98 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.Equal(0, mockSetItems.Calls.length);
         }
 
+        [Fact]
+        function StoresTokenAfterInitialization() {
+
+            var expectedToken = "myToken";
+            var storedItems;
+            var mockAction = Mocks.GetMocks(Object.Global(), {
+                Action: {
+                    getStorage: function() {
+                        return {
+                        	enqueue : function(afterInit) {
+                        		var resolve = Stubs.GetMethod();
+                        		afterInit(resolve);
+                        	},
+                            adapter:{
+                                setItems: function(items) {
+                                	storedItems = items;
+                                	return ResolvePromise();
+                                }
+                            },
+                            isPersistent: function() {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            });
+
+            mockGlobal(function() {
+                mockAction(function() {
+                    var targetService = new Aura.Services.AuraClientService();
+                    targetService._token = expectedToken;
+
+                    targetService.saveTokenToStorage();
+                });
+            });
+
+            Assert.Equal(expectedToken, storedItems[0][1].value.token);
+        }
+
     }
+
+
+    [Fixture]
+    function loadTokenFromStorage() {
+
+        [Fact]
+        function ResolvesToTokenAfterInitialization() {
+
+        	var expectedToken = "myToken";
+            var storedItem = {};
+        	storedItem[Aura.Services.AuraClientService.TOKEN_KEY] = {
+    			value : {
+    				token : expectedToken
+    			}
+            };
+            var actual;
+            var resolve = function(value) {
+            	actual = value;
+            };
+            var mockAction = Mocks.GetMocks(Object.Global(), {
+                Action: {
+                    getStorage: function() {
+                        return {
+                        	enqueue : function(afterInit) {
+                        		afterInit(resolve);
+                        	},
+                            adapter:{
+                                getItems: function(items) {
+                                	return ResolvePromise(storedItem);
+                                }
+                            },
+                            isPersistent: function() {
+                                return true;
+                            }
+                        };
+                    }
+                }
+            });
+
+            mockGlobal(function() {
+                mockAction(function() {
+                    var targetService = new Aura.Services.AuraClientService();
+
+                    targetService.loadTokenFromStorage();
+                });
+            });
+
+            Assert.Equal(expectedToken, actual);
+        }
+
+    }
+
 
     [Fixture]
     function invalidSession() {

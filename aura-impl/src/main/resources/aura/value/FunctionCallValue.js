@@ -61,12 +61,15 @@ FunctionCallValue.prototype.isDirty = function(){
  */
 FunctionCallValue.prototype.evaluate = function(valueProvider){
     $A.getContext().setCurrentAccess(this.context);
-    var result = this.code.call(null, valueProvider || this.valueProvider, this.expressionFunctions);
-    if(!this.hasOwnProperty("result")){
-        this["result"]=result;
+    try {
+        var result = this.code.call(null, valueProvider || this.valueProvider, this.expressionFunctions);
+        if(!this.hasOwnProperty("result")){
+            this["result"]=result;
+        }    
+        return result;
+    } finally {
+        $A.getContext().releaseCurrentAccess();
     }
-    $A.getContext().releaseCurrentAccess();
-    return result;
 };
 
 /**

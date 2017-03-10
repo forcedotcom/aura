@@ -586,7 +586,7 @@ Action.prototype.callAllAboardCallback = function (context) {
             return false;
         } finally {
             context.setCurrentAction(previous);
-            $A.getContext().releaseCurrentAccess();
+            context.releaseCurrentAccess();
         }
     }
     return true;
@@ -928,72 +928,75 @@ Action.prototype.prepareToSend = function() {
  */
 Action.prototype.finishAction = function(context) {
     var previous = context.setCurrentAction(this);
-    context.setCurrentAccess(this.cmp);
     var clearComponents = false;
     var id = this.getId(context);
     var error = undefined;
     var oldDisplayFlag = $A.showErrors();
-    if (this.isFromStorage()) {
-        // suppress errors dialogs while performing cached actions.
-        // allows retry without the error dialog.
-        $A.showErrors(false);
-    }
+    context.setCurrentAccess(this.cmp);
     try {
-        if (this.cmp === undefined || this.cmp.destroyed!==1) {
-            // Add in any Action scoped components /or partial configs
-            if (this.components) {
-                context.joinComponentConfigs(this.components, id);
-                clearComponents = true;
-            }
+        if (this.isFromStorage()) {
+            // suppress errors dialogs while performing cached actions.
+            // allows retry without the error dialog.
+            $A.showErrors(false);
+        }
+        try {
+            if (this.cmp === undefined || this.cmp.destroyed!==1) {
+                // Add in any Action scoped components /or partial configs
+                if (this.components) {
+                    context.joinComponentConfigs(this.components, id);
+                    clearComponents = true;
+                }
 
-            if (this.events.length > 0) {
-                for (var x = 0; x < this.events.length; x++) {
-                    try {
-                        this.parseAndFireEvent(this.events[x]);
-                    } catch (e) {
-                        var eventFailedMessage = "Events failed: "+(this.def?this.def.toString():"");
-                        $A.warning(eventFailedMessage, e);
-                        e.message = e.message ? (e.message + '\n' + eventFailedMessage) : eventFailedMessage;
+                if (this.events.length > 0) {
+                    for (var x = 0; x < this.events.length; x++) {
+                        try {
+                            this.parseAndFireEvent(this.events[x]);
+                        } catch (e) {
+                            var eventFailedMessage = "Events failed: "+(this.def?this.def.toString():"");
+                            $A.warning(eventFailedMessage, e);
+                            e.message = e.message ? (e.message + '\n' + eventFailedMessage) : eventFailedMessage;
+                            error = e;
+                        }
+                    }
+                }
+
+                // If there is a callback for the action's current state, invoke that too
+                var cb = this.callbacks[this.getState()];
+
+                try {
+                    if (cb) {
+                        cb["fn"].call(cb["s"], this, this.cmp);
+                    }
+                } catch (e) {
+                    var callbackFailedMessage = "Callback failed: " + (this.def?this.def.toString():"");
+                    $A.warning(callbackFailedMessage, e);
+                    e.message = e.message ? (e.message + '\n' + callbackFailedMessage) : callbackFailedMessage;
+                    if (!error) {
                         error = e;
                     }
                 }
-            }
 
-            // If there is a callback for the action's current state, invoke that too
-            var cb = this.callbacks[this.getState()];
-
-            try {
-                if (cb) {
-                    cb["fn"].call(cb["s"], this, this.cmp);
+                this.complete();
+                if (this.components && (cb || !this.storable || !this.getStorage())) {
+                    context.finishComponentConfigs(id);
+                    clearComponents = false;
                 }
-            } catch (e) {
-                var callbackFailedMessage = "Callback failed: " + (this.def?this.def.toString():"");
-                $A.warning(callbackFailedMessage, e);
-                e.message = e.message ? (e.message + '\n' + callbackFailedMessage) : callbackFailedMessage;
-                if (!error) {
-                    error = e;
-                }
+            } else {
+                this.abort();
+            }
+        } catch (e) {
+            var actionFailedMessage = "Action failed: " + (this.def?this.def.toString():"");
+            $A.warning(actionFailedMessage, e);
+            e.message = e.message ? (e.message + '\n' + actionFailedMessage) : actionFailedMessage;
+            if (!error) {
+                error = e;
             }
 
-            this.complete();
-            if (this.components && (cb || !this.storable || !this.getStorage())) {
-                context.finishComponentConfigs(id);
-                clearComponents = false;
-            }
-        } else {
-            this.abort();
+            clearComponents = true;
         }
-    } catch (e) {
-        var actionFailedMessage = "Action failed: " + (this.def?this.def.toString():"");
-        $A.warning(actionFailedMessage, e);
-        e.message = e.message ? (e.message + '\n' + actionFailedMessage) : actionFailedMessage;
-        if (!error) {
-            error = e;
-        }
-
-        clearComponents = true;
+    } finally {
+        context.releaseCurrentAccess();
     }
-    context.releaseCurrentAccess();
     context.setCurrentAction(previous);
     if (clearComponents) {
         context.clearComponentConfigs(id);

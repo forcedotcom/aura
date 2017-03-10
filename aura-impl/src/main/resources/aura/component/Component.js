@@ -1738,20 +1738,21 @@ Component.prototype.render = function() {
     if(render){
         var context = $A.getContext();
         context.setCurrentAccess(this);
-        
-        var secureThis = $A.lockerService.wrapComponent(this);
-        var result = render(secureThis, this["helper"]);
-        
-        // Locker: anytime framework receive DOM elements from a locked down component
-        // it should unwrap them before using them. For regular components, this is
-        // a non-opt:
-        if (secureThis !== this) {
-            result = $A.lockerService.unwrap(this, result);
-        }
-        
-        context.releaseCurrentAccess();
+        try {
+            var secureThis = $A.lockerService.wrapComponent(this);
+            var result = render(secureThis, this["helper"]);
+            
+            // Locker: anytime framework receive DOM elements from a locked down component
+            // it should unwrap them before using them. For regular components, this is
+            // a non-opt:
+            if (secureThis !== this) {
+                result = $A.lockerService.unwrap(this, result);
+            }
 
-        return result;
+            return result;
+        } finally {
+            context.releaseCurrentAccess();
+        }
     } else {
         return this.superRender();
     }
@@ -1769,10 +1770,11 @@ Component.prototype.afterRender = function() {
     if(afterRender){
         var context=$A.getContext();
         context.setCurrentAccess(this);
-
-        afterRender($A.lockerService.wrapComponent(this), this["helper"]);
-
-        context.releaseCurrentAccess();
+        try {
+            afterRender($A.lockerService.wrapComponent(this), this["helper"]);
+        } finally {
+            context.releaseCurrentAccess();
+        }
     } else {
         this.superAfterRender();
     }
@@ -1791,16 +1793,19 @@ Component.prototype.rerender = function() {
     if(rerender){
         var context=$A.getContext();
         context.setCurrentAccess(this);
-        var secureThis = $A.lockerService.wrapComponent(this);
-        var result = rerender(secureThis, this["helper"]);
-        // Locker: anytime framework receive DOM elements from a locked down component
-        // it should unwrap them before using them. For regular components, this is
-        // a non-opt:
-        if (secureThis !== this) {
-            result = $A.lockerService.unwrap(this, result);
+        try {
+            var secureThis = $A.lockerService.wrapComponent(this);
+            var result = rerender(secureThis, this["helper"]);
+            // Locker: anytime framework receive DOM elements from a locked down component
+            // it should unwrap them before using them. For regular components, this is
+            // a non-opt:
+            if (secureThis !== this) {
+                result = $A.lockerService.unwrap(this, result);
+            }
+            return result;
+        } finally {
+            context.releaseCurrentAccess();
         }
-        context.releaseCurrentAccess();
-        return result;
      } else {
         return this.superRerender();
    }
@@ -1821,8 +1826,11 @@ Component.prototype.unrender = function() {
     if(unrender){
         var context=$A.getContext();
         context.setCurrentAccess(this);
-        unrender($A.lockerService.wrapComponent(this), this["helper"]);
-        context.releaseCurrentAccess();
+        try {
+            unrender($A.lockerService.wrapComponent(this), this["helper"]);
+        } finally {
+            context.releaseCurrentAccess();            
+        }
      } else {
         // If a component extends the root component and doesn't implement it's own
         // unrender function then we need to execute this default unrender. See aura:text.
@@ -1951,21 +1959,23 @@ Component.prototype.createComponentStack = function(facets, valueProvider){
                 }
 
                 context.setCurrentAccess(valueProvider);
+                try {
+                    var facetConfigAttr = { "values": {} };
+                    var facetConfigClone = $A.util.apply({}, config);
 
-                var facetConfigAttr = { "values": {} };
-                var facetConfigClone = $A.util.apply({}, config);
+                    if (facetConfigClone["attributes"]) {
+                        $A.util.apply(facetConfigAttr["values"], config["attributes"]["values"], true);
+                    } else {
+                        facetConfigClone["attributes"] = {};
+                    }
 
-                if (facetConfigClone["attributes"]) {
-                    $A.util.apply(facetConfigAttr["values"], config["attributes"]["values"], true);
-                } else {
-                    facetConfigClone["attributes"] = {};
+                    facetConfigAttr["valueProvider"] = (config["attributes"] && config["attributes"]["valueProvider"]) || valueProvider;
+                    facetConfigClone["attributes"] = facetConfigAttr;
+                    facetConfigClone["containerComponentId"] = this.globalId;
+                    components.push($A.componentService.createComponentPriv(facetConfigClone));                    
+                } finally {
+                    context.releaseCurrentAccess();
                 }
-
-                facetConfigAttr["valueProvider"] = (config["attributes"] && config["attributes"]["valueProvider"]) || valueProvider;
-                facetConfigClone["attributes"] = facetConfigAttr;
-                facetConfigClone["containerComponentId"] = this.globalId;
-                components.push($A.componentService.createComponentPriv(facetConfigClone));
-                context.releaseCurrentAccess();
             } else {
                 // KRIS: HALO: This is hit, when you create a newComponentDeprec and use raw values, vs configs on the attribute values.
                 throw new $A.auraError("Component.createComponentStack: invalid config. Expected component definition, found '"+config+"'.", null, $A.severity.QUIET);
@@ -1991,47 +2001,48 @@ Component.prototype.setupSuper = function(configAttributes) {
         superConfig["concreteComponentId"] = this.concreteComponentId || this.globalId;
 
         $A.pushCreationPath("super");
-        $A.getContext().setCurrentAccess(this);
+        var context = $A.getContext();
+        context.setCurrentAccess(this);
+        try {
+            if (configAttributes) {
+                superAttributes["values"] = {};
+                var facets = this.componentDef.getFacets();
 
-        if (configAttributes) {
-            superAttributes["values"] = {};
-            var facets = this.componentDef.getFacets();
-
-            if (facets) {
-                for (var i = 0; i < facets.length; i++) {
-                    var facetDef = AttributeSet.getDef(facets[i]["descriptor"], this.componentDef);
-                    if (!$A.clientService.allowAccess(facetDef[0], facetDef[1])) {
-                        var context=$A.getContext();
-                        var contextCmp = context && context.getCurrentAccess();
-                        var message="Access Check Failed! Component.setupSuper():'" + facets[i]["descriptor"] + "' of component '" + this + "' is not visible to '" + contextCmp + "'.";
-                        if(context.enableAccessChecks) {
-                            if(context.logAccessFailures){
-                                var ae = new $A.auraError(message);
-                                ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
-                                ae["componentStack"] = context && context.getAccessStackHierarchy();
-                                $A.error(null, ae);
-                            }
-                            continue;
-                        }else{
-                            if(context.logAccessFailures){
-                                $A.warning(message);
+                if (facets) {
+                    for (var i = 0; i < facets.length; i++) {
+                        var facetDef = AttributeSet.getDef(facets[i]["descriptor"], this.componentDef);
+                        if (!$A.clientService.allowAccess(facetDef[0], facetDef[1])) {
+                            var contextCmp = context && context.getCurrentAccess();
+                            var message="Access Check Failed! Component.setupSuper():'" + facets[i]["descriptor"] + "' of component '" + this + "' is not visible to '" + contextCmp + "'.";
+                            if(context.enableAccessChecks) {
+                                if(context.logAccessFailures){
+                                    var ae = new $A.auraError(message);
+                                    ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+                                    ae["componentStack"] = context && context.getAccessStackHierarchy();
+                                    $A.error(null, ae);
+                                }
+                                continue;
+                            }else{
+                                if(context.logAccessFailures){
+                                    $A.warning(message);
+                                }
                             }
                         }
+                        superAttributes["values"][facets[i]["descriptor"]] = facets[i]["value"];
                     }
-                    superAttributes["values"][facets[i]["descriptor"]] = facets[i]["value"];
                 }
+
+                superAttributes["events"] = configAttributes["events"];
+                superAttributes["valueProvider"] = configAttributes["facetValueProvider"];
             }
 
-            superAttributes["events"] = configAttributes["events"];
-            superAttributes["valueProvider"] = configAttributes["facetValueProvider"];
+            superConfig["attributes"] = superAttributes;
+
+            this.setSuperComponent($A.componentService.createComponentPriv(superConfig));
+        } finally {
+            context.releaseCurrentAccess();
+            $A.popCreationPath("super");
         }
-
-        superConfig["attributes"] = superAttributes;
-
-        this.setSuperComponent($A.componentService.createComponentPriv(superConfig));
-
-        $A.getContext().releaseCurrentAccess();
-        $A.popCreationPath("super");
     }
 };
 
@@ -2568,9 +2579,12 @@ Component.prototype.injectComponent = function(config, localCreation) {
 
         if (this["provider"]) {
             context.setCurrentAccess(this);
-            var providedConfig = this.provide(localCreation);
-            this.setProvided(providedConfig['componentDef'], providedConfig['attributes']);
-            context.releaseCurrentAccess();
+            try {
+                var providedConfig = this.provide(localCreation);
+                this.setProvided(providedConfig['componentDef'], providedConfig['attributes']);
+            } finally {
+                context.releaseCurrentAccess();
+            }
         } else {
             $A.assert(this.partialConfig,
                     "Abstract component without provider def cannot be instantiated : "

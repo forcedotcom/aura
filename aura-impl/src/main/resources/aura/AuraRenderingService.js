@@ -74,8 +74,8 @@ AuraRenderingService.prototype.render = function(components, parent) {
         // JBUCH: HALO: TODO: END REMOVE ME
 
         if (cmp.isValid()) {
+            $A.getContext().setCurrentAccess(cmp);
             try {
-                $A.getContext().setCurrentAccess(cmp);
                 var renderedElements = cmp["render"]();
                 renderedElements=this.finishRender(cmp, renderedElements);
                 elements = elements.concat(renderedElements);
@@ -149,8 +149,8 @@ AuraRenderingService.prototype.rerender = function(components) {
                     throw new $A.auraError("Aura.RenderingService.rerender: attempt to rerender component that has not been rendered.", null, $A.severity.QUIET);
                 }
                 var rerenderedElements = undefined;
+                context.setCurrentAccess(cmp);
                 try {
-                    context.setCurrentAccess(cmp);
                     rerenderedElements=cmp["rerender"]();
                 } catch (e) {
                     if (e instanceof $A.auraError && e["component"]) {
@@ -218,8 +218,8 @@ AuraRenderingService.prototype.afterRender = function(components) {
             throw new $A.auraError("AuraRenderingService.afterRender: 'cmp' must be a valid Component, found '"+cmp+"'.", null, $A.severity.QUIET);
         }
         if(cmp.isValid()) {
+            context.setCurrentAccess(cmp);
             try {
-                context.setCurrentAccess(cmp);
                 cmp["afterRender"]();
             } catch (e) {
                 // The after render routine threw an error, so we should
@@ -292,9 +292,9 @@ AuraRenderingService.prototype.unrender = function(components) {
                 // Disconnect a components elements
                 this.disconnectComponent(cmp);
             }
-             
+
+            context.setCurrentAccess(cmp);
             try {
-                context.setCurrentAccess(cmp);
                 cmp["unrender"]();
             } catch (e) {
                 if (e instanceof $A.auraError && e["component"]) {

@@ -284,15 +284,17 @@ AuraHistoryService.prototype.getEvent = function(){
  */
 AuraHistoryService.prototype.changeHandler = function(){
 
-	var loc = this.getLocationHash() || this.getHistoryState();
+    var loc = this.getLocationHash() || this.getHistoryState();
     var context = $A.getContext();
 
     // The event should be accessible in the context of the application.
     context.setCurrentAccess($A.getRoot());
-
-    var event = $A.eventService.newEvent(this.getEvent());
-
-    context.releaseCurrentAccess();
+    var event;
+    try {
+        event = $A.eventService.newEvent(this.getEvent());
+    } finally {
+        context.releaseCurrentAccess();
+    }
 
     if(!event) {
         throw new $A.auraError("The event specified on the app for the locationChange (" + this.getEvent() + ") was not found.", null, $A.severity.QUIET);

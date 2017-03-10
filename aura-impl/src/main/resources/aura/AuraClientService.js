@@ -1501,8 +1501,8 @@ AuraClientService.prototype.init = function(config, token, container) {
     var component = $A.componentService.createComponentPriv(config);
     Aura.bootstrapMark("appCreationEnd");
 
+    context.setCurrentAccess(component);
     try {
-        context.setCurrentAccess(component);
         Aura.bootstrapMark("appRenderingStart");
         $A.renderingService.render(component, container || document.body);
         $A.renderingService.afterRender(component);
@@ -3109,10 +3109,11 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
     }
     var context=$A.getContext();
     var priorAccess=context.getCurrentAccess();
+
+    if(!priorAccess){
+        context.setCurrentAccess($A.getRoot());
+    }
     try {
-        if(!priorAccess){
-            context.setCurrentAccess($A.getRoot());
-        }
         if ("context" in responseMessage) {
             var responseContext = responseMessage["context"];
             context['merge'](responseContext);
@@ -3341,13 +3342,11 @@ AuraClientService.prototype.injectComponent = function(config, locatorDomId, loc
     var self = this;
 
     action.setCallback(action, function(a) {
+        var root = $A.getRoot();
+        if(!priorAccess){
+            context.setCurrentAccess(root);
+        }
         try {
-            var root = $A.getRoot();
-
-            if(!priorAccess){
-                context.setCurrentAccess(root);
-            }
-
             var element = $A.util.getElement(locatorDomId);
 
             // Check for bogus locatorDomId
@@ -3499,18 +3498,19 @@ AuraClientService.prototype.injectComponentAsync = function(config, locator, eve
     if (!priorAccess) {
         context.setCurrentAccess(root);
     }
+    try {
+        $A.componentService.newComponentAsync(undefined, function(component) {
+            if (callback) {
+                callback(component);
+            }
 
-    $A.componentService.newComponentAsync(undefined, function(component) {
-        if (callback) {
-            callback(component);
-        }
-
-        acs.renderInjection(component, locator, eventHandlers);
-
+            acs.renderInjection(component, locator, eventHandlers);     
+        }, config, root, false, false, true);
+    } finally {
         if (!priorAccess) {
             context.releaseCurrentAccess();
-        }
-    }, config, root, false, false, true);
+        }        
+    }
 
     // Now we go ahead and stick a label load on the request.
     var labelAction = $A.get("c.aura://ComponentController.loadLabels");

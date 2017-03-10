@@ -231,11 +231,14 @@ ExpressionComponent.prototype["renderer"] = {
         if(!($A.util.isComponent(value) || $A.util.isArray(value))){
             // JBUCH: HALO: TODO: MIGHT BE ABLE TO RETURN THIS TO SIMPLE TEXTNODE MANAGEMENT
             var owner = component.getOwner();
-            var context = $A.getContext();      
+            var context = $A.getContext();
             context.setCurrentAccess(owner);
-            value = component._lastRenderedTextNode = $A.createComponentFromConfig({ "descriptor": "markup://aura:text", "attributes":{ value: value } });
-            value.setContainerComponentId(component.globalId);
-            context.releaseCurrentAccess();
+            try {
+                value = component._lastRenderedTextNode = $A.createComponentFromConfig({ "descriptor": "markup://aura:text", "attributes":{ value: value } });
+                value.setContainerComponentId(component.globalId);                
+            } finally {
+                context.releaseCurrentAccess();
+            }
             
             $A.lockerService.trust(owner, value);
         }

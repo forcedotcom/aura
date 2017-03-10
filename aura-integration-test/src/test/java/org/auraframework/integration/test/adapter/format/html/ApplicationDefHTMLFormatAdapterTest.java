@@ -181,6 +181,6 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         assertFalse("Comments were not stripped out from template CSS", body.contains("Multi line comment"));
         assertFalse("Inline comments were not stripped our from template CSS", body.contains("Inline comment"));
         assertTrue("Expected template css not found in serialized response.",
-                body.contains("<style>body {background-color:#ededed; font-size:13px; line-height:1.3}</style>"));
+                body.contains("body {background-color:#ededed; font-size:13px; line-height:1.3}</style>"));
     }
 }

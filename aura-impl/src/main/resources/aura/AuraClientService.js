@@ -21,6 +21,7 @@
 Aura.Services.AuraClientServiceMarker = 0;
 
 Aura.Services.AuraClientService$AuraXHR = function AuraXHR() {
+    this.allowFlowthrough=false;
     this.length = 0;
     this.marker = 0;
     this.request = undefined;
@@ -3566,13 +3567,32 @@ AuraClientService.prototype.isConnected = function() {
  * @platform
  */
 AuraClientService.prototype.enqueueAction = function(action, background) {
-
-    $A.assert(!$A.util.isUndefinedOrNull(action), "EnqueueAction() cannot be called on an undefined or null action.");
     $A.assert($A.util.isAction(action), "Cannot call EnqueueAction() with a non Action parameter.");
 
     if (background) {
-        $A.warning("Do not use the deprecated background parameter");
+        $A.deprecated("Do not use the deprecated background parameter",null,"2017/03/08","2018/03/08");
     }
+
+    if(this.allowFlowthrough){
+        // special queue if all criteria are met:
+        // - server action
+        // - not a refresh action
+        // - does not have a cache hit (if persisted actions filter is disabled then assume a cache miss)
+        var isServerAction=action.getDef().isServerAction()&&!action.isRefreshAction();
+        if(isServerAction){
+            var isPersisted=this.persistedActionFilterEnabled && this.persistedActionFilter && this.persistedActionFilter.hasOwnProperty(action.getStorageKey());
+            if (!isPersisted) {
+                var auraXHR = this.getAvailableXHR(false);
+                if (auraXHR) {
+                    if (!this.send(auraXHR, [action], "POST")) {
+                        this.releaseXHR(auraXHR);
+                    }
+                    return;
+                } // no XHR available; fall through to default behavior
+            } // not persisted
+        } // not a server action or cache refresh
+    }
+
     this.actionsQueued.push(action);
 };
 

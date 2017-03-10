@@ -232,6 +232,7 @@ Aura.bootstrapMark = function (mark, value) {
      * @borrows AuraClientService#enqueueAction as $A.enqueueAction
      * @borrows AuraInstance#getRoot as $A.getRoot
      * @borrows AuraInstance#getCallback as $A.getCallback
+     * @borrows AuraInstance#executeHotspot as $A.executeHotspot
      * @borrows AuraInstance#get as $A.get
      * @borrows AuraInstance#set as $A.set
      * @borrows AuraInstance#error as $A.error

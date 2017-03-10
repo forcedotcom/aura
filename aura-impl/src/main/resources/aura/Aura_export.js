@@ -21,6 +21,7 @@ AuraInstance.prototype["error"] = AuraInstance.prototype.error;
 AuraInstance.prototype["warning"] = AuraInstance.prototype.warning;
 AuraInstance.prototype["message"] = AuraInstance.prototype.message;
 AuraInstance.prototype["enqueueAction"] = AuraInstance.prototype.enqueueAction;
+AuraInstance.prototype["executeHotspot"] = AuraInstance.prototype.executeHotspot;
 AuraInstance.prototype["deferAction"] = AuraInstance.prototype.deferAction;
 AuraInstance.prototype["get"] = AuraInstance.prototype.get;
 AuraInstance.prototype["getReference"] = AuraInstance.prototype.getReference;

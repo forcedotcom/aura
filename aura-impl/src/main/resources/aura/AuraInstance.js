@@ -961,6 +961,28 @@ AuraInstance.prototype.getCallback = function(callback) {
     };
 };
 
+/*
+* Allows for non-blocking action dispatch while executing cpu-bound code.
+* Synchronous code run in the callback passed to this method will allow server actions to
+* be dispatched immediately, without waiting for a boxcar at the end of the thread.
+*
+* @function
+* @param {Function} callback The method to invoke while allowing actions to flow out as they occur.
+* @export
+* @experimental
+* */
+AuraInstance.prototype.executeHotspot=function(callback){
+    if(!$A.util.isFunction(callback)){
+        throw new Error("$A.executeHotspot: 'callback' must be a valid Function.");
+    }
+    this.clientService.allowFlowthrough=true;
+    try {
+        callback();
+    }finally{
+        this.clientService.allowFlowthrough=false;
+    }
+};
+
 /**
  * Returns the application configuration token referenced by name.
  * A tokens file is configured with the tokens attribute in the aura:application tag.

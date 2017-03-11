@@ -79,50 +79,65 @@ public class ModuleRegistryProvider implements RegistryAdapter, SourceListener {
 
     @Override
     public DefRegistry[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders) {
-    	if (!J2V8Util.isJ2V8Available()) {
-    		return new DefRegistry[0];
-    	}
-    	
+        if (!J2V8Util.isJ2V8Available()) {
+            return new DefRegistry[0];
+        }
+
         List<DefRegistry> registries = new ArrayList<>();
-        List<SourceLoader> moduleLoaders = new ArrayList<>();
 
         for (ComponentLocationAdapter location : locationAdapters) {
             if (location.type() == DefType.MODULE) {
-                File modules = location.getComponentSourceDir();
-                SourceLoader sourceLoader;
-                if (modules != null) {
-                    try {
-                        modules = modules.getCanonicalFile();
-                    } catch (IOException ioe) {
-                        // ignore, not sure what we can do.
-                        throw new AuraRuntimeException("unable to get canonical path for " + modules.getAbsolutePath(), ioe);
-                    }
+                DefRegistry moduleDefRegistry = getDefRegistry(location);
+                if (moduleDefRegistry != null) {
+                    registries.add(moduleDefRegistry);
                 }
-                if (modules != null && modules.canRead() && modules.canExecute() && modules.isDirectory()) {
-                    sourceLoader = new FileSourceLoader(modules, fileMonitor);
-                } else {
-                    // jar mode:
-                    sourceLoader = new ResourceSourceLoader(location.getComponentSourcePackage());
-                }
-
-                moduleLoaders.add(sourceLoader);
-                CompilingDefRegistry defRegistry = new CompilingDefRegistry(sourceLoader, PREFIXES, DEF_TYPES,
-                        compilerService);
-                registries.add(defRegistry);
-
-                // register namespaces to optimize processing of definition references
-                configAdapter.addModuleNamespaces(defRegistry.getNamespaces());
-
-                locationMap.putIfAbsent(location, defRegistry);
             }
         }
 
-        if (moduleLoaders.size() > 0) {
-            // ensure file based module namespaces are cached
-            new SourceFactory(moduleLoaders, configAdapter);
+        return registries.toArray(new DefRegistry[registries.size()]);
+    }
+
+    private DefRegistry getDefRegistry(ComponentLocationAdapter location) {
+
+        DefRegistry defRegistry = locationMap.get(location);
+        if (defRegistry != null) {
+            return defRegistry;
         }
 
-        return registries.toArray(new DefRegistry[registries.size()]);
+        SourceLoader sourceLoader = null;
+
+        String pkg = location.getComponentSourcePackage();
+        if (pkg != null) {
+            sourceLoader = new ResourceSourceLoader(location.getComponentSourcePackage());
+        } else if (location.getComponentSourceDir() != null) {
+            File modules = location.getComponentSourceDir();
+            try {
+                modules = modules.getCanonicalFile();
+            } catch (IOException ioe) {
+                // ignore, not sure what we can do.
+                throw new AuraRuntimeException("unable to get canonical path for " + modules.getAbsolutePath(), ioe);
+            }
+            if (modules.canRead() && modules.canExecute() && modules.isDirectory()) {
+                sourceLoader = new FileSourceLoader(modules, fileMonitor);
+            }
+        }
+
+        if (sourceLoader != null) {
+            List<SourceLoader> moduleLoaders = new ArrayList<>();
+            moduleLoaders.add(sourceLoader);
+            defRegistry = new CompilingDefRegistry(sourceLoader, PREFIXES, DEF_TYPES, compilerService);
+
+            // ensure file based module namespaces are cached
+            new SourceFactory(moduleLoaders, configAdapter);
+
+            // register namespaces to optimize processing of definition references
+            configAdapter.addModuleNamespaces(defRegistry.getNamespaces());
+
+            // cache to reduce DefRegistry creation
+            locationMap.putIfAbsent(location, defRegistry);
+        }
+
+        return defRegistry;
     }
 
     @PostConstruct
@@ -140,10 +155,14 @@ public class ModuleRegistryProvider implements RegistryAdapter, SourceListener {
                     File changedFile = new File(filePath);
                     String canonicalPath = changedFile.getCanonicalPath();
                     for (ComponentLocationAdapter cla : locationMap.keySet()) {
-                        String moduleLocationPath = cla.getComponentSourceDir().getCanonicalPath();
-                        if (canonicalPath.startsWith(moduleLocationPath)) {
-                            DefRegistry registry = locationMap.get(cla);
-                            registry.reset();
+                        File componentSourceDir = cla.getComponentSourceDir();
+                        if (componentSourceDir != null) {
+                            // only file based components will have source dir.
+                            String moduleLocationPath = componentSourceDir.getCanonicalPath();
+                            if (canonicalPath.startsWith(moduleLocationPath)) {
+                                DefRegistry registry = locationMap.get(cla);
+                                registry.reset();
+                            }
                         }
                     }
                 } catch (IOException ignored) {

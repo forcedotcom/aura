@@ -63,6 +63,16 @@ function SecureScriptElement(el, key) {
 			}
 		},
 
+		// dataset can only change `data-` attributes, thus, it is safe to expose.
+		dataset : {
+			get: function () {
+				return o.dataset;
+			},
+			set: function (value) {
+				o.dataset = value;
+			}
+		},
+
 		getAttributeNode : {
 			value: function(name) {
 				return el.getAttributeNode(getAttributeName(name));

@@ -556,8 +556,8 @@ Aura.Services.MetricsService.prototype.defaultPostProcessing = function (customM
             mark["context"]  = $A.util.apply(mark["context"] || {}, customMarks[i]["context"] || {});
             mark["duration"] = parseInt(customMarks[i]["ts"] - mark["ts"]);
             procesedMarks.push(mark);
-            delete mark["phase"];
-            delete queue[id];
+            mark["phase"] = 'stamp';
+            queue[id] = null;
         }
     }
     return procesedMarks;

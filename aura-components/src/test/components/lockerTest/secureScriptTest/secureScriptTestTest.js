@@ -28,11 +28,5 @@
         test: function(cmp) {
             cmp.testGetSetAttributeNode();
         }
-    },
-
-    testScriptsFromUnsafeSourceBlocked: {
-        test: function(cmp) {
-            cmp.testScriptsFromUnsafeSourceBlocked();
-        }
     }
 })

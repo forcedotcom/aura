@@ -86,42 +86,6 @@ function SecureScriptElement(el, key) {
 				var src = o.getAttribute("src");
 				if (!src) {
 					return;
-				} else {
-					var safeSources = $A.getContext().safeScriptSources;
-					// Easiest way to get the resolved url for any src value provided including relative paths on same domain
-					var testElement = document.createElement('a');
-					testElement.href = src;
-					var hrefToTest = testElement["href"];
-					var hostToTest = testElement["host"];
-					var sourceVetted = false;
-					for(var i in safeSources) {
-						var safeSource = safeSources[i];
-						if (safeSource && $A.util.isString(safeSource)) {
-							safeSource = safeSource.trim();
-							// 1. Source url matches the specified protocol, domain, sub-domain, path
-							// Also takes care of same origin
-							if (hrefToTest && hrefToTest.indexOf(safeSource) === 0){
-								sourceVetted = true;
-								break;
-							}
-							if(hostToTest) {
-								if (safeSource.indexOf("*.") === 0) { // 2. Sub-domain match
-									var subDomainTestStr = safeSource.replace("*", "");
-									// endsWith check since String.endsWith() is not supported on all browsers
-									if(hostToTest.length >= subDomainTestStr.length &&  hostToTest.substr(hostToTest.length - subDomainTestStr.length) === subDomainTestStr) {
-										sourceVetted = true;
-										break;
-									}
-								} else if (safeSource === hostToTest){ // 3. Domain match
-									sourceVetted = true;
-									break;
-								}
-							}
-						}
-					}
-					if(!sourceVetted){
-						throw new Error("SecureScriptElement: External script loading blocked, CSP restrictions:" + hrefToTest);
-					}
 				}
 
 				document.head.appendChild(el);

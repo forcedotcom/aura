@@ -556,9 +556,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                     }
                 }
             }
-            
-            // Store the script-src allowed to be retrieved later when serializing the template to initialize locker
-            this.contextService.getCurrentContext().setScriptSources(csp.getScriptSources());
         }
     }
 

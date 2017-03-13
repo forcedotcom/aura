@@ -215,7 +215,7 @@
 
     testGetDateStringBasedOnTimezoneForSameZone: {
         test: function() {
-            var expected = "2015-7-6";
+            var expected = "2015-07-06";
             var date = $A.localizationService.parseDateTimeISO8601("2015-07-06T00:00:00+02:00");
             $A.localizationService.getDateStringBasedOnTimezone("Europe/Berlin", date, function(dateString){
                 $A.test.assertEquals(expected, dateString);
@@ -225,7 +225,7 @@
 
     testGetDateStringBasedOnTimezoneForDifferentZones: {
         test: function() {
-            var expected = "2015-7-5";
+            var expected = "2015-07-05";
             var date = $A.localizationService.parseDateTimeISO8601("2015-07-06T00:00:00+02:00");
             // Zone "America/Los_Angeles" is still on 2015-7-5
             $A.localizationService.getDateStringBasedOnTimezone("America/Los_Angeles", date, function(dateString){

@@ -684,8 +684,8 @@ AuraLocalizationService.prototype.getDateStringBasedOnTimezone = function(timezo
     dateObj.setTime(dateObj.getTime() + dateObj.getTimezoneOffset() * 60 * 1000); // time in UTC
     var tz = timezone ? timezone : $A.get("$Locale.timezone");
     this.UTCToWallTime(dateObj, tz, function(date) {
-        callback(date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate());
-    });
+        callback(date.getFullYear() + "-" + this.pad(date.getMonth() + 1) + "-" + this.pad(date.getDate()));
+    }.bind(this));
 };
 
 

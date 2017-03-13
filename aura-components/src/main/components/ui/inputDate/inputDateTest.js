@@ -126,10 +126,9 @@
             cmp.find("datePicker").find("grid").selectToday();
         }, function (cmp) {
             var inputDateStr = cmp.find("inputText").getElement().value;
-            $A.localizationService.getToday($A.get("$Locale.timezone"), function(dateString) {
-                var dt = moment(dateString).format('MMM DD, YYYY');
-                $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
-            });
+            var todayStr = cmp.find("datePicker").find("grid").get('v._today');
+            var dt = moment(todayStr).format('MMM DD, YYYY');
+            $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
         }]
     },
 
@@ -142,10 +141,9 @@
             cmp.find("datePicker").find("grid").selectToday();
         }, function (cmp) {
             var inputDateStr = cmp.find("inputText").getElement().value;
-            $A.localizationService.getToday($A.get("$Locale.timezone"), function(dateString) {
-                var dt = moment(dateString).format('DD/MM/YYYY');
-                $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
-            });
+            var todayStr = cmp.find("datePicker").find("grid").get('v._today');
+            var dt = moment(todayStr).format('DD/MM/YYYY');
+            $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
         }]
     },
 

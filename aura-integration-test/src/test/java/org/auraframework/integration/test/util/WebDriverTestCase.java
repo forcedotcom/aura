@@ -829,7 +829,11 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
              * WebDriverUtil.addChromeOptions(capabilities, windowSize); }
              */
 
-            logger.info(String.format("Requesting: %s", capabilities));
+	    logger.info(String.format("Requesting: %s", capabilities));
+            if(currentBrowserType == BrowserType.GOOGLECHROME) {
+		WebDriverUtil.addChromeOptions(capabilities, null);
+	    }
+
             currentDriver = provider.get(capabilities);
 
             if (currentDriver == null) {

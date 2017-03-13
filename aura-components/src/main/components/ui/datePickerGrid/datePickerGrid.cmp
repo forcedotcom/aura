@@ -60,8 +60,8 @@
             <tbody aura:id="tableBody">
                 {!v.gridBody}
                 <aura:if isTrue="{!v.showToday}">
-                    <tr><td colspan="7" role="gridcell">
-                        <span aura:id="today" class="today slds-show--inline-block slds-text-link slds-p-bottom--x-small" tabindex="0" onclick="{!c.selectToday}"/>
+                    <tr><td colspan="7" role="gridcell" tabindex="0" onclick="{!c.selectToday}">
+                        <span aura:id="today" class="today slds-show--inline-block slds-text-link slds-p-bottom--x-small"/>
                     </td></tr>
                 </aura:if>
             </tbody>

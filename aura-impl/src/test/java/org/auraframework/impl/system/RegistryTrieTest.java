@@ -162,53 +162,13 @@ public class RegistryTrieTest extends AuraTestCase {
     public void testInitWithDuplicateRegistriesBasedOnNamespaceCaseInsensitivity() {
         MockRegistry reg1 = new MockRegistry().setNamespaces("testNamespace");
         MockRegistry reg2 = new MockRegistry().setNamespaces("TESTNAMESPACE");
-        new RegistryTrie(Sets.newHashSet(reg1, reg2));
-    }
-
-    @Test
-    public void testGetAllRegistriesWithCaseSensitiveNamespaces() {
-        MockRegistry reg1 = new MockRegistry().setNamespaces("one");
-        MockRegistry reg2 = new MockRegistry().setNamespaces("ONE");
-        RegistryTrie trie = new RegistryTrie(Sets.newHashSet(reg1, reg2));
-
-        Collection<DefRegistry> actual = trie.getAllRegistries();
-        assertEquals(true, actual.contains(reg1));
-        assertEquals(true, actual.contains(reg2));
-    }
-
-    // W-3676967: Temporarily allow case sensitive namespaces
-    @Test
-    public void testGetRegistriesMatchAllCaseInsensitiveNamespace() {
-        MockRegistry reg1 = new MockRegistry().setNamespaces("one");
-        MockRegistry reg2 = new MockRegistry().setNamespaces("ONE");
-        RegistryTrie trie = new RegistryTrie(Sets.newHashSet(reg1, reg2));
-
-        DescriptorFilter matcher = new DescriptorFilter("one:*");
-        Collection<DefRegistry> actual = trie.getRegistries(matcher);
-        assertEquals(2, actual.size());
-        assertEquals(true, actual.contains(reg1));
-        assertEquals(true, actual.contains(reg2));
-
-        matcher = new DescriptorFilter("ONE:*");
-        actual = trie.getRegistries(matcher);
-        assertEquals(2, actual.size());
-        assertEquals(true, actual.contains(reg1));
-        assertEquals(true, actual.contains(reg2));
-    }
-
-    @Test
-    public void testGetRegistryForCaseSensitiveNamespace() {
-        MockRegistry reg1 = new MockRegistry().setNamespaces("one");
-        MockRegistry reg2 = new MockRegistry().setNamespaces("ONE");
-        RegistryTrie trie = new RegistryTrie(Sets.newHashSet(reg1, reg2));
-
-        DefDescriptor<?> descriptor = new DefDescriptorImpl<>("one:*", ComponentDef.class);
-        DefRegistry actual = trie.getRegistryFor(descriptor);
-        assertEquals(reg1, actual);
-
-        descriptor = new DefDescriptorImpl<>("ONE:*", ComponentDef.class);
-        actual = trie.getRegistryFor(descriptor);
-        assertEquals(reg2, actual);
+        try {
+            new RegistryTrie(Lists.newArrayList(reg1, reg2));
+            fail("No error thrown for duplicate registries");
+        } catch (AuraError t) {
+            assertExceptionMessageStartsWith(t, AuraError.class,
+                    "Duplicate DefType/Prefix/Namespace combination claimed by 2 DefRegistries : {[COMPONENT]/[markup]/[testNamespace]} and {[COMPONENT]/[markup]/[TESTNAMESPACE]}");
+        }
     }
 
     @Test

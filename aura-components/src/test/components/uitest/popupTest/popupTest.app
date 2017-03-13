@@ -3,21 +3,21 @@
     	<li class="popup">
 		    <ui:popup>
 		        <ui:popupTrigger aura:id="triggerExtendedTarget" label="extended target"/>
-		        <uitest:popupTestExtendedTarget aura:id="targetExtendedTarget" attachToBody="true" closeOnClickInside="true">
+		        <uiTest:popupTestExtendedTarget aura:id="targetExtendedTarget" attachToBody="true" closeOnClickInside="true">
 		            <div style="width:150px;height:200px;">
     	              extended target <ui:button press="{!c.alert}" label="Alert + close" />
 		            </div>
-	            </uitest:popupTestExtendedTarget>
+	            </uiTest:popupTestExtendedTarget>
 		    </ui:popup>
         </li>
         <li class="popup">
 		    <ui:popup>
 		        <ui:popupTrigger aura:id="triggerExtendedTarget" label="!attachToBody"/>
-		        <uitest:popupTestExtendedTarget aura:id="targetNotAttached">
+		        <uiTest:popupTestExtendedTarget aura:id="targetNotAttached">
 		            <div style="width:150px;height:200px;">
     	              !attachToBody
 		            </div>
-	            </uitest:popupTestExtendedTarget>
+	            </uiTest:popupTestExtendedTarget>
 		    </ui:popup>
         </li>
     	<li class="popup">
@@ -42,7 +42,7 @@
 		    <ui:popup>
 		        <ui:popupTrigger class="customTrigger">
 		        	<aura:set attribute="trigger">
-		        		<uitest:popupTestTriggerElement aura:id="triggerTriggerElement" />
+		        		<uiTest:popupTestTriggerElement aura:id="triggerTriggerElement" />
 		        	</aura:set>
 		        </ui:popupTrigger>
 		        <ui:popupTarget class="customTriggerTargetContainer" aura:id="targetTriggerElement" attachToBody="true">
@@ -53,7 +53,7 @@
 		    </ui:popup>
         </li>
 		<li class="popup">
-		    <uitest:popupTestExtendedPopup>
+		    <uiTest:popupTestExtendedPopup>
 		        <ui:popupTrigger aura:id="triggerPopupExtended">
                     <span>extended popup</span>
 		        </ui:popupTrigger>
@@ -62,7 +62,7 @@
                       target inside extended popup
 		            </div>
 		        </ui:popupTarget>
-		    </uitest:popupTestExtendedPopup>
+		    </uiTest:popupTestExtendedPopup>
         </li>        
         <li class="popup">
 		    <ui:popup>

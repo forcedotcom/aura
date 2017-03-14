@@ -81,6 +81,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     public void testAutoCompleteComponentInitialRender() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
+        openAllAutocompletes(driver);
         WebElement list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         assertTrue("AutocompleteList should be invisible on initial load", hasCssClass(list, "invisible"));
         List<WebElement> options = getAutoCompleteListOptions(list);
@@ -337,6 +338,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
 
         open(URL);
         WebDriver driver = getDriver();
+        openAllAutocompletes(driver);
         WebElement input = getAutoCompleteInput(driver, autoCompleteCmpNum);
 
         input.sendKeys("hello worldx");
@@ -357,6 +359,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
 
         open(URL);
         WebDriver driver = getDriver();
+        openAllAutocompletes(driver);
         WebElement toggle = getAutoCompleteToggle(driver, autoCompleteCmpNum);
         WebElement list = getAutoCompleteList(driver, autoCompleteCmpNum);
 
@@ -455,8 +458,9 @@ public class BaseAutoComplete extends WebDriverTestCase {
             OptionType optionType) throws Exception {
         open(URL);
         WebDriver driver = getDriver();
+        openAllAutocompletes(driver);
         WebElement input = getAutoCompleteInput(driver, autoCompleteCmpNum);
-
+        
         input.sendKeys(searchString);
         WebElement list = getAutoCompleteList(driver, autoCompleteCmpNum);
         waitForAutoCompleteListVisible(list, true);
@@ -481,6 +485,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
             boolean emptyContentVisible) throws Exception {
         open(URL);
         WebDriver driver = getDriver();
+        openAllAutocompletes(driver);
         WebElement input = getAutoCompleteInput(driver, autoCompleteCmpNum);
 
         input.sendKeys(searchString);
@@ -498,6 +503,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     private void doTestSelectOption(int autoCompleteCmpNum, OptionType optionType) throws Exception {
         open(URL);
         WebDriver driver = getDriver();
+        openAllAutocompletes(driver);
         WebElement input = getAutoCompleteInput(driver, autoCompleteCmpNum);
 
         input.sendKeys("o");
@@ -540,6 +546,15 @@ public class BaseAutoComplete extends WebDriverTestCase {
         });
         
         return lists.get(listNumber - 1);
+    }
+    
+    // Focus' on all inputs
+    // This is called in every test case since is lazyLoaded on focus
+    private void openAllAutocompletes(WebDriver d) {
+    	List<WebElement> inputs = d.findElements(By.cssSelector(INPUT_SELECTOR));
+    	for(WebElement inputElement : inputs) {
+    		inputElement.click();
+    	}
     }
 
     /**

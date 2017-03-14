@@ -27,14 +27,17 @@
 			outputComponentDefRef.attributes.values['value'] = {
 				descriptor 	: 'value',
 				value 		: value
-			};	
+			};
 
 			// Create component and inject it. 
-			$A.componentService.newComponentAsync(this, function (outputComponent, status) {
-				if (status === "SUCCESS") {
-					priv_outputComponent.setValue([outputComponent]);
-				}
-			}, outputComponentDefRef);
+			$A.createComponent(
+			    outputComponentDefRef.componentDef["descriptor"],
+                outputComponentDefRef.attributes["values"],
+				function (outputComponent, status) {
+					if (status === "SUCCESS") {
+						priv_outputComponent.setValue([outputComponent]);
+					}
+				});
 		}
 	},
 

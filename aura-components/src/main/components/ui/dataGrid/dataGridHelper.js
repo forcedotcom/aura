@@ -622,7 +622,7 @@
 	/**
 	 * Asynchronously (if has serverside dependencies) create and render the given components. 
 	 *
-	 * @param {Component} concrete The concrete componetn
+	 * @param {Component} concrete The concrete component
 	 * @param {Array.<ComponentDefRef>} cdrs THe defRefs to use as a blueprint
 	 * @param {ValueProvider} vp The value provider to resolve against
 	 * @param {HTMLElement} element The parent element of the components
@@ -630,26 +630,33 @@
 	 * @param {function (Component)} callback A callback. Not using promises due to high volume.
 	 */
 	createAndRenderCell: function (concrete, cdrs, vp, element, components, callback) {
+        callback = callback || function () {};
 
-        var resolved = 0;
+        var defs = [];
 
-        function setupComponent(out, status) {
-        	if (status === "SUCCESS") {
-        		components.push(out);
+        for (var cdrIndex = 0; cdrIndex < cdrs.length; cdrIndex++) {
+            defs.push(cdrs[cdrIndex].componentDef["descriptor"]);
+        }
+
+		$A.getDefinitions(defs, $A.getCallback(function () {
+            for (var i = 0; i < cdrs.length; i++) {
+                var cdr = cdrs[i];
+                var config = {
+                    descriptor: cdr.componentDef["descriptor"],
+                    localId: cdr["localId"],
+                    flavor: cdr["flavor"],
+                    attributes: cdr.attributes["values"],
+                    valueProvider: vp
+                };
+
+                var out = $A.createComponentFromConfig(config);
+
+                components.push(out);
 
                 $A.render(out, element);	// Most of the performance hits here
                 $A.afterRender(out);
-
-                if (callback && (++resolved === cdrs.length)) {
-                    callback();
-                }
-        	}
-        }
-
-		for (var cdrIndex = 0; cdrIndex < cdrs.length; cdrIndex++) {
-			var cdr = cdrs[cdrIndex];
-			$A.componentService.newComponentAsync(this, setupComponent, cdr, vp);
-		}
+            }
+        }));
 	},
 	
 	/**

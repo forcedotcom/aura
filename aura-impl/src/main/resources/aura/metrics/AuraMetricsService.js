@@ -839,7 +839,8 @@ Aura.Services.MetricsService.prototype.registerBeacon = function (beacon) {
     this.beaconProviders[beacon["name"] || Aura.Services.MetricsService.DEFAULT] = beacon["beacon"] || beacon;
 };
 /**
- * Summarizes perf timming request info
+ * Summarizes perf timing request info
+ * @param {PerformanceResourceTiming} r
  * @export
 */
 Aura.Services.MetricsService.prototype.summarizeResourcePerfInfo = function (r) {
@@ -853,9 +854,12 @@ Aura.Services.MetricsService.prototype.summarizeResourcePerfInfo = function (r) 
         "tcp"             : parseInt(r.connectEnd - r.connectStart, 10),
         "ttfb"            : parseInt(r.responseStart - r.startTime, 10),
         "transfer"        : parseInt(r.responseEnd - r.responseStart, 10),
-        "transferSize"    : r.transferSize || 0,
-        "encodedBodySize" : r.encodedBodySize || 0,
-        "decodedBodySize" : r.decodedBodySize || 0
+        // Note that these additional properties will need to be set using explicit strings
+        // the extern used in current version of closure-compiler doesn't list them out: 
+        // https://github.com/google/closure-compiler/blob/v20130411/externs/w3c_navigation_timing.js
+        "transferSize"    : r["transferSize"] || 0,
+        "encodedBodySize" : r["encodedBodySize"] || 0,
+        "decodedBodySize" : r["decodedBodySize"] || 0
     };
 };
 

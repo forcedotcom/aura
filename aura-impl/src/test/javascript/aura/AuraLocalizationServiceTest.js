@@ -1739,43 +1739,31 @@ Test.Aura.AuraLocalizationServiceTest = function() {
     }
 
     [Fixture]
-    function toISOString(){
+    function toISOString() {
 
         [Fact]
-        function Null(){
+        function ReturnsInputValueForFalsyInput() {
             // Arrange
-            var expected = null;
-            var actual;
+            var expected = "";
+            var targetService = new Aura.Services.AuraLocalizationService();
 
             // Act
-            actual = targetService.toISOString(null);
+            var actual = targetService.toISOString(expected);
 
             // Assert
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        function EmptyString(){
+        function ReturnsInputValueForNonDateInput() {
             // Arrange
-            var expected = '';
-            var actual;
-
-            // Act
-            actual = targetService.toISOString('');
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function NotDateObject(){
-            // Arrange
-            var expected = targetDate;
+            var expected = "2015-04-01";
+            var targetService = new Aura.Services.AuraLocalizationService();
             var actual;
 
             // Act
             mockUtil(function() {
-                actual = targetService.toISOString(targetDate);
+                actual = targetService.toISOString(expected);
             });
 
             // Assert
@@ -1783,21 +1771,32 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         }
 
         [Fact]
-        function DateObjectWithToISOString(){
+        function CallsToISOStringOnDateIfExits() {
             // Arrange
-            var dt = new Date(2004,10,23,12,30,59,123);
-            var expected = dt.getUTCFullYear() + "-" +
-                        (dt.getUTCMonth() + 1) + "-" +
-                        dt.getUTCDate() + "T" +
-                        (dt.getUTCHours() < 10 ? '0' + dt.getUTCHours() : dt.getUTCHours()) + ':' +
-                        dt.getUTCMinutes() + ':' +
-                        dt.getUTCSeconds() + '.' +
-                        dt.getUTCMilliseconds() + 'Z';
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var date = new Date(2004,10,23,12,30,59,123);
+            date.toISOString = Stubs.GetMethod();
+
+            // Act
+            mockUtil(function() {
+                targetService.toISOString(date);
+            });
+
+            // Assert
+            Assert.Equal(1, date.toISOString.Calls.length);
+        }
+
+        [Fact]
+        function ReturnsISOStringForDateWithToISOString(){
+            // Arrange
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var date = new Date(2004,10,09,12,30,59,123);
+            var expected = "2004-11-09T20:30:59.123Z";
             var actual;
 
             // Act
             mockUtil(function() {
-                actual = targetService.toISOString(dt);
+                actual = targetService.toISOString(date);
             });
 
             // Assert
@@ -1805,22 +1804,17 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         }
 
         [Fact]
-        function DateObjectWithoutToISOString(){
+        function ReturnsISOStringForDateWithoutToISOString(){
             // Arrange
-            var dt = new Date(2004,10,23,12,30,59,123);
-            dt.toISOString = null;
-            var expected = dt.getUTCFullYear() + "-" +
-                        (dt.getUTCMonth() + 1) + "-" +
-                        dt.getUTCDate() + "T" +
-                        (dt.getUTCHours() < 10 ? '0' + dt.getUTCHours() : dt.getUTCHours()) + ':' +
-                        dt.getUTCMinutes() + ':' +
-                        dt.getUTCSeconds() + '.' +
-                        dt.getUTCMilliseconds() + 'Z';
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var expected = "2004-11-09T20:30:59.123Z";
+            var date = new Date(2004,10,09,12,30,59,123);
+            date.toISOString = undefined;
             var actual;
 
             // Act
             mockUtil(function() {
-                actual = targetService.toISOString(dt);
+                actual = targetService.toISOString(date);
             });
 
             // Assert

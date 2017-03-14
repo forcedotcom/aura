@@ -104,7 +104,7 @@
             var date = $A.localizationService.parseDateTime("Dec 23, 2013 3:30:00 PM", format);
             var expected = "Dec 23, 2013 11:30:00 PM";
 
-            $A.localizationService.WallTimeToUTC(date, "America/Los_Angeles", function(utc){
+            $A.localizationService.WallTimeToUTC(date, "America/Los_Angeles", function(utc) {
                 var actual = $A.localizationService.formatDateTime(utc, format);
                 $A.test.assertEquals(expected, actual, "Incorrect time from WallTimeToUTC");
             });
@@ -117,7 +117,7 @@
             var date = $A.localizationService.parseDateTime("Sep 23, 2013 4:30:00 PM", format);
             var expected = "Sep 23, 2013 11:30:00 PM";
 
-            $A.localizationService.WallTimeToUTC(date, "America/Los_Angeles", function(utc){
+            $A.localizationService.WallTimeToUTC(date, "America/Los_Angeles", function(utc) {
                 var actual = $A.localizationService.formatDateTime(utc, format);
                 $A.test.assertEquals(expected, actual,
                         "Incorrect time from WallTimeToUTC when given time is in DST");
@@ -131,7 +131,7 @@
             var date = $A.localizationService.parseDateTime("Dec 24, 2013 12:30:00 AM", format);
             var expected = "Dec 23, 2013 11:30:00 PM";
 
-            $A.localizationService.WallTimeToUTC(date, "Europe/Berlin", function(utc){
+            $A.localizationService.WallTimeToUTC(date, "Europe/Berlin", function(utc) {
                 var actual = $A.localizationService.formatDateTime(utc, format);
                 $A.test.assertEquals(expected, actual,
                         "Incorrect time from WallTimeToUTC when given zone has positive offset");
@@ -162,12 +162,12 @@
     },
 
     testWallTimeToUTCForGMT: {
-        test:function() {
+        test: function() {
             var format = "MMM DD, YYYY h:mm:ss A";
             var date = $A.localizationService.parseDateTime("Dec 23, 2013 3:30:00 PM", format);
             var expected = "Dec 23, 2013 3:30:00 PM";
 
-            $A.localizationService.WallTimeToUTC(date, "GMT", function(utc){
+            $A.localizationService.WallTimeToUTC(date, "GMT", function(utc) {
                 var actual = $A.localizationService.formatDateTime(utc, format);
                 $A.test.assertEquals(expected, actual,
                         "Incorrect time from WallTimeToUTC when given zone is GMT");
@@ -217,7 +217,7 @@
         test: function() {
             var expected = "2015-07-06";
             var date = $A.localizationService.parseDateTimeISO8601("2015-07-06T00:00:00+02:00");
-            $A.localizationService.getDateStringBasedOnTimezone("Europe/Berlin", date, function(dateString){
+            $A.localizationService.getDateStringBasedOnTimezone("Europe/Berlin", date, function(dateString) {
                 $A.test.assertEquals(expected, dateString);
             });
         }
@@ -228,7 +228,7 @@
             var expected = "2015-07-05";
             var date = $A.localizationService.parseDateTimeISO8601("2015-07-06T00:00:00+02:00");
             // Zone "America/Los_Angeles" is still on 2015-7-5
-            $A.localizationService.getDateStringBasedOnTimezone("America/Los_Angeles", date, function(dateString){
+            $A.localizationService.getDateStringBasedOnTimezone("America/Los_Angeles", date, function(dateString) {
                 $A.test.assertEquals(expected, dateString);
             });
         }
@@ -492,5 +492,298 @@
         }
     },
 
+    testIsAfter: {
+        test: function() {
+            var date1 = $A.localizationService.parseDateTime("2013-08-13T16:30:00");
+            var date2 = $A.localizationService.parseDateTime("2014-09-23T16:30:00");
+
+            var actual = $A.localizationService.isAfter(date2, date1);
+            $A.test.assertTrue(actual, "isAfter() should return true when 1st arg is later than 2nd arg");
+
+            actual = $A.localizationService.isAfter(date1, date2);
+            $A.test.assertFalse(actual, "isAfter() should return false when 1st arg is earlier than 2nd arg");
+        }
+    },
+
+    testIsAfterWithUnit: {
+        test: function() {
+            var date1 = $A.localizationService.parseDateTime("2013-08-13T16:30:00");
+            var date2 = $A.localizationService.parseDateTime("2014-09-23T16:30:00");
+
+            var actual = $A.localizationService.isAfter(date2, date1, "hours");
+            $A.test.assertTrue(actual, "isAfter() should return true when 1st arg is later than 2nd arg in given unit");
+
+            actual = $A.localizationService.isAfter(date1, date2, "hours");
+            $A.test.assertFalse(actual, "isAfter() should return false when 1st arg is earlier than 2nd arg in given unit");
+        }
+    },
+
+    testIsAfterForSameDates: {
+        test: function() {
+            var date1 = $A.localizationService.parseDateTime("2014-09-23T16:30:00");
+            var date2 = $A.localizationService.parseDateTime("2014-09-23T16:30:00");
+
+            var actual = $A.localizationService.isAfter(date1, date2);
+
+            $A.test.assertFalse(actual, "isAfter() should return false for same dates.");
+        }
+    },
+
+    testIsBefore: {
+        test: function() {
+            var date1 = $A.localizationService.parseDateTime("2013-08-13T16:30:00");
+            var date2 = $A.localizationService.parseDateTime("2014-09-23T16:30:00");
+
+            var actual = $A.localizationService.isBefore(date1, date2);
+            $A.test.assertTrue(actual, "isBefore() should return true when 1st arg is earlier than 2nd arg");
+
+            actual = $A.localizationService.isBefore(date2, date1);
+            $A.test.assertFalse(actual, "isBefore() should return false when 1st arg is later than 2nd arg");
+        }
+    },
+
+    testIsBeforeWithUnit: {
+        test: function() {
+            var date1 = $A.localizationService.parseDateTime("2013-08-13T16:30:00");
+            var date2 = $A.localizationService.parseDateTime("2014-09-23T16:30:00");
+
+            var actual = $A.localizationService.isBefore(date1, date2, "minutes");
+            $A.test.assertTrue(actual, "isBefore() should return true when 1st arg is earlier than 2nd arg in given unit");
+
+            actual = $A.localizationService.isBefore(date2, date1, "minutes");
+            $A.test.assertFalse(actual, "isBefore() should return false when 1st arg is later than 2nd arg in given unit");
+        }
+    },
+
+    testIsBeforeForSameDates: {
+        test: function() {
+            var date1 = $A.localizationService.parseDateTime("2014-09-23T16:30:00");
+            var date2 = $A.localizationService.parseDateTime("2014-09-23T16:30:00");
+
+            var actual = $A.localizationService.isBefore(date1, date2);
+
+            $A.test.assertFalse(actual, "isBefore() should return false for same dates");
+        }
+    },
+
+    testIsBeforeForSameDatesWithUnit: {
+        test: function() {
+            var date1 = $A.localizationService.parseDateTime("2014-09-15");
+            var date2 = $A.localizationService.parseDateTime("2014-09-23");
+
+            var actual = $A.localizationService.isBefore(date1, date2, "years");
+
+            $A.test.assertFalse(actual, "isBefore() should return false for same in unit");
+        }
+    },
+
+    testEndOfForDate: {
+        test: function() {
+            var format =  "MMM DD, YYYY";
+            var dateString = "2014-02-23";
+
+            var date = $A.localizationService.endOf(dateString, "months");
+
+            var actual = $A.localizationService.formatDateTime(date, format);
+            $A.test.assertEquals("Feb 28, 2014", actual, "unexpected end date of the month");
+        }
+    },
+
+    testEndOfForDateTime: {
+        test: function() {
+            var format =  "MMM DD, YYYY h:mm:ss A";
+            var dateTimeString = "2014-02-23T16:40:00";
+
+            var date = $A.localizationService.endOf(dateTimeString, "hours");
+
+            var actual = $A.localizationService.formatDateTime(date, format);
+            $A.test.assertEquals("Feb 23, 2014 4:59:59 PM", actual, "unexpected end datetime of the hour");
+        }
+    },
+
+    testStartOfForDate: {
+        test: function() {
+            var format =  "MMM DD, YYYY";
+            var dateString = "2014-02-23";
+
+            var date = $A.localizationService.startOf(dateString, "months");
+
+            var actual = $A.localizationService.formatDateTime(date, format);
+            $A.test.assertEquals("Feb 01, 2014", actual, "unexpected start date of the month");
+        }
+    },
+
+    testStartOfForDateTime: {
+        test: function() {
+            var format =  "MMM DD, YYYY h:mm:ss A";
+            var dateTimeString = "2014-02-23T16:40:00";
+
+            var date = $A.localizationService.startOf(dateTimeString, "hours");
+
+            var actual = $A.localizationService.formatDateTime(date, format);
+            $A.test.assertEquals("Feb 23, 2014 4:00:00 PM", actual, "unexpected start datetime of the hour");
+        }
+    },
+
+    testDisplayDurationWithoutSuffix: {
+        test: function() {
+            var duration = $A.localizationService.duration(1095957000000, "milliseconds"); // 35 years
+
+            var actual = $A.localizationService.displayDuration(duration, false);
+
+            $A.test.assertEquals("35 years", actual, "displayDuration() returns an incorrect duration string");
+        }
+    },
+
+    testDisplayDurationWithSuffix: {
+        test: function() {
+            var duration = $A.localizationService.duration(1095957000000, "milliseconds"); // 35 years
+
+            var actual = $A.localizationService.displayDuration(duration, true);
+
+            $A.test.assertEquals("in 35 years", actual, "displayDuration() returns an incorrect duration string");
+        }
+    },
+
+    testDisplayDurationInYears: {
+        test: function() {
+            var duration = $A.localizationService.duration(30, "months");
+
+            var actual = $A.localizationService.displayDurationInYears(duration);
+
+            $A.test.assertEquals(2.5, actual, "unexpected length of the duration in years");
+        }
+    },
+
+    testGetYearsInDuration: {
+        test: function() {
+            var duration = $A.localizationService.duration(30, "months");
+
+            var actual = $A.localizationService.getYearsInDuration(duration);
+
+            $A.test.assertEquals(2, actual, "unexpected number of years");
+        }
+    },
+
+    testDisplayDurationInMonths: {
+        test: function() {
+            var duration = $A.localizationService.duration(2, "years");
+
+            var actual = $A.localizationService.displayDurationInMonths(duration);
+
+            $A.test.assertEquals(24, actual, "unexpected length of the duration in months");
+        }
+    },
+
+    testGetMonthsInDuration: {
+        test: function() {
+            var duration = $A.localizationService.duration(2, "years");
+
+            var actual = $A.localizationService.getMonthsInDuration(duration);
+
+            $A.test.assertEquals(0, actual, "unexpected length of the duration in months");
+        }
+    },
+
+    testDisplayDurationInDays: {
+        test: function() {
+            var duration = $A.localizationService.duration(60, "hours");
+
+            var actual = $A.localizationService.displayDurationInDays(duration);
+
+            $A.test.assertEquals(2.5, actual, "unexpected length of the duration in days");
+        }
+    },
+
+    testGetDaysInDuration: {
+        test: function() {
+            var duration = $A.localizationService.duration(60, "hours");
+
+            var actual = $A.localizationService.getDaysInDuration(duration);
+
+            $A.test.assertEquals(2, actual, "unexpected number of days");
+        }
+    },
+
+    testDisplayDurationInHours: {
+        test: function() {
+            var duration = $A.localizationService.duration(30, "minutes");
+
+            var actual = $A.localizationService.displayDurationInHours(duration);
+
+            $A.test.assertEquals(0.5, actual, "unexpected length of the duration in hours");
+        }
+    },
+
+    testGetHoursInDuration: {
+        test: function() {
+            var duration = $A.localizationService.duration(30, "minutes");
+
+            var actual = $A.localizationService.getHoursInDuration(duration);
+
+            $A.test.assertEquals(0, actual, "unexpected number of hours");
+        }
+    },
+
+    testDisplayDurationInMinutes: {
+        test: function() {
+            var duration = $A.localizationService.duration(105, "seconds");
+
+            var actual = $A.localizationService.displayDurationInMinutes(duration);
+
+            $A.test.assertEquals(1.75, actual, "unexpected length of the duration in minutes");
+        }
+    },
+
+    testGetMinutesInDuration: {
+        test: function() {
+            var duration = $A.localizationService.duration(105, "seconds");
+
+            var actual = $A.localizationService.getMinutesInDuration(duration);
+
+            $A.test.assertEquals(1, actual, "unexpected number of minutes");
+        }
+    },
+
+    testDisplayDurationInSeconds: {
+        test: function() {
+            var duration = $A.localizationService.duration(1500, "milliseconds");
+
+            var actual = $A.localizationService.displayDurationInSeconds(duration);
+
+            $A.test.assertEquals(1.5, actual, "unexpected length of the duration in seconds");
+        }
+    },
+
+    testGetSecondsInDuration: {
+        test: function() {
+            var duration = $A.localizationService.duration(1500, "milliseconds");
+
+            var actual = $A.localizationService.getSecondsInDuration(duration);
+
+            $A.test.assertEquals(1, actual, "unexpected number of seconds");
+        }
+    },
+
+    testDisplayDurationInMilliseconds: {
+        test: function() {
+            var duration = $A.localizationService.duration(1500, "milliseconds");
+
+            var actual = $A.localizationService.displayDurationInMilliseconds(duration);
+
+            $A.test.assertEquals(1500, actual, "unexpected length of the duration in milliseconds");
+        }
+    },
+
+    testGetMillisecondsInDuration: {
+        test: function() {
+            var duration = $A.localizationService.duration(1500, "milliseconds");
+
+            var actual = $A.localizationService.getMillisecondsInDuration(duration);
+
+            // In moment, duration().milliseconds() only returns a number between 0 and 999
+            $A.test.assertEquals(500, actual, "unexpected number of milliseconds");
+        }
+    }
 
 })

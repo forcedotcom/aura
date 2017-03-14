@@ -177,8 +177,10 @@ SecureObject.filterEverything = function(st, raw, options) {
             } else if (SecureObject.isUnfilteredType(raw)) {
                 // return raw for unfiltered types
                 mutated = false;
-            }
-            else {
+            } else if (raw instanceof PropertyReferenceValue) {
+                swallowed = SecurePropertyReferenceValue(raw, key);
+                mutated = true;
+            } else {
                 if (!belongsToLocker) {
                     if (!rawKey) {
                         // Object that was created in this locker or insystem mode and not yet keyed - key it now

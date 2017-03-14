@@ -30,6 +30,30 @@ function SecureAura(AuraInstance, key) {
         return o;
     }
 
+    /**
+     * Deep traverse an object and unfilter any Locker proxies. Isolate this logic here for the component
+     * creation APIs rather than a more general solution to avoid overly aggressive unfiltering that may open
+     * new security holes.
+     */
+    function deepUnfilterArgs(baseObject, members) {
+        var value;
+        for (var property in members) {
+            value = members[property];
+            if (value !== undefined && value !== null) {
+                if (Array.isArray(value) || AuraInstance.util.isPlainObject(value)) {
+                    var branchValue = baseObject[property];
+                    baseObject[property] = deepUnfilterArgs(branchValue, value);
+                    continue;
+                } 
+            }
+            if (ls_isProxy(value)) {
+                value = ls_getRef(value, key);
+            }
+            baseObject[property] = value;
+        }
+        return baseObject;
+    }
+
     var su = Object.create(null);
     var sls = Object.create(null);
     o = Object.create(null, {
@@ -54,11 +78,45 @@ function SecureAura(AuraInstance, key) {
             value : function() {
                 return "SecureAura: " + AuraInstance + "{ key: " + JSON.stringify(key) + " }";
             }
+        },
+
+        "createComponent" : {
+            enumerable : true,
+            writable : true,
+            value : function(type, attributes, callback) {
+                // copy attributes before modifying so caller does not see unfiltered results
+                var attributesCopy = AuraInstance.util.apply({}, attributes, true, true);
+                var filteredArgs = attributes && AuraInstance.util.isObject(attributes) ? deepUnfilterArgs(attributesCopy, attributes) : attributes;
+                var fnReturnedValue = AuraInstance.createComponent(type, filteredArgs, SecureObject.filterEverything(o, callback));
+                return SecureObject.filterEverything(o, fnReturnedValue);
+            }
+        },
+
+        "createComponents" : {
+            enumerable : true,
+            writable : true,
+            value : function(components, callback) {
+                var filteredComponents = [];
+                if (Array.isArray(components)) {
+                    for (var i = 0; i < components.length; i++) {
+                        var filteredComponent = [];
+                        filteredComponent[0] = components[i][0];
+                        // copy attributes before modifying so caller does not see unfiltered results
+                        var attributesCopy = AuraInstance.util.apply({}, components[i][1], true, true);
+                        filteredComponent[1] = deepUnfilterArgs(attributesCopy, components[i][1]);
+                        filteredComponents.push(filteredComponent);
+                    }
+                } else {
+                    filteredComponents = components;
+                }
+                var fnReturnedValue = AuraInstance.createComponents(filteredComponents, SecureObject.filterEverything(o, callback));
+                return SecureObject.filterEverything(o, fnReturnedValue);
+            }
         }
     });
 
     // SecureAura methods and properties
-    [ "createComponent", "createComponents", "enqueueAction" ].forEach(function(name) {
+    [ "enqueueAction" ].forEach(function(name) {
         Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, AuraInstance, name, { rawArguments: true }));
     });
 

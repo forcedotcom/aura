@@ -229,6 +229,8 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
         SecureObject.addPropertyIfSupported(o, win, name);
     });
 
+    SecureObject.addRTCMediaApis(o, win, "webkitRTCPeerConnection", key);
+
     var workerFrame = win.document.getElementById("safeEvalWorkerCustom");
     var safeEvalWindow = workerFrame && workerFrame.contentWindow;            
     var globalScope = safeEvalWindow || win;
@@ -273,7 +275,7 @@ SecureWindow.metadata = {
                 "Audio":                                CTOR,
                 "AudioBuffer":                          FUNCTION,
                 "AudioBufferSourceNode":                FUNCTION,
-                "AudioContext":                         FUNCTION,
+                "AudioContext":                         CTOR,
                 "AudioDestinationNode":                 FUNCTION,
                 "AudioListener":                        FUNCTION,
                 "AudioNode":                            FUNCTION,
@@ -461,7 +463,7 @@ SecureWindow.metadata = {
                 "MIDIPort":                             FUNCTION,
                 "Map":                                  RAW,
                 "Math":                                 DEFAULT,
-                "MediaDevices":                         FUNCTION,
+                "MediaDevices":                         DEFAULT,
                 "MediaElementAudioSourceNode":          FUNCTION,
                 "MediaEncryptedEvent":                  FUNCTION,
                 "MediaError":                           FUNCTION,
@@ -473,11 +475,11 @@ SecureWindow.metadata = {
                 "MediaList":                            FUNCTION,
                 "MediaQueryList":                       FUNCTION,
                 "MediaQueryListEvent":                  FUNCTION,
-                "MediaRecorder":                        FUNCTION,
+                "MediaRecorder":                        CTOR,
                 "MediaSource":                          FUNCTION,
-                "MediaStreamAudioDestinationNode":      FUNCTION,
-                "MediaStreamAudioSourceNode":           FUNCTION,
-                "MediaStreamEvent":                     FUNCTION,
+                "MediaStreamAudioDestinationNode":      CTOR,
+                "MediaStreamAudioSourceNode":           CTOR,
+                "MediaStreamEvent":                     CTOR,
                 "MediaStreamTrack":                     FUNCTION,
                 "MessageChannel":                       RAW,
                 "MessageEvent":                         RAW,

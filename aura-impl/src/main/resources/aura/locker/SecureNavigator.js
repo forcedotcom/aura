@@ -44,13 +44,17 @@ function SecureNavigator(navigator, key) {
 	});
 
     ["appCodeName", "appName", "appVersion", "cookieEnabled", "geolocation",
-	 "language", "onLine", "platform", "product", "userAgent"].forEach(function(name) {
+     "language", "onLine", "platform", "product", "userAgent"].forEach(function(name) {
         SecureObject.addPropertyIfSupported(o, navigator, name);
+    });
+
+    ["mediaDevices", "mozGetUserMedia", "webkitGetUserMedia"].forEach(function(name) {
+        SecureObject.addRTCMediaApis(o, navigator, name, key);
     });
 
     ls_setRef(o, navigator, key);
     ls_addToCache(navigator, o, key);
     ls_registerProxy(o);
 
-	return o;
+    return o;
 }

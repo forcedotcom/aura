@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 import org.auraframework.modules.ModulesCompiler;
 import org.auraframework.modules.ModulesCompilerData;
-import org.auraframework.util.IOUtil;
+import org.auraframework.util.j2v8.J2V8Util;
 import org.springframework.util.StringUtils;
 
 import com.eclipsesource.v8.JavaVoidCallback;
@@ -109,8 +109,7 @@ public final class ModulesCompilerJ2V8 implements ModulesCompiler {
             }
         };
 
-        IOUtil.newTempDir("to_force_create_tmpdir"); // otherwise next fails with IOException: No such file or directory
-        NodeJS nodeJS = NodeJS.createNodeJS();
+        NodeJS nodeJS = J2V8Util.createNodeJS();
 
         MemoryManager memoryManager = new MemoryManager(nodeJS.getRuntime());
         nodeJS.getRuntime().registerJavaMethod(onErrorCallback, "onErrorCallback");

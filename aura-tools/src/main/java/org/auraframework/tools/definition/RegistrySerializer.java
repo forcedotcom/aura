@@ -253,15 +253,14 @@ public class RegistrySerializer {
         for (DefDescriptor<?> desc : descriptors) {
             if (modulesEnabled) {
                 if (desc.getDefType() != DefType.MODULE) {
-                    System.out.println("---> skipping non-module desc: " + desc);
+                    logger.debug("skipping non-module desc: " + desc);
                     continue;
                 }
             } else {
                 if (desc.getDefType() == DefType.MODULE) {
-                    System.out.println("---> skipping module desc: " + desc);
+                    logger.debug("skipping module desc: " + desc);
                     continue;
                 }
-                // TODO: skip also JS in modules dirs
             }
             try {
                 Definition def = definitionService.getDefinition(desc);

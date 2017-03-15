@@ -18,6 +18,7 @@ package org.auraframework.util.j2v8;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.eclipsesource.v8.NodeJS;
 import com.eclipsesource.v8.V8;
 
 public class J2V8Util {
@@ -45,5 +46,19 @@ public class J2V8Util {
         }
         logger.info("J2V8Util running in: " + env + ", enabled=" + enabled);
         return enabled;
+    }
+    
+    /**
+     * Use this method instead of calling NodeJS.createNodeJS() directly to avoid random IOExceptions
+     */
+    public synchronized static NodeJS createNodeJS() {
+        // this is the exception we get randomly:
+        // Caused by: java.io.IOException: No such file or directory
+        // at java.io.UnixFileSystem.createFileExclusively(Native Method)
+        // at java.io.File.createTempFile(File.java:2024)
+        // at java.io.File.createTempFile(File.java:2070)
+        // at com.eclipsesource.v8.NodeJS.createTemporaryScriptFile(NodeJS.java:204)
+        // at com.eclipsesource.v8.NodeJS.createNodeJS(NodeJS.java:73)
+        return NodeJS.createNodeJS();
     }
 }

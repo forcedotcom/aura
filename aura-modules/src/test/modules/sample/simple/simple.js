@@ -1,6 +1,6 @@
 import { HTMLElement } from "engine";
 import { module1, const1 } from "modules:testLib";
-import { log } from "util.js"
+import { log } from "util.js";
 
 export default class Simple extends HTMLElement {
     constructor () {

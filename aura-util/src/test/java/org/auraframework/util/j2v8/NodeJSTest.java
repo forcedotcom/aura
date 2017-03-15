@@ -55,7 +55,7 @@ public class NodeJSTest extends UnitTestCase {
             }
         };
 
-        NodeJS nodeJS = NodeJS.createNodeJS();
+        NodeJS nodeJS = J2V8Util.createNodeJS();
         nodeJS.getRuntime().registerJavaMethod(javaCallback, "javaCallback");
         nodeJS.exec(createTempScriptFile(NODE_SCRIPT, "useNodeJS"));
 
@@ -74,7 +74,7 @@ public class NodeJSTest extends UnitTestCase {
 
         // execute using J2V8 NodeJS
         long startNanos = System.nanoTime();
-        NodeJS nodeJS = NodeJS.createNodeJS();
+        NodeJS nodeJS = J2V8Util.createNodeJS();
         nodeJS.exec(quickSortJS);
         while (nodeJS.isRunning()) {
             nodeJS.handleMessage();
@@ -116,7 +116,7 @@ public class NodeJSTest extends UnitTestCase {
             @Override
             public Integer call() {
                 try {
-                    NodeJS nodeJS = NodeJS.createNodeJS();
+                    NodeJS nodeJS = J2V8Util.createNodeJS();
                     nodeJS.exec(createTempScriptFile("global.tmpvar = " + num + ';', "useManyInParallel" + num));
                     // block threads here until all running
                     memoryCheckLatch.countDown();
@@ -156,7 +156,7 @@ public class NodeJSTest extends UnitTestCase {
 
     @Test
     public void testExecuteScript() {
-        NodeJS nodeJS = NodeJS.createNodeJS();
+        NodeJS nodeJS = J2V8Util.createNodeJS();
         V8 v8 = nodeJS.getRuntime();
         int result = v8
                 .executeIntegerScript("" + "var hello = 'hello, ';\n" + "var world = 'world!';\n" + "hello.length;\n");

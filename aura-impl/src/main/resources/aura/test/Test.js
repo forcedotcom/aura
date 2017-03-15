@@ -1610,12 +1610,7 @@ TestInstance.prototype.getElementAttributeValue = function(element, attributeNam
 TestInstance.prototype.addEventHandler = function(eventName, handler, component, insert) {
     if ($A.util.isUndefinedOrNull(component)) {
         // application event handler
-        $A.eventService.addHandler({
-            'event' : eventName,
-            'globalId' : 'TESTHANDLER' + eventName,
-            'handler' : handler
-        });
-
+        $A.addEventHandler(eventName,handler);
     } else {
         // component event handler
         // mock a ValueProvider that returns a synthetic action

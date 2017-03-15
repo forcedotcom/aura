@@ -845,8 +845,8 @@
                     })
                 },
 
-                onAfterShow: function(panel) {
-                    var closeCount = 0; 
+                onAfterShow: $A.getCallback(function(panel) {
+                    var closeCount = 0;
                     globalId = panel.getGlobalId();
 
                     
@@ -866,7 +866,7 @@
                     $A.get('e.ui:destroyPanel').setParams({
                         panelInstance: panel.getGlobalId(),
                     }).fire();
-                }
+                })
             }).fire();
             
         }]

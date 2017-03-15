@@ -74,6 +74,7 @@ function SecureComponent(component, key) {
         // component @platform methods
         "isValid": SecureObject.createFilteredMethod(o, component, "isValid"),
         "isInstanceOf": SecureObject.createFilteredMethod(o, component, "isInstanceOf"),
+        "addEventHandler": SecureObject.createFilteredMethod(o, component, "addEventHandler"),
         "addHandler": SecureObject.createFilteredMethod(o, component, "addHandler"),
         "addValueHandler": SecureObject.createFilteredMethod(o, component, "addValueHandler"),
         "addValueProvider": SecureObject.createFilteredMethod(o, component, "addValueProvider"),
@@ -93,7 +94,8 @@ function SecureComponent(component, key) {
         "getElement": SecureObject.createFilteredMethod(o, component, "getElement"),
         "getElements": SecureObject.createFilteredMethod(o, component, "getElements"),
         "getName": SecureObject.createFilteredMethod(o, component, "getName"),
-        "getType": SecureObject.createFilteredMethod(o, component, "getType")
+        "getType": SecureObject.createFilteredMethod(o, component, "getType"),
+        "removeEventHandler": SecureObject.createFilteredMethod(o, component, "removeEventHandler")
     });
 
     // The shape of the component depends on the methods exposed in the definitions:

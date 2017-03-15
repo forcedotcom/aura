@@ -303,6 +303,7 @@ Aura.Event.Event.prototype.executeHandlerIterator = function(handlerIterator) {
     var res = {};
     var value;
 
+    var context=$A.getContext();
     var isSystemError = this.eventDef.getDescriptor().toString() === "markup://aura:systemError";
     var isCustomerError = this.eventDef.getDescriptor().toString() === "markup://aura:customerError";
     var isComponentEventType = this.getEventExecutionType() === "COMPONENT";
@@ -337,7 +338,9 @@ Aura.Event.Event.prototype.executeHandlerIterator = function(handlerIterator) {
                 }
             }
             else {
+                context.setCurrentAccess(value.cmp);
                 value.handler(this);
+                context.releaseCurrentAccess();
             }
         }
     }

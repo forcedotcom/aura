@@ -3814,7 +3814,7 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
             // JBUCH: HACK: THIS DELIGHTFUL BLOCK IS BECAUSE OF LEGACY UNAUTHENTICATED/AUTHENTICATED ABUSE OF ACCESS ATTRIBUTE. COOL.
             return (definition.isInstanceOf && definition.isInstanceOf("aura:application")) ||
             // #if {"excludeModes" : ["PRODUCTION","PRODUCTIONDEBUG"]}
-            // This check allows components to be loaded directly in the browser in DEV/TEST
+            // JBUCH: HACK: REMOVE WHEN WE NO LONGER LOAD COMPONENTS DIRECTTLY FOR DEV/TEST
             (!$A.getRoot() || !$A.getRoot().isInstanceOf('aura:application')) && !(context&&context.getCurrentAccess()) ||
             // #end
             false;

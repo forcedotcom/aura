@@ -239,6 +239,8 @@ Aura.bootstrapMark = function (mark, value) {
      * @borrows AuraInstance#log as $A.log
      * @borrows AuraInstance#warning as $A.warning
      * @borrows AuraInstance#run as $A.run
+     * @borrows AuraEventService#addEventHandler as $A.addEventHandler
+     * @borrows AuraEventService#removeEventHandler as $A.removeEventHandler
      * @borrows AuraComponentService#newComponentDeprecated as $A.newCmp
      * @borrows AuraComponentService#newComponentAsync as $A.newCmpAsync
      * @borrows AuraInstance#localizationService as localizationService

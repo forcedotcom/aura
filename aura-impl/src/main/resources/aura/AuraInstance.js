@@ -26,6 +26,8 @@
  * @borrows AuraComponentService#createComponent as createComponent
  * @borrows AuraComponentService#createComponents as createComponents
  * @borrows AuraComponentService#getComponent as getComponent
+ * @borrows AuraEventService#addEventHandler as addEventHandler
+ * @borrows AuraEventService#removeEventHandler as removeEventHandler
  */
 function AuraInstance () {
     this.globalValueProviders = {};
@@ -237,9 +239,11 @@ function AuraInstance () {
     this.getComponent              = this.componentService.getComponent.bind(this.componentService);
     this.createComponent           = this.componentService["createComponent"].bind(this.componentService);
     this.createComponents          = this.componentService["createComponents"].bind(this.componentService);
-
     this.createComponentFromConfig = this.componentService.createComponentFromConfig.bind(this.componentService);
+
     this.getEvt                    = this.eventService.newEvent.bind(this.eventService);
+    this.addEventHandler           = this.eventService.addEventHandler.bind(this.eventService);
+    this.removeEventHandler        = this.eventService.removeEventHandler.bind(this.eventService);
 
     // DEPRECATED
     this.deferAction               = this.clientService.deferAction.bind(this.clientService);
@@ -340,6 +344,8 @@ function AuraInstance () {
     this["createComponents"] = this.createComponents;
     this["createComponentFromConfig"] = this.createComponentFromConfig;
     this["getEvt"] = this.getEvt;
+    this["addEventHandler"] = this.addEventHandler;
+    this["removeEventHandler"] = this.removeEventHandler;
     this["Component"] = this.Component;
 
     this["auraFriendlyError"] = this.auraFriendlyError;
@@ -388,30 +394,6 @@ function AuraInstance () {
             return services.component.getControllerDef(controllerDef).get(action);
         }
     };
-
-    this.eventService.addHandler({
-        event : 'aura:clientRedirect',
-        "globalId" : "Aura",
-        "handler" : function(evt) {
-            var url = evt.getParam('url');
-            if (url != null) {
-                // XSS protection: don't allow javascript or data url
-                var protocolBlacklist = ['javascript', 'data'];
-                var doc = document.implementation.createDocument('http://www.w3.org/1999/xhtml', 'html', null);
-                var testXSSLink = doc.createElement('a');
-                testXSSLink.setAttribute('href', url);
-                if (testXSSLink.protocol != null){
-                    for(var i = 0; i < protocolBlacklist.length; i++){
-                        if(testXSSLink.protocol.indexOf(protocolBlacklist[i]) === 0){
-                            url = encodeURIComponent(url);
-                            break;
-                        }
-                    }
-                }
-                window.location = url;
-            }
-        }
-    });
 
 }
 
@@ -611,11 +593,12 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
         $A.localizationService.init();
 
         var app = $A.clientService["init"](config, token, $A.util.getElement(container));
+        // Set the top level element as the root
         $A.setRoot(app);
 
         if (!$A.initialized) {
             $A.initialized = true;
-            $A.addDefaultErrorHandler(app);
+            $A.addDefaultEventHandlers(app);
             $A.afterInitHooks();
             $A.finishInit(doNotInitializeServices);
         }
@@ -634,26 +617,56 @@ AuraInstance.prototype.addTearDownHandler = function () {
  * Add default handler to aura:systemError event
  * @private
  */
-AuraInstance.prototype.addDefaultErrorHandler = function (app) {
-    $A.eventService.addHandler({
-        "event": "aura:systemError",
-        "globalId": app.getGlobalId(),
-        "handler": function(event) {
-            if (event["handled"]) { return; }
-            $A.message(event.getParam("message"), event.getParam("auraError"));
-            event["handled"] = true;
-        }
-    });
-    $A.eventService.addHandler({
-        "event": "aura:customerError",
-        "globalId": app.getGlobalId(),
-        "handler": function(event) {
-            if (event["handled"]) { return; }
-            $A.message(event.getParam("message"), event.getParam("auraError"));
-            event["handled"] = true;
-        }
-    });
+AuraInstance.prototype.addDefaultEventHandlers = function (app) {
+    var context=$A.getContext();
+    context.setCurrentAccess(app);
+
+    // Add default XSS navigation handler
+    $A.addEventHandler("aura:clientRedirect",$A.defaultRedirectHandler);
+
+    // Add default error handlers
+    $A.addEventHandler("aura:systemError",$A.defaultErrorHandler);
+    $A.addEventHandler("aura:customerError",$A.defaultErrorHandler);
+
+    context.releaseCurrentAccess();
 };
+
+/*
+*  Default Error handler
+*  @private
+* */
+AuraInstance.prototype.defaultErrorHandler=function(event) {
+    if (event["handled"]){
+        return;
+    }
+    $A.message(event.getParam("message"), event.getParam("auraError"));
+    event["handled"] = true;
+};
+
+/*
+ * Default XSS controlled location redirect event handler
+ * @private
+ * */
+AuraInstance.prototype.defaultRedirectHandler=function(evt) {
+    var url = evt.getParam('url');
+    if (url != null) {
+        // XSS protection: don't allow javascript or data url
+        var protocolBlacklist = ['javascript', 'data'];
+        var doc = document.implementation.createDocument('http://www.w3.org/1999/xhtml', 'html', null);
+        var testXSSLink = doc.createElement('a');
+        testXSSLink.setAttribute('href', url);
+        if (testXSSLink.protocol != null){
+            for(var i = 0; i < protocolBlacklist.length; i++){
+                if(testXSSLink.protocol.indexOf(protocolBlacklist[i]) === 0){
+                    url = encodeURIComponent(url);
+                    break;
+                }
+            }
+        }
+        window.location = url;
+    }
+};
+
 
 /**
  * Signals that initialization has completed.

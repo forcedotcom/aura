@@ -128,6 +128,7 @@ function AuraError() {
             lines.forEach(function(line) {
                 line = line.replace(/https?:\/\/([^\/]*\/)+/gi, "");
                 line = line.replace(/:[0-9]+:[0-9]+/gi, "");
+                line = line.replace(/\.js.+$/gi, ".js");
                 ret.push(line);
             });
 

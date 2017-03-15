@@ -186,6 +186,8 @@ public class ComponentController implements Controller {
                 trace = trace.replaceAll("https?://([^/]*/)+", "");
                 // remove line and column number
                 trace = trace.replaceAll(":[0-9]+:[0-9]+", "");
+                // remove trailing part of filename
+                trace = trace.replaceAll("[.]js.+$", ".js");
                 sb.append(trace+'\n');
             }
             return sb.toString();

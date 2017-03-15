@@ -34,6 +34,7 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.CachingService;
@@ -303,7 +304,6 @@ public class CachingServiceImpl implements CachingService {
 
     private void invalidateSourceRelatedCaches(DefDescriptor<?> descriptor) {
         
-        
         depsCache.invalidateAll();
         descriptorFilterCache.invalidateAll();
         stringsCache.invalidateAll();
@@ -317,6 +317,7 @@ public class CachingServiceImpl implements CachingService {
         } else {
             DefDescriptor<ComponentDef> cdesc = new DefDescriptorImpl<>(descriptor, ComponentDef.class, "markup");
             DefDescriptor<ApplicationDef> adesc = new DefDescriptorImpl<>(descriptor, ApplicationDef.class, "markup");
+            DefDescriptor<ModuleDef> moduleDefDescriptor = new DefDescriptorImpl<>(descriptor, ModuleDef.class, "markup");
 
             defsCache.invalidate(descriptor);
             existsCache.invalidate(descriptor);
@@ -324,12 +325,12 @@ public class CachingServiceImpl implements CachingService {
             existsCache.invalidate(cdesc);
             defsCache.invalidate(adesc);
             existsCache.invalidate(adesc);
+            defsCache.invalidate(moduleDefDescriptor);
+            existsCache.invalidate(moduleDefDescriptor);
 
-            switch (descriptor.getDefType()) {
-            case INCLUDE:
-                invalidateSourceRelatedCaches(descriptor.getBundle());
-                break;
-            default:
+            DefDescriptor<?> bundleParent = descriptor.getBundle();
+            if (bundleParent != null) {
+                invalidateSourceRelatedCaches(bundleParent);
             }
         }
     }

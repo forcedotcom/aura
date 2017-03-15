@@ -34,6 +34,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.CachingService;
 import org.auraframework.system.DependencyEntry;
@@ -327,6 +328,8 @@ public class CachingServiceImplTest extends AuraImplTestCase {
                 ApplicationDef.class, DefDescriptor.MARKUP_PREFIX));
         invalidatedDds.add(DefDescriptorImpl.getAssociateDescriptor(source,
                 ComponentDef.class, DefDescriptor.MARKUP_PREFIX));
+        invalidatedDds.add(DefDescriptorImpl.getAssociateDescriptor(source,
+                ModuleDef.class, DefDescriptor.MARKUP_PREFIX));
 
         CachingServiceImpl cachingService = new CachingServiceImpl();
         cachingService.setLoggingAdapter(loggingAdapter);
@@ -354,6 +357,8 @@ public class CachingServiceImplTest extends AuraImplTestCase {
                 ApplicationDef.class, DefDescriptor.MARKUP_PREFIX));
         invalidatedDds.add(DefDescriptorImpl.getAssociateDescriptor(source,
                 ComponentDef.class, DefDescriptor.MARKUP_PREFIX));
+        invalidatedDds.add(DefDescriptorImpl.getAssociateDescriptor(source,
+                ModuleDef.class, DefDescriptor.MARKUP_PREFIX));
 
         CachingServiceImpl cachingService = new CachingServiceImpl();
         cachingService.setLoggingAdapter(loggingAdapter);

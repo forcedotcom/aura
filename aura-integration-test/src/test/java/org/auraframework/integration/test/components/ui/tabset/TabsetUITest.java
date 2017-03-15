@@ -404,6 +404,7 @@ public class TabsetUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE,
             BrowserType.IPAD })
     @Test
+    @Flapper
     public void testOverflowKeyboardInteraction() throws Exception { 	
     	open("/uitest/tabset_Test.cmp?renderItem=overflow");
     	overflowKeyboardNav(5, false, Keys.ARROW_LEFT);

@@ -40,6 +40,7 @@ public class BasePillContainerAutoComplete extends WebDriverTestCase {
      * ui:pillContainer dropdown continues to focus after clicking on any of the pill
      * Bug: W-2628705
      */
+    @Flapper
     public void testAutoCompleteListContentVisible() throws MalformedURLException, URISyntaxException, InterruptedException {
         open(CMP_URL);
         WebElement input = findDomElement(By.cssSelector(INPUT));

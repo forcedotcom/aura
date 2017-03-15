@@ -26,8 +26,8 @@
         helper.initializeSorting(cmp);
         
         helper.initializeItems(cmp);
-        
-        helper.createVirtualRowsAsync(cmp);
+        helper.createVirtualRows(cmp); // if we initialize data model, we then create the rows twice
+        helper.markDirty(cmp);
 
         cmp._initializing = false;
         
@@ -37,7 +37,9 @@
             return;
         }
 
-        helper.createVirtualRowsAsync(cmp);
+        helper.markClean(cmp, 'v.items');
+        helper.createVirtualRows(cmp);
+        helper.markDirty(cmp); // So we go into the rerender
     },
     handleColumnsChange: function (cmp, event, helper) {
         var concreteCmp = cmp.getConcreteComponent(),
@@ -51,8 +53,10 @@
         helper.initializeTemplates(cmp);
         helper.initializeSorting(cmp);
 
-        helper.createVirtualRowsAsync(cmp);
-        
+        helper.markClean(cmp, 'v.columns');
+        helper.markClean(cmp, 'v.headerColumns');
+        helper.createVirtualRows(cmp);
+        helper.markDirty(cmp); // So we go into the rerender
     },
     handleHeaderColumnsChange: function (cmp, event, helper) {
         helper.initializeHeaderColumns(cmp);

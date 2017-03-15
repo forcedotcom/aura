@@ -321,59 +321,6 @@
         }
     },
     
-    INIT_DELAY: 100, // For the first time, make it show asap.
-    ANIMATE_DELAY: 150,
-    DEFAULT_BULK_COUNT: 10,
-    
-    createVirtualRowsAsync: function(cmp) {   
-        // Start the async insertion process, clean up previous values.
-        cmp._readyItems = [];
-        cmp._virtualItems = [];
-        cmp._lastIndex = 0;
-        
-        if (cmp._timeoutId) {
-            window.clearTimeout(cmp._timeoutId);
-        }
-        
-        this._nextLoop(cmp, this.INIT_DELAY);
-    },
-        
-    partialInsertItems: function(cmp) {
-        if (cmp && cmp.isValid()) {
-            $A.metricsService.markStart(this.NS, this.NAME + ".partialInsertItems", {auraid : cmp.getGlobalId()});
-
-            var bulkCount = cmp.get("v.bulkItemCount") || this.DEFAULT_BULK_COUNT;
-            
-            var items = cmp.get("v.items");
-            if (items && items.length) {
-                cmp._lastIndex = cmp._lastIndex || 0;
-                
-                if (cmp._lastIndex > items.length) {
-                    cmp._lastIndex = items.length;   
-                    cmp._timeoutId = null;
-                    return;
-                }
-                
-                for (var i = cmp._lastIndex; i < items.length && i < cmp._lastIndex + bulkCount; i++) {
-                    cmp._readyItems.push(this._generateVirtualRow(cmp, items[i], i));
-                }
-                
-                cmp.set("v.renderInfo", { type : "append", offset: cmp._lastIndex});
-                cmp._lastIndex += bulkCount;
-                this._nextLoop(cmp);
-            }
-            
-            $A.metricsService.markEnd(this.NS, this.NAME + ".partialInsertItems");
-        }
-    },  
-
-    _nextLoop: function(cmp, time) {
-        time = time || this.ANIMATE_DELAY;
-        cmp._timeoutId = window.setTimeout($A.getCallback(function(){
-            this.partialInsertItems(cmp);
-        }.bind(this)), time);
-    },
-    
     _generateVirtualRow: function (cmp, item, index) {
         var rowTmpl = cmp._rowTemplate,
             itemVar = cmp.get('v.itemVar'),
@@ -395,7 +342,6 @@
 
         return clonedRow;
     },
-    
     _getItemAttached: function (dom) {
         return dom._data;
     },
@@ -416,12 +362,36 @@
         }
         return -1;
     },
-    
     appendVirtualRows: function (cmp, items) {
-        cmp.set('v.items', (cmp.get('v.items') || []).concat(items), true);
-        this._nextLoop(cmp);
-    },
+        $A.metricsService.markStart(this.NS, this.NAME + ".appendVirtualRows", {auraid : cmp.getGlobalId()});
+        var fragment  = document.createDocumentFragment(),
+            container = this.getGridBody(cmp),
+            offset = cmp.get("v.items").length;
 
+        for (var i = 0; i < items.length; i++) {
+            var virtualItem = this._generateVirtualRow(cmp, items[i], offset + i);
+            cmp._virtualItems.push(virtualItem);
+            fragment.appendChild(virtualItem);
+        }
+        container.appendChild(fragment);
+        this.fireRenderEvent(cmp, "append", offset);
+        
+        cmp.set("v.renderInfo", { type : "append" });
+        cmp.set('v.items', (cmp.get('v.items') || []).concat(items), true);
+        $A.metricsService.markEnd(this.NS, this.NAME + ".appendVirtualRows");
+    },
+    createVirtualRows: function (cmp) {
+        var items = cmp.get('v.items');
+        cmp._virtualItems = [];
+        if (items && items.length) {
+            $A.metricsService.markStart(this.NS, this.NAME + ".createVirtualRows", {auraid : cmp.getGlobalId()});
+            for (var i = 0; i < items.length; i++) {
+                cmp._virtualItems.push(this._generateVirtualRow(cmp, items[i], i));
+            }
+            $A.metricsService.markEnd(this.NS, this.NAME + ".createVirtualRows");
+        }
+        cmp.set("v.renderInfo", {});          
+    },
     selectRow: function(cmp, index, value) {
         var row = cmp._virtualItems[index];
         
@@ -441,7 +411,6 @@
         cmp.set("v.renderInfo", { type : "update", index : index });
         cmp.set('v.items', updatedItems, true);
     },
-    
     _getRootComponent: function (cmp) {
         var superCmp   = cmp.getSuper(),
             isExtended = superCmp.getType() !== 'aura:component';
@@ -461,8 +430,9 @@
         } else {
             switch (renderInfo.type) {
                 case "append":
-                    this._rerenderPartials(cmp);
-                    this.fireRenderEvent(cmp, "append", renderInfo.offset);
+                    // Currently doesn't need to do anything since elements are directly appended
+                    // into the DOM when the items are appended.
+                    // TODO: Evaluate whether DOM manipulation should be moved to rendering lifecycle
                     break;
                 case "update":
                     // Currently doesn't need to do anything since elements are directly updated
@@ -477,47 +447,18 @@
         cmp.set("v.renderInfo", {});
     },
     
-    _rerenderPartials: function(cmp) {
-        // check if should clean old item.
+    _rerender: function(cmp) {
         var container = this.getGridBody(cmp);
-        if (cmp._virtualItems.length === 0) {
-            while (container.lastChild) {
-                container.removeChild(container.lastChild);
-            }   
-        }
-        
-        var items = cmp._readyItems;
-        cmp._readyItems = [];
-        
-        // if no items be added, just return.
-        if (items.length === 0) {
-            return;
-        }     
-        
-        var fragment = document.createDocumentFragment();
-        
-        for (var i = 0; i < items.length; i++) {
-            fragment.appendChild(items[i]);
-            cmp._virtualItems.push(items[i]);
-        }
-        container.appendChild(fragment);
-    },
-    
-    _rerender: function(cmp) {      
-        // re-append all virtualItems to container.
-        var container = this.getGridBody(cmp);
-       
         var items = cmp._virtualItems;
         var fragment = document.createDocumentFragment();
         
         for (var i = 0; i < items.length; i++) {
             fragment.appendChild(items[i]);
         }
-        
-        while (container.lastChild) {
-            container.removeChild(container.lastChild);
-        } 
-        
+
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
         container.appendChild(fragment);
         this.fireRenderEvent(cmp, "rerender", 0);
     },

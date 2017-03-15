@@ -54,7 +54,6 @@
     <aura:attribute name="_dirty"          type="Integer"                                        description="Internal attribute for evaluating whether the grid should be rerendered"/>
     <aura:attribute name="itemVar"         type="String"                 default="item"          description="The name of the variable to use for each item inside the grid"/>
     <aura:attribute name="delegatedEvents" type="String"                 default="click,keydown" description="List of events the grid should delegate, separated by comma."/>
-    <aura:attribute name="bulkItemCount"   type="Integer"                default="10"            description="Items will be added to list for asynchronouse loop."/>
     
     <aura:attribute name="_sortBy"      type="String" default="" description="Sort order of the data in the grid. Name of column, predicated by a '-' for descending."/>
     

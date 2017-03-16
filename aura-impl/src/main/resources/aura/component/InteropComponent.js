@@ -69,8 +69,10 @@ InteropComponent.prototype.setupAttributes = function(config) {
     var configValues = config && config['values'] || {};
     var attributes = {};
     var self = this;
-    var changeHandlerPRV = function (event) {
-        self.attributeChange(this.handler.key, event.getParam('value'));
+    var changeHandlerPRVFactory = function(ctx) {
+        return function (event) {
+            ctx.attributeChange(this.handler.key, event.getParam('value'));
+        };
     };
     var changeHandlerFCV = function (attr, fcv /*, event*/) {
         this.attributeChange(attr, fcv.evaluate());
@@ -91,7 +93,7 @@ InteropComponent.prototype.setupAttributes = function(config) {
 
                 // For "v" add change handler, for "c" add bridging
                 if (provider === 'v') {
-                    valueConfig.value.addChangeHandler(this, attribute, changeHandlerPRV);
+                    valueConfig.value.addChangeHandler(this, attribute, changeHandlerPRVFactory(this));
                 } else {
                     isEvent = value['descriptor'].indexOf('on') === 0;
                     valueConfig = this.bridgeAction(valueConfig.value, isEvent);

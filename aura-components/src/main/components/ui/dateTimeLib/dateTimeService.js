@@ -35,7 +35,10 @@ function lib() { //eslint-disable-line no-unused-vars
          */
         getDisplayValue: function(value, config, callback) {
             if ($A.util.isEmpty(value)) {
-                callback(value, value);
+                callback({
+                    date: "",
+                    time: ""
+                });
                 return;
             }
 
@@ -44,13 +47,23 @@ function lib() { //eslint-disable-line no-unused-vars
             var dateValue = splitValue[0] || value;
             var timeValue = splitValue[1];
             var useStrictParsing = config.validateString === true;
-            var hasTime = timeValue && timeValue !== '00:00:00.000Z';
 
             var date = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD", config.langLocale, useStrictParsing);
-
             if ($A.util.isEmpty(date)) {
-                callback(value, value);
+                // invalid date/time value.
+                callback({
+                    date: dateValue,
+                    time: timeValue || value
+                });
                 return;
+            }
+
+            var hasTime = !$A.util.isEmpty(timeValue);
+            // For date only fields, the value is by default an ISO string ending with '00:00:00.000Z'.
+            // Only in this case, we don't need to convert the date to the provided timezone since we might end up
+            // with a +/-1 date difference. DateTime fields should still be converted to the provided timezone
+            if (!config.timeFormat && timeValue === "00:00:00.000Z") {
+                hasTime = false;
             }
 
             var displayValue = function (convertedDate) {
@@ -62,7 +75,10 @@ function lib() { //eslint-disable-line no-unused-vars
                     formattedTime = $A.localizationService.formatTimeUTC(translatedDate, config.timeFormat, config.langLocale);
                 }
 
-                callback(formattedDate, formattedTime);
+                callback({
+                    date: formattedDate,
+                    time: formattedTime
+                });
             };
 
             if (hasTime) {

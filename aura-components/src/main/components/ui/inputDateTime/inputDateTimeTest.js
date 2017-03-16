@@ -340,6 +340,81 @@
     },
 
     /**
+     * Verify a value in default time zone.
+     */
+    testMidnightInGMT: {
+        browsers: ['DESKTOP'],
+        attributes: {
+            value: '2004-09-23T00:00:00.000Z',
+            displayDatePicker: 'true',
+            format: 'M/dd/yy h:mm A',
+            dateFormat: 'M/dd/yy',
+            timeFormat: 'h:mm A',
+            timezone: 'GMT'
+        },
+        test: function (cmp) {
+            $A.test.addWaitFor(true, function () {
+                return cmp.find("inputDate").getElement().value.length > 0;
+            }, function () {
+                var inputDateStr = cmp.find("inputDate").getElement().value;
+                $A.test.assertEquals("9/23/04", inputDateStr, "Dates are not the same and they should be");
+                var inputTimeStr = cmp.find("inputTime").getElement().value;
+                $A.test.assertEquals("12:00 AM", inputTimeStr, "Dates are not the same and they should be");
+            });
+        }
+    },
+
+    /**
+     * Verify a value in LA time zone.
+     */
+    testUTCMidnightInLA: {
+        browsers: ['DESKTOP'],
+        attributes: {
+            value: '2004-09-23T00:00:00.000Z',
+            displayDatePicker: 'true',
+            format: 'M/dd/yy h:mm A',
+            dateFormat: 'M/dd/yy',
+            timeFormat: 'h:mm A',
+            timezone: 'America/Los_Angeles'
+        },
+        test: function (cmp) {
+            $A.test.addWaitFor(true, function () {
+                return cmp.find("inputDate").getElement().value.length > 0;
+            }, function () {
+                var inputDateStr = cmp.find("inputDate").getElement().value;
+                $A.test.assertEquals("9/22/04", inputDateStr, "Dates are not the same and they should be");
+                var inputTimeStr = cmp.find("inputTime").getElement().value;
+                $A.test.assertEquals("5:00 PM", inputTimeStr, "Dates are not the same and they should be");
+            });
+        }
+    },
+
+    /**
+     * Verify a value in NY time zone.
+     */
+    testUTCMidnightInNewYork: {
+        browsers: ['DESKTOP'],
+        attributes: {
+            value: '2004-09-23T00:00:00.000Z',
+            displayDatePicker: 'true',
+            format: 'M/dd/yy h:mm A',
+            dateFormat: 'M/dd/yy',
+            timeFormat: 'h:mm A',
+            timezone: 'America/New_York'
+        },
+        test: function (cmp) {
+            $A.test.addWaitFor(true, function () {
+                return cmp.find("inputDate").getElement().value.length > 0;
+            }, function () {
+                var inputDateStr = cmp.find("inputDate").getElement().value;
+                $A.test.assertEquals("9/22/04", inputDateStr, "Dates are not the same and they should be");
+                var inputTimeStr = cmp.find("inputTime").getElement().value;
+                $A.test.assertEquals("8:00 PM", inputTimeStr, "Dates are not the same and they should be");
+            });
+        }
+    },
+
+    /**
      * Verify a value in other language.
      * TODO: The usage is not valid anymore. Needs to change the app's locale on the server side.
      */

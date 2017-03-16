@@ -25,7 +25,7 @@
 
         var helper = this;
         var displayValue = function (returnValue) {
-            helper.setOutputValue(component, returnValue);
+            helper.setOutputValue(component, returnValue.date);
         };
 
         var value = component.get("v.value");

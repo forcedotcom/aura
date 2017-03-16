@@ -340,6 +340,24 @@
         }]
     },
 
+    testDateInputWithDefaultTime: {
+        browsers: ['DESKTOP'],
+        attributes: {value: "2017-03-16T00:00:00.000Z", timezone: 'America/Toronto', format: 'MM-DD-YYYY'},
+        test: [function (cmp) {
+            var inputDateTimeCmp = cmp.find("datePickerTestCmp");
+            var inputDateElement = inputDateTimeCmp.find("inputText").getElement();
+            $A.test.addWaitFor(true, function () {
+                return inputDateElement.value == "03-16-2017";
+            });
+        },
+            function (cmp) {
+                this.openDatePicker(cmp);
+            }, function (cmp) {
+                var curDate = $A.test.getElementByClass("selectedDate")[0];
+                $A.test.assertEquals("16", $A.util.getText(curDate), "Date picker did not open to the correct day");
+            }]
+    },
+
     /**
      * Test Flow:
      *

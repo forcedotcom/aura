@@ -129,9 +129,9 @@
             config.timeFormat = component._timeFormat;
         }
 
-        var displayValue = function (dateValue, timeValue) {
-            this.displayDate(component, dateValue);
-            this.displayTime(component, timeValue);
+        var displayValue = function (returnValue) {
+            this.displayDate(component, returnValue.date);
+            this.displayTime(component, returnValue.time);
         }.bind(this);
 
         var value = component.get("v.value");

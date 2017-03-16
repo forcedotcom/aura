@@ -22,7 +22,7 @@
         };
 
         var displayValue = function (returnValue) {
-            this.setInputValue(component, returnValue);
+            this.setInputValue(component, returnValue.date);
         }.bind(this);
 
         var value = component.get("v.value");

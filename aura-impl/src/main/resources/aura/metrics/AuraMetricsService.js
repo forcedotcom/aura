@@ -38,6 +38,7 @@ Aura.Services.MetricsService = function MetricsService() {
     this["PAGE_NOT_LOADED"] = "PageNotLoaded";
     this["PREVIOUS_PAGE_NOT_LOADED"] = "PreviousPageNotLoaded";
     this["INTERACTION_BEFORE_PAGE_LOADED"] = "InteractionBeforePageLoaded";
+    this["PAGE_IN_BACKGROUND_BEFORE_LOADED"] = "PageInBackgroundBeforeLoaded";
 };
 
 // Version

@@ -530,6 +530,7 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
         return namespaceInfo != null && namespaceInfo.access == NamespaceAccess.PRIVILEGED;
     }
 
+    @Override
     public void reset() {
     }
 }

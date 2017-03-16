@@ -87,6 +87,7 @@ public class AttributeDefRefHandler<P extends RootDefinition> extends ParentedTa
         }
     }
 
+    @Override
     protected AttributeDefRefImpl createDefinition() throws QuickFixException {
         return builder.build();
     }

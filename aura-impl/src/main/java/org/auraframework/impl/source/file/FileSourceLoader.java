@@ -282,6 +282,7 @@ public class FileSourceLoader extends BaseSourceLoader implements InternalNamesp
         }
     }
 
+    @Override
     public void reset() {
         synchronized (this) {
             namespaces = null;

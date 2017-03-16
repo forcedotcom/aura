@@ -52,7 +52,6 @@ public class Manifest extends AuraResourceImpl {
 
     // FIXME: this is horrendous we actually render the manifest as a component.
     private RenderingService renderingService;
-    private ContextService contextService;
     private ManifestUtil manifestUtil;
 
     public Manifest() {
@@ -244,11 +243,6 @@ public class Manifest extends AuraResourceImpl {
     @Inject
     public void setRenderingService(RenderingService renderingService) {
         this.renderingService = renderingService;
-    }
-
-    @Inject
-    public void setContextService(ContextService contextService) {
-        this.contextService = contextService;
     }
 
     public void setManifestUtil(ManifestUtil manifestUtil) {

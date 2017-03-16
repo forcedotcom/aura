@@ -31,10 +31,12 @@ public class ComponentXMLParserTest extends XMLParserTest<ComponentDef> {
     @Inject
     private ComponentXMLParser parser;
 
+    @Override
     protected XMLParser<ComponentDef> getParser() {
         return parser;
     }
 
+    @Override
     protected Class<ComponentDef> getDefinitionClass() {
         return ComponentDef.class;
     }

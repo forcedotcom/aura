@@ -2085,13 +2085,22 @@ public class ComponentAccessAttributeEnforcementTest extends AuraImplTestCase {
 
     @Test
     public void testComponentDependencyWildCardIncludesOnlyAccessibleComponents() throws Exception {
-        //create component with custom namespace
+        //create component with custom namespace        
         String cmpTemplate = "<aura:component %s/>";
 
-        DefDescriptor<? extends Definition> cmpGlobalDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, String.format(cmpTemplate, "access='Global'"),
-                StringSourceLoader.ANOTHER_CUSTOM_NAMESPACE + ":testcomponent", NamespaceAccess.CUSTOM);
-        DefDescriptor<? extends Definition> cmpInternalDescriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, String.format(cmpTemplate, ""),
-                StringSourceLoader.ANOTHER_CUSTOM_NAMESPACE + ":testcomponent", NamespaceAccess.CUSTOM);
+        // add a global component
+        getAuraTestingUtil().addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(cmpTemplate, "access='Global'"),
+                StringSourceLoader.ANOTHER_CUSTOM_NAMESPACE + ":testcomponent",
+                NamespaceAccess.CUSTOM);
+
+        // add an internal component
+        getAuraTestingUtil().addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(cmpTemplate, ""),
+                StringSourceLoader.ANOTHER_CUSTOM_NAMESPACE + ":testcomponent",
+                NamespaceAccess.CUSTOM);
 
         //create application with above component in markup
         String source = "<aura:component><aura:dependency resource='markup://" + StringSourceLoader.ANOTHER_CUSTOM_NAMESPACE + ":*'/></aura:component>";

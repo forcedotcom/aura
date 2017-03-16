@@ -896,7 +896,6 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         Boolean foundit = false;
         for(String key : depsCache.getKeySet()) {
             if(key.contains("markup://ui:button")) {
-                DependencyEntry value = depsCache.getIfPresent(key);
                 foundit = true;
             }
         }
@@ -907,7 +906,6 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         foundit = false;
         for(String key : depsCache.getKeySet()) {
             if(key.contains("markup://ui:button")) {
-                DependencyEntry value = depsCache.getIfPresent(key);
                 foundit = true;
             }
         }
@@ -921,7 +919,6 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         foundit = false;
         for(String key : depsCache.getKeySet()) {
             if(key.contains("markup://ui:button")) {
-                DependencyEntry value = depsCache.getIfPresent(key);
                 foundit = true;
             }
         }

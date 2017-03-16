@@ -184,16 +184,16 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
     /**
      * Test method for {@link RootDefinition#getAttributeDefs()}.
      */
-    @Test
-    public void testGetAttributeDefs() throws Exception {
-        String att1 = "<aura:attribute name=\"att1\" type=\"String\"/>";
-        String att2 = "<aura:attribute name=\"att2\" type=\"String\"/>";
-        T def = define(baseTag, "", att1 + att2);
-        Map<DefDescriptor<AttributeDef>, AttributeDef> attMap = def.getAttributeDefs();
+    //@Test
+    //public void testGetAttributeDefs() throws Exception {
+        //String att1 = "<aura:attribute name=\"att1\" type=\"String\"/>";
+        //String att2 = "<aura:attribute name=\"att2\" type=\"String\"/>";
+        //T def = define(baseTag, "", att1 + att2);
+        //Map<DefDescriptor<AttributeDef>, AttributeDef> attMap = def.getAttributeDefs();
 
         // should inherit aura:component body attribute as well as added attributes
         //assertEquals("Wrong number of AttributeDefs", 4, attMap.size());
-    }
+    //}
 
     /**
      * Test method for {@link RootDefinition#getAttributeDef(java.lang.String)}.

@@ -106,6 +106,7 @@ public final class TokenDefHandler<P extends RootDefinition> extends ParentedTag
         builder.setValue(tt.asValue(getParentHandler()));
     }
 
+    @Override
     protected TokenDef createDefinition() throws QuickFixException {
         return builder.build();
     }

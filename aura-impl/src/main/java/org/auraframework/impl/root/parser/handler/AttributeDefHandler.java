@@ -156,6 +156,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         }
     }
 
+    @Override
     public AttributeDefImpl createDefinition() throws QuickFixException {
         return builder.build();
     }

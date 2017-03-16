@@ -644,8 +644,7 @@ AuraComponentService.prototype.addModule = function(name, dependencies, exporter
 
     var descriptor = name.indexOf('markup://') === 0 ? name : 'markup://' + name;
     var entry = this.moduleDefRegistry[descriptor] || (this.moduleDefRegistry[descriptor] = {});
-
-    entry.dependencies = dependencies.map(function (d) { return d.indexOf(':') === -1 ? d.replace('-',':') : d });
+    entry.dependencies = dependencies.map(function (d) { return d.indexOf(':') === -1 ? d.replace('-',':') : d; });
     entry.definition = exporterClass;
     entry.descriptor = descriptor;
     entry.moduleName = name;

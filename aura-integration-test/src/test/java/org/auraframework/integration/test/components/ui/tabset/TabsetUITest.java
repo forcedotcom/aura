@@ -405,7 +405,7 @@ public class TabsetUITest extends WebDriverTestCase {
             BrowserType.IPAD })
     @Test
     @Flapper
-    public void testOverflowKeyboardInteraction() throws Exception { 	
+    public void _testOverflowKeyboardInteraction() throws Exception { 	
     	open("/uitest/tabset_Test.cmp?renderItem=overflow");
     	overflowKeyboardNav(5, false, Keys.ARROW_LEFT);
     }

@@ -45,10 +45,8 @@
     <aura:attribute name="listReferenceComponent" type="Aura.Component[]" description="Sets the component that the lookup menu is displayed under."/>
     <aura:attribute name="devNameOrId" type="String" description="Id or alias for the autocomplete." />
     <aura:attribute name="showEmptyList" type="boolean" default="false" description="Indicates if an empty list should be visible when the keyword attribute in ui:autocompleteList is empty. The default is false."/>
-    <aura:attribute name="autocompleteListClass" default=" lookup__menu" type="String" description="The css class for autocompleteList"/>
-    
+
     <aura:handler name="change" value="{!v.listReferenceComponent}" action="{!c.referenceElementChange}"/>
-    <aura:handler name="change" value="{!v.class}" action="{!c.setAutocompleteClass}"/>
     <!-- END - the following attributes are only used when using the default list -->
 
     <aura:locator target="*" alias="autocomplete-content" description="Content in autocomplete">
@@ -88,8 +86,7 @@
                                          ariaDescribedBy="{!v.ariaDescribedBy}"
                                          autocompleteButton="{!v.autocompleteButton}"
                                          disabled="{!v.disabled}"
-                                         domId="{!v.domId}"
-                                         focus="{!c.focus}"/>
+                                         domId="{!v.domId}"/>
         <aura:set attribute="else">
             <ui:inputTextForAutocomplete aura:id="input"
                                          aura:flavor="{!v.inputFlavor}"
@@ -102,12 +99,62 @@
                                          ariaDescribedBy="{!v.ariaDescribedBy}"
                                          autocompleteButton="{!v.autocompleteButton}"
                                          disabled="{!v.disabled}"
-                                         domId="{!v.domId}"
-                                         focus="{!c.focus}"/>
+                                         domId="{!v.domId}"/>
         </aura:set>
     </aura:if>
 
-    {!v.body}
-    {!v.autocompleteList}
+    <aura:if isTrue="{!empty(v.autocompleteList)}">
+        <aura:if isTrue="{!v.usePanel}">
+            <ui:autocompletePanel aura:id="panel">
+                <ui:autocompleteList aura:id="list" class="{!v.class + ' lookup__menu'}"
+                                     dataProvider="{!v.dataProvider}"
+                                     itemVar="{!v.optionVar}"
+                                     itemTemplate="{!v.listOption}"
+                                     emptyListContent="{!v.emptyListContent}"
+                                     loadingIndicator="{!v.loadingIndicator}"
+                                     listHeader="{!v.listHeader}"
+                                     listFooter="{!v.listFooter}"
+                                     showListHeader="{!v.showListHeader}"
+                                     showListFooter="{!v.showListFooter}"
+                                     theme="{!v.theme}"
+                                     visible="false"
+                                     role="listbox"
+                                     propertyToMatch="{!v.propertyToMatch}"
+                                     matchDone="{!c.handleMatchDone}"
+                                     selectListOption="{!c.handleSelectOption}"
+                                     updateAriaAttributes="{!c.updateAriaAttributes}"
+                                     matchFunc="{!v.matchFunc}"
+                                     disableMatch="{!v.disableMatch}"
+                                     setDefaultHighlight="{!v.setDefaultHighlight}"
+                                     showEmptyList="{!v.showEmptyList}"/>
+            </ui:autocompletePanel>
+            <aura:set attribute="else">
+                <ui:autocompleteList aura:id="list" class="{!v.class + ' lookup__menu'}"
+                                     dataProvider="{!v.dataProvider}"
+                                     itemVar="{!v.optionVar}"
+                                     itemTemplate="{!v.listOption}"
+                                     emptyListContent="{!v.emptyListContent}"
+                                     loadingIndicator="{!v.loadingIndicator}"
+                                     listHeader="{!v.listHeader}"
+                                     listFooter="{!v.listFooter}"
+                                     showListHeader="{!v.showListHeader}"
+                                     showListFooter="{!v.showListFooter}"
+                                     theme="{!v.theme}"
+                                     visible="false"
+                                     role="listbox"
+                                     propertyToMatch="{!v.propertyToMatch}"
+                                     matchDone="{!c.handleMatchDone}"
+                                     selectListOption="{!c.handleSelectOption}"
+                                     updateAriaAttributes="{!c.updateAriaAttributes}"
+                                     matchFunc="{!v.matchFunc}"
+                                     disableMatch="{!v.disableMatch}"
+                                     setDefaultHighlight="{!v.setDefaultHighlight}"
+                                     showEmptyList="{!v.showEmptyList}"/>
+            </aura:set>
+        </aura:if>
+        <aura:set attribute="else">
+            {!v.autocompleteList}
+        </aura:set>
+    </aura:if>
 
 </aura:component>

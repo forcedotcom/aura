@@ -269,7 +269,8 @@ IterationComponent.prototype["helper"] = {
                     'markup://aura:iteration [id:' + component.getGlobalId() + '] ',
                     'in ', owner.getType() + ' ["' + owner.getGlobalId() + '"] ',
                     'had multiple items set in the same Aura cycle.\n',
-                    'More info: https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/perf_warnings_iteration.htm'
+                    'More info: https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/perf_warnings_iteration.htm\n',
+                    'Component access stack: ' + $A.getContext().getAccessStackHierarchy()
                 ].join(''));
             }
             //#end

@@ -1061,7 +1061,7 @@ AuraRenderingService.prototype.moveReferencesToMarker = function(marker) {
 
     if(references) {
         var collection = references.get();
-        for(var c=length;c>=0;c--) {
+        for(var c=collection.length;c>=0;c--) {
             var cmp = $A.getComponent(collection[c]);
             if(cmp && !cmp.destroyed) {
                 this.setMarker(cmp, newMarker);

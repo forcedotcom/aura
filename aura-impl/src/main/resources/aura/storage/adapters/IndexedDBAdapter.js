@@ -128,9 +128,10 @@ IndexedDBAdapter.prototype.initialize = function() {
  * Initializes the adapter by setting up the DB and ObjectStore.
  * @param {Number=} version Optional version value for IndexedDB.open(). Set
  *  to a new value if schema needs to change (eg new table, new index).
+ * @param {Object} [transactionTimer] timer measuring open / initialization of db.
  * @private
  */
-IndexedDBAdapter.prototype.initializeInternal = function(version) {
+IndexedDBAdapter.prototype.initializeInternal = function(version, transactionTimer) {
     var dbRequest;
     var that = this;
 
@@ -146,6 +147,10 @@ IndexedDBAdapter.prototype.initializeInternal = function(version) {
         }, IndexedDBAdapter.INITIALIZE_TIMEOUT);
     }
 
+    if (!transactionTimer) {
+        transactionTimer = this.thresholdMetricTimer("performance:storage-indexeddb-open-transaction");
+        transactionTimer.info = {"wasBlocked":false, "wasUpgraded":false};
+    }
     if (version) {
         // version is dynamic because it needs to be incremented when we need to create an objectStore
         // for the current app or cmp. IndexedDB only allows modifications to db or objectStore during
@@ -160,9 +165,10 @@ IndexedDBAdapter.prototype.initializeInternal = function(version) {
         // this is fired if there's a version mismatch. if createTable() doesn't throw
         // then onsuccess() is fired, else onerror() is fired.
         that.createTables(e);
+        transactionTimer.info["wasUpgraded"] = true;
     };
     dbRequest.onsuccess = function(e) {
-        that.setupDB(e);
+        that.setupDB(e, transactionTimer);
     };
     dbRequest.onerror = function(e) {
         // this means we have no storage.
@@ -176,6 +182,7 @@ IndexedDBAdapter.prototype.initializeInternal = function(version) {
     };
     dbRequest.onblocked = function(/*error*/) {
         that.log(IndexedDBAdapter.LOG_LEVEL.INFO, "initializeInternal(): blocked from opening DB, most likely by another open browser tab");
+        transactionTimer.info["wasBlocked"] = true;
     };
 };
 
@@ -260,9 +267,10 @@ IndexedDBAdapter.prototype.sweep = function() {
 /**
  * Initializes the structure with a new DB.
  * @param {Event} event IndexedDB event.
+ * @param {Object} transactionTimer measuring time taken to open/initialize db.
  * @private
  */
-IndexedDBAdapter.prototype.setupDB = function(event) {
+IndexedDBAdapter.prototype.setupDB = function(event, transactionTimer) {
     var db = event.target.result;
     var that = this;
     this.db = db;
@@ -281,9 +289,10 @@ IndexedDBAdapter.prototype.setupDB = function(event) {
         // objectStore does not exist so increment version so we can create it
         var currentVersion = db["version"];
         db.close();
-        this.initializeInternal(currentVersion + 1);
+        this.initializeInternal(currentVersion + 1, transactionTimer);
     } else {
         this.initializeComplete(true);
+        transactionTimer.end(transactionTimer.info);
     }
 };
 

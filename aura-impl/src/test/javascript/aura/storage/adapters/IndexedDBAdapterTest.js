@@ -102,6 +102,9 @@ Test.Aura.Storage.Adapters.IndexedDBAdapterTest = function(){
                     }
                 },
                 location: {}
+            },
+            document: {
+                visibilityState: true
             }
         });
 

@@ -23,6 +23,7 @@ function AuraStorageService(){
     this.adapters = {};
     this.version = "";
     this.isolationKey = "";
+    this.partitionName = "";
 }
 
 /**
@@ -98,7 +99,8 @@ AuraStorageService.prototype.initStorage = function(config) {
          // falsey values, like <auraStorage:init/>'s default empty string, are treated as not specified
         "version": config["version"] ? "" + config["version"] : this.version,
         "isolationKey": this.isolationKey,
-        "autoRefreshInterval":  $A.util.isFiniteNumber(config["autoRefreshInterval"]) && config["autoRefreshInterval"] >= 0 ? config["autoRefreshInterval"] : 30
+        "autoRefreshInterval":  $A.util.isFiniteNumber(config["autoRefreshInterval"]) && config["autoRefreshInterval"] >= 0 ? config["autoRefreshInterval"] : 30,
+        "partitionName": this.partitionName
     };
 
     var adapterName = this.selectAdapter(validatedConfig["persistent"], validatedConfig["secure"]);
@@ -265,6 +267,28 @@ AuraStorageService.prototype.setIsolation = function(isolationKey) {
     delete AuraStorageService.prototype["setIsolation"];
     //#end
 
+};
+
+/**
+ * Sets a name for the table within the storage system.
+ *
+ * This mechanism is typically used to distinguish storage tables from one another
+ * when no context has been set.
+ *
+ * It should only be called once during the application life cycle, since it
+ * will be deleted after invocation in production mode.
+ *
+ * @param {String} partitionName the name to define a table.
+ * @export
+ */
+AuraStorageService.prototype.setPartition = function(partitionName) {
+    // ensure string
+    this.partitionName = "" + (partitionName || "");
+
+    //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    delete AuraStorageService.prototype.setPartitionName;
+    delete AuraStorageService.prototype["setPartitionName"];
+    //#end
 };
 
 Aura.Services.AuraStorageService = AuraStorageService;

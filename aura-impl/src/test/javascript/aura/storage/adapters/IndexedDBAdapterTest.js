@@ -191,6 +191,18 @@ Test.Aura.Storage.Adapters.IndexedDBAdapterTest = function(){
 
             Assert.True(actual);
         }
+
+        [Fact]
+        function PartitionNameSetsTableName() {
+            var partitionName = "partition";
+            var tableName;
+            mocks(function() {
+                var adapter = new Aura.Storage.IndexedDBAdapter({"partitionName": partitionName});
+                tableName = adapter.tableName;
+            });
+
+            Assert.Equal(partitionName, tableName);
+        }
     }
 
 }

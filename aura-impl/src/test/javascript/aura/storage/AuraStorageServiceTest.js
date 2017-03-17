@@ -411,6 +411,17 @@ Test.Aura.Storage.AuraStorageServiceTest = function() {
 
             Assert.Equal(expected, configPassedToAuraStorage.isolationKey);
         }
+
+        [Fact]
+        function PartitionNameNotUseConfigProperty() {
+            var expected = "expected";
+            targetService.partitionName = expected;
+            mockA(function() {
+                targetService.initStorage({name:"name", partitionName:"shouldIgnore"});
+            });
+
+            Assert.Equal(expected, configPassedToAuraStorage.partitionName);
+        }
     }
 
     [Fixture]

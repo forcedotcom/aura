@@ -329,6 +329,11 @@ InteropComponent.prototype.getRenderer = function() {};
 InteropComponent.prototype.getReference = function() {};
 
 /**
+ * @private
+ */
+InteropComponent.prototype.fire = function() {};
+
+/**
  * @public
  * @export
  */
@@ -394,13 +399,6 @@ InteropComponent.prototype.getEvent = function() {
  */
 InteropComponent.prototype.getEventByDescriptor = function() {
     this.raiseInvalidComponentError('getEventByDescriptor', arguments);
-};
-
-/**
- * @private
- */
-InteropComponent.prototype.fire = function() {
-    this.raiseInvalidComponentError('fire', arguments);
 };
 
 /**

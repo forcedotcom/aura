@@ -105,7 +105,7 @@ AuraEventService.prototype.getNewEvent = function(eventDefinition, eventName, so
  * @private
  */
 AuraEventService.prototype.collectBubblePath = function(cmp, queue, visited, isOwner) {
-    if(!cmp || !cmp.isValid()) {
+    if(!cmp || cmp.destroyed===1) {
         // we reached a dead end
         return queue;
     }
@@ -445,7 +445,7 @@ AuraEventService.prototype.getComponentEventHandlers = function(evt, cmp, phase,
     var handlers;
     var eventName = evt.getName();
     // just get event handlers for this cmp, not its super(s)
-    var dispatcher = cmp.isValid() && cmp.getEventDispatcher();
+    var dispatcher = cmp.destroyed!==1 && cmp.getEventDispatcher();
     if (dispatcher) {
 
         // Complex component event handling lives here... be wary
@@ -519,7 +519,7 @@ AuraEventService.prototype.getComponentEventHandlers = function(evt, cmp, phase,
 AuraEventService.prototype.getNonBubblingComponentEventHandlers = function(cmp, evt, phase/*, isOwner*/) {
     var handlers;
     // just get event handlers for this cmp, not its super(s)
-    if(cmp.isValid() && cmp.getDef().getEventDef(evt.getName())) {
+    if(cmp.destroyed!==1 && cmp.getDef().getEventDef(evt.getName())) {
         var dispatcher = cmp.getEventDispatcher();
         if (dispatcher) {
             var handlersObj = dispatcher[evt.getName()];

@@ -22,11 +22,9 @@ function lib() { //eslint-disable-line no-unused-vars
      *  - Anything that looks like a valid hostname followed by a legal TLD suffix.
      *      (RFC 2181 limits each fragment to 64 octets and the whole name to 255 octets)
      *  - Anything that looks like a valid email address (64 characters before the @@ sign and  255 characters afterward)
-     *  - A valid UNC path (each fragment is up to 255 characters and the whole path is 32k characters).
      * The regex has been slightly modified to work in javascript.Major changes include:
      *  - unicode properties in regular expressions are not supported in javascript, so \p{L} has been removed.
-     *  - the <UNC> match has been removed because javascript regular expressions don't support lookbehinds.
-     *    UNC's are still matched with the generic pattern.
+     *  - the <UNC> match has been removed. See W-3679997
      *
      * For more details on how this regex is constructed, refer to UrlUtil.java in core.
      */
@@ -53,8 +51,7 @@ function lib() { //eslint-disable-line no-unused-vars
         "VU|WF|WS|XN--0ZWM56D|XN--11B5BS3A9AJ6G|XN--80AKHBYKNJ4F|XN--9T4B11YI5A|XN--DEBA0AD|XN--FIQS8S|XN--FIQZ9S|XN--G6W251D|" +
         "XN--HGBK6AJ7F53BBA|XN--HLCJ6AYA9ESC7A|XN--J6W193G|XN--JXALPDLP|XN--KGBECHTV|XN--KPRW13D|XN--KPRY57D|XN--MGBAAM7A8H|" +
         "XN--MGBERP4A5D4AR|XN--P1AI|XN--WGBH1C|XN--ZCKZAH|YE|YT|ZA|ZM|ZW))(?:/[\\w\\-=?/.&;:%~,+@#*]{0,2048}(?:[\\w=/+#-]|" +
-        "\\([^\\s()]*\\)))?(?:$|(?=\\.$)|(?=\\.\\s)|(?=[^\\w\\.]))))|((?:\\\\|[A-Za-z]:)(?:\\\\[^/:*?\"<>| \\t\\n\\f\\r]" +
-        "{1,255})+)|([\\w-\\.\\+_]{1,64}@(?:[\\w-]){1,255}(?:\\.[\\w-]{1,255}){1,10})";
+        "\\([^\\s()]*\\)))?(?:$|(?=\\.$)|(?=\\.\\s)|(?=[^\\w\\.]))))|([\\w-\\.\\+_]{1,64}@(?:[\\w-]){1,255}(?:\\.[\\w-]{1,255}){1,10})";
 
     var whitelistedTagsMatchingRegex =
         "(<a[\\s]+[^>]+[^\/]>[\\s\\S]*?<\/a>|<a[\\s]+[^>]+\/>|" +
@@ -82,10 +79,6 @@ function lib() { //eslint-disable-line no-unused-vars
             href = "http://" + href;
         }
         return "<a href=\"" + href + "\" target=\"_blank\">" + match + "</a>";
-    };
-    var createFileLink = function (match) {
-        var href = match.replace(/\\/g,"/");
-        return "<a href=\"file:" + href + "\" target=\"_blank\">" + match + "</a>";
     };
     var createEmailLink = function(match) {
         return "<a href=\"mailto:" + match + "\">" + match + "</a>";
@@ -117,16 +110,13 @@ function lib() { //eslint-disable-line no-unused-vars
             }
 
             var regex = new RegExp(whitelistedTagsMatchingRegex + "|" + linksMatchingRegex, "gi");
-            return text.replace(regex, function(match, tagMatch, hrefMatch, fileMatch, emailMatch) {
+            return text.replace(regex, function(match, tagMatch, hrefMatch, emailMatch) {
                 if (tagMatch) {
                     // if a tag with href was found, don't linkify it.
                     return tagMatch;
                 } else if (hrefMatch) {
                     // got href
                     return createHttpLink(hrefMatch);
-                } else if (fileMatch) {
-                    // got UNC or DOS drive path
-                    return createFileLink(fileMatch);
                 } else if (emailMatch) {
                     // got an email address
                     return createEmailLink(emailMatch);
@@ -141,15 +131,11 @@ function lib() { //eslint-disable-line no-unused-vars
                 text = text.toString();
             }
 
-
             var regex = new RegExp(linksMatchingRegex + "|" + escapeCharacterMatchingRegex, "gi");
-            return text.replace(regex, function(match, hrefMatch, fileMatch, emailMatch, escapeMatch) {
+            return text.replace(regex, function(match, hrefMatch, emailMatch, escapeMatch) {
                 if (hrefMatch) {
                     // got href
                     return createHttpLink(hrefMatch);
-                } else if (fileMatch) {
-                    // got UNC or DOS drive path
-                    return createFileLink(fileMatch);
                 } else if (emailMatch) {
                     // got an email address
                     return createEmailLink(emailMatch);

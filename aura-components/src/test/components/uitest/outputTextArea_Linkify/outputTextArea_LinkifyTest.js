@@ -51,7 +51,7 @@
             this.assertLinksPresent(cmp, "href=\"https://www.salesforce.com\"");
         }
     },
-    
+
     testNoHttpNoWWWLink:{
         attributes : {textValue: 'visit salesforce.com for more details'},
         test: function(cmp){
@@ -63,13 +63,6 @@
         attributes : {textValue: 'visit ftp://user:password@example.com/pub/file.txt for more details'},
         test: function(cmp){
             this.assertLinksPresent(cmp, "href=\"ftp://user:password@example.com/pub/file.txt\"");
-        }
-    },
-
-    testUNCLink:{
-        attributes : {textValue: 'visit \\\\Server\\path for more details'},
-        test: function(cmp){
-            this.assertLinksPresent(cmp, "href=\"file://Server/path\"");
         }
     },
 
@@ -134,7 +127,6 @@
         test: function(cmp){
             this.assertLinksPresent(cmp, "href=\"http://www.salesforce.com/sfdc?attributes=1234#work\"");
             this.assertLinksPresent(cmp, "href=\"http://google.com\"");
-            this.assertLinksPresent(cmp, "href=\"file://Server/path\"");
             this.assertLinksPresent(cmp, "href=\"mailto:dude@aura.com\"");
         }
     },
@@ -148,7 +140,7 @@
             this.assertTextNotPresent(cmp, "href=\"&lt;a href=\"");
         }
     },
-    
+
     testImgInText:{
         attributes : {textValue: 'visit <img src="http://www2.sfdcstatic.com/common/assets/img/logo-tag-company.png"/> or www.salesforce.com for more details'},
         test: function(cmp){
@@ -158,7 +150,7 @@
             this.assertTextNotPresent(cmp, "src=\"&lt;a href=\"");
         }
     },
-    
+
     testNonString : {
         attributes : {textValue: false},
         test: [function(cmp) {

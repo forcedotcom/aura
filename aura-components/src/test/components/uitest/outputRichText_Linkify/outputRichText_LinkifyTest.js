@@ -66,13 +66,6 @@
         }
     },
 
-    testUNCLink:{
-        attributes : {textValue: 'visit \\\\Server\\path for more details'},
-        test: function(cmp){
-            this.assertLinksPresent(cmp, "href=\"file://Server/path\"");
-        }
-    },
-
     testComDomain:{
         attributes : {textValue: 'visit salesforce.com for more details'},
         test: function(cmp){
@@ -134,7 +127,6 @@
         test: function(cmp){
             this.assertLinksPresent(cmp, "href=\"http://www.salesforce.com/sfdc?attributes=1234#work\"");
             this.assertLinksPresent(cmp, "href=\"http://google.com\"");
-            this.assertLinksPresent(cmp, "href=\"file://Server/path\"");
             this.assertLinksPresent(cmp, "href=\"mailto:dude@aura.com\"");
         }
     },

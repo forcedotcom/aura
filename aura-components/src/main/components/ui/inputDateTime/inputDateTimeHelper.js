@@ -443,8 +443,8 @@
 
         return component.get("v.useSingleInput")
             || ($A.util.isEmpty(currentDateString) && $A.util.isEmpty(currentTimeString))
+            || $A.util.isEmpty(component.get("v.value"))
             || this.parseDateTimeInput(false, component, currentDateString, currentTimeString);
-
     },
 
     parseDateTimeInput: function (isUTC, component, dateValue, timeValue) {

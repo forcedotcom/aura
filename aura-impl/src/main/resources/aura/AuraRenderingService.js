@@ -191,6 +191,9 @@ AuraRenderingService.prototype.rerender = function(components) {
         this.visited = undefined;
         this.afterRender(this.afterRenderStack);
         this.afterRenderStack.length=0;
+        for(var r=0;r<components.length;r++){
+            components[r].fire("render");
+        }
     }
 
     return elements;
@@ -221,6 +224,7 @@ AuraRenderingService.prototype.afterRender = function(components) {
             context.setCurrentAccess(cmp);
             try {
                 cmp["afterRender"]();
+                cmp.fire("render");
             } catch (e) {
                 // The after render routine threw an error, so we should
                 //  (a) log the error

@@ -341,8 +341,9 @@ InteropComponentDef.prototype.getModelDef = function() {
  */
 ComponentDef.valueEvents = {
     "change" : "aura:valueChange",
-    "init" : "aura:valueInit",
-    "destroy" : "aura:valueDestroy"
+    "destroy": "aura:valueDestroy",
+    "init"   : "aura:valueInit",
+    "render" : "aura:valueRender"
 };
 
 /**

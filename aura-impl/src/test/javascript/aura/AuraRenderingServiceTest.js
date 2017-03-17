@@ -48,6 +48,7 @@ Test.Aura.AuraRenderingServiceTest = function(){
             afterRender : Stubs.GetMethod("component", null)
         };
         return {
+            fire:function(){},
             getGlobalId : function() { return "1"; },
             getElements : function() { return [ "1" ]; },
             isValid : function() { return valid; },

@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="VALUE" support="GA" access="GLOBAL" description="Indicates that a Value is being destroyed.">
-    <aura:attribute name="value" type="Object" access="GLOBAL" description="The value that is being destroyed."/>
+<aura:event type="VALUE" support="GA" access="GLOBAL" description="Indicates that a component is being destroyed.">
+    <aura:attribute name="value" type="Object" access="GLOBAL" description="The component that is being destroyed."/>
 </aura:event>

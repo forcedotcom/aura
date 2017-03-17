@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="VALUE" support="GA" access="GLOBAL" description="Indicates that a component has been initialized.">
-    <aura:attribute name="value" type="Object" access="GLOBAL" description="The component that initialized."/>
+<aura:event type="VALUE" support="GA" access="GLOBAL" description="Indicates that a component has been rendered.">
+    <aura:attribute name="value" type="Object" access="GLOBAL" description="The component that rendered."/>
 </aura:event>

@@ -165,24 +165,24 @@ public class AuraTestFilter {
             return;
         }
 
-		if (testCaseFilters != null && testCaseFilters.size() > 0) {
-	        final AtomicBoolean handled = new AtomicBoolean(false);
-	        
-	        for (HttpFilter filter : testCaseFilters) {
-	            if (filter == null) {
-	                continue;
-	            }
-	            filter.doFilter((HttpServletRequest) request, (HttpServletResponse) response, (req, res) -> {
-	                innerFilter(req, res, chain);
-	                handled.set(true);
-	            });
-	            if (handled.get()) {
-	                return; // Only 1 filter is allowed to generate a response
-	            }
-	        }
-		}
+        if (testCaseFilters != null && testCaseFilters.size() > 0) {
+            final AtomicBoolean handled = new AtomicBoolean(false);
+            
+            for (HttpFilter filter : testCaseFilters) {
+                if (filter == null) {
+                    continue;
+                }
+                filter.doFilter((HttpServletRequest) request, (HttpServletResponse) response, (req, res) -> {
+                    innerFilter(req, res, chain);
+                    handled.set(true);
+                });
+                if (handled.get()) {
+                    return; // Only 1 filter is allowed to generate a response
+                }
+            }
+        }
 
-		innerFilter(request, response, chain);
+        innerFilter(request, response, chain);
     }
     
     private void innerFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -205,7 +205,6 @@ public class AuraTestFilter {
                     Format format = context.getFormat();
                     switch (format) {
                     case HTML:
-                        LOG.info(this + " jstest request: " + request.getRequestURL() + "?" + request.getQueryString(), new Error());
                         TestCaseDef testDef;
                         String targetUri;
                         try {
@@ -259,7 +258,7 @@ public class AuraTestFilter {
                     }
                 } else if (testToRun != null && testToRun.isEmpty()) {
                     Object origRequest = request.getAttribute(AuraResourceServlet.ORIG_REQUEST_URI);
-                    LOG.error(this + " empty jstestrun: " + request.getRequestURL() + "?" + request.getQueryString()
+                    LOG.error("empty jstestrun: " + request.getRequestURL() + "?" + request.getQueryString()
                             + " original request: " + origRequest, new Error());
                 }
 
@@ -291,6 +290,7 @@ public class AuraTestFilter {
                             Format.HTML, Authentication.AUTHENTICATED.name(), NO_RUN, qs);
                     RequestDispatcher dispatcher = request.getServletContext().getContext(newUri).getRequestDispatcher(newUri);
                     if (dispatcher != null) {
+                        testContextAdapter.release();
                         dispatcher.forward(request, response);
                         return;
                     }
@@ -304,7 +304,7 @@ public class AuraTestFilter {
             testContextAdapter.clear();
         } else {
             if (!contextService.isEstablished()) {
-                LOG.error(this + " Aura context is not established! New context will NOT be created.");
+                LOG.error("Aura context is not established! New context will NOT be created.");
                 chain.doFilter(request, response);
                 return;
             }
@@ -406,7 +406,7 @@ public class AuraTestFilter {
                 }
                 context.addDynamicDef(def);
             } catch (Throwable t) {
-                LOG.error(this + " Failed to add mock " + def, t);
+                LOG.error("Failed to add mock " + def, t);
                 error = true;
             }
         }
@@ -565,38 +565,38 @@ public class AuraTestFilter {
         }
         
         out.append(
-        		String.format(
-        			"var testBootstrapFunction = function(testName, suiteProps, testTimeout) { \n"+
-        					"if(!$A.test.isComplete()) {\n"+
-        						"if(window.sessionStorage) {\n"+
-        							"var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
-        							"sessionStorage.setItem('TestRunStatus',(oldStatus?oldStatus:'')+'Run '+testName+', timeStamp#'+$A.test.time()+'.'); \n"+
-        						"}\n"+
-        						"$A.test.run(testName, suiteProps, testTimeout); \n"+
-        					"} else {\n"+
-        						"if(window.sessionStorage) {\n"+
-        							"var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
-        							"sessionStorage.setItem('TestRunStatus',(oldStatus?oldStatus:'')+'Skip '+testName+', Test Already Complete, timeStamp#'+$A.test.time()+'.'); \n"+
-        						"}\n"+
-        					"}\n"+
-        			"}; \n"+
-        			"if(window && window.Aura && window.Aura.appBootstrapStatus === 'loaded' " +//bootstrap is finished
-        		         "&& window.$A && window.$A.test && window.$A.test.isComplete instanceof Function ) { \n"+//but the test wasn't
-        		         "if(window.sessionStorage) {\n"+
-								//"var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
-								"sessionStorage.setItem('TestRunStatus','Run %s directly, as bootstrap finish before we can push test to its run-after, timeStamp#'+$A.test.time()+'.'); \n"+
-						 "}\n"+
-						 "testBootstrapFunction('%s', %s, '%s'); \n"+
-        			"} else {\n"+
-	        			"if(window.sessionStorage) {\n"+
-							//"var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
-							"sessionStorage.setItem('TestRunStatus','Push %s to bootstrap run after, timeStamp#'+$A.test.time()+'.'); \n"+
-						"}\n"+
-						"window.Aura || (window.Aura = {}); \n"+
-	        			"window.Aura.afterBootstrapReady || (window.Aura.afterBootstrapReady = []); \n"+
-	        			"window.Aura.afterBootstrapReady.push(testBootstrapFunction.bind(this, '%s', %s, '%s')); \n"+
-        			"} \n"
-        			,testName, testName, suiteDef.getCode()+"\t\n", testTimeout, testName, testName, suiteDef.getCode()+"\t\n", testTimeout)
+                String.format(
+                    "var testBootstrapFunction = function(testName, suiteProps, testTimeout) { \n"+
+                            "if(!$A.test.isComplete()) {\n"+
+                                "if(window.sessionStorage) {\n"+
+                                    "var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
+                                    "sessionStorage.setItem('TestRunStatus',(oldStatus?oldStatus:'')+'Run '+testName+', timeStamp#'+$A.test.time()+'.'); \n"+
+                                "}\n"+
+                                "$A.test.run(testName, suiteProps, testTimeout); \n"+
+                            "} else {\n"+
+                                "if(window.sessionStorage) {\n"+
+                                    "var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
+                                    "sessionStorage.setItem('TestRunStatus',(oldStatus?oldStatus:'')+'Skip '+testName+', Test Already Complete, timeStamp#'+$A.test.time()+'.'); \n"+
+                                "}\n"+
+                            "}\n"+
+                    "}; \n"+
+                    "if(window && window.Aura && window.Aura.appBootstrapStatus === 'loaded' " +//bootstrap is finished
+                         "&& window.$A && window.$A.test && window.$A.test.isComplete instanceof Function ) { \n"+//but the test wasn't
+                         "if(window.sessionStorage) {\n"+
+                                //"var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
+                                "sessionStorage.setItem('TestRunStatus','Run %s directly, as bootstrap finish before we can push test to its run-after, timeStamp#'+$A.test.time()+'.'); \n"+
+                         "}\n"+
+                         "testBootstrapFunction('%s', %s, '%s'); \n"+
+                    "} else {\n"+
+                        "if(window.sessionStorage) {\n"+
+                            //"var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
+                            "sessionStorage.setItem('TestRunStatus','Push %s to bootstrap run after, timeStamp#'+$A.test.time()+'.'); \n"+
+                        "}\n"+
+                        "window.Aura || (window.Aura = {}); \n"+
+                        "window.Aura.afterBootstrapReady || (window.Aura.afterBootstrapReady = []); \n"+
+                        "window.Aura.afterBootstrapReady.push(testBootstrapFunction.bind(this, '%s', %s, '%s')); \n"+
+                    "} \n"
+                    ,testName, testName, suiteDef.getCode()+"\t\n", testTimeout, testName, testName, suiteDef.getCode()+"\t\n", testTimeout)
         );
     }
 
@@ -640,19 +640,19 @@ public class AuraTestFilter {
         return null;
     }
 
-	public void addFilter(HttpFilter filter) {
-		synchronized (testCaseFilters) {
-			if (filter != null) {
-				testCaseFilters.add(0, filter);
-			}
-		}
+    public void addFilter(HttpFilter filter) {
+        synchronized (testCaseFilters) {
+            if (filter != null) {
+                testCaseFilters.add(0, filter);
+            }
+        }
     }
     
-	public synchronized void removeFilter(HttpFilter filter) {
-		synchronized (testCaseFilters) {
-			if (filter != null) {
-				testCaseFilters.remove(filter);
-			}
-		}
-	}
+    public synchronized void removeFilter(HttpFilter filter) {
+        synchronized (testCaseFilters) {
+            if (filter != null) {
+                testCaseFilters.remove(filter);
+            }
+        }
+    }
 }

@@ -52,7 +52,7 @@ import com.google.common.collect.ImmutableList;
 public class JavascriptMockActionHandler extends JavascriptMockHandler<ControllerDef> {
     
 
-	@Configuration
+    @Configuration
     public static class ConfigureMockActionInstanceBuilder {
         @Bean(autowire = Autowire.BY_TYPE)
         public InstanceBuilder<Action, ?> mockActionInstanceBuilder() {
@@ -148,7 +148,8 @@ public class JavascriptMockActionHandler extends JavascriptMockHandler<Controlle
     @Override
     protected ControllerDef getDefaultBaseDefinition() throws QuickFixException {
         for (DefDescriptor<ControllerDef> desc : getTargetDescriptor().getDef().getControllerDefDescriptors()) {
-            if ("java".equals(desc.getPrefix())) {
+            String prefix = desc.getPrefix();
+            if ("java".equals(prefix) || "serviceComponent".equals(prefix)) {
                 return desc.getDef();
             }
         }

@@ -196,7 +196,8 @@
 
     setInputValue: function (component, displayValue) {
         var inputElement = this.getInputElement(component);
-        if (!$A.util.isUndefinedOrNull(inputElement)) {
+        if (!$A.util.isUndefinedOrNull(inputElement) && inputElement.value !== displayValue) {
+            // only update value if display value is different.
             inputElement.value = displayValue ? $A.localizationService.translateToLocalizedDigits(displayValue) : "";
         }
     },

@@ -1069,4 +1069,40 @@ Test.Aura.Util.UtilTest = function() {
             Assert.False(actual);
         }
     }
+
+    [Fixture]
+    function getComponentHierarchy() {
+        var mockComponent = function(type) {
+            return {
+                setOwner: function(owner) {this.owner = owner;},
+                getOwner: function() {return this.owner;},
+                getType: function() {return type;}
+            };
+        };
+
+        [Fact]
+        function ReturnsEmptyStringWhenNull() {
+            var expected = '';
+
+            var actual = targetUtil.getComponentHierarchy(null);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ReturnsComponentHierarchyWhenComponentHasOwner() {
+            var a = mockComponent("a");
+            var b = mockComponent("b");
+            var c = mockComponent("c");
+            a.setOwner(b);
+            b.setOwner(c);
+            c.setOwner(c);
+            
+            var expected = "[c]>[b]>[a]";
+
+            var actual = targetUtil.getComponentHierarchy(a);
+
+            Assert.Equal(expected, actual);
+        }
+    }
 };

@@ -2398,6 +2398,25 @@ Aura.Utils.Util.prototype.postMessage = function(targetWindow, argsArray){
 	}
 };
 
+/**
+ * Get a string representation of component hierarchy by calling getOwner and walk up the component tree. 
+ * @param {component} leaf component to walk up the hierarchy
+ * @private
+ */
+Aura.Utils.Util.prototype.getComponentHierarchy = function(component){
+    if (!component) {
+        return '';
+    }
+    var ret = ['['+component.getType()+']'];
+    var owner = component.getOwner();
+    while (owner !== owner.getOwner()) {
+        ret.push('['+owner.getType()+']');
+        owner = owner.getOwner();
+    }
+    ret.push('['+owner.getType()+']');
+    return ret.reverse().join('>');
+};
+
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     /**
      * Gets the aura debug tool component whether in an iframe or not.

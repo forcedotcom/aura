@@ -267,7 +267,7 @@ IfComponent.prototype["helper"] = {
                 owner.getType() + ' ["' + owner.getGlobalId() + '"] ',
                 'needed to clear unrendered body.\n',
                 'More info: https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/perf_warnings_if.htm\n',
-                'Component access stack: ' + $A.getContext().getAccessStackHierarchy()
+                'Component hierarchy: ' + $A.util.getComponentHierarchy(owner)
             ].join(''));
         }
         //#end

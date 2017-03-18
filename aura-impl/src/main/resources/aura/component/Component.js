@@ -1327,7 +1327,7 @@ Component.prototype.trackComponentReplacement = function(prevCmps, key) {
                     actualLeak.length + ' component(s) in ' + owner.getType() + ' ["' + owner.getGlobalId() + '"] ',
                     'have been created and removed before being rendered when calling cmp.set("' + key + '").\n',
                     'More info: https://sfdc.co/performance-aura-component-set\n',
-                    'Component access stack: ' + $A.getContext().getAccessStackHierarchy()
+                    'Component hierarchy: ' + $A.util.getComponentHierarchy(owner)
                 ].join(''));
             }
         };

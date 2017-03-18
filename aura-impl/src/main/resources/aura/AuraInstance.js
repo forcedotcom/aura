@@ -598,7 +598,7 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
 
         if (!$A.initialized) {
             $A.initialized = true;
-            $A.addDefaultEventHandlers(app);
+            $A.addDefaultEventHandlers();
             $A.afterInitHooks();
             $A.finishInit(doNotInitializeServices);
         }
@@ -617,7 +617,7 @@ AuraInstance.prototype.addTearDownHandler = function () {
  * Add default handler to aura:systemError event
  * @private
  */
-AuraInstance.prototype.addDefaultEventHandlers = function (app) {
+AuraInstance.prototype.addDefaultEventHandlers = function () {
     // Add default XSS navigation handler
     $A.addEventHandler("aura:clientRedirect",$A.defaultRedirectHandler);
 

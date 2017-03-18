@@ -1055,8 +1055,11 @@ AuraEventService.prototype.addEventHandler=function(event,handler,phase,includeF
     }
     var component=$A.getContext()&&$A.getContext().getCurrentAccess();
     var globalId=component&&component.globalId;
-    if(!globalId){
+    if(!globalId&&$A.finishedInit){
         throw new Error("$A.addEventHandler: Unable to find current component target. Are you running in Aura scope?");
+    }
+    if(!globalId){
+        globalId="aura:root";
     }
     event=DefDescriptor.normalize(event);
     // JBUCH: TODO: VALIDATE THIS EVENT EXISTS BEFORE ADDING IT
@@ -1114,10 +1117,7 @@ AuraEventService.prototype.addHandler = function(config) {
     //$A.deprecated("$A.eventService.addHandler(config) is no longer supported.","Please use $A.addEventHandler(event,handler,phase,includeFacets) instead.","2016/12/31","2017/07/13");
     var includeFacets=config["includeFacets"];
     includeFacets=includeFacets !== undefined && includeFacets !== null && includeFacets !== false && includeFacets !== 0 && includeFacets !== "false" && includeFacets !== "" && includeFacets !== "f";
-    var context=$A.getContext();
-    context.setCurrentAccess($A.getComponent(config["globalId"]));
     this.addEventHandler(config["event"],config["handler"],config["phase"],includeFacets);
-    context.releaseCurrentAccess();
 };
 
 /**
@@ -1141,17 +1141,26 @@ AuraEventService.prototype.removeEventHandler=function(event,handler,phase) {
         if(phaseHandlers){
             var component=$A.getContext()&&$A.getContext().getCurrentAccess();
             var globalId=component&&component.globalId;
-            if(!globalId){
+            if(!globalId&&$A.finishedInit){
                 throw new Error("$A.removeEventHandler: Unable to find current component target. Are you running in Aura scope?");
             }
+            if(!globalId){
+                globalId="aura:root";
+            }
             var cmpHandlers=phaseHandlers[globalId];
-            if(cmpHandlers){
+            while(cmpHandlers){
                 for(var i=0;i<cmpHandlers.length;i++){
                     if(cmpHandlers[i]===handler||cmpHandlers[i].reference===handler){
                         delete cmpHandlers[i].reference;
                         cmpHandlers.splice(i,1);
                         break;
                     }
+                }
+                if(globalId===$A.getRoot().globalId){
+                    cmpHandlers=phaseHandlers["aura:root"];
+                    globalId=null;
+                }else{
+                    cmpHandlers=null;
                 }
             }
         }

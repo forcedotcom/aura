@@ -618,17 +618,12 @@ AuraInstance.prototype.addTearDownHandler = function () {
  * @private
  */
 AuraInstance.prototype.addDefaultEventHandlers = function (app) {
-    var context=$A.getContext();
-    context.setCurrentAccess(app);
-
     // Add default XSS navigation handler
     $A.addEventHandler("aura:clientRedirect",$A.defaultRedirectHandler);
 
     // Add default error handlers
     $A.addEventHandler("aura:systemError",$A.defaultErrorHandler);
     $A.addEventHandler("aura:customerError",$A.defaultErrorHandler);
-
-    context.releaseCurrentAccess();
 };
 
 /*

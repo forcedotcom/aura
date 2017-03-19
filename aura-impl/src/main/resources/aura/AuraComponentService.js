@@ -54,6 +54,9 @@ function AuraComponentService() {
 
     // Initialize core modules
     this.initCoreModules();
+    
+    // Instrumentation tracking
+    this.trackingCreate = false;
 }
 
 /**
@@ -1682,62 +1685,76 @@ AuraComponentService.prototype.createComponentPriv = function (config, callback)
     var descriptor = this.getDescriptorFromConfig(config["componentDef"]);
     var def = this.getComponentDef({ "descriptor" : descriptor });
     var cmp = null;
-    if($A.clientService.allowAccess(def)) {
-        var classConstructor = this.getComponentClass(descriptor, def);
+    var createMark;
 
-        if (!classConstructor) {
-            var errorMessage = $A.util.format("Component class not found: {0}\n hasClassConstructor: {1}\n hasClassExporter: {2}\n hasSavedComponentConfigs: {3}\n hasComponentDefCreated: {4}", 
-                descriptor, 
-                !!$A.componentService.componentClassRegistry.classConstructors[descriptor],
-                !!$A.componentService.componentClassRegistry.classExporter[descriptor],
-                !!$A.componentService.savedComponentConfigs[descriptor],
-                !!$A.componentService.componentDefRegistry[descriptor]);
-            var auraError = new $A.auraError(errorMessage, null, $A.severity.QUIET);
-            auraError["component"] = descriptor;
-            throw auraError;
-        }
-        try {
-            cmp = new classConstructor(config);
-        } catch (e){
-            if (e instanceof $A.auraError) {
-                throw e;
-            } else {
-                var creationError = new $A.auraError("Component class instance initialization error", e);
-                creationError["component"] = descriptor;
-                throw creationError;
+    if (!this.trackingCreate && descriptor.indexOf("markup://aura") < 0) {
+        createMark = $A.metricsService.mark("component", "create", {"name" : descriptor});
+        this.trackingCreate = true;
+    }
+
+    try {
+        if($A.clientService.allowAccess(def)) {
+            var classConstructor = this.getComponentClass(descriptor, def);
+
+            if (!classConstructor) {
+                var errorMessage = $A.util.format("Component class not found: {0}\n hasClassConstructor: {1}\n hasClassExporter: {2}\n hasSavedComponentConfigs: {3}\n hasComponentDefCreated: {4}", 
+                    descriptor, 
+                    !!$A.componentService.componentClassRegistry.classConstructors[descriptor],
+                    !!$A.componentService.componentClassRegistry.classExporter[descriptor],
+                    !!$A.componentService.savedComponentConfigs[descriptor],
+                    !!$A.componentService.componentDefRegistry[descriptor]);
+                var auraError = new $A.auraError(errorMessage, null, $A.severity.QUIET);
+                auraError["component"] = descriptor;
+                throw auraError;
             }
-        }
-    }else{
-        var context=$A.getContext();
-        var contextCmp = context && context.getCurrentAccess();
-        var message="Access Check Failed! AuraComponentService.createComponentFromConfig(): '" + descriptor + "' is not visible to '" + contextCmp + "'.";
-        if(context.enableAccessChecks) {
-            if(context.logAccessFailures){
-                var ae = new $A.auraError(message);
-                ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
-                ae["componentStack"] = context && context.getAccessStackHierarchy();
-                $A.error(null, ae);
+            try {
+                cmp = new classConstructor(config);
+            } catch (e){
+                if (e instanceof $A.auraError) {
+                    throw e;
+                } else {
+                    var creationError = new $A.auraError("Component class instance initialization error", e);
+                    creationError["component"] = descriptor;
+                    throw creationError;
+                }
             }
         }else{
-            if(context.logAccessFailures){
-                $A.warning(message);
-            }
-            if(def) {
-               cmp = new (this.getComponentClass(descriptor))(config);
+            var context=$A.getContext();
+            var contextCmp = context && context.getCurrentAccess();
+            var message="Access Check Failed! AuraComponentService.createComponentFromConfig(): '" + descriptor + "' is not visible to '" + contextCmp + "'.";
+            if(context.enableAccessChecks) {
+                if(context.logAccessFailures){
+                    var ae = new $A.auraError(message);
+                    ae["component"] = contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName();
+                    ae["componentStack"] = context && context.getAccessStackHierarchy();
+                    $A.error(null, ae);
+                }
+            }else{
+                if(context.logAccessFailures){
+                    $A.warning(message);
+                }
+                if(def) {
+                    cmp = new (this.getComponentClass(descriptor))(config);
+                }
             }
         }
-    }
-    if (callback && $A.util.isFunction(callback)) {
-        if (cmp !== null) {
-            callback(cmp, "SUCCESS");
-        } else {
-            callback(null, "ERROR", "Unknown component '" + descriptor + "'.");
+        if (callback && $A.util.isFunction(callback)) {
+            if (cmp !== null) {
+                callback(cmp, "SUCCESS");
+            } else {
+                callback(null, "ERROR", "Unknown component '" + descriptor + "'.");
+            }
+            return undefined;
+        } else if (cmp !== null) {
+            return cmp;
         }
-        return undefined;
-    } else if (cmp !== null) {
-        return cmp;
+        throw new Error('Definition does not exist on the client for descriptor:'+descriptor);
+    } finally {
+        if (createMark) {
+            this.trackingCreate = false;
+            createMark["duration"] = $A.metricsService.time() - createMark["ts"];
+        }
     }
-    throw new Error('Definition does not exist on the client for descriptor:'+descriptor);
 };
 
 /*

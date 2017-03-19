@@ -267,6 +267,7 @@ window['aura'] = window['$A'];
 // #include aura.metrics.plugins.QueuedActionsMetricsPlugin
 // #include aura.metrics.plugins.AuraContextPlugin
 // #include aura.metrics.plugins.DomHandlersPlugin
+// #include aura.metrics.plugins.ComponentMetricsPlugin
 
 // #include {"excludeModes" : ["PRODUCTION"], "path" : "aura.metrics.plugins.ComponentServiceMetricsPlugin"}
 // #include aura.Logging

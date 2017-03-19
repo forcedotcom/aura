@@ -82,31 +82,28 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
             Map<DefDescriptor<?>, Source<?>> sourceMap = source.getBundledParts();
 
             // loop and get contents of all files in the bundle
-            Source<?> rootClassSource = null;
+            Source<?> baseClassSource = sourceMap.get(descriptor);
+
+            if (baseClassSource == null) {
+                // javascript file of the same name as module is required
+                throw new InvalidDefinitionException("No base javascript for " + descriptor,
+                        new Location(descriptor.getNamespace() + "/" + descriptor.getName(), -1));
+            }
+
+            // compute base js path
+            String baseJSPath = baseClassSource.getSystemId();
+            int start = baseJSPath.lastIndexOf('/', baseJSPath.lastIndexOf('/', baseJSPath.lastIndexOf('/') - 1) - 1);
+            String componentPath = baseJSPath.substring(start + 1);
+
             // source map of sources with absolute file paths as keys
             Map<String,String> fullPathSources = new HashMap<>();
-            String componentPath = null;
-            
+
             for (Map.Entry<DefDescriptor<?>, Source<?>> entry : sourceMap.entrySet()) {
-                DefDescriptor<?> entryDescriptor = entry.getKey();
                 Source<?> entrySource = entry.getValue();
                 String path = entrySource.getSystemId();
-                if (entryDescriptor.getPrefix().equals(DefDescriptor.JAVASCRIPT_PREFIX)) {
-                    if (entryDescriptor.getName().equals(descriptor.getName())) {
-                        rootClassSource = entrySource;
-                        // extract "namespace/name/name.js"
-                        int start = path.lastIndexOf('/', path.lastIndexOf('/', path.lastIndexOf('/') - 1) - 1);
-                        componentPath = path.substring(start + 1);
-                    }
-                }
                 if (entrySource instanceof TextSource) {
                     fullPathSources.put(path, ((TextSource<?>) entrySource).getContents());
                 }
-            }
-            
-            if (componentPath == null) {
-                throw new InvalidDefinitionException("No base javascript for " + descriptor,
-                        new Location(sourceMap.get(descriptor)));
             }
             
             // make source paths relative to the folder that contains the bundle
@@ -122,7 +119,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
             ModuleDefImpl.Builder builder = new ModuleDefImpl.Builder();
 
             // base definition
-            location = new Location(rootClassSource);
+            location = new Location(baseClassSource);
             builder.setDescriptor(descriptor);
             builder.setTagName(descriptor.getDescriptorName());
             builder.setLocation(location);
@@ -133,7 +130,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
                     isInInternalNamespace ? AuraContext.Access.INTERNAL : AuraContext.Access.PUBLIC));
 
             // module
-            builder.setPath(rootClassSource.getSystemId());
+            builder.setPath(baseClassSource.getSystemId());
 
             ModulesCompiler compiler = new ModulesCompilerJ2V8();
             ModulesCompilerData compilerData = compiler.compile(componentPath, sources);

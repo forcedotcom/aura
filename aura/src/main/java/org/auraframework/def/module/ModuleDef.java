@@ -23,6 +23,8 @@ import org.auraframework.def.Definition;
  */
 public interface ModuleDef extends Definition {
 
+    String TEMPLATE_PREFIX = "template";
+
     @Override
     DefDescriptor<ModuleDef> getDescriptor();
 

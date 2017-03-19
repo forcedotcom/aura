@@ -16,12 +16,12 @@
 package org.auraframework.impl.source.file;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.StyleDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -29,81 +29,113 @@ import org.auraframework.service.LoggingService;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.Parser.Format;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.auraframework.system.Source;
 
 import com.google.common.collect.Maps;
 
+import javax.inject.Inject;
+
 @ServiceComponent
 public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
-    
-    @Autowired
+
     private LoggingService loggingService;
 
     @Override
     public boolean isBundleMatch(File base) {
-        if (new File(base, base.getName()+".html").exists()) {
-            return true;
-        }
-        String name = base.getName()+".html";
-        for (File content : base.listFiles()) {
-            if (name.equalsIgnoreCase(content.getName())) {
-                // ERROR!!!
-                return true;
-            }
-        }
-        return false;
+        File baseJs = getFileFromBase(base, ".js");
+        File baseHtml = getFileFromBase(base, ".html");
+        File baseLib = getFileFromBase(base, ".lib");
+        // modules may either have .js or .html so both needs to be the indicator
+        // because it may only have the html or js file
+        // check both html or js and not lib base file to ensure we don't pick up lib bundles
+        return (baseHtml.exists() || baseJs.exists()) && !baseLib.exists();
     }
 
     @Override
     public BundleSource<?> buildBundle(File base) {
         Map<DefDescriptor<?>, Source<?>> sourceMap = Maps.newHashMap();
         String name = base.getName();
-        int len = name.length();
         String namespace = base.getParentFile().getName();
-        DefDescriptor<ModuleDef> modDesc = new DefDescriptorImpl<>("markup", namespace, name, ModuleDef.class);
+        DefDescriptor<ModuleDef> modDesc = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, namespace, name, ModuleDef.class);
+
+        try {
+            File baseJs = getFileFromBase(base, ".js");
+            File baseHtml = getFileFromBase(base, ".html");
+            String moduleDescriptorFilePath = null;
+            if (baseJs.exists()) {
+                sourceMap.put(modDesc, new FileSource<>(modDesc, baseJs, Format.JS));
+                moduleDescriptorFilePath = baseJs.getCanonicalPath();
+            } else if (baseHtml.exists()) {
+                sourceMap.put(modDesc, new FileSource<>(modDesc, baseHtml, Format.XML));
+                moduleDescriptorFilePath = baseHtml.getCanonicalPath();
+            }
+
+            if (moduleDescriptorFilePath != null) {
+                processBundle(base, sourceMap, 0, modDesc, moduleDescriptorFilePath, namespace);
+            }
+        } catch (IOException ignored) {
+            // ignore file path issues
+        }
+
+        return new BundleSourceImpl<ModuleDef>(modDesc, sourceMap);
+    }
+
+    private void processBundle(File base, Map<DefDescriptor<?>, Source<?>> sourceMap, int level,
+                               DefDescriptor<ModuleDef> moduleDescriptor, String moduleDescriptorPath,
+                               String namespace)
+            throws IOException {
 
         for (File file : base.listFiles()) {
+
+            if (file.isDirectory()) {
+                processBundle(file, sourceMap, ++level, moduleDescriptor, moduleDescriptorPath, namespace);
+                continue;
+            }
+
+            if (level == 0 && file.getCanonicalPath().equals(moduleDescriptorPath)) {
+                // skip if first level and module descriptor source is already set
+                // to the current file
+                continue;
+            }
+
             DefDescriptor<?> descriptor = null;
             Format format = null;
-            String fname = file.getName();
-            if (fname.startsWith(name) || fname.toLowerCase().startsWith(name.toLowerCase())) {
-                String postName = fname.substring(len);
-                switch (postName) {
-                case ".html":
-                    descriptor = modDesc;
-                    format = Format.XML;
-                    break;
-                case ".auradoc":
-                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, StyleDef.class);
-                    format = Format.XML;
-                    break;
-                case ".design":
-                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, StyleDef.class);
-                    format = Format.XML;
-                    break;
-                case ".svg":
-                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, StyleDef.class);
-                    format = Format.SVG;
-                    break;
-                default:
-                    break;
-                }
+
+            String fileName = file.getName().toLowerCase();
+            String descriptorName = createDescriptorName(file, moduleDescriptor.getName(), level);
+
+            if (fileName.endsWith(".html")) {
+                descriptor = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, namespace, descriptorName, ModuleDef.class, moduleDescriptor);
+                format = Format.XML;
             }
-            if (descriptor == null && file.getName().toLowerCase().endsWith(".js")) {
-                descriptor = new DefDescriptorImpl<>("js", namespace, FilenameUtils.getBaseName(file.getName()), ModuleDef.class, modDesc);
+            if (descriptor == null && fileName.endsWith(".js")) {
+                descriptor = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, namespace, descriptorName, ModuleDef.class, moduleDescriptor);
                 format = Format.JS;
             }
-            if (descriptor == null && file.getName().toLowerCase().endsWith(".css")) {
-                descriptor = new DefDescriptorImpl<>("css", namespace, FilenameUtils.getBaseName(file.getName()), ModuleDef.class, modDesc);
+            if (descriptor == null && fileName.endsWith(".css")) {
+                descriptor = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, namespace, descriptorName, ModuleDef.class, moduleDescriptor);
                 format = Format.CSS;
             }
             if (descriptor != null) {
                 sourceMap.put(descriptor, new FileSource<>(descriptor, file, format));
-            } else if (!file.isDirectory()){
-                loggingService.warn("unhandled file in MODULE bundle: " + file.getAbsolutePath());
             }
         }
-        return new BundleSourceImpl<ModuleDef>(modDesc, sourceMap);
+    }
+
+    private String createDescriptorName(File file, String baseName, int level) {
+        String name = FilenameUtils.getBaseName(file.getName());
+        for (int i = 0; i < level; i++) {
+            name = file.getParent() + "-" + name;
+        }
+        return baseName + "-" + name;
+    }
+
+    private File getFileFromBase(File base, String extension) {
+        return new File(base, base.getName() + extension);
+    }
+
+    @Inject
+    public void setLoggingService(LoggingService loggingService) {
+        this.loggingService = loggingService;
     }
 }

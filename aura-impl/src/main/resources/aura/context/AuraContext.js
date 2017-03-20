@@ -166,9 +166,6 @@ Aura.Context.AuraContext.prototype.getAccessStackHierarchy=function(){
     }).join(" > ") : null;
 };
 
-/**
- * @export
-*/
 Aura.Context.AuraContext.prototype.setCurrentAccess=function(component){
     if(!component){
         component=this.getCurrentAccess();
@@ -182,9 +179,6 @@ Aura.Context.AuraContext.prototype.setCurrentAccess=function(component){
     }
 };
 
-/**
- *  @export
-*/
 Aura.Context.AuraContext.prototype.releaseCurrentAccess=function(){
     this.accessStack.pop();
 };

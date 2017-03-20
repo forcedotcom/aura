@@ -136,8 +136,7 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
     }
 
     @Override
-    public Map<String, RegisterEventDef> getRegisterEventDefs()
-            throws org.auraframework.throwable.quickfix.QuickFixException {
+    public Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException {
         Map<String, RegisterEventDef> ret = new LinkedHashMap<>();
         for (DefDescriptor<InterfaceDef> extendsDescriptor : extendsDescriptors) {
             InterfaceDef extendsDef = extendsDescriptor.getDef();

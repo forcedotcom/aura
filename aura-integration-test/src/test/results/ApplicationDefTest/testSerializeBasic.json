@@ -1,30 +1,18 @@
 {
-  "s":1,
-  "v":{
-    "xs":"I",
-    "descriptor":"markup://aura:test",
-    "superDef":{
-      "s":2,
-      "v":{
-        "descriptor":"markup://aura:application"
-      }
-    },
-    "attributeDefs":[
-      {
-        "s":3,
-        "v":{
-          "name":"body",
-          "type":"aura://Aura.Component[]",
-          "xs":"G"
-        }
-      }
-    ],
-    "componentClass":"function(){$A.componentService.addComponentClass(\"markup://aura:test\",function() {\nvar aura$test = {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:application\"\n  }\n};\nreturn aura$test;\n});\n}",
-    "locationChangeEventDef":{
-      "s":4,
-      "v":{
-        "descriptor":"markup://aura:locationChange"
-      }
+  "xs":"I",
+  "descriptor":"markup://aura:test",
+  "superDef":{
+    "descriptor":"markup://aura:application"
+  },
+  "attributeDefs":[
+    {
+      "name":"body",
+      "type":"aura://Aura.Component[]",
+      "xs":"G"
     }
+  ],
+  "componentClass":"function(){$A.componentService.addComponentClass(\"markup://aura:test\",function() {\nvar aura$test = {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:application\"\n  }\n};\nreturn aura$test;\n});\n}",
+  "locationChangeEventDef":{
+    "descriptor":"markup://aura:locationChange"
   }
 }

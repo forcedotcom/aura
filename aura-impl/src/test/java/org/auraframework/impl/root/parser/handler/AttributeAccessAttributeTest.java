@@ -18,15 +18,17 @@ package org.auraframework.impl.root.parser.handler;
 import javax.inject.Inject;
 
 import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.util.AuraTestingUtil;
+import org.auraframework.impl.util.AuraTestingUtil.BundleEntryInfo;
 import org.auraframework.service.CompilerService;
-import org.auraframework.system.TextSource;
-import org.auraframework.test.source.StringSourceLoader;
-import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
+import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
+
+import com.google.common.collect.Lists;
 
 
 @UnAdaptableTest("when run in core, we throw error with different type.")
@@ -41,28 +43,28 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	//test default access
     @Test
     public void testAttributeWithDefaultAccessCustomNamespace() throws Exception {
-    	String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String'  /></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
-        
-        compilerService.compile(descriptor, source);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String'  /></aura:component>")
+                    ));
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
     @Test
     public void testAttributeWithEmptyAccessCustomNamespace() throws Exception {
-    	String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access=''/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access=''/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -71,17 +73,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithInvalidAccessCustomNamespace() throws Exception {
-    	String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='BLAH'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='BLAH'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"BLAH\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -90,18 +92,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithInvalidAccessMethodCustomNamespace() throws Exception {
-    	String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.invalid'/></aura:component>";
-    	
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.invalid'/></aura:component>")
+                    ));
         String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.invalid\" must return a result of type org.auraframework.system.AuraContext$Access";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -110,17 +111,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithInvalidAndValidAccessCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, BLAH, GLOBAL'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, BLAH, GLOBAL'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"BLAH\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -129,17 +130,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithStaticAccessAndAccessMethodCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL,org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL,org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute may not specify \"GLOBAL\" when a static method is also specified";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -148,17 +149,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithAuthenticationAndAccessMethodCustomNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal,AUTHENTICATED'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal,AUTHENTICATED'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -172,53 +173,56 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      */
     @Test
     public void testAttributeWithGlobalAccessCustomNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
 
     @Test
     public void testAttributeWithPublicAccessCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
 
     @Test
     public void testAttributeWithPrivateAccessCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVATE'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVATE'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
 
     @Test
     public void testAttributeWithInternalAccessCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='INTERNAL'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='INTERNAL'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"INTERNAL\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -228,17 +232,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 
     @Test
     public void testAttributeWithPrivilegedAccessCustomNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVILEGED'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVILEGED'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"PRIVILEGED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -251,17 +255,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      */
     @Test
     public void testAttributeWithGlobalAccessMethodCustomNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -271,17 +275,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 
     @Test
     public void testAttributeWithPublicAccessMethodCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPublic'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPublic'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -291,17 +295,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 
     @Test
     public void testAttributeWithPrivateAccessMethodCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivate'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivate'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -311,17 +315,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 
     @Test
     public void testAttributeWithPrivilegedAccessMethodCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivileged'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivileged'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -331,17 +335,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	
     @Test
     public void testAttributeWithInternalAccessMethodCustomNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowInternal'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponnet",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowInternal'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -354,17 +358,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      */
     @Test
     public void testAttributeWithGlobalAndPrivateAccessCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, PRIVATE'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, PRIVATE'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute can only specify one of GLOBAL, PUBLIC, or PRIVATE";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -377,14 +381,15 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      */
     @Test
     public void testAttributeWithPublicAndPublicAccessCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC, PUBLIC'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC, PUBLIC'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
 	
 	/*
@@ -392,17 +397,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	 */
     @Test
     public void testComponentWithAuthenticationCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -412,17 +417,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	
     @Test
     public void testComponentWithUnAuthenticationCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='UNAUTHENTICATED'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='UNAUTHENTICATED'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"UNAUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -435,17 +440,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	 */
     @Test
     public void testAttributeWithUnAuthenticationMethodCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'/></aura:component>")
+                    ));
         String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated\" must return a result of type org.auraframework.system.AuraContext$Access";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -458,17 +463,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      */
     @Test
     public void testAttributeWithAuthenticatedAndUnAuthenticationAccessCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,UNAUTHENTICATED'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,UNAUTHENTICATED'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute cannot specify both AUTHENTICATED and UNAUTHENTICATED";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -481,17 +486,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      */
     @Test
     public void testAttributeWithAuthenticatedAndAuthenticationAccessCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,AUTHENTICATED'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,AUTHENTICATED'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -504,17 +509,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      */
     @Test
     public void testAttributeWithAuthenticatedAndGlobalAccessCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,GLOBAL'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,GLOBAL'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -524,17 +529,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	
     @Test
     public void testAttributeWithAuthenticatedAndPrivateAccessCustomNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVATE'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVATE'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -544,17 +549,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	
     @Test
     public void testAttributeWithAuthenticatedAndPublicAccessCustomNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PUBLIC'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PUBLIC'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -564,17 +569,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 
     @Test
     public void testAttributeWithAuthenticatedAndPrivilegedAccessCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVILEGED'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVILEGED'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -584,17 +589,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 
     @Test
     public void testAttributeWithAuthenticatedAndInternalAccessCustomNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,INTERNAL'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":testcomponent",
-                        NamespaceAccess.CUSTOM);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getCustomNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,INTERNAL'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -607,28 +612,29 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	 ************************************************************************************/
     @Test
     public void testAttributeWithDefaultAccessPrivilegedNamespace() throws Exception {
-    	String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String'  /></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String'  /></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
     @Test
     public void testAttributeWithEmptyAccessPrivilegedNamespace() throws Exception {
-    	String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access=''/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access=''/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -637,17 +643,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithInvalidAccessPrivilegedNamespace() throws Exception {
-    	String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='BLAH'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='BLAH'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"BLAH\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -656,17 +662,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithInvalidAccessMethodPrivilegedNamespace() throws Exception {
-    	String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.invalid'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.invalid'/></aura:component>")
+                    ));
         String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.invalid\" must return a result of type org.auraframework.system.AuraContext$Access";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -675,17 +681,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithInvalidAndValidAccessPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, BLAH, GLOBAL'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, BLAH, GLOBAL'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"BLAH\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -694,17 +700,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithStaticAccessAndAccessMethodPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL,org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL,org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute may not specify \"GLOBAL\" when a static method is also specified";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -713,17 +719,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithAuthenticationAndAccessMethodPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal,AUTHENTICATED'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal,AUTHENTICATED'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -737,53 +743,56 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      */
     @Test
     public void testAttributeWithGlobalAccessPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
 
     @Test
     public void testAttributeWithPublicAccessPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
 
     @Test
     public void testAttributeWithPrivateAccessPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVATE'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVATE'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
 
     @Test
     public void testAttributeWithInternalAccessPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='INTERNAL'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='INTERNAL'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"INTERNAL\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -793,14 +802,15 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 
     @Test
     public void testAttributeWithPrivilegedAccessPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVILEGED'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVILEGED'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
 	
 	/*
@@ -808,17 +818,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	 */
     @Test
     public void testAttributeWithGlobalAccessMethodPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponnet",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -828,17 +838,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 
     @Test
     public void testAttributeWithPublicAccessMethodPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPublic'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponnet",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPublic'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -848,17 +858,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 
     @Test
     public void testAttributeWithPrivateAccessMethodPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivate'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponnet",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivate'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -868,17 +878,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 
     @Test
     public void testAttributeWithPrivilegedAccessMethodPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivileged'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponnet",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivileged'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -888,17 +898,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 
     @Test
     public void testAttributeWithInternalAccessMethodPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowInternal'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponnet",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowInternal'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -911,17 +921,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	 */
     @Test
     public void testAttributeWithGlobalAndPrivateAccessPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, PRIVATE'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, PRIVATE'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute can only specify one of GLOBAL, PUBLIC, or PRIVATE";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -934,14 +944,15 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	 */
     @Test
     public void testAttributeWithPublicAndPublicAccessPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC, PUBLIC'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC, PUBLIC'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
 	
 	/*
@@ -949,17 +960,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	 */
     @Test
     public void testComponentWithAuthenticationPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -969,17 +980,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 
     @Test
     public void testComponentWithUnAuthenticationPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='UNAUTHENTICATED'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='UNAUTHENTICATED'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"UNAUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -992,17 +1003,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	 */
     @Test
     public void testAttributeWithUnAuthenticationMethodPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'/></aura:component>")
+                    ));
         String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated\" must return a result of type org.auraframework.system.AuraContext$Access";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1015,17 +1026,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	 */
     @Test
     public void testAttributeWithAuthenticatedAndUnAuthenticationAccessPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,UNAUTHENTICATED'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,UNAUTHENTICATED'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute cannot specify both AUTHENTICATED and UNAUTHENTICATED";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1038,17 +1049,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	 */
     @Test
     public void testAttributeWithAuthenticatedAndAuthenticationAccessPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,AUTHENTICATED'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,AUTHENTICATED'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1061,17 +1072,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 	 */
     @Test
     public void testAttributeWithAuthenticatedAndGlobalAccessPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,GLOBAL'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,GLOBAL'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1081,17 +1092,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 
     @Test
     public void testAttributeWithAuthenticatedAndPrivateAccessPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVATE'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVATE'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1101,17 +1112,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 
     @Test
     public void testAttributeWithAuthenticatedAndPublicAccessPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PUBLIC'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PUBLIC'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1121,17 +1132,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 
     @Test
     public void testAttributeWithAuthenticatedAndPrivilegedAccessPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVILEGED'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVILEGED'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1141,17 +1152,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
 
     @Test
     public void testAttributeWithAuthenticatedAndInternalAccessPrivilegedNamespace() throws Exception {
-		String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,INTERNAL'/></aura:component>";
-    	DefDescriptor<ComponentDef> descriptor = 
-    			getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-        		cmpSource, "privilegedNS:testcomponent",
-                        NamespaceAccess.PRIVILEGED);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getPrivilegedNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,INTERNAL'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1164,28 +1175,29 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      ************************************************************************************/
     @Test
     public void testAttributeWithDefaultAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String'  /></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String'  /></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
     @Test
     public void testAttributeWithEmptyAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access=''/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access=''/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1194,17 +1206,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithInvalidAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='BLAH'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='BLAH'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"BLAH\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1213,18 +1225,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithInvalidAccessMethodInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.invalid'/></aura:component>";
-        
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.invalid'/></aura:component>")
+                    ));
         String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.invalid\" must return a result of type org.auraframework.system.AuraContext$Access";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1233,17 +1244,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithInvalidAndValidAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, BLAH, GLOBAL'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, BLAH, GLOBAL'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"BLAH\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1252,17 +1263,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithStaticAccessAndAccessMethodInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL,org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL,org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute may not specify \"GLOBAL\" when a static method is also specified";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1271,17 +1282,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithAuthenticationAndAccessMethodInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal,AUTHENTICATED'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal,AUTHENTICATED'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1295,58 +1306,63 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      */
     @Test
     public void testAttributeWithGlobalAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
     @Test
     public void testAttributeWithPublicAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
     @Test
     public void testAttributeWithPrivateAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVATE'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVATE'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
     @Test
     public void testAttributeWithInternalAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='INTERNAL'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='INTERNAL'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
     @Test
     public void testAttributeWithPrivilegedAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVILEGED'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='PRIVILEGED'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
     
     /*
@@ -1355,58 +1371,63 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      */
     @Test
     public void testAttributeWithGlobalAccessMethodInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowGlobal'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
     @Test
     public void testAttributeWithPublicAccessMethodInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPublic'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPublic'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
     @Test
     public void testAttributeWithPrivateAccessMethodInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivate'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivate'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
     @Test
     public void testAttributeWithPrivilegedAccessMethodInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivileged'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowPrivileged'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
     @Test
     public void testAttributeWithInternalAccessMethodInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowInternal'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponnet",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowInternal'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
     
     /*
@@ -1414,17 +1435,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      */
     @Test
     public void testAttributeWithGlobalAndPrivateAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, PRIVATE'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='GLOBAL, PRIVATE'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute can only specify one of GLOBAL, PUBLIC, or PRIVATE";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1436,14 +1457,15 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      */
     @Test
     public void testAttributeWithPublicAndPublicAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC, PUBLIC'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='PUBLIC, PUBLIC'/></aura:component>")
+                    ));
         
-        compilerService.compile(descriptor, source);
+        ComponentDef def = compilerService.compile(source.getDescriptor(), source);
+        assertNotNull(def);
     }
     
     /*
@@ -1451,17 +1473,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      */
     @Test
     public void testComponentWithAuthenticationInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1470,17 +1492,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testComponentWithUnAuthenticationInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='UNAUTHENTICATED'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='UNAUTHENTICATED'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"UNAUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1493,17 +1515,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      */
     @Test
     public void testAttributeWithUnAuthenticationMethodInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'/></aura:component>")
+                    ));
         String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated\" must return a result of type org.auraframework.system.AuraContext$Access";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1516,17 +1538,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      */
     @Test
     public void testAttributeWithAuthenticatedAndUnAuthenticationAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,UNAUTHENTICATED'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,UNAUTHENTICATED'/></aura:component>")
+                    ));
         String expectedMsg = "Access attribute cannot specify both AUTHENTICATED and UNAUTHENTICATED";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1539,17 +1561,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      */
     @Test
     public void testAttributeWithAuthenticatedAndAuthenticationAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,AUTHENTICATED'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,AUTHENTICATED'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1562,17 +1584,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      */
     @Test
     public void testAttributeWithAuthenticatedAndGlobalAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,GLOBAL'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,GLOBAL'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1581,17 +1603,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithAuthenticatedAndPrivateAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVATE'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVATE'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1600,17 +1622,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithAuthenticatedAndPublicAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PUBLIC'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PUBLIC'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1619,17 +1641,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithAuthenticatedAndPrivilegedAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVILEGED'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,PRIVILEGED'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1638,17 +1660,17 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     }
     @Test
     public void testAttributeWithAuthenticatedAndInternalAccessInternalNamespace() throws Exception {
-        String cmpSource = "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,INTERNAL'/></aura:component>";
-        DefDescriptor<ComponentDef> descriptor = 
-                getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
-                cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testcomponent",
-                        NamespaceAccess.INTERNAL);
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(descriptor);
+        AuraTestingUtil util = getAuraTestingUtil();
+        Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class, 
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='AUTHENTICATED,INTERNAL'/></aura:component>")
+                    ));
         String expectedMsg = "Invalid access attribute value \"AUTHENTICATED\"";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(descriptor, source);
+            compilerService.compile(source.getDescriptor(), source);
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }

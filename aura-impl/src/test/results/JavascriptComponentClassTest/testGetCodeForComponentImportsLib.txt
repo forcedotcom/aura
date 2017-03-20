@@ -1,0 +1,12 @@
+$A.componentService.addComponentClass("markup://test:testComponent",function() {
+var string$testComponent = {
+  "meta":{
+    "name":"string$testComponent",
+    "extends":"markup://aura:component",
+    "imports":{
+
+    }
+  }
+};
+return string$testComponent;
+});

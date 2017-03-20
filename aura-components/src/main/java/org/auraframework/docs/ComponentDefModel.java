@@ -18,23 +18,24 @@ package org.auraframework.docs;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
-import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LibraryDef;
+import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.ds.servicecomponent.ModelInstance;
@@ -157,15 +158,21 @@ public class ComponentDefModel implements ModelInstance {
             support = rootDef.getSupport().name();
 
             if (definition instanceof RootDefinition) {
+                Map<DefDescriptor<?>,Definition> bundled = ((RootDefinition) definition).getBundledDefs();
                 List<DefDescriptor<?>> deps = ((RootDefinition) definition).getBundle();
 
                 for (DefDescriptor<?> dep : deps) {
                     // we already surface the documentation--users don't need to see the source for it.
-                    if (dep.getDefType() != DefType.DOCUMENTATION) {
+                    if (dep.getDefType() != DefType.DOCUMENTATION && !bundled.containsKey(dep)) {
                         Definition def = definitionService.getDefinition(dep);
                         if (hasAccess(def)) {
                             defs.add(new DefModel(dep));
                         }
+                    }
+                }
+                for (Definition def : ((RootDefinition) definition).getBundledDefs().values()) {
+                    if (def.getDescriptor().getDefType() != DefType.DOCUMENTATION) {
+                        defs.add(new DefModel(def.getDescriptor()));
                     }
                 }
             }

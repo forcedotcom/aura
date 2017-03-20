@@ -15,37 +15,42 @@
  */
 package org.auraframework.tools.definition;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.auraframework.Aura;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorFilter;
-import org.auraframework.impl.source.file.FileSourceLoader;
-import org.auraframework.impl.system.StaticDefRegistryImpl;
-import org.auraframework.service.DefinitionService;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.system.AuraContext.Format;
-import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.DefRegistry;
-import org.auraframework.throwable.quickfix.QuickFixException;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.RootDefinition;
+import org.auraframework.impl.source.BundleSourceImpl;
+import org.auraframework.impl.system.StaticDefRegistryImpl;
+import org.auraframework.service.RegistryService;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.DefRegistry;
+import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Compile components into a set of static registries and write them to a file.
@@ -175,6 +180,12 @@ public class RegistrySerializer {
     @Nonnull
     private final RegistrySerializerLogger logger;
 
+    @Nonnull
+    private final RegistryService registryService;
+
+    @Nonnull
+    private final ConfigAdapter configAdapter;
+
     /**
      * A flag for an error occuring.
      */
@@ -189,8 +200,11 @@ public class RegistrySerializer {
      * @param outputDirectory the output directory where we should write the compiled component '.registry' file.
      * @param excluded a set of excluded namespaces.
      */
-    public RegistrySerializer(@Nonnull File componentDirectory, @Nonnull File outputDirectory,
+    public RegistrySerializer(@Nonnull RegistryService registryService, @Nonnull ConfigAdapter configAdapter,
+            @Nonnull File componentDirectory, @Nonnull File outputDirectory,
             @Nonnull String[] excluded, @CheckForNull RegistrySerializerLogger logger) {
+        this.registryService = registryService;
+        this.configAdapter = configAdapter;
         this.componentDirectory = componentDirectory;
         this.outputDirectory = outputDirectory;
         this.excluded = excluded;
@@ -203,14 +217,24 @@ public class RegistrySerializer {
     /**
      * write out the set of namespace registries to the given output stream.
      *
-     * @param namespaces the namespaces to serialize.
      * @param out the output stream to write into.
      * @throws RegistrySerializerException if there is an error.
      */
-    public void write(@Nonnull Set<String> namespaces, @Nonnull OutputStream out) {
+    public void write(@Nonnull OutputStream out) throws RegistrySerializerException {
         List<DefRegistry> regs = Lists.newArrayList();
+        DefRegistry master = registryService.getRegistry(componentDirectory);
+
+        Set<String> namespaces = master.getNamespaces();
+        if (excluded != null) {
+            for (String x : excluded) {
+                if (!namespaces.remove(x)) {
+                    throw new RegistrySerializerException("Unable to exclude "+x);
+                }
+            }
+        }
+
         for (String name : namespaces) {
-            regs.add(getRegistry(name));
+            regs.add(getRegistry(master, name));
         }
 
         ObjectOutputStream objectOut = null;
@@ -235,21 +259,26 @@ public class RegistrySerializer {
      *
      * @param namespace the namespace for which we want to retrieve a static registry.
      */
-    private DefRegistry getRegistry(@Nonnull String namespace) {
+    private DefRegistry getRegistry(@Nonnull DefRegistry master, @Nonnull String namespace) {
         Set<String> prefixes = Sets.newHashSet();
         Set<DefType> types = Sets.newHashSet();
         Set<DefDescriptor<?>> descriptors;
-        List<Definition> defs = Lists.newArrayList();
-        DefinitionService definitionService = Aura.getDefinitionService();
-        DescriptorFilter root_nsf = new DescriptorFilter(namespace, "*");
-        Map<DefDescriptor<?>, Definition> filtered;
+        Map<DefDescriptor<?>, Definition> filtered = Maps.newHashMap();
         Set<String> namespaces = Sets.newHashSet(namespace);
         AuraContext context = Aura.getContextService().getCurrentContext();
         boolean modulesEnabled = context.isModulesEnabled();
+        configAdapter.addInternalNamespace(namespace);
         //
         // Fetch all matching descriptors for our 'root' definitions.
         //
-        descriptors = definitionService.find(root_nsf);
+        logger.debug("******************************************* "+namespace+" ******************************");
+        DescriptorFilter root_nsf;
+		if (modulesEnabled) {
+			root_nsf = new DescriptorFilter(namespace, Lists.newArrayList(DefType.MODULE));
+		} else {
+			root_nsf = new DescriptorFilter(namespace, Lists.newArrayList(BundleSourceImpl.bundleDefTypes));
+		}
+        descriptors = master.find(root_nsf);
         for (DefDescriptor<?> desc : descriptors) {
             if (modulesEnabled) {
                 if (desc.getDefType() != DefType.MODULE) {
@@ -263,38 +292,33 @@ public class RegistrySerializer {
                 }
             }
             try {
-                Definition def = definitionService.getDefinition(desc);
+                Definition def = master.getDef(desc);
                 if (def == null) {
-                    logger.error("Unable to find "+desc+"@"+desc.getDefType());
+                    logger.error("Unable to find " + desc + "@" + desc.getDefType());
                     error = true;
+                }
+                types.add(desc.getDefType());
+                prefixes.add(desc.getPrefix());
+                logger.debug("ENTRY: " + desc + "@" + desc.getDefType().toString());
+                filtered.put(desc, def);
+                if (def instanceof RootDefinition) {
+                    RootDefinition rd = (RootDefinition) def;
+                    Map<DefDescriptor<?>, Definition> bundled = rd.getBundledDefs();
+                    if (bundled != null) {
+                        for (Map.Entry<DefDescriptor<?>, Definition> entry : bundled.entrySet()) {
+                            logger.debug("ENTRY:\t " + entry.getKey() + "@" + entry.getKey().getDefType().toString());
+                            filtered.put(entry.getKey(), entry.getValue());
+                            types.add(entry.getKey().getDefType());
+                            prefixes.add(entry.getKey().getPrefix());
+                        }
+                    }
                 }
             } catch (QuickFixException qfe) {
                 logger.error(qfe);
                 error = true;
             }
         }
-        //
-        // Now filter the compiled set on the namespace.
-        //
-        Set<DefDescriptor<?>> empty = Sets.newHashSet();
-        filtered = Aura.getContextService().getCurrentContext().filterLocalDefs(empty);
-        logger.debug("******************************************* "+namespace+" ******************************");
-        for (Map.Entry<DefDescriptor<?>,Definition> entry : filtered.entrySet()) {
-            DefDescriptor<?> desc = entry.getKey();
-            Definition def = entry.getValue();
-            // We ignore null here as we don't care about dead ends during compile.
-            if (namespace.equals(desc.getNamespace()) && def != null) {
-                logger.debug("ENTRY: "+desc+"@"+desc.getDefType().toString());
-                types.add(desc.getDefType());
-                prefixes.add(desc.getPrefix());
-                defs.add(def);
-            }
-        }
-        if (defs.size() == 0) {
-            logger.error("No files compiled for "+namespace);
-            error = true;
-        }
-        return new StaticDefRegistryImpl(types, prefixes, namespaces, defs);
+        return new StaticDefRegistryImpl(types, prefixes, namespaces, filtered.values());
     }
 
     public static final String ERR_ARGS_REQUIRED = "Component and Output Directory are both required";
@@ -310,17 +334,6 @@ public class RegistrySerializer {
         if (!componentDirectory.canRead() || !componentDirectory.canWrite() ) {
             throw new RegistrySerializerException("Unable to read/write "+componentDirectory);
         }
-        // Now, get our namespaces.
-        FileSourceLoader fsl = new FileSourceLoader(componentDirectory, null);
-        Set<String> namespaces = fsl.getNamespaces();
-        if (excluded != null) {
-            for (String x : excluded) {
-                if (!namespaces.remove(x)) {
-                    throw new RegistrySerializerException("Unable to exclude "+x);
-                }
-            }
-        }
-
         if (!outputDirectory.exists()) {
             outputDirectory.mkdirs();
         }
@@ -351,9 +364,10 @@ public class RegistrySerializer {
         }
         try {
             AuraContext context = Aura.getContextService().startContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED, null);
-            context.setModulesEnabled(Boolean.valueOf(System.getProperty("aura.modules")));
+            Boolean isModulesEnabled = Boolean.valueOf(System.getProperty("aura.modules"));
+            context.setModulesEnabled(isModulesEnabled);
             try {
-                write(namespaces, out);
+                write(out);
             } finally {
                 Aura.getContextService().endContext();
             }

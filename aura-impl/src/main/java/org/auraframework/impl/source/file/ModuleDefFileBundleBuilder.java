@@ -72,7 +72,7 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
             // ignore file path issues
         }
 
-        return new BundleSourceImpl<ModuleDef>(modDesc, sourceMap);
+        return new BundleSourceImpl<ModuleDef>(modDesc, sourceMap, true);
     }
 
     private void processBundle(File base, Map<DefDescriptor<?>, Source<?>> sourceMap, int level,

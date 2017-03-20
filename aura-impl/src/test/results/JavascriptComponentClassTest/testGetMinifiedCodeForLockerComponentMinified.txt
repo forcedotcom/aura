@@ -1,0 +1,2 @@
+$A.componentService.addComponentClass("markup://test:testComponent",function(){return{meta:{name:"string$testComponent","extends":"markup://aura:component"},controller:{function1:function(a,b,c){a.get("bla")}}}//# sourceURL=components/test/testComponent.js
+});

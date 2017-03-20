@@ -17,15 +17,10 @@
 package org.auraframework.impl.root.component;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.HelperDef;
 import org.auraframework.def.LibraryDefRef;
-import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RendererDef;
 import org.auraframework.impl.javascript.BaseJavascriptClass;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -43,40 +38,108 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
     /**
      * Create a JavaScript identifier from the descriptor.
      */
-    public static String getClientClassName(DefDescriptor<? extends BaseComponentDef> descriptor) {
+    public static String getClientClassName(DefDescriptor<?> descriptor) {
         return (descriptor.getNamespace() + "$" + descriptor.getName()).replaceAll("-", "_");
     }
 
     public static class Builder extends BaseJavascriptClass.Builder {
-
-        private BaseComponentDef componentDef;
         private boolean hasCode = false;
         private String jsDescriptor;
 
-        public Builder setDefinition(BaseComponentDef componentDef) throws QuickFixException {
-            this.componentDef = componentDef;
-            return this;
-        }
+        private Collection<LibraryDefRef> imports;
+        private DefDescriptor<?> descriptor;
+        private DefDescriptor<?> extendsDescriptor;
+        private Location location;
+        private String helperCode;
+        private String controllerCode;
+        private String rendererCode;
+        private String providerCode;
 
         @Override
         protected boolean hasCode() {
             return hasCode;
         }
 
+        /**
+         * @param imports the imports to set
+         */
+        public Builder setImports(Collection<LibraryDefRef> imports) {
+            this.imports = imports;
+            return this;
+        }
+
+        /**
+         * @param descriptor the descriptor to set
+         */
+        public Builder setDescriptor(DefDescriptor<?> descriptor) {
+            this.descriptor = descriptor;
+            return this;
+        }
+
+        /**
+         * @param extendsDescriptor the extendsDescriptor to set
+         */
+        public Builder setExtendsDescriptor(DefDescriptor<?> extendsDescriptor) {
+            this.extendsDescriptor = extendsDescriptor;
+            return this;
+        }
+
         @Override
         protected Location getLocation() {
-            return componentDef.getLocation();
+            return location;
+        }
+
+        /**
+         * @param location the location to set
+         */
+        public Builder setLocation(Location location) {
+            this.location = location;
+            return this;
+        }
+
+        /**
+         * @param helperCode the helperCode to set
+         */
+        public Builder setHelperCode(String helperCode) {
+            this.helperCode = helperCode;
+            return this;
+        }
+
+        /**
+         * @param controllerCode the controllerCode to set
+         */
+        public Builder setControllerCode(String controllerCode) {
+            this.controllerCode = controllerCode;
+            return this;
+        }
+
+        /**
+         * @param rendererCode the rendererCode to set
+         */
+        public Builder setRendererCode(String rendererCode) {
+            this.rendererCode = rendererCode;
+            return this;
+        }
+
+        /**
+         * @param providerCode the providerCode to set
+         */
+        public Builder setProviderCode(String providerCode) {
+            this.providerCode = providerCode;
+            return this;
         }
 
         @Override
         protected String getFilename() {
-            return componentDef.getDescriptor().getQualifiedName();
+            return descriptor.getQualifiedName();
         }
 
         @Override
         protected String generate() throws QuickFixException {
-
-            jsDescriptor = componentDef.getDescriptor().getQualifiedName();
+            if (descriptor == null) {
+                throw new InvalidDefinitionException("No descriptor", getLocation());
+            }
+            jsDescriptor = descriptor.getQualifiedName();
             if (AuraTextUtil.isNullEmptyOrWhitespace(jsDescriptor)) {
                 throw new InvalidDefinitionException("Component classes require a non empty fully qualified name",
                         null);
@@ -129,7 +192,7 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
 
         private void writeObjectVariable(StringBuilder out) throws IOException, QuickFixException {
 
-            String jsClassName = getClientClassName(componentDef.getDescriptor());
+            String jsClassName = getClientClassName(descriptor);
 
             out.append("var ").append(jsClassName).append(" = ");
             writeObjectLiteral(out);
@@ -146,10 +209,9 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
             json.writeMapKey("meta");
             json.writeMapBegin();
 
-            String jsClassName = getClientClassName(componentDef.getDescriptor());
+            String jsClassName = getClientClassName(descriptor);
             json.writeMapEntry("name", jsClassName);
 
-            DefDescriptor<? extends BaseComponentDef> extendsDescriptor = componentDef.getExtendsDescriptor();
             if (extendsDescriptor != null) {
                 String jsExtendsDescriptor = extendsDescriptor.getQualifiedName();
                 json.writeMapEntry("extends", jsExtendsDescriptor);
@@ -161,7 +223,6 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
             // and we need to detect those conflicts earlier in the process.
             // At the very least, an intermediary object "ImportDefSet" should
             // encapsulate the collection's peculiarities.
-            List<LibraryDefRef> imports = componentDef.getImports();
             if (imports != null && !imports.isEmpty()) {
                 json.writeMapKey("imports");
                 json.writeMapBegin();
@@ -177,47 +238,31 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
             hasCode = false;
 
             // TODO: tag line # for controller
-            ControllerDef controlerDef = componentDef.getRemoteControllerDef();
-            if (controlerDef != null) {
-                String controller = controlerDef.getCode();
-                if (!AuraTextUtil.isNullEmptyOrWhitespace(controller)) {
-                    json.writeMapKey("controller");
-                    json.writeLiteral(controller);
-                    hasCode = true;
-                }
+            if (!AuraTextUtil.isNullEmptyOrWhitespace(controllerCode)) {
+                json.writeMapKey("controller");
+                json.writeLiteral(controllerCode);
+                hasCode = true;
             }
 
             // TODO: tag line # for helper
-            HelperDef helperDef = componentDef.getRemoteHelperDef();
-            if (helperDef != null) {
-                String helper = helperDef.getCode();
-                if (!AuraTextUtil.isNullEmptyOrWhitespace(helper)) {
-                    json.writeMapKey("helper");
-                    json.writeLiteral(helper);
-                    hasCode = true;
-                }
+            if (!AuraTextUtil.isNullEmptyOrWhitespace(helperCode)) {
+                json.writeMapKey("helper");
+                json.writeLiteral(helperCode);
+                hasCode = true;
             }
 
             // TODO: tag line # for renderer
-            RendererDef rendererDef = componentDef.getRemoteRendererDef();
-            if (rendererDef != null) {
-                String renderer = rendererDef.getCode();
-                if (!AuraTextUtil.isNullEmptyOrWhitespace(renderer)) {
-                    json.writeMapKey("renderer");
-                    json.writeLiteral(renderer);
-                    hasCode = true;
-                }
+            if (!AuraTextUtil.isNullEmptyOrWhitespace(rendererCode)) {
+                json.writeMapKey("renderer");
+                json.writeLiteral(rendererCode);
+                hasCode = true;
             }
 
             // TODO: tag line # for provider
-            ProviderDef providerDef = componentDef.getRemoteProviderDef();
-            if (providerDef != null) {
-                String provider = providerDef.getCode();
-                if (!AuraTextUtil.isNullEmptyOrWhitespace(provider)) {
-                    json.writeMapKey("provider");
-                    json.writeLiteral(provider);
-                    hasCode = true;
-                }
+            if (!AuraTextUtil.isNullEmptyOrWhitespace(providerCode)) {
+                json.writeMapKey("provider");
+                json.writeLiteral(providerCode);
+                hasCode = true;
             }
 
             out.append("\n}");

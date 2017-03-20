@@ -18,6 +18,7 @@ package org.auraframework.integration.test.css;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.auraframework.def.ActionDef;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TokensDef;
@@ -26,6 +27,10 @@ import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
 import org.auraframework.service.InstanceService;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.junit.Test;
 
 import javax.inject.Inject;
@@ -49,10 +54,10 @@ public class StyleControllerTest extends StyleTestCase {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
 
+        DefDescriptor<ApplicationDef> appDesc = addContextApp("<aura:application/>");
         DefDescriptor<StyleDef> style = addContextAppBundleStyle(".THIS{margin: 10px; color: t(color);}");
-        addContextApp("<aura:application/>");
 
-        Action action = runAction(toApply.getDescriptorName());
+        Action action = runAction(appDesc, toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
         String expected = String.format(".%s {color:green}\n", 
@@ -66,11 +71,11 @@ public class StyleControllerTest extends StyleTestCase {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
 
+        DefDescriptor<ApplicationDef> appDesc = addContextApp("<aura:application/>");
         DefDescriptor<StyleDef> style = addContextAppBundleStyle(
                 "@media screen {.THIS{margin: 10px; color: t(color);}} .THIS {color: red}");
-        addContextApp("<aura:application/>");
 
-        Action action = runAction(toApply.getDescriptorName());
+        Action action = runAction(appDesc, toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
         String expected = String.format("@media screen {\n  .%s {color:green}\n}\n", 
@@ -84,11 +89,11 @@ public class StyleControllerTest extends StyleTestCase {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
 
+        DefDescriptor<ApplicationDef> appDesc = addContextApp("<aura:application/>");
         DefDescriptor<StyleDef> style = addContextAppBundleStyle(
                 "@media screen {.THIS{margin: 10px;}} .THIS {color:t(color)}");
-        addContextApp("<aura:application/>");
 
-        Action action = runAction(toApply.getDescriptorName());
+        Action action = runAction(appDesc, toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
         String expected = String.format(".%s {color:green}\n", 
@@ -102,11 +107,11 @@ public class StyleControllerTest extends StyleTestCase {
         addNsTokens(tokens().token("query", "all and (min-width:300px)"));
         DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("query", "screen"));
 
+        DefDescriptor<ApplicationDef> appDesc = addContextApp("<aura:application/>");
         DefDescriptor<StyleDef> style = addContextAppBundleStyle(
                 "@media t(query) {.THIS{color:red}}");
-        addContextApp("<aura:application/>");
 
-        Action action = runAction(toApply.getDescriptorName());
+        Action action = runAction(appDesc, toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
         String expected = String.format("@media screen {\n  .%s {color:red}\n}\n", 
@@ -120,11 +125,11 @@ public class StyleControllerTest extends StyleTestCase {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
 
+        DefDescriptor<ApplicationDef> appDesc = addContextApp("<aura:application/>");
         DefDescriptor<StyleDef> style = addContextAppBundleStyle(
                 "@media screen {.THIS{color:red}} .THIS{color: t(color);}");
-        addContextApp("<aura:application/>");
 
-        Action action = runAction(toApply.getDescriptorName());
+        Action action = runAction(appDesc, toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
         String expected = String.format(".%s {color:green}\n", 
@@ -137,11 +142,11 @@ public class StyleControllerTest extends StyleTestCase {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
 
+        DefDescriptor<ApplicationDef> appDesc = addContextApp("<aura:application/>");
         DefDescriptor<StyleDef> style = addContextAppBundleStyle(
                 "@if(OTHER) {.THIS{margin: 10px; color: t(color);}} .THIS {color: red}");
-        addContextApp("<aura:application/>");
 
-        Action action = runAction(toApply.getDescriptorName());
+        Action action = runAction(appDesc, toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
         String expected = String.format(".%s {color:green}\n", 
@@ -154,11 +159,11 @@ public class StyleControllerTest extends StyleTestCase {
         addNsTokens(tokens().token("color", "red"));
         DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
 
+        DefDescriptor<ApplicationDef> appDesc = addContextApp("<aura:application/>");
         DefDescriptor<StyleDef> style = addContextAppBundleStyle(
                 "@if(OTHER) {.THIS{margin: 10px}} .THIS {color: t(color)}");
-        addContextApp("<aura:application/>");
 
-        Action action = runAction(toApply.getDescriptorName());
+        Action action = runAction(appDesc, toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
         String expected = String.format(".%s {color:green}\n", 
@@ -175,11 +180,11 @@ public class StyleControllerTest extends StyleTestCase {
         // token overrides color1
         DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color1", "green"));
 
+        DefDescriptor<ApplicationDef> appDesc = addContextApp("<aura:application/>");
         // style points to color2, it should be included because color1 is overridden
         DefDescriptor<StyleDef> style = addContextAppBundleStyle(".THIS{color: t(color2); background: t(color3);}");
-        addContextApp("<aura:application/>");
 
-        Action action = runAction(toApply.getDescriptorName());
+        Action action = runAction(appDesc, toApply.getDescriptorName());
         assertEquals("errors:" + action.getErrors(), State.SUCCESS, action.getState());
 
         String expected = String.format(".%s {color:green}\n", 
@@ -187,7 +192,15 @@ public class StyleControllerTest extends StyleTestCase {
         assertEquals(expected, action.getReturnValue());
     }
 
-    private Action runAction(String descriptor) throws Exception {
+    private Action runAction(DefDescriptor<ApplicationDef> appDesc, String descriptor) throws Exception {
+        // restart the context with the new app
+        if (contextService.isEstablished()) {
+            contextService.endContext();
+        }
+        AuraContext ctx = contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED, appDesc);
+        ctx.setApplicationDescriptor(appDesc);
+        definitionService.updateLoaded(appDesc);
+
         Map<String, Object> params = new HashMap<>();
         params.put("descriptors", Lists.newArrayList(descriptor));
         params.put("extraStyles", ImmutableList.<String>of());

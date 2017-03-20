@@ -15,16 +15,19 @@
  */
 package org.auraframework.tools.definition;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import javax.inject.Inject;
+
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.service.RegistryService;
 import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerException;
 import org.auraframework.util.FileMonitor;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
-
-import javax.inject.Inject;
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 
 public class RegistrySerializerTest extends UnitTestCase {
@@ -32,6 +35,12 @@ public class RegistrySerializerTest extends UnitTestCase {
 
     @Inject
     private FileMonitor fileMonitor;
+
+    @Inject
+    private RegistryService registryService;
+
+    @Inject
+    private ConfigAdapter configAdapter;
 
     @Override
     public void setUp() throws Exception {
@@ -47,7 +56,8 @@ public class RegistrySerializerTest extends UnitTestCase {
 
     @Test
     public void testNullOutput() {
-        RegistrySerializer rs = new RegistrySerializer(null, actb.getComponentsPath().toFile(), null, null);
+        RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter, null,
+                actb.getComponentsPath().toFile(), null, null);
         try {
             rs.execute();
         } catch (RegistrySerializerException mee) {
@@ -60,7 +70,8 @@ public class RegistrySerializerTest extends UnitTestCase {
         File dir = new File(IOUtil.newTempDir("componentDirIsFile"));
         File file = new File(dir, "foo");
         file.createNewFile();
-        RegistrySerializer rs = new RegistrySerializer(file, actb.getComponentsPath().toFile(), null, null);
+        RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter,
+                file, actb.getComponentsPath().toFile(), null, null);
         try {
             rs.execute();
         } catch (RegistrySerializerException mee) {
@@ -72,7 +83,8 @@ public class RegistrySerializerTest extends UnitTestCase {
     @Test
     public void testOutputDirIsFile() throws Exception {
         Path path = Files.createTempFile("badOutput", "foo");
-        RegistrySerializer rs = new RegistrySerializer(actb.getComponentsPath().toFile(), path.toFile(), null, null);
+        RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter,
+                actb.getComponentsPath().toFile(), path.toFile(), null, null);
         try {
             rs.execute();
         } catch (RegistrySerializerException mee) {

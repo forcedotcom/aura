@@ -20,8 +20,10 @@ import java.util.Map;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.StyleDef;
+import org.auraframework.def.SVGDef;
+import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.BundleSource;
@@ -69,15 +71,15 @@ public class InterfaceDefFileBundleBuilder implements FileBundleSourceBuilder {
                     format = Format.XML;
                     break;
                 case ".auradoc":
-                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, StyleDef.class);
+                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, DocumentationDef.class);
                     format = Format.XML;
                     break;
                 case ".design":
-                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, StyleDef.class);
+                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, DesignDef.class);
                     format = Format.XML;
                     break;
                 case ".svg":
-                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, StyleDef.class);
+                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, SVGDef.class);
                     format = Format.SVG;
                     break;
                 default:
@@ -90,6 +92,6 @@ public class InterfaceDefFileBundleBuilder implements FileBundleSourceBuilder {
                 // error
             }
         }
-        return new BundleSourceImpl<InterfaceDef>(intfDesc, sourceMap);
+        return new BundleSourceImpl<InterfaceDef>(intfDesc, sourceMap, true);
     }
 }

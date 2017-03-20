@@ -153,6 +153,10 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
     }
 
     @Override
+    protected void finishDefinition() {
+    }
+
+    @Override
     protected DesignAttributeDef createDefinition() throws QuickFixException {
         return builder.build();
     }

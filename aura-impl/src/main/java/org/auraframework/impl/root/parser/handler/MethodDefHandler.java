@@ -111,6 +111,10 @@ public class MethodDefHandler<P extends RootDefinition> extends ParentedTagHandl
     }
 
     @Override
+    protected void finishDefinition() throws QuickFixException {
+    }
+
+    @Override
     protected MethodDefImpl createDefinition() throws QuickFixException {
         return builder.build();
     }

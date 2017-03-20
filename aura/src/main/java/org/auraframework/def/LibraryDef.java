@@ -17,9 +17,9 @@ package org.auraframework.def;
 
 import java.util.List;
 
-public interface LibraryDef extends RootDefinition, HasJavascriptReferences {
+public interface LibraryDef extends RootDefinition {
 
-	@Override
+    @Override
     DefDescriptor<LibraryDef> getDescriptor();
     
     /**

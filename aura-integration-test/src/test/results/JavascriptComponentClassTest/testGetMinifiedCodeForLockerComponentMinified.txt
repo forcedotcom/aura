@@ -1,2 +1,0 @@
-$A.componentService.addComponentClass("markup://test:testComponent",function(){return{meta:{name:"nonInternal$testComponent","extends":"markup://aura:component"},controller:{funtion1:function(a,b,c){a.get("bla")}}}//# sourceURL=components/test/testComponent.js
-});

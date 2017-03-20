@@ -16,6 +16,8 @@
 package org.auraframework.impl.util;
 
 import java.io.IOException;
+import java.security.SecureRandom;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,22 +30,29 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.impl.source.StringSource;
 import org.auraframework.def.Definition;
+import org.auraframework.impl.source.BundleSourceImpl;
+import org.auraframework.impl.source.StringSource;
+import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.source.StringSourceLoaderImpl.DescriptorInfo;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.BundleSource;
+import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener;
+import org.auraframework.system.TextSource;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.FileMonitor;
 import org.auraframework.util.json.JsonEncoder;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -59,16 +68,33 @@ public class AuraTestingUtil {
     private ConfigAdapter configAdapter;
     private ContextService contextService;
 
+    private final SecureRandom random = new SecureRandom();
+    private final String internalNamespace;
+    private final String privilegedNamespace;
+    private final String customNamespace;
+
     public AuraTestingUtil(FileMonitor fileMonitor, StringSourceLoader stringSourceLoader,
-                           DefinitionService definitionService, ConfigAdapter configAdapter, ContextService contextService) {
+                           DefinitionService definitionService, ConfigAdapter configAdapter,
+                           ContextService contextService) {
         this.fileMonitor = fileMonitor;
         this.stringSourceLoader = stringSourceLoader;
         this.definitionService = definitionService;
         this.configAdapter = configAdapter;
         this.contextService = contextService;
+        //
+        // Setup namespaces
+        //
+        internalNamespace = "ns_internal_"+Math.abs(random.nextLong());
+        configAdapter.addInternalNamespace(internalNamespace);
+        privilegedNamespace = "ns_privileged_"+Math.abs(random.nextLong());
+        configAdapter.addPrivilegedNamespace(privilegedNamespace);
+        customNamespace = "ns_custom_"+Math.abs(random.nextLong());
     }
 
     public AuraTestingUtil() {
+        internalNamespace = null;
+        privilegedNamespace = null;
+        customNamespace = null;
     }
 
     public void tearDown() {
@@ -85,6 +111,27 @@ public class AuraTestingUtil {
      */
     public String getNonce() {
         return Long.toString(nonce.incrementAndGet());
+    }
+
+    /**
+     * @return the internalNamespace
+     */
+    public String getInternalNamespace() {
+        return internalNamespace;
+    }
+
+    /**
+     * @return the privilegedNamespace
+     */
+    public String getPrivilegedNamespace() {
+        return privilegedNamespace;
+    }
+
+    /**
+     * @return the customNamespace
+     */
+    public String getCustomNamespace() {
+        return customNamespace;
     }
 
     /**
@@ -112,7 +159,13 @@ public class AuraTestingUtil {
                 return res;
             }
         }
-        return stringSourceLoader.getSource(descriptor);
+        Source<T> source = stringSourceLoader.getSource(descriptor);
+        if (source instanceof BundleSource) {
+            @SuppressWarnings("unchecked")
+            Source<T> inBundle = (Source<T>)((BundleSource<T>)source).getBundledParts().get(descriptor);
+            return inBundle;
+        }
+        return source;
     }
 
     /**
@@ -141,8 +194,7 @@ public class AuraTestingUtil {
             if (StringSource.class.isAssignableFrom(src.getClass())) {
                 stringSourceLoader.putSource(src.getDescriptor(), content, true);
             } else {
-                // FIXME:
-                throw new RuntimeException("Implement me");
+                throw new RuntimeException("We can only update StringSource, but we got " + src.getClass());
             }
             updated.acquire();
         } catch (InterruptedException e) {
@@ -167,6 +219,19 @@ public class AuraTestingUtil {
         return stringSourceLoader.createStringSourceDescriptor(namePrefix, defClass, bundle);
     }
 
+    /**
+     * Get a descriptor for a bundle part.
+     *   
+     * @param defClass the interface of the type definition
+     * @param bundle the bundle for this descriptor
+     * @return a {@link DefDescriptor} with name that is guaranteed to be unique in the string: namespace.
+     */
+    public <D extends Definition, B extends Definition> DefDescriptor<D> getBundlePartDescriptor(Class<D> defClass,
+            DefDescriptor<B> bundle) {
+        DescriptorInfo descriptorInfo = DescriptorInfo.get(defClass);
+        return descriptorInfo.getDescriptor(definitionService, bundle);
+    }
+    
     /**
      * Convenience method to create a description and load a source in one shot.
      *
@@ -398,5 +463,202 @@ public class AuraTestingUtil {
         }
         sb.setCharAt(3, flip);
         return sb.toString();
+    }
+
+    private Map<DefType, String> prefixMap = new ImmutableMap.Builder<DefType, String>()
+            .put(DefType.COMPONENT, "markup")
+            .put(DefType.APPLICATION, "markup")
+            .put(DefType.EVENT, "markup")
+            .put(DefType.INTERFACE, "markup")
+            .put(DefType.LIBRARY, "markup")
+            .put(DefType.TOKENS, "markup")
+            .put(DefType.MODULE, "markup")
+
+            .put(DefType.DESIGN, "markup")
+            .put(DefType.RENDERER, "js")
+            .put(DefType.PROVIDER, "js")
+            .put(DefType.CONTROLLER, "js")
+            .put(DefType.HELPER, "js")
+            .put(DefType.MODEL, "js")
+            .put(DefType.INCLUDE, "js")
+            .put(DefType.TESTSUITE, "js")
+
+            .put(DefType.STYLE, "css")
+            .put(DefType.FLAVORED_STYLE, "css")
+
+            .put(DefType.DOCUMENTATION, "markup")
+            .put(DefType.EXAMPLE, "markup")
+
+            .put(DefType.SVG, "svg")
+            .build();
+
+    private Map<DefType, Boolean> nameableMap = new ImmutableMap.Builder<DefType, Boolean>()
+            .put(DefType.INCLUDE, Boolean.TRUE)
+            .build();
+
+    private Map<DefType, Parser.Format> formatMap = new ImmutableMap.Builder<DefType, Parser.Format>()
+            .put(DefType.COMPONENT, Parser.Format.XML)
+            .put(DefType.APPLICATION, Parser.Format.XML)
+            .put(DefType.EVENT, Parser.Format.XML)
+            .put(DefType.INTERFACE, Parser.Format.XML)
+            .put(DefType.LIBRARY, Parser.Format.XML)
+            .put(DefType.TOKENS, Parser.Format.XML)
+            .put(DefType.MODULE, Parser.Format.XML)
+
+            .put(DefType.DESIGN, Parser.Format.XML)
+            .put(DefType.RENDERER, Parser.Format.JS)
+            .put(DefType.PROVIDER, Parser.Format.JS)
+            .put(DefType.CONTROLLER, Parser.Format.JS)
+            .put(DefType.HELPER, Parser.Format.JS)
+            .put(DefType.MODEL, Parser.Format.JS)
+            .put(DefType.INCLUDE, Parser.Format.JS)
+            .put(DefType.TESTSUITE, Parser.Format.JS)
+
+            .put(DefType.STYLE, Parser.Format.CSS)
+            .put(DefType.FLAVORED_STYLE, Parser.Format.CSS)
+
+            .put(DefType.DOCUMENTATION, Parser.Format.XML)
+            .put(DefType.EXAMPLE, Parser.Format.XML)
+
+            .put(DefType.SVG, Parser.Format.SVG)
+            .build();
+
+    public static class BundleEntryInfo {
+        private final DefType type;
+        private String name;
+        private final String contents;
+        private DefDescriptor<?> descriptor;
+
+        public BundleEntryInfo(DefType type, String name, String contents) {
+            this.type = type;
+            this.name = name;
+            this.contents = contents;
+        }
+
+        public BundleEntryInfo(DefType type, String contents) {
+            this.type = type;
+            this.contents = contents;
+        }
+
+        /**
+         * @return the type
+         */
+        public DefType getType() {
+            return type;
+        }
+
+        /**
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * @param name the name to set
+         */
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        /**
+         * @return the contents
+         */
+        public String getContents() {
+            return contents;
+        }
+
+        /**
+         * @return the descriptor
+         */
+        public DefDescriptor<?> getDescriptor() {
+            return descriptor;
+        }
+
+        /**
+         * @param descriptor the descriptor to set
+         */
+        public void setDescriptor(DefDescriptor<?> descriptor) {
+            this.descriptor = descriptor;
+        }
+    }
+
+    /**
+     * Build a single text source.
+     *
+     * This is intended for unit testing, or submodule testing. The source provided here is not registered
+     * anywhere and cannot be looked up by aura. This means that it can only be used for sub-unit testing.
+     *
+     * @param namespace the namespace (should be one of the provided ones here) - specifies internal/priveleged/custom
+     * @param defClass the class of the source.
+     * @param contents the contents for the source.
+     */
+    public <D extends Definition> TextSource<D> buildTextSource(String namespace, Class<D> defClass,
+            String contents) {
+        String name;
+        DefType type = DefType.getDefType(defClass);
+        name = "name"+random.nextLong();
+        DefDescriptor<D> descriptor = new DefDescriptorImpl<>(prefixMap.get(type), namespace, name, defClass);
+        return new StringSource<>(descriptor, contents, descriptor.getQualifiedName(), formatMap.get(type));
+    }
+
+    /**
+     * Build a bundle from a map of type to contents, including a static name.
+     *
+     * This builds a simple bundle for testing compilers and def builders. The resulting tests are really
+     * integration tests of everything below the bundle compiler.
+     *
+     * Note that the DefTypes map to a descriptor for a file base bundle part. This means that there are only
+     * JS functional declarations (CONTROLLER, HELPER, RENDERER, PROVIDER, MODEL)
+     *
+     * @param namespace the namespace for building (should be #getInternalNamespace() #getPrivilegedNamespace() or #getCustomNamespace()
+     * @param name the names for building
+     * @param defClass the class of the def to be provided.
+     * @param contents the map of DefType to string contents.
+     */
+    public <D extends Definition> BundleSource<D> buildBundleSource(String namespace, String name,
+            Class<D> defClass, Collection<BundleEntryInfo> contents) {
+        DefDescriptor<D> bundleDescriptor = new DefDescriptorImpl<>("markup", namespace, name, defClass);
+        Map<DefDescriptor<?>, Source<?>> map = Maps.newHashMap();
+
+        for (BundleEntryInfo entry : contents) {
+            // Sort out our name
+            String entryName = name;
+            DefType type = entry.getType();
+            DefDescriptor<D> parent = null;
+            if (Boolean.TRUE.equals(nameableMap.get(type))) {
+                entryName = entry.getName();
+                if (entryName == null) {
+                    entryName = "name"+random.nextLong();
+                }
+                parent = bundleDescriptor;
+            }
+            entry.setName(entryName);
+            DefDescriptor<?> descriptor = new DefDescriptorImpl<>(prefixMap.get(type),
+                    namespace, entryName, type.getPrimaryInterface(), parent);
+            entry.setDescriptor(descriptor);
+            Source<?> source = new StringSource<>(descriptor, entry.getContents(), descriptor.getQualifiedName(),
+                    formatMap.get(type));
+            map.put(descriptor, source);
+        }
+        return new BundleSourceImpl<D>(bundleDescriptor, map, true);
+    }
+
+    /**
+     * Build a bundle from a map of type to contents.
+     *
+     * This builds a simple bundle for testing compilers and def builders. The resulting tests are really
+     * integration tests of everything below the bundle compiler.
+     *
+     * Note that the DefTypes map to a descriptor for a file base bundle part. This means that there are only
+     * JS functional declarations (CONTROLLER, HELPER, RENDERER, PROVIDER, MODEL)
+     *
+     * @param namespace the namespace for building (should be #getInternalNamespace() #getPrivilegedNamespace() or #getCustomNamespace()
+     * @param defClass the class of the def to be provided.
+     * @param contents the map of DefType to string contents.
+     */
+    public <D extends Definition> BundleSource<D> buildBundleSource(String namespace, Class<D> defClass,
+            Collection<BundleEntryInfo> contents) {
+        return buildBundleSource(namespace, "name"+random.nextLong(), defClass, contents);
     }
 }

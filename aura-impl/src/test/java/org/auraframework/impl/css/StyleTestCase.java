@@ -89,12 +89,22 @@ public abstract class StyleTestCase extends AuraImplTestCase {
 
     /** adds a {@link StyleDef} to the namespace with the given source */
     public DefDescriptor<StyleDef> addStyleDef(CharSequence src) {
-        return addSourceAutoCleanup(StyleDef.class, src.toString(), getNs1() + "." + "style");
+        DefDescriptor<ComponentDef> bundle = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>",
+                getNs1() + ":style");
+        DefDescriptor<StyleDef> desc = definitionService.getDefDescriptor(
+                String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, bundle.getNamespace(), bundle.getName()),
+                StyleDef.class, bundle);
+        return addSourceAutoCleanup(desc, src.toString());
     }
 
     /** adds a {@link StyleDef} in the "other" namespace with the given source */
     public DefDescriptor<StyleDef> addStyleDefOtherNamespace(CharSequence src) {
-        return addSourceAutoCleanup(StyleDef.class, src.toString(), getNs2() + "." + "style");
+        DefDescriptor<ComponentDef> bundle = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>",
+                getNs2() + ":style");
+        DefDescriptor<StyleDef> desc = definitionService.getDefDescriptor(
+                String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, bundle.getNamespace(), bundle.getName()),
+                StyleDef.class, bundle);
+        return addSourceAutoCleanup(desc, src.toString());
     }
 
     /** adds a {@link ComponentDef} to the namespace with a basic source */

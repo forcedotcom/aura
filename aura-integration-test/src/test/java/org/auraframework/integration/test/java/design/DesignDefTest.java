@@ -113,7 +113,7 @@ public class DesignDefTest extends AuraImplTestCase {
     @Test
     public void testDesignTemplateWithRegions() throws Exception {
         ComponentDef cmp = definitionService.getDefinition("test:fakeDesign", ComponentDef.class);
-        DesignDef c = definitionService.getDefinition(cmp.getDesignDefDescriptor());
+        DesignDef c = cmp.getDesignDef();
         assertNotNull("DesignDef not found!", c);
         DesignTemplateDef template = c.getDesignTemplateDef();
         assertNotNull("DesignTemplateDef not found!", template);
@@ -148,7 +148,7 @@ public class DesignDefTest extends AuraImplTestCase {
     @Test
     public void testDesignLayoutWithMultipleSectionsAndItems() throws Exception {
         ComponentDef cmp = definitionService.getDefinition("test:fakeDesign", ComponentDef.class);
-        DesignDef c = definitionService.getDefinition(cmp.getDesignDefDescriptor());
+        DesignDef c = cmp.getDesignDef();
         //Get default layout (empty string is default)
         DesignLayoutDef layout = c.getDefaultDesignLayoutDef();
         assertNotNull(layout);
@@ -185,7 +185,7 @@ public class DesignDefTest extends AuraImplTestCase {
     @Test
     public void testDesignOption() throws Exception {
         ComponentDef cmp = definitionService.getDefinition("test:fakeDesign", ComponentDef.class);
-        DesignDef c = definitionService.getDefinition(cmp.getDesignDefDescriptor());
+        DesignDef c = cmp.getDesignDef();
 
         assertNotNull("Expected to receive a value with option", c.getOption("filter").get(0).getValue());
         assertNull("Expected option to return null value", c.getOption("desktopEnabled").get(0).getValue());

@@ -108,6 +108,10 @@ public class ClientLibraryDefHandler<P extends RootDefinition> extends ParentedT
     }
 
     @Override
+    protected void finishDefinition() {
+    }
+
+    @Override
     protected ClientLibraryDef createDefinition() throws QuickFixException {
         return builder.build();
     }

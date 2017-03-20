@@ -49,6 +49,7 @@ import org.auraframework.impl.java.JavaSourceLoader;
 import org.auraframework.impl.source.SourceFactory;
 import org.auraframework.impl.source.file.FileBundleSourceLoader;
 import org.auraframework.impl.source.file.FileSourceLoader;
+import org.auraframework.impl.source.resource.ResourceBundleSourceLoader;
 import org.auraframework.impl.source.resource.ResourceSourceLoader;
 import org.auraframework.impl.system.CompilingDefRegistry;
 import org.auraframework.impl.system.NonCachingDefRegistryImpl;
@@ -139,7 +140,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             DefType.TESTSUITE,
             DefType.TOKENS
             );
-    
+
     private static final Set<String> moduleMarkupPrefixes = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX,
             DefDescriptor.JAVASCRIPT_PREFIX, DefDescriptor.CSS_PREFIX);
 
@@ -268,8 +269,10 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         if (pkg != null) {
             ResourceSourceLoader rsl = new ResourceSourceLoader(pkg);
             markupLoaders.add(rsl);
-            defRegistry = new CompilingDefRegistry(rsl, prefixes, modules ? moduleDefTypes : allMarkupDefTypes, compilerService);
-            markupRegistries.add(defRegistry);
+            markupRegistries.add(new CompilingDefRegistry(rsl, markupPrefixes, markupDefTypes, compilerService));
+            markupRegistries.add(new CompilingDefRegistry(
+                            new ResourceBundleSourceLoader(pkg, fileMonitor, builders),
+                            markupPrefixes, BundleSource.bundleDefTypes, compilerService));
         } else if (location.getComponentSourceDir() != null) {
             File components = location.getComponentSourceDir();
             if (!components.canRead() || !components.canExecute() || !components.isDirectory()) {
@@ -286,7 +289,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
                     markupRegistries.add(defRegistry);
                 }
                 defRegistry = new CompilingDefRegistry(
-                        new FileBundleSourceLoader(components, fileMonitor, builders),
+                            new FileBundleSourceLoader(components, fileMonitor, builders),
                         prefixes, modules ? moduleDefTypes : BundleSource.bundleDefTypes, compilerService);
                 markupRegistries.add(defRegistry);
                 File generatedJavaBase = location.getJavaGeneratedSourceDir();
@@ -441,6 +444,12 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     @Override
     public RegistrySet getRegistrySet(Collection<DefRegistry> registries) {
         return new RegistryTrie(registries);
+    }
+
+    @Override
+    public DefRegistry getRegistry(File directory) {
+        return new CompilingDefRegistry(new FileBundleSourceLoader(directory, fileMonitor, builders),
+                            markupPrefixes, BundleSource.bundleDefTypes, compilerService);
     }
 
     private  Collection<ComponentLocationAdapter> getAllComponentLocationAdapters() {

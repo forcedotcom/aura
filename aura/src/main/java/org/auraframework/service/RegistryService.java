@@ -15,6 +15,7 @@
  */
 package org.auraframework.service;
 
+import java.io.File;
 import java.util.Collection;
 
 import org.auraframework.system.AuraContext.Authentication;
@@ -39,6 +40,17 @@ public interface RegistryService {
      * @return a RegistrySet that can be used and is thread safe.
      */
     RegistrySet getDefaultRegistrySet(Mode mode, Authentication access);
+
+    /**
+     * Get a registry set based on a single directory.
+     *
+     * This is intended for use in compiling modes wehre we want to limit our registry set to just
+     * the local namespaces.
+     *
+     * @param directory the directory to scan.
+     * @return a Registry
+     */
+    DefRegistry getRegistry(File directory);
 
     /**
      * Get a registry set based on a single registry.

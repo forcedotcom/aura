@@ -36,7 +36,6 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.DefinitionServiceImpl;
 import org.auraframework.impl.context.AbstractRegistryAdapterImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefFactoryImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
@@ -57,6 +56,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
@@ -162,8 +162,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     public void testGetDefinitionThrowsExceptionWhenComponentHasInvalidHelper() {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
         DefDescriptor<ComponentDef> cmpDescriptor = addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
-        DefDescriptor<HelperDef> helperDescriptor =
-                DefDescriptorImpl.getAssociateDescriptor(cmpDescriptor, HelperDef.class, DefDescriptor.JAVASCRIPT_PREFIX);
+        DefDescriptor<HelperDef> helperDescriptor = getAuraTestingUtil().getBundlePartDescriptor(HelperDef.class, cmpDescriptor);
         String invalidHelperJs = "({help:function(){ ";
         addSourceAutoCleanup(helperDescriptor, invalidHelperJs);
 
@@ -192,11 +191,14 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     @Test
     public void testGetDefinitionThrowsExceptionWhenComponentUsesInvalidHelperDescriptor() {
         contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-        DefDescriptor<HelperDef> helperDescriptor = addSourceAutoCleanup(HelperDef.class, "({})");
+        DefDescriptor<ComponentDef> cmpDescriptor = getAuraTestingUtil().createStringSourceDescriptor(null, ComponentDef.class, null);
+		DefDescriptor<HelperDef> helperDescriptor = getAuraTestingUtil().getBundlePartDescriptor(HelperDef.class, cmpDescriptor);
+
+        addSourceAutoCleanup(helperDescriptor, "({})");
         // using colon (:) as separator
         String helperAttributeWithInvalidHelperDescriptor = String.format("helper='js://%s:%s'", helperDescriptor.getNamespace(), helperDescriptor.getName());
         String cmpMarkup = String.format(baseComponentTag, helperAttributeWithInvalidHelperDescriptor, "");
-        DefDescriptor<ComponentDef> cmpDescriptor = addSourceAutoCleanup(ComponentDef.class, cmpMarkup);
+        addSourceAutoCleanup(cmpDescriptor, cmpMarkup);
 
         try {
             definitionService.getDefinition(cmpDescriptor.getQualifiedName(), ComponentDef.class);
@@ -862,11 +864,11 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         // Find CSS
         DefDescriptor<ApplicationDef> appWithCss = getAuraTestingUtil().createStringSourceDescriptor(null,
                 ApplicationDef.class, null);
-        DefDescriptor<StyleDef> CSSdesc = definitionService.getDefDescriptor(appWithCss,
-                DefDescriptor.CSS_PREFIX, StyleDef.class);
+		DefDescriptor<StyleDef> CSSdesc = getAuraTestingUtil().getBundlePartDescriptor(StyleDef.class, appWithCss);
         addSourceAutoCleanup(appWithCss, baseContents);
         addSourceAutoCleanup(CSSdesc, ".THIS { background: blue }");
 
+        // TODO: find() is not locating the StyleDef
         assertEquals("find() failed to find both markup and css file in same bundle", 2,
                 definitionService.find(new DescriptorFilter("*://" + appWithCss.getDescriptorName())).size());
         assertEquals("find() did not find CSS file", 1,

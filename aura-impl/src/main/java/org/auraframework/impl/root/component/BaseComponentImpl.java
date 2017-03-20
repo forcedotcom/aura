@@ -267,6 +267,7 @@ BaseComponent<D, I> {
 
         BaseComponentDef def = getComponentDef();
 
+        // FIXME(goliver): what, pray tell, is this for
         DefDescriptor<RendererDef> rendererDesc = def.getRendererDescriptor();
         if ((rendererDesc != null && rendererDesc.getDef().isLocal())) {
             hasLocalDependencies = true;

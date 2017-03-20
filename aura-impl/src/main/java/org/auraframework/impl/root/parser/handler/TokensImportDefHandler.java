@@ -84,6 +84,10 @@ public class TokensImportDefHandler<P extends RootDefinition> extends ParentedTa
     }
 
     @Override
+    protected void finishDefinition() throws QuickFixException {
+    }
+
+    @Override
     protected TokensImportDef createDefinition() throws QuickFixException {
         return builder.build();
     }

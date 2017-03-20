@@ -34,6 +34,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.FlavorsDef;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.TokenDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.expression.Expression;
@@ -62,7 +63,7 @@ import com.google.common.collect.Maps;
 public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> implements ApplicationDef {
 
     private static final long serialVersionUID = 9044177107921912717L;
-	
+    
     private final DefDescriptor<EventDef> locationChangeEventDescriptor;
     private final List<DefDescriptor<ComponentDef>> trackedDependencies;
     private final Boolean isAppcacheEnabled;
@@ -133,10 +134,10 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         }
 
         public void addTrackedDependency(DefDescriptor<ComponentDef> trackedDef) {
-        	if (this.trackedDependency == null) {
-        		 this.trackedDependency = new ArrayList<>();
-        	}
-        	this.trackedDependency.add(trackedDef);
+            if (this.trackedDependency == null) {
+                 this.trackedDependency = new ArrayList<>();
+            }
+            this.trackedDependency.add(trackedDef);
         }
     }
 
@@ -159,7 +160,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
     @Override
     public List<DefDescriptor<ComponentDef>> getTrackedDependencies() {
-    	return trackedDependencies;
+        return trackedDependencies;
     }
     
     @Override

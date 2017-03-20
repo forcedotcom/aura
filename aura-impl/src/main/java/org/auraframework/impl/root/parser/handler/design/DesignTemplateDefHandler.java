@@ -99,6 +99,10 @@ public class DesignTemplateDefHandler extends ParentedTagHandler<DesignTemplateD
     }
 
     @Override
+    protected void finishDefinition() {
+    }
+
+    @Override
     protected DesignTemplateDef createDefinition() throws QuickFixException {
         return builder.build();
     }

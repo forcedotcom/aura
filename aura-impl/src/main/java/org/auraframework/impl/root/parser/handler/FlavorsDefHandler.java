@@ -103,6 +103,10 @@ public class FlavorsDefHandler extends RootTagHandler<FlavorsDef> {
     }
 
     @Override
+    protected void finishDefinition() throws QuickFixException {
+    }
+
+    @Override
     protected FlavorsDef createDefinition() throws QuickFixException {
         return builder.build();
     }

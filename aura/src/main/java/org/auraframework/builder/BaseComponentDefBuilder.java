@@ -15,16 +15,22 @@
  */
 package org.auraframework.builder;
 
+import java.util.Collection;
+
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseComponentDef.RenderType;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DependencyDef;
 import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.LocatorDef;
 import org.auraframework.def.ModelDef;
+import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
@@ -47,13 +53,33 @@ public interface BaseComponentDefBuilder<T extends BaseComponentDef> extends Roo
 
     BaseComponentDefBuilder<T> setTemplate(String templateName);
 
+    BaseComponentDefBuilder<T> setStyleDefExternal(DefDescriptor<StyleDef> styleDefDescriptor);
+
     BaseComponentDefBuilder<T> setStyleDef(StyleDef styleDef);
 
-    BaseComponentDefBuilder<T> addRendererDef(RendererDef rendererDef);
+    /**
+     * Add a renderer descriptor.
+     */
+    BaseComponentDefBuilder<T> addRendererDescriptor(DefDescriptor<RendererDef> rendererDef);
 
-    BaseComponentDefBuilder<T> addControllerDef(ControllerDef controllerDef);
+    /**
+     * Add a controller descriptor.
+     */
+    BaseComponentDefBuilder<T> addControllerDescriptor(DefDescriptor<ControllerDef> controllerDef);
 
-    BaseComponentDefBuilder<T> addInterfaceDef(InterfaceDef interfaceDef);
+    /**
+     * Add an interface descriptor.
+     *
+     * @param interfaceDef the interface descriptor to add.
+     */
+    BaseComponentDefBuilder<T> addInterfaceDescriptor(DefDescriptor<InterfaceDef> interfaceDef);
+
+    /**
+     * Add a helper descriptor.
+     *
+     * @param helperDef the helper descriptor to add.
+     */
+    BaseComponentDefBuilder<T> addHelperDescriptor(DefDescriptor<HelperDef> helperDef);
 
     BaseComponentDefBuilder<T> setRenderType(RenderType renderType);
 
@@ -64,6 +90,12 @@ public interface BaseComponentDefBuilder<T extends BaseComponentDef> extends Roo
     BaseComponentDefBuilder<T> addLocatorDef(LocatorDef locator);
 
     BaseComponentDefBuilder<T> setExtendsDescriptor(DefDescriptor<T> extendsDescriptor);
+
+    DefDescriptor<T> getExtendsDescriptor();
+
+    BaseComponentDefBuilder<T> addLibraryImport(LibraryDefRef newImport);
+
+    Collection<LibraryDefRef> getLibraryImports();
 
     /**
      * Specifies the default flavor (the name of a flavor in the component bundle flavor def).
@@ -84,4 +116,23 @@ public interface BaseComponentDefBuilder<T extends BaseComponentDef> extends Roo
      * Specifies whether this component is dynamically flavorable.
      */
     BaseComponentDefBuilder<T> setDynamicallyFlavorable(boolean dynamicallyFlavorable);
+
+    BaseComponentDefBuilder<T> setClientModelDef(ModelDef clientModelDef);
+    BaseComponentDefBuilder<T> setClientRendererDef(RendererDef clientRendererDef);
+    BaseComponentDefBuilder<T> setClientHelperDef(HelperDef clientHelperDef);
+    BaseComponentDefBuilder<T> setClientControllerDef(ControllerDef clientControllerDef);
+    BaseComponentDefBuilder<T> setClientProviderDef(ProviderDef clientProviderDef);
+    BaseComponentDefBuilder<T> setFlavoredStyle(FlavoredStyleDef flavoredStyle);
+
+    ModelDef getClientModelDef();
+    RendererDef getClientRendererDef();
+    HelperDef getClientHelperDef();
+    ControllerDef getClientControllerDef();
+    ProviderDef getClientProviderDef();
+
+    BaseComponentDefBuilder<T> setMinifyEnabled(boolean minify);
+
+    BaseComponentDefBuilder<T> addDependency(DependencyDef dependency);
+
+    void finish();
 }

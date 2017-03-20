@@ -90,6 +90,6 @@ public class TokensDefFileBundleBuilder implements FileBundleSourceBuilder {
                 // error
             }
         }
-        return new BundleSourceImpl<TokensDef>(tokensDesc, sourceMap);
+        return new BundleSourceImpl<TokensDef>(tokensDesc, sourceMap, true);
     }
 }

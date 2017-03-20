@@ -15,7 +15,15 @@
  */
 package org.auraframework.impl.test.util;
 
-import com.google.common.collect.ImmutableList;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDef.SerializeToType;
@@ -75,14 +83,8 @@ import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 /**
  * Utility to easily get aura objects.
@@ -114,10 +116,6 @@ public class AuraImplUnitTestingUtil {
 
     public String getAttributeValue() {
         return defaultAttributeValue;
-    }
-
-    public DefDescriptor<RendererDef> getRendererDescriptor() {
-        return definitionService.getDefDescriptor("js://test.renderer", RendererDef.class);
     }
 
     public DefDescriptor<StyleDef> getStyleDescriptor() {
@@ -597,8 +595,8 @@ public class AuraImplUnitTestingUtil {
         builder.eventHandlers = eventHandlers;
         builder.events = eventDefs;
         builder.interfaces = interfaces;
-        builder.rendererDescriptors = renderers;
-        builder.helperDescriptors = helpers;
+        builder.rendererDescriptors = renderers == null ? null : Lists.newArrayList(renderers);
+        builder.helperDescriptors = helpers == null ? null : Lists.newArrayList(helpers);
         builder.setAccess(access != null ? new DefinitionAccessImpl(access) : null);
         return builder.build();
     }
@@ -659,10 +657,10 @@ public class AuraImplUnitTestingUtil {
                 : extendsDescriptor;
         builder.interfaces = interfaces;
         builder.eventHandlers = eventHandlers;
-        builder.styleDescriptor = styleDescriptor == null ? getStyleDescriptor()
-                : styleDescriptor;
-        builder.addRenderer(rendererDescriptor == null ? getRendererDescriptor()
-                .getQualifiedName() : rendererDescriptor.getQualifiedName());
+        //builder.styleDescriptor = styleDescriptor == null ? getStyleDescriptor()
+        //        : styleDescriptor;
+        builder.addRendererDescriptor(rendererDescriptor == null
+                ? definitionService.getDefDescriptor("java://test.renderer", RendererDef.class) : rendererDescriptor);
         builder.isAbstract = isAbstract;
         builder.isExtensible = isExtensible;
         return builder.build();

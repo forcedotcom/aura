@@ -113,6 +113,10 @@ public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
     }
 
     @Override
+    protected void finishDefinition() {
+    }
+
+    @Override
     protected DocumentationDef createDefinition() throws QuickFixException {
         return builder.build();
     }

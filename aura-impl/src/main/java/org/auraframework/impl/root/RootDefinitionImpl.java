@@ -18,10 +18,12 @@ package org.auraframework.impl.root;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RequiredVersionDef;
@@ -29,6 +31,7 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.text.Hash;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -45,23 +48,22 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
     protected final Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
     protected final Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs;
     protected final List<DefDescriptor<ProviderDef>> providerDescriptors;
-    protected final DefDescriptor<DocumentationDef> documentationDescriptor;
+    protected final DocumentationDef documentationDef;
     private final int hashCode;
     private final SupportLevel support;
+    private final Map<DefDescriptor<?>, Definition> bundledDefs;
 
     protected RootDefinitionImpl(Builder<T> builder) {
         super(builder);
         if (builder.attributeDefs == null || builder.attributeDefs.size() == 0) {
             this.attributeDefs = ImmutableMap.of();
         } else {
-            this.attributeDefs = Collections
-                    .unmodifiableMap(new LinkedHashMap<>(builder.attributeDefs));
+            this.attributeDefs = Collections.unmodifiableMap(new LinkedHashMap<>(builder.attributeDefs));
         }
         if (builder.requiredVersionDefs == null || builder.requiredVersionDefs.size() == 0) {
             this.requiredVersionDefs = ImmutableMap.of();
         } else {
-            this.requiredVersionDefs = Collections
-                    .unmodifiableMap(new LinkedHashMap<>(builder.requiredVersionDefs));
+            this.requiredVersionDefs = Collections.unmodifiableMap(new LinkedHashMap<>(builder.requiredVersionDefs));
         }
         this.providerDescriptors = AuraUtil.immutableList(builder.providerDescriptors);
 
@@ -71,8 +73,8 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
             support = builder.support;
         }
 
-        this.documentationDescriptor = builder.documentationDescriptor;
-
+        this.documentationDef = builder.documentationDef;
+        this.bundledDefs = builder.bundledDefs;
         this.hashCode = AuraUtil.hashCode(descriptor, location, attributeDefs, requiredVersionDefs);
     }
 
@@ -89,6 +91,45 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         }
         for (AttributeDef attr : attributeDefs.values()) {
             attr.appendDependencies(dependencies);
+        }
+        if (bundledDefs != null) {
+            for (Definition def : bundledDefs.values()) {
+                if (def != null) {
+                    def.appendDependencies(dependencies);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void retrieveLabels() throws QuickFixException {
+        super.retrieveLabels();
+        if (bundledDefs != null) {
+            for (Definition def : bundledDefs.values()) {
+                if (def != null) {
+                    def.retrieveLabels();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void validateDefinition() throws QuickFixException {
+        super.validateDefinition();
+        if (bundledDefs != null) {
+            for (Definition def : bundledDefs.values()) {
+                if (def != null) {
+                    def.validateDefinition();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void validateReferences() throws QuickFixException {
+        super.validateReferences();
+        for (Definition def : bundledDefs.values()) {
+            def.validateReferences();
         }
     }
 
@@ -120,7 +161,8 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs;
         public List<DefDescriptor<ProviderDef>> providerDescriptors;
         private SupportLevel support;
-        private DefDescriptor<DocumentationDef> documentationDescriptor;
+        private DocumentationDef documentationDef;
+        private Map<DefDescriptor<?>,Definition> bundledDefs = Maps.newHashMap();
 
         public Builder(Class<T> defClass) {
             super(defClass);
@@ -135,8 +177,30 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
             this.providerDescriptors.add(Aura.getDefinitionService().getDefDescriptor(name, ProviderDef.class));
         }
 
-        public Builder<T> setDocumentation(String name) {
-            documentationDescriptor = Aura.getDefinitionService().getDefDescriptor(name, DocumentationDef.class);
+        @Override
+        public String getOwnHash() {
+            String working = super.getOwnHash();
+            if (bundledDefs != null) {
+                StringBuffer hashAcc = new StringBuffer();
+
+                hashAcc.append(working);
+                for (Map.Entry<DefDescriptor<?>,Definition> entry : this.bundledDefs.entrySet()) {
+                    hashAcc.append("|");
+                    hashAcc.append(entry.getKey());
+                    if (entry.getValue() != null) {
+                        hashAcc.append("=");
+                        hashAcc.append(entry.getValue().getOwnHash());
+                    }
+                }
+                working = new Hash(hashAcc.toString().getBytes()).toString();
+            }
+            return working;
+        }
+
+
+        @Override
+        public Builder<T> setDocumentationDef(DocumentationDef def) {
+            documentationDef = def;
             return this;
         }
 
@@ -178,6 +242,12 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         @Override
         public Builder<T> setSupport(SupportLevel support) {
             this.support = support;
+            return this;
+        }
+
+        @Override
+        public Builder<T> setBundledDefs(Map<DefDescriptor<?>, Definition> bundledDefs) {
+            this.bundledDefs = bundledDefs;
             return this;
         }
     }
@@ -240,11 +310,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
      */
     @Override
     public DocumentationDef getDocumentationDef() throws QuickFixException {
-        DocumentationDef def = null;
-        if (documentationDescriptor != null) {
-            def = documentationDescriptor.getDef();
-        }
-        return def;
+        return documentationDef;
     }
 
     /**
@@ -261,5 +327,16 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
             return providerDef != null;
         }
         return true;
+    }
+
+    @Override
+    public Map<DefDescriptor<?>, Definition> getBundledDefs() {
+        return Collections.unmodifiableMap(bundledDefs);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <X extends Definition> X getBundledDefinition(DefDescriptor<X> descriptor) {
+        return (X)bundledDefs.get(descriptor);
     }
 }

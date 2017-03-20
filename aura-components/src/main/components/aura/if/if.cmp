@@ -16,7 +16,7 @@
 
 -->
 <aura:component support="GA" implements="aura:rootComponent"
-    renderer="js://aura.component, java://org.auraframework.components.aura.ProvidedBodyRenderer"
+    renderer="js://aura.if, java://org.auraframework.components.aura.ProvidedBodyRenderer"
     provider="java://org.auraframework.impl.root.component.IfProvider, js://aura.if"
     access="GLOBAL"
     description="Conditionally instantiates and renders either the body or the components in the else attribute.">

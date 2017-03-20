@@ -84,6 +84,10 @@ public class MetaDefHandler<P extends RootDefinition> extends ParentedTagHandler
     }
 
     @Override
+    protected void finishDefinition() throws QuickFixException {
+    }
+
+    @Override
     protected MetaDefImpl createDefinition() throws QuickFixException {
         return builder.build();
     }

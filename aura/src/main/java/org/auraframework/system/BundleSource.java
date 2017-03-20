@@ -41,8 +41,18 @@ public interface BundleSource<D extends Definition> extends Source<D> {
      */
     Map<DefDescriptor<?>,Source<?>> getBundledParts();
 
+
+    /**
+     * Should we trade off time vs size?.
+     *
+     * If this returns true, we will do additional minimization on the code. This costs us time
+     * when compiling the source, but makes the result smaller and possibly faster, and also allows
+     * us to do further validation.
+     */
+    boolean isMinifyEnabled();
+
     // This is temporary while we create bundles.
     public static final Set<DefType> bundleDefTypes = new ImmutableSet.Builder<DefType>()
         .add(DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT,
-                DefType.INTERFACE, DefType.LIBRARY).build();
+                DefType.INTERFACE, DefType.LIBRARY, DefType.TOKENS, DefType.FLAVOR_BUNDLE).build();
 }

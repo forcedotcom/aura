@@ -17,6 +17,7 @@ package org.auraframework.impl.root;
 
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.RootDefinition.SupportLevel;
@@ -32,12 +33,14 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 public abstract class RootDefinitionTest<T extends RootDefinition> extends DefinitionTest<T> {
-    private final Class<T> defClass;
+    protected final Class<T> defClass;
+    protected final DefType defType;
     protected final String baseTag;
 
     public RootDefinitionTest(Class<T> defClass, String tag) {
         this.defClass = defClass;
         this.baseTag = "<" + tag + " %s>%s</" + tag + ">";
+        this.defType = DefType.getDefType(defClass);
     }
 
     protected Class<T> getDefClass() {

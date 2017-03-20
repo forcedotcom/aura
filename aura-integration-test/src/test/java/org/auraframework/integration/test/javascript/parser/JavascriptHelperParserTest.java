@@ -50,7 +50,7 @@ public class JavascriptHelperParserTest extends AuraImplTestCase {
             "    }\n" +
             "})";
         DefDescriptor<HelperDef> helperDesc = addSourceAutoCleanup(HelperDef.class, helperJs);
-        TextSource<HelperDef> source = loader.getSource(helperDesc);
+        TextSource<HelperDef> source = (TextSource<HelperDef>)loader.getSource(helperDesc);
 
         HelperDef helperDef = new JavascriptHelperParser().getDefinition(helperDesc, source);
 
@@ -76,7 +76,7 @@ public class JavascriptHelperParserTest extends AuraImplTestCase {
             "    }\n" +
             "})";
         DefDescriptor<HelperDef> helperDesc = addSourceAutoCleanup(HelperDef.class, helperJs);
-        TextSource<HelperDef> source = loader.getSource(helperDesc);
+        TextSource<HelperDef> source = (TextSource<HelperDef>)loader.getSource(helperDesc);
 
         HelperDef helperDef = new JavascriptHelperParser().getDefinition(helperDesc, source);
 
@@ -95,7 +95,7 @@ public class JavascriptHelperParserTest extends AuraImplTestCase {
                 "    function1: function(cmp) {var v = 2;}\n" +
                 "})";
         DefDescriptor<HelperDef> helperDesc = addSourceAutoCleanup(HelperDef.class, helperJs);
-        TextSource<HelperDef> source = loader.getSource(helperDesc);
+        TextSource<HelperDef> source = (TextSource<HelperDef>)loader.getSource(helperDesc);
 
         HelperDef helperDef = new JavascriptHelperParser().getDefinition(helperDesc, source);
 
@@ -113,7 +113,7 @@ public class JavascriptHelperParserTest extends AuraImplTestCase {
                 "    foo: 'do NOthing'\n"+
                 "})";
         DefDescriptor<HelperDef> helperDesc = addSourceAutoCleanup(HelperDef.class, helperJs);
-        TextSource<HelperDef> source = loader.getSource(helperDesc);
+        TextSource<HelperDef> source = (TextSource<HelperDef>)loader.getSource(helperDesc);
 
         HelperDef helperDef = new JavascriptHelperParser().getDefinition(helperDesc, source);
         
@@ -135,7 +135,7 @@ public class JavascriptHelperParserTest extends AuraImplTestCase {
                 "    var global = 'Do everything';\n"+
                 "})";
         DefDescriptor<HelperDef> helperDesc = addSourceAutoCleanup(HelperDef.class, helperJs);
-        TextSource<HelperDef> source = loader.getSource(helperDesc);
+        TextSource<HelperDef> source = (TextSource<HelperDef>)loader.getSource(helperDesc);
 
         HelperDef helperDef = new JavascriptHelperParser().getDefinition(helperDesc, source);
         try {

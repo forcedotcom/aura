@@ -102,6 +102,10 @@ public class DesignTemplateRegionDefHandler extends ParentedTagHandler<DesignTem
     }
 
     @Override
+    protected void finishDefinition() throws QuickFixException {
+    }
+
+    @Override
     protected DesignTemplateRegionDef createDefinition() throws QuickFixException {
         return builder.build();
     }

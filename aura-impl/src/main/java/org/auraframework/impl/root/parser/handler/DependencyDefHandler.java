@@ -85,6 +85,10 @@ public class DependencyDefHandler<P extends RootDefinition> extends ParentedTagH
     }
 
     @Override
+    protected void finishDefinition() {
+    }
+
+    @Override
     protected DependencyDef createDefinition() throws QuickFixException {
         return builder.build();
     }

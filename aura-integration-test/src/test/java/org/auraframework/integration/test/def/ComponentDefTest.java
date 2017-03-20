@@ -15,9 +15,6 @@
  */
 package org.auraframework.integration.test.def;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,7 +27,7 @@ import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.component.BaseComponentDefTest;
 import org.auraframework.service.CompilerService;
-import org.auraframework.system.TextSource;
+import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Test;
@@ -308,7 +305,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
     }
 
     @Test
-    public void testValidateReferencesValidateJsCodeWhenMinifyIsTrue() throws Exception {
+    public void testValidateDefinitionValidateJsCode() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class, "<aura:component></aura:component>");
         DefDescriptor<ControllerDef> controllerDesc = definitionService.getDefDescriptor(cmpDesc,
@@ -317,60 +314,15 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
         String controllerCode = "({ function1: function(cmp) {var a = {k:}} })";
         addSourceAutoCleanup(controllerDesc, controllerCode);
 
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(cmpDesc);
-        ComponentDef cmpDef = compilerService.compile(cmpDesc, source);
+        Source<ComponentDef> source = stringSourceLoader.getSource(cmpDesc);
 
         try {
-            cmpDef.validateReferences(true);
+            compilerService.compile(cmpDesc, source);
             fail("Expecting an InvalidDefinitionException");
         } catch(Exception e) {
             String expectedMsg = String.format("JS Processing Error: %s", cmpDesc.getQualifiedName());
             this.assertExceptionMessageContains(e, InvalidDefinitionException.class, expectedMsg);
         }
-    }
-
-    @Test
-    public void testValidateReferencesNotValidateJsCodeWhenMinifyIsFalse() throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
-                ComponentDef.class, "<aura:component></aura:component>");
-        DefDescriptor<ControllerDef> controllerDesc = definitionService.getDefDescriptor(cmpDesc,
-                DefDescriptor.JAVASCRIPT_PREFIX, ControllerDef.class);
-
-        String controllerCode = "({ function1: function(cmp) {var a = {k:}} })";
-        addSourceAutoCleanup(controllerDesc, controllerCode);
-
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(cmpDesc);
-        ComponentDef appDef = compilerService.compile(cmpDesc, source);
-
-        try {
-            appDef.validateReferences(false);
-        } catch(Exception e) {
-            fail("Unexpected exception is thrown: " + e.toString());
-        }
-    }
-
-    /**
-     * Verify that when javascriptClass gets initiated in getCode(), getCode() doesn't validate Js code,
-     * even if when minify is true. Because we enforce javascriptClass not to compile Js code when javascriptClass
-     * is initiated in getCode().
-     */
-    @Test
-    public void testGetCodeNotValidateJsCodeWhenMinifyIsTrue() throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
-                ComponentDef.class, "<aura:component></aura:component>");
-        DefDescriptor<ControllerDef> controllerDesc = definitionService.getDefDescriptor(cmpDesc,
-                DefDescriptor.JAVASCRIPT_PREFIX, ControllerDef.class);
-
-        String controllerCode = "({ function1: function(cmp) {var a = {k:}} })";
-        addSourceAutoCleanup(controllerDesc, controllerCode);
-
-        TextSource<ComponentDef> source = stringSourceLoader.getSource(cmpDesc);
-        ComponentDef appDef = compilerService.compile(cmpDesc, source);
-
-        String actual = appDef.getCode(true);
-
-        String expected = "\"controller\":{\n    \"function1\":function(cmp) {var a = {k:}}\n  }";
-        assertThat(actual, containsString(expected));
     }
 
     @Test

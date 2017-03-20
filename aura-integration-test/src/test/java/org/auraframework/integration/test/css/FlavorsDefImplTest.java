@@ -28,6 +28,7 @@ import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class FlavorsDefImplTest extends StyleTestCase {
@@ -36,6 +37,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
     DefinitionService definitionService;
 
     @Test
+    @Ignore("BUNDLES")
     public void testLoadsIndependently() throws QuickFixException {
         // flavor assortments can be placed independently in their own bundles
         DefDescriptor<FlavorsDef> fa = addFlavorAssortment("<aura:flavors></aura:flavors>");
@@ -44,6 +46,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
     }
 
     @Test
+    @Ignore("BUNDLES")
     public void testLoadsFromAppBundle() throws QuickFixException {
         DefDescriptor<FlavorsDef> fa = addSourceAutoCleanup(FlavorsDef.class, "<aura:flavors></aura:flavors>");
 
@@ -56,6 +59,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
     }
 
     @Test
+    @Ignore("BUNDLES")
     public void testGetFlavorIncludeDefs() throws QuickFixException {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         addStandardFlavor(cmp, ".THIS--test{}");
@@ -66,6 +70,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
     }
 
     @Test
+    @Ignore("BUNDLES")
     public void testGetFlavorDefaultDefs() throws QuickFixException {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         addStandardFlavor(cmp, ".THIS--test{}");
@@ -78,6 +83,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
     }
 
     @Test
+    @Ignore("BUNDLES")
     public void testIterationOrderOfComputeOverrides() throws Exception {
         // both of these should have flavors for x_sample
         String fmt = "<aura:flavors>"
@@ -95,6 +101,7 @@ public class FlavorsDefImplTest extends StyleTestCase {
     }
 
     @Test
+    @Ignore("BUNDLES")
     public void testSerialization() throws Exception {
         DefDescriptor<ComponentDef> cmp1 = definitionService.getDefDescriptor("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<ComponentDef> cmp2 = definitionService.getDefDescriptor("flavorTest:x_landmark", ComponentDef.class);

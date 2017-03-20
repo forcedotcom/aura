@@ -230,6 +230,7 @@ public abstract class BaseXmlElementImpl implements BaseXmlElement {
             return this;
         }
 
+        @Override
         public Location getLocation() {
             return this.location;
         }
@@ -261,7 +262,7 @@ public abstract class BaseXmlElementImpl implements BaseXmlElement {
             return this;
         }
 
-        String getOwnHash() {
+        public String getOwnHash() {
             //
             // Try to make sure that we have a hash string.
             //

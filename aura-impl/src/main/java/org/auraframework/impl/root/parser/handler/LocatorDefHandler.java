@@ -118,6 +118,10 @@ public class LocatorDefHandler<P extends RootDefinition> extends ParentedTagHand
     }
 
     @Override
+    protected void finishDefinition() throws QuickFixException {
+    }
+
+    @Override
     protected LocatorDef createDefinition() throws QuickFixException {
         return builder.build();
     }

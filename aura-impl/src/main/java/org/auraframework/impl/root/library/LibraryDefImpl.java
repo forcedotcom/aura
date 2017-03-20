@@ -23,9 +23,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.builder.LibraryDefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.RegisterEventDef;
@@ -33,10 +33,8 @@ import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.AuraContext;
-import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -60,6 +58,7 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
 
     @Override
     public void retrieveLabels() throws QuickFixException {
+        super.retrieveLabels();
         for (IncludeDefRef idr : includes) {
             idr.retrieveLabels();
         }
@@ -67,35 +66,32 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
 
     @Override
     public void serialize(Json json) throws IOException {
-    	try {
-	        json.writeMapBegin();
+        json.writeMapBegin();
 
-	        json.writeMapEntry("descriptor", getDescriptor());
+        json.writeMapEntry("descriptor", getDescriptor());
 
-	        json.writeMapKey("includes");
-	        json.writeMapBegin();
-	        for (IncludeDefRef defRef : includes) {
-	            json.writeMapEntry(defRef.getName(), JavascriptIncludeClass.getClientDescriptor(defRef.getDescriptor()));
-	        }
-	        json.writeMapEnd();
-
-	        // Process Libraries with a lower granularity level, to prevent duplication of external includes.
-	        StringBuilder sb = new StringBuilder();
-	        AuraContext context = Aura.getContextService().getCurrentContext();
-	        boolean minify = context.getMode().minify();
-	        for (IncludeDefRef defRef : includes) {
-	            if(!context.getClientClassLoaded(defRef.getDescriptor())) {
-	            	sb.append(defRef.getCode(minify));
-	            }
-	        }
-	        if (sb.length() > 0) {
-	        	json.writeMapEntry("includeClasses", "function(){" + sb.toString() + "}");
-	        }
-
-	        json.writeMapEnd();
-        } catch (QuickFixException e) {
-            throw new AuraUnhandledException("unhandled exception", e);
+        json.writeMapKey("includes");
+        json.writeMapBegin();
+        for (IncludeDefRef defRef : includes) {
+            json.writeMapEntry(defRef.getName(),
+                    JavascriptIncludeClass.getClientDescriptor(defRef.getDescriptor()));
         }
+        json.writeMapEnd();
+
+        // Process Libraries with a lower granularity level, to prevent duplication of external includes.
+        StringBuilder sb = new StringBuilder();
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        boolean minify = context.getMode().minify();
+        for (IncludeDefRef defRef : includes) {
+            if (!context.getClientClassLoaded(defRef.getDescriptor())) {
+                sb.append(defRef.getCode(minify));
+            }
+        }
+        if (sb.length() > 0) {
+            json.writeMapEntry("includeClasses", "function(){" + sb.toString() + "}");
+        }
+
+        json.writeMapEnd();
     }
 
     @Override
@@ -103,29 +99,24 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
         super.validateDefinition();
 
         if (includes == null || includes.isEmpty()) {
-            throw new InvalidDefinitionException("aura:library must contain at least one aura:include attribute",
-                    getLocation());
+            throw new InvalidDefinitionException(
+                "aura:library must contain at least one aura:include attribute", getLocation());
         }
 
         Set<String> names = new HashSet<>();
         for (IncludeDefRef include : includes) {
+            include.validateDefinition();
             if (!names.add(include.getName())) {
-                throw new InvalidDefinitionException(String.format("%s with duplicate name found in library: %s",
-                        IncludeDefRefHandler.TAG, include.getName()), getLocation());
-            }
+                throw new InvalidDefinitionException(String
+                    .format("%s with duplicate name found in library: %s", IncludeDefRefHandler.TAG, include.getName()),
+                    getLocation()); }
         }
     }
 
     @Override
     public void validateReferences() throws QuickFixException {
-        validateReferences(false);
-    }
-
-    @Override
-    public void validateReferences(boolean minify) throws QuickFixException {
         for (IncludeDefRef include : includes) {
-            include.validateDefinition();
-            include.validateReferences(minify);
+            include.validateReferences();
         }
     }
 
@@ -140,7 +131,7 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof LibraryDef) {
-            LibraryDef other = (LibraryDef) obj;
+            LibraryDef other = (LibraryDef)obj;
             return getDescriptor().equals(other.getDescriptor());
         }
 
@@ -161,8 +152,7 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
     }
 
     @Override
-    public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other)
-            throws QuickFixException {
+    public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException {
         return false;
     }
 
@@ -173,8 +163,7 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
     }
 
     @Override
-    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs()
-            throws QuickFixException {
+    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
         return attributeDefs;
     }
 
@@ -183,7 +172,7 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
         throw new UnsupportedOperationException("LibraryDef cannot contain RequiredVersionDefs.");
     }
 
-    public static class Builder extends RootDefinitionImpl.Builder<LibraryDef> {
+    public static class Builder extends RootDefinitionImpl.Builder<LibraryDef> implements LibraryDefBuilder {
 
         private List<IncludeDefRef> includes;
 
@@ -197,17 +186,12 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
 
         @Override
         public LibraryDefImpl build() {
-
-            // Lookup associated documentation in present:
-            DefDescriptor<DocumentationDef> documentationDescriptor = DefDescriptorImpl.getAssociateDescriptor(
-                    getDescriptor(), DocumentationDef.class, DefDescriptor.MARKUP_PREFIX
-                    );
-
-            if (documentationDescriptor.exists()) {
-                setDocumentation(documentationDescriptor.getQualifiedName());
-            }
-
             return new LibraryDefImpl(this);
+        }
+
+        @Override
+        public List<IncludeDefRef> getIncludes() {
+            return this.includes;
         }
     }
 }

@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -41,7 +40,6 @@ import org.auraframework.def.DefDescriptor.DescriptorKey;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.HasJavascriptReferences;
 import org.auraframework.def.ParentedDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
@@ -91,9 +89,9 @@ public class DefinitionServiceImpl implements DefinitionService {
     private CachingService cachingService;
 
     private LoggingService loggingService;
-
+    
     private ConfigAdapter configAdapter;
-
+    
     @Override
     public <T extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName, Class<T> defClass) {
         return getDefDescriptor(qualifiedName, defClass, null);
@@ -102,7 +100,7 @@ public class DefinitionServiceImpl implements DefinitionService {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Definition, B extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName,
-                                                                                          Class<T> defClass, DefDescriptor<B> bundle) {
+            Class<T> defClass, DefDescriptor<B> bundle) {
         if (defClass == ActionDef.class) {
             return SubDefDescriptorImpl.getInstance(qualifiedName, defClass, ControllerDef.class);
         }
@@ -157,7 +155,7 @@ public class DefinitionServiceImpl implements DefinitionService {
 
     @Override
     public <T extends Definition> DefDescriptor<T> getDefDescriptor(DefDescriptor<?> desc, String prefix,
-                                                                    Class<T> defClass) {
+            Class<T> defClass) {
 
         return DefDescriptorImpl.getAssociateDescriptor(desc, defClass, prefix);
     }
@@ -183,7 +181,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         if (descriptor == null) {
             return null;
         }
-
+            
         // TODO: Clean up so that we just walk up descriptor trees and back down them.
         Optional<T> optLocalDef = null;
         if (descriptor instanceof SubDefDescriptor) {
@@ -793,7 +791,7 @@ public class DefinitionServiceImpl implements DefinitionService {
             DefDescriptor<? extends Definition> descriptor = def.getDescriptor();
             String message = configAdapter.isProduction() ? DefinitionNotFoundException.getMessage(
                     descriptor.getDefType(), descriptor.getName()) : status;
-            throw new NoAccessException(message);
+                    throw new NoAccessException(message);
         }
     }
 
@@ -1064,8 +1062,8 @@ public class DefinitionServiceImpl implements DefinitionService {
                     if (!currentCC.hasSwitchableReference) {
                         // if no switchable references detected, DE is the same for both aura or modules
                         depsCache.put(makeNonUidGlobalKey(descriptor, !modulesEnabled), de);
-                    }
                 }
+            }
             }
 
             // See localDependencies comment
@@ -1176,7 +1174,7 @@ public class DefinitionServiceImpl implements DefinitionService {
      * @throws QuickFixException if something has gone terribly wrong.
      */
     private <D extends Definition> void validateHelper(@Nonnull CompileContext currentCC,
-                                                       @Nonnull DefDescriptor<D> descriptor) throws QuickFixException {
+            @Nonnull DefDescriptor<D> descriptor) throws QuickFixException {
         CompilingDef<D> compiling = new CompilingDef<>(descriptor);
         currentCC.compiled.put(descriptor, compiling);
         if (compiling.def == null && !fillCompilingDef(compiling, currentCC)) {
@@ -1282,8 +1280,8 @@ public class DefinitionServiceImpl implements DefinitionService {
         public boolean shouldCacheDependencies;
 
         public CompileContext(DefDescriptor<? extends Definition> topLevel, AuraContext context,
-                              Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache,
-                              List<ClientLibraryDef> clientLibs) {
+                Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache,
+                List<ClientLibraryDef> clientLibs) {
             this.defsCache = defsCache;
             this.context = context;
             this.registries = context.getRegistries();
@@ -1335,7 +1333,7 @@ public class DefinitionServiceImpl implements DefinitionService {
      * @throws QuickFixException if validateDefinition caused a quickfix.
      */
     private <D extends Definition> boolean fillCompilingDef(CompilingDef<D> compiling,
-                                                            CompileContext currentCC) throws QuickFixException {
+            CompileContext currentCC) throws QuickFixException {
         assert compiling.def == null;
 
         //
@@ -1442,8 +1440,8 @@ public class DefinitionServiceImpl implements DefinitionService {
      * @throws QuickFixException if the definition is not found, or validateDefinition() throws one.
      */
     private <D extends Definition> D getHelper(@Nonnull DefDescriptor<D> descriptor,
-                                               @Nonnull CompileContext cc, @Nonnull Set<DefDescriptor<?>> stack,
-                                               @CheckForNull Definition parent) throws QuickFixException {
+            @Nonnull CompileContext cc, @Nonnull Set<DefDescriptor<?>> stack,
+            @CheckForNull Definition parent) throws QuickFixException {
         loggingService.incrementNum(LoggingService.DEF_VISIT_COUNT);
         CompilingDef<D> cd = cc.getCompiling(descriptor);
         try {
@@ -1534,12 +1532,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                             // throw new
                             // AuraRuntimeException("Nested add of "+cd.descriptor+" during validation of "+currentCC.topLevel);
                         }
-                        // Validate, including JavaScript if we can cache 
-                        if (cd.cacheable && cd.def instanceof HasJavascriptReferences) {
-                            ((HasJavascriptReferences) cd.def).validateReferences(true);
-                        } else {
                             cd.def.validateReferences();
-                        }
                         cd.validated = true;
                     }
                 } finally {
@@ -1593,7 +1586,7 @@ public class DefinitionServiceImpl implements DefinitionService {
      */
     @CheckForNull
     private <D extends Definition> D compileDef(@Nonnull DefDescriptor<D> descriptor,
-                                                @Nonnull CompileContext currentCC, boolean nested) throws QuickFixException {
+            @Nonnull CompileContext currentCC, boolean nested) throws QuickFixException {
         D def;
 
         if (!nested) {

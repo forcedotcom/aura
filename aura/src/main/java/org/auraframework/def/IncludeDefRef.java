@@ -17,36 +17,43 @@ package org.auraframework.def;
 
 import java.util.List;
 
-public interface IncludeDefRef extends Definition, HasJavascriptReferences, JavascriptClassDefinition {
+public interface IncludeDefRef extends Definition {
 
     @Override
     public DefDescriptor<IncludeDef> getDescriptor();
 
-	/**
+    /**
      * Gets the list of imports.
      *
      * @return the client descriptor.
      */
-	List<DefDescriptor<IncludeDef>> getImports();
+    List<DefDescriptor<IncludeDef>> getImports();
 
-	/**
+    /**
      * Gets the list of JavaScript identifiers to alias the imports inside the module.
      *
      * @return the list of aliases identifiers.
      */
-	List<String> getAliases();
+    List<String> getAliases();
 
-	/**
+    /**
      * Gets the JavaScript identifier return from the module.
      *
      * @return the export identifier.
      */
-	String getExport();
-	
-	/**
+    String getExport();
+    
+    /**
      * Gets client descriptor
      *
      * @return the client descriptor identifier.
      */
-	String getClientDescriptor();
+    String getClientDescriptor();
+
+    /**
+     * get the client side code for the include.
+     *
+     * @boolean minify true if the code should be minified.
+     */
+    String getCode(boolean minify);
 }

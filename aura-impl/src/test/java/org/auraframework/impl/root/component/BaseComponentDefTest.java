@@ -23,7 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
+import javax.inject.Inject;
+
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
@@ -46,6 +47,7 @@ import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.root.RootDefinitionTest;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.CompilerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -66,6 +68,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends RootDefinitionTest<T> {
+    @Inject
+    protected CompilerService compilerService;
+
     public BaseComponentDefTest(Class<T> defClass, String tag) {
         super(defClass, tag);
     }
@@ -95,7 +100,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         interfaces.add(vendor.getInterfaceDefDescriptor());
 
         List<DefDescriptor<RendererDef>> renderers = new ArrayList<>();
-        renderers.add(vendor.getRendererDescriptor());
+        renderers.add(definitionService.getDefDescriptor("java://test.renderer", RendererDef.class));
 
         List<EventHandlerDef> eventHandlers = new ArrayList<>();
         eventHandlers.add(vendor.makeEventHandlerDef());
@@ -357,26 +362,28 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     @Test
-    public void testAppendDependenciesWithAllReferences() throws QuickFixException {
+    public void testAppendDependenciesDoesNotIncludeBundledParts() throws QuickFixException {
         DefDescriptor<T> parentDesc = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "extensible='true'", ""));
         DefDescriptor<ComponentDef> childDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
         DefDescriptor<InterfaceDef> intfDesc = addSourceAutoCleanup(InterfaceDef.class, "<aura:interface/>");
         DefDescriptor<EventDef> eventDesc = addSourceAutoCleanup(EventDef.class,
                 "<aura:event type='component' support='GA'/>");
-        DefDescriptor<ProviderDef> providerDesc = definitionService.getDefDescriptor(
-                "java://org.auraframework.impl.java.provider.ConcreteProvider", ProviderDef.class);
 
         DefDescriptor<T> cmpDesc = addSourceAutoCleanup(
                 getDefClass(),
                 String.format(
                         baseTag,
-                        String.format("extends='%s' implements='%s' provider='%s'", parentDesc.getDescriptorName(),
-                                intfDesc.getDescriptorName(), providerDesc),
+                        String.format("extends='%s' implements='%s'", parentDesc.getDescriptorName(),
+                                intfDesc.getDescriptorName()),
                         String.format(
                                 "<%s/><aura:registerevent name='evt' type='%s'/>", childDesc.getDescriptorName(),
                                 eventDesc.getDescriptorName())));
 
+        DefDescriptor<ProviderDef> providerDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, ProviderDef.class,
+                DefDescriptor.JAVASCRIPT_PREFIX);
+        addSourceAutoCleanup(providerDesc, "{provide:function(){}}");
+        
         DefDescriptor<ModelDef> modelDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, ModelDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
         addSourceAutoCleanup(modelDesc, "{obj:{}}");
@@ -385,9 +392,9 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 DefDescriptor.JAVASCRIPT_PREFIX);
         addSourceAutoCleanup(controllerDesc, "{hi:function(){}}");
 
-        DefDescriptor<RendererDef> renderDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, RendererDef.class,
+        DefDescriptor<RendererDef> rendererDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, RendererDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
-        addSourceAutoCleanup(renderDesc, "({render:function(c){return this.superRender();}})");
+        addSourceAutoCleanup(rendererDesc, "({render:function(c){return this.superRender();}})");
 
         DefDescriptor<HelperDef> helperDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, HelperDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
@@ -396,21 +403,154 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         DefDescriptor<StyleDef> styleDesc = definitionService
                 .getDefDescriptor(cmpDesc, DefDescriptor.CSS_PREFIX,
                         StyleDef.class);
-        String className = cmpDesc.getNamespace()
-                + StringUtils.capitalize(cmpDesc.getName());
-        addSourceAutoCleanup(styleDesc,
-                String.format(".%s {font-style:italic;}", className));
+        addSourceAutoCleanup(styleDesc, ".THIS {}");
+
+        Set<DefDescriptor<?>> dependencies = new HashSet<>();
+        definitionService.getDefinition(cmpDesc).appendDependencies(dependencies);
+
+        Set<DefDescriptor<?>> expected = Sets.newHashSet(parentDesc, childDesc, intfDesc, eventDesc, styleDesc);
+        if (!dependencies.containsAll(expected)) {
+            StringBuilder msg = new StringBuilder("missing dependencies:");
+            expected.removeAll(dependencies);
+            expected.forEach((desc) -> {
+                msg.append(" " + desc.getDefType() + "-" + desc);
+            });
+            fail(msg.toString());
+        }
+        if (!expected.containsAll(dependencies)) {
+            StringBuilder msg = new StringBuilder("extra dependencies:");
+            dependencies.removeAll(expected);
+            dependencies.forEach((desc) -> {
+                msg.append(" " + desc.getDefType() + "-" + desc);
+            });
+            fail(msg.toString());
+        }
+    }
+
+    @Test
+    public void testAppendDependenciesWithServerDependencies() throws QuickFixException {
+        DefDescriptor<T> parentDesc = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "extensible='true'", ""));
+        DefDescriptor<ComponentDef> childDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        DefDescriptor<InterfaceDef> intfDesc = addSourceAutoCleanup(InterfaceDef.class, "<aura:interface/>");
+        DefDescriptor<EventDef> eventDesc = addSourceAutoCleanup(EventDef.class,
+                "<aura:event type='component' support='GA'/>");
+        DefDescriptor<?> providerDesc = definitionService.getDefDescriptor(
+                "java://org.auraframework.impl.java.provider.ConcreteProvider", ProviderDef.class);
+        DefDescriptor<?> modelDesc = definitionService.getDefDescriptor(
+                "java://org.auraframework.impl.java.model.TestModel", ModelDef.class);
+        DefDescriptor<?> controllerDesc = definitionService.getDefDescriptor(
+                "java://org.auraframework.impl.java.controller.ComponentTestController", ControllerDef.class);
+        DefDescriptor<?> rendererDesc = definitionService.getDefDescriptor(
+                "java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer", RendererDef.class);
+
+        
+        DefDescriptor<T> cmpDesc = addSourceAutoCleanup(
+                getDefClass(),
+                String.format(
+                        baseTag,
+                        String.format(
+                                "extends='%s' implements='%s' provider='%s' model='%s' controller='%s' renderer='%s'",
+                                parentDesc.getDescriptorName(), intfDesc.getDescriptorName(), providerDesc, modelDesc,
+                                controllerDesc, rendererDesc),
+                        String.format(
+                                "<%s/><aura:registerevent name='evt' type='%s'/>", childDesc.getDescriptorName(),
+                                eventDesc.getDescriptorName())));
+
+        DefDescriptor<StyleDef> styleDesc = definitionService
+                .getDefDescriptor(cmpDesc, DefDescriptor.CSS_PREFIX,
+                        StyleDef.class);
+        addSourceAutoCleanup(styleDesc, ".THIS {}");
 
         Set<DefDescriptor<?>> dependencies = new HashSet<>();
         definitionService.getDefinition(cmpDesc).appendDependencies(dependencies);
 
         Set<DefDescriptor<?>> expected = Sets.newHashSet(parentDesc, childDesc, intfDesc, providerDesc, modelDesc,
-                controllerDesc, eventDesc, styleDesc, renderDesc, helperDesc);
+                controllerDesc, eventDesc, styleDesc, rendererDesc);
         if (!dependencies.containsAll(expected)) {
-            fail(String.format("missing dependencies - EXPECTED: %s, ACTUAL: %s", expected, dependencies));
+            StringBuilder msg = new StringBuilder("missing dependencies:");
+            expected.removeAll(dependencies);
+            expected.forEach((desc) -> {
+                msg.append(" " + desc.getDefType() + "-" + desc);
+            });
+            fail(msg.toString());
         }
         if (!expected.containsAll(dependencies)) {
-            fail(String.format("extra dependencies - EXPECTED: %s, ACTUAL: %s", expected, dependencies));
+            StringBuilder msg = new StringBuilder("extra dependencies:");
+            dependencies.removeAll(expected);
+            dependencies.forEach((desc) -> {
+                msg.append(" " + desc.getDefType() + "-" + desc);
+            });
+            fail(msg.toString());
+        }
+    }
+
+    @Test
+    public void testAppendDependenciesWithExternalDependencies() throws QuickFixException {
+        DefDescriptor<T> parentDesc = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "extensible='true'", ""));
+        DefDescriptor<ComponentDef> childDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        DefDescriptor<ComponentDef> otherDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        DefDescriptor<InterfaceDef> intfDesc = addSourceAutoCleanup(InterfaceDef.class, "<aura:interface/>");
+        DefDescriptor<EventDef> eventDesc = addSourceAutoCleanup(EventDef.class,
+                "<aura:event type='component' support='GA'/>");
+
+        DefDescriptor<ProviderDef> providerDesc = DefDescriptorImpl.getAssociateDescriptor(otherDesc, ProviderDef.class,
+                DefDescriptor.JAVASCRIPT_PREFIX);
+        addSourceAutoCleanup(providerDesc, "{provide:function(){}}");
+        
+        DefDescriptor<ModelDef> modelDesc = DefDescriptorImpl.getAssociateDescriptor(otherDesc, ModelDef.class,
+                DefDescriptor.JAVASCRIPT_PREFIX);
+        addSourceAutoCleanup(modelDesc, "{obj:{}}");
+        DefDescriptor<ControllerDef> controllerDesc = DefDescriptorImpl.getAssociateDescriptor(otherDesc,
+                ControllerDef.class,
+                DefDescriptor.JAVASCRIPT_PREFIX);
+        addSourceAutoCleanup(controllerDesc, "{hi:function(){}}");
+
+        DefDescriptor<RendererDef> rendererDesc = DefDescriptorImpl.getAssociateDescriptor(otherDesc, RendererDef.class,
+                DefDescriptor.JAVASCRIPT_PREFIX);
+        addSourceAutoCleanup(rendererDesc, "({render:function(c){return this.superRender();}})");
+
+        DefDescriptor<HelperDef> helperDesc = DefDescriptorImpl.getAssociateDescriptor(otherDesc, HelperDef.class,
+                DefDescriptor.JAVASCRIPT_PREFIX);
+        addSourceAutoCleanup(helperDesc, "({help:function(){}})");
+
+        DefDescriptor<T> cmpDesc = addSourceAutoCleanup(
+                getDefClass(),
+                String.format(
+                        baseTag,
+                        String.format(
+                                "extends='%s' implements='%s' provider='%s' model='%s' controller='%s' renderer='%s'",
+                                parentDesc.getDescriptorName(), intfDesc.getDescriptorName(), providerDesc, modelDesc,
+                                controllerDesc, rendererDesc, helperDesc),
+                        String.format(
+                                "<%s/><aura:registerevent name='evt' type='%s'/>", childDesc.getDescriptorName(),
+                                eventDesc.getDescriptorName())));
+
+        DefDescriptor<StyleDef> styleDesc = definitionService
+                .getDefDescriptor(cmpDesc, DefDescriptor.CSS_PREFIX,
+                        StyleDef.class);
+        addSourceAutoCleanup(styleDesc, ".THIS {}");
+
+        Set<DefDescriptor<?>> dependencies = new HashSet<>();
+        definitionService.getDefinition(cmpDesc).appendDependencies(dependencies);
+
+        Set<DefDescriptor<?>> expected = Sets.newHashSet(parentDesc, childDesc, intfDesc, eventDesc, styleDesc);
+        if (!dependencies.containsAll(expected)) {
+            StringBuilder msg = new StringBuilder("missing dependencies:");
+            expected.removeAll(dependencies);
+            expected.forEach((desc) -> {
+                msg.append(" " + desc.getDefType() + "-" + desc);
+            });
+            fail(msg.toString());
+        }
+        if (!expected.containsAll(dependencies)) {
+            StringBuilder msg = new StringBuilder("extra dependencies:");
+            dependencies.removeAll(expected);
+            dependencies.forEach((desc) -> {
+                msg.append(" " + desc.getDefType() + "-" + desc);
+            });
+            fail(msg.toString());
         }
     }
 
@@ -554,70 +694,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * getLocalModelDefDescriptor returns null if there are no models. Test method for
-     * {@link BaseComponentDef#getLocalModelDefDescriptor()}.
-     */
-    @Test
-    public void testGetLocalModelDefDescriptorWithoutModels() throws QuickFixException {
-        DefDescriptor<ModelDef> dd = define(baseTag, "", "").getLocalModelDefDescriptor();
-        assertNull(dd);
-    }
-
-    /**
-     * getLocalModelDefDescriptor returns model if json model is implicitly defined. Test method for
-     * {@link BaseComponentDef#getLocalModelDefDescriptor()}.
-     */
-    @Test
-    public void testGetLocalModelDefDescriptorWithImplicitJsonModel() throws QuickFixException {
-        DefDescriptor<T> compDesc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "", ""));
-        DefDescriptor<ModelDef> modelDesc = DefDescriptorImpl.getAssociateDescriptor(compDesc, ModelDef.class,
-                DefDescriptor.JAVASCRIPT_PREFIX);
-        addSourceAutoCleanup(modelDesc, "{obj:{}}");
-        DefDescriptor<ModelDef> dd = definitionService.getDefinition(compDesc).getLocalModelDefDescriptor();
-        assertNotNull(dd);
-        assertEquals(modelDesc.getQualifiedName(), dd.getQualifiedName());
-    }
-
-    /**
-     * getLocalModelDefDescriptor returns model if json model is explicitly specified. Test method for
-     * {@link BaseComponentDef#getLocalModelDefDescriptor()}.
-     */
-    @Test
-    public void testGetLocalModelDefDescriptorWithExplicitJsonModel() throws QuickFixException {
-        @SuppressWarnings("unchecked")
-        DefDescriptor<T> ddParent = (DefDescriptor<T>) define(baseTag,
-                "extensible='true' model='java://org.auraframework.components.test.java.model.TestModel'", "")
-                        .getDescriptor();
-        DefDescriptor<ModelDef> dd = define(
-                baseTag,
-                "model='js://test.jsModel' extends='" + ddParent.getNamespace() + ":"
-                        + ddParent.getName() + "'",
-                "").getLocalModelDefDescriptor();
-        assertNotNull(dd);
-        assertEquals("js://test.jsModel", dd.getQualifiedName());
-    }
-
-    /**
-     * getLocalModelDefDescriptor returns model if java model is explicitly specified. Test method for
-     * {@link BaseComponentDef#getLocalModelDefDescriptor()}.
-     */
-    @Test
-    public void testGetLocalModelDefDescriptorWithJavaModel() throws QuickFixException {
-        @SuppressWarnings("unchecked")
-        DefDescriptor<T> ddParent = (DefDescriptor<T>) define(baseTag,
-                "extensible='true' model='java://org.auraframework.components.test.java.model.TestModel2'", "")
-                        .getDescriptor();
-        DefDescriptor<ModelDef> dd = define(
-                baseTag,
-                "model='java://org.auraframework.components.test.java.model.TestModel' extends='"
-                        + ddParent.getNamespace() + ":"
-                        + ddParent.getName() + "'",
-                "").getLocalModelDefDescriptor();
-        assertNotNull(dd);
-        assertEquals("java://org.auraframework.components.test.java.model.TestModel", dd.getQualifiedName());
-    }
-
-    /**
      * getModelDefDescriptors returns empty list if there are no models. Test method for
      * {@link BaseComponentDef#getModelDefDescriptors()}.
      */
@@ -657,7 +733,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         List<DefDescriptor<ModelDef>> dds = definitionService.getDefinition(compDesc).getModelDefDescriptors();
         assertNotNull(dds);
 
-        assertEquals(3, dds.size());
         List<String> names = Lists.transform(dds, new Function<DefDescriptor<?>, String>() {
             @Override
             public String apply(DefDescriptor<?> input) {
@@ -989,26 +1064,25 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         }
     }
 
-    /**
-     * Test method for {@link BaseComponentDef#getStyleDescriptor()}.
-     */
     @Test
-    public void testGetStyleDescriptorWithoutStyle() throws QuickFixException {
+    public void testGetStyleDefWithoutStyle() throws QuickFixException {
         T def = define(baseTag, "", "");
-        DefDescriptor<StyleDef> styleDef = def.getStyleDescriptor();
+        StyleDef styleDef = def.getStyleDef();
         assertNull("StyleDescriptor for component without style should be null", styleDef);
     }
 
-    /**
-     * Test method for {@link BaseComponentDef#getStyleDescriptor()}.
-     */
     @Test
-    public void testGetStyleDescriptor() throws QuickFixException {
-        T def = define(baseTag, "style=\"templateCss://test.styleTestTemplate\"", "");
-        DefDescriptor<StyleDef> styleDef = def.getStyleDescriptor();
+    public void testGetStyleDef() throws QuickFixException {
+        DefDescriptor<? extends BaseComponentDef> descriptor = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "", ""));
+        DefDescriptor<StyleDef> styleDesc = definitionService.getDefDescriptor(descriptor, DefDescriptor.CSS_PREFIX,
+                StyleDef.class);
+        addSourceAutoCleanup(styleDesc, ".THIS {}");
+        BaseComponentDef def = definitionService.getDefinition(descriptor);
+        StyleDef styleDef = def.getStyleDef();
+        
         assertNotNull("StyleDescriptor not found on component", styleDef);
-        assertEquals("Wrong StyleDescriptor found on component", "templateCss://test.styleTestTemplate",
-                styleDef.getQualifiedName());
+        assertEquals("Wrong StyleDescriptor found on component", styleDesc, styleDef.getDescriptor());
     }
 
     /**
@@ -1228,7 +1302,12 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      */
     @Test
     public void testIsLocallyRenderableWithStyle() throws QuickFixException {
-        T baseComponentDef = define(baseTag, "style='css://test.testValidCSS'", "");
+        DefDescriptor<? extends BaseComponentDef> descriptor = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "", ""));
+        DefDescriptor<StyleDef> styleDesc = definitionService.getDefDescriptor(descriptor, DefDescriptor.CSS_PREFIX,
+                StyleDef.class);
+        addSourceAutoCleanup(styleDesc, ".THIS {}");
+        BaseComponentDef baseComponentDef = definitionService.getDefinition(descriptor);
         assertEquals("Rendering detection logic is not on.", RenderType.AUTO, baseComponentDef.getRender());
         assertFalse("When a component has a style, the rendering should be done clientside.",
                 baseComponentDef.isLocallyRenderable());

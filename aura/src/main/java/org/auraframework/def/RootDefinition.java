@@ -77,6 +77,7 @@ public interface RootDefinition extends Definition, Versionable {
 
     ProviderDef getProviderDef() throws QuickFixException;
 
+    @Deprecated
     List<DefDescriptor<?>> getBundle();
 
     ProviderDef getLocalProviderDef() throws QuickFixException;
@@ -84,4 +85,11 @@ public interface RootDefinition extends Definition, Versionable {
     SupportLevel getSupport();
 
     DocumentationDef getDocumentationDef() throws QuickFixException;
+
+    Map<DefDescriptor<?>, Definition> getBundledDefs();
+
+    /**
+     * Get a single def that is bundled into this root definition.
+     */
+    <X extends Definition> X getBundledDefinition(DefDescriptor<X> descriptor);
 }

@@ -16,7 +16,7 @@
 
 -->
 <aura:component support="DEPRECATED" access="GLOBAL"
-    renderer="js://aura.component, java://org.auraframework.renderer.ComponentRenderer"
+    renderer="js://aura.renderIf, java://org.auraframework.renderer.ComponentRenderer"
     description="Deprecated. Use aura:if instead. This component allows you to conditionally render its contents. It renders its body only if isTrue evaluates to true. The else attribute allows you to render an alternative when isTrue evaluates to false.">
 
     <aura:attribute name="isTrue" type="Boolean" required="true" access="GLOBAL" description="An expression that must evaluate to true to display the body of the component."/>

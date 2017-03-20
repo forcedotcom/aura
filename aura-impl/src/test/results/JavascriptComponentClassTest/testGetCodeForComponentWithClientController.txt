@@ -1,0 +1,14 @@
+$A.componentService.addComponentClass("markup://test:testComponent",function() {
+var string$testComponent = {
+  "meta":{
+    "name":"string$testComponent",
+    "extends":"markup://aura:component"
+  },
+  "controller":{
+    "funtion1":function(cmp, event, helper) {
+        cmp.get('bla');
+    }
+  }
+};
+return string$testComponent;
+});

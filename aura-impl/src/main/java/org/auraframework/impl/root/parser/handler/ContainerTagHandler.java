@@ -95,7 +95,7 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
 
     public final void process() throws XMLStreamException, QuickFixException {
         try {
-            readElement();
+        readElement();
         } finally {
             finishDefinition();
         }
@@ -134,11 +134,6 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
         return false;
     }
 
-    /**
-     * Create and return the definition
-     *
-     * @throws QuickFixException
-     */
     protected abstract T createDefinition() throws QuickFixException;
 
     /**

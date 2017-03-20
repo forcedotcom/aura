@@ -26,7 +26,6 @@ import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.util.TemplateUtil.Script;
 import org.auraframework.instance.BaseComponent;
@@ -91,9 +90,9 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
 
             sb.setLength(0);
             writeHtmlScripts(context, servletUtilAdapter.getScripts(context, true, false, componentAttributes), Script.SYNC, sb);
-            DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
-            if (styleDefDesc != null) {
-                attributes.put("auraInlineStyle", definitionService.getDefinition(styleDefDesc).getCode());
+            StyleDef styleDef = templateDef.getStyleDef();
+            if (styleDef != null) {
+                attributes.put("auraInlineStyle", styleDef.getCode());
             }
 
             String contextPath = context.getContextPath();

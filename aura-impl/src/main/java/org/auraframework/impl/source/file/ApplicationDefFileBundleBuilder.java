@@ -22,13 +22,16 @@ import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
+import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.BundleSource;
@@ -100,23 +103,20 @@ public class ApplicationDefFileBundleBuilder implements FileBundleSourceBuilder 
                     format = Format.CSS;
                     break;
                 case ".css":
+                    // FIXME: template...
                     descriptor = new DefDescriptorImpl<>("css", namespace, name, StyleDef.class);
                     format = Format.CSS;
                     break;
-                case ".tokens":
-                    descriptor = new DefDescriptorImpl<>("css", namespace, name, StyleDef.class);
-                    format = Format.XML;
-                    break;
                 case ".auradoc":
-                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, StyleDef.class);
+                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, DocumentationDef.class);
                     format = Format.XML;
                     break;
                 case ".design":
-                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, StyleDef.class);
+                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, DesignDef.class);
                     format = Format.XML;
                     break;
                 case ".svg":
-                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, StyleDef.class);
+                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, SVGDef.class);
                     format = Format.SVG;
                     break;
                 case ".flavors":
@@ -125,6 +125,10 @@ public class ApplicationDefFileBundleBuilder implements FileBundleSourceBuilder 
                     break;
                 default:
                 }
+            } else if (fname.endsWith("Flavors.css")) {
+                descriptor = new DefDescriptorImpl<>("css", namespace, fname.substring(0, fname.length()-4),
+                        FlavoredStyleDef.class, cmpDesc);
+                format = Format.CSS;
             }
             if (descriptor != null) {
                 sourceMap.put(descriptor, new FileSource<>(descriptor, file, format));
@@ -132,6 +136,6 @@ public class ApplicationDefFileBundleBuilder implements FileBundleSourceBuilder 
                 // error
             }
         }
-        return new BundleSourceImpl<ApplicationDef>(cmpDesc, sourceMap);
+        return new BundleSourceImpl<ApplicationDef>(cmpDesc, sourceMap, true);
     }
 }

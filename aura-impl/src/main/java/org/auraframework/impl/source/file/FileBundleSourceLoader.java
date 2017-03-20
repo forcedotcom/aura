@@ -122,6 +122,9 @@ public class FileBundleSourceLoader implements SourceLoader, InternalNamespaceSo
     }
 
     private BundleSource<?> createSource(FileEntry entry) {
+        if (entry == null) {
+            return null;
+        }
         if (entry.source != null) {
             return entry.source;
         }
@@ -164,17 +167,20 @@ public class FileBundleSourceLoader implements SourceLoader, InternalNamespaceSo
             }
         } else {
             for (FileEntry entry : fileMap.values()) {
-                DefDescriptor<?> descriptor = null;
-
-                if (entry.source != null) {
-                    descriptor = entry.source.getDescriptor();
-                } else {
-                    if (matcher.matchNamespace(entry.namespace) && matcher.matchName(entry.name)) {
-                        descriptor = getDescriptor(entry);
+                if (matcher.matchNamespace(entry.namespace) && matcher.matchName(entry.name)) {
+                    BundleSource<?> source = createSource(entry);
+                    if (source != null) {
+                        if (matcher.matchDescriptor(source.getDescriptor())) {
+                           ret.add(source.getDescriptor());
+                        }
+                        /*
+                        for (DefDescriptor<?> descriptor : source.getBundledParts().keySet()) {
+                            if (matcher.matchDescriptor(descriptor)) {
+                               ret.add(descriptor);
+                            }
+                        }
+                        */
                     }
-                }
-                if (descriptor != null && matcher.matchDescriptor(descriptor)) {
-                    ret.add(descriptor);
                 }
             }
         }

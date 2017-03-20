@@ -535,10 +535,10 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
         Set<DefDescriptor<?>> writable = Sets.newLinkedHashSet();
 
-        writable.add(definitionService.getDefinition(child1).getStyleDescriptor());
-        writable.add(definitionService.getDefinition(grandparent).getStyleDescriptor());
-        writable.add(definitionService.getDefinition(parent).getStyleDescriptor());
-        writable.add(definitionService.getDefinition(child2).getStyleDescriptor());
+        writable.add(definitionService.getDefinition(child1).getStyleDef().getDescriptor());
+        writable.add(definitionService.getDefinition(grandparent).getStyleDef().getDescriptor());
+        writable.add(definitionService.getDefinition(parent).getStyleDef().getDescriptor());
+        writable.add(definitionService.getDefinition(child2).getStyleDef().getDescriptor());
 
         StringWriter output = new StringWriter();
         serverService.writeAppCss(writable, output);

@@ -35,6 +35,8 @@ public interface ElementBuilder {
      */
     ElementBuilder setLocation(Location location);
 
+    Location getLocation();
+
     ElementBuilder setTagName(String fullyQualifiedName);
 
     ElementBuilder setAPIVersion(String apiVersion);

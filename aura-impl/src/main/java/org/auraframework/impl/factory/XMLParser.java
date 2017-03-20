@@ -15,31 +15,12 @@
  */
 package org.auraframework.impl.factory;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-
-import javax.inject.Inject;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
-import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.impl.source.AbstractTextSourceImpl;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.DefinitionFactory;
-import org.auraframework.system.Location;
-import org.auraframework.system.Source;
 import org.auraframework.system.TextSource;
-import org.auraframework.throwable.AuraExceptionInfo;
-import org.auraframework.throwable.AuraUnhandledException;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -49,50 +30,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * Objects.
  */
 @ServiceComponent
-public abstract class XMLParser<D extends RootDefinition> implements DefinitionFactory<TextSource<D>,D> {
-
-    @Inject
-    private ConfigAdapter configAdapter;
-
-    @Inject
-    private DefinitionService definitionService;
-
-    @Inject
-    private DefinitionParserAdapter definitionParserAdapter;
-
-
-    private static final XMLInputFactory xmlInputFactory;
-
-    static {
-        xmlInputFactory = XMLInputFactory.newInstance();
-
-        try {
-
-            // Setting IS_NAMESPACE_AWARE to true will require all xml to be valid xml and
-            // we would need to enforce namespace definitions ie xmlns in all cmp and app files.
-            xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-            xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
-            xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, true);
-            xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-            xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, true);
-
-            // sjsxp does not currently have a thread-safe XMLInputFactory, as that implementation
-            // tries to cache and reuse theXMLStreamReader. Setting the parser-specific "reuse-instance"
-            // property to false prevents this.
-            // All other known open-source stax parsers (and the bea ref impl) have thread-safe factories.
-            // W-2316503: remove compatibility code for both SJSXP and Woodstox
-            xmlInputFactory.setProperty("reuse-instance", false);
-        } catch (IllegalArgumentException ex) {
-            // Other implementations will likely throw this exception since "reuse-instance"
-            // is implementation specific. NO-OP
-        }
-    }
-
-    protected abstract RootTagHandler<D> getHandler(DefDescriptor<D>defDescriptor, TextSource<D> source,
-                                                    XMLStreamReader xmlReader, boolean isInInternalNamespace,
-                                                    DefinitionService definitionService,
-                                                    ConfigAdapter configAdapter,
-                                                    DefinitionParserAdapter definitionParserAdapter) throws QuickFixException;
+public abstract class XMLParser<D extends RootDefinition> extends XMLParserBase<D>
+        implements DefinitionFactory<TextSource<D>,D> {
 
     @Override
     public Class<?> getSourceInterface() {
@@ -108,140 +47,4 @@ public abstract class XMLParser<D extends RootDefinition> implements DefinitionF
     public D getDefinition(DefDescriptor<D> descriptor, TextSource<D> source) throws QuickFixException {
         return getDefinitionBuilder(descriptor, source).getBuilder().build();
     }
-
-    protected RootTagHandler<D> getDefinitionBuilder(DefDescriptor<D> descriptor, TextSource<D> source)
-            throws QuickFixException {
-        Reader reader = null;
-        XMLStreamReader xmlReader = null;
-        RootTagHandler<D> handler = null;
-
-        try {
-            String contents = source.getContents();
-            reader = new HTMLReader(new StringReader(contents));
-
-            xmlReader = xmlInputFactory.createXMLStreamReader(reader);
-            handler = getHandler(descriptor, source, xmlReader, isInInternalNamespace(descriptor),
-                    definitionService, configAdapter, definitionParserAdapter);
-            if (xmlReader != null) {
-                // need to skip junk above the start that is ok
-                LOOP: while (xmlReader.hasNext()) {
-                    int type = xmlReader.next();
-                    switch (type) {
-                    case XMLStreamConstants.START_ELEMENT:
-                        break LOOP;
-                    case XMLStreamConstants.DTD:
-                    case XMLStreamConstants.START_DOCUMENT:
-                    case XMLStreamConstants.COMMENT:
-                    case XMLStreamConstants.SPACE:
-                        break;
-                    default:
-                        throw new InvalidDefinitionException(
-                                String.format("Found unexpected element of type %s", type), getLocation(xmlReader,
-                                        source));
-                    }
-                }
-                if (!xmlReader.hasNext()) {
-                    throw new InvalidDefinitionException("Empty file", getLocation(xmlReader, source));
-                }
-            }
-            handler.process();
-            if (xmlReader != null) {
-                LOOP: while (xmlReader.hasNext()) {
-                    int type = xmlReader.next();
-                    switch (type) {
-                    case XMLStreamConstants.END_DOCUMENT:
-                        break LOOP;
-                    case XMLStreamConstants.COMMENT:
-                    case XMLStreamConstants.SPACE:
-                        break;
-                    default:
-                        throw new InvalidDefinitionException(String.format(
-                                "Found unexpected element of type %s when expecting end of file.", type), getLocation(
-                                xmlReader, source));
-                    }
-                }
-            }
-        } catch (Exception e) {
-            if (handler != null) {
-                if (e instanceof AuraExceptionInfo) {
-                    handler.setParseError(e);
-                } else {
-                    handler.setParseError(new AuraUnhandledException(e.getLocalizedMessage(),
-                        getLocation(xmlReader, source), e));
-                }
-                return handler;
-            } else {
-                throw new AuraUnhandledException(e.getLocalizedMessage(), getLocation(xmlReader, source), e);
-            }
-        } finally {
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (IOException e) {
-                // Throwing this seems wrong, if there was already an error, it
-                // should pass through,
-                // and if not, well, something went wrong with the close...
-                // throw new AuraUnhandledException("parse error",
-                // getLocation(xmlReader, source), e);
-            } finally {
-                try {
-                    if (xmlReader != null) {
-                        xmlReader.close();
-                    }
-                } catch (XMLStreamException e) {
-                    // Throwing this seems wrong, if there was already an error,
-                    // it should pass through,
-                    // and if not, well, something went wrong with the close...
-                    // throw new AuraUnhandledException("parse error",
-                    // getLocation(xmlReader, source), e);
-                }
-            }
-        }
-        return handler;
-    }
-
-    /**
-     * Returns a location for the reader and source provided. When
-     * {@code xmlReader} is provided, its location will be used for the
-     * finer-grain information such as line number; otherwise, a new and more
-     * limited location will be constructed based on {@code source}.
-     *
-     * @param xmlReader
-     * @param source
-     * @return An as-specific-as-possible location.
-     */
-    public static Location getLocation(XMLStreamReader xmlReader, Source<?> source) {
-        if (xmlReader != null) {
-            assert source != null;
-            // xmlLocation provides column and line number.
-            javax.xml.stream.Location xmlLocation = xmlReader.getLocation();
-            String location = source.getSystemId();
-            if (location == null) {
-                // If we can't find a name, use the descriptor.
-                location = source.getDescriptor().getQualifiedName();
-            }
-            return new Location(location, xmlLocation.getLineNumber() - 1, xmlLocation.getColumnNumber(),
-                    source.getLastModified(), null);
-        } else if (source != null) {
-            return new Location(source.getSystemId(), source.getLastModified());
-        }
-        return null;
-    }
-
-    /**
-     * Convenience method to use input factory to create steam reader
-     *
-     * @param reader reader
-     * @return xml stream reader implementation
-     * @throws XMLStreamException
-     */
-    public static XMLStreamReader createXMLStreamReader(Reader reader) throws XMLStreamException {
-        return xmlInputFactory.createXMLStreamReader(reader);
-    }
-
-    protected boolean isInInternalNamespace(DefDescriptor<?> descriptor) {
-        return configAdapter.isInternalNamespace(descriptor.getNamespace());
-    }
-
 }

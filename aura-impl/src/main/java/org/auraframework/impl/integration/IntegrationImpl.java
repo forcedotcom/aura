@@ -310,9 +310,9 @@ public class IntegrationImpl implements Integration {
             templateUtil.writeInlineHtmlScripts(context, servletUtilAdapter.getScripts(context, false, false, null), sb);
             attributes.put("auraScriptTags", sb.toString());
 
-            DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
-            if (styleDefDesc != null) {
-                attributes.put("auraInlineStyle", definitionService.getDefinition(styleDefDesc).getCode());
+            StyleDef styleDef = templateDef.getStyleDef();
+            if (styleDef != null) {
+                attributes.put("auraInlineStyle", styleDef.getCode());
             }
 
             Map<String, Object> auraInit = Maps.newHashMap();

@@ -27,8 +27,11 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * Common base for ComponentDef and ApplicationDef
  */
-public interface BaseComponentDef extends RootDefinition, HasJavascriptReferences, JavascriptClassDefinition {
+public interface BaseComponentDef extends RootDefinition {
 
+    /**
+     * Get the component descriptor.
+     */
     @Override
     DefDescriptor<? extends BaseComponentDef> getDescriptor();
 
@@ -96,22 +99,23 @@ public interface BaseComponentDef extends RootDefinition, HasJavascriptReference
      */
     Map<String, LocatorDef> getLocators();
 
-    /**
-     * Get a server side model descriptor.
-     */
-    DefDescriptor<ModelDef> getLocalModelDefDescriptor();
+    List<DefDescriptor<ModelDef>> getModelDefDescriptors() throws QuickFixException;
 
-    List<DefDescriptor<ModelDef>> getModelDefDescriptors()
-            throws QuickFixException;
-
-    List<DefDescriptor<ControllerDef>> getControllerDefDescriptors()
-            throws QuickFixException;
+    List<DefDescriptor<ControllerDef>> getControllerDefDescriptors() throws QuickFixException;
 
     ModelDef getModelDef() throws QuickFixException;
 
     ControllerDef getControllerDef() throws QuickFixException;
+
     HelperDef getHelperDef() throws QuickFixException;
-    RendererDef getRendererDef() throws QuickFixException;
+
+    /**
+     * Get the code for the client side for this component.
+     *
+     * @param minify should it be the minified version or not.
+     */
+    String getCode(boolean minify);
+
     @Override
     ProviderDef getProviderDef() throws QuickFixException;
 
@@ -120,10 +124,6 @@ public interface BaseComponentDef extends RootDefinition, HasJavascriptReference
     DefDescriptor<? extends BaseComponentDef> getExtendsDescriptor();
 
     DefDescriptor<RendererDef> getRendererDescriptor() throws QuickFixException;
-
-    DefDescriptor<StyleDef> getStyleDescriptor();
-
-    StyleDef getStyleDef() throws QuickFixException;
 
     FlavoredStyleDef getFlavoredStyleDef() throws QuickFixException;
 
@@ -138,10 +138,6 @@ public interface BaseComponentDef extends RootDefinition, HasJavascriptReference
     boolean isLocallyRenderable() throws QuickFixException;
 
     ComponentDef getTemplateDef() throws QuickFixException;
-
-    DefDescriptor<DesignDef> getDesignDefDescriptor();
-
-    DefDescriptor<SVGDef> getSVGDefDescriptor();
 
     DefDescriptor<ComponentDef> getTemplateDefDescriptor();
 
@@ -207,8 +203,17 @@ public interface BaseComponentDef extends RootDefinition, HasJavascriptReference
      */
     Set<String> getAllFlavorNames() throws QuickFixException;
 
-    ControllerDef getRemoteControllerDef() throws QuickFixException;
-    HelperDef getRemoteHelperDef() throws QuickFixException;
-    ProviderDef getRemoteProviderDef() throws QuickFixException;
-    RendererDef getRemoteRendererDef() throws QuickFixException;
+    //
+    // Bundled Defs.
+    //
+    ControllerDef getRemoteControllerDef();
+    HelperDef getRemoteHelperDef();
+    ProviderDef getRemoteProviderDef();
+    RendererDef getRemoteRendererDef();
+    StyleDef getStyleDef();
+    DefDescriptor<DesignDef> getDesignDefDescriptor();
+    DesignDef getDesignDef();
+    SVGDef getSVGDef();
+    // FIXME: this should be deprecated.
+    DefDescriptor<SVGDef> getSVGDefDescriptor();
 }

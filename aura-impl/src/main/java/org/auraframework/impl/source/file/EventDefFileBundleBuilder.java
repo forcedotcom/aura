@@ -90,6 +90,6 @@ public class EventDefFileBundleBuilder implements FileBundleSourceBuilder {
                 // error
             }
         }
-        return new BundleSourceImpl<EventDef>(evtDesc, sourceMap);
+        return new BundleSourceImpl<EventDef>(evtDesc, sourceMap, true);
     }
 }

@@ -15,24 +15,29 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
+import java.util.Map;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.RootDefinition.SupportLevel;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import javax.xml.stream.XMLStreamReader;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 
 /**
  * Super class for the top level tags, handles some common setup
@@ -46,6 +51,8 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
     protected static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_DESCRIPTION);
     protected static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(ATTRIBUTE_SUPPORT).addAll(ALLOWED_ATTRIBUTES).build();
 
+    private Map<DefDescriptor<?>, Definition> bundled = null;
+
     protected RootTagHandler() {
         super();
     }
@@ -54,6 +61,37 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
                              boolean isInInternalNamespace, DefinitionService definitionService,
                              ConfigAdapter configAdapter, DefinitionParserAdapter definitionParserAdapter) {
         super(defDescriptor, xmlReader, source, isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
+    }
+
+    public void setBundledDefs(Map<DefDescriptor<?>, Definition> bundled) {
+        RootDefinitionBuilder<T> builder = getBuilder();
+
+        this.bundled = bundled;
+        builder.setBundledDefs(bundled);
+        builder.setDocumentationDef(getBundledDef(DocumentationDef.class, "markup"));
+    }
+
+    public XMLStreamReader getXMLReader() {
+        return xmlReader;
+    }
+
+    protected <D extends Definition> D getBundledDef(DefDescriptor<D> bundledDesc) {
+        if (bundled != null) {
+            @SuppressWarnings("unchecked")
+            D ret = (D)bundled.get(bundledDesc);
+            return ret;
+        }
+        return null;
+    }
+
+    protected <D extends Definition> D getBundledDef(Class<D> clazz, String prefix) {
+        DefDescriptor<D> bundledDesc = DefDescriptorImpl.getAssociateDescriptor(defDescriptor, clazz, prefix);
+        if (bundled != null) {
+            @SuppressWarnings("unchecked")
+            D ret = (D)bundled.get(bundledDesc);
+            return ret;
+        }
+        return null;
     }
 
     @Override

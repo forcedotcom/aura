@@ -20,8 +20,10 @@ import java.util.Map;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.IncludeDef;
 import org.auraframework.def.LibraryDef;
-import org.auraframework.def.StyleDef;
+import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.BundleSource;
@@ -69,18 +71,21 @@ public class LibraryDefFileBundleBuilder implements FileBundleSourceBuilder {
                     format = Format.XML;
                     break;
                 case ".auradoc":
-                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, StyleDef.class);
+                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, DocumentationDef.class);
                     format = Format.XML;
                     break;
                 case ".design":
-                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, StyleDef.class);
+                    descriptor = new DefDescriptorImpl<>("markup", namespace, name, DesignDef.class);
                     format = Format.XML;
                     break;
                 default:
                 }
             }
             if (descriptor == null && file.getName().toLowerCase().endsWith(".js")) {
-                descriptor = new DefDescriptorImpl<>("js", namespace, file.getName(), StyleDef.class, libDesc);
+                // Drop off the .js
+                String includeName = file.getName();
+                includeName = includeName.substring(0, includeName.length()-3);
+                descriptor = new DefDescriptorImpl<>("js", namespace, includeName, IncludeDef.class, libDesc);
                 format = Format.JS;
             }
             if (descriptor != null) {
@@ -89,6 +94,6 @@ public class LibraryDefFileBundleBuilder implements FileBundleSourceBuilder {
                 // error
             }
         }
-        return new BundleSourceImpl<LibraryDef>(libDesc, sourceMap);
+        return new BundleSourceImpl<LibraryDef>(libDesc, sourceMap, true);
     }
 }

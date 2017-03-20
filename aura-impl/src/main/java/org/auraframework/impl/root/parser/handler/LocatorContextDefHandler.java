@@ -98,6 +98,10 @@ public class LocatorContextDefHandler<P extends RootDefinition> extends Parented
     };
 
     @Override
+    protected void finishDefinition() throws QuickFixException {
+    }
+
+    @Override
     protected LocatorContextDef createDefinition() throws QuickFixException {
         return builder.build();
     }

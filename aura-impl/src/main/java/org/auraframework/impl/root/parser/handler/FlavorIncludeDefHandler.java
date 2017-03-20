@@ -86,6 +86,10 @@ public class FlavorIncludeDefHandler<P extends RootDefinition> extends ParentedT
     }
 
     @Override
+    protected void finishDefinition() throws QuickFixException {
+    }
+
+    @Override
     protected FlavorIncludeDef createDefinition() throws QuickFixException {
         return builder.build();
     }

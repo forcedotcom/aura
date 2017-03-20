@@ -137,6 +137,10 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
     }
 
     @Override
+    protected void finishDefinition() {
+    }
+
+    @Override
     protected DesignDef createDefinition() throws QuickFixException {
         return builder.build();
     }

@@ -603,9 +603,9 @@ public class ServerServiceImpl implements ServerService {
         attributes.put("auraStyleTags", sb.toString());
         sb.setLength(0);
         
-        DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
-        if (styleDefDesc != null) {
-            attributes.put("auraInlineStyle", definitionService.getDefinition(styleDefDesc).getCode());
+        StyleDef styleDef = templateDef.getStyleDef();
+        if (styleDef != null) {
+            attributes.put("auraInlineStyle", styleDef.getCode());
         }
         
         if (mode.allowLocalRendering() && value.isLocallyRenderable()) {

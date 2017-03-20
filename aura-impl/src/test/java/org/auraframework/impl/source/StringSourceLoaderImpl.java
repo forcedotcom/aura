@@ -51,10 +51,12 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.def.design.DesignDef;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.system.BundleSource;
 import org.auraframework.system.Parser.Format;
+import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
-import org.auraframework.system.TextSource;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.util.FileMonitor;
 import org.springframework.context.annotation.Bean;
@@ -119,7 +121,7 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
     private static Lock nsLock = new ReentrantLock();
 
     private static class NamespaceInfo {
-        private final ConcurrentHashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> defs;
+        private final ConcurrentHashMap<String, BundleSource<? extends Definition>> bundles;
         private final String namespace;
         private final NamespaceAccess access;
         private boolean isPermanent;
@@ -127,17 +129,59 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
         public NamespaceInfo(String namespace, NamespaceAccess access) {
             this.namespace = namespace;
             this.access = access;
-            this.defs = new ConcurrentHashMap<>();
+            this.bundles = new ConcurrentHashMap<>();
         }
 
+        @Override
+        public String toString() {
+            return namespace + "(" + access + ")";
+        }
+        
         public void setPermanent() {
             this.isPermanent = true;
         }
 
-        @SuppressWarnings("unchecked")
-        public <D extends Definition> StringSource<D> get(DefDescriptor<D> descriptor) {
-            return (StringSource<D>)defs.get(descriptor);
+        private DefDescriptor<?> getBundleDescriptor(DefDescriptor<?> descriptor) {
+            while (descriptor.getBundle() != null) {
+                descriptor = descriptor.getBundle();
+            }
+            return descriptor;
         }
+
+        private String getBundleKey(DefDescriptor<?> descriptor) {
+            DefDescriptor<?> bundleDescriptor = getBundleDescriptor(descriptor);
+            return bundleDescriptor.getName();
+        }
+
+        private BundleSource<? extends Definition> getBundle(DefDescriptor<?> descriptor) {
+            return bundles.get(getBundleKey(descriptor));
+        }
+        
+        private BundleSource<? extends Definition> getOrAddBundle(DefDescriptor<?> descriptor) {
+            BundleSource<? extends Definition> bundle = getBundle(descriptor);
+            if (bundle == null) {
+                DefDescriptor<?> bundleDescriptor = getBundleDescriptor(descriptor);
+                if (!bundleDescriptor.getDefType().definesBundle()) {
+                    bundleDescriptor = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, descriptor.getNamespace(),
+                            descriptor.getName(), ComponentDef.class);
+                }
+                bundle = new BundleSourceImpl<>(bundleDescriptor, Maps.newConcurrentMap(), true);
+                bundles.put(getBundleKey(bundleDescriptor), bundle);
+            }
+            return bundle;
+        }
+        
+        public synchronized Source<? extends Definition> get(DefDescriptor<?> descriptor) {
+            BundleSource<? extends Definition> bundle = getBundle(descriptor);
+            if (bundle == null) {
+                return null;
+            }
+            if (descriptor.equals(bundle.getDescriptor())) {
+                return bundle;
+            }
+            return bundle.getBundledParts().get(descriptor);
+        }
+
 
         /**
          * Put a definition in the namespace.
@@ -145,12 +189,15 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
          * @param def the definition.
          * @param overwrite should we overwrite whatever is there?
          */
-        public <D extends Definition> boolean put(StringSource<D> def, boolean overwrite) {
-            StringSource<? extends Definition> oldDef;
+        public synchronized <D extends Definition> boolean put(StringSource<D> def, boolean overwrite) {
+            DefDescriptor<D> targetDesc = def.getDescriptor();
+            BundleSource<? extends Definition> bundle = getOrAddBundle(targetDesc);
+            Map<DefDescriptor<?>, Source<?>> bundleParts = bundle.getBundledParts();
+            Source<?> oldDef;
             if (overwrite) {
-                oldDef = defs.put(def.getDescriptor(), def);
+                oldDef = bundleParts.put(def.getDescriptor(), def);
             } else {
-                oldDef = defs.putIfAbsent(def.getDescriptor(), def);
+                oldDef = bundleParts.putIfAbsent(def.getDescriptor(), def);
             }
             Preconditions.checkState(overwrite || oldDef == null);
             return oldDef != null;
@@ -158,15 +205,21 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
 
         public void validateAccess(NamespaceAccess requestedAccess) {
             if (access != requestedAccess) {
-                throw new RuntimeException("Mismatch on access of "+ namespace
-                        + " current access = " + access
+                throw new RuntimeException("Mismatch on access of " + namespace + " current access = " + access
                         + " requested access = " + requestedAccess);
             }
-    }
+        }
 
-        public boolean remove(DefDescriptor<? extends Definition> descriptor) {
-            Preconditions.checkState(defs.remove(descriptor) != null);
-            return defs.size() == 0;
+        public synchronized boolean remove(DefDescriptor<? extends Definition> descriptor) {
+            BundleSource<? extends Definition> bundle = getBundle(descriptor);
+            if (bundle != null) {
+                Map<DefDescriptor<?>, Source<?>> bundleParts = bundle.getBundledParts();
+                bundleParts.remove(descriptor);
+                if (bundleParts.isEmpty()) {
+                    bundles.remove(getBundleKey(bundle.getDescriptor()));
+                }
+            }
+            return bundles.size() == 0;
         }
     }
 
@@ -269,8 +322,7 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
      */
     @Override
     public final <D extends Definition> StringSource<D> addSource(Class<D> defClass, String contents,
-                                                                  @Nullable String namePrefix,
-                                                                  NamespaceAccess access) {
+            @Nullable String namePrefix, NamespaceAccess access) {
         return putSource(defClass, contents, namePrefix, false, access);
     }
 
@@ -286,8 +338,7 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
      */
     @Override
     public final <D extends Definition> StringSource<D> putSource(Class<D> defClass, String contents,
-                                                                  @Nullable String namePrefix, boolean overwrite,
-                                                                  NamespaceAccess access) {
+            @Nullable String namePrefix, boolean overwrite, NamespaceAccess access) {
         return putSource(defClass, contents, namePrefix, overwrite, access, null);
     }
 
@@ -334,8 +385,9 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
      */
     @Override
     public final <D extends Definition> StringSource<D> putSource(DefDescriptor<D> descriptor, String contents,
-                                                                  boolean overwrite, NamespaceAccess access) {
-        Format format = DescriptorInfo.get(descriptor.getDefType().getPrimaryInterface()).getFormat();
+            boolean overwrite, NamespaceAccess access) {
+        DefType defType = descriptor.getDefType();
+        Format format = DescriptorInfo.get(defType.getPrimaryInterface()).getFormat();
         StringSource<D> source = new StringSource<>(fileMonitor, descriptor, contents, descriptor.getQualifiedName(), format);
         return putSource(descriptor, source, overwrite, access);
     }
@@ -375,8 +427,8 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
             NamespaceInfo namespaceInfo = namespaces.get(namespace);
             Preconditions.checkState(namespaceInfo != null);
             if (namespaceInfo.remove(descriptor) && !namespaceInfo.isPermanent) {
-                    namespaces.remove(namespace);
-                }
+                namespaces.remove(namespace);
+            }
         } finally {
             nsLock.unlock();
         }
@@ -390,7 +442,7 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
      * @param source the loaded definition to remove.
      */
     @Override
-    public final void removeSource(TextSource<?> source) {
+    public final void removeSource(Source<?> source) {
         removeSource(source.getDescriptor());
     }
 
@@ -399,9 +451,14 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
         Set<DefDescriptor<?>> ret = Sets.newHashSet();
         for (String namespace : namespaces.keySet()) {
             if (matcher.matchNamespace(namespace)) {
-                for (DefDescriptor<?> desc : namespaces.get(namespace).defs.keySet()) {
-                    if (matcher.matchDescriptorNoNS(desc)) {
-                        ret.add(desc);
+                NamespaceInfo nsInfo = namespaces.get(namespace);
+                for (String name : nsInfo.bundles.keySet()) {
+                    if (matcher.matchName(name)) {
+                        for (DefDescriptor<?> desc : nsInfo.bundles.get(name).getBundledParts().keySet()) {
+                            if (matcher.matchDescriptorNoNS(desc)) {
+                                ret.add(desc);
+                            }
+                        }
                     }
                 }
             }
@@ -425,18 +482,20 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
     }
 
     @Override
-    public <D extends Definition> TextSource<D> getSource(DefDescriptor<D> descriptor) {
+    public <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
         if (descriptor == null) {
             return null;
         }
         NamespaceInfo namespaceInfo = namespaces.get(getNamespace(descriptor));
 
         if (namespaceInfo != null) {
-            StringSource<D> ret = namespaceInfo.get(descriptor);
-            if (ret != null) {
+            @SuppressWarnings("unchecked")
+            Source<D> ret = (Source<D>)namespaceInfo.get(descriptor);
+            if (ret != null && ret instanceof StringSource) {
                 // return a copy of the StringSource to emulate other Sources (hash is reset)
-                return new StringSource<>(fileMonitor, ret);
+                return new StringSource<>(fileMonitor, (StringSource<D>)ret);
             }
+            return ret;
         }
         return null;
     }
@@ -484,7 +543,7 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
             infoMap.put(defClass, info);
         }
 
-        static DescriptorInfo get(Class<? extends Definition> defClass) {
+        public static DescriptorInfo get(Class<? extends Definition> defClass) {
             return infoMap.get(defClass);
         }
 
@@ -497,6 +556,11 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
                             defClass, bundle);
         }
 
+        public <D extends Definition, B extends Definition> DefDescriptor<D> getDescriptor(
+                DefinitionService definitionService, DefDescriptor<B> bundle) {
+            return getDescriptor(definitionService, bundle.getNamespace(), bundle.getName(), null);
+        }
+        
         Format getFormat() {
             return format;
         }

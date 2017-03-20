@@ -31,14 +31,15 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements IncludeDefRef {
-	private static final long serialVersionUID = 610875326950592992L;
-	private final int hashCode;
+    private static final long serialVersionUID = 610875326950592992L;
+    private final int hashCode;
 
     private final List<DefDescriptor<IncludeDef>> imports;
     private final List<String> aliases;
     private final String export;
 
-    private BaseJavascriptClass javascriptClass;
+    private final String classCode;
+    private final String minifiedClassCode;
 
     protected IncludeDefRefImpl(Builder builder) {
         super(builder);
@@ -48,6 +49,8 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
         this.export = builder.export;
 
         this.hashCode = AuraUtil.hashCode(imports, aliases, export);
+        this.classCode = builder.classCode;
+        this.minifiedClassCode = builder.minifiedClassCode;
     }
 
     @Override
@@ -60,76 +63,57 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
         return imports;
     }
 
-	@Override
-	public List<String> getAliases() {
-		return aliases;
-	}
+    @Override
+    public List<String> getAliases() {
+        return aliases;
+    }
 
     @Override
     public String getExport() {
         return export;
     }
-    
+
     @Override
     public String getClientDescriptor() {
-    	return JavascriptIncludeClass.getClientDescriptor(this.getDescriptor());
+        return JavascriptIncludeClass.getClientDescriptor(this.getDescriptor());
     }
 
     @Override
-    public String getCode(boolean minify) throws QuickFixException {
-    	String js = null;
-		initializeJavascriptClass(false);
-    	if (minify) {
-    		js = javascriptClass.getMinifiedCode();
-    	}
-    	if (js == null) {
-    		js = javascriptClass.getCode();
-    	}
-    	return js;
+    public String getCode(boolean minify) {
+        String js = null;
+        if (minify) {
+            js = minifiedClassCode;
+        }
+        if (js == null) {
+            js = classCode;
+        }
+        return js;
     }
 
-    private void initializeJavascriptClass(boolean minify) throws QuickFixException {
-        if (javascriptClass == null) {
-            javascriptClass = new JavascriptIncludeClass.Builder().setDefinition(this).setMinify(minify).build();
-        }
-    }
-    
     @Override
     public void serialize(Json json) throws IOException {
-    	throw new UnsupportedOperationException("IncludeDefRef can't be serialized to JSON");
+        throw new UnsupportedOperationException("IncludeDefRef can't be serialized to JSON");
     }
 
     @Override
     public void validateDefinition() throws QuickFixException {
-    	if (AuraTextUtil.isNullEmptyOrWhitespace(getName())) {
-            throw new InvalidDefinitionException(String.format(
-            		"%s must specify a name", IncludeDefRefHandler.TAG), getLocation());
-        }
-        if (!AuraTextUtil.isValidNCNameIdentifier(getName())) {
-            throw new InvalidDefinitionException(String.format(
-                    "%s 'name' attribute must be a valid NCName identifier", IncludeDefRefHandler.TAG),
-                    getLocation());
-        }
+        if (AuraTextUtil.isNullEmptyOrWhitespace(getName())) { throw new InvalidDefinitionException(
+                String.format("%s must specify a name", IncludeDefRefHandler.TAG), getLocation()); }
+        if (!AuraTextUtil.isValidNCNameIdentifier(getName())) { throw new InvalidDefinitionException(
+                String.format("%s 'name' attribute must be a valid NCName identifier", IncludeDefRefHandler.TAG),
+                getLocation()); }
         if (aliases != null && !aliases.isEmpty()) {
-        	for (String alias : aliases) {
-        		if (!AuraTextUtil.isValidJsIdentifier(alias)) {
-        			throw new InvalidDefinitionException(String.format(
-        					"%s 'alias' attribute must contain only valid javascript identifiers", IncludeDefRefHandler.TAG),
-        					getLocation());
-        		}
-        	}
+            for (String alias : aliases) {
+                if (!AuraTextUtil.isValidJsIdentifier(alias)) { throw new InvalidDefinitionException(
+                        String.format("%s 'alias' attribute must contain only valid javascript identifiers",
+                                IncludeDefRefHandler.TAG),
+                        getLocation()); }
+            }
         }
-        if (export != null && !AuraTextUtil.isValidJsIdentifier(export)) {
-            throw new InvalidDefinitionException(String.format(
-                    "%s 'export' attribute must be a valid javascript identifier", IncludeDefRefHandler.TAG),
-                    getLocation());
-        }
-    }
-
-    @Override
-    public void validateReferences(boolean minify) throws QuickFixException {
-        validateReferences();
-        initializeJavascriptClass(minify);
+        if (export != null && !AuraTextUtil.isValidJsIdentifier(export)) { throw new InvalidDefinitionException(
+                String.format("%s 'export' attribute must be a valid javascript identifier", IncludeDefRefHandler.TAG),
+                getLocation()); }
+        super.validateDefinition();
     }
 
     @Override
@@ -152,7 +136,7 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof IncludeDefRefImpl) {
-            IncludeDefRefImpl other = (IncludeDefRefImpl) obj;
+            IncludeDefRefImpl other = (IncludeDefRefImpl)obj;
             return getDescriptor().equals(other.getDescriptor());
         }
         return false;
@@ -165,13 +149,17 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
 
     public static class Builder extends DefinitionImpl.RefBuilderImpl<IncludeDef, IncludeDefRef> {
 
-    	public List<DefDescriptor<IncludeDef>> imports;
-		public List<String> aliases;
+        public List<DefDescriptor<IncludeDef>> imports;
+        public List<String> aliases;
         public String export;
+        private IncludeDef includeDef;
+        private String classCode;
+        private String minifiedClassCode;
+        private boolean minifyEnabled;
 
         public Builder() {
-			super(IncludeDef.class);
-		}
+            super(IncludeDef.class);
+        }
 
         public Builder setImports(List<DefDescriptor<IncludeDef>> imports) {
             this.imports = AuraUtil.immutableList(imports);
@@ -188,9 +176,31 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDef> implements Inc
             return this;
         }
 
+        public Builder setMinifyEnabled(boolean minify) {
+            minifyEnabled = minify;
+            return this;
+        }
+
         @Override
         public IncludeDefRefImpl build() {
+            if (includeDef != null) {
+                try {
+                    // add Javascript source codes to the builder
+                    JavascriptIncludeClass.Builder includeClassBuilder = new JavascriptIncludeClass.Builder();
+                    includeClassBuilder.setDefinition(this, includeDef);
+                    BaseJavascriptClass includeClass = includeClassBuilder.setMinify(minifyEnabled).build();
+                    minifiedClassCode = includeClass.getMinifiedCode();
+                    classCode = includeClass.getCode();
+                } catch (QuickFixException qfe) {
+                    setParseError(qfe);
+                }
+            }
             return new IncludeDefRefImpl(this);
+        }
+
+        public Builder setIncludeDef(IncludeDef def) {
+            this.includeDef = def;
+            return this;
         }
     }
 }

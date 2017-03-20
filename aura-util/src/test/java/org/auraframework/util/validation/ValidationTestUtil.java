@@ -54,7 +54,7 @@ public final class ValidationTestUtil {
         // csslint doesn't work when running with 1.6
         boolean cssLintErrorsReported = !System.getProperty("java.version").startsWith("1.6");
 
-        Assert.assertEquals(cssLintErrorsReported ? 3 : 0, errors.size());
+        Assert.assertEquals(cssLintErrorsReported ? 2 : 0, errors.size());
         ArrayList<String> expectedErrors = new ArrayList<>();
         if(cssLintErrorsReported){
             expectedErrors.add("basic.css [line 1, column 1] cssparser: CSS selector must begin with '.validationTestBasic' or '.THIS'");

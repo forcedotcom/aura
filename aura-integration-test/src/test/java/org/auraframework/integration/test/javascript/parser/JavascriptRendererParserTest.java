@@ -47,7 +47,7 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
                 "    rerender:function() {}\n" +
                 "})";
         DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
-        TextSource<RendererDef> source = loader.getSource(rendererDesc);
+        TextSource<RendererDef> source = (TextSource<RendererDef>)loader.getSource(rendererDesc);
 
         RendererDef rendererDef = new JavascriptRendererParser().getDefinition(rendererDesc, source);
 
@@ -68,7 +68,7 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
                 "    rerender:function() {}\n" +
                 "})";
         DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
-        TextSource<RendererDef> source = loader.getSource(rendererDesc);
+        TextSource<RendererDef> source = (TextSource<RendererDef>)loader.getSource(rendererDesc);
 
         RendererDef rendererDef = new JavascriptRendererParser().getDefinition(rendererDesc, source);
 
@@ -87,7 +87,7 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
                 "    render: function(cmp) {var v = 2;}\n" +
                 "})";
         DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
-        TextSource<RendererDef> source = loader.getSource(rendererDesc);
+        TextSource<RendererDef> source = (TextSource<RendererDef>)loader.getSource(rendererDesc);
 
         RendererDef rendererDef = new JavascriptRendererParser().getDefinition(rendererDesc, source);
 
@@ -107,7 +107,7 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
                 "    bar: function(cmp) {var v = 2;}\n"+
                 "})";
         DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
-        TextSource<RendererDef> source = loader.getSource(rendererDesc);
+        TextSource<RendererDef> source = (TextSource<RendererDef>)loader.getSource(rendererDesc);
 
         RendererDef rendererDef = new JavascriptRendererParser().getDefinition(rendererDesc, source);
 

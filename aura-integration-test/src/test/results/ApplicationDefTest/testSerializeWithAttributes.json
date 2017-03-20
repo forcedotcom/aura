@@ -1,38 +1,23 @@
 {
-  "s":1,
-  "v":{
-    "xs":"I",
-    "descriptor":"markup://aura:test",
-    "superDef":{
-      "s":2,
-      "v":{
-        "descriptor":"markup://aura:application"
-      }
+  "xs":"I",
+  "descriptor":"markup://aura:test",
+  "superDef":{
+    "descriptor":"markup://aura:application"
+  },
+  "attributeDefs":[
+    {
+      "name":"body",
+      "type":"aura://Aura.Component[]",
+      "xs":"G"
     },
-    "attributeDefs":[
-      {
-        "s":3,
-        "v":{
-          "name":"body",
-          "type":"aura://Aura.Component[]",
-          "xs":"G"
-        }
-      },
-      {
-        "s":4,
-        "v":{
-          "name":"testAttributeDescriptorName",
-          "type":"aura://String",
-          "default":"testValue"
-        }
-      }
-    ],
-    "componentClass":"function(){$A.componentService.addComponentClass(\"markup://aura:test\",function() {\nvar aura$test = {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:application\"\n  }\n};\nreturn aura$test;\n});\n}",
-    "locationChangeEventDef":{
-      "s":5,
-      "v":{
-        "descriptor":"markup://aura:locationChange"
-      }
+    {
+      "name":"testAttributeDescriptorName",
+      "type":"aura://String",
+      "default":"testValue"
     }
+  ],
+  "componentClass":"function(){$A.componentService.addComponentClass(\"markup://aura:test\",function() {\nvar aura$test = {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:application\"\n  }\n};\nreturn aura$test;\n});\n}",
+  "locationChangeEventDef":{
+    "descriptor":"markup://aura:locationChange"
   }
 }

@@ -15,10 +15,13 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.builder.RootDefinitionBuilder;
@@ -36,6 +39,7 @@ import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LocatorDef;
 import org.auraframework.def.MethodDef;
 import org.auraframework.def.ModelDef;
+import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.SVGDef;
@@ -43,28 +47,23 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.DefinitionAccessImpl;
-import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.impl.root.component.BaseComponentDefImpl.Builder;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.TextSource;
 import org.auraframework.system.SubDefDescriptor;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 /**
  */
@@ -121,12 +120,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
         if (source != null) {
             builder.setOwnHash(source.getHash());
         }
-        builder.events = Maps.newHashMap();
-        builder.interfaces = Sets.newLinkedHashSet();
-        builder.eventHandlers = Lists.newArrayList();
-        builder.imports = Lists.newArrayList();
-        builder.controllerDescriptors = Lists.newArrayList();
-        builder.facets = Lists.newArrayList();
         this.contextService = contextService;
     }
 
@@ -166,16 +159,16 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             RequiredVersionDefHandler<T> handler = new RequiredVersionDefHandler<>(this, xmlReader, source,
                     isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
             RequiredVersionDefImpl requiredVersionDef = handler.getElement();
-        	DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef.getDescriptor();
-        	if (builder.getRequiredVersionDefs().containsKey(requiredVersionDesc)) {
-        		tagError(
+            DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef.getDescriptor();
+            if (builder.getRequiredVersionDefs().containsKey(requiredVersionDesc)) {
+                tagError(
                         "There is already a namespace '%s' on %s '%s'.",
                         handler.getParentHandler().getDefDescriptor(),
                         requiredVersionDesc.getName(),
                         "%s", "%s"
                 );
-        	}
-        	builder.getRequiredVersionDefs().put(requiredVersionDesc, requiredVersionDef);
+            }
+            builder.getRequiredVersionDefs().put(requiredVersionDesc, requiredVersionDef);
         } else if (RegisterEventHandler.TAG.equalsIgnoreCase(tag)) {
             RegisterEventHandler<T> handler = new RegisterEventHandler<>(this, xmlReader, source,
                     isInInternalNamespace, definitionService, configAdapter, definitionParserAdapter);
@@ -201,7 +194,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
         } else if (EventHandlerDefHandler.TAG.equalsIgnoreCase(tag)) {
             builder.eventHandlers.add(new EventHandlerDefHandler(this, xmlReader, source, definitionService).getElement());
         } else if (LibraryDefRefHandler.TAG.equalsIgnoreCase(tag)) {
-            builder.imports.add(new LibraryDefRefHandler(this, xmlReader, source, definitionService).getElement());
+            builder.addLibraryImport(new LibraryDefRefHandler(this, xmlReader, source, definitionService).getElement());
         } else if (AttributeDefRefHandler.TAG.equalsIgnoreCase(tag)) {
             builder.facets.add(new AttributeDefRefHandler<>(this, xmlReader, source, isInInternalNamespace,
                     definitionService, configAdapter, definitionParserAdapter).getElement());
@@ -299,93 +292,68 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
         context.pushCallingDescriptor(builder.getDescriptor());
         try {
             super.readAttributes();
+
+            //
+            // Controller
+            //
+            builder.setClientControllerDef(getBundledDef(ControllerDef.class, "js"));
             String controllerName = getAttributeValue(ATTRIBUTE_CONTROLLER);
-            DefDescriptor<ControllerDef> controllerDescriptor = null;
             if (controllerName != null) {
-                controllerDescriptor = getDefDescriptor(controllerName, ControllerDef.class);
-            }
-
-            if (controllerDescriptor != null) {
-                builder.controllerDescriptors.add(controllerDescriptor);
-            }
-
-            String modelName = getAttributeValue(ATTRIBUTE_MODEL);
-            if (modelName != null) {
-                builder.modelDefDescriptor = definitionService.getDefDescriptor(
-                        modelName, ModelDef.class);
-            } else {
-                String jsModelName = String.format("js://%s.%s",
-                        defDescriptor.getNamespace(), defDescriptor.getName());
-                DefDescriptor<ModelDef> jsDescriptor = definitionService
-                        .getDefDescriptor(jsModelName, ModelDef.class);
-                if (definitionService.exists(jsDescriptor)) {
-                    builder.modelDefDescriptor = jsDescriptor;
-                }
-            }
-
-            // See if there is a clientController that has the same qname.
-            String jsDescriptorName = String.format("js://%s.%s",
-                    defDescriptor.getNamespace(), defDescriptor.getName());
-            DefDescriptor<ControllerDef> jsDescriptor = definitionService
-                    .getDefDescriptor(jsDescriptorName, ControllerDef.class);
-            if (definitionService.exists(jsDescriptor)) {
-                builder.controllerDescriptors.add(jsDescriptor);
+                builder.addControllerDescriptor(getDefDescriptor(controllerName, ControllerDef.class));
             }
 
             //
+            // Model
+            //
+            builder.setClientModelDef(getBundledDef(ModelDef.class, "js"));
+            String modelName = getAttributeValue(ATTRIBUTE_MODEL);
+            if (modelName != null) {
+                builder.modelDefDescriptor = getDefDescriptor(modelName, ModelDef.class);
+            }
+
+            //
+            // Renderers
             // TODO: W-1501702
             // Need to handle dual renderers for aura:placeholder
             //
+            builder.setClientRendererDef(getBundledDef(RendererDef.class, "js"));
             String rendererName = getAttributeValue(ATTRIBUTE_RENDERER);
             if (rendererName != null) {
-                List<String> rendererNames = AuraTextUtil.splitSimpleAndTrim(
-                        rendererName, ",", 0);
+                List<String> rendererNames = AuraTextUtil.splitSimpleAndTrim(rendererName, ",", 0);
                 for (String renderer : rendererNames) {
-                    builder.addRenderer(renderer);
-                }
-
-            } else {
-                // See if there is a clientRenderer that has the same qname.
-                DefDescriptor<RendererDef> jsRendererDescriptor = definitionService
-                        .getDefDescriptor(jsDescriptorName, RendererDef.class);
-                if (definitionService.exists(jsRendererDescriptor)) {
-                    builder.addRenderer(jsRendererDescriptor.getQualifiedName());
+                    builder.addRendererDescriptor(getDefDescriptor(renderer, RendererDef.class));
                 }
             }
 
+
+            //
+            // Helper
+            //
+            builder.setClientHelperDef(getBundledDef(HelperDef.class, "js"));
             String helperName = getAttributeValue(ATTRIBUTE_HELPER);
             if (helperName != null) {
-                List<String> helperNames = AuraTextUtil.splitSimpleAndTrim(
-                        helperName, ",", 0);
+                List<String> helperNames = AuraTextUtil.splitSimpleAndTrim(helperName, ",", 0);
                 for (String helper : helperNames) {
-                    builder.addHelper(helper);
-                }
-
-            } else {
-                // See if there is a helper that has the same qname.
-                DefDescriptor<HelperDef> jsHelperDescriptor = definitionService
-                        .getDefDescriptor(jsDescriptorName, HelperDef.class);
-                if (definitionService.exists(jsHelperDescriptor)) {
-                    builder.addHelper(jsHelperDescriptor.getQualifiedName());
+                    builder.addHelperDescriptor(getDefDescriptor(helper, HelperDef.class));
                 }
             }
-
-            // See if there is a style that has the same qname.
+            
+            //
+            // Style
+            //
             String styleName = getAttributeValue(ATTRIBUTE_STYLE);
-            if (AuraTextUtil.isNullEmptyOrWhitespace(styleName)) {
-                styleName = String.format("css://%s.%s",
-                        defDescriptor.getNamespace(), defDescriptor.getName());
+            if (styleName != null){
+                DefDescriptor<StyleDef> styleDescriptor = getDefDescriptor(styleName, StyleDef.class);
+                builder.setStyleDefExternal(styleDescriptor);
             }
-            DefDescriptor<StyleDef> cssDescriptor = definitionService.getDefDescriptor(
-                    styleName, StyleDef.class);
-            if (definitionService.exists(cssDescriptor)) {
-                builder.styleDescriptor = cssDescriptor;
+            StyleDef sd = getBundledDef(StyleDef.class, DefDescriptor.CSS_PREFIX);
+            if (sd != null) {
+                builder.setStyleDef(getBundledDef(StyleDef.class, DefDescriptor.CSS_PREFIX));
             }
 
-            // see if there is a flavored style def that has the same qname
-            DefDescriptor<FlavoredStyleDef> flavorDesc = Flavors.standardFlavorDescriptor(defDescriptor);
-            if (definitionService.exists(flavorDesc)) {
-                builder.flavoredStyleDescriptor = flavorDesc;
+            FlavoredStyleDef flavor = getBundledDef(FlavoredStyleDef.class, DefDescriptor.CSS_PREFIX);
+            if (flavor != null) {
+                builder.setFlavoredStyle(flavor);
             }
 
             String extendsName = getAttributeValue(ATTRIBUTE_EXTENDS);
@@ -397,7 +365,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             String implementsNames = getAttributeValue(ATTRIBUTE_IMPLEMENTS);
             if (implementsNames != null) {
                 for (String implementsName : AuraTextUtil.splitSimple(",",implementsNames)) {
-                    builder.interfaces.add(getDefDescriptor((implementsName.trim()), InterfaceDef.class));
+                    builder.addInterfaceDescriptor(getDefDescriptor((implementsName.trim()), InterfaceDef.class));
                 }
             }
 
@@ -410,11 +378,10 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                 builder.isExtensible = getBooleanAttributeValue(ATTRIBUTE_EXTENSIBLE);
             }
 
+            builder.setClientProviderDef(getBundledDef(ProviderDef.class, "js"));
             String providerName = getAttributeValue(ATTRIBUTE_PROVIDER);
-
             if (providerName != null) {
-                List<String> providerNames = AuraTextUtil.splitSimpleAndTrim(
-                        providerName, ",", 0);
+                List<String> providerNames = AuraTextUtil.splitSimpleAndTrim(providerName, ",", 0);
                 for (String provider : providerNames) {
                     builder.addProvider(provider);
                 }
@@ -422,30 +389,12 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
 
             String templateName = getAttributeValue(ATTRIBUTE_TEMPLATE);
             if (templateName != null) {
-                builder.templateDefDescriptor = definitionService.getDefDescriptor(
-                        templateName, ComponentDef.class);
+                builder.templateDefDescriptor = definitionService.getDefDescriptor(templateName, ComponentDef.class);
             }
 
-            DefDescriptor<DocumentationDef> documentationDescriptor = DefDescriptorImpl.getAssociateDescriptor(
-                    builder.getDescriptor(), DocumentationDef.class, DefDescriptor.MARKUP_PREFIX);
-
-            if (definitionService.exists(documentationDescriptor)) {
-                builder.setDocumentation(documentationDescriptor.getQualifiedName());
-            }
-
-            DefDescriptor<DesignDef> designDescriptor = DefDescriptorImpl.getAssociateDescriptor(
-                    builder.getDescriptor(), DesignDef.class, DefDescriptor.MARKUP_PREFIX);
-
-            if (definitionService.exists(designDescriptor)) {
-                builder.designDefDescriptor = designDescriptor;
-            }
-
-            DefDescriptor<SVGDef> svgDescriptor = DefDescriptorImpl.getAssociateDescriptor(builder.getDescriptor(),
-                    SVGDef.class, DefDescriptor.MARKUP_PREFIX);
-
-            if (definitionService.exists(svgDescriptor)) {
-                builder.svgDefDescriptor = svgDescriptor;
-            }
+            builder.setDocumentationDef(getBundledDef(DocumentationDef.class, DefDescriptor.MARKUP_PREFIX));
+            builder.setDesignDef(getBundledDef(DesignDef.class, DefDescriptor.MARKUP_PREFIX));
+            builder.setSVGDef(getBundledDef(SVGDef.class, DefDescriptor.MARKUP_PREFIX));
 
             builder.render = getAttributeValue(ATTRIBUTE_RENDER);
 

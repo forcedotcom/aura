@@ -15,21 +15,29 @@
  */
 package org.auraframework.integration.test.helper;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
+
+import javax.inject.Inject;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.javascript.helper.JavascriptHelperDef;
+import org.auraframework.impl.util.AuraTestingUtil;
+import org.auraframework.service.CompilerService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.TextSource;
 import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertThat;
 
 /**
  * Test class to verify implementation of JavascriptHelperDef.
  */
 public class JavascriptHelperDefTest extends AuraImplTestCase {
+    @Inject
+    CompilerService compilerService;
+
     /**
      * Verify JavascriptHelperDef is non-local.
      */
@@ -43,23 +51,24 @@ public class JavascriptHelperDefTest extends AuraImplTestCase {
 
     @Test
     public void testGetDescriptor() throws Exception {
-        DefDescriptor<HelperDef> expectedHelperDesc = addSourceAutoCleanup(HelperDef.class, "({})");
-        HelperDef helperDef = definitionService.getDefinition(expectedHelperDesc);
+        AuraTestingUtil util = getAuraTestingUtil();
+        TextSource<HelperDef> source = util.buildTextSource(util.getCustomNamespace(), HelperDef.class, "({})");
+        HelperDef helperDef = compilerService.compile(source.getDescriptor(), source);
 
         DefDescriptor<HelperDef> actualHelperDesc = helperDef.getDescriptor();
-        assertSame(expectedHelperDesc, actualHelperDesc);
+        assertSame(source.getDescriptor(), actualHelperDesc);
     }
 
     @Test
     public void testSerializeJavascriptHelperDef() throws Exception {
-        String helperJS =
-                "({\n" +
-                "    getHelp:function() {\n" +
-                "        return 'simply';\n" +
-                "    }\n" +
-                "})\n";
-        DefDescriptor<HelperDef> helperDesc = addSourceAutoCleanup(HelperDef.class, helperJS);
-        HelperDef helperDef = definitionService.getDefinition(helperDesc);
+        AuraTestingUtil util = getAuraTestingUtil();
+        TextSource<HelperDef> source = util.buildTextSource(util.getCustomNamespace(), HelperDef.class,
+                "({\n"
+                +"    getHelp:function() {\n"
+                +"        return 'simply';\n"
+                +"    }\n"
+                +"})\n");
+        HelperDef helperDef = compilerService.compile(source.getDescriptor(), source);
 
         assertThat(helperDef, instanceOf(JavascriptHelperDef.class));
         goldFileText(helperDef.getCode());

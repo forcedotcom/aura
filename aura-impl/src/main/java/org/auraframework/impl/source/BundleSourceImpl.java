@@ -34,10 +34,20 @@ import org.auraframework.system.Source;
 public class BundleSourceImpl<D extends Definition> implements BundleSource<D> {
     private final DefDescriptor<D> descriptor;
     private final Map<DefDescriptor<?>,Source<?>> bundleParts;
+    private final boolean minifyEnabled;
 
-    public BundleSourceImpl(DefDescriptor<D> descriptor, Map<DefDescriptor<?>, Source<?>> bundleParts) {
+    /**
+     * Create a bundle source.
+     *
+     * @param descriptor the descriptor for the bundle level descriptor.
+     * @param bundleParts a map of all of the bundle parts, including the top level markup.
+     * @param minifyEnabled set to true if we want the resulting bundle to be optimized.
+     */
+    public BundleSourceImpl(DefDescriptor<D> descriptor, Map<DefDescriptor<?>, Source<?>> bundleParts,
+            boolean minifyEnabled) {
         this.descriptor = descriptor;
         this.bundleParts = bundleParts;
+        this.minifyEnabled = minifyEnabled;
     }
 
     @Override
@@ -73,6 +83,14 @@ public class BundleSourceImpl<D extends Definition> implements BundleSource<D> {
     @Override
     public DefDescriptor<D> getDescriptor() {
         return descriptor;
+    }
+
+    /**
+     * @return the minifyEnabled
+     */
+    @Override
+    public boolean isMinifyEnabled() {
+        return minifyEnabled;
     }
 
     @Override

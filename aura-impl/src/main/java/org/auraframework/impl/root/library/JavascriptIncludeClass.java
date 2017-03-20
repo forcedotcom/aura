@@ -22,10 +22,8 @@ import java.util.List;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
-import org.auraframework.def.IncludeDefRef;
 import org.auraframework.impl.javascript.BaseJavascriptClass;
 import org.auraframework.system.Location;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -53,14 +51,15 @@ public class JavascriptIncludeClass extends BaseJavascriptClass {
 
     public static class Builder extends BaseJavascriptClass.Builder {
 
-        private IncludeDefRef includeDefRef;
+        private IncludeDefRefImpl.Builder includeDefRefBuilder;
         private IncludeDef includeDef;
         private boolean hasCode = false;
         private String jsDescriptor;
 
-        public Builder setDefinition(IncludeDefRef includeDefRef) throws QuickFixException {
-            this.includeDefRef = includeDefRef;
-            this.includeDef = includeDefRef.getDescriptor().getDef();
+        public Builder setDefinition(IncludeDefRefImpl.Builder includeDefRefBuilder, IncludeDef includeDef)
+                throws QuickFixException {
+            this.includeDefRefBuilder = includeDefRefBuilder;
+            this.includeDef = includeDef;
             return this;
         }
 
@@ -82,7 +81,7 @@ public class JavascriptIncludeClass extends BaseJavascriptClass {
         @Override
         protected String generate() throws QuickFixException {
 
-            jsDescriptor = getClientDescriptor(includeDefRef.getDescriptor());
+            jsDescriptor = getClientDescriptor(includeDefRefBuilder.getDescriptor());
             if (AuraTextUtil.isNullEmptyOrWhitespace(jsDescriptor)) {
                 throw new InvalidDefinitionException("Include classes require a non empty fully qualified name", null);
             }
@@ -124,7 +123,7 @@ public class JavascriptIncludeClass extends BaseJavascriptClass {
 
             out.append('[');
 
-            List<DefDescriptor<IncludeDef>> imports = includeDefRef.getImports();
+            List<DefDescriptor<IncludeDef>> imports = includeDefRefBuilder.imports;
             if (imports != null && !imports.isEmpty()) {
                 boolean first = true;
                 for (DefDescriptor<IncludeDef> desc : imports) {
@@ -140,10 +139,10 @@ public class JavascriptIncludeClass extends BaseJavascriptClass {
             out.append(']');
         }
 
-        private void writeExporter(StringBuilder out) {
+        private void writeExporter(StringBuilder out) throws QuickFixException {
 
-            List<String> aliases = includeDefRef.getAliases();
-            String export = includeDefRef.getExport();
+            List<String> aliases = includeDefRefBuilder.aliases;
+            String export = includeDefRefBuilder.export;
             String include = includeDef.getCode();
 
             try {
@@ -154,8 +153,8 @@ public class JavascriptIncludeClass extends BaseJavascriptClass {
                 StringBuffer sb = sw.getBuffer();
                 sb.deleteCharAt(sb.length() - 1);
                 include = sb.toString();
-            } catch (IOException | InvalidDefinitionException e) {
-                throw new AuraRuntimeException(e.getMessage());
+            } catch (IOException e ) {
+                throw new InvalidDefinitionException(e.getMessage(), null, e);
             }
 
             boolean hasAliases = aliases != null && !aliases.isEmpty();

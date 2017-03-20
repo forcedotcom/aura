@@ -27,13 +27,13 @@ public interface JavascriptCodeBuilder {
      * Set the client JavaScript code, normally a client class.
      * @param code the client JavaScript code.
      */
-	void setCode(String code);
+    void setCode(String code);
 
     /**
      * Add a label (global value provider) found in the JavaScript code.
      * @param expressionRef Expression referencing the label.
      */
-	void addExpressionRef(PropertyReference propRef);
+    void addExpressionRef(PropertyReference propRef);
 
     /**
      * Add a dependency (fully qualified names) found in the JavaScript code.

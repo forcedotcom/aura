@@ -213,6 +213,14 @@ HtmlComponent.prototype.setupValueProviders = function(customValueProviders) {
 };
 
 /**
+ * Simple type checking. All simple components implement aura:rootComponent and cannot be extended, 
+ * so the simple condition here is sufficient unless any of the individual components change.
+ */
+HtmlComponent.prototype.isInstanceOf = function(type) {
+    return type === "aura:html" || type === "aura:rootComponent";
+};
+
+/**
  * Copied from htmlRenderer.js
  * Now has access to internal APIs and advanced mode compilation.
  */

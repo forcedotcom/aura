@@ -17,42 +17,68 @@
     /**
      * Destroying a single component should call unrender only once.
      */
-    // W-1130639
-    _testDestroySingleComponent: {
+    testDestroySingleComponent: {
         attributes : {},
         test: function(component){
+            var expected = "unrender alone";
+
             component.find("alone").destroy();
             var logs = component.find("log").getElement();
+            var actual = $A.util.getText(logs);
+
             $A.test.assertEquals(1, logs.childNodes.length);
-            $A.test.assertEquals("unrender alone", logs.firstChild.innerText);
+            $A.test.assertEquals(expected, actual);
         }
     },
 
     /**
      * Destroying the root of a tree should call unrender only once for the root.
      */
-    // W-1130639
-    _testDestroyRootComponent: {
+    testDestroyRootComponent: {
         attributes : {},
         test: function(component){
+            var expected = "unrender root";
+
             component.find("root").destroy();
             var logs = component.find("log").getElement();
+            var actual = $A.util.getText(logs);
+            
             $A.test.assertEquals(1, logs.childNodes.length);
-            $A.test.assertEquals("unrender root", logs.firstChild.innerText);
+            $A.test.assertEquals(expected, actual);
         }
     },
 
     /**
      * Destroying a tree should call unrender only once for the children.
      */
-    // W-1130639
-    _testDestroyNestedComponent: {
+    testDestroyNestedComponent: {
         attributes : {},
         test: function(component){
+            var expected = "unrender nested";
+
             component.find("nested").destroy();
             var logs = component.find("log").getElement();
+            var actual = $A.util.getText(logs);
+            
             $A.test.assertEquals(1, logs.childNodes.length);
-            $A.test.assertEquals("unrender nested", logs.firstChild.innerText);
+            $A.test.assert(expected, actual);
+        }
+    },
+
+    /**
+     * We can remove the dom nodes before calling unrender, but that causes problems with Modules.
+     * Primarily that now components can't fire events to communicate they've been unrendered since those
+     * dom events won't bubble correctly through the dom.
+     */
+    testUnrenderInTheDocument: {
+        attributes: {},
+        test: function(component) {
+            var expected = "true";
+            component.find("nested").destroy();
+
+            var actual = $A.util.getText(component.find("isInDomLog").getElement());
+
+            $A.test.assertEquals(expected, actual);
         }
     }
 })

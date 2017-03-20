@@ -195,6 +195,14 @@ IfComponent.prototype.setupValueProviders = function(customValueProviders) {
     }
 };
 
+/**
+ * Simple type checking. All simple components implement aura:rootComponent and cannot be extended, 
+ * so the simple condition here is sufficient unless any of the individual components change.
+ */
+IfComponent.prototype.isInstanceOf = function(type) {
+    return type === "aura:if" || type === "aura:rootComponent";
+};
+
 IfComponent.prototype["controller"] = {
     "init": function(cmp, evt, helper) {
         var bodyTemplate  = cmp.attributeSet.getBody(cmp.globalId);

@@ -21,5 +21,8 @@
     <auratest:unrenderComponent aura:id="root" name="root"><b><i>root of evil</i></b><br/></auratest:unrenderComponent>
     <div aura:id="nested"><span><h1><auratest:unrenderComponent name="nested"><b><i>rat's nest</i></b><br/></auratest:unrenderComponent></h1></span></div>
     <br/>
-    <div aura:id="log"/>
+    Unrender Count: <span aura:id="log"/>
+    <br/>
+    <br/>
+    Was Component in the Dom while Unrendering: <span aura:id="isInDomLog"/>
 </aura:component>

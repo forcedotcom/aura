@@ -19,9 +19,15 @@
         var log = cmp.find("log").getElement();
         if(!log )
             return;
-        var div = document.createElement("div");
-        div.innerText = evtToken;
-        $A.util.insertFirst(div, log);
+        var span = document.createElement("span");
+        $A.util.setText(span, evtToken+"");
+        $A.util.insertFirst(span, log);
+
+        var isInDomLog = cmp.find("isInDomLog").getElement();
+        var element = cmp.getElement();
+        var isInDom = $A.util.contains(document.body, element);
+        
+        $A.util.setText(isInDomLog, isInDom+"");
     },
 
     destroy : function(cmp, event) {

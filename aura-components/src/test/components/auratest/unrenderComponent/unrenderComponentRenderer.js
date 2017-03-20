@@ -18,6 +18,8 @@
         var renderEvent = $A.get("e.auratest:renderEvent");
         renderEvent.setParams({ "event" : "unrender " + component.get("v.name") });
         renderEvent.fire();
+
         this.superUnrender();
+
     }
 })

@@ -203,6 +203,14 @@ IterationComponent.prototype.setupValueProviders = function(customValueProviders
     }
 };
 
+/**
+ * Simple type checking. All simple components implement aura:rootComponent and cannot be extended, 
+ * so the simple condition here is sufficient unless any of the individual components change.
+ */
+IterationComponent.prototype.isInstanceOf = function(type) {
+    return type === "aura:iteration" || type === "aura:rootComponent";
+};
+
 IterationComponent.prototype["controller"] = {
     "rangeChange": function(component, evt, helper) {
         helper.updateBody(component);

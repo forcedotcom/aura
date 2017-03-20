@@ -279,25 +279,28 @@ AuraRenderingService.prototype.unrender = function(components) {
     var context=$A.getContext();
     var cmp;
     var container;
+    var beforeUnrenderElements;
     for (var i = 0,length=components.length; i < length; i++){
         cmp = components[i];
         if ($A.util.isComponent(cmp) && cmp.destroyed!==1 && cmp.isRendered()) {
             cmp.setUnrendering(true);
-            // Use the container to check if we're in the middle of unrendering a parent component.
-            // Sometimes that is not available, so otherwise move to considering the owner. 
-            container = cmp.getContainer() || cmp.getOwner();
-            
-            this.removeElement(this.getMarker(cmp), container);
-
-            // If the parent is NOT unrendering, then remove these and unrender it's children.
-            // In the unrenderFacets function, those elements won't be removed from the DOM since their parents here 
-            // are getting removed.
-            if(container && !container.getConcreteComponent().isUnrendering()) {
-                // Disconnect a components elements
-                this.disconnectComponent(cmp);
-            }
-
             context.setCurrentAccess(cmp);
+            
+                // Use the container to check if we're in the middle of unrendering a parent component.
+                // Sometimes that is not available, so otherwise move to considering the owner. 
+                container = cmp.getContainer() || cmp.getOwner();
+
+                // If the parent is NOT unrendering, then remove these and unrender it's children.
+                // In the unrenderFacets function, those elements won't be removed from the DOM since their parents here 
+                // are getting removed.
+                if(container && !container.getConcreteComponent().isUnrendering()) {
+                    // This is the top of the unrendering tree. 
+                    // Save the elements we want to remove, so they can be deleted after the unrender is called.
+                    beforeUnrenderElements = cmp.getElements();
+                } else {
+                    beforeUnrenderElements = null;
+                }
+
             try {
                 cmp["unrender"]();
             } catch (e) {
@@ -312,6 +315,17 @@ AuraRenderingService.prototype.unrender = function(components) {
                 }
             } finally {
                 context.releaseCurrentAccess(cmp);
+
+                this.removeElement(this.getMarker(cmp), container);
+
+                // If we have beforeUnrenderElements, then we're in a component that should have its 
+                // elements removed, and those elements are the ones in beforeUnrenderElements. 
+                if(beforeUnrenderElements && beforeUnrenderElements.length) {
+                    for(var c=0,len=beforeUnrenderElements.length;c<len;c++) {
+                        $A.util.removeElement(beforeUnrenderElements[c], container);
+                    }
+                }
+                
                 if (cmp.destroyed!==1) {
                     cmp.setRendered(false);
                     if (visited) {
@@ -530,7 +544,8 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
     }
 
     // JBUCH: HALO: FIXME: THIS IS SUB-OPTIMAL, BUT WE NEVER WANT TO REASSOCIATE HTML COMPONENTS
-    if (!component.isInstanceOf("aura:html")){
+    var type = component.getType();
+    if (type!=="aura:html"){
         component.disassociateElements();
         this.associateElements(component, ret);
     }
@@ -591,10 +606,11 @@ AuraRenderingService.prototype.setMarker = function(cmp, newMarker) {
         return;
     }
 
-    // Html Markers are added in the render phase. 
-    // They always have a 1 to 1 mapping from component to element, and will never
-    // use a comment marker. So no need to add overhead of tracking html element markers.
-    if(!cmp.isInstanceOf("aura:html")) {
+    // Html and Text Markers are special parts of the framework.
+    // They always have a 1 to 1 mapping from component to element|textnode, and will never
+    // use a comment marker. So no need to add overhead of tracking markers just for these component types.
+    var type = cmp.getType();
+    if(type!=="aura:html") {
         $A.renderingService.addMarkerReference(newMarker, concrete.getGlobalId());
     }
     if(oldMarker) {
@@ -942,6 +958,12 @@ AuraRenderingService.prototype.associateElements = function(cmp, elements) {
     }
 };
 
+/**
+ * Create a new Comment marker optinally before the specified target and for the specified reason.
+ * Often the reason is something relating to what was unrendered or rendered such as a globalId.
+ *
+ * @private
+ */
 AuraRenderingService.prototype.createMarker = function(target,reason){
     var node = document.createComment(reason);
     node.aura_marker=true;
@@ -951,24 +973,35 @@ AuraRenderingService.prototype.createMarker = function(target,reason){
     return node;
 };
 
+/**
+ * Basically was this node created by the createMarker() function above.
+ * Since we use comment markers as placement in the dom for non-rendered components and expressions
+ * We often branch logic on wether the element is a comment marker or not.
+ * @private
+ */
 AuraRenderingService.prototype.isCommentMarker = function(node){
     return node&&node.aura_marker;
 };
 
+/**
+ * If you use component.getElements() it will normalize the array, but also slice it to give you a copy.
+ * When in trusted code that is aware of this situation, we can avoid the cost of slicing the array.
+ * 
+ * @private
+ */
 AuraRenderingService.prototype.getElements = function(component) {
     // avoid a slice of the elements collection
     return component.getConcreteComponent().elements || [];
 };
 
-AuraRenderingService.prototype.disconnectComponent = function(component) {
-    var elements = this.getElements(component);
-    if(elements && elements.length) {
-        for(var c=0,length=elements.length;c<length;c++) {
-            $A.util.removeElement(elements[c]);
-        }
-    }
-};
-
+/**
+ * Get a uniqueID to identify different HTML elements by.
+ * This method tries to use the data-rendered-by attribute first if possible.
+ * If not (such as comment nodes) then we'll just append our own data attribute.
+ * We need this so we can maintain a map of references to a component without a reference to the component.
+ * 
+ * @private
+ */
 AuraRenderingService.prototype.getUid = function(element) {
     if(element.nodeType === 1) {
         // Try to use the rendered-by attribute which should be on almost everything
@@ -978,7 +1011,7 @@ AuraRenderingService.prototype.getUid = function(element) {
             return id;
         }
 
-        // Try to use data attributes for our unique ID
+        // Try to use data attributes for our unique ID of our own creation to the element as the fallback.
         id = $A.util.getDataAttribute(element, this.DATA_UID_KEY);
         if(id!==null) {
             return id;
@@ -987,6 +1020,12 @@ AuraRenderingService.prototype.getUid = function(element) {
     return element[this.DATA_UID_KEY];
 };
 
+/**
+ * Assign a new unique id to the specified element.
+ * The unique ID is just an incrementing number on the service.
+ * 
+ * @private
+ */
 AuraRenderingService.prototype.newUid = function(element) {
     var nextUid = this.uid++;
     var success = null;
@@ -1003,6 +1042,12 @@ AuraRenderingService.prototype.newUid = function(element) {
     return nextUid;
 };
 
+/**
+ * Get the unique id for an element. If it does not have one, generate one and return that.
+ * Uses a combination of getUid() and newUid().
+ * 
+ * @private
+ */
 AuraRenderingService.prototype.resolveUid = function(element) {
     var uid = this.getUid(element);
     if(uid === null || uid === undefined) {
@@ -1011,6 +1056,12 @@ AuraRenderingService.prototype.resolveUid = function(element) {
     return uid;
 };
 
+/**
+ * The marker can be any dom node. This method tracks that that dom node is being
+ * referenced by the component with the specified globalid
+ * 
+ * @private
+ */
 AuraRenderingService.prototype.addMarkerReference = function(marker, globalId) {
     if(!marker||!globalId) { 
         return;
@@ -1023,6 +1074,11 @@ AuraRenderingService.prototype.addMarkerReference = function(marker, globalId) {
     existing.add(globalId);
 };
 
+/**
+ * The specified dom node (marker) is no longer being used by the component with the specified global id.
+ * 
+ * @private
+ */
 AuraRenderingService.prototype.removeMarkerReference = function(marker, globalId) {
     if(!marker||!globalId) { return; }
     var references = this.markerToReferencesMap[this.resolveUid(marker)];
@@ -1032,6 +1088,12 @@ AuraRenderingService.prototype.removeMarkerReference = function(marker, globalId
     }
 };
 
+/**
+ * Get a collection of IDs who are using the specified element as a marker.
+ * If the element is being removed, we'll want to move those references to another element or a comment marker.
+ * 
+ * @private
+ */
 AuraRenderingService.prototype.getMarkerReferences = function(marker) {
     if(!marker) { 
         return null;
@@ -1039,6 +1101,13 @@ AuraRenderingService.prototype.getMarkerReferences = function(marker) {
     return this.markerToReferencesMap[this.resolveUid(marker)];
 };
 
+/**
+ * Carefully remove the marker from the container. 
+ * If we're trying to remove a shared comment marker, we do nothing since others are using it.
+ * If the parent isn't unrendering or is being destroyed, we won't do anything either since the container will have its dom node removed and that will remove all its children from the dom.
+ * 
+ * @private
+ */
 AuraRenderingService.prototype.removeElement = function(marker, container) {
     //var container = component.getConcreteComponent().getContainer();
     //if(!container || !container.getConcreteComponent().isUnrendering()) {
@@ -1059,6 +1128,13 @@ AuraRenderingService.prototype.removeElement = function(marker, container) {
     }
 };
 
+/**
+ * All the components who are using the specified dom node as a marker need to now be moved to a comment marker.
+ * This method doesn't check if you're moving from one comment node to another. That would be a waste of time, so 
+ * be aware you should verify that first.
+ * 
+ * @private
+ */
 AuraRenderingService.prototype.moveReferencesToMarker = function(marker) {
     var references = this.getMarkerReferences(marker);
     var newMarker = this.createMarker(null, "unrender marker: " + marker.nodeValue);
@@ -1079,6 +1155,12 @@ AuraRenderingService.prototype.moveReferencesToMarker = function(marker) {
     }
 };
 
+/**
+ * Are multiple components using this as a marker?
+ * Shared markers need to have their other references moved before being able to remove the marker node from the dom.
+ * 
+ * @private
+ */
 AuraRenderingService.prototype.isSharedMarker = function(marker) {
     var references = this.getMarkerReferences(marker);
     if(references) {
@@ -1087,7 +1169,16 @@ AuraRenderingService.prototype.isSharedMarker = function(marker) {
     return false;
 };
 
-
+/**
+ * The ReferenceCollection is a data structure for tracking references from components to dom nodes.
+ * Since it is a many (components() to one element mapping, this is necessary to track whos using what.
+ * The collection will optimize to not create an array at first. Only after you've added more than one reference
+ * will the array be created.
+ * 
+ * Lastly, this collecton acts just like a Set(). You cannot add the same value twice, which helps with our reference counting logic. 
+ * 
+ * @private
+ */
 AuraRenderingService.prototype.ReferenceCollection = function() {
     // this.references = "" || [];
 };

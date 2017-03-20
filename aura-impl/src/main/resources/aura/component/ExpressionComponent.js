@@ -221,6 +221,15 @@ ExpressionComponent.prototype.setupComponentDef = function() {
     $A.lockerService.trust(this.componentDef, this);
 };
 
+/**
+ * Simple type checking. All simple components implement aura:rootComponent and cannot be extended, 
+ * so the simple condition here is sufficient unless any of the individual components change.
+ */
+ExpressionComponent.prototype.isInstanceOf = function(type) {
+    return type === "aura:expression" || type === "aura:rootComponent";
+};
+
+
 ExpressionComponent.prototype["renderer"] = {
     "render" : function(component) {
         var value = component.attributeSet.getValue("value");

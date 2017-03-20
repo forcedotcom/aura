@@ -99,14 +99,14 @@ function LockerService() {
 		containerSupportsRequiredFeatures : function() {
 			// Sniff for basic ES5 and strict mode support for Locker
 			var isStrictModeAvailable = $A.util.globalEval("(function() { \"use strict\"; return this === undefined; })()");
-			
+
 			var mapIsAvailable = typeof Map !== "undefined" && Map.prototype["keys"] !== undefined && Map.prototype["values"] !== undefined
 			&& Map.prototype["entries"] !== undefined;
-			
+
 			var proxyIsAvailable = typeof Proxy !== "undefined" && (new Proxy({}, {
 				getPrototypeOf: function() { return Node.prototype; }
 			})) instanceof Node;
-			
+
 			return isStrictModeAvailable && mapIsAvailable && proxyIsAvailable;
 		},
 
@@ -264,7 +264,7 @@ function LockerService() {
 		unwrap : ls_unwrap,
 
 		trust : ls_trust,
-		
+
 		getRaw: function(value) {
 			if (value) {
 				var key = ls_getKey(value);
@@ -272,7 +272,7 @@ function LockerService() {
 					value = ls_getRef(value, key) || value;
 				}
 			}
-			
+
 			return value;
 		},
 
@@ -289,8 +289,10 @@ function LockerService() {
 	// Exports
 	service["create"] = service.create;
 	service["createForDef"] = service.createForDef;
+    service["getEnv"] = service.getEnv;
 	service["getEnvForSecureObject"] = service.getEnvForSecureObject;
 	service["getKeyForNamespace"] = service.getKeyForNamespace;
+    service["trust"] = service.trust;
     service["wrapComponent"] = service.wrapComponent;
 	service["runScript"] = service.runScript;
 

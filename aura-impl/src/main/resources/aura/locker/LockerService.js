@@ -14,291 +14,296 @@
  * limitations under the License.
  */
 function LockerService() {
-	"use strict";
+    "use strict";
 
-	// #include aura.locker.InlineSafeEval
-	// #include aura.locker.LockerKeyManager
-	// #include aura.locker.SecureObject
-	// #include aura.locker.SecureDOMEvent
-	// #include aura.locker.SecureIFrameElement
-	// #include aura.locker.SecureElement
-	// #include aura.locker.SecureScriptElement
-	// #include aura.locker.SecureDocument
-	// #include aura.locker.SecureAura
-	// #include aura.locker.SecureStorage
-	// #include aura.locker.SecureMutationObserver
-	// #include aura.locker.SecureNavigator
-	// #include aura.locker.SecureNotification
-	// #include aura.locker.SecureXMLHttpRequest
-	// #include aura.locker.SecureWindow
-	// #include aura.locker.SecureAuraEvent
-	// #include aura.locker.SecureAction
-	// #include aura.locker.SecureComponent
-	// #include aura.locker.SecureComponentRef
+    // #include aura.locker.InlineSafeEval
+    // #include aura.locker.LockerKeyManager
+    // #include aura.locker.SecureObject
+    // #include aura.locker.SecureDOMEvent
+    // #include aura.locker.SecureIFrameElement
+    // #include aura.locker.SecureElement
+    // #include aura.locker.SecureScriptElement
+    // #include aura.locker.SecureDocument
+    // #include aura.locker.SecureAura
+    // #include aura.locker.SecureStorage
+    // #include aura.locker.SecureMutationObserver
+    // #include aura.locker.SecureNavigator
+    // #include aura.locker.SecureNotification
+    // #include aura.locker.SecureXMLHttpRequest
+    // #include aura.locker.SecureWindow
+    // #include aura.locker.SecureAuraEvent
+    // #include aura.locker.SecureAction
+    // #include aura.locker.SecureComponent
+    // #include aura.locker.SecureComponentRef
 
-	var lockers = [];
-	var keyToEnvironmentMap = {};
-	var lockerShadows;
+    var lockers = [];
+    var keyToEnvironmentMap = {};
+    var lockerShadows;
+    var isLockerEnabled;
 
-	// This whilelist represents reflective ECMAScript APIs or reflective DOM APIs
-	// which, by definition, do not provide authority or access to globals.
-	var whitelist = [
-	// Accessible Intrinsics (not reachable by own property name traversal)
-	// -> from ES5
-	"ThrowTypeError",
-	// -> from ES6.
-	"IteratorPrototype", "ArrayIteratorPrototype", "StringIteratorPrototype", "MapIteratorPrototype", "SetIteratorPrototype", "GeneratorFunction", "TypedArray",
+    // This whilelist represents reflective ECMAScript APIs or reflective DOM APIs
+    // which, by definition, do not provide authority or access to globals.
+    var whitelist = [
+                     // Accessible Intrinsics (not reachable by own property name traversal)
+                     // -> from ES5
+                     "ThrowTypeError",
+                     // -> from ES6.
+                     "IteratorPrototype", "ArrayIteratorPrototype", "StringIteratorPrototype", "MapIteratorPrototype", "SetIteratorPrototype", "GeneratorFunction", "TypedArray",
 
-	// Intrinsics
-	// -> from ES5
-	"Function", "WeakMap", "StringMap",
-	// Proxy,
-	"escape", "unescape", "Object", "NaN", "Infinity", "undefined",
-	// eval,
-	"parseInt", "parseFloat", "isNaN", "isFinite", "decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent", "Function", "Array", "String", "Boolean", "Number",
-			"Math", "Date", "RegExp", "Error", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "JSON",
-			// -> from ES6
-			"ArrayBuffer", "Int8Array", "Uint8Array", "Uint8ClampedArray", "Int16Array", "Uint16Array", "Int32Array", "Uint32Array", "Float32Array", "Float64Array", "DataView",
-			"Promise",
+                     // Intrinsics
+                     // -> from ES5
+                     "Function", "WeakMap", "StringMap",
+                     // Proxy,
+                     "escape", "unescape", "Object", "NaN", "Infinity", "undefined",
+                     // eval,
+                     "parseInt", "parseFloat", "isNaN", "isFinite", "decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent", "Function", "Array", "String", "Boolean", "Number",
+                     "Math", "Date", "RegExp", "Error", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "JSON",
+                     // -> from ES6
+                     "ArrayBuffer", "Int8Array", "Uint8Array", "Uint8ClampedArray", "Int16Array", "Uint16Array", "Int32Array", "Uint32Array", "Float32Array", "Float64Array", "DataView",
+                     "Promise",
 
-			// Misc
-			"Intl"];
+                     // Misc
+                     "Intl"];
 
-	var nsKeys = {};
+    var nsKeys = {};
 
-	var workerFrame = window.document.getElementById("safeEvalWorkerCustom");
-	var safeEvalWindow = workerFrame && workerFrame.contentWindow;
-	var typeToOtherRealmType;
+    var workerFrame = window.document.getElementById("safeEvalWorkerCustom");
+    var safeEvalWindow = workerFrame && workerFrame.contentWindow;
+    var typeToOtherRealmType;
 
-	// Wire up bidirectional back references from one realm to the other for cross realm instanceof checks
-	if (safeEvalWindow) {
-		typeToOtherRealmType = new Map();
-		var types = Object.keys(SecureWindow.metadata["prototypes"]["Window"]).concat([ "Blob", "File", "FormData", "Notification" ]);
-		types.forEach(function(name) {
-			try{
-				var mainInstance = window[name];
-				var safeEvalInstance = safeEvalWindow[name];
-				if (mainInstance && safeEvalInstance) {
-					typeToOtherRealmType.set(safeEvalInstance, mainInstance);
-					typeToOtherRealmType.set(mainInstance, safeEvalInstance);
-				}
-			}
-			catch(e){
-			    //continue if we hit exception getting properties
-			    //e.g window.frameElement throws AccessDenied in Edge/IE)
-			}
-		});
-	}
+    // Wire up bidirectional back references from one realm to the other for cross realm instanceof checks
+    if (safeEvalWindow) {
+        typeToOtherRealmType = new Map();
+        var types = Object.keys(SecureWindow.metadata["prototypes"]["Window"]).concat([ "Blob", "File", "FormData", "Notification" ]);
+        types.forEach(function(name) {
+            try{
+                var mainInstance = window[name];
+                var safeEvalInstance = safeEvalWindow[name];
+                if (mainInstance && safeEvalInstance) {
+                    typeToOtherRealmType.set(safeEvalInstance, mainInstance);
+                    typeToOtherRealmType.set(mainInstance, safeEvalInstance);
+                }
+            }
+            catch(e){
+                //continue if we hit exception getting properties
+                //e.g window.frameElement throws AccessDenied in Edge/IE)
+            }
+        });
+    }
 
-	// defining LockerService as a service
-	var service = {
-		isEnabled : function() {
-			return $A.getContext().isLockerServiceEnabled;
-		},
+    // defining LockerService as a service
+    var service = {
+            isEnabled : function() {	    
+                //cache the result to avoid having to do the lookup
+                if(isLockerEnabled === undefined){
+                    isLockerEnabled =  $A.getContext().isLockerServiceEnabled || false;
+                }
+                return isLockerEnabled;
+            },
 
-		containerSupportsRequiredFeatures : function() {
-			// Sniff for basic ES5 and strict mode support for Locker
-			var isStrictModeAvailable = $A.util.globalEval("(function() { \"use strict\"; return this === undefined; })()");
+            containerSupportsRequiredFeatures : function() {
+                // Sniff for basic ES5 and strict mode support for Locker
+                var isStrictModeAvailable = $A.util.globalEval("(function() { \"use strict\"; return this === undefined; })()");
 
-			var mapIsAvailable = typeof Map !== "undefined" && Map.prototype["keys"] !== undefined && Map.prototype["values"] !== undefined
-			&& Map.prototype["entries"] !== undefined;
+                var mapIsAvailable = typeof Map !== "undefined" && Map.prototype["keys"] !== undefined && Map.prototype["values"] !== undefined
+                && Map.prototype["entries"] !== undefined;
 
-			var proxyIsAvailable = typeof Proxy !== "undefined" && (new Proxy({}, {
-				getPrototypeOf: function() { return Node.prototype; }
-			})) instanceof Node;
+                var proxyIsAvailable = typeof Proxy !== "undefined" && (new Proxy({}, {
+                    getPrototypeOf: function() { return Node.prototype; }
+                })) instanceof Node;
 
-			return isStrictModeAvailable && mapIsAvailable && proxyIsAvailable;
-		},
+                return isStrictModeAvailable && mapIsAvailable && proxyIsAvailable;
+            },
 
-		createForDef : function(code, def) {
-			var descriptor = def.getDescriptor();
-			var namespace = descriptor.getNamespace();
-			var name = descriptor.getName();
-			var descriptorDebuggableURL = "components/" + namespace + "/" + name + ".js";
-			var key = this.getKeyForNamespace(namespace);
+            createForDef : function(code, def) {
+                var descriptor = def.getDescriptor();
+                var namespace = descriptor.getNamespace();
+                var name = descriptor.getName();
+                var descriptorDebuggableURL = "components/" + namespace + "/" + name + ".js";
+                var key = this.getKeyForNamespace(namespace);
 
-			// Key this def so we can transfer the key to component instances
-			ls_setKey(def, key);
+                // Key this def so we can transfer the key to component instances
+                ls_setKey(def, key);
 
-			return this.create(code, key, descriptorDebuggableURL);
-		},
+                return this.create(code, key, descriptorDebuggableURL);
+            },
 
-		getEnv : function(key, doNotCreate) {
-			var psuedoKeySymbol = JSON.stringify(key);
-			var env = keyToEnvironmentMap[psuedoKeySymbol];
-			if (!env && !doNotCreate) {
-				env = keyToEnvironmentMap[psuedoKeySymbol] = SecureWindow(window, key, whitelist);
-			}
+            getEnv : function(key, doNotCreate) {
+                var psuedoKeySymbol = JSON.stringify(key);
+                var env = keyToEnvironmentMap[psuedoKeySymbol];
+                if (!env && !doNotCreate) {
+                    env = keyToEnvironmentMap[psuedoKeySymbol] = SecureWindow(window, key, whitelist);
+                }
 
-			return env;
-		},
+                return env;
+            },
 
-		getKeyForNamespace : function(namespace) {
-			// Get the locker key for this namespace
-			var key = nsKeys[namespace];
-			if (!key) {
-				key = nsKeys[namespace] = Object.freeze({
-					"namespace" : namespace
-				});
-			}
+            getKeyForNamespace : function(namespace) {
+                // Get the locker key for this namespace
+                var key = nsKeys[namespace];
+                if (!key) {
+                    key = nsKeys[namespace] = Object.freeze({
+                        "namespace" : namespace
+                    });
+                }
 
-			return key;
-		},
+                return key;
+            },
 
-		getEnvForSecureObject : function(st, doNotCreate) {
-			var key = ls_getKey(st);
-			return key ? this.getEnv(key, doNotCreate) : undefined;
-		},
+            getEnvForSecureObject : function(st, doNotCreate) {
+                var key = ls_getKey(st);
+                return key ? this.getEnv(key, doNotCreate) : undefined;
+            },
 
-        runScript : function(code, namespace) {
-            var key = this.getKeyForNamespace(namespace);
-            // force Locker because scripts may be run before context is established
-            var ret = this.createInternal(code.toString(), key, undefined, undefined, true);
-            ret["returnValue"]();
-        },
+            runScript : function(code, namespace) {
+                var key = this.getKeyForNamespace(namespace);
+                // force Locker because scripts may be run before context is established
+                var ret = this.createInternal(code.toString(), key, undefined, undefined, true);
+                ret["returnValue"]();
+            },
 
-        create : function(code, key, sourceURL, skipPreprocessing) {
-            return this.createInternal(code, key, sourceURL, skipPreprocessing);
-        },
+            create : function(code, key, sourceURL, skipPreprocessing) {
+                return this.createInternal(code, key, sourceURL, skipPreprocessing);
+            },
 
-        createInternal : function(code, key, sourceURL, skipPreprocessing, forceLocker) {
-            var envRec;
+            createInternal : function(code, key, sourceURL, skipPreprocessing, forceLocker) {
+                var envRec;
 
-			if (!lockerShadows) {
-				lazyInitInlinedSafeEvalWorkaround();
-			}
+                if (!lockerShadows) {
+                    lazyInitInlinedSafeEvalWorkaround();
+                }
 
-			if (forceLocker || this.isEnabled()) {
-				envRec = this.getEnv(key);
-				if (!lockerShadows) {
-					// one time operation to lazily create this giant object with
-					// the value of `undefined` to shadow every global binding in
-					// `window`, except for those with no authority defined in the
-					// `whitelist`. this object will be used as the base lexical
-					// scope when evaluating all non-privilege components.
-					lockerShadows = {};
-					Object.getOwnPropertyNames(window).forEach(function(name) {
-						// apply whitelisting to the lockerShadows
-						// TODO: recursive to cover WindowPrototype properties as well
-						var value = whitelist.indexOf(name) >= 0 ? window[name] : undefined;
-						lockerShadows[name] = value;
-					});
-				}
-			} else {
-				// Degrade gracefully back to global window, no shadows, etc
-				envRec = window;
+                if (forceLocker || this.isEnabled()) {
+                    envRec = this.getEnv(key);
+                    if (!lockerShadows) {
+                        // one time operation to lazily create this giant object with
+                        // the value of `undefined` to shadow every global binding in
+                        // `window`, except for those with no authority defined in the
+                        // `whitelist`. this object will be used as the base lexical
+                        // scope when evaluating all non-privilege components.
+                        lockerShadows = {};
+                        Object.getOwnPropertyNames(window).forEach(function(name) {
+                            // apply whitelisting to the lockerShadows
+                            // TODO: recursive to cover WindowPrototype properties as well
+                            var value = whitelist.indexOf(name) >= 0 ? window[name] : undefined;
+                            lockerShadows[name] = value;
+                        });
+                    }
+                } else {
+                    // Degrade gracefully back to global window, no shadows, etc
+                    envRec = window;
 
-				if (!lockerShadows) {
-					lockerShadows = {};
-				}
-			}
+                    if (!lockerShadows) {
+                        lockerShadows = {};
+                    }
+                }
 
-			var returnValue = window['$$safe-eval$$'](code, sourceURL, skipPreprocessing, envRec, lockerShadows);
+                var returnValue = window['$$safe-eval$$'](code, sourceURL, skipPreprocessing, envRec, lockerShadows);
 
-			var locker = {
-				globals : envRec,
-				returnValue : returnValue
-			};
+                var locker = {
+                        globals : envRec,
+                        returnValue : returnValue
+                };
 
-			locker["globals"] = locker.globals;
-			locker["returnValue"] = locker.returnValue;
+                locker["globals"] = locker.globals;
+                locker["returnValue"] = locker.returnValue;
 
-			Object.freeze(locker);
-			lockers.push(locker);
+                Object.freeze(locker);
+                lockers.push(locker);
 
-			return locker;
-		},
+                return locker;
+            },
 
-		destroy : function(locker) {
-			var index = lockers.indexOf(locker);
-			if (index >= 0) {
-				lockers.splice(index, 1);
-			}
-		},
+            destroy : function(locker) {
+                var index = lockers.indexOf(locker);
+                if (index >= 0) {
+                    lockers.splice(index, 1);
+                }
+            },
 
-		destroyAll : function() {
-			lockers = [];
-			keyToEnvironmentMap = [];
-		},
+            destroyAll : function() {
+                lockers = [];
+                keyToEnvironmentMap = [];
+            },
 
-		wrapComponent : function(component) {
-			if (!$A.lockerService.isEnabled()) {
-				return component;
-			}
+            wrapComponent : function(component) {
+                if (!this.isEnabled()) {
+                    return component;
+                }
 
-			if (typeof component !== "object") {
-				return component;
-			}
+                var key = ls_getKey(component);
+                if (!key) {
+                    return component;
+                }
 
-			var key = ls_getKey(component);
-			if (!key) {
-				return component;
-			}
+                if (typeof component !== "object") {
+                    return component;
+                }
 
-			var def = component.getDef();
-			if ($A.clientService.isInternalNamespace(def.getDescriptor().getNamespace()) && !def.isInstanceOf("aura:requireLocker")) {
-				return component;
-			}
+                var def = component.getDef();
+                if ($A.clientService.isInternalNamespace(def.getDescriptor().getNamespace()) && !def.isInstanceOf("aura:requireLocker")) {
+                    return component;
+                }
 
-			return SecureComponent(component, key);
-		},
+                return SecureComponent(component, key);
+            },
 
-		wrapComponentEvent : function(component, event) {
-			if (!$A.lockerService.isEnabled()) {
-				return event;
-			}
+            wrapComponentEvent : function(component, event) {
+                if (!this.isEnabled()) {
+                    return event;
+                }
 
-			if (typeof event !== "object" || typeof component !== "object") {
-				return event;
-			}
+                var key = ls_getKey(component);
+                if (!key) {
+                    return event;
+                }
 
-			var key = ls_getKey(component);
-			if (!key) {
-				return event;
-			}
+                if (typeof event !== "object" || typeof component !== "object") {
+                    return event;
+                }
 
-			// if the component is secure, the event have to be secure.
-			return event instanceof Aura.Event.Event ? SecureAuraEvent(event, key) : SecureDOMEvent(event, key);
-		},
+                // if the component is secure, the event have to be secure.
+                return event instanceof Aura.Event.Event ? SecureAuraEvent(event, key) : SecureDOMEvent(event, key);
+            },
 
-		unwrap : ls_unwrap,
+            unwrap : ls_unwrap,
 
-		trust : ls_trust,
+            trust : ls_trust,
 
-		getRaw: function(value) {
-			if (value) {
-				var key = ls_getKey(value);
-				if (key) {
-					value = ls_getRef(value, key) || value;
-				}
-			}
+            getRaw: function(value) {
+                if (value) {
+                    var key = ls_getKey(value);
+                    if (key) {
+                        value = ls_getRef(value, key) || value;
+                    }
+                }
 
-			return value;
-		},
+                return value;
+            },
 
-		instanceOf : function(value, type) {
-			if (value instanceof type) {
-				return true;
-			} else {
-				var otherRealmType = typeToOtherRealmType && typeToOtherRealmType.get(type);
-				return otherRealmType && value instanceof otherRealmType;
-			}
-		}
-	};
+            instanceOf : function(value, type) {
+                if (value instanceof type) {
+                    return true;
+                } else {
+                    var otherRealmType = typeToOtherRealmType && typeToOtherRealmType.get(type);
+                    return otherRealmType && value instanceof otherRealmType;
+                }
+            }
+    };
 
-	// Exports
-	service["create"] = service.create;
-	service["createForDef"] = service.createForDef;
+    // Exports
+    service["create"] = service.create;
+    service["createForDef"] = service.createForDef;
     service["getEnv"] = service.getEnv;
-	service["getEnvForSecureObject"] = service.getEnvForSecureObject;
-	service["getKeyForNamespace"] = service.getKeyForNamespace;
+    service["getEnvForSecureObject"] = service.getEnvForSecureObject;
+    service["getKeyForNamespace"] = service.getKeyForNamespace;
     service["trust"] = service.trust;
     service["wrapComponent"] = service.wrapComponent;
-	service["runScript"] = service.runScript;
+    service["runScript"] = service.runScript;
 
-	Object.freeze(service);
+    Object.freeze(service);
 
-	return service;
+    return service;
 }
 
 Aura.Services.LockerService = LockerService;

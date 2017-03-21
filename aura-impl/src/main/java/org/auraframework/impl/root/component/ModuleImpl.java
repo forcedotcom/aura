@@ -16,19 +16,24 @@
 package org.auraframework.impl.root.component;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
 import org.auraframework.Aura;
-import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDefRef;
+import org.auraframework.impl.root.AttributeSetImpl;
 import org.auraframework.instance.Action;
+import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.Module;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -36,7 +41,7 @@ import org.auraframework.util.json.Serialization;
 import org.auraframework.util.json.Serialization.ReferenceType;
 
 /**
- * Created by byao on 2/10/17.
+ * ModuleImpl for dynamic component creation
  */
 @Serialization(referenceType = ReferenceType.IDENTITY)
 public class ModuleImpl implements Module {
@@ -46,23 +51,55 @@ public class ModuleImpl implements Module {
     private final String path;
     private final String localId;
 
-    private final Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeValues;
+    private final AttributeSet attributeSet;
+
+    private Map<String, Object> attributes = Maps.newHashMap();
 
     private final ContextService contextService;
 
+    public ModuleImpl(DefDescriptor<ModuleDef> descriptor, Map<String, Object> attributes) throws QuickFixException {
+        this(descriptor, null, null);
+        this.attributes = attributes;
+        if (this.attributeSet != null) {
+            this.attributeSet.set(attributes);
+        }
+    }
+
+
     public ModuleImpl(ModuleDefRef moduleDefRef, BaseComponent<?, ?> attributeValueProvider) throws QuickFixException {
+        this(moduleDefRef.getDescriptor(), moduleDefRef.getAttributeValueList(), attributeValueProvider, moduleDefRef.getLocalId());
+    }
+
+    public ModuleImpl(DefDescriptor<ModuleDef> descriptor, Collection<AttributeDefRef> attributeDefRefs,
+                      BaseComponent<?, ?> attributeValueProvider, String localId) throws QuickFixException {
+        this(descriptor, attributeValueProvider, localId);
+        if (this.attributeSet != null) {
+            this.attributeSet.set(attributeDefRefs);
+        }
+    }
+
+    public ModuleImpl(DefDescriptor<ModuleDef> descriptor, BaseComponent<?, ?> attributeValueProvider,
+                      String localId) throws QuickFixException {
         // services
         this.contextService = Aura.getContextService();
+        DefinitionService definitionService = Aura.getDefinitionService();
 
-        this.descriptor = moduleDefRef.getDescriptor();
-        this.attributeValues = moduleDefRef.getAttributeValues();
-        this.localId = moduleDefRef.getLocalId();
+        this.descriptor = descriptor;
+        this.localId = localId;
 
         AuraContext context = contextService.getCurrentContext();
         InstanceStack instanceStack = context.getInstanceStack();
 
         this.path = instanceStack.getPath();
         instanceStack.pushInstance(this, descriptor);
+
+        DefDescriptor<ComponentDef> compDesc = definitionService.getDefDescriptor(descriptor,
+                DefDescriptor.MARKUP_PREFIX, ComponentDef.class);
+        if (compDesc.exists()) {
+            this.attributeSet = new AttributeSetImpl(compDesc, attributeValueProvider, this, true);
+        } else {
+            this.attributeSet = null;
+        }
 
         this.globalId = getNextGlobalId();
 
@@ -129,18 +166,19 @@ public class ModuleImpl implements Module {
 
         json.writeMapEntry("creationPath", getPath());
 
-        if (!this.attributeValues.isEmpty()) {
+        if (this.attributeSet != null && !this.attributeSet.isEmpty()) {
+            json.writeMapEntry("attributes", attributeSet);
+        } else if (!attributes.isEmpty()) {
             json.writeMapKey("attributes");
 
             json.writeMapBegin();
             json.writeMapKey("values");
 
             json.writeMapBegin();
-            for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : attributeValues.entrySet()) {
+            for (Map.Entry<String, Object> entry : attributes.entrySet()) {
                 json.writeMapEntry(entry.getKey(), entry.getValue());
             }
             json.writeMapEnd();
-
             json.writeMapEnd();
         }
 

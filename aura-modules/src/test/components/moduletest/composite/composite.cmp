@@ -8,7 +8,7 @@
     <aura:registerevent name="onpress" type="ui:press" access="GLOBAL" description="The event fired when the button is clicked."/>
     <section>
         <p>I'm composite Aura component</p>
-        <sample:simple
+        <moduletest:simple
             literal="{!v.literal}"
             bound="{!v.bound}"
             unbound="{#v.unbound}"

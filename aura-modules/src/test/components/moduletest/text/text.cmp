@@ -1,0 +1,4 @@
+<aura:component>
+    <aura:attribute type="String" name="text" default="Yes" />
+    <div>aura: {!v.text}</div>
+</aura:component>

@@ -2,8 +2,11 @@
     <aura:attribute name="str1" type="String" default="Hello" access="GLOBAL" />
     <aura:attribute name="str2" type="String" default="World!!" access="GLOBAL" />
     <aura:attribute name="str3" type="String" default="Hello World!!" access="GLOBAL" />
+
+    <aura:dependency resource="markup://moduletest:testLib" type="LIBRARY"/>
+
     <div>
-        <sample:simple
+        <moduletest:simple
             aura:id="simple"
             literal="Hi!"
             bound="{!v.str1}"
@@ -13,4 +16,6 @@
             onpress="{!c.handlePress}"
         />
     </div>
+
+    {!v.body}
 </aura:component>

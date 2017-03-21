@@ -323,6 +323,10 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
                 $A.eventService.saveEventConfig(defs[i]);
             }
         }
+
+        if (otherContext["moduleDefs"]) {
+            $A.componentService.initModuleDefs(otherContext["moduleDefs"]);
+        }
     
         this.joinComponentConfigs(otherContext["components"], ""+this.getNum());
         this.joinLoaded(otherContext["loaded"]);

@@ -1,0 +1,9 @@
+<aura:component>
+    <aura:attribute name="str" type="String" default="WOOHOO!" access="GLOBAL" />
+    <section>
+        <moduletest:text
+            text="{!v.str}"
+            aura:id="module-text"
+        />
+    </section>
+</aura:component>

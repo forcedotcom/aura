@@ -81,31 +81,33 @@ InteropComponent.prototype.setupAttributes = function(config) {
     for (var attribute in configValues) {
         var isEvent = false;
         var value = configValues[attribute];
-        var valueConfig = valueFactory.create(value, config['valueProvider'] || this);
+        var valueConfig = value;
+
+        if ($A.componentService.isConfigDescriptor(value)) {
+            valueConfig = value["value"];
+        }
+
+        valueConfig = valueFactory.create(valueConfig, config['valueProvider'] || this);
 
         // Check typeof PRV | FCV
-        if ($A.util.isExpression(valueConfig.value)) {
+        if ($A.util.isExpression(valueConfig)) {
             // PRV type
-            if (valueConfig.value.getExpression) { // Fastest typeof for PRV
-                var key = $A.expressionService.normalize(valueConfig.value.getExpression());
+            if (valueConfig.getExpression) { // Fastest typeof for PRV
+                var key = $A.expressionService.normalize(valueConfig.getExpression());
                 var provider = key.split('.')[0];
                 $A.assert(provider === 'c' || provider === 'v', 'Provider type not supported');
 
                 // For "v" add change handler, for "c" add bridging
                 if (provider === 'v') {
-                    valueConfig.value.addChangeHandler(this, attribute, changeHandlerPRVFactory(this));
+                    valueConfig.addChangeHandler(this, attribute, changeHandlerPRVFactory(this));
                 } else {
                     isEvent = value['descriptor'].indexOf('on') === 0;
-                    valueConfig = this.bridgeAction(valueConfig.value, isEvent);
+                    valueConfig = this.bridgeAction(valueConfig, isEvent);
                 }
             // FCV attribute
             } else {
-                valueConfig.value.addChangeHandler(this, attribute, changeHandlerFCV.bind(self, attribute, valueConfig.value));
+                valueConfig.addChangeHandler(this, attribute, changeHandlerFCV.bind(self, attribute, valueConfig));
             }
-
-        // Is a plain object or a literal, just use the raw value
-        } else {
-            valueConfig = valueConfig.value;
         }
 
         // Check is on the definition and assign it as an attribute

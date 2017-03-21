@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ActionDef;
@@ -31,6 +32,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.def.module.ModuleDef;
 import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.impl.java.controller.JavaAction;
 import org.auraframework.impl.javascript.controller.JavascriptPseudoAction;
@@ -40,6 +42,7 @@ import org.auraframework.instance.Action;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
+import org.auraframework.instance.Instance;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
@@ -57,6 +60,7 @@ public class ComponentController implements Controller {
     private ExceptionAdapter exceptionAdapter;
     private DefinitionService definitionService;
     private ContextService contextService;
+    private ConfigAdapter configAdapter;
 
     /**
      * A Java exception representing a <em>Javascript</em> error condition, as
@@ -225,14 +229,20 @@ public class ComponentController implements Controller {
 
     // Not aura enabled, but called from code. This is probably bad practice.
     public Component getComponent(String name, Map<String, Object> attributes) throws QuickFixException {
-        return  getBaseComponent(Component.class, ComponentDef.class, name, attributes, false);
+        return getBaseComponent(Component.class, ComponentDef.class, name, attributes, false);
     }
 
     @AuraEnabled
-    public Component getComponent(@Key(value = "name", loggable = true) String name,
-                                  @Key("attributes") Map<String, Object> attributes,
-                                  @Key(value = "chainLoadLabels", loggable = true) Boolean loadLabels) throws QuickFixException {
-        return  getBaseComponent(Component.class, ComponentDef.class, name, attributes, loadLabels);
+    public Instance getComponent(@Key(value = "name", loggable = true) String name,
+                                 @Key("attributes") Map<String, Object> attributes,
+                                 @Key(value = "chainLoadLabels", loggable = true) Boolean loadLabels) throws QuickFixException {
+        DefDescriptor<ModuleDef> moduleDesc = definitionService.getDefDescriptor(name, ModuleDef.class);
+        if (contextService.getCurrentContext().isModulesEnabled() &&
+                configAdapter.getModuleNamespaces().contains(moduleDesc.getNamespace()) && moduleDesc.exists()) {
+            definitionService.updateLoaded(moduleDesc);
+            return instanceService.getInstance(moduleDesc, attributes);
+        }
+        return getBaseComponent(Component.class, ComponentDef.class, name, attributes, loadLabels);
     }
 
     @AuraEnabled
@@ -299,15 +309,15 @@ public class ComponentController implements Controller {
     }
 
     @AuraEnabled
-    public List<Component> getComponents(@Key("components") List<Map<String, Object>> components)
+    public List<Instance> getComponents(@Key("components") List<Map<String, Object>> components)
             throws QuickFixException {
-        List<Component> ret = Lists.newArrayList();
+        List<Instance> ret = Lists.newArrayList();
         for (int i = 0; i < components.size(); i++) {
             Map<String, Object> cmp = components.get(i);
             String descriptor = (String)cmp.get("descriptor");
             @SuppressWarnings("unchecked")
             Map<String, Object> attributes = (Map<String, Object>) cmp.get("attributes");
-            ret.add(getBaseComponent(Component.class, ComponentDef.class, descriptor, attributes, Boolean.FALSE));
+            ret.add(getComponent(descriptor, attributes, Boolean.FALSE));
         }
         return ret;
     }
@@ -330,5 +340,10 @@ public class ComponentController implements Controller {
     @Inject
     public void setContextService(ContextService contextService) {
         this.contextService = contextService;
+    }
+
+    @Inject
+    public void setConfigAdapter(ConfigAdapter configAdapter) {
+        this.configAdapter = configAdapter;
     }
 }

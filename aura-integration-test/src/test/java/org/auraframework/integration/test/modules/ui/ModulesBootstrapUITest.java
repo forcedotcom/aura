@@ -36,7 +36,7 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
 
     @Test
     public void testInterop() throws Exception {
-        open("/modules/bootstrap.app");
+        open("/moduletest/bootstrap.app");
 
         // check initial state
         assertEquals("I'm modules!", findDomElement(By.cssSelector(".i-am-modules")).getText());

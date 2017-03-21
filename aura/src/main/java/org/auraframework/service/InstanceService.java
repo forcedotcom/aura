@@ -21,7 +21,6 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionReference;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Instance;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import java.util.Map;
@@ -31,7 +30,7 @@ import java.util.Map;
  * Service for constructing an {@link Instance} of a {@link Definition}
  * </p>
  * <p>
- * Instances of all AuraServices should be retrieved from {@link Aura}
+ * Instances of all AuraServices should be retrieved from {@link org.auraframework.Aura}
  * </p>
  */
 public interface InstanceService extends AuraService {
@@ -41,51 +40,48 @@ public interface InstanceService extends AuraService {
      * passed in.
      *
      * @return The named definition
-     * @throws DefinitionNotFoundException if definition does not exist
+     * @throws QuickFixException if definition does not exist
      */
     <T extends Instance<D>, D extends Definition> T getInstance(DefDescriptor<D> descriptor)
-            throws DefinitionNotFoundException, QuickFixException;
+            throws QuickFixException;
 
     /**
      * Get the an Instance of the Definition associated with the descriptor
      * passed in, using the map of attributes to initialize the instance.
      *
      * @return The named definition
-     * @throws DefinitionNotFoundException if definition does not exist
+     * @throws QuickFixException if definition does not exist
      */
     <T extends Instance<D>, D extends Definition> T getInstance(DefDescriptor<D> descriptor,
-            Map<String, Object> attributes) throws DefinitionNotFoundException, QuickFixException;
+            Map<String, Object> attributes) throws QuickFixException;
 
     /**
      * Get the an Instance of the Definition passed in.
      *
      * @return The named definition
-     * @throws DefinitionNotFoundException if definition does not exist
+     * @throws QuickFixException if definition does not exist
      */
-    <T extends Instance<D>, D extends Definition> T getInstance(D definition) throws DefinitionNotFoundException,
-            QuickFixException;
+    <T extends Instance<D>, D extends Definition> T getInstance(D definition) throws QuickFixException;
 
     /**
      * Get the an Instance of the Definition passed in, using the map of
      * attributes to initialize the instance.
      *
      * @return The named definition
-     * @throws DefinitionNotFoundException if definition does not exist
+     * @throws QuickFixException if definition does not exist
      */
     <T extends Instance<D>, D extends Definition> T getInstance(D definition, Map<String, Object> attributes)
-            throws DefinitionNotFoundException, QuickFixException;
+            throws QuickFixException;
 
     /**
      * Creates a {@link DefDescriptor} from the qualified name passed in,
      * retrieves the named Definition and then returns an in Instance of it.
      *
      * @return The named definition
-     * @throws DefinitionNotFoundException if definition does not exist
-     * @throws QuickFixException
-     * @throws AuraRuntimeException: this might throw AuraRuntimeException from BaseComponentImpl.injectComponent()
+     * @throws QuickFixException this might throw AuraRuntimeException from BaseComponentImpl.injectComponent()
      */
     <T extends Instance<D>, D extends Definition> T getInstance(String qualifiedName, Class<D> defClass)
-            throws DefinitionNotFoundException, QuickFixException;
+            throws QuickFixException;
 
     /**
      * Creates a {@link DefDescriptor} from the qualified name passed in,
@@ -93,10 +89,10 @@ public interface InstanceService extends AuraService {
      * using the map of Attributes to initialize the instance.
      *
      * @return The named definition
-     * @throws DefinitionNotFoundException if definition does not exist
+     * @throws QuickFixException if definition does not exist
      */
     <T extends Instance<D>, D extends Definition> T getInstance(String qualifiedName, Class<D> defClass,
-            Map<String, Object> attributes) throws DefinitionNotFoundException, QuickFixException;
+            Map<String, Object> attributes) throws QuickFixException;
 
     /**
      * Create a new instance of a component using a passed in Component Definition Reference.

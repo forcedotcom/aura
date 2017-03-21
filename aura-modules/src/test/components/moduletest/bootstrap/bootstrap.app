@@ -15,15 +15,14 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<aura:application template="modules:bootstrapTemplate" access="global" useAppcache="false">
+<aura:application template="moduletest:bootstrapTemplate" access="global" useAppcache="false">
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:attribute name="branch" type="Boolean" default="true" access="GLOBAL" />
     <aura:attribute name="test" type="String" default="I'm v.test" access="GLOBAL" />
     <aura:attribute name="test2" type="String" default="I'm v.test2" access="GLOBAL" />
     <aura:attribute name="test3" type="String" default="I'm v.test3" access="GLOBAL"/>
 
-    <aura:dependency resource="markup://sample:simple" type="MODULE"/>
-    <aura:dependency resource="markup://modules:testLib" type="LIBRARY"/>
+    <aura:dependency resource="markup://moduletest:testLib" type="LIBRARY"/>
     
     <section>
         <ui:button aura:id="y" class="button-toggle" label="Toggle if - first modules container" press="{!c.toggle}" />
@@ -43,7 +42,7 @@
         
         <aura:if isTrue="{!v.branch}">
             <section class="aura" aura:id="container">
-                <sample:simple 
+                <moduletest:simple
                     aura:id="simple" 
                     literal="Hi!"
                     bound="{!v.test}"
@@ -56,7 +55,7 @@
         </aura:if>
         <!--
         <section class="aura">
-            <sample:composite 
+            <moduletest:composite
                 aura:id="composite"
                 literal="Hi2!"
                 bound="{!v.test}"

@@ -39,6 +39,7 @@ import org.auraframework.instance.Instance;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.ValueProvider;
 import org.auraframework.instance.Wrapper;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
@@ -73,12 +74,21 @@ public class AttributeSetImpl implements AttributeSet {
     private final Map<DefDescriptor<EventHandlerDef>, EventHandler> events = Maps.newHashMap();
     private final BaseComponent<?, ?> valueProvider;
     private final Instance<?> parent;
+    private final boolean useUnlinkedDefinition;
 
     public AttributeSetImpl(DefDescriptor<? extends RootDefinition> componentDefDescriptor,
             BaseComponent<?, ?> valueProvider, Instance<?> parent) throws QuickFixException {
+        this(componentDefDescriptor, valueProvider, parent, false);
+    }
+
+    public AttributeSetImpl(DefDescriptor<? extends RootDefinition> componentDefDescriptor,
+                            BaseComponent<?, ?> valueProvider, Instance<?> parent, boolean useUnlinkedDefinition)
+            throws QuickFixException {
         this.rootDefDescriptor = componentDefDescriptor;
         this.valueProvider = valueProvider;
         this.parent = parent;
+        this.useUnlinkedDefinition = useUnlinkedDefinition;
+
         setDefaults();
     }
 
@@ -94,8 +104,7 @@ public class AttributeSetImpl implements AttributeSet {
     }
 
     private void setDefaults() throws QuickFixException {
-        Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = rootDefDescriptor.getDef().getAttributeDefs();
-
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = getRootDefinition().getAttributeDefs();
         for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> attr : attrs.entrySet()) {
             AttributeDefRef ref = attr.getValue().getDefaultValue();
             if (ref != null && !attributes.containsKey(attr.getKey())) {
@@ -116,7 +125,7 @@ public class AttributeSetImpl implements AttributeSet {
     }
 
     private void set(AttributeDefRef attributeDefRef) throws QuickFixException {
-        RootDefinition def = rootDefDescriptor.getDef();
+        RootDefinition def = getRootDefinition();
         Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = def.getAttributeDefs();
 
         AttributeDef attributeDef = attributeDefs.get(attributeDefRef.getDescriptor());
@@ -185,7 +194,7 @@ public class AttributeSetImpl implements AttributeSet {
 
     @Override
     public void set(Collection<AttributeDefRef> facetDefRefs, AttributeSet attributeSet) throws QuickFixException {
-        RootDefinition rootDef = rootDefDescriptor.getDef();
+        RootDefinition rootDef = getRootDefinition();
         Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = rootDef.getAttributeDefs();
         Map<DefDescriptor<?>, Object> lookup = Maps.newHashMap();
 
@@ -214,8 +223,7 @@ public class AttributeSetImpl implements AttributeSet {
     @Override
     public void set(Map<String, Object> attributeMap) throws QuickFixException {
         if (attributeMap != null) {
-            RootDefinition rootDef = rootDefDescriptor.getDef();
-            Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = rootDef.getAttributeDefs();
+            Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = getRootDefinition().getAttributeDefs();
             for (Map.Entry<String, Object> entry : attributeMap.entrySet()) {
                 DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor(entry.getKey(), AttributeDef.class);
                 if (attrs.containsKey(desc)) {
@@ -270,7 +278,7 @@ public class AttributeSetImpl implements AttributeSet {
     }
 
     private void setExpression(DefDescriptor<AttributeDef> desc, Object value) throws QuickFixException {
-        RootDefinition rd = rootDefDescriptor.getDef();
+        RootDefinition rd = getRootDefinition();
         AttributeDef ad = rd.getAttributeDefs().get(desc);
         if (ad == null) {
             // this location isn't even close to right...
@@ -289,7 +297,7 @@ public class AttributeSetImpl implements AttributeSet {
             if (valueProvider != null) {
                 iStack.pushAccess(valueProvider);
             }
-            att.setValue(rootDefDescriptor.getDef().getAttributeDef(att.getName()).getTypeDef().initialize(value, null));
+            att.setValue(getRootDefinition().getAttributeDef(att.getName()).getTypeDef().initialize(value, null));
             if (valueProvider != null) {
                 iStack.popAccess(valueProvider);
             }
@@ -297,6 +305,25 @@ public class AttributeSetImpl implements AttributeSet {
             iStack.clearParent(parent);
         }
         set(att);
+    }
+
+    /**
+     * Due to dynamic providers, we need to fetch definition each time when setting attributes.
+     *
+     * TODO: Why?
+     *
+     * @return Definition
+     * @throws QuickFixException
+     */
+    private RootDefinition getRootDefinition() throws QuickFixException {
+        DefinitionService definitionService = Aura.getDefinitionService();
+        if (this.useUnlinkedDefinition) {
+            // when serializing module instances, we normalize attributes with the component,
+            // but the def should be stored in context cache as it will be serialized to the client
+            return definitionService.getUnlinkedDefinition(rootDefDescriptor);
+        } else {
+            return definitionService.getDefinition(rootDefDescriptor);
+        }
     }
 
     @Override
@@ -310,7 +337,7 @@ public class AttributeSetImpl implements AttributeSet {
         if (value instanceof ValueProvider && stem != null) {
             value = ((ValueProvider) value).getValue(stem);
         } else if (stem != null) {
-            AttributeDef attributeDef = rootDefDescriptor.getDef().getAttributeDef(expr.getRoot());
+            AttributeDef attributeDef = getRootDefinition().getAttributeDef(expr.getRoot());
             if (attributeDef == null) {
                 // no such attribute.
                 throw new NoAccessException("No attribute "+expr.getRoot()+" in "+rootDefDescriptor);
@@ -332,7 +359,7 @@ public class AttributeSetImpl implements AttributeSet {
             json.writeMapBegin();
             json.writeMapEntry("valueProvider", valueProvider);
             if (!attributes.isEmpty()) {
-                RootDefinition def = rootDefDescriptor.getDef();
+                RootDefinition def = getRootDefinition();
                 json.writeMapKey("values");
                 json.writeMapBegin();
 
@@ -404,7 +431,7 @@ public class AttributeSetImpl implements AttributeSet {
 
     @Override
     public Set<AttributeDef> getMissingAttributes() throws QuickFixException {
-        Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = rootDefDescriptor.getDef().getAttributeDefs();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = getRootDefinition().getAttributeDefs();
         Set<AttributeDef> missingAttributes = null;
         for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> attr : attrs.entrySet()) {
             if (attr.getValue().isRequired() && !attributes.containsKey(attr.getKey())) {

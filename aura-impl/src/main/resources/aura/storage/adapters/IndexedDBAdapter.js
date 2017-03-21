@@ -374,17 +374,16 @@ IndexedDBAdapter.prototype.getItemsInternal = function(keys, resolve, reject) {
         }
     }
 
-    transaction.onabort = function(event) {
-        var message = "getItemsInternal(): transaction aborted for keys "+keys.toString()+": "+event.error;
+    transaction.onabort = function() {
+        var message = "getItemsInternal(): transaction aborted for keys [" + keys + "]: " + transaction.error;
         that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-        reject(new Error("IndexedDBAdapter."+message));
+        reject(new Error("IndexedDBAdapter." + message));
     };
-    transaction.onerror = function(event) {
-        var message = "getItemsInternal(): transaction error for keys "+keys.toString()+": "+event.error;
+    transaction.onerror = function() {
+        var message = "getItemsInternal(): transaction error for keys [" + keys + "]: " + transaction.error;
         that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-        reject(new Error("IndexedDBAdapter."+message));
+        reject(new Error("IndexedDBAdapter." + message));
     };
-
 
     var objectStoreRequest;
     for (var i = 0; i < keys.length; i++) {
@@ -488,17 +487,17 @@ IndexedDBAdapter.prototype.setItems = function(tuples) {
             }
         }
 
-        transaction.onabort = function(event) {
+        transaction.onabort = function() {
             var keys = tuples.map(function(tuple) { return tuple[0]; });
-            var message = "setItemsInternal(): transaction aborted for keys "+keys.toString()+": "+event.error;
+            var message = "setItemsInternal(): transaction aborted for keys [" + keys + "]: " + transaction.error;
             that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-            reject(new Error("IndexedDBAdapter."+message));
+            reject(new Error("IndexedDBAdapter." + message));
         };
-        transaction.onerror = function(event) {
+        transaction.onerror = function() {
             var keys = tuples.map(function(tuple) { return tuple[0]; });
-            var message = "setItemsInternal(): transaction error for keys "+keys.toString()+": "+event.error;
+            var message = "setItemsInternal(): transaction error for keys [" + keys + "]: " + transaction.error;
             that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
-            reject(new Error("IndexedDBAdapter."+message));
+            reject(new Error("IndexedDBAdapter." + message));
         };
 
         var objectStoreRequest;
@@ -537,13 +536,13 @@ IndexedDBAdapter.prototype.removeItems = function(keys) {
             }
         }
 
-        transaction.onabort = function(event) {
-            var message = "removeItemsInternal(): transaction aborted for keys "+keys.toString()+": "+event.error;
+        transaction.onabort = function() {
+            var message = "removeItemsInternal(): transaction aborted for keys [" + keys + "]: " + transaction.error;
             that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
             reject(new Error("IndexedDBAdapter."+message));
         };
-        transaction.onerror = function(event) {
-            var message = "removeItemsInternal(): transaction error for keys "+keys.toString()+": "+event.error;
+        transaction.onerror = function() {
+            var message = "removeItemsInternal(): transaction error for keys [" + keys + "]: " + transaction.error;
             that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
             reject(new Error("IndexedDBAdapter."+message));
         };
@@ -572,15 +571,15 @@ IndexedDBAdapter.prototype.clear = function() {
         objectStore.clear();
         that.setSize(0, 0);
 
-        transaction.onabort = function(event) {
-            reject(new Error("IndexedDBAdapter.clear(): Transaction aborted: "+event.error));
+        transaction.onabort = function() {
+            reject(new Error("IndexedDBAdapter.clear(): Transaction aborted: " + transaction.error));
         };
         transaction.oncomplete = function() {
             transactionTimer.end({});
             resolve();
         };
-        transaction.onerror = function(event) {
-            reject(new Error("IndexedDBAdapter.clearI(): Transaction failed: "+event.error));
+        transaction.onerror = function() {
+            reject(new Error("IndexedDBAdapter.clear(): Transaction failed: " + transaction.error));
         };
     });
 };

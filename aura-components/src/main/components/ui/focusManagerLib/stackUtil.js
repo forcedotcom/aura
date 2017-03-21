@@ -35,16 +35,28 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
 
     /**
      * Returns the current activeElement, if document's activeElement can be accessed.
-     * @returns {Element | undefined}
+     * @returns {Element | null}
      */
     function getActiveElement() {
         // Edge/IE11 throws an Unspecified Error for document.activeElement when accessed from an iframe.
         try {
             return document.activeElement;
-        } catch(ignore) {
-            return undefined;
+        } catch(e) {
+            return null;
         }
-        return undefined;
+    }
+
+    /**
+     * Returns an element if the given selector is available in the DOM.
+     * @param {String} selector
+     * @returns {Element | null}
+     */
+    function getQuerySelector(selector) {
+        try {
+            return document.querySelector(selector);
+        } catch(e) {
+            return null;
+        }
     }
 
     /**
@@ -126,7 +138,7 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
         var el = pop();
         while (el && (!document.body.contains(el.domElement) || focusUtil.isElementHidden(el.domElement))) {
             if(el.selector) {
-                var element = document.querySelector(el.selector);
+                var element = getQuerySelector(el.selector);
                 if(element && document.body.contains(element) && !focusUtil.isElementHidden(element)) {
                     el.domElement = element;
                     break;

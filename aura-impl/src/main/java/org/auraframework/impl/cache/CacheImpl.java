@@ -112,7 +112,7 @@ public class CacheImpl<K, T> implements Cache<K, T> {
 
     @Override
     public void invalidate(Iterable<K> keys) {
-        cache.invalidate(keys);
+        cache.invalidateAll(keys);
     }
 
     @Override

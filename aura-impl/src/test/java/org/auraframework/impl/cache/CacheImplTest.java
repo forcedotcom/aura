@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
@@ -89,11 +90,10 @@ public class CacheImplTest extends UnitTestCase {
         com.google.common.cache.Cache<Object, Object> backingCache = getMockCache();
         Cache<Object, Object> cache = new CacheImpl<>(
                 backingCache);
-        @SuppressWarnings("unchecked")
-        Iterable<Object> keys = Mockito.mock(Iterable.class);
+        Iterable<Object> keys = new ArrayList<>();
 
         cache.invalidate(keys);
-        Mockito.verify(backingCache, Mockito.times(1)).invalidate(keys);
+        Mockito.verify(backingCache, Mockito.times(1)).invalidateAll(keys);
     }
 
     @Test

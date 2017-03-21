@@ -67,12 +67,6 @@ SecureObject.filterEverything = function(st, raw, options) {
     }
 
     var t = typeof raw;
-    if (t === "object") {		
-        if (SecureObject.isUnfilteredType(raw)) {
-            // Pass thru for objects without privileges.
-            return raw;
-        }
-    }
 
     var key = ls_getKey(st);
     var cached = ls_getFromCache(raw, key);
@@ -178,7 +172,11 @@ SecureObject.filterEverything = function(st, raw, options) {
                 SecureObject.addPropertyIfSupported(swallowed, raw, "opener");
 
                 mutated = true;
-            } else {
+            } else if (SecureObject.isUnfilteredType(raw)) {
+                // return raw for unfiltered types
+                mutated = false;
+            }
+            else {
                 if (!belongsToLocker) {
                     if (!rawKey) {
                         // Object that was created in this locker or insystem mode and not yet keyed - key it now
@@ -981,19 +979,19 @@ var safeEvalScope = workerFrame && workerFrame.contentWindow;
 function getUnfilteredTypes() {
     var ret = [];
     var unfilteredTypesMeta = [
-        "File",
-        "FileList",
-        "CSSStyleDeclaration",
-        "TimeRanges",
-        "Date",
-        "Promise",
-        "MessagePort",
-        "MessageChannel",
-        "MessageEvent",
-        "FormData",
-        "ValidityState",
-        "Crypto", 
-        "DOMTokenList"];
+                               "File",
+                               "FileList",
+                               "CSSStyleDeclaration",
+                               "TimeRanges",
+                               "Date",
+                               "Promise",
+                               "MessagePort",
+                               "MessageChannel",
+                               "MessageEvent",
+                               "FormData",
+                               "ValidityState",
+                               "Crypto",
+                               "DOMTokenList"];
     unfilteredTypesMeta.forEach(function(unfilteredType){
         if (typeof window[unfilteredType] !== "undefined") {
             ret.push(window[unfilteredType]);
@@ -1018,7 +1016,7 @@ SecureObject.isUnfilteredType = function(raw) {
     return false;
 };
 
-// FIXME(tbliss): remove this once the necessary APIs become standard and can be exposed to everyone
+//FIXME(tbliss): remove this once the necessary APIs become standard and can be exposed to everyone
 SecureObject.addRTCMediaApis = function(st, raw, name, key) {
     if (raw[name]) {
         var config = {

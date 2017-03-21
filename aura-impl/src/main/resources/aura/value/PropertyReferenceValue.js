@@ -154,7 +154,7 @@ PropertyReferenceValue.prototype.getReference = function(path) {
         expression = valueProvider.getExpression(expression);
         valueProvider=valueProvider.getComponent();
     }
-    return valueProvider.getReference(expression + "." + path);
+    return valueProvider ? valueProvider.getReference(expression + "." + path) : null;
 };
 
 PropertyReferenceValue.prototype.equals = function (target){

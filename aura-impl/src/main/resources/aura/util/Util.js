@@ -161,8 +161,10 @@ Aura.Utils.Util.prototype.isIOSWebView = function() {
  * @private
  */
 Aura.Utils.Util.prototype.globalEval = function(src, globals, optionalSourceURL) {
+    var srcToEval = "var r = " + src + "; return r;";
     if (window["$$safe-eval-compat$$"]) {
-        return window["$$safe-eval-compat$$"](src, optionalSourceURL || "", false, window, globals);
+        //For perf, disable pre-processing step and assume that src passed returns a value
+        return window["$$safe-eval-compat$$"](srcToEval, optionalSourceURL, true, window, globals);
     }
 
     // --- backward compatibility ---
@@ -181,7 +183,7 @@ Aura.Utils.Util.prototype.globalEval = function(src, globals, optionalSourceURL)
         sourceURL = '\n//# sourceURL=' + optionalSourceURL;
     }
 
-    return new Function(keys, "var a = " + src + "; return a;" + sourceURL).apply({}, vals);
+    return new Function(keys, srcToEval + sourceURL).apply({}, vals);
 };
 
 /**

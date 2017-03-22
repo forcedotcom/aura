@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="APPLICATION" access="GLOBAL" description="An event used to communicate customizable error object from server action to its client callback, the event should not be used outside of framework.">
+<aura:event type="APPLICATION" description="An event used to communicate customizable error object from server action to its client callback, the event should not be used outside of framework.">
     <aura:attribute name="error" type="Object" />
 </aura:event>

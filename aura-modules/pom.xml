@@ -67,23 +67,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <configuration>
-                    <workingDirectory>${project.parent.basedir}</workingDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>install-node-npm</id>
-                        <phase>pre-clean</phase>
-                    </execution>
-                    <execution>
-                        <id>npm-install</id>
-                        <phase>pre-clean</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
                 <executions>

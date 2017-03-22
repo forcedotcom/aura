@@ -100,6 +100,8 @@ public class ModuleDefFileBundleBuilderUnitTest {
         File mockParentBaseFile = mock(File.class);
         when(mockParentBaseFile.getName()).thenReturn("namespace");
 
+        // ROOT LEVEL
+
         File mockBaseFile = mock(File.class);
         when(mockBaseFile.exists()).thenReturn(true);
         when(mockBaseFile.getName()).thenReturn("module");
@@ -126,8 +128,12 @@ public class ModuleDefFileBundleBuilderUnitTest {
         DefDescriptor dataJs = setupMockFile(mockDataJsFile, mockBaseFile, "data", ".js",
                 DefDescriptor.JAVASCRIPT_PREFIX, module);
 
+        // NESTED
+
         File mockNestFolder = mock(File.class);
         when(mockNestFolder.isDirectory()).thenReturn(true);
+        when(mockNestFolder.getName()).thenReturn("nest");
+        when(mockNestFolder.getParentFile()).thenReturn(mockBaseFile);
 
         File[] baseListFiles = new File[] { mockJsFile, mockCssFile, mockTemplateFile, mockUtilJsFile, mockDataJsFile, mockNestFolder };
 
@@ -135,17 +141,40 @@ public class ModuleDefFileBundleBuilderUnitTest {
         DefDescriptor nestedUtilJs = setupMockFile(mockNestUtilJsFile, mockBaseFile, "nest/utils", ".js",
                 DefDescriptor.JAVASCRIPT_PREFIX, module);
         when(mockNestUtilJsFile.getParent()).thenReturn("nest");
+        when(mockNestUtilJsFile.getParentFile()).thenReturn(mockNestFolder);
 
         File mockNestDataJsFile = mock(File.class);
         DefDescriptor nestedDataJs = setupMockFile(mockNestDataJsFile, mockBaseFile, "nest/data", ".js",
                 DefDescriptor.JAVASCRIPT_PREFIX, module);
         when(mockNestDataJsFile.getParent()).thenReturn("nest");
+        when(mockNestDataJsFile.getParentFile()).thenReturn(mockNestFolder);
 
-        File[] nestListFiles = new File[] { mockNestUtilJsFile, mockNestDataJsFile };
+        // SECOND NESTED
 
-        when(mockNestFolder.listFiles()).thenReturn(nestListFiles);
+        File mockSecondNestFolder = mock(File.class);
+        when(mockSecondNestFolder.isDirectory()).thenReturn(true);
+        when(mockSecondNestFolder.getName()).thenReturn("egg");
+        when(mockSecondNestFolder.getParentFile()).thenReturn(mockNestFolder);
+
+        File[] nestListFiles = new File[] { mockNestUtilJsFile, mockNestDataJsFile, mockSecondNestFolder };
+
+        File mockSecondNestUtilJsFile = mock(File.class);
+        DefDescriptor secondNestedUtilJs = setupMockFile(mockSecondNestUtilJsFile, mockBaseFile, "nest/egg/utils", ".js",
+                DefDescriptor.JAVASCRIPT_PREFIX, module);
+        when(mockSecondNestUtilJsFile.getParent()).thenReturn("egg");
+        when(mockSecondNestUtilJsFile.getParentFile()).thenReturn(mockSecondNestFolder);
+
+        File mockSecondNestDataJsFile = mock(File.class);
+        DefDescriptor secondNestedDataJs = setupMockFile(mockSecondNestDataJsFile, mockBaseFile, "nest/egg/data", ".js",
+                DefDescriptor.JAVASCRIPT_PREFIX, module);
+        when(mockSecondNestDataJsFile.getParent()).thenReturn("egg");
+        when(mockSecondNestDataJsFile.getParentFile()).thenReturn(mockSecondNestFolder);
+
+        File[] secondNestListFiles = new File[] { mockSecondNestUtilJsFile, mockSecondNestDataJsFile };
 
         when(mockBaseFile.listFiles()).thenReturn(baseListFiles);
+        when(mockNestFolder.listFiles()).thenReturn(nestListFiles);
+        when(mockSecondNestFolder.listFiles()).thenReturn(secondNestListFiles);
 
         ModuleDefFileBundleBuilder moduleDefFileBundleBuilder = spy(new ModuleDefFileBundleBuilder());
 
@@ -156,7 +185,7 @@ public class ModuleDefFileBundleBuilderUnitTest {
 
         Map<DefDescriptor<?>, Source<?>> sourceMap = moduleBundleSource.getBundledParts();
 
-        assertEquals("number of entries for module bundle source differs", 7, sourceMap.size());
+        assertEquals("number of entries for module bundle source differs", 9, sourceMap.size());
         assertEquals("incorrect base js entry", "/namespace/module/module.js", sourceMap.get(module).getSystemId());
         assertEquals("incorrect base css entry", "/namespace/module/module.css", sourceMap.get(css).getSystemId());
         assertEquals("incorrect base template entry", "/namespace/module/module.html", sourceMap.get(template).getSystemId());
@@ -164,6 +193,8 @@ public class ModuleDefFileBundleBuilderUnitTest {
         assertEquals("incorrect base data js entry", "/namespace/module/data.js", sourceMap.get(dataJs).getSystemId());
         assertEquals("incorrect nested utils js entry", "/namespace/module/nest/utils.js",  sourceMap.get(nestedUtilJs).getSystemId());
         assertEquals("incorrect nested data js entry", "/namespace/module/nest/data.js", sourceMap.get(nestedDataJs).getSystemId());
+        assertEquals("incorrect second nested utils js entry", "/namespace/module/nest/egg/utils.js",  sourceMap.get(secondNestedUtilJs).getSystemId());
+        assertEquals("incorrect second nested data js entry", "/namespace/module/nest/egg/data.js", sourceMap.get(secondNestedDataJs).getSystemId());
     }
 
     @Test

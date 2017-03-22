@@ -81,7 +81,8 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         try {
             Map<DefDescriptor<?>, Source<?>> sourceMap = source.getBundledParts();
 
-            // loop and get contents of all files in the bundle
+            // get base source. should be js file
+            // TODO: module only has .html file ?
             Source<?> baseClassSource = sourceMap.get(descriptor);
 
             if (baseClassSource == null) {
@@ -96,8 +97,9 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
             String componentPath = baseJSPath.substring(start + 1);
 
             // source map of sources with absolute file paths as keys
-            Map<String,String> fullPathSources = new HashMap<>();
+            Map<String, String> fullPathSources = new HashMap<>();
 
+            // loop and get contents of all files in the bundle
             for (Map.Entry<DefDescriptor<?>, Source<?>> entry : sourceMap.entrySet()) {
                 Source<?> entrySource = entry.getValue();
                 String path = entrySource.getSystemId();

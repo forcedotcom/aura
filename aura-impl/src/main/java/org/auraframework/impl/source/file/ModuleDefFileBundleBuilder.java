@@ -25,7 +25,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.service.LoggingService;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.Parser.Format;
@@ -33,12 +32,8 @@ import org.auraframework.system.Source;
 
 import com.google.common.collect.Maps;
 
-import javax.inject.Inject;
-
 @ServiceComponent
 public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
-
-    private LoggingService loggingService;
 
     @Override
     public boolean isBundleMatch(File base) {
@@ -124,18 +119,15 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
 
     private String createDescriptorName(File file, String baseName, int level) {
         String name = FilenameUtils.getBaseName(file.getName());
+        File parent = file;
         for (int i = 0; i < level; i++) {
-            name = file.getParent() + "-" + name;
+            parent = parent.getParentFile();
+            name = parent.getName() + "-" + name;
         }
         return baseName + "-" + name;
     }
 
     private File getFileFromBase(File base, String extension) {
         return new File(base, base.getName() + extension);
-    }
-
-    @Inject
-    public void setLoggingService(LoggingService loggingService) {
-        this.loggingService = loggingService;
     }
 }

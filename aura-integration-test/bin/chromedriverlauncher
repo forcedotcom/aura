@@ -5,3 +5,7 @@
 binary="${0%/bin/*}/target/bin/chromedriver"
 chmod 775 $binary
 $binary $@ 1> chromedriver.log 2>&1
+
+# More debug logging
+#$binary --verbose --log-path=chromedriver.log $@
+

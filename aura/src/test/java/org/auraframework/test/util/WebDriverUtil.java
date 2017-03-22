@@ -242,7 +242,10 @@ public final class WebDriverUtil {
         ChromeOptions options = new ChromeOptions();
         List<String> arguments = Lists.newArrayList();
         arguments.add("--ignore-gpu-blacklist");
-        arguments.add("--no-sandbox");
+        Boolean noSandbox = Boolean.valueOf(System.getProperty("webdriver.chrome.nosandbox"));
+        if (noSandbox) {
+            arguments.add("--no-sandbox");
+        }
         if (windowSize != null) {
             arguments.add("window-size=" + windowSize.width + ',' + windowSize.height);
         }

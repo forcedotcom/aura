@@ -241,10 +241,13 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 }
             } else if (mappedEx instanceof DefinitionNotFoundException && isProductionMode(context.getMode())
                     && format == Format.HTML) {
-                // We're in production and tried to hit an aura app that doesn't exist.
-                // just show the standard 404 page.
-                this.send404(request.getServletContext(), request, response);
-                return;
+            	DefDescriptor<? extends BaseComponentDef> appDescriptor = context.getApplicationDescriptor();
+                if (appDescriptor != null && appDescriptor.equals(((DefinitionNotFoundException) mappedEx).getDescriptor())) {
+                    // We're in production and tried to hit an aura app that doesn't exist.
+                    // just show the standard 404 page.
+                    this.send404(request.getServletContext(), request, response);
+                    return;
+                }
             }
 
             if (map) {
@@ -358,7 +361,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      */
     private List<String> getClientLibraryUrls(AuraContext context, ClientLibraryDef.Type type)
             throws QuickFixException {
-    	return new ArrayList<>(clientLibraryService.getUrls(context, type));
+        return new ArrayList<>(clientLibraryService.getUrls(context, type));
     }
 
     /**
@@ -402,7 +405,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
 
     @Override
     public List <String> getJsClientLibraryUrls (AuraContext context) throws QuickFixException {
-    	return getClientLibraryUrls(context, ClientLibraryDef.Type.JS);
+        return getClientLibraryUrls(context, ClientLibraryDef.Type.JS);
     }
 
     @Override
@@ -421,7 +424,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
 
     @Override
     public List <String> getCssClientLibraryUrls (AuraContext context) throws QuickFixException {
-    	return new ArrayList<>(getClientLibraryUrls(context, ClientLibraryDef.Type.CSS));
+        return new ArrayList<>(getClientLibraryUrls(context, ClientLibraryDef.Type.CSS));
     }
 
     @Override
@@ -877,69 +880,69 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
             this.delegate = delegate;
         }
         
-		@Override
-		public String getCspHeaderValue() {
-			return DefaultContentSecurityPolicy.buildHeaderNormally(this);
-		}
+        @Override
+        public String getCspHeaderValue() {
+            return DefaultContentSecurityPolicy.buildHeaderNormally(this);
+        }
 
-		@Override
-		public Collection<String> getFrameAncestors() {
-			return delegate.getFrameAncestors();
-		}
+        @Override
+        public Collection<String> getFrameAncestors() {
+            return delegate.getFrameAncestors();
+        }
 
-		@Override
-		public Collection<String> getFrameSources() {
-			return delegate.getFrameSources();
-		}
+        @Override
+        public Collection<String> getFrameSources() {
+            return delegate.getFrameSources();
+        }
 
-		@Override
-		public Collection<String> getScriptSources() {
-		    Collection<String> sources = Lists.newArrayList(delegate.getScriptSources());
-		    sources.add(CSP.UNSAFE_EVAL);
-			return sources;
-		}
+        @Override
+        public Collection<String> getScriptSources() {
+            Collection<String> sources = Lists.newArrayList(delegate.getScriptSources());
+            sources.add(CSP.UNSAFE_EVAL);
+            return sources;
+        }
 
-		@Override
-		public Collection<String> getStyleSources() {
-			return delegate.getStyleSources();
-		}
+        @Override
+        public Collection<String> getStyleSources() {
+            return delegate.getStyleSources();
+        }
 
-		@Override
-		public Collection<String> getFontSources() {
-			return delegate.getFontSources();
-		}
+        @Override
+        public Collection<String> getFontSources() {
+            return delegate.getFontSources();
+        }
 
-		@Override
-		public Collection<String> getConnectSources() {
-			return delegate.getConnectSources();
-		}
+        @Override
+        public Collection<String> getConnectSources() {
+            return delegate.getConnectSources();
+        }
 
-		@Override
-		public Collection<String> getDefaultSources() {
-			return delegate.getDefaultSources();
-		}
+        @Override
+        public Collection<String> getDefaultSources() {
+            return delegate.getDefaultSources();
+        }
 
-		@Override
-		public Collection<String> getImageSources() {
-			return delegate.getImageSources();
-		}
+        @Override
+        public Collection<String> getImageSources() {
+            return delegate.getImageSources();
+        }
 
-		@Override
-		public Collection<String> getObjectSources() {
-			return delegate.getObjectSources();
-		}
+        @Override
+        public Collection<String> getObjectSources() {
+            return delegate.getObjectSources();
+        }
 
-		@Override
-		public Collection<String> getMediaSources() {
-			return delegate.getMediaSources();
-		}
+        @Override
+        public Collection<String> getMediaSources() {
+            return delegate.getMediaSources();
+        }
 
-		@Override
-		public String getReportUrl() {
-			return delegate.getReportUrl();
-		}
-		
-		private final ContentSecurityPolicy delegate;
+        @Override
+        public String getReportUrl() {
+            return delegate.getReportUrl();
+        }
+        
+        private final ContentSecurityPolicy delegate;
     }
     
     private static final String SAFE_EVAL_HTML_URI = "/lockerservice/safeEval.html";

@@ -1,0 +1,3 @@
+<aura:component>
+    <ui:button class='Icon_only' press="{!c.handleIconOnly}" iconImgSrc="/auraFW/resources/aura/images/checkbox_checked.gif" label="Icon_only" labelDisplay="false"/>
+</aura:component>

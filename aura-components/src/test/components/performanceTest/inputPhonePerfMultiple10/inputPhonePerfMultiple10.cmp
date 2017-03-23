@@ -1,0 +1,12 @@
+<aura:component>
+    <ui:inputPhone label="inPhone" value="345987345"/>
+    <ui:inputPhone label="inPhone" value="345987345"/>
+    <ui:inputPhone label="inPhone" value="345987345"/>
+    <ui:inputPhone label="inPhone" value="345987345"/>
+    <ui:inputPhone label="inPhone" value="345987345"/>
+    <ui:inputPhone label="inPhone" value="345987345"/>
+    <ui:inputPhone label="inPhone" value="345987345"/>
+    <ui:inputPhone label="inPhone" value="345987345"/>
+    <ui:inputPhone label="inPhone" value="345987345"/>
+    <ui:inputPhone label="inPhone" value="345987345"/>
+</aura:component>

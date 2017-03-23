@@ -1,0 +1,3 @@
+<aura:component>
+    <ui:button class="Label_only" label='Label only!!' press="{!c.handleLabelOnly}"/>
+</aura:component>

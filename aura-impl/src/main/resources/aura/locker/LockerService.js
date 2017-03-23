@@ -35,6 +35,7 @@ function LockerService() {
     // #include aura.locker.SecureAction
     // #include aura.locker.SecureComponent
     // #include aura.locker.SecureComponentRef
+    // #include aura.locker.SecureLocation
 
     var lockers = [];
     var keyToEnvironmentMap = {};

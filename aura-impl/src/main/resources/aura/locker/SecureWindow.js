@@ -83,6 +83,16 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
                 return setInterval.apply(win, [SecureObject.FunctionPrototypeBind.call(callback, o)].concat(SecureObject.ArrayPrototypeSlice.call(arguments, 1)));
             }
         },
+        location: {
+            enumerable: true,
+            get: function() {
+                return SecureLocation(location, key);
+            },
+            set: function(value) {
+                var ret = location.href = value;
+                return ret;
+            }
+        },
         toString: {
             value: function() {
                 return "SecureWindow: " + win + "{ key: " + JSON.stringify(key) + " }";
@@ -753,7 +763,6 @@ SecureWindow.metadata = {
                 "isSecureContext":                      DEFAULT,
                 "length":                               DEFAULT,
                 "localStorage":                         DEFAULT,
-                "location":                             RAW,
                 "locationbar":                          DEFAULT,
                 "matchMedia":                           FUNCTION,
                 "menubar":                              DEFAULT,

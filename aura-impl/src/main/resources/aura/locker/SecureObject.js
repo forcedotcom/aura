@@ -109,7 +109,9 @@ SecureObject.filterEverything = function(st, raw, options) {
             return $A.lockerService.getEnv(key);
         } else if (raw === document) {
             return $A.lockerService.getEnv(key).document;
-        } 
+        } else if (raw === location) {
+            return $A.lockerService.getEnv(key).location;
+        }
 
         var isNodeList = raw && (raw instanceof NodeList || raw instanceof HTMLCollection);
         if (Array.isArray(raw)) {

@@ -129,6 +129,7 @@
     "SecureAction": true,
     "SecureDOMEvent": true,
     "SecureAuraEvent": true,
+    "SecureLocation": true,
     "TimeRanges": true,
     "ValidityState": true,
     "DOMPurify": true,

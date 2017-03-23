@@ -156,7 +156,15 @@ QueuedActionsMetricsPlugin.prototype.postProcess = function (actionMarks /*, trx
                 mark["enqueueWait"] = Math.floor(actionMark["ts"] - mark["ts"]);
                 break;
             case "sendStart":
-                mark["xhrWait"] = Math.floor(actionMark["ts"] - mark["xhrWait"]);
+                if (mark["xhrWait"] === undefined) {
+                    mark["xhrWait"] = 0;
+                } else {
+                    mark["xhrWait"] = Math.floor(actionMark["ts"] - mark["xhrWait"]);
+                }
+                // send can start immediately as well before a sendQueued is triggered for executeHotspot
+                if (mark["enqueueWait"] === undefined) {
+                    mark["enqueueWait"] = Math.floor(actionMark["ts"] - mark["ts"]);
+                }
                 break;
             case "finishStart":
                 $A.util.apply(mark["context"], actionMark["context"]);

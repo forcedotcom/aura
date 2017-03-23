@@ -349,6 +349,71 @@
         ]
     },
 
+    testGetCallbackErrorReporting: {
+        test: [
+            /**
+             * Verifies that passing in random data to a getCallback generated function reports
+             * the original error.
+             */
+            function(cmp) {
+                var expected = "Error in $A.getCallback() [testGetCallbackErrorReporting]";
+                var callback = $A.getCallback(function(){
+                    throw new Error("testGetCallbackErrorReporting");
+                });
+                var actual;
+
+                try {
+                    callback(true, true);
+                } catch(e) {
+                    actual = e.message;
+                }
+
+                $A.test.assertEquals(expected, actual);
+            },
+
+            /**
+             * Verifies that when you pass in an action as the first parameter, but junk as the second still reports the original error.
+             */
+            function(cmp) {
+                var expected = "Error in $A.getCallback() [testGetCallbackErrorReporting]";
+                var action = cmp.get("c.handleCustomExceptionWithData");
+                var callback = $A.getCallback(function(){
+                    throw new Error("testGetCallbackErrorReporting");
+                });
+                var actual;
+
+                try {
+                    callback(action, true);
+                } catch(e) {
+                    actual = e.message;
+                }
+
+                $A.test.assertEquals(expected, actual);
+            },
+
+            /**
+             * Verifies Happiest path. Passing in an action and a component. This is the typical use case for actions throwing exceptions
+             * and what the getCallback should be best at reporting errors for.
+             */
+            function(cmp) {
+                var expected = "Error in $A.getCallback() [testGetCallbackErrorReporting]";
+                var action = cmp.get("c.handleCustomExceptionWithData");
+                var callback = $A.getCallback(function(){
+                    throw new Error("testGetCallbackErrorReporting");
+                });
+                var actual;
+
+                try {
+                    callback(action, cmp);
+                } catch(e) {
+                    actual = e.message;
+                }
+
+                $A.test.assertEquals(expected, actual);
+            }
+        ]
+    },
+
     /**
      * Checks the properties of an Action error object.
      *

@@ -933,7 +933,7 @@ AuraInstance.prototype.getCallback = function(callback) {
                 var syntheticStackFrame = "";
                 if (arguments.length === 2) {
                     var action = arguments[0];
-                    if (action) {
+                    if ($A.util.isAction(action)) {
                         var actionDef = action.getDef();
                         if (actionDef) {
                             syntheticStackFrame = actionDef.getDescriptor().toString();
@@ -941,7 +941,7 @@ AuraInstance.prototype.getCallback = function(callback) {
                     }
                     var actionComponent = arguments[1];
                     var actionComponentDefDescriptor = null;
-                    if (actionComponent) {
+                    if ($A.util.isComponent(actionComponent)) {
                         var actionComponentDef = actionComponent.getDef();
                         if (actionComponentDef) {
                             actionComponentDefDescriptor = actionComponentDef.getDescriptor().toString();

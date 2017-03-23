@@ -18,15 +18,28 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-		  A <code>ui:outputRichText</code> component represents rich text and can be used to display input from a <code>ui:inputRichText</code> component. This component displays URLs and email addresses within rich text fields as hyperlinks.
+		  A <code>ui:outputRichText</code> component represents formatted text and can be used to display input from a <code>lightning:inputRichText</code> or <code>ui:inputRichText</code> component. 
+		  Using <code>lightning:inputRichText</code> is recommended since <code>ui:inputRichText</code> is no longer supported when LockerService is enabled.
+		  <code>ui:outputRichText</code> renders formatted text. For example, URLs and email addresses enclosed by anchor tags are displayed as hyperlinks.
 		</p>
 		<p>
-		  For example, you can enter bold or colored text via a <code>ui:inputRichText</code> component and bind its value to a <code>ui:outputRichText</code> component, which results in the following HTML. 
+		  This example sets bold text and bind the value to a <code>lightning:inputRichText</code> and <code>ui:outputRichText</code> component.
 		</p>
-<pre>&lt;div class="uiOutputRichText">
-    &lt;b>Aura&lt;/b>, &lt;span style="color:red">input rich text demo&lt;/span>
-&lt;/div></pre>
-        <p>This component supports the following HTML tags: <code>a</code>, <code>b</code>, <code>br</code>, <code>big</code>, <code>blockquote</code>, <code>caption</code>, <code>cite</code>, <code>code</code>, <code>col</code>, <code>colgroup</code>,
+		<pre>&lt;aura:component>
+    &lt;aura:attribute name="myVal" type="String" />
+    &lt;aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+    &lt;lightning:inputRichText value="{!v.myVal}"/>
+    &lt;ui:outputRichText value="{!v.myVal}"/>
+&lt;/aura:component></pre>
+
+        <p>During initialization, the value is set on both the <code>lightning:inputRichText</code> and <code>ui:outputRichText</code> component.</p>
+        <pre>({
+    init: function(cmp) {
+        cmp.set('v.myVal', '&lt;b>Hello!&lt;/b>');
+    }
+})</pre>
+        <p><code>ui:outputRichText</code> supports the following HTML tags: <code>a</code>, <code>b</code>, <code>br</code>, <code>big</code>, <code>blockquote</code>, <code>caption</code>, <code>cite</code>, <code>code</code>, <code>col</code>, <code>colgroup</code>,
          <code>del</code>, <code>div</code>, <code>em</code>, <code>h1</code>, <code>h2</code>, <code>h3</code>, <code>hr</code>, <code>i</code>, <code>img</code>, <code>ins</code>,
          <code>kbd</code>, <code>li</code>, <code>ol</code>, <code>p</code>, <code>param</code>, <code>pre</code>, <code>q</code>, <code>s</code>, <code>samp</code>, <code>small</code>,
          <code>span</code>, <code>strong</code>, <code>sub</code>, <code>sup</code>, <code>table</code>, <code>tbody</code>, <code>td</code>, <code>tfoot</code>, <code>th</code>,

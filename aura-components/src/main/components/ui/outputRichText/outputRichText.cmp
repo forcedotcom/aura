@@ -15,11 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" implements="ui:visible" extensible="true" description="Displays richly-formatted text including tags such as paragraph, image, and hyperlink, as specified in the value attribute.">
+<aura:component access="GLOBAL" support="GA" implements="ui:visible" extensible="true" description="Displays formatted text including tags such as paragraph, image, and hyperlink, as specified in the value attribute.">
 
     <aura:import library="ui:urlLib" property="urlLib"/>
 
-    <aura:attribute access="GLOBAL" name="value" type="String" description="The richly-formatted text used for output."/>
+    <aura:attribute access="GLOBAL" name="value" type="String" description="The formatted text used for output."/>
 	<aura:attribute access="GLOBAL" name="linkify" type="Boolean" default="true" description="Indicates if the URLs in the text are set to render as hyperlinks."/>
 	<aura:attribute access="PRIVATE" name="displayValue" type="String" description="The value after being escaped and activated."/>
 

@@ -52,6 +52,13 @@
         }
     },
 
+    testHttpsLinkCapitalLetters:{
+        attributes : {textValue: 'visit HTTPS://www.salesforce.com for more details'},
+        test: function(cmp){
+            this.assertLinksPresent(cmp, "href=\"HTTPS://www.salesforce.com\"");
+        }
+    },
+
     testNoHttpNoWWWLink:{
         attributes : {textValue: 'visit salesforce.com for more details'},
         test: function(cmp){
@@ -119,6 +126,13 @@
         attributes : {textValue: 'visit https://en.wikipedia.org/wiki/Salesforce.com#Lightning for more details'},
         test: function(cmp){
             this.assertLinksPresent(cmp, "href=\"https://en.wikipedia.org/wiki/Salesforce.com#Lightning\"");
+        }
+    },
+
+    testAnchorWithHash:{
+        attributes : {textValue: 'visit <a href="#overview">Overview \/ Use Case</a> section'},
+        test: function(cmp){
+            this.assertLinksPresent(cmp, "href=\"#overview\"");
         }
     },
 

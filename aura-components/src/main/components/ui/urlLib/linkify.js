@@ -75,7 +75,7 @@ function lib() { //eslint-disable-line no-unused-vars
         var href = match;
         // lastIndexOf starting from index 0 checks if the match begins with the string.
         // It has performance advantages over indexOf when the match doesn't begin with the string because it only checks index 0.
-        if (match.lastIndexOf("http", 0) !== 0 && match.lastIndexOf("ftp", 0) !== 0) {
+        if (match.toLowerCase().lastIndexOf("http", 0) !== 0 && match.toLowerCase().lastIndexOf("ftp", 0) !== 0) {
             href = "http://" + href;
         }
         return "<a href=\"" + href + "\" target=\"_blank\">" + match + "</a>";

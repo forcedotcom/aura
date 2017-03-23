@@ -511,7 +511,16 @@ AuraInstance.prototype.initAsync = function(config) {
                 $A.clientService.loadTokenFromStorage(),
                 $A.clientService.loadBootstrapFromStorage(),
                 $A.componentService.restoreDefsFromStorage(context),
-                $A.clientService.populatePersistedActionsFilter()
+                $A.clientService.populatePersistedActionsFilter(),
+                // before rendering the app, we need to ensure the app.css has been loaded
+                // many applications depend upon the css existing before initialization takes place.
+                new Promise(function(resolve) {
+                    if (Aura["bootstrap"]["appCssLoaded"]) {
+                        resolve();
+                    } else {
+                        Aura["bootstrap"]["appCssLoaded"] = resolve;
+                    }
+                })
             ])
                 .then(initializeApp, function (err) {
                     $A.log("Aura.initAsync: failed to load defs, get bootstrap or actions from storage", err);

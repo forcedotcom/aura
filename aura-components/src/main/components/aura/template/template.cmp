@@ -247,6 +247,8 @@
     {!v.bootstrapInlineJs}
 
 
+    window.Aura.bootstrap.appCssLoaded = false;
+
     function onloadMoveStyleSheets() {
         document.removeEventListener('DOMContentLoaded', onloadMoveStyleSheets);
 
@@ -260,6 +262,10 @@
                 }
             }
         }
+        if (typeof window.Aura.bootstrap.appCssLoaded === "function") {
+            window.Aura.bootstrap.appCssLoaded();
+        }
+        window.Aura.bootstrap.appCssLoaded = true;
     }
     document.addEventListener('DOMContentLoaded', onloadMoveStyleSheets);
 

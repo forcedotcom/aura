@@ -231,7 +231,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
         Map<String, String> params = new HashMap<>();
         params.put("message", jsonMessage);
-        params.put("aura.token", getCsrfToken());
+        params.put("aura.token", configAdapter.getCSRFToken());
 
         DefDescriptor<ApplicationDef> app = definitionService.getDefDescriptor(
                 "auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
@@ -271,7 +271,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
         Map<String, String> params = new HashMap<>();
         params.put("message", jsonMessage);
-        params.put("aura.token", getCsrfToken());
+        params.put("aura.token", configAdapter.getCSRFToken());
         DefDescriptor<ApplicationDef> app = definitionService.getDefDescriptor(
                 "auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
         String fwuid = getAuraTestingUtil().modifyUID(configAdapter.getAuraFrameworkNonce());

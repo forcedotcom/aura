@@ -36,6 +36,7 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -117,10 +118,6 @@ public abstract class IntegrationTestCase extends AuraImplTestCase {
         return httpClient;
     }
 
-    protected String getCsrfToken() throws Exception {
-        return getTestServletConfig().getCsrfToken();
-    }
-
     /**
      * Start a context and set up default values.
      */
@@ -180,20 +177,7 @@ public abstract class IntegrationTestCase extends AuraImplTestCase {
      * @throws Exception
      */
     protected HttpResponse perform(HttpRequestBase method, HttpContext context) throws Exception {
-        HttpResponse response = getHttpClient().execute(method, context);
-        Header cspHeaders[] = response.getHeaders(CSP.Header.REPORT_ONLY);
-        if (response.getStatusLine().getStatusCode() == 200) {
-            // TODO(fabbott): Although a request for e.g. moment.js from testSetRunner.app
-            // does have a header, the same request from AuraFrameworkServletHttpTest does
-            // not.  I suspect this is because the test has no UID, but the "real life" one
-            // does... but for now, let's validate the CSP header only if it's actually there.
-            if (cspHeaders.length != 0) {
-                assertEquals(1, cspHeaders.length);
-                assertTrue("No connect-src in default CSP",
-                        cspHeaders[0].getValue().contains("; connect-src 'self';"));
-            }
-        }
-        return response;
+        return getHttpClient().execute(method, context);
     }
 
     /**

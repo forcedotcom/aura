@@ -44,7 +44,7 @@ import javax.inject.Inject;
 public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
 
     @Inject
-    ConfigAdapter configAdapter;
+    private ConfigAdapter configAdapter;
 
     /**
      * Verify that AuraServlet returns an error code in the response body when
@@ -112,7 +112,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
 
         Map<String, String> params = new HashMap<>();
         params.put("message", jsonMessage);
-        params.put("aura.token", getCsrfToken());
+        params.put("aura.token", configAdapter.getCSRFToken());
 
         String serContext;
         contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED,

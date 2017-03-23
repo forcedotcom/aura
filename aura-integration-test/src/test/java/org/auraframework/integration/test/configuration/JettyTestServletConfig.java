@@ -117,10 +117,4 @@ public class JettyTestServletConfig implements TestServletConfig {
 
         return http;
     }
-
-    @Override
-    public String getCsrfToken() throws Exception {
-        String token = configAdapter.getCSRFToken();
-        return token == null ? "" : token;
-    }
 }

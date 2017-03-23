@@ -43,7 +43,7 @@ import org.junit.Test;
  */
 public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
     @Inject
-    ConfigAdapter configAdapter;
+    private ConfigAdapter configAdapter;
 
     private Map<String, String> makeBasePostParams() {
         Map<String, Object> message = new HashMap<>();
@@ -131,7 +131,7 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
     public void testVerifyPostWithValidToken() throws Exception {
         Map<String, String> params = makeBasePostParams();
         // Valid token
-        params.put("aura.token", getCsrfToken());
+        params.put("aura.token", configAdapter.getCSRFToken());
         params.put("aura.context", String.format("{\"mode\":\"FTEST\",\"fwuid\":\"%s\"}",
                 configAdapter.getAuraFrameworkNonce()));
         HttpPost post = obtainPostMethod("/aura", params);

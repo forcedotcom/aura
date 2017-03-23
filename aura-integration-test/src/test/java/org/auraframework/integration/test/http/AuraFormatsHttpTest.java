@@ -40,7 +40,7 @@ import java.util.Map;
  */
 public class AuraFormatsHttpTest extends AuraHttpTestCase {
     @Inject
-    ConfigAdapter configAdapter;
+    private ConfigAdapter configAdapter;
 
     private final String componentTag = "&aura.tag=auratest:test_TokenValidation";
     private final String quickFixComponentTag = "&aura.tag=foo:bar";
@@ -86,7 +86,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
         Map<String, String> params = new HashMap<>();
         params.put("message", jsonMessage);
         if (!causeException) {
-            params.put("aura.token", getCsrfToken());
+            params.put("aura.token", configAdapter.getCSRFToken());
         }
         params.put("aura.context", String.format("{\"mode\":\"FTEST\",\"fwuid\":\"%s\"}",
                 configAdapter.getAuraFrameworkNonce()));

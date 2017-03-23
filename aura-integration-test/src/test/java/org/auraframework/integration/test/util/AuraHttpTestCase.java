@@ -380,7 +380,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         }
         postParams.put("message", jsonMessage);
         if (!postParams.containsKey("aura.token")) {
-            postParams.put("aura.token", getCsrfToken());
+            postParams.put("aura.token", configAdapter.getCSRFToken());
         }
         if (!postParams.containsKey("aura.context")) {
             postParams.put("aura.context",
@@ -600,7 +600,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                 String jsonMessage = JsonEncoder.serialize(message);
                 Map<String, String> params = Maps.newHashMap();
                 params.put("message", jsonMessage);
-                params.put("aura.token", getTestServletConfig().getCsrfToken());
+                params.put("aura.token", configAdapter.getCSRFToken());
 
                 params.put("aura.context", getAuraTestingUtil().buildContextForPost(mode, app, null, dn));
                 post = obtainPostMethod("/aura", params);

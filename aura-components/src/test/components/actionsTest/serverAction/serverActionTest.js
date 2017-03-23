@@ -505,6 +505,54 @@
     },
 
     /**
+     * If you have a component with a server dependency, and you create it with a component in its attribute set
+     * it should not serialize the component and try to send it to the server. That will only result in a gack.
+     */
+    testCreateComponentWithComponentInAttributes : {
+        test : [
+            /**
+             * Pass an array of components as body, verify no exception on the server.
+             */
+            function(cmp) {
+                var expected = "SUCCESS";
+                var actual;
+
+                // Request a component with a server dependency so it sends the attributes to the server.
+                $A.createComponent("auratest:test_Model_Parent", { body: [cmp] }, function(component, status, errorMessage){
+                    actual = status;
+
+                    if(errorMessage) {
+                        $A.test.fail(errorMessage);
+                    }
+                });
+
+                // Wait for the callback to successfully come back
+                $A.test.addWaitFor(expected, function() { return actual; }, function(){});
+            },
+
+            /**
+             * Pass a single component as the body, verify no exception on the server.
+             */
+            function(cmp) {
+                var expected = "SUCCESS";
+                var actual;
+
+                // Request a component with a server dependency so it sends the attributes to the server.
+                $A.createComponent("auratest:test_Model_Parent", { body: cmp }, function(component, status, errorMessage){
+                    actual = status;
+
+                    if(errorMessage) {
+                        $A.test.fail(errorMessage);
+                    }
+                });
+
+                // Wait for the callback to successfully come back
+                $A.test.addWaitFor(expected, function() { return actual; }, function(){});
+            }
+        ]
+    },
+
+    /**
      * When requesting a component via an action, the returned config should be consumed on the client in the Action
      * callback. If it is not, a warning should be logged.
      */

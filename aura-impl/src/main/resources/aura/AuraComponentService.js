@@ -820,7 +820,6 @@ AuraComponentService.prototype.requestComponent = function(callback, config, avp
             : null;
 
     var atts = {};
-    var self = this;
 
     //
     // Note to self, these attributes are _not_ Aura Values. They are instead either
@@ -871,7 +870,7 @@ AuraComponentService.prototype.requestComponent = function(callback, config, avp
 
             var error;
             try {
-                newComp = self.createComponentPriv(returnedConfig);
+                newComp = this.createComponentPriv(returnedConfig);
             } catch(e) {
                 status = "ERROR";
                 statusMessage = e.message;
@@ -885,7 +884,7 @@ AuraComponentService.prototype.requestComponent = function(callback, config, avp
             statusMessage=errors?errors[0].message:"Unknown Error.";
             if (statusMessage !== "Event fired") {
 	            if(!returnNullOnError) {
-	                newComp = self.createComponentPriv({
+	                newComp = this.createComponentPriv({
 	                    "componentDef": { "descriptor": "markup://aura:text" },
 	                    "attributes": { "values": { "value" : statusMessage } }
 	                });
@@ -912,8 +911,28 @@ AuraComponentService.prototype.requestComponent = function(callback, config, avp
  * @returns {*}
  * @export
  */
-AuraComponentService.prototype.computeValue = function(valueObj, valueProvider) {
-    return $A.util.isExpression(valueObj) ? valueObj.evaluate(valueProvider) : valueObj;
+AuraComponentService.prototype.computeValue = function(value, valueProvider) {
+    // Resolve the expression first, so we can do further processing on the return value.
+    if($A.util.isExpression(value)) {
+        value = value.evaluate(valueProvider);
+    }
+
+    // Don't serialize 
+    if($A.util.isComponent(value)) {
+        return null;
+    }
+
+    if($A.util.isArray(value)) {
+        var newValue = [];
+        for(var c=0,length = value.length;c<length;c++) {
+            if(!$A.util.isComponent(value[c])) {
+                newValue.push(value[c]);
+            }
+        }
+        value = newValue;
+    }
+
+    return value;
 };
 
 /**

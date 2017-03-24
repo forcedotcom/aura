@@ -57,6 +57,19 @@
         }]
     },
 
+    testPassClassNamesToOptionItems: {
+        test: [function(cmp) {
+            this.inputSelect = cmp.find("inputSelectMenu");
+            this.openInputSelect(this.inputSelect);
+        }, function(cmp) {
+            var selectListElm = this.inputSelect.find("options").getElement();
+            var options = selectListElm.getElementsByTagName("li");
+            for (var i = 0; i < options.length; i++) {
+                $A.test.assertTrue($A.util.hasClass(options[i], "option" + (i + 1) + "-class"));
+            }
+        }]
+    },
+
     /****************************************************************
      * Helper Functions
      ****************************************************************/

@@ -16,10 +16,10 @@
 ({
     init: function(cmp) {
         var opts =[
-                {"label": "Option1", "value": "option1", "selected": false},
-                {"label": "Option2", "value": "option2", "selected": true},
-                {"label": "Option3", "value": "option3", "selected": false},
-                {"label": "Option4", "value": "option4", "selected": false}
+                {"label": "Option1", "value": "option1", "class": "option1-class", "selected": false},
+                {"label": "Option2", "value": "option2", "class": "option2-class", "selected": true},
+                {"label": "Option3", "value": "option3", "class": "option3-class", "selected": false},
+                {"label": "Option4", "value": "option4", "class": "option4-class", "selected": false}
             ];
 
         cmp.find("inputSelectMenu").set("v.options", opts);

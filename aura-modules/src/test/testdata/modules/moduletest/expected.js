@@ -16,12 +16,18 @@ var _tmpl = function ($api, $cmp, $slotset) {
 const templateUsedIds = ["test"];
 
 class Test {
-  render() {
-    return _tmpl;
-  }
+    render() {
+        return _tmpl;
+    }
 
 }
 Test.tagName = "modules-moduletest";
+Test.publicProps = {
+    stringQuote: 'str"ing',
+    stringDoubleQuote: "str'ing",
+    stringBacktick: `key=${value}`,
+    VALID_NAME_RE: /^([a-zA-Z]\w*):([a-zA-Z]\w*)$/
+};
 Test.templateUsedIds = templateUsedIds;
 
 return Test;

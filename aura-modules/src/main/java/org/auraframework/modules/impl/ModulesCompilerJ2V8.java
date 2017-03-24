@@ -21,10 +21,10 @@ import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.auraframework.modules.ModulesCompiler;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.util.j2v8.J2V8Util;
-import org.springframework.util.StringUtils;
 
 import com.eclipsesource.v8.JavaVoidCallback;
 import com.eclipsesource.v8.NodeJS;
@@ -49,10 +49,10 @@ public final class ModulesCompilerJ2V8 implements ModulesCompiler {
         // add entries for all files in the bundle
         for (Entry<String, String> sourceEntry: sources.entrySet()) {
             String name = sourceEntry.getKey();
-            String source = StringUtils.replace(sourceEntry.getValue(), "`", "\\`");
+            String source = StringEscapeUtils.escapeEcmaScript(sourceEntry.getValue());
             
             options += '"' + name + "\": ";
-            options += '`' + source + '`';
+            options += '"' + source + '"';
             options += ",\n";
             
             if (entry.endsWith(name.substring(1))) {
@@ -66,7 +66,7 @@ public final class ModulesCompilerJ2V8 implements ModulesCompiler {
         
         // add entry for sourceClass .js
         options += '"' + entry + "\": ";
-        options += '`' + sourceClass + '`';
+        options += '"' + sourceClass + '"';
         options += "}}";
         
         return compile(entry, options);
@@ -74,11 +74,11 @@ public final class ModulesCompilerJ2V8 implements ModulesCompiler {
     
     @Override
     public ModulesCompilerData compile(String entry, String sourceTemplate, String sourceClass) throws Exception {
-        sourceTemplate = StringUtils.replace(sourceTemplate, "`", "\\`");
-        sourceClass = StringUtils.replace(sourceClass, "`", "\\`");
+        sourceTemplate = StringEscapeUtils.escapeEcmaScript(sourceTemplate);
+        sourceClass = StringEscapeUtils.escapeEcmaScript(sourceClass);
 
-        String options = "{ sourceTemplate: `" + sourceTemplate
-                + "`\n, sourceClass: `" + sourceClass + "`\n"
+        String options = "{ sourceTemplate: \"" + sourceTemplate
+                + "\"\n, sourceClass: \"" + sourceClass + "\"\n"
                 + ", format: 'aura', mapNamespaceFromPath: true }";
         return compile(entry, options);
     }

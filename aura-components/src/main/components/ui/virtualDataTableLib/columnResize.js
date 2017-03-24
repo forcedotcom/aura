@@ -181,38 +181,10 @@ function lib(w) { //eslint-disable-line no-unused-vars
             var promise = Promise.resolve();
             var that = this;
             for (var i = 0; i < columns.length; i++) {
-                var column = columns[i];
-
-                if (!this.hasHandle(column)) {
-                    var handle = this._createHandle();
-                    this._attachHandle(column, handle);
-                    
-                    // Chain each setDividerHeight for each column into async sequence.
-                    promise = promise.then($A.getCallback(function (){
-                        // If the column already has a width style, default to that.
-                        // Otherwise, use the specified initialWidth or the column's actual width. 
-                        var initialWidth;
-                        if (column.style.width) {
-                            initialWidth = column.style.width.replace('px','');
-                        } else {
-                            initialWidth = initialWidths[i] || column.clientWidth;
-                            if (initialWidth < that.config.minWidth) {
-                                initialWidth = that.config.minWidth;
-                            }
-                        }
-                        
-                        return that._setDividerHeight(handle).then(function(){
-                            return initialWidth;
-                        });
-                    })).then($A.getCallback(function(initialWidth) {
-                        that._resize(column, initialWidth);
-                        that._resize(column.firstChild, initialWidth);
-                        that._updateRange(that._findRangeElement(column), column.clientWidth);
-                    }));
-                }
-                promise.then(function() {
-                    totalWidth += column.clientWidth;
-                });
+                promise = this._calculateWidthAsync(promise, columns[i], initialWidths[i])
+                    .then(function(column) {
+                        totalWidth += column.clientWidth;
+                    });
             }
 
             promise = promise.then($A.getCallback(function (){
@@ -222,6 +194,39 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 table.style.width = totalWidth + 'px';
                 that.tableWidth = totalWidth;
             }));
+        },
+
+        _calculateWidthAsync: function(promise, column, initialWidth) {
+            var that = this;
+            if (!this.hasHandle(column)) {
+                var handle = this._createHandle();
+                this._attachHandle(column, handle);
+
+                // Chain each setDividerHeight for each column into async sequence.
+                promise = promise.then($A.getCallback(function(){
+                    // If the column already has a width style, default to that.
+                    // Otherwise, use the specified initialWidth or the column's actual width.
+                    if (column.style.width) {
+                        initialWidth = column.style.width.replace('px','');
+                    } else {
+                        initialWidth = initialWidth || column.clientWidth;
+                        if (initialWidth < that.config.minWidth) {
+                            initialWidth = that.config.minWidth;
+                        }
+                    }
+
+                    return that._setDividerHeight(handle).then(function(){
+                        return initialWidth;
+                    });
+                })).then($A.getCallback(function(width) {
+                    that._resize(column, width);
+                    that._resize(column.firstChild, width);
+                    that._updateRange(that._findRangeElement(column), column.clientWidth);
+                }));
+            }
+            return promise.then(function() {
+                return column;
+            });
         },
 
         /**

@@ -1691,7 +1691,17 @@ AuraComponentService.prototype.createComponentPriv = function (config, callback)
             auraError["component"] = descriptor;
             throw auraError;
         }
-        cmp = new classConstructor(config);
+        try {
+            cmp = new classConstructor(config);
+        } catch (e){
+            if (e instanceof $A.auraError) {
+                throw e;
+            } else {
+                var creationError = new $A.auraError("Component class instance initialization error", e);
+                creationError["component"] = descriptor;
+                throw creationError;
+            }
+        }
     }else{
         var context=$A.getContext();
         var contextCmp = context && context.getCurrentAccess();

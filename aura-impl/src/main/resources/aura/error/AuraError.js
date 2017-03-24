@@ -92,7 +92,12 @@ function AuraError() {
                 throw new Error("foo");
             } catch (f) {
                 e = f;
-                remove += 3;
+                // fabricated frames to remove:
+                // 0: new $A.auraError
+                // 1: AuraErrorInternal
+                // 2: getStackFrames
+                // 3: throw new Error("foo")
+                remove += 4;
             }
         }
 

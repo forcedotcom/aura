@@ -755,6 +755,10 @@ Test.Aura.Controller.ActionTest = function() {
                     logger: {
                         reportError: function () {
                         }
+                    },
+                    util: {
+                        getComponentHierarchy: function() {
+                        }
                     }
                 },
                 window: Object.Global()

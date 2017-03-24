@@ -1276,9 +1276,8 @@ Action.prototype.markException = function(e) {
         e["component"] = e["component"] || descriptor;
     }
 
-    var context = $A.getContext();
-    if (!e['componentStack'] && context) {
-        e['componentStack'] = context.getAccessStackHierarchy();
+    if (!e['componentStack']) {
+        e['componentStack'] = $A.util.getComponentHierarchy(this.cmp);
     }
 
     this.state = "ERROR";

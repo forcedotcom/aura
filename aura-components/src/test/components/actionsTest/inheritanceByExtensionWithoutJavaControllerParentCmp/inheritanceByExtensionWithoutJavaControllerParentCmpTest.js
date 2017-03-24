@@ -48,7 +48,7 @@
      */
     testGetNonExistentAction : {
         test : function(cmp) {
-            var errorMsg = "Assertion Failed!: Unknown controller action 'serverSideActionInChildOnly' : undefined";
+            var errorMsg = "Unknown controller action 'serverSideActionInChildOnly'";
             try {
                 var action = cmp.get("c.serverSideActionInChildOnly");
                 $A.test.fail("Attemping to get a non-existent controller action should have thrown error.");

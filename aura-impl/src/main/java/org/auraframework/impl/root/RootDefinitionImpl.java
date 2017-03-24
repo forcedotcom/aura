@@ -34,6 +34,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -184,7 +185,9 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
                 StringBuffer hashAcc = new StringBuffer();
 
                 hashAcc.append(working);
-                for (Map.Entry<DefDescriptor<?>,Definition> entry : this.bundledDefs.entrySet()) {
+                List<Map.Entry<DefDescriptor<?>,Definition>> entries = Lists.newArrayList(this.bundledDefs.entrySet());
+                Collections.sort(entries, Comparator.comparing(entry -> entry.getKey()));
+                for (Map.Entry<DefDescriptor<?>,Definition> entry : entries) {
                     hashAcc.append("|");
                     hashAcc.append(entry.getKey());
                     if (entry.getValue() != null) {

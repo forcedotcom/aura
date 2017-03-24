@@ -133,6 +133,10 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         // Grabbing the Date Icon and click on it to open the calendar
         WebElement element = findDomElement(By.cssSelector(DATE_ICON_SEL));
         element.click();
+        waitForDatePickerVisible();
+    }
+
+    private void waitForDatePickerVisible() {
         getAuraUITestingUtil().waitForElement("DatePicker doesn't appear after clicking on the calendar icon!",
             By.cssSelector(DATEPICKER_SEL));
     }
@@ -535,5 +539,18 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
         assertEquals("Moving dates using arrows has not brought us to todays date", TEST_DATE_TO_USE,
                 element.getAttribute("value").trim());
+    }
+
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+    @Test
+    public void testFocusClickOnInputBoxToOpenDatePicker() throws Exception {
+        open(URL);
+
+        WebElement inputElement = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
+        inputElement.click();
+        waitForDatePickerVisible();
+
+        WebElement activeElement = (WebElement)getAuraUITestingUtil().getEval(ACTIVE_ELEMENT);
+        assertEquals("Focus should be on input box", activeElement, inputElement);
     }
 }

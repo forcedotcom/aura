@@ -27,9 +27,9 @@
 function InteropComponentDef(config) {
     this.interop = true;
     this.access = 'G';
+    this.descriptor       = new DefDescriptor(config.descriptor);
     this.dependencies     = config.dependencies;
     this.definition       = config.definition;
-    this.descriptor       = config.descriptor;
     this.moduleName       = config.moduleName;
     this.interopClass     = config.interopClass;
     this.elementName      = this.moduleName.replace(':', '-');
@@ -449,7 +449,8 @@ InteropComponentDef.prototype.toString = function() {
  * @export
  */
 InteropComponentDef.prototype.isInstanceOf = function(name) {
-    return this.descriptor.indexOf(name) !== -1;
+    var thisName = this.descriptor.getNamespace() + ":" + this.descriptor.getName();
+    return thisName === name;
 };
 
 /**

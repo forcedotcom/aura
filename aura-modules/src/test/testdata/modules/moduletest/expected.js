@@ -1,6 +1,6 @@
 $A.componentService.addModule('modules:moduletest', ['x-test'], function (_xTest) { 'use strict';
 
-const memoized = Symbol();
+const memoized = Symbol('memoize');
 var _tmpl = function ($api, $cmp, $slotset) {
     const m = $cmp[memoized] || ($cmp[memoized] = {});
     return [$api.c(

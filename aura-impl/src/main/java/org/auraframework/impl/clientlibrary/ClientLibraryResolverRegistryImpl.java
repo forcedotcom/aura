@@ -39,7 +39,7 @@ public enum ClientLibraryResolverRegistryImpl implements ClientLibraryResolverRe
         this.resolvers = new HashMap<>();
         register(new AuraResourceResolver("CkEditor", ClientLibraryDef.Type.JS, "ckeditor/ckeditor-4.x/rel/ckeditor.js", "ckeditor/ckeditor-4.x/rel/ckeditor.js"));
         register(new AuraResourceResolver("DOMPurify", ClientLibraryDef.Type.JS, "domPurify/DOMPurify.js", "domPurify/DOMPurify.min.js"));
-        register(new AuraResourceResolver("engine", ClientLibraryDef.Type.JS, "engine/engine.min.js", "engine/engine.min.js"));
+        register(new AuraResourceResolver("engine", ClientLibraryDef.Type.JS, "engine/engine.js", "engine/engine.min.js"));
     }
 
     /**

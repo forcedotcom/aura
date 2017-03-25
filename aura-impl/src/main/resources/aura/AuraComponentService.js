@@ -52,8 +52,8 @@ function AuraComponentService() {
     this.renderedBy    = "auraRenderedBy";
     this["renderedBy"] = this.renderedBy;   // originally exposed using exp()
 
-    // Initialize module
-    this.addModule("engine", [], null, window["Engine"]);
+    // Initialize core modules
+    this.initCoreModules();
 }
 
 /**
@@ -66,6 +66,11 @@ function AuraComponentService() {
  */
 AuraComponentService.prototype.get = function(globalId) {
     return this.indexes.globalId[globalId];
+};
+
+AuraComponentService.prototype.initCoreModules = function () {
+    this.addModule("engine", [], null, window["Engine"]);
+    this.addModule("aura", [], null, Aura.ExportsModule);
 };
 
 /**
@@ -1228,7 +1233,7 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
     }
 
     var deps = entry.dependencies.map(function (name) {
-        if (name === 'export') {
+        if (name === 'exports') {
             exportns = {};
             return exportns;
         }

@@ -54,14 +54,15 @@ InteropComponent.prototype.constructor = InteropComponent;
 
 InteropComponent.prototype.bridgeAction = function (prv, isEvent) {
     var self = this;
-
-    return function callbackBridge(params) {
+    return $A.getCallback(function callbackBridge(params) {
         var action = prv.evaluate();
         var evt = new Aura.Event.Event({ 'component' : self , 'sourceEvent': isEvent && params });
         // TODO: If there is more than one argument, pass it as argument expando?
-        evt.params = isEvent ? { "details" : params.details } : params;
-        action.run(evt);
-    };
+        evt.params = isEvent ? { "detail" : params["detail"] } : params;
+        $A.run(function () {
+            action.runDeprecated(evt);
+        });
+    });
 
 };
 

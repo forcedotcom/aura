@@ -53,9 +53,6 @@ public class DesignLayoutComponentDefHandler extends BaseXMLElementHandler {
             error("Attribute '%s' is required on <%s>", ATTRIBUTE_NAME, TAG);
         }
         DefDescriptor<ComponentDef> cmp = Aura.getDefinitionService().getDefDescriptor(name, ComponentDef.class);
-        if (!cmp.exists()) {
-            throw new DefinitionNotFoundException(cmp, getLocation());
-        }
         builder.setComponent(cmp);
     }
 

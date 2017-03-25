@@ -111,6 +111,11 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
                                 if (!attributeDesignDefs.containsKey(descriptor)) {
                                     throw new DefinitionNotFoundException(descriptor, getLocation());
                                 }
+                            } else {
+                                if (!definitionService.exists(item.getComponent().getComponentDef())) {
+                                    throw new DefinitionNotFoundException(item.getComponent().getComponentDef(),
+                                            getLocation());
+                                }
                             }
                         }
                     }

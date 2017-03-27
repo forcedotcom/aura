@@ -22,16 +22,13 @@ import java.util.Set;
 import org.auraframework.Aura;
 import org.auraframework.builder.FlavoredStyleDefBuilder;
 import org.auraframework.css.FlavorAnnotation;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.impl.css.style.AbstractStyleDef;
-import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.css.util.Tokens;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.AuraContext;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -70,19 +67,20 @@ public final class FlavoredStyleDefImpl extends AbstractStyleDef<FlavoredStyleDe
                 dependencies.add(namespaceTokens);
             }
         }
-
-        dependencies.add(Flavors.toComponentDescriptor(getDescriptor()));
     }
 
-    @Override
-    public void validateReferences() throws QuickFixException {
-        DefDescriptor<ComponentDef> desc = Flavors.toComponentDescriptor(getDescriptor());
-        ComponentDef def = Aura.getDefinitionService().getDefinition(desc);
-        if (!def.hasFlavorableChild() && !def.inheritsFlavorableChild() && !def.isDynamicallyFlavorable()) {
-            throw new InvalidDefinitionException(
-                    String.format("%s must contain at least one aura:flavorable element: ", desc), getLocation());
-        }
-    }
+    // TODO: This is not working with bundle compile
+    // We need Nathan's help understand how to make this work
+    // comment out for now.
+//    @Override
+//    public void validateReferences() throws QuickFixException {
+//        DefDescriptor<ComponentDef> desc = Flavors.toComponentDescriptor(getDescriptor());
+//        ComponentDef def = Aura.getDefinitionService().getDefinition(desc);
+//        if (!def.hasFlavorableChild() && !def.inheritsFlavorableChild() && !def.isDynamicallyFlavorable()) {
+//            throw new InvalidDefinitionException(
+//                    String.format("%s must contain at least one aura:flavorable element: ", desc), getLocation());
+//        }
+//    }
 
     @Override
     public void serialize(Json json) throws IOException {

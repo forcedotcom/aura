@@ -22,9 +22,11 @@ import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorBundleDef;
+import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.css.flavor.FlavorBundleDefImpl;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -43,6 +45,7 @@ public class FlavorBundleDefFactory extends BundleBaseFactory<FlavorBundleDef> {
         FlavorBundleDefImpl.Builder builder = new FlavorBundleDefImpl.Builder();
         builder.setBundledDefs(this.buildDefinitionMap(descriptor, source.getBundledParts()));
         builder.setDescriptor(descriptor);
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
         return builder.build();
     }
 

@@ -179,7 +179,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
                             "expressionTest", "forEachDefTest", "forEachTest", "handleEventTest", "ifTest",
                             "iterationTest", "listTest", "loadLevelTest", "perfTest", "performanceTest",
                             "renderingTest", "setAttributesTest", "test", "tokenSanityTest", "uitest", "utilTest",
-                            "updateTest", "whitespaceBehaviorTest", "appCache")
+                            "updateTest", "appCache")
                     .build();
 
     private static final Set<String> SYSTEM_TEST_PRIVILEGED_NAMESPACES = new ImmutableSortedSet.Builder<>(

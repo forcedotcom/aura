@@ -82,6 +82,7 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
 
     @Override
     public void validateReferences() throws QuickFixException {
+        super.validateReferences();
     	EventDef event = null;
         DefinitionService definitionService = Aura.getDefinitionService();
         if (name == null && descriptor != null) {

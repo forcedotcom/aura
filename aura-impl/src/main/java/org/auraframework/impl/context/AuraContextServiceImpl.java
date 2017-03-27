@@ -37,7 +37,9 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.RegistrySet;
 import org.auraframework.throwable.NoContextException;
+import org.auraframework.util.json.BasicJsonSerializationContext;
 import org.auraframework.util.json.JsonSerializerFactory;
 import org.springframework.context.annotation.Lazy;
 
@@ -125,6 +127,14 @@ public class AuraContextServiceImpl implements ContextService {
         return contextAdapter.establish(mode, registryService.getDefaultRegistrySet(mode, access),
                 this.prefixDefaultsAdapter.getPrefixDefaults(mode), format, access,
                 AuraJsonContext.createContext(mode, jsonSerializerFactory), ImmutableMap.of(), appDesc);
+    }
+
+    @Override
+    public AuraContext startBasicContext(Mode mode, Format format, Authentication access, RegistrySet registries) {
+        return contextAdapter.establish(mode, registries,
+                // FIXME; should use basic defaults here.
+                this.prefixDefaultsAdapter.getPrefixDefaults(mode), format, access,
+                new BasicJsonSerializationContext(true), ImmutableMap.of(), null);
     }
 
     @Override

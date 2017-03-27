@@ -315,9 +315,18 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             }
         }
         
-        if (modules && defRegistry != null) {
-            // register namespaces to optimize processing of definition references
-            configAdapter.addModuleNamespaces(defRegistry.getNamespaces());
+        if (modules) {
+            if (defRegistry != null) {
+                // register namespaces to optimize processing of definition references
+                configAdapter.addModuleNamespaces(defRegistry.getNamespaces());
+            }
+            if (staticRegs != null) {
+                for (DefRegistry reg : staticRegs) {
+                    if (reg.getDefTypes().contains(DefType.MODULE)) {
+                        configAdapter.addModuleNamespaces(reg.getNamespaces());
+                    }
+                }
+            }
         }
         
         //
@@ -448,7 +457,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
 
     @Override
     public DefRegistry getRegistry(File directory) {
-        return new CompilingDefRegistry(new FileBundleSourceLoader(directory, fileMonitor, builders),
+        return new CompilingDefRegistry(new FileBundleSourceLoader(directory, null, builders),
                             markupPrefixes, BundleSource.bundleDefTypes, compilerService);
     }
 

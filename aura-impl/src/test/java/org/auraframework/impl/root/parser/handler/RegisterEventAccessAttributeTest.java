@@ -26,6 +26,7 @@ import org.auraframework.service.CompilerService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -102,7 +103,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
                     new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.invalid'/></aura:component>")
                     ));
         
-        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.invalid\" must return a result of type org.auraframework.system.AuraContext$Access";
+        String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
@@ -443,7 +444,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
                 Lists.newArrayList(
                     new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'/></aura:component>")
                     ));
-        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated\" must return a result of type org.auraframework.system.AuraContext$Access";
+        String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
@@ -664,7 +665,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
                 Lists.newArrayList(
                     new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.invalid'/></aura:component>")
                     ));
-        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.invalid\" must return a result of type org.auraframework.system.AuraContext$Access";
+        String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
@@ -998,7 +999,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
                 Lists.newArrayList(
                     new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:registerEvent name='testevent' type='ui:keydown' description='For QA' access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'/></aura:component>")
                     ));
-        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated\" must return a result of type org.auraframework.system.AuraContext$Access";
+        String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
@@ -1212,6 +1213,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
     }
     
     @Test
+    @Ignore("we should not allow this")
     public void testRegisterEventWithInvalidAccessMethodInternalNamespace() throws Exception {
         AuraTestingUtil util = getAuraTestingUtil();
         Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
@@ -1505,6 +1507,7 @@ public class RegisterEventAccessAttributeTest extends AuraImplTestCase {
      * we cannot set access to Authenticated by method, like what we do for access value
      */
     @Test
+    @Ignore("we cannot allow this")
     public void testRegisterEventWithUnAuthenticationMethodInternalNamespace() throws Exception {
         AuraTestingUtil util = getAuraTestingUtil();
         Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),

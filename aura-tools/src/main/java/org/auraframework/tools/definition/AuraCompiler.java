@@ -19,8 +19,8 @@ import java.io.File;
 import java.util.Set;
 
 import org.auraframework.AuraConfiguration;
-import org.auraframework.AuraDeprecated;
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.RegistryService;
 import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerException;
 import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerLogger;
@@ -113,6 +113,11 @@ public abstract class AuraCompiler {
         }
     }
 
+    @SuppressWarnings("deprecation")
+    private static void initDeprecated(AnnotationConfigApplicationContext applicationContext) {
+        applicationContext.getBean(org.auraframework.AuraDeprecated.class);
+    }
+
     public static void main(String[] args) throws Throwable {
         CommandLineLogger cll = new CommandLineLogger();
         File componentsDir = new File(args[0]);
@@ -126,11 +131,13 @@ public abstract class AuraCompiler {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(AuraConfiguration.class, ConfigAdapterImpl.class);
 
         try {
-            applicationContext.getBean(AuraDeprecated.class);
+            Boolean modulesEnabled = Boolean.valueOf(System.getProperty("aura.modules"));
             RegistryService registryService = applicationContext.getBean(RegistryService.class);
             ConfigAdapter configAdapter = applicationContext.getBean(ConfigAdapter.class);
+            ContextService contextService = applicationContext.getBean(ContextService.class);
+            initDeprecated(applicationContext);
             new RegistrySerializer(registryService, configAdapter, componentsDir, outputDir,
-                    ns.toArray(new String [ns.size()]), cll).execute();
+                    ns.toArray(new String [ns.size()]), cll, contextService, modulesEnabled).execute();
         } catch (RegistrySerializerException rse) {
             cll.error(rse.getMessage(), rse.getCause());
             System.exit(1);
@@ -139,5 +146,4 @@ public abstract class AuraCompiler {
         }
         System.exit(0);
     }
-
 }

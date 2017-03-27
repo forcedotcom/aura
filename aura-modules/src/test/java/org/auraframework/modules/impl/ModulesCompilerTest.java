@@ -16,7 +16,6 @@ package org.auraframework.modules.impl;
  * limitations under the License.
  */
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 

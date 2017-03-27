@@ -14,8 +14,8 @@
         <component.dir>components_aura_modules</component.dir>
         <module.test.dir>modules_aura_modules_test</module.test.dir>
         <component.test.dir>components_aura_modules_test</component.test.dir>
-        <component.compile.phase>process-classes</component.compile.phase>
-        <component.test.compile.phase>process-test-classes</component.test.compile.phase>
+        <component.compile.phase>disabled</component.compile.phase>
+        <component.test.compile.phase>disabled</component.test.compile.phase>
     </properties>
 
     <dependencies>

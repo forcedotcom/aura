@@ -117,11 +117,12 @@ public abstract class BaseAccessAttributeTest<D extends RootDefinition> extends 
                 Lists.newArrayList(
                     new BundleEntryInfo(type, String.format(tag, "access='org.auraframework.impl.test.util.TestAccessMethods.invalid'", ""))
                     ));
-        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.invalid\" must return a result of type org.auraframework.system.AuraContext$Access";
+        String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(source.getDescriptor(), source);
+            D def = compilerService.compile(source.getDescriptor(), source);
+            def.getAccess().validateReferences();
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -476,11 +477,12 @@ public abstract class BaseAccessAttributeTest<D extends RootDefinition> extends 
                 Lists.newArrayList(
                     new BundleEntryInfo(type, String.format(tag, "access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'", ""))
                     ));
-        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated\" must return a result of type org.auraframework.system.AuraContext$Access";
+        String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(source.getDescriptor(), source);
+            D def = compilerService.compile(source.getDescriptor(), source);
+            def.getAccess().validateReferences();
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -707,7 +709,8 @@ public abstract class BaseAccessAttributeTest<D extends RootDefinition> extends 
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(source.getDescriptor(), source);
+            D def = compilerService.compile(source.getDescriptor(), source);
+            def.getAccess().validateReferences();
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1025,7 +1028,8 @@ public abstract class BaseAccessAttributeTest<D extends RootDefinition> extends 
         InvalidAccessValueException qfe = null;
         
         try {
-            compilerService.compile(source.getDescriptor(), source);
+            D def = compilerService.compile(source.getDescriptor(), source);
+            def.getAccess().validateReferences();
         } catch (InvalidAccessValueException e) {
             qfe = e;
         }
@@ -1254,7 +1258,7 @@ public abstract class BaseAccessAttributeTest<D extends RootDefinition> extends 
                 Lists.newArrayList(
                     new BundleEntryInfo(type, String.format(tag, "access='org.auraframework.impl.test.util.TestAccessMethods.invalid'", ""))
                     ));
-        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.invalid\" must return a result of type org.auraframework.system.AuraContext$Access";
+        String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
@@ -1607,7 +1611,7 @@ public abstract class BaseAccessAttributeTest<D extends RootDefinition> extends 
                 Lists.newArrayList(
                     new BundleEntryInfo(type, String.format(tag, "access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'", ""))
                     ));
-        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated\" must return a result of type org.auraframework.system.AuraContext$Access";
+        String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {

@@ -28,6 +28,7 @@ import org.auraframework.system.Location;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.BasicJsonSerializationContext;
 import org.auraframework.util.json.Json.IndentType;
 import org.auraframework.util.json.JsonConstant;
 import org.auraframework.util.json.JsonEncoder;
@@ -144,7 +145,7 @@ public abstract class JavascriptHandler<D extends Definition, T extends Definiti
      */
     protected String mapToCode(Map<String, Object> map) throws IOException {
         StringBuilder sb = new StringBuilder(map.size() * 32);
-        JsonEncoder json = new JsonEncoder(sb, true);
+        JsonEncoder json = new JsonEncoder(sb, new BasicJsonSerializationContext(true));
         // Indent to ease debugging.
         json.pushIndent(IndentType.BRACE);
         json.writeValue(map);

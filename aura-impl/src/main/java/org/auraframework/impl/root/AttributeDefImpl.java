@@ -159,6 +159,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
 
     @Override
     public void validateReferences() throws QuickFixException {
+        super.validateReferences();
         try {
             TypeDef typeDef = typeDefDescriptor.getDef();
             if (defaultValue != null) {

@@ -26,6 +26,7 @@ import org.auraframework.service.CompilerService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -37,10 +38,10 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
     @Inject
     private CompilerService compilerService;
 
-	/***********************************************************************************
-	 ******************* Tests for Custom Namespace start ****************************
-	 ************************************************************************************/
-	//test default access
+    /***********************************************************************************
+     ******************* Tests for Custom Namespace start ****************************
+     ************************************************************************************/
+    //test default access
     @Test
     public void testAttributeWithDefaultAccessCustomNamespace() throws Exception {
         AuraTestingUtil util = getAuraTestingUtil();
@@ -98,7 +99,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 Lists.newArrayList(
                     new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.invalid'/></aura:component>")
                     ));
-        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.invalid\" must return a result of type org.auraframework.system.AuraContext$Access";
+        String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
@@ -446,7 +447,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 Lists.newArrayList(
                     new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'/></aura:component>")
                     ));
-        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated\" must return a result of type org.auraframework.system.AuraContext$Access";
+        String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
@@ -668,7 +669,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 Lists.newArrayList(
                     new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.invalid'/></aura:component>")
                     ));
-        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.invalid\" must return a result of type org.auraframework.system.AuraContext$Access";
+        String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
@@ -1009,7 +1010,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
                 Lists.newArrayList(
                     new BundleEntryInfo(DefType.COMPONENT, "<aura:component><aura:attribute name='testattribute' type='String' access='org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated'/></aura:component>")
                     ));
-        String expectedMsg = "\"org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated\" must return a result of type org.auraframework.system.AuraContext$Access";
+        String expectedMsg = "Access attribute may not use a static method";
         InvalidAccessValueException qfe = null;
         
         try {
@@ -1224,6 +1225,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
         assertTrue("Message '"+qfe.getMessage()+"' should contain '"+expectedMsg, qfe.getMessage().contains(expectedMsg));
     }
     @Test
+    @Ignore("we should not allow this")
     public void testAttributeWithInvalidAccessMethodInternalNamespace() throws Exception {
         AuraTestingUtil util = getAuraTestingUtil();
         Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),
@@ -1514,6 +1516,7 @@ public class AttributeAccessAttributeTest extends AuraImplTestCase {
      * we cannot set access to Authenticated by method, like what we do for access value
      */
     @Test
+    @Ignore("We can't allow this... this should die")
     public void testAttributeWithUnAuthenticationMethodInternalNamespace() throws Exception {
         AuraTestingUtil util = getAuraTestingUtil();
         Source<ComponentDef> source = util.buildBundleSource(util.getInternalNamespace(),

@@ -26,6 +26,7 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.json.BasicJsonSerializationContext;
 import org.auraframework.util.json.JsonEncoder;
 
 public class JavascriptComponentClass extends BaseJavascriptClass {
@@ -45,6 +46,7 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
     public static class Builder extends BaseJavascriptClass.Builder {
         private boolean hasCode = false;
         private String jsDescriptor;
+        private final BasicJsonSerializationContext jsonContext;
 
         private Collection<LibraryDefRef> imports;
         private DefDescriptor<?> descriptor;
@@ -54,6 +56,10 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
         private String controllerCode;
         private String rendererCode;
         private String providerCode;
+
+        public Builder() {
+            this.jsonContext = new BasicJsonSerializationContext(true);
+        }
 
         @Override
         protected boolean hasCode() {
@@ -202,7 +208,7 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
 
         private void writeObjectLiteral(StringBuilder out) throws IOException, QuickFixException {
 
-            JsonEncoder json = new JsonEncoder(out, true);
+            JsonEncoder json = new JsonEncoder(out, jsonContext);
             json.writeMapBegin();
 
             // Metadata

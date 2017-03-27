@@ -104,6 +104,9 @@ public abstract class DefinitionImpl<T extends Definition> extends BaseXmlElemen
      */
     @Override
     public void validateReferences() throws QuickFixException {
+        if (access != null) {
+            access.validateReferences();
+        }
     }
 
 

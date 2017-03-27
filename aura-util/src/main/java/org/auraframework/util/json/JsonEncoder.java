@@ -133,6 +133,10 @@ public class JsonEncoder implements Json {
         this(out, null, new DefaultJsonSerializationContext(format, false));
     }
 
+    public JsonEncoder(Appendable out, JsonSerializationContext context) {
+        this(out, null, context);
+    }
+
     /**
      * @deprecated refSupport no longer supported
      */

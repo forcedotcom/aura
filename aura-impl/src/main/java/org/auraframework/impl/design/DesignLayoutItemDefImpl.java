@@ -15,11 +15,15 @@
  */
 package org.auraframework.impl.design;
 
+import java.io.Serializable;
+
 import org.auraframework.def.design.DesignLayoutAttributeDef;
 import org.auraframework.def.design.DesignLayoutComponentDef;
 import org.auraframework.def.design.DesignLayoutItemDef;
 
-public class DesignLayoutItemDefImpl implements  DesignLayoutItemDef{
+public class DesignLayoutItemDefImpl implements  DesignLayoutItemDef, Serializable {
+    private static final long serialVersionUID = -6748672272779930655L;
+
     private final DesignLayoutComponentDef cmp;
     private final DesignLayoutAttributeDef attr;
     private boolean isAttribute;

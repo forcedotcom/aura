@@ -105,4 +105,9 @@ public class StaticDefRegistryImpl extends DefRegistryImpl {
     @Override
     public void reset() {
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName()+"["+getNamespaces()+"]"+"["+getDefTypes()+"]"+"="+defs;
+    }
 }

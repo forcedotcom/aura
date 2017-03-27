@@ -25,6 +25,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.RegistrySet;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -61,6 +62,13 @@ public interface ContextService extends AuraService {
      */
     AuraContext startContextNoGVP(Mode mode, Format format, Authentication access,
                                  DefDescriptor<? extends BaseComponentDef> appDesc);
+
+    /**
+     * Start a AuraContext with the given Mode, Format, and Access
+     */
+    AuraContext startBasicContext(Mode mode, Format format, Authentication access, RegistrySet registries);
+
+
     /**
      * Close the current AuraContext, no matter which type it is.
      */

@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.RegistryService;
 import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerException;
 import org.auraframework.util.FileMonitor;
@@ -42,6 +43,9 @@ public class RegistrySerializerTest extends UnitTestCase {
     @Inject
     private ConfigAdapter configAdapter;
 
+    @Inject
+    private ContextService contextService;
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -57,7 +61,7 @@ public class RegistrySerializerTest extends UnitTestCase {
     @Test
     public void testNullOutput() {
         RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter, null,
-                actb.getComponentsPath().toFile(), null, null);
+                actb.getComponentsPath().toFile(), null, null, contextService, false);
         try {
             rs.execute();
         } catch (RegistrySerializerException mee) {
@@ -71,7 +75,7 @@ public class RegistrySerializerTest extends UnitTestCase {
         File file = new File(dir, "foo");
         file.createNewFile();
         RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter,
-                file, actb.getComponentsPath().toFile(), null, null);
+                file, actb.getComponentsPath().toFile(), null, null, contextService, false);
         try {
             rs.execute();
         } catch (RegistrySerializerException mee) {
@@ -84,7 +88,7 @@ public class RegistrySerializerTest extends UnitTestCase {
     public void testOutputDirIsFile() throws Exception {
         Path path = Files.createTempFile("badOutput", "foo");
         RegistrySerializer rs = new RegistrySerializer(registryService, configAdapter,
-                actb.getComponentsPath().toFile(), path.toFile(), null, null);
+                actb.getComponentsPath().toFile(), path.toFile(), null, null, contextService, false);
         try {
             rs.execute();
         } catch (RegistrySerializerException mee) {

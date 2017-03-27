@@ -74,6 +74,7 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
 
     @Override
     public void validateReferences() throws QuickFixException {
+        super.validateReferences();
         Object v = this.getValue();
         if (v instanceof Definition) {
             ((Definition) v).validateReferences();

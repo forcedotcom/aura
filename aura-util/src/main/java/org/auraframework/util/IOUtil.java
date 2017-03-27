@@ -47,9 +47,6 @@ public class IOUtil {
         StringBuilder sb = new StringBuilder();
         SecureRandom random = new SecureRandom();
 
-        if (!tmpDir.canWrite() && !tmpDir.mkdirs()) {
-            throw new RuntimeException("Unable to write to the temporary directory");
-        }
         if (prefix == null) {
             prefix = "aura";
         }
@@ -62,7 +59,7 @@ public class IOUtil {
             sb.setLength(len);
             sb.append(Long.toString(random.nextLong(), 36));
             File attempt = new File(tmpDir, sb.toString());
-            if (attempt.mkdir()) {
+            if (attempt.mkdirs()) {
                 attempt.deleteOnExit();
                 return attempt.getAbsolutePath();
             }

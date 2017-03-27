@@ -21,7 +21,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +30,6 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -40,12 +38,14 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.RegistryService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.system.RegistrySet;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -186,6 +186,11 @@ public class RegistrySerializer {
     @Nonnull
     private final ConfigAdapter configAdapter;
 
+    @Nonnull
+    private final ContextService contextService;
+
+    private boolean modulesEnabled;
+
     /**
      * A flag for an error occuring.
      */
@@ -202,12 +207,15 @@ public class RegistrySerializer {
      */
     public RegistrySerializer(@Nonnull RegistryService registryService, @Nonnull ConfigAdapter configAdapter,
             @Nonnull File componentDirectory, @Nonnull File outputDirectory,
-            @Nonnull String[] excluded, @CheckForNull RegistrySerializerLogger logger) {
+            @Nonnull String[] excluded, @CheckForNull RegistrySerializerLogger logger,
+            @Nonnull ContextService contextService, boolean modulesEnabled) {
         this.registryService = registryService;
         this.configAdapter = configAdapter;
         this.componentDirectory = componentDirectory;
         this.outputDirectory = outputDirectory;
+        this.contextService = contextService;
         this.excluded = excluded;
+        this.modulesEnabled = modulesEnabled;
         if (logger == null) {
             logger = DEFAULT_LOGGER;
         }
@@ -220,9 +228,8 @@ public class RegistrySerializer {
      * @param out the output stream to write into.
      * @throws RegistrySerializerException if there is an error.
      */
-    public void write(@Nonnull OutputStream out) throws RegistrySerializerException {
+    public void write(@Nonnull OutputStream out, DefRegistry master) throws RegistrySerializerException {
         List<DefRegistry> regs = Lists.newArrayList();
-        DefRegistry master = registryService.getRegistry(componentDirectory);
 
         Set<String> namespaces = master.getNamespaces();
         if (excluded != null) {
@@ -265,19 +272,17 @@ public class RegistrySerializer {
         Set<DefDescriptor<?>> descriptors;
         Map<DefDescriptor<?>, Definition> filtered = Maps.newHashMap();
         Set<String> namespaces = Sets.newHashSet(namespace);
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        boolean modulesEnabled = context.isModulesEnabled();
         configAdapter.addInternalNamespace(namespace);
         //
         // Fetch all matching descriptors for our 'root' definitions.
         //
         logger.debug("******************************************* "+namespace+" ******************************");
         DescriptorFilter root_nsf;
-		if (modulesEnabled) {
-			root_nsf = new DescriptorFilter(namespace, Lists.newArrayList(DefType.MODULE));
-		} else {
-			root_nsf = new DescriptorFilter(namespace, Lists.newArrayList(BundleSourceImpl.bundleDefTypes));
-		}
+        if (modulesEnabled) {
+            root_nsf = new DescriptorFilter(namespace, Lists.newArrayList(DefType.MODULE));
+        } else {
+            root_nsf = new DescriptorFilter(namespace, Lists.newArrayList(BundleSourceImpl.bundleDefTypes));
+        }
         descriptors = master.find(root_nsf);
         for (DefDescriptor<?> desc : descriptors) {
             if (modulesEnabled) {
@@ -331,7 +336,7 @@ public class RegistrySerializer {
         if (!componentDirectory.exists() || !componentDirectory.isDirectory()) {
             throw new RegistrySerializerException("Component directory is not a directory: "+componentDirectory);
         }
-        if (!componentDirectory.canRead() || !componentDirectory.canWrite() ) {
+        if (!componentDirectory.canRead()) {
             throw new RegistrySerializerException("Unable to read/write "+componentDirectory);
         }
         if (!outputDirectory.exists()) {
@@ -363,13 +368,15 @@ public class RegistrySerializer {
             throw new RegistrySerializerException("Unable to create "+outputFile, fnfe);
         }
         try {
-            AuraContext context = Aura.getContextService().startContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED, null);
-            Boolean isModulesEnabled = Boolean.valueOf(System.getProperty("aura.modules"));
-            context.setModulesEnabled(isModulesEnabled);
+            DefRegistry master = registryService.getRegistry(componentDirectory);
+            RegistrySet registries = registryService.getRegistrySet(master);
+            AuraContext context = contextService.startBasicContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED, registries);
+            context.setModulesEnabled(modulesEnabled);
+
             try {
-                write(out);
+                write(out, master);
             } finally {
-                Aura.getContextService().endContext();
+                contextService.endContext();
             }
             if (error) {
                 throw new RegistrySerializerException("one or more errors occurred during compile");

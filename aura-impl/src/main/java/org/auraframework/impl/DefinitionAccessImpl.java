@@ -42,7 +42,7 @@ public class DefinitionAccessImpl implements DefinitionAccess {
     private Access access = null;
     private transient Method accessMethod = null;
     private boolean isInternalNamespace=false;
-    private final String namespace;
+    private String methodString;
     private final String accessString;
    
     private static final Map<String, Access> ACCESS_MAP;
@@ -54,16 +54,16 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 
     public DefinitionAccessImpl(AuraContext.Access access) {
         assert access != null : "You must specify the access level, null is not allowed.";
-        this.namespace = null;
         this.accessString = access.toString();
         this.access = access;
+        this.methodString = null;
     }
 
     public DefinitionAccessImpl(String namespace, String access, boolean isInternalNamespace) throws InvalidAccessValueException {
         assert access != null : "You must specify the access level, null is not allowed.";
-        this.namespace = namespace;
         this.accessString = access;
         this.isInternalNamespace = isInternalNamespace;
+        this.methodString = null;
         parseAccess(namespace, access);
         defaultAccess(this.isInternalNamespace);
     }
@@ -101,29 +101,12 @@ public class DefinitionAccessImpl implements DefinitionAccess {
         // Look for classname.methodname
         int dotPos = item.lastIndexOf('.');
         if (dotPos > 0) {
-            String className = item.substring(0, dotPos);
-            String methodName = item.substring(dotPos + 1);
-            try {
-                Class<?> clazz = Class.forName(className);
-                Method meth = clazz.getMethod(methodName, new Class[0]);
-                if (!Modifier.isStatic(meth.getModifiers())) {
-                    throw new InvalidAccessValueException("\"" + item + "\" must be a static method");
-                }
-                Class<?> retType = meth.getReturnType();
-                if (! Access.class.equals(retType)) {
-                    throw new InvalidAccessValueException("\"" + item + "\" must return a result of type " + 
-                        Access.class.getName());
-                }   
-                if (this.accessMethod != null) {
-                    throw new InvalidAccessValueException("Access attribute may not specify more than one static method");
-                }
-                this.accessMethod = meth;
-                return;
-            } catch (ClassNotFoundException | SecurityException | NoSuchMethodException ignored) {
+            if (methodString != null) {
+                throw new InvalidAccessValueException("Access attribute may not specify more than one static method");
             }
-            throw new InvalidAccessValueException("\"" + item + "\" is not a valid public method reference");
+            methodString = item;
+            return;
         }
-        
         throw new InvalidAccessValueException("Invalid access attribute value \"" + item + "\"");
     }
 
@@ -158,6 +141,31 @@ public class DefinitionAccessImpl implements DefinitionAccess {
     }
 
     @Override
+    public void validateReferences() throws InvalidAccessValueException {
+        if (methodString != null && accessMethod == null) {
+            int dotPos = methodString.lastIndexOf('.');
+            String className = methodString.substring(0, dotPos);
+            String methodName = methodString.substring(dotPos + 1);
+            try {
+                Class<?> clazz = Class.forName(className);
+                Method meth = clazz.getMethod(methodName, new Class[0]);
+                if (!Modifier.isStatic(meth.getModifiers())) {
+                    throw new InvalidAccessValueException("\"" + methodString + "\" must be a static method");
+                }
+                Class<?> retType = meth.getReturnType();
+                if (! Access.class.equals(retType)) {
+                    throw new InvalidAccessValueException("\"" + methodString + "\" must return a result of type " + 
+                        Access.class.getName());
+                }   
+                this.accessMethod = meth;
+                return;
+            } catch (ClassNotFoundException | SecurityException | NoSuchMethodException ignored) {
+            }
+            throw new InvalidAccessValueException("\"" + methodString + "\" is not a valid public method reference");
+        }
+    }
+
+    @Override
     public void validate(String namespace, boolean allowAuth, boolean allowPrivate, ConfigAdapter configAdapter)
             throws InvalidAccessValueException {
         boolean isInternalNamespace = configAdapter.isInternalNamespace(namespace);
@@ -174,13 +182,12 @@ public class DefinitionAccessImpl implements DefinitionAccess {
         if (access == Access.PRIVILEGED && !(isInternalNamespace || isPrivilegedNamespace)) {
             throw new InvalidAccessValueException("Invalid access attribute value \"" + access.name() + "\"");
         }
-        if (access != null && accessMethod != null) {
+        if (access != null && methodString != null) {
             throw new InvalidAccessValueException("Access attribute may not specify \"" + access.name() + "\" when a static method is also specified");
         }
-        if (!isInternalNamespace && accessMethod != null) {
+        if (!isInternalNamespace && methodString != null) {
             throw new InvalidAccessValueException("Access attribute may not use a static method");
         }
-        
     }
 
     @Override
@@ -209,12 +216,19 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 
     protected void defaultAccess(boolean internalNamespace) {
         // Default access if necessary
-        if (access == null && accessMethod == null) {
+        if (access == null && methodString == null) {
             access = internalNamespace ? Access.INTERNAL : Access.PUBLIC;
         }
     }
 
     protected Access getAccess() {
+        if (methodString != null && accessMethod == null) {
+            try {
+                validateReferences();
+            } catch (InvalidAccessValueException iave) {
+                throw new AuraRuntimeException("unable to handle access name", iave);
+            }
+        }
         if (accessMethod != null) {
             try {
                 return (Access) accessMethod.invoke(null);
@@ -228,7 +242,7 @@ public class DefinitionAccessImpl implements DefinitionAccess {
     }
     
     protected boolean isAccessSpecified() {
-        return access != null || accessMethod != null;
+        return access != null || methodString != null;
     }
 
     @Override
@@ -238,12 +252,5 @@ public class DefinitionAccessImpl implements DefinitionAccess {
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        if (accessString != null) {
-            try {
-                parseAccess(namespace, accessString);
-            } catch (InvalidAccessValueException iave) {
-                throw new ClassNotFoundException("Unable to parse access", iave);
-            }
-        }
     }
 }

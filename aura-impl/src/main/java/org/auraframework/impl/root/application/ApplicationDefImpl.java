@@ -34,7 +34,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.FlavorsDef;
-import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.TokenDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.expression.Expression;

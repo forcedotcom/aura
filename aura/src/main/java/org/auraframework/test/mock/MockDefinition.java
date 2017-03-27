@@ -150,6 +150,10 @@ public abstract class MockDefinition<D extends Definition> implements Definition
         public void validate(String namespace, boolean allowAuth,
                              boolean allowPrivate, ConfigAdapter configAdapter) throws InvalidAccessValueException {
         }
+
+        @Override
+        public void validateReferences() throws InvalidAccessValueException {
+        }
     }
 
     @Override

@@ -120,7 +120,8 @@ public class DefinitionAccessImplTest extends AuraImplTestCase {
                 })
         {
             try{
-                definitionParserAdapter.parseAccess(null, s);
+                access = definitionParserAdapter.parseAccess(null, s);
+                access.validateReferences();
                 fail("Should have failed because this access method is unusable :"+ s);
             }catch(InvalidAccessValueException expected){
                 //Expected

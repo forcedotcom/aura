@@ -35,7 +35,6 @@ import org.auraframework.util.adapter.SourceControlAdapter;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.util.test.annotation.AuraTestLabels;
-import org.auraframework.util.test.annotation.UnitTest;
 import org.auraframework.util.test.diff.GoldFileUtils;
 import org.auraframework.util.test.perf.metrics.PerfMetrics;
 import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;

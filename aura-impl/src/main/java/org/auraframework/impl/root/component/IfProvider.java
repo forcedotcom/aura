@@ -25,7 +25,6 @@ import org.auraframework.annotations.Annotations.ServiceComponentProvider;
 import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.BaseComponent;
-import org.auraframework.instance.Component;
 import org.auraframework.instance.ComponentConfig;
 import org.auraframework.instance.Instance;
 import org.auraframework.instance.InstanceStack;

@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
@@ -30,12 +29,6 @@ import org.auraframework.throwable.CircularReferenceException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.XFailure;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Map;
-
 import org.junit.Test;
 
 

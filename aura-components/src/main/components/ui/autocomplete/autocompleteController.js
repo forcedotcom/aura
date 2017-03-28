@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 ({
+    setAutocompleteClass: function(component, event, helper) {
+        helper.setAutocompleteClass(component);
+    },
+
     doInit: function(component, event, helper) {
+        helper.setAutocompleteClass(component);
         var inputCmp = component.find("input");
         if (inputCmp) {
             inputCmp.addHandler("input", component, "c.handleInputChange"); // Later on we need to make it work on older browsers too.
@@ -23,22 +28,6 @@
             inputCmp.addHandler("blur", component, "c.handleBlur");
         }
         helper.relayEvents(component);
-
-        var listCmp = helper.getListComponent(component);
-        if (listCmp && !listCmp.isInstanceOf("ui:autocompleteListInterface")) {
-            throw new Error("The autocomplete list must implement ui:autocompleteListInterface: " + listCmp);
-        }
-
-        if (listCmp && listCmp.isInstanceOf("ui:autocompleteList")) {
-            helper.initPanelPositionHandlers(component);
-
-            // check for required fields if we're not using a custom autocomplete list
-            ["dataProvider", "optionVar", "listOption"].forEach(function(attribute) {
-                if (!component.get("v." + attribute)) {
-                    throw new Error("Missing required attribute '" + attribute + "'");
-                }
-            });
-        }
 
         // This calls a function (callback) in a delayed manner and it can be cancelled.
         component._delay = (function(){
@@ -67,6 +56,7 @@
     },
 
     handleFocus: function(component, event, helper) {
+        helper.initAutocompleteList(component, helper);
         var inputCmp = event.getSource();
         if (inputCmp) {
             var domEvent = event.getParam("domEvent");
@@ -83,6 +73,7 @@
     },
     
     handleInputChange: function(component, event, helper) {
+        helper.initAutocompleteList(component, helper);
         // DVAL: HALO: FIXME: This sync should be done by the input itself 
         // before firing the event to anyone else.
         var inputHelper = component.getDef().getHelper();
@@ -127,6 +118,7 @@
     },
     
     matchText: function(component, event, helper) {
+        helper.initAutocompleteList(component, helper);
         var listCmp = helper.getListComponent(component);
         if (listCmp) {
             listCmp.set("v.keyword", event.getParam("keyword"));
@@ -162,15 +154,11 @@
     },
 
     referenceElementChange: function(component, event, helper) {
-        // this is only supported if autocomplete is used with the default list, or if the custom list defines "listReferenceComponent"
-        if (!helper.isDefaultList(component)) {
-            throw new Error("ui:autocomplete: function 'referenceElementChange' is not supported with a custom list.");
-        }
-        var usePanel = component.get('v.usePanel');
-        if (!usePanel) {
-            var list = helper.getListComponent(component);
-            var referenceComponent = component.get("v.listReferenceComponent");
-            list.set("v.listReferenceComponent", referenceComponent);
+        // Defer the calling referenceElementChange until autocompleteList is created
+        if(!component._initialized) {
+            component._deferReferenceElementChange = event;
+        } else {
+            helper.referenceElementChange(component, event, helper);
         }
     },
 

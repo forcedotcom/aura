@@ -21,6 +21,127 @@
      * TODO: This needs to live somewhere more accessible to most components
      * that deal with aria attributes.
      */
+     
+     initAutocompleteList: function(component, helper) {
+        if(!component._initialized) {
+            component._initialized = true;
+            
+            // Dynamically create autocompleteList
+            helper.lazyLoadAutocompleteList(component);
+            
+            var listCmp = helper.getListComponent(component);
+            if (listCmp && !listCmp.isInstanceOf("ui:autocompleteListInterface")) {
+                throw new Error("The autocomplete list must implement ui:autocompleteListInterface: " + listCmp);
+            }
+    
+            if (listCmp && listCmp.isInstanceOf("ui:autocompleteList")) {
+                helper.initPanelPositionHandlers(component);
+    
+                // check for required fields if we're not using a custom autocomplete list
+                ["dataProvider", "optionVar", "listOption"].forEach(function(attribute) {
+                    if (!component.get("v." + attribute)) {
+                        throw new Error("Missing required attribute '" + attribute + "'");
+                    }
+                });
+            }
+            
+            if(component._deferReferenceElementChange) {
+                helper.referenceElementChange(component, component._deferReferenceElementChange, helper);
+            }
+            
+            if(component._deferSetIgnoredElements) {
+                helper.setIgnoredElements(component);
+            }
+            
+            if(component._deferAddIgnoredElement) {
+                helper.addIgnoredElement(component, component._deferAddIgnoredElement);
+            }
+        }
+    },
+     
+     lazyLoadAutocompleteList: function(component) {
+        var useDefaultList = $A.util.isEmpty(component.get("v.autocompleteList"));
+        var usePanel = component.get("v.usePanel");
+        var body = component.get('v.body');
+        
+        if (useDefaultList) {
+            var autocompleteListCmp;
+            var autocompletePanelCmp;
+            var returnCmp;
+            
+            // Dynamically create autocompleteList
+            autocompleteListCmp = $A.createComponentFromConfig({
+                descriptor: "markup://ui:autocompleteList",
+                localId: "list",
+                valueProvider: component,
+                attributes: {
+                    'class' : component.getReference("v.autocompleteListClass"),
+                    'dataProvider' : component.getReference("v.dataProvider"),
+                    'itemVar' : component.getReference("v.optionVar"),
+                    'itemTemplate' : component.getReference("v.listOption"),
+                    'emptyListContent' : component.getReference("v.emptyListContent"),
+                    'loadingIndicator' : component.getReference("v.loadingIndicator"),
+                    'listHeader' : component.getReference("v.listHeader"),
+                    'listFooter' : component.getReference("v.listFooter"),
+                    'showListHeader' : component.getReference("v.showListHeader"),
+                    'showListFooter' : component.getReference("v.showListFooter"),
+                    'theme' : component.getReference("v.theme"),
+                    'visible' : false,
+                    'role' : "listbox",
+                    'propertyToMatch' : component.getReference("v.propertyToMatch"),
+                    'matchDone' : component.getReference("c.handleMatchDone"),
+                    'selectListOption' : component.getReference("c.handleSelectOption"),
+                    'updateAriaAttributes' : component.getReference("c.updateAriaAttributes"),
+                    'matchFunc' : component.getReference("v.matchFunc"),
+                    'disableMatch' : component.getReference("v.disableMatch"),
+                    'setDefaultHighlight' : component.getReference("v.setDefaultHighlight"),
+                    'showEmptyList' : component.getReference("v.showEmptyList")
+                }
+            });
+            
+            if (usePanel) {
+                // Dynamically create autocompletePanel
+                autocompletePanelCmp = $A.createComponentFromConfig({
+                    descriptor: "markup://ui:autocompletePanel",
+                    localId: "panel",
+                    valueProvider: component
+                });
+                
+                // insert autocompletePanel into returnCmp
+                var autocompletePanelBody = autocompletePanelCmp.get("v.body");
+                autocompletePanelBody.push(autocompleteListCmp);
+                autocompletePanelCmp.set("v.body", autocompletePanelBody);
+                
+                // set returnCmp to autocompletePanelCmp
+                returnCmp = autocompletePanelCmp;
+            } else {
+                // set returnCmp to autocompleteListCmp
+                returnCmp = autocompleteListCmp;
+            }
+            
+            // Append returnCmp into autocomplete's body
+            body.push(returnCmp);
+            component.set("v.body", body);
+        }
+    },
+    
+    setAutocompleteClass: function(component) {
+        component.set("v.autocompleteListClass", component.get("v.class") + " lookup__menu");
+    },
+    
+    referenceElementChange: function(component, event, helper) {
+        // this is only supported if autocomplete is used with the default list, or if the custom list defines "listReferenceComponent"
+        if (!helper.isDefaultList(component)) {
+            throw new Error("ui:autocomplete: function 'referenceElementChange' is not supported with a custom list.");
+        }
+        var usePanel = component.get("v.usePanel");
+        if (!usePanel) {
+            var list = helper.getListComponent(component);
+            var referenceComponent = component.get("v.listReferenceComponent");
+            list.set("v.listReferenceComponent", referenceComponent);
+        }
+    },
+    
     ariaAttributeMap: {
         "aria-expanded": "ariaExpanded",
         "aria-activedescendant": "ariaActiveDescendant"
@@ -177,19 +298,27 @@
      *
      */
     setIgnoredElements: function(component) {
-        var inputCmp = component.find("input");
-        var listCmp = this.getListComponent(component);
-        if (inputCmp && listCmp) {
-            var elems = inputCmp.getElements();
-            listCmp.set("v.ignoredElements", elems);
+        if(component._initialized) {
+            var inputCmp = component.find("input");
+            var listCmp = this.getListComponent(component);
+            if (inputCmp && listCmp) {
+                var elems = inputCmp.getElements();
+                listCmp.set("v.ignoredElements", elems);
+            }
+        } else {
+            component._deferSetIgnoredElements = true;
         }
     },
 
     addIgnoredElement: function(component, element) {
-        var listCmp = this.getListComponent(component);
-        if (listCmp) {
-            var ignoreElements = listCmp.get("v.ignoredElements");
-            ignoreElements.push(element);
+        if(component._initialized) {
+            var listCmp = this.getListComponent(component);
+            if (listCmp) {
+                var ignoreElements = listCmp.get("v.ignoredElements");
+                ignoreElements.push(element);
+            }
+        } else {
+            component._deferAddIgnoredElement = element;
         }
     },
 
@@ -209,6 +338,7 @@
     },
 
     getListComponent: function(component) {
+        this.initAutocompleteList(component, this);
         var listCmp = component.find("list");
         if (!listCmp) {
             listCmp = component.get("v.autocompleteList")[0];

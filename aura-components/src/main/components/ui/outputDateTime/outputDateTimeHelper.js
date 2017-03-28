@@ -47,7 +47,9 @@
         }
 
         var format = _helper.getFormat(concreteCmp);
-        var langLocale = concreteCmp.get("v.langLocale") || $A.get("$Locale.langLocale");
+        // localizationService uses locale in $Locale.langLocale by default
+        var langLocale = concreteCmp.get("v.langLocale");
+
         var d = $A.localizationService.parseDateTimeISO8601(value);
         var timezone = _helper.getTimeZone(concreteCmp);
         $A.localizationService.UTCToWallTime(d, timezone, function(walltime) {

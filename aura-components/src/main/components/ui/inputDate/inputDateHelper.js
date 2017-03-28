@@ -36,9 +36,10 @@
 
     cacheDefaultValues: function (component) {
         // these attributes are defined in an interface, and we currently cannot have their default set to an expression
-        component._locale = component.get("v.langLocale") || $A.get("$Locale.langLocale");
         component._timezone = component.get("v.timezone") || $A.get("$Locale.timezone");
         component._format = component.get("v.format") || $A.get("$Locale.dateFormat");
+        // localizationService uses locale in $Locale.langLocale by default
+        component._locale = component.get("v.langLocale");
     },
 
     displayValue: function (component) {

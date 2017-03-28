@@ -18,7 +18,6 @@
 <aura:component implements="ui:visible" description="A time picker which can be used in datePicker to select both date and time">
     <aura:import library="ui:panelPositioningLib" property="lib" />
     <aura:attribute name="timeFormat" type="String" description="The java.text.SimpleDateFormat style format for the time."/>
-    <aura:attribute name="langLocale" type="String" description="The language locale used to format time."/>
     <aura:attribute name="hours" type="Integer" default="12" description="The hour value."/>
     <aura:attribute name="minutes" type="Integer" default="00" description="The minute value."/>
     <aura:attribute name="interval" type="Integer" default="30" description="The interval in minutes."/>

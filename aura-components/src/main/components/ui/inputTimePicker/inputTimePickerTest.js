@@ -24,7 +24,7 @@
      * Passing interval as '' should set interval to the default value: 30
      */
     testEmptyInterval: {
-        attributes: {timeFormat: 'hh:mma', interval: '', langLocale: 'en', visible: 'true'},
+        attributes: {timeFormat: 'hh:mma', interval: '', visible: 'true'},
         test: function(cmp) {
             this.checkIntervals(cmp);
         }
@@ -34,7 +34,7 @@
      * Not specifying interval should set interval to the default value: 30
      */
     testDefaultInterval: {
-        attributes: {timeFormat: 'hh:mma', langLocale: 'en', visible: 'true'},
+        attributes: {timeFormat: 'hh:mma', visible: 'true'},
         test: function(cmp) {
             this.checkIntervals(cmp);
         }
@@ -44,7 +44,7 @@
      * Passing interval as '15' and check if timePicker's values are correct
      */
     testValidInterval: {
-        attributes: {timeFormat: 'hh:mma', interval: '15', langLocale: 'en', visible: 'true'},
+        attributes: {timeFormat: 'hh:mma', interval: '15', visible: 'true'},
         test: function(cmp) {
             this.checkIntervals(cmp);
         }
@@ -60,10 +60,9 @@
      */
     checkIntervals: function(cmp) {
         var timeFormat = cmp.get("v.timeFormat");
-        var langLocale = cmp.get("v.langLocale");
         var interval = parseInt(cmp.get("v.interval"));
 
-        var expectedIntervals = this.generateTimeIntervals(interval, timeFormat, langLocale);
+        var expectedIntervals = this.generateTimeIntervals(interval, timeFormat);
         var actualIntervals = cmp.find("timeList").getElement().children;
 
         // same errorMsg is used since both fails for the same reason
@@ -84,14 +83,14 @@
     /**
      * Generate an array of time values
      */
-    generateTimeIntervals: function(interval, timeFormat, locale){
+    generateTimeIntervals: function(interval, timeFormat){
         var date = new Date();
         var timevals = [];
 
         for (var hours = 0; hours < 24; hours++) {
             for (var minutes = 0; minutes < 60; minutes += interval) {
                 date.setHours(hours, minutes);
-                timevals.push($A.localizationService.formatTime(date, timeFormat, locale));
+                timevals.push($A.localizationService.formatTime(date, timeFormat));
             }
         }
         return timevals;

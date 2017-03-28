@@ -121,6 +121,7 @@
             if (d) {
                 var format = concCmp.get("v.format");
                 var langLocale = concCmp.get("v.langLocale");
+
                 try {
                     d = $A.localizationService.translateToOtherCalendar(d);
                     displayValue = $A.localizationService.formatDateUTC(d, format, langLocale);

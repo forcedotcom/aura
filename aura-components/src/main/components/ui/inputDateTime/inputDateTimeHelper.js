@@ -35,11 +35,13 @@
 
     cacheDefaultValues: function (component) {
         // these attributes are defined in an interface, and we currently cannot have their default set to an expression
-        component._locale = component.get("v.langLocale") || $A.get("$Locale.langLocale");
         component._timezone = component.get("v.timezone") || $A.get("$Locale.timezone");
         component._dateFormat = component.get("v.dateFormat") || $A.get("$Locale.dateFormat");
         component._timeFormat = component.get("v.timeFormat") || $A.get("$Locale.timeFormat");
         component._dateTimeFormat = component.get("v.format") || $A.get("$Locale.datetimeFormat");
+
+        // localizationService uses locale in $Locale.langLocale by default
+        component._locale = component.get("v.langLocale");
     },
 
     displayDatePicker: function (component, focusDatePicker) {

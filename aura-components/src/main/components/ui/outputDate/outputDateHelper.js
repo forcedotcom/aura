@@ -15,9 +15,11 @@
  */
 ({
     formatDate: function(component) {
-        // langlocale and format are defined in the interace, and they can't have default values set to an expression.
+
+        // format is defined in the interace, and they can't have default values set to an expression.
         var config = {
-            langLocale : component.get("v.langLocale") || $A.get("$Locale.langLocale"),
+            // localizationService uses locale in $Locale.langLocale by default
+            langLocale : component.get("v.langLocale"),
             format : component.get("v.format") || $A.get("$Locale.dateFormat"),
             timezone : component.get("v.timezone"),
             validateString : true

@@ -48,7 +48,10 @@ function lib() { //eslint-disable-line no-unused-vars
             var timeValue = splitValue[1];
             var useStrictParsing = config.validateString === true;
 
-            var date = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD", config.langLocale, useStrictParsing);
+            var date = config.langLocale ?
+                    $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD", config.langLocale, useStrictParsing) :
+                    $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD", useStrictParsing) ;
+
             if ($A.util.isEmpty(date)) {
                 // invalid date/time value.
                 callback({

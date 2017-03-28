@@ -159,7 +159,6 @@
             listElem.innerHTML = "";
             var date = new Date();
             var minIncrement = component.get("v.interval"),
-                langLocale = component.get("v.langLocale"),
                 timeFormat = component.get("v.timeFormat"),
                 currentHour = component.get("v.hours"),
                 currentMinutes = component.get("v.minutes");
@@ -167,7 +166,7 @@
             for (var hour = 0; hour < 24; hour++) {
                 for (var minutes = 0; minutes < 60; minutes += minIncrement) {
                     date.setHours(hour, minutes);
-                    var displayValue = $A.localizationService.formatTime(date, timeFormat, langLocale);
+                    var displayValue = $A.localizationService.formatTime(date, timeFormat);
                     var selected = currentHour === hour && currentMinutes === minutes;
                     this.appendListElement(listElem, displayValue, hour, minutes, selected);
                 }

@@ -54,7 +54,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
      */
     @Test
     public void testPostRequestWithDifferentUID() throws Exception {
-        HttpPost post = getPostMethod("auratest:test_TokenValidation", true);
+        HttpPost post = getPostMethod("aura:component", true);
         HttpResponse httpResponse = perform(post);                                                        // days
         int statusCode = getStatusCode(httpResponse);
         String response = getResponseBody(httpResponse);
@@ -72,7 +72,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
     @AuraTestLabels("auraSanity")
     @Test
     public void testPostRequestWithValidUID() throws Exception {
-        HttpPost post = getPostMethod("auratest:test_TokenValidation", false);
+        HttpPost post = getPostMethod("aura:component", false);
         HttpResponse httpResponse = perform(post);
         int statusCode = getStatusCode(httpResponse);
         String response = getResponseBody(httpResponse);

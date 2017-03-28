@@ -2343,6 +2343,143 @@ Test.Aura.AuraLocalizationServiceTest = function() {
     }
 
     [Fixture]
+    function isAvailableLocale(){
+
+        [Fact]
+        function ReturnsFalseForFalsyValue() {
+            // Arrange
+            var targetService = new Aura.Services.AuraLocalizationService();
+
+            // Act
+            var actual = targetService.isAvailableLocale("");
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsTrueIfLocaleCacheHits(){
+            // Arrange
+            var targetService = new Aura.Services.AuraLocalizationService();
+            targetService.localeCache["zh_CN"] = "zh-cn";
+
+            // Act
+            var actual = targetService.isAvailableLocale("zh_CN");
+
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ReturnsTrueIfMomentDataAvailable(){
+            // Arrange
+            var targetService = new Aura.Services.AuraLocalizationService();
+
+            var mockMoment = Mocks.GetMock(Object.Global(), "moment", {
+                locales: function(){
+                    return ["zh-cn"];
+                }
+            });
+
+            // Act
+            var actual;
+            mockMoment(function(){
+                actual = targetService.isAvailableLocale("ZH-CN");
+            });
+
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function AddsToCacheIfCacheMissesOnAvailableLocale(){
+            // Arrange
+            var expected = "zh-cn";
+            var locale = "zh_CN";
+            var targetService = new Aura.Services.AuraLocalizationService();
+
+            var mockMoment = Mocks.GetMock(Object.Global(), "moment", {
+                locales: function(){
+                    return [expected];
+                }
+            });
+
+            // Act
+
+            mockMoment(function(){
+                targetService.isAvailableLocale(locale);
+            });
+            var actual = targetService.localeCache[locale];
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ReturnsFalseForUnavailableLocale(){
+            // Arrange
+            var targetService = new Aura.Services.AuraLocalizationService();
+
+            var mockMoment = Mocks.GetMock(Object.Global(), "moment", {
+                locales: function(){
+                    return [];
+                }
+            });
+
+            // Act
+            var actual;
+            mockMoment(function(){
+                actual = targetService.isAvailableLocale("unavailable");
+            });
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseForUnavailableLocale(){
+            // Arrange
+            var targetService = new Aura.Services.AuraLocalizationService();
+
+            var mockMoment = Mocks.GetMock(Object.Global(), "moment", {
+                locales: function(){
+                    return [];
+                }
+            });
+
+            // Act
+            var actual;
+            mockMoment(function(){
+                actual = targetService.isAvailableLocale("unavailable");
+            });
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsTrueIfEnLocaleIsAvailable(){
+            var targetService = new Aura.Services.AuraLocalizationService();
+
+            var mockMoment = Mocks.GetMock(Object.Global(), "moment", {
+                locales: function(){
+                    return ["en"];
+                }
+            });
+
+            // Act
+            var actual;
+            mockMoment(function(){
+                actual = targetService.isAvailableLocale("en-US");
+            });
+
+            // Assert
+            Assert.True(actual);
+        }
+
+    }
+
+    [Fixture]
     function init(){
 
         [Fact]

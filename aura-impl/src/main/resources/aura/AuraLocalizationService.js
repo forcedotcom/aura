@@ -1300,9 +1300,9 @@ AuraLocalizationService.prototype.init = function() {
 };
 
 /**
- * Normalize the specified Java locale string to moment.js compatible one.
- *
- * This function only normalizes locales which have available data on the client.
+ * Normalize the specified Java locale string to moment-js compatible locale which
+ * has available data on the client. If the given locale doesn't have any available
+ * corresponding locale, it falls back to 'en'.
  *
  * @private
  */
@@ -1315,7 +1315,7 @@ AuraLocalizationService.prototype.normalizeToMomentLocale = function(locale) {
     var locales = moment["locales"]();
     var momentLocale;
 
-    var normalized = locale.toLowerCase().replace("_", "-");
+    var normalized = this.normalizeLocale(locale);
     var tokens = normalized.split("-", 2);
 
     if (tokens.length > 1) {
@@ -1332,6 +1332,15 @@ AuraLocalizationService.prototype.normalizeToMomentLocale = function(locale) {
 
     // no matching, falls back to en
     return "en";
+};
+
+/**
+ * Convert locale string into moment-js locale format.
+ *
+ * @private
+ */
+AuraLocalizationService.prototype.normalizeLocale = function(locale) {
+    return locale? locale.toLowerCase().replace("_", "-") : locale;
 };
 
 /**
@@ -1360,7 +1369,24 @@ AuraLocalizationService.prototype.getAvailableMomentLocale = function(locale) {
  * @private
  */
 AuraLocalizationService.prototype.isAvailableLocale = function(locale) {
-    return this.localeCache.hasOwnProperty(locale);
+    if (!locale) {
+        return false;
+    }
+
+    if (this.localeCache.hasOwnProperty(locale)) {
+        return true;
+    }
+
+    // If locale is not in cache, check if moment has avaiable for the locale
+    var momentLocale = this.normalizeToMomentLocale(locale);
+    var language = this.normalizeLocale(locale).split("-")[0];
+    // Locale falls back to en
+    if (momentLocale === "en" && language !== "en") {
+        return false;
+    } else {
+        this.localeCache[locale] = momentLocale;
+        return true;
+    }
 };
 
 /**

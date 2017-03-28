@@ -94,8 +94,10 @@
 
     /**
      * Test single tab in overflow
+     * 
+     * W-3827727: Fails in Zen build environments
      */
-    testZeroTabInOverflow : {
+    _testZeroTabInOverflow : {
     	attributes : {"numTabs" : 2},
     	test: [function(cmp) {
             this.testContainer = "testTabContainerFixed";

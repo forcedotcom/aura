@@ -32,6 +32,8 @@
         &lt;ui:autocompleteOption label="{!row.label}" keyword="{!row.keyword}" value="{!row.value}" visible="{!row.visible}"/>
     &lt;/aura:set>
 &lt;/ui:autocomplete></pre>
+
+        <h4>Setting the List Options</h4>
 		<p>
 			To set the list options, use the <code>ui:autocompleteOption</code> component in the <code>listOption</code> attribute. 
 			The behaviors for a text match, input change, and option display can be customized using the <code>matchText</code>, <code>inputChange</code>, and <code>selectListOption</code> events respectively.

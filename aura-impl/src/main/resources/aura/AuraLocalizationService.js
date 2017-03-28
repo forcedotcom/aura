@@ -869,7 +869,7 @@ AuraLocalizationService.prototype.isSame = function(date1, date2, unit) {
 };
 
 /**
- * Checks if date is between fromDate and toDate, inclusive.
+ * Checks if a date is between two other dates (fromDate and toDate), where the match is inclusive.
  * @param {String|Number|Date} date - A date format that the JavaScript Date object can parse
  * @param {String|Number|Date} fromDate - A date format that the JavaScript Date object can parse
  * @param {String|Number|Date} toDate - A date format that the JavaScript Date object can parse
@@ -877,6 +877,13 @@ AuraLocalizationService.prototype.isSame = function(date1, date2, unit) {
  *                 By default, millisecond is used.
  * @return {Boolean} Returns true if date is between fromDate and toDate, or false otherwise.
  * @memberOf AuraLocalizationService
+ * @example
+ * $A.localizationService.isBetween("2017-03-07","March 7, 2017", "12/1/2017")
+ * // Returns true
+ * $A.localizationService.isBetween("2017-03-07 12:00", "March 7, 2017 15:00", "12/1/2017")
+ * // Returns false
+ * $A.localizationService.isBetween("2017-03-07 12:00", "March 7, 2017 15:00", "12/1/2017", "day")
+ * // Returns true
  * @public
  * @export
  * @platform

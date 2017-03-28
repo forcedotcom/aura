@@ -15,8 +15,8 @@
  */
 ({
     handleSelectedDate: function(cmp, evt, helper){
-		var value = evt.getParam("value");
-		
+		var value = evt.getParam("value");		
 		cmp.set('v.selectedDate', value);
+		cmp.find('datePicker').set('v.visible', false);
 	}
 })

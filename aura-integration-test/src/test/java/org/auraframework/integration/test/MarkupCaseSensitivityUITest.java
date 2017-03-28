@@ -27,6 +27,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.system.TextSource;
 import org.junit.Assert;
 import org.junit.Test;
@@ -172,6 +173,7 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
      * then reload the testApp, it still loads fine, and what we changed is updated in lib too (verify through helper).
      *   fix it and enable plz: W-2984818   
      */
+    @UnAdaptableTest
     @Test
     public void testLibFileChangeAfterCached() throws Exception {
         //load the test app, and verify the lib loads fine

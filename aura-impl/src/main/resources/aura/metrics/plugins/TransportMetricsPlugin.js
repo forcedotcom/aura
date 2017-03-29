@@ -132,7 +132,10 @@ TransportMetricsPlugin.prototype.postProcess = function (transportMarks) {
     var procesedMarks = [];
     var queue = {};
     for (var i = 0; i < transportMarks.length; i++) {
-        var id = transportMarks[i]["context"]["auraXHRId"];
+        var id = transportMarks[i]["context"] && transportMarks[i]["context"]["auraXHRId"];
+        if (id === undefined) {
+            continue;
+        }
         var phase = transportMarks[i]["phase"];
         if (phase === 'start') {
             queue[id] = transportMarks[i];

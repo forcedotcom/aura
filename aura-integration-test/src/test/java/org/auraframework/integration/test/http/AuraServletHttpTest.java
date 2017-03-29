@@ -157,7 +157,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
                 "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getString",
                 actionParams);
         a.run();
-        String rawRes = a.getrawResponse();
+        String rawRes = a.getRawResponse();
         Integer posActions = rawRes.indexOf("actions");
         Integer posContex = rawRes.indexOf("context");
         assertTrue(posActions < posContex);
@@ -178,7 +178,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
                 "java://org.auraframework.impl.controller.ComponentController/ACTION$getComponent",
                 actionParams);
         a.run();
-        String rawRes = a.getrawResponse();
+        String rawRes = a.getRawResponse();
 
         int firstOccurrence = rawRes.indexOf("componentClass");
         int lastOccurrence = rawRes.lastIndexOf("componentClass");

@@ -42,12 +42,14 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.BundleSource;
+import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.TextSource;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.FileMonitor;
 import org.auraframework.util.json.JsonEncoder;
@@ -325,6 +327,23 @@ public class AuraTestingUtil {
             throws QuickFixException {
         AuraContext ctxt = contextService.startContext(mode, format, Authentication.AUTHENTICATED, desc);
         ctxt.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
+
+        // start debug block
+        DefRegistry registry = ctxt.getRegistries().getRegistryFor(desc);
+        BaseComponentDef def = null;
+        Throwable exception = null;
+        try {
+            def = registry.getDef(desc);
+        } catch (Throwable t) {
+            exception = t;
+        }
+        if (def == null) {
+            throw new AuraRuntimeException(String.format("Failed to find %s@%s in %s%s%s%s among %s", desc.getQualifiedName(),
+                    desc.getDefType(), registry.getClass(), registry.getDefTypes(), registry.getPrefixes(),
+                    registry.getNamespaces(), ctxt.getRegistries().getAllRegistries()), exception);
+        }
+        // end debug block
+
         String uid = definitionService.getUid(null, desc);
         ctxt.addLoaded(desc, uid);
         return ctxt;

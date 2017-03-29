@@ -44,7 +44,9 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
+import org.auraframework.impl.java.controller.DebugController;
 import org.auraframework.instance.Action;
+import org.auraframework.instance.InstanceBuilderProvider;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.EncodingStyle;
@@ -76,7 +78,35 @@ import java.util.Map;
 public abstract class AuraHttpTestCase extends IntegrationTestCase {
     @Inject
     private ConfigAdapter configAdapter;
+    
+    @Inject
+    private InstanceBuilderProvider instanceBuilderProvider;
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public void runTest() throws Throwable {
+        try {
+            super.runTest();
+        } catch (Throwable t) {
+            Map<String, String> info;
+            try {
+                ServerAction action = new ServerAction("java://org.auraframework.impl.java.controller.DebugController/ACTION$getInfo", null);
+                action.run();
+                info = (Map<String, String>) action.getReturnValue();
+                
+                DebugController controller = instanceBuilderProvider.get(DebugController.class);
+                Map<String, String> clientInfo = controller.getInfo();
+                
+                t = new Error(String.format("See cause for real exception. Debug properties - \napp: %s \ntest: %s",
+                        info, clientInfo), t);
+                t.setStackTrace(new StackTraceElement[0]);
+            }catch(Throwable ignore){
+                System.err.println(ignore);
+            }
+            throw t;
+        }
+    }
+    
     /**
      * Given a URL to post a GET request, this method compares the actual status code of the response with an expected
      * status code.
@@ -123,31 +153,31 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                 // There may be multiple CSP headers, so we will look for the one we're interested in
                 Map<String, List<String>> cspDirectives = getCSPDirectives(response);
                 
-				if (testMode || allowInline) {
-					assertTrue("frame-ancestors is wrong", cspDirectives.get("frame-ancestors").contains("*"));
-					assertTrue("script-src is wrong",
-							cspDirectives.get("script-src").contains("'self' chrome-extension: 'unsafe-eval'"));
-					assertTrue("style-src is wrong",
-							cspDirectives.get("style-src").contains("'self' chrome-extension: 'unsafe-inline'"));
-					assertEquals("ALLOWALL", headers[0].getValue());
-				} else {
-					assertTrue("frame-ancestors is wrong", cspDirectives.get("frame-ancestors").contains("'self'"));
-					assertTrue("script-src is wrong",
-							cspDirectives.get("script-src").contains("'self' chrome-extension:"));
-					assertTrue("style-src is wrong",
-							cspDirectives.get("style-src").contains("'self' chrome-extension: 'unsafe-inline'"));
-					assertEquals("SAMEORIGIN", headers[0].getValue());
-				}
+                if (testMode || allowInline) {
+                    assertTrue("frame-ancestors is wrong", cspDirectives.get("frame-ancestors").contains("*"));
+                    assertTrue("script-src is wrong",
+                            cspDirectives.get("script-src").contains("'self' chrome-extension: 'unsafe-eval'"));
+                    assertTrue("style-src is wrong",
+                            cspDirectives.get("style-src").contains("'self' chrome-extension: 'unsafe-inline'"));
+                    assertEquals("ALLOWALL", headers[0].getValue());
+                } else {
+                    assertTrue("frame-ancestors is wrong", cspDirectives.get("frame-ancestors").contains("'self'"));
+                    assertTrue("script-src is wrong",
+                            cspDirectives.get("script-src").contains("'self' chrome-extension:"));
+                    assertTrue("style-src is wrong",
+                            cspDirectives.get("style-src").contains("'self' chrome-extension: 'unsafe-inline'"));
+                    assertEquals("SAMEORIGIN", headers[0].getValue());
+                }
 
-				// These maybe aren't strictly "anti-clickjacking", but since
-				// we're testing the rest of the default CSP:
-				assertTrue("font-src is wrong", cspDirectives.get("font-src").contains("*"));
-				assertTrue("img-src is wrong", cspDirectives.get("img-src").contains("*"));
-				assertTrue("media-src is wrong", cspDirectives.get("media-src").contains("*"));
-				assertTrue("default-src is wrong", cspDirectives.get("default-src").contains("'self'"));
-				assertTrue("object-src is wrong", cspDirectives.get("object-src").contains("'self'"));
-				assertTrue("connect-src is wrong", cspDirectives.get("connect-src")
-						.contains("'self' http://invalid.salesforce.com http://offline https://offline"));
+                // These maybe aren't strictly "anti-clickjacking", but since
+                // we're testing the rest of the default CSP:
+                assertTrue("font-src is wrong", cspDirectives.get("font-src").contains("*"));
+                assertTrue("img-src is wrong", cspDirectives.get("img-src").contains("*"));
+                assertTrue("media-src is wrong", cspDirectives.get("media-src").contains("*"));
+                assertTrue("default-src is wrong", cspDirectives.get("default-src").contains("'self'"));
+                assertTrue("object-src is wrong", cspDirectives.get("object-src").contains("'self'"));
+                assertTrue("connect-src is wrong", cspDirectives.get("connect-src")
+                        .contains("'self' http://invalid.salesforce.com http://offline https://offline"));
             } else {
                 headers = response.getHeaders("Content-Security-Policy");
                 assertEquals(0, headers.length);
@@ -158,27 +188,27 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     }
 
     /**
-	 * Gather all the CSP directives in the response's headers into a Map keyed
-	 * by directive name. The entry values are a list of the directive values
-	 * found, since multiple headers may declare the same directives.
-	 */
+     * Gather all the CSP directives in the response's headers into a Map keyed
+     * by directive name. The entry values are a list of the directive values
+     * found, since multiple headers may declare the same directives.
+     */
     protected Map<String, List<String>> getCSPDirectives(HttpResponse response) {
-		Header[] headers = response.getHeaders("Content-Security-Policy");
-		Map<String, List<String>> directives = Maps.newHashMap();
-		for (Header header : headers) {
-			for (String element : header.getValue().split(";")) {
-				String[] parts = element.trim().split(" ", 2);
-				String name = parts[0];
-				String value = parts[1];
-				List<String> entry = directives.get(name);
-				if (entry != null) {
-					entry.add(value);
-				} else {
-					directives.put(name, Lists.newArrayList(value));
-				}
-			}
-		}
-		return directives;
+        Header[] headers = response.getHeaders("Content-Security-Policy");
+        Map<String, List<String>> directives = Maps.newHashMap();
+        for (Header header : headers) {
+            for (String element : header.getValue().split(";")) {
+                String[] parts = element.trim().split(" ", 2);
+                String name = parts[0];
+                String value = parts[1];
+                List<String> entry = directives.get(name);
+                if (entry != null) {
+                    entry.add(value);
+                } else {
+                    directives.put(name, Lists.newArrayList(value));
+                }
+            }
+        }
+        return directives;
     }
 
     protected String getHost() throws Exception {
@@ -593,7 +623,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                     actionInstanceArray.add(actionInstance);
                 }
                 if (app == null) {
-                    app = definitionService.getDefDescriptor("auratest:test_SimpleServerRenderedPage",
+                    app = definitionService.getDefDescriptor("aura:application",
                             ApplicationDef.class);
                 }
                 message.put("actions", actionInstanceArray.toArray());
@@ -669,7 +699,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             }
         }
 
-        public String getrawResponse() {
+        public String getRawResponse() {
             return this.rawResponse;
         }
 
@@ -750,13 +780,13 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         public void setCallingDescriptor(DefDescriptor<ComponentDef> descriptor) {
         }
 
-		@Override
-		public String getCallerVersion() {
-			return null;
-		}
+        @Override
+        public String getCallerVersion() {
+            return null;
+        }
 
-		@Override
-		public void setCallerVersion(String callerVersion) {
-		}
+        @Override
+        public void setCallerVersion(String callerVersion) {
+        }
     }
 }

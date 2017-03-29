@@ -36,11 +36,9 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.http.CSP;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
@@ -88,7 +86,7 @@ public abstract class IntegrationTestCase extends AuraImplTestCase {
 			return;
 		}
 		
-		if(testServletConfig == null) {
+		if (testServletConfig == null) {
 			// Already injected
 			return;
 		}

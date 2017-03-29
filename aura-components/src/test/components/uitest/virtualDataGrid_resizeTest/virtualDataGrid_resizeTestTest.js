@@ -63,13 +63,12 @@
 		}]
 	},
 	
-	testNegativeResizing : {
+	testResizingWhenInitializing : {
 		test : [function(cmp) {
-			cmp.find("grid").resizeColumns([-1, -1, -1]);
+			cmp.find("grid").resizeColumns([300, 500, 400]);
 		}, function(cmp) {
 			var grid = cmp.find("grid");
 			var columns = grid.getElement().querySelectorAll('th');
-			
 			for (var i=0; i<columns.length; i++) {
 				$A.test.assertTrue(columns[i].clientWidth >= this.WIDTHS.initialWidths[i],
 						"Column " + i + " should not have resized from " + this.WIDTHS.initialWidths[i] + " to " + columns[i].clientWidth + " since value was -1");
@@ -78,6 +77,21 @@
 		        
 		]
 	},
+
+    testNegativeResizing : {
+        test : [function(cmp) {
+            cmp.find("grid").resizeColumns([-1, -1, -1]);
+        }, function(cmp) {
+            var grid = cmp.find("grid");
+            var columns = grid.getElement().querySelectorAll('th');
+            for (var i=0; i<columns.length; i++) {
+            	$A.test.assertTrue(columns[i].clientWidth > -1,
+                    "Column " + i + " should not be resized if width is -1");
+            }
+        }
+
+        ]
+    },
 	
 	testTinyResizing : {
 		test : [function(cmp) {

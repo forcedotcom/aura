@@ -61,7 +61,8 @@ public class FlavorBundleFileBundleBuilder implements FileBundleSourceBuilder {
             DefDescriptor<?> descriptor = null;
             String fname = file.getName();
             if (fname.endsWith("Flavors.css")) {
-                descriptor = new DefDescriptorImpl<>("css", namespace, fname.substring(0, fname.length()-4),
+                descriptor = new DefDescriptorImpl<>(DefDescriptor.CUSTOM_FLAVOR_PREFIX, namespace,
+                        fname.substring(0, fname.length() - 4),
                         FlavoredStyleDef.class, bundleDesc);
             }
             if (descriptor != null) {

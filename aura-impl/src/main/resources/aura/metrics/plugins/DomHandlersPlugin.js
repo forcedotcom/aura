@@ -146,17 +146,12 @@ DomHandlersPlugin.prototype.logUnInstrumentedClick = function (parent, root) {
 };
 //#end
 
-DomHandlersPlugin.prototype.bindToHelper = function (descriptor, helperMethod) {
+DomHandlersPlugin.prototype.bindToMetricsService = function (jsObject, method) {
     var self = this;
-
-    var defConfig  = $A.componentService.createDescriptorConfig(descriptor);
-    var def        = $A.componentService.getComponentDef(defConfig);
-    var defHelper  = def && def.getHelper();
-
-    if (defHelper) {
+    if (jsObject) {
         this.metricsService.instrument(
-            defHelper, 
-            helperMethod, 
+            jsObject, 
+            method, 
             DomHandlersPlugin.NAME,
             false/*async*/,
             null, 
@@ -170,6 +165,23 @@ DomHandlersPlugin.prototype.bindToHelper = function (descriptor, helperMethod) {
     }    
 };
 
+DomHandlersPlugin.prototype.bindToHelper = function (descriptor, helperMethod) {
+    var defConfig  = $A.componentService.createDescriptorConfig(descriptor);
+    var def        = $A.componentService.getComponentDef(defConfig);
+    var defHelper  = def && def.getHelper();
+
+    this.bindToMetricsService(defHelper, helperMethod);
+};
+
+DomHandlersPlugin.prototype.bindToLib = function (lib, jsFile) {
+    var fileObject = $A.componentService.hasLibrary(lib) &&
+                        $A.componentService.getLibraryInclude(jsFile);
+
+    if (fileObject) {
+        this.bindToMetricsService(fileObject, "_dispatchAction");
+    }
+};
+
 DomHandlersPlugin.prototype.bind = function () {
     var self = this;
     $A.clientService.runAfterInitDefs(function () {
@@ -179,23 +191,10 @@ DomHandlersPlugin.prototype.bind = function () {
         self.bindToHelper("markup://ui:virtualDataTable", "_dispatchAction");
         
         // This is for input* components
-        var interactiveLib =    $A.componentService.hasLibrary("markup://ui:eventLib") &&
-                                $A.componentService.getLibraryInclude("js://ui.eventLib.interactive");
-        if (interactiveLib) {
-            self.metricsService.instrument(
-                    interactiveLib,
-                    "_dispatchAction",
-                    DomHandlersPlugin.NAME,
-                    false/*async*/,
-                    null, 
-                    null,
-                    function (original) {
-                        var xargs = Array.prototype.slice.call(arguments, 1);
-                        self.dispatchActionHook.apply(self, xargs);
-                        return original.apply(this, xargs);
-                    }
-                );
-        }
+        self.bindToLib("markup://ui:eventLib","js://ui.eventLib.interactive");
+
+        //This is for virtualTreeGrid component
+        self.bindToLib("markup://force:virtualGridLib","js://force.virtualGridLib.gridHelper");
     });
 };
 

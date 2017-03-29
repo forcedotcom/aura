@@ -84,17 +84,19 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
 
         String charset = getCharset(httpResponse);
         String responseMime = httpResponse.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue();
+        
+        // Jetty9 appends the charset to the mime type, this isn't bad, it just makes it harder to verify so we strip it off.
+        if(responseMime.contains(";")) {
+            responseMime = responseMime.substring(0, responseMime.indexOf(";"));
+        }
 
         if (mimeType.startsWith("text/")) {
 
             assertEquals("Framework servlet not responding with correct encoding type.", AuraBaseServlet.UTF_ENCODING,
                     charset);
-            assertTrue("Framework servlet not responding with correct mime type expected " + mimeType
-                    + " got " + responseMime, responseMime.startsWith(mimeType + ";"));
-        } else {
-            assertEquals("Framework servlet not responding with correct mime type", mimeType,
-                    responseMime);
         }
+        assertEquals("Framework servlet not responding with correct mime type", mimeType,
+                responseMime);
 
         SimpleDateFormat df = getHttpDateFormat();
         Date currentDate = new Date();

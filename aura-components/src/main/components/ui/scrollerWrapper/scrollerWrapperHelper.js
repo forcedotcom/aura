@@ -57,7 +57,7 @@
             dest = dest.toLowerCase();
             if (dest === 'custom') {
                 wrapper.scrollTop  = Math.abs(y);
-                wrapper.scrollLeft = Math.abs(x);
+                wrapper.scrollLeft =  Math.abs(x);
             } else if (dest === 'top') {
                 wrapper.scrollTop = 0;
             } else if (dest === 'left') {
@@ -68,21 +68,6 @@
                 wrapper.scrollLeft = wrapper.scrollWidth - wrapper.clientWidth;
             }
         }
-    },
-    updateStyle : function (cmp) {
-        var height = cmp.get("v.height");
-        var width = cmp.get("v.width");
-
-        var styleDeclarations = [];
-
-        if (height) {
-            styleDeclarations.push('height:' + height);
-        }
-
-        if (width) {
-            styleDeclarations.push('width:' + width);
-        }
-
-        cmp.set("v.privateWrapperStyle", styleDeclarations.join(';'));
     }
+
 }) // eslint-disable-line semi

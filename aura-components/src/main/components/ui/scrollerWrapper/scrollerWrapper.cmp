@@ -19,12 +19,9 @@
 
     <!-- Private Attributes -->
     <aura:attribute name="privateStartY" type="Integer" access="PRIVATE" description="Determines the user's mouse position in the vertical axis."/>
-    <aura:attribute name="privateWrapperStyle" type="String" access="PRIVATE" description="Determines the user's mouse position in the vertical axis."/>
 
     <!-- Global Attributes -->
     <aura:attribute name="class" type="String" access="GLOBAL" description="A CSS class applied to the outer element. This style is in addition to base classes output by the component."/>
-    <aura:attribute name="width" type="String" access="GLOBAL" description="The width of the scroll area, for example, 300px. Valid units: px, em, vh, and %."/>
-    <aura:attribute name="height" type="String" access="GLOBAL" description="The height of the scroll area, for example, 300px. Valid units: px, em, vh, and %."/>
 
     <aura:method name="scrollTo" action="{!c.scrollTo}" access="GLOBAL" description="Scrolls the content to a specified location.">
  	    <aura:attribute name="destination" type="String" description="The target location. Valid values: custom, top, bottom, left, and right. For custom destination, xcoord and ycoord are used to determine the target location."/>
@@ -32,17 +29,11 @@
  	    <aura:attribute name="ycoord" type="Integer" default="0" description="Y coordinate for custom destination."/>
     </aura:method>
 
-    <aura:handler name="change" value="{! v.width }" action="{! c.updateStyle }" />
-    <aura:handler name="change" value="{! v.height }" action="{! c.updateStyle }" />
-
     <!-- Markup -->
     <div aura:id="scrollerWrapper"
-         style="{! v.privateWrapperStyle }"
          class="{! join(' ', 'scrollable', $Browser.isIOS ? 'scrollingOnIOS' : '', v.class) }"
          ontouchstart="{! c.handleTouchstart }"
          ontouchmove="{! c.handleTouchmove }">
-
         {! v.body }
-
     </div>
 </aura:component>

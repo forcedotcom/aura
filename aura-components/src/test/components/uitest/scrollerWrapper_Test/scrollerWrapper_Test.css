@@ -17,8 +17,14 @@
 	font-size: 3rem;
 }
 
-.THIS .border {
+.THIS .outer-wrapper {
 	border: solid 3px blue;
+	height: 100vh;
+}
+
+.THIS .inner-wrapper {
+	border: solid 3px orange;
+	height: 500px;
 }
 
 .THIS .widebox {

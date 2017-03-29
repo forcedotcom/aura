@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 ({
-    updateStyle: function(cmp, event, helper) {
-        helper.updateStyle(cmp);
-    },
     scrollTo: function(cmp, event, helper) {
         helper.handleScrollTo(cmp, event);
     },

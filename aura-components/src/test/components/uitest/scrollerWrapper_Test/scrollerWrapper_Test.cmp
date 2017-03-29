@@ -18,7 +18,7 @@
 <aura:component>
     <aura:attribute name="content" type="String" default="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus porta dolor magna, vel ullamcorper tortor laoreet sit amet. Donec blandit dapibus urna, lacinia elementum risus mattis id. Duis condimentum libero vel imperdiet aliquet. Curabitur vulputate ipsum vitae quam maximus, at tempus nibh ullamcorper. Ut suscipit hendrerit lectus non viverra. Cras ut mi interdum felis pretium varius eu in dui. Nulla laoreet erat a augue dictum, eget varius orci accumsan.  Praesent suscipit mi dolor, in ultricies elit blandit sed. Nam a nisl et est porta tempus et non ex. Nulla ut ullamcorper nisi. Suspendisse interdum faucibus libero eget commodo."/>
     <div>
-        <ui:scrollerWrapper aura:id="outerWrapper" class="border" height="100vh">
+        <ui:scrollerWrapper aura:id="outerWrapper" class="outer-wrapper">
             <div aura:id="div1.1">
                 {!v.content}
                 <div aura:id="div1.2">
@@ -26,7 +26,7 @@
                 </div>
             </div>
 
-            <ui:scrollerWrapper aura:id="innerWrapper" class="border" height="500px">
+            <ui:scrollerWrapper aura:id="innerWrapper" class="inner-wrapper">
                 <div class="widebox">
                     {!v.content}
                     {!v.content}

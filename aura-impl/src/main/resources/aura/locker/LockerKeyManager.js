@@ -35,7 +35,9 @@ var ls_getKey,
     ls_addToCache,
     ls_getFromCache,
     ls_isProxy,
-    ls_registerProxy;
+    ls_registerProxy,
+    ls_registerFilteringProxy,
+    ls_isFilteringProxy;
 
 (function LockerKeyManager() {
 	var substituteMapForWeakMap = false;
@@ -77,6 +79,7 @@ var ls_getKey,
     var opaqueSecure = newWeakMap();
     var objectToKeyedData = newWeakMap();  
     var isSecureProxy = newWeakMap();
+    var isFilteringProxy = newWeakMap();
 
     // ALL METHODS BELOW USE KEY ONLY
 
@@ -237,7 +240,14 @@ var ls_getKey,
         isSecureProxy.set(st, true);
     };
     
-    
+    ls_registerFilteringProxy = function(st) {
+        isFilteringProxy.set(st, true);
+    };
+
+    ls_isFilteringProxy = function(st) {
+        return isFilteringProxy.get(st) === true;
+    };
+
     /**
      * LockerService internal API.
      * Verify access and retrieve the raw object.

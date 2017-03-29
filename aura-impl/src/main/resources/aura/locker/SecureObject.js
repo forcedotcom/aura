@@ -91,7 +91,20 @@ SecureObject.filterEverything = function(st, raw, options) {
         // wrapping functions to guarantee that they run in system mode but their
         // returned value complies with user-mode.
         swallowed = function SecureFunction() {
-            var filteredArgs = SecureObject.filterArguments(st, arguments);
+            // special unfiltering logic to unwrap Proxies passed back to origin.
+            // this could potentially be folded into filterArguments with an option set if needed.
+            var filteredArgs = [];
+            for (var i = 0; i < arguments.length; i++) {
+                var arg = arguments[i];
+                if (ls_isFilteringProxy(arg)) {
+                    var unfilteredProxy = ls_getRef(arg, ls_getKey(arg));
+                    var unfilteredKey = ls_getKey(unfilteredProxy);
+                    arg = unfilteredKey === ls_getKey(raw) ? unfilteredProxy : SecureObject.filterEverything(st, arg);
+                } else {
+                    arg = SecureObject.filterEverything(st, arg);
+                }
+                filteredArgs[i] = arg;
+            }
 
             // DCHASMAN TODO Here is where we need to factor in the decision to use raw self to avoid InvalidInvocation on system types!
             var self = SecureObject.filterEverything(st, this);
@@ -103,6 +116,11 @@ SecureObject.filterEverything = function(st, raw, options) {
 
         mutated = true;
         ls_setRef(swallowed, raw, key);
+
+        if (!rawKey) {
+            ls_setKey(raw, defaultKey);
+        }
+
         ls_registerProxy(swallowed);
     } else if (t === "object") {
         if (raw === window) {
@@ -361,6 +379,8 @@ SecureObject.createFilteringProxy = function(raw, key) {
     ls_setRef(swallowed, raw, key);
 
     ls_addToCache(raw, swallowed, key);
+
+    ls_registerFilteringProxy(swallowed);
 
     return swallowed;
 };

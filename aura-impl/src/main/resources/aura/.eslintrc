@@ -149,6 +149,8 @@
     "ls_setData": true,
     "ls_isProxy": true,
     "ls_registerProxy": true,
+    "ls_isFilteringProxy": true,
+    "ls_registerFilteringProxy": true,
     "lazyInitInlinedSafeEvalWorkaround": true
   },
 

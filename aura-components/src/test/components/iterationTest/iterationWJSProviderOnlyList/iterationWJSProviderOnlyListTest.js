@@ -20,16 +20,16 @@
             $A.test.assertEquals(4, children.length);
 
             $A.test.assertEquals("markup://ifTest:testIf", children[0].getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals("It is not true.It is literally not false.", $A.test.getTextByComponent(children[0]));
+            $A.test.assertEquals("It is not true.It is literally not false.", $A.test.getTextByComponent(children[0].find("whatIsIt")));
 
             $A.test.assertEquals("markup://ifTest:testIfElse", children[1].getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals("It wishes it was true.It is not true.", $A.test.getTextByComponent(children[1]));
+            $A.test.assertEquals("It wishes it was true.It is not true.", $A.test.getTextByComponent(children[1].find("whatIsIt")));
 
             $A.test.assertEquals("markup://ifTest:testIfNested", children[2].getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals("It wishes it was true.It is not true.", $A.test.getTextByComponent(children[2]));
+            $A.test.assertEquals("It wishes it was true.It is not true.", $A.test.getTextByComponent(children[2].find("whatIsIt")));
 
             $A.test.assertEquals("markup://ifTest:testIfServer", children[3].getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals("It is not true.It is literally not false.", $A.test.getTextByComponent(children[3]));
+            $A.test.assertEquals("It is not true.It is literally not false.", $A.test.getTextByComponent(children[3].find("whatIsIt")));
         }
     }
 })

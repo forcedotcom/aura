@@ -58,7 +58,7 @@ public class IfProvider implements ComponentConfigProvider {
         AttributeSet atts = component.getAttributes();
         m.put("template", atts.getValue("body"));
         Object o = atts.getValue("isTrue");
-        Boolean isTrue = (Boolean) o;
+        Boolean isTrue = this.isTruthy(o);
         ComponentDefRefArrayImpl facet;
         // get body facet if true, else facet if false
         if (isTrue != null && isTrue.booleanValue()) {
@@ -74,4 +74,23 @@ public class IfProvider implements ComponentConfigProvider {
         return cc;
     }
 
+    private Boolean isTruthy(Object value) {
+        // Boolean, return the boolean.
+        if(value instanceof Boolean) {
+            return (Boolean) value;
+        }
+        
+        // 0 is false, any other number true
+        if(value instanceof Number) {
+            return new Double(((Number) value).doubleValue()) != 0;
+        }
+        
+        // Empty strings are false
+        if(value instanceof String) {
+            return !value.toString().isEmpty();
+        }
+        
+        // Non Null objects are not false.
+        return value != null;
+    }
 }

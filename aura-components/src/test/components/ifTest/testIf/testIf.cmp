@@ -16,7 +16,8 @@
 
 -->
 <aura:component render="client">
-	<aura:attribute name="thang" type="Boolean"/>
+    <aura:attribute name="thang" type="Boolean"/>
+    <aura:attribute name="arry" type="List" default="[1, 2, 3]"/>
 	
 	<span aura:id="whatIsIt">
 		<aura:if isTrue="{!v.thang}">
@@ -33,4 +34,11 @@
 		</aura:if>
 	</span>
 	
+    <aura:if isTrue="{! v.arry.length }">
+        Truthy
+        <aura:set attribute="else">
+            Falsey
+        </aura:set>
+    </aura:if>
+
 </aura:component>

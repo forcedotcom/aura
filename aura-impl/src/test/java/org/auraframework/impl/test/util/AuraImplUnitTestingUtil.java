@@ -267,11 +267,6 @@ public class AuraImplUnitTestingUtil {
             }
 
             @Override
-            public boolean hasSwitchableReference() {
-                return false;
-            }
-
-            @Override
             public void retrieveLabels() {
             }
 

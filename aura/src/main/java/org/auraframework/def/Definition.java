@@ -20,6 +20,8 @@ import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
 
+import java.util.Set;
+
 /**
  * Define something.
  *
@@ -27,12 +29,12 @@ import org.auraframework.util.json.JsonSerializable;
  * 
  * Exceptions should not be thrown except where explicitly declared during the validation
  * process. This means that no exceptions should be thrown in a constructor or in
- * {@link #appendDependencies()}. You can use {@link #validateDefinition()} and
+ * {@link BaseXmlElement#appendDependencies(Set)}. You can use {@link #validateDefinition()} and
  * {@link #validateReferences()} to throw exceptions as a {@link QuickFixException}.
  *
  * Also note that as part of the contract, you may not call any routine intended to get
  * a definition until {@link #validateReferences()}. This includes the constructor,
- * {@link #appendDependencies()} and {@link #validateDefinition()}.
+ * {@link BaseXmlElement#appendDependencies(Set)} and {@link #validateDefinition()}.
  */
 public interface Definition extends JsonSerializable, BaseXmlElement {
 
@@ -60,6 +62,4 @@ public interface Definition extends JsonSerializable, BaseXmlElement {
      * @return the definition that matches the descriptor.
      */
     <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> descriptor);
-
-    boolean hasSwitchableReference();
 }

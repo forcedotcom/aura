@@ -15,6 +15,7 @@
  */
 package org.auraframework.adapter;
 
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -121,6 +122,7 @@ public interface ConfigAdapter extends AuraAdapter {
     Set<String> getInternalNamespaces();
     void addInternalNamespace(String namespace);
     void removeInternalNamespace(String namespace);
+    Map<String, String> getInternalNamespacesMap();
 
     boolean isPrivilegedNamespace(String namespace);
     Set<String> getPrivilegedNamespaces();

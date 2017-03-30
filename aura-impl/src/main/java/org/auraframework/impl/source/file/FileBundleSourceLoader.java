@@ -16,12 +16,16 @@
 package org.auraframework.impl.source.file;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
@@ -32,13 +36,18 @@ import org.auraframework.system.InternalNamespaceSourceLoader;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.FileMonitor;
 
 import com.google.common.collect.Sets;
+import org.auraframework.util.IOUtil;
+import org.auraframework.util.resource.ResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 public class FileBundleSourceLoader implements SourceLoader, InternalNamespaceSourceLoader, SourceListener {
 
-    private class FileEntry {
+    protected class FileEntry {
         public File file;
         public String namespace;
         public String name;
@@ -49,11 +58,11 @@ public class FileBundleSourceLoader implements SourceLoader, InternalNamespaceSo
         public String toString() {
             return file.getPath();
         }
-    };
+    }
 
     protected final File base;
-    private Set<String> namespaces;
-    private Map<String,FileEntry> fileMap;
+    protected Set<String> namespaces;
+    protected Map<String,FileEntry> fileMap;
     private final Collection<FileBundleSourceBuilder> builders;
 
     private void updateFileMap() {
@@ -77,6 +86,17 @@ public class FileBundleSourceLoader implements SourceLoader, InternalNamespaceSo
             namespaces = tnamespaces;
             fileMap = tfileMap;
         }
+    }
+
+    /**
+     * Copies jar resources into file system to be used as sources from jar
+     *
+     * @param resourcePackage resource location ins jar
+     * @param fileMonitor file monitor
+     * @param builders bundle builders
+     */
+    public FileBundleSourceLoader(String resourcePackage, FileMonitor fileMonitor, Collection<FileBundleSourceBuilder> builders) {
+        this(copyResourcesToDir(resourcePackage), fileMonitor, builders);
     }
 
     public FileBundleSourceLoader(File base, FileMonitor fileMonitor, Collection<FileBundleSourceBuilder> builders) {
@@ -224,5 +244,59 @@ public class FileBundleSourceLoader implements SourceLoader, InternalNamespaceSo
         synchronized (this) {
             updateFileMap();
         }
+    }
+
+    /**
+     * Copies sources from jars into file system
+     *
+     * @param basePackage source location in jar
+     * @return base folder of copied resources from jar
+     */
+    protected static File copyResourcesToDir(String basePackage) {
+        InputStreamReader reader = null;
+        ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
+        File directory = new File(IOUtil.newTempDir("resources"));
+
+        try {
+            PathMatchingResourcePatternResolver p = new PathMatchingResourcePatternResolver(resourceLoader);
+            Resource[] res = p.getResources("classpath*:/" + basePackage + "/*/*/*.*");
+            for (Resource r : res) {
+                //
+                // TOTAL HACK: Move this to getAllDescriptors later.
+                //
+                String filename = r.getURL().toString();
+                List<String> names = AuraTextUtil.splitSimple("/", filename);
+                if (names.size() < 3) {
+                    continue;
+                }
+                String last = names.get(names.size() - 1);
+                String name = names.get(names.size() - 2);
+                String ns = names.get(names.size() - 3);
+                File nsDir = new File(directory, ns);
+                if (!nsDir.exists()) {
+                    nsDir.mkdir();
+                }
+                File nameDir = new File(nsDir, name);
+                if (!nameDir.exists()) {
+                    nameDir.mkdir();
+                }
+                File target = new File(nameDir, last);
+                IOUtil.copyStream(r.getInputStream(), new FileOutputStream(target));
+            }
+        } catch (IOException x) {
+            throw new AuraRuntimeException(x);
+        } finally {
+            //
+            // Make sure we close everything out.
+            //
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (Throwable t) {
+                // ignore exceptions on close.
+            }
+        }
+        return directory;
     }
 }

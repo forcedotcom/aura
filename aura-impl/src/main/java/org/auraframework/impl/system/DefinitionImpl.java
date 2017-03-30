@@ -42,20 +42,19 @@ public abstract class DefinitionImpl<T extends Definition> extends BaseXmlElemen
 
     protected final DefDescriptor<T> descriptor;
     protected final Map<SubDefDescriptor<?, T>, Definition> subDefs;
-    protected final boolean hasSwitchableReference;
 
     protected DefinitionImpl(DefDescriptor<T> descriptor, Location location, DefinitionAccess access) {
-        this(descriptor, location, null, null, null, access, null, null, false);
+        this(descriptor, location, null, null, null, access, null, null);
     }
 
     protected DefinitionImpl(RefBuilderImpl<T, ?> builder) {
         this(builder.getDescriptor(), builder.getLocation(), builder.subDefs, builder.apiVersion, builder.description,
-                builder.getAccess(), builder.getOwnHash(), builder.getParseError(), builder.hasSwitchableReference);
+                builder.getAccess(), builder.getOwnHash(), builder.getParseError());
     }
 
     DefinitionImpl(DefDescriptor<T> descriptor, Location location, Map<SubDefDescriptor<?, T>, Definition> subDefs,
             String apiVersion, String description, DefinitionAccess access, String ownHash,
-            QuickFixException parseError, boolean hasSwitchableReference) {
+            QuickFixException parseError) {
         super(descriptor == null ? null : descriptor.getQualifiedName(),
                 location,
                 apiVersion,
@@ -65,7 +64,6 @@ public abstract class DefinitionImpl<T extends Definition> extends BaseXmlElemen
                 parseError);
         this.descriptor = descriptor;
         this.subDefs = subDefs;
-        this.hasSwitchableReference = hasSwitchableReference;
     }
 
     /**
@@ -132,11 +130,6 @@ public abstract class DefinitionImpl<T extends Definition> extends BaseXmlElemen
         return (D) subDefs.get(sddesc);
     }
 
-    @Override
-    public boolean hasSwitchableReference() {
-        return this.hasSwitchableReference;
-    }
-
     public abstract static class BuilderImpl<T extends Definition> extends RefBuilderImpl<T, T> {
         protected BuilderImpl(Class<T> defClass) {
             super(defClass);
@@ -149,8 +142,6 @@ public abstract class DefinitionImpl<T extends Definition> extends BaseXmlElemen
         public DefDescriptor<T> descriptor;
         public Map<SubDefDescriptor<?, T>, Definition> subDefs;;
         private boolean descriptorLocked;
-
-        public boolean hasSwitchableReference = false;
 
         protected RefBuilderImpl(Class<T> defClass) {
             super(defClass);
@@ -178,11 +169,6 @@ public abstract class DefinitionImpl<T extends Definition> extends BaseXmlElemen
         public RefBuilderImpl<T, A> lockDescriptor(DefDescriptor<T> desc) {
             this.descriptorLocked = true;
             this.descriptor = desc;
-            return this;
-        }
-
-        public RefBuilderImpl<T, A>  setHasSwitchableReference(boolean hasSwitchableReference) {
-            this.hasSwitchableReference = this.hasSwitchableReference || hasSwitchableReference;
             return this;
         }
 

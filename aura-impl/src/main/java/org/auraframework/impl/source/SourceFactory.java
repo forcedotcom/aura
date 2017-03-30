@@ -64,7 +64,14 @@ public final class SourceFactory {
                 if (loader instanceof InternalNamespaceSourceLoader) {
                     InternalNamespaceSourceLoader internalLoader = (InternalNamespaceSourceLoader)loader;
                     if (internalLoader.isInternalNamespace(namespace)) {
-                        configAdapter.addInternalNamespace(namespace);
+                        String existing = configAdapter.getInternalNamespacesMap().get(namespace.toLowerCase());
+                        if (existing == null) {
+                            // Prevents module loaders from overriding exiting namespaces
+                            // module source loaders may holder lower case namespaces of existing namespaces
+                            // which it is to override so we need to keep the existing case sensitive namespace
+                            // in order for modules to use existing namespaces.
+                            configAdapter.addInternalNamespace(namespace);
+                        }
                     }
                 }
 

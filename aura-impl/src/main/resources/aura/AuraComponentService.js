@@ -72,8 +72,8 @@ AuraComponentService.prototype.get = function(globalId) {
 };
 
 AuraComponentService.prototype.initCoreModules = function () {
-    this.addModule("engine", [], null, window["Engine"]);
-    this.addModule("aura", [], null, Aura.ExportsModule);
+    this.addModule("markup://engine", "engine", [], null, window["Engine"]);
+    this.addModule("markup://aura", "aura", [], null, Aura.ExportsModule);
 };
 
 /**
@@ -634,29 +634,89 @@ AuraComponentService.prototype.initModuleDefs = function(modules) {
     var moduleDefRegistry = this.moduleDefRegistry;
 
     modules.forEach(function (module) {
-        moduleDefRegistry[module["descriptor"]] = { "exporter": module["code"] };
+        var exporter = { "exporter": module["code"] };
+        moduleDefRegistry[module["descriptor"]] = moduleDefRegistry[module["name"]] = exporter;
     });
 };
-
 
 /**
  * Use the specified constructor as the definition of the Module descriptor.
  * @param {String} descriptor Uses the pattern of namespace:componentName.
- * @param {Function} exporter A function that when executed will return the component object litteral.
+ * @param {String} name module custom element name
+ * @param {Array} list of dependencies
+ * @param {Function} exporter A function that when executed will return the component object literal
  * @export
  */
-AuraComponentService.prototype.addModule = function(name, dependencies, exporterClass, nsexports) {
+AuraComponentService.prototype.addModule = function(descriptor, name, dependencies, exporterClass, nsexports) {
     if (exporterClass === undefined) {
-        return this.addModule(name, [], dependencies);
+        // amd define does not include dependencies param if no dependencies.
+        return this.addModule(descriptor, name, [], dependencies);
     }
 
-    var descriptor = name.indexOf('markup://') === 0 ? name : 'markup://' + name;
-    var entry = this.moduleDefRegistry[descriptor] || (this.moduleDefRegistry[descriptor] = {});
-    entry.dependencies = dependencies.map(function (d) { return d.indexOf(':') === -1 ? d.replace('-',':') : d; });
+    // set both descriptor and module name entries into registry
+    var entry = this.moduleDefRegistry[descriptor] || (this.moduleDefRegistry[descriptor] = this.moduleDefRegistry[name] = {});
+    entry.dependencies = dependencies;
     entry.definition = exporterClass;
     entry.descriptor = descriptor;
     entry.moduleName = name;
     entry.ns = nsexports;
+};
+
+AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
+    var entry = this.moduleDefRegistry[descriptor] || this.getLibraryAsModule(descriptor);
+    var factory;
+    var exportns;
+    var url;
+
+    $A.assert(entry, "We couldn't found the definition for dependency: " + descriptor);
+
+    // If we have resolved already the exports (libraries case), return them
+    if (entry.ns) {
+        return entry.ns;
+    }
+
+    if (!entry.dependencies) {
+        url = $A.clientService.getSourceMapsUrl(descriptor);
+        factory = $A.util.globalEval(entry["exporter"], undefined, url);
+        factory();
+    }
+
+    var deps = entry.dependencies.map(function (name) {
+        if (name === 'exports') {
+            exportns = {};
+            return exportns;
+        }
+
+        // processing library dependency
+        var desc = name.indexOf(":") !== -1 ? "markup://" + name : name;
+        var depEntry = this.moduleDefRegistry[desc];
+        if (depEntry && depEntry.dependencies) {
+            return this.moduleDefRegistry[desc].ns;
+        }
+
+        return this.evaluateModuleDef(desc);
+    }, this);
+
+    var Ctor = entry.definition.apply(undefined, deps) || exportns;
+    entry.ns = Ctor;
+
+    return Ctor;
+
+};
+
+AuraComponentService.prototype.createInteropComponentDef = function (descriptor) {
+    var Ctor = this.evaluateModuleDef(descriptor);
+    var module = this.moduleDefRegistry[descriptor];
+    var interOpCmpDef = new Aura.Component.InteropComponentDef({
+        dependencies : module.dependencies,
+        definition   : module.definition,
+        descriptor   : module.descriptor,
+        moduleName   : module.moduleName,
+        interopClass : Ctor
+    });
+
+    this.componentDefRegistry[descriptor] = interOpCmpDef;
+    return interOpCmpDef;
 };
 
 /**
@@ -1211,63 +1271,6 @@ AuraComponentService.prototype.createFromSavedComponentConfigs = function(config
     this.componentDefRegistry[descriptor] = def;
     delete this.savedComponentConfigs[descriptor];
     return def;
-};
-
-
-AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
-    var entry = this.moduleDefRegistry[descriptor] || this.getLibraryAsModule(descriptor);
-    var factory;
-    var exportns;
-    var url;
-
-    $A.assert(entry, 'We couldn\'t found the definition for dependency: ' + descriptor);
-
-    // If we have resolved already the exports (libraries case), return them
-    if (entry.ns) {
-        return entry.ns;
-    }
-
-    if (!entry.dependencies) {
-        url = $A.clientService.getSourceMapsUrl(descriptor);
-        factory = $A.util.globalEval(entry["exporter"], undefined, url);
-        factory();
-    }
-
-    var deps = entry.dependencies.map(function (name) {
-        if (name === 'exports') {
-            exportns = {};
-            return exportns;
-        }
-
-        var depDescriptor = 'markup://' + name;
-        var depEntry = this.moduleDefRegistry[depDescriptor];
-        if (depEntry && depEntry.dependencies) {
-            return this.moduleDefRegistry[depDescriptor].ns;
-        }
-
-        return this.evaluateModuleDef(depDescriptor);
-    }, this);
-
-    var Ctor = entry.definition.apply(undefined, deps) || exportns;
-    entry.ns = Ctor;
-
-    return Ctor;
-
-};
-
-AuraComponentService.prototype.createInteropComponentDef = function (descriptor) {
-    var Ctor = this.evaluateModuleDef(descriptor);
-    var module = this.moduleDefRegistry[descriptor];
-    var interOpCmpDef = new Aura.Component.InteropComponentDef({
-        dependencies : module.dependencies,
-        definition   : module.definition,
-        descriptor   : module.descriptor,
-        moduleName   : module.moduleName,
-        interopClass : Ctor
-    });
-
-    this.componentDefRegistry[descriptor] = interOpCmpDef;
-    return interOpCmpDef;
 };
 
 /**

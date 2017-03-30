@@ -16,6 +16,7 @@
 package org.auraframework.modules;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * POJO with the parsed data ModulesCompiler generates
@@ -23,12 +24,10 @@ import java.util.List;
 public class ModulesCompilerData {
 
     public final String code;
-    public final List<String> bundleDependencies;
-    public final List<String> templateUsedIds;
+    public final Set<String> bundleDependencies;
     
-    public ModulesCompilerData(String code, List<String> bundleDependencies, List<String> templateUsedIds) {
+    public ModulesCompilerData(String code, Set<String> bundleDependencies) {
         this.code = code;
         this.bundleDependencies = bundleDependencies;
-        this.templateUsedIds = templateUsedIds;
     }
 }

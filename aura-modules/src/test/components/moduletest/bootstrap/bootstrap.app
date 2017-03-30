@@ -15,14 +15,14 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<aura:application template="moduletest:bootstrapTemplate" access="global" useAppcache="false">
+<aura:application template="moduleTest:bootstrapTemplate" access="global" useAppcache="false">
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:attribute name="branch" type="Boolean" default="true" access="GLOBAL" />
     <aura:attribute name="test" type="String" default="I'm v.test" access="GLOBAL" />
     <aura:attribute name="test2" type="String" default="I'm v.test2" access="GLOBAL" />
     <aura:attribute name="test3" type="String" default="I'm v.test3" access="GLOBAL"/>
 
-    <aura:dependency resource="markup://moduletest:testLib" type="LIBRARY"/>
+    <aura:dependency resource="markup://moduleTest:testLib" type="LIBRARY"/>
     
     <section>
         <ui:button aura:id="y" class="button-toggle" label="Toggle if - first modules container" press="{!c.toggle}" />
@@ -32,8 +32,8 @@
         <ui:button aura:id="t3" class="button-set3" label="Set v.test3" buttonTitle="x" press="{!c.updateTest3}" />
         <module:marker></module:marker>
         
-        <section style="margin: 10px; border: 1px solid #333">
-            <h3>Aura land</h3>
+        <section style="margin: 10px; border: 1px solid # ">
+            <h3>Aura land!</h3>
             <p>[v.test]: <span class="a-res1">{!v.test}</span></p>
             <p>[v.test2]: <span class="a-res2">{!v.test2}</span></p>
             <p>[v.test3]: <span class="a-res3">{!v.test3}</span></p>
@@ -42,7 +42,7 @@
         
         <aura:if isTrue="{!v.branch}">
             <section class="aura" aura:id="container">
-                <moduletest:simple
+                <moduleTest:simpleCmp
                     aura:id="simple" 
                     literal="Hi!"
                     bound="{!v.test}"
@@ -53,9 +53,9 @@
                 />
             </section>
         </aura:if>
-        <!--
+
         <section class="aura">
-            <moduletest:composite
+            <moduleTest:compositeCmp
                 aura:id="composite"
                 literal="Hi2!"
                 bound="{!v.test}"
@@ -66,7 +66,6 @@
 
             />
         </section>
-        -->
         
     </section>
 </aura:application>

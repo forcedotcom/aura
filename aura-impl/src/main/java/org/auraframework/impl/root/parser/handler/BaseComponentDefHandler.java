@@ -29,6 +29,7 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefinitionReference;
@@ -153,7 +154,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                     "%s","%s"
                 );
             }
-            builder.setHasSwitchableReference(attributeDef.hasSwitchableReference());
             builder.getAttributeDefs().put(attributeDef.getDescriptor(),attributeDef);
         } else if (isInInternalNamespace && RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
             RequiredVersionDefHandler<T> handler = new RequiredVersionDefHandler<>(this, xmlReader, source,
@@ -250,13 +250,12 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
         } else {
 
             // if it wasn't one of the above, it must be a defref, or an error
-            DefinitionReference cdr = createDefRefDelegate(this);
-            if (cdr.isFlavorable() || cdr.hasFlavorableChild()) {
+            ComponentDefRef componentDefRef = getDefRefHandler(this).getElement();
+            if (componentDefRef.isFlavorable() || componentDefRef.hasFlavorableChild()) {
                 builder.setHasFlavorableChild(true);
             }
-            // bubble up switchable reference flag to indicate recompilation required for modules
-            builder.setHasSwitchableReference(cdr.hasSwitchableReference());
-            body.add(cdr);
+            DefinitionReference defRef = createDefRefDelegate(componentDefRef);
+            body.add(defRef);
         }
     }
 

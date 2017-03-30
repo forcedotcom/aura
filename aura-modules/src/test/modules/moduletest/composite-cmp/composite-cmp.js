@@ -1,4 +1,5 @@
-export default class Composite {
+import { Element } from 'engine';
+export default class Composite extends Element {
 	literal = "Default literal";
     bound = "Default bound";
     unbound = "Default unbound";
@@ -6,6 +7,7 @@ export default class Composite {
     callbackaction;
     
 	constructor() {
+	    super();
 		this.message = 'Test composite';
 	}
 

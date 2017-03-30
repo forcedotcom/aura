@@ -36,6 +36,7 @@ public class StaticDefRegistryImpl extends DefRegistryImpl {
     private static final long serialVersionUID = 1L;
     protected final Map<DefDescriptor<?>, Definition> defs;
     private transient SourceFactory sourceFactory = null;
+    private String name;
 
     public StaticDefRegistryImpl(Set<DefType> defTypes, Set<String> prefixes, Set<String> namespaces,
             Collection<? extends Definition> defs) {
@@ -50,6 +51,7 @@ public class StaticDefRegistryImpl extends DefRegistryImpl {
             Map<DefDescriptor<?>, Definition> defs) {
         super(defTypes, prefixes, namespaces);
         this.defs = defs;
+        this.name = getClass().getSimpleName() + defTypes + prefixes + namespaces;
     }
 
     @Override
@@ -108,6 +110,7 @@ public class StaticDefRegistryImpl extends DefRegistryImpl {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName()+"["+getNamespaces()+"]"+"["+getDefTypes()+"]"+"="+defs;
+        // matches the same output of CompilingDefRegistry
+        return name;
     }
 }

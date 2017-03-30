@@ -52,6 +52,8 @@ public interface RegistryService {
      */
     DefRegistry getRegistry(File directory);
 
+    DefRegistry getModulesRegistry(File directory);
+
     /**
      * Get a registry set based on a single registry.
      *

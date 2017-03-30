@@ -171,7 +171,6 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         ContainerTagHandler<?> parentHandler = getParentHandler();
         if(parentHandler!=null) {
             DefinitionReference dr = createDefRefDelegate(getParentHandler());
-            builder.setHasSwitchableReference(dr.hasSwitchableReference());
             body.add(dr);
         }
     }

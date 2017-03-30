@@ -63,11 +63,11 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends BaseDefRef
                     .getElement();
             builder.setAttribute(attributeDefRef.getDescriptor(), attributeDefRef);
         } else {
-            DefinitionReference defRef = createDefRefDelegate(getParentHandler());
-            if (defRef.isFlavorable() || defRef.hasFlavorableChild()) {
+            ComponentDefRef componentDefRef = getDefRefHandler(getParentHandler()).getElement();
+            if (componentDefRef.isFlavorable() || componentDefRef.hasFlavorableChild()) {
                 builder.setHasFlavorableChild(true);
             }
-            builder.setHasSwitchableReference(defRef.hasSwitchableReference());
+            DefinitionReference defRef = createDefRefDelegate(componentDefRef);
             body.add(defRef);
         }
     }

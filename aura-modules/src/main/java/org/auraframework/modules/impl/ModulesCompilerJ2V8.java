@@ -21,15 +21,15 @@ import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.modules.ModulesCompiler;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.util.j2v8.J2V8Util;
 
 import com.eclipsesource.v8.JavaVoidCallback;
 import com.eclipsesource.v8.NodeJS;
-import com.eclipsesource.v8.V8Array;
-import com.eclipsesource.v8.V8Object;
 import com.eclipsesource.v8.utils.MemoryManager;
 
 /**
@@ -41,49 +41,38 @@ public final class ModulesCompilerJ2V8 implements ModulesCompiler {
     
     @Override
     public ModulesCompilerData compile(String entry, Map<String,String> sources) throws Exception {
-        String options = "{ format: 'aura', mapNamespaceFromPath: true,\n"
-                + "sources : {\n";
-        
-        String sourceClass = null;
+        StringBuilder options = new StringBuilder("{ format: 'amd', mapNamespaceFromPath: true,\nsources : {\n");
         
         // add entries for all files in the bundle
+        int size = sources.size();
+        int count = 0;
         for (Entry<String, String> sourceEntry: sources.entrySet()) {
+            count++;
             String name = sourceEntry.getKey();
             String source = StringEscapeUtils.escapeEcmaScript(sourceEntry.getValue());
             
-            options += '"' + name + "\": ";
-            options += '"' + source + '"';
-            options += ",\n";
-            
-            if (entry.endsWith(name.substring(1))) {
-                sourceClass = source;
+            options.append('"').append(name).append("\": ");
+            options.append('"').append(source).append('"');
+
+            if (count < size) {
+                options.append(",\n");
             }
         }
+
+        options.append("}}");
         
-        if (sourceClass == null) {
-            throw new IllegalArgumentException("could not find entry in sources: " + entry);
-        }
-        
-        // add entry for sourceClass .js
-        options += '"' + entry + "\": ";
-        options += '"' + sourceClass + '"';
-        options += "}}";
-        
-        return compile(entry, options);
+        return compile(entry, options.toString());
     }
     
     @Override
     public ModulesCompilerData compile(String entry, String sourceTemplate, String sourceClass) throws Exception {
-        sourceTemplate = StringEscapeUtils.escapeEcmaScript(sourceTemplate);
-        sourceClass = StringEscapeUtils.escapeEcmaScript(sourceClass);
+        String templatePath = StringUtils.replace(entry, ".js", ".html");
+        Map<String, String> sources = Maps.newHashMap();
+        sources.put(entry, sourceClass);
+        sources.put(templatePath, sourceTemplate);
 
-        String options = "{ sourceTemplate: \"" + sourceTemplate
-                + "\"\n, sourceClass: \"" + sourceClass + "\"\n"
-                + ", format: 'aura', mapNamespaceFromPath: true }";
-        return compile(entry, options);
+        return this.compile(entry, sources);
     }
-
-    //
 
     private ModulesCompilerData compile(String entry, String options) throws Exception {
         String script = ""
@@ -93,20 +82,14 @@ public final class ModulesCompilerJ2V8 implements ModulesCompiler {
 
         CompletableFuture<ModulesCompilerData> future = new CompletableFuture<>();
 
-        JavaVoidCallback onErrorCallback = new JavaVoidCallback() {
-            @Override
-            public void invoke(final V8Object receiver, final V8Array parameters) {
-                String error = parameters.toString();
-                future.completeExceptionally(new RuntimeException(error));
-                logger.warning("ModulesCompilerJ2v8: error " + entry + ": " + error);
-            }
+        JavaVoidCallback onErrorCallback = (receiver, parameters) -> {
+            String error = parameters.toString();
+            future.completeExceptionally(new RuntimeException(error));
+            logger.warning("ModulesCompilerJ2v8: error " + entry + ": " + error);
         };
-        JavaVoidCallback onResultCallback = new JavaVoidCallback() {
-            @Override
-            public void invoke(final V8Object receiver, final V8Array parameters) {
-                ModulesCompilerData data = ModulesCompilerUtil.parseCompilerOutput(parameters.getObject(0));
-                future.complete(data);
-            }
+        JavaVoidCallback onResultCallback = (receiver, parameters) -> {
+            ModulesCompilerData data = ModulesCompilerUtil.parseCompilerOutput(parameters.getObject(0));
+            future.complete(data);
         };
 
         NodeJS nodeJS = J2V8Util.createNodeJS();

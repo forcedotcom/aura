@@ -3,10 +3,10 @@
     <aura:attribute name="str2" type="String" default="World!!" access="GLOBAL" />
     <aura:attribute name="str3" type="String" default="Hello World!!" access="GLOBAL" />
 
-    <aura:dependency resource="markup://moduletest:testLib" type="LIBRARY"/>
+    <aura:dependency resource="markup://moduleTest:testLib" type="LIBRARY"/>
 
     <div>
-        <moduletest:simple
+        <moduleTest:simpleCmp
             aura:id="simple"
             literal="Hi!"
             bound="{!v.str1}"

@@ -37,6 +37,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.log4j.Logger;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
@@ -132,7 +133,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private static final String VERSION_PROPERTY = "aura.build.version";
     private static final String VALIDATE_CSS_CONFIG = "aura.css.validate";
 
-    private final Map<String, Boolean> SYSTEM_NAMESPACES = new ConcurrentHashMap<>();
+    private final Map<String, String> SYSTEM_NAMESPACES = new ConcurrentHashMap<>();
     private final Map<String, Boolean> CANONICAL_NAMESPACES = new ConcurrentHashMap<>();
     private final Map<String, Boolean> PRIVILEGED_NAMESPACES = new ConcurrentHashMap<>();
 
@@ -657,7 +658,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public void addInternalNamespace(String namespace) {
         if(namespace != null && !namespace.isEmpty()){
-            SYSTEM_NAMESPACES.put(namespace.toLowerCase(), Boolean.TRUE);
+            SYSTEM_NAMESPACES.put(namespace.toLowerCase(), namespace);
             CANONICAL_NAMESPACES.put(namespace, Boolean.TRUE);
             synchronized (CANONICAL_NAMESPACES) {
                 CANONICAL_IMMUTABLE = ImmutableSortedSet.copyOf(CANONICAL_NAMESPACES.keySet());
@@ -672,6 +673,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         synchronized (CANONICAL_NAMESPACES) {
             CANONICAL_IMMUTABLE = ImmutableSortedSet.copyOf(CANONICAL_NAMESPACES.keySet());
         }
+    }
+
+    @Override
+    public Map<String, String> getInternalNamespacesMap() {
+        return ImmutableMap.copyOf(SYSTEM_NAMESPACES);
     }
 
     @Override

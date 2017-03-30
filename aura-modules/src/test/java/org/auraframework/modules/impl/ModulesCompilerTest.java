@@ -1,5 +1,3 @@
-package org.auraframework.modules.impl;
-
 /*
  * Copyright (C) 2013 salesforce.com, inc.
  *
@@ -15,6 +13,7 @@ package org.auraframework.modules.impl;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.auraframework.modules.impl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,8 +46,8 @@ public class ModulesCompilerTest extends UnitTestCase {
                 Charsets.UTF_8);
         
         Map<String,String> sources = new HashMap<>();
-        sources.put("moduletest.js", sourceClass);
-        sources.put("moduletest.html", sourceTemplate);
+        sources.put("modules/moduletest/moduletest.js", sourceClass);
+        sources.put("modules/moduletest/moduletest.html", sourceTemplate);
 
         ModulesCompilerData compilerData = compiler.compile(componentPath, sources);
         String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"),
@@ -56,7 +55,6 @@ public class ModulesCompilerTest extends UnitTestCase {
 
         assertEquals(expected.trim(), compilerData.code.trim());
         assertEquals("[x-test]", compilerData.bundleDependencies.toString());
-        assertEquals("[test]", compilerData.templateUsedIds.toString());
     }
     
     @Test
@@ -75,7 +73,6 @@ public class ModulesCompilerTest extends UnitTestCase {
 
         assertEquals(expected.trim(), compilerData.code.trim());
         assertEquals("[x-test]", compilerData.bundleDependencies.toString());
-        assertEquals("[test]", compilerData.templateUsedIds.toString());
     }
 
     @Test
@@ -93,7 +90,7 @@ public class ModulesCompilerTest extends UnitTestCase {
             fail("should report a syntax error");
         } catch (Exception e) {
             String message = Throwables.getRootCause(e).getMessage();
-            assertEquals("Error: ./errorInHtml.html: Unexpected token (2:5)", message.substring(0, 49));
+            assertEquals("Error: modules/errorInHtml/errorInHtml.html: Unexpected token (2:5)", message.substring(0, 67));
         }
     }
 

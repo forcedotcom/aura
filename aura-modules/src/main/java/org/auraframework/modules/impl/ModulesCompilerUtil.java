@@ -20,8 +20,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.util.IOUtil;
@@ -65,15 +65,10 @@ final class ModulesCompilerUtil {
         String code = result.getString("code");
         V8Object metadata = result.getObject("metadata");
         V8Array v8BundleDependencies = metadata.getArray("bundleDependencies");
-        List<String> bundleDependencies = new ArrayList<>();
+        Set<String> bundleDependencies = new HashSet<>();
         for (int i = 0; i < v8BundleDependencies.length(); i++) {
             bundleDependencies.add(v8BundleDependencies.getString(i));
         }
-        V8Array v8TemplateUsedIds = metadata.getArray("templateUsedIds");
-        List<String> templateUsedIds = new ArrayList<>();
-        for (int i = 0; i < v8TemplateUsedIds.length(); i++) {
-            templateUsedIds.add(v8TemplateUsedIds.getString(i));
-        }
-        return new ModulesCompilerData(code, bundleDependencies, templateUsedIds);
+        return new ModulesCompilerData(code, bundleDependencies);
     }
 }

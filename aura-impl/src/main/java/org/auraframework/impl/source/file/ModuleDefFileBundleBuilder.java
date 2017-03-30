@@ -20,21 +20,44 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.util.ModuleDefinitionUtil;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.AuraRuntimeException;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.collect.Maps;
+
+import javax.inject.Inject;
 
 @ServiceComponent
 public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
 
+    private ConfigAdapter configAdapter;
+
+    private DefinitionService definitionService;
+
+    /**
+     * Checks for existence of module bundle which will contain primarily js and html
+     * Also checks .lib doesn't exist as module may contain js of the same name as base
+     * similar to library bundles
+     *
+     * Additionally checks for bundle file naming conventions
+     * namespace: all lowercase, no hyphens
+     * name: all lowercase, hyphens
+     *
+     * @param base base folder
+     * @return true if contains module bundle
+     */
     @Override
     public boolean isBundleMatch(File base) {
         File baseJs = getFileFromBase(base, ".js");
@@ -43,15 +66,45 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
         // modules may either have .js or .html so both needs to be the indicator
         // because it may only have the html or js file
         // check both html or js and not lib base file to ensure we don't pick up lib bundles
-        return (baseHtml.exists() || baseJs.exists()) && !baseLib.exists();
+        boolean isModuleBundle = (baseHtml.exists() || baseJs.exists()) && !baseLib.exists();
+
+        if (isModuleBundle) {
+            String filename = base.getName();
+            String fileNamespace = base.getParentFile().getName();
+
+            if (CharMatcher.JAVA_UPPER_CASE.matchesAnyOf(fileNamespace)) {
+                throw new AuraRuntimeException("Use lowercase for module folder names. Not " + fileNamespace);
+            }
+
+            if (fileNamespace.contains("-")) {
+                throw new AuraRuntimeException("Namespace cannot have a hyphen. " + fileNamespace);
+            }
+
+            if (CharMatcher.JAVA_UPPER_CASE.matchesAnyOf(filename)) {
+                throw new AuraRuntimeException("Use lowercase and hyphens for module file names. Not " + filename);
+            }
+            return true;
+        }
+
+        return false;
     }
 
+    /**
+     * Processes module bundle and creates BundleSource of all files.
+     * .js or .html (if .js doesn't exist) of the same name is associated with ModuleDef descriptor
+     *
+     * @param base base folder
+     * @return bundle source of module
+     */
     @Override
     public BundleSource<?> buildBundle(File base) {
+
+        String filename = base.getName();
+        String fileNamespace = base.getParentFile().getName();
+        String descriptor = ModuleDefinitionUtil.convertToAuraDescriptor(fileNamespace, filename, configAdapter);
+
+        DefDescriptor<ModuleDef> modDesc = definitionService.getDefDescriptor(descriptor, ModuleDef.class);
         Map<DefDescriptor<?>, Source<?>> sourceMap = Maps.newHashMap();
-        String name = base.getName();
-        String namespace = base.getParentFile().getName();
-        DefDescriptor<ModuleDef> modDesc = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, namespace, name, ModuleDef.class);
 
         try {
             File baseJs = getFileFromBase(base, ".js");
@@ -66,7 +119,7 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
             }
 
             if (moduleDescriptorFilePath != null) {
-                processBundle(base, sourceMap, 0, modDesc, moduleDescriptorFilePath, namespace);
+                processBundle(base, sourceMap, 0, modDesc, moduleDescriptorFilePath, modDesc.getNamespace());
             }
         } catch (IOException ignored) {
             // ignore file path issues
@@ -129,5 +182,15 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
 
     private File getFileFromBase(File base, String extension) {
         return new File(base, base.getName() + extension);
+    }
+
+    @Inject
+    public void setConfigAdapter(ConfigAdapter configAdapter) {
+        this.configAdapter = configAdapter;
+    }
+
+    @Inject
+    public void setDefinitionService(DefinitionService definitionService) {
+        this.definitionService = definitionService;
     }
 }

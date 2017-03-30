@@ -65,6 +65,7 @@ public class FileSourceListener extends DescriptorFileMapper implements FileList
         String filePath = path.toString();
         LOG.info("File " + filePath + " changed due to: " + smEvent);
 
+        // TODO: getDescriptor uses DescriptorFileMapper which will NOT find the correct descriptor for modules
         DefDescriptor<?> defDescriptor = getDescriptor(filePath);
         onSourceChanged(defDescriptor, smEvent, filePath);
     }

@@ -1,2 +1,3 @@
-export default class Marker {
+import { Element } from 'engine';
+export default class Marker extends Element {
 }

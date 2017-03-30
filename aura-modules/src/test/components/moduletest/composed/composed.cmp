@@ -1,7 +1,7 @@
 <aura:component>
     <aura:attribute name="str" type="String" default="WOOHOO!" access="GLOBAL" />
     <section>
-        <moduletest:text
+        <moduleTest:textCmp
             text="{!v.str}"
             aura:id="module-text"
         />

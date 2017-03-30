@@ -104,8 +104,6 @@ public class DefRefDelegateUnitTest {
 
         DefRefDelegate defRefDelegate = new DefRefDelegate(mockComponentDefRef);
 
-        assertTrue("defRefDelegate should be switchable", defRefDelegate.hasSwitchableReference());
-
         when(mockContext.isModulesEnabled()).thenReturn(true);
         assertTrue("Should be ModuleDefRef with modules enabled",
                 defRefDelegate.get() instanceof ModuleDefRef);
@@ -123,8 +121,6 @@ public class DefRefDelegateUnitTest {
         moduleNamespaces.add("defref");
 
         DefRefDelegate defRefDelegate = new DefRefDelegate(mockComponentDefRef);
-
-        assertFalse("defRefDelegate should not be switchable", defRefDelegate.hasSwitchableReference());
 
         when(mockContext.isModulesEnabled()).thenReturn(true);
         assertEquals("Should be ComponentDefRef with non existent module and modules enabled",
@@ -144,8 +140,6 @@ public class DefRefDelegateUnitTest {
 
         DefRefDelegate defRefDelegate = new DefRefDelegate(mockComponentDefRef);
 
-        assertFalse("defRefDelegate should not be switchable", defRefDelegate.hasSwitchableReference());
-
         when(mockContext.isModulesEnabled()).thenReturn(true);
         assertTrue("Should be ModuleDefRef with non existent component and modules enabled",
                 defRefDelegate.get() instanceof ModuleDefRef);
@@ -158,8 +152,6 @@ public class DefRefDelegateUnitTest {
     @Test
     public void testModuleNamespaceNotRegistered() throws Exception {
         DefRefDelegate defRefDelegate = new DefRefDelegate(mockComponentDefRef);
-
-        assertFalse("defRefDelegate should not be switchable", defRefDelegate.hasSwitchableReference());
 
         verifyZeroInteractions(mockDefinitionService);
 

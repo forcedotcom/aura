@@ -74,7 +74,7 @@ LibraryRegistry.prototype.getLibrary = function(descriptor) {
             instance = this.buildLibrary(includes);
             this.instance[descriptor] = instance;
             // Register it also as a module
-            $A.componentService.addModule(descriptor, [], null, instance);
+            $A.componentService.addModule(descriptor, descriptor, [], null, instance);
         }
     }
 

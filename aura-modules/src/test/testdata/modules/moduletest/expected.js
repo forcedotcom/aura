@@ -1,8 +1,7 @@
-$A.componentService.addModule('modules:moduletest', ['x-test'], function (_xTest) { 'use strict';
+define('modules-moduletest', ['x-test'], function (_xTest) { 'use strict';
 
-const memoized = Symbol('memoize');
-var _tmpl = function ($api, $cmp, $slotset) {
-    const m = $cmp[memoized] || ($cmp[memoized] = {});
+function tmpl($api, $cmp, $slotset, $ctx) {
+    const m = $ctx.memoized || ($ctx.memoized = {});
     return [$api.c(
         "x-test",
         _xTest,
@@ -12,23 +11,28 @@ var _tmpl = function ($api, $cmp, $slotset) {
             }
         }
     )];
-};
-const templateUsedIds = ["test"];
+}
+tmpl.ids = ["test"];
 
 class Test {
+    constructor() {
+        this.stringQuote = 'str"ing';
+        this.stringDoubleQuote = "str'ing";
+        this.stringBacktick = `key=${value}`;
+        this.VALID_NAME_RE = /^([a-zA-Z]\w*):([a-zA-Z]\w*)$/;
+    }
+
     render() {
-        return _tmpl;
+        return tmpl;
     }
 
 }
-Test.tagName = "modules-moduletest";
 Test.publicProps = {
     stringQuote: 'str"ing',
     stringDoubleQuote: "str'ing",
     stringBacktick: `key=${value}`,
     VALID_NAME_RE: /^([a-zA-Z]\w*):([a-zA-Z]\w*)$/
 };
-Test.templateUsedIds = templateUsedIds;
 
 return Test;
 

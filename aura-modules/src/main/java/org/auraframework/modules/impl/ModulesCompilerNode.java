@@ -61,7 +61,7 @@ public final class ModulesCompilerNode implements ModulesCompiler {
         String result = new String(Files.readAllBytes(output.toPath()), Charsets.UTF_8);
         output.delete();
         // TODO: compiler metadata
-        return new ModulesCompilerData(result, null, null);
+        return new ModulesCompilerData(result, null);
     }
 
     @Override

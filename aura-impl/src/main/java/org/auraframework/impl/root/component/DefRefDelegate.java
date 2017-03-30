@@ -49,11 +49,10 @@ public class DefRefDelegate implements DefinitionReference {
 
     private DefinitionReference componentDefRef;
     private DefinitionReference moduleDefRef = null;
-    private boolean switchable = false;
+    private Boolean switchable = null;
 
     public DefRefDelegate(ComponentDefRef componentDefRef) throws DefinitionNotFoundException {
         this.componentDefRef = componentDefRef;
-        processReferences();
     }
 
     private void processReferences() throws DefinitionNotFoundException {
@@ -96,7 +95,6 @@ public class DefRefDelegate implements DefinitionReference {
 
         } else {
             this.moduleDefRef = this.componentDefRef;
-            this.switchable = this.componentDefRef.hasSwitchableReference();
         }
     }
 
@@ -246,17 +244,22 @@ public class DefRefDelegate implements DefinitionReference {
         return select().getSubDefinition(descriptor);
     }
 
-    @Override
-    public boolean hasSwitchableReference() {
-        return this.switchable;
-    }
-
     /**
      * Runtime selection of either component or module reference.
      *
      * @return definition reference dependent on module enablement
      */
     public DefinitionReference select() {
+        if (this.switchable == null) {
+            try {
+                // build time compilation requires runtime operation since namespace and existing descriptor lookup
+                // is limited to the current maven module during build time
+                processReferences();
+            } catch (DefinitionNotFoundException dnfe) {
+                this.switchable = false;
+            }
+        }
+
         if (this.switchable && Aura.getContextService().getCurrentContext().isModulesEnabled()) {
             return this.moduleDefRef;
         }

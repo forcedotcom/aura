@@ -32,8 +32,8 @@ function InteropComponentDef(config) {
     this.definition       = config.definition;
     this.moduleName       = config.moduleName;
     this.interopClass     = config.interopClass;
-    this.elementName      = this.moduleName.replace(':', '-');
-    this.interopClassName = this.moduleName.replace(':', '$');
+    this.elementName      = this.moduleName;
+    this.interopClassName = this.descriptor.getNamespace() + "$" + this.descriptor.getName();
 }
 
 InteropComponentDef.prototype.hasInit = function() {

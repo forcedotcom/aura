@@ -17,12 +17,14 @@ package org.auraframework.integration.test.modules.ui;
 
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 import org.openqa.selenium.By;
 
 /**
  * Runs the /moduletest/bootstrap.app app to verify raptor and aura/raptor interoperability works.
  */
+@UnAdaptableTest
 public class ModulesBootstrapUITest extends WebDriverTestCase {
 
     // private static final By BY_BUTTON_TOGGLE = By.cssSelector(".button-toggle");
@@ -39,7 +41,7 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
     private static final By BY_M_EXPR = By.cssSelector(".m-expr");
 
     @Test
-    @ExcludeBrowsers({BrowserType.IE11})
+    @ExcludeBrowsers({BrowserType.IE11, BrowserType.SAFARI})
     public void testInterop() throws Exception {
         open("/moduletest/bootstrap.app");
 

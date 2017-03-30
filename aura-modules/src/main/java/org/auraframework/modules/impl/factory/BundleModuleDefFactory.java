@@ -15,11 +15,9 @@
  */
 package org.auraframework.modules.impl.factory;
 
+import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -28,24 +26,21 @@ import javax.inject.Inject;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.LibraryDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl;
 import org.auraframework.modules.ModulesCompiler;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.modules.impl.ModulesCompilerJ2V8;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.system.TextSource;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
-import com.google.common.collect.Sets;
 
 /**
  * Provides ModuleDef implementation
@@ -53,11 +48,7 @@ import com.google.common.collect.Sets;
 @ServiceComponent
 public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<ModuleDef>, ModuleDef> {
 
-    @Inject
     private ConfigAdapter configAdapter;
-
-    @Inject
-    private DefinitionService definitionService;
 
     @Override
     public Class<?> getSourceInterface() {
@@ -81,42 +72,37 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         try {
             Map<DefDescriptor<?>, Source<?>> sourceMap = source.getBundledParts();
 
-            // get base source. should be js file
-            // TODO: module only has .html file ?
+            // get base source.
             Source<?> baseClassSource = sourceMap.get(descriptor);
 
             if (baseClassSource == null) {
                 // javascript file of the same name as module is required
-                throw new InvalidDefinitionException("No base javascript for " + descriptor,
+                throw new InvalidDefinitionException("No base file for " + descriptor,
                         new Location(descriptor.getNamespace() + "/" + descriptor.getName(), -1));
             }
 
-            // compute base js path
-            String baseJSPath = baseClassSource.getSystemId();
-            int start = baseJSPath.lastIndexOf('/', baseJSPath.lastIndexOf('/', baseJSPath.lastIndexOf('/') - 1) - 1);
-            String componentPath = baseJSPath.substring(start + 1);
+            // compute base file path. baseClassSource must be FileSource to return path for systemId
+            String baseFilePath = baseClassSource.getSystemId();
+            int start = baseFilePath.lastIndexOf('/', baseFilePath.lastIndexOf('/', baseFilePath.lastIndexOf('/') - 1) - 1);
+            String componentPath = baseFilePath.substring(start + 1);
 
             // source map of sources with absolute file paths as keys
             Map<String, String> fullPathSources = new HashMap<>();
 
             // loop and get contents of all files in the bundle
-            for (Map.Entry<DefDescriptor<?>, Source<?>> entry : sourceMap.entrySet()) {
-                Source<?> entrySource = entry.getValue();
+            sourceMap.forEach( (desc, entrySource) -> {
                 String path = entrySource.getSystemId();
                 if (entrySource instanceof TextSource) {
                     fullPathSources.put(path, ((TextSource<?>) entrySource).getContents());
                 }
-            }
-            
-            // make source paths relative to the folder that contains the bundle
-            // i.e. "component.js", "utils/util.js"
-            String namespaceAndName = componentPath.substring(0, componentPath.lastIndexOf('/') + 1);
-            Map<String,String> sources = new HashMap<>();
-            for (Entry<String, String> fullPathSource: fullPathSources.entrySet()) {
-                String fullPath = fullPathSource.getKey();
-                String relativePath = fullPath.substring(fullPath.indexOf(namespaceAndName) + namespaceAndName.length());
-                sources.put(relativePath, fullPathSource.getValue());
-            }
+            });
+
+            Map<String, String> sources = new HashMap<>();
+            fullPathSources.forEach( (fullPath, contents) -> {
+                // get full relative path starting from namespace ie "namespace/name/name.js", "namespace/name/utils/util.js"
+                String relativePath = fullPath.substring(start + 1);
+                sources.put(relativePath, contents);
+            });
 
             ModuleDefImpl.Builder builder = new ModuleDefImpl.Builder();
 
@@ -132,12 +118,14 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
                     isInInternalNamespace ? AuraContext.Access.INTERNAL : AuraContext.Access.PUBLIC));
 
             // module
-            builder.setPath(baseClassSource.getSystemId());
+            builder.setPath(baseFilePath);
+            builder.setCustomElementName(getCustomElementName(componentPath));
 
             ModulesCompiler compiler = new ModulesCompilerJ2V8();
             ModulesCompilerData compilerData = compiler.compile(componentPath, sources);
-            builder.setCompiledCode(compilerData.code);
-            builder.setDependencies(getDependencyDescriptors(compilerData.bundleDependencies));
+            String compiledCode = processCompiledCode(descriptor, compilerData.code);
+            builder.setCompiledCode(compiledCode);
+            builder.setModuleDependencies(compilerData.bundleDependencies);
             return builder.build();
         } catch (Exception e) {
             throw new InvalidDefinitionException(descriptor.toString(), location, e);
@@ -145,33 +133,40 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
     }
 
     /**
-     * Process dependencies from compiler in the form of DefDescriptor names (namespace:module)
-     * into DefDescriptor.
+     * Removes amd define function and replaces with specific Aura handling function
+     * and wraps in function
      *
-     * Module dependencies may include other modules and aura libraries
-     *
-     * @param dependencies list of descriptor names
-     * @return dependencies as DefDescriptors
+     * @param descriptor module descriptor
+     * @param code compiled code
+     * @return code results
+     * @throws InvalidDefinitionException if code from compiler does not start with define for amd
      */
-    private Set<DefDescriptor<?>> getDependencyDescriptors(List<String> dependencies) {
-        Set<DefDescriptor<?>> results = Sets.newHashSet();
-        for (String dep : dependencies) {
-            if (dep.contains("-")) {
-                // TODO remove when compiler is updated to return ':'
-                dep = dep.replaceFirst("-", ":");
-            }
-            DefDescriptor<ModuleDef> moduleDefDefDescriptor = definitionService.getDefDescriptor(dep, ModuleDef.class);
-            if (definitionService.exists(moduleDefDefDescriptor)) {
-                // if module exists, then add module dependency and continue
-                results.add(moduleDefDefDescriptor);
-            } else {
-                // otherwise check for library usage
-                DefDescriptor<LibraryDef> libraryDefDescriptor = definitionService.getDefDescriptor(dep, LibraryDef.class);
-                if (definitionService.exists(libraryDefDescriptor)) {
-                    results.add(libraryDefDescriptor);
-                }
-            }
+    private String processCompiledCode(DefDescriptor<ModuleDef> descriptor, String code) throws InvalidDefinitionException {
+        if (!code.substring(0, 7).equals("define(")) {
+            throw new AuraRuntimeException("Compiled code does not start with AMD 'define'");
         }
-        return results;
+        StringBuilder processedCode = new StringBuilder();
+        processedCode
+                .append("function() { $A.componentService.addModule('")
+                .append(descriptor.getQualifiedName()).append("', ")
+                .append(code.substring(7, code.length()))
+                .append(" };");
+        return processedCode.toString();
+    }
+
+    private String getCustomElementName(String path) {
+        String[] paths = path.split(File.separator);
+        int length = paths.length;
+        if (length > 2) {
+            String name = paths[1];
+            String namespace = paths[0];
+            return namespace + "-" + name;
+        }
+        return "";
+    }
+
+    @Inject
+    public void setConfigAdapter(ConfigAdapter configAdapter) {
+        this.configAdapter = configAdapter;
     }
 }

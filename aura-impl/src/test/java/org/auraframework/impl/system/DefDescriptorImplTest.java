@@ -293,8 +293,13 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
     }
 
     @Test
-    public void testHyphenUnderscoreInName() throws Exception {
-        definitionService.getDefDescriptor("markup://test:hyphened-underscored_name-component", ModuleDef.class);
+    public void testHyphenInNameThrows() throws Exception {
+        try {
+            definitionService.getDefDescriptor("markup://test:hyphened-underscored_name-component", ModuleDef.class);
+            fail("Should fail due to hyphen in descriptor name");
+        } catch (AuraRuntimeException are) {
+            assertTrue("Should have invalid descriptor message", are.getMessage().contains("Invalid Descriptor Format"));
+        }
     }
 
 }

@@ -23,6 +23,7 @@ import java.io.ObjectInputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +50,7 @@ import org.auraframework.impl.java.JavaSourceLoader;
 import org.auraframework.impl.source.SourceFactory;
 import org.auraframework.impl.source.file.FileBundleSourceLoader;
 import org.auraframework.impl.source.file.FileSourceLoader;
-import org.auraframework.impl.source.resource.ResourceBundleSourceLoader;
+import org.auraframework.impl.source.file.ModuleFileBundleSourceLoader;
 import org.auraframework.impl.source.resource.ResourceSourceLoader;
 import org.auraframework.impl.system.CompilingDefRegistry;
 import org.auraframework.impl.system.NonCachingDefRegistryImpl;
@@ -110,20 +111,19 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
 
     private static String SERVICECOMPONENT_PREFIX = "servicecomponent";
 
-    private static final Set<String> markupPrefixes = ImmutableSet.of(
+    private static final Set<String> MARKUP_PREFIXES = ImmutableSet.of(
             DefDescriptor.MARKUP_PREFIX,
             DefDescriptor.CSS_PREFIX,
             DefDescriptor.TEMPLATE_CSS_PREFIX,
             DefDescriptor.CUSTOM_FLAVOR_PREFIX,
             DefDescriptor.JAVASCRIPT_PREFIX);
 
-    private static final Set<DefType> allMarkupDefTypes = EnumSet.of(
+    private static final Set<DefType> ALL_MARKUP_DEFTYPES = EnumSet.of(
             DefType.APPLICATION,
             DefType.COMPONENT,
             DefType.EVENT,
             DefType.INTERFACE,
             DefType.LIBRARY,
-
             DefType.CONTROLLER,
             DefType.DESIGN,
             DefType.DOCUMENTATION,
@@ -141,14 +141,13 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             DefType.TOKENS
             );
 
-    private static final Set<String> moduleMarkupPrefixes = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX,
-            DefDescriptor.JAVASCRIPT_PREFIX, DefDescriptor.CSS_PREFIX);
+    private static final Set<String> MODULE_PREFIXES = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
 
-    private static final Set<DefType> moduleDefTypes = EnumSet.of(DefType.MODULE);
+    private static final Set<DefType> MODULE_DEFTYPES = EnumSet.of(DefType.MODULE);
 
     // Subtracts supported bundle source DefTypes in order to create two separate registries
     // for FileSourceLoader and FileBundleSourceLoader
-    private static final Set<DefType> markupDefTypes = Sets.difference(allMarkupDefTypes, BundleSource.bundleDefTypes);
+    private static final Set<DefType> MARKUP_DEFTYPES = Sets.difference(ALL_MARKUP_DEFTYPES, BundleSource.bundleDefTypes);
 
     private static class SourceLocationInfo {
         public final List<DefRegistry> staticLocationRegistries;
@@ -264,44 +263,41 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         String canonical = null;
         List<SourceLoader> markupLoaders = Lists.newArrayList();
         List<DefRegistry> markupRegistries = Lists.newArrayList();
-
-        Set<String> prefixes = modules? moduleMarkupPrefixes : markupPrefixes;
-        Set<DefType> defTypes = modules? moduleDefTypes : BundleSource.bundleDefTypes;
-
-        DefRegistry defRegistry = null;
+        ModuleFileBundleSourceLoader moduleBundleSourceLoader = null;
         if (pkg != null) {
-            ResourceSourceLoader rsl = new ResourceSourceLoader(pkg);
-            markupLoaders.add(rsl);
             if (!modules) {
-                markupRegistries.add(new CompilingDefRegistry(rsl, markupPrefixes, markupDefTypes, compilerService));
+                ResourceSourceLoader rsl = new ResourceSourceLoader(pkg);
+                markupLoaders.add(rsl);
+                markupRegistries.add(new CompilingDefRegistry(rsl, MARKUP_PREFIXES, MARKUP_DEFTYPES, compilerService));
+                markupRegistries.add(new CompilingDefRegistry(new FileBundleSourceLoader(pkg, fileMonitor, builders),
+                        MARKUP_PREFIXES, BundleSource.bundleDefTypes, compilerService));
+            } else {
+                moduleBundleSourceLoader = new ModuleFileBundleSourceLoader(pkg, fileMonitor, builders);
             }
-            markupRegistries.add(new CompilingDefRegistry(
-                            new ResourceBundleSourceLoader(pkg, fileMonitor, builders),
-                            prefixes, defTypes, compilerService));
         } else if (location.getComponentSourceDir() != null) {
             File components = location.getComponentSourceDir();
             if (!components.canRead() || !components.canExecute() || !components.isDirectory()) {
                 _log.error("Unable to find " + components + ", ignored.");
             } else {
-                FileSourceLoader fsl = new FileSourceLoader(components, fileMonitor);
-                markupLoaders.add(fsl);
+                FileSourceLoader fsl;
                 if (!modules) {
                     // modules requires BundleSource to allow multiple js/css files so skip FileSourceLoader
-                    // markupDefTypes is the difference between all and BundleSource DefTypes
+                    fsl = new FileSourceLoader(components, fileMonitor);
+                    markupLoaders.add(fsl);
+                    // MARKUP_DEFTYPES is the difference between all and BundleSource DefTypes
                     // Thus, creating two CompilingDefRegistry, FileSourceLoader and FileBundleSourceLoader
                     // works without DefType registry conflicts
-                    defRegistry = new CompilingDefRegistry(fsl, prefixes, markupDefTypes, compilerService);
-                    markupRegistries.add(defRegistry);
+                    markupRegistries.add(new CompilingDefRegistry(fsl, MARKUP_PREFIXES, MARKUP_DEFTYPES, compilerService));
+                    markupRegistries.add(new CompilingDefRegistry(new FileBundleSourceLoader(components, fileMonitor, builders),
+                            MARKUP_PREFIXES, BundleSource.bundleDefTypes, compilerService));
+                } else {
+                    moduleBundleSourceLoader = new ModuleFileBundleSourceLoader(components, fileMonitor, builders);
                 }
-                defRegistry = new CompilingDefRegistry(
-                        new FileBundleSourceLoader(components, fileMonitor, builders),
-                        prefixes, defTypes, compilerService);
-                markupRegistries.add(defRegistry);
                 File generatedJavaBase = location.getJavaGeneratedSourceDir();
                 if (generatedJavaBase != null && generatedJavaBase.exists()) {
                     fsl = new FileSourceLoader(generatedJavaBase, fileMonitor);
                     markupLoaders.add(fsl);
-                    markupRegistries.add(new CompilingDefRegistry(fsl, prefixes, markupDefTypes, compilerService));
+                    markupRegistries.add(new CompilingDefRegistry(fsl, MARKUP_PREFIXES, MARKUP_DEFTYPES, compilerService));
                 }
                 try {
                     canonical = components.getCanonicalPath();
@@ -315,23 +311,17 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             if (!loaders.isEmpty()) {
                 markupLoaders.addAll(loaders);
                 for (SourceLoader loader : loaders) {
-                    markupRegistries.add(new PassThroughDefRegistry(loader, allMarkupDefTypes, prefixes, true, compilerService));
+                    markupRegistries.add(new PassThroughDefRegistry(loader, ALL_MARKUP_DEFTYPES, MARKUP_PREFIXES, true, compilerService));
                 }
             }
         }
         
-        if (modules) {
-            if (defRegistry != null) {
-                // register namespaces to optimize processing of definition references
-                configAdapter.addModuleNamespaces(defRegistry.getNamespaces());
-            }
-            if (staticRegs != null) {
-                for (DefRegistry reg : staticRegs) {
-                    if (reg.getDefTypes().contains(DefType.MODULE)) {
-                        configAdapter.addModuleNamespaces(reg.getNamespaces());
-                    }
-                }
-            }
+        if (modules && moduleBundleSourceLoader != null) {
+            markupLoaders.add(moduleBundleSourceLoader);
+            DefRegistry defRegistry = new CompilingDefRegistry(moduleBundleSourceLoader, MODULE_PREFIXES, MODULE_DEFTYPES, compilerService);
+            markupRegistries.add(defRegistry);
+            // register namespaces to optimize processing of definition references
+            configAdapter.addModuleNamespaces(defRegistry.getNamespaces());
         }
         
         //
@@ -345,6 +335,10 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             for (DefRegistry reg : staticRegs) {
                 if (reg instanceof StaticDefRegistryImpl) {
                     ((StaticDefRegistryImpl)reg).setSourceFactory(sf);
+                }
+                if (reg.getDefTypes().contains(DefType.MODULE)) {
+                    // register precompiled module registry namespaces
+                    configAdapter.addModuleNamespaces(reg.getNamespaces());
                 }
             }
         }
@@ -463,7 +457,13 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     @Override
     public DefRegistry getRegistry(File directory) {
         return new CompilingDefRegistry(new FileBundleSourceLoader(directory, null, builders),
-                            markupPrefixes, BundleSource.bundleDefTypes, compilerService);
+                MARKUP_PREFIXES, BundleSource.bundleDefTypes, compilerService);
+    }
+
+    @Override
+    public DefRegistry getModulesRegistry(File directory) {
+        return new CompilingDefRegistry(new ModuleFileBundleSourceLoader(directory, null, builders),
+                MODULE_PREFIXES, MODULE_DEFTYPES, compilerService);
     }
 
     private  Collection<ComponentLocationAdapter> getAllComponentLocationAdapters() {
@@ -585,6 +585,10 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
      */
     @Inject
     public void setLocationAdapters(List<ComponentLocationAdapter> locationAdapters) {
+        // component locations MUST be processed first as their namespaces MUST be available for lookup
+        // to allow modules to override as their namespace are all lower cased
+        // DefType.COMPONENT before DefType.MODULE
+        Collections.sort(locationAdapters, Comparator.comparing(location -> location.type()));
         this.locationAdapters = locationAdapters;
     }
 

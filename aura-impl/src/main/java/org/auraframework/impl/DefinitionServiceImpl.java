@@ -1049,21 +1049,10 @@ public class DefinitionServiceImpl implements DefinitionService {
                 // put UID-qualified descriptor key for dependency
                 depsCache.put(makeGlobalKey(de.uid, descriptor, modulesEnabled), de);
 
-                if (!currentCC.hasSwitchableReference) {
-                    // if no switchable references detected, DE is the same for both aura or modules
-                    // so save so that the other doesn't have to go through compilation again.
-                    depsCache.put(makeGlobalKey(de.uid, descriptor, !modulesEnabled), de);
-                }
-
                 // put unqualified descriptor key for dependency
                 if (currentCC.shouldCacheDependencies) {
                     depsCache.put(makeNonUidGlobalKey(descriptor, modulesEnabled), de);
-
-                    if (!currentCC.hasSwitchableReference) {
-                        // if no switchable references detected, DE is the same for both aura or modules
-                        depsCache.put(makeNonUidGlobalKey(descriptor, !modulesEnabled), de);
                 }
-            }
             }
 
             // See localDependencies comment
@@ -1274,7 +1263,6 @@ public class DefinitionServiceImpl implements DefinitionService {
         public final RegistrySet registries;
         public final boolean compiling;
         public int level;
-        public boolean hasSwitchableReference;
 
         /** Is this def's dependencies cacheable? */
         public boolean shouldCacheDependencies;
@@ -1290,7 +1278,6 @@ public class DefinitionServiceImpl implements DefinitionService {
             this.level = 0;
             this.shouldCacheDependencies = true;
             this.compiling = true;
-            this.hasSwitchableReference = false;
         }
 
         public <D extends Definition> CompilingDef<D> getCompiling(DefDescriptor<D> descriptor) {
@@ -1314,10 +1301,6 @@ public class DefinitionServiceImpl implements DefinitionService {
             for (Map.Entry<DefDescriptor<? extends Definition>,Definition> entry : toAdd.entrySet()) {
                 addEntry(entry.getKey(), entry.getValue());
             }
-        }
-
-        public void setHasSwitchableReference(boolean hasSwitchableReference) {
-            this.hasSwitchableReference = this.hasSwitchableReference || hasSwitchableReference;
         }
     }
 
@@ -1356,8 +1339,6 @@ public class DefinitionServiceImpl implements DefinitionService {
                 if (currentCC.shouldCacheDependencies && currentCC.context.isLocalDefNotCacheable(compiling.descriptor)) {
                     currentCC.shouldCacheDependencies = false;
                 }
-                // bubble up flag to current CompileContext for recompilation
-                currentCC.setHasSwitchableReference(compiling.def.hasSwitchableReference());
                 return true;
             } else {
                 return false;
@@ -1377,7 +1358,6 @@ public class DefinitionServiceImpl implements DefinitionService {
                 compiling.def = cachedDef;
                 compiling.descriptor = canonical;
                 compiling.built = false;
-                currentCC.setHasSwitchableReference(compiling.def.hasSwitchableReference());
                 return true;
             } else {
                 return false;
@@ -1423,9 +1403,6 @@ public class DefinitionServiceImpl implements DefinitionService {
             loggingService.incrementNum(LoggingService.DEF_COUNT);
             compiling.def.validateDefinition();
         }
-
-        // find def containing switchable reference so we can recompile
-        currentCC.setHasSwitchableReference(compiling.def.hasSwitchableReference());
 
         return true;
     }

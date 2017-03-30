@@ -76,33 +76,33 @@ public class RegistrySerializer {
         private RegistrySerializerException(String message) {
             super(message);
         }
-    };
+    }
 
-    public static interface RegistrySerializerLogger {
-        public void error(CharSequence loggable);
+    public interface RegistrySerializerLogger {
+        void error(CharSequence loggable);
 
-        public void error(CharSequence loggable, Throwable cause);
+        void error(CharSequence loggable, Throwable cause);
 
-        public void error(Throwable cause);
+        void error(Throwable cause);
 
-        public void warning(CharSequence loggable);
+        void warning(CharSequence loggable);
 
-        public void warning(CharSequence loggable, Throwable cause);
+        void warning(CharSequence loggable, Throwable cause);
 
-        public void warning(Throwable cause);
+        void warning(Throwable cause);
 
-        public void info(CharSequence loggable);
+        void info(CharSequence loggable);
 
-        public void info(CharSequence loggable, Throwable cause);
+        void info(CharSequence loggable, Throwable cause);
 
-        public void info(Throwable cause);
+        void info(Throwable cause);
 
-        public void debug(CharSequence loggable);
+        void debug(CharSequence loggable);
 
-        public void debug(CharSequence loggable, Throwable cause);
+        void debug(CharSequence loggable, Throwable cause);
 
-        public void debug(Throwable cause);
-    };
+        void debug(Throwable cause);
+    }
 
     private static class DefaultLogger implements RegistrySerializerLogger {
         @Override
@@ -271,8 +271,16 @@ public class RegistrySerializer {
         Set<DefType> types = Sets.newHashSet();
         Set<DefDescriptor<?>> descriptors;
         Map<DefDescriptor<?>, Definition> filtered = Maps.newHashMap();
+
+        String existingNamespace = configAdapter.getInternalNamespacesMap().get(namespace.toLowerCase());
+        if (existingNamespace != null) {
+            // modules will have lower cased namespace folder
+            // it needs to use the case sensitive namespace to override existing aura components
+            namespace = existingNamespace;
+        } else {
+            configAdapter.addInternalNamespace(namespace);
+        }
         Set<String> namespaces = Sets.newHashSet(namespace);
-        configAdapter.addInternalNamespace(namespace);
         //
         // Fetch all matching descriptors for our 'root' definitions.
         //
@@ -285,17 +293,6 @@ public class RegistrySerializer {
         }
         descriptors = master.find(root_nsf);
         for (DefDescriptor<?> desc : descriptors) {
-            if (modulesEnabled) {
-                if (desc.getDefType() != DefType.MODULE) {
-                    logger.debug("skipping non-module desc: " + desc);
-                    continue;
-                }
-            } else {
-                if (desc.getDefType() == DefType.MODULE) {
-                    logger.debug("skipping module desc: " + desc);
-                    continue;
-                }
-            }
             try {
                 Definition def = master.getDef(desc);
                 if (def == null) {
@@ -368,8 +365,17 @@ public class RegistrySerializer {
             throw new RegistrySerializerException("Unable to create "+outputFile, fnfe);
         }
         try {
-            DefRegistry master = registryService.getRegistry(componentDirectory);
-            RegistrySet registries = registryService.getRegistrySet(master);
+            DefRegistry master;
+            RegistrySet registries;
+            if (modulesEnabled) {
+                // must get all component locations within current maven module first to register namespaces.
+                registries = registryService.getDefaultRegistrySet(Mode.DEV, Authentication.AUTHENTICATED);
+                // modules will use existing component namespaces for conversion
+                master = registryService.getModulesRegistry(componentDirectory);
+            } else {
+                master = registryService.getRegistry(componentDirectory);
+                registries = registryService.getRegistrySet(master);
+            }
             AuraContext context = contextService.startBasicContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED, registries);
             context.setModulesEnabled(modulesEnabled);
 

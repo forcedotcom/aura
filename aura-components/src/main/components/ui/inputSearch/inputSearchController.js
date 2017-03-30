@@ -21,6 +21,7 @@
             el.value = "";
             component.set("v.value", "");
             helper.toggleClearButton(component);
+            component.focus();
         }
         var e = component.getEvent("search");
         e.setParams({

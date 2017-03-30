@@ -151,6 +151,61 @@ Test.Aura.Component.ComponentTest=function(){
 
         return Mocks.GetMocks(Object.Global(),mock)(during);
     }
+
+    [Fixture]
+    function Constructor() {
+        [Fact]
+        function NotFiredInitWhenDefHasNoHandler() {
+            var fired = false;
+            mockFramework(function() {
+                $A.componentService.getDef = function(){
+                    return {
+                        attributeDefs:{
+                            getDef:function(){},
+                            getNames:function(){return []},
+                            getValues:function(){return null}
+                        },
+                        descriptor: {
+                            getFullName: function() { return "" }
+                        },
+                        getAllEvents:function(){
+                            return []
+                        },
+                        getAppHandlerDefs:function(){},
+                        getCmpHandlerDefs:function(){},
+                        getControllerDef:function(){},
+                        getDescriptor:function(){
+                            return {
+                                getNamespace:function(){}
+                            }
+                        },
+                        getEventDef:function(){
+                            return {getDescriptor:function(){
+                                return {
+                                    getQualifiedName:function(){}
+                                }
+                            }}
+                        },
+                        getModelDef:function(){},
+                        getSuperDef:function(){},
+                        getValueHandlerDefs:function(){},
+                        isAbstract:function(){},
+                        isInstanceOf:function(){},
+                        hasInit:function(){
+                            return false;
+                        }
+                    };
+                };
+                Aura.Component.Component.prototype.fire = function() {
+                    fired = true;
+                };
+                new Aura.Component.Component({});
+            });
+
+            Assert.False(fired);
+        }
+    }
+
     [Fixture]
     function DeIndex() {
         //this cover when localIndex does not exist

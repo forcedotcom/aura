@@ -233,8 +233,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         params.put("message", jsonMessage);
         params.put("aura.token", configAdapter.getCSRFToken());
 
-        DefDescriptor<ApplicationDef> app = definitionService.getDefDescriptor(
-                "auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
+        DefDescriptor<ApplicationDef> app = definitionService.getDefDescriptor("aura:application",
+                ApplicationDef.class);
         params.put("aura.context", getAuraTestingUtil().buildContextForPost(Mode.DEV, app));
 
         HttpPost post = obtainPostMethod("/aura", params);
@@ -272,8 +272,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         Map<String, String> params = new HashMap<>();
         params.put("message", jsonMessage);
         params.put("aura.token", configAdapter.getCSRFToken());
-        DefDescriptor<ApplicationDef> app = definitionService.getDefDescriptor(
-                "auratest:test_SimpleServerRenderedPage", ApplicationDef.class);
+        DefDescriptor<ApplicationDef> app = definitionService.getDefDescriptor("aura:application",
+                ApplicationDef.class);
         String fwuid = getAuraTestingUtil().modifyUID(configAdapter.getAuraFrameworkNonce());
         params.put("aura.context", getAuraTestingUtil().buildContextForPost(Mode.DEV, app, null, fwuid, null, null));
 
@@ -541,17 +541,17 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
             Header[] headers = response.getHeaders("X-FRAME-OPTIONS");
 
             // And CSP
-			Map<String, List<String>> cspDirectives = getCSPDirectives(response);
-			assertTrue("frame-ancestors is wrong", cspDirectives.get("frame-ancestors").contains(expectCspAncestors));
-			assertTrue("script-src is wrong", cspDirectives.get("script-src").contains("'self'"));
-			assertTrue("style-src is wrong", cspDirectives.get("style-src").contains("'self'"));
-			assertTrue("connect-src is wrong",
-					cspDirectives.get("connect-src").contains("www.itrustu.com/ www.also.com/other"));
-			assertTrue("font-src is wrong", cspDirectives.get("font-src").contains("*"));
-			assertTrue("img-src is wrong", cspDirectives.get("img-src").contains("*"));
-			assertTrue("object-src is wrong", cspDirectives.get("object-src").contains("'none'"));
-			assertTrue("media-src is wrong", cspDirectives.get("media-src").contains("*"));
-			assertTrue("default-src is wrong", cspDirectives.get("default-src").contains("'self'"));
+            Map<String, List<String>> cspDirectives = getCSPDirectives(response);
+            assertTrue("frame-ancestors is wrong", cspDirectives.get("frame-ancestors").contains(expectCspAncestors));
+            assertTrue("script-src is wrong", cspDirectives.get("script-src").contains("'self'"));
+            assertTrue("style-src is wrong", cspDirectives.get("style-src").contains("'self'"));
+            assertTrue("connect-src is wrong",
+                    cspDirectives.get("connect-src").contains("www.itrustu.com/ www.also.com/other"));
+            assertTrue("font-src is wrong", cspDirectives.get("font-src").contains("*"));
+            assertTrue("img-src is wrong", cspDirectives.get("img-src").contains("*"));
+            assertTrue("object-src is wrong", cspDirectives.get("object-src").contains("'none'"));
+            assertTrue("media-src is wrong", cspDirectives.get("media-src").contains("*"));
+            assertTrue("default-src is wrong", cspDirectives.get("default-src").contains("'self'"));
 
             return headers;
         } finally {
@@ -607,43 +607,43 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      * Verify providing invalid DefDescriptor format to the aura.tag param results in the proper handled Exception and
      * not an AuraUnhandledException.
      */
-	@UnAdaptableTest("PROD mode will likely be handled differently by the ExceptionAdapter")
+    @UnAdaptableTest("PROD mode will likely be handled differently by the ExceptionAdapter")
     @Test
     public void testInvalidDefDescriptorFormatExploitInProdMode()
-			throws Exception {
+            throws Exception {
         String url = "/aura?aura.tag=any:thing%3Csvg%3E%3Cscript%3E0%3C1%3Ealert(document.domain)%3C%2Fscript%3E.app";
         HttpGet get = obtainGetMethod(url + "&aura.mode=PROD");
         HttpResponse httpResponse = perform(get);
 
 
-		assertEquals(HttpStatus.SC_OK, getStatusCode(httpResponse));
-		String response = getResponseBody(httpResponse);
-		assertTrue(
-				"Expected 'Invalid Descriptor Format' but got: " + response,
-				response.contains("Invalid Descriptor Format: any:thing&lt;svg&gt;&lt;script&gt;"));
-		assertFalse(
-				"Invalid aura.tag input should not result in an AuraUnhandledException. "
-						+ response,
-				response.contains("AuraUnhandledException: Unable to process your request"));
-		get.releaseConnection();
-	}
+        assertEquals(HttpStatus.SC_OK, getStatusCode(httpResponse));
+        String response = getResponseBody(httpResponse);
+        assertTrue(
+                "Expected 'Invalid Descriptor Format' but got: " + response,
+                response.contains("Invalid Descriptor Format: any:thing&lt;svg&gt;&lt;script&gt;"));
+        assertFalse(
+                "Invalid aura.tag input should not result in an AuraUnhandledException. "
+                        + response,
+                response.contains("AuraUnhandledException: Unable to process your request"));
+        get.releaseConnection();
+    }
 
     @Test
-	public void testInvalidDefDescriptorFormatExploitInDevMode()
-			throws Exception {
-		String url = "/aura?aura.tag=any:thing%3Csvg%3E%3Cscript%3E0%3C1%3Ealert(document.domain)%3C%2Fscript%3E.app";
-		HttpGet get = obtainGetMethod(url + "&aura.mode=DEV");
-		HttpResponse httpResponse = perform(get);
+    public void testInvalidDefDescriptorFormatExploitInDevMode()
+            throws Exception {
+        String url = "/aura?aura.tag=any:thing%3Csvg%3E%3Cscript%3E0%3C1%3Ealert(document.domain)%3C%2Fscript%3E.app";
+        HttpGet get = obtainGetMethod(url + "&aura.mode=DEV");
+        HttpResponse httpResponse = perform(get);
 
-		assertEquals(HttpStatus.SC_OK, getStatusCode(httpResponse));
-		String response = getResponseBody(httpResponse);
-		assertTrue(
-				"Expected 'Invalid Descriptor Format' but got: " + response,
-				response.contains("Invalid Descriptor Format: any:thing&lt;svg&gt;&lt;script&gt;"));
-		assertFalse(
-				"Invalid aura.tag input should not result in an AuraUnhandledException. "
-						+ response,
-				response.contains("AuraUnhandledException: Unable to process your request"));
-		get.releaseConnection();
-	}
+        assertEquals(HttpStatus.SC_OK, getStatusCode(httpResponse));
+        String response = getResponseBody(httpResponse);
+        assertTrue(
+                "Expected 'Invalid Descriptor Format' but got: " + response,
+                response.contains("Invalid Descriptor Format: any:thing&lt;svg&gt;&lt;script&gt;"));
+        assertFalse(
+                "Invalid aura.tag input should not result in an AuraUnhandledException. "
+                        + response,
+                response.contains("AuraUnhandledException: Unable to process your request"));
+        get.releaseConnection();
+    }
 }

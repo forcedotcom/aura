@@ -43,9 +43,9 @@ import org.junit.Test;
  * components in a given namespace. It is also used to load CSS
  */
 public class AuraResourceServletHttpTest extends AuraHttpTestCase {
-	@Inject
-	private MockConfigAdapter configAdapter;
-	
+    @Inject
+    private MockConfigAdapter configAdapter;
+    
     /**
      * Verify style def ordering for components included as facets. Create a chain of components as facet and verify the
      * order of css(Style Defs)
@@ -109,7 +109,8 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     @UnAdaptableTest
     @Test
     public void testSpecialCharactersInCSSAreSerialized() throws Exception {
-        String modeAndContext = getSimpleContext(Format.CSS, false);
+        String modeAndContext = getAuraTestingUtil().getContextURL(Mode.DEV, Format.CSS,
+                "auratest:test_SimpleServerRenderedPage", ApplicationDef.class, false);
         String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.css";
 
         HttpGet get = obtainGetMethod(url);
@@ -136,7 +137,8 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     @UnAdaptableTest
     @Test
     public void testSpecialCharactersInMarkupAreSerialized() throws Exception {
-        String modeAndContext = getSimpleContext(Format.JS, false);
+        String modeAndContext = getAuraTestingUtil().getContextURL(Mode.DEV, Format.JS,
+                "auratest:test_SimpleServerRenderedPage", ApplicationDef.class, false);
         String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.js";
 
         HttpGet get = obtainGetMethod(url);
@@ -318,8 +320,6 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
      * This gets a simple context string that uses a single preload.
      */
     private String getSimpleContext(Format format, boolean modified) throws Exception {
-        return getAuraTestingUtil().getContextURL(Mode.DEV, format,
-                "auratest:test_SimpleServerRenderedPage", ApplicationDef.class,
-                modified);
+        return getAuraTestingUtil().getContextURL(Mode.DEV, format, "aura:application", ApplicationDef.class, modified);
     }
 }

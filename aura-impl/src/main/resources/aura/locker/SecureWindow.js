@@ -319,7 +319,7 @@ SecureWindow.metadata = {
                 "CanvasCaptureMediaStreamTrack":        FUNCTION,
                 "CanvasGradient":                       FUNCTION,
                 "CanvasPattern":                        FUNCTION,
-                "CanvasRenderingContext2D":             FUNCTION,
+                "CanvasRenderingContext2D":             RAW,
                 "ChannelMergerNode":                    FUNCTION,
                 "ChannelSplitterNode":                  FUNCTION,
                 "CharacterData":                        FUNCTION,

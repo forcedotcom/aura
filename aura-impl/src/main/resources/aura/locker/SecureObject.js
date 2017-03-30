@@ -109,6 +109,10 @@ SecureObject.filterEverything = function(st, raw, options) {
             // DCHASMAN TODO Here is where we need to factor in the decision to use raw self to avoid InvalidInvocation on system types!
             var self = SecureObject.filterEverything(st, this);
 
+            if (ls_isFilteringProxy(self) && ls_getKey(self) === ls_getKey(st)) {
+                self = ls_getRef(self, key);
+            }
+
             var fnReturnedValue = raw.apply(self, filteredArgs);
 
             return SecureObject.filterEverything(st, fnReturnedValue, options);

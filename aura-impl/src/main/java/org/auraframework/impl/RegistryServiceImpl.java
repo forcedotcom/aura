@@ -264,15 +264,20 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         String canonical = null;
         List<SourceLoader> markupLoaders = Lists.newArrayList();
         List<DefRegistry> markupRegistries = Lists.newArrayList();
+
         Set<String> prefixes = modules? moduleMarkupPrefixes : markupPrefixes;
+        Set<DefType> defTypes = modules? moduleDefTypes : BundleSource.bundleDefTypes;
+
         DefRegistry defRegistry = null;
         if (pkg != null) {
             ResourceSourceLoader rsl = new ResourceSourceLoader(pkg);
             markupLoaders.add(rsl);
-            markupRegistries.add(new CompilingDefRegistry(rsl, markupPrefixes, markupDefTypes, compilerService));
+            if (!modules) {
+                markupRegistries.add(new CompilingDefRegistry(rsl, markupPrefixes, markupDefTypes, compilerService));
+            }
             markupRegistries.add(new CompilingDefRegistry(
                             new ResourceBundleSourceLoader(pkg, fileMonitor, builders),
-                            markupPrefixes, BundleSource.bundleDefTypes, compilerService));
+                            prefixes, defTypes, compilerService));
         } else if (location.getComponentSourceDir() != null) {
             File components = location.getComponentSourceDir();
             if (!components.canRead() || !components.canExecute() || !components.isDirectory()) {
@@ -280,8 +285,8 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             } else {
                 FileSourceLoader fsl = new FileSourceLoader(components, fileMonitor);
                 markupLoaders.add(fsl);
-                if (!modules) { // modules requires BundleSource to allow multiple js/css files so skip FileSourceLoader
-
+                if (!modules) {
+                    // modules requires BundleSource to allow multiple js/css files so skip FileSourceLoader
                     // markupDefTypes is the difference between all and BundleSource DefTypes
                     // Thus, creating two CompilingDefRegistry, FileSourceLoader and FileBundleSourceLoader
                     // works without DefType registry conflicts
@@ -289,8 +294,8 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
                     markupRegistries.add(defRegistry);
                 }
                 defRegistry = new CompilingDefRegistry(
-                            new FileBundleSourceLoader(components, fileMonitor, builders),
-                        prefixes, modules ? moduleDefTypes : BundleSource.bundleDefTypes, compilerService);
+                        new FileBundleSourceLoader(components, fileMonitor, builders),
+                        prefixes, defTypes, compilerService);
                 markupRegistries.add(defRegistry);
                 File generatedJavaBase = location.getJavaGeneratedSourceDir();
                 if (generatedJavaBase != null && generatedJavaBase.exists()) {

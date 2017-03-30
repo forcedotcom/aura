@@ -16,7 +16,12 @@
 ({
 
 	render: function(component, helper) {
-	    helper.buildBody(component);
+    	// ensures that buildBody is only called on the first render()
+		if (!component._hasBuiltBody) {
+			helper.buildBody(component);
+			component._hasBuiltBody = true;
+		}
+		
         var domId = component.get('v.domId');
 		if (!domId) {
             var globalId = component.getGlobalId();

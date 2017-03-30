@@ -151,7 +151,9 @@
     "ls_registerProxy": true,
     "ls_isFilteringProxy": true,
     "ls_registerFilteringProxy": true,
-    "lazyInitInlinedSafeEvalWorkaround": true
+    "lazyInitInlinedSafeEvalWorkaround": true,
+    "SVGGraphicsElement": true,
+    "SVGGeometryElement": true
   },
 
   "rules": {

@@ -804,10 +804,109 @@ function getSupportedInterfaces(o) {
         } else if (o instanceof SVGElement) {
             if (o instanceof SVGSVGElement) {
                 interfaces.push("SVGSVGElement");
+            } else if (o instanceof SVGAngle) {
+                interfaces.push("SVGAngle");
+            } else if (o instanceof SVGCircleElement) {
+                interfaces.push("SVGCircleElement");
+            } else if (o instanceof SVGClipPathElement) {
+                interfaces.push("SVGClipPathElement");
+            } else if (o instanceof SVGDefsElement) {
+                interfaces.push("SVGGraphicsElement");
+            } else if (o instanceof SVGEllipseElement) {
+                interfaces.push("SVGEllipseElement");
+            } else if (o instanceof SVGFilterElement) {
+                interfaces.push("SVGFilterElement");
+            } else if (o instanceof SVGForeignObjectElement) {
+                interfaces.push("SVGForeignObjectElement");
+            } else if (o instanceof SVGImageElement) {
+                interfaces.push("SVGImageElement");
+            } else if (o instanceof SVGLength) {
+                interfaces.push("SVGLength");
+            } else if (o instanceof SVGLengthList) {
+                interfaces.push("SVGLengthList");
+            } else if (o instanceof SVGLineElement) {
+                interfaces.push("SVGLineElement");
+            } else if (o instanceof SVGLinearGradientElement) {
+                interfaces.push("SVGLinearGradientElement");
+            } else if (o instanceof SVGMaskElement) {
+                interfaces.push("SVGMaskElement");
+            } else if (o instanceof SVGNumber) {
+                interfaces.push("SVGNumber");
+            } else if (o instanceof SVGNumberList) {
+                interfaces.push("SVGNumberList");
+            } else if (o instanceof SVGPatternElement) {
+                interfaces.push("SVGPatternElement");
+            } else if (o instanceof SVGPreserveAspectRatio) {
+                interfaces.push("SVGPreserveAspectRatio");
+            } else if (o instanceof SVGRadialGradientElement) {
+                interfaces.push("SVGRadialGradientElement");
+            } else if (o instanceof SVGRect) {
+                interfaces.push("SVGRect");
+            } else if (o instanceof SVGRectElement) {
+                interfaces.push("SVGRectElement");
+            } else if (o instanceof SVGScriptElement) {
+                interfaces.push("SVGScriptElement");
+            } else if (o instanceof SVGStopElement) {
+                interfaces.push("SVGStopElement");
+            } else if (o instanceof SVGStringList) {
+                interfaces.push("SVGStringList");
+            } else if (o instanceof SVGStyleElement) {
+                interfaces.push("SVGStyleElement");
+            } else if (o instanceof SVGTransform) {
+                interfaces.push("SVGTransform");
+            } else if (o instanceof SVGTransformList) {
+                interfaces.push("SVGTransformList");
+            } else if (o instanceof SVGUseElement) {
+                interfaces.push("SVGUseElement");
+            } else if (o instanceof SVGViewElement) {
+                interfaces.push("SVGViewElement");
+            } else if (o instanceof SVGAnimatedAngle) {
+                interfaces.push("SVGAnimatedAngle");
+            } else if (o instanceof SVGAnimatedBoolean) {
+                interfaces.push("SVGAnimatedBoolean");
+            } else if (o instanceof SVGAnimatedEnumeration) {
+                interfaces.push("SVGAnimatedEnumeration");
+            } else if (o instanceof SVGAnimatedInteger) {
+                interfaces.push("SVGAnimatedInteger");
+            } else if (o instanceof SVGAnimatedLength) {
+                interfaces.push("SVGAnimatedLength");
+            } else if (o instanceof SVGAnimatedLengthList) {
+                interfaces.push("SVGAnimatedLengthList");
+            } else if (o instanceof SVGAnimatedNumber) {
+                interfaces.push("SVGAnimatedNumber");
+            } else if (o instanceof SVGAnimatedNumberList) {
+                interfaces.push("SVGAnimatedNumberList");
+            } else if (o instanceof SVGAnimatedPreserveAspectRatio) {
+                interfaces.push("SVGAnimatedPreserveAspectRatio");
+            } else if (o instanceof SVGAnimatedRect) {
+                interfaces.push("SVGAnimatedRect");
+            } else if (o instanceof SVGAnimatedString) {
+                interfaces.push("SVGAnimatedString");
+            } else if (o instanceof SVGAnimatedTransformList) {
+                interfaces.push("SVGAnimatedTransformList");
             }
-            interfaces.push("SVGElement");
 
-            // DCHASMAN TODO Add all of the remaining SVG name space elements
+            // below may be implemented by multiple types
+            if (o instanceof SVGTextContentElement) {
+                interfaces.push("SVGTextContentElement");
+            }
+            if (typeof SVGAnimationElement !== "undefined" && o instanceof SVGAnimationElement) {
+                interfaces.push("SVGAnimationElement");
+            }
+            if (o instanceof SVGGradientElement) {
+                interfaces.push("SVGGradientElement");
+            }
+            if (typeof SVGGraphicsElement !== "undefined" && o instanceof SVGGraphicsElement) {
+                interfaces.push("SVGGraphicsElement");
+            }
+            if (typeof SVGGeometryElement !== "undefined" && o instanceof SVGGeometryElement) {
+                interfaces.push("SVGGeometryElement");
+            }
+            if (o instanceof SVGTextPositioningElement) {
+                interfaces.push("SVGTextPositioningElement");
+            }
+
+            interfaces.push("SVGElement");
         }
 
         interfaces.push("Element", "Node", "EventTarget");

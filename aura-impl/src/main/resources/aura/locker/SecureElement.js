@@ -1387,6 +1387,255 @@ SecureElement.metadata = {
                 "translate":                      DEFAULT,
                 "webkitdropzone":                 DEFAULT
             },
+            "SVGAngle": {
+                "unitType":                       DEFAULT,
+                "value":                          DEFAULT,
+                "valueInSpecifiedUnits":          DEFAULT,
+                "valueAsString":                  DEFAULT,
+                "newValueSpecifiedUnits":         FUNCTION,
+                "convertToSpecifiedUnits":        FUNCTION
+            },
+            "SVGAnimatedAngle": {
+                "baseVal":                        DEFAULT,
+                "animVal":                        DEFAULT
+            },
+            "SVGAnimatedBoolean": {
+                "baseVal":                        DEFAULT,
+                "animVal":                        DEFAULT
+            },
+            "SVGAnimatedEnumeration": {
+                "baseVal":                        DEFAULT,
+                "animVal":                        DEFAULT
+            },
+            "SVGAnimatedInteger": {
+                "baseVal":                        DEFAULT,
+                "animVal":                        DEFAULT
+            },
+            "SVGAnimatedLength": {
+                "baseVal":                        DEFAULT,
+                "animVal":                        DEFAULT
+            },
+            "SVGAnimatedLengthList": {
+                "baseVal":                        DEFAULT,
+                "animVal":                        DEFAULT
+            },
+            "SVGAnimatedNumber": {
+                "baseVal":                        DEFAULT,
+                "animVal":                        DEFAULT
+            },
+            "SVGAnimatedNumberList": {
+                "baseVal":                        DEFAULT,
+                "animVal":                        DEFAULT
+            },
+            "SVGAnimatedPreserveAspectRatio": {
+                "baseVal":                        DEFAULT,
+                "animVal":                        DEFAULT
+            },
+            "SVGAnimatedRect": {
+                "baseVal":                        DEFAULT,
+                "animVal":                        DEFAULT
+            },
+            "SVGAnimatedString": {
+                "baseVal":                        DEFAULT,
+                "animVal":                        DEFAULT
+            },
+            "SVGAnimatedTransformList": {
+                "baseVal":                        DEFAULT,
+                "animVal":                        DEFAULT
+            },
+            "SVGAnimationElement": {
+                "targetElement":                  SKIP_OPAQUE,
+                "getCurrentTime":                 FUNCTION,
+                "getSimpleDuration":              FUNCTION
+            },
+            "SVGCircleElement": {
+                "cx":                             DEFAULT,
+                "cy":                             DEFAULT,
+                "r":                              DEFAULT
+            },
+            "SVGClipPathElement": {
+                "clipPathUnits":                  DEFAULT
+            },
+            "SVGEllipseElement": {
+                "cx":                             DEFAULT,
+                "cy":                             DEFAULT,
+                "rx":                             DEFAULT,
+                "ry":                             DEFAULT
+            },
+            "SVGFilterElement": {
+                "filterUnits":                    DEFAULT,
+                "primitiveUnits":                 DEFAULT,
+                "x":                              DEFAULT,
+                "y":                              DEFAULT,
+                "width":                          DEFAULT,
+                "height":                         DEFAULT,
+                "filterResX":                     DEFAULT,
+                "fitlerResY":                     DEFAULT
+            },
+            "SVGForeignObjectElement": {
+                "x":                              DEFAULT,
+                "y":                              DEFAULT,
+                "width":                          DEFAULT,
+                "height":                         DEFAULT
+            },
+            "SVGGeometryElement": {
+                "pathLength":                     DEFAULT,
+                "isPointInFill":                  FUNCTION,
+                "isPointInStroke":                FUNCTION,
+                "getTotalLength":                 FUNCTION,
+                "getPointAtLength":               FUNCTION
+            },
+            "SVGGradientElement": {
+                "gradientUnits":                  DEFAULT,
+                "gradientTransform":              DEFAULT,
+                "spreadMethod":                   DEFAULT
+            },
+            "SVGGraphicsElement": {
+                "transform":                      DEFAULT,
+                "getBBox":                        FUNCTION,
+                "getCTM":                         FUNCTION,
+                "getScreenCTM":                   FUNCTION
+            },
+            "SVGImageElement": {
+                "x":                              DEFAULT,
+                "y":                              DEFAULT,
+                "width":                          DEFAULT,
+                "height":                         DEFAULT,
+                "preserveAspectRatio":            DEFAULT,
+                "crossOrigin":                    DEFAULT
+            },
+            "SVGLength": {
+                "SVG_LENGTHTYPE_UNKNOWN":         DEFAULT,
+                "SVG_LENGTHTYPE_NUMBER":          DEFAULT,
+                "SVG_LENGTHTYPE_PERCENTAGE":      DEFAULT,
+                "SVG_LENGTHTYPE_EMS":             DEFAULT,
+                "SVG_LENGTHTYPE_EXS":             DEFAULT,
+                "SVG_LENGTHTYPE_PX":              DEFAULT,
+                "SVG_LENGTHTYPE_CM":              DEFAULT,
+                "SVG_LENGTHTYPE_MM":              DEFAULT,
+                "SVG_LENGTHTYPE_IN":              DEFAULT,
+                "SVG_LENGTHTYPE_PT":              DEFAULT,
+                "SVG_LENGTHTYPE_PC":              DEFAULT,
+                "unitType":                       DEFAULT,
+                "value":                          DEFAULT,
+                "valueInSpecifiedUnits":          DEFAULT,
+                "valueAsString":                  DEFAULT,
+                "newValueSpecifiedUnits":         FUNCTION,
+                "convertToSpecifiedUnits":        FUNCTION
+            },
+            "SVGLengthList": {
+                "numberOfItem":                   DEFAULT,
+                "clear":                          FUNCTION,
+                "initialize":                     FUNCTION,
+                "getItem":                        SKIP_OPAQUE,
+                "insertItemBefore":               FUNCTION,
+                "replaceItem":                    FUNCTION,
+                "removeItem":                     SKIP_OPAQUE,
+                "appendItem":                     FUNCTION
+            },
+            "SVGLineElement": {
+                "x1":                             DEFAULT,
+                "x2":                             DEFAULT,
+                "y1":                             DEFAULT,
+                "y2":                             DEFAULT
+            },
+            "SVGLinearGradientElement": {
+                "x1":                             DEFAULT,
+                "x2":                             DEFAULT,
+                "y1":                             DEFAULT,
+                "y2":                             DEFAULT
+            },
+            "SVGMaskElement": {
+                "maskUnits":                      DEFAULT,
+                "maskContentUnits":               DEFAULT,
+                "x":                              DEFAULT,
+                "y":                              DEFAULT,
+                "width":                          DEFAULT,
+                "height":                         DEFAULT
+            },
+            "SVGNumber": {
+                "value":                          DEFAULT
+            },
+            "SVGNumberList": {
+                "numberOfItem":                   DEFAULT,
+                "clear":                          FUNCTION,
+                "initialize":                     FUNCTION,
+                "getItem":                        SKIP_OPAQUE,
+                "insertItemBefore":               FUNCTION,
+                "replaceItem":                    FUNCTION,
+                "removeItem":                     SKIP_OPAQUE,
+                "appendItem":                     FUNCTION
+            },
+            "SVGPatternElement": {
+                "x":                              DEFAULT,
+                "y":                              DEFAULT,
+                "width":                          DEFAULT,
+                "height":                         DEFAULT,
+                "patternUnits":                   DEFAULT,
+                "patternContentUnits":            DEFAULT,
+                "patternTransform":               DEFAULT
+            },
+            "SVGPreserveAspectRatio": {
+                "align":                          DEFAULT,
+                "meetOrSlice":                    DEFAULT,
+                "SVG_PRESERVEASPECTRATIO_UNKNOWN":DEFAULT,
+                "SVG_PRESERVEASPECTRATIO_NONE":   DEFAULT,
+                "SVG_PRESERVEASPECTRATIO_XMINYMIN":DEFAULT,
+                "SVG_PRESERVEASPECTRATIO_XMIDYMIN":DEFAULT,
+                "SVG_PRESERVEASPECTRATIO_XMAXYMIN":DEFAULT,
+                "SVG_PRESERVEASPECTRATIO_XMINYMID":DEFAULT,
+                "SVG_PRESERVEASPECTRATIO_XMIDYMID":DEFAULT,
+                "SVG_PRESERVEASPECTRATIO_XMAXYMID":DEFAULT,
+                "SVG_PRESERVEASPECTRATIO_XMINYMAX":DEFAULT,
+                "SVG_PRESERVEASPECTRATIO_XMIDYMAX":DEFAULT,
+                "SVG_PRESERVEASPECTRATIO_XMAXYMAX":DEFAULT,
+                "SVG_MEETORSLICE_UNKNOWN":        DEFAULT,
+                "SVG_MEETORSLICE_MEET":           DEFAULT,
+                "SVG_MEETORSLICE_SLICE":          DEFAULT
+            },
+            "SVGRadialGradientElement": {
+                "cx":                             DEFAULT,
+                "cy":                             DEFAULT,
+                "r":                              DEFAULT,
+                "fx":                             DEFAULT,
+                "fy":                             DEFAULT
+            },
+            "SVGRect": {
+                "x":                              DEFAULT,
+                "y":                              DEFAULT,
+                "width":                          DEFAULT,
+                "height":                         DEFAULT
+            },
+            "SVGRectElement": {
+                "x":                              DEFAULT,
+                "y":                              DEFAULT,
+                "width":                          DEFAULT,
+                "height":                         DEFAULT,
+                "rx":                             DEFAULT,
+                "ry":                             DEFAULT
+            },
+            "SVGScriptElement": {
+                "type":                           DEFAULT,
+                "crossOrigin":                    DEFAULT
+            },
+            "SVGStopElement": {
+                "offset":                         DEFAULT
+            },
+            "SVGStringList": {
+                "numberOfItem":                   DEFAULT,
+                "clear":                          FUNCTION,
+                "initialize":                     FUNCTION,
+                "getItem":                        SKIP_OPAQUE,
+                "insertItemBefore":               FUNCTION,
+                "replaceItem":                    FUNCTION,
+                "removeItem":                     SKIP_OPAQUE,
+                "appendItem":                     FUNCTION
+            },
+            "SVGStyleElement": {
+                "type":                           DEFAULT,
+                "media":                          DEFAULT,
+                "title":                          DEFAULT
+            },
             "SVGSVGElement": {
                 "animationsPaused":				  FUNCTION,
                 "checkIntersection":			  FUNCTION,
@@ -1425,6 +1674,69 @@ SecureElement.metadata = {
                 "width":						  DEFAULT,
                 "x":							  DEFAULT,
                 "y":							  DEFAULT
+            },
+            "SVGTextContentElement": {
+                "LENGTHADJUST_UNKNOWN":           DEFAULT,
+                "LENGTHADJUST_SPACING":           DEFAULT,
+                "LENGTHADJUST_SPACINGANDGLYPHS":  DEFAULT,
+                "textLength":                     DEFAULT,
+                "lengthAdjust":                   DEFAULT,
+                "getNumberOfChars":               FUNCTION,
+                "getComputedTextLength":          FUNCTION,
+                "getSubStringLength":             FUNCTION,
+                "getStartPositionOfChar":         FUNCTION,
+                "getEndPositionOfChar":           FUNCTION,
+                "getExtentOfChar":                FUNCTION,
+                "getRotationOfChar":              FUNCTION,
+                "getCharNumAtPosition":           FUNCTION
+            },
+            "SVGTextPositioningElement": {
+                "x":                              DEFAULT,
+                "y":                              DEFAULT,
+                "dx":                             DEFAULT,
+                "dy":                             DEFAULT,
+                "rotate":                         DEFAULT
+            },
+            "SVGTransform": {
+                "SVG_TRANSFORM_UNKNOWN":          DEFAULT,
+                "SVG_TRANSFORM_MATRIX":           DEFAULT,
+                "SVG_TRANSFORM_TRANSLATE":        DEFAULT,
+                "SVG_TRANSFORM_SCALE":            DEFAULT,
+                "SVG_TRANSFORM_ROTATE":           DEFAULT,
+                "SVG_TRANSFORM_SKEWX":            DEFAULT,
+                "SVG_TRANSFORM_SKEWY":            DEFAULT,
+                "type":                           DEFAULT,
+                "angle":                          DEFAULT,
+                "matrix":                         DEFAULT,
+                "setMatrix":                      FUNCTION,
+                "setTranslate":                   FUNCTION,
+                "setScale":                       FUNCTION,
+                "setRotate":                      FUNCTION,
+                "setSkewX":                       FUNCTION,
+                "setSkewY":                       FUNCTION
+            },
+            "SVGTransformList": {
+                "numberOfItem":                   DEFAULT,
+                "clear":                          FUNCTION,
+                "initialize":                     FUNCTION,
+                "getItem":                        SKIP_OPAQUE,
+                "insertItemBefore":               FUNCTION,
+                "replaceItem":                    FUNCTION,
+                "removeItem":                     SKIP_OPAQUE,
+                "appendItem":                     FUNCTION,
+                "createSVGTransformFromMatrix":   FUNCTION,
+                "consolidate":                    FUNCTION
+            },
+            "SVGUseElement": {
+                "x":                              DEFAULT,
+                "y":                              DEFAULT,
+                "width":                          DEFAULT,
+                "height":                         DEFAULT,
+                "instanceRoot":                   DEFAULT,
+                "animatedInstanceRoot":           DEFAULT
+            },
+            "SVGViewElement": {
+                "viewTarget":                     DEFAULT
             },
             "SVGElement": {
                 "blur":							  FUNCTION,

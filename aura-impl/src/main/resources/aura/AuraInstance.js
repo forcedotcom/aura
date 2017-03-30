@@ -1322,7 +1322,9 @@ AuraInstance.prototype.deprecated = function(message,workaround,sinceDate,dueDat
         return;
     }
     if(Date.now()>=dueDate){
-        throw new Error(message);
+        $A.warning(message);
+        // JBUCH: TODO: REACTIVATE ONCE CRUC IS IN PLACE
+        //throw new Error(message);
     }else{
         $A.warning(message);
     }
@@ -1330,7 +1332,9 @@ AuraInstance.prototype.deprecated = function(message,workaround,sinceDate,dueDat
     //#if {modes:["TESTING", "TESTINGDEBUG", "AUTOTESTING", "AUTOTESTINGDEBUG"]}
     // BREAK EARLY IN TESTS
     if(Date.now()>=testDueDate){
-        throw new Error(message);
+        $A.warning(message);
+        // JBUCH: TODO: REACTIVATE ONCE CRUC IS IN PLACE
+        //throw new Error(message);
     }
     //#end
 };

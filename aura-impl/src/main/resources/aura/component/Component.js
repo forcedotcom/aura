@@ -2554,7 +2554,6 @@ Component.prototype.setupApplicationEventHandlers = function() {
     // Handle application-level events
     var handlerDefs = this.componentDef.getAppHandlerDefs();
     if (handlerDefs) {
-//#debugger
         for (var i = 0; i < handlerDefs.length; i++) {
             var handlerDef = handlerDefs[i];
             // var config={

@@ -62,6 +62,22 @@
     },
     
     /**
+     * Test classNames get added to classList.
+     */
+    testClassNamesOnPanel: {
+        attributes : {"testPanelType" : "panel", "testClassNames" : "extra1,extra2,extra3", "testUseReferenceElement" : true},
+        test: [function(cmp) {
+            var input = $A.test.select(".appInput2")[0];
+            $A.test.clickOrTouch(input);
+        }, function(cmp) {
+            this.waitForPanelDialogOpen();
+        }, function(cmp) {
+            var panelWithClassNames = $A.test.select(".extra2");
+            $A.test.assertNotNull(panelWithClassNames, "ClassNames should have been added to panel");
+        }]
+    },
+    
+    /**
      * Active class set correctly on panel/modal
      * Bug: W-2647558
      */

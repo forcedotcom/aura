@@ -47,6 +47,7 @@
 						.get("v.showPointer"));
 				config["referenceElementSelector"] = cmp
 						.get("v.referenceElementSelector");
+				config["classNames"] = cmp.get("v.classNames");
 	
 				var useReferenceElementSelector = $A.util.getBooleanValue(cmp.get("v.useReferenceElementSelector"));
 				var referenceElementSelector = cmp.get("v.referenceElementSelector");

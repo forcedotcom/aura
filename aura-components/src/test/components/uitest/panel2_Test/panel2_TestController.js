@@ -23,6 +23,7 @@
 		if (type == "panel") {
 			config["direction"] = cmp.get("v.direction");
 			config["referenceElementSelector"] = ".appInput";
+			config["classNames"] = cmp.get("v.classNames");
 		}
 
 		// set panel's body

@@ -391,7 +391,8 @@
         classList.add('positioned');
         classList.add(config.direction);
 
-        var extras = cmp.get("v.classNames").split(',');
+        var classNames = cmp.get('v.classNames');
+        var extras = classNames ? classNames.split(',') : [];
 
         for(var i = 0; i < extras.length; i++) {
             if(!$A.util.isEmpty(extras[i])) {

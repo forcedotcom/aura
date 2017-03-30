@@ -20,7 +20,8 @@
 	<aura:attribute name="title"        type="String"  default="New Panel"/>
 	<aura:attribute name="titleDisplay" type="Boolean" default="true"/>
 	<aura:attribute name="class"        type="String"/>
-	<aura:attribute name="flavor"       type="String"/>
+	<aura:attribute name="classNames"   type="String"/>
+    <aura:attribute name="flavor"       type="String"/>
 	<aura:attribute name="isVisible"    type="Boolean" default="true"/>
 	<aura:attribute name="startOfDialogLabel" type="String"  default="Start of Dialog"/>
 	<aura:attribute name="closeOnClickOut"    type="Boolean" default="false"/>
@@ -66,8 +67,9 @@
 			<ui:inputText     aura:id="inputPanelType"          label="Panel Type"       value="{!v.panelType}"      class="inputPanelTypeClass"/>
 			<ui:inputText     aura:id="inputTitle"              label="Title"            value="{!v.title}"          class="inputTitle`Class"/>
 			<ui:inputCheckbox aura:id="inputTitleDisplay"       label="Disaplay Title"   value="{!v.titleDisplay}"   class="inputTitleDisplayClass"/>
-			<ui:inputText     aura:id="inputClass"              label="class"            value="{!v.class}"          class="inputClassClass"/>
-			<ui:inputText     aura:id="inputFlavor"             label="Flavor"           value="{!v.flavor}"         class="inputFlavorClass"/>
+			<ui:inputText     aura:id="inputClass"              label="Class"            value="{!v.class}"          class="inputClassClass"/>
+			<ui:inputText     aura:id="inputClassNames"         label="Class Names"      value="{!v.classNames}"     class="inputClassClass"/>
+            <ui:inputText     aura:id="inputFlavor"             label="Flavor"           value="{!v.flavor}"         class="inputFlavorClass"/>
 			<ui:inputCheckbox aura:id="inputIsVisible"          label="Is Visible"       value="{!v.isVisible}"      class="inputIsVisibleClass"/>
 			<ui:inputText     aura:id="inputStartOfDialogLabel" label="Start of Dialog Label" value="{!v.startOfDialogLabel}" class="inputStartOfDialogLabelClass"/>
 			<ui:inputCheckbox aura:id="inputCloseOnClickOut"    label="Close on Click Out"    value="{!v.closeOnClickOut}"    class="inputcloseOnClickOutClass"/>

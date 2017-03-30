@@ -20,6 +20,7 @@
 	<aura:attribute name="testTitle"        type="String"  default="New Panel"/>
 	<aura:attribute name="testDisplayTitle" type="Boolean" default="true"/>
 	<aura:attribute name="testClass"        type="String" default="PanelModalClass"/>
+    <aura:attribute name="testClassNames"   type="String"/>
 	<aura:attribute name="testFlavor"       type="String"/>
 	<aura:attribute name="testIsVisible"    type="Boolean" default="true"/>
 	<aura:attribute name="testStartOfDialogLabel" type="String"  default="Start of Dialog"/>
@@ -68,7 +69,8 @@
 		title="{!v.testTitle}"       
 		titleDisplay="{!v.testDisplayTitle}"
 		class="{!v.testClass}"     
-		flavor="{!v.testFlavor}"    
+		classNames="{!v.testClassNames}"     
+        flavor="{!v.testFlavor}"    
 		isVisible="{!v.testIsVisible}" 
 		startOfDialogLabel="{!v.testStartOfDialogLabel}"
 		closeOnCLickOut="{!v.testCloseOnClickOut}" 

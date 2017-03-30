@@ -255,10 +255,11 @@
         // move style tags to the head to allow style tags to override that are appended
         var linkTags = document.body.getElementsByTagName("link");
         var inlineStyleElement = document.getElementById("auraInlineStyle");
-        if (linkTags.length &amp;&amp; inlineStyleElement) {
-            for (var i=0; i &lt; linkTags.length; i++) {
-                if (linkTags[i].rel &amp;&amp; linkTags[i].rel === "stylesheet") {
-                    document.head.insertBefore(linkTags[i], inlineStyleElement);
+        var length = linkTags.length;
+        if (length &amp;&amp; inlineStyleElement) {
+            for (var i=0; i &lt; length; i++) {
+                if (linkTags[0].rel === "stylesheet") {
+                    document.head.insertBefore(linkTags[0], inlineStyleElement);
                 }
             }
         }

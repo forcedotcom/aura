@@ -970,7 +970,7 @@ AuraInstance.prototype.getCallback = function(callback) {
             $A.getContext().releaseCurrentAccess();
         }
     }
-    if(callback.target&&callback.toString()===callbackWrapper.toString()){ // don't double-wrap
+    if(callback.reference&&callback.toString()===callbackWrapper.toString()){ // don't double-wrap
         return callback;
     }
     callbackWrapper.reference=callback;

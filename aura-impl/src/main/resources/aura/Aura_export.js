@@ -37,6 +37,7 @@ AuraInstance.prototype["log"] = AuraInstance.prototype.log;
 AuraInstance.prototype["trace"] = AuraInstance.prototype.trace;
 AuraInstance.prototype["reportError"] = AuraInstance.prototype.reportError;
 
+// JBUCH: TODO: DEPRECATED - REMOVE ALL
 // Perf
 AuraInstance.prototype["Perf"] = AuraInstance.prototype.Perf;
 AuraInstance.prototype["mark"] = AuraInstance.prototype.Perf.mark;

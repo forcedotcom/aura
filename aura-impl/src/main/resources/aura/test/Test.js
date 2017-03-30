@@ -1610,18 +1610,23 @@ TestInstance.prototype.getElementAttributeValue = function(element, attributeNam
 TestInstance.prototype.addEventHandler = function(eventName, handler, component, insert) {
     if ($A.util.isUndefinedOrNull(component)) {
         // application event handler
-        $A.addEventHandler(eventName,handler);
+        $A.getRoot().addEventHandler(eventName,handler);
     } else {
         // component event handler
-        // mock a ValueProvider that returns a synthetic action
-        component.addHandler(eventName, {
-            get : function() {
-                return {
-                    run : handler,
-                    runDeprecated : handler
-                };
-            }
-        }, 'TESTHANDLER', insert); // expression is irrelevant, because our synthesized provider above doesn't care
+        if(insert){
+            // DELETE THIS BRANCH ASAP
+            // UNCOMMENT TO FAIL BAD USES
+            // throw new Error("Test.addEventHandler called with 'insert'. Please update test.");
+            component.addHandler(eventName, {
+                get: function () {
+                    return {
+                        run: handler, runDeprecated: handler
+                    };
+                }
+            }, "TESTHANDLER",insert);
+        }else{
+            component.addEventHandler(eventName, handler);
+        }
     }
 };
 

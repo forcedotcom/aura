@@ -188,7 +188,7 @@
 
     testDestroyCleansUpDynamicallyAddedHandlers: {
         test: function(cmp) {
-            var uniqueEventName = "markup://componentTest:destroy"
+            var uniqueEventName = "markup://componentTest:destroyTest"
 
             // Add a dynamic handler
             $A.eventService.addHandler({

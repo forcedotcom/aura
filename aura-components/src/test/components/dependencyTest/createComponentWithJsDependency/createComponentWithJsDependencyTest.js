@@ -23,7 +23,7 @@
             var initialRequestCount = $A.test.getSentRequestCount();
             var status;
 
-            $A.test.addEventHandler('dependencyTest:notify',
+            $A.test.addEventHandler('markup://dependencyTest:notify',
                 function(event) {
                     status = event.getParam("status");
                 }
@@ -55,7 +55,7 @@
             var initialRequestCount = $A.test.getSentRequestCount();
             var status;
 
-            $A.test.addEventHandler('dependencyTest:notify',
+            $A.test.addEventHandler('markup://dependencyTest:notify',
                 function(event) {
                     status = event.getParam("status");
                 }
@@ -87,7 +87,7 @@
             var initialRequestCount = $A.test.getSentRequestCount();
             var status;
 
-            $A.test.addEventHandler('dependencyTest:notify',
+            $A.test.addEventHandler('markup://dependencyTest:notify',
                 function(event) {
                     status = event.getParam("status");
                 }
@@ -119,7 +119,7 @@
             var initialRequestCount = $A.test.getSentRequestCount();
             var status;
 
-            $A.test.addEventHandler('dependencyTest:notify',
+            $A.test.addEventHandler('markup://dependencyTest:notify',
                 function(event) {
                     status = event.getParam("status");
                 }

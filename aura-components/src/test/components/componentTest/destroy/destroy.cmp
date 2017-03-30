@@ -16,6 +16,8 @@
 
 -->
 <aura:component render="client">
+    <aura:dependency resource="markup://componentTest:destroyTest" type="EVENT" />
+
     <aura:attribute name="cmpDestroyed" type="Boolean" default="false" />
     <aura:attribute name="childCmpDestroyed" type="Boolean" default="false" />
 

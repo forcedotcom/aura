@@ -22,8 +22,13 @@
     handleB : function(cmp, evt){
         cmp.find("events").getElement().innerHTML += "B";
     },
-
     handleC : function(cmp, evt){
         cmp.find("events").getElement().innerHTML += "C";
+    },
+    handleC1 : function(cmp, evt){
+        cmp.find("events").getElement().innerHTML += "C1";
+    },
+    handleC2 : function(cmp, evt){
+        cmp.find("events").getElement().innerHTML += "C2";
     }
 })

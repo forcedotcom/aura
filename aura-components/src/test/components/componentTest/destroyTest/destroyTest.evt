@@ -15,12 +15,4 @@
     limitations under the License.
 
 -->
-<aura:component controller="js://handleEventTest.eventScope">
-    <aura:registerevent name="A" type="handleEventTest:event"/>
-    <aura:handler name="A" action="{!c.handleA}"/>
-    <aura:handler name="A" action="{!c.handleB}"/>
-    <aura:handler event="handleEventTest:applicationEvent" action="{!c.handleC1}"/>
-    <aura:handler event="handleEventTest:applicationEvent" action="{!c.handleC2}"/>
-    Events handled:<div aura:id="events"/>
-    {!v.body}
-</aura:component>
+<aura:event type="COMPONENT" />

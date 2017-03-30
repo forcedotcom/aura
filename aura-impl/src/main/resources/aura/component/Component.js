@@ -157,7 +157,7 @@ function Component(config, localCreation) {
     this.setupSuper(configAttributes, localCreation);
 
     // for application type events
-    this.setupApplicationEventHandlers(this);
+    this.setupApplicationEventHandlers();
 
     // index this component with its value provider (if it has a localid)
     this.doIndex(this);
@@ -489,13 +489,16 @@ Component.prototype.addEventHandler=function(event,handler,phase,includeFacets){
         handler.reference=reference;
     }
     if(!$A.util.isFunction(handler)){
-        throw new Error("Component.Handler: 'handler' must be a valid Function or a reference to a controller action, e.g., 'cmp.getReference(\"c.myAction\");'");
+        throw new Error("Component.addEventHandler: 'handler' must be a valid Function or a reference to a controller action, e.g., 'cmp.getReference(\"c.myAction\");'");
     }
-     event=DefDescriptor.normalize(event);
-    // JBUCH: TODO: VALIDATE THIS EVENT EXISTS BEFORE ADDING IT
-    // if(!this.getDef(event)){
-    //     throw new Error("AuraEventService.addEventHandler: 'event' must be a valid event descriptor. Unknown event '"+event+"'.");
+    var def=this.componentDef.getEventDef(event)||$A.eventService.getEventDef(event);
+    // if(!def){
+    //     throw new Error("Component.addEventHandler: 'event' must be a valid event descriptor. Unknown event '"+event+"'.");
     // }
+    if(def&&def.type==="APPLICATION"){
+        $A.eventService.addEventHandler(this,def,handler,phase,includeFacets);
+        return;
+    }
     phase=AuraEventService.validatePhase(phase,AuraEventService.Phase.BUBBLE);
 
     // Lazy initializations
@@ -552,8 +555,13 @@ Component.prototype.addEventHandler=function(event,handler,phase,includeFacets){
  * @deprecated use <code>addEventHandler</code> instead.
  */
 Component.prototype.addHandler = function(eventName, valueProvider, actionExpression, insert, phase, includeFacets) {
+// JBUCH:TODO
 //    $A.deprecated("Component.addHandler() is no longer supported.","Please use Component.addEventHandler() instead.","2016/12/31","2017/07/13");
-
+//     if(!$A.util.isExpression(actionExpression)){
+//         actionExpression=valueProvider.getReference(actionExpression);
+//     }
+//     this.addEventHandler(eventName,actionExpression,phase,includeFacets);
+    //
     var dispatcher = this.getEventDispatcher();
 
     if(!phase) {
@@ -593,7 +601,15 @@ Component.prototype.addHandler = function(eventName, valueProvider, actionExpres
  */
 Component.prototype.removeEventHandler=function(event,handler,phase) {
     // Guards
-    // event = DefDescriptor.normalize(event);
+//    event=DefDescriptor.normalize(event);
+    var def=this.componentDef.getEventDef(event)||$A.eventService.getEventDef(event);
+    // if(!def){
+    //     throw new Error("Component.removeEventHandler: 'event' must be a valid event descriptor. Unknown event '"+event+"'.");
+    // }
+    if(def&&def.type==="APPLICATION"){
+        $A.eventService.removeEventHandler(this,def,handler,phase);
+        return;
+    }
     phase = AuraEventService.validatePhase(phase,AuraEventService.Phase.BUBBLE);
 
     var handlers=this.getEventDispatcher()[event];
@@ -2534,41 +2550,29 @@ Component.prototype.setupComponentEvents = function(cmp, config) {
     }
 };
 
-Component.prototype.getHandler=function(cmp, actionExpression) {
-    return function ComponentPriv$getActionHandler(event) {
-        if (cmp.destroyed) {
-            return;
-        }
-
-        var clientAction = cmp.get(actionExpression);
-        if (clientAction) {
-            clientAction.runDeprecated(event);
-        } else {
-            $A.assert(false, "no client action by name " + actionExpression);
-        }
-    };
-};
-
-Component.prototype.setupApplicationEventHandlers = function(cmp) {
+Component.prototype.setupApplicationEventHandlers = function() {
     // Handle application-level events
     var handlerDefs = this.componentDef.getAppHandlerDefs();
     if (handlerDefs) {
+//#debugger
         for (var i = 0; i < handlerDefs.length; i++) {
             var handlerDef = handlerDefs[i];
-            var handlerConfig = {};
-            handlerConfig["globalId"] = cmp.globalId;
-            handlerConfig["handler"] = this.getHandler(cmp, handlerDef["action"]);
-            handlerConfig["event"] = handlerDef["eventDef"].getDescriptor().getQualifiedName();
-            handlerConfig["phase"] = handlerDef["phase"];
-            handlerConfig["includeFacets"] = handlerDef["includeFacets"];
-            $A.eventService.addHandler(handlerConfig);
-            // TODO:
-            // $A.addEventHandler(
-            //     handlerDef["eventDef"].getDescriptor().getQualifiedName(),
-            //     this.getHandler(cmp, handlerDef["action"]),
-            //     handlerDef["phase"],
-            //     handlerDef["includeFacets"]
-            // );
+            // var config={
+            //     "globalId":cmp.globalId,
+            //     "handler":$A.expressionService.expressionHandler.bind(this,this.getReference(handlerDef["action"])),
+            //     "event":handlerDef["eventDef"].getDescriptor().getQualifiedName(),
+            //     "phase":handlerDef["phase"],
+            //     "includeFacets":handlerDef["includeFacets"]
+            // };
+            // $A.eventService.addHandler(handlerConfig);
+
+            $A.eventService.addEventHandler(
+                this,
+                handlerDef["eventDef"],
+                this.getReference(handlerDef["action"]),
+                handlerDef["phase"],
+                handlerDef["includeFacets"]
+            );
         }
     }
 };

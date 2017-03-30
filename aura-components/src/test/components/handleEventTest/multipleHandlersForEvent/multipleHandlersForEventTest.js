@@ -25,12 +25,12 @@
     },
 
     /**
-     * Application event is handled by multiple handlers.
+     * Application event is handled by multiple *different* handlers.
      */
     testApplication:{
         test:function(cmp){
             $A.get("e.handleEventTest:applicationEvent").fire();
-            aura.test.assertEquals("CC", $A.test.getText(cmp.find("events").getElement()));
+            aura.test.assertEquals("C1C2", $A.test.getText(cmp.find("events").getElement()));
         }
     }
 })

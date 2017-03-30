@@ -26,8 +26,6 @@
  * @borrows AuraComponentService#createComponent as createComponent
  * @borrows AuraComponentService#createComponents as createComponents
  * @borrows AuraComponentService#getComponent as getComponent
- * @borrows AuraEventService#addEventHandler as addEventHandler
- * @borrows AuraEventService#removeEventHandler as removeEventHandler
  */
 function AuraInstance () {
     this.globalValueProviders = {};
@@ -242,8 +240,6 @@ function AuraInstance () {
     this.createComponentFromConfig = this.componentService.createComponentFromConfig.bind(this.componentService);
 
     this.getEvt                    = this.eventService.newEvent.bind(this.eventService);
-    this.addEventHandler           = this.eventService.addEventHandler.bind(this.eventService);
-    this.removeEventHandler        = this.eventService.removeEventHandler.bind(this.eventService);
 
     // DEPRECATED
     this.deferAction               = this.clientService.deferAction.bind(this.clientService);
@@ -344,8 +340,6 @@ function AuraInstance () {
     this["createComponents"] = this.createComponents;
     this["createComponentFromConfig"] = this.createComponentFromConfig;
     this["getEvt"] = this.getEvt;
-    this["addEventHandler"] = this.addEventHandler;
-    this["removeEventHandler"] = this.removeEventHandler;
     this["Component"] = this.Component;
 
     this["auraFriendlyError"] = this.auraFriendlyError;
@@ -607,7 +601,7 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
 
         if (!$A.initialized) {
             $A.initialized = true;
-            $A.addDefaultEventHandlers();
+            $A.addDefaultEventHandlers(app);
             $A.afterInitHooks();
             $A.finishInit(doNotInitializeServices);
         }
@@ -626,13 +620,13 @@ AuraInstance.prototype.addTearDownHandler = function () {
  * Add default handler to aura:systemError event
  * @private
  */
-AuraInstance.prototype.addDefaultEventHandlers = function () {
+AuraInstance.prototype.addDefaultEventHandlers = function (app) {
     // Add default XSS navigation handler
-    $A.addEventHandler("aura:clientRedirect",$A.defaultRedirectHandler);
+    app.addEventHandler("aura:clientRedirect",$A.defaultRedirectHandler);
 
     // Add default error handlers
-    $A.addEventHandler("aura:systemError",$A.defaultErrorHandler);
-    $A.addEventHandler("aura:customerError",$A.defaultErrorHandler);
+    app.addEventHandler("aura:systemError",$A.defaultErrorHandler);
+    app.addEventHandler("aura:customerError",$A.defaultErrorHandler);
 };
 
 /*
@@ -923,7 +917,7 @@ AuraInstance.prototype.getCallback = function(callback) {
             contextComponent = contextComponentDef.getDescriptor().toString();
         }
     }
-    return function(){
+    function callbackWrapper(){
         $A.getContext().setCurrentAccess(context);
         $A.clientService.pushStack("$A.getCallback()");
         try {
@@ -975,7 +969,12 @@ AuraInstance.prototype.getCallback = function(callback) {
             $A.clientService.popStack("$A.getCallback()");
             $A.getContext().releaseCurrentAccess();
         }
-    };
+    }
+    if(callback.target&&callback.toString()===callbackWrapper.toString()){ // don't double-wrap
+        return callback;
+    }
+    callbackWrapper.reference=callback;
+    return callbackWrapper;
 };
 
 /*

@@ -22,7 +22,7 @@
             var expected = "ERROR";
             var status;
 
-            $A.test.addEventHandler('dependencyTest:notify',
+            $A.test.addEventHandler('markup://dependencyTest:notify',
                 function(event) {
                     status = event.getParam("status");
                 }
@@ -53,7 +53,7 @@
             var expected = "SUCCESS";
             var status;
 
-            $A.test.addEventHandler('dependencyTest:notify',
+            $A.test.addEventHandler('markup://dependencyTest:notify',
                 function(event) {
                     status = event.getParam("status");
                 }
@@ -84,7 +84,7 @@
             var expected = "ERROR";
             var status;
 
-            $A.test.addEventHandler('dependencyTest:notify',
+            $A.test.addEventHandler('markup://dependencyTest:notify',
                 function(event) {
                     status = event.getParam("status");
                 }
@@ -115,7 +115,7 @@
             var expected = "SUCCESS";
             var status;
 
-            $A.test.addEventHandler('dependencyTest:notify',
+            $A.test.addEventHandler('markup://dependencyTest:notify',
                 function(event) {
                     status = event.getParam("status");
                 }

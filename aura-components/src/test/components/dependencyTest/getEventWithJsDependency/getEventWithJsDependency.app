@@ -16,5 +16,6 @@
 
 -->
 <aura:application render="client">
+    <aura:dependency resource="markup://dependencyTest:notify" type="EVENT" />
     {!v.body}
 </aura:application>

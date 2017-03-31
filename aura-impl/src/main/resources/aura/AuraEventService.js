@@ -1114,7 +1114,7 @@ AuraEventService.prototype.addHandler = function(config) {
     var component=$A.getComponent(config["globalId"]);
     if(!component){
         //JBUCH: HACK: remap unknown target to application root
-        component=Object.create($A.Component.prototype,{"globalId":{value:"1:0"}});
+        component=Object.create($A.Component.prototype,{globalId:{value:"1:0"}});
         //$A.warning("$A.eventService.addHandler: Unknown component with globalId '"+config["globalId"]+"'.");
     }
     this.addEventHandler(component,this.getEventDef(config["event"]),config["handler"],config["phase"],includeFacets);
@@ -1174,14 +1174,23 @@ AuraEventService.prototype.removeEventHandler=function(component,eventDef,handle
 AuraEventService.prototype.removeHandler = function(config) {
     //$A.deprecated("$A.eventService.removeHandler(config) is no longer supported.","Please use $A.removeEventHandler(event,handler,phase) instead.","2016/12/31","2017/07/13");
 
-    config["event"] = DefDescriptor.normalize(config["event"]);
+//    config["event"] = DefDescriptor.normalize(config["event"]);
 
-    var handlers = this.eventDispatcher[config["event"]];
+    var globalId=config["globalId"];
+    var component=$A.getComponent(globalId);
+    if(!component){
+        //JBUCH: HACK: remap unknown target to application root
+        globalId="1:0";
+        //$A.warning("$A.eventService.removeHandler: Unknown component with globalId '"+config["globalId"]+"'.");
+    }
+    var def=this.getEventDef(config["event"]);
+
+    var handlers = this.eventDispatcher[def.descriptor.qualifiedName];
     if (handlers) {
         var phase = config["phase"] || "default";
         var phaseHandlers = handlers[phase];
         if(phaseHandlers) {
-            delete phaseHandlers[config["globalId"]];
+            delete phaseHandlers[globalId];
         }
     }
 };
@@ -1210,16 +1219,22 @@ AuraEventService.prototype.removeHandlersByComponentId = function(globalId) {
  * @memberOf AuraEventService
  * @public
  * @export
+ * @deprecated
  */
 AuraEventService.prototype.addHandlerOnce = function(config) {
     var handler = config["handler"];
-
+    var component=$A.getComponent(config["globalId"]);
+    if(!component){
+        //JBUCH: HACK: remap unknown target to application root
+        component=Object.create($A.Component.prototype,{globalId:{value:"1:0"}});
+        //$A.warning("$A.eventService.addHandlerOnce: Unknown component with globalId '"+config["globalId"]+"'.");
+    }
+    var def=this.getEventDef(config["event"]);
     config["handler"] = $A.getCallback(function () {
-        this.removeHandler(config);
+        this.removeEventHandler(component,def,config["handler"],config["phase"]);
         handler();
     }.bind(this));
-
-    this.addHandler(config);
+    this.addEventHandler(component,def,config["handler"],config["phase"],config["includeFacets"]);
 };
 
 /**

@@ -91,6 +91,10 @@ function AuraInstance () {
     this.devToolService = new AuraDevToolService();
     //#end
 
+    this.injectedServices={
+        "localization":this.localizationService,
+        "metrics":this.metricsService
+    };
 
     /** @field */
     this.services = {
@@ -1005,7 +1009,7 @@ AuraInstance.prototype.executeHotspot=function(callback){
  *
  * @function
  * @param {String} token - The name of the application configuration token to retrieve, for example, <code>$A.getToken("section.configuration")</code>.
- * @public
+ *
  * @platform
  */
 AuraInstance.prototype.getToken = function(token){
@@ -1017,6 +1021,19 @@ AuraInstance.prototype.getToken = function(token){
         }
         throw new $A.auraError("Unknown token: '"+token+"'. Are you missing a tokens file or declaration?");
     }
+};
+
+/**
+ * Returns a service registered by the application.
+ *
+ * @function
+ * @param {String} name - The name of the service registered during application startup, for example, <code>$A.getService("metrics")</code>.
+ *
+ * @export
+ * @platform
+ */
+AuraInstance.prototype.getService = function(name) {
+    return this.injectedServices[name];
 };
 
 /**

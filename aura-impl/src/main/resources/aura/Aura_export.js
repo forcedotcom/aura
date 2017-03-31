@@ -29,6 +29,7 @@ AuraInstance.prototype["getRoot"] = AuraInstance.prototype.getRoot;
 AuraInstance.prototype["getCallback"] = AuraInstance.prototype.getCallback;
 AuraInstance.prototype["getContext"] = AuraInstance.prototype.getContext;
 AuraInstance.prototype["getToken"] = AuraInstance.prototype.getToken;
+AuraInstance.prototype["getService"] = AuraInstance.prototype.getService;
 AuraInstance.prototype["run"] = AuraInstance.prototype.run;
 AuraInstance.prototype["set"] = AuraInstance.prototype.set;
 AuraInstance.prototype["assert"] = AuraInstance.prototype.assert;

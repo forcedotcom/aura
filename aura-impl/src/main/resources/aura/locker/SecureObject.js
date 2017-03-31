@@ -912,6 +912,8 @@ function getSupportedInterfaces(o) {
         interfaces.push("Element", "Node", "EventTarget");
     } else if (o instanceof Text) {
         interfaces.push("Text", "CharacterData", "Node");
+    } else if (o instanceof Comment) {
+        interfaces.push("CharacterData", "Node");
     }
 
     return interfaces;

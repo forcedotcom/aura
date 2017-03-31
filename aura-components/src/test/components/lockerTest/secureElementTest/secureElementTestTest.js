@@ -569,19 +569,38 @@
             cmp.testRecursiveTraversal();
         }
     },
-    
+
     testSuperRenderResultFiltering: {
         test: function(cmp) {
             var testUtils = cmp.get("v.testUtils");
 
-        	// Verify that all elements (owned by the locker and by system) are returned from render
+            // Verify that all elements (owned by the locker and by system) are returned from render
             var sentinel = document.querySelector(".stamp-success.uiStamp");
-            
+
             testUtils.assertNotUndefinedOrNull(sentinel, "Unable to locate sentinel DOM element!");
             testUtils.assertEquals("Sentinel For Rendering Tests", sentinel.textContent);
-                        
+
             var secondSentinel = document.getElementById("secondSentinel");
             testUtils.assertNotUndefinedOrNull(secondSentinel, "Unable to locate second sentinel DOM element!");
-            testUtils.assertEquals("Second Sentinel", secondSentinel.textContent);        }
+            testUtils.assertEquals("Second Sentinel", secondSentinel.textContent);
+        }
+    },
+
+    testInnerHtmlFiltering: {
+        test: function(cmp) {
+            cmp.testInnerHtmlFiltering();
+        }
+    },
+
+    testTextContentFiltering: {
+        test: function(cmp) {
+            cmp.testTextContentFiltering();
+        }
+    },
+
+    testInnerTextFiltering: {
+        test: function(cmp) {
+            cmp.testInnerTextFiltering();
+        }
     }
 })

@@ -13,6 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+function cloneFiltered(el, st) {
+    var root = el.cloneNode(false);
+    function cloneChildren(parent, parentClone) {
+        var childNodes = parent.childNodes;
+        for (var i = 0; i < childNodes.length; i++) {
+            var child = childNodes[i];
+            if (ls_hasAccess(st, child) || child.nodeType === Node.TEXT_NODE) {
+                var childClone = child.cloneNode(false);
+                parentClone.appendChild(childClone);
+                ls_trust(st, childClone);
+                cloneChildren(child, childClone);
+            }
+        }
+    }
+    cloneChildren(el, root);
+    return root;
+}
 
 function runIfRunnable(st) {
     if (st instanceof HTMLScriptElement) {
@@ -286,7 +303,18 @@ function SecureElement(el, key) {
         if ("innerText" in el) {
             tagNameSpecificConfig["innerText"] = {
                     get: function() {
-                        return SecureObject.getRaw(this.cloneNode(true)).innerText;
+                        /*
+                         * innerText changes it's return value based on style and whether the element is live in 
+                         * the DOM or not. This implementation does not account for that and simply returns the
+                         * innerText of the cloned node. This may cause subtle differences, such as missing newlines,
+                         * from the original implementation.
+                         * 
+                         * https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent#Differences_from_innerText
+                         */
+                        var rawEl = SecureObject.getRaw(this);
+                        var filtered = cloneFiltered(rawEl, o);
+                        var ret = filtered.innerText;
+                        return ret;
                     },
                     set: function(value) {
                         var raw = SecureObject.getRaw(this);
@@ -304,7 +332,7 @@ function SecureElement(el, key) {
         if ("innerHTML" in el) {
             tagNameSpecificConfig["innerHTML"] = {
                     get : function() {
-                        return SecureObject.getRaw(this.cloneNode(true)).innerHTML;
+                        return cloneFiltered(SecureObject.getRaw(this), o).innerHTML;
                     },
                     set : function(value) {
                         var raw = SecureObject.getRaw(this);
@@ -333,6 +361,36 @@ function SecureElement(el, key) {
                         }
 
                         return SecureElement(newNode, ls_getKey(this));
+                    }
+            };
+        }
+
+        // special handle insertRow since it may automatically also insert a <tbody> element that
+        // also needs to be keyed.
+        if ("insertRow" in el && el instanceof HTMLTableElement) {
+            tagNameSpecificConfig["insertRow"] = {
+                    value: function(index) {
+
+                        function getFirstTBody(table) {
+                            for (var i = 0; i < table.childNodes.length; i++) {
+                                var node = table.childNodes[i];
+                                if (node instanceof HTMLTableSectionElement) {
+                                    return node;
+                                }
+                            }
+                            return undefined;
+                        }
+
+                        var raw = SecureObject.getRaw(this);
+                        var tbodyExists = !!getFirstTBody(raw);
+                        var newRow = raw.insertRow(index);
+                        $A.lockerService.trust(this, newRow);
+                        if (!tbodyExists) {
+                            // a new tbody element has also been inserted, key that too.
+                            var tbody = getFirstTBody(raw);
+                            tbody && $A.lockerService.trust(this, tbody);
+                        }
+                        return SecureElement(newRow, ls_getKey(this));
                     }
             };
         }
@@ -518,7 +576,7 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseIn
 
         textContent : {
             get : function() {
-                return SecureObject.getRaw(this.cloneNode(true)).textContent;
+                return cloneFiltered(SecureObject.getRaw(this), this).textContent;
             },
             set : function(value) {
                 var raw = SecureObject.getRaw(this);

@@ -1,4 +1,35 @@
 ({
+    testInnerHtmlFiltering: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var el = document.getElementById("innerHtmlFilteringTester");
+        var innerHTML = el.innerHTML;
+
+        // HTML output is coupled to location in DOM so just verify a few key characteristics
+        testUtils.assertTrue(innerHTML.indexOf("<p id=\"hiP\"") !== -1, "Expected <p> element to be present in el.innerHTML");
+        testUtils.assertTrue(innerHTML.indexOf("Inside facet") !== -1, "Expected facet text to be present in el.innerHTML");
+        // ui:outputText from a different namespace so it should be filtered out
+        testUtils.assertTrue(innerHTML.indexOf("outputText") === -1, "Expected ui:outputText to not be present in el.innerHTML");
+    },
+
+    testTextContentFiltering: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var el = document.getElementById("innerHtmlFilteringTester");
+        testUtils.assertEquals("hiInside facet", el.textContent, "Unexpected return from el.textContent");
+    },
+
+    testInnerTextFiltering: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var el = document.getElementById("innerHtmlFilteringTester");
+        // Note this exemplifies divergent behavior from the real innerText. The newline is not present here
+        // since we are getting the innerText of the clone, not the live DOM element
+        testUtils.assertEquals("hiInside facet", el.innerText, "Unexpected return from el.innerText");
+
+        var notInDom = document.createElement("div");
+        notInDom.innerHTML = "<p id='notInDom'>hi there</p><div> same line</div>";
+        // Elements not in the live DOM will not have styles such as newline for div applied
+        testUtils.assertEquals("hi there same line", notInDom.innerText, "Unexpected return from notInDom.innerText");
+    },
+
     testAriaAttributesAccessible: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var td = document.getElementById("td");
@@ -228,13 +259,13 @@
 
         testUtils.assertEquals("A scalar expression", element.innerHTML);
     },
-    
+
     testTableAPI: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
-        
+
 		// Call addRow() with the ID of a table
 		var table = document.createElement("table");
-		
+
 		// Insert a row in the table at row index 0
 		var newRow = table.insertRow(0);
 		testUtils.assertEquals("TR", newRow.tagName);
@@ -246,7 +277,7 @@
 		// Append a text node to the cell
 		var newText = document.createTextNode('New top row');
 		newCell.appendChild(newText);
-		
+
 		testUtils.assertEquals("<tbody><tr><td>New top row</td></tr></tbody>", table.innerHTML);
     },
 
@@ -354,19 +385,14 @@
     /**
      * Verify that when a facet's node is cloned and the facet is from a different namespace,
      * its is locked with a same key as twin. Verify it cannot be accessed by the owner.
-     * @param cmp
      */
     testCloneNodeDeep_VerifyBlockedAccess: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
-        // Before clone : Look for text from facet. Verifying that facet was rendered
-        testUtils.assertEquals(1, document.querySelector("#toBeClonedFacet").textContent.match(/body_toBeClonedFacet/g).length);
         testUtils.assertEquals(0, document.querySelectorAll("#table_facetLocked").length, "Facet content should not be accessible from other namespace");
 
         var lockedFacet = cmp.find("toBeClonedFacet");
         lockedFacet.cloneNode();
         // After clone : Look for text from facet, there should be two copies
-        testUtils.assertEquals(2, document.querySelector("#toBeClonedFacet").textContent.match(/body_toBeClonedFacet/g).length,
-            "Node of facet not cloned");
         testUtils.assertEquals(0, document.querySelectorAll("#table_facetLocked").length,
             "Cloned nodes should not be accessible from other namespace");
     },

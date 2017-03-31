@@ -95,7 +95,7 @@
                 if (status === "SUCCESS") {
                     content.set("v.body", newCmp);
                 } else {
-                    content.getElement().textContent = error;
+                    throw new Error(error);
                 }
             }
         );

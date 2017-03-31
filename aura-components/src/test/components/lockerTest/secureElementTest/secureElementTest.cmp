@@ -73,6 +73,9 @@
     <aura:method name="testLabelForInput"/>
     <aura:method name="testForAttributeAllowedOnLabelOnly"/>
     <aura:method name="testRecursiveTraversal"/>
+    <aura:method name="testInnerHtmlFiltering"/>
+    <aura:method name="testTextContentFiltering"/>
+    <aura:method name="testInnerTextFiltering"/>
 
     <lockerTest:facet/>
 
@@ -115,5 +118,15 @@
 
     <div id="toBeClonedFacet">
         <lockerTestOtherNamespace:toBeClonedFacet aura:id="toBeClonedFacet"/>
+    </div>
+
+    <div id="innerHtmlFilteringTester">
+        <p id="hiP">hi</p>
+        <ui:outputText value="outputText" />
+        <!-- facetLocked should be filtered out of innerHTML (and similar) calls since it's in another namespace -->
+        <lockerTestOtherNamespace:facetLocked/>
+        <div>
+            <lockerTest:facet/>
+        </div>
     </div>
 </aura:component>

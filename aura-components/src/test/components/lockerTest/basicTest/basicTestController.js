@@ -214,11 +214,12 @@
         testUtils.addWaitForWithFailureMessage(
                 true,
                 function checkComponentCreationComplete() {
-                    return document.getElementById("content").textContent !== "";
+                    var content = cmp.find("content").get("v.body")[0];
+                    return content && content.get("v.output") !== "Default output";
                 },
                 "DOM element with return from createComponent never updated",
                 function assertReturnIsSecureComponentRef() {
-                	var content = document.getElementById("content").textContent;
+                    var content = cmp.find("content").get("v.body")[0].get("v.output");
                     testUtils.assertStartsWith("SecureComponentRef", content,
                             "SecureComponent passed to another namespace should be filtered to SecureComponentRef");
                 });

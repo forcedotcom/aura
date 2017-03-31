@@ -22,4 +22,6 @@
         <aura:attribute name="callback" type="function" />
     </aura:method>
     <aura:method name="executeCallback" action="{!c.executeCallback}"/>
+    
+    <p>Inside facet</p>
 </aura:component>

@@ -71,16 +71,14 @@
     {!v.extraMetaTags}
 
     <!-- ====== Styles ====== -->
-    <!-- inline are ok, but "link" style tags cause the browser to fully download / evaluate css before evaluating any script tags -->
     {!v.auraResetTags}
     <style>
         {!v.inlineStyle}
         {!v.appcacheProgressBarStyle}
     </style>
-
-    <style id="auraInlineStyle">
-        {!v.auraInlineStyle}
-    </style>
+    {!v.auraStyleTags}
+    {!v.extraStyleTags}
+    <style>{!v.auraInlineStyle}</style>
 <!-- ==================== -->
 </head>
 
@@ -246,30 +244,6 @@
 
     {!v.bootstrapInlineJs}
 
-
-    window.Aura.bootstrap.appCssLoaded = false;
-
-    function onloadMoveStyleSheets() {
-        document.removeEventListener('DOMContentLoaded', onloadMoveStyleSheets);
-
-        // move style tags to the head to allow style tags to override that are appended
-        var linkTags = document.body.getElementsByTagName("link");
-        var inlineStyleElement = document.getElementById("auraInlineStyle");
-        var length = linkTags.length;
-        if (length &amp;&amp; inlineStyleElement) {
-            for (var i=0; i &lt; length; i++) {
-                if (linkTags[0].rel === "stylesheet") {
-                    document.head.insertBefore(linkTags[0], inlineStyleElement);
-                }
-            }
-        }
-        if (typeof window.Aura.bootstrap.appCssLoaded === "function") {
-            window.Aura.bootstrap.appCssLoaded();
-        }
-        window.Aura.bootstrap.appCssLoaded = true;
-    }
-    document.addEventListener('DOMContentLoaded', onloadMoveStyleSheets);
-
 }());
 
     </script>
@@ -277,13 +251,6 @@
     {!v.auraNamespacesScriptTags}
     {!v.extraScriptTags}
 
-
-    <!-- ====== Style tags ====== -->
-
-    {!v.auraStyleTags}
-    {!v.extraStyleTags}
-
-    <!-- ==================== -->
 </body>
 </html>
 </aura:component>

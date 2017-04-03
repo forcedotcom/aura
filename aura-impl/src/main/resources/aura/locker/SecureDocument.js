@@ -42,6 +42,13 @@ function SecureDocument(doc, key) {
                 return "SecureDocument: " + doc + "{ key: " + JSON.stringify(key) + " }";
             }
         },
+        createAttribute: {
+            value: function(name) {
+                var att = doc.createAttribute(name);
+                ls_setKey(att, key);
+                return SecureElement(att, key);
+            }
+        },
         createElement: {
             value: function(tag) {
                 var el = doc.createElement(tag);

@@ -853,7 +853,7 @@ public class MenuUITest extends WebDriverTestCase {
                 fail("Expected exception trying to click an unclickable element");
             }
         } catch (Exception e) {
-            checkExceptionContains(e, WebDriverException.class, "Element is not clickable");
+            checkExceptionContains(e, WebDriverException.class, "Other element would receive the click");
         }
     }
 }

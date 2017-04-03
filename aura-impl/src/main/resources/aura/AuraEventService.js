@@ -1114,10 +1114,16 @@ AuraEventService.prototype.addHandler = function(config) {
     var component=$A.getComponent(config["globalId"]);
     if(!component){
         //JBUCH: HACK: remap unknown target to application root
-        component=Object.create($A.Component.prototype,{globalId:{value:"1:0"}});
-        //$A.warning("$A.eventService.addHandler: Unknown component with globalId '"+config["globalId"]+"'.");
+        component=Object.create(Aura.Component.Component.prototype,{globalId:{value:"1:0"}});
+        $A.warning("$A.eventService.addHandler: Unknown component with globalId '"+config["globalId"]+"'. Does this component exist?");
     }
-    this.addEventHandler(component,this.getEventDef(config["event"]),config["handler"],config["phase"],includeFacets);
+    var eventDef=this.getEventDef(config["event"]);
+    if(!eventDef){
+        //JBUCH: HACK: allow unknown events to application root
+        eventDef=Object.create(Aura.Event.EventDef.prototype,{descriptor:{value:{qualifiedName:config["event"]}}});
+        $A.warning("$A.eventService.addHandler: Unknown event with name '"+config["event"]+"'. Do you have a missing dependency?");
+    }
+    this.addEventHandler(component,eventDef,config["handler"],config["phase"],includeFacets);
 };
 
 /**

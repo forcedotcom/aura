@@ -225,8 +225,8 @@ Aura.Services.MetricsService.prototype.syntheticTransactionStart = function (ns,
 /**
  * Add a callback everytime a transaction ends.
  * @param {function} callback Function to execute for every transaction
- * @public
  * @export
+ * @platform
 **/
 Aura.Services.MetricsService.prototype.onTransactionEnd = function (callback) {
     this.globalHandlers["transactionEnd"].push(callback);
@@ -338,8 +338,8 @@ Aura.Services.MetricsService.prototype.transactionUpdate = function (ns, name, c
  * @param {string} ns Namespace of the transaction
  * @param {string} id Id of the transaction
  * @param {Object} config Configuration and context for the transaction
- * @public
  * @export
+ * @platform
 **/
 Aura.Services.MetricsService.prototype.transactionStart = function (ns, name, config) {
     return this.createTransaction(ns, name, config);
@@ -350,8 +350,8 @@ Aura.Services.MetricsService.prototype.transactionStart = function (ns, name, co
  * @param {string} ns Namespace of the transaction
  * @param {string} id Id of the transaction
  * @param {Object} config Configuration and context for the transaction
- * @public
  * @export
+ * @platform
 **/
 Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, config, postProcess) {
     //console.time('>>>> TRANSACTIONPROCESSING > ' + ns + ':' + name);

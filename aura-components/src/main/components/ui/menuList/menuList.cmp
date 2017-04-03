@@ -52,7 +52,7 @@
             </div>
         </aura:if>
 
-        <ul aura:id="datalist" class="scrollable" role="presentation">
+        <ul aura:id="datalist" class="scrollable" role="presentation" tabindex="-1">
             <aura:if isTrue="{!v.hasMenuOpened}">
                 <aura:iteration items="{!v.menuItems}" var="item">
                     <ui:menuItem aura:id="item" class="{!item.className}" disabled="{!item.disabled}" label="{!item.label}"

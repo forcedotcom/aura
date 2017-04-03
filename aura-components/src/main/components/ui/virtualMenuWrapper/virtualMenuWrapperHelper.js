@@ -19,10 +19,10 @@
     
     // Event key code for Down key
     KEY_CODE_DOWN: 40,
-    
+
     CONTAINER_CLASS: 'virtualMenuContainer',
     
-    setupMenu: function(cmp, target) {
+    setupMenu: function(cmp, target, autofocus) {
         var menuDef = cmp.get("v.menu")[0];
         var menuCmp = $A.createComponentFromConfig(menuDef);
         
@@ -41,10 +41,11 @@
 
         // Trigger show
         menuCmp.get("e.popupTriggerPress").fire();
-        
+
         // make sure the trigger element is focused
         window.requestAnimationFrame($A.getCallback(function () {
-            var trigger = container.getElementsByTagName("a")[0];
+            var selector = autofocus ? "a[role=menuitem]" : "a[role=button]";
+            var trigger = container.querySelector(selector);
             if (trigger) {
                 trigger.focus();
             }
@@ -56,7 +57,7 @@
         if (keyCode === this.KEY_CODE_UP || keyCode === this.KEY_CODE_DOWN) {
             $A.util.squash(event, true);
 
-            this.setupMenu(cmp, event.target);
+            this.setupMenu(cmp, event.target, true);
         }
     }
 })// eslint-disable-line semi

@@ -15,7 +15,7 @@
  */
 ({
     handleClick: function(cmp, event, helper) {
-        helper.setupMenu(cmp, event.target);
+        helper.setupMenu(cmp, event.target, false);
     },
     
     handleKeydown: function(cmp, event, helper) {

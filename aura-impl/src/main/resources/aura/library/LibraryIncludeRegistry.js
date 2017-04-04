@@ -179,7 +179,6 @@ LibraryIncludeRegistry.prototype.buildLibraryInclude = function(descriptor) {
     // build the include.
     if (resolved) {
         var exporter = this.exporter[descriptor];
-        var url;
         if (!$A.util.isFunction(exporter)) {
             throw new Error("Library include not defined: " + descriptor);
         }

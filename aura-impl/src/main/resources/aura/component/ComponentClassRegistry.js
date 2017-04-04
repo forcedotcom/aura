@@ -74,8 +74,6 @@ ComponentClassRegistry.prototype.addComponentClass = function(descriptor, export
  */
 ComponentClassRegistry.prototype.getComponentClass = function(descriptor, def) {
     var storedConstructor = this.classConstructors[descriptor];
-    var url;
-
     if (!storedConstructor) {
         var exporter = this.classExporter[descriptor];
         if (exporter) {

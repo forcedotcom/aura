@@ -339,8 +339,11 @@ Aura.Event.Event.prototype.executeHandlerIterator = function(handlerIterator) {
             }
             else {
                 context.setCurrentAccess(value.cmp);
-                value.handler(this);
-                context.releaseCurrentAccess();
+                try {
+                    value.handler(this);
+                } finally {
+                    context.releaseCurrentAccess();
+                }
             }
         }
     }

@@ -15,6 +15,8 @@
  */
 package org.auraframework.impl.controller;
 
+import static org.powermock.api.mockito.PowerMockito.mock;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.impl.controller.ComponentController.AuraClientException;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
@@ -28,7 +30,7 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
     public void testCreateAuraClientExceptionWithQualifiedName() {
         String descriptor = "markup://foo:bar";
 
-        AuraClientException ace = new AuraClientException(descriptor, null, null, null, null, null, null);
+        AuraClientException ace = new AuraClientException(descriptor, null, null, null, null, null, null, null);
 
         String expectedNamespace = "foo";
         String expectedComponent = "bar";
@@ -40,7 +42,7 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
     public void testCreateAuraClientExceptionWithInvalidComponentQualifiedName() {
         String descriptor = "InvalidComponent markup://c:DTE_ImageCarousel {10:149;a}";
 
-        AuraClientException ace = new AuraClientException(descriptor, null, null, null, null, null, null);
+        AuraClientException ace = new AuraClientException(descriptor, null, null, null, null, null, null, null);
 
         String expectedNamespace = "c";
         String expectedComponent = "DTE_ImageCarousel";
@@ -52,7 +54,7 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
     public void testCreateAuraClientExceptionWithActionName() {
         String descriptor = "foo$bar$controller$doSomething";
 
-        AuraClientException ace = new AuraClientException(descriptor, null, null, null, null, null, null);
+        AuraClientException ace = new AuraClientException(descriptor, null, null, null, null, null, null, null);
 
         String expectedNamespace = "foo";
         String expectedComponent = "bar";
@@ -70,12 +72,31 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
                 "at value [as get] (https://customers.sage.com/s/sfsites/auraFW/javascript/9vevg4v6I80p1u_pT1V5VQ/aura_prod.js:548:194)\n" +
                 "at Object.next (components/c/UICarousel.js:57:36)";
 
-        AuraClientException ace = new AuraClientException(null, null, null, stacktrace, null, null, null);
+        AuraClientException ace = new AuraClientException(null, null, null, stacktrace, null, null, null, null);
 
         String expectedNamespace = "c";
         String expectedComponent = "UICarousel";
         assertEquals(expectedNamespace, ace.getFailedComponentNamespace());
         assertEquals(expectedComponent, ace.getFailedComponent());
+    }
+
+    @Test
+    public void testCreateAuraClientExceptionWithRaptorStacktrace() {
+        String stacktrace = "ReferenceError: foo is not defined\n"+
+         "at AppNavBarItem.handleClick (http://errortest.lightning.localhost.soma.force.com:6109/components/one-app-nav-bar-item.js:68:15)\n"+
+         "at Object.boundFn (http://errortest.lightning.localhost.soma.force.com:6109/auraFW/resources/tl_W7omHGRGQiu-tfZgpug/engine/engine.js:91:31)\n"+
+         "at invokeHandler (http://errortest.lightning.localhost.soma.force.com:6109/auraFW/resources/tl_W7omHGRGQiu-tfZgpug/engine/engine.js:2825:13)\n"+
+         "at handleEvent (http://errortest.lightning.localhost.soma.force.com:6109/auraFW/resources/tl_W7omHGRGQiu-tfZgpug/engine/engine.js:2853:5)\n"+
+         "at HTMLAnchorElement.handler (http://errortest.lightning.localhost.soma.force.com:6109/auraFW/resources/tl_W7omHGRGQiu-tfZgpug/engine/engine.js:2859:5)";
+
+        AuraClientException ace = new AuraClientException(null, null, null, stacktrace, null, null, null, mock(ConfigAdapter.class));
+
+        String expectedNamespace = "one";
+        String expectedComponent = "appNavBarItem";
+        String expectedFailingDescriptor = "markup://one:appNavBarItem";
+        assertEquals(expectedNamespace, ace.getFailedComponentNamespace());
+        assertEquals(expectedComponent, ace.getFailedComponent());
+        assertEquals(expectedFailingDescriptor, ace.getCauseDescriptor());
     }
 
     @Test
@@ -100,7 +121,7 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
                 "Object.onXHRReceived@app.js\n"+
                 "Object.<anonymous>@aura_prod.js\n"+
                 "Object.qz.ci@aura_prod.js\n";
-        String actual = new AuraClientException(null, null, null, jsstack, null, null, null).getStackTraceIdGen();
+        String actual = new AuraClientException(null, null, null, jsstack, null, null, null, null).getStackTraceIdGen();
         assertEquals(expected, actual);
     }
 
@@ -118,7 +139,7 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
                 "_receiveFrom$RecordGvp()\n"+
                 "merge()@inline.js\n"+
                 "onXHRReceived()\n";
-        String actual = new AuraClientException(null, null, null, jsstack, null, null, null).getStackTraceIdGen();
+        String actual = new AuraClientException(null, null, null, jsstack, null, null, null, null).getStackTraceIdGen();
         assertEquals(expected, actual);
     }
 
@@ -139,8 +160,8 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
         String jsstack1 = jsStackTemplate.replace("{DOMAIN}", "https://sidewalk.lightning.force.com");
         String jsstack2 = jsStackTemplate.replace("{DOMAIN}", "https://rgp.lightning.force.com");
 
-        String actual1 = new AuraClientException(null, null, null, jsstack1, null, null, null).getStackTraceIdGen();
-        String actual2 = new AuraClientException(null, null, null, jsstack2, null, null, null).getStackTraceIdGen();
+        String actual1 = new AuraClientException(null, null, null, jsstack1, null, null, null, null).getStackTraceIdGen();
+        String actual2 = new AuraClientException(null, null, null, jsstack2, null, null, null, null).getStackTraceIdGen();
         assertEquals(actual1, actual2);
     }
 
@@ -162,8 +183,8 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
         String jsstack1 = jsStackTemplate.replace("{FW_UID}", "vR3RI4HaFe6ZgUzebBGZ9A");
         String jsstack2 = jsStackTemplate.replace("{FW_UID}", "jW_bQSND_PAm5SMZfQEyeA");
 
-        String actual1 = new AuraClientException(null, null, null, jsstack1, null, null, null).getStackTraceIdGen();
-        String actual2 = new AuraClientException(null, null, null, jsstack2, null, null, null).getStackTraceIdGen();
+        String actual1 = new AuraClientException(null, null, null, jsstack1, null, null, null, null).getStackTraceIdGen();
+        String actual2 = new AuraClientException(null, null, null, jsstack2, null, null, null, null).getStackTraceIdGen();
         assertEquals(actual1, actual2);
     }
 }

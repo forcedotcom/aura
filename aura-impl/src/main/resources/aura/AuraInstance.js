@@ -752,6 +752,10 @@ AuraInstance.prototype.handleError = function(message, e) {
             dispMsg = $A.util.format(format, displayMessage);
             // use null error string to specify non auraFriendlyError type.
             evtArgs = {"message":dispMsg,"error":null,"auraError":e};
+        } else {
+            // wrap the error with auraError so that systemError event handlers can get it
+            e = new $A.auraError(null, e);
+            evtArgs = {"message":dispMsg,"error":null,"auraError":e};
         }
     }
 
@@ -765,6 +769,17 @@ AuraInstance.prototype.handleError = function(message, e) {
                 $A.eventService.getNewEvent('markup://aura:systemError').fire(evtArgs);
             }
         }, 0);
+
+        $A.getCallback(function() {
+            if (e && message) {
+                // if there's extra info in the message that's not in error.message, include it for report.
+                if (message !== e.message && message.indexOf(e.message) > -1) {
+                    e.message = message;
+                }
+            }
+            $A.logger.reportError(e);
+        })();
+        $A.services.client.postProcess();
     } else {
         if ($A.showErrors()) {
             $A.message(dispMsg, e);
@@ -816,18 +831,7 @@ AuraInstance.prototype.reportError = function(message, error) {
         new $A.auraError("[NoErrorObjectAvailable] " + message);
 
     $A.handleError(message, error);
-    if ($A.initialized) {
-        $A.getCallback(function() {
-            if (error && message) {
-                // if there's extra info in the message that's not in error.message, include it for report.
-                if (message !== error.message && message.indexOf(error.message) > -1) {
-                    error.message = message;
-                }
-            }
-            $A.logger.reportError(error);
-        })();
-        $A.services.client.postProcess();
-    }
+
     this.lastKnownError = null;
     return true;
 };

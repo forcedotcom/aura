@@ -34,6 +34,19 @@ import static org.powermock.api.mockito.PowerMockito.when;
 public class ModuleDefinitionUtilUnitTest {
 
     @Test
+    public void testConvertModuleComponentNameToAuraDescriptor() throws Exception {
+        Map<String, String> internalNamespaces = Maps.newHashMap();
+        internalNamespaces.put("namespace", "nameSpace");
+
+        ConfigAdapter configAdapter = mock(ConfigAdapter.class);
+        when(configAdapter.getInternalNamespacesMap()).thenReturn(internalNamespaces);
+
+        String actual = ModuleDefinitionUtil.convertToAuraDescriptor("namespace-some-cool-thing", configAdapter);
+        assertEquals("Expected descriptor does not match", "nameSpace:someCoolThing", actual);
+    }
+
+
+    @Test
     public void testConvertModuleNameToAuraDescriptor() throws Exception {
         Map<String, String> internalNamespaces = Maps.newHashMap();
         internalNamespaces.put("namespace", "nameSpace");

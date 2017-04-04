@@ -180,25 +180,29 @@ Logger.prototype.isExternalError = function(e) {
         return false;
     }
 
-    var frames;
+    var errorframes;
     var count = 0;
     if (e instanceof $A.auraError) {
-        frames = e.stackFrames;
+        errorframes = e.stackFrames;
     } else {
-        frames = Aura.Errors.StackParser.parse(e);
+        errorframes = Aura.Errors.StackParser.parse(e);
     }
 
-    frames.forEach(function(frame) {
-        var fileName = frame.fileName;
+    errorframes.forEach(function(errorframe) {
+        var fileName = errorframe.fileName;
         if (fileName &&
-            fileName.match(/aura_[^\.]+\.js$/gi) === null &&
-            fileName.match("app.js") === null) {
+            fileName.match(/aura_[^\.]+\.js$/gi) === null && // not from aura
+            fileName.match("engine.js") === null &&          // not from raptor engine
+            fileName.match("engine.min.js") === null &&      // not from raptor engine PROD
+            fileName.indexOf('/components/') === -1 &&       // not from components
+            fileName.indexOf('/libraries/') === -1 &&        // not from libraries
+            fileName.match("app.js") === null) {             // not from app.js
             count += 1;
         }
     });
 
-    // external means every stackframe isn't from framework
-    return frames.length === count;
+    // external means every stackframe isn't from framework nor framework consumers
+    return errorframes.length === count;
 };
 
 /**

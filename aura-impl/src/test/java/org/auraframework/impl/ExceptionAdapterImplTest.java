@@ -23,6 +23,7 @@ import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.impl.controller.ComponentController.AuraClientException;
 import org.auraframework.impl.test.util.LoggingTestAppender;
@@ -37,6 +38,9 @@ public class ExceptionAdapterImplTest extends AuraImplTestCase {
 
     @Inject
     private ExceptionAdapter exceptionAdapter;
+
+    @Inject
+    private ConfigAdapter configAdapter;
 
     public ExceptionAdapterImplTest() {
         logger = Logger.getLogger(ExceptionAdapterImpl.class);
@@ -62,7 +66,7 @@ public class ExceptionAdapterImplTest extends AuraImplTestCase {
         String errorMsg = "error message";
         String CmpStack = "Component stack";
         String JsStacktrace = "JS stack trace";
-        AuraClientException clientException = new AuraClientException(causeDescriptor, errorId, errorMsg, JsStacktrace, CmpStack, instanceService, exceptionAdapter);
+        AuraClientException clientException = new AuraClientException(causeDescriptor, errorId, errorMsg, JsStacktrace, CmpStack, instanceService, exceptionAdapter, configAdapter);
 
         exceptionAdapter.handleException(clientException, null);
         List<LoggingEvent> logs = appender.getLog();

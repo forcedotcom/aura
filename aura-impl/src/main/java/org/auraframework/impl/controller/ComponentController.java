@@ -36,6 +36,7 @@ import org.auraframework.def.module.ModuleDef;
 import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.impl.java.controller.JavaAction;
 import org.auraframework.impl.javascript.controller.JavascriptPseudoAction;
+import org.auraframework.impl.util.ModuleDefinitionUtil;
 import org.auraframework.impl.util.TypeParser;
 import org.auraframework.impl.util.TypeParser.Type;
 import org.auraframework.instance.Action;
@@ -81,7 +82,7 @@ public class ComponentController implements Controller {
         private String cmpStack;
 
         public AuraClientException(String desc, String id, String message, String jsStack, String cmpStack,
-                                   InstanceService instanceService, ExceptionAdapter exceptionAdapter) {
+                                   InstanceService instanceService, ExceptionAdapter exceptionAdapter, ConfigAdapter configAdapter) {
             super(message);
             Action action = null;
             this.causeDescriptor = null;
@@ -135,10 +136,25 @@ public class ComponentController implements Controller {
                         String filepath = trace.substring(0, i);
                         String[] pathparts = filepath.split("/");
                         // we don't care about aura script file path
-                        if (pathparts.length > 1 && !pathparts[pathparts.length-1].matches("aura_.+")) {
+                        if (pathparts.length > 1 &&
+                            !pathparts[pathparts.length-1].matches("aura_.+")) {
                             if (this.componentName == null) {
                                 this.componentName = pathparts[pathparts.length-1];
                                 this.namespace = pathparts[pathparts.length-2];
+                                if (this.causeDescriptor == null || this.causeDescriptor.isEmpty()) {
+                                    // aura component sourceURL convention: components/ns/name.js
+                                    // aura library sourceURL convention: libraries/ns/name.js
+                                    // raptor component sourceURL convention: components/ns-name.js
+                                    // raptor library sourceURL convention: libraries/ns-name.js
+                                    if (this.namespace.equals("components") || this.namespace.equals("libraries")) {
+                                        String auraDescriptor = ModuleDefinitionUtil.convertToAuraDescriptor(this.componentName, configAdapter);
+                                        String[] parts = auraDescriptor.split(":");
+                                        this.namespace = parts[0];
+                                        this.componentName = parts[1];
+                                    }
+                                    this.causeDescriptor = String.format("markup://%s:%s", this.namespace, this.componentName);
+                                }
+                                break;
                             }
                         }
                     }
@@ -269,7 +285,7 @@ public class ComponentController implements Controller {
     public void reportFailedAction(@Key(value = "failedAction") String desc, @Key("failedId") String id,
                                    @Key("clientError") String error, @Key("clientStack") String stack, @Key("componentStack") String componentStack) {
         // Error reporting (of errors in prior client-side actions) are handled specially
-        AuraClientException ace = new AuraClientException(desc, id, error, stack, componentStack, instanceService, exceptionAdapter);
+        AuraClientException ace = new AuraClientException(desc, id, error, stack, componentStack, instanceService, exceptionAdapter, configAdapter);
         exceptionAdapter.handleException(ace, ace.getOriginalAction());
     }
 

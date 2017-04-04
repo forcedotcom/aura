@@ -16,6 +16,7 @@
 package org.auraframework.impl.util;
 
 import com.google.common.base.CaseFormat;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
@@ -32,6 +33,20 @@ public final class ModuleDefinitionUtil {
      * Converts module lower case, hyphenated name into Aura descriptor name.
      * Checks and uses existing namespace provided by ConfigAdapter
      *
+     * @param moduleComponentName module component name in namespace-name format
+     * @param configAdapter ConfigAdapter
+     * @return Aura descriptor name
+     */
+    public static String convertToAuraDescriptor(String moduleComponentName, @Nonnull ConfigAdapter configAdapter) {
+        String namespace = moduleComponentName.split("-")[0];
+        String name = moduleComponentName.substring(moduleComponentName.indexOf('-')+1);
+        return convertToAuraDescriptor(namespace, name, configAdapter);
+    }
+
+    /**
+     * Converts module lower case, hyphenated name into Aura descriptor name.
+     * Checks and uses existing namespace provided by ConfigAdapter
+     *
      * @param namespace namespace
      * @param name name
      * @param configAdapter ConfigAdapter
@@ -42,6 +57,7 @@ public final class ModuleDefinitionUtil {
         if (internalNamespace != null) {
             namespace = internalNamespace;
         }
+
         // camel case by default to match Aura naming convention
         name = CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, name);
 

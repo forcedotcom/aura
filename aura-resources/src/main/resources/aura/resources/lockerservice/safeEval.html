@@ -58,8 +58,6 @@
             }
             
             src = 'return ' + brackets[0] + '(function(window){\n' + src + '\n})' + brackets[1] + '.call(arguments[0], arguments[0])';
-          } else {
-            src = 'return (function(window){\n' + src + '\n}).call(arguments[0], arguments[0])';
           }
           
           for (var i = 0; i < options.levels; i++) {
@@ -116,7 +114,7 @@
           
           return fn.apply(originalThis, args);
       }
-      
+
       // adding non-configurable hook into parent window.
       var id = window.location.search.toLowerCase();
       switch (id) {
@@ -130,7 +128,7 @@
           case "?id=system":
               Object.defineProperty(parent, "$$safe-eval-compat$$", {
                   value: function(src, sourceURL, skipPreprocessing) {
-                      return safeEval(src, sourceURL, skipPreprocessing, false, arguments[0], arguments);
+                      return safeEval(src, sourceURL, skipPreprocessing, false, undefined, arguments);
                   }
               });
               break;

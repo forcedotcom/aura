@@ -150,7 +150,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
                 .append("function() { $A.componentService.addModule('")
                 .append(descriptor.getQualifiedName()).append("', ")
                 .append(code.substring(7, code.length()))
-                .append(" };");
+                .append("}");
         return processedCode.toString();
     }
 

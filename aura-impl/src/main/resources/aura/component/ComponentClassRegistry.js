@@ -183,7 +183,7 @@ ComponentClassRegistry.prototype.buildConstructor = function(componentProperties
     //#end
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    componentConstructor = $A.util.globalEval("(function " + className + "(config) { Ctor.call(this, config); });", {
+    componentConstructor = $A.util.globalEval("(function " + className + "(config) { Ctor.call(this, config); })", {
         "Ctor": Ctor
     });
     //#end

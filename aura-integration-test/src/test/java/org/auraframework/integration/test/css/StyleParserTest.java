@@ -24,7 +24,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.test.client.UserAgent;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.StyleParserException;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -70,27 +69,6 @@ public class StyleParserTest extends AuraImplTestCase {
     /**
      * Tests for validation of css files and creation of StyleDefs for aura components. {@link StyleParser}
      * 
-     * Negative Test Case 2: Have a single css file for a component. Break the Case sensitivity rule of CSS selectors.
-     * This test is sufficient to cover the test case for missing prefix for selectors.
-     * 
-     * Expected result: The parser should throw a StyleParserException.
-     */
-    @Test
-    public void testCaseSensitivity() throws Exception {
-        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testStyleSelectorCaseSensitivity",
-                StyleDef.class);
-        try {
-        	definitionService.getDefinition(descriptor);
-            fail("Should have caught the css selector in caps.");
-        } catch (StyleParserException expected) {
-            assertTrue(expected.getMessage().contains(
-                    "CSS selector must begin with '.testTestStyleSelectorCaseSensitivity'"));
-        }
-    }
-
-    /**
-     * Tests for validation of css files and creation of StyleDefs for aura components. {@link StyleParser}
-     * 
      * Positive Test Case 1: Have a single valid css file for a component.
      * 
      * Expected result: Pick up only the style defined in file.
@@ -101,26 +79,6 @@ public class StyleParserTest extends AuraImplTestCase {
         StyleDef style = definitionService.getDefinition(descriptor);
         assertTrue(style.getName().equals("testValidCSS"));
         serializeAndGoldFile(style, "_styleDef");
-    }
-
-    /**
-     * Tests for validation of css files and creation of StyleDefs for aura components. {@link StyleParser}
-     * 
-     * Positive Test Case 2: Have an invalid css file for a single component. Just leave on of the selectors definitions
-     * open.
-     * 
-     * Expected result: The parser should throw a StyleParserException.
-     */
-    @Test
-    public void testInvalidCss() throws Exception {
-        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testInValidCSS", StyleDef.class);
-        try {
-        	definitionService.getDefinition(descriptor);
-            fail("Should have caught the bad css");
-        } catch (StyleParserException expected) {
-            assertTrue("Incorrect message in StyleParserException",
-                    expected.getMessage().contains("Expected to find closing brace '}'"));
-        }
     }
 
     /**
@@ -166,25 +124,6 @@ public class StyleParserTest extends AuraImplTestCase {
         StyleDef style = definitionService.getDefinition(descriptor);
         assertTrue(style.getName().equals("testStyleNamespaceTokenValidCSS"));
         serializeAndGoldFile(style, "_styleDef");
-    }
-
-    /**
-     * Tests for substitution of the THIS token with the component's namespace for a set of invalid CSS rules.
-     * {@link StyleParser}
-     * 
-     * Expected result: The parser will throw exception based on type of error it encounters while parsing the CSS file.
-     */
-    @Test
-    public void testStyleNamespaceTokenInvalidCSS() throws Exception {
-        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testStyleNamespaceTokenInvalidCSS",
-                StyleDef.class);
-        try {
-        	definitionService.getDefinition(descriptor);
-            fail("Exception not thrown for some set of invalid CSS rules!");
-        } catch (StyleParserException expected) {
-            assertTrue("Incorrect message in StyleParserException", expected.getMessage().contains(
-                    "Unparsable text found at the end of the source '~div"));
-        }
     }
 
     /**
@@ -260,22 +199,6 @@ public class StyleParserTest extends AuraImplTestCase {
     }
 
     /**
-     * Tests for invalid values as part of browser conditionals.
-     */
-    @Test
-    public void testStyleNamespaceExceptions() throws Exception {
-        DefDescriptor<StyleDef> descriptor = definitionService.getDefDescriptor("test.testStyleNamespaceInvalidConditions",
-                StyleDef.class);
-        try {
-        	definitionService.getDefinition(descriptor);
-            fail("Exception not thrown for some set of invalid CSS rules!");
-        } catch (StyleParserException expected) {
-            assertTrue("Incorrect message in StyleParserException", expected.getMessage().contains(
-                    "Expected to find closing closing brace '}'"));
-        }
-    }
-
-    /**
      * Tests that templateCss is not validated but standard CSS files are.
      * 
      * W-1366145
@@ -321,21 +244,6 @@ public class StyleParserTest extends AuraImplTestCase {
          * lineCount.add(code.split("\n").length); } System.out.println(newTimes); System.out.println(oldTimes);
          * System.out.println(lineCount); holder.getDefaultCss(); //System.out.println(holder.getDefaultCss());
          */
-    }
-
-    @Test
-    public void testInvalidCSS() throws Exception {
-        try {
-            definitionService.getDefinition("auratest.invalidCss", StyleDef.class);
-            fail("Expected exception.");
-        } catch (QuickFixException e) {
-            String[] errors = e.getMessage().split("\n");
-            StringBuffer sb = new StringBuffer();
-            for (int i = 1; i < errors.length; i++) {
-                sb.append(errors[i]);
-            }
-            goldFileText(sb.toString());
-        }
     }
 
     /**

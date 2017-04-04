@@ -45,11 +45,10 @@ public class SVGDefTest extends AuraImplTestCase {
     @Test
     public void testSvgParsingLimit() throws Exception {
         try {
-            definitionService.getDefinition("test:svgIsTooLarge", SVGDef.class);
-            fail("SVGDef for 'test:svgIsTooLarge' should be too large.");
+            definitionService.getDefinition("validationTest:svgIsTooLarge", SVGDef.class);
+            fail("SVGDef for 'validationTest:svgIsTooLarge' should be too large.");
         } catch (Exception t) {
-            assertExceptionMessageStartsWith(t, SVGParserException.class,
-                    "SVGDef length must be less than");
+            assertExceptionMessageStartsWith(t, SVGParserException.class, "SVGDef length must be less than");
         }
     }
 }

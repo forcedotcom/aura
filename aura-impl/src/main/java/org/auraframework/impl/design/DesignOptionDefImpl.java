@@ -16,10 +16,13 @@
 
 package org.auraframework.impl.design;
 
+import java.io.Serializable;
+
 import org.auraframework.def.design.DesignOptionDef;
 import org.auraframework.def.genericxml.GenericXmlElement;
 
-public class DesignOptionDefImpl implements DesignOptionDef {
+public class DesignOptionDefImpl implements DesignOptionDef, Serializable {
+    private static final long serialVersionUID = 4612599723125527089L;
 
     private final GenericXmlElement tag;
 

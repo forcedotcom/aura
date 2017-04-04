@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    testCreatingAuraMethodOfRenderErrors: {
-    	test: function() {
-            var expected = "ERROR";
-            var actual;
+package org.auraframework.components;
 
-            $A.componentService.createComponent("validationTest:auraMethodError", {}, function(instance, status) {
-               actual = status;	
-            });
+import org.auraframework.adapter.ComponentLocationAdapter;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.springframework.context.annotation.Lazy;
+//import org.springframework.context.annotation.Profile;
 
-            $A.test.addWaitFor(expected, function() { return actual; });          
-    	}
+//@Profile("auraTestProfile")
+@Lazy
+@ServiceComponent
+public class AuraComponentsNegativeTestComponentLocationAdapter extends ComponentLocationAdapter.Impl {
+
+    public AuraComponentsNegativeTestComponentLocationAdapter() {
+        super(AuraComponentsFiles.NegativeTestComponents.asFile(), null, "components_aura_components_test_negative");
     }
-    
-})
+}

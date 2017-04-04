@@ -11,6 +11,7 @@
         <aura.home>${basedir}/..</aura.home>
         <component.dir>components_aura_components</component.dir>
         <component.test.dir>components_aura_components_test</component.test.dir>
+        <component.negativetest.dir>components_aura_components_test_negative</component.negativetest.dir>
         <component.compile.phase>process-classes</component.compile.phase>
         <component.test.compile.phase>process-test-classes</component.test.compile.phase>
     </properties>
@@ -133,14 +134,6 @@
                                 <argument>org.auraframework.tools.definition.AuraCompiler</argument>
                                 <argument>${basedir}/src/test/components</argument>
                                 <argument>${project.build.testOutputDirectory}/${component.test.dir}</argument>
-                                <argument>auratest</argument>
-                                <argument>tokenProviderTest</argument>
-                                <argument>flavorTest</argument>
-                                <argument>lintTest</argument>
-                                <argument>handleEventTest</argument>
-                                <argument>validationTest</argument>
-                                <argument>test</argument>
-                                <argument>testCustomNS1</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -201,6 +194,27 @@
                                 </resource>
                             </resources>
                             <outputDirectory>${project.build.testOutputDirectory}/${component.test.dir}</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-test-negative-components</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/test/negativeComponents</directory>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                    <excludes>
+                                        <exclude>**/.gitignore</exclude>
+                                    </excludes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.testOutputDirectory}/${component.negativetest.dir}</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>

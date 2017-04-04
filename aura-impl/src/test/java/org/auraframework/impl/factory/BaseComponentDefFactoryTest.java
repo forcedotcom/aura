@@ -35,6 +35,26 @@ public abstract class BaseComponentDefFactoryTest<D extends BaseComponentDef> ex
     Class<D> defClass;
     DefType type;
 
+//PUBLIC
+//     ATTRIBUTE_IMPLEMENTS
+//     ATTRIBUTE_ACCESS
+//     ATTRIBUTE_MODEL
+//     ATTRIBUTE_CONTROLLER
+//     ATTRIBUTE_EXTENDS
+//     ATTRIBUTE_EXTENSIBLE
+//     ATTRIBUTE_ABSTRACT
+//     ATTRIBUTE_API_VERSION
+//
+//INTERNAL
+//    ATTRIBUTE_RENDER
+//    ATTRIBUTE_TEMPLATE -- handled by subclass
+//    ATTRIBUTE_PROVIDER
+//    ATTRIBUTE_STYLE
+//    ATTRIBUTE_HELPER
+//    ATTRIBUTE_RENDERER
+//    ATTRIBUTE_DEFAULT_FLAVOR
+//    ATTRIBUTE_DYNAMICALLY_FLAVORABLE
+
     /**
      * Constructor for the common tests on both application and component bundles.
      *

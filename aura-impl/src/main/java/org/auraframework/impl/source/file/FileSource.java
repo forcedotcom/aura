@@ -37,8 +37,8 @@ public class FileSource<D extends Definition> extends AbstractTextSourceImpl<D> 
     private final File file;
     private final long lastModified;
 
-    public FileSource(DefDescriptor<D> newDescriptor, FileSource<D> original) throws IOException {
-        super(newDescriptor, getFilePath(original.file), original.getMimeType());
+    public FileSource(DefDescriptor<D> newDescriptor, FileSource<D> original, String mimeType) throws IOException {
+        super(newDescriptor, getFilePath(original.file), mimeType);
         this.file = original.file;
         this.lastModified = original.lastModified;
     }

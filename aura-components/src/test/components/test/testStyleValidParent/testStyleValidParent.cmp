@@ -16,5 +16,5 @@
 
 -->
 <aura:component>
-    <test:testStyleValidChild/>
+    <validationTest:testStyleValidChild/>
 </aura:component>

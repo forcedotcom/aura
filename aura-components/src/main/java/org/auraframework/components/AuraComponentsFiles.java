@@ -37,7 +37,12 @@ public enum AuraComponentsFiles {
     /**
      * File-based component root dir
      */
-    TestComponents(AuraComponentsModuleDirectory.getPath(), "src/test/components");
+    TestComponents(AuraComponentsModuleDirectory.getPath(), "src/test/components"),
+
+    /**
+     * File-based component root dir
+     */
+    NegativeTestComponents(AuraComponentsModuleDirectory.getPath(), "src/test/negativeComponents");
 
     private final String path;
 

@@ -23,6 +23,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.util.AuraTestingUtil;
 import org.auraframework.impl.util.AuraTestingUtil.BundleEntryInfo;
 import org.auraframework.system.BundleSource;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -52,5 +53,87 @@ public class ComponentDefFactoryTest extends BaseComponentDefFactoryTest<Compone
         ComponentDef def = factory.getDefinition(bundleSource.getDescriptor(), bundleSource);
         assertNotNull(def);
         assertNotNull(def.getDesignDef());
+    }
+
+    @Test
+    public void testEventHandlerDefHandler() throws Exception {
+        AuraTestingUtil util = getAuraTestingUtil();
+        BundleSource<ComponentDef> bundleSource = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class,
+                Lists.newArrayList(new BundleEntryInfo(DefType.COMPONENT,
+                "<aura:component><aura:handler event='aura:click' action='{!c.action}'/></aura:component>")));
+        ComponentDef def = factory.getDefinition(bundleSource.getDescriptor(), bundleSource);
+        assertNotNull(def);
+        // FIXME Test for the handler.
+    }
+
+    @Test
+    public void testEventHandlerDefHandlerNoName() throws Exception {
+        AuraTestingUtil util = getAuraTestingUtil();
+        BundleSource<ComponentDef> bundleSource = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class,
+                Lists.newArrayList(new BundleEntryInfo(DefType.COMPONENT,
+                    "<aura:component><aura:handler action='{!c.handleIt}'/></aura:component>"
+                )));
+        ComponentDef def = factory.getDefinition(bundleSource.getDescriptor(), bundleSource);
+        QuickFixException expected = null;
+
+        try {
+            def.validateDefinition();
+        } catch (QuickFixException qfe) {
+            expected = qfe;
+        }
+        assertNotNull(expected);
+    }
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////
+    // isTemplate
+    ////////////////////////////////////////////////////////////////////////////////////////
+    @Test
+    public void testCustomIsTemplateTrue() throws Exception {
+    }
+
+    @Test
+    public void testCustomIsTemplateFalse() throws Exception {
+    }
+
+    @Test
+    public void testCustomIsTemplateInvalid() throws Exception {
+    }
+
+    @Test
+    public void testInternalIsTemplateTrue() throws Exception {
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////
+    // template
+    ////////////////////////////////////////////////////////////////////////////////////////
+    @Test
+    public void testCustomTemplateNegative() throws Exception {
+    }
+
+    @Test
+    public void testInternalTemplate() throws Exception {
+    }
+
+    @Test
+    public void testInvalidImportNoName() throws Exception {
+        AuraTestingUtil util = getAuraTestingUtil();
+        BundleSource<ComponentDef> bundleSource = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class,
+                Lists.newArrayList(new BundleEntryInfo(DefType.COMPONENT,
+                    "<aura:component><aura:import property='testLibrary' /></aura:component>"
+                )));
+        ComponentDef def = factory.getDefinition(bundleSource.getDescriptor(), bundleSource);
+        QuickFixException expected = null;
+
+        try {
+            def.validateDefinition();
+        } catch (QuickFixException qfe) {
+            expected = qfe;
+        }
+        assertNotNull(expected);
     }
 }

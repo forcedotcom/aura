@@ -20,7 +20,6 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
@@ -72,11 +71,14 @@ public abstract class BundleBaseFactory<D extends RootDefinition> extends XMLPar
         Map<DefDescriptor<?>, Definition> defMap = Maps.newHashMap();
         for (Map.Entry<DefDescriptor<?>, Source<?>> entry : sourceMap.entrySet()) {
             if (!entry.getKey().equals(descriptor)) {
-                if (entry.getKey().getDefType() == DefType.STYLE) {
-                    // FIXME: we need template CSS here.
-                }
                 Definition d = bogusCompileCall(entry.getKey(), entry.getValue());
-                defMap.put(entry.getKey(), d);
+                if (d == null) {
+                    // DOH!
+                    System.out.println("FAILED: "+entry.getKey()+"@"+entry.getKey().getDefType()
+                            +" != "+descriptor+"@"+descriptor.getDefType());
+                } else {
+                    defMap.put(entry.getKey(), d);
+                }
             }
         }
         return defMap;

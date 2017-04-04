@@ -241,7 +241,13 @@ public class RegistrySerializer {
         }
 
         for (String name : namespaces) {
-            regs.add(getRegistry(master, name));
+            DefRegistry reg = getRegistry(master, name);
+            if (reg != null) {
+                regs.add(reg);
+            }
+        }
+        if (error) {
+            return;
         }
 
         ObjectOutputStream objectOut = null;
@@ -298,6 +304,7 @@ public class RegistrySerializer {
                 if (def == null) {
                     logger.error("Unable to find " + desc + "@" + desc.getDefType());
                     error = true;
+                    continue;
                 }
                 types.add(desc.getDefType());
                 prefixes.add(desc.getPrefix());
@@ -319,6 +326,9 @@ public class RegistrySerializer {
                 logger.error(qfe);
                 error = true;
             }
+        }
+        if (error) {
+            return null;
         }
         return new StaticDefRegistryImpl(types, prefixes, namespaces, filtered.values());
     }

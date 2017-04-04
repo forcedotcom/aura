@@ -31,6 +31,7 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.impl.source.file.FileSource;
+import org.auraframework.impl.source.AbstractTextSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -81,7 +82,6 @@ public class ComponentDefFactory extends BaseComponentDefFactory<ComponentDef> {
         public void callback(boolean isTemplate) throws QuickFixException {
             Map<DefDescriptor<?>, Source<?>> newSourceMap = source.getBundledParts();
             if (isTemplate) {
-                newSourceMap = Maps.newHashMap(newSourceMap);
                 DefDescriptor<ComponentDef> descriptor = source.getDescriptor();
                 DefDescriptor<StyleDef> oldDesc = new DefDescriptorImpl<StyleDef>("css", descriptor.getNamespace(),
                             descriptor.getName(), StyleDef.class);
@@ -93,7 +93,9 @@ public class ComponentDefFactory extends BaseComponentDefFactory<ComponentDef> {
                     try {
                         DefDescriptor<StyleDef> newDesc = new DefDescriptorImpl<StyleDef>("templateCss",
                                 descriptor.getNamespace(), descriptor.getName(), StyleDef.class);
-                        cssSource = new FileSource<>(newDesc, cssSource);
+                        cssSource = new FileSource<>(newDesc, cssSource, AbstractTextSourceImpl.MIME_TEMPLATE_CSS);
+
+                        newSourceMap = Maps.newHashMap(newSourceMap);
                         newSourceMap.remove(oldDesc);
                         newSourceMap.put(newDesc, cssSource);
                     } catch (IOException ioe) {

@@ -292,10 +292,10 @@
     testCreateBadServerComponent:{
         test: function(cmp){
             var actionComplete = false;
-            $A.createComponent("test:test_Preload_BadCmp", null, function(newCmp, status, statusDetail) {
+            $A.createComponent("validationTest:test_Preload_BadCmp", null, function(newCmp, status, statusDetail) {
                 $A.test.assertNull(newCmp, "No component expected on error");
                 $A.test.assertEquals("ERROR", status, "Wrong status");
-                $A.test.assertTrue($A.test.contains(statusDetail, "There is already an attribute named 'dup' on component 'test:test_Preload_BadCmp'."),
+                $A.test.assertTrue($A.test.contains(statusDetail, "There is already an attribute named 'dup' on component 'validationTest:test_Preload_BadCmp'."),
                         "Incorrect error message returned in error component when trying to create invalid component");
                 actionComplete = true;
             });

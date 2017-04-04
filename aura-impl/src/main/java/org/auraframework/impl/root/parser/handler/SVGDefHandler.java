@@ -49,12 +49,14 @@ public class SVGDefHandler<D extends Definition> {
         try {
             long length = IOUtil.countNumberOfCharacters(stream);
             if (length > MAX_SVG_LENGTH) {
-                throw new SVGParserException("SVGDef length must be less than " + MAX_SVG_LENGTH, null);
+                builder.setParseError(new SVGParserException("SVGDef length must be less than "+MAX_SVG_LENGTH,
+                            builder.getLocation()));
+                return;
             }
         } catch (IOException e) {
-            throw new SVGParserException(e.getMessage(), null);
+            builder.setParseError(new SVGParserException(e.getMessage(), builder.getLocation()));
+            return;
         }
-
         builder.setSource(source);
     }
 

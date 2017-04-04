@@ -34,19 +34,6 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         serializeAndGoldFile(eventHandlerDef2);
     }
 
-    @Test
-    public void testHandlerWithoutNameOrEventAttribute() throws Exception {
-        DefDescriptor<ComponentDef> componentDefDescriptor = definitionService.getDefDescriptor(
-                "handleEventTest:handlerWithoutNameOrEvent", ComponentDef.class);
-        try {
-            definitionService.getDefinition(componentDefDescriptor);
-            fail("Expected InvalidDefinitionException");
-        } catch (InvalidDefinitionException e) {
-            assertEquals("Incorrect exception message",
-                    "aura:handler must specify at least one of name=\"…\" or event=\"…\"", e.getMessage());
-        }
-    }
-
     /**
      * A aura:handler for a component event with event attribute specified is invalid. Should be name attribute that is
      * specified.

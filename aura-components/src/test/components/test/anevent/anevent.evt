@@ -17,10 +17,10 @@
 -->
 <!-- comment first -->
 
-    <aura:event type="component">
-<aura:attribute name="att1" type="String"/>
-            <aura:attribute name="att2" required="true" type="String"/>
+<aura:event type="component">
+    <aura:attribute name="att1" type="String"/>
+    <aura:attribute name="att2" required="true" type="String"/>
 
-      <aura:attribute name="att3" type="String"/>
-  <!-- more comments -->
+    <aura:attribute name="att3" type="String"/>
+    <!-- more comments -->
 </aura:event>

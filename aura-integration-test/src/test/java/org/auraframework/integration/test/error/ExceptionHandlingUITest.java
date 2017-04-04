@@ -286,10 +286,10 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
      */
     @Test
     public void testControllerThrowsWithFileName() throws Exception {
-        String fileName = "auratest/parseError";
+        String fileName = "validationTest/parseError";
         openRaw(fileName + ".cmp");
         assertStacktrace("org.auraframework.throwable.AuraRuntimeException: ");
-        assertStacktrace("auratest/parseError/parseErrorController.js");
+        assertStacktrace("validationTest/parseError/parseErrorController.js");
     }
 
     /**

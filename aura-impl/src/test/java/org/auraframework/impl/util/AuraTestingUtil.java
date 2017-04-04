@@ -603,6 +603,26 @@ public class AuraTestingUtil {
     }
 
     /**
+     * Build a single text source with a static name.
+     *
+     * This is intended for unit testing, or submodule testing. The source provided here is not registered
+     * anywhere and cannot be looked up by aura. This means that it can only be used for sub-unit testing.
+     *
+     * Preferably use the version without the name.
+     *
+     * @param namespace the namespace (should be one of the provided ones here) - specifies internal/priveleged/custom
+     * @param namespace the name
+     * @param defClass the class of the source.
+     * @param contents the contents for the source.
+     */
+    public <D extends Definition> TextSource<D> buildTextSource(String namespace, String name, Class<D> defClass,
+            String contents) {
+        DefType type = DefType.getDefType(defClass);
+        DefDescriptor<D> descriptor = new DefDescriptorImpl<>(prefixMap.get(type), namespace, name, defClass);
+        return new StringSource<>(descriptor, contents, descriptor.getQualifiedName(), formatMap.get(type));
+    }
+
+    /**
      * Build a single text source.
      *
      * This is intended for unit testing, or submodule testing. The source provided here is not registered
@@ -614,11 +634,7 @@ public class AuraTestingUtil {
      */
     public <D extends Definition> TextSource<D> buildTextSource(String namespace, Class<D> defClass,
             String contents) {
-        String name;
-        DefType type = DefType.getDefType(defClass);
-        name = "name"+random.nextLong();
-        DefDescriptor<D> descriptor = new DefDescriptorImpl<>(prefixMap.get(type), namespace, name, defClass);
-        return new StringSource<>(descriptor, contents, descriptor.getQualifiedName(), formatMap.get(type));
+        return buildTextSource(namespace, "name"+random.nextLong(), defClass, contents);
     }
 
     /**

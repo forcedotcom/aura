@@ -221,8 +221,10 @@
             getElmt   = function (t) { return t; },
             position,
             item, targetCmp, actionHandler, actionHandlerScope;
-
-        while (target) {
+            
+        // target = target.parentNode, it may reach the root document which doesn't have the getAttribute method
+        while (target && target.getAttribute) {
+            
             if (target.getAttribute("data-virtualDataTable-skipEventDelegation")) {
                 // only clear out the handlers but continue in case there are more event handlers to be executed
                 handlers  = [];

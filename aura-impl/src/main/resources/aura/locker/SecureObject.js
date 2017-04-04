@@ -189,7 +189,7 @@ SecureObject.filterEverything = function(st, raw, options) {
             } else if (raw instanceof Event) {
                 swallowed = SecureDOMEvent(raw, key);
                 mutated = true;
-            } else if (raw["Window"] && raw instanceof raw["Window"]) {
+            } else if (typeof raw["Window"] === "function" && raw instanceof raw["Window"]) {
                 // Cross realm window instances (window.open() and iframe.contentWindow)
                 swallowed = SecureIFrameElement.SecureIFrameContentWindow(raw, key);
                 SecureObject.addMethodIfSupported(swallowed, raw, "close");

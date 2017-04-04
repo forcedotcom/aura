@@ -256,7 +256,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     @Test
     public void testGetSvgResource() throws Exception {
         String requestContext = getSimpleContext(Format.SVG, false);
-        String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/test:fakeComponent/resources.svg";
+        String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/componentTest:hasSvg/resources.svg";
 
         HttpGet get = obtainGetMethod(url);
         HttpResponse httpResponse = perform(get);
@@ -268,7 +268,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         assertNotNull(response);
         assertTrue("SVG source was not found in the response.", response.contains("SVG"));
 
-        url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/test:doesNotExist/resources.svg";
+        url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/componentTest:hasBody/resources.svg";
 
         get = obtainGetMethod(url);
         httpResponse = perform(get);

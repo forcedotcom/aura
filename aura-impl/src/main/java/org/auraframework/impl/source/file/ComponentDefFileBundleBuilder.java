@@ -31,6 +31,7 @@ import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.source.BundleSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -77,6 +78,10 @@ public class ComponentDefFileBundleBuilder implements FileBundleSourceBuilder {
                 case ".cmp":
                     descriptor = cmpDesc;
                     format = Format.XML;
+                    break;
+                case "Test.js":
+                    descriptor = new DefDescriptorImpl<>("js", namespace, name, TestSuiteDef.class);
+                    format = Format.JS;
                     break;
                 case "Controller.js":
                     descriptor = new DefDescriptorImpl<>("js", namespace, name, ControllerDef.class);

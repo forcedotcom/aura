@@ -349,7 +349,9 @@ AuraClientService.prototype.deferPendingActions = function() {
     }
 };
 
-//#if {"excludeModes" : ["PRODUCTION"]}
+/**
+ * @private
+ */
 AuraClientService.prototype.getSourceMapsUrl = function (descriptor, type) {
     if (window.location) {
         var splitChar = ':';
@@ -364,7 +366,6 @@ AuraClientService.prototype.getSourceMapsUrl = function (descriptor, type) {
         return [window.location.origin, folder, parts.join('/'),'.js'].join('');
     }
 };
-//#end
 
 /**
  * Take a json (hopefully) response and decode it. If the input is invalid JSON, we try to handle it gracefully.

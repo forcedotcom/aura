@@ -79,20 +79,6 @@ ComponentClassRegistry.prototype.getComponentClass = function(descriptor, def) {
     if (!storedConstructor) {
         var exporter = this.classExporter[descriptor];
         if (exporter) {
-            //#if {"excludeModes" : ["PRODUCTION"]}
-                url = $A.clientService.getSourceMapsUrl(descriptor);
-                exporter = $A.util.globalEval(exporter.toString(), null, url);
-                if(!exporter) {
-                    var defDescriptor = new Aura.System.DefDescriptor(descriptor);
-                    var includeComponentSource = defDescriptor.getPrefix() === "layout" || $A.clientService.isInternalNamespace(defDescriptor.getNamespace());
-                    var errorMessage = (!includeComponentSource) ? 
-                        "Hydrating the component" + descriptor + " failed." : 
-                        "Hydrating the component" + descriptor + " failed.\n Exporter code: " + exporter;
-                    var auraError = new $A.auraError(errorMessage, null, $A.severity.QUIET);
-                    auraError["component"] = descriptor;
-                    throw auraError;
-                }
-            //#end
             var componentProperties = exporter();
             storedConstructor = this.buildComponentClass(componentProperties);
             this.classConstructors[descriptor] = storedConstructor;

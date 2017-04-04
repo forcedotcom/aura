@@ -168,20 +168,6 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
             return new JavascriptComponentClass(this);
         }
 
-        @Override
-        public String getSourceUrl() {
-            String desc = jsDescriptor.split("://")[1];
-            String[] parts = desc.split(":");
-            StringBuilder sb = new StringBuilder();
-            sb.append("//# sourceURL=components");
-            for (String part : parts) {
-                sb.append('/');
-                sb.append(part);
-            }
-            sb.append(".js\n");
-            return sb.toString();
-        }
-
         private void writeExporter(StringBuilder out) throws QuickFixException {
 
             out.append("function() {\n");

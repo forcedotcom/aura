@@ -1180,7 +1180,7 @@ AuraComponentService.prototype.hydrateComponent = function(descriptor, exporter)
     var tmp = exporter.toString();
     var pos = [tmp.indexOf('/*') + 2, tmp.indexOf('*/')];
     tmp = tmp.substr(pos[0], pos[1] - pos[0]);
-    exporter = $A.util.globalEval("function () {" + tmp + " }");
+    exporter = $A.util.globalEval("function () {" + tmp + " }", undefined, $A.clientService.getSourceMapsUrl(descriptor));
 
     if(!exporter) {
         var defDescriptor = new Aura.System.DefDescriptor(descriptor);
@@ -1228,10 +1228,8 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
     }
 
     if (!entry.dependencies) {
-        //#if {"excludeModes" : ["PRODUCTION"]}
-            url = $A.clientService.getSourceMapsUrl(descriptor);
-        //#end
-        factory = $A.util.globalEval(entry["exporter"], null, url);
+        url = $A.clientService.getSourceMapsUrl(descriptor);
+        factory = $A.util.globalEval(entry["exporter"], undefined, url);
         factory();
     }
 

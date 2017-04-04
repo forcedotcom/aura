@@ -124,7 +124,7 @@ LibraryIncludeRegistry.prototype.hydrateLibrary = function(descriptor, exporter)
     var pos = [tmp.indexOf('/*') + 2, tmp.indexOf('*/')];
     
     tmp = tmp.substr(pos[0], pos[1] - pos[0]);
-    exporter = $A.util.globalEval("function () {" + tmp + " }");
+    exporter = $A.util.globalEval("function () {" + tmp + " }", undefined, $A.clientService.getSourceMapsUrl(descriptor, 'lib'));
     
     if(!exporter) {
         var defDescriptor = new Aura.System.DefDescriptor(descriptor);
@@ -180,11 +180,6 @@ LibraryIncludeRegistry.prototype.buildLibraryInclude = function(descriptor) {
     if (resolved) {
         var exporter = this.exporter[descriptor];
         var url;
-
-        //#if {"excludeModes" : ["PRODUCTION"]}
-            url = $A.clientService.getSourceMapsUrl(descriptor, 'lib');
-            exporter = ($A.util.globalEval("function() { return " + exporter.toString() + "}", null, url)());
-        //#end
         if (!$A.util.isFunction(exporter)) {
             throw new Error("Library include not defined: " + descriptor);
         }

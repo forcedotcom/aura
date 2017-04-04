@@ -172,6 +172,9 @@ Logger.prototype.reportError = function(e, action, foreground){
     e["reported"] = true;
 };
 
+/**
+ * @private
+ */
 Logger.prototype.isExternalError = function(e) {
     if (!e) {
         return false;

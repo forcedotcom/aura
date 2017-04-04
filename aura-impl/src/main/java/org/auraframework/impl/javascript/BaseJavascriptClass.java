@@ -95,8 +95,6 @@ public abstract class BaseJavascriptClass implements Serializable {
          */
         protected abstract String generate() throws QuickFixException;
 
-        protected abstract String getSourceUrl();
-
         protected void finish() throws QuickFixException {
             code = generate();
             if (minify && hasCode()) {
@@ -120,7 +118,6 @@ public abstract class BaseJavascriptClass implements Serializable {
             StringBuilder sb = new StringBuilder();
             int lastCurlyPos = codeToWrite.lastIndexOf('}');
             sb.append(codeToWrite.substring(0, lastCurlyPos));
-            sb.append(getSourceUrl());
             sb.append(codeToWrite.substring(lastCurlyPos));
             return sb.toString();
         }

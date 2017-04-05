@@ -28,5 +28,81 @@ Test.Aura.Event.Event=function(){
     function DoesNotOverrideEventGlobal() {
         Assert.NotEqual(Object.Global().Event, Aura.Event.Event);
     }
+	
+	[Fixture]
+    function executeHandlerIterator() {
+		var auraContext = {
+				stack : [],
+				"setCurrentAccess": function(cmp) {
+					this.stack.push(cmp)
+				},
+				"releaseCurrentAccess": function() {
+					this.stack.pop();
+				},
+				"getStackLength": function() {
+					return this.stack.length;
+				},
+				"resetStack": function() {
+					this.stack = [];
+				}
+		};
+		var mockFramework = Mocks.GetMocks(Object.Global(), {
+			"$A": {
+	            "getContext": function() {
+	            	return auraContext;
+	            },
+				"lockerService": {
+	            	"trust": function(a, b) {}
+	            }
+	        }
+		}
+		);
+		[Fact]
+		function releaseContextNoMatterWhat() {
+			// Arrange
+			var eventCmp = {};
+			var eventDefDescriptor = {
+					"getQualifiedName": function() { return "markup://aura:methodCall" }, //for getEventExecutionType(), also isComponentEventType will be false
+					"toString": function() { return "markup://aura:methodCall" }
+			};
+			var eventDef = {
+					"getDescriptor": function() { return eventDefDescriptor; }
+			};
+			var eventDispatcher = {};
+			var eventName = "testEvent";
+			var mockEventConfig = {
+			        "name" : eventName,
+			        "eventDef" : eventDef,
+			        "component" : eventCmp,
+			        "eventDispatcher" : eventDispatcher
+		    };
+			var mockHandler = {
+				"value": {
+					"handler": function(thisEvent) { thisEvent.paused = true; throw Error("from testing event"); },
+					"phase": "mockPhase"
+				}	
+			};
+			var mockHandlerIterator = {
+					"next": function() {
+						return mockHandler;
+					}
+			};
+			
+			// Act
+			auraContext.resetStack();
+            mockFramework(function(){
+                var target = new Aura.Event.Event(mockEventConfig);
+                try { 
+                	target.executeHandlerIterator(mockHandlerIterator);
+                } catch(err) {
+                	//expected, we did throw error "from testing event"
+                }
+            });
+
+            // Assert
+            Assert.True(auraContext.getStackLength() == 0);
+		}
+	}
+	
 
 };	

@@ -22,5 +22,12 @@ Aura.ExportsModule = {
         } finally {
             context.releaseCurrentAccess();    
         }
+    },
+    "labels": function (obj) {
+        return Object.keys(obj).reduce(function(r, cmpKey) {
+            var key = obj[cmpKey];
+            r[cmpKey] = $A.get('$Label.' + key);
+            return r;
+        }, {});
     }
 };

@@ -47,7 +47,7 @@ public class RegistryTrie implements RegistrySet {
     
     private static String getNamespaceKey(String namespace) {
         // W-3676967: temporarily allow a case-sensitive "duplicate" namespace, should be lower-cased otherwise
-    	return "ONE".equals(namespace) ? namespace : namespace.toLowerCase();
+    	return ("SocialService".equals(namespace) || "ONE".equals(namespace)) ? namespace : namespace.toLowerCase();
     }
 
     private void initializeHashes() {

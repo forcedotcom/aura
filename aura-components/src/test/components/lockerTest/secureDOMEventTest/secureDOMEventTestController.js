@@ -9,7 +9,7 @@
         var domEvent;
         var element = cmp.find("title").getElement();
         element.addEventListener("click", function(e) {
-        	domEvent = e;
+            domEvent = e;
         });
         element.click(); 
         testUtils.assertStartsWith("SecureDOMEvent", domEvent.toString());

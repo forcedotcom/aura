@@ -16,7 +16,10 @@
 ({
     handleVisibilityChange: function (component, event, helper) {
         if (component.get("v.visible")) {
-            helper.position(component);
+            var popupTarget = component.find("popupTarget");
+            if (popupTarget.isRendered()) {
+                helper.position(component);
+            }
         } else {
             helper.unposition(component);
         }

@@ -1,0 +1,13 @@
+.THIS {
+	margin: 5px;
+}
+
+.THIS moduletest-simple .modules-container {
+	padding: 5px;
+	border: 2px solid red;
+}
+
+.THIS .aura {
+	padding: 10px;
+	border:1px solid blue;
+}

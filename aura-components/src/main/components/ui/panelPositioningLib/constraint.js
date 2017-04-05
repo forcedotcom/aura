@@ -134,12 +134,11 @@ function lib() { //eslint-disable-line no-unused-vars
                     }
 
                     if(boxDirs.right && elementBox.left + elementBox.width > (targetBox.left + targetBox.width) - pad) {
-                        // retBox.left = elementBox.left - (elementBox.right - targetBox.right);
                         retBox.left = (targetBox.left + targetBox.width) - elementBox.width - pad;
                     }
                     
-                    if(boxDirs.bottom && elementBox.top + elementBox.height + window.scrollY > targetBox.top + targetBox.height +window.scrollY - pad) {
-                        retBox.top = targetBox.top + targetBox.height - elementBox.height - window.scrollY - pad; 
+                    if(boxDirs.bottom && elementBox.top + elementBox.height > targetBox.top + targetBox.height - pad) {
+                        retBox.top = targetBox.top + targetBox.height - elementBox.height - pad;
                     }
 
                     return retBox;

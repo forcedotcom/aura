@@ -277,7 +277,7 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
                     enabled: config.enabled,
                     target: elementProxyFactory.getElement(scrollableParent),
                     type: 'bounding box',
-                    pad: 5,
+                    pad: 3,
                     boxDirections: {top: true, bottom: true, left: true, right: true}
                 };
                 constraintList.push(new Constraint(boxConfig.type, boxConfig));

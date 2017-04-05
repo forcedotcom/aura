@@ -478,6 +478,11 @@ function getArrayLikeThingProxyHandler(key) {
                     }
 
                     return ret;
+                },
+                "has": function(target, property) {
+                    var raw = ls_getRef(target, key);
+                    var filtered = getFilteredArray(raw, key);
+                    return property in filtered;
                 }
         };
 

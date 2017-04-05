@@ -143,21 +143,10 @@ SecureObject.filterEverything = function(st, raw, options) {
                     ls_setKey(raw, defaultKey);
                     return SecureObject.filterEverything(st, raw, options);
                 } else {
-                    // DCHASMAN TODO Replace this with SecureObject.createProxyForArrayLikeObjects() once it supports mutating operations!!!
-
-                    swallowed = [];
-
-                    for (var n = 0; n < raw.length; n++) {
-                        var newValue = SecureObject.filterEverything(st, raw[n]);
-
-                        if (!ls_isOpaque(newValue)) {
-                            swallowed.push(newValue);
-                        }
-
-                        mutated = mutated || (newValue !== raw[n]);
-                    }
-
+                    swallowed = SecureObject.createProxyForArrayObjects(raw, key);
                     ls_setRef(swallowed, raw, key);
+                    ls_addToCache(raw, swallowed, key);
+                    mutated = true;
                 }
             }
         } else if (isNodeList) {
@@ -205,7 +194,7 @@ SecureObject.filterEverything = function(st, raw, options) {
             } else {
                 if (!belongsToLocker) {
                     if (!rawKey) {
-                        // Object that was created in this locker or insystem mode and not yet keyed - key it now
+                        // Object that was created in this locker or in system mode and not yet keyed - key it now
                         ls_setKey(raw, defaultKey);
                         return SecureObject.filterEverything(st, raw, options);
                     } else {
@@ -391,9 +380,9 @@ SecureObject.createFilteringProxy = function(raw, key) {
 
 
 //We cache 1 array like thing proxy per key
-var KEY_TO_ARRAY_LIKE_THING_HANLDER = typeof Map !== "undefined" ? new Map() : undefined;
+var KEY_TO_ARRAY_LIKE_THING_HANDLER = typeof Map !== "undefined" ? new Map() : undefined;
 
-function getFilteredArray(raw, key) {
+function getFilteredArrayLikeThings(raw, key) {
     var filtered = [];
 
     for (var n = 0; n < raw.length; n++) {
@@ -402,7 +391,6 @@ function getFilteredArray(raw, key) {
             filtered.push(value);
         }
     }
-
     return filtered;
 }
 
@@ -410,85 +398,88 @@ function getArrayLikeThingProxyHandler(key) {
     function getFromFiltered(so, filtered, index) {
         // Numeric indexing into array
         var value = filtered[index];
-        return value ? SecureObject.filterEverything(so, value) : value;	
+        return value ? SecureObject.filterEverything(so, value) : value;
     }
 
-    var handler = KEY_TO_ARRAY_LIKE_THING_HANLDER.get(key);
-    if (!handler) {    	
+    var handler = KEY_TO_ARRAY_LIKE_THING_HANDLER.get(key);
+    if (!handler) {
         handler = {
-                "get": function(target, property) {
-                    var raw = ls_getRef(target, key);
+            "get": function(target, property) {
+                var raw = ls_getRef(target, key);
 
-                    var filtered = getFilteredArray(raw, key);
-                    var ret;
+                var filtered = getFilteredArrayLikeThings(raw, key);
+                var ret;
 
-                    property = convertSymbol(property);
-                    if (isNaN(property)) {
-                        switch (property) {
+                property = convertSymbol(property);
+                if (isNaN(property)) {
+                    switch (property) {
                         case "length":
                             ret = filtered.length;
                             break;
 
-                        case "item": 
-                            ret = function(index) {
-                            return getFromFiltered(handler, filtered, index);
-                        };
-                        break;
+                        case "item":
+                            ret = function (index) {
+                                return getFromFiltered(handler, filtered, index);
+                            };
+                            break;
 
-                        case "namedItem": 
-                            ret = function(name) {
-                            var value = raw.namedItem(name);
-                            return value ? SecureObject.filterEverything(handler, value) : value;	
-                        };
-                        break;
+                        case "namedItem":
+                            ret = function (name) {
+                                var value = raw.namedItem(name);
+                                return value ? SecureObject.filterEverything(handler, value) : value;
+                            };
+                            break;
 
                         case "toString":
-                            ret = function() {
-                            return raw.toString();
-                        };
-                        break;
+                            ret = function () {
+                                return raw.toString();
+                            };
+                            break;
 
                         case "toJSON":
-                            ret = function() {
-                            return JSON.stringify(filtered);
-                        };
-                        break;
+                            ret = function () {
+                                return JSON.stringify(filtered);
+                            };
+                            break;
                         case "Symbol(Symbol.iterator)":
                             ret = function () {
-                            var nextIndex = 0;
-                            return {
-                                next: function() {
-                                    if(nextIndex < filtered.length) {
-                                        var value = filtered[nextIndex];
-                                        nextIndex++;
-                                        return {value: value ? SecureObject.filterEverything(handler, value) : value, done: false};
-                                    } else {
-                                        return {done: true};
+                                var nextIndex = 0;
+                                return {
+                                    next: function () {
+                                        if (nextIndex < filtered.length) {
+                                            var value = filtered[nextIndex];
+                                            nextIndex++;
+                                            return {
+                                                value: value ? SecureObject.filterEverything(handler, value) : value,
+                                                done: false
+                                            };
+                                        } else {
+                                            return {done: true};
+                                        }
                                     }
-                                }
+                                };
                             };
-                        };
-                        break;
+                            break;
                         default:
                             $A.warning("Unsupported " + raw + " method: " + property + ". Returning undefined");
-                        return undefined;
-                        }
-                    } else {
-                        ret = getFromFiltered(handler, filtered, property);		    		
+                            return undefined;
                     }
+                } else {
+                    ret = getFromFiltered(handler, filtered, property);
+                }
 
                     return ret;
-                },
-                "has": function(target, property) {
-                    var raw = ls_getRef(target, key);
-                    var filtered = getFilteredArray(raw, key);
-                    return property in filtered;
-                }
+            },
+            "has": function(target, property) {
+                var raw = ls_getRef(target, key);
+                var filtered = getFilteredArrayLikeThings(raw, key);
+                return property in filtered;
+            }
         };
 
         ls_setKey(handler, key);
 
-        KEY_TO_ARRAY_LIKE_THING_HANLDER.set(key, handler);
+        KEY_TO_ARRAY_LIKE_THING_HANDLER.set(key, handler);
 
         Object.freeze(handler);
     }
@@ -501,6 +492,306 @@ SecureObject.createProxyForArrayLikeObjects = function(raw, key) {
     ls_setRef(surrogate, raw, key);
 
     var proxy = new Proxy(surrogate, getArrayLikeThingProxyHandler(key));   
+    ls_setKey(proxy, key);
+    ls_registerProxy(proxy);
+
+    return proxy;
+};
+
+//We cache 1 array proxy per key
+var KEY_TO_ARRAY_HANLDER = typeof Map !== "undefined" ? new Map() : undefined;
+
+function getFilteredArray(st, raw, key) {
+    var filtered = [];
+
+    for (var n = 0; n < raw.length; n++) {
+        var value = raw[n];
+        var validEntry = false;
+        if (!value // Array can contain undefined/null/false/0 such falsy values
+            || ls_getKey(value) === key // Value has been keyed and belongs to this locker
+        ) {
+            validEntry = true;
+        } else {
+            var filteredValue = SecureObject.filterEverything(st, value, {defaultKey: key});
+            if (filteredValue && !ls_isOpaque(filteredValue)) {
+                validEntry = true;
+            }
+        }
+        if (validEntry) {
+            // Store the raw index and value in an object
+            filtered.push({"rawIndex": n, "rawValue" : value});
+        }
+    }
+
+    return filtered;
+}
+
+function getArrayProxyHandler(key) {
+    function getFromFiltered(so, filtered, index) {
+        // Numeric indexing into array
+        var value = filtered[index] ? filtered[index]["rawValue"]: filtered[index];
+        return value ? SecureObject.filterEverything(so, value) : value;
+    }
+    function getFilteredValues(so, filtered) { // Gather values from the filtered array
+        var ret = [];
+        filtered.forEach(function(item){
+            var value = item["rawValue"];
+            ret.push(value ? SecureObject.filterEverything(so, value) : value);
+        });
+        return ret;
+    }
+    var handler = KEY_TO_ARRAY_HANLDER.get(key);
+    if (!handler) {
+        handler = {
+            "get": function(target, property) {
+                var raw = ls_getRef(target, key);
+
+                var filtered = getFilteredArray(handler, raw, key);
+                var ret;
+
+                property = convertSymbol(property);
+                if (isNaN(property) || parseFloat(property) < 0 || (parseFloat(property) !== 0 && parseFloat(property) !== parseInt(property, 10))) {
+                    switch (property) {
+                        case "length":
+                            ret = filtered.length;
+                            break;
+                        case "pop":
+                            ret = function() {
+                                if (filtered.length > 0){
+                                    // Get the filtered value by index to return
+                                    var itemValue = getFromFiltered(handler, filtered, filtered.length - 1);
+                                    // Get raw index and update the raw array
+                                    var itemToRemove = filtered.pop();
+                                    raw.splice(itemToRemove["rawIndex"], 1);
+                                    return itemValue;
+                                } else {
+                                    return undefined;
+                                }
+                            };
+                            break;
+                        case "push":
+                            ret = function() {
+                                if (arguments.length === 0 ){
+                                    return filtered.length;
+                                }
+                                for (var i = 0; i < arguments.length ; i++) {
+                                    raw.push(SecureObject.filterEverything(handler, arguments[i]));
+                                }
+                                return filtered.length + arguments.length;
+                            };
+                            break;
+                        case "reverse":
+                            ret = function() {
+                                raw.reverse();
+                                return ls_getFromCache(raw, key);
+                            };
+                            break;
+                        case "shift":
+                            ret = function() {
+                                if (filtered.length > 0){
+                                    // Get the filtered value by index to return
+                                    var itemValue = getFromFiltered(handler, filtered, 0);
+                                    // Get raw index and update the raw array
+                                    var itemToRemove = filtered.shift();
+                                    raw.splice(itemToRemove["rawIndex"], 1);
+                                    return itemValue;
+                                } else {
+                                    return undefined;
+                                }
+                            };
+                            break;
+                        case "sort":
+                            ret = function(compareFunction) {
+                                if (arguments.length > 0){
+                                    raw.sort(SecureObject.filterEverything(handler, compareFunction));
+                                } else{
+                                    raw.sort();
+                                }
+                                return ls_getFromCache(raw, key);
+                            };
+                            break;
+                        case "splice":
+                            ret = function(start, deleteCount) {
+                                var positionToInsert = raw.length; // By default insert at the end of raw
+                                var itemsToRemove = filtered.splice(start, deleteCount);
+                                // If there are items to remove
+                                if (itemsToRemove.length > 0) {
+                                    // Get position to insert the new items if there are any
+                                    positionToInsert = itemsToRemove[0]["rawIndex"];
+                                    // Remove from raw
+                                    for (var i = 0; i < itemsToRemove.length ; i++) {
+                                        var itemToRemove = itemsToRemove[i];
+                                        // Remove from raw
+                                        raw.splice((itemToRemove["rawIndex"] - i), 1);  // Since we are removing elements from raw, account for index adjustment
+                                    }
+                                } else {
+                                    // Not deleting anything but inserting
+                                    if (start >= 0 && start < filtered.length) {
+                                        positionToInsert = filtered[start]["rawIndex"];
+                                    } else if (start >= filtered.length){ // If position is bigger than filtered's last index, insert at end of raw
+                                        positionToInsert = raw.length;
+                                    } else { // If start is a negative
+                                        // If trying to insert at the beginning of filtered array
+                                        if((filtered.length + start) <= 0) {
+                                            positionToInsert = filtered.length > 0 ? filtered[0]["rawIndex"] : raw.length;
+                                        } else{ // Else inserting in the middle of filtered array, get index of element in raw array
+                                            positionToInsert = filtered[filtered.length + start]["rawIndex"];
+                                        }
+                                    }
+                                }
+                                // If there are items to be inserted
+                                var newItems = [];
+                                if (arguments.length > 2){
+                                    for (var j = 2; j < arguments.length ; j++) {
+                                        newItems.push(SecureObject.filterEverything(handler, arguments[j]));
+                                    }
+                                }
+                                if (newItems.length > 0){
+                                    raw.splice.apply(raw, [positionToInsert, 0].concat(newItems));
+                                }
+                                return getFilteredValues(handler, itemsToRemove);
+                            };
+                            break;
+                        case "unshift":
+                            ret = function() {
+                                if (arguments.length === 0 ){
+                                    return filtered.length;
+                                } else {
+                                    var newItems = [];
+                                    for (var i = 0; i < arguments.length ; i++) {
+                                        newItems.push(SecureObject.filterEverything(handler, arguments[i]));
+                                    }
+                                    raw.splice.apply(raw, [0, 0].concat(newItems));
+                                    return filtered.length + newItems.length;
+                                }
+                            };
+                            break;
+                        case "concat":
+                        case "indexOf":
+                        case "join":
+                        case "lastIndexOf":
+                        case "slice":
+                            ret = function() {
+                                var filteredValues = getFilteredValues(handler, filtered);
+                                return filteredValues[property].apply(filteredValues, arguments);
+                            };
+                            break;
+                        // For the iteration handlers, secure the callback function and invoke the method on filtered array
+                        case "every":
+                        case "filter":
+                        case "forEach":
+                        case "map":
+                        case "reduce":
+                        case "reduceRight":
+                        case "some":
+                            ret = function() {
+                                if (arguments.length > 0) {
+                                    var secureCallback = SecureObject.filterEverything(handler, arguments[0]);
+                                    arguments[0] = secureCallback;
+                                }
+                                var filteredValues = getFilteredValues(handler, filtered);
+                                return filteredValues[property].apply(filteredValues, arguments);
+                            };
+                            break;
+                        case "toString":
+                            ret = function() {
+                                var filteredValues = getFilteredValues(handler, filtered);
+                                return filteredValues.toString();
+                            };
+                            break;
+                        case "toJSON":
+                            ret = function() {
+                                var filteredValues = getFilteredValues(handler, filtered);
+                                return JSON.stringify(filteredValues);
+                            };
+                            break;
+                        case "Symbol(Symbol.iterator)":
+                            ret = function () {
+                                var nextIndex = 0;
+                                return {
+                                    next: function() {
+                                        if(nextIndex < filtered.length) {
+                                            var value = filtered[nextIndex]["rawValue"];
+                                            nextIndex++;
+                                            return {value: value ? SecureObject.filterEverything(handler, value) : value, done: false};
+                                        } else {
+                                            return {done: true};
+                                        }
+                                    }
+                                };
+                            };
+                            break;
+                        default:
+                            if (raw[property]) { // If trying to use array like an associative array
+                                ret = SecureObject.filterEverything(handler, raw[property]);
+                            } else {
+                                $A.warning("Unsupported " + raw + " method: " + property + ". Returning undefined");
+                                return undefined;
+                            }
+                    }
+                } else {
+                    ret = getFromFiltered(handler, filtered, property);
+                }
+
+                return ret;
+            },
+            "set" : function(target, property, value) {
+                var raw = ls_getRef(target, key);
+                // Setting numerical indexes, number has to be positive integer, else its treated as an associative array key
+                if (!isNaN(property) && (parseFloat(property) >= 0) && (parseFloat(property) === parseInt(property, 10))) {
+                    // Refilter raw to recreate the index mapping between raw and filtered value
+                    var filtered = getFilteredArray(handler, raw, key);
+                    // If we are replacing existing index
+                    if (filtered[property]) {
+                        raw[filtered[property]["rawIndex"]] = SecureObject.filterEverything(handler, value);
+                        return true;
+                    } else { // Adding values at a random numerical index greater than length
+                        var filteredLength = filtered.length;
+                        var newItems = [];
+                        for(var i = 0; i < (property - filtered.length); i++) {
+                            newItems.push(undefined);
+                        }
+                        newItems.push(value);
+                        // Find the position in raw where we have to insert the new items
+                        // If filtered is empty, insert at beginning of raw
+                        // else, find the rawIndex of last filtered element and insert one after
+                        var positionToInsert = filteredLength ? (filtered[filteredLength-1]["rawIndex"]+1): 0;
+                        raw.splice.apply(raw, [positionToInsert, 0].concat(newItems));
+                        return true;
+                    }
+                } else { // Trying to use it like an associative array
+                    raw[property] = SecureObject.filterEverything(handler, value);
+                    return true;
+                }
+            }
+        };
+
+        ls_setKey(handler, key);
+
+        KEY_TO_ARRAY_HANLDER.set(key, handler);
+
+        Object.freeze(handler);
+    }
+
+    return handler;
+}
+
+/**
+ * Create a proxy to handle Arrays
+ * @param raw
+ * @param key
+ * @returns {Proxy}
+ */
+SecureObject.createProxyForArrayObjects = function(raw, key) {
+    if (!Array.isArray(raw)) {
+        $A.warning("Illegal usage of SecureObject.createProxyForArrayObjects");
+        return SecureObject.createFilteringProxy(raw, key);
+    }
+    // https://github.com/tvcutsem/harmony-reflect/issues/13#issuecomment-17249465
+    var surrogate = [];
+    ls_setRef(surrogate, raw, key);
+
+    var proxy = new Proxy(surrogate, getArrayProxyHandler(key));
     ls_setKey(proxy, key);
     ls_registerProxy(proxy);
 

@@ -1025,7 +1025,6 @@ AuraInstance.prototype.getToken = function(token){
  * @param {String} name - The name of the service registered during application startup, for example, <code>$A.getService("metrics")</code>.
  *
  * @export
- * @platform
  */
 AuraInstance.prototype.getService = function(name) {
     return this.injectedServices[name];

@@ -120,7 +120,7 @@ function SecureAura(AuraInstance, key) {
         Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, AuraInstance, name, { rawArguments: true }));
     });
 
-    [ "get", "getComponent", "getReference", "getRoot", "getService", "log", "reportError", "warning" ].forEach(function(name) {
+    [ "get", "getComponent", "getReference", "getRoot", "log", "reportError", "warning" ].forEach(function(name) {
         Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, AuraInstance, name));
     });
 

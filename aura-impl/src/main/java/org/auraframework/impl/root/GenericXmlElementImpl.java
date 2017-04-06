@@ -44,12 +44,10 @@ import java.util.TreeMap;
  */
 public class GenericXmlElementImpl extends BaseXmlElementImpl implements GenericXmlElement {
     private static final long serialVersionUID = 2650254115435046340L;
-    private final Multimap<String, GenericXmlElement> childrenString;
-    private transient Multimap<Class<? extends GenericXmlValidator>, GenericXmlElement> children;
+    private final Multimap<Class<? extends GenericXmlValidator>, GenericXmlElement> children;
     private final Map<String, String> attributes;
     private final String text;
-    private final String validatorClassString;
-    private transient Class<? extends GenericXmlValidator> validatorClass;
+    private final Class<? extends GenericXmlValidator> validatorClass;
 
     private GenericXmlElementImpl(Builder builder) {
         super(builder);
@@ -57,29 +55,6 @@ public class GenericXmlElementImpl extends BaseXmlElementImpl implements Generic
         this.attributes = builder.attributes;
         this.text = builder.text;
         this.validatorClass = builder.validatorClass;
-        if (builder.validatorClass != null) {
-            this.validatorClassString = this.validatorClass.getName();
-        } else {
-            this.validatorClassString = null;
-        }
-        childrenString = Multimaps.newSetMultimap(Maps.newHashMap(), Suppliers.ofInstance(Sets.newHashSet()));
-        for (Map.Entry<Class<? extends GenericXmlValidator>, GenericXmlElement> entry : children.entries()) {
-            childrenString.put(entry.getKey().getName(), entry.getValue());
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private Multimap<Class<? extends GenericXmlValidator>, GenericXmlElement> getChildrenInternal() {
-        if (children == null && childrenString != null) {
-            children = Multimaps.newSetMultimap(Maps.newHashMap(), Suppliers.ofInstance(Sets.newHashSet()));
-            for (Map.Entry<String, GenericXmlElement> entry : childrenString.entries()) {
-                try {
-                    children.put((Class<? extends GenericXmlValidator>)Class.forName(entry.getKey()), entry.getValue());
-                } catch (ClassNotFoundException cnfe) {
-                }
-            }
-        }
-        return children;
     }
 
     @Override
@@ -92,7 +67,7 @@ public class GenericXmlElementImpl extends BaseXmlElementImpl implements Generic
     @Override
     @SuppressWarnings("unchecked")
     public Set<GenericXmlElement> getChildren(@SuppressWarnings("rawtypes") Class implementingDef) {
-        Collection<GenericXmlElement> child = getChildrenInternal().get(implementingDef);
+        Collection<GenericXmlElement> child = children.get(implementingDef);
         if (child == null) {
             return Collections.emptySet();
         }
@@ -131,15 +106,7 @@ public class GenericXmlElementImpl extends BaseXmlElementImpl implements Generic
         return result;
     }
 
-    @SuppressWarnings("unchecked")
     public Class<? extends GenericXmlValidator> getValidatorClass() {
-        if (validatorClass == null && validatorClassString != null) {
-            try {
-                validatorClass = (Class<? extends GenericXmlValidator>)Class.forName(validatorClassString);
-            } catch (ClassNotFoundException cnfe) {
-                // dunno what to do here.
-            }
-        }
         return validatorClass;
     }
 

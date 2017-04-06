@@ -28,7 +28,6 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -37,7 +36,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.spy;
@@ -117,6 +115,78 @@ public class ModuleDefFileBundleBuilderUnitTest {
         assertEquals("incorrect base template entry", "/namespace/module-cmp/module-cmp.html", sourceMap.get(template).getSystemId());
         assertEquals("incorrect base utils js entry", "/namespace/module-cmp/utils.js",  sourceMap.get(utilJs).getSystemId());
         assertEquals("incorrect base data js entry", "/namespace/module-cmp/data.js", sourceMap.get(dataJs).getSystemId());
+    }
+
+    /**
+     * naming convention check occurs in module def factory so we still want to produce
+     * the bundle source
+     */
+    @Test
+    public void testStillBuildsWithBadNames() throws Exception {
+
+        File mockParentBaseFile = mock(File.class);
+        when(mockParentBaseFile.getName()).thenReturn("name-space");
+
+        File mockBaseFile = mock(File.class);
+        when(mockBaseFile.exists()).thenReturn(true);
+        when(mockBaseFile.getName()).thenReturn("moduleCmp");
+        when(mockBaseFile.getParentFile()).thenReturn(mockParentBaseFile);
+
+        File mockJsFile = mock(File.class);
+        setupMockFile(mockJsFile, mockBaseFile, "moduleCmp.js");
+        DefDescriptor module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "name-space", "modulecmp", ModuleDef.class);
+
+        File mockCssFile = mock(File.class);
+        setupMockFile(mockCssFile, mockBaseFile, "module.css");
+        DefDescriptor css = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, "name-space", "modulecmp-module", ModuleDef.class, module);
+
+        File mockTemplateFile = mock(File.class);
+        setupMockFile(mockTemplateFile, mockBaseFile, "moduleCmp.html");
+        DefDescriptor template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "name-space", "modulecmp-moduleCmp", ModuleDef.class, module);
+
+        File mockUtilJsFile = mock(File.class);
+        setupMockFile(mockUtilJsFile, mockBaseFile, "utils.js");
+        DefDescriptor utilJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "name-space", "modulecmp-utils", ModuleDef.class, module);
+
+        File mockDataJsFile = mock(File.class);
+        setupMockFile(mockDataJsFile, mockBaseFile, "data.js");
+        DefDescriptor dataJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "name-space", "modulecmp-data", ModuleDef.class, module);
+
+        File[] baseListFiles = new File[] { mockJsFile, mockCssFile, mockTemplateFile, mockUtilJsFile, mockDataJsFile };
+
+        when(mockBaseFile.listFiles()).thenReturn(baseListFiles);
+
+        ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
+        Map<String, String> mockInternalNamespaces = Maps.newHashMap();
+        when(mockConfigAdapter.getInternalNamespacesMap()).thenReturn(mockInternalNamespaces);
+
+        DefinitionService mockDefinitionService = mock(DefinitionService.class);
+        DefDescriptor<ComponentDef> cmpDesc = new DefDescriptorImpl<>(
+                DefDescriptor.MARKUP_PREFIX, "name-space", "modulecmp", ComponentDef.class);
+        DefDescriptor<ModuleDef> moduleDesc = new DefDescriptorImpl<>(
+                DefDescriptor.MARKUP_PREFIX, "name-space", "modulecmp", ModuleDef.class);
+        when(mockDefinitionService.getDefDescriptor("name-space:modulecmp", ComponentDef.class))
+                .thenReturn(cmpDesc);
+        when(mockDefinitionService.getDefDescriptor("name-space:modulecmp", ModuleDef.class))
+                .thenReturn(moduleDesc);
+
+        ModuleDefFileBundleBuilder moduleDefFileBundleBuilder = spy(new ModuleDefFileBundleBuilder());
+        moduleDefFileBundleBuilder.setConfigAdapter(mockConfigAdapter);
+        moduleDefFileBundleBuilder.setDefinitionService(mockDefinitionService);
+
+        doReturn(mockJsFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".js");
+        doReturn(mockTemplateFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".html");
+
+        BundleSource<?> moduleBundleSource = moduleDefFileBundleBuilder.buildBundle(mockBaseFile);
+
+        Map<DefDescriptor<?>, Source<?>> sourceMap = moduleBundleSource.getBundledParts();
+
+        assertEquals("number of entries for module bundle source differs", baseListFiles.length, sourceMap.size());
+        assertEquals("incorrect base js entry", "/name-space/moduleCmp/moduleCmp.js", sourceMap.get(module).getSystemId());
+        assertEquals("incorrect base css entry", "/name-space/moduleCmp/module.css", sourceMap.get(css).getSystemId());
+        assertEquals("incorrect base template entry", "/name-space/moduleCmp/moduleCmp.html", sourceMap.get(template).getSystemId());
+        assertEquals("incorrect base utils js entry", "/name-space/moduleCmp/utils.js",  sourceMap.get(utilJs).getSystemId());
+        assertEquals("incorrect base data js entry", "/name-space/moduleCmp/data.js", sourceMap.get(dataJs).getSystemId());
     }
 
     @Test
@@ -309,13 +379,95 @@ public class ModuleDefFileBundleBuilderUnitTest {
         File mockLibFile = mock(File.class);
         when(mockLibFile.exists()).thenReturn(true);
 
+        File mockCmpFile = mock(File.class);
+        when(mockCmpFile.exists()).thenReturn(false);
+
+        File mockAppFile = mock(File.class);
+        when(mockAppFile.exists()).thenReturn(false);
+
         ModuleDefFileBundleBuilder moduleDefFileBundleBuilder = spy(new ModuleDefFileBundleBuilder());
 
         doReturn(mockJsFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".js");
         doReturn(mockHtmlFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".html");
         doReturn(mockLibFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".lib");
+        doReturn(mockCmpFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".cmp");
+        doReturn(mockAppFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".app");
 
         assertFalse("bundle containing .lib file should not match", moduleDefFileBundleBuilder.isBundleMatch(mockBaseFile));
+    }
+
+    @Test
+    public void testBundleNotMatchCmp() throws Exception {
+
+        File mockParentBaseFile = mock(File.class);
+        when(mockParentBaseFile.getName()).thenReturn("namespace");
+
+        File mockBaseFile = mock(File.class);
+        when(mockBaseFile.exists()).thenReturn(true);
+        when(mockBaseFile.getName()).thenReturn("module");
+        when(mockBaseFile.getParentFile()).thenReturn(mockParentBaseFile);
+
+        File mockJsFile = mock(File.class);
+        when(mockJsFile.exists()).thenReturn(true);
+
+        File mockHtmlFile = mock(File.class);
+        when(mockHtmlFile.exists()).thenReturn(false);
+
+        File mockLibFile = mock(File.class);
+        when(mockLibFile.exists()).thenReturn(false);
+
+        File mockCmpFile = mock(File.class);
+        when(mockCmpFile.exists()).thenReturn(true);
+
+        File mockAppFile = mock(File.class);
+        when(mockAppFile.exists()).thenReturn(false);
+
+        ModuleDefFileBundleBuilder moduleDefFileBundleBuilder = spy(new ModuleDefFileBundleBuilder());
+
+        doReturn(mockJsFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".js");
+        doReturn(mockHtmlFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".html");
+        doReturn(mockLibFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".lib");
+        doReturn(mockCmpFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".cmp");
+        doReturn(mockAppFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".app");
+
+        assertFalse("bundle containing .cmp file should not match", moduleDefFileBundleBuilder.isBundleMatch(mockBaseFile));
+    }
+
+    @Test
+    public void testBundleNotMatchApp() throws Exception {
+
+        File mockParentBaseFile = mock(File.class);
+        when(mockParentBaseFile.getName()).thenReturn("namespace");
+
+        File mockBaseFile = mock(File.class);
+        when(mockBaseFile.exists()).thenReturn(true);
+        when(mockBaseFile.getName()).thenReturn("module");
+        when(mockBaseFile.getParentFile()).thenReturn(mockParentBaseFile);
+
+        File mockJsFile = mock(File.class);
+        when(mockJsFile.exists()).thenReturn(true);
+
+        File mockHtmlFile = mock(File.class);
+        when(mockHtmlFile.exists()).thenReturn(false);
+
+        File mockLibFile = mock(File.class);
+        when(mockLibFile.exists()).thenReturn(false);
+
+        File mockCmpFile = mock(File.class);
+        when(mockCmpFile.exists()).thenReturn(false);
+
+        File mockAppFile = mock(File.class);
+        when(mockAppFile.exists()).thenReturn(true);
+
+        ModuleDefFileBundleBuilder moduleDefFileBundleBuilder = spy(new ModuleDefFileBundleBuilder());
+
+        doReturn(mockJsFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".js");
+        doReturn(mockHtmlFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".html");
+        doReturn(mockLibFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".lib");
+        doReturn(mockCmpFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".cmp");
+        doReturn(mockAppFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".app");
+
+        assertFalse("bundle containing .app file should not match", moduleDefFileBundleBuilder.isBundleMatch(mockBaseFile));
     }
 
     @Test
@@ -338,81 +490,21 @@ public class ModuleDefFileBundleBuilderUnitTest {
         File mockLibFile = mock(File.class);
         when(mockLibFile.exists()).thenReturn(false);
 
-        ModuleDefFileBundleBuilder moduleDefFileBundleBuilder = spy(new ModuleDefFileBundleBuilder());
+        File mockCmpFile = mock(File.class);
+        when(mockCmpFile.exists()).thenReturn(false);
 
-        doReturn(mockJsFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".js");
-        doReturn(mockHtmlFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".html");
-        doReturn(mockLibFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".lib");
-
-        assertTrue("bundle should match without .lib file", moduleDefFileBundleBuilder.isBundleMatch(mockBaseFile));
-    }
-
-    @Test
-    public void testBundleNoUppercase() throws Exception {
-
-        File mockParentBaseFile = mock(File.class);
-        when(mockParentBaseFile.getName()).thenReturn("nameSpace");
-
-        File mockBaseFile = mock(File.class);
-        when(mockBaseFile.exists()).thenReturn(true);
-        when(mockBaseFile.getName()).thenReturn("moduleCmp");
-        when(mockBaseFile.getParentFile()).thenReturn(mockParentBaseFile);
-
-        File mockJsFile = mock(File.class);
-        when(mockJsFile.exists()).thenReturn(true);
-
-        File mockHtmlFile = mock(File.class);
-        when(mockHtmlFile.exists()).thenReturn(true);
-
-        File mockLibFile = mock(File.class);
-        when(mockLibFile.exists()).thenReturn(false);
+        File mockAppFile = mock(File.class);
+        when(mockAppFile.exists()).thenReturn(false);
 
         ModuleDefFileBundleBuilder moduleDefFileBundleBuilder = spy(new ModuleDefFileBundleBuilder());
 
         doReturn(mockJsFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".js");
         doReturn(mockHtmlFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".html");
         doReturn(mockLibFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".lib");
+        doReturn(mockCmpFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".cmp");
+        doReturn(mockAppFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".app");
 
-        try {
-            moduleDefFileBundleBuilder.isBundleMatch(mockBaseFile);
-            fail("Should have thrown AuraRuntimeException for camel case names");
-        } catch(AuraRuntimeException are) {
-            assertTrue("Error should indicate lower case names", are.getMessage().contains("Use lowercase"));
-        }
-    }
-
-    @Test
-    public void testBundleNamespaceNoHyphen() throws Exception {
-
-        File mockParentBaseFile = mock(File.class);
-        when(mockParentBaseFile.getName()).thenReturn("name-space");
-
-        File mockBaseFile = mock(File.class);
-        when(mockBaseFile.exists()).thenReturn(true);
-        when(mockBaseFile.getName()).thenReturn("module");
-        when(mockBaseFile.getParentFile()).thenReturn(mockParentBaseFile);
-
-        File mockJsFile = mock(File.class);
-        when(mockJsFile.exists()).thenReturn(true);
-
-        File mockHtmlFile = mock(File.class);
-        when(mockHtmlFile.exists()).thenReturn(true);
-
-        File mockLibFile = mock(File.class);
-        when(mockLibFile.exists()).thenReturn(false);
-
-        ModuleDefFileBundleBuilder moduleDefFileBundleBuilder = spy(new ModuleDefFileBundleBuilder());
-
-        doReturn(mockJsFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".js");
-        doReturn(mockHtmlFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".html");
-        doReturn(mockLibFile).when(moduleDefFileBundleBuilder, "getFileFromBase", mockBaseFile, ".lib");
-
-        try {
-            moduleDefFileBundleBuilder.isBundleMatch(mockBaseFile);
-            fail("Should have thrown AuraRuntimeException for hyphen in namesapce");
-        } catch(AuraRuntimeException are) {
-            assertTrue("Error should indicate lower case names", are.getMessage().contains("Namespace cannot have a hyphen."));
-        }
+        assertTrue("bundle should match", moduleDefFileBundleBuilder.isBundleMatch(mockBaseFile));
     }
 
     private void setupMockFile(File mock, File base, String fileName) throws IOException {

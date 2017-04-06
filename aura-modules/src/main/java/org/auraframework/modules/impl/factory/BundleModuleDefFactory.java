@@ -23,6 +23,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
+import com.google.common.base.CharMatcher;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
@@ -38,9 +39,9 @@ import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.system.TextSource;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.text.Hash;
 
 /**
  * Provides ModuleDef implementation
@@ -68,68 +69,83 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
     @Override
     public ModuleDef getDefinition(@CheckForNull DefDescriptor<ModuleDef> descriptor,
                                    @Nonnull BundleSource<ModuleDef> source) throws QuickFixException {
-        Location location = null;
-        try {
-            Map<DefDescriptor<?>, Source<?>> sourceMap = source.getBundledParts();
+        Map<DefDescriptor<?>, Source<?>> sourceMap = source.getBundledParts();
 
-            // get base source.
-            Source<?> baseClassSource = sourceMap.get(descriptor);
+        // get base source.
+        Source<?> baseClassSource = sourceMap.get(descriptor);
 
-            if (baseClassSource == null) {
-                // javascript file of the same name as module is required
-                throw new InvalidDefinitionException("No base file for " + descriptor,
-                        new Location(descriptor.getNamespace() + "/" + descriptor.getName(), -1));
+        if (baseClassSource == null) {
+            // javascript file of the same name as module is required
+            throw new InvalidDefinitionException("No base file for " + descriptor,
+                    new Location(descriptor.getNamespace() + "/" + descriptor.getName(), -1));
+        }
+
+        // compute base file path. baseClassSource must be FileSource to return path for systemId
+        String baseFilePath = baseClassSource.getSystemId();
+        int start = baseFilePath.lastIndexOf('/', baseFilePath.lastIndexOf('/', baseFilePath.lastIndexOf('/') - 1) - 1);
+        String componentPath = baseFilePath.substring(start + 1);
+
+        Location location = new Location(baseClassSource);
+
+        String[] paths = componentPath.split("/");
+        if (paths.length > 2) {
+            String namespace = paths[0];
+            String name = paths[1];
+
+            // ensure module folders adhere to web component (custom element) naming conventions.
+
+            if (CharMatcher.JAVA_UPPER_CASE.matchesAnyOf(namespace)) {
+                throw new InvalidDefinitionException("Use lowercase for module folder names. Not " + namespace, location);
             }
 
-            // compute base file path. baseClassSource must be FileSource to return path for systemId
-            String baseFilePath = baseClassSource.getSystemId();
-            int start = baseFilePath.lastIndexOf('/', baseFilePath.lastIndexOf('/', baseFilePath.lastIndexOf('/') - 1) - 1);
-            String componentPath = baseFilePath.substring(start + 1);
+            if (namespace.contains("-")) {
+                throw new InvalidDefinitionException("Namespace cannot have a hyphen. Not " + namespace, location);
+            }
 
-            // source map of sources with absolute file paths as keys
-            Map<String, String> fullPathSources = new HashMap<>();
-
-            // loop and get contents of all files in the bundle
-            sourceMap.forEach( (desc, entrySource) -> {
-                String path = entrySource.getSystemId();
-                if (entrySource instanceof TextSource) {
-                    fullPathSources.put(path, ((TextSource<?>) entrySource).getContents());
-                }
-            });
-
-            Map<String, String> sources = new HashMap<>();
-            fullPathSources.forEach( (fullPath, contents) -> {
-                // get full relative path starting from namespace ie "namespace/name/name.js", "namespace/name/utils/util.js"
-                String relativePath = fullPath.substring(start + 1);
-                sources.put(relativePath, contents);
-            });
-
-            ModuleDefImpl.Builder builder = new ModuleDefImpl.Builder();
-
-            // base definition
-            location = new Location(baseClassSource);
-            builder.setDescriptor(descriptor);
-            builder.setTagName(descriptor.getDescriptorName());
-            builder.setLocation(location);
-
-            // access
-            boolean isInInternalNamespace = configAdapter.isInternalNamespace(descriptor.getNamespace());
-            builder.setAccess(new DefinitionAccessImpl(
-                    isInInternalNamespace ? AuraContext.Access.INTERNAL : AuraContext.Access.PUBLIC));
-
-            // module
-            builder.setPath(baseFilePath);
-            builder.setCustomElementName(getCustomElementName(componentPath));
-
-            ModulesCompiler compiler = new ModulesCompilerJ2V8();
-            ModulesCompilerData compilerData = compiler.compile(componentPath, sources);
-            String compiledCode = processCompiledCode(descriptor, compilerData.code);
-            builder.setCompiledCode(compiledCode);
-            builder.setModuleDependencies(compilerData.bundleDependencies);
-            return builder.build();
-        } catch (Exception e) {
-            throw new InvalidDefinitionException(descriptor.toString(), location, e);
+            if (CharMatcher.JAVA_UPPER_CASE.matchesAnyOf(name)) {
+                throw new InvalidDefinitionException("Use lowercase and hyphens for module file names. Not " + name, location);
+            }
         }
+
+        Map<String, String> sources = new HashMap<>();
+
+        // loop and get contents of all files in the bundle
+        sourceMap.forEach( (desc, entrySource) -> {
+            String path = entrySource.getSystemId();
+            String relativePath = path.substring(start + 1);
+            if (entrySource instanceof TextSource) {
+                sources.put(relativePath, ((TextSource<?>) entrySource).getContents());
+            }
+        });
+
+        ModuleDefImpl.Builder builder = new ModuleDefImpl.Builder();
+
+        builder.setDescriptor(descriptor);
+        builder.setTagName(descriptor.getDescriptorName());
+        builder.setLocation(location);
+
+        // access
+        boolean isInInternalNamespace = configAdapter.isInternalNamespace(descriptor.getNamespace());
+        builder.setAccess(new DefinitionAccessImpl(
+                isInInternalNamespace ? AuraContext.Access.INTERNAL : AuraContext.Access.PUBLIC));
+
+        // module
+        builder.setPath(baseFilePath);
+        builder.setCustomElementName(getCustomElementName(componentPath));
+
+        ModulesCompiler compiler = new ModulesCompilerJ2V8();
+        ModulesCompilerData compilerData;
+        try {
+            compilerData = compiler.compile(componentPath, sources);
+        } catch (Exception e) {
+            throw new InvalidDefinitionException(descriptor + ": " + e.getMessage(), location, e);
+        }
+        String compiledCode = processCompiledCode(descriptor, compilerData.code, location);
+        builder.setCompiledCode(compiledCode);
+        builder.setModuleDependencies(compilerData.bundleDependencies);
+        builder.setOwnHash(calculateOwnHash(descriptor + compiledCode));
+        return builder.build();
+
     }
 
     /**
@@ -141,9 +157,9 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
      * @return code results
      * @throws InvalidDefinitionException if code from compiler does not start with define for amd
      */
-    private String processCompiledCode(DefDescriptor<ModuleDef> descriptor, String code) throws InvalidDefinitionException {
+    private String processCompiledCode(DefDescriptor<ModuleDef> descriptor, String code, Location location) throws InvalidDefinitionException {
         if (!code.substring(0, 7).equals("define(")) {
-            throw new AuraRuntimeException("Compiled code does not start with AMD 'define'");
+            throw new InvalidDefinitionException("Compiled code does not start with AMD 'define'", location);
         }
         StringBuilder processedCode = new StringBuilder();
         processedCode
@@ -163,6 +179,12 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
             return namespace + "-" + name;
         }
         return "";
+    }
+
+    private String calculateOwnHash(String input) {
+        Hash.StringBuilder hashBuilder = new Hash.StringBuilder();
+        hashBuilder.addString(input);
+        return hashBuilder.build().toString();
     }
 
     @Inject

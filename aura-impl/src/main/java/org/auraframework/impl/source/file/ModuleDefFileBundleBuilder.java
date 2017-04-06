@@ -32,9 +32,7 @@ import org.auraframework.system.BundleSource;
 import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.AuraRuntimeException;
 
-import com.google.common.base.CharMatcher;
 import com.google.common.collect.Maps;
 
 import javax.inject.Inject;
@@ -63,32 +61,14 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
         File baseJs = getFileFromBase(base, ".js");
         File baseHtml = getFileFromBase(base, ".html");
         File baseLib = getFileFromBase(base, ".lib");
+        File baseCmp = getFileFromBase(base, ".cmp");
+        File baseApp = getFileFromBase(base, ".app");
         // modules may either have .js or .html so both needs to be the indicator
         // because it may only have the html or js file
         // check both html or js and not lib base file to ensure we don't pick up lib bundles
-        boolean isModuleBundle = (baseHtml.exists() || baseJs.exists()) && !baseLib.exists();
-
-        if (isModuleBundle) {
-            String filename = base.getName();
-            String fileNamespace = base.getParentFile().getName();
-
-            if (CharMatcher.JAVA_UPPER_CASE.matchesAnyOf(fileNamespace)) {
-                throw new AuraRuntimeException("Use lowercase for module folder names. Not " + fileNamespace);
-            }
-
-            if (fileNamespace.contains("-")) {
-                throw new AuraRuntimeException("Namespace cannot have a hyphen. " + fileNamespace);
-            }
-
-            if (CharMatcher.JAVA_UPPER_CASE.matchesAnyOf(filename)) {
-                throw new AuraRuntimeException("Use lowercase and hyphens for module file names. Not " + filename);
-            }
-            return true;
-        }
-
-        return false;
+        // also check for cmp/app bundles that has stray js with the same name
+        return (baseHtml.exists() || baseJs.exists()) && !baseCmp.exists() && !baseApp.exists() && !baseLib.exists();
     }
-
     /**
      * Processes module bundle and creates BundleSource of all files.
      * .js or .html (if .js doesn't exist) of the same name is associated with ModuleDef descriptor

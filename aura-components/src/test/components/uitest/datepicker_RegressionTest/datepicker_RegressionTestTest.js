@@ -164,6 +164,7 @@
 
     // test date picker focus on initial render when setFocus = false
     testDatePickerSetFocusFalse: {
+        browsers: ['DESKTOP'],
         attributes: {"renderItem": "testDatepickerSetFocus", "setFocus": "false"},
         test: function(cmp) {
 
@@ -179,6 +180,7 @@
 
     // test date picker focus on initial render when setFocus = true
     testDatePickerSetFocusTrue: {
+        browsers: ['DESKTOP'],
         attributes: {"renderItem": "testDatepickerSetFocus", "setFocus": "true"},
         test: [function(cmp) {
             var tagName = $A.test.getActiveElement().tagName;

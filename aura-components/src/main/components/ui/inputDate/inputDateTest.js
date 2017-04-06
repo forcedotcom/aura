@@ -121,6 +121,7 @@
      * Verify behavior of Today() with default 'format' value.
      */
     testToday: {
+        browsers: ['DESKTOP'],
         attributes: {displayDatePicker: 'true', format: 'MMM dd, yyyy', loadDatePicker: 'true'},
         test: [function (cmp) {
             cmp.find("datePicker").find("grid").selectToday();
@@ -136,6 +137,7 @@
      * Verify behavior of Today() when 'format' is assigned a valid value.
      */
     testTodayDifferentFormat: {
+        browsers: ['DESKTOP'],
         attributes: {displayDatePicker: 'true', format: 'DD/MM/YYYY',  loadDatePicker: 'true'},
         test: [function (cmp) {
             cmp.find("datePicker").find("grid").selectToday();

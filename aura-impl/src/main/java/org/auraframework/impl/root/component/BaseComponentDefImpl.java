@@ -1928,7 +1928,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     @Override
     public DefDescriptor<DesignDef> getDesignDefDescriptor() {
-        return designDef.getDescriptor();
+        return designDef != null ? designDef.getDescriptor() : null;
     }
 
     @Override

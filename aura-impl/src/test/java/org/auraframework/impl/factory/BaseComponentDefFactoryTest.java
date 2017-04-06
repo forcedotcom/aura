@@ -76,7 +76,13 @@ public abstract class BaseComponentDefFactoryTest<D extends BaseComponentDef> ex
         AuraTestingUtil util = getAuraTestingUtil();
         BundleSource<D> bundleSource = util.buildBundleSource(util.getInternalNamespace(), defClass,
                 Lists.newArrayList(new BundleEntryInfo(type, String.format(tag, "", ""))));
-        assertNotNull(factory.getDefinition(bundleSource.getDescriptor(), bundleSource));
+        D def = factory.getDefinition(bundleSource.getDescriptor(), bundleSource);
+        assertNotNull(def);
+        assertNull(def.getDesignDefDescriptor());
+        assertNotNull(def.getExtendsDescriptor());
+        assertNull(def.getProviderDescriptor());
+        assertNull(def.getRendererDescriptor());
+        assertFalse(def.isTemplate());
     }
 
     @Test

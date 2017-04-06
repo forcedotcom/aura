@@ -18,7 +18,10 @@ Function.RegisterNamespace("Test.Aura");
 [Fixture]
 Test.Aura.LoggingTest = function() {
     var subscribe = Stubs.GetMethod("name", "fn");
-    var theWindow = {};
+    var eventHandler;
+    var theWindow = {
+        addEventListener: function(eventname, handler) { eventHandler = handler; }
+    };
 
     Mocks.GetMocks(Object.Global(), {
         "$A" : {
@@ -172,6 +175,69 @@ Test.Aura.LoggingTest = function() {
                 theWindow.onerror(message, file, line, col, expectedError);
             });
             Assert.Equal(1, reportError.Calls.length);
+        }
+    }
+
+    [Fixture]
+    function unhandledrejectionHandler() {
+        [Fact]
+        function CallsReportErrorWithEventReason() {
+            var reportError = Stubs.GetMethod("message", "error", true);
+            var expectedError = "bad reason";
+
+            Mocks.GetMocks(Object.Global(), {
+                "$A": {
+                    "reportError":reportError
+                }
+            })(function() {
+                eventHandler({reason:expectedError});
+            });
+
+            Assert.Equal({"message":null, "error":expectedError}, reportError.Calls[0].Arguments);
+        }
+
+        [Fact]
+        function DoesNotCallConsoleErrorIfReportReturnsTrue() {
+            var reportError = Stubs.GetMethod("message", "error", true);
+            var consoleError = Stubs.GetMethod("message", "error", undefined);
+            var expectedError = "bad reason";
+
+            Mocks.GetMocks(Object.Global(), {
+                "$A": {
+                    "reportError":reportError
+                },
+                "window": {
+                    "console":{
+                        "error":consoleError
+                    }
+                }
+            })(function() {
+                eventHandler({reason:expectedError});
+            });
+
+            Assert.Equal(0, consoleError.Calls.length);
+        }
+
+        [Fact]
+        function CallsConsoleErrorIfReportReturnsFalse() {
+            var reportError = Stubs.GetMethod("message", "error", false);
+            var consoleError = Stubs.GetMethod("message", "error", undefined);
+            var expectedError = "bad reason";
+
+            Mocks.GetMocks(Object.Global(), {
+                "$A": {
+                    "reportError":reportError
+                },
+                "window": {
+                    "console":{
+                        "error":consoleError
+                    }
+                }
+            })(function() {
+                eventHandler({reason:expectedError});
+            });
+
+            Assert.Equal({"message":null, "error":expectedError}, consoleError.Calls[0].Arguments);
         }
     }
 };

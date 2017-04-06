@@ -78,4 +78,13 @@
         };
     })();
 
+    window.addEventListener("unhandledrejection", function (event) {
+        if (!$A.reportError(null, event.reason)) {
+            var console_error = (window.console && window.console.error);
+            if (console_error) {
+                console_error(null, event.reason);
+            }
+        }
+    });
+
 })();

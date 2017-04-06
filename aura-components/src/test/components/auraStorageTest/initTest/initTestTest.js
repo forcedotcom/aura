@@ -280,12 +280,14 @@
     	                $A.test.assertEquals("2", $A.test.getText(cmp.find("callbackCounter").getElement()));
     	                $A.storageService.getStorage("actions").get(a.getStorageKey(), true).then(
     	                    function(item){
-    	                		$A.test.assertEquals(1, item.value.returnValue.Counter,
-    	                				"Refresh action response not stored in storage");
-    	                		if(item.expires <= cmp._originalExpiration){
-    	                            $A.test.fail("storage expiration was not updated after refresh " +
-    	                                item.expires+" != "+cmp._originalExpiration);
-    	                        }
+                                if (item.value) {
+                                    $A.test.assertEquals(1, item.value.returnValue.Counter,
+                                            "Refresh action response not stored in storage");
+                                }
+                                if(item.expires <= cmp._originalExpiration){
+                                    $A.test.fail("storage expiration was not updated after refresh " +
+                                            item.expires+" != "+cmp._originalExpiration);
+                                }
     	                    });
     	            });
         } ]

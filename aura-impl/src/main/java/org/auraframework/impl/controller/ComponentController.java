@@ -24,7 +24,6 @@ import javax.inject.Inject;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -34,12 +33,6 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.ds.servicecomponent.Controller;
-import org.auraframework.impl.java.controller.JavaAction;
-import org.auraframework.impl.javascript.controller.JavascriptPseudoAction;
-import org.auraframework.impl.util.ModuleDefinitionUtil;
-import org.auraframework.impl.util.TypeParser;
-import org.auraframework.impl.util.TypeParser.Type;
-import org.auraframework.instance.Action;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
@@ -62,157 +55,6 @@ public class ComponentController implements Controller {
     private DefinitionService definitionService;
     private ContextService contextService;
     private ConfigAdapter configAdapter;
-
-    /**
-     * A Java exception representing a <em>Javascript</em> error condition, as
-     * reported from client to server for forensic logging.
-     *
-     * @since 194
-     */
-    public static class AuraClientException extends Exception {
-        private static final long serialVersionUID = -5884312216684971013L;
-
-        private final Action action;
-        private final String jsStack;
-        private String causeDescriptor;
-        private String errorId;
-        private String namespace;
-        private String componentName;
-        private String methodName;
-        private String cmpStack;
-
-        public AuraClientException(String desc, String id, String message, String jsStack, String cmpStack,
-                                   InstanceService instanceService, ExceptionAdapter exceptionAdapter, ConfigAdapter configAdapter) {
-            super(message);
-            Action action = null;
-            this.causeDescriptor = null;
-            this.errorId = id;
-            if (desc != null) {
-                try {
-                    action = instanceService.getInstance(desc, ActionDef.class);
-                    if (action instanceof JavascriptPseudoAction) {
-                        JavascriptPseudoAction jpa = (JavascriptPseudoAction) action;
-                        jpa.addError(this);
-                    } else if (action instanceof JavaAction) {
-                        JavaAction ja = (JavaAction) action;
-                        ja.addException(this, Action.State.ERROR, false, false, exceptionAdapter);
-                    }
-                } catch (Exception e) {
-                    this.causeDescriptor = desc;
-                }
-            }
-
-            // use cause to track failing component markup if action is not sent.
-            if (this.causeDescriptor == null && desc != null && desc.contains("markup://")) {
-                this.causeDescriptor = desc;
-            }
-
-            if (this.causeDescriptor != null && !this.causeDescriptor.isEmpty()) {
-                // "markup://foo:bar"
-                int markupIndex = this.causeDescriptor.indexOf("markup://");
-                if (markupIndex > -1) {
-                    String markup = this.causeDescriptor.substring(markupIndex).split(" ")[0];
-                    Type t = TypeParser.parseTag(markup);
-                    this.namespace = t.namespace;
-                    this.componentName = t.name;
-                } else {
-                    // foo$bar$controller$method
-                    String[] parts = this.causeDescriptor.split("[$]");
-                    if (parts.length > 1) {
-                        this.namespace = parts[0];
-                        this.componentName = parts[1];
-                        this.methodName = parts[parts.length-1];
-                    }
-                }
-            }
-
-            // parsing stacktrace to figure out whether the error is from external script 
-            if (this.componentName == null && jsStack != null && !jsStack.isEmpty()) {
-                String[] traces = jsStack.split("\n");
-                for (String trace : traces) {
-                    // extract filename
-                    int i = trace.indexOf(".js:");
-                    if (i > -1) {
-                        String filepath = trace.substring(0, i);
-                        String[] pathparts = filepath.split("/");
-                        // we don't care about aura script file path
-                        if (pathparts.length > 1 &&
-                            !pathparts[pathparts.length-1].matches("aura_.+")) {
-                            if (this.componentName == null) {
-                                this.componentName = pathparts[pathparts.length-1];
-                                this.namespace = pathparts[pathparts.length-2];
-                                if (this.causeDescriptor == null || this.causeDescriptor.isEmpty()) {
-                                    // aura component sourceURL convention: components/ns/name.js
-                                    // aura library sourceURL convention: libraries/ns/name.js
-                                    // raptor component sourceURL convention: components/ns-name.js
-                                    // raptor library sourceURL convention: libraries/ns-name.js
-                                    if (this.namespace.equals("components") || this.namespace.equals("libraries")) {
-                                        String auraDescriptor = ModuleDefinitionUtil.convertToAuraDescriptor(this.componentName, configAdapter);
-                                        String[] parts = auraDescriptor.split(":");
-                                        this.namespace = parts[0];
-                                        this.componentName = parts[1];
-                                    }
-                                    this.causeDescriptor = String.format("markup://%s:%s", this.namespace, this.componentName);
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            this.action = action;
-            this.jsStack = jsStack;
-            this.cmpStack = cmpStack;
-        }
-
-        public Action getOriginalAction() {
-            return action;
-        }
-
-        public String getClientStack() {
-            return jsStack;
-        }
-
-        public String getComponentStack() {
-            return cmpStack;
-        }
-
-        public String getCauseDescriptor() {
-            return causeDescriptor;
-        }
-
-        public String getClientErrorId() {
-            return errorId;
-        }
-
-        public String getFailedComponentNamespace() {
-            return this.namespace;
-        }
-
-        public String getFailedComponent() {
-            return this.componentName;
-        }
-
-        public String getFailedComponentMethod() {
-            return this.methodName;
-        }
-
-        public String getStackTraceIdGen() {
-            String[] traces = jsStack.split("\n");
-            StringBuilder sb = new StringBuilder();
-            for (String trace : traces) {
-                // remove domain and url parts except filename
-                trace = trace.replaceAll("https?://([^/]*/)+", "");
-                // remove line and column number
-                trace = trace.replaceAll(":[0-9]+:[0-9]+", "");
-                // remove trailing part of filename
-                trace = trace.replaceAll("[.]js.+$", ".js");
-                sb.append(trace+'\n');
-            }
-            return sb.toString();
-        }
-    }
 
     @AuraEnabled
     public Boolean loadLabels() throws QuickFixException {
@@ -248,6 +90,7 @@ public class ComponentController implements Controller {
         return getBaseComponent(Component.class, ComponentDef.class, name, attributes, false);
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @AuraEnabled
     public Instance getComponent(@Key(value = "name", loggable = true) String name,
                                  @Key("attributes") Map<String, Object> attributes,
@@ -285,7 +128,7 @@ public class ComponentController implements Controller {
     public void reportFailedAction(@Key(value = "failedAction") String desc, @Key("failedId") String id,
                                    @Key("clientError") String error, @Key("clientStack") String stack, @Key("componentStack") String componentStack) {
         // Error reporting (of errors in prior client-side actions) are handled specially
-        AuraClientException ace = new AuraClientException(desc, id, error, stack, componentStack, instanceService, exceptionAdapter, configAdapter);
+        AuraClientException ace = new AuraClientException(desc, id, error, stack, componentStack, instanceService, exceptionAdapter, configAdapter, contextService, definitionService);
         exceptionAdapter.handleException(ace, ace.getOriginalAction());
     }
 
@@ -324,6 +167,7 @@ public class ComponentController implements Controller {
         return definitionService.getDefinition(desc);
     }
 
+    @SuppressWarnings("rawtypes")
     @AuraEnabled
     public List<Instance> getComponents(@Key("components") List<Map<String, Object>> components)
             throws QuickFixException {

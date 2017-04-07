@@ -27,7 +27,7 @@ import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.http.resource.AuraResourceImpl.AuraResourceException;
 import org.auraframework.impl.compound.controller.CompoundControllerDefFactory.ActionNameConflictException;
-import org.auraframework.impl.controller.ComponentController.AuraClientException;
+import org.auraframework.impl.controller.AuraClientException;
 import org.auraframework.instance.Action;
 import org.auraframework.throwable.AuraExceptionInfo;
 import org.auraframework.throwable.AuraHandledException;
@@ -131,6 +131,13 @@ public class ExceptionAdapterImpl implements ExceptionAdapter {
                 extended.append("Javascript stack: ");
                 extended.append(ace.getClientStack());
                 extended.append("\n");
+
+                String sourceCode = ace.getSourceCode();
+                if (sourceCode != null && !sourceCode.isEmpty()) {
+                    extended.append("Error source code snippet: \n");
+                    extended.append(sourceCode);
+                    extended.append("\n");
+                }
             }
             if (th instanceof AuraExceptionInfo) {
                 AuraExceptionInfo info = (AuraExceptionInfo) th;

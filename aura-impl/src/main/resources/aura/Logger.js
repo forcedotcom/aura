@@ -192,8 +192,8 @@ Logger.prototype.isExternalError = function(e) {
         var fileName = errorframe.fileName;
         if (fileName &&
             fileName.match(/aura_[^\.]+\.js$/gi) === null && // not from aura
-            fileName.match("engine.js") === null &&          // not from raptor engine
-            fileName.match("engine.min.js") === null &&      // not from raptor engine PROD
+            fileName.match("engine.js") === null &&          // not from module engine
+            fileName.match("engine.min.js") === null &&      // not from module engine PROD
             fileName.indexOf('/components/') === -1 &&       // not from components
             fileName.indexOf('/libraries/') === -1 &&        // not from libraries
             fileName.match("app.js") === null) {             // not from app.js

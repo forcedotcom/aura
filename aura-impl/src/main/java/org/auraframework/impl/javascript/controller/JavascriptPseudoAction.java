@@ -18,7 +18,7 @@ package org.auraframework.impl.javascript.controller;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.impl.controller.ComponentController.AuraClientException;
+import org.auraframework.impl.controller.AuraClientException;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.system.LoggingContext.KeyValueLogger;

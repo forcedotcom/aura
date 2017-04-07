@@ -25,8 +25,10 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
-import org.auraframework.impl.controller.ComponentController.AuraClientException;
+import org.auraframework.impl.controller.AuraClientException;
 import org.auraframework.impl.test.util.LoggingTestAppender;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
@@ -41,6 +43,12 @@ public class ExceptionAdapterImplTest extends AuraImplTestCase {
 
     @Inject
     private ConfigAdapter configAdapter;
+
+    @Inject
+    private ContextService contextService;
+
+    @Inject
+    private DefinitionService definitionService;
 
     public ExceptionAdapterImplTest() {
         logger = Logger.getLogger(ExceptionAdapterImpl.class);
@@ -66,7 +74,7 @@ public class ExceptionAdapterImplTest extends AuraImplTestCase {
         String errorMsg = "error message";
         String CmpStack = "Component stack";
         String JsStacktrace = "JS stack trace";
-        AuraClientException clientException = new AuraClientException(causeDescriptor, errorId, errorMsg, JsStacktrace, CmpStack, instanceService, exceptionAdapter, configAdapter);
+        AuraClientException clientException = new AuraClientException(causeDescriptor, errorId, errorMsg, JsStacktrace, CmpStack, instanceService, exceptionAdapter, configAdapter, contextService, definitionService);
 
         exceptionAdapter.handleException(clientException, null);
         List<LoggingEvent> logs = appender.getLog();

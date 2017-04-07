@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 
 /**
- * Runs the /moduletest/bootstrap.app app to verify raptor and aura/raptor interoperability works.
+ * Runs the /moduletest/bootstrap.app app to verify module and aura/module interoperability works.
  */
 @UnAdaptableTest
 public class ModulesBootstrapUITest extends WebDriverTestCase {

@@ -37,10 +37,6 @@ function SecureDOMEvent(event, key) {
             currentTarget: SecureObject.createFilteredProperty(o, event, "currentTarget"),
 
             initEvent: SecureObject.createFilteredMethod(o, event, "initEvent"),
-            preventDefault: SecureObject.createFilteredMethod(o, event, "preventDefault"),
-            stopImmediatePropagation: SecureObject.createFilteredMethod(o, event, "stopImmediatePropagation"),
-            stopPropagation: SecureObject.createFilteredMethod(o, event, "stopPropagation"),
-
             // Touch Events are special on their own:
             // https://developer.mozilla.org/en-US/docs/Web/API/Touch
             touches: SecureDOMEvent.filterTouchesDescriptor(o, event, "touches"),
@@ -55,6 +51,10 @@ function SecureDOMEvent(event, key) {
                 }
             }
     };
+
+    ["preventDefault", "stopImmediatePropagation", "stopPropagation"].forEach(function(method) {
+        SecureObject.addMethodIfSupported(o, event, method);
+    });
 
     // non-standard properties and aliases
     ["relatedTarget", "srcElement", "explicitOriginalTarget", "originalTarget"].forEach(function(property) {

@@ -283,6 +283,11 @@
      * @param  optional config literal
      */
     var _parseConfig = function(cfg) {
+        /* Do not reprocess cfg if it has already been processed */
+        if(CONFIG && CONFIG === cfg){
+            return;
+        }
+
         /* Shield configuration object from tampering */
         if (typeof cfg !== 'object') {
             cfg = {};

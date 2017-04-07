@@ -18,7 +18,7 @@ package org.auraframework.impl.source.file;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -253,7 +253,6 @@ public class FileBundleSourceLoader implements SourceLoader, InternalNamespaceSo
      * @return base folder of copied resources from jar
      */
     protected static File copyResourcesToDir(String basePackage) {
-        InputStreamReader reader = null;
         ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
         File directory = new File(IOUtil.newTempDir("resources"));
 
@@ -281,21 +280,16 @@ public class FileBundleSourceLoader implements SourceLoader, InternalNamespaceSo
                     nameDir.mkdir();
                 }
                 File target = new File(nameDir, last);
-                IOUtil.copyStream(r.getInputStream(), new FileOutputStream(target));
+                try (
+                    InputStream resourceStream = r.getInputStream();
+                    FileOutputStream targetStream = new FileOutputStream(target)
+                    // automatically calls close() after code block
+                ) {
+                    IOUtil.copyStream(resourceStream, targetStream);
+                }
             }
         } catch (IOException x) {
             throw new AuraRuntimeException(x);
-        } finally {
-            //
-            // Make sure we close everything out.
-            //
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (Throwable t) {
-                // ignore exceptions on close.
-            }
         }
         return directory;
     }

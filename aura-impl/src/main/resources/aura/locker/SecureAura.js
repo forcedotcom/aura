@@ -128,8 +128,12 @@ function SecureAura(AuraInstance, key) {
     Object.seal(o);
 
     // SecureUtil: creating a proxy for $A.util
-    [ "addClass", "getBooleanValue", "hasClass", "isArray", "isEmpty", "isObject", "isUndefined", "isUndefinedOrNull", "removeClass", "toggleClass" ].forEach(function(name) {
+    ["getBooleanValue", "isArray", "isEmpty", "isObject", "isUndefined", "isUndefinedOrNull"].forEach(function(name) {
         Object.defineProperty(su, name, SecureObject.createFilteredMethod(su, AuraInstance["util"], name));
+    });
+    // These methods in Util deal with raw objects like components, so mark them as such
+    [ "addClass", "hasClass", "removeClass", "toggleClass" ].forEach(function(name) {
+        Object.defineProperty(su, name, SecureObject.createFilteredMethod(su, AuraInstance["util"], name, { rawArguments: true }));
     });
 
     ls_setRef(su, AuraInstance["util"], key);

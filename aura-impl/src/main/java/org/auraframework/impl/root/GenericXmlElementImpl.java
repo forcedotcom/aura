@@ -16,13 +16,9 @@
 
 package org.auraframework.impl.root;
 
-import com.google.common.base.Suppliers;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Sets;
-
 import org.auraframework.def.genericxml.GenericXmlElement;
 import org.auraframework.def.genericxml.GenericXmlValidator;
 import org.auraframework.impl.system.BaseXmlElementImpl;
@@ -31,12 +27,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.management.modelmbean.XMLParseException;
+import java.util.*;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * Generic tag implementation. Responsible for basic xml validation.
@@ -122,9 +114,8 @@ public class GenericXmlElementImpl extends BaseXmlElementImpl implements Generic
     public static class Builder extends BaseBuilderImpl {
 
         private final Class<? extends GenericXmlValidator> validatorClass;
-        private Multimap<Class<? extends GenericXmlValidator>, GenericXmlElement> children =
-                Multimaps.newSetMultimap(Maps.newHashMap(), Suppliers.ofInstance(Sets.newHashSet()));
-        private Map<String, String> attributes = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+        private Multimap<Class<? extends GenericXmlValidator>, GenericXmlElement> children = HashMultimap.create();
+        private Map<String, String> attributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         private String text = null;
 
         public Builder(Class<? extends GenericXmlValidator> validatorClass, String tagName) {

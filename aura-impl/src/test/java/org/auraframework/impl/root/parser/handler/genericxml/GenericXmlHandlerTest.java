@@ -24,6 +24,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.factory.XMLParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
@@ -31,6 +32,7 @@ import javax.annotation.Nonnull;
 import javax.xml.stream.XMLStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -161,6 +163,17 @@ public class GenericXmlHandlerTest extends AuraImplTestCase {
     }
 
     @Test
+    public void testGetChildrenWithNonValidatorClass() throws Exception {
+        final String childTag = "child";
+        GenericXmlValidator child = new MockValidator(childTag, true);
+        GenericXmlValidator validator = new MockValidator(TAG, false, ATTRIBUTE_FUNC, Sets.newHashSet(child));
+        final String xml = String.format("<aura:designtest><%s>testText</%s></aura:designtest>", childTag, childTag);
+        GenericXmlElementHandler handler = createGenericXmlHandler(xml, validator);
+        GenericXmlElement def = handler.createElement();
+        assertEquals("Should get no elements back", 0, def.getChildren(String.class).size());
+    }
+
+    @Test
     public void testAttributeCaseInsensitive() throws Exception {
         final String attrUppercase = nonPriviledgedAttr.get(0).toUpperCase();
         final String attrLowercase = nonPriviledgedAttr.get(0);
@@ -192,6 +205,72 @@ public class GenericXmlHandlerTest extends AuraImplTestCase {
         assertNotNull("Expected to issue while validating definition", exception);
         String message = exception.getMessage();
         assertTrue("Expected error to be about duplicate attribute", message.toLowerCase().contains(attrLowercase));
+    }
+
+    @Test
+    public void testHanderWithGenericXmlChildren() throws Exception {
+        MockValidator2 childValidator = new MockValidator2();
+        MockValidator3 childValidator2 = new MockValidator3();
+        GenericXmlValidator validator = new MockValidator("root", false, (priv) -> Collections.emptyList(), Sets.newHashSet(childValidator, childValidator2));
+        final String xml = "<root><mockValidator2/><mockValidator3/></root>";
+        GenericXmlElementHandler handler = createGenericXmlHandler(xml, validator);
+        GenericXmlElement element = handler.createElement();
+        assertEquals("There should be two child elements",
+                2, element.getChildren().size());
+        assertEquals("There should only be one element with validator of mockValidator2",
+                1, element.getChildren(MockValidator2.class).size());
+
+    }
+
+    @Test
+    public void testHanderWith2LevelsOfDepth() throws Exception {
+        MockValidator3 childValidator_1 = new MockValidator3();
+        MockValidator2 childValidator2_1 = new MockValidator2();
+        MockValidator2 childValidator_subRoot = new MockValidator2(Sets.newHashSet(childValidator2_1, childValidator_1));
+        GenericXmlValidator validator = new MockValidator("root", false, (priv) -> Collections.emptyList(), Sets.newHashSet(childValidator_subRoot));
+        final String xml = "<root>" +
+                "               <mockValidator2>" +
+                "                   <mockValidator2/>" +
+                "                   <mockValidator3/>" +
+                "               </mockValidator2>" +
+                "           </root>";
+        GenericXmlElementHandler handler = createGenericXmlHandler(xml, validator);
+        GenericXmlElement root = handler.createElement();
+
+        assertEquals("Should be one child element from the root", 1, root.getChildren().size());
+
+        GenericXmlElement subRoot = new ArrayList<>(root.getChildren(MockValidator2.class)).get(0);
+        assertEquals("Expect the tag to be mockValidator2", MockValidator2.TAG, subRoot.getName());
+
+        Set<GenericXmlElement> subRootChild2 = subRoot.getChildren(MockValidator2.class);
+        Set<GenericXmlElement> subRootChild3 = subRoot.getChildren(MockValidator3.class);
+        assertEquals("Expect there to be two children under subRoot", 2, subRoot.getChildren().size());
+        assertEquals("Expect there to be one element of type MockValidator2", 1, subRootChild2.size());
+        assertEquals("Expect there to be one element of type MockValidator3", 1, subRootChild3.size());
+    }
+
+    @Test
+    public void testHanderWithrecursiveTagFail() throws Exception {
+        MockValidator2 childValidator_1 = new MockValidator2();
+        MockValidator2 childValidator_subRoot = new MockValidator2(Sets.newHashSet(childValidator_1));
+        GenericXmlValidator validator = new MockValidator("root", false, (priv) -> Collections.emptyList(), Sets.newHashSet(childValidator_subRoot));
+        //Should allow recursive but our validator only specifies 2 levels, were trying 3
+        final String xml = "<root>" +
+                "               <mockValidator2>" +
+                "                   <mockValidator2>" +
+                "                       <mockValidator2/>" +
+                "                   </mockValidator2>" +
+                "               </mockValidator2>" +
+                "           </root>";
+        GenericXmlElementHandler handler = createGenericXmlHandler(xml, validator);
+        Exception exception = null;
+        try {
+            handler.createElement();
+        } catch (AuraRuntimeException e) {
+            exception = e;
+        }
+        assertExceptionMessageContains(exception, AuraRuntimeException.class, "Unexpected tag");
+
     }
 
     private static class MockValidator extends GenericXmlValidator {
@@ -231,6 +310,28 @@ public class GenericXmlHandlerTest extends AuraImplTestCase {
         @Override
         public Set<String> getAllowedAttributes(boolean isPriviledgedNs) {
             return Sets.newHashSet(allowedAttributes.apply(isPriviledgedNs));
+        }
+    }
+
+    /**
+     * GenericXmlHandler user validator class for tag equality over the tag name.
+     * Creating multiple mock validators so the class differs.
+     */
+    private static class MockValidator2 extends MockValidator {
+        private static final String TAG = "mockValidator2";
+        public MockValidator2() {
+            this(Collections.emptySet());
+        }
+
+        public MockValidator2(Set<GenericXmlValidator> childValidators) {
+            super(TAG, false, (priv) -> Collections.emptyList(), childValidators);
+        }
+    }
+
+    private static class MockValidator3 extends MockValidator {
+        private static final String TAG = "mockValidator3";
+        public MockValidator3() {
+            super(TAG, false);
         }
     }
 }

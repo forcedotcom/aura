@@ -320,6 +320,7 @@
 	        "alt":                            { type: "string" },
 	        "autocapitalize":                 { type: "string" },
 	        "autocomplete":                   { type: "string" },
+	        "autocorrect":                    { type: "string", support : false},
 	        "autofocus":                      { type: "boolean" },
 	        "checkValidity":                  { type: "function" },
 	        "checked":                        { type: "boolean" },
@@ -350,6 +351,7 @@
 	        "readOnly":                       { type: "boolean" },
 	        "reportValidity":                 { type: "function" },
 	        "required":                       { type: "boolean" },
+	        "results":                        { type: "number", support : false},
 	        "select":                         { type: "function" },
 	        "selectionDirection":             { type: "string" },
 	        "selectionEnd":                   { type: "number" },
@@ -372,7 +374,8 @@
 	        "webkitEntries":                  { type: "Array" },
 	        "webkitdirectory":                { type: "boolean" },
 	        "width":                          { type: "number" },
-	        "willValidate":                   { type: "boolean" }
+	        "willValidate":                   { type: "boolean" },
+	        "x-moz-errormessage":             { type: "string", support: false}
 	    },
 	    "HTMLLabelElement": {
 	        "control":                        { type: "Null" },

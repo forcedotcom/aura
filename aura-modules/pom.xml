@@ -530,4 +530,31 @@
         </pluginManagement>
     </build>
 
+    <profiles>
+        <profile>
+            <id>skipComponentCompile</id>
+            <activation>
+                <property>
+                    <name>skipComponentCompile</name>
+                </property>
+            </activation>
+            <properties>
+                <component.compile.phase>disabled</component.compile.phase>
+                <component.test.compile.phase>disabled</component.test.compile.phase>
+            </properties>
+        </profile>
+        <profile>
+            <id>skipTestComponentCompile</id>
+            <activation>
+                <property>
+                    <name>maven.test.skip</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <component.test.compile.phase>disabled</component.test.compile.phase>
+            </properties>
+        </profile>
+    </profiles>
+
 </project>

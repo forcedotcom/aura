@@ -61,7 +61,6 @@
 	right: 0;
     background-color: #ffffff;
     font-size: 13px;
-    font-family: 'ProximaNovaSoft-Regular';
     height: 42px;
     text-align: center;
     color: #686c70;
@@ -69,8 +68,7 @@
 
 .THIS .headerBar .title {
 	line-height: 42px;
-	font-size: 18px;	
-	font-family: 'ProximaNovaSoft-Semibold';
+	font-size: 18px;
 	text-shadow: none;
 }
 
@@ -100,7 +98,6 @@
 	border-radius: 5px;	
 	background: rgba(0,0,0,.07);
 	color: #686c70;
-	font-family: 'ProximaNovaSoft-Semibold';
 	font-size: 13px;
 	line-height: 28px;
 }

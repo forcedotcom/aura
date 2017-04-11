@@ -76,6 +76,9 @@
     <aura:method name="testInnerHtmlFiltering"/>
     <aura:method name="testTextContentFiltering"/>
     <aura:method name="testInnerTextFiltering"/>
+    <aura:method name="testElementAttributesGetSet"/>
+    <aura:method name="testElementAttributesRemove"/>
+    <aura:method name="testElementGetAttribute"/>
 
     <lockerTest:facet/>
 

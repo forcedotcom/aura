@@ -17,9 +17,10 @@
         function verifySrcdocBlocked(frame, attrName, f) {
        		f();
     		// Try to access the attribute via SecureElement.attributes
-    		frame.attributes.forEach(function(attr) {
+		    for (var i = 0; i < frame.attributes.length; i++) {
+		        var attr = frame.attributes.item(i);
     			testUtils.assertTrue(attr.name.toLowerCase() !== attrName.toLowerCase(), "SecureElement.attributes should not have contained: " + name);
-			});
+			}
             testUtils.assertNull(frame.getAttribute(attrName), "getAttribute() on an invalid attribute should return null");
         }
 

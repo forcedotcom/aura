@@ -166,6 +166,9 @@ SecureObject.filterEverything = function(st, raw, options) {
                     swallowed = SecureElement(raw, key);
                 } else if (!options) {
                     swallowed = SecureObject(raw, key);
+                } else if (raw instanceof Attr && !rawKey) {
+                    ls_setKey(raw, defaultKey);
+                    return SecureObject.filterEverything(st, raw, options);
                 } else {
                     swallowed = options.defaultValue;
                     ls_addToCache(raw, swallowed, key);
@@ -798,6 +801,178 @@ SecureObject.createProxyForArrayObjects = function(raw, key) {
     return proxy;
 };
 
+var KEY_TO_NAMED_NODE_MAP_HANLDER = typeof Map !== "undefined" ? new Map() : undefined;
+
+function getFilteredNamedNodeMap(raw, key, prototype, caseInsensitiveAttributes) {
+    var filtered = {};
+
+    for (var n = 0; n < raw.length; n++) {
+        var value = raw[n];
+        if (SecureElement.isValidAttributeName(raw, value.name, prototype, caseInsensitiveAttributes)) {
+            filtered[n] = value;
+        }
+    }
+
+    return filtered;
+}
+
+function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) {
+    function getFromFiltered(so, filtered, index) {
+        var value = filtered[index];
+        return value ? SecureObject.filterEverything(so, value, { defaultKey: key }) : value;
+    }
+
+    var handler = KEY_TO_NAMED_NODE_MAP_HANLDER.get(key);
+    if (!handler) {     
+        handler = {
+                "get": function(target, property) {
+                    var raw = ls_getRef(target, key);
+
+                    var filtered = getFilteredNamedNodeMap(raw, key, prototype, caseInsensitiveAttributes);
+                    var ret;
+
+                    property = convertSymbol(property);
+                    if (isNaN(property)) {
+                        switch (property) {
+                        case "length":
+                            ret = Object.keys(filtered).length;
+                            break;
+                        case "item":
+                            ret = function(index) {
+                                return getFromFiltered(handler, filtered, index);
+                            };
+                        break;
+                        case "getNamedItem":
+                            ret = function(name) {
+                                for (var val in filtered) {
+                                    if (name === filtered[val].name) {
+                                        return SecureObject.filterEverything(handler, filtered[val], { defaultKey: key });
+                                    }
+                                }
+                                return null;
+                            };
+                        break;
+                        case "setNamedItem":
+                            ret = function(attribute) {
+                                if (!SecureElement.isValidAttributeName(raw, attribute.name, prototype, caseInsensitiveAttributes)) {
+                                    $A.warning(this + " does not allow getting/setting the " + attribute.name.toLowerCase() + " attribute, ignoring!");
+                                    return undefined;
+                                }
+                                // it may not be possible to get here from another Locker so the access check may be unnecessary
+                                // keep to error on the safe side
+                                ls_verifyAccess(attribute, target);
+                                if (ls_isProxy(attribute)) {
+                                    attribute = ls_getRef(attribute, key);
+                                }
+                                return SecureObject.filterEverything(handler, raw["setNamedItem"](attribute), { defaultKey: key });
+                            };
+                        break;
+                        case "removeNamedItem":
+                            ret = function(name) {
+                                if (!SecureElement.isValidAttributeName(raw, name, prototype, caseInsensitiveAttributes)) {
+                                    $A.warning(this + " does not allow removing the " + name.toLowerCase() + " attribute, ignoring!");
+                                    return undefined;
+                                }
+                                return SecureObject.filterEverything(handler, raw["removeNamedItem"](name), { defaultKey: key });
+                            };
+                        break;
+                        case "getNamedItemNS":
+                            ret = function(namespace, localName) {
+                                for (var val in filtered) {
+                                    if (namespace === filtered[val].namespaceURI && localName === filtered[val].localName) {
+                                        return SecureObject.filterEverything(handler, filtered[val], { defaultKey: key });
+                                    }
+                                }
+                                return null;
+                            };
+                        break;
+                        case "setNamedItemNS":
+                            ret = function(attribute) {
+                                if (!SecureElement.isValidAttributeName(raw, attribute.name, prototype, caseInsensitiveAttributes)) {
+                                    $A.warning(this + " does not allow getting/setting the " + attribute.name.toLowerCase() + " attribute, ignoring!");
+                                    return undefined;
+                                }
+                                ls_verifyAccess(attribute, target);
+                                if (ls_isProxy(attribute)) {
+                                    attribute = ls_getRef(attribute, key);
+                                }
+                                return SecureObject.filterEverything(handler, raw["setNamedItemNS"](attribute), { defaultKey: key });
+                            };
+                        break;
+                        case "removeNamedItemNS":
+                            ret = function(namespace, localName) {
+                                if (!SecureElement.isValidAttributeName(raw, name, prototype, caseInsensitiveAttributes)) {
+                                    $A.warning(this + " does not allow removing the " + name.toLowerCase() + " attribute, ignoring!");
+                                    return undefined;
+                                }
+                                return SecureObject.filterEverything(handler, raw["removeNamedItemNS"](namespace, localName), { defaultKey: key });
+                            };
+                        break;
+                        case "toString":
+                            ret = function() {
+                                return raw.toString();
+                            };
+                        break;
+
+                        case "toJSON":
+                            ret = function() {
+                                return JSON.stringify(filtered);
+                            };
+                        break;
+                        case "Symbol(Symbol.iterator)":
+                            ret = function () {
+                            var nextIndex = 0;
+                            return {
+                                next: function() {
+                                    if(nextIndex < filtered.length) {
+                                        var value = filtered[nextIndex];
+                                        nextIndex++;
+                                        return {value: value ? SecureObject.filterEverything(handler, value) : value, done: false};
+                                    } else {
+                                        return {done: true};
+                                    }
+                                }
+                            };
+                        };
+                        break;
+                        default:
+                            $A.warning("Unsupported " + raw + " method: " + property + ". Returning undefined");
+                        return undefined;
+                        }
+                    } else {
+                        ret = getFromFiltered(handler, filtered, property);
+                    }
+
+                    return ret;
+                },
+                "has": function(target, property) {
+                    var raw = ls_getRef(target, key);
+                    var filtered = getFilteredNamedNodeMap(handler, raw, key, prototype, caseInsensitiveAttributes);
+                    return property in filtered;
+                }
+        };
+
+        ls_setKey(handler, key);
+
+        KEY_TO_NAMED_NODE_MAP_HANLDER.set(key, handler);
+
+        Object.freeze(handler);
+    }
+
+    return handler;
+}
+
+SecureObject.createProxyForNamedNodeMap = function(raw, key, prototype, caseInsensitiveAttributes) {
+    var surrogate = Object.create(Object.getPrototypeOf(raw));
+    ls_setRef(surrogate, raw, key);
+
+    var proxy = new Proxy(surrogate, getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes));
+    ls_setKey(proxy, key);
+    ls_registerProxy(proxy);
+
+    return proxy;
+};
+
 SecureObject.createFilteredMethod = function(st, raw, methodName, options) {
     "use strict";
 
@@ -1210,6 +1385,8 @@ function getSupportedInterfaces(o) {
         interfaces.push("Text", "CharacterData", "Node");
     } else if (o instanceof Comment) {
         interfaces.push("CharacterData", "Node");
+    } else if (o instanceof Attr) {
+        interfaces.push("Attr", "Node", "EventTarget");
     }
 
     return interfaces;

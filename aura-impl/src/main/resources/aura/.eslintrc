@@ -153,7 +153,8 @@
     "ls_registerFilteringProxy": true,
     "lazyInitInlinedSafeEvalWorkaround": true,
     "SVGGraphicsElement": true,
-    "SVGGeometryElement": true
+    "SVGGeometryElement": true,
+    "Attr"
   },
 
   "rules": {

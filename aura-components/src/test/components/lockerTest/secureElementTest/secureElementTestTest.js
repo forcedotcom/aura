@@ -602,5 +602,23 @@
         test: function(cmp) {
             cmp.testInnerTextFiltering();
         }
+    },
+
+    testElementAttributesGetSet: {
+        test: function(cmp) {
+            cmp.testElementAttributesGetSet();
+        }
+    },
+
+    testElementAttributesRemove: {
+        test: function(cmp) {
+            cmp.testElementAttributesRemove();
+        }
+    },
+
+    testElementGetAttribute: {
+        test: function(cmp) {
+            cmp.testElementGetAttribute();
+        }
     }
 })

@@ -1,4 +1,41 @@
 ({
+    testElementAttributesGetSet: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var element = document.getElementById("title");
+        var attrs = element.attributes;
+        var origLength = attrs.length;
+
+        var attr = document.createAttribute ("data-foo");
+        attr.value = "bar";
+        attrs.setNamedItem(attr);
+
+        testUtils.assertEquals(origLength + 1, attrs.length, "Unexpected attribute length after adding new attribute");
+        testUtils.assertEquals("bar", attrs.getNamedItem("data-foo").value, "Unexpected attribute value from new attribute");
+        testUtils.assertEquals(null, attrs.getNamedItem("does-notExist"), "Unexpected return trying to get attribute that doesn't exist");
+    },
+
+    testElementAttributesRemove: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var element = document.getElementById("title");
+        var attrs = element.attributes;
+        var origLength = attrs.length;
+
+        attrs.removeNamedItem("id");
+
+        testUtils.assertEquals(origLength - 1, attrs.length, "Unexpected attribute length after removing attribute");
+        testUtils.assertEquals(null, attrs.getNamedItem("id"), "Unexpected return trying to get removed attribute");
+    },
+
+    testElementGetAttribute: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var element = document.getElementById("title");
+        var attr = element.getAttributeNode("id");
+
+        testUtils.assertEquals("title", attr.value, "Unexpected Attr value");
+        testUtils.assertTrue(attr.toString().startsWith("SecureElement"), "Attr returned from getAttributeNode should be SecureElement");
+        testUtils.assertTrue(attr.ownerElement.toString().startsWith("SecureElement"), "Attr ownerElement did not return SecureElement");
+    },
+
     testInnerHtmlFiltering: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var el = document.getElementById("innerHtmlFilteringTester");
@@ -44,7 +81,8 @@
         var dataFooFound = false;
 
         var div = document.getElementById("attributesTester");
-        div.attributes.forEach(function(attribute) {
+        for (var i = 0; i < div.attributes.length; i++) {
+            var attribute = div.attributes.item(i);
             if (attribute.name === "data-foo") {
                 dataFooFound = true;
             }
@@ -52,7 +90,7 @@
             if (attribute.name !== "id" && attribute.name.indexOf("data-") !== 0) {
                 testUtils.fail("Unexpected attribute " + attribute.name + " found on element");
             }
-        });
+        }
         testUtils.assertTrue(dataFooFound, "Custom element attribute data-foo not present on div");
     },
 

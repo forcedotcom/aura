@@ -248,7 +248,7 @@ function SecureElement(el, key) {
             return new SecureElementPrototype();
         })();
 
-        SecureElement.addStandardMethodAndPropertyOverrides(prototype, caseInsensitiveAttributes);
+        SecureElement.addStandardMethodAndPropertyOverrides(prototype, caseInsensitiveAttributes, key);
 
         Object.defineProperties(prototype, {
             toString: {
@@ -270,32 +270,14 @@ function SecureElement(el, key) {
 
         // Conditionally add things that not all Node types support
         if ("attributes" in el) {
-
-            // DCHASMAN TODO W-3158233 We need Proxy (208) to fully implement the syntax/semantics of Element.attributes!
-
             tagNameSpecificConfig["attributes"] = SecureObject.createFilteredPropertyStateless("attributes", prototype, {
                 writable : false,
                 afterGetCallback : function(attributes) {
                     if (!attributes) {
-                        return attribute;
+                        return attributes;
                     }
 
-                    // Secure attributes
-                    var secureAttributes = [];
-                    var raw = SecureObject.getRaw(this);
-                    for (var i = 0; i < attributes.length; i++) {
-                        var attribute = attributes[i];
-
-                        // Only add supported attributes
-                        if (SecureElement.isValidAttributeName(raw, attribute.name, prototype, caseInsensitiveAttributes)) {
-                            secureAttributes.push({
-                                name : attribute.name,
-                                value : SecureObject.filterEverything(this, attribute.value)
-                            });
-                        }
-                    }
-
-                    return secureAttributes;
+                    return SecureObject.createProxyForNamedNodeMap(attributes, key, prototype, caseInsensitiveAttributes);
                 }
             });
         }
@@ -461,7 +443,7 @@ SecureElement.isValidAttributeName = function(raw, name, prototype, caseInsensit
     return false;
 };
 
-SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseInsensitiveAttributes) {
+SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseInsensitiveAttributes, key) {
     Object.defineProperties(prototype, {
         appendChild : {
             writable: true,
@@ -590,22 +572,22 @@ SecureElement.addStandardMethodAndPropertyOverrides = function(prototype, caseIn
             }
         },
 
-        getAttribute: SecureElement.createAttributeAccessMethodConfig("getAttribute", prototype, caseInsensitiveAttributes, null, undefined, undefined),
-        getAttributeNS: SecureElement.createAttributeAccessMethodConfig("getAttributeNS", prototype, caseInsensitiveAttributes, null, true, undefined),
-        getAttributeNode: SecureElement.createAttributeAccessMethodConfig("getAttributeNode", prototype, caseInsensitiveAttributes, null, undefined, undefined),
-        getAttributeNodeNS: SecureElement.createAttributeAccessMethodConfig("getAttributeNodeNS", prototype, caseInsensitiveAttributes, null, true, undefined),
+        getAttribute: SecureElement.createAttributeAccessMethodConfig("getAttribute", prototype, caseInsensitiveAttributes, null, undefined, undefined, key),
+        getAttributeNS: SecureElement.createAttributeAccessMethodConfig("getAttributeNS", prototype, caseInsensitiveAttributes, null, true, undefined, key),
+        getAttributeNode: SecureElement.createAttributeAccessMethodConfig("getAttributeNode", prototype, caseInsensitiveAttributes, null, undefined, undefined, key),
+        getAttributeNodeNS: SecureElement.createAttributeAccessMethodConfig("getAttributeNodeNS", prototype, caseInsensitiveAttributes, null, true, undefined, key),
 
-        setAttribute: SecureElement.createAttributeAccessMethodConfig("setAttribute", prototype, caseInsensitiveAttributes, undefined, undefined, undefined),
-        setAttributeNS: SecureElement.createAttributeAccessMethodConfig("setAttributeNS", prototype, caseInsensitiveAttributes, undefined, true, undefined),
-        setAttributeNode: SecureElement.createAttributeAccessMethodConfig("setAttributeNode", prototype, caseInsensitiveAttributes, undefined, undefined, "name"),
-        setAttributeNodeNS: SecureElement.createAttributeAccessMethodConfig("setAttributeNodeNS", prototype, caseInsensitiveAttributes, undefined, true, "name"),
+        setAttribute: SecureElement.createAttributeAccessMethodConfig("setAttribute", prototype, caseInsensitiveAttributes, undefined, undefined, undefined, key),
+        setAttributeNS: SecureElement.createAttributeAccessMethodConfig("setAttributeNS", prototype, caseInsensitiveAttributes, undefined, true, undefined, key),
+        setAttributeNode: SecureElement.createAttributeAccessMethodConfig("setAttributeNode", prototype, caseInsensitiveAttributes, undefined, undefined, "name", key),
+        setAttributeNodeNS: SecureElement.createAttributeAccessMethodConfig("setAttributeNodeNS", prototype, caseInsensitiveAttributes, undefined, true, "name", key),
 
-        removeAttributeNode: SecureElement.createAttributeAccessMethodConfig("removeAttributeNode", prototype, caseInsensitiveAttributes, undefined, undefined, "name"),
-        removeAttributeNodeNS: SecureElement.createAttributeAccessMethodConfig("removeAttributeNodeNS", prototype, caseInsensitiveAttributes, undefined, true, "name")
+        removeAttributeNode: SecureElement.createAttributeAccessMethodConfig("removeAttributeNode", prototype, caseInsensitiveAttributes, undefined, undefined, "name", key),
+        removeAttributeNodeNS: SecureElement.createAttributeAccessMethodConfig("removeAttributeNodeNS", prototype, caseInsensitiveAttributes, undefined, true, "name", key)
     });
 };
 
-SecureElement.createAttributeAccessMethodConfig = function(methodName, prototype, caseInsensitiveAttributes, invalidAttributeReturnValue, namespaced, nameProp) {
+SecureElement.createAttributeAccessMethodConfig = function(methodName, prototype, caseInsensitiveAttributes, invalidAttributeReturnValue, namespaced, nameProp, key) {
     return {
         writable: true,
         value: function() {
@@ -621,7 +603,9 @@ SecureElement.createAttributeAccessMethodConfig = function(methodName, prototype
                 return invalidAttributeReturnValue;
             }
 
-            return raw[methodName].apply(raw, args);
+            args = SecureObject.filterArguments(this, args, { rawArguments: true });
+            var ret = raw[methodName].apply(raw, args);
+            return ret instanceof Node ? SecureElement(ret, key) : ret;
         }
     };
 };
@@ -1955,6 +1939,15 @@ SecureElement.metadata = {
                 "replaceWholeText":               FUNCTION,
                 "splitText":                      FUNCTION,
                 "wholeText":                      DEFAULT
+            },
+            "Attr": {
+                "name":                           DEFAULT,
+                "namespaceURI":                   DEFAULT,
+                "localName":                      DEFAULT,
+                "prefix":                         DEFAULT,
+                "ownerElement":                   DEFAULT,
+                "specified":                      DEFAULT,
+                "value":                          DEFAULT
             },
             "Node": SecureElement.nodeMetadata,
             "EventTarget": SecureElement.eventTargetMetadata

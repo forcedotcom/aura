@@ -25,8 +25,10 @@ import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Location;
 import org.auraframework.test.mock.Answer;
+import org.auraframework.test.mock.DelegatingHandler;
 import org.auraframework.test.mock.Invocation;
 import org.auraframework.test.mock.Stub;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -86,7 +88,10 @@ public abstract class JavascriptMockHandler<D extends Definition> {
     protected D getBaseDefinition(String descStr, Class<D> defClass)
             throws DefinitionNotFoundException, QuickFixException {
         if (descStr != null) {
-            return Aura.getDefinitionService().getDefinition(descStr, defClass);
+            DefinitionService definitionService = Aura.getDefinitionService();
+            D def = definitionService.getDefinition(descStr, defClass);
+            def = (D) DelegatingHandler.getSourceDelegate(def);
+            return def;
         }
         D ret = getDefaultBaseDefinition();
         if (ret == null) {

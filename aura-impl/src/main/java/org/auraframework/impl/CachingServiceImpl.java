@@ -299,11 +299,13 @@ public class CachingServiceImpl implements CachingService {
             invalidateSourceRelatedCaches(source);
 
             // notify provided listeners, presumably to clear caches
-            for (WeakReference<SourceListener> i : listeners) {
-                SourceListener sl = i.get();
-
-                if (sl != null) {
-                    sl.onSourceChanged(source, event, filePath);
+            if (listeners != null) {
+                for (WeakReference<SourceListener> i : listeners) {
+                    SourceListener sl = i.get();
+    
+                    if (sl != null) {
+                        sl.onSourceChanged(source, event, filePath);
+                    }
                 }
             }
         } catch (InterruptedException e) {

@@ -37,9 +37,9 @@ public class Stub<T> {
 			throw new IllegalArgumentException(
 					"Must provide at least one answer for a stub");
 		}
-		reset();
 		this.invocation = invocation;
 		this.answers = Lists.newLinkedList(answers);
+		reset();
 	}
 
 	public void reset() {

@@ -50,7 +50,6 @@ import com.google.common.collect.ImmutableList;
  * Parse JSTEST mock Actions.
  */
 public class JavascriptMockActionHandler extends JavascriptMockHandler<ControllerDef> {
-    
 
     @Configuration
     public static class ConfigureMockActionInstanceBuilder {
@@ -63,7 +62,7 @@ public class JavascriptMockActionHandler extends JavascriptMockHandler<Controlle
 
     private static class MockActionHandler extends DelegatingHandler {
         private final Answer<?> answer;
-
+        
         public MockActionHandler(Object delegate, Answer<?> answer) {
             super(delegate);
             this.answer = answer;
@@ -118,12 +117,14 @@ public class JavascriptMockActionHandler extends JavascriptMockHandler<Controlle
                 }
                 for (Stub<?> stub : stubs) {
                     if (stub.getInvocation().getMethodName().equals(name)) {
+                        Answer<?> answer = stub.getNextAnswer();
+                        MockActionHandler handler = new MockActionHandler(res, answer);
                         return Proxy.newProxyInstance(JavascriptMockActionHandler.class.getClassLoader(),
-                                new Class<?>[] { ActionDef.class },
-                                new MockActionHandler(res, stub.getNextAnswer()));
+                                new Class<?>[] { ActionDef.class },handler);
                     }
                 }
             }
+            
             return res;
         }
     }
@@ -141,8 +142,8 @@ public class JavascriptMockActionHandler extends JavascriptMockHandler<Controlle
         controllerDef = getBaseDefinition((String) map.get("descriptor"), ControllerDef.class);
         List<Stub<?>> stubs = getStubs(map.get("stubs"));
         return (JavaControllerDef) Proxy.newProxyInstance(JavascriptMockActionHandler.class.getClassLoader(),
-                new Class<?>[] { JavaControllerDef.class, Resettable.class }, new MockJavaControllerDefHandler(
-                        controllerDef, stubs));
+                new Class<?>[] { JavaControllerDef.class, Resettable.class },
+                new MockJavaControllerDefHandler(controllerDef, stubs));
     }
 
     @Override

@@ -197,9 +197,9 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                     putMocks(mocksMap, caseMocks);
                     mocks = Lists.newArrayList(mocksMap.values());
                 }
-
-                builder.caseDefs.add(new JavascriptTestCaseDef(descriptor, key, null, attributes, defType, labels,
-                        browsers, mocks, auraErrorsExpectedDuringInit, scrumTeam, owner, caseAccess));
+                JavascriptTestCaseDef testCaseDef = new JavascriptTestCaseDef(descriptor, key, null, attributes, defType, labels,
+                        browsers, mocks, auraErrorsExpectedDuringInit, scrumTeam, owner, caseAccess);
+                builder.caseDefs.add(testCaseDef);
             }
         }
 

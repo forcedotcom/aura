@@ -18,6 +18,7 @@ package org.auraframework.modules.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.modules.ModulesCompiler;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.util.test.util.UnitTestCase;
@@ -53,7 +54,7 @@ public class ModulesCompilerTest extends UnitTestCase {
         String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"),
                 Charsets.UTF_8);
 
-        assertEquals(expected.trim(), compilerData.code.trim());
+        assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
         assertEquals("[x-test]", compilerData.bundleDependencies.toString());
     }
     
@@ -71,7 +72,7 @@ public class ModulesCompilerTest extends UnitTestCase {
         String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"),
                 Charsets.UTF_8);
 
-        assertEquals(expected.trim(), compilerData.code.trim());
+        assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
         assertEquals("[x-test]", compilerData.bundleDependencies.toString());
     }
 

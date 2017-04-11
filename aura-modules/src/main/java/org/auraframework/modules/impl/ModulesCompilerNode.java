@@ -19,9 +19,11 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.modules.ModulesCompiler;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.util.AuraFiles;
@@ -60,8 +62,13 @@ public final class ModulesCompilerNode implements ModulesCompiler {
 
         String result = new String(Files.readAllBytes(output.toPath()), Charsets.UTF_8);
         output.delete();
+        // TODO update for new compiler output with all modes
+        Map<CodeType, String> codeMap = new EnumMap<>(CodeType.class);
+        codeMap.put(CodeType.DEV, result);
+        codeMap.put(CodeType.PROD, result);
+        codeMap.put(CodeType.COMPAT, result);
         // TODO: compiler metadata
-        return new ModulesCompilerData(result, null);
+        return new ModulesCompilerData(codeMap, null);
     }
 
     @Override

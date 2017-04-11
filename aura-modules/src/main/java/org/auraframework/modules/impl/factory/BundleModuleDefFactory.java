@@ -16,6 +16,7 @@
 package org.auraframework.modules.impl.factory;
 
 import java.io.File;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
+import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl;
 import org.auraframework.modules.ModulesCompiler;
@@ -140,12 +142,35 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         } catch (Exception e) {
             throw new InvalidDefinitionException(descriptor + ": " + e.getMessage(), location, e);
         }
-        String compiledCode = processCompiledCode(descriptor, compilerData.code, location);
-        builder.setCompiledCode(compiledCode);
+        Map<CodeType, String> codes = processCodes(descriptor, compilerData.codes, location);
+        builder.setCodes(codes);
         builder.setModuleDependencies(compilerData.bundleDependencies);
-        builder.setOwnHash(calculateOwnHash(descriptor + compiledCode));
+        builder.setOwnHash(calculateOwnHash(descriptor, codes));
         return builder.build();
+    }
 
+    /**
+     * Processes different versions of the compiled code
+     * DEV, PROD, COMPAT
+     *
+     * @param descriptor ModuleDef descriptor
+     * @param codeMap map of code from compiler
+     * @param location location for errors
+     * @return map of processed code
+     * @throws InvalidDefinitionException
+     */
+    private Map<CodeType, String> processCodes(DefDescriptor<ModuleDef> descriptor, Map<CodeType, String> codeMap,
+                                               Location location) throws InvalidDefinitionException {
+        Map<CodeType, String> newCodeMap = new EnumMap<>(CodeType.class);
+        for (CodeType codeType : CodeType.values()) {
+            String code = codeMap.get(codeType);
+            if (code == null) {
+                throw new InvalidDefinitionException(codeType + " compiled code not found", location);
+            }
+            String compiledCode = processCompiledCode(descriptor, code, codeType, location);
+            newCodeMap.put(codeType, compiledCode);
+        }
+        return newCodeMap;
     }
 
     /**
@@ -154,22 +179,36 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
      *
      * @param descriptor module descriptor
      * @param code compiled code
+     * @param codeType current code type
      * @return code results
      * @throws InvalidDefinitionException if code from compiler does not start with define for amd
      */
-    private String processCompiledCode(DefDescriptor<ModuleDef> descriptor, String code, Location location) throws InvalidDefinitionException {
-        if (!code.substring(0, 7).equals("define(")) {
-            throw new InvalidDefinitionException("Compiled code does not start with AMD 'define'", location);
-        }
+    private String processCompiledCode(DefDescriptor<ModuleDef> descriptor, String code, CodeType codeType,
+                                       Location location)
+            throws InvalidDefinitionException {
         StringBuilder processedCode = new StringBuilder();
-        processedCode
-                .append("function() { $A.componentService.addModule('")
-                .append(descriptor.getQualifiedName()).append("', ")
-                .append(code.substring(7, code.length()))
-                .append("}");
+        if (codeType == CodeType.COMPAT) {
+            // TODO compat mode client side registration
+            // no define() for compat mode
+            processedCode.append(code);
+        } else {
+            if (!code.substring(0, 7).equals("define(")) {
+                throw new InvalidDefinitionException("Compiled code does not start with AMD 'define'", location);
+            }
+            processedCode
+                    .append("function() { $A.componentService.addModule('")
+                    .append(descriptor.getQualifiedName()).append("', ")
+                    .append(code.substring(7, code.length()))
+                    .append("}");
+        }
         return processedCode.toString();
     }
 
+    /**
+     * Custom element tag name from path
+     * @param path file path
+     * @return custom element tag name
+     */
     private String getCustomElementName(String path) {
         String[] paths = path.split(File.separator);
         int length = paths.length;
@@ -181,9 +220,18 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         return "";
     }
 
-    private String calculateOwnHash(String input) {
+    /**
+     * Produces hash from current descriptor and dev code
+     *
+     * @param descriptor ModuleDef descriptor
+     * @param codeMap code map
+     * @return hash
+     */
+    private String calculateOwnHash(DefDescriptor descriptor, Map<CodeType, String> codeMap) {
+        String code = codeMap.get(CodeType.DEV);
         Hash.StringBuilder hashBuilder = new Hash.StringBuilder();
-        hashBuilder.addString(input);
+        hashBuilder.addString(descriptor.toString());
+        hashBuilder.addString(code);
         return hashBuilder.build().toString();
     }
 

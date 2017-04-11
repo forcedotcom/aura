@@ -41,7 +41,7 @@ public final class ModulesCompilerJ2V8 implements ModulesCompiler {
     
     @Override
     public ModulesCompilerData compile(String entry, Map<String,String> sources) throws Exception {
-        StringBuilder options = new StringBuilder("{ format: 'amd', mapNamespaceFromPath: true,\nsources : {\n");
+        StringBuilder options = new StringBuilder("{ format: 'amd', mode: 'all', mapNamespaceFromPath: true,\nsources : {\n");
         
         // add entries for all files in the bundle
         int size = sources.size();

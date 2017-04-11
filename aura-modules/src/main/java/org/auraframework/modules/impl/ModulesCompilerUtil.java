@@ -20,9 +20,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.util.IOUtil;
 
@@ -62,13 +65,25 @@ final class ModulesCompilerUtil {
     }
 
     static ModulesCompilerData parseCompilerOutput(V8Object result) {
-        String code = result.getString("code");
-        V8Object metadata = result.getObject("metadata");
+        V8Object dev = result.getObject("dev");
+        V8Object prod = result.getObject("prod");
+        V8Object compat = result.getObject("compat");
+
+        String devCode = dev.getString("code");
+        String prodCode = prod.getString("code");
+        String compatCode = compat.getString("code");
+
+        Map<CodeType, String> codeMap = new EnumMap<>(CodeType.class);
+        codeMap.put(CodeType.DEV, devCode);
+        codeMap.put(CodeType.PROD, prodCode);
+        codeMap.put(CodeType.COMPAT, compatCode);
+
+        V8Object metadata = dev.getObject("metadata");
         V8Array v8BundleDependencies = metadata.getArray("bundleDependencies");
         Set<String> bundleDependencies = new HashSet<>();
         for (int i = 0; i < v8BundleDependencies.length(); i++) {
             bundleDependencies.add(v8BundleDependencies.getString(i));
         }
-        return new ModulesCompilerData(code, bundleDependencies);
+        return new ModulesCompilerData(codeMap, bundleDependencies);
     }
 }

@@ -16,6 +16,7 @@
 package org.auraframework.impl.root.component;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
@@ -39,22 +40,22 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
 
     private static final long serialVersionUID = 5154640929496754931L;
     private String path;
-    private String compiledCode;
     private Set<String> moduleDependencies;
     private String customElementName;
     private Set<DefDescriptor<?>> dependencies = null;
+    private Map<CodeType, String> codes;
 
     private ModuleDefImpl(Builder builder) {
         super(builder);
         this.path = builder.path;
-        this.compiledCode = builder.compiledCode;
+        this.codes = builder.codes;
         this.moduleDependencies = builder.moduleDependencies;
         this.customElementName = builder.customElementName;
     }
 
     @Override
-    public String getCompiledCode() {
-        return compiledCode;
+    public String getCode(CodeType codeType) {
+        return this.codes.get(codeType);
     }
 
     @Override
@@ -64,10 +65,13 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
 
     @Override
     public void serialize(Json json) throws IOException {
+        boolean minified = Aura.getContextService().getCurrentContext().getMode().minify();
+        CodeType codeType = minified ? CodeType.PROD : CodeType.DEV;
+        String code = this.codes.get(codeType);
         json.writeMap(ImmutableMap.of(
                 "descriptor", getDescriptor().getQualifiedName(),
                 "name", this.customElementName,
-                "code", this.compiledCode));
+                "code", code));
     }
 
     @Override
@@ -122,7 +126,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     public static final class Builder extends DefinitionImpl.BuilderImpl<ModuleDef> {
 
         private String path;
-        private String compiledCode;
+        private Map<CodeType, String> codes;
         private Set<String> moduleDependencies;
         private String customElementName;
 
@@ -130,8 +134,8 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
             super(ModuleDef.class);
         }
 
-        public void setCompiledCode(String compiledCode) {
-            this.compiledCode = compiledCode;
+        public void setCodes(Map<CodeType, String> codes) {
+            this.codes = codes;
         }
 
         public void setPath(String path) {

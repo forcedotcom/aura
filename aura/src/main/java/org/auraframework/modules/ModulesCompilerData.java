@@ -15,7 +15,9 @@
  */
 package org.auraframework.modules;
 
-import java.util.List;
+import org.auraframework.def.module.ModuleDef.CodeType;
+
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -23,11 +25,11 @@ import java.util.Set;
  */
 public class ModulesCompilerData {
 
-    public final String code;
+    public final Map<CodeType, String> codes;
     public final Set<String> bundleDependencies;
     
-    public ModulesCompilerData(String code, Set<String> bundleDependencies) {
-        this.code = code;
+    public ModulesCompilerData(Map<CodeType, String> codes, Set<String> bundleDependencies) {
+        this.codes = codes;
         this.bundleDependencies = bundleDependencies;
     }
 }

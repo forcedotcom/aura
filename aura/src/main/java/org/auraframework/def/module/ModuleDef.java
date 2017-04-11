@@ -23,12 +23,16 @@ import org.auraframework.def.Definition;
  */
 public interface ModuleDef extends Definition {
 
+    enum CodeType {
+        DEV, PROD, COMPAT
+    }
+
     String TEMPLATE_PREFIX = "template";
 
     @Override
     DefDescriptor<ModuleDef> getDescriptor();
 
-    String getCompiledCode();
+    String getCode(CodeType codeType);
 
     String getPath();
 }

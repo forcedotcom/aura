@@ -18,7 +18,20 @@
         cmp.set('v.updateOnDisabled', true);
     },
 
-    doUpdate: function() {
-        // disabled since it's handled by inputSmartNumber
+    handleUpdate: function() {
+        // Override update handler and let inputSmartNumber updates.
+        // This calls doUpdate in ui:input.helper and set v.value,
+        // which is unwanted because in inputSmartNumber, v.value
+        // is internal and needs to be preprocessed before getting set.
+    },
+
+    fireEvent: function(component, event) {
+        // Override to avoid firing extra events not wanted by inputSmartNumber.
+        // With special formatting, there's logic in inputSmartNumber to decide
+        // whether a change event should be fired.
+        // Without filtering this, ui:input can fire change event in unexpected moment.
+        if (event.type !== 'change') {
+            this.lib.interactive.fireEvent(component, event);
+        }
     }
 })//eslint-disable-line semi

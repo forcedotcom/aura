@@ -80,7 +80,7 @@
     <aura:registerEvent name="onsort" type="ui:sort" description="The event fired when a column is sorted."/>
     <aura:registerEvent name="onColumnResize" type="ui:resize" description="The event fired when a column is resized."/>
 
-    <table aura:id="table" class="{! 'slds-table ' + v.class + ( v.fixedHeader ? ' fixedHeader' : '') + (v.enableResizableColumns ? ' resizable-cols' : '')}" aura:flavorable="true">
+    <table aura:id="table" class="{! 'slds-table ' + v.class + ( v.fixedHeader ? ' fixedHeader' : '') + (v.enableResizableColumns ? ' resizable-cols slds-table--resizable-cols' : '')}" aura:flavorable="true">
         <thead aura:id="thead">
             <tr aura:id="headerRow" class="slds-text-title--caps">
                 <aura:iteration items="{!v.headerColumns}" var="headerColumn">

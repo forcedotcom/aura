@@ -18,7 +18,8 @@
         var config = {
             format: "YYYY-MM-DD",
             timezone: component.get("v.timezone") || $A.get("$Locale.timezone"),
-            validateString: false
+            validateString: false,
+            ignoreThaiYearTranslation: true
         };
 
         var displayValue = function (returnValue) {

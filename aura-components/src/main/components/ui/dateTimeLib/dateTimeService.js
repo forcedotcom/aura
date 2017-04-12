@@ -70,12 +70,15 @@ function lib() { //eslint-disable-line no-unused-vars
             }
 
             var displayValue = function (convertedDate) {
-                var translatedDate = $A.localizationService.translateToOtherCalendar(convertedDate);
-                var formattedDate = $A.localizationService.formatDateUTC(translatedDate, config.format, config.langLocale);
+                if (!$A.util.getBooleanValue(config.ignoreThaiYearTranslation)) {
+                    convertedDate = $A.localizationService.translateToOtherCalendar(convertedDate);
+                }
+
+                var formattedDate = $A.localizationService.formatDateUTC(convertedDate, config.format, config.langLocale);
                 var formattedTime;
                 // time format is provided by inputDateTime, where there is a separate input for date and time
                 if (config.timeFormat) {
-                    formattedTime = $A.localizationService.formatTimeUTC(translatedDate, config.timeFormat, config.langLocale);
+                    formattedTime = $A.localizationService.formatTimeUTC(convertedDate, config.timeFormat, config.langLocale);
                 }
 
                 callback({

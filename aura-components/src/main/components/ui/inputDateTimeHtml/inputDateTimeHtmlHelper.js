@@ -23,7 +23,6 @@
             var timezone = component.get("v.timezone");
 
             $A.localizationService.UTCToWallTime(isoDate, timezone, function (walltime) {
-                walltime = $A.localizationService.translateToOtherCalendar(walltime);
                 var walltimeISO = $A.localizationService.toISOString(walltime);
 
                 // datetime-local input doesn't support any time zone offset information,
@@ -44,7 +43,6 @@
         var timezone = component.get("v.timezone");
 
         $A.localizationService.WallTimeToUTC(isoDate, timezone, function (utcDate) {
-            utcDate = $A.localizationService.translateFromOtherCalendar(utcDate);
             component.set("v.value", $A.localizationService.toISOString(utcDate));
         });
     }

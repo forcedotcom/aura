@@ -1105,6 +1105,9 @@ AuraLocalizationService.prototype.translateFromLocalizedDigits = function(input)
  * @platform
  */
 AuraLocalizationService.prototype.translateFromOtherCalendar = function(date) {
+    if (!date) {
+        return date;
+    }
     var userLocaleLang = $A.get("$Locale.userLocaleLang");
     var userLocaleCountry = $A.get("$Locale.userLocaleCountry");
     if (userLocaleLang === 'th' && userLocaleCountry === 'TH') { // Buddhist year
@@ -1153,6 +1156,9 @@ AuraLocalizationService.prototype.translateToLocalizedDigits = function(input) {
  * @platform
  */
 AuraLocalizationService.prototype.translateToOtherCalendar = function(date) {
+    if (!date) {
+        return date;
+    }
     var userLocaleLang = $A.get("$Locale.userLocaleLang");
     var userLocaleCountry = $A.get("$Locale.userLocaleCountry");
     if (userLocaleLang === 'th' && userLocaleCountry === 'TH') { // Buddhist year

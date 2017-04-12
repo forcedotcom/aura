@@ -438,9 +438,10 @@ AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) 
  * @export
  */
 AuraRenderingService.prototype.renderFacet = function(component, facet, parent) {
+    var ret = this.render(facet, parent);
     this.storeFacetInfo(component, facet);
-    var ret=this.render(facet,parent);
-    if(!ret.length){
+
+    if(!ret.length) {
         if(parent) {
             this.setMarker(component, parent);
         } else {
@@ -492,7 +493,6 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
                     ret=ret.concat(renderedElements);
                     marker = this.getMarker(component);
                     if(this.isCommentMarker(marker)){
-
                         this.removeElement(marker);
                     }
                     this.setMarker(component, ret[0]);

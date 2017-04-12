@@ -46,15 +46,15 @@
                 var array = new Uint8Array(128);
                 crypto.getRandomValues(array);
 
-                array.forEach(function(number){
-                    if (number % 2){
-                        brackets[0] = brackets[0] + '(';
-                        brackets[1] = ')' + brackets[1];
-                    } else {
-                        brackets[0] = brackets[0] + '[';
-                        brackets[1] = '][0]' + brackets[1];
-                    }
-                });
+                for(var i = 0; i < array.length; i++){
+                     if (array[i] % 2){
+                         brackets[0] = brackets[0] + '(';
+                         brackets[1] = ')' + brackets[1];
+                     } else {
+                         brackets[0] = brackets[0] + '[';
+                         brackets[1] = '][0]' + brackets[1];
+                     }
+                }
             }
             
             src = 'return ' + brackets[0] + '(function(window){\n' + src + '\n})' + brackets[1] + '.call(arguments[0], arguments[0])';

@@ -58,13 +58,14 @@
         	$A.test.assertEquals('reset', component.find("button").getElement().getAttribute("type"), "Button not rendered with specified type");
         }
     },
-    // FF 3.6 doesn't default the type as FF 4+ and Google Chrome do, but FF 3.6 is not our end-target platform
-    _testInvalidButtonType:{
+    
+    testInvalidButtonType:{
         attributes:{buttonType: 'fooBar'},
         test:function(component){
         	$A.test.assertEquals('submit', component.find("button").getElement().type, "Button not rendered with default type when a bad type is specified");
         }
     },
+    
     testLabelClass:{
         attributes:{label:'Ok', labelClass: 'OkStyling'},
         test:function(component){
@@ -89,8 +90,8 @@
             $A.test.fail("Could not attach an image icon to button");
         }
     },
-    //TODO Uncomment test once user story W-747907 is resolved
-    _testButtonWithoutIcon:{
+
+    testButtonWithoutIcon:{
         attributes:{},
         test:function(component){
             for(var i in component.find('button').getElement().children){
@@ -149,19 +150,20 @@
         }
     },
     
-    //TODO W-1014086
-    _testRerender:{
+    testRerender:{
         attributes:{label:"Like", disabled:false, hasIcon:true, iconImgSrc:'/auraFW/resources/aura/images/bug.png'},
         test:function(component){
-        	$A.test.assertEquals('Like', $A.test.getText(component.find("div").getElement()), "Label not correct");
+        	$A.test.assertEquals('Like', $A.test.getText(component.find("span").getElement()), "Label not correct");
         	$A.test.assertFalse(component.find("button").getElement().disabled, "Button was rendered in disabled state");
 
             component.set('v.disabled', true);
             component.set('v.label', 'clear');
             component.set('v.iconImgSrc', '/auraFW/resources/aura/images/clear.png');
-            $A.renderingService.rerender(component);
+            
 
-            $A.test.assertEquals('clear', $A.test.getText(component.find("div").getElement()), "New label not rerendered");
+            $A.renderingService.rerenderDirty();
+
+            $A.test.assertEquals('clear', $A.test.getText(component.find("span").getElement()), "New label not rerendered");
             $A.test.assertTrue(component.find("button").getElement().disabled, "Button was not rerendered in disabled state");
 
             var i, child;
@@ -171,14 +173,7 @@
                 	$A.test.assertTrue(child.src.indexOf('/auraFW/resources/aura/images/clear.png')!==-1, "Button not rerendered with specified icon img");
                 }
             }
-            $A.renderingService.rerender(component);
-
-            for(i in component.find('button').getElement().children){
-                child = component.find('button').getElement().children[i];
-                if($A.test.isInstanceOfImageElement(child)){
-                    $A.test.fail("There should be no image element for the button");
-                }
-            }
+            
         }
     }
 

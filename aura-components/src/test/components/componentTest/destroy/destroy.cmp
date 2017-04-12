@@ -24,6 +24,7 @@
     <aura:attribute name="cmpAttribute" type="Aura.Component"/>
     <aura:attribute name="cmpArrayAttribute" type="Aura.Component[]"/>
     <aura:attribute name="objWithDestroy" type="Object"/>
+    <aura:attribute name="list" type="List" default="[1, 2, 3]"/>
 
     <div aura:id="team" class="team">
         <componentTest:hasBody aura:id="outerFacet">
@@ -46,4 +47,11 @@
 
     <componentTest:cmpWithDestroyHandlerWrapper aura:id="cmpWithDestroyHandlerWrapper">
     </componentTest:cmpWithDestroyHandlerWrapper>
+
+    <!-- Destroy nested ifs in iterations after clearing v.list -->
+    <aura:iteration items="{!v.list}" var="item" aura:id="iteration">
+        <b>
+            <aura:if isTrue="{!v.list.length != 0}"><div aura:id="div">{!item}</div></aura:if>
+        </b>
+    </aura:iteration>
 </aura:component>

@@ -267,6 +267,53 @@
         }
     },
 
+    /**
+     * Render an iteration with several items.
+     * The body should contain an if bound to the same expression as the iteration v.items
+     * 1. Set the iteration v.items to empty
+     * 2. The If will rerender with the iteration, blanking out its facet.
+     * 3. Rerender the iteration explicitly.
+     * 4. See that all the elements in the iteration have been destroyed.
+     */
+    testDestroyIterationWithIf: {
+        test: [
+            function(component) {
+                var iteration = component.find("iteration");
+                //var ifs = iteration.find({instancesOf:"aura:if"});
+                //var divs = ifs.map(function(item){ return item.find({instancesOf:"aura:html"})[0]; });
+                
+                var components = this.getBodyComponentsRecursively(iteration);
+
+                component.set("v.list", []);
+                
+                $A.renderingService.rerenderDirty();
+                
+                // All of the components inside the iteration should be invalid at this point.
+                //var components = ifs.concat(divs);
+                for(var c=0;c<components.length;c++) {
+                    $A.test.assertFalse(components[c].isValid(), "One of the components inside the iteration after empty and rerender was valid: " + components[c]);
+                }
+            }
+        ]
+    },
+
+    getBodyComponentsRecursively: function(component) {
+        var components = [];
+
+        function getBodyComponents(children) {
+            for(var c=0;c<children.length;c++) {
+                components.push(children[c]);
+                if(children[c].getType() !== "aura:expression") {
+                    getBodyComponents(children[c].get("v.body"));
+                }
+            }
+        }
+
+        getBodyComponents(component.get("v.body"))
+
+        return components;
+    },
+
     verifyOuterFacetComponentDestroyed : function(cmp) {
         this.verifyChildComponentsDestroyed(cmp);
         $A.test.assertEquals(0, cmp.find("team").getElement().childNodes.length);

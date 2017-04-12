@@ -791,6 +791,15 @@ Component.prototype.destroy = function() {
     // call unrender before setting _destroying
     // so that _destroying could be used for isValid check.
     $A.renderingService.unrender(this);
+
+    // Workaround for a case in aura:if where you rerender the body away then destroy.
+    if(this._lastFacetInfo) {
+        for(var c=0;c<this._lastFacetInfo.length;c++) {
+            this._lastFacetInfo[c].destroy();
+        }
+        this._lastFacetInfo = null;
+    }
+
     if(this._marker) {
         $A.renderingService.removeMarkerReference(this._marker, this.getGlobalId());
         $A.renderingService.removeElement(this._marker, this.getContainer());

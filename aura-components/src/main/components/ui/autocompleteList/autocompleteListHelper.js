@@ -95,25 +95,6 @@
             var i;
             var f = function (event) {
                 // ignore gestures/swipes; only run the click handler if it's a click or tap
-                var clickEndEvent;
-
-                if (helper.getOnClickEventProp("isTouchDevice")) {
-                    var touchIdFound = false;
-                    for (i = 0; i < event.changedTouches.length; i++) {
-                        clickEndEvent = event.changedTouches[i];
-                        if (clickEndEvent.identifier === component._onStartId) {
-                            touchIdFound = true;
-                            break;
-                        }
-                    }
-
-                    if (helper.getOnClickEventProp("isTouchDevice") && !touchIdFound) {
-                        return;
-                    }
-                } else {
-                    clickEndEvent = event;
-                }
-
                 var listElems = component.getElements();
                 var ignoreElements = component.get("v.ignoredElements");
                 var clickOutside = true;
@@ -160,31 +141,16 @@
         }
 
         // fill the cache
-        this.getOnClickEventProp.cache["isTouchDevice"] = !$A.util.isUndefined(document.ontouchstart);
-        if (this.getOnClickEventProp.cache["isTouchDevice"]) {
-            this.getOnClickEventProp.cache["onClickStartEvent"] = "touchstart";
-            this.getOnClickEventProp.cache["onClickEndEvent"] = "touchend";
-        } else {
-            this.getOnClickEventProp.cache["onClickStartEvent"] = "mousedown";
-            this.getOnClickEventProp.cache["onClickEndEvent"] = "mouseup";
-        }
+        this.getOnClickEventProp.cache["onClickStartEvent"] = "mousedown";
+        this.getOnClickEventProp.cache["onClickEndEvent"] = "mouseup";
         return this.getOnClickEventProp.cache[prop];
     },
 
     getOnClickStartFunction: function (component) {
         if ($A.util.isUndefined(component._onClickStartFunc)) {
-            var helper = this;
             var f = function (event) {
-                if (helper.getOnClickEventProp("isTouchDevice")) {
-                    var touch = event.changedTouches[0];
-                    // record the ID to ensure it's the same finger on a multi-touch device
-                    component._onStartId = touch.identifier;
-                    component._onStartX = touch.clientX;
-                    component._onStartY = touch.clientY;
-                } else {
-                    component._onStartX = event.clientX;
-                    component._onStartY = event.clientY;
-                }
+                component._onStartX = event.clientX;
+                component._onStartY = event.clientY;
             };
             component._onClickStartFunc = f;
         }

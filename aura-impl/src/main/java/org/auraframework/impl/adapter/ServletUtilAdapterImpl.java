@@ -162,9 +162,9 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 status = HttpStatus.SC_INTERNAL_SERVER_ERROR;
             }
             response.setStatus(status);
-            if (status == HttpStatus.SC_OK) {
-                setNoCache(response);
-            }
+
+            // never ever do we want to cache a error response, even if it's a "success" response for the exception
+            setNoCache(response);
         } catch (Throwable failStatus) {
             try {
                 exceptionAdapter.handleException(failStatus);

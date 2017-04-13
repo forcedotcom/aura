@@ -31,11 +31,13 @@
      * Story: W-2886097
      */
     testListWithReferenceElementOnLeft: {
-        test: function (cmp) {
+        test: [function (cmp) {
+            this._focusOnInput(cmp);
+        }, function(cmp) {
         	//set reference component to the button
         	var buttonId = "leftButton";
             this._verifyListReferenceComponent(cmp, buttonId);
-        }
+        }]
     },
     
     /**
@@ -43,11 +45,13 @@
      * Story: W-2886097
      */
     testListWithReferenceElementOnRight: {
-    	test: function (cmp) {
+    	test: [function (cmp) {
+            this._focusOnInput(cmp);
+        }, function(cmp) {
     		//set reference component to the button
         	var buttonId = "rightButton";
             this._verifyListReferenceComponent(cmp, buttonId);
-        }
+        }]
     },
 
     testEnterCreatesPill: {
@@ -539,6 +543,18 @@
             inputChangeEvt.fire();
         }
     },
+
+    _fireFocus: function(cmp) {
+        var focusEvt = cmp.getEvent("focus");
+        if (focusEvt) {
+            focusEvt.setParams({
+                domEvent: {
+                    type: "focus",
+                    preventDefault: function(){}
+                }
+            }).fire();
+        }
+    },
     
     _createPillUsingAutoCompleteList: function(cmp){
     	var textInput = this._getInput(cmp);
@@ -578,6 +594,7 @@
         pillContainer.insertItems([this.PILLS[3]]);
         return pillContainer;
     },
+
     _verifyListReferenceComponent: function(cmp, referenceElemId){
     	var autocomplete = cmp.find("autocomplete");
         autocomplete.set("v.listReferenceComponent",cmp.find(referenceElemId));
@@ -600,5 +617,9 @@
             
 			return (refElementLoc|0)===(autoCompleteListLoc|0);
 		}, "List should be position below "+referenceElemId);
+    },
+
+    _focusOnInput: function(cmp) {
+        this._fireFocus(this._getInput(cmp));
     }
 })

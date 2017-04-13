@@ -31,7 +31,9 @@
      * Story: W-2886097
      */
     testListWithReferenceElementOnLeft: {
-        test: function (cmp) {
+        test: [function (cmp) {
+            this._focusOnInput(cmp);
+        }, function(cmp) {
             //set reference component to the button
         	buttonId = "leftButton";
             var autocomplete = cmp.find("autocomplete");
@@ -50,7 +52,7 @@
 			    var autoCompleteListLoc = autocomplete.getSuper().find("list").getElement().getBoundingClientRect().left;
 			    return refElementLoc===autoCompleteListLoc;
 			}, "left position of list should be the same as the button");
-        }
+        }]
     },
 
     testEnterCreatesPill: {
@@ -547,6 +549,18 @@
             inputChangeEvt.fire();
         }
     },
+
+    _fireFocus: function(cmp) {
+        var focusEvt = cmp.getEvent("focus");
+        if (focusEvt) {
+            focusEvt.setParams({
+                domEvent: {
+                    type: "focus",
+                    preventDefault: function(){}
+                }
+            }).fire();
+        }
+    },
     
     _createPillUsingAutoCompleteList: function(cmp){
     	var textInput = this._getInput(cmp);
@@ -585,6 +599,9 @@
         var pillContainer = this._initializeWithThreePills(cmp);
         pillContainer.insertItems([this.PILLS[3]]);
         return pillContainer;
-    }
+    },
 
+    _focusOnInput: function(cmp) {
+        this._fireFocus(this._getInput(cmp));
+    }
 })

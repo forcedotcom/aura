@@ -235,8 +235,7 @@ public class AuraClientExceptionUtilUnitTest extends UnitTestCase {
     @Test
     public void testGenerateCodeSnippet() {
         String code = 
-                "(\n"+
-                "function $globalEvalIIFE$(){with(arguments[1]||{}){with(arguments[0]||{}){return (function() { $A.componentService.addModule('markup://moduleTest:simpleCmp', 'moduletest-simple-cmp', ['moduletest-text-cmp', 'engine', 'moduleTest:testLib'], function (_moduletestTextCmp, engine, moduleTest_testLib) { 'use strict';\n"+
+                "(function $globalEvalIIFE$(){with(arguments[1]||{}){with(arguments[0]||{}){return (function() { $A.componentService.addModule('markup://moduleTest:simpleCmp', 'moduletest-simple-cmp', ['moduletest-text-cmp', 'engine', 'moduleTest:testLib'], function (_moduletestTextCmp, engine, moduleTest_testLib) { 'use strict';\n"+
                 "class Simple extends engine.Element {\n"+
                 "    handlePressEvent(e) {\n"+
                 "        foo\n"+
@@ -255,7 +254,7 @@ public class AuraClientExceptionUtilUnitTest extends UnitTestCase {
                 "        ^\n"+
                 "        const event = new CustomEvent('press', {\n";
 
-        String actual = AuraClientExceptionUtil.generateCodeSnippet(code, "6", "9");
+        String actual = AuraClientExceptionUtil.generateCodeSnippet(code, "4", "9");
 
         assertEquals(expected, actual);
     }

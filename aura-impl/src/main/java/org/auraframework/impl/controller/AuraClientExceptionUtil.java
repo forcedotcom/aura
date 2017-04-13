@@ -139,7 +139,7 @@ public class AuraClientExceptionUtil {
     static String generateCodeSnippet(String code, String line, String column) {
         String[] codeLines = code.split("\n");
         StringBuilder sb = new StringBuilder();
-        int lineNumber = Integer.parseInt(line)-2; // 2 lines difference between source and actual eval'ed code
+        int lineNumber = Integer.parseInt(line) - 1;
         int columnNumber = Integer.parseInt(column);
         if (codeLines.length > lineNumber) {
             if (lineNumber - 1 >= 0) {
@@ -148,12 +148,18 @@ public class AuraClientExceptionUtil {
             }
             sb.append(codeLines[lineNumber]);
             sb.append("\n");
+            // TODO: if error happens on the first line, indicator would be off
+            // when strict-csp is enabled
+            // because locker safeEval outputs hook fn and arguments
+            // need to figure out a way to calculate the offset
             for (int n = 1; n < columnNumber; n++) {
                 sb.append(" ");
             }
             sb.append("^\n");
-            sb.append(codeLines[lineNumber+1]);
-            sb.append("\n");
+            if (lineNumber + 1 < codeLines.length) {
+                sb.append(codeLines[lineNumber+1]);
+                sb.append("\n");
+            }
         }
 
         return sb.toString();

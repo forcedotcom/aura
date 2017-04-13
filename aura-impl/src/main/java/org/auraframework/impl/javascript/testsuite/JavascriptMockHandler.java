@@ -90,7 +90,7 @@ public abstract class JavascriptMockHandler<D extends Definition> {
         if (descStr != null) {
             DefinitionService definitionService = Aura.getDefinitionService();
             D def = definitionService.getDefinition(descStr, defClass);
-            def = (D) DelegatingHandler.getSourceDelegate(def);
+            def = DelegatingHandler.getSourceDelegate(def);
             return def;
         }
         D ret = getDefaultBaseDefinition();

@@ -183,7 +183,15 @@ Aura.Utils.Util.prototype.globalEval = function(src, globals, optionalSourceURL)
         sourceURL = '\n//# sourceURL=' + optionalSourceURL;
     }
 
-    return new Function(keys, srcToEval + sourceURL).apply({}, vals);
+    if (keys.length > 0) {
+        return new Function(keys, srcToEval + sourceURL).apply({}, vals);
+    } else {
+        // for component and library hydration, globals is undefined
+        // Chrome new Function output hard-coded 1st line "(function() {"
+        // so use eval instead to keep script content consistent across browsers
+        // force an indirect eval so it uses global context
+        return (0,eval)("(function(){"+ srcToEval +"})();" + sourceURL);
+    }
 };
 
 /**

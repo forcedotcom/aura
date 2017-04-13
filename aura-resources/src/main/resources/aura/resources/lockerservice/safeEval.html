@@ -77,7 +77,7 @@
           var result;
           
           if (useEval) {
-              result = internalEval("(\n" + src + "\n)");
+              result = internalEval("(" + src + "\n)");
           } else {
               var tmp = window[hookFn];
               try {

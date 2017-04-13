@@ -46,7 +46,11 @@ function lib(w) { //eslint-disable-line no-unused-vars
             this.on('_initialize', this._initializeInfiniteLoading);
             
             // Allows a forced reflow of this scroller through the firing of a global custom event, "FORCEREFLOW"
-            document.addEventListener("FORCEREFLOW", function() { this._forceReflow(); }.bind(this));
+            this._reflowHandler = this._forceReflow.bind(this);
+            document.addEventListener("FORCEREFLOW", this._reflowHandler);
+        },
+        destroy: function () {
+        	document.removeEventListener("FORCEREFLOW", this._reflowHandler);
         },
         _mergeInfiniteLoading: function () {
             this.opts.infiniteLoadingConfig = this._mergeConfigOptions(

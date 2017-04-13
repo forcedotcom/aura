@@ -1,0 +1,24 @@
+<aura:component>
+    <aura:attribute name="log" type="String" default="" description="Required attribute by auraStorageTest:iframeTestLib:iframeTest.js" />
+    <aura:attribute name="status" type="String" default="Waiting"/>
+    <!--inputs-->
+    <aura:attribute name="storageItemKey" type="String" default="key"/>
+    <aura:attribute name="storageItemValue" type="String"/>
+    <aura:attribute name="partitionName" type="String" default="" />
+    <!--outputs-->
+    <aura:attribute name="item" type="String" />
+    <aura:attribute name="objectStoreNames" type="String" />
+
+    <aura:import library="auraStorageTest:iframeTestLib" property="iframeLib" />
+
+    <aura:method name="addItemToStorage" action="{!c.addItemToStorage}"/>
+    <aura:method name="getAdapterFromStorage" action="{!c.getAdapterFromStorage}"/>
+    <aura:method name="deleteStorage" action="{!c.deleteStorage}"/>
+
+    <div aura:id="iframeContainer" />
+
+    Status: <span>{!v.status}</span><br/>
+    Partition Name: <span>{!v.partitionName}</span><br/>
+    Item: <span>{!v.item}</span><br/>
+
+</aura:component>

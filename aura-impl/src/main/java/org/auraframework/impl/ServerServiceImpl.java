@@ -645,7 +645,7 @@ public class ServerServiceImpl implements ServerService {
         	}
             
             String lockerWorkerURL = configAdapter.getLockerWorkerURL();
-            if (lockerWorkerURL != null) {
+            if (configAdapter.isStrictCSPEnforced() && lockerWorkerURL != null) {
                 auraInit.put("safeEvalWorker", lockerWorkerURL);
             }
             

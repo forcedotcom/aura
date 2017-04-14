@@ -170,9 +170,9 @@ public class Manifest extends AuraResourceImpl {
             sw.write(servletUtilAdapter.getInlineJsUrl(context, attributes));
             sw.write('\n');
 
-            // Add locker service safe eval worker url
+            // Add locker service safe eval worker url if strict CSP is to be enforced
             String lockerWorkerURL = configAdapter.getLockerWorkerURL();
-            if (lockerWorkerURL != null) {
+            if (configAdapter.isStrictCSPEnforced() && lockerWorkerURL != null) {
                 sw.write(lockerWorkerURL);
                 sw.write('\n');
             }

@@ -180,6 +180,14 @@ public interface ConfigAdapter extends AuraAdapter {
     boolean isLockerServiceEnabled();
     boolean requireLocker(RootDefinition def);
     String getLockerServiceCacheBuster();
+
+    /**
+     * Is strict CSP policy enforced:
+     *  1. No unsafe-eval
+     *  2. No unsafe-inline
+     * @return
+     */
+    boolean isStrictCSPEnforced();
     
     /**
      * @return max number of parallel XHRs used to execute server actions, must be 2 or more

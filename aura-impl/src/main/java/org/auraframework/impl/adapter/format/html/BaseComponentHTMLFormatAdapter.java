@@ -129,7 +129,7 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
                 auraInit.put("pathPrefix", pathPrefix);
                 
                 String lockerWorkerURL = configAdapter.getLockerWorkerURL();
-                if (lockerWorkerURL != null) {
+                if (configAdapter.isStrictCSPEnforced() && lockerWorkerURL != null) {
                     auraInit.put("safeEvalWorker", lockerWorkerURL);
                 }
 

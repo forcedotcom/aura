@@ -85,13 +85,13 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
 
         list.add("chrome-extension:");
 
-        boolean lockerServiceEnabled = Aura.getConfigAdapter().isLockerServiceEnabled();
+        boolean strictCSPEnforced = Aura.getConfigAdapter().isStrictCSPEnforced();
 
-        if (allowInline || !lockerServiceEnabled) {
+        if (allowInline || !strictCSPEnforced) {
             list.add(CSP.UNSAFE_INLINE);
         }
         
-		if (!lockerServiceEnabled) {
+		if (!strictCSPEnforced) {
             list.add(CSP.UNSAFE_EVAL);
         }
         

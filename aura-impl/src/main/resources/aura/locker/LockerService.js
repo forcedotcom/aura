@@ -243,7 +243,14 @@ function LockerService() {
                 }
 
                 var def = component.getDef();
-                if ($A.clientService.isInternalNamespace(def.getDescriptor().getNamespace()) && !def.isInstanceOf("aura:requireLocker")) {
+                // return raw component:
+                // 1. If component belongs to internal namespace and doesn't extend aura:requireLocker interface
+                // 2. API Version is less than 40(Summer '17 release):
+                //      get the api version of component and verify its less than 40
+                if (($A.clientService.isInternalNamespace(def.getDescriptor().getNamespace()) && !def.isInstanceOf("aura:requireLocker"))
+                    || (def.getRequiredVersionDefs().getDef("aura") != null
+                        && parseInt(def.getRequiredVersionDefs().getDef("aura").getVersion()) < 40)
+                ){
                     return component;
                 }
 

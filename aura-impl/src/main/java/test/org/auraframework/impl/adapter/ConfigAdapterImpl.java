@@ -748,6 +748,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
+    public boolean isStrictCSPEnforced() {
+        return true;
+    }
+
+    @Override
     public boolean requireLocker(RootDefinition def) {
         boolean requireLocker = !isInternalNamespace(def.getDescriptor().getNamespace());
         if (!requireLocker) {

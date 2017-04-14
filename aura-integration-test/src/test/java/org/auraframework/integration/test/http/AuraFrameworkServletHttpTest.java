@@ -83,13 +83,8 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         assertNotNull(getResponseBody(httpResponse));
 
         String charset = getCharset(httpResponse);
-        String responseMime = httpResponse.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue();
+        String responseMime = getContentTypeFromResponse(httpResponse);
         
-        // Jetty9 appends the charset to the mime type, this isn't bad, it just makes it harder to verify so we strip it off.
-        if(responseMime.contains(";")) {
-            responseMime = responseMime.substring(0, responseMime.indexOf(";"));
-        }
-
         if (mimeType.startsWith("text/")) {
 
             assertEquals("Framework servlet not responding with correct encoding type.", AuraBaseServlet.UTF_ENCODING,
@@ -113,14 +108,14 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         assertEquals("AuraFrameworkServlet failed to return ok.", HttpStatus.SC_OK, statusCode);
 
         String charset = getCharset(response);
-        String responseMime = response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue();
+        String responseMime = getContentTypeFromResponse(response);
 
         if (mimeType.startsWith("text/")) {
 
             assertEquals("Framework servlet not responding with correct encoding type.", AuraBaseServlet.UTF_ENCODING,
                     charset);
-            assertTrue("Framework servlet not responding with correct mime type expected " + mimeType
-                    + " got " + responseMime, responseMime.startsWith(mimeType + ";"));
+            assertEquals("Framework servlet not responding with correct mime type expected " + mimeType
+                    + " got " + responseMime, mimeType, responseMime);
         } else {
             assertEquals("Framework servlet not responding with correct mime type", mimeType,
                     responseMime);
@@ -137,6 +132,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
 
         if (fake) {
             nonce = "thisisnotanonce";
+            
         } else {
             nonce = configAdapter.getAuraFrameworkNonce();
         }
@@ -308,7 +304,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);
         String response = getResponseBody(httpResponse);
-        String contentType = httpResponse.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue();
+        String contentType = getContentTypeFromResponse(httpResponse);
         String expires = httpResponse.getFirstHeader(HttpHeaders.EXPIRES).getValue();
         get.releaseConnection();
 
@@ -320,6 +316,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         long expirationMillis = (df.parse(expires).getTime() - currentDate.getTime());
         assertTrue("AuraFrameworkServlet is not setting the right value for expires header.",
                 ApproximatelyEqual(expirationMillis, AuraBaseServlet.SHORT_EXPIRE, timeWindowExpiry));
+        
         assertDefaultAntiClickjacking(httpResponse, true, false);
     }
 
@@ -365,8 +362,8 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
 
         assertEquals("Framework servlet not responding with correct encoding type.", AuraBaseServlet.UTF_ENCODING,
                 charset);
-        assertTrue("Framework servlet not responding with correct mime type",
-                httpResponse.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue().startsWith("text/css;"));
+        assertEquals("Framework servlet not responding with correct mime type", "text/css", getContentTypeFromResponse(httpResponse));
+        
         SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
         Date currentDate = new Date();
         long expirationMillis = (df.parse(httpResponse.getFirstHeader(HttpHeaders.EXPIRES).getValue()).getTime()
@@ -447,4 +444,14 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
 
         get.releaseConnection();
     }
+    
+    private String getContentTypeFromResponse(HttpResponse response) {
+    	final String contentType = response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue();
+    	
+    	if(contentType.contains(";")) {
+    		return contentType.substring(0, contentType.indexOf(";"));
+    	}
+    	
+    	return contentType;
+	}
 }

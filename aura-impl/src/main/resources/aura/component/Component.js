@@ -1330,7 +1330,7 @@ Component.prototype.trackComponentReplacement = function(prevCmps, key) {
     // Filter valid and not rendered components
     var potentialLeak = [];
     for (var i = 0; i < prevCmps.length; i++) {
-        if (prevCmps[i].isValid() && !prevCmps[i].isRendered()) {
+        if (prevCmps[i].isValid() && !prevCmps[i].isRendered() && prevCmps[i].autoDestroy()) {
             potentialLeak.push(prevCmps[i]);
         }
     }
@@ -1341,7 +1341,7 @@ Component.prototype.trackComponentReplacement = function(prevCmps, key) {
             // Compute again if the some components are still not rendered
             var actualLeak = [];
             for (var j = 0; j < potentialLeak.length; j++) {
-                if (potentialLeak[j].isValid() && !potentialLeak[j].isRendered()) {
+                if (potentialLeak[j].isValid() && !potentialLeak[j].isRendered() && potentialLeak[j].autoDestroy()) {
                     actualLeak.push(potentialLeak[j]);
                 }
             }

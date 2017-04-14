@@ -499,6 +499,7 @@ AttributeSet.prototype.destroy = function() {
                         }
                     }
                 }
+                values[k] = undefined;
                 continue;
             }
 

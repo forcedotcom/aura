@@ -74,7 +74,7 @@ function SecureComponent(component, key) {
         // component @platform methods
         "isValid": SecureObject.createFilteredMethod(o, component, "isValid"),
         "isInstanceOf": SecureObject.createFilteredMethod(o, component, "isInstanceOf"),
-        "addEventHandler": SecureObject.createFilteredMethod(o, component, "addEventHandler"),
+        "addEventHandler": SecureObject.createFilteredMethod(o, component, "addEventHandler", { rawArguments: true }),
         "addHandler": SecureObject.createFilteredMethod(o, component, "addHandler"),
         "addValueHandler": SecureObject.createFilteredMethod(o, component, "addValueHandler"),
         "addValueProvider": SecureObject.createFilteredMethod(o, component, "addValueProvider"),

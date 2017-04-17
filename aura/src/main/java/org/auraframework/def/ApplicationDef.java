@@ -48,5 +48,13 @@ public interface ApplicationDef extends BaseComponentDef {
      * Gets the application-wide default flavor override.
      * @throws QuickFixException
      */
+    FlavorsDef getFlavorOverridesDef() throws QuickFixException;
+
+    /**
+     * Gets the application-wide default flavor override.
+     * @deprecated use #getFlavorOverridesDef()
+     * @throws QuickFixException
+     */
+    @Deprecated
     DefDescriptor<FlavorsDef> getFlavorOverrides() throws QuickFixException;
 }

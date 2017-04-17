@@ -29,7 +29,6 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.TextSource;
@@ -131,10 +130,8 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         if (!AuraTextUtil.isNullEmptyOrWhitespace(flavorOverrides)) {
             builder.setFlavorOverrides(definitionService.getDefDescriptor(flavorOverrides, FlavorsDef.class));
         } else {
-            // see if there is a flavors file in the bundle
-            DefDescriptor<FlavorsDef> flavors = DefDescriptorImpl.getAssociateDescriptor(
-                    builder.getDescriptor(), FlavorsDef.class, DefDescriptor.MARKUP_PREFIX);
-            if (flavors.exists()) {
+            FlavorsDef flavors = getBundledDef(FlavorsDef.class, DefDescriptor.MARKUP_PREFIX);
+            if (flavors != null) {
                 builder.setFlavorOverrides(flavors);
             }
         }

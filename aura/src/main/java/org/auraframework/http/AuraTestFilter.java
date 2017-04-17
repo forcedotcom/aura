@@ -210,7 +210,6 @@ public class AuraTestFilter {
                         try {
                             TestSuiteDef suiteDef = getTestSuite(targetDescriptor);
                             testDef = getTestCase(suiteDef, testToRun);
-                            testDef.validateDefinition();
                             if (testContext == null) {
                                 testContext = testContextAdapter.getTestContext(testDef.getQualifiedName());
                             }
@@ -370,6 +369,7 @@ public class AuraTestFilter {
         for (TestCaseDef currentTestDef : suiteDef.getTestCaseDefs()) {
             if (testCaseName.equals(currentTestDef.getName())) {
                 currentTestDef.validateDefinition();
+                currentTestDef.validateReferences();
                 return currentTestDef;
             }
         }

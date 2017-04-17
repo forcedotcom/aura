@@ -35,4 +35,11 @@ public interface ApplicationDefBuilder extends BaseComponentDefBuilder<Applicati
      * @param flavorOverride The {@link FlavorsDef} descriptor.
      */
     BaseComponentDefBuilder<ApplicationDef> setFlavorOverrides(DefDescriptor<FlavorsDef> flavorOverrides);
+
+    /**
+     * Specifies the {@link FlavorsDef}.
+     *
+     * @param flavorOverride The {@link FlavorsDef}.
+     */
+    BaseComponentDefBuilder<ApplicationDef> setFlavorOverrides(FlavorsDef flavorOverrides);
 }

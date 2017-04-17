@@ -23,7 +23,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.util.AuraTestingUtil;
 import org.auraframework.impl.util.AuraTestingUtil.BundleEntryInfo;
 import org.auraframework.system.BundleSource;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.test.annotation.XFailure;
 import org.junit.Test;
 

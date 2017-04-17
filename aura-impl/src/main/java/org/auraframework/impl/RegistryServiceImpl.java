@@ -215,7 +215,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     private DefRegistry[] getStaticRegistries(ComponentLocationAdapter location) {
         InputStream ris = null;
 
-        String pkg = location.getComponentSourcePackage();
+        String pkg = location.getComponentSourcePackageAlways();
         if (pkg != null) {
             ris = location.getClass().getClassLoader().getResourceAsStream(pkg + "/.registries");
         } else {

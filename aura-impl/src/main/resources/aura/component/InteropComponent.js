@@ -397,7 +397,7 @@ InteropComponent.prototype.destroy = function(){
  * @export
  */
 InteropComponent.prototype.index = function() {
-    this.raiseInvalidComponentError('index', arguments);
+    this.raiseInvalidInteropApi('index', arguments);
 };
 
 /**
@@ -411,21 +411,21 @@ InteropComponent.prototype.deIndex = function(){};
  * @export
  */
 InteropComponent.prototype.find = function(){
-    this.raiseInvalidComponentError('find', arguments);
+    this.raiseInvalidInteropApi('find', arguments);
 };
 
 /**
  * @private
  */
 InteropComponent.prototype.findInstancesOf = function(){
-    this.raiseInvalidComponentError('findInstancesOf', arguments);
+    this.raiseInvalidInteropApi('findInstancesOf', arguments);
 };
 
 /**
  * @private
  */
 InteropComponent.prototype.getSuperest = function(){
-    this.raiseInvalidComponentError('getSuperest', arguments);
+    this.raiseInvalidInteropApi('getSuperest', arguments);
 };
 
 /**
@@ -433,7 +433,7 @@ InteropComponent.prototype.getSuperest = function(){
  * @private
  */
 InteropComponent.prototype.findInstanceOf = function(){
-    this.raiseInvalidComponentError('findInstanceOf', arguments);
+    this.raiseInvalidInteropApi('findInstanceOf', arguments);
 };
 
 /**
@@ -441,7 +441,7 @@ InteropComponent.prototype.findInstanceOf = function(){
  * @private
  */
 InteropComponent.prototype.implementsDirectly = function(){
-    this.raiseInvalidComponentError('implementsDirectly', arguments);
+    this.raiseInvalidInteropApi('implementsDirectly', arguments);
 };
 
 /**
@@ -449,7 +449,7 @@ InteropComponent.prototype.implementsDirectly = function(){
  * @export
  */
 InteropComponent.prototype.addHandler = function(){
-    this.raiseInvalidComponentError('addHandler', arguments);
+    this.raiseInvalidInteropApi('addHandler', arguments);
 };
 
 /**
@@ -457,7 +457,7 @@ InteropComponent.prototype.addHandler = function(){
  * @export
  */
 InteropComponent.prototype.addValueHandler = function(){
-    this.raiseInvalidComponentError('addValueHandler', arguments);
+    this.raiseInvalidInteropApi('addValueHandler', arguments);
 };
 
 InteropComponent.prototype.removeValueHandler = function() {};
@@ -480,16 +480,8 @@ InteropComponent.prototype.fire = function() {};
  * @public
  * @export
  */
-InteropComponent.prototype.getLocalId = function() {
-    this.raiseInvalidComponentError('getLocalId', arguments);
-};
-
-/**
- * @public
- * @export
- */
 InteropComponent.prototype.getRendering = function(){
-    this.raiseInvalidComponentError('getRendering', arguments);
+    this.raiseInvalidInteropApi('getRendering', arguments);
 };
 
 /**
@@ -518,7 +510,7 @@ InteropComponent.prototype.isConcrete = function() {
  * @export
  */
 InteropComponent.prototype.getEventDispatcher = function(){
-    this.raiseInvalidComponentError('getEventDispatcher', arguments);
+    this.raiseInvalidInteropApi('getEventDispatcher', arguments);
 };
 
 /**
@@ -526,7 +518,7 @@ InteropComponent.prototype.getEventDispatcher = function(){
  * @export
  */
 InteropComponent.prototype.getModel = function(){
-    this.raiseInvalidComponentError('getModel', arguments);
+    this.raiseInvalidInteropApi('getModel', arguments);
 };
 
 /**
@@ -534,14 +526,14 @@ InteropComponent.prototype.getModel = function(){
  * @export
  */
 InteropComponent.prototype.getEvent = function() {
-    this.raiseInvalidComponentError('getEvent', arguments);
+    this.raiseInvalidInteropApi('getEvent', arguments);
 };
 
 /**
  * @protected
  */
 InteropComponent.prototype.getEventByDescriptor = function() {
-    this.raiseInvalidComponentError('getEventByDescriptor', arguments);
+    this.raiseInvalidInteropApi('getEventByDescriptor', arguments);
 };
 
 /**
@@ -556,13 +548,13 @@ InteropComponent.prototype.toString = function(){
  * @export
  */
 InteropComponent.prototype.getFacets = function() {
-    this.raiseInvalidComponentError('getFacets', arguments);
+    this.raiseInvalidInteropApi('getFacets', arguments);
 };
 
 /**
  * @private
  */
-InteropComponent.prototype.raiseInvalidComponentError = function(func, args) {
+InteropComponent.prototype.raiseInvalidInteropApi = function(func, args) {
     var error = 'Interop component tried calling function [' + func + ']';
     var argsArr = Array.prototype.slice.call(args);
     if (argsArr.length) {

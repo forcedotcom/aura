@@ -239,8 +239,10 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             return value;
         }
 
-        return compare(dd1.getBundle(), dd2.getBundle());
+        value = compare(dd1.getBundle(), dd2.getBundle());
+        return value;
     }
+
     private int createHashCode() {
         return (bundle == null ? 0 : bundle.hashCode())
                 + AuraUtil.hashCodeLowerCase(name, namespace, prefix, defType.ordinal());
@@ -289,11 +291,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     @Override
     public boolean equals(Object o) {
         if (o instanceof DefDescriptor) {
-            DefDescriptor<?> e = (DefDescriptor<?>) o;
-            return (bundle == e.getBundle() || (bundle != null && bundle.equals(e.getBundle())))
-                    && getDefType() == e.getDefType() && name.equalsIgnoreCase(e.getName())
-                    && (namespace == null ? e.getNamespace() == null : namespace.equalsIgnoreCase(e.getNamespace()))
-                    && (prefix == null ? e.getPrefix() == null : prefix.equalsIgnoreCase(e.getPrefix()));
+            return compare(this, (DefDescriptor<?>)o) == 0;
         }
         return false;
     }

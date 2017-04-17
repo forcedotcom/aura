@@ -212,12 +212,13 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         } else {
             this.compoundControllerDescriptor = null;
         }
-		this.hashCode = AuraUtil.hashCode(super.hashCode(), events, controllerDescriptor, modelDescriptor,
-				extendsDescriptor, interfaces, methodDefs, providerDescriptor, rendererDescriptor, helperDescriptor,
-				imports, externalModelDescriptor, externalRendererDescriptor, externalControllerDescriptor,
-				externalHelperDescriptor, externalProviderDescriptor);
-        if (externalRendererDescriptor == null && externalHelperDescriptor == null && externalProviderDescriptor == null
-                && externalControllerDescriptor == null && externalModelDescriptor == null) {
+        this.hashCode = AuraUtil.hashCode(super.hashCode(), events, controllerDescriptor, modelDescriptor,
+                        extendsDescriptor, interfaces, methodDefs, providerDescriptor, rendererDescriptor, helperDescriptor,
+                        imports, externalModelDescriptor, externalRendererDescriptor, externalControllerDescriptor,
+                        externalHelperDescriptor, externalProviderDescriptor);
+        if (externalRendererDescriptor == null && externalHelperDescriptor == null
+                && externalProviderDescriptor == null && externalControllerDescriptor == null
+                && externalModelDescriptor == null) {
             try {
                 buildClass();
             } catch (QuickFixException qfe) {
@@ -608,6 +609,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
 
+        // This is a hack. we should do this differently.
         if (styleDef != null) {
             dependencies.add(styleDef.getDescriptor());
         }

@@ -1003,7 +1003,9 @@ public class DefinitionServiceImpl implements DefinitionService {
             // levels affecting the ordering of dependencies and creates different uid.
             //
             // Using descriptor only produces a more consistent UID
-            Collections.sort(compiled, Comparator.comparing(cd2 -> cd2.descriptor));
+            //compiled.sort((cd1, cd2) -> cd1.descriptor.compareTo(cd2.descriptor));
+            Comparator<CompilingDef<?>> comparator = Comparator.comparing(compilingDef -> compilingDef.descriptor);
+            Collections.sort(compiled, comparator.thenComparing(compilingDef -> compilingDef.def.getOwnHash()));
 
             //
             // Now walk the sorted list, building up our dependencies, and uid

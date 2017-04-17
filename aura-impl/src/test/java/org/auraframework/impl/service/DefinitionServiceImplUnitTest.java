@@ -861,7 +861,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
 
         @Override
         public String getOwnHash() {
-            return null;
+            return "";
         }
 
         @Override

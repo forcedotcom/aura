@@ -67,6 +67,9 @@ public abstract class BaseXmlElementImpl implements BaseXmlElement {
         this.location = location;
         this.apiVersion = apiVersion;
         this.description = description;
+        if (ownHash == null) {
+            ownHash = "";
+        }
         this.ownHash = ownHash;
         this.parseError = parseError;
         this.access = access;

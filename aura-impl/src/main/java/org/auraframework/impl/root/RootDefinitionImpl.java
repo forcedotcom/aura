@@ -186,7 +186,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
 
                 hashAcc.append(working);
                 List<Map.Entry<DefDescriptor<?>,Definition>> entries = Lists.newArrayList(this.bundledDefs.entrySet());
-                Collections.sort(entries, Comparator.comparing(entry -> entry.getKey()));
+                entries.sort((e1, e2) -> e1.getKey().compareTo(e2.getKey()));
                 for (Map.Entry<DefDescriptor<?>,Definition> entry : entries) {
                     hashAcc.append("|");
                     hashAcc.append(entry.getKey());

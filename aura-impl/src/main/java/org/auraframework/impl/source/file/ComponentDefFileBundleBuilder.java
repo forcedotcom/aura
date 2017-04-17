@@ -23,6 +23,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.FlavorBundleDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.HelperDef;
@@ -67,6 +68,7 @@ public class ComponentDefFileBundleBuilder implements FileBundleSourceBuilder {
         int len = name.length();
         String namespace = base.getParentFile().getName();
         DefDescriptor<ComponentDef> cmpDesc = new DefDescriptorImpl<>("markup", namespace, name, ComponentDef.class);
+        DefDescriptor<FlavorBundleDef> flavorBundleDef = null;
 
         for (File file : base.listFiles()) {
             DefDescriptor<?> descriptor = null;
@@ -131,8 +133,11 @@ public class ComponentDefFileBundleBuilder implements FileBundleSourceBuilder {
                 default:
                 }
             } else if (fname.endsWith("Flavors.css")) {
-                descriptor = new DefDescriptorImpl<>("css", namespace, fname.substring(0, fname.length()-4),
-                        FlavoredStyleDef.class, cmpDesc);
+                if (flavorBundleDef == null) {
+                    flavorBundleDef = new DefDescriptorImpl<>("markup", namespace, name, FlavorBundleDef.class);
+                }
+                descriptor = new DefDescriptorImpl<>("customCss", namespace, fname.substring(0, fname.length()-4),
+                        FlavoredStyleDef.class, flavorBundleDef);
                 format = Format.CSS;
             }
             if (descriptor != null) {
@@ -141,6 +146,6 @@ public class ComponentDefFileBundleBuilder implements FileBundleSourceBuilder {
                 // error
             }
         }
-        return new BundleSourceImpl<ComponentDef>(cmpDesc, sourceMap, true);
+        return new BundleSourceImpl<>(cmpDesc, sourceMap, true);
     }
 }

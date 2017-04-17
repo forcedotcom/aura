@@ -588,7 +588,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         // component locations MUST be processed first as their namespaces MUST be available for lookup
         // to allow modules to override as their namespace are all lower cased
         // DefType.COMPONENT before DefType.MODULE
-        Collections.sort(locationAdapters, Comparator.comparing(location -> location.type()));
+    	locationAdapters.sort((la1, la2) -> la1.type().compareTo(la2.type()));
         this.locationAdapters = locationAdapters;
     }
 

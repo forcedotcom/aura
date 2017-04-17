@@ -32,6 +32,7 @@
               class="{!v.class + ' textarea' + (v.resizable?'':' noresize')}"
               cols="{!v.cols}"
               rows="{!v.rows}"
+              role="textbox"
               disabled="{!v.disabled}"
               readonly="{!v.readonly}"
               maxlength="{!v.maxlength}"

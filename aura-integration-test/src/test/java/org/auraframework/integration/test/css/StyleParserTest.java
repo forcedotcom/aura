@@ -207,22 +207,12 @@ public class StyleParserTest extends AuraImplTestCase {
     public void testTemplateCssValid() throws Exception {
         DefDescriptor<StyleDef> templateCssDesc = definitionService.getDefDescriptor("templateCss://test.testTemplateCss",
                 StyleDef.class);
-        DefDescriptor<StyleDef> cssDesc = definitionService.getDefDescriptor("css://test.testTemplateCss", StyleDef.class);
 
         // templateCss should work here since not validated
         try {
         	definitionService.getDefinition(templateCssDesc);
         } catch (Exception e) {
             fail("CSS should be valid for templateCss, no Exception should be thrown.");
-        }
-
-        // CSS should fail on validation
-        try {
-        	definitionService.getDefinition(cssDesc);
-            fail("Parser should have thrown StyleParserException trying to parse invalid CSS.");
-        } catch (StyleParserException e) {
-            assertTrue("Incorrect message in StyleParserException",
-                    e.getMessage().contains("CSS selector must begin with '.testTestTemplateCss' or '.THIS'"));
         }
     }
 

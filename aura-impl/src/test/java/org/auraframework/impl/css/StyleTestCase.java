@@ -93,7 +93,7 @@ public abstract class StyleTestCase extends AuraImplTestCase {
                 getNs1() + ":style");
         DefDescriptor<StyleDef> desc = definitionService.getDefDescriptor(
                 String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, bundle.getNamespace(), bundle.getName()),
-                StyleDef.class, bundle);
+                StyleDef.class);
         return addSourceAutoCleanup(desc, src.toString());
     }
 
@@ -103,7 +103,7 @@ public abstract class StyleTestCase extends AuraImplTestCase {
                 getNs2() + ":style");
         DefDescriptor<StyleDef> desc = definitionService.getDefDescriptor(
                 String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, bundle.getNamespace(), bundle.getName()),
-                StyleDef.class, bundle);
+                StyleDef.class);
         return addSourceAutoCleanup(desc, src.toString());
     }
 

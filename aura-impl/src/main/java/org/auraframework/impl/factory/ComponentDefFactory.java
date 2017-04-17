@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.factory;
 
-import java.io.IOException;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -30,15 +29,14 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
-import org.auraframework.impl.source.file.FileSource;
 import org.auraframework.impl.source.AbstractTextSourceImpl;
+import org.auraframework.impl.source.CopiedTextSourceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.Source;
 import org.auraframework.system.TextSource;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Maps;
@@ -86,21 +84,17 @@ public class ComponentDefFactory extends BaseComponentDefFactory<ComponentDef> {
                 DefDescriptor<StyleDef> oldDesc = new DefDescriptorImpl<StyleDef>("css", descriptor.getNamespace(),
                             descriptor.getName(), StyleDef.class);
                 @SuppressWarnings("unchecked")
-                FileSource<StyleDef> cssSource = (FileSource<StyleDef>)newSourceMap.get(
+                TextSource<StyleDef> cssSource = (TextSource<StyleDef>)newSourceMap.get(
                         new DefDescriptorImpl<StyleDef>("css", descriptor.getNamespace(),
                             descriptor.getName(), StyleDef.class));
                 if (cssSource != null) {
-                    try {
-                        DefDescriptor<StyleDef> newDesc = new DefDescriptorImpl<StyleDef>("templateCss",
-                                descriptor.getNamespace(), descriptor.getName(), StyleDef.class);
-                        cssSource = new FileSource<>(newDesc, cssSource, AbstractTextSourceImpl.MIME_TEMPLATE_CSS);
+                    DefDescriptor<StyleDef> newDesc = new DefDescriptorImpl<StyleDef>("templateCss",
+                            descriptor.getNamespace(), descriptor.getName(), StyleDef.class);
+                    cssSource = new CopiedTextSourceImpl<>(newDesc, cssSource, AbstractTextSourceImpl.MIME_TEMPLATE_CSS);
 
-                        newSourceMap = Maps.newHashMap(newSourceMap);
-                        newSourceMap.remove(oldDesc);
-                        newSourceMap.put(newDesc, cssSource);
-                    } catch (IOException ioe) {
-                        throw new InvalidDefinitionException("File removed", null, ioe);
-                    }
+                    newSourceMap = Maps.newHashMap(newSourceMap);
+                    newSourceMap.remove(oldDesc);
+                    newSourceMap.put(newDesc, cssSource);
                 }
             }
             Map<DefDescriptor<?>, Definition> defMap = buildDefinitionMap(source.getDescriptor(), newSourceMap);

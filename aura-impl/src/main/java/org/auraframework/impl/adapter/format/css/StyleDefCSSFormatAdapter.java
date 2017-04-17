@@ -90,9 +90,9 @@ public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<BaseStyleDef> {
         AuraContext ctx = contextService.getCurrentContext();
         DefDescriptor<? extends BaseComponentDef> top = ctx.getLoadingApplicationDescriptor();
         if (top != null && top.getDefType() == DefType.APPLICATION) {
-            DefDescriptor<FlavorsDef> flavors = ((ApplicationDef)definitionService.getDefinition(top)).getFlavorOverrides();
+            FlavorsDef flavors = ((ApplicationDef)definitionService.getDefinition(top)).getFlavorOverridesDef();
             if (flavors != null) {
-                FlavorOverrideLocator overrides = definitionService.getDefinition(flavors).computeOverrides();
+                FlavorOverrideLocator overrides = flavors.computeOverrides();
                 if (!overrides.isEmpty()) {
                     return overrides;
                 }

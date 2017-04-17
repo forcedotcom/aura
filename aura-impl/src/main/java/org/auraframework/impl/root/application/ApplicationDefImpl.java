@@ -69,7 +69,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     private final String additionalAppCacheURLs;
     private final String bootstrapPublicCacheExpiration;
     private final List<DefDescriptor<TokensDef>> tokenOverrides;
-    private final DefDescriptor<FlavorsDef> flavorOverrides;
+    private FlavorsDef flavorOverrides;
+    private final DefDescriptor<FlavorsDef> externalFlavorOverrides;
 
     private final Boolean isOnePageApp;
 
@@ -87,6 +88,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         this.bootstrapPublicCacheExpiration = builder.bootstrapPublicCacheExpiration;
         this.tokenOverrides = AuraUtil.immutableList(builder.tokenOverrides);
         this.flavorOverrides = builder.flavorOverrides;
+        this.externalFlavorOverrides = builder.externalFlavorOverrides;
     }
 
     public static class Builder extends BaseComponentDefImpl.Builder<ApplicationDef>implements ApplicationDefBuilder {
@@ -97,7 +99,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         public String additionalAppCacheURLs;
         public String bootstrapPublicCacheExpiration;
         private List<DefDescriptor<TokensDef>> tokenOverrides;
-        private DefDescriptor<FlavorsDef> flavorOverrides;
+        private FlavorsDef flavorOverrides;
+        private DefDescriptor<FlavorsDef> externalFlavorOverrides;
 
         public Builder() {
             super(ApplicationDef.class);
@@ -116,6 +119,12 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
         @Override
         public BaseComponentDefBuilder<ApplicationDef> setFlavorOverrides(DefDescriptor<FlavorsDef> flavorOverrides) {
+            this.externalFlavorOverrides = flavorOverrides;
+            return this;
+        }
+
+        @Override
+        public BaseComponentDefBuilder<ApplicationDef> setFlavorOverrides(FlavorsDef flavorOverrides) {
             this.flavorOverrides = flavorOverrides;
             return this;
         }
@@ -173,9 +182,22 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     }
 
     @Override
-    public DefDescriptor<FlavorsDef> getFlavorOverrides() throws QuickFixException {
+    public FlavorsDef getFlavorOverridesDef() throws QuickFixException {
         if (flavorOverrides != null) {
             return flavorOverrides;
+        } else if (getExtendsDescriptor() != null) {
+            return getExtendsDescriptor().getDef().getFlavorOverridesDef();
+        }
+        return null;
+    }
+
+    @Override
+    @Deprecated
+    public DefDescriptor<FlavorsDef> getFlavorOverrides() throws QuickFixException {
+        if (externalFlavorOverrides != null) {
+            return externalFlavorOverrides;
+        } else if (flavorOverrides != null) {
+            return flavorOverrides.getDescriptor();
         }
         if (getExtendsDescriptor() != null) {
             return getExtendsDescriptor().getDef().getFlavorOverrides();
@@ -186,9 +208,15 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     @Override
     public List<DefDescriptor<?>> getBundle() {
         List<DefDescriptor<?>> ret = super.getBundle();
+        DefDescriptor<FlavorsDef> flavors = null;
         
-        if (flavorOverrides != null) {
-            ret.add(flavorOverrides);
+        if (externalFlavorOverrides != null) {
+            flavors = externalFlavorOverrides;
+        } else if (flavorOverrides != null) {
+            flavors = flavorOverrides.getDescriptor();
+        }
+        if (flavors != null) {
+            ret.add(flavors);
         }
         
         return ret;
@@ -205,7 +233,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             json.writeMapEntry("tokens",tokens);
         }
         if (flavorOverrides != null) {
-            json.writeMapEntry("flavorOverrides", flavorOverrides.getDef());
+            json.writeMapEntry("flavorOverrides", flavorOverrides);
         }
     }
 
@@ -221,8 +249,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             dependencies.addAll(tokenOverrides);
         }
 
-        if (flavorOverrides != null) {
-            dependencies.add(flavorOverrides);
+        if (externalFlavorOverrides != null) {
+            dependencies.add(externalFlavorOverrides);
         }
     }
 
@@ -339,6 +367,9 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
                 EventDef.class))) {
             throw new InvalidDefinitionException(String.format("%s must extend aura:locationChange",
                     locationChangeDef.getDescriptor()), getLocation());
+        }
+        if (externalFlavorOverrides != null && flavorOverrides == null) {
+            flavorOverrides = externalFlavorOverrides.getDef();
         }
     }
 

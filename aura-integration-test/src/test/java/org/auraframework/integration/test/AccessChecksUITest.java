@@ -152,18 +152,6 @@ public class AccessChecksUITest extends WebDriverTestCase {
     }
 
     /**
-     * Setting an attribute to have access level INTERNAL in a non-Internal namespace will error.
-     */
-    @Test
-    public void testAccessInternalMarkupOnExternalNamespace() throws Exception {
-        openNoAura("/testCustomNS1/accessInternalAttribute.cmp");
-
-        String errorMsg = "org.auraframework.throwable.quickfix.InvalidAccessValueException: Invalid access attribute value \"INTERNAL\"";
-        getAuraUITestingUtil().waitForElementText(By.id("auraErrorMessage"), errorMsg, true,
-                "Didn't find expected error", false);
-    }
-
-    /**
      * An External component contains a global component in markup that provides an internal component. This is to
      * verify the internal component access is checked against the global providing component, not the top level
      * External component.

@@ -33,6 +33,8 @@ public interface ComponentLocationAdapter extends AuraAdapter {
 
     String getComponentSourcePackage();
 
+    String getComponentSourcePackageAlways();
+
     Set<SourceLoader> getSourceLoaders();
 
     DefType type();
@@ -42,6 +44,7 @@ public interface ComponentLocationAdapter extends AuraAdapter {
         private final File componentSourceDir;
         private final File javaGeneratedSourceDir;
         private final String componentSourcePackage;
+        private final String packageAlways;
         private final Set<SourceLoader> loaders = Sets.<SourceLoader> newHashSet();
 
         public Impl(File componentSourceDir) {
@@ -53,6 +56,7 @@ public interface ComponentLocationAdapter extends AuraAdapter {
         }
 
         public Impl(File componentSourceDir, File javaGeneratedSourceDir, String componentSourcePackage) {
+            this.packageAlways = componentSourcePackage;
             if (componentSourceDir.exists() || componentSourcePackage == null) {
                 this.componentSourceDir = componentSourceDir;
                 this.javaGeneratedSourceDir = javaGeneratedSourceDir;
@@ -71,11 +75,13 @@ public interface ComponentLocationAdapter extends AuraAdapter {
             this.componentSourceDir = null;
             this.javaGeneratedSourceDir = null;
             this.componentSourcePackage = null;
+            this.packageAlways = null;
         }
 
         public Impl(String componentSourcePackage) {
             if (componentSourcePackage != null && !componentSourcePackage.isEmpty()) {
                 this.componentSourcePackage = componentSourcePackage;
+                this.packageAlways = componentSourcePackage;
                 this.componentSourceDir = null;
                 this.javaGeneratedSourceDir = null;
             } else {
@@ -96,6 +102,11 @@ public interface ComponentLocationAdapter extends AuraAdapter {
         @Override
         public String getComponentSourcePackage() {
             return componentSourcePackage;
+        }
+
+        @Override
+        public String getComponentSourcePackageAlways() {
+            return packageAlways;
         }
 
         @Override

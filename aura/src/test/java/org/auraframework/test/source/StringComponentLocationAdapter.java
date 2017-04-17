@@ -56,6 +56,11 @@ public class StringComponentLocationAdapter implements ComponentLocationAdapter 
     }
 
     @Override
+    public String getComponentSourcePackageAlways() {
+        return null;
+    }
+
+    @Override
     public Set<SourceLoader> getSourceLoaders() {
         if (theSet == null) {
             theSet = Sets.newHashSet(loader);

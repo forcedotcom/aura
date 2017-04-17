@@ -25,11 +25,10 @@
         this.superAfterRender();
         helper.updateEmptyListContent(component);
     },
-    rerender : function(component){
+    rerender : function(component, helper){
         this.superRerender();
-        var concreteCmp = component.getConcreteComponent();
-        if (concreteCmp.isDirty('v.items')) {
-            concreteCmp.getDef().getHelper().updateEmptyListContent(component);
+        if (component.getConcreteComponent().isDirty('v.items')) {
+            helper.updateEmptyListContent(component);
         }
     }
 })// eslint-disable-line semi

@@ -1,5 +1,5 @@
 import { Element } from "engine";
-import { module1, const1 } from "moduleTest:testLib";
+import { const1 } from "moduleTest:testLib";
 import { log } from "util.js";
 
 export default class Simple extends Element {
@@ -16,13 +16,13 @@ export default class Simple extends Element {
 
     static publicMethods = ['test'];
 
-    handleFireAction (e) {
+    handleFireAction () {
         if (this.callbackaction) {
             this.callbackaction({ something: 'true' });
         }
     }
     
-    handlePressEvent (e) {
+    handlePressEvent () {
         const event = new CustomEvent('press', {
             bubbles: true,
             cancelable: true,

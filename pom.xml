@@ -75,6 +75,22 @@
             <url>http://repo.auraframework.org/libs-release</url>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>maven.auraframework.org</id>
+            <url>http://maven.auraframework.org/libs-release</url>
+        </pluginRepository>
+        <pluginRepository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>repo.auraframework.org</id>
+            <url>http://repo.auraframework.org/libs-release</url>
+        </pluginRepository>
+    </pluginRepositories>
     <distributionManagement>
         <repository>
             <id>maven.auraframework.org</id>
@@ -1034,6 +1050,17 @@
                     <configuration>
                         <coberturaXML>true</coberturaXML>
                         <lCOV>true</lCOV>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.auraframework</groupId>
+                    <artifactId>tools-maven-plugin</artifactId>
+                    <version>0.0.8</version>
+                    <configuration>
+                        <arguments>
+                            <argument>${project.basedir}/src/main/modules</argument>
+                            <argument>${project.basedir}/src/test/modules</argument>
+                        </arguments>
                     </configuration>
                 </plugin>
             </plugins>

@@ -299,10 +299,7 @@ public class AuraTestFilter {
         }
 
         // Handle mock definitions specified in the tests.
-        if (testContext == null) {
-            // During manual testing, the test context adapter may not always get cleared.
-            testContextAdapter.clear();
-        } else {
+        if (testContext != null) {
             if (!contextService.isEstablished()) {
                 LOG.error("Aura context is not established! New context will NOT be created.");
                 chain.doFilter(request, response);

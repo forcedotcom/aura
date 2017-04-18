@@ -18,14 +18,27 @@
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
 
-    <div>SecureAuraEvent test</div>
+    <div id="title">SecureAuraEvent test</div>
 
     <aura:method name="testGetEventSourceReturnsSecureComponent" />
     <aura:method name="testExerciseEventAPIs" />
     <aura:method name="testGetType" />
     <aura:method name="testGetEventType" />
+    <aura:method name="testEventParamsFilteringNonLockerHandler"/>
+    <aura:method name="testEventParamsFilteringSameLocker"/>
+    <aura:method name="testEventParamsFilteringDifferentLocker"/>
+
+    <aura:registerevent name="debugLog" type="aura:debugLog"/>
+    <aura:registerevent name="applicationEvent" type="lockerTest:applicationEvent"/>
 
     <ui:button label="press event" aura:id="button" press="c.testGetSourceReturnsSecureComponentRefWhenNoAccess"/>
 
-    <aura:registerevent name="debugLog" type="aura:debugLog"/>
+    <!-- panelManager is required to repro ui:createPanel event scenario -->
+    <aura:dependency resource="markup://ui:createPanel" type="EVENT"/> 
+    <ui:panelManager2>
+        <aura:set attribute="registeredPanels">
+                <ui:modal alias="modal"/>
+        </aura:set>
+    </ui:panelManager2>
+    <lockerTestOtherNamespace:applicationEventHandler />
 </aura:component>

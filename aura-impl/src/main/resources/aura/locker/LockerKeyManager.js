@@ -37,7 +37,9 @@ var ls_getKey,
     ls_isProxy,
     ls_registerProxy,
     ls_registerFilteringProxy,
-    ls_isFilteringProxy;
+    ls_isFilteringProxy,
+    ls_registerSecureFunction,
+    ls_isSecureFunction;
 
 (function LockerKeyManager() {
 	var substituteMapForWeakMap = false;
@@ -80,6 +82,7 @@ var ls_getKey,
     var objectToKeyedData = newWeakMap();  
     var isSecureProxy = newWeakMap();
     var isFilteringProxy = newWeakMap();
+    var isSecureFunction = newWeakMap();
 
     // ALL METHODS BELOW USE KEY ONLY
 
@@ -246,6 +249,14 @@ var ls_getKey,
 
     ls_isFilteringProxy = function(st) {
         return isFilteringProxy.get(st) === true;
+    };
+
+    ls_registerSecureFunction = function(st) {
+        isSecureFunction.set(st, true);
+    };
+
+    ls_isSecureFunction = function(st) {
+        return isSecureFunction.get(st) === true;
     };
 
     /**

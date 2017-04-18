@@ -80,9 +80,11 @@ SecureObject.filterEverything = function(st, raw, options) {
     var defaultKey = options && options.defaultKey ? options.defaultKey : defaultSecureObjectKey;
 
     if (ls_isProxy(raw)) {
-        // If !belongsToLocker then this is a jump from one locker to another - we just need to unwrap and then reproxy based on the target locker's perspective
-        // otherwise just return the proxy (do not proxy a proxy)
-        return belongsToLocker ? raw : SecureObject.filterEverything(st, ls_getRef(raw, rawKey), options);
+        // - If !belongsToLocker then this is a jump from one locker to another - we just need to unwrap and then reproxy based on the target locker's perspective
+        // otherwise just return the proxy (do not proxy a proxy).
+        // - Bypass unwrapping and refiltering for SecureFunction so arguments and 'this' are filtered against the
+        // Locker where the function was originally defined.
+        return belongsToLocker || ls_isSecureFunction(raw) ? raw : SecureObject.filterEverything(st, ls_getRef(raw, rawKey), options);
     }
 
     var swallowed;
@@ -106,9 +108,7 @@ SecureObject.filterEverything = function(st, raw, options) {
                 filteredArgs[i] = arg;
             }
 
-            // DCHASMAN TODO Here is where we need to factor in the decision to use raw self to avoid InvalidInvocation on system types!
             var self = SecureObject.filterEverything(st, this);
-
             if (ls_isFilteringProxy(self) && ls_getKey(self) === ls_getKey(st)) {
                 self = ls_getRef(self, key);
             }
@@ -126,6 +126,7 @@ SecureObject.filterEverything = function(st, raw, options) {
         }
 
         ls_registerProxy(swallowed);
+        ls_registerSecureFunction(swallowed);
     } else if (t === "object") {
         if (raw === window) {
             return $A.lockerService.getEnv(key);

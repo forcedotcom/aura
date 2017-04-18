@@ -44,5 +44,23 @@
         test: function(cmp) {
             cmp.testGetEventType();
         }
+    },
+
+    testEventParamsFilteringNonLockerHandler: {
+        test: function(cmp) {
+            cmp.testEventParamsFilteringNonLockerHandler();
+        }
+    },
+
+    testEventParamsFilteringSameLocker: {
+        test: function(cmp) {
+            cmp.testEventParamsFilteringSameLocker();
+        }
+    },
+
+    testEventParamsFilteringDifferentLocker: {
+        test: function(cmp) {
+            cmp.testEventParamsFilteringDifferentLocker();
+        }
     }
 })

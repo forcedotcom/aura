@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION">
+    <aura:attribute name="paramBag" type="Object"/>
+    <aura:attribute name="callback" type="Object"/>
+</aura:event>

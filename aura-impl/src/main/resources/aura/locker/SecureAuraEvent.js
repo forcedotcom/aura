@@ -22,19 +22,58 @@ function SecureAuraEvent(event, key) {
         return o;
     }
 
+    /**
+     * Traverse all entries in the baseObject to unwrap any secure wrappers and wrap any functions as
+     * SecureFunction. This ensures any non-Lockerized handlers of the event do not choke on the secure
+     * wrappers, but any callbacks back into the original Locker have their arguments properly filtered.
+     */
+    function deepUnfilterEventParams(baseObject, members) {
+        var value;
+        for (var property in members) {
+            value = members[property];
+            if (value !== undefined && value !== null && (Array.isArray(value) || $A.util.isPlainObject(value))) {
+                var branchValue = baseObject[property];
+                baseObject[property] = deepUnfilterEventParams(branchValue, value);
+                continue;
+            }
+            if (typeof value !== "function") {
+                value = $A.lockerService.getRaw(value);
+            } else {
+                value = SecureObject.filterEverything(o, value, { defaultKey: key });
+            }
+            baseObject[property] = value;
+        }
+        return baseObject;
+    }
+
     o = Object.create(null, {
         toString: {
             value: function() {
                 return "SecureAuraEvent: " + event + "{ key: " + JSON.stringify(key) + " }";
             }
+        },
+        "setParams": {
+            writable: true,
+            enumerable: true,
+            value: function(config) {
+                var paramsCopy = $A.util.apply({}, config, true, true);
+                var unfiltered = deepUnfilterEventParams(paramsCopy, config);
+                var fnReturnedValue = event["setParams"](unfiltered);
+                return SecureObject.filterEverything(o, fnReturnedValue, { defaultKey: key });
+            }
+        },
+        "setParam": {
+            writable: true,
+            enumerable: true,
+            value: function(config) {
+                var paramCopy = $A.util.apply({}, config, true, true);
+                var unfiltered = deepUnfilterEventParams(paramCopy, config);
+                var fnReturnedValue = event["setParam"](unfiltered);
+                return SecureObject.filterEverything(o, fnReturnedValue, { defaultKey: key });
+            }
         }
     });
 
-	[ "setParam", "setParams" ]
-	.forEach(function(name) {
-		Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, event, name, { defaultKey: key }));
-	});
-	
 	[ "fire", "getName", "getParam", "getParams", "getPhase", "getSource", "pause", "preventDefault", "resume", "stopPropagation", "getType", "getEventType" ]
 	.forEach(function(name) {
 		Object.defineProperty(o, name, SecureObject.createFilteredMethod(o, event, name));

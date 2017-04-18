@@ -20,7 +20,10 @@
     },
 
     rerender: function (component, helper) {
-        helper.formatValue(component);
+        // If treating the value as local time, don't convert it to the user's timezone on rerender
+        if (!component._considerLocalDateTime) {
+            helper.formatValue(component);
+        }
         this.superRerender();
     }
 });

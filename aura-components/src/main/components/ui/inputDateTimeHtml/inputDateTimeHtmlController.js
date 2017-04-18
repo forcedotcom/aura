@@ -27,5 +27,10 @@
         if ($A.get("$Browser.isAndroid")) {
             cmp.set('v.updateOn', 'change');
         }
+
+        // When there is no value, consider the input as local date/time
+        if ($A.util.isEmpty(cmp.get("v.value"))) {
+            cmp._considerLocalDateTime = true;
+        }
     }
 });

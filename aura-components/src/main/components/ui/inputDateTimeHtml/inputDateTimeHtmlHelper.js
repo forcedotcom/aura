@@ -39,11 +39,23 @@
      * Override
      */
     doUpdate: function (component, value) {
-        var isoDate = $A.localizationService.parseDateTimeUTC(value);
         var timezone = component.get("v.timezone");
 
-        $A.localizationService.WallTimeToUTC(isoDate, timezone, function (utcDate) {
-            component.set("v.value", $A.localizationService.toISOString(utcDate));
-        });
+        if (component._considerLocalDateTime) {
+            // When v.value is empty and the new value is 2017-04-12T01:00, we use parseDateTime method that will parse
+            // it in local time. When toISOString is called, it will take into account the timezone offset and return a
+            // UTC ISO string corresponding to that local time.
+            var date = $A.localizationService.parseDateTime(value);
+            this.setValue(component, date);
+        } else {
+            date = $A.localizationService.parseDateTimeUTC(value);
+            $A.localizationService.WallTimeToUTC(date, timezone, function (utcDate) {
+                this.setValue(component, utcDate);
+            }.bind(this));
+        }
+    },
+
+    setValue: function (component, value) {
+        component.set("v.value", $A.localizationService.toISOString(value), true);
     }
 });

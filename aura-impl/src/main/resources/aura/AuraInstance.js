@@ -793,13 +793,49 @@ AuraInstance.prototype.handleError = function(message, e) {
 AuraInstance.prototype.isCustomerError = function(e) {
     if (e && e instanceof $A.auraError) {
         if (e["component"]) {
-            var descriptor = e["component"].split("$",1);
-            var componentDef = $A.componentService.getComponentDef($A.componentService.createDescriptorConfig(descriptor[0]));
-            if (componentDef != null) {
-                var namespace = componentDef.getDescriptor().getNamespace();
-                var internal = $A.clientService.isInternalNamespace(namespace);
-                var privileged = $A.clientService.isPrivilegedNamespace(namespace);
-                if (namespace && !internal && !privileged) {
+            if ($A.isCustomerComponent(e["component"])) {
+                return true;
+            } else if (e["componentStack"]) {
+                return $A.isCustomerComponentStack(e["componentStack"]);
+            }
+        }
+    }
+    return false;
+};
+
+/**
+ * @private
+ */
+AuraInstance.prototype.isCustomerComponent = function(cmp) {
+    if (!$A.util.isEmpty(cmp)) {
+        var descriptor = cmp.split("$",1);
+        var componentDef = $A.componentService.getComponentDef($A.componentService.createDescriptorConfig(descriptor[0]));
+        if (!$A.util.isUndefinedOrNull(componentDef)) {
+            var namespace = componentDef.getDescriptor().getNamespace();
+            var internal = $A.clientService.isInternalNamespace(namespace);
+            var privileged = $A.clientService.isPrivilegedNamespace(namespace);
+            if (!$A.util.isEmpty(namespace) && !internal && !privileged) {
+                return true;
+            }
+        }
+    }
+    return false;
+};
+
+/**
+ * @private
+ */
+AuraInstance.prototype.isCustomerComponentStack = function(cmpStack) {
+    if (!$A.util.isEmpty(cmpStack)) {
+        var stack = cmpStack.split(">");
+        // Traverse stack (top down) looking for a customer component
+        for (var i = stack.length - 1; i >= 0; i--) {
+            var cmp = stack[i];
+            if (!$A.util.isUndefinedOrNull(cmp)) {
+                // Remove leading/trailing brackets from component descriptor
+                cmp = cmp.trim().replace(new RegExp("^\\[|\\]$","g"), "");
+                // Check each stack component to determine if it belongs to customer namespace
+                if ($A.isCustomerComponent(cmp)) {
                     return true;
                 }
             }

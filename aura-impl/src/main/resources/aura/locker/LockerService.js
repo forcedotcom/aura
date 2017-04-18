@@ -72,10 +72,28 @@ function LockerService() {
     var workerFrame = window.document.getElementById("safeEvalWorkerCustom");
     var safeEvalWindow = workerFrame && workerFrame.contentWindow;
     var typeToOtherRealmType;
-
+    function newMap() {
+        if(typeof Map !== "undefined") {
+            return new Map();
+        } else {
+            // Very simple map polyfill
+            return function(){
+                var polyFillMap = {};
+                polyFillMap["get"] = function(key) {
+                    return ((key in polyFillMap) ? polyFillMap[key]: undefined);
+                };
+                polyFillMap["set"] = function(key,value) {
+                    polyFillMap[key] = value;
+                    return polyFillMap;
+                };
+                return polyFillMap;
+            }();
+        }
+    }
     // Wire up bidirectional back references from one realm to the other for cross realm instanceof checks
     if (safeEvalWindow) {
-        typeToOtherRealmType = new Map();
+        // NOTE: newMap() return a very simple polyfill for Map when browser does not support Map
+        typeToOtherRealmType = newMap();
         var types = Object.keys(SecureWindow.metadata["prototypes"]["Window"]).concat([ "Blob", "File", "FormData", "Notification" ]);
         types.forEach(function(name) {
             try{

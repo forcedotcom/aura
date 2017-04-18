@@ -4,6 +4,9 @@
      * verification to the controller and helper files, which operate in user mode.
      */
 
+    // privileged vs. internal namespaces are unreliable when the default adapters and source loaders are not used.
+    labels : ["UnAdaptableTest"],
+
     // LockerService not supported on IE
     // TODO(W-3674741,W-3674751): FF and iOS browser versions in autobuilds are too far behind
     browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPHONE", "-IPAD"],

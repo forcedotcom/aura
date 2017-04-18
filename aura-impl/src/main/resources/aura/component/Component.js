@@ -794,8 +794,12 @@ Component.prototype.destroy = function() {
 
     // Workaround for a case in aura:if where you rerender the body away then destroy.
     if(this._lastFacetInfo) {
+        var current;
         for(var c=0;c<this._lastFacetInfo.length;c++) {
-            this._lastFacetInfo[c].destroy();
+            current = this._lastFacetInfo[c];
+            if(current.autoDestroy()){
+                current.destroy();
+            }
         }
         this._lastFacetInfo = null;
     }

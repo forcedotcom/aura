@@ -845,7 +845,9 @@ AuraClientService.prototype.hardRefresh = function() {
     var cacheBustKey = "?" + AuraClientService.CACHE_BUST_QUERY_PARAM + "=";
 
     if (this.shouldPreventReload()) {
-        this.showErrorDialogWithReload(new AuraError("We can't load the page. Please click Refresh."));
+        var ae = new $A.auraError("We can't load the page. Please click Refresh.");
+        ae["reported"] = true;
+        this.showErrorDialogWithReload(ae);
         return;
     }
 
@@ -982,6 +984,11 @@ AuraClientService.prototype.clearReloadCount = function() {
 AuraClientService.prototype.showErrorDialogWithReload = function(e, additionalLoggedMessage) {
     if (e && e.message) {
         $A.message(e.message, e, true);
+
+        // we only want to report/gack this if it is not from AuraClientService.prototype.hardRefresh
+        if (e["reported"]) {
+            return;
+        }
 
         try {
             // report the error, set foreground to make the action run now, not as a caboose.

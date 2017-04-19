@@ -264,7 +264,7 @@
 
     _getActualHeight: function(element) {
         var elmHeight, elmMargin;
-        if (document.all) { // IE
+        if ($A.util.isIE && document.all) { // IE, an old IE
             elmHeight = element.currentStyle.height;
             elmMargin = parseInt(element.currentStyle.marginTop, 10) + parseInt(element.currentStyle.marginBottom, 10);
         }

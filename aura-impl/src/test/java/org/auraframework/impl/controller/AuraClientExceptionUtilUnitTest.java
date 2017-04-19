@@ -19,7 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.IncludeDefRef;
+import org.auraframework.def.LibraryDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -250,8 +253,7 @@ public class AuraClientExceptionUtilUnitTest extends UnitTestCase {
 
         String expected = 
                 "    handlePressEvent(e) {\n"+
-                "        foo\n"+
-                "        ^\n"+
+                ">>>        foo\n" +
                 "        const event = new CustomEvent('press', {\n";
 
         String actual = AuraClientExceptionUtil.generateCodeSnippet(code, "4", "9");

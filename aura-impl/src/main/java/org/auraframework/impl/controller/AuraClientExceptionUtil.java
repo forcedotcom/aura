@@ -18,7 +18,10 @@ package org.auraframework.impl.controller;
 import java.util.List;
 
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.IncludeDefRef;
+import org.auraframework.def.LibraryDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.impl.util.ModuleDefinitionUtil;
@@ -48,8 +51,10 @@ public class AuraClientExceptionUtil {
             String[] parts = descriptor.split("[$]");
             if (parts.length > 1) {
                 String[] componentInfoParts = parts[0].split(":");
-                auraClientException.setFailedComponentNamespace(componentInfoParts[0]);
-                auraClientException.setFailedComponent(componentInfoParts[1]);
+                if (componentInfoParts.length > 1) {
+                    auraClientException.setFailedComponentNamespace(componentInfoParts[0]);
+                    auraClientException.setFailedComponent(componentInfoParts[1]);
+                }
                 auraClientException.setFailedComponentMethod(parts[parts.length-1]);
             }
         }
@@ -140,22 +145,14 @@ public class AuraClientExceptionUtil {
         String[] codeLines = code.split("\n");
         StringBuilder sb = new StringBuilder();
         int lineNumber = Integer.parseInt(line) - 1;
-        int columnNumber = Integer.parseInt(column);
         if (codeLines.length > lineNumber) {
             if (lineNumber - 1 >= 0) {
                 sb.append(codeLines[lineNumber-1]);
                 sb.append("\n");
             }
+            sb.append(">>>");
             sb.append(codeLines[lineNumber]);
             sb.append("\n");
-            // TODO: if error happens on the first line, indicator would be off
-            // when strict-csp is enabled
-            // because locker safeEval outputs hook fn and arguments
-            // need to figure out a way to calculate the offset
-            for (int n = 1; n < columnNumber; n++) {
-                sb.append(" ");
-            }
-            sb.append("^\n");
             if (lineNumber + 1 < codeLines.length) {
                 sb.append(codeLines[lineNumber+1]);
                 sb.append("\n");

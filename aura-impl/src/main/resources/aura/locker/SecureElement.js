@@ -722,12 +722,14 @@ SecureElement.FUNCTION = { type: "function" };
 SecureElement.FUNCTION_TRUST_RETURN_VALUE = { type: "function", trustReturnValue: true };
 SecureElement.EVENT = { type: "@event" };
 SecureElement.SKIP_OPAQUE = { skipOpaque : true};
+SecureElement.FUNCTION_RAW_ARGS = { type: "function", rawArguments: true };
 
 var DEFAULT = SecureElement.DEFAULT;
 var FUNCTION = SecureElement.FUNCTION;
 var FUNCTION_TRUST_RETURN_VALUE = SecureElement.FUNCTION_TRUST_RETURN_VALUE;
 var EVENT = SecureElement.EVENT;
 var SKIP_OPAQUE = SecureElement.SKIP_OPAQUE;
+var FUNCTION_RAW_ARGS = SecureElement.FUNCTION_RAW_ARGS;
 
 SecureElement.nodeMetadata = {
         "ATTRIBUTE_NODE":                 DEFAULT,
@@ -752,13 +754,13 @@ SecureElement.nodeMetadata = {
         "baseURI":                        DEFAULT,
         "childNodes":                     DEFAULT,
         "cloneNode":                      FUNCTION,
-        "compareDocumentPosition":        FUNCTION,
-        "contains":                       FUNCTION,
+        "compareDocumentPosition":        FUNCTION_RAW_ARGS,
+        "contains":                       FUNCTION_RAW_ARGS,
         "firstChild":                     SKIP_OPAQUE,
         "insertBefore":                   FUNCTION,
         "isDefaultNamespace":             FUNCTION,
-        "isEqualNode":                    FUNCTION,
-        "isSameNode":                     FUNCTION,
+        "isEqualNode":                    FUNCTION_RAW_ARGS,
+        "isSameNode":                     FUNCTION_RAW_ARGS,
         "lastChild":                      SKIP_OPAQUE,
         "lookupNamespaceURI":             FUNCTION,
         "lookupPrefix":                   FUNCTION,

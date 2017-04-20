@@ -79,6 +79,7 @@
     <aura:method name="testElementAttributesGetSet"/>
     <aura:method name="testElementAttributesRemove"/>
     <aura:method name="testElementGetAttribute"/>
+    <aura:method name="testNodeApiParamUnfilter"/>
 
     <lockerTest:facet/>
 
@@ -132,4 +133,9 @@
             <lockerTest:facet/>
         </div>
     </div>
+
+    <div id="nodeApiTester">
+        <p id="insideDiv"/>
+    </div>
+    <p id="outsideDiv"/>
 </aura:component>

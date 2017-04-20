@@ -1402,7 +1402,8 @@ SecureObject.addPrototypeMethodsAndProperties = function(metadata, so, raw, key)
             var options = {
                     skipOpaque: item.skipOpaque || false,
                     defaultValue: item.defaultValue || null,
-                    trustReturnValue: item.trustReturnValue || false
+                    trustReturnValue: item.trustReturnValue || false,
+                    rawArguments: item.rawArguments || false
             };
 
             if (item.type === "function") {
@@ -1489,7 +1490,8 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(name, prototype, protot
         var options = {
                 skipOpaque: item.skipOpaque || false,
                 defaultValue: item.defaultValue || null,
-                trustReturnValue: item.trustReturnValue || false
+                trustReturnValue: item.trustReturnValue || false,
+                rawArguments: item.rawArguments || false
         };
 
         if (item.type === "function") {

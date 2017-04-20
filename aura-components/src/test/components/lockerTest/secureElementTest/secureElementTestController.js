@@ -514,5 +514,15 @@
 
         var unattachedElement = document.createElement("div");
         testUtils.assertFalse(helper.contains(document, unattachedElement), "Dom element was expected to not be in the document");
+    },
+
+    testNodeApiParamUnfilter: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var div = document.getElementById("nodeApiTester");
+        var insideDiv = document.getElementById("insideDiv");
+        var outsideDiv = document.getElementById("outsideDiv");
+
+        testUtils.assertTrue(div.contains(insideDiv), "Expected Node.contains() to return true for <p> inside <div>");
+        testUtils.assertFalse(div.contains(outsideDiv), "Expected Node.contains() to return false for <p> outsidse <div>");
     }
 })

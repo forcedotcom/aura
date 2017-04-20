@@ -28,6 +28,7 @@ import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.ModuleDefinitionUtil;
 import org.auraframework.service.DefinitionService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -65,8 +66,10 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
 
     @Override
     public void serialize(Json json) throws IOException {
-        boolean minified = Aura.getContextService().getCurrentContext().getMode().minify();
-        CodeType codeType = minified ? CodeType.PROD : CodeType.DEV;
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        boolean compat = context.useCompatSource();
+        boolean minified = context.getMode().minify();
+        CodeType codeType = compat ? CodeType.COMPAT : (minified ? CodeType.PROD : CodeType.DEV);
         String code = this.codes.get(codeType);
         json.writeMap(ImmutableMap.of(
                 "descriptor", getDescriptor().getQualifiedName(),

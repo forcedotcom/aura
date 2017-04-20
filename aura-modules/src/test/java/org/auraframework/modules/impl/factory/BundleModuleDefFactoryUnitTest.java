@@ -100,7 +100,8 @@ public class BundleModuleDefFactoryUnitTest {
                 devCode.endsWith("}"));
         assertTrue("prod code should be wrapped in function and calls $A.componentService.addModule",
                 prodCode.startsWith("function() { $A.componentService.addModule("));
-        assertNotNull("compat code should not be null", compatCode);
+        assertTrue("compat code should be wrapped in function",
+                compatCode.startsWith("function() { "));
         assertNotNull("ownHash should not be null", moduleDef.getOwnHash());
     }
 

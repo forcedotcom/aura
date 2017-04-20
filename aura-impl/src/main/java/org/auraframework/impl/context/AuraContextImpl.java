@@ -141,6 +141,8 @@ public class AuraContextImpl implements AuraContext {
     private boolean isSystem = false;
 
     private boolean isModulesEnabled = false;
+    private boolean useCompatSource = false;
+
     /**
      * The set of defs that are thread local.
      *
@@ -968,5 +970,15 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public boolean isModulesEnabled() {
         return this.isModulesEnabled;
+    }
+
+    @Override
+    public void setUseCompatSource(boolean useCompatSource) {
+        this.useCompatSource = useCompatSource;
+    }
+
+    @Override
+    public boolean useCompatSource() {
+        return this.useCompatSource;
     }
 }

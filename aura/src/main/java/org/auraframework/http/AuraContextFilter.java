@@ -239,6 +239,7 @@ public class AuraContextFilter implements Filter {
         context.setRequestedLocales(requestedLocales);
         context.setClient(new Client(request.getHeader(HttpHeaders.USER_AGENT)));
         context.setModulesEnabled(isModulesEnabled(request, configMap, m));
+        context.setUseCompatSource(useCompatSource(request, m));
         if (configMap != null) {
             getLoaded(context, configMap.get("loaded"));
             @SuppressWarnings("unchecked")
@@ -361,6 +362,7 @@ public class AuraContextFilter implements Filter {
      *
      * @param request http request
      * @param configMap context config from encoded url
+     * @param mode Aura context mode
      * @return whether modules should be enabled
      */
     protected boolean isModulesEnabled(HttpServletRequest request, Map<String, Object> configMap, Mode mode) {
@@ -386,6 +388,18 @@ public class AuraContextFilter implements Filter {
         }
 
         return configAdapter.isModulesEnabled();
+    }
+
+    /**
+     * Whether compat module should be served based on ???
+     *
+     * @param request http request
+     * @param mode Aura context mode
+     * @return whether compat module should be served
+     */
+    protected boolean useCompatSource(HttpServletRequest request, Mode mode) {
+        // TODO: define when we want to serve compat module source
+        return false;
     }
 
     private DefDescriptor<? extends BaseComponentDef> getAppParam(HttpServletRequest request, Map<String, Object> configMap) {

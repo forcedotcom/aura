@@ -727,4 +727,8 @@ public interface AuraContext {
     void setModulesEnabled(boolean isModulesEnabled);
 
     boolean isModulesEnabled();
+
+    void setUseCompatSource(boolean useCompatSource);
+
+    boolean useCompatSource();
 }

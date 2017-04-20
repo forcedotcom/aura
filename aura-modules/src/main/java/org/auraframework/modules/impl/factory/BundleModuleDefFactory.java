@@ -188,9 +188,17 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
             throws InvalidDefinitionException {
         StringBuilder processedCode = new StringBuilder();
         if (codeType == CodeType.COMPAT) {
-            // TODO compat mode client side registration
-            // no define() for compat mode
-            processedCode.append(code);
+            String amdString = "define(";
+            int amdIndex = code.indexOf(amdString);
+            String polyfills = code.substring(0, amdIndex);
+            String module = code.substring(amdIndex+amdString.length(), code.length());
+            processedCode
+                .append("function() { ")
+                .append(polyfills)
+                .append("$A.componentService.addModule('")
+                .append(descriptor.getQualifiedName()).append("', ")
+                .append(module)
+                .append("}");
         } else {
             if (!code.substring(0, 7).equals("define(")) {
                 throw new InvalidDefinitionException("Compiled code does not start with AMD 'define'", location);

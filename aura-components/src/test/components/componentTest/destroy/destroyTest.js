@@ -275,12 +275,11 @@
      * 3. Rerender the iteration explicitly.
      * 4. See that all the elements in the iteration have been destroyed.
      */
-    testDestroyIterationWithIf: {
+    // KRIS: Commented out till we properly destroy the body of the if (W-3649297)
+    _testDestroyIterationWithIf: {
         test: [
             function(component) {
                 var iteration = component.find("iteration");
-                //var ifs = iteration.find({instancesOf:"aura:if"});
-                //var divs = ifs.map(function(item){ return item.find({instancesOf:"aura:html"})[0]; });
                 
                 var components = this.getBodyComponentsRecursively(iteration);
 

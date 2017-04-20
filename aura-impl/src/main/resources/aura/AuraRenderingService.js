@@ -564,7 +564,6 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
 AuraRenderingService.prototype.unrenderFacet = function(cmp,facet){
     if (cmp._facetInfo) {
         this.unrender(cmp._facetInfo);
-        cmp._lastFacetInfo = cmp._facetInfo;
         cmp._facetInfo = null;
     }
 

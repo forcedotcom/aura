@@ -397,13 +397,8 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         // Hitting escape to close the Calendar
         element.sendKeys(Keys.ESCAPE);
 
-        // Want to get a NoSuchElementExpection when looking for the class
-        // if visible exists, that means that the calendar did not close
-        element = findDomElement(By.cssSelector("div[class*='uiDatePicker']"));
-
-        escButtonClosedCal = !element.getAttribute("class").contains("visible");
-
-        assertTrue("Escape button did not close the calendar", escButtonClosedCal);
+        // Check to make sure element was removed from dom
+        assertFalse("Escape button did not close the calendar", isElementPresent(By.cssSelector("div[class*='uiDatePicker']")));
     }
 
     /**

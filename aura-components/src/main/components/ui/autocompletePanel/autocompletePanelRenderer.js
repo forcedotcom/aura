@@ -22,7 +22,7 @@
     },
 
     unrender: function(component, helper) {
-        this.superUnrender();
         helper.clearPositionConstraint(component);
+        this.superUnrender();
     }
 })// eslint-disable-line semi

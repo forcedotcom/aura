@@ -29,9 +29,9 @@
 
 	handleVisibilityChange: function(cmp, evt, helper) {
 		if (cmp.get('v.visible')) {
-			helper.positionList(cmp);
+			helper.showPositionList(cmp);
 		} else {
-			helper.clearPositionConstraint(cmp);
+			helper.hidePositionList(cmp);
 		}
 	},
 

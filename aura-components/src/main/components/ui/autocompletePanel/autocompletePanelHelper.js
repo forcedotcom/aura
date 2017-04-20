@@ -76,6 +76,20 @@
 		}
 	},
 
+	showPositionList : function(component) {
+		if (component.positionConstraint) {
+            component.positionConstraint.enable();
+		} else {
+            this.positionList(component);
+		}
+	},
+
+	hidePositionList : function(component) {
+		if (component.positionConstraint) {
+			component.positionConstraint.disable();
+		}
+	},
+
 	clearPositionConstraint: function(component) {
 		if(component.positionConstraint) {
 			component.positionConstraint.destroy();

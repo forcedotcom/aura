@@ -311,6 +311,14 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
                         while (constraintList.length > 0) {
                             constraintList.pop().destroy();
                         }
+
+                        // Clean up node appended to body of dom
+                        if (config.appendToBody && config.element) {
+                            var nodeToRemove = document.getElementById(config.element.id);
+                            if (nodeToRemove) {
+                                nodeToRemove.remove();
+                            }
+                        }
                     }
                 };
 

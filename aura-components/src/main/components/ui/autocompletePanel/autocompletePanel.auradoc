@@ -23,6 +23,9 @@
 		    the viewport provides sufficient space above and not below. 
 		</p>
 
+         <h4>Methods</h4>
+        <p>This component supports the following method.</p>
+        <p><code>repositionPanel</code>: Forces the panel to reposition itself.</p>
         
 	</aura:description>	
 		<aura:example name="autocompletePanel" ref="uiExamples:autocompleteExample" label="Wrapping the List of Options with ui:autocompletePanel">

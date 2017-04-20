@@ -25,10 +25,10 @@
     <aura:handler name="change" value="{!v.visible}" action="{!c.handleVisibilityChange}"/>
     <aura:handler name="change" value="{!v.referenceElement}" action="{!c.handleReferenceChange}"/>
 
-    <aura:registerEvent name="listCollapse" type="ui:autocompleteListCollapse" description="The event fired when the list is made invisible"/>
+    <aura:registerEvent name="listCollapse" type="ui:autocompleteListCollapse" description="The event fired when the list is hidden from view."/>
     <aura:handler name="listCollapse" action="{!c.listCollapse}" includeFacets="true"/>
 
-    <aura:method name="repositionPanel" action="{!c.repositionPanel}" description="Force the panel to reposition itself." />
+    <aura:method name="repositionPanel" action="{!c.repositionPanel}" description="Forces the panel to reposition itself." />
 
     <div class="{!v.visible == true ? ' visible' : ''}" aura:flavorable="true">
         {!v.body}

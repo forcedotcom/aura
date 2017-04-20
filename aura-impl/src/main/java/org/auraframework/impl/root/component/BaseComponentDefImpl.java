@@ -1036,11 +1036,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     json.writeMapEntry("handlerDefs", handlers);
                 }
 
-                Collection<LibraryDefRef> imports = getImports();
-                if (!imports.isEmpty()) {
-                    json.writeMapEntry("imports", imports);
-                }
-
                 Map<String, LocatorDef> locatorDefs = getLocators();
                 if (locatorDefs!=null && !locatorDefs.isEmpty()) {
                     json.writeMapEntry("locatorDefs", locatorDefs);

@@ -20,7 +20,13 @@
     cbAction: function (cmp, event) {
         console.log('CB - Action!', event);
     },
-    cbEvent: function (cmp, event) {
+    cbEvent: function (cmp, event, helper) {
+      if (helper.simpleLib) {
+        helper.simpleLib.log('CB - Event with lib!');
+      }
+      if (helper.simpleModule) {
+        console.log(helper.simpleModule.publicMethods[0]);
+      }
       console.log('CB - Event!', event);  
     }
 })

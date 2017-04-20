@@ -155,7 +155,16 @@ ComponentClassRegistry.prototype.buildLibraries = function(componentProperties) 
     if (componentImports) {
         var helper = componentProperties["helper"];
         for (var property in componentImports) {
-            helper[property] = $A.componentService.getLibrary(componentImports[property]);
+            var descriptor = componentImports[property];
+            var library = $A.componentService.getLibrary(descriptor);
+            if (!library) {
+                try {
+                    library = $A.componentService.evaluateModuleDef(descriptor);
+                } catch (e) {
+                    // ignore module not found
+                }
+            }
+            helper[property] = library;
         }
         componentProperties["helper"] = helper;
     }

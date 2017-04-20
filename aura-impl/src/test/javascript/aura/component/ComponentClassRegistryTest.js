@@ -58,7 +58,7 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
                 }
             },
             "componentService": {
-                "getLibrary": function(descriptor) { return descriptor }
+                "getLibrary": function(descriptor) { return descriptor },
             },
             clientService: {
                 getSourceMapsUrl: function () {return;}
@@ -334,6 +334,61 @@ Test.Aura.Component.ComponentClassRegistryTest = function () {
                 target.addComponentClass("testDescriptor", exporter);
                 var componentClass = target.getComponentClass("testDescriptor");
                 actual = componentClass.prototype.helper["testLib"];
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fixture]
+    function BuildLibraries() {
+        [Fact]
+        function SetsComponentHelperPropertiesFromLibrary() {
+            // Arrange
+            var expected = "test:lib";
+            var componentProperties = {
+                "meta": {
+                    "imports": {
+                        "testLib": expected
+                    }
+                },
+                "helper": {}
+            };
+
+            // Act
+            var actual;
+            mockFramework(function() {
+                var target = new Aura.Component.ComponentClassRegistry();
+                target.buildLibraries(componentProperties);
+                actual = componentProperties["helper"]["testLib"];
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function SetsComponentHelperPropertiesFromModule() {
+            // Arrange
+            var expected = "test:module";
+            var componentProperties = {
+                "meta": {
+                    "imports": {
+                        "testModule": expected
+                    }
+                },
+                "helper": {}
+            };
+
+            // Act
+            var actual;
+            mockFramework(function() {
+                var target = new Aura.Component.ComponentClassRegistry();
+                $A.componentService.getLibrary = function(descriptor) {};
+                $A.componentService.evaluateModuleDef = function(descriptor) { return descriptor; };
+                target.buildLibraries(componentProperties);
+                actual = componentProperties["helper"]["testModule"];
             });
 
             // Assert

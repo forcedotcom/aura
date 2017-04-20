@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.LibraryDefRef;
 import org.auraframework.def.RootDefinition;
@@ -74,8 +75,15 @@ public class LibraryDefRefHandler extends XMLHandler<LibraryDefRef> {
         if (AuraTextUtil.isNullEmptyOrWhitespace(library)) {
             throw new InvalidDefinitionException(String.format("%s missing library attribute", TAG), getLocation());
         }
-        DefDescriptor<LibraryDef> descriptor = definitionService.getDefDescriptor(library.trim(), LibraryDef.class);
-        builder.setDescriptor(descriptor);
+
+        DefDescriptor<ModuleDef> moduleDescriptor = definitionService.getDefDescriptor(library.trim(), ModuleDef.class);
+        boolean moduleExists = definitionService.exists(moduleDescriptor);
+        if (moduleExists) {
+            builder.setModuleDescriptor(moduleDescriptor);
+        } else {
+            DefDescriptor<LibraryDef> descriptor = definitionService.getDefDescriptor(library.trim(), LibraryDef.class);
+            builder.setDescriptor(descriptor);
+        }
 
         String property = getAttributeValue(ATTRIBUTE_PROPERTY);
         if (AuraTextUtil.isNullEmptyOrWhitespace(property)) {

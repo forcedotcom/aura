@@ -23,7 +23,8 @@
     <aura:attribute name="test3" type="String" default="I'm v.test3" access="GLOBAL"/>
 
     <aura:dependency resource="markup://moduleTest:testLib" type="LIBRARY"/>
-    
+    <aura:import library="moduleTest:simpleLib" property="simpleLib"/>
+    <aura:import library="moduleTest:simpleCmp" property="simpleModule"/>
     <section>
         <ui:button aura:id="y" class="button-toggle" label="Toggle if - first modules container" press="{!c.toggle}" />
         <br/>

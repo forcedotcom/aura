@@ -18,11 +18,14 @@ package org.auraframework.impl.root.library;
 import java.io.IOException;
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.LibraryDefRef;
+import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.root.parser.handler.LibraryDefRefHandler;
 import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -31,15 +34,22 @@ import org.auraframework.util.json.Json;
 public class LibraryDefRefImpl extends DefinitionImpl<LibraryDef> implements LibraryDefRef {
     private static final long serialVersionUID = 8916829297107001915L;
     private final String property;
+    private DefDescriptor<ModuleDef> moduleDescriptor;
 
     protected LibraryDefRefImpl(Builder builder) {
         super(builder);
         this.property = builder.property;
+        this.moduleDescriptor = builder.moduleDescriptor;
     }
 
     @Override
     public DefDescriptor<LibraryDef> getReferenceDescriptor() {
         return descriptor;
+    }
+
+    @Override
+    public DefDescriptor<ModuleDef> getModuleReferenceDescriptor() {
+        return moduleDescriptor;
     }
 
     @Override
@@ -49,8 +59,20 @@ public class LibraryDefRefImpl extends DefinitionImpl<LibraryDef> implements Lib
 
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        if (descriptor != null) {
-            dependencies.add(descriptor);
+        if (moduleDescriptor != null) {
+            dependencies.add(moduleDescriptor);
+        } else if (descriptor != null) {
+            // During maven compiler time, StaticRegistry always think of aura:import as LibraryDef
+            // try using moduleDef associated descriptor and see if the module exist before adding LibraryDef descriptor as a dependency.
+            DefinitionService definitionService = Aura.getDefinitionService();
+            DefDescriptor<ModuleDef> moduleDefDescriptor = definitionService.getDefDescriptor(descriptor, DefDescriptor.MARKUP_PREFIX, ModuleDef.class);
+            boolean moduleExists = definitionService.exists(moduleDefDescriptor);
+            if (moduleExists) {
+                this.moduleDescriptor = moduleDefDescriptor;
+                dependencies.add(moduleDefDescriptor);
+            } else {
+                dependencies.add(descriptor);
+            }
         }
     }
 
@@ -68,15 +90,13 @@ public class LibraryDefRefImpl extends DefinitionImpl<LibraryDef> implements Lib
 
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeMapBegin();
-        json.writeMapEntry("descriptor", descriptor.getQualifiedName());
-        json.writeMapEntry("property", property);
-        json.writeMapEnd();
+        /*This is not used because imports are output as meta in JavaScriptComponentClass*/
     }
 
     public static class Builder extends DefinitionImpl.RefBuilderImpl<LibraryDef, LibraryDefRef> {
 
         private String property;
+        private DefDescriptor<ModuleDef> moduleDescriptor;
 
         public Builder() {
             super(LibraryDef.class);
@@ -84,6 +104,11 @@ public class LibraryDefRefImpl extends DefinitionImpl<LibraryDef> implements Lib
 
         public Builder setProperty(String property) {
             this.property = property;
+            return this;
+        }
+
+        public Builder setModuleDescriptor(DefDescriptor<ModuleDef> moduleDescriptor) {
+            this.moduleDescriptor = moduleDescriptor;
             return this;
         }
 

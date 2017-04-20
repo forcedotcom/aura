@@ -24,9 +24,12 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.LibraryDefRef;
+import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
 import org.auraframework.impl.source.StringSource;
+import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -66,8 +69,25 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
         LibraryDefRef def = handler.getElement();
 
         DefDescriptor<LibraryDef> expectedDescriptor = definitionService.getDefDescriptor(expectedLibrary, LibraryDef.class);
-        assertEquals(expectedDescriptor, def.getDescriptor());
         assertEquals(expectedDescriptor, def.getReferenceDescriptor());
+    }
+
+    @Test
+    public void testGetElementWithModule() throws Exception {
+        String expectedLibrary = "myModule:Lib";
+        StringSource<LibraryDefRef> source = new StringSource<>(descriptor, 
+                String.format("<%s library='%s' property='p'/>", LibraryDefRefHandler.TAG, expectedLibrary), "myModuleID", Format.XML);
+        Mockito.doReturn(parentDescriptor).when(parentHandler).getDefDescriptor();
+        Mockito.doReturn(DefType.COMPONENT).when(parentDescriptor).getDefType();
+        DefinitionService definitionService = Mockito.mock(DefinitionService.class);
+        DefDescriptor<ModuleDef> expectedDescriptor = new DefDescriptorImpl<ModuleDef>(expectedLibrary, ModuleDef.class, null);
+        Mockito.doReturn(expectedDescriptor).when(definitionService).getDefDescriptor(expectedLibrary, ModuleDef.class);
+        Mockito.doReturn(true).when(definitionService).exists(expectedDescriptor);
+        LibraryDefRefHandler handler = new LibraryDefRefHandler(parentHandler, getReader(source), source, definitionService);
+
+        LibraryDefRef def = handler.getElement();
+
+        assertEquals(expectedDescriptor, def.getModuleReferenceDescriptor());
     }
 
     @Test
@@ -117,7 +137,7 @@ public class LibraryDefRefHandlerTest extends AuraImplTestCase {
             fail("Include tag requires a library attribute with a valid descriptor.");
         } catch (AuraRuntimeException t) {
             assertExceptionMessageEndsWith(t, AuraRuntimeException.class,
-                    String.format("Invalid Descriptor Format: this is invalid[%s]", DefType.LIBRARY));
+                    String.format("Invalid Descriptor Format: this is invalid[%s]", DefType.MODULE));
         }
     }
 

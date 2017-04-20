@@ -63,6 +63,10 @@
                     pageSize = this._getPageSize(),
                     newPage  = Math.abs(this.x / pageSize);
 
+                if (isNaN(newPage)) {
+                    return;
+                }
+
                 this._setContinuousFlow(false);
                 if (oldPage !== newPage) {
                     this._activePage = newPage;
@@ -70,15 +74,15 @@
                 }
             },
             /*
-             * If the scroller was forced to stop in the middle of a page transition, 
+             * If the scroller was forced to stop in the middle of a page transition,
              * we need to make sure it does not get stucked in the middle,
-             * so we force it to transalte to a correct state in that case. 
+             * so we force it to transalte to a correct state in that case.
              */
             _onStopScrolling: function (e) {
                 e.preventDefault();
                 var end = this._end;
                 var pageSize = this._getPageSize();
-                
+
                 // Hook in the _end since this scroller won't fire any event since has been stopped
                 this._end = function () {
                 	end.apply(this, arguments);

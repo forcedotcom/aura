@@ -64,6 +64,7 @@
     height: 42px;
     text-align: center;
     color: #686c70;
+	z-index: 1;
 }
 
 .THIS .headerBar .title {

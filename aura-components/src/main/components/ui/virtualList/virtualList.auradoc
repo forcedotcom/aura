@@ -17,16 +17,109 @@
 -->
 <aura:documentation>
 	<aura:description>
-		 <p>To render your items in an unordered list, include a <code>&lt;ul></code> tag in your <code>ui:virtualList</code> component.
-		 In your template component, you can use the <code>&lt;li></code> tag to render the items. Note that this functionality is built-in for the
-		 <code>ui:infiniteList</code> component.</p>
-<pre>&lt;ui:virtualList aura:id="list" itemVar="item" items="{!v.items}">
-    &lt;aura:set attribute="itemTemplate">
-        &lt;!-- Your template here -->
-    &lt;/aura:set>
-    &lt;ul class="my list items"/>
-&lt;/ui:virtualList>
+	   <p>The <code>ui:virtualList</code> component uses a template to generate list items (rows) and share component attributes across the list items. 
+	   <code>ui:virtualList</code> is generally faster than <code> ui:list</code> and <code>ui:infiniteList</code> since the template is created once only. 
+	   You can create a list that uses a single template or multiple templates.</p>
+	   
+	   <h4>Creating Single-Template Lists</h4>
+	   <p>This example creates a list of items using a template. Providing a <code>ul</code> tag in the <code>ui:virtualList</code> component uses the <code>ul</code> tag as the top-level container for the list.
+	   </p>
+	   <pre>&lt;aura:component>  
+    &lt;aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    
+    &lt;div>
+        &lt;div class="inline">
+            &lt;div>
+                &lt;ui:button label="Refresh List" press="{!c.refreshSingleList}"/>
+            &lt;/div>
+            &lt;ui:virtualList aura:id="singleTemplate" itemVar="item">
+                &lt;aura:set attribute="itemTemplate">
+                    &lt;li>&lt;ui:outputText class="listItem" value="{!item.record.value}" />&lt;/li>
+                &lt;/aura:set>
+                &lt;ul />
+            &lt;/ui:virtualList>
+        &lt;/div>     
+    &lt;/div> 
+&lt;/aura:component></pre>
+        <p>During intialization, the items are appended to the template in the helper. Remember that your init handler is only called once, so don't set any dynamic logic during initialization and use a rerender function instead.</p>
+        <pre>/** JavaScript Controller **/
+({
+    init: function(cmp, event, helper) {
+        
+        helper.initializeLists(cmp);
+    },
+    
+    refreshSingleList: function(cmp, event, helper) {
+        helper.setItems(cmp, "singleTemplate");
+    }
+})</pre>
+<pre>/** JavaScript Helper **/
+({ 
+    initializeLists: function(cmp) {            
+        this.setItems(cmp, "singleTemplate");
+    },
+    
+    generateItems: function(count, startIndex) {
+        var items = [];     
+        startIndex = startIndex || 0;
+        
+        for (var i = 0; i &lt; count; i++) {          
+            items.push({
+                record: {       
+                    value: "Value " + (startIndex + i)        
+                },
+                actions: {}            
+            });
+        }
+        return items;
+    },  
+    setItems: function(cmp, targetId) {
+        cmp.find(targetId).set("v.items", this.generateItems(10));
+    }
+})</pre>
+	   <h4>Creating Multi-Template Lists</h4>
+	   <p>Lists can have multiple templates for more complex use cases. Create the map of templates during initialization and set its value on the <code>templateMap</code> attribute.
+	   For more information, see the Examples tab.</p>
+		 <h4>Usage Considerations</h4>
+		 <p><code>aura:if</code> is not supported in <code>ui:virtualList</code>. Use <code>aura:renderIf</code> or the ternary operator instead.
+		 For example, <code>value="{!v.myAttribute.value ? v.myAttribute.value : ''}"</code> returns an empty string if the expression evaluates to false.
+		 Alternatively, use CSS to toggle the components. Since the template is created only once, the performance impact to create conditional components is minimal.</p>
+		<p>Since component attributes are shared across list items, store state changes using the <code>item</code> attribute and refresh the row using <code>updateItem()</code>.
+		Here's a simple example of how that looks like.</p>
+		 <pre>var newItem = this.processItem(cmp, myItem);
+var items = list.get('v.items');
+for (var i = 0; items.length; i++) {
+    newItem.myVar = items[i].myVar;
+    items[i] = newItem;
+    list.updateItem(items[i], i);
+}
 </pre>		 
+        <h4>Methods</h4>
+        <p>This component supports the following methods.</p>
+        <p><code>addTemplate(key, template)</code>: Adds a template to the list without rerendering.</p>
+        <ul>
+            <li><code>key</code> (Object): The key that returns a value on the template.</li>
+            <li><code>template</code> (Object): The template that's used to generate items in the list.</li>
+        </ul>
+        <p><code>rerenderList()</code>: Rerenders the entire list.</p>
+        <p><code>appendItems(items)</code>: Appends items to the list.</p>
+        <ul>
+            <li><code>items</code> (Object): Items to be appended to the list.</li>
+        </ul>
+        <p><code>updateItem(item, index)</code>: Updates an item in the list without rerendering the entire list.</p>
+        <ul>
+            <li><code>item</code> (Object): The item to be updated.</li>
+            <li><code>index</code> (Integer): Optional. Index of the item within the list.</li>
+        </ul>
+        <p><code>getComponentByIndex(index, callback)</code>: </p>
+        <ul>
+            <li><code>index</code> (Integer): Index within the list.</li>
+            <li><code>callback</code> (Function): Callback which takes the component as its first parameter</li>
+        </ul>
+        
 	</aura:description>	
 		
+    <aura:example name="virtualListExample" ref="uiExamples:virtualListExample" label="Using ui:virtualList">
+        <p>Here's an example on how you can create a single and multi-template list. The templates are created during initialization.</p>
+    </aura:example>
 </aura:documentation>

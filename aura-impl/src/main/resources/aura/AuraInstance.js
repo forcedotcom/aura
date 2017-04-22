@@ -854,8 +854,9 @@ AuraInstance.prototype.isCustomerComponentStack = function(cmpStack) {
  * @platform
  */
 AuraInstance.prototype.reportError = function(message, error) {
-    if ($A.logger.isExternalError(error)) {
-        // ignore external errors
+    // ignore if sourceURL is not supported
+    // ignore external errors
+    if (!$A.util.hasSourceURL() || $A.logger.isExternalError(error)) {
         return false;
     }
 

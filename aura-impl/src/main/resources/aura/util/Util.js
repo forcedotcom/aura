@@ -2427,6 +2427,22 @@ Aura.Utils.Util.prototype.getComponentHierarchy = function(component){
     return ret.reverse().join('>');
 };
 
+/**
+ * eval throwing an error to check whether sourceURL is supported.
+ * @private
+ */
+Aura.Utils.Util.prototype.hasSourceURL = function() {
+    if (this.sourceURLsupported === undefined) {
+        try {
+            eval('throw new Error("test");\n//# sourceURL=testSourceURL.js');//eslint-disable-line no-eval
+        } catch(e) {
+            this.sourceURLsupported = e.stack.indexOf("testSourceURL.js") > -1;
+        }
+    }
+
+    return this.sourceURLsupported;
+};
+
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     /**
      * Gets the aura debug tool component whether in an iframe or not.

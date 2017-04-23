@@ -2,7 +2,8 @@
     /**
      * Verify that error message box displays in the auraErrorMask div and can be dismissed using the close button.
      */
-    testErrorMessageDisplayAndClose: {
+    // disable because test is run with Chrome/49.0.2623.112
+    _testErrorMessageDisplayAndClose: {
         test: [
             function(cmp) {
                 var iframeSrc = "/auratest/errorHandlingApp.app";
@@ -29,7 +30,8 @@
      * Verify that error message box displays via $A.error.
      * Test coverage for deprecated API.
      */
-    testErrorMessageDisplayAndCloseViaAError: {
+    // disable because test is run with Chrome/49.0.2623.112
+    _testErrorMessageDisplayAndCloseViaAError: {
         test: [
             function(cmp) {
                 var iframeSrc = "/auratest/errorHandlingApp.app";
@@ -51,8 +53,8 @@
             }
         ]
     },
-
-    testErrorFromContainedCmpRender: {
+    // disable because test is run with Chrome/49.0.2623.112
+    _testErrorFromContainedCmpRender: {
         test: function(cmp) {
             var iframeSrc = "/auratest/errorHandlingApp.app?throwErrorFromContainedCmpRender=true";
             this.loadIframe(iframeSrc, cmp, "iframeContainer");
@@ -72,8 +74,8 @@
             });
         }
     },
-
-    testErrorFromContainedCmpAfterRender: {
+    // disable because test is run with Chrome/49.0.2623.112
+    _testErrorFromContainedCmpAfterRender: {
         test: function(cmp) {
             var iframeSrc = "/auratest/errorHandlingApp.app?throwErrorFromContainedCmpAfterRender=true";
             this.loadIframe(iframeSrc, cmp, "iframeContainer");
@@ -93,8 +95,8 @@
             });
         }
     },
-
-    testErrorFromContainedCmpRerender: {
+    // disable because test is run with Chrome/49.0.2623.112
+    _testErrorFromContainedCmpRerender: {
         test: [
             function(cmp) {
                 var iframeSrc = "/auratest/errorHandlingApp.app";
@@ -120,8 +122,8 @@
             }
         ]
     },
-
-    testErrorFromSuperCmpAfterRender: {
+    // disable because test is run with Chrome/49.0.2623.112
+    _testErrorFromSuperCmpAfterRender: {
         test: function(cmp) {
             var iframeSrc = "/auratest/errorHandlingExtend.cmp?throwErrorFromSuperAfterRender=true&requiredAttribute=true";
             this.loadIframe(iframeSrc, cmp, "iframeContainer");
@@ -142,8 +144,8 @@
             });
         }
     },
-
-    testErrorFromSuperCmpUnrender: {
+    // disable because test is run with Chrome/49.0.2623.112
+    _testErrorFromSuperCmpUnrender: {
         test: [
             function(cmp) {
                 var iframeSrc = "/auratest/errorHandlingExtend.cmp?requiredAttribute=true";
@@ -175,7 +177,8 @@
     /**
      * Verify Aura default error handler can handle systemError event when there is a component which misses required attribute.
      */
-    testErrorFromRequiredAttributeMissingComponent: {
+    // disable because test is run with Chrome/49.0.2623.112
+    _testErrorFromRequiredAttributeMissingComponent: {
         test: function(cmp) {
             var iframeSrc = "/auratest/errorHandlingApp.app?addAttributeMissingComponent=true";
             this.loadIframe(iframeSrc, cmp, "iframeContainer");
@@ -197,7 +200,8 @@
      * if a cmp/app contains custom error handler. When error is thrown from render(), $A is not initialized, so the
      * event has to be handled by default handler.
      */
-    testDefaultHandleErrorFromAppRenderWhenMarkEventHandled: {
+    // disable because test is run with Chrome/49.0.2623.112
+    _testDefaultHandleErrorFromAppRenderWhenMarkEventHandled: {
         test: function(cmp) {
             var iframeSrc = "/auratest/errorHandlingApp.app?throwErrorFromRender=true&handleSystemError=true";
             this.loadIframe(iframeSrc, cmp, "iframeContainer");
@@ -217,8 +221,8 @@
             });
         }
     },
-
-    testErrorFromAuraAssertContainsStacktraceInDevMode: {
+    // disable because test is run with Chrome/49.0.2623.112
+    _testErrorFromAuraAssertContainsStacktraceInDevMode: {
         test: [
             function(cmp) {
                 var iframeSrc = "/auratest/errorHandlingApp.app";

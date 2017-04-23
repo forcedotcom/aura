@@ -28,6 +28,7 @@ import org.auraframework.integration.test.logging.AbstractLoggingUITest;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.hamcrest.CoreMatchers;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -84,6 +85,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
     }
 
     @Test
+    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testClientErrorFromActionCallback() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
         // generate a client error in a server action callback
@@ -105,6 +107,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
      * Verify expected logs are sent to server when a client error occurs in a callback function wrapped in $A.getCallback()
      */
     @Test
+    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testClientErrorFromGetcallbackWrappedFunction() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
         // generate a client error in a callback function wrapped in $A.getCallback()
@@ -175,6 +178,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
     }
 
     @Test
+    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testClientErrorFromContainedCmpActionCallback() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromServerActionCallbackButton"));
@@ -191,6 +195,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
     }
 
     @Test
+    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testClientErrorFromGetcallbackWrappedFunctionInContainCmp() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromFunctionWrappedInGetCallbackButton"));

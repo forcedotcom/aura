@@ -1,5 +1,6 @@
 ({
-    testErrorSurfacedToUser: {
+    // disable because test is run with Chrome/49.0.2623.112
+    _testErrorSurfacedToUser: {
         test: [
             function(cmp) {
                 cmp._frameLoaded = false;

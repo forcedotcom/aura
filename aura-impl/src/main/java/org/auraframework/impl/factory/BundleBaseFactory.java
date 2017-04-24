@@ -72,11 +72,7 @@ public abstract class BundleBaseFactory<D extends RootDefinition> extends XMLPar
         for (Map.Entry<DefDescriptor<?>, Source<?>> entry : sourceMap.entrySet()) {
             if (!entry.getKey().equals(descriptor)) {
                 Definition d = bogusCompileCall(entry.getKey(), entry.getValue());
-                if (d == null) {
-                    // DOH!
-                    System.out.println("FAILED: "+entry.getKey()+"@"+entry.getKey().getDefType()
-                            +" != "+descriptor+"@"+descriptor.getDefType());
-                } else {
+                if (d != null) {
                     defMap.put(entry.getKey(), d);
                 }
             }

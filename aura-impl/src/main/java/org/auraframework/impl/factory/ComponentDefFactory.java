@@ -86,20 +86,22 @@ public class ComponentDefFactory extends BaseComponentDefFactory<ComponentDef> {
                 DefDescriptor<StyleDef> oldDesc = new DefDescriptorImpl<StyleDef>("css", descriptor.getNamespace(),
                             descriptor.getName(), StyleDef.class);
                 @SuppressWarnings("unchecked")
-                FileSource<StyleDef> cssSource = (FileSource<StyleDef>)newSourceMap.get(
+                Source<StyleDef> cssSource = (Source<StyleDef>)newSourceMap.get(
                         new DefDescriptorImpl<StyleDef>("css", descriptor.getNamespace(),
                             descriptor.getName(), StyleDef.class));
-                if (cssSource != null) {
+                if (cssSource != null && cssSource instanceof FileSource) {
                     try {
                         DefDescriptor<StyleDef> newDesc = new DefDescriptorImpl<StyleDef>("templateCss",
                                 descriptor.getNamespace(), descriptor.getName(), StyleDef.class);
-                        cssSource = new FileSource<>(newDesc, cssSource, AbstractTextSourceImpl.MIME_TEMPLATE_CSS);
+                        cssSource = new FileSource<>(newDesc, (FileSource<StyleDef>)cssSource,
+                                AbstractTextSourceImpl.MIME_TEMPLATE_CSS);
 
                         newSourceMap = Maps.newHashMap(newSourceMap);
                         newSourceMap.remove(oldDesc);
                         newSourceMap.put(newDesc, cssSource);
                     } catch (IOException ioe) {
-                        throw new InvalidDefinitionException("File removed", null, ioe);
+                        throw new InvalidDefinitionException("Unable to read file, removed while compiling?",
+                                null, ioe);
                     }
                 }
             }

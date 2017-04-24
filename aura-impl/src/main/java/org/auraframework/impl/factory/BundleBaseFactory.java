@@ -74,8 +74,8 @@ public abstract class BundleBaseFactory<D extends RootDefinition> extends XMLPar
                 Definition d = bogusCompileCall(entry.getKey(), entry.getValue());
                 if (d == null) {
                     // DOH!
-                    //System.out.println("FAILED: "+entry.getKey()+"@"+entry.getKey().getDefType()
-                    //        +" != "+descriptor+"@"+descriptor.getDefType());
+                    System.out.println("FAILED: "+entry.getKey()+"@"+entry.getKey().getDefType()
+                            +" != "+descriptor+"@"+descriptor.getDefType());
                 } else {
                     defMap.put(entry.getKey(), d);
                 }

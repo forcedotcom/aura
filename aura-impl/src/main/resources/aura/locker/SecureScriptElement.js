@@ -124,9 +124,9 @@ SecureScriptElement.run = function(st) {
             $A.lockerService.create(xhr.responseText, key, src, true);
 
             el.dispatchEvent(new Event("load"));
+        } else if (xhr.status >= 400 && xhr.status < 600) {
+            el.dispatchEvent(new Event("error"));
         }
-
-        // DCHASMAN TODO W-2837800 Add in error handling for 404's etc
     };
 
     xhr.open("GET", src, true);

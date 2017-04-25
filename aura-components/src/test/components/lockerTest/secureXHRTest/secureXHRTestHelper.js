@@ -5,7 +5,8 @@
             testUtils.assertStartsWith("SecureXMLHttpRequest", this.toString(), "Expected this to return SecureXMLHttpRequest");
 
             if (this.readyState == 4 && this.status == 200) {
-                testUtils.assertStartsWith("<!DOCTYPE html><html><head><title>Aura</title>",  this.responseText.trim());
+            	var regex = new RegExp('^<!DOCTYPE html><html lang="[^"]*"><head><title>Aura</title>');
+            	testUtils.assert(regex.test(this.responseText.trim()));
             }
 
             cmp.set("v.completed", true);

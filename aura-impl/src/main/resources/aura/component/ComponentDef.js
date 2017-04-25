@@ -51,10 +51,9 @@ function ComponentDef(config) {
 
     // Initialize the concrete component class if provided
     if (config.hasOwnProperty("componentClass")) {
-		var componentClass = $A.util.json.decode(config["componentClass"]);
-    	componentClass();
-    }
-    
+        var componentClass = $A.util.globalEval(config["componentClass"], undefined, $A.clientService.getSourceMapsUrl(descriptor.toString()));
+        componentClass();
+    }    
 
     var appHandlerDefs;
     var cmpHandlerDefs;

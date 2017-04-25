@@ -597,7 +597,7 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
     // Always comes back as a function to execute, which defines the component classes.
     var componentClassDef = config["componentClass"] || config["componentDef"]["componentClass"];
     if(componentClassDef && !this.hasComponentClass(desc)) {
-        componentClassDef = $A.util.json.decode(componentClassDef);
+        componentClassDef = $A.util.globalEval(componentClassDef, undefined, $A.clientService.getSourceMapsUrl(desc));
         componentClassDef();
     }
 
@@ -1395,7 +1395,7 @@ AuraComponentService.prototype.saveLibraryConfig = function(config) {
 
     // Initialize the concrete include classes if provided
     if (config.hasOwnProperty("includeClasses")) {
-        var includeClasses = $A.util.json.decode(config["includeClasses"]);
+        var includeClasses = $A.util.globalEval(config["includeClasses"], undefined, $A.clientService.getSourceMapsUrl(config["descriptor"], 'lib'));
         includeClasses();
     }
 };

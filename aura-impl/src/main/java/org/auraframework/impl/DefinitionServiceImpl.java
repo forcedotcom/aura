@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -428,7 +429,8 @@ public class DefinitionServiceImpl implements DefinitionService {
                 // we will make them undesirable.
                 //
                 boolean cacheable = configAdapter.isCacheable(matcher) && namespaceMatcher.isConstant();
-                for (DefRegistry reg : context.getRegistries().getRegistries(matcher)) {
+                Collection<DefRegistry> matchedRegistries = context.getRegistries().getRegistries(matcher);
+                for (DefRegistry reg : matchedRegistries) {
                     if (reg.hasFind()) {
                         //
                         // Now we walk then entire set of registries, and check to see if our namespace

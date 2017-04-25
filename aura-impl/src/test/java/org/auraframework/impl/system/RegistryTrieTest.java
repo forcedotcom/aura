@@ -462,21 +462,24 @@ public class RegistryTrieTest extends AuraTestCase {
         assertEquals(true, actual.contains(reg2));
     }
 
+    /**
+     * Test that registries are matched based on existence of ANY of the matcher DefTypes
+     */
     @Test
-    public void testGetRegistriesIgnoresDefType() {
+    public void testGetRegistriesMatchesDefTypes() {
         MockRegistry reg1 = new MockRegistry().setNamespaces("testNamespace").setPrefixes("markup");
-        MockRegistry reg2 = new MockRegistry().setNamespaces("testNamespace").setPrefixes("js").setDefTypes(DefType.APPLICATION);
+        MockRegistry reg2 = new MockRegistry().setNamespaces("testNamespace").setPrefixes("js").setDefTypes(DefType.DOCUMENTATION, DefType.DESCRIPTION);
         MockRegistry reg3 = new MockRegistry().setNamespaces("testNamespace").setPrefixes("js").setDefTypes(DefType.COMPONENT);
         MockRegistry reg4 = new MockRegistry().setNamespaces("testNamespace").setPrefixes("js").setDefTypes(DefType.LIBRARY);
         MockRegistry reg5 = new MockRegistry().setNamespaces("other").setPrefixes("js");
         RegistryTrie trie = new RegistryTrie(Lists.newArrayList(reg1, reg2, reg3, reg4,reg5));
 
-        DescriptorFilter matcher = new DescriptorFilter("js://testNamespace:*", DefType.COMPONENT);
+        DescriptorFilter matcher = new DescriptorFilter("js://testNamespace:*", Lists.newArrayList(DefType.COMPONENT, DefType.DOCUMENTATION));
         Collection<DefRegistry> actual = trie.getRegistries(matcher);
-        assertEquals(3, actual.size());
-        assertEquals(true, actual.contains(reg2));
-        assertEquals(true, actual.contains(reg3));
-        assertEquals(true, actual.contains(reg4));
+        assertEquals("Should return two matching registries",2, actual.size());
+        assertTrue("Should contain partial DefType match registry", actual.contains(reg2));
+        assertTrue("Should contain DefType match registry", actual.contains(reg3));
+        assertFalse("Should not contain markup prefix registry", actual.contains(reg1));
     }
 
     @Test

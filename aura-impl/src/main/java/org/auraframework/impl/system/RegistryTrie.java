@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -100,11 +101,26 @@ public class RegistryTrie implements RegistrySet {
 
         for (DefRegistry reg : this.allRegistries) {
             boolean found = false;
-
-            for (String prefix : reg.getPrefixes()) {
-                if (matcher.matchPrefix(prefix)) {
-                    found = true;
-                    break;
+            
+            List<DefType> matcherDefTypes = matcher.getDefTypes();
+            if (matcherDefTypes == null) {
+                found = true;
+            } else {
+                for (DefType defType : matcherDefTypes) {
+                    if (reg.getDefTypes().contains(defType)) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (found) {
+                found = false;
+                for (String prefix : reg.getPrefixes()) {
+                    if (matcher.matchPrefix(prefix)) {
+                        found = true;
+                        break;
+                    }
                 }
             }
             if (found) {

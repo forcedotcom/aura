@@ -18,7 +18,7 @@
 <aura:component access="GLOBAL" support="GA" extensible="true" extends="ui:popupTrigger" description="A link that triggers a dropdown menu used in ui:menu">
 
     <aura:attribute name="ariaLabel" type="String" description="A label for the menu trigger link, used by the aria-label attribute."/>
-    <aura:attribute name="ariaRequired" type="Boolean"/>
+    <aura:attribute name="ariaRequired" type="Boolean" description="Specifies whether the menu trigger link is required, used by the aria-required attribute."/>
 
     <aura:registerEvent access="GLOBAL" name="menuTriggerPress" type="ui:menuTriggerPress" description="The event that is fired when the trigger is clicked."/>
 

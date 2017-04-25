@@ -1,0 +1,61 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation> 
+    <aura:description>
+        <p>A menu enclosed in a <code>ui:virtualMenuWrapper</code> is rendered in the DOM only when the menu trigger is clicked.
+        This example creates a menu when the label on the trigger is clicked.</p>
+        <pre>&lt;aura:component>
+    &lt;aura:attribute name="items" type="String[]" default="Coffee,Tea"/>
+    &lt;ui:virtualMenuWrapper triggerLabel="Label for Menu">
+        &lt;aura:set attribute="menu">
+            &lt;ui:menu>
+                &lt;ui:menuTriggerLink label="Label for Menu" stopClickPropagation="true"/>
+                &lt;ui:menuList class="checkPosition" aura:id="checkPosition" menuSelect="{!c.menuSelect}">
+                    &lt;aura:iteration items="{!v.items}" var="i">
+                        &lt;ui:actionMenuItem label="{!i}" />
+                    &lt;/aura:iteration>
+                &lt;/ui:menuList>
+            &lt;/ui:menu>
+        &lt;/aura:set>
+    &lt;/ui:virtualMenuWrapper>
+&lt;/aura:component></pre>
+        <p>You can also provide a body in your trigger using the <code>triggerBody</code> attribute in the <code>ui:virtualMenuWrapper</code> component. 
+        Providing a different label or trigger body to the <code>ui:menuTriggerLink</code> overrides the label or trigger body provided by <code>ui:virtualMenuWrapper</code> after the menu is displayed and hidden.</p>
+        <pre>&lt;ui:virtualMenuWrapper>
+    &lt;aura:set attribute="triggerBody">
+        &lt;div style="background-color:red; width:16px; height:16px"/>
+    &lt;/aura:set>
+    &lt;aura:set attribute="menu">
+        &lt;ui:menu>
+            &lt;ui:menuTriggerLink stopClickPropagation="true">
+                &lt;div>This body overrides the triggerBody attribute.&lt;/div>
+            &lt;/ui:menuTriggerLink>
+            &lt;!-- ui:menuList markup here --&gt;
+        &lt;/ui:menu>
+    &lt;/aura:set>
+&lt;/ui:virtualMenuWrapper></pre>   
+    </aura:description>
+     <aura:example name="virtualMenuWrapperExample" ref="test:testVirtualListTemplate" label="Using ui:virtualMenuWrapper">
+        <p>Here are a few examples on how to use the wrapper to lazy load a menu.</p>
+    </aura:example>
+    
+</aura:documentation> 
+
+    
+
+    

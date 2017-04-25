@@ -111,5 +111,18 @@
         } catch (e) {
             testUtils.assertEquals("'deleteProperty' on proxy: trap returned falsish for property 'expando'", e.message);
         }
+    },
+
+    testAddOptionsToSelect: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var selectContainer = document.getElementById("selectContainer");
+        selectContainer[0] = new Option(1, 1);
+        selectContainer[1] = new Option(2, 2);
+        selectContainer[2] = new Option(3, 3);
+        var selectOptions = selectContainer.options;
+        testUtils.assertTrue(selectOptions instanceof HTMLOptionsCollection);
+        testUtils.assertEquals(3, selectOptions.length);
+        testUtils.assertEquals('<option value="1">1</option>', selectOptions[0].outerHTML);
+        testUtils.assertEquals('<option value="2">2</option>', selectOptions.item(1).outerHTML);
     }
 })

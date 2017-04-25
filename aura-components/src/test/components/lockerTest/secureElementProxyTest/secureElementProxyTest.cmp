@@ -27,6 +27,8 @@
     <aura:method name="testObjectKeys"/>
     <aura:method name="testGetOwnPropertyNames"/>
     <aura:method name="testDelete"/>
+    <aura:method name="testAddOptionsToSelect"/>
 
     <div aura:id="title" class="title" id="title">SecureElement Proxy test</div>
+    <select aura:id="selectContainer" id="selectContainer"><option value="1">1</option></select>
 </aura:component>

@@ -64,5 +64,11 @@
         test: function(cmp) {
             cmp.testDelete();
         }
+    },
+
+    testAddOptionsToSelect: {
+        test: function(cmp) {
+            cmp.testAddOptionsToSelect();
+        }
     }
 })

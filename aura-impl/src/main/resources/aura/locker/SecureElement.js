@@ -179,6 +179,14 @@ function SecureElement(el, key) {
 
                 // Expando - store it from a private locker scoped object
                 var raw = ls_getRef(target, key);
+
+                // SELECT elements allow options to be specified in array assignment style
+                if( raw instanceof HTMLSelectElement && !isNaN(property)) {
+                    var rawOption = ls_getRef(value, key);
+                    raw[property] = rawOption;
+                    return value;
+                }
+
                 var data = ls_getData(raw, key);
                 if (!data) {
                     data = {};
@@ -186,7 +194,6 @@ function SecureElement(el, key) {
                 }
 
                 data[property] = value;
-
                 return true;
             },
 

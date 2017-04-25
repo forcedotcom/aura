@@ -21,7 +21,6 @@ import static org.junit.Assert.assertThat;
 import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
 
@@ -35,7 +34,6 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     /* Test with dynamic created component */
     // create componentClassParent.cmp in controller dynamically, expect it to error out from render
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testDynamicCreatedCmpErrorOutFromRender() throws Exception {
         String expectContainedMessage = "blahFromParentRerender is not defined";
 
@@ -52,7 +50,6 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     /* Tests with parent component */
     // load componentClassParent.cmp, error out from its re-render
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testParentErrorOutFromReRender() throws Exception {
         String expectContainedMessage = "blahFromParentReRerender is not defined";
 
@@ -66,7 +63,6 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
 
     // load componentClassParent.cmp, error out from its after-render
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testParentErrorOutFromAfterRender() throws Exception {
         String expectContainedMessage = "blahFromParentAfterRerender is not defined";
 
@@ -81,7 +77,6 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     /* Tests with grandChild component */
     // load componentClassGrandChildClientProvider.cmp, error out from componentClassParent.cmp's render
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testGrandChildClientErrorOutFromParentRender() throws Exception {
         String expectContainedMessage = "blahFromParentRerender is not defined";
         String url = "/auratest/componentClassGrandChildClientProvider.cmp?errorOutFromRender_Parent=true";
@@ -95,7 +90,6 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
 
     // load componentClassGrandChildClientProvider.cmp, error out from componentClassChild.cmp's render
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testGrandChildClientErrorOutFromChildRender() throws Exception {
         String expectContainedMessage = "blahFromChildRerender is not defined";
         String url = "/auratest/componentClassGrandChildClientProvider.cmp?errorOutFromRender_Child=true";
@@ -109,7 +103,6 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
 
     // load componentClassGrandChildClientProvider.cmp, error out from componentClassParent.cmp's helper
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testGrandChildClientErrorOutFromParentHelper() throws Exception {
         String expectContainedMessage = "blahFromParentHelper is not defined";
         String url = "/auratest/componentClassGrandChildClientProvider.cmp?errorOutFromHelper_Parent=true";
@@ -123,7 +116,6 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
 
     // load componentClassGrandChildClientProvider.cmp, error out from componentClassParent.cmp's helper
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testGrandChildClientErrorOutFromChildHelper() throws Exception {
         String expectContainedMessage = "blahFromChildHelper is not defined";
         String url = "/auratest/componentClassGrandChildClientProvider.cmp?errorOutFromHelper_Child=true";
@@ -139,7 +131,6 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassChild's helper
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testClientProvidedGrandChildClientErrorOutFromChildHelper() throws Exception {
         String expectContainedMessage = "blahFromChildHelper is not defined";
 
@@ -157,7 +148,6 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassParent's helper
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testClientProvidedGrandChildClientErrorOutFromParentHelper() throws Exception {
         String expectContainedMessage = "blahFromParentHelper is not defined";
         String url = "/auratest/componentClassClientProvider.cmp?" +
@@ -174,7 +164,6 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassChild's render
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testClientProvidedGrandChildClientErrorOutFromChildRender() throws Exception {
         String expectContainedMessage = "blahFromChildRerender is not defined";
 
@@ -192,7 +181,6 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassParent's render
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testClientProvidedGrandChildClientErrorOutFromParentRender() throws Exception {
         String expectContainedMessage = "blahFromParentRerender is not defined";
         String url = "/auratest/componentClassClientProvider.cmp?" +
@@ -210,7 +198,6 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassChild's helper
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testServerProvidedGrandChildClientErrorOutFromChildHelper() throws Exception {
         String expectContainedMessage = "blahFromChildHelper is not defined";
         String url ="/auratest/componentClassServerProvider.cmp?" +
@@ -227,7 +214,6 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassParent's helper
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testServerProvidedGrandChildClientErrorOutFromParentHelper() throws Exception {
         String expectContainedMessage = "blahFromParentHelper is not defined";
         String url = "/auratest/componentClassServerProvider.cmp?" +
@@ -245,7 +231,6 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     // componentClassChild's render
     @Test
     @Flapper // occassionally gets StaleElementReferenceException getting error message
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testServerProvidedGrandChildClientErrorOutFromChildRender() throws Exception {
         String expectContainedMessage = "blahFromChildRerender is not defined";
         String url = "/auratest/componentClassServerProvider.cmp?" +
@@ -262,7 +247,6 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     // load componentClassGrandChildServerProvider through componentClassServerProvider.cmp, error out from
     // componentClassParent's render
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testServerProvidedGrandChildClientErrorOutFromParentRender() throws Exception {
         String expectContainedMessage = "blahFromParentRerender is not defined";
         String url = "/auratest/componentClassServerProvider.cmp?" +

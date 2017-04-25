@@ -19,7 +19,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
 import org.auraframework.system.AuraContext.Mode;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ServerModelErrorUITest extends AbstractErrorUITestCase {
@@ -27,7 +26,6 @@ public class ServerModelErrorUITest extends AbstractErrorUITestCase {
      * Verify Aura default error handler can handle systemError when an exception is thrown from model.
      */
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testDefaultHandleErrorInModelWhenSerialize() throws Exception {
         open("/auratest/errorHandlingErrorModelApp.app", Mode.PROD, false);
 

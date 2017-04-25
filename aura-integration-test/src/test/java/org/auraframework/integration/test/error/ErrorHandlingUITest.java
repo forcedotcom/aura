@@ -19,7 +19,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
 import org.auraframework.system.AuraContext.Mode;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -32,7 +31,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * $A has not been initialized yet.
      */
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testErrorMessageDisplayAndCloseWhenAuraIsNotInitialized() throws Exception {
         open("/auratest/errorHandlingApp.app?throwErrorFromRender=true", Mode.PROD, false);
 
@@ -232,7 +230,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * callback.
      */
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testDefaultHandleErrorThrownFromServerActionCallback() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
         findAndClickElement(By.cssSelector(".errorFromAppTable .errorFromServerActionCallbackButton"));
@@ -246,7 +243,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * Verify custom error handler can handle systemError event when an error is thrown from a server action's callback.
      */
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testCustomHandleErrorThrownFromServerActionCallback() throws Exception {
         String expectedContainedMessage = "Error from server action callback in app";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
@@ -298,7 +294,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * wrapped in $A.getCallback().
      */
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testDefaultHandleErrorThrownFromFunctionWrappedInGetCallback() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.PROD);
 
@@ -314,7 +309,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * in $A.getCallback().
      */
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testCustomHandleErrorThrownFromFunctionWrappedInGetCallback() throws Exception {
         String expectedContainedMessage = "Error from function wrapped in getCallback in app";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
@@ -365,7 +359,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * Verify Aura default error handler can handle systemError event when an error is thrown from afterRender().
      */
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testDefaultHandleErrorFromAfterRenderWhenNoCustomHandler() throws Exception {
         open("/auratest/errorHandlingApp.app?throwErrorFromAfterRender=true", Mode.PROD, false);
 
@@ -380,7 +373,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * initialized, so the event has to be handled by default handler.
      */
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testDefaultHandleErrorFromAfterRenderWhenMarkEventHandled() throws Exception {
         open("/auratest/errorHandlingApp.app?throwErrorFromAfterRender=true&handleSystemError=true", Mode.PROD, false);
 
@@ -459,7 +451,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * Verify Aura default error handler can handle systemError event when an error is thrown during init phase.
      */
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testDefaultHandleErrorFromInitWhenNoCustomHandler() throws Exception {
         open("/auratest/errorHandlingApp.app?throwErrorFromInit=true", Mode.PROD, false);
 
@@ -474,7 +465,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * so the event has to be handled by default handler.
      */
     @Test
-    @Ignore("disable because test is run with Chrome/49.0.2623.112")
     public void testDefaultHandleErrorFromInitWhenMarkEventHandled() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true&throwErrorFromInit=true", Mode.PROD, false);
 

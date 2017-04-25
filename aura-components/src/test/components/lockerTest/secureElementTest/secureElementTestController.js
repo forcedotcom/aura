@@ -10,6 +10,8 @@
         attrs.setNamedItem(attr);
 
         testUtils.assertEquals(origLength + 1, attrs.length, "Unexpected attribute length after adding new attribute");
+        testUtils.assertEquals("data-foo", attrs.getNamedItem("data-foo").name, "Unexpected attribute name from new attribute");
+        testUtils.assertEquals("data-foo", attrs[origLength].name, "Unexpected attribute accessed at last index");
         testUtils.assertEquals("bar", attrs.getNamedItem("data-foo").value, "Unexpected attribute value from new attribute");
         testUtils.assertEquals(null, attrs.getNamedItem("does-notExist"), "Unexpected return trying to get attribute that doesn't exist");
     },
@@ -157,9 +159,9 @@
         }
 
         element.addEventListener("click", function oneTimeClicker() {
-                counter += 1;
-                element.removeEventListener("click", oneTimeClicker, useCapture);
-            }, useCapture);
+            counter += 1;
+            element.removeEventListener("click", oneTimeClicker, useCapture);
+        }, useCapture);
 
         testUtils.clickOrTouch(element);
         // the event listener has been removed
@@ -173,12 +175,12 @@
 
         var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svg.innerHTML = '<defs> <text id="text" x="50" y="50">SVG</text> </defs>' +
-                        '<use xlink:href="#text"></use>';
+            '<use xlink:href="#text"></use>';
 
         var actual = svg.innerHTML;
         // partially matching the tag, since browsers may insert attributes in the tag
         testUtils.assertTrue(actual.indexOf('xlink:href="#text"></use>') > -1,
-                "use tag should not be removed by DOMPurify: " + actual);
+            "use tag should not be removed by DOMPurify: " + actual);
     },
 
     testTextContent: function(cmp) {
@@ -265,10 +267,10 @@
     testSvgGetBBox: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var expected = {
-                "x": 20,
-                "y": 30,
-                "height": 40,
-                "width": 50
+            "x": 20,
+            "y": 30,
+            "height": 40,
+            "width": 50
         };
 
         var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -301,22 +303,22 @@
     testTableAPI: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
 
-		// Call addRow() with the ID of a table
-		var table = document.createElement("table");
+        // Call addRow() with the ID of a table
+        var table = document.createElement("table");
 
-		// Insert a row in the table at row index 0
-		var newRow = table.insertRow(0);
-		testUtils.assertEquals("TR", newRow.tagName);
+        // Insert a row in the table at row index 0
+        var newRow = table.insertRow(0);
+        testUtils.assertEquals("TR", newRow.tagName);
 
-		// Insert a cell in the row at index 0
-		var newCell = newRow.insertCell(0);
-		testUtils.assertEquals("TD", newCell.tagName);
+        // Insert a cell in the row at index 0
+        var newCell = newRow.insertCell(0);
+        testUtils.assertEquals("TD", newCell.tagName);
 
-		// Append a text node to the cell
-		var newText = document.createTextNode('New top row');
-		newCell.appendChild(newText);
+        // Append a text node to the cell
+        var newText = document.createTextNode('New top row');
+        newCell.appendChild(newText);
 
-		testUtils.assertEquals("<tbody><tr><td>New top row</td></tr></tbody>", table.innerHTML);
+        testUtils.assertEquals("<tbody><tr><td>New top row</td></tr></tbody>", table.innerHTML);
     },
 
     testElementCache: function(cmp, event, helper) {
@@ -448,7 +450,7 @@
 
             // verify API on Node
             testUtils.assertStartsWith("SecureDocument", textNode.ownerDocument.toString(), "Node.ownerDocument should" +
-                    " return a SecureDocument");
+                " return a SecureDocument");
 
             // verify API on Text
             testUtils.assertEquals(expectedText, textNode.wholeText, "Text.wholeText returned unexpected results");

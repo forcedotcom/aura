@@ -33,7 +33,7 @@ export default class Simple extends Element {
     }
 
     test () {
-        console.log('Test method!');
+        console.log('Test method!'); // eslint-disable-line no-console
     }
 }
 

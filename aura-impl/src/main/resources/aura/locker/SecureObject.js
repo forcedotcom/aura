@@ -703,12 +703,6 @@ function getArrayProxyHandler(key) {
                                 return filteredValues.toString();
                             };
                             break;
-                        case "toJSON":
-                            ret = function() {
-                                var filteredValues = getFilteredValues(handler, filtered);
-                                return JSON.stringify(filteredValues);
-                            };
-                            break;
                         case "Symbol(Symbol.iterator)":
                             ret = function () {
                                 var nextIndex = 0;

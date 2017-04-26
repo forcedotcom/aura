@@ -16,11 +16,7 @@
 
 package org.auraframework.http.resource;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.http.HttpHeaders;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.SVGDef;
@@ -29,6 +25,10 @@ import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @ServiceComponent
 public class ResourceSvg extends AuraResourceImpl {
@@ -41,24 +41,25 @@ public class ResourceSvg extends AuraResourceImpl {
     @Override
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context) throws IOException {
         try {
-            //For Security and updating we require the host to validate the cache. Thus we need to overright
+            //For Security and caching we require the host to validate the cache. Thus we need to overwrite
             //the original caching
-            response.setHeader("Cache-Control", "no-cache");
+            response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache");
 
             String fqn = lookup.get(request);
             if (fqn == null || fqn.isEmpty()) {
                 fqn = context.getApplicationDescriptor().getQualifiedName();
             }
             DefDescriptor<SVGDef> svg = definitionService.getDefDescriptor(fqn, SVGDef.class);
-            SVGDef def = svg.getDef();
+            SVGDef def = definitionService.getDefinition(svg);
 
             //Get the original etag if exists
-            String etag = request.getHeader("If-None-Match");
+            String etag = request.getHeader(HttpHeaders.IF_NONE_MATCH);
             //generate the new etag from the definitions hash
-            String hash = def.getOwnHash();
+            //note per rfc7232 etags are a opaque quoted string
+            String hash = "\"" + def.getOwnHash() + "\"";
             //For security reasons, if the user fetches the svg from the browser directly we
             //force the browser to download the file
-            if (request.getHeader("Referer") == null) {
+            if (request.getHeader(HttpHeaders.REFERER) == null) {
                 response.setContentType(null);
                 response.setHeader("Content-Disposition", "attachment; filename=resources.svg");
                 //Otherwise check the etag, if it matches that reply with a 304, unchanged
@@ -67,7 +68,7 @@ public class ResourceSvg extends AuraResourceImpl {
                 return;
             }
             //finally add the etag to the header and write the image
-            response.setHeader("Etag", hash);
+            response.setHeader(HttpHeaders.ETAG, hash);
             serverService.writeAppSvg(svg, response.getWriter());
         } catch (QuickFixException qfe) {
             servletUtilAdapter.handleServletException(qfe, true, context, request, response, false);

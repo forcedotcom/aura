@@ -358,6 +358,7 @@ public class AuraTestFilter {
     private TestSuiteDef getTestSuite(DefDescriptor<?> targetDescriptor) throws QuickFixException {
         DefDescriptor<TestSuiteDef> suiteDesc = definitionService.getDefDescriptor(targetDescriptor,
                 DefDescriptor.JAVASCRIPT_PREFIX, TestSuiteDef.class);
+        definitionService.getDefinition(targetDescriptor); // prime target def first
         return definitionService.getDefinition(suiteDesc);
     }
 

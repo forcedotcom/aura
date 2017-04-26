@@ -341,13 +341,18 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             // Style
             //
             String styleName = getAttributeValue(ATTRIBUTE_STYLE);
+            StyleDef sd = null;
             if (styleName != null){
                 DefDescriptor<StyleDef> styleDescriptor = getDefDescriptor(styleName, StyleDef.class);
-                builder.setStyleDefExternal(styleDescriptor);
+                sd = getBundledDef(styleDescriptor);
+                if (sd == null) {
+                    builder.setStyleDefExternal(styleDescriptor);
+                }
+            } else {
+                sd = getBundledDef(StyleDef.class, DefDescriptor.CSS_PREFIX);
             }
-            StyleDef sd = getBundledDef(StyleDef.class, DefDescriptor.CSS_PREFIX);
             if (sd != null) {
-                builder.setStyleDef(getBundledDef(StyleDef.class, DefDescriptor.CSS_PREFIX));
+                builder.setStyleDef(sd);
             }
 
             FlavoredStyleDef flavor = getBundledDef(FlavoredStyleDef.class, DefDescriptor.CSS_PREFIX);

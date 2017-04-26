@@ -1259,6 +1259,7 @@ public class DefinitionServiceImpl implements DefinitionService {
     private static class CompileContext {
         public final AuraContext context;
         public Map<DefDescriptor<? extends Definition>, CompilingDef<?>> compiled = Maps.newHashMap();
+        public Map<DefDescriptor<? extends Definition>, Definition> subDefinitions = Maps.newHashMap();
         public final Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache;
         public final List<ClientLibraryDef> clientLibs;
         public final DefDescriptor<? extends Definition> topLevel;
@@ -1309,6 +1310,21 @@ public class DefinitionServiceImpl implements DefinitionService {
     private final ThreadLocal<CompileContext> threadContext = new ThreadLocal<>();
 
     /**
+     * Temporary fix to get sub definitions.
+     *
+     * FIXME: this needs to go away in 210 when we rework registries and source loaders to use
+     * only a bundle source loader for text components.
+     */
+    private void populateSubDefs(Definition def, CompileContext currentCC) {
+        if (def instanceof RootDefinition) {
+            RootDefinition rootDef = (RootDefinition)def;
+            for (Definition subdef : rootDef.getBundledDefs().values()) {
+                currentCC.subDefinitions.put(subdef.getDescriptor(), subdef);
+            }
+        }
+    }
+
+    /**
      * Fill a compiling def for a descriptor.
      *
      * This makes sure that we can get a registry for a given def, then tries to get the def from the global cache, if
@@ -1348,6 +1364,19 @@ public class DefinitionServiceImpl implements DefinitionService {
         }
 
         @SuppressWarnings("unchecked")
+        D subDef = (D)currentCC.subDefinitions.get(compiling.descriptor);
+        if (subDef != null) {
+            @SuppressWarnings("unchecked")
+            DefDescriptor<D> canonical = (DefDescriptor<D>) subDef.getDescriptor();
+
+            compiling.def = subDef;
+            compiling.cacheable = false;
+            compiling.descriptor = canonical;
+            compiling.built = false;
+            return true;
+        }
+
+        @SuppressWarnings("unchecked")
         Optional<D> opt = (Optional<D>) currentCC.defsCache.getIfPresent(compiling.descriptor);
         if (opt != null) {
             D cachedDef = opt.orNull();
@@ -1360,6 +1389,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                 compiling.def = cachedDef;
                 compiling.descriptor = canonical;
                 compiling.built = false;
+                populateSubDefs(cachedDef, currentCC);
                 return true;
             } else {
                 return false;
@@ -1401,6 +1431,16 @@ public class DefinitionServiceImpl implements DefinitionService {
         @SuppressWarnings("unchecked")
         DefDescriptor<D> canonical = (DefDescriptor<D>) compiling.def.getDescriptor();
         compiling.descriptor = canonical;
+
+        if (cachingService != null) {
+            Cache<DescriptorKey, DefDescriptor<? extends Definition>> cache;
+            DescriptorKey dk = new DescriptorKey(canonical.getQualifiedName(),
+                    canonical.getDefType().getPrimaryInterface(), canonical.getBundle());
+            cache = cachingService.getDefDescriptorByNameCache();
+            cache.put(dk, canonical);
+        }
+        populateSubDefs(compiling.def, currentCC);
+
         if (!registry.isStatic()) {
             loggingService.incrementNum(LoggingService.DEF_COUNT);
             compiling.def.validateDefinition();

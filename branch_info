@@ -1,0 +1,25 @@
+a0c29a2eb604e511c1759f694458e05238a376c7###Ravi###Update 208/patch branch###Initial Commit
+bd250c64dbb39c0ea8cdf614dbbc49bec211bf0f###Diego Ferreiro Val###Fallback on original getLocalid###None
+8f0b2790bd3ae83b9f472b53fd0ec1d0339746c1###Diego Ferreiro Val###Add module flag for bootstrap###None
+a0a06399662914f933425be7350e1728dc922578###Kris###Do not destroy components if they are not autodestroy in lastFacetInfo###87fb446d175fd516a5342aadfc1ff8cbb6dab126
+72a662639d3e52474798cef56f5c808b6eacf88b###Gordon###StyleDef test fixes.###76d0566147909ce5b6cbd06afd1c8696c060fcef
+e365bbee9ac483cc595aee05b8a3c5b4e397ad13###Vince Chen###update source code snippet formatting###7e78703f7771f6e850878f8cad67a9853aee64e3
+8bd27c86dee00e88c3eecae48cc916db758ceedb###Gordon###Fix class cast errors.###b7688fd7d5eec8e8b6e7dcb096ec03b836f68360
+6ef61ead353d38e47a17d3c2da9f873f488876c9###Ravi Jayaramappa###Simple polyfill for Map to allow Locker Service initialization to continue @rev tbliss@ @bug W-3815519@###f24bb50793117ab309100becbb1fc87f4ab57fe4
+080b4826aae84e907c499ea953881e405fa1393f###Cheng###Force warming of entire file based component cache.###Do Not Port
+8adacc6bca2107af2c1929bf39924e0bc5898ea8###Vince Chen###forward port cache warmer to 208###Do Not Port
+95cb0c5192822d57de319fd7bdb0e9f232c798ee###Michael Makarov###Fixes IE detection logic for pillContainer###79a686f53c28ca9f02766dd6dc669b9a49632ee1
+85cae00dccd7a19dc2d67996e2cb2de5d78d15b2###Gordon###Clean up DefDescriptors.###fe02e6ede8fc63d86cc22ada2090920b37372c14
+c9813a7fc961d0a4f84c55ff24b6cb4f405abec4###Rocky###Remove aggresive test cleanup to fix premature test label purge when uncached assets present.###0a6f223119eb7e216c007c9de2cd9b89b1e38e23
+1a94ac941e7c8ef7303258e416c2479319bf852e###Alireza###[S1][v13][iOS][Record Home][GS0] Getting a guck when navigating back from news.  @bug W-3886584@###52f9e95cbd259bc6ec92fdeadcc52b5eb76214a5
+d68f0dac25a91960cadbfb60e19a177a486f7bcc###Diana Widjaja###Docs: New repositionPanel method###cbc37acc0aaffbcc5b2e681d3d035f5168c37b4b
+e55477510ddad211136d3f277f9e9111f827dd75###Kris###Remove lastFacetInfo as it causes other rerendering issues. Fix should be in the IfComponent anyway.###d48e5b03e0313c2020bb5e9eb8a9398fccc6a2ab
+c9db266333c47eaa9f83ceabdf0313af3b1ad360###Trevor###Node raw arguments###01271210694794d7601ebb76606b4411a3533a83
+041ebaa7d89630be1f82ed8fb0beef6abe224524###Trevor###Event params from Locker to non-Locker###2b086f5a13bb72781589aeafefa5ce34ffd8de03
+368cbaac83391d702730267eb4aa7714b5bb4580###Shaocong Mo###Make headerBar on top of body in listSorter###3c64a669ec7f53f19ccd1379ee0479ab5056a64e
+ab37138b1a8713d1a32a72f04156378dfc6c2588###Gordon###Revert "Fix class cast errors."###34aa3816147a92dec1c1839ccc82f4c7764bcb23
+977aa171135b6da468b21e2e8e64484164ac65dc###Gordon###Only do templateCss:// for File based components.###69a150a9b66ae35e889e2dd4a8bda20846aba40a
+c32fcb8b0589067a79c1cfbdd833a2dc9e708173###Vince Chen###allow action names as part of xhr for PROD###None
+fcd969a49c6495738ca1b9df5d35d8011a03a9fe###Ravi###NamedNodeProxy - Attribute Node was being created with incorrect shape. Attribute Node was being wrapped in a SecureElement with incorrect shape because its tagName property was undefined. @rev tbliss@ @bug W-3899272@###None
+bb20bdc286426a731f1665506a3c61cfe1392aeb###Nicholas Santoso###Fix issue where panel remained behind on autocomplete close###None
+522b4df92856261c66bf2674d3cebecfd3767e5d###Vince Chen###sourceURL for ComponentDef###None

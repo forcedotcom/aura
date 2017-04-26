@@ -48,7 +48,7 @@ public abstract class AbstractTextSourceImpl<D extends Definition> implements Te
     private final Format format;
     private final String mimeType;
     private final DefDescriptor<D> descriptor;
-    private final Hash hash;
+    protected final Hash hash;
 
     protected AbstractTextSourceImpl(DefDescriptor<D> descriptor, String systemId, String mimeType) {
         this.systemId = systemId;

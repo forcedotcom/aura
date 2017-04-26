@@ -1,0 +1,48 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+.THIS {}
+.THIS h1 { font-weight: bold; font-size: 2em; }
+.THIS h2 { font-size: 1.5em; }
+.THIS h3 { font-size: 1.25em; }
+.THIS h3 span { color: navy; }
+
+.THIS ul {
+    list-style-type: none; 
+    padding: 5px
+}
+
+.THIS li {
+    padding: 2px 0;
+}
+
+.THIS table {
+    margin: 10px;
+    margin-top:50px;
+}
+.THIS table td {
+    padding: 5px 3px;
+}
+
+.THIS table tr:nth-child(even) {
+    background: #efefef;
+}
+
+.THIS table th {
+    font-size: 1.5em;
+    font-weight: bold;
+    text-transform: uppercase;
+}

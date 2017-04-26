@@ -25,6 +25,7 @@ import java.util.SortedSet;
 
 import javax.inject.Inject;
 
+import org.auraframework.Aura;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -34,6 +35,8 @@ import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
+import org.auraframework.throwable.ClientOutOfSyncException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraFiles;
 
 import com.google.common.collect.Lists;
@@ -45,6 +48,7 @@ import com.google.gson.Gson;
 public class DependenciesController implements Controller {
     @Inject
     private DefinitionService definitionService;
+
 
     @AuraEnabled
     public Set<String> getAllDescriptors() {
@@ -65,6 +69,7 @@ public class DependenciesController implements Controller {
         
         return list;
     }
+    
     
     @AuraEnabled
     public Map<String, Object> getDependencies(@Key("component")String component) {
@@ -119,6 +124,81 @@ public class DependenciesController implements Controller {
             return null;
         }
     }
+    
+    /**
+     * Used by the traceDependencies.app application.
+     * Returns a similar set of data to getDependencies method, but also includes UIDs and HashCodes which help us diagnose 
+     * COOS issues.
+     * 
+     * @param component
+     * @return
+     */
+    @AuraEnabled
+    public Map<String, Object> getDependenciesWithHashCodes(@Key("component")String component) {
+        DefDescriptor<?> descriptor;
+        SortedSet<DefDescriptor<?>> sorted;
+        Map<String, Object> dependencies = Maps.newHashMap();
+        ArrayList<Map<String, String>> dependenciesData = Lists.newArrayList();
+        String uid;
+    	
+        int pos = component.indexOf("@");
+        
+        if (pos != -1) {
+            component = component.substring(0, pos);
+        }
+
+        DescriptorFilter filter = new DescriptorFilter(component,
+                Lists.newArrayList(DefType.LIBRARY,DefType.COMPONENT,DefType.APPLICATION,DefType.FLAVORED_STYLE));
+        Set<DefDescriptor<?>> descriptors = definitionService.find(filter);
+        if (descriptors.size() != 1) {
+            return null;
+        }
+        descriptor = descriptors.iterator().next();
+        
+        try {
+            Definition definition = definitionService.getDefinition(descriptor);
+            if (definition == null) {
+                return null;
+            }
+            
+            descriptor = definition.getDescriptor();
+            uid = definitionService.getUid(null, descriptor);
+            sorted = Sets.newTreeSet(definitionService.getDependencies(uid));
+            
+            for (DefDescriptor<?> dependency : sorted) {
+                definition = definitionService.getDefinition(dependency);
+                DefType type = dependency.getDefType();
+                
+                Map<String, String> returnData = Maps.newHashMap();
+                
+                try {
+                	String bundle = dependency.getBundle() != null ? dependency.getBundle().getQualifiedName() : "";
+                	returnData.put("descriptor", dependency.toString());
+                	returnData.put("defType", type.toString());
+                	returnData.put("uid", definitionService.getUid(null, dependency));
+                	returnData.put("bundleName", bundle);
+                	returnData.put("hash", definitionService.getDefinition(dependency).getOwnHash());
+                	
+            	} catch(ClientOutOfSyncException | QuickFixException ex) {
+            	    returnData.put("descriptor", dependency.toString());
+            	    returnData.put("defType", type.toString());
+            	    returnData.put("error", ex.getMessage());
+            	    
+            	}
+                
+                dependenciesData.add(returnData);
+            }
+            
+            dependencies.put("dependencies", dependenciesData);
+            dependencies.put("def", component);
+            
+            return dependencies;    
+            
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+    
     @AuraEnabled
     public Boolean writeAllDependencies(@Key("file")String file) {
         Set<String> descriptors = getAllDescriptors();

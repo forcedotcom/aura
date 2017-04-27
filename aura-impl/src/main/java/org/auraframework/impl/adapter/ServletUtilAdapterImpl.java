@@ -411,7 +411,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     @Override
     public void writeScriptUrls(AuraContext context, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException {
         templateUtil.writeHtmlScripts(context, this.getJsClientLibraryUrls(context), Script.LAZY, sb);
-        templateUtil.writeHtmlScript(context, this.getInteropEngineUrl(context), Script.SYNC, sb);
         templateUtil.writeHtmlScript(context, this.getInlineJsUrl(context, componentAttributes), Script.SYNC, sb);
         templateUtil.writeHtmlScript(context, this.getFrameworkUrl(), Script.SYNC, sb);
         templateUtil.writeHtmlScript(context, this.getAppJsUrl(context, null), Script.SYNC, sb);

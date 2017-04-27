@@ -54,6 +54,5 @@ var stuff = {
 
 
  Aura.externalLibraries = function() {
-// moment
 
 };

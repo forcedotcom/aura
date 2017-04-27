@@ -184,10 +184,12 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                 try {
                     Writer writer = null;
                     try {
+                        ResourceLoader rl = getResourceLoader();
                         writer = new FileWriter(dest);
+                        prependInterop(writer, rl);
                         mode.getJavascriptWriter().compress(everything, writer, dest.getName());
                         writer.write('\n');
-                        appendExternalLibraries(writer);
+                        appendExternalLibraries(writer, rl);
                     } finally {
                         if (writer != null) {
                             writer.close();
@@ -203,12 +205,27 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                 }
             }
 
-            private void appendExternalLibraries(Writer writer) throws IOException {
-                ResourceLoader rl = getResourceLoader();
+            private void prependInterop(Writer writer, ResourceLoader rl) throws IOException {
+                String minified = "";
+                URL engineResource = rl.getResource("aura/resources/engine/engine" + minified + ".js");
+                
+                if (mode.allowedInProduction()) {
+                    minified = ".min";
+                }
+                
+                if (engineResource != null && mode != JavascriptGeneratorMode.DOC) {
+                    writer.write("try {\n");
+                    appendResourceToWriter(writer, "engine", engineResource);
+                    writer.write("\n} catch (e) {}");
+                }
+            }
+
+            private void appendExternalLibraries(Writer writer, ResourceLoader rl) throws IOException {
                 String minified = "";
                 if (mode.allowedInProduction()) {
                     minified = ".min";
                 }
+
                 writer.write("\n Aura.externalLibraries = function() {\n");
                 try {
                     appendResourceToWriter(writer, "moment", rl.getResource("aura/resources/moment/moment" + minified + ".js"));
@@ -222,9 +239,12 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
             }
 
             private void appendResourceToWriter(Writer writer, String name, URL url) throws IOException {
-                writer.write("// " + name + "\n");
-                writer.write(Resources.toString(url, Charsets.UTF_8));
-                writer.write("\n");
+                String src = Resources.toString(url, Charsets.UTF_8);
+                if (src != null) {
+                    writer.write("// " + name + "\n");
+                    writer.write(src);
+                    writer.write("\n");
+                }
             }
 
             private ResourceLoader getResourceLoader() throws IOException {

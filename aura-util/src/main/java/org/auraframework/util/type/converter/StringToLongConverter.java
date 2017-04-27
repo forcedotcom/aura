@@ -35,7 +35,16 @@ public class StringToLongConverter implements Converter<String, Long> {
             return Long.valueOf(value);
         } catch (NumberFormatException ex) {
             // Possible decimal value
+            return convertAsDouble(value);
+        }
+    }
+
+    private Long convertAsDouble(String value) {
+        try {
             return Double.valueOf(value).longValue();
+        } catch (Exception ex) {
+            // fail gracefully, we don't want to bubble an exception here
+            return null;
         }
     }
 

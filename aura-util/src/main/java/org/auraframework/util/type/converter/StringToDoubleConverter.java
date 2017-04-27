@@ -31,7 +31,13 @@ public class StringToDoubleConverter implements Converter<String, Double> {
         if (value == null || value.isEmpty()) {
             return null;
         }
-        return Double.valueOf(value);
+
+        try {
+            return Double.valueOf(value);
+        } catch (NumberFormatException ex){
+            // fail gracefully, we don't want to bubble an exception here
+            return null;
+        }
     }
 
     @Override

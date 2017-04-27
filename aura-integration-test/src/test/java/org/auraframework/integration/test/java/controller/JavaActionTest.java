@@ -179,9 +179,9 @@ public class JavaActionTest extends AuraImplTestCase {
         ControllerDef controllerDef = getJavaControllerDef(targetController);
 
         Map<String, Object> params = new HashMap<>();
-        // Passing the wrong type (Strings instead of Integers)
-        params.put("a", "x");
-        params.put("b", "y");
+        // Passing the wrong type (NaN instead of Integers)
+        params.put("a", Double.NaN);
+        params.put("b", Double.NaN);
         ActionDef actionDef = controllerDef.getSubDefinition("sumValues");
         JavaAction javaAction = instanceService.getInstance(actionDef, params);
         javaAction.run();
@@ -191,7 +191,7 @@ public class JavaActionTest extends AuraImplTestCase {
         assertEquals(null, javaAction.getReturnValue());
         assertEquals(1, javaAction.getErrors().size());
         Exception actualException = (Exception) javaAction.getErrors().get(0);
-        String expectedMessage = "Invalid value for a: java://java.lang.Integer";
+        String expectedMessage = "Error on parameter a: java://java.lang.Integer";
         checkExceptionContains(actualException, AuraUnhandledException.class, expectedMessage);
     }
 

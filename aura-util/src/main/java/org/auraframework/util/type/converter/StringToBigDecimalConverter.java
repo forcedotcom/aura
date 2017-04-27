@@ -35,7 +35,13 @@ public class StringToBigDecimalConverter implements Converter<String, BigDecimal
             return null;
         }
 
-        return new BigDecimal(value);
+        try {
+            return new BigDecimal(value);
+        }
+        catch (NumberFormatException ex) {
+            // fail gracefully, we don't want to bubble an exception here
+            return null;
+        }
     }
 
     @Override

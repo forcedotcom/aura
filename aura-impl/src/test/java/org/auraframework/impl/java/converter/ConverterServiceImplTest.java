@@ -111,6 +111,30 @@ public class ConverterServiceImplTest extends UnitTestCase {
     }
 
     @Test
+    public void testConvertingInvalidDoubleDoesNotThrow() {
+        assertNull("Expected null return for invalid value",
+                converterService.convert("notanumber", Double.class, new AuraLocaleImpl()));
+    }
+
+    @Test
+    public void testConvertingInvalidBigDecimalDoesNotThrow() {
+        assertNull("Expected null return for invalid value",
+                converterService.convert("notanumber", BigDecimal.class, new AuraLocaleImpl()));
+    }
+
+    @Test
+    public void testConvertingInvalidIntegerDoesNotThrow() {
+        assertNull("Expected null return for invalid value",
+                converterService.convert("notanumber", Integer.class, new AuraLocaleImpl()));
+    }
+
+    @Test
+    public void testConvertingInvalidLongDoesNotThrow() {
+        assertNull("Expected null return for invalid value",
+            converterService.convert("notanumber", Long.class, new AuraLocaleImpl()));
+    }
+
+    @Test
     public void testStringToIntWithDecimal() {
         Integer expected = 123;
 

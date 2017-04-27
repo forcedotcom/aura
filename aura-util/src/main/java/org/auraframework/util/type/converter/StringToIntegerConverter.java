@@ -36,7 +36,16 @@ public class StringToIntegerConverter implements Converter<String, Integer> {
         } catch (NumberFormatException ex) {
             // Value had decimal precision probably. Try parsing it as a float and returning
             // only the integer portion.
+            return convertAsFloat(value);
+        }
+    }
+
+    private Integer convertAsFloat(String value) {
+        try {
             return Float.valueOf(value).intValue();
+        } catch (NumberFormatException ex) {
+            // fail gracefully, we don't want to bubble an exception here
+            return null;
         }
     }
 

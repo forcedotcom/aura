@@ -25,7 +25,20 @@
 		<p>This is a basic set up of a date field with a date picker, which displays the field value <code>Jan 30, 2014</code> based on the locale format. 
 		On desktop, the <code>input</code> tag is wrapped in a <code>form</code> tag.</p>
 		<pre>&lt;ui:inputDate aura:id="dateField" label="Birthday" value="2014-01-30" displayDatePicker="true"/></pre>
-		<p>When viewed on a mobile or tablet, the ui:inputDate component renders as ui:inputDateHtml and uses the native date picker. The <code>format</code> attribute is not supported for ui:inputDateHtml.</p>
+		<h4>Selecting A Date on Mobile Devices</h4>
+		<p>When viewed on a mobile or tablet, the <code>ui:inputDate</code> component renders as <code>ui:inputDateHtml</code> and uses the native date picker. The <code>format</code> attribute is not supported for <code>ui:inputDateHtml</code>.
+		We recommend using the value change handler to retrieve date value change on the input field. On iOS devices, selecting a date on the date picker triggers the change handler on the component but the value is bound only on the blur event.
+		This example binds the date value to a value change handler.</p>
+		<pre>&lt;aura:component>
+    &lt;aura:attribute name="myDate" type="Date" />
+    &lt;!-- Value change handler -->
+    &lt;aura:handler name="change" value="{!v.myDate}" action="{!c.handleValueChange}"/>
+    
+    &lt;ui:inputDate aura:id="mySelectedDate" 
+                  label="Select a date" displayDatePicker="true" 
+                  value="{!v.myDate}"/>
+&lt;/aura:component></pre>
+
 	</aura:description>		
 	<aura:example name="inputExample" ref="uiExamples:date" label="Using ui:inputDate">
     		This example sets today's date on a <code>ui:inputDate</code> component, retrieves its value, and displays it using <code>ui:outputDate</code>. The <code>init</code> handler initializes and sets the date on the component.

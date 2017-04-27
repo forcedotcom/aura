@@ -34,6 +34,20 @@
 /** Client-Side Controller **/
  var today = new Date(); 
 component.set("v.today", today);</pre>
+
+        <h4>Selecting A Date and Time on Mobile Devices</h4>
+        <p>When viewed on a mobile or tablet, the <code>ui:inputDateTime</code> component renders as <code>ui:inputDateTimeHtml</code> and uses the native date and time picker. The <code>format</code> attribute is not supported for <code>ui:inputDateTimeHtml</code>.
+        We recommend using the value change handler to retrieve date and time value change on the input field. On iOS devices, selecting a date and time on the date picker triggers the change handler on the component but the value is bound only on the blur event.
+        This example binds the date value to a value change handler.</p>
+        <pre>&lt;aura:component>
+    &lt;aura:attribute name="myDateTime" type="DateTime" />
+    &lt;!-- Value change handler -->
+    &lt;aura:handler name="change" value="{!v.myDateTime}" action="{!c.handleValueChange}"/>
+    
+    &lt;ui:inputDateTime aura:id="mySelectedDateTime" 
+                  label="Select a date and time" 
+                  value="{!v.myDateTime}"/>
+&lt;/aura:component></pre>
 		
 	</aura:description>		
 	<aura:example name="datetime" ref="uiExamples:datetime" label="Using ui:inputDateTime">

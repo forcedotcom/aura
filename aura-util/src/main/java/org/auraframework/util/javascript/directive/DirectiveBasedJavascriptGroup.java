@@ -212,7 +212,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                 if (mode.allowedInProduction()) {
                     minified = ".min";
                 }
-                
+                // Skipping DOC mode due to parsing issues on our very old SpiderMonkey version dependency
                 if (engineResource != null && mode != JavascriptGeneratorMode.DOC) {
                     writer.write("try {\n");
                     appendResourceToWriter(writer, "engine", engineResource);

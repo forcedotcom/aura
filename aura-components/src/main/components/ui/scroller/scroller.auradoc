@@ -18,13 +18,84 @@
 <aura:documentation>
 	<aura:description>
 		 <p>
-	        <code>ui:scroller</code> expands vertically to fill the space available within its parent component. You can set the width, and enable or disable both vertical and horizontal scrolling.
-	        Handle pull-to-refresh event in an action method. You can customize the status display for pull-to-refresh behavior, or accept the defaults.
+        <code>ui:scroller</code> expands vertically to fill the space available within its parent component. The scroller supports a rich set of features for developing scrollable views,
+	        as provided by the component's attributes. Here's a high-level overview of what you can do with <code>ui:scroller</code>.
+	     </p>
+	     <ul>
+	       <li>Enable vertical and horizontal scrolling using the <code>scroll</code> attribute.</li>
+	       <li>Display or hide the scroll bars using the <code>showScrollbars</code> attribute.</li>
+	       <li>Emulate scrolling with CSS transition using the <code>useCSSTransitions</code> attribute.</li>
+	       <li>Set the width and height of the scrollable view.</li>
+	       <li>Use pull-to-refresh and pull-to-load events to get data.</li>
+	       <li>Use infinite loading to load more data.</li>
+	       <li>Customize the scroller using plugins.</li>
+	     </ul>
+	     <p>This example creates a scrollable view with the default configuration.</p>
+        <pre>&lt;aura:component>
+    &lt;ui:scroller showScrollbars="true">
+        This is a sentence that goes on and on and on...
+    &lt;/ui:scroller>
+&lt;/aura:component></pre>
+        <h4>Loading Data Using Pull-To-Refresh And Pull-To-Load Events</h4>
+	     <p>   
+	        The scroller supports pull-to-refresh and pull-to-load events, which you can handle via the <code>onPullToRefresh</code> and <code>onPullToShowMore</code> attributes.
 	    </p>
-	     <p>
-	        The scroller listens to the <code>ui:updateSize</code> event, which automatically resizes the scroller view to fit new content during a refresh.
-	        For large or dynamic data sets, you can embed menu and list components in the scroller and take advantage of its pull-to-refresh behavior to retrieve new data.
-	    </p>
+	     <p>Here's a simple example on how to use the pull-to-refresh event.</p>
+	     <pre>&lt;ui:scroller aura:id="myScroller" onPullToRefresh="{!c.replaceBodyContent}">
+    &lt;ui:outputText aura:id="content" value="Update me!" />
+&lt;/ui:scroller>
+	     </pre>
+	     <p>When pull-to-refresh is triggered, the new content replaces the existing content in the scrollable view.</p>
+	     
+	     <pre>({
+    replaceBodyContent : function(component){
+        //Update the content
+        component.find("content").set("v.value", "new content");
+        var scroller = component.find("myScroller");
+        
+        //Call the refresh action on ui:scroller
+        var refresh = scroller.get("c.refresh");
+        $A.enqueueAction(refresh);
+    }
+})</pre>
+        <p>You can provide your own labels for the text that displays before the user pulls to refresh the page using the <code>pullToRefreshPull</code> attribute.
+         Similarly, you can provide your own labels for the text that displays when the user is pulling to refresh and when data is being refreshed using the <code>pullToRefreshRelease</code> and <code>pullToRefreshUpdating</code> attributes.</p>
+         
+         <p>For the pull-to-load event, you can customize the labels via <code>pullToShowMorePull</code>, <code>pullToShowMoreRelease</code>, and <code>pullToShowMoreUpdating</code> attributes among others.</p>
+         
+         <p>The scroller listens to the <code>ui:updateSize</code> event, which automatically resizes the scroller view to fit new content during a refresh. 
+         For large or dynamic data sets, you can embed list components, such as <code>ui:infiniteList</code> or <code>ui:virtualList</code>, in the scroller and delegate the <code>refresh</code> and <code>showMore</code> events to the lists.</p>
+	    <pre>var list = cmp.find("list");
+var refreshEvent = list.get('e.refresh');
+refreshEvent.setParams(event.getParams()); 
+refreshEvent.setComponentEvent().fire();</pre>
+	    
+	    <h4>Using a Template for Infinite Loading</h4>
+	    <p>Infinite loading is useful when you want to load more data as users scroll down. You can customize what users see when they load data using infinite loading using a template or use the defaults. The template must implement the <code>ui:scrollerInfiniteLoadingTemplate</code> interface.
+	    This example creates a scrollable view with a component passed in to the <code>infiniteLoadingTemplate</code> attribute, which implements the <code>ui:scrollerInfiniteLoadingTemplate</code> interface.</p>
+	    <pre>&lt;aura:component>
+    &lt;ui:scroller aura:id="pullToRefresh" onPullToRefresh="{!c.replaceBodyContent}">
+        &lt;aura:set attribute="infiniteLoadingTemplate">
+            &lt;auradocs:demoListTemplate/>
+        &lt;/aura:set>
+        &lt;ui:outputText aura:id="content" value="Update me!" />
+    &lt;/ui:scroller>	    
+&lt;/aura:component></pre>
+
+	    <h4>Methods</h4>
+	     <p>This component supports the following methods provided by the ScrollerJS library.</p>
+        <p><code>appendItems(data)</code>: Appends items to the scroller.</p>
+        <p><code>destroy()</code>: Destroys the scroller.</p>
+        <p><code>on(eventType, fn, [context])</code>: Prepends scroller-specific event listeners to the scroller.</p>
+        <p><code>plug(plugin)</code>: Adds a plugin to the scroller.</p>
+        <p><code>prependItems(data)</code>: Prepends items to the scroller.</p>
+        <p><code>refresh()</code>: Refreshes the scroller size and enables plugins to update themselves.</p>
+        <p><code>resize()</code>: Updates the scroller size. Called automatically when the browser fires a <code>resize</code> or an <code>orientationChange</code> event.</p>
+        <p><code>scrollTo(x, y, [time], [easingFn])</code>: Scrolls to a {x, y} position given a specific time and easing function.</p>
+        <p><code>scrollToBottom([time], [easingFn])</code>: Scrolls to the bottom of the scroller.</p>
+        <p><code>scrollToTop([time], [easingFn])</code>: Scrolls to the top of the scroller.</p>    
+	    <p>For more information, see <a href="http://www.scrollerjs.com" target="_blank">ScrollerJS API documentation and examples</a>.</p>
+>>>>>>> 4995d19... Feedback for scroller doc updates
 	</aura:description>	
 		<aura:example name="scroller" ref="auradocs:demoScroller" label="Using ui:scroller">
     	  <p>This example shows how to use the pull-to-refresh behavior on the scroller.</p>

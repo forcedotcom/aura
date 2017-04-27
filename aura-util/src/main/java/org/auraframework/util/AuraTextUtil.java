@@ -94,6 +94,8 @@ public class AuraTextUtil {
     private static final String NCNAME_IDENTIFIER_REGEX = "^[_a-zA-Z][\\.\\-_a-zA-Z0-9]*$";
     private static final Pattern NCNAME_IDENTIFIER_PATTERN = Pattern.compile(NCNAME_IDENTIFIER_REGEX);
 
+    private static final Pattern ATTRIBUTE_NAME_PATTERN = Pattern.compile("^[a-zA-Z_].[-a-zA-Z0-9_]*$");
+
     /**
      * Makes the first letter of the input string lower case.
      */
@@ -635,13 +637,11 @@ public class AuraTextUtil {
      * well.
      *
      * @param attributeName is the attribute name which is being validated
-     * @return a : true if the name is valid and false if its invalid
+     * @return true if the name is valid and false if its invalid
      */
     public static boolean validateAttributeName(String attributeName) {
-        Pattern p = Pattern.compile("^[a-zA-Z_].[-a-zA-Z0-9_]*$");
-        Matcher m = p.matcher(attributeName);
-        boolean a = m.find();
-        return a;
+        Matcher m = ATTRIBUTE_NAME_PATTERN.matcher(attributeName);
+        return m.find();
     }
 
     /**

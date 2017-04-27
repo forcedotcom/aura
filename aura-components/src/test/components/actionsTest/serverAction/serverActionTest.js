@@ -354,13 +354,16 @@
         }
     },
 
-    // the test will get into infinite reload because of coos so disable for now.
-    _testActionWithErrorsIsErrorState: {
+    testActionWithErrorsIsErrorState: {
         test: function(cmp) {
-            var callbackCalled = false;
-            var action = cmp.get("c.throwsClientOutOfSyncException");
+            var successCallbackCalled = false;
+            var errorCallbackCalled = false;
+            var action = cmp.get("c.throwsException");
             action.setCallback(this, function(a) {
-                callbackCalled = true;
+                successCallbackCalled = true;
+            }, "SUCCESS");
+            action.setCallback(this, function(a) {
+                errorCallbackCalled = true;
             }, "ERROR");
 
             $A.enqueueAction(action);
@@ -369,8 +372,10 @@
                 function(){ return $A.test.areActionsComplete([action]); },
                 function() {
                     $A.test.assertEquals("ERROR", action.getState());
-                    $A.test.assertFalse(callbackCalled,
-                            "ERROR callback should not get called.");
+                    $A.test.assertEquals(true, errorCallbackCalled,
+                        "ERROR callback should get called.");
+                    $A.test.assertEquals(false, successCallbackCalled,
+                        "SUCCESS callback should not get called.");
                 });
         }
     },

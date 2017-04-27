@@ -71,6 +71,11 @@ public class ParallelActionTestController implements Controller {
         throw new ClientOutOfSyncException("Testing Exception.");
     }
 
+    @AuraEnabled
+    public static void throwsException() throws Exception {
+        throw new Exception("Generic Exception");
+    }
+
     /**
      * Object to represent return value for controller.
      */

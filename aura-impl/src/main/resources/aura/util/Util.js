@@ -2434,8 +2434,7 @@ Aura.Utils.Util.prototype.getComponentHierarchy = function(component){
 Aura.Utils.Util.prototype.hasSourceURL = function() {
     if (this.sourceURLsupported === undefined) {
         try {
-            // creating a ReferenceError: foo is not defined
-            this.globalEval('foo.bar', undefined, "testSourceURL.js");
+            this.globalEval('(undefined).x', undefined, "testSourceURL.js");
         } catch(e) {
             this.sourceURLsupported = e.stack.indexOf("testSourceURL.js") > -1;
         }

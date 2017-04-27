@@ -425,9 +425,22 @@ AuraStorage.prototype.getAllInternal = function(keys, includeExpired, resolve, r
  * @private
  */
 AuraStorage.prototype.buildPayload = function(key, value, now) {
+    var encoded = false;
     // For the size calculation, consider only the inputs to the storage layer: key and value.
-    // Ignore all the extras in the item object below.
-    var size = $A.util.estimateSize("" + key) + $A.util.estimateSize(value);
+    var size = $A.util.estimateSize("" + key);
+    if (this.adapter.encodeValue) {
+        try {
+            value = this.adapter.encodeValue(value);
+            encoded = true;
+            size += value.length;
+        } catch (e) {
+            // if encoding is required in the store, it will reject later on when attempting to encode again
+            // because encoded will be false
+        }
+    }
+    if (!encoded) {
+        size += $A.util.estimateSize(value);
+    }
     if (size > this.maxSize) {
         throw new Error("AuraStorage.set() cannot store " + key + " of size " + size + "b because it's over the max size of " + this.maxSize + "b");
     }
@@ -437,7 +450,8 @@ AuraStorage.prototype.buildPayload = function(key, value, now) {
         {
             "value": value,
             "created": now,
-            "expires": now + this.expiration
+            "expires": now + this.expiration,
+            "valueEncoded": encoded
         },
         size
     ];

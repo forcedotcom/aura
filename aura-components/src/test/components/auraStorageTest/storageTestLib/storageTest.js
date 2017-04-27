@@ -368,7 +368,7 @@ function storageTest () {
         },
 
         testClear: function(cmp, storage) {
-            var value = new Array(1024).join("x");
+            var value = new Array(1024).join("ツ");
             return storage.clear()
                 .then(function() {
                     append(cmp, "finished clear");
@@ -463,7 +463,7 @@ function storageTest () {
         },
 
         testBulkSetLargerThanMaxSize: function(cmp, storage) {
-            var chunk = new Array(512).join("x");
+            var chunk = new Array(512).join("ツ");
             var keyLength = 14;
             // When SizeEstimator calculates the size it gives a value of 2 per string character so to get the total
             // size that will be added to storage we multiple 2 by the length of the chunk and key, times the number

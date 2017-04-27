@@ -395,6 +395,13 @@ CryptoAdapter.prototype.objectToArrayBuffer = function(o) {
     return this.encoder["encode"](str);
 };
 
+/**
+ * Alias for objectToArrayBuffer, used by AuraStorage to avoid multiple calls to json.encode
+ * @param {Object} o The object to convert
+ */
+CryptoAdapter.prototype.encodeValue = function(o) {
+    return this.objectToArrayBuffer(o);
+};
 
 /**
  * Converts an ArrayBuffer to object.
@@ -444,7 +451,11 @@ CryptoAdapter.prototype.encryptToTuple = function(tuple) {
         var itemArrayBuffer;
         try {
             // if json serialization errors then reject
-            itemArrayBuffer = that.objectToArrayBuffer(tuple[1]["value"]);
+            if (!tuple[1]["valueEncoded"]) {
+                itemArrayBuffer = that.objectToArrayBuffer(tuple[1]["value"]);
+            } else {
+                itemArrayBuffer = tuple[1]["value"];
+            }
         } catch (e) {
             that.log(CryptoAdapter.LOG_LEVEL.WARNING, "encryptToTuple(): serialization failed for key " + tuple[0], e);
             reject(e);

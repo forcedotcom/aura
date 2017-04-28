@@ -58,6 +58,7 @@
         <npm.download.root.url>http://repo.auraframework.org/simple/plugins-release-local/npm/</npm.download.root.url>
         <node.version>v4.2.1</node.version>
         <npm.version>2.14.7</npm.version>
+        <eslint.max.warnings>100000</eslint.max.warnings>
     </properties>
     <repositories>
         <repository>
@@ -1055,9 +1056,11 @@
                 <plugin>
                     <groupId>org.auraframework</groupId>
                     <artifactId>tools-maven-plugin</artifactId>
-                    <version>0.0.11</version>
+                    <version>0.0.13</version>
                     <configuration>
                         <arguments>
+                            <argument>--max-warnings</argument>
+                            <argument>${eslint.max.warnings}</argument>
                             <argument>${project.basedir}/src/main/modules</argument>
                             <argument>${project.basedir}/src/test/modules</argument>
                         </arguments>

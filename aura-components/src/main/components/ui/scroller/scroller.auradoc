@@ -95,7 +95,6 @@ refreshEvent.setComponentEvent().fire();</pre>
         <p><code>scrollToBottom([time], [easingFn])</code>: Scrolls to the bottom of the scroller.</p>
         <p><code>scrollToTop([time], [easingFn])</code>: Scrolls to the top of the scroller.</p>    
 	    <p>For more information, see <a href="http://www.scrollerjs.com" target="_blank">ScrollerJS API documentation and examples</a>.</p>
->>>>>>> 4995d19... Feedback for scroller doc updates
 	</aura:description>	
 		<aura:example name="scroller" ref="auradocs:demoScroller" label="Using ui:scroller">
     	  <p>This example shows how to use the pull-to-refresh behavior on the scroller.</p>

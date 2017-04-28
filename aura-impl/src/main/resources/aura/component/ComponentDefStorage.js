@@ -139,19 +139,6 @@ ComponentDefStorage.prototype.getStorage = function () {
 };
 
 /**
- * Checks a descriptor if it should be cacheable or not.
- * Only components in the internal or privileged namespaces should be cached.
- * Others potentially are volatile and most apps do not know if they are updated or not.
- * TODO: generate a uid for each component to compare with what is already loaded
- * @return {Boolean} true if the component can be stored in cache
- * @private
- */
-ComponentDefStorage.prototype.shouldCacheComponent = function(descriptor) {
-    var defDescriptor = new Aura.System.DefDescriptor(descriptor);
-    return $A.clientService.isInternalNamespace(defDescriptor.getNamespace()) || $A.clientService.isPrivilegedNamespace(defDescriptor.getNamespace());
-};
-
-/**
  * Stores component and library definitions into storage.
  * @param {Array} cmpConfigs The component definitions to store.
  * @param {Array} libConfigs The library definitions to store.
@@ -170,9 +157,6 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, evtCo
 
     for (i = 0; i < cmpConfigs.length; i++) {
         descriptor = cmpConfigs[i]["descriptor"];
-        if (!this.shouldCacheComponent(descriptor)) {
-            continue;
-        }
         cmpConfigs[i]["uuid"] = context.findLoaded(descriptor);
         encodedConfig = $A.util.json.encode(cmpConfigs[i]);
         toStore[descriptor] = encodedConfig;
@@ -180,18 +164,12 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, evtCo
 
     for (i = 0; i < libConfigs.length; i++) {
         descriptor = libConfigs[i]["descriptor"];
-        if (!this.shouldCacheComponent(descriptor)) {
-            continue;
-        }
         encodedConfig = $A.util.json.encode(libConfigs[i]);
         toStore[descriptor] = encodedConfig;
     }
 
     for (i = 0; i < evtConfigs.length; i++) {
         descriptor = evtConfigs[i]["descriptor"];
-        if (!this.shouldCacheComponent(descriptor)) {
-            continue;
-        }
         encodedConfig = $A.util.json.encode(evtConfigs[i]);
         toStore[descriptor] = encodedConfig;
     }

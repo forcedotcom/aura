@@ -32,4 +32,5 @@
     <aura:method name="testArrayAccessorMethods"/>
     <aura:method name="testArrayForEach"/>
     <aura:method name="testArrayAssociativeArray"/>
+    <aura:method name="testArrayProxyTraps"/>
     </aura:component>

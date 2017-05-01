@@ -72,6 +72,11 @@
         test: function(cmp) {
             cmp.testArrayAssociativeArray();
         }
+    },
+    testArrayProxyTraps: {
+        test: function(cmp) {
+            cmp.testArrayProxyTraps();
+        }
     }
 
 })

@@ -53,12 +53,51 @@ function SecureComponentRef(component, key) {
         }
     });
 
+    /**
+     * Traverse all entries in the baseObject to unwrap any secure wrappers and wrap any functions as
+     * SecureFunction. This ensures any non-Lockerized handlers of the event do not choke on the secure
+     * wrappers, but any callbacks back into the original Locker have their arguments properly filtered.
+     */
+    function deepUnfilterMethodArguments(baseObject, members) {
+        var value;
+        for (var property in members) {
+            value = members[property];
+            if (value !== undefined && value !== null && (Array.isArray(value) || $A.util.isPlainObject(value))) {
+                var newBranch;
+                if (Array.isArray(value)) {
+                    newBranch = [];
+                } else if ($A.util.isPlainObject(value)) {
+                    newBranch = {};
+                }
+                baseObject[property] = deepUnfilterMethodArguments(newBranch, value);
+                continue;
+            }
+            if (typeof value !== "function") {
+                value = $A.lockerService.getRaw(value);
+                //If value is a plain object, we need to deep unfilter
+                if ($A.util.isPlainObject(value)) {
+                    value = deepUnfilterMethodArguments({}, value);
+                }
+            } else {
+                value = SecureObject.filterEverything(o, value, { defaultKey: key });
+            }
+            baseObject[property] = value;
+        }
+        return baseObject;
+    }
+
     // The shape of the component depends on the methods exposed in the definitions:
     var defs = component.getDef().methodDefs;
     if (defs) {
         defs.forEach(function(method) {
             var descriptor = new DefDescriptor(method.name);
-            SecureObject.addMethodIfSupported(o, component, descriptor.getName(), { defaultKey: key });
+            SecureObject.addMethodIfSupported(o, component, descriptor.getName(),
+                {
+                    defaultKey: key,
+                    // If SecureComponentRef is an unlockerized component, then let it have access to raw arguments
+                    beforeCallback: ($A.lockerService.wrapComponent(component) === component) ? function(st, args){ return deepUnfilterMethodArguments([], args) } : undefined
+                }
+            );
         }, o);
     }
 

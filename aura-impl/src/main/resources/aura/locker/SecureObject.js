@@ -507,7 +507,7 @@ var KEY_TO_ARRAY_HANLDER = typeof Map !== "undefined" ? new Map() : undefined;
 
 function getFilteredArray(st, raw, key) {
     var filtered = [];
-
+    // TODO: RJ, we are missing named(non-integer) properties, changing this for loop to for..in should fix it
     for (var n = 0; n < raw.length; n++) {
         var value = raw[n];
         var validEntry = false;
@@ -547,9 +547,37 @@ function getArrayProxyHandler(key) {
     var handler = KEY_TO_ARRAY_HANLDER.get(key);
     if (!handler) {
         handler = {
+            "getPrototypeOf": function(target) {
+                return Object.getPrototypeOf(target);
+            },
+            "setPrototypeOf": function(target, newProto) {
+                return Object.setPrototypeOf(target, newProto);
+            },
+            "isExtensible": function(target) {
+                return Object.isExtensible(target);
+            },
+            "preventExtensions": function(target) {
+                Object.preventExtensions(target);
+                return ls_getFromCache(target, key);
+            },
+            "getOwnPropertyDescriptor": function(target, property) {
+                var raw = target;
+                var filtered = getFilteredArray(handler, raw, key);
+                if (property === "length") {
+                    return Object.getOwnPropertyDescriptor(filtered, property);
+                }
+                if (property in filtered) {
+                    return Object.getOwnPropertyDescriptor(raw, filtered[property]["rawIndex"]);
+                }
+                return undefined;
+            },
+            "defineProperty": function(target, property, descriptor) {
+                var raw = target;
+                Object.defineProperty(raw, property, descriptor);
+                return true;
+            },
             "get": function(target, property) {
-                var raw = ls_getRef(target, key);
-
+                var raw = target;
                 var filtered = getFilteredArray(handler, raw, key);
                 var ret;
 
@@ -734,7 +762,7 @@ function getArrayProxyHandler(key) {
                 return ret;
             },
             "set" : function(target, property, value) {
-                var raw = ls_getRef(target, key);
+                var raw = target;
                 // Setting numerical indexes, number has to be positive integer, else its treated as an associative array key
                 if (!isNaN(property) && (parseFloat(property) >= 0) && (parseFloat(property) === parseInt(property, 10))) {
                     // Refilter raw to recreate the index mapping between raw and filtered value
@@ -761,7 +789,39 @@ function getArrayProxyHandler(key) {
                     raw[property] = SecureObject.filterEverything(handler, value);
                     return true;
                 }
+            },
+            "has" : function(target, property) {
+                var raw = target;
+                var filtered = getFilteredArray(handler, raw, key);
+                return property in filtered;
+            },
+            "ownKeys": function(target) {
+                var raw = target;
+                var filtered = getFilteredArray(handler, raw, key);
+                return Object.getOwnPropertyNames(filtered);
+            },
+            "deleteProperty": function(target, property) {
+                var raw = target;
+                // If property is a non-numerical index
+                if (isNaN(property) || parseFloat(property) < 0 || (parseFloat(property) !== 0 && parseFloat(property) !== parseInt(property, 10))) {
+                    var value = raw[property];
+                    // If value was set by using the array like an associative array
+                    if (value) {
+                        // Check if we have access
+                        var rawValue = ls_getRef(value, key);
+                        if (rawValue) {
+                            delete raw[property];
+                        }
+                    }
+                } else {
+                    var filtered = getFilteredArray(handler, raw, key);
+                    if (filtered[property]) {
+                        delete raw[filtered[property]["rawIndex"]];
+                    }
+                }
+                return true;
             }
+            // No handling "apply" and "construct" trap and letting the underlying raw handle apply and throw the error
         };
 
         ls_setKey(handler, key);
@@ -785,11 +845,9 @@ SecureObject.createProxyForArrayObjects = function(raw, key) {
         $A.warning("Illegal usage of SecureObject.createProxyForArrayObjects");
         return SecureObject.createFilteringProxy(raw, key);
     }
-    // https://github.com/tvcutsem/harmony-reflect/issues/13#issuecomment-17249465
-    var surrogate = [];
-    ls_setRef(surrogate, raw, key);
-
-    var proxy = new Proxy(surrogate, getArrayProxyHandler(key));
+    // Not using a surrogate for array Proxy because we want to support for..in style of looping on arrays
+    // Having a fake surrogate does not allow for correct looping. Mitigating this risk by handling all traps for Proxy.
+    var proxy = new Proxy(raw, getArrayProxyHandler(key));
     ls_setKey(proxy, key);
     ls_registerProxy(proxy);
 
@@ -984,7 +1042,14 @@ SecureObject.createFilteredMethod = function(st, raw, methodName, options) {
         enumerable : true,
         writable : true,
         value : function() {
-            var filteredArgs = SecureObject.filterArguments(st, arguments, options);
+            var filteredArgs;
+            // Allow hook for pre-processing of the arguments
+            if (options && options.beforeCallback) {
+                filteredArgs = options.beforeCallback(st, arguments);
+            } else{
+                filteredArgs = SecureObject.filterArguments(st, arguments, options);
+            }
+
             var fnReturnedValue = raw[methodName].apply(raw, filteredArgs);
 
             if (options && options.afterCallback) {

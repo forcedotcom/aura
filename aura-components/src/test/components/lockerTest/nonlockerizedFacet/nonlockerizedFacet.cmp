@@ -15,16 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component implements="aura:requireLocker">
-    <aura:attribute name="callback" type="Object"/>
-
-    <aura:method name="setCallback" action="{!c.setCallback}">
-        <aura:attribute name="callback" type="function" />
-    </aura:method>
-    <aura:method name="executeCallback" action="{!c.executeCallback}"/>
-    
-    <p>Inside facet</p>
-
+<aura:component>
     <aura:attribute name="methodCalled" type="Boolean"/>
     <aura:method name="inspectMethodParams" action="{!c.inspectMethodParams}">
         <aura:attribute name="cmpParam" type="String"/>
@@ -32,5 +23,6 @@
         <aura:attribute name="listParam" type="List"/>
         <aura:attribute name="objParam" type="Object"/>
         <aura:attribute name="testUtils" type="Object"/>
+        <aura:attribute name="resultHolder" type="Object"/>
     </aura:method>
 </aura:component>

@@ -72,6 +72,7 @@
 
         for (var i = 0; i < columnsDefs.length; i++) {
             columnsDefs[i]["attributes"]["valueProvider"] = ptv;
+            columnsDefs[i]["skipCreationPath"] = true;
             templates.push($A.createComponentFromConfig(columnsDefs[i]));
 
             if (templates[i].isInstanceOf("ui:hasGridEvents")) {

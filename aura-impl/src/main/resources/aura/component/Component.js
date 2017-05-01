@@ -2536,7 +2536,7 @@ Component.prototype.setupComponentEvents = function(cmp, config) {
                             "Event handler for " + key
                             + " defined on super component "
                             + this.globalId);
-                    cmp.addHandler(key, valueProvider, eventValue["value"]||eventValue, false, "bubble");
+                    cmp.addHandler(key, valueProvider || this, eventValue["value"]||eventValue, false, "bubble");
                 }
             }
         }

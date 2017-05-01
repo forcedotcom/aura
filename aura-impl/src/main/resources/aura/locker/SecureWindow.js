@@ -716,7 +716,7 @@ SecureWindow.metadata = {
                 "XMLHttpRequest":                       CTOR,
                 "XMLHttpRequestEventTarget":            FUNCTION,
                 "XMLHttpRequestUpload":                 FUNCTION,
-                "XMLSerializer":                        FUNCTION,
+                "XMLSerializer":                        CTOR,
                 "XPathEvaluator":                       FUNCTION,
                 "XPathExpression":                      FUNCTION,
                 "XPathResult":                          FUNCTION,

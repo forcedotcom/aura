@@ -38,7 +38,7 @@
         <ui:outputText class="outputItemInfo" aura:id="outputItemInfo" value=""/> <br/><br/>
         <p class="counter" style="text-align:right">Click counter: <span>{!v.counter}</span></p>
         <test:testVirtualListTemplateChild name="{!v.name}"/>
-        <ui:virtualMenuWrapper triggerLabel="Label for Menu">
+        <ui:virtualMenuWrapper triggerLabel="Label for Menu" class="menuWithTriggerLabel">
             <aura:set attribute="menu">
                 <ui:menu>
                     <ui:menuTriggerLink label="Label for Menu" stopClickPropagation="true"/>
@@ -51,7 +51,7 @@
             </aura:set>
         </ui:virtualMenuWrapper>
         
-        <ui:virtualMenuWrapper>
+        <ui:virtualMenuWrapper class="menuWithCustomTriggerBody">
             <aura:set attribute="triggerBody">
                 <div style="background-color:red; width:16px; height:16px"/>
             </aura:set>

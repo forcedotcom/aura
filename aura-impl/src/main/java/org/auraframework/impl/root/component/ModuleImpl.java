@@ -50,12 +50,10 @@ public class ModuleImpl implements Module {
     private final String globalId;
     private final String path;
     private final String localId;
-
+    private final ContextService contextService;
     private final AttributeSet attributeSet;
 
     private Map<String, Object> attributes = Maps.newHashMap();
-
-    private final ContextService contextService;
 
     public ModuleImpl(DefDescriptor<ModuleDef> descriptor, Map<String, Object> attributes) throws QuickFixException {
         this(descriptor, null, null);
@@ -63,6 +61,7 @@ public class ModuleImpl implements Module {
         if (this.attributeSet != null) {
             this.attributeSet.set(attributes);
         }
+        this.contextService.getCurrentContext().getInstanceStack().popInstance(this);
     }
 
 
@@ -76,6 +75,7 @@ public class ModuleImpl implements Module {
         if (this.attributeSet != null) {
             this.attributeSet.set(attributeDefRefs);
         }
+        this.contextService.getCurrentContext().getInstanceStack().popInstance(this);
     }
 
     public ModuleImpl(DefDescriptor<ModuleDef> descriptor, BaseComponent<?, ?> attributeValueProvider,
@@ -92,6 +92,7 @@ public class ModuleImpl implements Module {
 
         this.path = instanceStack.getPath();
         instanceStack.pushInstance(this, descriptor);
+        this.globalId = getNextGlobalId(context);
 
         DefDescriptor<ComponentDef> compDesc = definitionService.getDefDescriptor(descriptor,
                 DefDescriptor.MARKUP_PREFIX, ComponentDef.class);
@@ -100,15 +101,10 @@ public class ModuleImpl implements Module {
         } else {
             this.attributeSet = null;
         }
-
-        this.globalId = getNextGlobalId();
-
-        instanceStack.popInstance(this);
     }
 
     // TODO: duplicate code
-    private String getNextGlobalId() {
-        AuraContext context = contextService.getCurrentContext();
+    private String getNextGlobalId(AuraContext context) {
         String num = context.getNum();
         Action action = context.getCurrentAction();
         int id;

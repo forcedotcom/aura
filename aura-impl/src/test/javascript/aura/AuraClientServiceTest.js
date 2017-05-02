@@ -84,7 +84,13 @@ Test.Aura.AuraClientServiceTest = function() {
             },
             warning: function() {}
         },
-        window:{},
+        window:{
+            location: {
+                pathname : "/pathname",
+                search : "?search=1",
+                hash : "#hash"
+            }
+        },
         document:document,
         Aura: Aura,
         AuraClientService: Aura.Services.AuraClientService

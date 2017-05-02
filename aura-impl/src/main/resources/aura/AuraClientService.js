@@ -2764,11 +2764,12 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     var timerId = undefined;
     var marker = Aura.Services.AuraClientServiceMarker++;
     var qs, url;
-
+    var loc = window.location;
     try {
         var params = {
             "message"      : $A.util.json.encode({ "actions" : actionsToSend }),
-            "aura.context" : context.encodeForServer(method === "POST")
+            "aura.context" : context.encodeForServer(method === "POST"),
+            "aura.pageURI" : loc.pathname + loc.search + loc.hash
         };
         if (method === "GET") {
             params["aura.access"] = "UNAUTHENTICATED";

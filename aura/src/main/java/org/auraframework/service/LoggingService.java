@@ -39,6 +39,8 @@ public interface LoggingService extends AuraService {
     public static final String TIMER_DESERIALIZATION = "deSerialization";
     public static final String AURA_REQUEST_QUERY = "auraRequestQuery";
     public static final String AURA_REQUEST_URI = "auraRequestURI";
+    public static final String PAGE_URI = "pageURI";
+    public static final String APP = "app";
     public static final String MESSAGE = "message";
     public static final String REQUEST_METHOD = "requestMethod";
     public static final String STATUS = "httpStatus";

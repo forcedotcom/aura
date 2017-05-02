@@ -75,6 +75,7 @@ public class AuraContextFilter implements Filter {
     private static final StringParam app = new StringParam(AuraServlet.AURA_PREFIX + "app", 0, false);
     private static final StringParam num = new StringParam(AuraServlet.AURA_PREFIX + "num", 0, false);
     private static final StringParam contextConfig = new StringParam(AuraServlet.AURA_PREFIX + "context", 0, false);
+    protected static final StringParam pageURI = new StringParam(AuraServlet.AURA_PREFIX + "pageURI", 0, false);
     protected static final BooleanParam modulesParam = new BooleanParam(AuraServlet.AURA_PREFIX + "modules", false);
 
     private String componentDir = null;
@@ -153,11 +154,17 @@ public class AuraContextFilter implements Filter {
         }
 
         try {
-            startContext(req, res, chain);
+            AuraContext context = startContext(req, res, chain);
             HttpServletRequest request = (HttpServletRequest) req;
             loggingService.setValue(LoggingService.REQUEST_METHOD, request.getMethod());
             loggingService.setValue(LoggingService.AURA_REQUEST_URI, request.getRequestURI());
             loggingService.setValue(LoggingService.AURA_REQUEST_QUERY, request.getQueryString());
+            loggingService.setValue(LoggingService.PAGE_URI, pageURI.get(request));
+            DefDescriptor app = context.getApplicationDescriptor();
+            if (app != null) {
+                loggingService.setValue(LoggingService.APP, app.getDescriptorName());
+            }
+            
             if (testFilter != null) {
                 testFilter.doFilter(req, res, chain);
             } else {

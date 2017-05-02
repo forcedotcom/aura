@@ -401,8 +401,10 @@
                 if (cmp.isValid()) {
                     helper.adjustOverflow(cmp);
                 }
-            })
-            );
+            }));
+        } else if (barWidth === 0 && overflowData.barWidth === 0) {
+            // Edge case, should hide the overflow menu when tabBar is reset.
+            this.toggleOverflowMenu(cmp, false);
         }
     },
 

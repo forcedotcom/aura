@@ -64,7 +64,7 @@
 
     <!-- Resizable Columns -->
     <aura:attribute name="enableResizableColumns"	type="Boolean"		default="false" description="Enables the column resize plugin. The default is false."/>
-    <aura:attribute name="resizableColumnsConfig"	type="Object" description="The column resize configuration. If not provided, the default configuration is used."/>
+    <aura:attribute name="resizableColumnsConfig"	type="Object" description="The column resize configuration. If not provided, the default configuration is used. The configuration can be set during initialization or in afterRender only."/>
     
     <!-- PRIVATE ATTRIBUTES -->
     <aura:attribute name="renderInfo" type="Object" description="Determines how the grid should rerender its DOM"/>

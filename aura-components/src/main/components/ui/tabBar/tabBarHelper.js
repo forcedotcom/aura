@@ -324,8 +324,8 @@
     },
 
     getBarWidth: function(cmp) {
-        var container = cmp.find("tabItemsContainer");
-        return container.getElement().getBoundingClientRect().width || 0;
+        var element = cmp.find("tabItemsContainer").getElement();
+        return (element && element.getBoundingClientRect().width) || 0;
     },
 
     getOuterWidth: function(el) {

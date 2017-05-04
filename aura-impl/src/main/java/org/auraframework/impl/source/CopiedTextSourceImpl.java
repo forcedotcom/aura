@@ -60,6 +60,7 @@ public class CopiedTextSourceImpl<D extends Definition> extends AbstractTextSour
         return this.defaultNamespace;
     }
 
+    @Override
     public long getLastModified() {
         return this.lastModified;
     }

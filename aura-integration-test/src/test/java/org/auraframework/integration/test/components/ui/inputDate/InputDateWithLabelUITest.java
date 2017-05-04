@@ -387,8 +387,6 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     public void testEscape() throws Exception {
         open(URL);
 
-        boolean escButtonClosedCal;
-
         openDatePicker();
 
         // Looking for the current date, which should be focused on

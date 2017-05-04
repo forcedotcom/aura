@@ -3,6 +3,7 @@
      * Verify that AuraError's severity default value is Quiet
      */
     testAuraFriendlyErrorDefaultSeverity : {
+        browsers : [ "-IE11", "-Safari" ],
         attributes: {"handleSystemError": true},
         test: [
             function(cmp) {
@@ -28,6 +29,7 @@
      * Verify that a non-AuraError is wrapped in an AuraError when it's handled in error handler
      */
      testNonAuraErrorIsWrappedAsAuraErrorInHandler: {
+        browsers : [ "-IE11", "-Safari" ],
         attributes: {"handleSystemError": true},
         test: [
             function(cmp) {
@@ -51,6 +53,7 @@
      },
 
     testFailingDescriptorForErrorFromCreateComponentCallback: {
+        browsers : [ "-IE11", "-Safari" ],
         test: [
             function(cmp) {
                 $A.test.expectAuraError("Error from createComponent callback in app");
@@ -72,6 +75,7 @@
      * The test approach is to click a button to call aura:method in controller.
      */
     testFailingDescriptorForErrorFromAuraMethodHandler: {
+        browsers : [ "-IE11", "-Safari" ],
         test: [
             function(cmp) {
                 $A.test.expectAuraError("Error from app client controller");
@@ -90,6 +94,7 @@
     },
 
     testFailingDescriptorForErrorFromAuraMethodWithCallback: {
+        browsers : [ "-IE11", "-Safari" ],
         test: [
             function(cmp) {
                 $A.test.expectAuraError("Error from server action callback in app");
@@ -107,6 +112,7 @@
     },
 
     testFailingDescriptorForErrorFromContainedCmpController: {
+        browsers : [ "-IE11", "-Safari" ],
         test: [
             function(cmp) {
                 $A.test.expectAuraError("Error from component client controller");
@@ -124,6 +130,7 @@
     },
 
     testFailingDescriptorForErrorFromContainedCmpCallback: {
+        browsers : [ "-IE11", "-Safari" ],
         test: [
             function(cmp) {
                 $A.test.expectAuraError("Error from function wrapped in getCallback in component");
@@ -149,6 +156,7 @@
      * component (markup://auratest:errorHandling).
      */
     testFailingDescriptorForErrorFromNestedGetCallbackFunctions: {
+        browsers : [ "-IE11", "-Safari" ],
         test: [
             function(cmp) {
                 $A.test.expectAuraError("Error from function wrapped in getCallback in component");
@@ -166,6 +174,7 @@
     },
 
     testStackTraceForErrorFromServerActionCallbackWrappedInGetCallback: {
+        browsers : [ "-IE11", "-Safari" ],
         test: [
             function(cmp) {
                 $A.test.expectAuraError("Error in $A.getCallback() [Error from server action callback wrapped in $A.getCallback]");
@@ -182,6 +191,7 @@
     },
 
     testFailingDescriptorForNonExistingEventHandlerError: {
+        browsers : [ "-IE11", "-Safari" ],
         test: [
             function(cmp) {
                 $A.test.expectAuraError("Unable to find 'nonExistingHandler'");
@@ -270,6 +280,7 @@
     },
 
     testHandleExceptionCallbackNotCalled: {
+        browsers : [ "-IE11", "-Safari" ],
         test: [
             function(cmp) {
                 // arrange

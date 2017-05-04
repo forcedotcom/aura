@@ -141,6 +141,7 @@
      * Extra actions not marked as storable throw an error.
      */
     testExtraActionsNotStorableDisplaysError: {
+        browsers : [ "-IE11", "-Safari" ],
         test: function(cmp) {
             // error message thrown by framework
             var expected = "Unable to find an action for 12345;a";

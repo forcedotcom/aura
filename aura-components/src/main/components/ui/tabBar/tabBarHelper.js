@@ -507,7 +507,7 @@
     /**
      * Private helper methods
      */
-    toggleTab : function(tab, condition) {
+    toggleTab: function(tab, condition) {
         if (condition === undefined) {
             condition = !tab.get("v.hidden");
         }
@@ -516,7 +516,7 @@
         $A.util.toggleClass(tab, "hidden", condition);
     },
 
-    isInOverflow : function(cmp, key) {
+    isInOverflow: function(cmp, key) {
         var overflowData = this.getOverflowData(cmp);
         return overflowData.tabCache[key] >= 0;
     },

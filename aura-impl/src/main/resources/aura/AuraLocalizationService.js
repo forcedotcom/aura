@@ -1196,6 +1196,16 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
         return;
     }
 
+    if (!moment["tz"]) {
+        var message = "AuraLocalizationService.UTCToWallTime(): moment-timezone lib is missing on moment. " +
+                      "It could be overridden by another version of moment-js in userland code. Current moment-js version: " + moment["version"];
+        $A.warning(message);
+        $A.logger.reportError(new $A.auraError(message));
+
+        callback(date);
+        return;
+    }
+
     if (!timezone || !moment["tz"]["zone"](timezone)) {
         $A.warning("AuraLocalizationService.UTCToWallTime(): unsupported time zone: " +
             timezone + ". Fallback to default timezone.");
@@ -1241,6 +1251,16 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
 
     if (typeof callback !== 'function') {
         $A.warning("AuraLocalizationService.WallTimeToUTC(): callback must be a function.");
+        return;
+    }
+
+    if (!moment["tz"]) {
+        var message = "AuraLocalizationService.WallTimeToUTC(): moment-timezone lib is missing on moment. " +
+                      "It could be overridden by another version of moment-js in userland code. Current moment-js version: " + moment["version"];
+        $A.warning(message);
+        $A.logger.reportError(new $A.auraError(message));
+
+        callback(date);
         return;
     }
 

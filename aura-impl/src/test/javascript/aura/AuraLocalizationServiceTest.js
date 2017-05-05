@@ -49,6 +49,7 @@ Test.Aura.AuraLocalizationServiceTest = function() {
 
     var mockUtil = Mocks.GetMock(Object.Global(), "$A", {
         assert: function () {},
+        auraError: function() {},
         get:function(value){
             if(value == "$Locale.dateFormat") return targetDateFormat;
             if(value == "$Locale.datetimeFormat") return targetDateTimeFormat;
@@ -67,7 +68,11 @@ Test.Aura.AuraLocalizationServiceTest = function() {
             instanceOf: function(value, type) {
                 return value instanceof type;
             }
-        }
+        },
+        logger: {
+            reportError: function(){}
+        },
+        warning: function(){}
     });
 
     var mockInvalidDate = {
@@ -126,27 +131,12 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         }
     });
 
-    var mockDisplayDateTime = Mocks.GetMock(targetService, "displayDateTime", function(mDate, format, locale){
-        return mDate.toString() + format + locale;
-    });
-
     var mockGetNormalizedFormat = Mocks.GetMock(targetService, "getNormalizedFormat", function(format){
         return format;
     });
 
     var mockGetAvailableMomentLocale = Mocks.GetMock(targetService, "getAvailableMomentLocale", function(locale){
         return locale;
-    });
-
-    var mockLazyInitTimeZoneInfo = Mocks.GetMock(targetService, "lazyInitTimeZoneInfo", function(timezone, callback){
-        callback(mockDateTime, timezone);
-    });
-
-    var mockWallTime = Mocks.GetMock(Object.Global(), "WallTime",{
-        zones: {
-            PST:true,
-            EST:false
-        }
     });
 
     [Fixture]
@@ -1838,6 +1828,28 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         });
 
         [Fact]
+        function CallbackWithOriginalDateWhenTimezoneLibIsMissing() {
+            // Arrange
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var expected = Stubs.GetObject({});
+            var actual;
+
+            var mockMomentWithoutTimezone = Mocks.GetMock(Object.Global(), "moment", {});
+
+            // Act
+            mockUtil(function () {
+                mockMomentWithoutTimezone(function () {
+                    targetService.UTCToWallTime(expected, "GMT", function(date) {
+                        actual = date;
+                    });
+                });
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         function CallbackWithOriginalDateWhenZoneIsGMT() {
             // Arrange
             var targetService = new Aura.Services.AuraLocalizationService();
@@ -1873,9 +1885,11 @@ Test.Aura.AuraLocalizationServiceTest = function() {
 
             // Act
             mockUtil(function() {
-                // when timezone is UTC, callback gets called with the original date
-                targetService.UTCToWallTime(mockDateTime, undefined, function(date) {
-                    actual = date;
+                mockMoment(function () {
+                    // when timezone is UTC, callback gets called with the original date
+                    targetService.UTCToWallTime(mockDateTime, undefined, function(date) {
+                        actual = date;
+                    });
                 });
             });
 
@@ -1927,6 +1941,28 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         });
 
         [Fact]
+        function CallbackWithOriginalDateWhenTimezoneLibIsMissing() {
+            // Arrange
+            var targetService = new Aura.Services.AuraLocalizationService();
+            var expected = Stubs.GetObject({});
+            var actual;
+
+            var mockMomentWithoutTimezone = Mocks.GetMock(Object.Global(), "moment", {});
+
+            // Act
+            mockUtil(function () {
+                mockMomentWithoutTimezone(function () {
+                    targetService.WallTimeToUTC(expected, "GMT", function(date) {
+                        actual = date;
+                    });
+                });
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         function CallbackWithOriginalDateWhenZoneIsGMT() {
             // Arrange
             var targetService = new Aura.Services.AuraLocalizationService();
@@ -1962,9 +1998,11 @@ Test.Aura.AuraLocalizationServiceTest = function() {
 
             // Act
             mockUtil(function() {
-                // when timezone is UTC, callback gets called with the original date
-                targetService.WallTimeToUTC(mockDateTime, undefined, function(date) {
-                    actual = date;
+                mockMoment(function () {
+                    // when timezone is UTC, callback gets called with the original date
+                    targetService.WallTimeToUTC(mockDateTime, undefined, function(date) {
+                        actual = date;
+                    });
                 });
             });
 

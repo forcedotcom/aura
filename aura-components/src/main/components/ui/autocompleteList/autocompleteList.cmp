@@ -44,6 +44,7 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="change" value="{!v.visible}" action="{!c.visibleChange}"/>
+    <aura:handler name="change" value="{!v.items}" action="{!c.handleItemChange}"/>
     <aura:handler name="listHighlight" action="{!c.handleListHighlight}"/>
     <aura:handler name="matchText" action="{!c.matchText}"/>
     <aura:handler name="pressOnHighlighted" action="{!c.handlePressOnHighlighted}"/>

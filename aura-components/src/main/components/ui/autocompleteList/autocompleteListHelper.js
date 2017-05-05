@@ -72,7 +72,13 @@
         });
         abortEvent.fire();
     },
-
+    
+    updateItems: function(cmp) {
+        var items = cmp.get("v.items");
+        if (items && items.length > 0) {
+            cmp.set("v.privateItems", items);
+        }
+    },
 
     getEventSourceOptionComponent: function (component, event) {
         //option could be a compound component so look for the right option

@@ -29,15 +29,21 @@ function SecureAuraEvent(event, key) {
      */
     function deepUnfilterEventParams(baseObject, members) {
         var value;
+        var branchValue;
         for (var property in members) {
             value = members[property];
             if (value !== undefined && value !== null && (Array.isArray(value) || $A.util.isPlainObject(value))) {
-                var branchValue = baseObject[property];
+                branchValue = baseObject[property];
                 baseObject[property] = deepUnfilterEventParams(branchValue, value);
                 continue;
             }
             if (typeof value !== "function") {
                 value = $A.lockerService.getRaw(value);
+                // If value was just a proxy around a plain object,there could still be secure objects inside it, spider through it and unfilter everything inside it
+                if ($A.util.isPlainObject(value)) {
+                    branchValue = baseObject[property];
+                    value = deepUnfilterEventParams(branchValue, value);
+                }
             } else {
                 value = SecureObject.filterEverything(o, value, { defaultKey: key });
             }

@@ -238,6 +238,9 @@ SecureObject.filterArguments = function(st, args, options) {
     if (options && options.beforeCallback) {
         options.beforeCallback.apply(st, args);
     }
+    if (options && options.unfilterEverything) {
+        return options.unfilterEverything.call(st, args);
+    }
 
     var rawArguments = options && options.rawArguments;
     for (var n = 0; n < args.length; n++) {
@@ -821,7 +824,7 @@ function getArrayProxyHandler(key) {
                 }
                 return true;
             }
-            // No handling "apply" and "construct" trap and letting the underlying raw handle apply and throw the error
+            // Not handling "apply" and "construct" trap and letting the underlying raw handle apply and throw the error
         };
 
         ls_setKey(handler, key);
@@ -1042,13 +1045,7 @@ SecureObject.createFilteredMethod = function(st, raw, methodName, options) {
         enumerable : true,
         writable : true,
         value : function() {
-            var filteredArgs;
-            // Allow hook for pre-processing of the arguments
-            if (options && options.beforeCallback) {
-                filteredArgs = options.beforeCallback(st, arguments);
-            } else{
-                filteredArgs = SecureObject.filterArguments(st, arguments, options);
-            }
+            var filteredArgs = SecureObject.filterArguments(st, arguments, options);
 
             var fnReturnedValue = raw[methodName].apply(raw, filteredArgs);
 

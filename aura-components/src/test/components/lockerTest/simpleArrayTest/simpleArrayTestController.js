@@ -38,6 +38,7 @@
         obj2.arr[5] = 5; // assign the newly created index
         helper.verifyArrayElements(testUtils, [0, 2, 3, undefined, undefined, 5, 6], obj2.arr);
     },
+
     testArrayProperties: function (component, event, helper) {
         var testUtils = component.get("v.testUtils");
         var obj1 = {
@@ -57,6 +58,12 @@
 
         testObj.arr = [1, 2, 3];
         helper.verifyArrayElements(testUtils, [1, 2, 3], testObj.arr);
+
+        var properties = [];
+        for (var prop in testObj.arr) {
+            properties.push(prop);
+        }
+        helper.verifyArrayElements(testUtils, ["0", "1", "2"], properties);
     },
 
     testArrayPop: function (component, event, helper) {
@@ -332,6 +339,21 @@
             },
             "Failed to execute forEach with a custom this"
         );
+    },
+
+    testArrayForIn: function (component, event, helper) {
+        var testUtils = component.get("v.testUtils");
+        var obj1 = {
+            arr: [1, 2, 3]
+        };
+        component.set("v.wrapUnwrapTestObj", obj1);
+        var testObj = component.get("v.wrapUnwrapTestObj");
+
+        var properties = [];
+        for (var prop in testObj.arr) {
+            properties.push(prop);
+        }
+        helper.verifyArrayElements(testUtils, ["0", "1", "2"], properties);
     },
 
     testArrayAssociativeArray: function (component, event, helper) {

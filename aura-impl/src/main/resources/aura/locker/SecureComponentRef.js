@@ -95,7 +95,7 @@ function SecureComponentRef(component, key) {
                 {
                     defaultKey: key,
                     // If SecureComponentRef is an unlockerized component, then let it have access to raw arguments
-                    beforeCallback: ($A.lockerService.wrapComponent(component) === component) ? function(st, args){ return deepUnfilterMethodArguments([], args) } : undefined
+                    unfilterEverything: ($A.lockerService.wrapComponent(component) === component) ? function(args){ return deepUnfilterMethodArguments([], args); } : undefined
                 }
             );
         }, o);

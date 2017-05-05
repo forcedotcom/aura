@@ -68,6 +68,11 @@
             cmp.testArrayForEach();
         }
     },
+    testArrayForIn : {
+        test: function(cmp) {
+            cmp.testArrayForIn();
+        }
+    },
     testArrayAssociativeArray: {
         test: function(cmp) {
             cmp.testArrayAssociativeArray();

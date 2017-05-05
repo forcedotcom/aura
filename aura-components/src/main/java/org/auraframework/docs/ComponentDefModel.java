@@ -171,7 +171,7 @@ public class ComponentDefModel implements ModelInstance {
                     }
                 }
                 for (Definition def : ((RootDefinition) definition).getBundledDefs().values()) {
-                    if (def.getDescriptor().getDefType() != DefType.DOCUMENTATION) {
+                    if (def.getDescriptor().getDefType() != DefType.DOCUMENTATION && hasAccess(def)) {
                         defs.add(new DefModel(def.getDescriptor()));
                     }
                 }

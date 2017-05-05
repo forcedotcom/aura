@@ -316,7 +316,7 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
                         if (config.appendToBody && config.element) {
                             var nodeToRemove = document.getElementById(config.element.id);
                             if (nodeToRemove) {
-                                nodeToRemove.remove();
+                                nodeToRemove.parentNode.removeChild(nodeToRemove);
                             }
                         }
                     }

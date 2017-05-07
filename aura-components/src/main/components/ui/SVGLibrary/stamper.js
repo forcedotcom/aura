@@ -59,18 +59,20 @@ function StampSVG() { //eslint-disable-line no-unused-vars
 
         uses.forEach(function (use) {
             var src = use.getAttribute("href");
-            var srcSplit = src.split("#");
-            var url = srcSplit.shift();
-            var id = srcSplit.join("#");
+            if (src) {
+                var srcSplit = src.split("#");
+                var url = srcSplit.shift();
+                var id = srcSplit.join("#");
 
-            if (url.length) {
+                if (url.length) {
 
-                (requests[url] || (requests[url] = fetchSVG(url)))
-                    .then(function (svgSpriteElement) {
-                        var svgFragment = svgSpriteElement.getElementById(id);
+                    (requests[url] || (requests[url] = fetchSVG(url)))
+                        .then(function (svgSpriteElement) {
+                            var svgFragment = svgSpriteElement.getElementById(id);
 
-                        embed(svgElement, svgFragment, use);
-                    });
+                            embed(svgElement, svgFragment, use);
+                        });
+                }
             }
         });
     };

@@ -2300,6 +2300,383 @@ Test.Aura.AuraClientServiceTest = function() {
     }
 
     [Fixture]
+    function sendActionXHRs() {
+        var actionTypeForeground = "FOREGROUND";
+        var actionTypeDeferred = "DEFERRED";
+        var actionTypeBackground = "BACKGROUND";
+        var actionTypeCaboose = "CABOOSE";
+        var mockAction = function(actionType, abort) {
+            return {
+                abortIfComponentInvalid : function(v) {
+                    return abort;
+                },
+                isDeferred : function() {
+                    return actionType === actionTypeDeferred;
+                },
+                isBackground : function() {
+                    return actionType === actionTypeBackground;
+                },
+                isCaboose : function() {
+                    return actionType === actionTypeCaboose;
+                },
+            }
+        };
+
+        [Fact]
+        function testReleaseCalledIfSendReturnsFalseForeground() {
+            var actions = [ mockAction(actionTypeForeground) ];
+            var expected = "XHR";
+            var actual = null;
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.getAvailableXHR = function(background) {
+                    return expected;
+                };
+                target.shouldSendOutForegroundActions = function(x,y) {
+                    return true;
+                };
+                target.send = function(xhr, actionsToSend, method) {
+                    return false;
+                };
+                target.deDupe = function() {
+                    return false;
+                };
+                target.releaseXHR = function(v) {
+                    actual = v;
+                };
+            });
+
+            target.actionsDeferred = actions;
+            target.sendActionXHRs();
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function testReleaseCalledIfSendReturnsFalseForegroundExclusivity() {
+            var actions = [ mockAction(actionTypeForeground) ];
+            var expected = "XHR";
+            var actual = null;
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.getAvailableXHR = function(background) {
+                    return expected;
+                };
+                target.deDupe = function() {
+                    return false;
+                };
+                target.send = function(xhr, actionsToSend, method) {
+                    return false;
+                };
+                target.releaseXHR = function(v) {
+                    actual = v;
+                };
+                target.xhrExclusivity = true;
+            });
+
+            target.actionsDeferred = actions;
+            target.sendActionXHRs();
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function testReleaseCalledIfSendReturnsFalseBackground() {
+            var actions = [ mockAction(actionTypeBackground) ];
+            var expected = "XHR";
+            var actual = null;
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.getAvailableXHR = function(background) {
+                    return expected;
+                };
+                target.deDupe = function() {
+                    return false;
+                };
+                target.send = function(xhr, actionsToSend, method) {
+                    return false;
+                };
+                target.releaseXHR = function(v) {
+                    actual = v;
+                };
+            });
+
+            target.actionsDeferred = actions;
+            target.sendActionXHRs();
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function testTwoForegroundSentInOneXHRNoExclusivity() {
+            var actions = [ mockAction(actionTypeForeground), mockAction(actionTypeForeground) ];
+            var expected = [ actions ];
+            var actual = [];
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.getAvailableXHR = function(background) {
+                    return true;
+                };
+                target.send = function(xhr, actionsToSend, method) {
+                    actual.push(actionsToSend);
+                    return true;
+                };
+            });
+
+            target.actionsDeferred = actions;
+            target.sendActionXHRs();
+            Assert.Equal(expected, actual);
+        }
+
+        function testTwoForegroundSentInTwoXHRsExclusivity() {
+            var actions = [ mockAction(actionTypeForeground), mockAction(actionTypeForeground) ];
+            var expected = [ [ actions[0] ], [ actions[1] ] ];
+            var actual = [];
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.getAvailableXHR = function(background) {
+                    return true;
+                };
+                target.shouldSendOutForegroundActions = function(x,y) {
+                    return true;
+                };
+                target.send = function(xhr, actionsToSend, method) {
+                    actual.push(actionsToSend);
+                    return true;
+                };
+                target.xhrExclusivity = true;
+            });
+
+            target.actionsDeferred = actions;
+            target.sendActionXHRs();
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function testCabooseSentWithForeground() {
+            var actions = [ mockAction(actionTypeForeground), mockAction(actionTypeCaboose) ];
+            var expected = [ actions ];
+            var actual = [];
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.getAvailableXHR = function(background) {
+                    return true;
+                };
+                target.send = function(xhr, actionsToSend, method) {
+                    actual.push(actionsToSend);
+                    return true;
+                };
+            });
+
+            target.actionsDeferred = actions;
+            target.sendActionXHRs();
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function testCabooseFound() {
+            var actions = [ mockAction(actionTypeCaboose) ];
+            var expected = 1
+            var actual = null;
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.getAvailableXHR = function(background) {
+                    return true;
+                };
+                target.shouldSendOutForegroundActions = function(foreground,caboose) {
+                    actual = caboose;
+                    return true;
+                };
+                target.send = function(xhr, actionsToSend, method) {
+                    return true;
+                };
+            });
+
+            target.actionsDeferred = actions;
+            target.sendActionXHRs();
+            Assert.Equal(expected, actual);
+        }
+
+
+        [Fact]
+        function testCabooseSent() {
+            var actions = [ mockAction(actionTypeCaboose) ];
+            var expected = [ actions ];
+            var actual = [];
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.getAvailableXHR = function(background) {
+                    return true;
+                };
+                target.shouldSendOutForegroundActions = function(foreground,caboose) {
+                    return true
+                };
+                target.send = function(xhr, actionsToSend, method) {
+                    actual.push(actionsToSend);
+                    return true;
+                };
+            });
+
+            target.actionsDeferred = actions;
+            target.sendActionXHRs();
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function testCabooseNotSentIfRejected() {
+            var actions = [ mockAction(actionTypeCaboose) ];
+            var expected = [ ];
+            var actual = [];
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.getAvailableXHR = function(background) {
+                    return expected;
+                };
+                target.shouldSendOutForegroundActions = function(foreground, caboose) {
+                    return false;
+                };
+                target.send = function(xhr, actionsToSend, method) {
+                    actual.push(actionsToSend);
+                    return true;
+                };
+            });
+
+            target.actionsDeferred = actions;
+            target.sendActionXHRs();
+            Assert.Equal(expected, actual);
+        }
+
+
+        [Fact]
+        function testCabooseSentUnconditionallyWithExclusivity() {
+            var actions = [ mockAction(actionTypeCaboose) ];
+            var expected = [ actions ];
+            var actual = [];
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.getAvailableXHR = function(background) {
+                    return true;
+                };
+                target.shouldSendOutForegroundActions = function(x,y) {
+                    return false;
+                };
+                target.deDupe = function() {
+                    return false;
+                };
+                target.send = function(xhr, actionsToSend, method) {
+                    actual.push(actionsToSend);
+                    return true;
+                };
+                target.xhrExclusivity = true;
+            });
+
+            target.actionsDeferred = actions;
+            target.sendActionXHRs();
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function testDeferredSentWhenIdle() {
+            var actions = [ mockAction(actionTypeDeferred), mockAction(actionTypeDeferred) ];
+            var expected = [ [ actions[0] ], [ actions[1] ] ];
+            var actual = [];
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.getAvailableXHR = function(background) {
+                    return true;
+                };
+                target.idle = function() {
+                    return true;
+                };
+                target.deDupe = function() {
+                    return false;
+                };
+                target.send = function(xhr, actionsToSend, method) {
+                    actual.push(actionsToSend);
+                    return true;
+                };
+            });
+
+            target.actionsDeferred = actions;
+            target.sendActionXHRs();
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function testDeferredNotSentWhenNotIdle() {
+            var actions = [ mockAction(actionTypeDeferred), mockAction(actionTypeDeferred) ];
+            var expected = [ ];
+            var actual = [];
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.getAvailableXHR = function(background) {
+                    return true;
+                };
+                target.idle = function() {
+                    return false;
+                };
+                target.send = function(xhr, actionsToSend, method) {
+                    actual.push(actionsToSend);
+                    return true;
+                };
+                target.xhrExclusivity = true;
+            });
+
+            target.actionsDeferred = actions;
+            target.sendActionXHRs();
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function testDeferredLeftWhenIdle() {
+            var actions = [ mockAction(actionTypeDeferred), mockAction(actionTypeDeferred) ];
+            var expected = actions;
+            var actual = [];
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.getAvailableXHR = function(background) {
+                    return true;
+                };
+                target.idle = function() {
+                    return false;
+                };
+                target.send = function(xhr, actionsToSend, method) {
+                    actual.push(actionsToSend);
+                    return true;
+                };
+                target.xhrExclusivity = true;
+            });
+
+            target.actionsDeferred = actions;
+            target.sendActionXHRs();
+            Assert.Equal(expected, target.actionsDeferred);
+        }
+    }
+
+    [Fixture]
     function dumpCachesAndReload() {
         [Fact]
         function testDumpCacheSetsFunctionBeforeReady() {

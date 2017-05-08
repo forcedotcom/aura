@@ -511,7 +511,8 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 // if(cmp.returnFocus) {
                 //     cmp.returnFocus.focus();
                 // } else 
-                if(el && el.querySelectorAll) {
+                var returnFocusElement = cmp.getAttributeValueProvider().returnFocus;
+                if(el && el.querySelectorAll && $A.util.isUndefinedOrNull(returnFocusElement)) {
                     var focusables = this.getFocusables(el);
                     focusables.initial && focusables.initial.focus();
                 }

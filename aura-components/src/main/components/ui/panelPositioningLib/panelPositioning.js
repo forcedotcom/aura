@@ -286,46 +286,42 @@ function lib(constraint, elementProxyFactory, utils, win) { //eslint-disable-lin
             constraints = constraints.concat(constraintList);
             reposition();
 
-            return (function () {
+            return {
+                disable: function () {
+                    constraintList.forEach(function (constraintToDisable) {
+                        constraintToDisable.detach();
+                    });
+                },
 
+                enable: function () {
+                    constraintList.forEach(function (constraintToEnable) {
+                        constraintToEnable.attach();
+                    });
+                },
 
-                return {
+                destroy: function () {
+                    if (scrollableParent) {
+                        scrollableParent.removeEventListener('scroll', handleRepositionEvents);
+                    }
 
-                    disable: function () {
-                        constraintList.forEach(function (constraintToDisable) {
-                            constraintToDisable.detach();
-                        });
-                    },
+                    while (constraintList.length > 0) {
+                        constraintList.pop().destroy();
+                    }
 
-                    enable: function () {
-                        constraintList.forEach(function (constraintToEnable) {
-                            constraintToEnable.attach();
-                        });
-                    },
-
-                    destroy: function () {
-                        if (scrollableParent) {
-                            scrollableParent.removeEventListener('scroll', handleRepositionEvents);
-                        }
-
-                        while (constraintList.length > 0) {
-                            constraintList.pop().destroy();
-                        }
-
-                        // Clean up node appended to body of dom
-                        if (config.appendToBody && config.element) {
-                            var nodeToRemove = document.getElementById(config.element.id);
-                            if (nodeToRemove) {
-                                nodeToRemove.parentNode.removeChild(nodeToRemove);
-                            }
+                    // Clean up node appended to body of dom
+                    if (config.appendToBody && config.element) {
+                        var nodeToRemove = document.getElementById(config.element.id);
+                        if (nodeToRemove) {
+                            nodeToRemove.parentNode.removeChild(nodeToRemove);
                         }
                     }
-                };
-
-            })();
-
+                }
+            };
         },
 
+        /**
+         * Reposition
+         */
         reposition: reposition
     };
 

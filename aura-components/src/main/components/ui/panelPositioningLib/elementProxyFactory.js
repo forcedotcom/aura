@@ -63,22 +63,19 @@ function lib(elementProxy, utils, win) { //eslint-disable-line no-unused-vars
     function elementProxyFactory(el) {
         var key, newProxy;
 
-        if(!utils.isWindow(el)) {
-    
-            $A.assert(el && el.nodeType && (el.nodeType !== 1 || el.nodeType !== 11), "Element Proxy requires an element");
-        }
-        
-        //validate node
-        if(!utils.isWindow(el) && !el.id) {
-            el.id = w.$A.getComponent(el).getGlobalId();
-        }
-
         if(utils.isWindow(el)) {
             key = 'window';
         } else {
+            // 1 - Node.ELEMENT_NODE, 11 - Node.DOCUMENT_FRAGMENT_NODE
+            $A.assert(el && el.nodeType && (el.nodeType !== 1 || el.nodeType !== 11), "Element Proxy requires an element");
+
+            if(!el.id) {
+                var cmp = w.$A.getComponent(el);
+                el.id = cmp ? cmp.getGlobalId() : "window";
+            }
             key = el.id;
         }
-        
+
         if(proxyCache[key]) {
             proxyCache[key].refCount++;
             return proxyCache[key].el;

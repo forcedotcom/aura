@@ -40,14 +40,16 @@ function lib() { //eslint-disable-line no-unused-vars
             return $A.createComponentFromConfig(clonedDef);
         }
 
-        function renderContainer(containerManager, newContainer) {
-            var children = containerManager.get('v.body'),
-                dom      = containerManager.getElement();
+        function renderContainer(containerWrapper, newContainer) {
+            if(containerWrapper.isValid()) {
+                var children = containerWrapper.get('v.body'),
+                    dom      = containerWrapper.getElement();
 
-            $A.render(newContainer, dom);
-            $A.afterRender(newContainer);
-            children.push(newContainer);
-            containerManager.set('v.body', children, true /* dont mark it dirty for rendering */);
+                $A.render(newContainer, dom);
+                $A.afterRender(newContainer);
+                children.push(newContainer);
+                containerWrapper.set('v.body', children, true /* dont mark it dirty for rendering */);
+            }
         }
 
         // Public methods

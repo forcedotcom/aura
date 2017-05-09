@@ -1732,6 +1732,9 @@ Aura.Utils.Util.prototype.isHTMLElement = function(obj) {
  * @returns {Boolean} True if the object is an SVGElement object, or false otherwise.
  */
 Aura.Utils.Util.prototype.isSVGElement = function(obj) {
+    if(obj.correspondingUseElement) {
+        return obj.correspondingUseElement instanceof SVGElement || obj instanceof SVGElement;
+    }
     return obj instanceof SVGElement;
 };
 

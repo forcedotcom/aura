@@ -133,6 +133,20 @@
             var actual = $A.util.contains(divElement, svgElement);
             $A.test.assertTrue(actual);
         }
-    }
+    },
 
+    testContainsForSVGElementInstance: {
+        test: function() {
+            var svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            var divElement = document.createElement("div");
+            //We don't create a real SVGElementInstance here because SVGElementInstance's are not
+            //supported in all browsers.
+            var svgElementInstance = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svgElementInstance["correspondingUseElement"] = svgElement;
+
+            divElement.appendChild(svgElementInstance);
+            var actual = $A.util.contains(divElement, svgElementInstance);
+            $A.test.assertTrue(actual);
+        }
+    }
 })

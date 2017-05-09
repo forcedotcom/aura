@@ -797,7 +797,8 @@ Component.prototype.destroy = function() {
         $A.renderingService.removeElement(this._marker, this.getContainer());
         this._marker = null;
     }
-	this.elements=undefined;
+    this.elements=undefined;
+    this.allElements=undefined;
 
     // Reset all attributes and clear expressions;
     // Don't do this until the topmost parent, to allow customer code to read attributes in destroy events
@@ -1068,8 +1069,16 @@ Component.prototype.associateElement = function(element) {
             this.elements = [];
         }
 
-        this.elements.push(element);
-        this.associateRenderedBy(this, element);
+        if (!this.allElements) {
+            this.allElements = [];
+        }
+
+        this.allElements.push(element);
+        // Is it NOT a marker, put it in the customer accessed elements collection. 
+        if(!element.aura_marker) {
+            this.elements.push(element);
+            this.associateRenderedBy(this, element);
+        }
     }
 };
 
@@ -1089,6 +1098,9 @@ Component.prototype.disassociateElements = function() {
     } else {
         if(this.elements){
             this.elements.length=0;
+        }
+        if(this.allElements) {
+            this.allElements.length=0;
         }
     }
 };

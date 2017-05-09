@@ -588,7 +588,7 @@ public class AuraTestFilter {
                     "} else {\n"+
                         "if(window.sessionStorage) {\n"+
                             //"var oldStatus = sessionStorage.getItem('TestRunStatus'); \n"+
-                            "sessionStorage.setItem('TestRunStatus','Push %s to bootstrap run after, timeStamp#'+$A.test.time()+'.'); \n"+
+                            "sessionStorage.setItem('TestRunStatus','Push %s to bootstrap run after, timeStamp#'+((window.$A && window.$A.test) ? $A.test.time():Date.now())+'.'); \n"+
                         "}\n"+
                         "window.Aura || (window.Aura = {}); \n"+
                         "window.Aura.afterBootstrapReady || (window.Aura.afterBootstrapReady = []); \n"+

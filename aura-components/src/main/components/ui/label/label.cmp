@@ -24,7 +24,7 @@
     <aura:attribute name="requiredIndicator" type="Aura.Component[]" description="A component that displays the indicator for the required field. "/>
 
     <label class="{!join(' ', v.class, token('uiLabel.label'), v.labelDisplay ? null : token('uiLabel.assistive'))}" aura:id="labelElement" for="{!v.for}">
-        <span aria-hidden="{!v.for ? true : false }" title="{!v.title}" class="{!v.labelDisplay ? null : 'assistiveText' }">{!v.label}</span>
+        <span title="{!v.title}" class="{!v.labelDisplay ? null : 'assistiveText' }">{!v.label}</span>
         {!v.body}
         {!v.requiredIndicator}
     </label>

@@ -206,17 +206,19 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
             }
 
             private void prependInterop(Writer writer, ResourceLoader rl) throws IOException {
-                String minified = "";
-                URL engineResource = rl.getResource("aura/resources/engine/engine" + minified + ".js");
-                
-                if (mode.allowedInProduction()) {
-                    minified = ".min";
-                }
                 // Skipping DOC mode due to parsing issues on our very old SpiderMonkey version dependency
-                if (engineResource != null && mode != JavascriptGeneratorMode.DOC) {
-                    writer.write("try {\n");
-                    appendResourceToWriter(writer, "engine", engineResource);
-                    writer.write("\n} catch (e) {}");
+                if (mode != JavascriptGeneratorMode.DOC) {
+                    String minified = "";
+                    if (mode.allowedInProduction()) {
+                        minified = ".min";
+                    }
+                    URL engineResource = rl.getResource("aura/resources/engine/engine" + minified + ".js");
+
+                    if (engineResource != null) {
+                        writer.write("try {\n");
+                        appendResourceToWriter(writer, "engine", engineResource);
+                        writer.write("\n} catch (e) {}");
+                    }
                 }
             }
 

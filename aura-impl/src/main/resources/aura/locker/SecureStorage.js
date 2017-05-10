@@ -38,7 +38,13 @@ function SecureStorage(storage, type, key) {
     var stringizedKey = JSON.stringify(key);
     var nextSyntheticKey = "LSSNextSynthtic:" + type;
     var storedIndexKey = "LSSIndex:" + type + stringizedKey;
-    var nameToSyntheticRaw = storage.getItem(storedIndexKey);
+    var nameToSyntheticRaw;
+	try {
+		nameToSyntheticRaw = storage.getItem(storedIndexKey);
+	} catch(e) {
+		// There is a bug in google chrome where localStorage becomes inaccessible.
+		// Don't fast fail and break all applications. Defer the exception throwing to when the app actually uses localStorage
+	}
     var nameToSynthetic = nameToSyntheticRaw ? JSON.parse(nameToSyntheticRaw) : {};
     
     function persistSyntheticNameIndex() {

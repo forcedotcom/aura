@@ -32,6 +32,8 @@
 
     <p>The other tabs vary depending on the type of definition. For components, you might see tabs for the client-side renderer and client-side controller if they're included in the component's bundle.</p>
 
+    <p>If you're a Salesforce developer, there's more documentation for components, events, and interfaces in the <a href="https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/aura_compref.htm" target="_blank">Lightning Components Developer Guide</a>.</p>
+    
     <h3>Support Level for Definitions</h3>
 
     <p>Each definition has a support level indicating whether it is fully supported or not. The support level is defined in the <code>support</code> system attribute in the root tag of the definition. The support level is shown in the top-right corner for each definition in the Reference tab.</p>

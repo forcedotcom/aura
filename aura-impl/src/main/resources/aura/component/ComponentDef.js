@@ -51,9 +51,15 @@ function ComponentDef(config) {
 
     // Initialize the concrete component class if provided
     if (config.hasOwnProperty("componentClass")) {
-        var componentClass = $A.util.globalEval(config["componentClass"], undefined, $A.clientService.getSourceMapsUrl(descriptor.toString()));
-        componentClass();
-    }    
+        try {
+            var componentClass = $A.util.globalEval(config["componentClass"], undefined, $A.clientService.getSourceMapsUrl(descriptor.toString()));
+            componentClass();
+        } catch (e) {
+            var auraError = new $A.auraError("ComponentDef initialization error", e);
+            auraError["component"] = descriptor.getQualifiedName();
+            throw auraError;
+        }
+    }
 
     var appHandlerDefs;
     var cmpHandlerDefs;

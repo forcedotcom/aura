@@ -9,8 +9,8 @@ Once running, to see the app browse to:
 
 which should redirect you to 
 
-  http://localhost:8080/<myartifactId>/<myartifactId>.app
+  http://localhost:8080/example/<artifactId>.app
 
 To edit the app, open:
 
-  src/main/webapp/WEB-INF/components/<myartifactId>/<myartifactId>/<myartifactId>.app
+  src/main/components/example/<artifactId>/<artifactId>.app

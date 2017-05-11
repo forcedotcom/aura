@@ -1,0 +1,4 @@
+<aura:component>
+    <aura:attribute name="text" type="String" default="" access="GLOBAL" />
+    <p>{!v.text}</p>
+</aura:component>

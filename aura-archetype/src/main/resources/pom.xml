@@ -6,9 +6,12 @@
     <groupId>\${groupId}</groupId>
     <artifactId>\${artifactId}</artifactId>
     <version>\${version}</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <properties>
+        <custom.home>\${basedir}</custom.home>
+        <components.dir>custom-components</components.dir>
+        <modules.dir>custom-modules</modules.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -27,27 +30,12 @@
     <dependencies>
         <dependency>
             <groupId>org.auraframework</groupId>
-            <artifactId>aura-util</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
-            <artifactId>aura</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
-            <artifactId>aura-impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
             <artifactId>aura-components</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
-            <artifactId>aura-impl-expression</artifactId>
+            <artifactId>aura-modules</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -82,14 +70,34 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.mortbay.jetty</groupId>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>3.0.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.0.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.6.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.0.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-maven-plugin</artifactId>
-                    <version>8.1.11.v20130520</version>
+                    <version>9.4.5.v20170502</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.16</version>
+                    <version>2.19.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -98,16 +106,136 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-war-plugin</artifactId>
-                    <version>2.1.1</version>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>1.8</version>
                 </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
             <plugin>
-                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <!-- index components -->
+                    <execution>
+                        <id>index-components</id>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <target>
+                                <path id="definitions">
+                                    <fileset dir="src/main/components">
+                                        <include name="**/*.app" />
+                                        <include name="**/*.auradoc" />
+                                        <include name="**/*.cmp" />
+                                        <include name="**/*.css" />
+                                        <include name="**/*.design" />
+                                        <include name="**/*.evt" />
+                                        <include name="**/*.flavors" />
+                                        <include name="**/*.intf" />
+                                        <include name="**/*.js" />
+                                        <include name="**/*.lib" />
+                                        <include name="**/*.svg" />
+                                        <include name="**/*.tokens" />
+                                    </fileset>
+                                </path>
+                                <pathconvert property="definitionList" refid="definitions" pathsep=",">
+                                    <!-- Allow either slash (Windows actually uses both) -->
+                                    <regexpmapper from=".*[/\\]([^/\\]*)[/\\]([^/\\]*)[/\\](.*)" to="\1/\2/\3" />
+                                </pathconvert>
+                                <echo file="target/src-gen/main/components/.index">\${definitionList}</echo>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>index-modules</id>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <target>
+                                <path id="definitions">
+                                    <fileset dir="src/main/modules">
+                                        <include name="**/*" />
+                                    </fileset>
+                                </path>
+                                <pathconvert property="definitionList" refid="definitions" pathsep=",">
+                                    <!-- Allow either slash (Windows actually uses both) -->
+                                    <regexpmapper from=".*[/\\]([^/\\]*)[/\\]([^/\\]*)[/\\](.*)" to="\1/\2/\3" />
+                                </pathconvert>
+                                <echo file="target/src-gen/main/modules/.index">\${definitionList}</echo>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-components</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/components</directory>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>target/src-gen/main/components</directory>
+                                    <includes>
+                                        <include>.index</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>\${project.build.outputDirectory}/\${components.dir}</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-modules</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/modules</directory>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>target/src-gen/main/modules</directory>
+                                    <includes>
+                                        <include>.index</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>\${project.build.outputDirectory}/\${modules.dir}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <configuration>
+                    <useTestClasspath>true</useTestClasspath>
+                    <useTestScope>true</useTestScope>
+                    <systemProperties>
+                        <systemProperty>
+                            <name>custom.home</name>
+                            <value>\${custom.home}</value>
+                        </systemProperty>
+                    </systemProperties>
                     <stopKey>simple</stopKey>
                     <stopPort>18080</stopPort>
                 </configuration>
@@ -115,16 +243,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -160,18 +283,29 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.mortbay.jetty</groupId>
+                        <groupId>org.eclipse.jetty</groupId>
                         <artifactId>jetty-maven-plugin</artifactId>
+                        <configuration>
+                            <scanIntervalSeconds>10</scanIntervalSeconds>
+                            <stopKey>aura-int-test</stopKey>
+                            <stopPort>19999</stopPort>
+                            <daemon>true</daemon>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>start-jetty</id>
                                 <phase>pre-integration-test</phase>
                                 <goals>
-                                    <goal>run</goal>
+                                    <goal>start</goal>
                                 </goals>
                                 <configuration>
-                                    <scanIntervalSeconds>5</scanIntervalSeconds>
-                                    <daemon>true</daemon>
+                                    <scanIntervalSeconds>0</scanIntervalSeconds>
+                                    <systemProperties>
+                                        <systemProperty>
+                                            <name>custom.home</name>
+                                            <value>${custom.home}</value>
+                                        </systemProperty>
+                                    </systemProperties>
                                 </configuration>
                             </execution>
                             <execution>

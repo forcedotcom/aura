@@ -35,17 +35,28 @@ You need:
 * JDK 1.8
 * Apache Maven 3
 
-### Step 1: Generate a Template from the Aura Archetype
+### Step 1: Clone Aura git repo and build Archetype
+
+1. Open a command line window.
+2. Clone or download Aura maven project using the above github button.
+3. Navigate to root `aura` directory
+4. Build Aura
+
+    `mvn clean install`
+
+### Step 2: Generate a Template from the Aura Archetype
 
 1. Open a command line window.
 2. Navigate to the directory where you want to create your project template and run:
 
-    `mvn archetype:generate -DarchetypeCatalog=http://repo.auraframework.org/libs-release-local/archetype-catalog.xml`
+    `mvn archetype:generate -DarchetypeCatalog=local`
        
-3. When prompted to choose an archetype, enter `1`.
-4. Select the latest archetype version, or press enter for the default version.
-       The archetype is downloaded to your machine.
-5. Enter these values:
+3. When prompted to choose an archetype, type the number that corresponds with Aura archetype.
+
+    `Choose archetype:
+     1: local -> org.auraframework:simple-aura-archetype (archetype for Aura-based "hello, world")`
+     
+4 Enter these values:
 <pre><code>
     Define value for property 'groupId': org.myGroup
     Define value for property 'artifactId': helloWorld
@@ -53,7 +64,7 @@ You need:
     Define value for property 'package': org.myGroup
 </code></pre>
     **Note**: The artifactId can only contain alphanumeric characters.
-6. When prompted to confirm properties configuration, enter `Y`.
+5. When prompted to confirm properties configuration, enter `Y`.
 The following output confirms that your template has been generated successfully.
 <pre><code>
     [INFO] ----------------------------------------------------------------------------
@@ -78,7 +89,7 @@ The following output confirms that your template has been generated successfully
     [INFO] ------------------------------------------------------------------------
 </code></pre>
 
-### Step 2: Build and Run Your Project
+### Step 3: Build and Run Your Project
    
 1. On the command line, navigate to the directory for your new app.
 
@@ -95,7 +106,7 @@ The following output confirms that your template has been generated successfully
     To use another port, append: `-Djetty.port=portNumber. For example, mvn jetty:run -Djetty.port=9877`.
 4. Test your app in a browser by navigating to:
 
-    `http://localhost:8080/helloWorld/helloWorld.app`       
+    `http://localhost:8080/example/helloWorld.app`       
 You should see a simple greeting in your browser.
 5. To stop the Jetty server and free up the port when you are finished, press `CTRL+C` on the command line.
     

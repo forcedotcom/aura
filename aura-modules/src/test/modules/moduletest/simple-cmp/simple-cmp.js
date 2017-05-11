@@ -3,7 +3,7 @@ import { const1 } from "moduleTest:testLib";
 import { log } from "util.js";
 
 export default class Simple extends Element {
-    constructor () {
+    constructor() {
         super();
         log('>>> const:', const1);
     }
@@ -16,13 +16,13 @@ export default class Simple extends Element {
 
     static publicMethods = ['test'];
 
-    handleFireAction () {
+    handleFireAction() {
         if (this.callbackaction) {
             this.callbackaction({ something: 'true' });
         }
     }
-    
-    handlePressEvent () {
+
+    handlePressEvent() {
         const event = new CustomEvent('press', {
             bubbles: true,
             cancelable: true,
@@ -32,8 +32,7 @@ export default class Simple extends Element {
         this.dispatchEvent(event);
     }
 
-    test () {
+    test() {
         console.log('Test method!'); // eslint-disable-line no-console
     }
 }
-

@@ -10,6 +10,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <aura.version>${project.version}</aura.version>
+        <jetty.version>9.4.0.v20161208</jetty.version>
     </properties>
 
     <repositories>
@@ -28,32 +30,32 @@
         <dependency>
             <groupId>org.auraframework</groupId>
             <artifactId>aura-util</artifactId>
-            <version>${project.version}</version>
+            <version>${aura.version}</version>
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
             <artifactId>aura</artifactId>
-            <version>${project.version}</version>
+            <version>${aura.version}</version>
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
             <artifactId>aura-impl</artifactId>
-            <version>${project.version}</version>
+            <version>${aura.version}</version>
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
             <artifactId>aura-components</artifactId>
-            <version>${project.version}</version>
+            <version>${aura.version}</version>
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
             <artifactId>aura-impl-expression</artifactId>
-            <version>${project.version}</version>
+            <version>${aura.version}</version>
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
             <artifactId>aura-resources</artifactId>
-            <version>${project.version}</version>
+            <version>${aura.version}</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.pjl-comp-filter</groupId>
@@ -82,9 +84,9 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.mortbay.jetty</groupId>
+                    <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-maven-plugin</artifactId>
-                    <version>8.1.11.v20130520</version>
+                    <version>\${jetty.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -105,7 +107,7 @@
         </pluginManagement>
         <plugins>
             <plugin>
-                <groupId>org.mortbay.jetty</groupId>
+                <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <configuration>
                     <stopKey>simple</stopKey>
@@ -160,7 +162,7 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.mortbay.jetty</groupId>
+                        <groupId>org.eclipse.jetty</groupId>
                         <artifactId>jetty-maven-plugin</artifactId>
                         <executions>
                             <execution>

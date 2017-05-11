@@ -57,13 +57,13 @@
     </filter>
 
     <filter-mapping>
-        <url-pattern>*.cmp</url-pattern>
         <filter-name>AuraRewriteFilter</filter-name>
+        <url-pattern>*.cmp</url-pattern>
     </filter-mapping>
 
     <filter-mapping>
-        <url-pattern>*.app</url-pattern>
         <filter-name>AuraRewriteFilter</filter-name>
+        <url-pattern>*.app</url-pattern>
     </filter-mapping>
 
 
@@ -95,8 +95,8 @@
     </filter>
 
     <filter-mapping>
-        <url-pattern>/l/*</url-pattern>
         <filter-name>AuraResourceRewriteFilter</filter-name>
+        <url-pattern>/l/*</url-pattern>
     </filter-mapping>
 
     <servlet>

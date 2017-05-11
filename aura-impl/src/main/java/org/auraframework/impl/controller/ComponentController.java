@@ -32,7 +32,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.module.ModuleDef;
-import org.auraframework.ds.servicecomponent.Controller;
+import org.auraframework.ds.servicecomponent.GlobalController;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
@@ -48,13 +48,19 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import com.google.common.collect.Lists;
 
 @ServiceComponent
-public class ComponentController implements Controller {
+public class ComponentController implements GlobalController {
+    private static final String NAME = "aura://ComponentController";
 
     private InstanceService instanceService;
     private ExceptionAdapter exceptionAdapter;
     private DefinitionService definitionService;
     private ContextService contextService;
     private ConfigAdapter configAdapter;
+
+    @Override
+    public String getQualifiedName() {
+        return NAME;
+    }
 
     @AuraEnabled
     public Boolean loadLabels() throws QuickFixException {

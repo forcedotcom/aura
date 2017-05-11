@@ -23,7 +23,6 @@ import java.io.ObjectInputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +44,7 @@ import org.auraframework.cache.Cache;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.compound.controller.CompoundControllerDefFactory;
-import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
+import org.auraframework.impl.controller.AuraGlobalControllerDefRegistry;
 import org.auraframework.impl.java.JavaSourceLoader;
 import org.auraframework.impl.source.SourceFactory;
 import org.auraframework.impl.source.file.FileBundleSourceLoader;
@@ -104,6 +103,8 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     private CachingService cachingService;
 
     private List<ComponentLocationAdapter> locationAdapters;
+
+    private AuraGlobalControllerDefRegistry globalControllerDefRegistry;
 
     private static final Logger _log = Logger.getLogger(RegistryService.class);
 
@@ -315,7 +316,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
                 }
             }
         }
-        
+
         if (modules && moduleBundleSourceLoader != null) {
             markupLoaders.add(moduleBundleSourceLoader);
             DefRegistry defRegistry = new CompilingDefRegistry(moduleBundleSourceLoader, MODULE_PREFIXES, MODULE_DEFTYPES, compilerService);
@@ -323,7 +324,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             // register namespaces to optimize processing of definition references
             configAdapter.addModuleNamespaces(defRegistry.getNamespaces());
         }
-        
+
         //
         // Ooh, now _this_ is ugly. Because internal namespaces are tracked by the
         // SourceFactory constructor, we'd best build a source factory for every loader.
@@ -363,7 +364,8 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         List<DefRegistry> regBuild = Lists.newArrayList();
 
         regBuild.add(AuraStaticTypeDefRegistry.INSTANCE);
-        regBuild.add(AuraStaticControllerDefRegistry.getInstance(definitionService));
+        regBuild.add(globalControllerDefRegistry);
+
         for (ComponentLocationAdapter location : markupLocations) {
             if (location != null) {
                 SourceLocationInfo sli = getSourceLocationInfo(location);
@@ -590,6 +592,11 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         // DefType.COMPONENT before DefType.MODULE
     	locationAdapters.sort((la1, la2) -> la1.type().compareTo(la2.type()));
         this.locationAdapters = locationAdapters;
+    }
+
+    @Inject
+    public void setAuraGlobalControllerDefRegistry(AuraGlobalControllerDefRegistry globalControllerDefRegistry) {
+        this.globalControllerDefRegistry = globalControllerDefRegistry;
     }
 
     public ExceptionAdapter getExceptionAdapter() {

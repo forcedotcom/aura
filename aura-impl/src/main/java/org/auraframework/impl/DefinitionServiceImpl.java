@@ -44,7 +44,7 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.ParentedDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
-import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
+import org.auraframework.impl.controller.AuraGlobalControllerDefRegistry;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
@@ -90,9 +90,11 @@ public class DefinitionServiceImpl implements DefinitionService {
     private CachingService cachingService;
 
     private LoggingService loggingService;
-    
+
     private ConfigAdapter configAdapter;
-    
+
+    private AuraGlobalControllerDefRegistry globalControllerDefRegistry;
+
     @Override
     public <T extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName, Class<T> defClass) {
         return getDefDescriptor(qualifiedName, defClass, null);
@@ -182,7 +184,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         if (descriptor == null) {
             return null;
         }
-            
+
         // TODO: Clean up so that we just walk up descriptor trees and back down them.
         Optional<T> optLocalDef = null;
         if (descriptor instanceof SubDefDescriptor) {
@@ -692,6 +694,11 @@ public class DefinitionServiceImpl implements DefinitionService {
         this.configAdapter = configAdapter;
     }
 
+    @Inject
+    public void setAuraGlobalControllerDefRegistry(AuraGlobalControllerDefRegistry globalControllerDefRegistry) {
+        this.globalControllerDefRegistry = globalControllerDefRegistry;
+    }
+
     /**
      * Get the UID associated with a descriptor.
      *
@@ -991,7 +998,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         currentCC = new CompileContext(descriptor, context, defsCache, clientLibs);
         threadContext.set(currentCC);
         try {
-            currentCC.addMap(AuraStaticControllerDefRegistry.getInstance(this).getAll());
+            currentCC.addMap(globalControllerDefRegistry.getAll());
             Definition def = compileDef(descriptor, currentCC, false);
 
             if (def == null) {

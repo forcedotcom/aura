@@ -15,8 +15,12 @@
  */
 package org.auraframework.impl.controller;
 
+import static org.auraframework.instance.AuraValueProviderType.LABEL;
+
+import javax.inject.Inject;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.ds.servicecomponent.Controller;
+import org.auraframework.ds.servicecomponent.GlobalController;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.instance.GlobalValueProvider;
@@ -25,12 +29,9 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import javax.inject.Inject;
-
-import static org.auraframework.instance.AuraValueProviderType.LABEL;
-
 @ServiceComponent
-public class LabelController implements Controller {
+public class LabelController implements GlobalController {
+    private static final String NAME = "aura://LabelController";
 
     @Inject
     private ContextService contextService;
@@ -43,4 +44,8 @@ public class LabelController implements Controller {
         return (String) labelProvider.getValue(labelRef);
     }
 
+    @Override
+    public String getQualifiedName() {
+        return NAME;
+    }
 }

@@ -28,7 +28,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TokensDef;
-import org.auraframework.ds.servicecomponent.Controller;
+import org.auraframework.ds.servicecomponent.GlobalController;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.StyleService;
 import org.auraframework.system.Annotations.AuraEnabled;
@@ -41,12 +41,20 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * app.css file. See AuraStyleService.js for more details.
  */
 @ServiceComponent
-public final class StyleController implements Controller {
+public final class StyleController implements GlobalController {
+
+    private static final String NAME = "aura://StyleController";
+
     @Inject
     private StyleService styleService;
 
     @Inject
     private DefinitionService definitionService;
+
+    @Override
+    public String getQualifiedName() {
+        return NAME;
+    }
 
     /**
      * Main endpoint. This applies the given token descriptors to the current application's CSS.

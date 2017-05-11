@@ -38,6 +38,7 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.DefinitionServiceImpl;
 import org.auraframework.impl.context.AuraContextImpl;
+import org.auraframework.impl.controller.AuraGlobalControllerDefRegistry;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -59,6 +60,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -68,6 +70,9 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
 
     @Inject
     private CachingService cachingService;
+
+    @Mock
+    private AuraGlobalControllerDefRegistry globalControllerDefRegistry;
 
     @Mock
     private ConfigAdapter configAdapter;
@@ -129,6 +134,9 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
         definitionService.setContextService(contextService);
         definitionService.setConfigAdapter(configAdapter);
         definitionService.setLoggingService(loggingService);
+        definitionService.setAuraGlobalControllerDefRegistry(globalControllerDefRegistry);
+        Mockito.when(globalControllerDefRegistry.getAll()).thenReturn(ImmutableMap.of());
+        
         return definitionService;
     }
 

@@ -28,5 +28,5 @@ import org.auraframework.util.json.Json;
  */
 public interface MetricsService extends AuraService {
 	void serializeMetrics (Json json);
-	void clearMetrics();
+	void serializeMetricsSummary (Json json);
 }

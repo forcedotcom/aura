@@ -55,13 +55,26 @@ public class MetricsServiceImpl implements MetricsService {
         }
     }
 
-    @Override
-    public void clearMetrics() {
-        // TODO Auto-generated method stub
-    }
-
     @Inject
     public void setLoggingService(LoggingService service) {
         this.loggingService = service;
+    }
+
+    @Override
+    public void serializeMetricsSummary(Json json) {
+        try {
+            json.writeMapKey("perfSummary");
+            // actions
+            json.writeMapBegin();
+            json.writeMapEntry("version", "aura");
+            json.writeMapKey("actions");
+            json.writeArrayBegin();
+            this.loggingService.serializeActions(json);
+            json.writeArrayEnd();
+            json.writeMapEnd();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

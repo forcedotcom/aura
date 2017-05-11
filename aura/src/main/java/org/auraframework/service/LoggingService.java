@@ -18,6 +18,7 @@ package org.auraframework.service;
 import java.util.Map;
 
 import org.auraframework.Aura;
+import org.auraframework.instance.Action;
 import org.auraframework.system.LoggingContext;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.util.json.Json;
@@ -68,7 +69,7 @@ public interface LoggingService extends AuraService {
     /**
      * Start timers for an action.
      */
-    void startAction(String actionName);
+    void startAction(String actionName, Action action);
     
     /**
      * Stop all timers for an action

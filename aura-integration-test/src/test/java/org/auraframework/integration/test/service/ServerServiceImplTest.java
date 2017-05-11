@@ -79,7 +79,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         setShouldSetupContext(false);
     }
 
-    private static final Set<String> GLOBAL_IGNORE = Sets.newHashSet("context", "actions", "perf");
+    private static final Set<String> GLOBAL_IGNORE = Sets.newHashSet("context", "actions", "perf", "perfSummary");
 
     // Do not test for null message, it cannot legally be null.
     private static class EmptyActionDef implements ActionDef {

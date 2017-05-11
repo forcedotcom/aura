@@ -119,7 +119,13 @@ TransportMetricsPlugin.prototype.receiveOverride = function(/* config, auraXHR *
         }
     }
 
-    return config["fn"].apply(config["scope"], arguments);
+    var ret = config["fn"].apply(config["scope"], arguments);
+    // the decoded and json parsed message is only available in the response to this method
+    var perfSummary = ret && ret["message"] && ret["message"]["perfSummary"];
+    if (perfSummary && perfSummary["version"] === "core") {
+        endMark["context"]["serverTime"] = perfSummary["request"];
+    }
+    return ret;
 };
 
 TransportMetricsPlugin.prototype.bind = function () {

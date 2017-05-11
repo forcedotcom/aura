@@ -19,11 +19,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.instance.Action;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.LoggingContext;
 import org.auraframework.util.json.Json;
 
 import com.google.common.cache.CacheStats;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 /**
@@ -42,7 +44,7 @@ public class LoggingContextImpl implements LoggingContext {
     private final Map<String, Map<String, Long>> actionStats = Maps.newHashMap();
     
     @Override
-    public void startAction(String actionName) {
+    public void startAction(String actionName, Action action) {
         Map<String, Long> actionStatMap = Maps.newHashMap();
         actionStats.put(actionName, actionStatMap);
         for (Map.Entry<String, Timer> timerEntry : timers.entrySet()) {
@@ -53,11 +55,15 @@ public class LoggingContextImpl implements LoggingContext {
             Counter counter = counterEntry.getValue();
             counter.mark(actionName);
         }
-        startActionTimer(actionName);
+        startActionTimer(actionName, action);
     }
     
-    protected void startActionTimer(String actionName) {
-        startTimer(LoggingService.TIMER_ACTION + actionName);
+    protected void startActionTimer(String actionName, Action action) {
+        String actionId = action.getId();
+        if (actionId == null) {
+            actionId = "none";
+        }
+        startTimer(LoggingService.TIMER_ACTION + actionName, ImmutableMap.of("id", actionId));
     }
     
     protected Map<String, Map<String, Long>> getActionStats() {
@@ -94,12 +100,23 @@ public class LoggingContextImpl implements LoggingContext {
 
     @Override
     public void startTimer(String name) {
+        startTimerInternal(name);
+    }
+
+    private Timer startTimerInternal(String name) {
         Timer t = timers.get(name);
         if (t == null) {
             t = new Timer(name);
             timers.put(name, t);
         }
         t.start();
+        return t;
+    }
+    
+    @Override
+    public void startTimer(String name, Map<String, String> context) {
+        Timer t = startTimerInternal(name);
+        t.setContext(context);
     }
 
     @Override
@@ -296,9 +313,18 @@ public class LoggingContextImpl implements LoggingContext {
         private final String name;
         private int startCount = 0;
         private Map<String, Long> marks = Maps.newHashMap();
+        private Map<String, String> context = null;
 
         public Timer(String name) {
             this.name = name;
+        }
+
+        public void setContext(Map<String, String> context) {
+            this.context = context;
+        }
+        
+        public Map<String, String> getContext() {
+            return context;
         }
 
         public String getName() {

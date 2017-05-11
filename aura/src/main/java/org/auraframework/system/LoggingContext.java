@@ -17,6 +17,7 @@ package org.auraframework.system;
 
 import java.util.Map;
 
+import org.auraframework.instance.Action;
 import org.auraframework.util.json.Json;
 
 import com.google.common.cache.CacheStats;
@@ -26,11 +27,13 @@ import com.google.common.cache.CacheStats;
  */
 public interface LoggingContext {
     
-    void startAction(String actionName);
+    void startAction(String actionName, Action action);
     
     void stopAction(String actionName);
 
     void startTimer(String name);
+    
+    void startTimer(String name, Map<String, String> context);
 
     void stopTimer(String name);
 

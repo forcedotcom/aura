@@ -17,6 +17,7 @@ package org.auraframework.impl;
 
 import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.instance.Action;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.LoggingContext;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
@@ -61,10 +62,10 @@ public class LoggingServiceImpl implements LoggingService {
     }
 
     @Override
-    public void startAction(String actionName) {
+    public void startAction(String actionName, Action action) {
         LoggingContext lc = getLoggingContext();
         if (lc != null) {
-            lc.startAction(actionName);
+            lc.startAction(actionName, action);
         }
     }
     

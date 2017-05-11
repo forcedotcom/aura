@@ -169,14 +169,14 @@ public class ServerServiceImpl implements ServerService {
 
             loggingService.stopTimer(LoggingService.TIMER_AURA_RUN);
 
-            // MetricsService for Non PROD environments
-            if (context.getMode() != Mode.PROD) {
-                try {
+            try {
+                if (context.getMode() != Mode.PROD) {
                     metricsService.serializeMetrics(json);
-                    metricsService.clearMetrics();
-                } catch (Exception e) {
-                    loggingService.error("Error parsing MetricsService", e);
                 }
+                // Always serialize metrics summary
+                metricsService.serializeMetricsSummary(json);
+            } catch (Exception e) {
+                loggingService.error("Error parsing MetricsService", e);
             }
 
             json.writeMapEnd();
@@ -198,7 +198,7 @@ public class ServerServiceImpl implements ServerService {
                 action.logParams(logger);
             }
             String aap = String.valueOf(++idx)+"$"+actionAndParams.toString();
-            loggingService.startAction(aap);
+            loggingService.startAction(aap, action);
             Action oldAction = context.setCurrentAction(action);
             try {
                 action.run();

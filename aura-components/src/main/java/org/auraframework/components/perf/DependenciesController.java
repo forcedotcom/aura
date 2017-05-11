@@ -18,6 +18,7 @@ package org.auraframework.components.perf;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -27,10 +28,15 @@ import javax.inject.Inject;
 
 import org.auraframework.Aura;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.ds.servicecomponent.Controller;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
@@ -133,32 +139,62 @@ public class DependenciesController implements Controller {
      * @param component
      * @return
      */
-    @AuraEnabled
+    @SuppressWarnings("unchecked")
+	@AuraEnabled
     public Map<String, Object> getDependenciesWithHashCodes(@Key("component")String component) {
-        DefDescriptor<?> descriptor;
+    	DefDescriptor<?> descriptor = null;
         SortedSet<DefDescriptor<?>> sorted;
         Map<String, Object> dependencies = Maps.newHashMap();
         ArrayList<Map<String, String>> dependenciesData = Lists.newArrayList();
         String uid;
-    	
-        int pos = component.indexOf("@");
+    	String specifiedDefType = null;
         
-        if (pos != -1) {
-            component = component.substring(0, pos);
+    	// Allows specifying what type you want, since descriptor isn't enough.
+    	@SuppressWarnings("serial")
+		final Map<String, Class> prefixToTypeMap = new HashMap<String, Class>() {{
+    		put("templatecss", StyleDef.class);
+    		put("js@helper", HelperDef.class);
+    		put("js@controller", ControllerDef.class);
+    		put("js@renderer", RendererDef.class);
+    		put("js@provider", ProviderDef.class);
+    	}};    	
+    	
+        if (component.contains("@")) {
+        	final String[] descriptorPair = component.split("@");
+        	component = descriptorPair[0];
+        	specifiedDefType = descriptorPair[1].toLowerCase();
         }
 
-        DescriptorFilter filter = new DescriptorFilter(component,
-                Lists.newArrayList(DefType.LIBRARY,DefType.COMPONENT,DefType.APPLICATION,DefType.FLAVORED_STYLE));
-        Set<DefDescriptor<?>> descriptors = definitionService.find(filter);
-        if (descriptors.size() != 1) {
-            return null;
-        }
-        descriptor = descriptors.iterator().next();
-        
         try {
+            if(component.contains("://")) {
+            	final String[] pair = component.split("://");
+            	final String prefix = pair[0].toLowerCase();
+            	final String key = (specifiedDefType != null) ? prefix + "@" + specifiedDefType : prefix;
+            	
+            	if(prefixToTypeMap.containsKey(key)) {
+            		descriptor = definitionService.getDefDescriptor(component, prefixToTypeMap.get(key));
+            	}        	
+            } 
+            
+            if(descriptor == null) {
+                final DescriptorFilter filter = new DescriptorFilter(component,
+                        Lists.newArrayList(DefType.LIBRARY,DefType.COMPONENT,DefType.APPLICATION,DefType.FLAVORED_STYLE,DefType.HELPER,DefType.CONTROLLER,DefType.STYLE,DefType.EVENT,DefType.RENDERER));
+                final Set<DefDescriptor<?>> descriptors = definitionService.find(filter);
+                if (descriptors.size() != 1) {
+                    return null;
+                }
+                descriptor = descriptors.iterator().next();
+                	
+            }
+            
+            if(descriptor==null) {
+            	return null; 
+            }
+            
             Definition definition = definitionService.getDefinition(descriptor);
             if (definition == null) {
-                return null;
+            	dependencies.put("error", "No Definition found for '" + descriptor.toString() + "'");
+                return dependencies;
             }
             
             descriptor = definition.getDescriptor();
@@ -195,7 +231,8 @@ public class DependenciesController implements Controller {
             return dependencies;    
             
         } catch (Throwable t) {
-            return null;
+        	dependencies.put("error", t.getMessage());
+            return dependencies;
         }
     }
     

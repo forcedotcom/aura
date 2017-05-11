@@ -26,24 +26,32 @@
     <aura:attribute name="def" type="String"/>
     <aura:attribute name="dependencies" type="List"/>
     <aura:attribute name="processing" type="Boolean" default="false"/>
+    <aura:attribute name="error" type="String"/>
         
-    <section class="container" aura:id="container"> 
-        <h1 style="padding: 5px; text-align: center;">Trace Dependencies App </h1>
-        <h2 style="text-align:center; margin: 20px 0">
-            <code>/auradev/traceDependencies.app?def=markup://foo:bar</code><br/>
-        </h2>
-        
+    <header>
+        <h1>Trace Dependencies App </h1>
         <aura:if isTrue="{! !empty(v.def) }">        
             <h3>
                 Showing ({! v.dependencies.length }) Dependencies for: <span>{!v.def}</span>
             </h3>
         </aura:if>
 
-
-            <aura:if isTrue="{! !v.processing &amp;&amp; !empty(v.def) &amp;&amp; empty(v.dependencies) }">
-                <center><b>No dependencies detected for {!v.def}</b></center>
+        <blockquote>
+            <h3>
+                Usage
+            </h3>
+            <code>
+                /auradev/traceDependencies.app?def=markup://foo:bar<br/>
+                /auradev/traceDependencies.app?def=js://foo:bar@HELPER<br/>
+            </code>
+        </blockquote>
+        <div class="error">{!v.error}</div>
+    </header>
+        
+    <section class="container" aura:id="container"> 
+             <aura:if isTrue="{! !v.processing &amp;&amp; !empty(v.def) &amp;&amp; empty(v.dependencies) }">
+                <div class="error"><b>No dependencies detected for {!v.def}</b></div>
             </aura:if>
-
 
             <table width="100%">
                 <thead>
@@ -60,7 +68,7 @@
                     <aura:iteration items="{!v.dependencies}" var="item">
                         <tr>
                             <td>{!item.defType}</td>
-                            <td>{!item.descriptor}</td>
+                            <td><a href="{! '?def=' + item.descriptor + '@' + item.defType}">{#item.descriptor}</a></td>
                             <td>{!item.uid}</td>
                             <td>{!item.hash}</td>
                             <td>{!item.bundleName}</td>

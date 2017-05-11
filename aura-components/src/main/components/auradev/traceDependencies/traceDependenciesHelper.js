@@ -27,6 +27,10 @@
                 cmp.set("v.dependencies", []);
             }
             cmp.set("v.processing", false);
+            
+            if(defs && defs.error) {
+                cmp.set("v.error", "Error while trying to retrieve dependencies for '" + cmp.get("v.def") + "':" + defs.error);
+            }
         });
 
         cmp.set("v.processing", true);

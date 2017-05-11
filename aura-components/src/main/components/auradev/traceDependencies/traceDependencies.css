@@ -15,14 +15,28 @@
  */
  
 .THIS {}
-.THIS h1 { font-weight: bold; font-size: 2em; }
-.THIS h2 { font-size: 1.5em; }
-.THIS h3 { font-size: 1.25em; }
+.THIS h1 { font-weight: bold; font-size: 2em; margin:5px 0; }
+.THIS h2 { font-size: 1.5em; margin:5px 0; }
+.THIS h3 { font-size: 1.25em; margin:5px 0; }
 .THIS h3 span { color: navy; }
+
+header.THIS {
+    padding: 10px;
+}
 
 .THIS ul {
     list-style-type: none; 
     padding: 5px
+}
+
+.THIS blockquote {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #eee;
+    display: inline-block;
+    background: #efefef;
+    border-radius: 5px;
+    
 }
 
 .THIS li {
@@ -31,7 +45,6 @@
 
 .THIS table {
     margin: 10px;
-    margin-top:50px;
 }
 .THIS table td {
     padding: 5px 3px;
@@ -45,4 +58,9 @@
     font-size: 1.5em;
     font-weight: bold;
     text-transform: uppercase;
+}
+
+.THIS .error {
+    text-align:center;
+    color: #F00;
 }

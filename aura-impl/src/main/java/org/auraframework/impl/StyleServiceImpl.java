@@ -157,14 +157,17 @@ public class StyleServiceImpl implements StyleService {
         String descUid = definitionService.getUid(null, defDescriptor);
         if (descUid != null) {
             for (DefDescriptor<?> dep : definitionService.getDependencies(descUid)) {
-                DefDescriptor<StyleDef> style = definitionService.getDefDescriptor(dep, DefDescriptor.CSS_PREFIX, StyleDef.class);
-                if (style.exists()) {
-                    styles.add(style);
-                }
-
-                DefDescriptor<FlavoredStyleDef> flavor = definitionService.getDefDescriptor(dep, DefDescriptor.CSS_PREFIX, FlavoredStyleDef.class);
-                if (flavor.exists()) {
-                    styles.add(flavor);
+                DefType type = dep.getDefType();
+                if (type == DefType.COMPONENT || type == DefType.APPLICATION || type == DefType.STYLE) {
+                    DefDescriptor<StyleDef> style = definitionService.getDefDescriptor(dep, DefDescriptor.CSS_PREFIX, StyleDef.class);
+                    if (style.exists()) {
+                        styles.add(style);
+                    }
+    
+                    DefDescriptor<FlavoredStyleDef> flavor = definitionService.getDefDescriptor(dep, DefDescriptor.CSS_PREFIX, FlavoredStyleDef.class);
+                    if (flavor.exists()) {
+                        styles.add(flavor);
+                    }
                 }
             }
         }

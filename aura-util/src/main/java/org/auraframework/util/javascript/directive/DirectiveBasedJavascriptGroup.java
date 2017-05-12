@@ -91,7 +91,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
             return builder.toString();
         }
     }
-    
+
     // Caching for resources
     private static final String LIB_CACHE_TEMP_DIR = IOUtil.newTempDir("auracache");
 
@@ -106,7 +106,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
     // used during parsing, should be clear for storing in memory
     private DirectiveParser parser;
-    
+
     private ResourceLoader resourceLoader;
 
     public DirectiveBasedJavascriptGroup(String name, File root, String start) throws IOException {
@@ -121,7 +121,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         this.directiveTypes = directiveTypes;
         this.modes = modes;
         this.startFile = addFile(start);
-        
+
     }
 
     public List<DirectiveType<?>> getDirectiveTypes() {
@@ -233,7 +233,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                     appendResourceToWriter(writer, "moment", rl.getResource("aura/resources/moment/moment" + minified + ".js"));
                     // 1999 is selected since it's when SFDC starts
                     appendResourceToWriter(writer, "moment-timezone-with-data-1999-2020", rl.getResource("aura/resources/moment-timezone/moment-timezone-with-data-1999-2020" + minified + ".js"));
-                    appendResourceToWriter(writer, "DOMPurify", rl.getResource("aura/resources/domPurify/DOMPurify" + minified + ".js"));
+                    appendResourceToWriter(writer, "DOMPurify", rl.getResource("aura/resources/DOMPurify/DOMPurify" + minified + ".js"));
                 } catch (Exception ignored) {
                 }
 

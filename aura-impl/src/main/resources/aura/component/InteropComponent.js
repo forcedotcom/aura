@@ -74,11 +74,13 @@ InteropComponent.prototype.setupAttributes = function(config) {
     var configValues = config && config['values'] || {};
     var attributes = {};
     var self = this;
+
     var changeHandlerPRVFactory = function(ctx, attr) {
         return function (/*event*/) {
             ctx.attributeChange(attr || this.handler.key, ctx.get('v.' + (attr ? attr : this.handler.key)));
         };
     };
+
     var changeHandlerFCV = function (attr, fcv /*, event*/) {
         this.attributeChange(attr, fcv.evaluate());
     };
@@ -120,12 +122,50 @@ InteropComponent.prototype.setupAttributes = function(config) {
             }
         }
 
-        // Check is on the definition and assign it as an attribute
-        $A.assert(isEvent || attribute in this.interopDef["props"]);
-        attributes[attribute] = valueConfig;
-    }
 
+        // Check is attribute is in the definition or is an HTML Global attribute then
+        // assign it as an attribute
+        if (htmlGlobalProp = this.isHtmlGlobal(attribute)) {
+            attributes[htmlGlobalProp] = valueConfig;
+        } else {
+            var isAttrInDefinition =  attribute in this.interopDef["props"];
+            var assertionMessage = '"' + attribute  + '" must either be a public property of ' + this.getName() + ' or a global HTML attribute'
+
+            $A.assert(isEvent || isAttrInDefinition, assertionMessage);
+            attributes[attribute] = valueConfig;
+        }
+    }
+    
     return attributes;
+};
+
+/**
+ * Return the transformed html property or undefined if the attrName is not a HTML
+ * Global attribute
+ * @private
+ * @param attrName
+ * @returns {String | undefined }
+ */
+InteropComponent.prototype.isHtmlGlobal = function (attrName) {
+    var HTML_GLOBAL_ATTRS = {
+        'title': 'title',
+        'accesskey': 'accessKey',
+        'readonly': 'readOnly',
+        'tabindex': 'tabIndex',
+        'bgcolor': 'bgColor',
+        'colspan': 'colSpan',
+        'rowspan': 'rowSpan',
+        'contentEditable': 'contentEditable',
+        'datetime': 'dateTime',
+        'formaction': 'formAction',
+        'ismap': 'isMap',
+        'maxlength': 'maxLength',
+        'usemap': 'useMap',
+        'class': 'className',
+        'for': 'htmlFor',
+    };
+
+    return HTML_GLOBAL_ATTRS[attrName];
 };
 
 InteropComponent.prototype.setupMethods = function () {
@@ -142,10 +182,20 @@ InteropComponent.prototype.setupMethods = function () {
     });
 };
 
+/**
+ * Function called when an attribute changed in Aura lang
+ * @param key - { String }
+ * @param value - { String }
+ */
 InteropComponent.prototype.attributeChange = function (key, value) {
     if (this.rendered) {
-        var elmt = this.getElement();
-        elmt[key] = value;
+        var element = this.getElement();
+
+        if (htmlGlobalProp = this.isHtmlGlobal(key)) {
+            element[htmlGlobalProp] = value;
+        } else {
+            element[key] = value;
+        }
     }
 };
 
@@ -153,8 +203,7 @@ InteropComponent.prototype.attributeChange = function (key, value) {
  * Returns the value referenced using property syntax.
  * For example, <code>cmp.get('v.attr')</code> returns the value of the attr aura:attribute.
  *
- * @param {String}
- *            key - The data key to look up on the Component.
+ * @param {String} key - The data key to look up on the Component.
  * @public
  * @platform
  * @export
@@ -175,8 +224,8 @@ InteropComponent.prototype.get = function (key) {
  * @export
  */
 InteropComponent.prototype.set = function (key, value) {
-    key = $A.expressionService.normalize(key);
-    var path = key.split('.');
+    var normalizedKey  = $A.expressionService.normalize(key);
+    var path = normalizedKey.split('.');
     var provider = path.shift();
 
     $A.assert(provider === 'v', 'This component does not allow mutations on controller actions');
@@ -194,10 +243,7 @@ InteropComponent.prototype.set = function (key, value) {
         attrValue.value.set(value);
     } else {
         this.attributes[expr] = value;
-        if (this.rendered) {
-            var elmt = this.getElement();
-            elmt[expr] = value;
-        }
+        this.attributeChange(expr, value);
     }
 };
 

@@ -1,0 +1,38 @@
+<aura:component render="client">
+    <!-- HTML Global Attributes -->
+    <aura:attribute name="class" type="String" default="my-custom-class"/>
+    <aura:attribute name="title" type="String" default="title"/>
+    <aura:attribute name="accesskey" type="String" description="A"/>
+    <aura:attribute name="readonly" type="Boolean" description="false"/>
+    <aura:attribute name="tabindex" type="Integer" description="1"/>
+    <aura:attribute name="for" type="String" description="some-id"/>
+    <aura:attribute name="contentEditable" type="boolean" description="false"/>
+    <aura:attribute name="bgcolor" type="String" description="red"/>
+    <aura:attribute name="datetime" type="String" description="2020-01-04"/>
+    <aura:attribute name="rowspan" type="String" description="1"/>
+    <aura:attribute name="colspan" type="String" description="1"/>
+    <aura:attribute name="formaction" type="String" description="some-value"/>
+    <aura:attribute name="ismap" type="Boolean" description="false"/>
+    <aura:attribute name="maxlength" type="Integer" description="10"/>
+    <aura:attribute name="usemap" type="Boolean" description="false"/>
+
+    <!-- Markup -->
+    <moduleTest:globalAttrsTests class="{! v.class }"
+                                 title="{! v.title }"
+                                 accesskey="{! v.accesskey }"
+                                 readonly="{! v.readonly }"
+                                 tabindex="{! v.tabindex }"
+                                 for="{! v.for }"
+                                 contentEditable="{! v.contentEditable }"
+                                 bgcolor="{! v.bgcolor }"
+                                 datetime="{! v.datetime }"
+                                 rowspan="{! v.rowspan }"
+                                 colspan="{! v.colspan }"
+                                 formaction="{! v.formaction }"
+                                 ismap="{! v.ismap }"
+                                 maxlength="{! v.maxlength }"
+                                 usemap="{! v.usemap }"
+                                 aura:id="raptor"
+
+    />
+</aura:component>

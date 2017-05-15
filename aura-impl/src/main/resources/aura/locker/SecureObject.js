@@ -1598,6 +1598,12 @@ function addPrototypeMethodsAndPropertiesStatelessHelper(name, prototype, protot
 
                         // Insure that we pick up the current proxy for the raw object
                         var key = ls_getKey(raw);
+                        // Shared elements like <body> and <head> are not tied to specific namespaces.
+                        // Every namespace has a secure wrapper for these elements
+                        if (!key && SecureElement.isSharedElement(raw)) {
+                            // Obtain the key of the secure wrapper
+                            key = ls_getKey(this);
+                        }
                         var o = ls_getFromCache(raw, key);
 
                         raw[name] = function(e) {

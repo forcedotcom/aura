@@ -16,6 +16,7 @@
 package org.auraframework.tools.definition;
 
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 import org.auraframework.AuraConfiguration;
@@ -24,8 +25,10 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.RegistryService;
 import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerException;
 import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerLogger;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import test.org.auraframework.impl.adapter.ConfigAdapterImpl;
@@ -128,7 +131,23 @@ public abstract class AuraCompiler {
             ns.add(args[i]);
         }
 
-        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(AuraConfiguration.class, ConfigAdapterImpl.class);
+        
+		List<Class<?>> configurationClasses = Lists.newArrayList(AuraConfiguration.class, ConfigAdapterImpl.class);
+		// Look for additional configuration classes
+		String classNames = System.getProperty("additionalConfigurationClasses");
+		if(classNames!=null){
+			for(String className : classNames.split(",")){
+				try {
+					Class<?> configurationClass = Class.forName(className);
+					configurationClasses.add(configurationClass);
+				} catch (Throwable t) {
+					System.err.println("Failed to load configuration class: " + className);
+				}
+			}
+		}
+		
+		AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(
+				configurationClasses.toArray(new Class<?>[configurationClasses.size()]));
 
         try {
             Boolean modulesEnabled = Boolean.valueOf(System.getProperty("aura.modules"));

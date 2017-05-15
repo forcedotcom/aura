@@ -183,10 +183,11 @@
         browsers: ['DESKTOP'],
         attributes: {"renderItem": "testDatepickerSetFocus", "setFocus": "true"},
         test: [function(cmp) {
-            var tagName = $A.test.getActiveElement().tagName;
-            $A.test.assertEquals('TD', tagName,
-                'with SetFocus=true, focused elm should be a "TD" tag'
-            );
+            $A.test.addWaitForWithFailureMessage(true, function(){
+                var actualTagName = $A.test.getActiveElement().tagName;
+                var expectedTagName = "TD";
+                return expectedTagName == actualTagName;
+            }, 'with SetFocus=true, focused elm should be a "TD" tag but was '+ $A.test.getActiveElement().tagName +' tag');
         }]
     },
 

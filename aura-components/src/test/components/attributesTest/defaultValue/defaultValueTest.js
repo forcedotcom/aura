@@ -75,7 +75,7 @@
     },
 
     testCaseSensitivity : {
-        browsers : [ "-IE11", "-Safari" ],
+        browsers : [ "-IE11", "-SAFARI" ],
         test : [
             function(cmp) {
                 $A.test.assertEquals('Aura', cmp.get("v.strAttributeWithDefaultValue"));

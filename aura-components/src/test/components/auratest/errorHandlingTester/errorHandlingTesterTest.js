@@ -3,6 +3,7 @@
      * Verify that error message box displays in the auraErrorMask div and can be dismissed using the close button.
      */
     testErrorMessageDisplayAndClose: {
+        browsers : [ "-IE11", "-SAFARI" ],
         test: [
             function(cmp) {
                 var iframeSrc = "/auratest/errorHandlingApp.app";
@@ -30,6 +31,7 @@
      * Test coverage for deprecated API.
      */
     testErrorMessageDisplayAndCloseViaAError: {
+        browsers : [ "-IE11", "-SAFARI" ],
         test: [
             function(cmp) {
                 var iframeSrc = "/auratest/errorHandlingApp.app";
@@ -53,6 +55,7 @@
     },
 
     testErrorFromContainedCmpRender: {
+        browsers : [ "-IE11", "-SAFARI" ],
         test: function(cmp) {
             var iframeSrc = "/auratest/errorHandlingApp.app?throwErrorFromContainedCmpRender=true";
             this.loadIframe(iframeSrc, cmp, "iframeContainer");
@@ -74,6 +77,7 @@
     },
 
     testErrorFromContainedCmpAfterRender: {
+        browsers : [ "-IE11", "-SAFARI" ],
         test: function(cmp) {
             var iframeSrc = "/auratest/errorHandlingApp.app?throwErrorFromContainedCmpAfterRender=true";
             this.loadIframe(iframeSrc, cmp, "iframeContainer");
@@ -95,6 +99,7 @@
     },
 
     testErrorFromContainedCmpRerender: {
+        browsers : [ "-IE11", "-SAFARI" ],
         test: [
             function(cmp) {
                 var iframeSrc = "/auratest/errorHandlingApp.app";
@@ -122,6 +127,7 @@
     },
 
     testErrorFromSuperCmpAfterRender: {
+        browsers : [ "-IE11", "-SAFARI" ],
         test: function(cmp) {
             var iframeSrc = "/auratest/errorHandlingExtend.cmp?throwErrorFromSuperAfterRender=true&requiredAttribute=true";
             this.loadIframe(iframeSrc, cmp, "iframeContainer");
@@ -144,6 +150,7 @@
     },
 
     testErrorFromSuperCmpUnrender: {
+        browsers : [ "-IE11", "-SAFARI" ],
         test: [
             function(cmp) {
                 var iframeSrc = "/auratest/errorHandlingExtend.cmp?requiredAttribute=true";
@@ -176,6 +183,7 @@
      * Verify Aura default error handler can handle systemError event when there is a component which misses required attribute.
      */
     testErrorFromRequiredAttributeMissingComponent: {
+        browsers : [ "-IE11", "-SAFARI" ],
         test: function(cmp) {
             var iframeSrc = "/auratest/errorHandlingApp.app?addAttributeMissingComponent=true";
             this.loadIframe(iframeSrc, cmp, "iframeContainer");
@@ -198,6 +206,7 @@
      * event has to be handled by default handler.
      */
     testDefaultHandleErrorFromAppRenderWhenMarkEventHandled: {
+        browsers : [ "-IE11", "-SAFARI" ],
         test: function(cmp) {
             var iframeSrc = "/auratest/errorHandlingApp.app?throwErrorFromRender=true&handleSystemError=true";
             this.loadIframe(iframeSrc, cmp, "iframeContainer");
@@ -219,6 +228,7 @@
     },
 
     testErrorFromAuraAssertContainsStacktraceInDevMode: {
+        browsers : [ "-IE11", "-SAFARI" ],
         test: [
             function(cmp) {
                 var iframeSrc = "/auratest/errorHandlingApp.app";

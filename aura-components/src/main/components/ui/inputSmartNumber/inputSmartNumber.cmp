@@ -28,8 +28,9 @@
     <aura:attribute name="updateOn"  type="String"   default="change"  description="Specifies when do you want to change value attr. Valid values are change and input. This value defaults to the change event." />
 
     <!-- Private attributes -->
-    <aura:attribute name="inputValue"           type="string"  access="private" default="" description="Private. Do not use." />
-    <aura:attribute name="lastInputValue"       type="string"  access="private" default="" description="Private. Do not use." />
+    <aura:attribute name="inputValue"           type="string"  access="private" default=""      description="Private. Do not use." />
+    <aura:attribute name="lastInputValue"       type="string"  access="private" default=""      description="Private. Do not use." />
+    <aura:attribute name="privateIsCompositionstarted" type="Boolean" access="private" default="false" description="Private. Do not use." />
 
     <!-- Event handlers -->
     <aura:handler name="init"   value="{! this }"    action="{! c.initialize }" />
@@ -44,6 +45,8 @@
            onchange="{! c.handleOnChange }"
            onblur="{! c.handleOnBlur }"
            onfocus="{! c.handleOnFocus }"
+           oncompositionstart="{!c.handleCompositionStart}"
+           oncompositionend="{!c.handleCompositionEnd}"
            class="{!v.class + ' input'}"
            value="{! v.inputValue }"
            max="{!v.max}"

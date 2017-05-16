@@ -18,8 +18,21 @@
         helper.setDefaultAttrs(cmp);
         helper.handleNewValue(cmp);
     },
+    handleCompositionStart : function(cmp) {
+        cmp.set('v.privateIsCompositionstarted', true);
+    },
+    handleCompositionEnd : function(cmp) {
+        cmp.set('v.privateIsCompositionstarted', false);
+    },
     handleOnInput : function (cmp, event, helper) {
-        cmp.set('v.inputValue', event.target.value);
+        if (cmp.get('v.privateIsCompositionstarted')) {
+            // on iOS japanese keyboard, input gets refocused after finishing input
+            // entry. This work around was put in to prevent duplicate value being
+            // set. For example if enter 123 then value would be 123123 after refocus.
+            cmp.set('v.inputValue', event.data);
+        } else {
+            cmp.set('v.inputValue', event.target.value);
+        }
 
         if (helper.isInputValueValid(cmp)) {
             helper.updateLastInputValue(cmp);

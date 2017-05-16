@@ -125,7 +125,7 @@ InteropComponent.prototype.setupAttributes = function(config) {
 
         // Check is attribute is in the definition or is an HTML Global attribute then
         // assign it as an attribute
-        if (htmlGlobalProp = this.isHtmlGlobal(attribute)) {
+        if (htmlGlobalProp = this.getHtmlGlobal(attribute)) {
             attributes[htmlGlobalProp] = valueConfig;
         } else {
             var isAttrInDefinition =  attribute in this.interopDef["props"];
@@ -146,7 +146,7 @@ InteropComponent.prototype.setupAttributes = function(config) {
  * @param attrName
  * @returns {String | undefined }
  */
-InteropComponent.prototype.isHtmlGlobal = function (attrName) {
+InteropComponent.prototype.getHtmlGlobal = function (attrName) {
     var HTML_GLOBAL_ATTRS = {
         'title': 'title',
         'accesskey': 'accessKey',
@@ -155,7 +155,7 @@ InteropComponent.prototype.isHtmlGlobal = function (attrName) {
         'bgcolor': 'bgColor',
         'colspan': 'colSpan',
         'rowspan': 'rowSpan',
-        'contentEditable': 'contentEditable',
+        'contenteditable': 'contentEditable',
         'datetime': 'dateTime',
         'formaction': 'formAction',
         'ismap': 'isMap',
@@ -163,6 +163,7 @@ InteropComponent.prototype.isHtmlGlobal = function (attrName) {
         'usemap': 'useMap',
         'class': 'className',
         'for': 'htmlFor',
+        'role': 'role',
     };
 
     return HTML_GLOBAL_ATTRS[attrName];
@@ -191,7 +192,7 @@ InteropComponent.prototype.attributeChange = function (key, value) {
     if (this.rendered) {
         var element = this.getElement();
 
-        if (htmlGlobalProp = this.isHtmlGlobal(key)) {
+        if (htmlGlobalProp = this.getHtmlGlobal(key)) {
             element[htmlGlobalProp] = value;
         } else {
             element[key] = value;
@@ -262,6 +263,7 @@ InteropComponent.prototype.render = function () {
             if (p.indexOf('on') === 0) {
                 elmt.addEventListener(p.substring(2), attr, false);
             } else {
+                if (this)
                 elmt[p] = attr;
             }
         }

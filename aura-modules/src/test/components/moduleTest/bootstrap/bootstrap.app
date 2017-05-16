@@ -21,6 +21,7 @@
     <aura:attribute name="test" type="String" default="I'm v.test" access="GLOBAL" />
     <aura:attribute name="test2" type="String" default="I'm v.test2" access="GLOBAL" />
     <aura:attribute name="test3" type="String" default="I'm v.test3" access="GLOBAL"/>
+    <aura:attribute name="privItems" type="List" default="[{ label: '1' }, { label: '2' }]" access="GLOBAL"/>
 
     <aura:dependency resource="markup://moduleTest:testLib" type="LIBRARY"/>
     <aura:import library="moduleTest:simpleLib" property="simpleLib"/>
@@ -47,6 +48,7 @@
                     aura:id="simple" 
                     literal="Hi!"
                     bound="{!v.test}"
+                    nested="{!v.privItems[0].label}"
                     unbound="{#v.test2}"
                     expression="{! v.test3 + '!!' }"
                     callbackaction="{!c.cbAction}"
@@ -66,6 +68,19 @@
                 onpress="{!c.cbEvent}"
 
             />
+        </section>
+
+        <p>Iteration:</p>
+
+        <section class="aura">
+             <aura:iteration items="{!v.privItems}" var="item">
+                <moduleTest:simpleCmp
+                    literal="{!item.label}" 
+                    callbackaction="{!c.cbAction}"
+                    onpress="{!c.cbEvent}"
+                />
+                <!-- <ui:button label="{!item.label}"></ui:button> -->
+             </aura:iteration>
         </section>
         
     </section>

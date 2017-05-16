@@ -21,7 +21,10 @@
  * @export
  */
 function InteropComponent(config) {
+    var context = $A.getContext();
     var cmpDef = $A.componentService.getDef(config['componentDef']);
+    this.concreteComponentId = config["concreteComponentId"];
+    this.containerComponentId = config["containerComponentId"];
     this.componentDef = cmpDef;
     this.interopClass = cmpDef.interopClass;
     this.interopDef = window["Engine"]['getComponentDef'](cmpDef.interopClass);
@@ -33,6 +36,7 @@ function InteropComponent(config) {
     this.valueProviders = {};
     this.localId = config['localId'];
     this.attributeValueProvider = config['attributes']['valueProvider'];
+    this.owner = context.getCurrentAccess();
 
     this.setupGlobalId(config['globalId']);
 
@@ -70,9 +74,9 @@ InteropComponent.prototype.setupAttributes = function(config) {
     var configValues = config && config['values'] || {};
     var attributes = {};
     var self = this;
-    var changeHandlerPRVFactory = function(ctx) {
-        return function (event) {
-            ctx.attributeChange(this.handler.key, event.getParam('value'));
+    var changeHandlerPRVFactory = function(ctx, attr) {
+        return function (/*event*/) {
+            ctx.attributeChange(attr || this.handler.key, ctx.get('v.' + (attr ? attr : this.handler.key)));
         };
     };
     var changeHandlerFCV = function (attr, fcv /*, event*/) {
@@ -88,22 +92,27 @@ InteropComponent.prototype.setupAttributes = function(config) {
             valueConfig = value["value"];
         }
 
-        valueConfig = valueFactory.create(valueConfig, config['valueProvider'] || this);
+        var valueProvider = config['valueProvider'];
+
+        valueConfig = valueFactory.create(valueConfig, valueProvider || this);
 
         // Check typeof PRV | FCV
         if ($A.util.isExpression(valueConfig)) {
-            // PRV type
+            // PRV typeconfigValues.callbackaction
             if (valueConfig.getExpression) { // Fastest typeof for PRV
                 var key = $A.expressionService.normalize(valueConfig.getExpression());
                 var provider = key.split('.')[0];
-                $A.assert(provider === 'c' || provider === 'v', 'Provider type not supported');
+                var isPTV = valueProvider instanceof PassthroughValue;
+                $A.assert(isPTV || provider === 'c' || provider === 'v', 'Provider type not supported');
 
                 // For "v" add change handler, for "c" add bridging
                 if (provider === 'v') {
                     valueConfig.addChangeHandler(this, attribute, changeHandlerPRVFactory(this));
-                } else {
+                } else if (provider === 'c') {
                     isEvent = value['descriptor'].indexOf('on') === 0;
                     valueConfig = this.bridgeAction(valueConfig, isEvent);
+                } else {
+                    valueConfig.addChangeHandler(this, attribute, changeHandlerPRVFactory(this, attribute));
                 }
             // FCV attribute
             } else {

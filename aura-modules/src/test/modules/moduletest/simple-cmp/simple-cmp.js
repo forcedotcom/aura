@@ -13,6 +13,7 @@ export default class Simple extends Element {
     unbound = "Default unbound";
     expression = 'Default expression';
     callbackaction;
+    nested = "Default nested"
 
     static publicMethods = ['test'];
 

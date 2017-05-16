@@ -36,6 +36,23 @@
         testUtils.assertEquals(expected, secureAuraEvent.getEventType(), "Unexpected type returned from Event.js#getEventType");
     },
 
+    testGetSetParamAndParams: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var event = $A.get("e.lockerTest:applicationEvent");
+
+        event.setParam("name", "123");
+        testUtils.assertEquals("123", event.getParam("name"), "Unexpected type returned from Event.js#setParam followed by Event.js#getParam");
+
+        event.setParams({ name: "abc" });
+        testUtils.assertEquals("abc", event.getParam("name"), "Unexpected type returned from Event.js#setParams followed by Event.js#getParam");
+
+        event.setParam("name", "123");
+        testUtils.assertEquals("123", event.getParams().name, "Unexpected type returned from Event.js#setParam followed by Event.js#getParams");
+
+        event.setParams({ name: "abc" });
+        testUtils.assertEquals("abc", event.getParams().name, "Unexpected type returned from Event.js#setParams followed by Event.js#getParams");
+    },
+
     testEventParamsFilteringNonLockerHandler: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var onCreateCalled = false;
@@ -74,7 +91,7 @@
             var foo = paramBag.foo;
             testUtils.assertStartsWith("SecureComponent", paramBag.foo.toString(), "Expected SecureComponent when passing cmp as event parameter");
 
-            // pass back a DOM element to verify filtering logic 
+            // pass back a DOM element to verify filtering logic
             var callback = event.getParams().callback;
             var div = document.getElementById("title");
             callback(div);
@@ -119,7 +136,7 @@
                 function() { return callbackCalled; },
                 "Event callback set as param never called",
                 function() {
-                    testUtils.assertStartsWith("SecureComponentRef", callbackParam.toString(), 
+                    testUtils.assertStartsWith("SecureComponentRef", callbackParam.toString(),
                             "Expected SecureComponentRef when event handler from another namespace passes own component ref back in callback function");
                 }
         );

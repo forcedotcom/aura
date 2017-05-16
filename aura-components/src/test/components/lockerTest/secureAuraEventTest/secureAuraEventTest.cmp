@@ -24,6 +24,7 @@
     <aura:method name="testExerciseEventAPIs" />
     <aura:method name="testGetType" />
     <aura:method name="testGetEventType" />
+    <aura:method name="testGetSetParamAndParams" />
     <aura:method name="testEventParamsFilteringNonLockerHandler"/>
     <aura:method name="testEventParamsFilteringSameLocker"/>
     <aura:method name="testEventParamsFilteringDifferentLocker"/>
@@ -34,7 +35,7 @@
     <ui:button label="press event" aura:id="button" press="c.testGetSourceReturnsSecureComponentRefWhenNoAccess"/>
 
     <!-- panelManager is required to repro ui:createPanel event scenario -->
-    <aura:dependency resource="markup://ui:createPanel" type="EVENT"/> 
+    <aura:dependency resource="markup://ui:createPanel" type="EVENT"/>
     <ui:panelManager2>
         <aura:set attribute="registeredPanels">
                 <ui:modal alias="modal"/>

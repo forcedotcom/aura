@@ -46,6 +46,12 @@
         }
     },
 
+    testGetSetParamAndParams: {
+        test: function(cmp) {
+            cmp.testGetSetParamAndParams();
+        }
+    },
+
     testEventParamsFilteringNonLockerHandler: {
         test: function(cmp) {
             cmp.testEventParamsFilteringNonLockerHandler();

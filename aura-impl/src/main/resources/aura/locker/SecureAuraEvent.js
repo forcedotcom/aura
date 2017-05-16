@@ -27,29 +27,28 @@ function SecureAuraEvent(event, key) {
      * SecureFunction. This ensures any non-Lockerized handlers of the event do not choke on the secure
      * wrappers, but any callbacks back into the original Locker have their arguments properly filtered.
      */
-    function deepUnfilterEventParams(baseObject, members) {
-        var value;
-        var branchValue;
-        for (var property in members) {
-            value = members[property];
-            if (value !== undefined && value !== null && (Array.isArray(value) || $A.util.isPlainObject(value))) {
-                branchValue = baseObject[property];
-                baseObject[property] = deepUnfilterEventParams(branchValue, value);
-                continue;
+    function deepUnfilterEventParams(value) {
+        if (Array.isArray(value)) {
+            var len = value.length;
+            while (len--) {
+                value[len] = deepUnfilterEventParams(value[len]);
             }
-            if (typeof value !== "function") {
-                value = $A.lockerService.getRaw(value);
-                // If value was just a proxy around a plain object,there could still be secure objects inside it, spider through it and unfilter everything inside it
-                if ($A.util.isPlainObject(value)) {
-                    branchValue = baseObject[property];
-                    value = deepUnfilterEventParams(branchValue, value);
+        } else if ($A.util.isPlainObject(value)) {
+            for (var property in value) {
+                if (value.hasOwnProperty(property)) {
+                    value[property] = deepUnfilterEventParams(value[property]);
                 }
-            } else {
-                value = SecureObject.filterEverything(o, value, { defaultKey: key });
             }
-            baseObject[property] = value;
+        } else if (typeof value !== "function") {
+            value = $A.lockerService.getRaw(value);
+            // If value was just a proxy around a plain object,there could still be secure objects inside it, spider through it and unfilter everything inside it
+            if ($A.util.isPlainObject(value)) {
+                value = deepUnfilterEventParams(value);
+            }
+        } else {
+            value = SecureObject.filterEverything(o, value, { defaultKey: key });
         }
-        return baseObject;
+        return value;
     }
 
     o = Object.create(null, {
@@ -62,19 +61,19 @@ function SecureAuraEvent(event, key) {
             writable: true,
             enumerable: true,
             value: function(config) {
-                var paramsCopy = $A.util.apply({}, config, true, true);
-                var unfiltered = deepUnfilterEventParams(paramsCopy, config);
-                var fnReturnedValue = event["setParams"](unfiltered);
+                var configCopy = $A.util.apply({}, config, true, true);
+                configCopy = deepUnfilterEventParams(configCopy);
+                var fnReturnedValue = event["setParams"](configCopy);
                 return SecureObject.filterEverything(o, fnReturnedValue, { defaultKey: key });
             }
         },
         "setParam": {
             writable: true,
             enumerable: true,
-            value: function(config) {
-                var paramCopy = $A.util.apply({}, config, true, true);
-                var unfiltered = deepUnfilterEventParams(paramCopy, config);
-                var fnReturnedValue = event["setParam"](unfiltered);
+            value: function(property, value) {
+                var valueCopy = $A.util.apply({}, {value: value}, true, true).value;
+                valueCopy = deepUnfilterEventParams(valueCopy);
+                var fnReturnedValue = event["setParam"](property, valueCopy);
                 return SecureObject.filterEverything(o, fnReturnedValue, { defaultKey: key });
             }
         }

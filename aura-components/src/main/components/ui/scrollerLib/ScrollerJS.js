@@ -352,6 +352,21 @@ function lib(w) { //eslint-disable-line no-unused-vars
             }
         },
         /**
+        * Destroy each plugin.  Because we should not allow the individual plugin 
+        * to override the destroy() mothod of the scroller.
+        *
+        * @method _destroyPlugins
+        * @private
+        */
+        _destroyPlugins: function() {
+            var userPlugins = this.opts.plugins;
+            if (userPlugins) {
+                userPlugins.forEach(function (plugin) {
+                    this.unplug(plugin);
+                }, this);
+            }
+        },
+        /**
         * Returns wether or not to obserChanges on the DOM
         * By default `observeDomChanges` will be enabled 
         * unless `gpuOptimization` is set to true.
@@ -1855,7 +1870,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
         plug: function (plugin) {
             var ScrollerPlugin  = typeof plugin === 'string' ? PLUGINS[plugin] : plugin,
                 PluginPrototype = (ScrollerPlugin && ScrollerPlugin.prototype) || ScrollerPlugin, // try to get the prototype if it has one
-                whiteList       = ['init'],
+                whiteList       = ['init', 'destroy'],
                 methodName;
 
             if (PluginPrototype) {
@@ -1870,6 +1885,28 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 }
             } else {
                 console.log('Error adding plugin:', plugin); //eslint-disable-line no-console
+            }
+        },
+        /**
+        * Remove a plugin to the scroller.
+        *
+        * We need to make sure the individual plugin.destroy() method is not
+        * overrideing the destroy() method of the scroller
+        * @param plugin {Function | Object} Plugin to remove from the scroller
+        * @method unplug
+        * @public
+        *
+        **/
+        unplug: function (plugin) {
+            var ScrollerPlugin  = typeof plugin === 'string' ? PLUGINS[plugin] : plugin,
+                PluginPrototype = (ScrollerPlugin && ScrollerPlugin.prototype) || ScrollerPlugin; // try to get the prototype if it has one
+
+            if (PluginPrototype) {
+                if (PluginPrototype.destroy) {
+                    PluginPrototype.destroy.call(this);
+                }
+            } else {
+                console.log('Error removing plugin:', plugin); //eslint-disable-line no-console
             }
         },
 
@@ -1970,6 +2007,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
         * @public
         */
         destroy: function () {
+            this._destroyPlugins();
             this._destroy();
             this._fire('destroy');
         }

@@ -20,9 +20,13 @@ import javax.inject.Inject;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.StyleDef;
 import org.auraframework.impl.util.AuraTestingUtil;
 import org.auraframework.impl.util.AuraTestingUtil.BundleEntryInfo;
+import org.auraframework.service.CompilerService;
 import org.auraframework.system.BundleSource;
+import org.auraframework.system.Parser;
+import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
@@ -31,6 +35,9 @@ import com.google.common.collect.Lists;
 public class ComponentDefFactoryTest extends BaseComponentDefFactoryTest<ComponentDef> {
     @Inject
     ComponentDefFactory componentDefFactory;
+
+    @Inject
+    CompilerService compilerService;
 
     public ComponentDefFactoryTest() {
         super("<aura:component %s>%s</aura:component>", ComponentDef.class);
@@ -135,5 +142,25 @@ public class ComponentDefFactoryTest extends BaseComponentDefFactoryTest<Compone
             expected = qfe;
         }
         assertNotNull(expected);
+    }
+
+    @Test
+    public void testTemplateUIDMatch() throws Exception {
+        AuraTestingUtil util = getAuraTestingUtil();
+        String styleText = ".div { color: blue; }";
+        BundleSource<ComponentDef> bundleSource = util.buildBundleSource(util.getInternalNamespace(),
+                ComponentDef.class,
+                Lists.newArrayList(
+                    new BundleEntryInfo(DefType.COMPONENT,
+                        "<aura:component isTemplate='true'></aura:component>"),
+                    new BundleEntryInfo(DefType.STYLE, styleText)
+                ));
+        TextSource<StyleDef> styleSource = util.buildTextSource(
+                bundleSource.getDescriptor().getNamespace(),
+                bundleSource.getDescriptor().getName(),
+                StyleDef.class, "templateCss", styleText, Parser.Format.TEMPLATE_CSS);
+        ComponentDef component = factory.getDefinition(bundleSource.getDescriptor(), bundleSource);
+        StyleDef templateCss = compilerService.compile(styleSource.getDescriptor(), styleSource);
+        assertEquals(templateCss.getOwnHash(), component.getStyleDef().getOwnHash());
     }
 }

@@ -603,6 +603,27 @@ public class AuraTestingUtil {
     }
 
     /**
+     * Build a single text source with a static name and static prefix (only for templateCss?).
+     *
+     * This is intended for unit testing, or submodule testing. The source provided here is not registered
+     * anywhere and cannot be looked up by aura. This means that it can only be used for sub-unit testing.
+     *
+     * Preferably use the version without the name.
+     *
+     * @param namespace the namespace (should be one of the provided ones here) - specifies internal/priveleged/custom
+     * @param namespace the name
+     * @param defClass the class of the source.
+     * @param prefixOverride the prefix override
+     * @param contents the contents for the source.
+     */
+    public <D extends Definition> TextSource<D> buildTextSource(String namespace, String name, Class<D> defClass,
+            String prefixOverride, String contents, Parser.Format fmt) {
+        DefDescriptor<D> descriptor = new DefDescriptorImpl<>(prefixOverride, namespace, name, defClass);
+        return new StringSource<D>(descriptor, contents, descriptor.getQualifiedName(), fmt);
+    }
+
+
+    /**
      * Build a single text source with a static name.
      *
      * This is intended for unit testing, or submodule testing. The source provided here is not registered

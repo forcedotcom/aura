@@ -15,12 +15,14 @@
  */
 package org.auraframework.impl.source;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.TextSource;
+import org.auraframework.util.IOUtil;
 
 /**
  * Text source for making a copy of a text source with a variable descriptor and mime type.
@@ -40,8 +42,12 @@ public class CopiedTextSourceImpl<D extends Definition> extends AbstractTextSour
         super(descriptor, original.getSystemId(), mimeType);
         this.contents = original.getContents();
         this.defaultNamespace = original.getDefaultNamespace();
-        this.hash.setHash(this.contents.getBytes());
         this.lastModified = original.getLastModified();
+        try {
+            IOUtil.readText(this.getHashingReader());
+        } catch (IOException ioe) {
+            // ignore - can't get this on a string reader.
+        }
     }
 
     @Override

@@ -17,14 +17,19 @@ package org.auraframework.modules.impl.factory;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.impl.source.file.FileSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.instance.AuraValueProviderType;
+import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.modules.impl.ModulesCompilerJ2V8;
+import org.auraframework.service.ContextService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -42,6 +47,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
@@ -49,11 +55,11 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
  * Unit tests for {@link BundleModuleDefFactory}
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({BundleModuleDefFactory.class, ModulesCompilerJ2V8.class})
+@PrepareForTest({BundleModuleDefFactory.class, ModulesCompilerJ2V8.class, Aura.class})
 public class BundleModuleDefFactoryUnitTest {
 
     @Test
-    public void getDefinition() throws Exception {
+    public void testGetDefinition() throws Exception {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
         FileSource jsFileSource = mock(FileSource.class);
@@ -80,7 +86,7 @@ public class BundleModuleDefFactoryUnitTest {
         codeMap.put(CodeType.COMPAT, mockCompiled);
 
         ModulesCompilerJ2V8 mockCompiler = mock(ModulesCompilerJ2V8.class);
-        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet());
+        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet());
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
         whenNew(ModulesCompilerJ2V8.class).withNoArguments().thenReturn(mockCompiler);
 
@@ -106,7 +112,7 @@ public class BundleModuleDefFactoryUnitTest {
     }
 
     @Test
-    public void getNamespaceFolderWithHyphen() throws Exception {
+    public void testNamespaceFolderWithHyphen() throws Exception {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
         FileSource jsFileSource = mock(FileSource.class);
@@ -137,7 +143,7 @@ public class BundleModuleDefFactoryUnitTest {
     }
 
     @Test
-    public void getNamespaceFolderUpperCase() throws Exception {
+    public void testNamespaceFolderUpperCase() throws Exception {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
         FileSource jsFileSource = mock(FileSource.class);
@@ -168,7 +174,7 @@ public class BundleModuleDefFactoryUnitTest {
     }
 
     @Test
-    public void getNameFolderUpperCase() throws Exception {
+    public void testNameFolderUpperCase() throws Exception {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
         FileSource jsFileSource = mock(FileSource.class);
@@ -199,7 +205,7 @@ public class BundleModuleDefFactoryUnitTest {
     }
 
     @Test
-    public void getMissingModeCode() throws Exception {
+    public void testMissingModeCode() throws Exception {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
         FileSource jsFileSource = mock(FileSource.class);
@@ -224,7 +230,7 @@ public class BundleModuleDefFactoryUnitTest {
         codeMap.put(CodeType.DEV, mockCompiled);
 
         ModulesCompilerJ2V8 mockCompiler = mock(ModulesCompilerJ2V8.class);
-        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet());
+        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet());
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
         whenNew(ModulesCompilerJ2V8.class).withNoArguments().thenReturn(mockCompiler);
 
@@ -240,5 +246,60 @@ public class BundleModuleDefFactoryUnitTest {
         } catch (InvalidDefinitionException ide) {
             assertTrue("Incorrect exception message", ide.getMessage().startsWith("PROD compiled code not found"));
         }
+    }
+
+    @Test
+    public void testValidateLabels() throws Exception {
+        BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
+
+        FileSource jsFileSource = mock(FileSource.class);
+        when(jsFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/module-cmp.js");
+        when(jsFileSource.getContents()).thenReturn("javascript code here");
+
+        FileSource htmlFileSource = mock(FileSource.class);
+        when(htmlFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/module-cmp.html");
+        when(htmlFileSource.getContents()).thenReturn("template code here");
+
+        DefDescriptor module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
+        DefDescriptor template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
+
+        Map<DefDescriptor<?>, Source<?>> mockBundledParts = Maps.newHashMap();
+        mockBundledParts.put(module, jsFileSource);
+        mockBundledParts.put(template, htmlFileSource);
+
+        when(mockBundleSource.getBundledParts()).thenReturn(mockBundledParts);
+
+        String mockCompiled = "define()";
+        Map<CodeType, String> codeMap = new EnumMap<>(CodeType.class);
+        codeMap.put(CodeType.DEV, mockCompiled);
+        codeMap.put(CodeType.PROD, mockCompiled);
+        codeMap.put(CodeType.COMPAT, mockCompiled);
+
+        ModulesCompilerJ2V8 mockCompiler = mock(ModulesCompilerJ2V8.class);
+        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet("$Label.task_mode_today.en", "task_mode_today.de"));
+        when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
+        whenNew(ModulesCompilerJ2V8.class).withNoArguments().thenReturn(mockCompiler);
+
+        ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
+        when(mockConfigAdapter.isInternalNamespace(anyString())).thenReturn(true);
+
+        BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
+        moduleDefFactory.setConfigAdapter(mockConfigAdapter);
+
+        ContextService mockContextService = mock(ContextService.class);
+        AuraContext mockAuraContext = mock(AuraContext.class);
+        GlobalValueProvider mockLabelProvider = mock(GlobalValueProvider.class);
+        when(mockLabelProvider.getValueProviderKey()).thenReturn(AuraValueProviderType.LABEL);
+
+        Map<String, GlobalValueProvider> mockGVPs = Maps.newHashMap();
+        mockGVPs.put(AuraValueProviderType.LABEL.getPrefix(), mockLabelProvider);
+
+        mockStatic(Aura.class);
+        when(Aura.getContextService()).thenReturn(mockContextService);
+        when(mockContextService.getCurrentContext()).thenReturn(mockAuraContext);
+        when(mockAuraContext.getGlobalProviders()).thenReturn(mockGVPs);
+
+        ModuleDef moduleDef = moduleDefFactory.getDefinition(module, mockBundleSource);
+        moduleDef.validateReferences();
     }
 }

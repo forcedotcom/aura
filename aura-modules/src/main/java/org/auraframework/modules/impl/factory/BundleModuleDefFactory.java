@@ -145,6 +145,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         Map<CodeType, String> codes = processCodes(descriptor, compilerData.codes, location);
         builder.setCodes(codes);
         builder.setModuleDependencies(compilerData.bundleDependencies);
+        builder.setLabels(compilerData.labels);
         builder.setOwnHash(calculateOwnHash(descriptor, codes));
         return builder.build();
     }

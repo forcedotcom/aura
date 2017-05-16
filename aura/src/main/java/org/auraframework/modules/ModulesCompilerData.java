@@ -27,9 +27,12 @@ public class ModulesCompilerData {
 
     public final Map<CodeType, String> codes;
     public final Set<String> bundleDependencies;
+    public final Set<String> labels;
     
-    public ModulesCompilerData(Map<CodeType, String> codes, Set<String> bundleDependencies) {
+    public ModulesCompilerData(Map<CodeType, String> codes, Set<String> bundleDependencies,
+                               Set<String> labels) {
         this.codes = codes;
         this.bundleDependencies = bundleDependencies;
+        this.labels = labels;
     }
 }

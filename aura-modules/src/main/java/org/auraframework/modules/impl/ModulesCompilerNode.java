@@ -68,7 +68,7 @@ public final class ModulesCompilerNode implements ModulesCompiler {
         codeMap.put(CodeType.PROD, result);
         codeMap.put(CodeType.COMPAT, result);
         // TODO: compiler metadata
-        return new ModulesCompilerData(codeMap, null);
+        return new ModulesCompilerData(codeMap, null, null);
     }
 
     @Override

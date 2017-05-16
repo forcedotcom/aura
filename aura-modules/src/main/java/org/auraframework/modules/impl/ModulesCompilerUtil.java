@@ -80,10 +80,15 @@ final class ModulesCompilerUtil {
 
         V8Object metadata = dev.getObject("metadata");
         V8Array v8BundleDependencies = metadata.getArray("bundleDependencies");
+        V8Array v8BundleLabels = metadata.getArray("bundleLabels");
         Set<String> bundleDependencies = new HashSet<>();
+        Set<String> bundleLabels = new HashSet<>();
         for (int i = 0; i < v8BundleDependencies.length(); i++) {
             bundleDependencies.add(v8BundleDependencies.getString(i));
         }
-        return new ModulesCompilerData(codeMap, bundleDependencies);
+        for (int i = 0; i < v8BundleLabels.length(); i++) {
+            bundleLabels.add(v8BundleLabels.getString(i));
+        }
+        return new ModulesCompilerData(codeMap, bundleDependencies, bundleLabels);
     }
 }

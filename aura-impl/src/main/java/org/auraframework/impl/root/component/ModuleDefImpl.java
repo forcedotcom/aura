@@ -16,6 +16,7 @@
 package org.auraframework.impl.root.component;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,10 +26,15 @@ import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.module.ModuleDef;
+import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.ModuleDefinitionUtil;
+import org.auraframework.instance.AuraValueProviderType;
+import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -41,10 +47,11 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
 
     private static final long serialVersionUID = 5154640929496754931L;
     private String path;
-    private Set<String> moduleDependencies;
-    private String customElementName;
+    private final Set<String> moduleDependencies;
+    private final String customElementName;
     private Set<DefDescriptor<?>> dependencies = null;
-    private Map<CodeType, String> codes;
+    private final Map<CodeType, String> codes;
+    private final Set<PropertyReference> labelReferences;
 
     private ModuleDefImpl(Builder builder) {
         super(builder);
@@ -52,6 +59,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         this.codes = builder.codes;
         this.moduleDependencies = builder.moduleDependencies;
         this.customElementName = builder.customElementName;
+        this.labelReferences = builder.labelReferences;
     }
 
     @Override
@@ -88,7 +96,10 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         }
     }
 
-
+    @Override
+    public void retrieveLabels() throws QuickFixException {
+        retrieveLabels(this.labelReferences);
+    }
 
     /**
      * Process dependencies from compiler in the form of DefDescriptor names (namespace:module)
@@ -126,12 +137,43 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         return results;
     }
 
+    @Override
+    public void validateReferences() throws QuickFixException {
+        super.validateReferences();
+        validateLabels();
+    }
+
+    private void validateLabels() throws QuickFixException {
+        if (!this.labelReferences.isEmpty()) {
+            AuraContext context = Aura.getContextService().getCurrentContext();
+            for (PropertyReference ref : this.labelReferences) {
+                String root = ref.getRoot();
+                AuraValueProviderType vpt = AuraValueProviderType.getTypeByPrefix(root);
+                if (vpt != AuraValueProviderType.LABEL) {
+                    // Aura coexistence for modules only supports $Label
+                    throw new InvalidExpressionException("Expression didn't have enough terms: " + ref,
+                            ref.getLocation());
+                }
+                GlobalValueProvider gvp = context.getGlobalProviders().get(root);
+                if (gvp != null && gvp.getValueProviderKey().isGlobal()) {
+                    PropertyReference stem = ref.getStem();
+                    if (stem == null) {
+                        throw new InvalidExpressionException("Expression didn't have enough terms: " + ref,
+                                ref.getLocation());
+                    }
+                    gvp.validate(stem);
+                }
+            }
+        }
+    }
+
     public static final class Builder extends DefinitionImpl.BuilderImpl<ModuleDef> {
 
         private String path;
         private Map<CodeType, String> codes;
         private Set<String> moduleDependencies;
         private String customElementName;
+        private Set<PropertyReference> labelReferences = new HashSet<>();
 
         public Builder() {
             super(ModuleDef.class);
@@ -151,6 +193,16 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
 
         public void setCustomElementName(String customElementName) {
             this.customElementName = customElementName;
+        }
+
+        public void setLabels(Set<String> labels) {
+            String labelPrefix = AuraValueProviderType.LABEL.getPrefix() + ".";
+            for (String label : labels) {
+                if (!label.startsWith(labelPrefix)) {
+                    label = labelPrefix + label;
+                }
+                this.labelReferences.add(new PropertyReferenceImpl(label, location));
+            }
         }
 
         @Override

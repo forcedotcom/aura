@@ -62,17 +62,11 @@ function SecureComponentRef(component, key) {
         var value;
         for (var property in members) {
             value = members[property];
-            if (value !== undefined && value !== null && (Array.isArray(value) || $A.util.isPlainObject(value))) {
-                var newBranch;
-                if (Array.isArray(value)) {
-                    newBranch = [];
-                } else if ($A.util.isPlainObject(value)) {
-                    newBranch = {};
-                }
-                baseObject[property] = deepUnfilterMethodArguments(newBranch, value);
-                continue;
-            }
-            if (typeof value !== "function") {
+            if (Array.isArray(value)) {
+                value = deepUnfilterMethodArguments([], value);
+            } else if ($A.util.isPlainObject(value)) {
+                value = deepUnfilterMethodArguments({}, value);
+            } else if (typeof value !== "function") {
                 value = $A.lockerService.getRaw(value);
                 //If value is a plain object, we need to deep unfilter
                 if ($A.util.isPlainObject(value)) {

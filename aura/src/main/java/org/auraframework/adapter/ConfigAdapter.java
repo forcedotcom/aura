@@ -215,4 +215,6 @@ public interface ConfigAdapter extends AuraAdapter {
     void addModuleNamespaces(Set<String> namespaces);
     
     boolean cdnEnabled();
+
+    Map<String, String> getNamespaceAliases();
 }

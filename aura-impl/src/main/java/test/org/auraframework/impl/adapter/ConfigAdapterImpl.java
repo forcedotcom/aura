@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -38,6 +39,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
@@ -55,6 +57,7 @@ import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.impl.util.BrowserInfo;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.modules.NamespaceAlias;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
@@ -78,6 +81,7 @@ import org.auraframework.util.text.Hash;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Sets;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @ServiceComponent
 public class ConfigAdapterImpl implements ConfigAdapter {
@@ -147,6 +151,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private final Set<String> CACHEABLE_PREFIXES = ImmutableSet.of("aura", "java", "compound");
 
     private final Set<String> moduleNamespaces = Sets.newHashSet();
+    private final Map<String, String> namespaceAliases = Maps.newConcurrentMap();
 
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
     private JavascriptGroup jsGroup;
@@ -863,7 +868,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public Set<String> getModuleNamespaces() {
-        return this.moduleNamespaces;
+        return ImmutableSet.copyOf(this.moduleNamespaces);
     }
 
     @Override
@@ -875,4 +880,17 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public boolean cdnEnabled() {
         return false;
     }
+
+    @Override
+    public Map<String, String> getNamespaceAliases() {
+        return ImmutableMap.copyOf(this.namespaceAliases);
+    }
+
+    @Autowired(required = false)
+    public void setNamespaceAliases(List<NamespaceAlias> aliases) {
+        for(NamespaceAlias ns : aliases) {
+            this.namespaceAliases.put(ns.target(), ns.alias());
+        }
+    }
+
 }

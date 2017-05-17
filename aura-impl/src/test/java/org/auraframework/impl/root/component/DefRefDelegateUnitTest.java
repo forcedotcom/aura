@@ -17,8 +17,10 @@ package org.auraframework.impl.root.component;
 
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Maps;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ComponentDef;
@@ -40,7 +42,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import com.google.common.collect.Sets;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.verifyZeroInteractions;
@@ -60,6 +61,7 @@ public class DefRefDelegateUnitTest {
     private AuraContext mockContext = mock(AuraContext.class);
     private ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
     private Set<String> moduleNamespaces = Sets.newHashSet();
+    private Map<String, String> namespaceAliases = Maps.newHashMap();
 
     private DefDescriptor<ComponentDef> componentDefDescriptor = new DefDescriptorImpl<>("markup", "defref",
             "test", ComponentDef.class);
@@ -81,10 +83,11 @@ public class DefRefDelegateUnitTest {
         when(Aura.getConfigAdapter()).thenReturn(mockConfigAdapter);
         when(mockContextService.getCurrentContext()).thenReturn(mockContext);
         when(mockConfigAdapter.getModuleNamespaces()).thenReturn(moduleNamespaces);
+        when(mockConfigAdapter.getNamespaceAliases()).thenReturn(namespaceAliases);
 
         when(mockComponentDefRef.getDescriptor()).thenReturn(componentDefDescriptor);
 
-        when(mockDefinitionService.getDefDescriptor(componentDefDescriptor, DefDescriptor.MARKUP_PREFIX, ModuleDef.class))
+        when(mockDefinitionService.getDefDescriptor("markup://defref:test", ModuleDef.class))
                 .thenReturn(moduleDefDescriptor);
 
         // set up componentDefRef mocks for building ModuleDefRef

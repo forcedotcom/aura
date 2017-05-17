@@ -23,6 +23,7 @@ import java.io.ObjectInputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -590,7 +591,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         // component locations MUST be processed first as their namespaces MUST be available for lookup
         // to allow modules to override as their namespace are all lower cased
         // DefType.COMPONENT before DefType.MODULE
-    	locationAdapters.sort((la1, la2) -> la1.type().compareTo(la2.type()));
+    	locationAdapters.sort(Comparator.comparing(ComponentLocationAdapter::type));
         this.locationAdapters = locationAdapters;
     }
 

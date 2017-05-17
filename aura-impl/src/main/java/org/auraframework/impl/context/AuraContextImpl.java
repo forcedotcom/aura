@@ -19,15 +19,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.auraframework.adapter.ConfigAdapter;
@@ -66,6 +58,7 @@ import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -105,7 +98,7 @@ public class AuraContextImpl implements AuraContext {
     private final Map<DefDescriptor<?>, String> clientLoaded = Maps.newLinkedHashMap();
 
     private String contextPath = "";
-    
+
     private String pathPrefix = "";
 
     private boolean preloading = false;
@@ -142,6 +135,8 @@ public class AuraContextImpl implements AuraContext {
 
     private boolean isModulesEnabled = false;
     private boolean useCompatSource = false;
+    private List<String> scriptHashes = new ArrayList<>();
+    private String nonce;
 
     /**
      * The set of defs that are thread local.
@@ -218,6 +213,7 @@ public class AuraContextImpl implements AuraContext {
                 .setRecordStats(true)
                 .setSoftValues(true)
                 .build();
+        this.nonce = String.format("aura-%s", new Random().nextInt(Integer.MAX_VALUE));
     }
 
     @Override
@@ -229,7 +225,7 @@ public class AuraContextImpl implements AuraContext {
             this.currentDefs = userDefs;
         }
     }
-    
+
     @Override
     public boolean isSystemMode() {
     	return this.isSystem;
@@ -256,7 +252,7 @@ public class AuraContextImpl implements AuraContext {
         }
         currentDefs.defs.putIfAbsent(descriptor, opt);
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public <D extends Definition> Optional<D> getLocalDef(DefDescriptor<D> descriptor) {
@@ -266,7 +262,7 @@ public class AuraContextImpl implements AuraContext {
         }
         return opt;
     }
-    
+
     /**
      * Filter the entire set of current definitions by a set of preloads.
      *
@@ -355,7 +351,7 @@ public class AuraContextImpl implements AuraContext {
     public String getContextPath() {
         return contextPath;
     }
-    
+
     @Override
     public String getPathPrefix() {
         return pathPrefix;
@@ -410,6 +406,21 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public Map<String, GlobalValueProvider> getGlobalProviders() {
         return globalProviders;
+    }
+
+    @Override
+    public void addScriptHash(String hash) {
+        scriptHashes.add(hash);
+    }
+
+    @Override
+    public ImmutableList<String> getScriptHashes() {
+        return ImmutableList.copyOf(scriptHashes);
+    }
+
+    @Override
+    public String getScriptNonce() {
+        return nonce;
     }
 
     @Override

@@ -22,6 +22,7 @@ import java.util.List;
 import org.auraframework.Aura;
 import org.auraframework.http.CSP;
 import org.auraframework.http.CSPReporterServlet;
+import org.auraframework.service.CSPInliningService;
 
 /**
  * A default, fairly strict security policy, allowing no framing and only same-origin script.
@@ -38,6 +39,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
     private static String defaultHeader = null;
 
     private static List<String> sameOrigin = null;
+    private final CSPInliningService cspInliningService;
 
     private boolean allowInline;
 
@@ -53,9 +55,11 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
      * Creates a default policy.
      *
      * @param inline whether to allow inline script and style. It's better not to, but legacy is what legacy is.
+     * @param scriptService inline csp service
      */
-    public DefaultContentSecurityPolicy(boolean inline) {
+    public DefaultContentSecurityPolicy(boolean inline, CSPInliningService scriptService) {
         allowInline = inline;
+        cspInliningService = scriptService;
     }
 
     /**
@@ -82,6 +86,10 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
     public Collection<String> getScriptSources() {
         List<String> list = new ArrayList<>(allowInline ? 4 : 3);
         list.add(null); // Same origin allowed
+
+        if (!allowInline){
+            list.addAll(cspInliningService.getCurrentScriptDirectives());
+        }
 
         list.add("chrome-extension:");
 

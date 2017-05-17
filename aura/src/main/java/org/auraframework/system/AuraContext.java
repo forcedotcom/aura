@@ -21,6 +21,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableList;
 import org.auraframework.cache.Cache;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.BaseComponentDef;
@@ -731,4 +732,22 @@ public interface AuraContext {
     void setUseCompatSource(boolean useCompatSource);
 
     boolean useCompatSource();
+
+    /**
+     * add base 64 SHA256 hash of a script. This is used for CSP2 inline js
+     * @param hash the base 64 SHA256 hash of a script
+     */
+    void addScriptHash(String hash);
+
+    /**
+     * retrieve the list of known script hashes at this point
+     * @return a copy of the list of known hashes
+     */
+    ImmutableList<String> getScriptHashes();
+
+    /**
+     * get the nonce used for inlining script on a page
+     * @return the request scoped nonce
+     */
+    String getScriptNonce();
 }

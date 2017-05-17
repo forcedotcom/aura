@@ -40,14 +40,16 @@ public class RenderContextHTMLImpl implements RenderContext {
     }
 
     @Override
-    public void popScript() {
+    public boolean popScript() {
         if (--scriptCount == 0) {
             try {
                 out.append("</script>");
+                return false;
             } catch (IOException ioe) {
                 // ignore
             }
         }
+        return true;
     }
 
     @Override
@@ -57,6 +59,11 @@ public class RenderContextHTMLImpl implements RenderContext {
 
     @Override
     public String getScript() {
+        return "";
+    }
+
+    @Override
+    public String getCurrentScript() {
         return "";
     }
 

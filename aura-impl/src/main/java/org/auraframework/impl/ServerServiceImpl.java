@@ -47,6 +47,7 @@ import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.http.ManifestUtil;
+import org.auraframework.http.resource.InlineJs;
 import org.auraframework.impl.util.TemplateUtil;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
@@ -111,7 +112,7 @@ public class ServerServiceImpl implements ServerService {
     
     @Inject
     private InstanceService instanceService;
-    
+
     private ManifestUtil manifestUtil;
 
     @PostConstruct
@@ -619,9 +620,9 @@ public class ServerServiceImpl implements ServerService {
             if (manifestUtil.isManifestEnabled()) {
                 attributes.put("manifest", servletUtilAdapter.getManifestUrl(context, componentAttributes));
             }
-            
-            servletUtilAdapter.writeScriptUrls(context, componentAttributes, sb);
-            
+
+            servletUtilAdapter.writeScriptUrls(context, templateDef, componentAttributes, sb);
+
             attributes.put("auraNamespacesScriptTags", sb.toString());
             
             Map<String, Object> auraInit = Maps.newHashMap();

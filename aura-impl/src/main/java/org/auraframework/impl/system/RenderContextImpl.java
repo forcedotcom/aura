@@ -16,15 +16,21 @@
 package org.auraframework.impl.system;
 
 import org.auraframework.system.RenderContext;
+import org.auraframework.throwable.AuraRuntimeException;
+
+import java.io.IOException;
 
 public class RenderContextImpl implements RenderContext {
     private final Appendable script;
     private final Appendable standard;
+    private final StringBuilder partialScript;
     private Appendable current;
     private int scriptCount;
+    private String currentScript;
 
     public RenderContextImpl(Appendable standard, Appendable script) {
         this.script = script;
+        this.partialScript = new StringBuilder();
         this.standard = standard;
         this.current = standard;
         this.scriptCount = 0;
@@ -32,19 +38,28 @@ public class RenderContextImpl implements RenderContext {
 
     @Override
     public void pushScript() {
-        current = script;
+        current = partialScript;
         scriptCount += 1;
     }
 
     @Override
-    public void popScript() {
+    public boolean popScript() {
         if (--scriptCount == 0) {
             current = standard;
+            try {
+                currentScript = partialScript.toString();
+                partialScript.setLength(0);
+                script.append(currentScript);
+            } catch (IOException e) {
+                throw new AuraRuntimeException(e);
+            }
+            return false;
         } else {
             if (scriptCount < 0) {
                 throw new RuntimeException("Script popped too many times");
             }
         }
+        return true;
     }
 
     @Override
@@ -54,10 +69,26 @@ public class RenderContextImpl implements RenderContext {
 
     @Override
     public String getScript() {
-        if(script == null) {
-            return null;
+        StringBuilder scriptChunks = new StringBuilder();
+        boolean hasScript = script != null;
+        boolean hasPartialScript = partialScript.length() > 0;
+        if (hasScript){
+            scriptChunks.append(script.toString());
         }
-        return script.toString();
+        if (hasPartialScript){
+            scriptChunks.append(partialScript.toString());
+        }
+
+        return hasScript || hasPartialScript ? scriptChunks.toString() : null;
+    }
+
+    @Override
+    public String getCurrentScript() {
+        //if we have appended to the current script use that. otherwise use the last completed script
+        if (partialScript.length() > 0){
+            return partialScript.toString();
+        }
+        return currentScript;
     }
 
     @Override

@@ -310,14 +310,11 @@ public class AuraServlet extends AuraBaseServlet {
             definitionService.updateLoaded(defDescriptor);
             def = definitionService.getDefinition(defDescriptor);
 
-            // Knowing the app, we can do the HTTP headers, some of which depend on
-            // the app in play, so we couldn't do this earlier.
-            servletUtilAdapter.setCSPHeaders(defDescriptor, request, response);
-
             if (!context.isTestMode() && !context.isDevMode()) {
                 assertAccess(def);
             }
         } catch (Throwable t) {
+            servletUtilAdapter.setCSPHeaders(defDescriptor, request, response);
             servletUtilAdapter.handleServletException(t, false, context, request, response, false);
             return;
         }
@@ -337,13 +334,21 @@ public class AuraServlet extends AuraBaseServlet {
             loggingService.startTimer(LoggingService.TIMER_SERIALIZATION);
             loggingService.startTimer(LoggingService.TIMER_SERIALIZATION_AURA);
             // Prevents Mhtml Xss exploit:
-            PrintWriter out = response.getWriter();
-            out.write("\n    ");
+            StringBuilder out = new StringBuilder(); //keep content local so we can safely set headers after render
+            out.append("\n    ");
             @SuppressWarnings("unchecked")
             Class<T> clazz = (Class<T>) def.getDescriptor().getDefType().getPrimaryInterface();
             String formatAdapter = formatAdapterParam.get(request);
             serializationService.write(def, getComponentAttributes(request), clazz, out, formatAdapter);
+
+            // we could not do the csp headers until all inline js hashes had been collected
+            servletUtilAdapter.setCSPHeaders(defDescriptor, request, response);
+
+            PrintWriter writer = response.getWriter();
+            writer.append(out.toString());
+
         } catch (Throwable e) {
+            servletUtilAdapter.setCSPHeaders(defDescriptor, request, response);
             servletUtilAdapter.handleServletException(e, false, context, request, response, true);
         } finally {
             loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION_AURA);

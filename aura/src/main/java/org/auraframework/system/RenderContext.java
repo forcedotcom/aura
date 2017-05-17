@@ -30,8 +30,10 @@ public interface RenderContext {
 
     /**
      * Pop out of script mode.
+     * @return true if there are more scripts to pop
      */
-    public void popScript();
+    public boolean popScript();
+
 
     /**
      * Get the current appendable.
@@ -52,6 +54,15 @@ public interface RenderContext {
      * @return the 'script'.
      */
     public String getScript();
+
+    /**
+     * Get only the current script output of the render.
+     *
+     * This function should be used by the original caller to get the rendered script.
+     *
+     * @return the 'script'.
+     */
+    public String getCurrentScript();
 
     /**
      * Get the standard output.

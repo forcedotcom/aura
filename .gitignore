@@ -21,3 +21,4 @@ tags
 aura-impl/src/test/eslint/
 node
 node_modules
+rebel.xml

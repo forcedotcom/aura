@@ -22,15 +22,17 @@ import static org.mockito.Mockito.mock;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpStatus;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
-import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.resource.InlineJs;
+import org.auraframework.http.resource.LocaleDataJsAppender;
+import org.auraframework.http.resource.PreInitJavascriptJSAppender;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -64,13 +66,16 @@ public class InlineJsTest extends AuraImplTestCase {
     private ServletUtilAdapter servletUtilAdapter;
 
     @Inject
-    private LocalizationAdapter localizationAdapter;
-
-    @Inject
     private ServerService serverService;
 
     @Inject
     private ExceptionAdapter exceptionAdapter;
+
+    @Inject
+    private PreInitJavascriptJSAppender preInitJavascriptJSAppender;
+
+    @Inject
+    private LocaleDataJsAppender localeDataJsAppender;
 
     private InlineJs getInlineJs() {
         InlineJs inlineJs = new InlineJs();
@@ -82,9 +87,8 @@ public class InlineJsTest extends AuraImplTestCase {
         inlineJs.setServerService(serverService);
         inlineJs.setRenderingService(renderingService);
         inlineJs.setExceptionAdapter(exceptionAdapter);
-        inlineJs.setLocalizationAdapter(localizationAdapter);
+        inlineJs.setInlineJSAppenders(ImmutableList.of(localeDataJsAppender, preInitJavascriptJSAppender));
         inlineJs.initManifest();
-        inlineJs.initialize();
         return inlineJs;
     }
 
@@ -283,15 +287,5 @@ public class InlineJsTest extends AuraImplTestCase {
         // Assert
         // JWT token failure returns 404 response code
         assertEquals(HttpStatus.SC_NOT_FOUND, response.getStatus());
-    }
-
-    /**
-     * Verify all moment locale data are correctly parsed into map.
-     * For current version of moment, it has 108 locales.
-     */
-    @Test
-    public void testInitializeLoadsAllMomentLocaleData() {
-        InlineJs inlineJs = getInlineJs();
-        assertEquals(108, inlineJs.getMomentLocales().size());
     }
 }

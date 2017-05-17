@@ -25,6 +25,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.AuraContext;
@@ -106,12 +107,12 @@ public interface ServletUtilAdapter extends AuraAdapter {
 
     /**
      * Write all urls on the string builder
-     *
      * @param context the aura context to use.
+     * @param templateDef
      * @param componentAttributes Component attributes.
      * @param sb the string builder to use.
      */
-    void writeScriptUrls(AuraContext context, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException;
+    void writeScriptUrls(AuraContext context, ComponentDef templateDef, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException;
 
     /**
      * Get bootstrap url.
@@ -124,6 +125,14 @@ public interface ServletUtilAdapter extends AuraAdapter {
      */
 
     String getInlineJsUrl(AuraContext context, Map<String,Object> attributes);
+
+    /**
+     * get the inline js content
+     * @param context
+     * @param templateDef
+     * @return the script content
+     */
+    String getInlineJs(AuraContext context, ComponentDef templateDef) throws IOException;
 
     /**
      * Get app.js url.

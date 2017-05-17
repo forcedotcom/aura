@@ -28,6 +28,7 @@ import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.Definition;
 import org.auraframework.instance.Instance;
 import org.auraframework.service.BuilderService;
+import org.auraframework.service.CSPInliningService;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.ConverterService;
@@ -64,6 +65,10 @@ public class Aura implements AuraDeprecated {
     private static ExceptionAdapter exceptionAdapter;
     private static LocalizationAdapter localizationAdapter;
     private static ServerService serverService;
+    private static CSPInliningService cspInliningService;
+
+    @Inject
+    public void setCspScriptService(CSPInliningService service){ cspInliningService = service;}
 
     @Inject
     public void setLocalizationAdapter(LocalizationAdapter adapter) {
@@ -283,5 +288,15 @@ public class Aura implements AuraDeprecated {
     @Deprecated
     public static ServerService getServerService() {
         return serverService;
+    }
+
+    /**
+     * USE INJECTION INSTEAD
+     * @return the csp inline service
+     *
+     */
+    // Used by: SFDCContentSecurityPolicy
+    public static CSPInliningService getCspInliningService() {
+        return cspInliningService;
     }
 }

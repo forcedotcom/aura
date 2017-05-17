@@ -34,13 +34,15 @@ public class RenderContextImplTest extends AuraImplTestCase{
 
     @Test
     public void testPushScriptSwithCurrentToScript() {
+        //can't compare getCurrent to script as it's now buffered. Instead, make sure buffer switch happened
         StringWriter script = new StringWriter();
-        RenderContext renderContext = new RenderContextImpl(null, script);
+        StringWriter standard = new StringWriter();
+        RenderContext renderContext = new RenderContextImpl(standard, script);
 
         renderContext.pushScript();
 
         Appendable actual = renderContext.getCurrent();
-        assertSame(script, actual);
+        assertNotSame(standard, actual);
     }
 
     @Test

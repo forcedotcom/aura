@@ -31,6 +31,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.auraframework.adapter.ConfigAdapter;
@@ -43,16 +45,19 @@ import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ClientLibraryDef.Type;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.CSP;
 import org.auraframework.http.ManifestUtil;
+import org.auraframework.http.resource.InlineJSAppender;
 import org.auraframework.impl.util.BrowserUserAgent;
 import org.auraframework.impl.util.TemplateUtil;
 import org.auraframework.impl.util.TemplateUtil.Script;
 import org.auraframework.impl.util.UserAgent;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.CSPInliningService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext;
@@ -68,6 +73,7 @@ import org.auraframework.util.json.JsonEncoder;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @ServiceComponent
 public class ServletUtilAdapterImpl implements ServletUtilAdapter {
@@ -79,6 +85,8 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     protected TemplateUtil templateUtil = new TemplateUtil();
     protected DefinitionService definitionService;
     protected ManifestUtil manifestUtil;
+    protected List<InlineJSAppender> inlineJsAppenders;
+    protected CSPInliningService cspInliningService;
 
     /**
      * "Short" pages (such as manifest cookies and AuraFrameworkServlet pages) expire in 1 day.
@@ -409,9 +417,15 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     @Override
-    public void writeScriptUrls(AuraContext context, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException {
+    public void writeScriptUrls(AuraContext context, ComponentDef templateDef, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException {
         templateUtil.writeHtmlScripts(context, this.getJsClientLibraryUrls(context), Script.LAZY, sb);
-        templateUtil.writeHtmlScript(context, this.getInlineJsUrl(context, componentAttributes), Script.SYNC, sb);
+
+        if (cspInliningService.isSupported()) {
+            cspInliningService.writeInlineScript(this.getInlineJs(context, templateDef), sb);
+        } else {
+            templateUtil.writeHtmlScript(context, this.getInlineJsUrl(context, componentAttributes), Script.SYNC, sb);
+        }
+
         templateUtil.writeHtmlScript(context, this.getFrameworkUrl(), Script.SYNC, sb);
         templateUtil.writeHtmlScript(context, this.getAppJsUrl(context, null), Script.SYNC, sb);
         templateUtil.writeHtmlScript(context, this.getBootstrapUrl(context, componentAttributes), Script.SYNC, sb);
@@ -450,6 +464,15 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         ret += ret.endsWith("bootstrap.js") ? "?jwt=" : "&jwt=";
         ret += configAdapter.generateJwtToken();
         return ret;
+    }
+
+    @Override
+    public String getInlineJs(AuraContext context, ComponentDef templateDef) throws IOException {
+        StringBuilder out = new StringBuilder();
+        for(InlineJSAppender appender : MoreObjects.firstNonNull(inlineJsAppenders, ImmutableList.<InlineJSAppender>of())){
+            appender.append(templateDef, context, out);
+        }
+        return out.toString();
     }
 
     @Override
@@ -866,6 +889,11 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         this.clientLibraryService = clientLibraryService;
     }
 
+    @Autowired(required = false)
+    public void setInlineJSAppenders(List<InlineJSAppender> inlineJsAppenders) { this.inlineJsAppenders = inlineJsAppenders; }
+
+    @Inject
+    public void setCspInliningService(CSPInliningService service) {this.cspInliningService = service;}
     /**
      * Exposed for testing
      */

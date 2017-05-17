@@ -59,6 +59,7 @@ import org.auraframework.impl.util.BrowserInfo;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.modules.NamespaceAlias;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.CSPInliningService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
@@ -179,6 +180,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Inject
     private FileMonitor fileMonitor;
+
+    @Inject
+    private CSPInliningService cspInliningService;
 
     private String resourceCacheDir;
 
@@ -732,7 +736,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             allowInline = isSafeEvalWorkerURI(request.getRequestURI());
         }
 
-        return new DefaultContentSecurityPolicy(allowInline);
+        return new DefaultContentSecurityPolicy(allowInline, cspInliningService);
     }
 
     public void setLocalizationAdapter(LocalizationAdapter adapter) {

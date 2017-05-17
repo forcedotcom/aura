@@ -151,7 +151,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
                 AuraValueProviderType vpt = AuraValueProviderType.getTypeByPrefix(root);
                 if (vpt != AuraValueProviderType.LABEL) {
                     // Aura coexistence for modules only supports $Label
-                    throw new InvalidExpressionException("Expression didn't have enough terms: " + ref,
+                    throw new InvalidExpressionException(AuraValueProviderType.LABEL.getPrefix() + " is only supported for modules: " + ref,
                             ref.getLocation());
                 }
                 GlobalValueProvider gvp = context.getGlobalProviders().get(root);

@@ -52,6 +52,40 @@
         }
     },
 
+    testSetParamFilter: {
+        test: function(cmp) {
+            cmp.addEventHandler("lockerTest:applicationEvent", function(event) {
+                var params = event.getParams();
+                $A.test.assertEquals("[object Window]", params.paramBag.data.toString(), "Expected raw object in system mode when passing secure object as event parameter");
+            });
+            cmp.testSetParamFilter();
+        }
+    },
+
+    testSetParamsFilter: {
+        test: function(cmp) {
+            cmp.addEventHandler("lockerTest:applicationEvent", function(event) {
+                var params = event.getParams();
+                $A.test.assertEquals("[object Window]", params.paramBag.data.toString(), "Expected raw object in system mode when passing secure object as event parameter");
+            });
+            cmp.testSetParamsFilter();
+        }
+    },
+
+    testGetParamFilter: {
+        test: function(cmp) {
+            cmp.testGetParamFilter();
+            $A.get("e.lockerTest:applicationEvent").setParams({paramBag: {data: window}}).fire();
+        }
+    },
+
+   testGetParamsFilter: {
+        test: function(cmp) {
+            cmp.testGetParamsFilter();
+            $A.get("e.lockerTest:applicationEvent").setParams({paramBag: {data: window}}).fire();
+        }
+    },
+
     testEventParamsFilteringNonLockerHandler: {
         test: function(cmp) {
             cmp.testEventParamsFilteringNonLockerHandler();

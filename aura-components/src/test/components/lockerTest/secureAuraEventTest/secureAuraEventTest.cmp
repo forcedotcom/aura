@@ -25,6 +25,10 @@
     <aura:method name="testGetType" />
     <aura:method name="testGetEventType" />
     <aura:method name="testGetSetParamAndParams" />
+    <aura:method name="testSetParamFilter" />
+    <aura:method name="testSetParamsFilter" />
+    <aura:method name="testGetParamFilter" />
+    <aura:method name="testGetParamsFilter" />
     <aura:method name="testEventParamsFilteringNonLockerHandler"/>
     <aura:method name="testEventParamsFilteringSameLocker"/>
     <aura:method name="testEventParamsFilteringDifferentLocker"/>

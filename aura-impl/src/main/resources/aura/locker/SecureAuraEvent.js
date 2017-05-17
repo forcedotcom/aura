@@ -27,28 +27,26 @@ function SecureAuraEvent(event, key) {
      * SecureFunction. This ensures any non-Lockerized handlers of the event do not choke on the secure
      * wrappers, but any callbacks back into the original Locker have their arguments properly filtered.
      */
-    function deepUnfilterEventParams(value) {
-        if (Array.isArray(value)) {
-            var len = value.length;
-            while (len--) {
-                value[len] = deepUnfilterEventParams(value[len]);
-            }
-        } else if ($A.util.isPlainObject(value)) {
-            for (var property in value) {
-                if (value.hasOwnProperty(property)) {
-                    value[property] = deepUnfilterEventParams(value[property]);
+    function deepUnfilterMethodArguments(baseObject, members) {
+        var value;
+        for (var property in members) {
+            value = members[property];
+            if (Array.isArray(value)) {
+                value = deepUnfilterMethodArguments([], value);
+            } else if ($A.util.isPlainObject(value)) {
+                value = deepUnfilterMethodArguments({}, value);
+            } else if (typeof value !== "function") {
+                value = $A.lockerService.getRaw(value);
+                //If value is a plain object, we need to deep unfilter
+                if ($A.util.isPlainObject(value)) {
+                    value = deepUnfilterMethodArguments({}, value);
                 }
+            } else {
+                value = SecureObject.filterEverything(o, value, { defaultKey: key });
             }
-        } else if (typeof value !== "function") {
-            value = $A.lockerService.getRaw(value);
-            // If value was just a proxy around a plain object,there could still be secure objects inside it, spider through it and unfilter everything inside it
-            if ($A.util.isPlainObject(value)) {
-                value = deepUnfilterEventParams(value);
-            }
-        } else {
-            value = SecureObject.filterEverything(o, value, { defaultKey: key });
+            baseObject[property] = value;
         }
-        return value;
+        return baseObject;
     }
 
     o = Object.create(null, {
@@ -61,20 +59,17 @@ function SecureAuraEvent(event, key) {
             writable: true,
             enumerable: true,
             value: function(config) {
-                var configCopy = $A.util.apply({}, config, true, true);
-                configCopy = deepUnfilterEventParams(configCopy);
-                var fnReturnedValue = event["setParams"](configCopy);
-                return SecureObject.filterEverything(o, fnReturnedValue, { defaultKey: key });
+                var unfiltered = deepUnfilterMethodArguments({}, config);
+                event["setParams"](unfiltered);
+                return o;
             }
         },
         "setParam": {
             writable: true,
             enumerable: true,
             value: function(property, value) {
-                var valueCopy = $A.util.apply({}, {value: value}, true, true).value;
-                valueCopy = deepUnfilterEventParams(valueCopy);
-                var fnReturnedValue = event["setParam"](property, valueCopy);
-                return SecureObject.filterEverything(o, fnReturnedValue, { defaultKey: key });
+                var unfiltered = deepUnfilterMethodArguments({}, {value: value}).value;
+                event["setParam"](property, unfiltered);
             }
         }
     });

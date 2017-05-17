@@ -219,7 +219,9 @@
             cmp._virtualItems.push(virtualItem);
             fragment.appendChild(virtualItem);
         }
-        container.appendChild(fragment);
+        if (container) {
+            container.appendChild(fragment);
+        }
         cmp.set('v.items', (cmp.get('v.items') || []).concat(items), true);
         this.ignorePTVChanges(cmp, false);
         $A.metricsService.markEnd(this.NS, this.NAME + ".appendVirtualRows");

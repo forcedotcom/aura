@@ -26,8 +26,9 @@
 
         // Create the events for delegation
         helper.createEventDelegates(cmp, container);
-
-        container.appendChild(fragment);
+        if (container) {
+            container.appendChild(fragment);
+        }
         return dom;
 
     },

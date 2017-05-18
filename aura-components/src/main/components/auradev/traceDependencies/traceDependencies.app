@@ -17,7 +17,6 @@
 -->
 <aura:application
     controller="java://org.auraframework.components.perf.DependenciesController"
-    access="GLOBAL"
     useAppcache="false">
 
 

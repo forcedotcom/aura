@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>aura-modules</artifactId>
-   
+
     <properties>
         <module.dir>modules_aura_modules</module.dir>
         <component.dir>components_aura_modules</component.dir>
@@ -62,6 +62,11 @@
         <dependency>
             <groupId>org.auraframework</groupId>
             <artifactId>aura-components</artifactId>
+        </dependency>
+        <!-- for ModulesCompilerNode -->
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>node-tool</artifactId>
         </dependency>
     </dependencies>
 
@@ -304,7 +309,7 @@
                             <outputDirectory>${project.build.testOutputDirectory}/${component.test.dir}</outputDirectory>
                         </configuration>
                     </execution>
-                    
+
                     <execution>
                         <!-- copy back .registries to source tree -->
                         <id>copy-component-registries</id>

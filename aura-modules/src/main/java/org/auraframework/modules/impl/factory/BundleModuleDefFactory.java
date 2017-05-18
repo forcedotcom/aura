@@ -24,7 +24,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import com.google.common.base.CharMatcher;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
@@ -32,9 +31,8 @@ import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl;
-import org.auraframework.modules.ModulesCompiler;
 import org.auraframework.modules.ModulesCompilerData;
-import org.auraframework.modules.impl.ModulesCompilerJ2V8;
+import org.auraframework.service.ModulesCompilerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.DefinitionFactory;
@@ -45,6 +43,8 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.text.Hash;
 
+import com.google.common.base.CharMatcher;
+
 /**
  * Provides ModuleDef implementation
  */
@@ -52,6 +52,8 @@ import org.auraframework.util.text.Hash;
 public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<ModuleDef>, ModuleDef> {
 
     private ConfigAdapter configAdapter;
+    
+    private ModulesCompilerService modulesCompilerService;
 
     @Override
     public Class<?> getSourceInterface() {
@@ -135,10 +137,9 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         builder.setPath(baseFilePath);
         builder.setCustomElementName(getCustomElementName(componentPath));
 
-        ModulesCompiler compiler = new ModulesCompilerJ2V8();
         ModulesCompilerData compilerData;
         try {
-            compilerData = compiler.compile(componentPath, sources);
+            compilerData = modulesCompilerService.compile(componentPath, sources);
         } catch (Exception e) {
             throw new InvalidDefinitionException(descriptor + ": " + e.getMessage(), location, e);
         }
@@ -247,5 +248,10 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
     @Inject
     public void setConfigAdapter(ConfigAdapter configAdapter) {
         this.configAdapter = configAdapter;
+    }
+    
+    @Inject
+    public void setModulesCompilerService(ModulesCompilerService modulesCompilerService) {
+        this.modulesCompilerService = modulesCompilerService;
     }
 }

@@ -23,11 +23,15 @@ import java.io.PrintWriter;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.util.IOUtil;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Object;
@@ -35,7 +39,7 @@ import com.eclipsesource.v8.V8Object;
 final class ModulesCompilerUtil {
 
     static final String COMPILER_JS_PATH = pathToLocalTempFile("modules/compiler.min.js");
-    static final String COMPILER_CLI_JS_PATH = pathToLocalTempFile("modules/compiler-cli.js");
+    static final String INVOKE_COMPILE_JS_PATH = pathToLocalTempFile("modules/invokeCompile.js");
 
     private static String pathToLocalTempFile(String classpathResource) {
         try {
@@ -63,6 +67,28 @@ final class ModulesCompilerUtil {
         file.deleteOnExit();
         return file;
     }
+    
+    static JSONObject generateCompilerInput(String entry, Map<String, String> sources) throws JSONException {
+        JSONObject options = new JSONObject();
+        options.put("format", "amd");
+        options.put("mode", "all");
+        options.put("mapNamespaceFromPath", true);
+        
+        // add entries for all files in the bundle
+        JSONObject sourcesObject = new JSONObject();
+        for (Entry<String, String> sourceEntry: sources.entrySet()) {
+            String name = sourceEntry.getKey();
+            String source = sourceEntry.getValue();
+            sourcesObject.put(name, source);
+        }
+        options.put("sources", sourcesObject);
+        
+        JSONObject input = new JSONObject();
+        input.put("entry", entry);
+        input.put("options", options);
+
+        return input;
+    }
 
     static ModulesCompilerData parseCompilerOutput(V8Object result) {
         V8Object dev = result.getObject("dev");
@@ -81,6 +107,34 @@ final class ModulesCompilerUtil {
         V8Object metadata = dev.getObject("metadata");
         V8Array v8BundleDependencies = metadata.getArray("bundleDependencies");
         V8Array v8BundleLabels = metadata.getArray("bundleLabels");
+        Set<String> bundleDependencies = new HashSet<>();
+        Set<String> bundleLabels = new HashSet<>();
+        for (int i = 0; i < v8BundleDependencies.length(); i++) {
+            bundleDependencies.add(v8BundleDependencies.getString(i));
+        }
+        for (int i = 0; i < v8BundleLabels.length(); i++) {
+            bundleLabels.add(v8BundleLabels.getString(i));
+        }
+        return new ModulesCompilerData(codeMap, bundleDependencies, bundleLabels);
+    }
+    
+    static ModulesCompilerData parseCompilerOutput(JSONObject result) {
+        JSONObject dev = result.getJSONObject("dev");
+        JSONObject prod = result.getJSONObject("prod");
+        JSONObject compat = result.getJSONObject("compat");
+
+        String devCode = dev.getString("code");
+        String prodCode = prod.getString("code");
+        String compatCode = compat.getString("code");
+
+        Map<CodeType, String> codeMap = new EnumMap<>(CodeType.class);
+        codeMap.put(CodeType.DEV, devCode);
+        codeMap.put(CodeType.PROD, prodCode);
+        codeMap.put(CodeType.COMPAT, compatCode);
+
+        JSONObject metadata = dev.getJSONObject("metadata");
+        JSONArray v8BundleDependencies = metadata.getJSONArray("bundleDependencies");
+        JSONArray v8BundleLabels = metadata.getJSONArray("bundleLabels");
         Set<String> bundleDependencies = new HashSet<>();
         Set<String> bundleLabels = new HashSet<>();
         for (int i = 0; i < v8BundleDependencies.length(); i++) {

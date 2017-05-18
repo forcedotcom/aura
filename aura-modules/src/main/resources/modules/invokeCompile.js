@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.modules;
 
-import java.util.Map;
-
-/**
- * Interface to compile modules
- */
-public interface ModulesCompiler {
-    
-    ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception;
-    
-    @Deprecated  // use another compile() method
-    ModulesCompilerData compile(String entry, String sourceTemplate, String sourceClass) throws Exception;
+module.exports = function(input) {
+    const compiler = require(input.pathToCompilerJs);
+    const promise = compiler.compile(input.entry, input.options);
+    promise.then((result) => {
+        console.log('>>> output results: >>>:');
+        console.log(JSON.stringify(result));
+    })
+    .catch((error) => {
+        console.log('>>> output results: >>>:');
+        console.log(JSON.stringify({compilerError: error.toString()}));
+    });
 }

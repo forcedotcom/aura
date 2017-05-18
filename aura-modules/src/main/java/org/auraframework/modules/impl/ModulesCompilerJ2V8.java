@@ -17,16 +17,12 @@ package org.auraframework.modules.impl;
 
 import java.io.File;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
-import com.google.common.collect.Maps;
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.auraframework.modules.ModulesCompiler;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.util.j2v8.J2V8Util;
+import org.json.JSONObject;
 
 import com.eclipsesource.v8.JavaVoidCallback;
 import com.eclipsesource.v8.NodeJS;
@@ -35,46 +31,14 @@ import com.eclipsesource.v8.utils.MemoryManager;
 /**
  * ModulesCompiler implementation using https://github.com/eclipsesource/J2V8
  */
-public final class ModulesCompilerJ2V8 implements ModulesCompiler {
+final class ModulesCompilerJ2V8 implements ModulesCompiler {
     
     private static final Logger logger = Logger.getLogger(ModulesCompilerJ2V8.class.getName());
     
     @Override
     public ModulesCompilerData compile(String entry, Map<String,String> sources) throws Exception {
-        StringBuilder options = new StringBuilder("{ format: 'amd', mode: 'all', mapNamespaceFromPath: true,\nsources : {\n");
-        
-        // add entries for all files in the bundle
-        int size = sources.size();
-        int count = 0;
-        for (Entry<String, String> sourceEntry: sources.entrySet()) {
-            count++;
-            String name = sourceEntry.getKey();
-            String source = StringEscapeUtils.escapeEcmaScript(sourceEntry.getValue());
-            
-            options.append('"').append(name).append("\": ");
-            options.append('"').append(source).append('"');
-
-            if (count < size) {
-                options.append(",\n");
-            }
-        }
-
-        options.append("}}");
-        
-        return compile(entry, options.toString());
-    }
-    
-    @Override
-    public ModulesCompilerData compile(String entry, String sourceTemplate, String sourceClass) throws Exception {
-        String templatePath = StringUtils.replace(entry, ".js", ".html");
-        Map<String, String> sources = Maps.newHashMap();
-        sources.put(entry, sourceClass);
-        sources.put(templatePath, sourceTemplate);
-
-        return this.compile(entry, sources);
-    }
-
-    private ModulesCompilerData compile(String entry, String options) throws Exception {
+        JSONObject input = ModulesCompilerUtil.generateCompilerInput(entry, sources);
+        String options = input.getJSONObject("options").toString();
         String script = ""
                 + "const compiler = require('" + ModulesCompilerUtil.COMPILER_JS_PATH + "');"
                 + "const promise = compiler.compile('" + entry + "', " + options + ");"

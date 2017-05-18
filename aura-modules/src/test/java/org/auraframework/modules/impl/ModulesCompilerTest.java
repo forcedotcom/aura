@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.auraframework.def.module.ModuleDef.CodeType;
-import org.auraframework.modules.ModulesCompiler;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
@@ -33,97 +32,94 @@ import com.google.common.io.Files;
  */
 public class ModulesCompilerTest extends UnitTestCase {
 
-    /**
-     * Test the compile method that takes the sources map
-     */
     @Test
-    public void testModulesCompilerJ2V8Sources() throws Exception {
-        ModulesCompiler compiler = new ModulesCompilerJ2V8();
+    public void testModulesCompilerNode() throws Exception {
+        testModulesCompiler(new ModulesCompilerNode());
+    }
 
-        String componentPath = "modules/moduletest/moduletest.js";
-        String sourceTemplate = Files
-                .toString(getResourceFile("/testdata/modules/moduletest/moduletest.html"), Charsets.UTF_8);
+    @Test
+    public void testModulesCompilerJ2V8() throws Exception {
+        testModulesCompiler(new ModulesCompilerJ2V8());
+    }
+    
+    private void testModulesCompiler(ModulesCompiler compiler) throws Exception {
+        String entry = "modules/moduletest/moduletest.js";
+        String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/moduletest/moduletest.html"),
+                Charsets.UTF_8);
         String sourceClass = Files.toString(getResourceFile("/testdata/modules/moduletest/moduletest.js"),
                 Charsets.UTF_8);
-        
-        Map<String,String> sources = new HashMap<>();
+
+        Map<String, String> sources = new HashMap<>();
         sources.put("modules/moduletest/moduletest.js", sourceClass);
         sources.put("modules/moduletest/moduletest.html", sourceTemplate);
 
-        ModulesCompilerData compilerData = compiler.compile(componentPath, sources);
-        String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"),
-                Charsets.UTF_8);
+        ModulesCompilerData compilerData = compiler.compile(entry, sources);
+        String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"), Charsets.UTF_8);
 
         assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
         assertEquals("[x-test]", compilerData.bundleDependencies.toString());
     }
     
     @Test
-    public void testModulesCompilerJ2V8() throws Exception {
-        ModulesCompiler compiler = new ModulesCompilerJ2V8();
-
-        String componentPath = "modules/moduletest/moduletest.js";
-        String sourceTemplate = Files
-                .toString(getResourceFile("/testdata/modules/moduletest/moduletest.html"), Charsets.UTF_8);
-        String sourceClass = Files.toString(getResourceFile("/testdata/modules/moduletest/moduletest.js"),
-                Charsets.UTF_8);
-
-        ModulesCompilerData compilerData = compiler.compile(componentPath, sourceTemplate, sourceClass);
-        String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"),
-                Charsets.UTF_8);
-
-        assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
-        assertEquals("[x-test]", compilerData.bundleDependencies.toString());
+    public void testModulesCompilerNodeErrorInHtml() throws Exception {
+        testModulesCompilerErrorInHtml(new ModulesCompilerNode());
     }
 
     @Test
     public void testModulesCompilerJ2V8ErrorInHtml() throws Exception {
-        ModulesCompiler compiler = new ModulesCompilerJ2V8();
+        testModulesCompilerErrorInHtml(new ModulesCompilerJ2V8());
+    }
 
-        String componentPath = "modules/errorInHtml/errorInHtml.js";
+    private void testModulesCompilerErrorInHtml(ModulesCompiler compiler) throws Exception {
+        String entry = "modules/errorInHtml/errorInHtml.js";
         String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/errorInHtml/errorInHtml.html"),
                 Charsets.UTF_8);
         String sourceClass = Files.toString(getResourceFile("/testdata/modules/errorInHtml/errorInHtml.js"),
                 Charsets.UTF_8);
 
+        Map<String, String> sources = new HashMap<>();
+        sources.put("modules/errorInHtml/errorInHtml.js", sourceClass);
+        sources.put("modules/errorInHtml/errorInHtml.html", sourceTemplate);
+
         try {
-            compiler.compile(componentPath, sourceTemplate, sourceClass);
+            compiler.compile(entry, sources);
             fail("should report a syntax error");
         } catch (Exception e) {
+            e.printStackTrace();
             String message = Throwables.getRootCause(e).getMessage();
-            assertEquals("Error: modules/errorInHtml/errorInHtml.html: Unexpected token (2:5)", message.substring(0, 67));
+            assertEquals("Error: modules/errorInHtml/errorInHtml.html: Unexpected token (2:5)",
+                    message.substring(0, 67));
         }
+    }
+    
+    @Test
+    public void testModulesCompilerNodeErrorInJs() throws Exception {
+        testModulesCompilerErrorInJs(new ModulesCompilerNode());
     }
 
     @Test
     public void testModulesCompilerJ2V8ErrorInJs() throws Exception {
-        ModulesCompiler compiler = new ModulesCompilerJ2V8();
+        testModulesCompilerErrorInJs(new ModulesCompilerJ2V8());
+    }
 
-        String componentPath = "modules/errorInJs/errorInJs.js";
+    private void testModulesCompilerErrorInJs(ModulesCompiler compiler) throws Exception {
+        String entry = "modules/errorInJs/errorInJs.js";
         String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/errorInJs/errorInJs.html"),
                 Charsets.UTF_8);
         String sourceClass = Files.toString(getResourceFile("/testdata/modules/errorInJs/errorInJs.js"),
                 Charsets.UTF_8);
+        
+        Map<String, String> sources = new HashMap<>();
+        sources.put("modules/errorInJs/errorInJs.js", sourceClass);
+        sources.put("modules/errorInJs/errorInJs.html", sourceTemplate);
 
         try {
-            compiler.compile(componentPath, sourceTemplate, sourceClass);
+            compiler.compile(entry, sources);
             fail("should report a syntax error");
         } catch (Exception e) {
             Throwable cause = Throwables.getRootCause(e);
-            assertEquals("Error: modules/errorInJs/errorInJs.js: Unexpected token (1:11)", cause.getMessage().substring(0, 62));
+            assertEquals("Error: modules/errorInJs/errorInJs.js: Unexpected token (1:11)",
+                    cause.getMessage().substring(0, 62));
         }
     }
-
-    // tests for ModulesCompilerNode:
-
-//    @Test
-//    public void testModulesCompilerNode() throws Exception {
-//        ModulesCompilerNode compiler = new ModulesCompilerNode();
-//        File file = getResourceFile("/testdata/modules/moduletest/moduletest.js");
-//        assertTrue(file.getAbsolutePath(), file.exists());
-//        String result = compiler.compile(file).code;
-//        String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"),
-//                Charsets.UTF_8);
-//        assertEquals(expected, result);
-//    }
 }

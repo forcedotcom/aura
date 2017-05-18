@@ -15,8 +15,18 @@
  */
 package org.auraframework.modules.impl.factory;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
+
+import java.util.EnumMap;
+import java.util.Map;
+
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
@@ -27,8 +37,8 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.modules.ModulesCompilerData;
-import org.auraframework.modules.impl.ModulesCompilerJ2V8;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.ModulesCompilerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.Source;
@@ -38,24 +48,15 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.EnumMap;
-import java.util.Map;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyString;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 /**
  * Unit tests for {@link BundleModuleDefFactory}
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({BundleModuleDefFactory.class, ModulesCompilerJ2V8.class, Aura.class})
+@PrepareForTest({BundleModuleDefFactory.class, Aura.class})
 public class BundleModuleDefFactoryUnitTest {
 
     @Test
@@ -85,16 +86,16 @@ public class BundleModuleDefFactoryUnitTest {
         codeMap.put(CodeType.PROD, mockCompiled);
         codeMap.put(CodeType.COMPAT, mockCompiled);
 
-        ModulesCompilerJ2V8 mockCompiler = mock(ModulesCompilerJ2V8.class);
+        ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
         ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet());
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
-        whenNew(ModulesCompilerJ2V8.class).withNoArguments().thenReturn(mockCompiler);
 
         ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
         when(mockConfigAdapter.isInternalNamespace(anyString())).thenReturn(true);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
         moduleDefFactory.setConfigAdapter(mockConfigAdapter);
+        moduleDefFactory.setModulesCompilerService(mockCompiler);
 
         ModuleDef moduleDef = moduleDefFactory.getDefinition(module, mockBundleSource);
         String devCode = moduleDef.getCode(CodeType.DEV);
@@ -229,16 +230,16 @@ public class BundleModuleDefFactoryUnitTest {
         Map<CodeType, String> codeMap = new EnumMap<>(CodeType.class);
         codeMap.put(CodeType.DEV, mockCompiled);
 
-        ModulesCompilerJ2V8 mockCompiler = mock(ModulesCompilerJ2V8.class);
+        ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
         ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet());
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
-        whenNew(ModulesCompilerJ2V8.class).withNoArguments().thenReturn(mockCompiler);
 
         ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
         when(mockConfigAdapter.isInternalNamespace(anyString())).thenReturn(true);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
         moduleDefFactory.setConfigAdapter(mockConfigAdapter);
+        moduleDefFactory.setModulesCompilerService(mockCompiler);
 
         try {
             moduleDefFactory.getDefinition(module, mockBundleSource);
@@ -275,16 +276,16 @@ public class BundleModuleDefFactoryUnitTest {
         codeMap.put(CodeType.PROD, mockCompiled);
         codeMap.put(CodeType.COMPAT, mockCompiled);
 
-        ModulesCompilerJ2V8 mockCompiler = mock(ModulesCompilerJ2V8.class);
-        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet("$Label.task_mode_today.en", "task_mode_today.de"));
+        ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
+        ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet());
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
-        whenNew(ModulesCompilerJ2V8.class).withNoArguments().thenReturn(mockCompiler);
 
         ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
         when(mockConfigAdapter.isInternalNamespace(anyString())).thenReturn(true);
 
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
         moduleDefFactory.setConfigAdapter(mockConfigAdapter);
+        moduleDefFactory.setModulesCompilerService(mockCompiler);
 
         ContextService mockContextService = mock(ContextService.class);
         AuraContext mockAuraContext = mock(AuraContext.class);

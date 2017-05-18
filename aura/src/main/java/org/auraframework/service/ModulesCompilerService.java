@@ -13,26 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.modules;
+package org.auraframework.service;
 
 import java.util.Map;
-import java.util.Set;
 
-import org.auraframework.def.module.ModuleDef.CodeType;
+import org.auraframework.modules.ModulesCompilerData;
 
 /**
- * POJO with the data ModulesCompilerService generates
+ * Service to compile modules into their runtime representation.
  */
-public final class ModulesCompilerData {
+public interface ModulesCompilerService {
 
-    public final Map<CodeType, String> codes;
-    public final Set<String> bundleDependencies;
-    public final Set<String> labels;
-    
-    public ModulesCompilerData(Map<CodeType, String> codes, Set<String> bundleDependencies,
-                               Set<String> labels) {
-        this.codes = codes;
-        this.bundleDependencies = bundleDependencies;
-        this.labels = labels;
-    }
+    ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception;
 }

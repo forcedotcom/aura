@@ -523,8 +523,19 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
                 if (!this.isCommentMarker(marker)) {
                     if (updatedFacet.fullUnrender || !marker.nextSibling) {
                         this.setMarker(component, this.createMarker(marker,"unrender facet: " + component.getGlobalId()));
-                    } else if (info.component.isValid() && this.getAllElements(info.component)[0] === marker) {
-                        this.setMarker(component, marker.nextSibling);
+                    } else {
+                        var allElements = this.getAllElements(info.component);
+                        if (info.component.isValid() && allElements[0] === marker) {
+                            // We can't just assume the nextSibling, it could belong to what we're unrendering.
+                            // Find the next element that this unrendering component does not own.
+                            var count = allElements.length - 1;
+                            nextSibling = marker.nextSibling;
+                            while(count && nextSibling.nextSibling) {
+                                nextSibling = nextSibling.nextSibling;
+                                count--;
+                            }
+                            this.setMarker(component, nextSibling);
+                        }
                     }
                 }
 

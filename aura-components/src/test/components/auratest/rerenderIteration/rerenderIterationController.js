@@ -14,12 +14,21 @@
  * limitations under the License.
  */
 ({
-    unrender: function(component) {
-        var renderEvent = $A.getEvt("markup://auratest:renderEvent");
-        renderEvent.setParams({ "event" : "unrender " + component.get("v.name") });
-        renderEvent.fire();
+    addRemoveItem: function(cmp) {
+        var items = cmp.get("v.items") || [];
+        items.shift();
+        items.push(Date.now());
+        cmp.set("v.items", items);
+    },
+    removeItem : function(cmp, event) {
+        var items = cmp.get("v.items") || [];
+        items.shift();
+        cmp.set("v.items", items);
+    },
 
-        this.superUnrender();
-
+    addItem : function(cmp, event) {
+        var items = cmp.get("v.items") || [];
+        items.push(Date.now());
+        cmp.set("v.items", items);
     }
 })

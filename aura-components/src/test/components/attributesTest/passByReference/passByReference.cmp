@@ -25,14 +25,14 @@
     <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
     
     <div aura:id="staticLabelContainer">
-        <aura:label value="{0} Members">
+        <ui:format value="{0} Members">
             {!v.intByReference}
-        </aura:label>
+        </ui:format>
     </div>
     <div aura:id="dynamicLabelContainer">
-        <aura:label value="{!$Label.AuraTestLabelSection.dynamic_label_for_test}">
+        <ui:format value="{!$Label.AuraTestLabelSection.dynamic_label_for_test}">
             {!v.intByReference}
-        </aura:label>
+        </ui:format>
     </div>
 
     <!-- Include facet as dependency so client-side component creation does not have to go to server for def -->

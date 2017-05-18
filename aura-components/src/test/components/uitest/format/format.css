@@ -1,0 +1,48 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+.THIS.divBig {
+    width: 600px;
+    padding:10px;
+    border: 2px solid blue;
+    margin-left: 20px;
+    margin-top: 20px;
+}
+
+.THIS .divSmall {
+	width: 300px;
+    padding:10px;
+    border: 2px solid yellow;
+    margin-left: 40px;
+    margin-top: 5px;
+}
+
+.THIS p {
+	color: Blue;
+    line-height: 1.4;
+    margin-bottom: 1.1em;
+}
+
+.THIS div{
+	width: 400px;
+    padding:10px;
+    border: 2px solid green;
+    margin-left: 100px;
+    margin-top: 10px;
+}
+
+

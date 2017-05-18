@@ -18,16 +18,16 @@
 <aura:component>
 
     <div aura:id="PV_staticLabelContainer">
-        <aura:label value="{0} Members">
+        <ui:format value="{0} Members">
             {#v.numberValue}
-        </aura:label>
+        </ui:format>
     </div>
     <!-- This is just to show #$ also works. but please notice #$Label.xxx or !$Label.xxx doesn't matter here, 
     as we cannot change dynamic_label_for_test which is defined in TestLocalizationAdapterImpl. -->
     <div aura:id="PV_dynamicLabelContainer">
-        <aura:label value="{#$Label.AuraTestLabelSection.dynamic_label_for_test}">
+        <ui:format value="{#$Label.AuraTestLabelSection.dynamic_label_for_test}">
             {#v.numberValue}
-        </aura:label>
+        </ui:format>
     </div>
 
     <!-- initValue doesn't work as init() on controller is too late for this -->

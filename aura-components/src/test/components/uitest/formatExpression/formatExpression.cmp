@@ -1,0 +1,93 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:attribute name="value" type="String"/>
+    <aura:attribute name="valueElse" type="String"/>
+    <aura:attribute name="date" type="Date" default="2015-09-08"/>
+    <aura:attribute name="string" type="String" default="test"/>
+    <aura:attribute name="boolean" type="boolean" default="false"/>
+    <aura:attribute name="double" type="double" default="20"/>
+    <aura:attribute name="undef" type="Object"/><!-- v.undef is set to undefined, and v.noll to null in renderer -->
+    <aura:attribute name="noll" type="Object"/>
+    <aura:attribute name="list" type="List" default="1,2,3,4,5"/>
+
+    <div class='divBig'>
+        <p> test Format Simple Case </p>
+
+        <!-- We want format to behave similarily to aura:lablel so we output them side-by-side -->
+        <div><ui:format value="{!v.value}"></ui:format></div>
+        <div aura:id="bodyEmpty">{!v.value}</div>
+
+        <div><ui:format value="{!v.value}">{!v.string}{!v.boolean}{!v.double}{!'spanned'}{!'login'}</ui:format></div>
+        <div aura:id="bodyProperties">{!format(v.value, v.string, v.boolean, v.double, 'spanned', 'login')}</div>
+
+        <div><ui:format value="{!v.value}">{!v.string + v.boolean + v.double}</ui:format></div>
+        <div aura:id="bodyFunction">{!format(v.value, v.string + v.boolean + v.double)}</div>
+
+        <div><ui:format value="{!v.string + v.value}">{!v.string}{!v.boolean}{!v.double}</ui:format></div>
+        <div aura:id="functionValue">{!format(v.string + v.value, v.string, v.boolean, v.double)}</div>
+
+        <div><ui:format value="{!v.value}">{!v.undef}</ui:format></div>
+        <div aura:id="bodyUndefined">{!format(v.value, v.undef)}</div>
+
+        <div><ui:format value="{!v.value}">{!v.undef}{!v.string}</ui:format></div>
+        <div aura:id="bodyWithUndefined">{!format(v.value, v.undef, v.string)}</div>
+
+        <div><ui:format value="{!v.value}">{!v.noll}</ui:format></div>
+        <div aura:id="bodyNull">{!format(v.value, v.noll)}</div>
+
+        <div><ui:format value="{!v.value}">{!v.noll}{!v.string}</ui:format></div>
+        <div aura:id="bodyWithNull">{!format(v.value, v.noll, v.string)}</div>
+
+        <div><ui:format value="{!v.value}">inner</ui:format></div>
+        <div aura:id="bodyText">{!format(v.value)}</div>
+        
+        <!-- diff when value has token {x} -->
+        <div aura:id="bodyWithText"><ui:format value="{!v.value}">inner{!v.string}space</ui:format></div>
+        <div aura:id="bodyWithText">{!format(v.value, 'inner', v.string, 'space')}</div>
+
+        <div><ui:format value="{!v.value}">{!v.string}</ui:format></div>
+        <div aura:id="bodyWithString">{!format(v.value, v.string)}</div>
+        
+        <!-- <div><ui:format value="{!v.value}">{!v.list}</ui:format></div> -->
+        <div> for ui:format, we cannot sub with a list, but format() can :-) </div>
+        <div aura:id="bodyList">{!format(v.value, v.list)}</div>
+    </div>
+
+
+    <!-- test format with If -->
+    <aura:attribute name="booleanForIf" type="Boolean" default="true"/>
+    <div class='divBig'>
+        <p> test Format with If </p>
+
+        <div>
+            <aura:if isTrue="{!(v.booleanForIf)}">
+                <ui:format value="{!v.value}"/>
+            <aura:set attribute="else">
+                <ui:format value="{!v.valueElse}"/>
+            </aura:set>
+            </aura:if>
+        </div>
+
+        <div aura:id="testBodyEmptyWithIf">
+            {!format(v.booleanForIf ? v.value : v.valueElse)}
+        </div>
+
+   </div>
+
+</aura:component>

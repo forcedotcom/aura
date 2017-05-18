@@ -148,7 +148,7 @@ ComponentDefStorage.prototype.getStorage = function () {
  */
 ComponentDefStorage.prototype.shouldCacheComponent = function(descriptor) {
     var defDescriptor = new Aura.System.DefDescriptor(descriptor);
-    return $A.clientService.isInternalNamespace(defDescriptor.getNamespace()) || $A.clientService.isPrivilegedNamespace(defDescriptor.getNamespace());
+    return defDescriptor.prefix === "layout" || $A.clientService.isInternalNamespace(defDescriptor.getNamespace()) || $A.clientService.isPrivilegedNamespace(defDescriptor.getNamespace());
 };
 
 /**

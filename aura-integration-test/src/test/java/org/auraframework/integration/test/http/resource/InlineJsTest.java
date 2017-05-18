@@ -19,6 +19,9 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
+import java.util.Arrays;
+import java.util.Locale;
+
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
@@ -108,6 +111,8 @@ public class InlineJsTest extends AuraImplTestCase {
 
         AuraContext context = contextService.startContext(
                 AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
+        context.setRequestedLocales(Arrays.asList(Locale.US));
+
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         mockRequest.addParameter("jwt", configAdapter.generateJwtToken());
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
@@ -139,6 +144,9 @@ public class InlineJsTest extends AuraImplTestCase {
 
         AuraContext context = contextService.startContext(
                 AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
+        // momentJs locale data is written into inline if locale is not en_US
+        context.setRequestedLocales(Arrays.asList(Locale.US));
+
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         mockRequest.addParameter("jwt", configAdapter.generateJwtToken());
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
@@ -179,6 +187,8 @@ public class InlineJsTest extends AuraImplTestCase {
 
         AuraContext context = contextService.startContext(
                 AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
+        context.setRequestedLocales(Arrays.asList(Locale.US));
+
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         mockRequest.addParameter("jwt", configAdapter.generateJwtToken());
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();

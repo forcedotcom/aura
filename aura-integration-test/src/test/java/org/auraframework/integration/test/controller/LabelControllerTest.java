@@ -15,6 +15,8 @@
  */
 package org.auraframework.integration.test.controller;
 
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -26,6 +28,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
 import org.auraframework.service.InstanceService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
@@ -75,6 +78,10 @@ public class LabelControllerTest extends AuraImplTestCase {
         Map<String, Object> params = Maps.newHashMap();
         params.put("section", section);
         params.put("name", name);
+
+        // Set locale as en_US, otherwise localizationAdapter will use server's locale
+        AuraContext context = contextService.getCurrentContext();
+        context.setRequestedLocales(Arrays.asList(Locale.US));
 
         Action instance = instanceService.getInstance(getLabelDesc,
                 ActionDef.class, params);

@@ -1,40 +1,18 @@
 <aura:component render="client">
+
     <!-- HTML Global Attributes -->
     <aura:attribute name="class" type="String" default="my-custom-class"/>
     <aura:attribute name="title" type="String" default="title"/>
     <aura:attribute name="accesskey" type="String" default="A"/>
-    <aura:attribute name="readonly" type="Boolean" default="false"/>
     <aura:attribute name="tabindex" type="Integer" default="1"/>
-    <aura:attribute name="for" type="String" default="some-id"/>
     <aura:attribute name="contenteditable" type="boolean" default="false"/>
-    <aura:attribute name="bgcolor" type="String" default="red"/>
-    <aura:attribute name="datetime" type="Integer" default="2020-01-04"/>
-    <aura:attribute name="rowspan" type="Integer" default="1"/>
-    <aura:attribute name="colspan" type="Integer" default="1"/>
-    <aura:attribute name="formaction" type="String" default="some-value"/>
-    <aura:attribute name="ismap" type="Boolean" default="false"/>
-    <aura:attribute name="maxlength" type="Integer" default="10"/>
-    <aura:attribute name="usemap" type="Boolean" default="false"/>
-    <aura:attribute name="role" type="String" default="some-role"/>
-
+    
     <!-- Markup -->
     <moduleTest:globalAttrsTests class="{! v.class }"
                                  title="{! v.title }"
                                  accesskey="{! v.accesskey }"
-                                 readonly="{! v.readonly }"
                                  tabindex="{! v.tabindex }"
-                                 for="{! v.for }"
                                  contenteditable="{! v.contenteditable }"
-                                 bgcolor="{! v.bgcolor }"
-                                 datetime="{! v.datetime }"
-                                 rowspan="{! v.rowspan }"
-                                 colspan="{! v.colspan }"
-                                 formaction="{! v.formaction }"
-                                 ismap="{! v.ismap }"
-                                 maxlength="{! v.maxlength }"
-                                 usemap="{! v.usemap }"
-                                 role="{! v.role }"
                                  aura:id="raptor"
-
     />
 </aura:component>

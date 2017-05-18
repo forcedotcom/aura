@@ -125,48 +125,37 @@ InteropComponent.prototype.setupAttributes = function(config) {
 
         // Check is attribute is in the definition or is an HTML Global attribute then
         // assign it as an attribute
-        if (htmlGlobalProp = this.getHtmlGlobal(attribute)) {
-            attributes[htmlGlobalProp] = valueConfig;
-        } else {
-            var isAttrInDefinition =  attribute in this.interopDef["props"];
-            var assertionMessage = '"' + attribute  + '" must either be a public property of ' + this.getName() + ' or a global HTML attribute'
+        var isAttrInDefinition =  attribute in this.interopDef["props"];
+        var assertionMessage = '"' + attribute  + '" must either be a public property of ' + this.getName() + ' or a global HTML attribute'
 
-            $A.assert(isEvent || isAttrInDefinition, assertionMessage);
-            attributes[attribute] = valueConfig;
-        }
+        $A.assert(isEvent || isAttrInDefinition || this.isHtmlGlobalAttr(attribute), assertionMessage);
+        attributes[attribute] = valueConfig;
     }
     
     return attributes;
 };
 
-/**
- * Return the transformed html property or undefined if the attrName is not a HTML
- * Global attribute
- * @private
- * @param attrName
- * @returns {String | undefined }
- */
-InteropComponent.prototype.getHtmlGlobal = function (attrName) {
-    var HTML_GLOBAL_ATTRS = {
-        'title': 'title',
-        'accesskey': 'accessKey',
-        'readonly': 'readOnly',
-        'tabindex': 'tabIndex',
-        'bgcolor': 'bgColor',
-        'colspan': 'colSpan',
-        'rowspan': 'rowSpan',
-        'contenteditable': 'contentEditable',
-        'datetime': 'dateTime',
-        'formaction': 'formAction',
-        'ismap': 'isMap',
-        'maxlength': 'maxLength',
-        'usemap': 'useMap',
-        'class': 'className',
-        'for': 'htmlFor',
-        'role': 'role',
-    };
 
-    return HTML_GLOBAL_ATTRS[attrName];
+InteropComponent.prototype.isHtmlGlobalAttr = function (attrName) {
+    return InteropComponent.HTML_GLOBAL_ATTRS[attrName] || false;
+};
+
+InteropComponent.HTML_GLOBAL_ATTRS = {
+    'title': true,
+    'accesskey': true,
+    'tabindex': true,
+    'class': true,
+    'contenteditable': true,
+    'contextmenu': true,
+    'dir': true,
+    'draggable': true,
+    'dropzone': true,
+    'hidden': true,
+    'id': true,
+    'lang' : true,
+    'spellcheck': true,
+    'style': true,
+    'translate': true
 };
 
 InteropComponent.prototype.setupMethods = function () {
@@ -192,11 +181,21 @@ InteropComponent.prototype.attributeChange = function (key, value) {
     if (this.rendered) {
         var element = this.getElement();
 
-        if (htmlGlobalProp = this.getHtmlGlobal(key)) {
-            element[htmlGlobalProp] = value;
+        if (this.isHtmlGlobalAttr(key)) {
+            this.setGlobalAttribute(element, key, value);
         } else {
-            element[key] = value;
+            element[key] =  value;
         }
+    }
+};
+
+InteropComponent.prototype.setGlobalAttribute = function (element, attrName, value) {
+    if (value === true) {
+        element.setAttribute(attrName, "");
+    } else if (value === false || value === null || value === undefined) {
+        element.removeAttribute(attrName);
+    } else {
+        element.setAttribute(attrName, value);
     }
 };
 
@@ -254,22 +253,22 @@ InteropComponent.prototype.set = function (key, value) {
  */
 InteropComponent.prototype.render = function () {
     var Ctor = this.interopClass;
-    var elmt = window["Engine"]['createElement'](this.componentDef.elementName, { 'is': Ctor });
+    var element = window["Engine"]['createElement'](this.componentDef.elementName, { 'is': Ctor });
     var cmp = this;
 
-    Object.keys(this.attributes).forEach(function (p) {
-        var attr = cmp.get('v.' + p);
-        if (attr !== undefined) {
-            if (p.indexOf('on') === 0) {
-                elmt.addEventListener(p.substring(2), attr, false);
-            } else {
-                if (this)
-                elmt[p] = attr;
-            }
-        }
-    });
+    Object.keys(this.attributes).forEach(function (attrName) {
+        var value = cmp.get('v.' + attrName);
 
-    return [elmt];
+        if (attrName.indexOf('on') === 0) {
+            element.addEventListener(attrName.substring(2), value, false);
+        } else if (this.isHtmlGlobalAttr(attrName)) {
+            this.setGlobalAttribute(element, attrName, value);
+        } else {
+            element[attrName] = value;
+        }
+    }.bind(this));
+
+    return [element];
 };
 
 /**

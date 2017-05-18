@@ -1357,7 +1357,7 @@ AuraInstance.prototype.deprecated = function(message,workaround,sinceDate,dueDat
     // JBUCH: TEMPORARILY IGNORE CALLS BY FRAMEWORK.
     // REMOVE WHEN ALL @public METHODS HAVE BEEN ADDRESSED.
     if(caller.indexOf("/aura_")>-1) {
-        $A.log("Framework use of deprecated method: " + message);
+        // $A.log("Framework use of deprecated method: " + message);
         return;
     }
 
@@ -1366,7 +1366,7 @@ AuraInstance.prototype.deprecated = function(message,workaround,sinceDate,dueDat
     var context=$A.getContext();
     context=context&&context.getCurrentAccess();
     if(/^(ui|aura):\w+$/.test(context&&context.getType())){
-        $A.log("Framework component use of deprecated method: "+message);
+        // $A.log("Framework component use of deprecated method: "+message);
         return;
     }
     if(Date.now()>=dueDate){

@@ -43,6 +43,9 @@ import org.auraframework.service.InstanceService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.Location;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -82,7 +85,13 @@ public class ComponentController implements GlobalController {
     T getBaseComponent(Class<T> type, Class<D> defType, String name,
                        Map<String, Object> attributes, Boolean loadLabels) throws QuickFixException {
 
-        DefDescriptor<D> desc = definitionService.getDefDescriptor(name, defType);
+        DefDescriptor<D> desc;
+        try {
+            desc = definitionService.getDefDescriptor(name, defType);
+        } catch (AuraRuntimeException invalid) {
+            // FIXME: W-3979409 we should return an error to the client.
+            throw new InvalidDefinitionException("Invalid descriptor: "+name, new Location("getComponent", 0L));
+        }
         definitionService.updateLoaded(desc);
         T component = instanceService.getInstance(desc, attributes);
         if (Boolean.TRUE.equals(loadLabels)) {

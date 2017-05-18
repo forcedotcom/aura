@@ -2475,13 +2475,12 @@ Component.prototype.getActionCaller = function(valueProvider, actionExpression) 
         }else{
             clientAction=valueProvider.get(actionExpression);
         }
+        // JBUCH: HALO: HACK: FIXME?
+        if(clientAction && $A.util.isString(clientAction)){
+            clientAction=valueProvider.getConcreteComponent().get(clientAction);
+        }
 
         if (clientAction) {
-            // JBUCH: HALO: HACK: FIXME?
-            if($A.util.isString(clientAction)){
-                clientAction=valueProvider.getConcreteComponent().get(clientAction);
-            }
-
             clientAction.runDeprecated(event);
         } else {
             $A.assert(false, "no client action by name " + actionExpression);

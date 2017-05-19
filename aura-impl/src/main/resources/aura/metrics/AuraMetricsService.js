@@ -31,6 +31,7 @@ Aura.Services.MetricsService = function MetricsService() {
     this.doneBootstrap             = false;
     this.pluginsInitialized        = false;
     this.clearCompleteTransactions = true; // In PTEST Mode this is set to false (see initialize method)
+    this.shouldLogBootstrap         = true;
     
     // Public constants used for flagging page transactions
     this["PAGE_IN_DOM"] = "PageInDOM";
@@ -181,7 +182,9 @@ Aura.Services.MetricsService.prototype.emitBootstrapTransaction = function () {
     var domReady = window.document && window.document.readyState;
     if (!this._emittedBootstrap && this.applicationReadyTime && domReady === "complete") {
         this._emittedBootstrap = true;
-
+        if (!this.shouldLogBootstrap) {
+            return;
+        }
         // We need a timeout because appCache events only fire after onload event
         setTimeout(function () {
             var bootstrap = this.getBootstrapMetrics();
@@ -862,6 +865,15 @@ Aura.Services.MetricsService.prototype.summarizeResourcePerfInfo = function (r) 
         "encodedBodySize" : r["encodedBodySize"] || 0,
         "decodedBodySize" : r["decodedBodySize"] || 0
     };
+};
+
+/**
+ * Prevent the framework from logging the bootstrap transaction
+ * This will be handled by the calling app at some point in the future
+ * @export
+*/
+Aura.Services.MetricsService.prototype.skipBootstrapLogging = function () {
+    this.shouldLogBootstrap = false;
 };
 
 /**

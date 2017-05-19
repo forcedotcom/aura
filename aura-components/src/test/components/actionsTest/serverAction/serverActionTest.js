@@ -408,7 +408,6 @@
     },
 
     testEnqueuedCallbackJavascriptError : {
-        browsers : [ "-IE11", "-Safari" ],
         test : function(cmp) {
             $A.test.expectAuraWarning("Callback failed: java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground");
             $A.test.expectAuraError("this is intentional");
@@ -421,7 +420,6 @@
     },
 
     testRunActionsCallbackJavascriptError : {
-        browsers : [ "-IE11", "-Safari" ],
         test : function(cmp) {
             $A.test.expectAuraError("this is intentional");
             var a = $A.test.getAction(cmp, "c.executeInForeground", null, function() {
@@ -666,7 +664,6 @@
      * Verify when a retry action from the server fails the error is properly displayed to the user.
      */
     testStorableRetry_errorOnRetry: {
-        browsers : [ "-IE11", "-Safari" ],
         test : [
             function(cmp) {
                 // prime storage

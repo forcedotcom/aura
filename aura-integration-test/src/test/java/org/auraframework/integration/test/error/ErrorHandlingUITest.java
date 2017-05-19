@@ -18,15 +18,12 @@ package org.auraframework.integration.test.error;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
-import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.system.AuraContext.Mode;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
-import org.auraframework.test.util.WebDriverUtil.BrowserType;
 
-@ExcludeBrowsers({ BrowserType.IE11, BrowserType.SAFARI })
 public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
     /**

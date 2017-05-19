@@ -59,6 +59,9 @@
     },
 
     displayDatePicker: function (component, focusDatePicker) {
+        if (!component.get("v.displayDatePicker")) {
+            return;
+        }
         var useManager = component.get("v.useManager"),
             managerExists = component.get("v.managerExists");
         if (useManager && managerExists) {

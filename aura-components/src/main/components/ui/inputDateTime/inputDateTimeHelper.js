@@ -45,7 +45,7 @@
     },
 
     displayDatePicker: function (component, focusDatePicker) {
-        if (component.get("v.useSingleInput") && !component.get("v.displayDatePicker")) {
+        if (!component.get("v.displayDatePicker")) {
             return;
         }
 
@@ -54,6 +54,10 @@
     },
 
     displayTimePicker: function (component, focusTimePicker) {
+        if (!component.get("v.displayDatePicker")) {
+            return;
+        }
+
         var inputTimeValue = this.getTimeString(component);
         var dateTimeString;
         var hours, minutes;

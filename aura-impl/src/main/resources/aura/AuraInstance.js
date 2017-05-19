@@ -769,17 +769,6 @@ AuraInstance.prototype.handleError = function(message, e) {
                 $A.eventService.getNewEvent('markup://aura:systemError').fire(evtArgs);
             }
         }, 0);
-
-        $A.getCallback(function() {
-            if (e && message) {
-                // if there's extra info in the message that's not in error.message, include it for report.
-                if (message !== e.message && message.indexOf(e.message) > -1) {
-                    e.message = message;
-                }
-            }
-            $A.logger.reportError(e);
-        })();
-        $A.services.client.postProcess();
     } else {
         if ($A.showErrors()) {
             $A.message(dispMsg, e);
@@ -854,9 +843,8 @@ AuraInstance.prototype.isCustomerComponentStack = function(cmpStack) {
  * @platform
  */
 AuraInstance.prototype.reportError = function(message, error) {
-    // ignore if sourceURL is not supported
     // ignore external errors
-    if (!$A.util.hasSourceURL() || $A.logger.isExternalError(error)) {
+    if ($A.logger.isExternalError(error)) {
         return false;
     }
 
@@ -868,6 +856,20 @@ AuraInstance.prototype.reportError = function(message, error) {
         new $A.auraError("[NoErrorObjectAvailable] " + message);
 
     $A.handleError(message, error);
+
+    // only report the error to the server if sourceURL is supported
+    if ($A.initialized && $A.util.hasSourceURL()) {
+        $A.getCallback(function() {
+            if (error && message) {
+                // if there's extra info in the message that's not in error.message, include it for report.
+                if (message !== error.message && message.indexOf(error.message) > -1) {
+                    error.message = message;
+                }
+            }
+            $A.logger.reportError(error);
+        })();
+        $A.services.client.postProcess();
+    }
 
     this.lastKnownError = null;
     return true;

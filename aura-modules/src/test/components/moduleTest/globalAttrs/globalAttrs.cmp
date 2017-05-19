@@ -6,6 +6,7 @@
     <aura:attribute name="accesskey" type="String" default="A"/>
     <aura:attribute name="tabindex" type="Integer" default="1"/>
     <aura:attribute name="contenteditable" type="boolean" default="false"/>
+    <aura:attribute name="role" type="String" default="navigation"/>
     
     <!-- Markup -->
     <moduleTest:globalAttrsTests class="{! v.class }"
@@ -13,6 +14,7 @@
                                  accesskey="{! v.accesskey }"
                                  tabindex="{! v.tabindex }"
                                  contenteditable="{! v.contenteditable }"
+                                 role="{! v.role }"
                                  aura:id="raptor"
     />
 </aura:component>

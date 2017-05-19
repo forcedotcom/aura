@@ -155,7 +155,8 @@ InteropComponent.HTML_GLOBAL_ATTRS = {
     'lang' : true,
     'spellcheck': true,
     'style': true,
-    'translate': true
+    'translate': true,
+    'role': true
 };
 
 InteropComponent.prototype.setupMethods = function () {

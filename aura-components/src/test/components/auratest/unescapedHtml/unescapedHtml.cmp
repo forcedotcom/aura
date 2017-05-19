@@ -19,5 +19,7 @@
     <aura:attribute name="value" type="String"/>
     <ui:button aura:id="toggle" label="toggle" press="{!c.toggleValue}"/>
     <aura:unescapedHtml aura:id="null" value="{!false || null}"/>
-    <aura:unescapedHtml aura:id="value" value="{!v.value}"/>
+    <span aura:id="output">
+        <aura:unescapedHtml aura:id="value" value="{!v.value}"/>
+    </span>
 </aura:component>

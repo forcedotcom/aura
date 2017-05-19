@@ -85,5 +85,43 @@
                 var cmp = component.find("null");
                 $A.test.assertTrue($A.util.isEmpty(cmp.getElements()), "still no elements should have been rendered");
             }]
+    },
+
+    testRerender: {
+        test: [
+            function(cmp) {
+                var expected = "<b>testRerender</b>";
+                var contents;
+                var output = cmp.find("output");
+
+                cmp.set("v.value", expected);
+                $A.rerender(cmp);
+
+                $A.test.addWaitForWithFailureMessage(true, function() {
+                    var bold = output.getElement().firstChild;
+                    return bold && $A.util.getText(bold) === "testRerender";
+
+                }, "The expected HTML " + expected + " was not present");
+            },
+            function(cmp) {
+                var expected = "<i>testRerender2</i>";
+                var contents;
+                var output = cmp.find("output");
+
+                cmp.set("v.value", "<b>Initial</b>");
+                $A.rerender(cmp);
+                cmp.set("v.value", expected);
+                $A.rerender(cmp);
+
+                $A.test.addWaitForWithFailureMessage(true, function() {
+                    var italic = output.getElement().firstChild;
+                    return italic && $A.util.getText(italic) === "testRerender2";
+                }, "The expected HTML " + expected + " was not present", function() {
+                    // All the other values in the output are gone.
+                    var count = output.getElement().getElementsByTagName("*").length;
+                    $A.test.assertEquals(1, count);
+                });
+            }
+        ]
     }
 })

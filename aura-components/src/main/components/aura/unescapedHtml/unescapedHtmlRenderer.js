@@ -39,5 +39,13 @@
                 $A.afterRender(cmp);
             }
         }
+    },
+
+    unrender: function(cmp) {
+        var elements = cmp.getElements();
+        for(var c=0;c<elements.length;c++) {
+            $A.util.removeElement(elements[c]);
+        }
+        cmp.disassociateElements();
     }
 })// eslint-disable-line semi

@@ -16,7 +16,7 @@
 
 -->
 <aura:component support="GA" access="GLOBAL"
-    description="The value assigned to this component will be rendered as-is, without altering its contents. It's intended for outputting pre-formatted HTML, for example, where the formatting is arbitrary, or expensive to calculate. The body of this component is ignored, and won't be rendered. Warning: this component outputs value as unescaped HTML, which introduces the possibility of security vulnerabilities in your code. You must sanitize user input before rendering it unescaped, or you will create a cross-site scripting (XSS) vulnerability. Only use &lt;aura:unescapedHtml&gt; with trusted or sanitized sources of data.">
+    description="The value assigned to this component will be rendered as-is, without altering its contents. It's intended for outputting pre-formatted HTML, for example, where the formatting is arbitrary, or expensive to calculate. The body of this component is ignored, and won't be rendered. Warning: this component outputs value as unescaped HTML, which introduces the possibility of security vulnerabilities in your code. You must sanitize user input before rendering it unescaped, or you will create a cross-site scripting (XSS) vulnerability. Only use &lt;aura:unescapedHtml&gt; with trusted or sanitized sources of data." implements="aura:rootComponent">
 
     <!--
         Warning: this component outputs "value" string as a piece of unescaped HTML codes and

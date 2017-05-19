@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.def.ActionDef;
@@ -55,7 +56,7 @@ public class AuraClientException extends Exception {
         Action action = null;
         this.causeDescriptor = null;
         this.errorId = id;
-        if (desc != null) {
+        if (!StringUtils.isEmpty(desc)) {
             try {
                 action = instanceService.getInstance(desc, ActionDef.class);
                 if (action instanceof JavascriptPseudoAction) {

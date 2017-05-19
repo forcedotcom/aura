@@ -16,7 +16,6 @@
 package org.auraframework.integration.test;
 
 import org.auraframework.integration.test.util.WebDriverTestCase;
-import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -50,7 +49,6 @@ public class AccessChecksUITest extends WebDriverTestCase {
      * will try to the component on the client and fail.
      */
     @Test
-    @ExcludeBrowsers({ BrowserType.IE11, BrowserType.SAFARI })
     public void testPublicComponentInaccessibleFromExternalNamespace() throws Exception {
         open("/testCustomNS1/accessExternalNamespace.cmp?cmpToCreate=auratest:accessPublicComponent");
         clickCreateComponentButton();

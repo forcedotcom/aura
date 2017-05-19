@@ -18,12 +18,9 @@ package org.auraframework.integration.test.error;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
-import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
 
-@ExcludeBrowsers({ BrowserType.IE11, BrowserType.SAFARI })
 public class ServerModelErrorUITest extends AbstractErrorUITestCase {
     /**
      * Verify Aura default error handler can handle systemError when an exception is thrown from model.

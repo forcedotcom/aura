@@ -69,7 +69,7 @@ public class DefRefDelegate implements DefinitionReference {
         }
 
         // Only process references that have namespaces registered as modules
-        if (moduleNamespaces.contains(actualNamespace)) {
+        if (moduleNamespaces.contains(actualNamespace.toLowerCase())) {
 
             DefinitionService definitionService = Aura.getDefinitionService();
             DefDescriptor<?> componentRefDescriptor = this.componentDefRef.getDescriptor();

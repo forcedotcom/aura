@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 ({
-    updateTemplate:function(cmp,event,helper){
+    updateTemplate:function(cmp){
         if(!cmp.get("v.updating")){
             cmp.set("v.template", cmp.get("v.body"));
         }
         cmp.set("v.updating",false);
     },
 
-    update:function(cmp,event,helper){
+    update:function(cmp){
         var value=cmp.get("v.value")||'';
         // No value, clear out body
         if(!value||!$A.util.isString(value)){
@@ -50,7 +50,7 @@
                 body.push(substitution);
                 startIndex=index+match.length;
             }
-        })
+        });
         // Append the tail of the string
         if(startIndex<value.length){
             body.push($A.createComponentFromConfig({descriptor:"markup://aura:text",attributes:{value:value.substring(startIndex)}}));

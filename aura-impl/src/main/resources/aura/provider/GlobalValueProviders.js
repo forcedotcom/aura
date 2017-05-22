@@ -153,11 +153,20 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
     var that = this;
     $A.util.Mutex.lock(that.MUTEX_KEY, function (unlock) {
         that.mutexUnlock = unlock;
+
+        var errors = [];
         storage.get(that.STORAGE_KEY, true)
             .then(
                 undefined,
                 function(e) {
-                    $A.warning("GlobalValueProviders.merge(): failed to load GVP values from storage, will overwrite storage with in-memory values. " + e);
+                    var message = "GlobalValueProviders.merge(): failed to load GVP values from storage, will overwrite storage with in-memory values.";
+                    $A.warning(message, e);
+
+                    errors.push({
+                        "action": "load",
+                        "message": message,
+                        "error": e
+                    });
                     // do not rethrow
                 }
             )
@@ -200,7 +209,13 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
 
                         toStore = value;
                     } catch (e) {
-                        $A.warning("GlobalValueProviders.merge(): merging from storage failed, overwriting with in-memory values. " + e);
+                        var message = "GlobalValueProviders.merge(): merging from storage failed, overwriting with in-memory values.";
+                        $A.warning(message, e);
+                        errors.push({
+                            "action": "merge",
+                            "message": message,
+                            "error": e
+                        });
                     }
                 }
                 return storage.set(that.STORAGE_KEY, toStore);
@@ -210,10 +225,19 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
                     if (that.getAbsentGvpValuesCookie()) {
                         // clear the cookie if persistence succeeds
                         that.clearAbsentGvpValuesCookie();
+                    }
 
-                        $A.metricsService.transaction("aura", "performance:gvpStorageRecovery", {
+                    if (errors.length > 0) {
+                        var message = "GlobalValueProviders.merge(): GVP values in storage have been overwritten with in-memory values.";
+                        $A.warning(message);
+
+                        // GVPs in current tab are persisted, but b/c errors in step 1 or 2, GVPs for other tabs could be dropped.
+                        $A.metricsService.transaction("aura", "performance:gvpStorageFailure", {
                             "context": {
-                                "attributes" : {}
+                                "attributes" : {
+                                    "message": message,
+                                    "errors": JSON.stringify(errors)
+                                }
                             }
                         });
                     }
@@ -221,14 +245,12 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
                     that.mutexUnlock();
                 },
                 function(e) {
-                    var message = "GlobalValueProviders.merge(): failed to store merged GVP values to storage. ";
-                    $A.warning(message + e);
                     that.setAbsentGvpValuesCookie();
 
-                    // The error could protentially cause missing labels if a new loading page restores
-                    // GVPs from storage. Logging the error to server.
-                    // $A.logger.reportError(new $A.auraError(message, e));
-                    var labels;
+                    var message = "GlobalValueProviders.merge(): failed to store merged GVP values to storage.";
+                    $A.warning(message, e);
+
+                    var labels = [];
                     for (i = 0; i < gvps.length; i++) {
                         // For now, only cares about labels. To minimize the payload, only sending the sections.
                         if (gvps[i]["type"] === "$Label") {
@@ -237,17 +259,22 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
                         }
                     }
 
-                    if (labels) {
-                        $A.metricsService.transaction("aura", "performance:gvpStorageFailure", {
-                            "context": {
-                                "attributes" : {
-                                    "message": message,
-                                    "error": e && e.toString(),
-                                    "labels": labels
-                                }
+                    errors.push({
+                        "action": "save",
+                        "message": message,
+                        "error": e,
+                        "dropped-labels": labels
+                    });
+
+                    // new coming GVPs fail to be saved into storage
+                    $A.metricsService.transaction("aura", "performance:gvpStorageFailure", {
+                        "context": {
+                            "attributes" : {
+                                "message": message,
+                                "errors": JSON.stringify(errors)
                             }
-                        });
-                    }
+                        }
+                    });
 
                     that.mutexUnlock();
                 }

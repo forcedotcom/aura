@@ -43,7 +43,7 @@
                disabled="{!v.disabled}"
                onclick="{!c.inputDateClick}"/>
 
-        <aura:if isTrue="{!v.displayDatePicker}">
+        <aura:if isTrue="{!v.displayDatePicker}"> 
             <a aura:id="datePickerOpener" class="datePicker-openIcon display" aria-haspopup="true" onclick="{!c.openDatePicker}" onkeydown="{!c.pickerKeydown}">
                 <span class="assistiveText">Date Picker</span>
             </a>

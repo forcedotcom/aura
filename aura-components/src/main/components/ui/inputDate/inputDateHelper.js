@@ -16,7 +16,6 @@
 ({
     init: function (component) {
         if (component.get("v.disabled")) {
-            component.set("v.displayDatePicker", false);
             // don't bother with the rest if the input is disabled
             return;
         }
@@ -141,6 +140,14 @@
             } else {
                 $A.util.swapClass(clearElem, "hide", "display");
                 $A.util.swapClass(openIconElem, "display", "hide");
+            }
+        } else {
+            if (component.get('v.displayDatePicker')) {
+                if ($A.util.getBooleanValue(component.get('v.disabled'))) {
+                    $A.util.swapClass(openIconElem, "display", "hide");
+                } else {
+                    $A.util.swapClass(openIconElem, "hide", "display");
+                }
             }
         }
     },

@@ -32,20 +32,10 @@ public class ModulesCompilerServiceImpl implements ModulesCompilerService {
 
     @Override
     public final ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception {
-        ModulesCompilerData data;
-
         long startNanos = System.nanoTime();
-
-        try {
-            data = new ModulesCompilerNode().compile(entry, sources);
-        } catch (Exception ex) {
-            loggingService.error("ModulesCompilerNode failed on " + entry + " trying J2V8", ex);
-            data = new ModulesCompilerJ2V8().compile(entry,  sources);
-        }
-
+        ModulesCompilerData data = new ModulesCompilerNode().compile(entry, sources);
         long elapsedMillis = (System.nanoTime() - startNanos) / 1000000;
         loggingService.info("modules compiled " + entry + " in " + elapsedMillis + " ms");
-
         return data;
     }
 }

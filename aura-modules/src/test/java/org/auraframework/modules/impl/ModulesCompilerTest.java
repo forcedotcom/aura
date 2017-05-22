@@ -21,6 +21,7 @@ import java.util.Map;
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.base.Charsets;
@@ -38,6 +39,7 @@ public class ModulesCompilerTest extends UnitTestCase {
     }
 
     @Test
+    @Ignore("deprecated and J2V8 tests sometimes flap")
     public void testModulesCompilerJ2V8() throws Exception {
         testModulesCompiler(new ModulesCompilerJ2V8());
     }
@@ -66,6 +68,7 @@ public class ModulesCompilerTest extends UnitTestCase {
     }
 
     @Test
+    @Ignore("deprecated and J2V8 tests sometimes flap")
     public void testModulesCompilerJ2V8ErrorInHtml() throws Exception {
         testModulesCompilerErrorInHtml(new ModulesCompilerJ2V8());
     }
@@ -98,6 +101,7 @@ public class ModulesCompilerTest extends UnitTestCase {
     }
 
     @Test
+    @Ignore("deprecated and J2V8 tests sometimes flap")
     public void testModulesCompilerJ2V8ErrorInJs() throws Exception {
         testModulesCompilerErrorInJs(new ModulesCompilerJ2V8());
     }

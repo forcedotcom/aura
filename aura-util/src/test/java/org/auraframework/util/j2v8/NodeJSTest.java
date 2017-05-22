@@ -39,6 +39,7 @@ import com.eclipsesource.v8.V8Object;
 /**
  * Verifies NodeJS can be used in Aura plus usage examples
  */
+@Ignore("deprecated and tests flap")
 public class NodeJSTest extends UnitTestCase {
 
     // basic

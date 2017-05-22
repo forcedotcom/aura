@@ -23,6 +23,7 @@ import java.util.concurrent.FutureTask;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.eclipsesource.v8.JavaCallback;
@@ -34,6 +35,7 @@ import com.eclipsesource.v8.utils.MemoryManager;
 /**
  * Verifies J2V8 can be used in Aura plus usage examples
  */
+@Ignore("deprecated and tests flap")
 public class J2V8Test extends UnitTestCase {
 
     private V8 v8;

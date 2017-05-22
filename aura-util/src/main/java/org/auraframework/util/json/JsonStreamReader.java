@@ -108,7 +108,10 @@ import javax.annotation.Nonnull;
  */
 public class JsonStreamReader {
 
-    private static final int MAX_LENGTH = 1000000;
+    // When we JSON.parse, it needs to load all the bytes into memory. 
+    // Allowing any amount of bytes would allow someone to compromise our servers.
+    // 4mb seems to be industry standard here.
+    private static final int MAX_LENGTH = 4194304;
     private static JsonHandlerProvider defaultProvider = new JsonHandlerProviderImpl();
     private static Map<Character, Character> escapes = Maps.newHashMapWithExpectedSize(13);
     static {

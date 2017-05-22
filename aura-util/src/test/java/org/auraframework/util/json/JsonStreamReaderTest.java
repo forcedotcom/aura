@@ -64,6 +64,22 @@ public class JsonStreamReaderTest extends UnitTestCase {
         super.tearDown();
     }
 
+    @Test(expected = org.auraframework.util.json.JsonStreamReader.JsonParseException.class)
+    public void testMaxLength() throws Exception {
+        // Specified in JsonStreamReader.java as a private constant. 
+        final int MAX_LENGTH = 4194304;
+        final int length = MAX_LENGTH + 1;
+        char[] characters = new char[length];
+        Arrays.fill(characters, ' ');
+        StringBuffer chars = new StringBuffer(length+4); 
+        chars.append("[\"");
+        chars.append(characters);
+        chars.append("\"]");
+
+        jsonStreamReader = new JsonStreamReader(chars.toString());
+        jsonStreamReader.next();
+    }
+    
     /**
      * Testing extreme cases for constructor
      */

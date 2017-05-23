@@ -177,18 +177,6 @@ public class ApplicationDefFactoryTest extends BaseComponentDefFactoryTest<Appli
     public void testInternalLocationChange() throws Exception {
     }
 
-    /////////////////////////////////////////////////////////////////////////////
-    // one page (deprecated)
-    /////////////////////////////////////////////////////////////////////////////
-
-    @Test
-    public void testCustomOnePageNegative() throws Exception {
-    }
-
-    @Test
-    public void testInternalOnePageChange() throws Exception {
-    }
-
 
     /////////////////////////////////////////////////////////////////////////////
     // template

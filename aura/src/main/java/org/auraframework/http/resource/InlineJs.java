@@ -15,14 +15,20 @@
  */
 package org.auraframework.http.resource;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.Component;
 import org.auraframework.service.RenderingService;
 import org.auraframework.system.AuraContext;
@@ -31,13 +37,8 @@ import org.auraframework.throwable.AuraJWTError;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableList;
 
 @ServiceComponent
 public class InlineJs extends AuraResourceImpl {
@@ -47,6 +48,10 @@ public class InlineJs extends AuraResourceImpl {
 
     public InlineJs() {
         super("inline.js", Format.JS);
+    }
+
+    public InlineJs(ManifestUtil manifestUtil) {
+        super("inline.js", Format.JS, manifestUtil);
     }
 
     @Inject
@@ -77,11 +82,8 @@ public class InlineJs extends AuraResourceImpl {
             definitionService.assertAccess(referencingDescriptor, def);
         }
 
-        if (shouldCacheHTMLTemplate(defDescriptor, request, context)) {
-            servletUtilAdapter.setLongCache(response);
-        } else {
-            servletUtilAdapter.setNoCache(response);
-        }
+        // Always set no cache.
+        servletUtilAdapter.setNoCache(response);
 
         // Prevents Mhtml Xss exploit:
         PrintWriter out = response.getWriter();
@@ -94,16 +96,6 @@ public class InlineJs extends AuraResourceImpl {
         renderingService.render(template, null, out);
     }
 
-    private boolean shouldCacheHTMLTemplate(DefDescriptor<? extends BaseComponentDef> appDefDesc,
-            HttpServletRequest request, AuraContext context) throws QuickFixException {
-        if (appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)) {
-            Boolean isOnePageApp = ((ApplicationDef)definitionService.getDefinition(appDefDesc)).isOnePageApp();
-            if (isOnePageApp != null) {
-                return isOnePageApp;
-            }
-        }
-        return !manifestUtil.isManifestEnabled(request);
-    }
 
     @Override
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context)

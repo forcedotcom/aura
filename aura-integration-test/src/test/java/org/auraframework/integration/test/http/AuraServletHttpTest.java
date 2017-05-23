@@ -333,17 +333,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     @Test
     public void testHTMLTemplateCaching() throws Exception {
-        // An application with isOnePageApp set to true
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
-                "<aura:application isOnePageApp='true'></aura:application>");
-
-        // Expect the get request to be set for long cache
-        assertResponseSetToLongCache(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
-
-        // An application with isOnePageApp set to false
-        desc = addSourceAutoCleanup(ApplicationDef.class, "<aura:application isOnePageApp='false'></aura:application>");
-        // Expect the get request to be set for no caching
-        assertResponseSetToNoCache(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
+        DefDescriptor<ApplicationDef> desc;
 
         // An application with no specification
         desc = addSourceAutoCleanup(ApplicationDef.class, "<aura:application></aura:application>");
@@ -356,7 +346,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component ></aura:component>");
         // Expect the get request to be set for long cache
-        assertResponseSetToLongCache(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
+        assertResponseSetToNoCache(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
     }
 
     // following 5 tests are mainly for mapping between custom CSP to X-FRAME-OPTIONS
@@ -429,18 +419,11 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     @Test
     public void testHTMLTemplateCachingWhenAppCacheIsEnable() throws Exception {
+        DefDescriptor<ApplicationDef> desc;
+
         setHttpUserAgent(UserAgent.GOOGLE_CHROME.getUserAgentString());
 
-        // An application with isOnePageApp set to true and useAppcache set to
-        // true
-        // isOnePageApp overrides useAppCache specification
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
-                "<aura:application isOnePageApp='true' useAppcache='true'></aura:application>");
-        // Expect the get request to be set for long cache
-        assertResponseSetToLongCache(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
-
-        // An application with useAppcache set to true and no specification for
-        // isOnePageApp
+        // An application with useAppcache set to true
         desc = addSourceAutoCleanup(ApplicationDef.class, "<aura:application useAppcache='true'></aura:application>");
         // Expect the get request to be set for no caching
         assertResponseSetToNoCache(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
@@ -449,46 +432,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component ></aura:component>");
         // Expect the get request to be set for long cache
-        assertResponseSetToLongCache(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
-    }
-
-    /**
-     * Wiggle factor.
-     *
-     * This is intended to allow for variance between the local date and the server date, along with any latency that
-     * might occur. Currently it is set to 1 hour, which should be more than enough to account for offsets, but short
-     * enough so that we don't really care.
-     */
-    private final static long WIGGLE_FACTOR = (1000L * 60 * 60 * 1);
-
-    /**
-     * Submit a request and check that the 'long cache' is set correctly.
-     *
-     * See documentation for {@link #WIGGLE_FACTOR}.
-     *
-     * @param url the url
-     */
-    private void assertResponseSetToLongCache(String url) throws Exception {
-        Date expected = new Date(System.currentTimeMillis() + AuraBaseServlet.LONG_EXPIRE - WIGGLE_FACTOR);
-
-        HttpGet get = obtainGetMethod(url);
-        HttpResponse response = perform(get);
-
-        assertEquals("Failed to execute request successfully.", HttpStatus.SC_OK, getStatusCode(response));
-
-        assertEquals("Expected response to be marked for long cache",
-                String.format("max-age=%s, public", AuraBaseServlet.LONG_EXPIRE / 1000),
-                response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue());
-        assertDefaultAntiClickjacking(response, true, false);
-        String expiresHdr = response.getFirstHeader(HttpHeaders.EXPIRES).getValue();
-        Date expires = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH).parse(expiresHdr);
-        //
-        // We show all of the related dates/strings to help with debugging.
-        //
-        assertTrue(String.format("Expires header is earlier than expected. Expected !before %s, got %s (%s).",
-                expected, expires, expiresHdr), !expires.before(expected));
-
-        get.releaseConnection();
+        assertResponseSetToNoCache(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
     }
 
     /**
@@ -530,9 +474,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         try {
             mci.setContentSecurityPolicy(mockCsp);
 
-            // An application with isOnePageApp set to true
             DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
-                    "<aura:application isOnePageApp='true'></aura:application>");
+                    "<aura:application></aura:application>");
 
             HttpGet get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
             HttpResponse response = perform(get);

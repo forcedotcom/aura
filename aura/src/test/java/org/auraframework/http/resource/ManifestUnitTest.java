@@ -74,13 +74,13 @@ public class ManifestUnitTest extends UnitTestCase {
         manifest.setManifestUtil(manifestUtil);
         manifest.setServletUtilAdapter(servletUtilAdapter);
 
-        Mockito.when(manifestUtil.isManifestEnabled(request)).thenReturn(false);
+        Mockito.when(manifestUtil.isManifestEnabled()).thenReturn(false);
         Mockito.when(request.getParameterNames()).thenReturn(getEmptyStringEnumeration());
 
         manifest.write(request, response, null);
 
         // This is mocked.
-        Mockito.verify(manifestUtil, Mockito.times(1)).isManifestEnabled(request);
+        Mockito.verify(manifestUtil, Mockito.times(1)).isManifestEnabled();
 
         //
         // These are the real verifications. It should not be cached, and it should be marked
@@ -109,14 +109,14 @@ public class ManifestUnitTest extends UnitTestCase {
         manifest.setManifestUtil(manifestUtil);
         manifest.setServletUtilAdapter(servletUtilAdapter);
 
-        Mockito.when(manifestUtil.isManifestEnabled(request)).thenReturn(true);
+        Mockito.when(manifestUtil.isManifestEnabled()).thenReturn(true);
         Mockito.when(manifestUtil.checkManifestCookie(request, response)).thenReturn(false);
         Mockito.when(request.getParameterNames()).thenReturn(getEmptyStringEnumeration());
 
         manifest.write(request, response, null);
 
         // This is mocked.
-        Mockito.verify(manifestUtil, Mockito.times(1)).isManifestEnabled(request);
+        Mockito.verify(manifestUtil, Mockito.times(1)).isManifestEnabled();
         Mockito.verify(manifestUtil, Mockito.times(1)).checkManifestCookie(request, response);
 
         //
@@ -145,14 +145,14 @@ public class ManifestUnitTest extends UnitTestCase {
         manifest.setManifestUtil(manifestUtil);
         manifest.setServletUtilAdapter(servletUtilAdapter);
 
-        Mockito.when(manifestUtil.isManifestEnabled(request)).thenReturn(true);
+        Mockito.when(manifestUtil.isManifestEnabled()).thenReturn(true);
         Mockito.when(manifestUtil.checkManifestCookie(request, response)).thenReturn(true);
         Mockito.when(request.getParameterNames()).thenReturn(getEmptyStringEnumeration());
 
         manifest.write(request, response, context);
 
         // This is mocked.
-        Mockito.verify(manifestUtil, Mockito.times(1)).isManifestEnabled(request);
+        Mockito.verify(manifestUtil, Mockito.times(1)).isManifestEnabled();
         Mockito.verify(manifestUtil, Mockito.times(1)).checkManifestCookie(request, response);
         Mockito.verify(context, Mockito.times(1)).getApplicationDescriptor();
 

@@ -72,8 +72,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     private FlavorsDef flavorOverrides;
     private final DefDescriptor<FlavorsDef> externalFlavorOverrides;
 
-    private final Boolean isOnePageApp;
-
     public static final DefDescriptor<ApplicationDef> PROTOTYPE_APPLICATION = new DefDescriptorImpl<>(
             "markup", "aura", "application", ApplicationDef.class);
 
@@ -84,7 +82,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         this.trackedDependencies = AuraUtil.immutableList(builder.trackedDependency);
         this.isAppcacheEnabled = builder.isAppcacheEnabled;
         this.additionalAppCacheURLs = builder.additionalAppCacheURLs;
-        this.isOnePageApp = builder.isOnePageApp;
         this.bootstrapPublicCacheExpiration = builder.bootstrapPublicCacheExpiration;
         this.tokenOverrides = AuraUtil.immutableList(builder.tokenOverrides);
         this.flavorOverrides = builder.flavorOverrides;
@@ -95,7 +92,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         public DefDescriptor<EventDef> locationChangeEventDescriptor;
         public List<DefDescriptor<ComponentDef>> trackedDependency;
         public Boolean isAppcacheEnabled;
-        public Boolean isOnePageApp;
         public String additionalAppCacheURLs;
         public String bootstrapPublicCacheExpiration;
         private List<DefDescriptor<TokensDef>> tokenOverrides;
@@ -302,11 +298,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         return urls;
     }
 
-    @Override
-    public Boolean isOnePageApp() throws QuickFixException {
-        return isOnePageApp;
-    }
-    
     /**
      * Returns any configured public cache expiration (in seconds) for bootstrap.js, or null if not set.
      */

@@ -67,6 +67,12 @@ public abstract class AuraResourceImpl implements AuraResource {
         this.format = format;
     }
 
+    public AuraResourceImpl(String name, Format format, ManifestUtil manifestUtil) {
+        this.name = name;
+        this.format = format;
+        this.manifestUtil = manifestUtil;
+    }
+
     @Override
     public void setContentType(HttpServletResponse response) {
         response.setContentType(this.servletUtilAdapter.getContentType(this.format));

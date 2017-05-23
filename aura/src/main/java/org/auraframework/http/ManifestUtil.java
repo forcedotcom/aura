@@ -62,13 +62,6 @@ public class ManifestUtil {
     }
 
     /**
-     * Check to see if we allow appcache on the current request.
-     */
-    public boolean isManifestEnabled(HttpServletRequest request) {
-        return isManifestEnabled();
-    }
-
-    /**
      * Is AppCache allowed by the current configuration?
      */
     public boolean isManifestEnabled() {

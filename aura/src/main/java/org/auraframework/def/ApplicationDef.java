@@ -35,8 +35,6 @@ public interface ApplicationDef extends BaseComponentDef {
 
     List<String> getAdditionalAppCacheURLs() throws QuickFixException;
 
-    Boolean isOnePageApp() throws QuickFixException;
-    
     Integer getBootstrapPublicCacheExpiration() throws QuickFixException;
 
     Map<String, String> getTokens();

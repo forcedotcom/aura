@@ -39,7 +39,6 @@ public class ApplicationDefImplUnitTest extends
     DefinitionAccess access;
     Boolean isAppcacheEnabled;
     String additionalAppCacheURLs;
-    Boolean isOnePageApp;
 
     public ApplicationDefImplUnitTest() {
         descriptorName = "application";
@@ -57,7 +56,6 @@ public class ApplicationDefImplUnitTest extends
         builder.setAccess(this.access);
         builder.isAppcacheEnabled = this.isAppcacheEnabled;
         builder.additionalAppCacheURLs = this.additionalAppCacheURLs;
-        builder.isOnePageApp = this.isOnePageApp;
         return super.buildDefinition(builder);
     }
 

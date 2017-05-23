@@ -22,7 +22,11 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.service.ContextService;
@@ -117,13 +121,6 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             builder.additionalAppCacheURLs = additionalAppCacheURLs;
         }
 
-        String isOnePageApp = getAttributeValue(ATTRIBUTE_IS_ONE_PAGE_APP);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(isOnePageApp)) {
-            builder.isOnePageApp = Boolean.parseBoolean(isOnePageApp);
-        } else {
-            builder.isOnePageApp = false;
-        }
-        
         String tokenOverrides = getAttributeValue(ATTRIBUTE_TOKEN_OVERRIDES);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(tokenOverrides)) {
             builder.setTokenOverrides(tokenOverrides);
@@ -155,7 +152,6 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     private static final String ATTRIBUTE_LOCATION_CHANGE_EVENT = "locationChangeEvent";
     private static final String ATTRIBUTE_APPCACHE_ENABLED = "useAppcache";
     private static final String ATTRIBUTE_ADDITIONAL_APPCACHE_URLS = "additionalAppCacheURLs";
-    private static final String ATTRIBUTE_IS_ONE_PAGE_APP = "isOnePageApp";
     private static final String ATTRIBUTE_TOKEN_OVERRIDES = "tokens";
     private static final String ATTRIBUTE_FLAVOR_OVERRIDES = "flavorOverrides";
     private static final String ATTRIBUTE_BOOTSTRAP_PUBLIC_CACHE_EXPIRATION = "bootstrapPublicCacheExpiration";
@@ -166,7 +162,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
 
     private static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
-            ATTRIBUTE_PRELOAD, ATTRIBUTE_TRACK, ATTRIBUTE_LOCATION_CHANGE_EVENT, ATTRIBUTE_IS_ONE_PAGE_APP,
+            ATTRIBUTE_PRELOAD, ATTRIBUTE_TRACK, ATTRIBUTE_LOCATION_CHANGE_EVENT,
             ATTRIBUTE_TOKEN_OVERRIDES, ATTRIBUTE_FLAVOR_OVERRIDES, ATTRIBUTE_BOOTSTRAP_PUBLIC_CACHE_EXPIRATION)
             .addAll(ALLOWED_ATTRIBUTES)
             .addAll(BaseComponentDefHandler.INTERNAL_ALLOWED_ATTRIBUTES)

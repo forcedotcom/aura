@@ -85,7 +85,7 @@ public class Manifest extends AuraResourceImpl {
             //
             // First, we make sure that the manifest is enabled.
             //
-            if (!manifestUtil.isManifestEnabled(request)) {
+            if (!manifestUtil.isManifestEnabled()) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }

@@ -282,23 +282,6 @@ public class AuraServlet extends AuraBaseServlet {
         internalGet(request, response, defDescriptor, context);
     }
 
-    private boolean shouldCacheHTMLTemplate(HttpServletRequest request) {
-        AuraContext context = contextService.getCurrentContext();
-        try {
-            DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getLoadingApplicationDescriptor();
-            if (appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)) {
-                Boolean isOnePageApp = ((ApplicationDef) definitionService.getDefinition(appDefDesc)).isOnePageApp();
-                if (isOnePageApp != null) {
-                    return isOnePageApp;
-                }
-            }
-        } catch (QuickFixException e) {
-            throw new AuraRuntimeException(e);
-        }
-
-        return !manifestUtil.isManifestEnabled(request);
-    }
-
     private <T extends BaseComponentDef> void internalGet(HttpServletRequest request,
                                                           HttpServletResponse response, DefDescriptor<T> defDescriptor, AuraContext context)
             throws ServletException, IOException {
@@ -320,17 +303,10 @@ public class AuraServlet extends AuraBaseServlet {
         }
 
         try {
-            if (shouldCacheHTMLTemplate(request)) {
-                /*
-                 * Set a long cache timeout.
-                 *
-                 * This sets several headers to try to ensure that the page will be cached for a reasonable length of time. Of note
-                 * is the last-modified header, which is set to a day ago so that browsers consider it to be safe.
-                 */
-                servletUtilAdapter.setLongCache(response);
-            } else {
-                servletUtilAdapter.setNoCache(response);
-            }
+            /**
+             * We set html to no-cache here always.
+             */
+            servletUtilAdapter.setNoCache(response);
             loggingService.startTimer(LoggingService.TIMER_SERIALIZATION);
             loggingService.startTimer(LoggingService.TIMER_SERIALIZATION_AURA);
             // Prevents Mhtml Xss exploit:

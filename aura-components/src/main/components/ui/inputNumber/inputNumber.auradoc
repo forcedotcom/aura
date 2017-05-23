@@ -19,8 +19,11 @@
 	<aura:description>
 		<p>
 			A <code>ui:inputNumber</code> component represents a number input field, which is rendered as an HTML <code>input</code> element of type <code>text</code>.
+			It uses JavaScript's Number type to determine the supported number of digits.
+	   </p>
+	   <p>
 			This example shows a number field, which displays a value of <code>10</code>.
-			</p>
+	   </p>
 			<pre>&lt;aura:attribute name="num" type="integer" default="10"/>
 &lt;ui:inputNumber aura:id="num" label="Age" value="{!v.num}"/></pre>
 			<p>The previous example results in the following HTML.</p>

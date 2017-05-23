@@ -23,7 +23,7 @@
 			The value is displayed based on the locale of the browser, for example, <code>MMM d, yyyy</code> and <code>h:mm:ss a</code>, which is returned by <code>$Locale.dateFormat</code>
 			and <code>$Locale.timeFormat</code>. 
 		</p>
-		<p>This is a basic set up of a date and time field with a date picker, which displays the current date and time.
+		<p>This is a basic set up of a pair of date and time field with a date picker icon. The client-side controller sets the current date and time in the fields.
 		On desktop, the <code>input</code> tag is wrapped in a <code>form</code> tag; the date and time fields display as two separate fields. 
 	The time picker displays a list of time in 30-minute increments.</p>
 		<pre>&lt;!-- Component markup -->
@@ -34,9 +34,9 @@
 /** Client-Side Controller **/
  var today = new Date(); 
 component.set("v.today", today);</pre>
-
+        <p><code>displayDatePicker="true"</code> displays a date picker icon in the field. Clicking in the date field displays the date picker, even if <code>displayDatePicker="false"</code>.</p>
         <h4>Selecting A Date and Time on Mobile Devices</h4>
-        <p>When viewed on a mobile or tablet, the <code>ui:inputDateTime</code> component renders as <code>ui:inputDateTimeHtml</code> and uses the native date and time picker. The <code>format</code> attribute is not supported for <code>ui:inputDateTimeHtml</code>.
+        <p>When viewed on a mobile or tablet, the <code>ui:inputDateTime</code> component uses the native date and time picker, and the <code>format</code> attribute is not supported in this case.
         We recommend using the value change handler to retrieve date and time value change on the input field. On iOS devices, selecting a date and time on the date picker triggers the change handler on the component but the value is bound only on the blur event.
         This example binds the date value to a value change handler.</p>
         <pre>&lt;aura:component>

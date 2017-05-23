@@ -22,11 +22,12 @@
 			Web apps running on mobiles and tablets use an input field of type <code>date</code> for all browsers except Internet Explorer.
 			The value is displayed based on the locale of the browser, for example, <code>MMM d, yyyy</code>, which is returned by <code>$Locale.dateFormat</code>. 
 		</p>
-		<p>This is a basic set up of a date field with a date picker, which displays the field value <code>Jan 30, 2014</code> based on the locale format. 
+		<p>This is a basic set up of a date field with a date picker icon, which displays the field value <code>Jan 30, 2014</code> based on the locale format. 
 		On desktop, the <code>input</code> tag is wrapped in a <code>form</code> tag.</p>
 		<pre>&lt;ui:inputDate aura:id="dateField" label="Birthday" value="2014-01-30" displayDatePicker="true"/></pre>
+		<p><code>displayDatePicker="true"</code> displays a date picker icon in the field. Clicking in the date field displays the date picker, even if <code>displayDatePicker="false"</code>.</p>
 		<h4>Selecting A Date on Mobile Devices</h4>
-		<p>When viewed on a mobile or tablet, the <code>ui:inputDate</code> component renders as <code>ui:inputDateHtml</code> and uses the native date picker. The <code>format</code> attribute is not supported for <code>ui:inputDateHtml</code>.
+		<p>When viewed on a mobile or tablet, the <code>ui:inputDate</code> component uses the native date picker, and the <code>format</code> attribute is not supported in this case.
 		We recommend using the value change handler to retrieve date value change on the input field. On iOS devices, selecting a date on the date picker triggers the change handler on the component but the value is bound only on the blur event.
 		This example binds the date value to a value change handler.</p>
 		<pre>&lt;aura:component>

@@ -133,12 +133,12 @@ Test.Tools.Aura.Stubs.Aura=new function(){
 
     this.GetContext = function(){
         return Stubs.GetObject({
-            setCurrentAccess: function(){},
-            releaseCurrentAccess: function(){},
+           setCurrentAccess: function(){},
+           releaseCurrentAccess: function(){},
             joinComponentConfigs : function() {},
             finishComponentConfigs : function() {},
             getNum : function() { return 0; },
-            getAccessStackHierarchy: function() {}
+//            getAccessStackHierarchy: function() {}
         });
     };
 }

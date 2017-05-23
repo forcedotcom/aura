@@ -121,12 +121,14 @@ Test.Tools.Aura.Stubs.Aura=new function(){
         return stub;
     };
 
-    this.GetComponentDef = function(descriptor) {
+    this.GetComponentDef = function(descriptor, attributes, instancesOf, propertyBag) {
+        var stubbedDescriptor=Stubs.GetObject({getQualifiedName:function(){return descriptor;}});
+        var stubbedAttributeDefs=Stubs.GetList(attributes&&Object.keys(attributes)||[], {each:function(value){return this.Source_Value;}});
         return Stubs.GetObject({
-            descriptor: Stubs.GetObject({
-                getQualifiedName: function() { return descriptor; }
-            })
-        });
+            getAttributeDefs:{returnValue:stubbedAttributeDefs},
+            getDescriptor:{returnValue:stubbedDescriptor},
+            isInstanceOf:function(instance){ return instancesOf && instance in instancesOf; }
+        }, propertyBag||{});
     };
 
     this.GetContext = function(){
@@ -138,16 +140,5 @@ Test.Tools.Aura.Stubs.Aura=new function(){
             getNum : function() { return 0; },
             getAccessStackHierarchy: function() {}
         });
-    };
-
-    // JBUCH: TODO: PROBABLY COLLAPSE THIS WITH GETCOMPONENTDEF
-    this.GetDef = function(descriptor, attributes, instancesOf, propertyBag) {
-        var stubbedDescriptor=Stubs.GetObject({getQualifiedName:function(){return descriptor;}});
-        var stubbedAttributeDefs=Stubs.GetList(attributes&&Object.keys(attributes)||[], {each:function(value){return this.Source_Value;}});
-        return Stubs.GetObject({
-            getAttributeDefs:{returnValue:stubbedAttributeDefs},
-            getDescriptor:{returnValue:stubbedDescriptor},
-            isInstanceOf:function(instance){ return instancesOf && instance in instancesOf; }
-        }, propertyBag||{});
     };
 }

@@ -16,7 +16,6 @@
 Function.RegisterNamespace("Test.Tools.Aura.Attributes");
 
 Test.Tools.Aura.Attributes.AuraAttribute=function(){
-    // ls aura-resources/target/*SNAPSHOT.jar
     if(!Test.Tools.Aura.Attributes.AuraAttribute.WindowStub) {
         this.WindowStub = Test.Tools.Aura.Attributes.AuraAttribute.WindowStub = Stubs.Dom.GetWindow();
         var additionalMocks = ["File", "FileList", "CSSStyleDeclaration", "TimeRanges", "Date", "Promise", "Proxy", "MessagePort", "MessageChannel", "MessageEvent", "FormData"];
@@ -27,7 +26,7 @@ Test.Tools.Aura.Attributes.AuraAttribute=function(){
         }
 
         Mocks.Dom.GetDom(this.WindowStub)(function () {
-            Import("aura-resources/target/src-gen/main/resources/aura/javascript/aura_proddebug.js");
+            Import(Test.Tools.Aura.FrameworkJs);
             $A.createComponent=Stubs.GetMethod(function(type,attributes,callback){
                 callback(Stubs.Aura.GetComponent(attributes,{},{},type));
             });

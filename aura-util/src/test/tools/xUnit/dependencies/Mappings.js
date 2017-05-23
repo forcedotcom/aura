@@ -1,7 +1,7 @@
 //Configuration Mappings
 Function.RegisterNamespace("Test.Tools.Aura");
+Test.Tools.Aura.FrameworkJs="aura-resources/target/src-gen/main/resources/aura/javascript/aura_proddebug.js";
 Test.Tools.Aura.BuildDirectory=String.TrimEnd(System.Environment&&System.Environment.GetWorkingDirectory() || "","aura-impl","aura-components");
-
 //temporary hack for javascript code coverage
 //ideally we would want to set the value for <workingDirectory>
 //as current module, but to refer to node npm installation, we set

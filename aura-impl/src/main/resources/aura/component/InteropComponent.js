@@ -37,6 +37,7 @@ function InteropComponent(config) {
     this.localId = config['localId'];
     this.attributeValueProvider = config['attributes']['valueProvider'];
     this.owner = context.getCurrentAccess();
+    this.currentClassMap = {};
 
     this.setupGlobalId(config['globalId']);
 
@@ -190,9 +191,6 @@ InteropComponent.prototype.attributeChange = function (key, value) {
     }
 };
 
-//caching the current class map
-InteropComponent._currentClassMap = {};
-
 /**
  * Creates a hash map for a given className string
  * e.g. `slds-grid slds-col` => { 'slds-grid': true, 'slds-col': true }
@@ -228,7 +226,7 @@ InteropComponent.prototype.getMapFromClassName = function (className) {
  * @param value
  */
 InteropComponent.prototype.updateClassAttribute = function (element, value) {
-    var currentClassMap = InteropComponent._currentClassMap || {};
+    var currentClassMap = this.currentClassMap || {};
     var classMap = this.getMapFromClassName(value);
 
     Object.keys(currentClassMap).forEach(function (className) {
@@ -238,12 +236,12 @@ InteropComponent.prototype.updateClassAttribute = function (element, value) {
     });
 
     Object.keys(classMap).forEach(function (className) {
-        if (!element.classList.contains(className)) {
+        if (!currentClassMap[className]) {
             element.classList.add(className);
         }
     });
 
-    InteropComponent._currentClassMap = classMap;
+    this.currentClassMap = classMap;
 };
 
 

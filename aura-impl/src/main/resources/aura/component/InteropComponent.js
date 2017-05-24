@@ -190,7 +190,75 @@ InteropComponent.prototype.attributeChange = function (key, value) {
     }
 };
 
+//caching the current class map
+InteropComponent._currentClassMap = {};
+
+/**
+ * Creates a hash map for a given className string
+ * e.g. `slds-grid slds-col` => { 'slds-grid': true, 'slds-col': true }
+ * @param className
+ * @returns {Object}
+ */
+InteropComponent.prototype.getMapFromClassName = function (className) {
+    var SPACE_CHAR = 32;
+    var map = {};
+
+    var start = 0;
+    var i, len = className.length;
+
+    for (i = 0; i < len; i++) {
+        if (className.charCodeAt(i) === SPACE_CHAR) {
+            if (i > start) {
+                map[className.slice(start, i)] = true;
+            }
+            start = i + 1;
+        }
+    }
+
+    if (i > start) {
+        map[className.slice(start, i)] = true;
+    }
+
+    return map;
+};
+
+/**
+ * Update the class attribute in the custom element, it makes a diff in between the previous class names
+ * @param element
+ * @param value
+ */
+InteropComponent.prototype.updateClassAttribute = function (element, value) {
+    var currentClassMap = InteropComponent._currentClassMap || {};
+    var classMap = this.getMapFromClassName(value);
+
+    Object.keys(currentClassMap).forEach(function (className) {
+        if (!classMap[className]) {
+            element.classList.remove(className);
+        }
+    });
+
+    Object.keys(classMap).forEach(function (className) {
+        if (!element.classList.contains(className)) {
+            element.classList.add(className);
+        }
+    });
+
+    InteropComponent._currentClassMap = classMap;
+};
+
+
+/**
+ * Implement special logic for set HTML Global Attributes
+ * @param element {node}
+ * @param attrName { string }
+ * @param value { any }
+ */
 InteropComponent.prototype.setGlobalAttribute = function (element, attrName, value) {
+    if (attrName === 'class') {
+        this.updateClassAttribute(element, value);
+        return;
+    }
+
     if (value === true) {
         element.setAttribute(attrName, "");
     } else if (value === false || value === null || value === undefined) {

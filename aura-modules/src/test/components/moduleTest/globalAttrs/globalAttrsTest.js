@@ -55,6 +55,38 @@
             }
         ]
     },
+    testClassDiffing:  {
+        attributes: {
+            'class': 'my-class1 my-class2'
+        },
+        test: [
+            function (cmp) {
+                var customEl = this.getCustomElement(cmp);
+                var expectedClass1 = 'my-class1';
+                var expectedClass2 = 'my-class2';
+
+                $A.test.assertTrue(customEl.classList.contains(expectedClass1), 'The class attribute is not being set in the custom element');
+                $A.test.assertTrue(customEl.classList.contains(expectedClass2), 'The class attribute is not being set in the custom element');
+            },
+            function (cmp) {
+                cmp.set('v.class', 'new-custom-class1 new-custom-class2');
+            },
+            function (cmp) {
+                var customEl = this.getCustomElement(cmp);
+                var expectedClass1 = 'new-custom-class1';
+                var expectedClass2 = 'new-custom-class1';
+                var unexpectedClass1 = 'my-class1';
+                var unexpectedClass2 = 'my-class2';
+
+                $A.test.assertTrue(customEl.classList.contains(expectedClass1), 'The class attribute is not being set in the custom element');
+                $A.test.assertTrue(customEl.classList.contains(expectedClass2), 'The class attribute is not being set in the custom element');
+
+                // check the oldest class were remove
+                $A.test.assertFalse(customEl.classList.contains(unexpectedClass1), 'The class oldest class names should be removed');
+                $A.test.assertFalse(customEl.classList.contains(unexpectedClass2), 'The class oldest class names should be removed');
+            },
+        ]
+    },
     getCustomElement: function (cmp) {
         return cmp.getElement();
     }

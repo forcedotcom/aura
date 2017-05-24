@@ -61,23 +61,23 @@ public class ModuleDefFileBundleBuilderUnitTest {
 
         File mockJsFile = mock(File.class);
         setupMockFile(mockJsFile, mockBaseFile, "module-cmp.js");
-        DefDescriptor module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
+        DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
 
         File mockCssFile = mock(File.class);
         setupMockFile(mockCssFile, mockBaseFile, "module.css");
-        DefDescriptor css = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, "nameSpace", "moduleCmp-module", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> css = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, "nameSpace", "moduleCmp-module", ModuleDef.class, module);
 
         File mockTemplateFile = mock(File.class);
         setupMockFile(mockTemplateFile, mockBaseFile, "module-cmp.html");
-        DefDescriptor template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
 
         File mockUtilJsFile = mock(File.class);
         setupMockFile(mockUtilJsFile, mockBaseFile, "utils.js");
-        DefDescriptor utilJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-utils", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> utilJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-utils", ModuleDef.class, module);
 
         File mockDataJsFile = mock(File.class);
         setupMockFile(mockDataJsFile, mockBaseFile, "data.js");
-        DefDescriptor dataJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-data", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> dataJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-data", ModuleDef.class, module);
 
         File[] baseListFiles = new File[] { mockJsFile, mockCssFile, mockTemplateFile, mockUtilJsFile, mockDataJsFile };
 
@@ -134,23 +134,23 @@ public class ModuleDefFileBundleBuilderUnitTest {
 
         File mockJsFile = mock(File.class);
         setupMockFile(mockJsFile, mockBaseFile, "moduleCmp.js");
-        DefDescriptor module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "name-space", "modulecmp", ModuleDef.class);
+        DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "name-space", "modulecmp", ModuleDef.class);
 
         File mockCssFile = mock(File.class);
         setupMockFile(mockCssFile, mockBaseFile, "module.css");
-        DefDescriptor css = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, "name-space", "modulecmp-module", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> css = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, "name-space", "modulecmp-module", ModuleDef.class, module);
 
         File mockTemplateFile = mock(File.class);
         setupMockFile(mockTemplateFile, mockBaseFile, "moduleCmp.html");
-        DefDescriptor template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "name-space", "modulecmp-moduleCmp", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "name-space", "modulecmp-moduleCmp", ModuleDef.class, module);
 
         File mockUtilJsFile = mock(File.class);
         setupMockFile(mockUtilJsFile, mockBaseFile, "utils.js");
-        DefDescriptor utilJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "name-space", "modulecmp-utils", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> utilJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "name-space", "modulecmp-utils", ModuleDef.class, module);
 
         File mockDataJsFile = mock(File.class);
         setupMockFile(mockDataJsFile, mockBaseFile, "data.js");
-        DefDescriptor dataJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "name-space", "modulecmp-data", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> dataJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "name-space", "modulecmp-data", ModuleDef.class, module);
 
         File[] baseListFiles = new File[] { mockJsFile, mockCssFile, mockTemplateFile, mockUtilJsFile, mockDataJsFile };
 
@@ -204,23 +204,23 @@ public class ModuleDefFileBundleBuilderUnitTest {
 
         File mockJsFile = mock(File.class);
         setupMockFile(mockJsFile, mockBaseFile, "module-cmp.js");
-        DefDescriptor module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
+        DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
 
         File mockCssFile = mock(File.class);
         setupMockFile(mockCssFile, mockBaseFile, "module.css");
-        DefDescriptor css = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, "nameSpace", "moduleCmp-module", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> css = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, "nameSpace", "moduleCmp-module", ModuleDef.class, module);
 
         File mockTemplateFile = mock(File.class);
         setupMockFile(mockTemplateFile, mockBaseFile, "module-cmp.html");
-        DefDescriptor template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
 
         File mockUtilJsFile = mock(File.class);
         setupMockFile(mockUtilJsFile, mockBaseFile, "utils.js");
-        DefDescriptor utilJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-utils", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> utilJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-utils", ModuleDef.class, module);
 
         File mockDataJsFile = mock(File.class);
         setupMockFile(mockDataJsFile, mockBaseFile, "data.js");
-        DefDescriptor dataJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-data", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> dataJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-data", ModuleDef.class, module);
 
         // NESTED
 
@@ -235,13 +235,13 @@ public class ModuleDefFileBundleBuilderUnitTest {
         setupMockFile(mockNestUtilJsFile, mockBaseFile, "nest/utils.js");
         when(mockNestUtilJsFile.getParent()).thenReturn("nest");
         when(mockNestUtilJsFile.getParentFile()).thenReturn(mockNestFolder);
-        DefDescriptor nestedUtilJs =  new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-nest-utils", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> nestedUtilJs =  new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-nest-utils", ModuleDef.class, module);
 
         File mockNestDataJsFile = mock(File.class);
         setupMockFile(mockNestDataJsFile, mockBaseFile, "nest/data.js");
         when(mockNestDataJsFile.getParent()).thenReturn("nest");
         when(mockNestDataJsFile.getParentFile()).thenReturn(mockNestFolder);
-        DefDescriptor nestedDataJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-nest-data", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> nestedDataJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-nest-data", ModuleDef.class, module);
 
         // SECOND NESTED
 
@@ -256,13 +256,13 @@ public class ModuleDefFileBundleBuilderUnitTest {
         setupMockFile(mockSecondNestUtilJsFile, mockBaseFile, "nest/egg/utils.js");
         when(mockSecondNestUtilJsFile.getParent()).thenReturn("egg");
         when(mockSecondNestUtilJsFile.getParentFile()).thenReturn(mockSecondNestFolder);
-        DefDescriptor secondNestedUtilJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-nest-egg-utils", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> secondNestedUtilJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-nest-egg-utils", ModuleDef.class, module);
 
         File mockSecondNestDataJsFile = mock(File.class);
         setupMockFile(mockSecondNestDataJsFile, mockBaseFile, "nest/egg/data.js");
         when(mockSecondNestDataJsFile.getParent()).thenReturn("egg");
         when(mockSecondNestDataJsFile.getParentFile()).thenReturn(mockSecondNestFolder);
-        DefDescriptor secondNestedDataJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-nest-egg-data", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> secondNestedDataJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-nest-egg-data", ModuleDef.class, module);
 
         File[] secondNestListFiles = new File[] { mockSecondNestUtilJsFile, mockSecondNestDataJsFile };
 
@@ -321,7 +321,7 @@ public class ModuleDefFileBundleBuilderUnitTest {
 
         File mockHtmlFile = mock(File.class);
         setupMockFile(mockHtmlFile, mockBaseFile, "module-cmp.html");
-        DefDescriptor module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "namespace", "moduleCmp", ModuleDef.class);
+        DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "namespace", "moduleCmp", ModuleDef.class);
 
         File mockJsFile = mock(File.class);
         when(mockJsFile.exists()).thenReturn(false);

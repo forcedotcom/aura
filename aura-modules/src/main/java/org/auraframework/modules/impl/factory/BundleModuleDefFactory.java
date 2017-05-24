@@ -159,7 +159,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
      * @param codeMap map of code from compiler
      * @param location location for errors
      * @return map of processed code
-     * @throws InvalidDefinitionException
+     * @throws InvalidDefinitionException invalid definition
      */
     private Map<CodeType, String> processCodes(DefDescriptor<ModuleDef> descriptor, Map<CodeType, String> codeMap,
                                                Location location) throws InvalidDefinitionException {
@@ -237,7 +237,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
      * @param codeMap code map
      * @return hash
      */
-    private String calculateOwnHash(DefDescriptor descriptor, Map<CodeType, String> codeMap) {
+    private String calculateOwnHash(DefDescriptor<ModuleDef> descriptor, Map<CodeType, String> codeMap) {
         String code = codeMap.get(CodeType.DEV);
         Hash.StringBuilder hashBuilder = new Hash.StringBuilder();
         hashBuilder.addString(descriptor.toString());

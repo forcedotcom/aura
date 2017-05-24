@@ -57,22 +57,23 @@ import com.google.common.collect.Sets;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({BundleModuleDefFactory.class, Aura.class})
+@SuppressWarnings({"unchecked"})
 public class BundleModuleDefFactoryUnitTest {
 
     @Test
     public void testGetDefinition() throws Exception {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
-        FileSource jsFileSource = mock(FileSource.class);
+        FileSource<ModuleDef> jsFileSource = mock(FileSource.class);
         when(jsFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/module-cmp.js");
         when(jsFileSource.getContents()).thenReturn("javascript code here");
 
-        FileSource htmlFileSource = mock(FileSource.class);
+        FileSource<ModuleDef> htmlFileSource = mock(FileSource.class);
         when(htmlFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/module-cmp.html");
         when(htmlFileSource.getContents()).thenReturn("template code here");
 
-        DefDescriptor module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
-        DefDescriptor template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
+        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
 
         Map<DefDescriptor<?>, Source<?>> mockBundledParts = Maps.newHashMap();
         mockBundledParts.put(module, jsFileSource);
@@ -116,16 +117,16 @@ public class BundleModuleDefFactoryUnitTest {
     public void testNamespaceFolderWithHyphen() throws Exception {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
-        FileSource jsFileSource = mock(FileSource.class);
+        FileSource<ModuleDef> jsFileSource = mock(FileSource.class);
         when(jsFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/name-space/moduleCmp/moduleCmp.js");
         when(jsFileSource.getContents()).thenReturn("javascript code here");
 
-        FileSource htmlFileSource = mock(FileSource.class);
+        FileSource<ModuleDef> htmlFileSource = mock(FileSource.class);
         when(htmlFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/name-space/moduleCmp/moduleCmp.html");
         when(htmlFileSource.getContents()).thenReturn("template code here");
 
-        DefDescriptor module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "name-space", "modulecmp", ModuleDef.class);
-        DefDescriptor template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "name-space", "modulecmp-moduleCmp", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "name-space", "modulecmp", ModuleDef.class);
+        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "name-space", "modulecmp-moduleCmp", ModuleDef.class, module);
 
         Map<DefDescriptor<?>, Source<?>> mockBundledParts = Maps.newHashMap();
         mockBundledParts.put(module, jsFileSource);
@@ -147,16 +148,16 @@ public class BundleModuleDefFactoryUnitTest {
     public void testNamespaceFolderUpperCase() throws Exception {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
-        FileSource jsFileSource = mock(FileSource.class);
+        FileSource<ModuleDef> jsFileSource = mock(FileSource.class);
         when(jsFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/name-Space/moduleCmp/moduleCmp.js");
         when(jsFileSource.getContents()).thenReturn("javascript code here");
 
-        FileSource htmlFileSource = mock(FileSource.class);
+        FileSource<ModuleDef> htmlFileSource = mock(FileSource.class);
         when(htmlFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/name-Space/moduleCmp/moduleCmp.html");
         when(htmlFileSource.getContents()).thenReturn("template code here");
 
-        DefDescriptor module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "name-Space", "modulecmp", ModuleDef.class);
-        DefDescriptor template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "name-Space", "modulecmp-moduleCmp", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "name-Space", "modulecmp", ModuleDef.class);
+        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "name-Space", "modulecmp-moduleCmp", ModuleDef.class, module);
 
         Map<DefDescriptor<?>, Source<?>> mockBundledParts = Maps.newHashMap();
         mockBundledParts.put(module, jsFileSource);
@@ -178,16 +179,16 @@ public class BundleModuleDefFactoryUnitTest {
     public void testNameFolderUpperCase() throws Exception {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
-        FileSource jsFileSource = mock(FileSource.class);
+        FileSource<ModuleDef> jsFileSource = mock(FileSource.class);
         when(jsFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/moduleCmp/moduleCmp.js");
         when(jsFileSource.getContents()).thenReturn("javascript code here");
 
-        FileSource htmlFileSource = mock(FileSource.class);
+        FileSource<ModuleDef> htmlFileSource = mock(FileSource.class);
         when(htmlFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/moduleCmp/moduleCmp.html");
         when(htmlFileSource.getContents()).thenReturn("template code here");
 
-        DefDescriptor module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "namespace", "modulecmp", ModuleDef.class);
-        DefDescriptor template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "namespace", "modulecmp-moduleCmp", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "namespace", "modulecmp", ModuleDef.class);
+        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "namespace", "modulecmp-moduleCmp", ModuleDef.class, module);
 
         Map<DefDescriptor<?>, Source<?>> mockBundledParts = Maps.newHashMap();
         mockBundledParts.put(module, jsFileSource);
@@ -209,16 +210,16 @@ public class BundleModuleDefFactoryUnitTest {
     public void testMissingModeCode() throws Exception {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
-        FileSource jsFileSource = mock(FileSource.class);
+        FileSource<ModuleDef> jsFileSource = mock(FileSource.class);
         when(jsFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/module-cmp.js");
         when(jsFileSource.getContents()).thenReturn("javascript code here");
 
-        FileSource htmlFileSource = mock(FileSource.class);
+        FileSource<ModuleDef> htmlFileSource = mock(FileSource.class);
         when(htmlFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/module-cmp.html");
         when(htmlFileSource.getContents()).thenReturn("template code here");
 
-        DefDescriptor module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
-        DefDescriptor template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
+        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
 
         Map<DefDescriptor<?>, Source<?>> mockBundledParts = Maps.newHashMap();
         mockBundledParts.put(module, jsFileSource);
@@ -253,16 +254,16 @@ public class BundleModuleDefFactoryUnitTest {
     public void testValidateLabels() throws Exception {
         BundleSource<ModuleDef> mockBundleSource = mock(BundleSource.class);
 
-        FileSource jsFileSource = mock(FileSource.class);
+        FileSource<ModuleDef> jsFileSource = mock(FileSource.class);
         when(jsFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/module-cmp.js");
         when(jsFileSource.getContents()).thenReturn("javascript code here");
 
-        FileSource htmlFileSource = mock(FileSource.class);
+        FileSource<ModuleDef> htmlFileSource = mock(FileSource.class);
         when(htmlFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/module-cmp.html");
         when(htmlFileSource.getContents()).thenReturn("template code here");
 
-        DefDescriptor module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
-        DefDescriptor template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
+        DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
 
         Map<DefDescriptor<?>, Source<?>> mockBundledParts = Maps.newHashMap();
         mockBundledParts.put(module, jsFileSource);

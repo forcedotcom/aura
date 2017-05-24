@@ -55,6 +55,15 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
      * Creates a default policy.
      *
      * @param inline whether to allow inline script and style. It's better not to, but legacy is what legacy is.
+     */
+    public DefaultContentSecurityPolicy(boolean inline) {
+	this(inline, Aura.getCspInliningService()); 
+    }
+
+    /**
+     * Creates a default policy.
+     *
+     * @param inline whether to allow inline script and style. It's better not to, but legacy is what legacy is.
      * @param scriptService inline csp service
      */
     public DefaultContentSecurityPolicy(boolean inline, CSPInliningService scriptService) {
@@ -87,7 +96,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
         List<String> list = new ArrayList<>(allowInline ? 4 : 3);
         list.add(null); // Same origin allowed
 
-        if (!allowInline){
+        if (!allowInline && cspInliningService != null){
             list.addAll(cspInliningService.getCurrentScriptDirectives());
         }
 

@@ -62,7 +62,7 @@ build:
     ORIG_UID: $$UID
     MAVEN_ARGS: $$MAVEN_ARGS
     LOCAL_DEPLOY_DIR: $$LOCAL_DEPLOY_DIR
-  add_hosts:
+  extra_hosts:
     - external-tools
   commands:
     - ./.zenbuild.sh

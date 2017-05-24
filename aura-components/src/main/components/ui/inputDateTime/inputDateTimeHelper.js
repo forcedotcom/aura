@@ -18,6 +18,10 @@
 
     init: function (component) {
         if (component.get("v.disabled")) {
+            if (component.get('v.displayDatePicker') && !component.get('v.useSingleInput')) {
+                this.cacheDefaultValues(component);
+                this.updateTimeFormat(component);
+            }
             // don't bother with the rest if the input is disabled
             return;
         }

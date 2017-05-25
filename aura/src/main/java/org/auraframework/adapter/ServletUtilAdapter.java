@@ -107,6 +107,16 @@ public interface ServletUtilAdapter extends AuraAdapter {
 
     /**
      * Write all urls on the string builder
+     *
+     * @param context the aura context to use.
+     * @param componentAttributes Component attributes.
+     * @param sb the string builder to use.
+     */
+    @Deprecated
+    void writeScriptUrls(AuraContext context, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException;
+
+    /**
+     * Write all urls on the string builder
      * @param context the aura context to use.
      * @param templateDef
      * @param componentAttributes Component attributes.

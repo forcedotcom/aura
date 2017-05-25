@@ -417,10 +417,16 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     @Override
+    @Deprecated
+    public void writeScriptUrls(AuraContext context, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException {
+            writeScriptUrls(context, null, componentAttributes, sb);
+    }
+    
+    @Override
     public void writeScriptUrls(AuraContext context, ComponentDef templateDef, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException {
         templateUtil.writeHtmlScripts(context, this.getJsClientLibraryUrls(context), Script.LAZY, sb);
 
-        if (cspInliningService.isSupported()) {
+        if (cspInliningService.isSupported() && templateDef != null) {
             cspInliningService.writeInlineScript(this.getInlineJs(context, templateDef), sb);
         } else {
             templateUtil.writeHtmlScript(context, this.getInlineJsUrl(context, componentAttributes), Script.SYNC, sb);

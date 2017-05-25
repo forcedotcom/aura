@@ -235,6 +235,29 @@
       $A.test.assertEquals(expectedDescriptor, cellType, 'Cell descriptor is incorrect');
   },
 
+  getPrePostBodyHeaderContent: function(domHeader) {
+      var content = [];
+      if (domHeader && domHeader.children) {
+          for (var i=0; i<domHeader.children.length; i++) {
+              if (domHeader.children[i].className === "uiOutputText") {
+                  content.push(domHeader.children[i]);
+              }
+          }
+      }
+      return content;
+  },
+
+  verifyPrePostBodyHeaderContent : function(dataGridColumn) {
+      var preContent = dataGridColumn.get("v.preBody");
+      var postContent = dataGridColumn.get("v.postBody");
+      var domContent = this.getPrePostBodyHeaderContent(dataGridColumn.getElement());
+      $A.test.assertEquals(preContent.length + postContent.length, domContent.length, "Header content does not match DOM");
+      for (var i=0; i< domContent.length; i++) {
+          var value = (i < preContent.length ? preContent[i] : postContent[i-preContent.length]).get("v.value");
+          $A.test.assertEquals(value, domContent[i].innerHTML, "Header content value does not match DOM value");
+      }
+  },
+
 
   /**************************************************HELPER FUNCTIONS END**************************************************/
 
@@ -334,6 +357,16 @@
           this.verifyCellDescriptor(0, 5, 'markup://uitest:virtualDataGridItem');
           this.verifyColumnDescriptor(6, 'markup://ui:inputCheckbox');
           this.verifyCellDescriptor(0, 6, 'markup://ui:inputCheckbox');
+      }
+  },
+
+  testPreAndPostBody: {
+      test : function(cmp) {
+          var grid = cmp.find("grid");
+          var headerColumns = grid.get("v.headerColumns");
+          for (var i=0; i < headerColumns.length; i++) {
+              this.verifyPrePostBodyHeaderContent(headerColumns[i]);
+          }
       }
   }
 

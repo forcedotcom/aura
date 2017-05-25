@@ -57,18 +57,19 @@
       
   },
   
+  // TODO: This needs to be made less dependent on header implementation
   getRenderedRows : function(cmp) {
 	  var thead = document.getElementsByTagName("thead")[0];
 	  var headers = [];
 	  var ths = thead.getElementsByTagName("th");
 	  for (var i = 0; i < ths.length; i++) {
-		  if (ths[i].firstChild.nodeType == 3) { // text node
+		  if (ths[i].childNodes[1].nodeType == 3) { // text node
 			  headers.push($A.test.getText(ths[i]).toLowerCase());
 		  } else {
-			  headers.push($A.test.getText(ths[i].firstChild.childNodes[1]).toLowerCase());
+			  headers.push($A.test.getText(ths[i].childNodes[1].childNodes[1]).toLowerCase());
 		  }
 	  }
-	  
+
 	  var tbody = document.getElementsByTagName("tbody")[0];
 	  var rows = [];
 	  var trs = tbody.children;
@@ -86,7 +87,7 @@
   getColumnDirection : function(index) {
 	  var thead = document.getElementsByTagName("thead")[0];
 	  var ths = thead.getElementsByTagName("th");
-	  var anchor = ths[index].firstChild;
+	  var anchor = ths[index].children[0];
 	  if (anchor.nodeType != 3) {
 		  return $A.test.getText(anchor.getElementsByTagName("span")[1]);
 	  }

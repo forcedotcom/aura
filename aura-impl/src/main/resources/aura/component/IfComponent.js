@@ -261,8 +261,8 @@ IfComponent.prototype["helper"] = {
             var child = currentBody[i];
             if (!child.isRendered()) {
                 hasUnrenderBody = true;
+                child.destroy();
             }
-            child.destroy();
         }
         
 

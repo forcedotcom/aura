@@ -109,7 +109,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         String version = configAdapter.getAuraVersion();
         if (!version.equals("development")) {
             assertTrue("Unexpected version format: " + version,
-                    version.matches("^\\d+\\.\\d+(\\.\\d+(\\.\\d+)?)?(-.*)?$"));
+                    version.matches("^\\d+(\\.\\d+(\\.\\d+(\\.\\d+)?)?)?(-.*)?$"));
         }
         assertTrue(configAdapter.getBuildTimestamp() > 0);
     }

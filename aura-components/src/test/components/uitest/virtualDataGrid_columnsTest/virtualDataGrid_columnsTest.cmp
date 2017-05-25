@@ -47,8 +47,25 @@
 				<ui:dataGridColumn name="id" 			label="Id"			sortable="true"/>
 				<ui:dataGridColumn name="subject" 		label="Subject"		sortable="true"/>
 				<ui:dataGridColumn name="date" 		    label="date" />
-				<ui:dataGridColumn name="name" 	        label="name" />
-				<ui:dataGridColumn name="relatedTo" 	label="related to" />
+				<ui:dataGridColumn name="name" 	        label="name">
+                    <aura:set attribute="preBody">
+                        <ui:outputText value="Full"/>
+                        <ui:outputText value="First"/>
+                    </aura:set>
+                    <aura:set attribute="postBody">
+                        <ui:outputText value="And"/>
+                        <ui:outputText value="Last"/>
+                    </aura:set>
+                </ui:dataGridColumn>
+				<ui:dataGridColumn name="relatedTo" 	label="related to">
+                    <aura:set attribute="preBody">
+                        <ui:outputText value="This "/>
+                        <ui:outputText value="is "/>
+                    </aura:set>
+                    <aura:set attribute="postBody">
+                        <ui:outputText value=" CO"/>
+                    </aura:set>
+                </ui:dataGridColumn>
 				<ui:dataGridColumn name="customCol"     label="some col"><uitest:virtualDataGridItem value="Custom Col"/></ui:dataGridColumn>
 				<ui:dataGridColumn><ui:inputCheckbox/></ui:dataGridColumn>
 			</aura:set>

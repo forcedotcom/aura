@@ -60,6 +60,8 @@
     </aura:attribute>
     
     <aura:attribute name="icon" type="Aura.ComponentDefRef[]" description="A visual icon that goes before the header label" />
+    <aura:attribute name="preBody" type="Aura.ComponentDefRef[]" description="A collection of components to prepend to the header body" />
+    <aura:attribute name="postBody" type="Aura.ComponentDefRef[]" description="A collection of components to append to the header body" />
     
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="change" value="{!v.disabled}" action="{!c.handleDisabledChange}"/>
@@ -69,6 +71,7 @@
     <th scope="{!v.scope}" class="{! v.class + ' ' + (v.disabled ? 'disabled' : v.direction) + (v.sortable ? ' slds-is-sortable ' : '') + (v.resizable ? ' slds-is-resizable' : '')}" title="{!v.title}"
                            style="{! (v.width gt 0) ? 'width:' + v.width + 'px' : ''}">
         <div aura:id="wrapper" class="slds-cell-fixed" style="{! (v.width gt 0) ? 'width:' + v.width + 'px' : ''}">
+        {!v.preBody}
         <aura:if isTrue="{! v.body.length == 0 }">
             <!-- Conditionally insert link for column sorting. -->
             <aura:if isTrue="{!v.sortable}">
@@ -91,6 +94,7 @@
             </aura:if>
         </aura:if>
         {!v.body}
+        {!v.postBody}
         </div>
     </th>
 </aura:component>

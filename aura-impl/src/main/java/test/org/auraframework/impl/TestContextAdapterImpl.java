@@ -38,10 +38,9 @@ import com.google.common.cache.CacheBuilder;
  */
 public class TestContextAdapterImpl implements TestContextAdapter {
 
-	
     @Configuration
     public static class TestConfiguration {
-    	
+
         private static TestContextAdapter testContextAdapter = new TestContextAdapterImpl();
 
         /**
@@ -52,19 +51,18 @@ public class TestContextAdapterImpl implements TestContextAdapter {
         @Bean
         @Scope(BeanDefinition.SCOPE_SINGLETON)
         public TestContextAdapter testContextAdapter() {
-        	return testContextAdapter;
+            return testContextAdapter;
         }
     }
-    
-    
+
     private static Cache<String, TestContext> allContexts = CacheBuilder.newBuilder().concurrencyLevel(8)
             .expireAfterAccess(30, TimeUnit.MINUTES).maximumSize(100).build();
 
     private final ThreadLocal<TestContext> testContext = new ThreadLocal<>();
-    
+
     @Inject
     private LocalizationAdapter localizationAdapter;
-    
+
     @Override
     public TestContext getTestContext() {
         return testContext.get();
@@ -77,18 +75,20 @@ public class TestContextAdapterImpl implements TestContextAdapter {
             context = new TestContextImpl(name);
             allContexts.put(name, context);
         }
+
         testContext.set(context);
-        
         this.setupTestLabels();
-        
+
         return context;
     }
 
     @Override
     public void clear() {
         testContext.set(null);
-        
-        tearDownTestLabels();
+        // We used to clean up test labels here, but it caused flapping tests.
+        // The requests without test context would release all contexts, which caused
+        // labels missing in tests. If cleanup is needed, maybe consider moving the
+        // related tests to UI tests.
     }
 
     @Override
@@ -100,69 +100,37 @@ public class TestContextAdapterImpl implements TestContextAdapter {
         }
         clear();
     }
-    
+
     private void setupTestLabels() {
-    	if(localizationAdapter instanceof TestableLocalizationAdapter) {
-    		TestableLocalizationAdapter testableAdapter = (TestableLocalizationAdapter) localizationAdapter;
-    		testableAdapter.setTestLabel("AuraTestLabelSection", "dynamic_label_for_test", "we have {0} members");
-    		testableAdapter.setTestLabel("AuraTestLabelSection", "label_for_attribute_default_value_test", "testing label");
-    		testableAdapter.setTestLabel("Section1", "controller", "Controller");
-    		testableAdapter.setTestLabel("Section2", "controller", "Controller");
-    		testableAdapter.setTestLabel("Section_A", "controller", "Controller");
-    		testableAdapter.setTestLabel("Section1", "helper", "Helper");
-    		testableAdapter.setTestLabel("Section2", "helper", "Helper");
-    		testableAdapter.setTestLabel("ML_Comment", "helper", "Helper");
-    		testableAdapter.setTestLabel("SL_Comment", "helper", "Helper");
-    		testableAdapter.setTestLabel("Section_a", "helper", "Helper");
-    		testableAdapter.setTestLabel("Section_B", "helper", "Helper");
-    		testableAdapter.setTestLabel("Section5", "helper", "Helper");
-    		testableAdapter.setTestLabel("Section1", "provider", "Provider");
-    		testableAdapter.setTestLabel("Section2", "provider", "Provider");
-    		testableAdapter.setTestLabel("Section3", "provider", "Provider");
-    		testableAdapter.setTestLabel("Section1", "renderer", "Renderer");
-    		testableAdapter.setTestLabel("Section2", "renderer", "Renderer");
-    		testableAdapter.setTestLabel("Section3", "renderer", "Renderer");
-    		testableAdapter.setTestLabel("Section1", "library", "Library1");
-    		testableAdapter.setTestLabel("Section2", "library", "Library2");
-    		testableAdapter.setTestLabel("Section1", "badlibrary", "BadLibrary1");
-    		testableAdapter.setTestLabel("Section2", "badlibrary", "BadLibrary2");
-    		testableAdapter.setTestLabel("SectionJsonTest_s", "s", "serialId");
-    		testableAdapter.setTestLabel("SectionJsonTest_sid", "sid", "serialIdShort");
-    		testableAdapter.setTestLabel("SectionJsonTest_r", "r", "serialRefId");
-    		testableAdapter.setTestLabel("SectionJsonTest_rid", "rid", "serialRefIdShort");    		
-    	}
+        if (localizationAdapter instanceof TestableLocalizationAdapter) {
+            TestableLocalizationAdapter testableAdapter = (TestableLocalizationAdapter) localizationAdapter;
+            testableAdapter.setTestLabel("AuraTestLabelSection", "dynamic_label_for_test", "we have {0} members");
+            testableAdapter.setTestLabel("AuraTestLabelSection", "label_for_attribute_default_value_test", "testing label");
+            testableAdapter.setTestLabel("Section1", "controller", "Controller");
+            testableAdapter.setTestLabel("Section2", "controller", "Controller");
+            testableAdapter.setTestLabel("Section_A", "controller", "Controller");
+            testableAdapter.setTestLabel("Section1", "helper", "Helper");
+            testableAdapter.setTestLabel("Section2", "helper", "Helper");
+            testableAdapter.setTestLabel("ML_Comment", "helper", "Helper");
+            testableAdapter.setTestLabel("SL_Comment", "helper", "Helper");
+            testableAdapter.setTestLabel("Section_a", "helper", "Helper");
+            testableAdapter.setTestLabel("Section_B", "helper", "Helper");
+            testableAdapter.setTestLabel("Section5", "helper", "Helper");
+            testableAdapter.setTestLabel("Section1", "provider", "Provider");
+            testableAdapter.setTestLabel("Section2", "provider", "Provider");
+            testableAdapter.setTestLabel("Section3", "provider", "Provider");
+            testableAdapter.setTestLabel("Section1", "renderer", "Renderer");
+            testableAdapter.setTestLabel("Section2", "renderer", "Renderer");
+            testableAdapter.setTestLabel("Section3", "renderer", "Renderer");
+            testableAdapter.setTestLabel("Section1", "library", "Library1");
+            testableAdapter.setTestLabel("Section2", "library", "Library2");
+            testableAdapter.setTestLabel("Section1", "badlibrary", "BadLibrary1");
+            testableAdapter.setTestLabel("Section2", "badlibrary", "BadLibrary2");
+            testableAdapter.setTestLabel("SectionJsonTest_s", "s", "serialId");
+            testableAdapter.setTestLabel("SectionJsonTest_sid", "sid", "serialIdShort");
+            testableAdapter.setTestLabel("SectionJsonTest_r", "r", "serialRefId");
+            testableAdapter.setTestLabel("SectionJsonTest_rid", "rid", "serialRefIdShort");
+        }
     }
-    
-    private void tearDownTestLabels() {
-    	if(localizationAdapter instanceof TestableLocalizationAdapter) {
-    		TestableLocalizationAdapter testableAdapter = (TestableLocalizationAdapter) localizationAdapter;
-	    	testableAdapter.removeTestLabel("AuraTestLabelSection", "dynamic_label_for_test");
-	    	testableAdapter.removeTestLabel("AuraTestLabelSection", "label_for_attribute_default_value_test");
-	    	testableAdapter.removeTestLabel("Section1", "controller");
-	    	testableAdapter.removeTestLabel("Section2", "controller");
-	    	testableAdapter.removeTestLabel("Section_A", "controller");
-	    	testableAdapter.removeTestLabel("Section1", "helper");
-	    	testableAdapter.removeTestLabel("Section2", "helper");
-	    	testableAdapter.removeTestLabel("ML_Comment", "helper");
-	    	testableAdapter.removeTestLabel("SL_Comment", "helper");
-	    	testableAdapter.removeTestLabel("Section_a", "helper");
-	    	testableAdapter.removeTestLabel("Section_B", "helper");
-	    	testableAdapter.removeTestLabel("Section5", "helper");
-	    	testableAdapter.removeTestLabel("Section1", "provider");
-	    	testableAdapter.removeTestLabel("Section2", "provider");
-	    	testableAdapter.removeTestLabel("Section3", "provider");
-	    	testableAdapter.removeTestLabel("Section1", "renderer");
-	    	testableAdapter.removeTestLabel("Section2", "renderer");
-	    	testableAdapter.removeTestLabel("Section3", "renderer");
-	    	testableAdapter.removeTestLabel("Section1", "library");
-	    	testableAdapter.removeTestLabel("Section2", "library");
-	    	testableAdapter.removeTestLabel("Section1", "badlibrary");
-	    	testableAdapter.removeTestLabel("Section2", "badlibrary");
-	    	testableAdapter.removeTestLabel("SectionJsonTest_s", "s");
-	    	testableAdapter.removeTestLabel("SectionJsonTest_sid", "sid");
-	    	testableAdapter.removeTestLabel("SectionJsonTest_r", "r");
-	    	testableAdapter.removeTestLabel("SectionJsonTest_rid", "rid");
-    	}
-    }
-    
+
 }

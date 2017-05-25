@@ -629,12 +629,12 @@ public class ServerServiceImpl implements ServerService {
             if (componentAttributes != null && !componentAttributes.isEmpty()) {
                 auraInit.put("attributes", componentAttributes);
             }
-            
+
             Map<String, Object> namespaces = Maps.newHashMap();
             namespaces.put("internal", configAdapter.getInternalNamespaces());
             namespaces.put("privileged", configAdapter.getPrivilegedNamespaces());
             auraInit.put("ns", namespaces);
-            
+
             auraInit.put("descriptor", value.getDescriptor());
             auraInit.put("deftype", value.getDescriptor().getDefType());
             auraInit.put("host", context.getContextPath());

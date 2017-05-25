@@ -167,7 +167,7 @@ public class AuraTestFilter {
 
         if (testCaseFilters != null && testCaseFilters.size() > 0) {
             final AtomicBoolean handled = new AtomicBoolean(false);
-            
+
             for (HttpFilter filter : testCaseFilters) {
                 if (filter == null) {
                     continue;
@@ -298,7 +298,11 @@ public class AuraTestFilter {
         }
 
         // Handle mock definitions specified in the tests.
-        if (testContext != null) {
+        if (testContext == null) {
+            // The test context adapter may not always get cleared,
+            // so release all test contexts for the request without explicit test context
+            testContextAdapter.clear();
+        } else {
             if (!contextService.isEstablished()) {
                 LOG.error("Aura context is not established! New context will NOT be created.");
                 chain.doFilter(request, response);
@@ -315,7 +319,7 @@ public class AuraTestFilter {
     public void init(FilterConfig filterConfig) throws ServletException {
         processInjection(filterConfig);
     }
-    
+
     public void processInjection(FilterConfig filterConfig) {
         if (testContextAdapter == null) {
             SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, filterConfig.getServletContext());

@@ -26,6 +26,8 @@ import org.auraframework.service.ModulesCompilerService;
 
 @ServiceComponent
 public class ModulesCompilerServiceImpl implements ModulesCompilerService {
+    
+    private static final ModulesCompiler compiler = new ModulesCompilerNode();
 
     @Inject
     private LoggingService loggingService;
@@ -33,7 +35,7 @@ public class ModulesCompilerServiceImpl implements ModulesCompilerService {
     @Override
     public final ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception {
         long startNanos = System.nanoTime();
-        ModulesCompilerData data = new ModulesCompilerNode().compile(entry, sources);
+        ModulesCompilerData data = compiler.compile(entry, sources);
         long elapsedMillis = (System.nanoTime() - startNanos) / 1000000;
         loggingService.info("modules compiled " + entry + " in " + elapsedMillis + " ms");
         return data;

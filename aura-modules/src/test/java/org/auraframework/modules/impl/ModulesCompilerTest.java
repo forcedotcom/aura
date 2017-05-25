@@ -43,7 +43,7 @@ public class ModulesCompilerTest extends UnitTestCase {
     public void testModulesCompilerJ2V8() throws Exception {
         testModulesCompiler(new ModulesCompilerJ2V8());
     }
-    
+
     private void testModulesCompiler(ModulesCompiler compiler) throws Exception {
         String entry = "modules/moduletest/moduletest.js";
         String sourceTemplate = Files.toString(getResourceFile("/testdata/modules/moduletest/moduletest.html"),
@@ -61,7 +61,7 @@ public class ModulesCompilerTest extends UnitTestCase {
         assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
         assertEquals("[x-test]", compilerData.bundleDependencies.toString());
     }
-    
+
     @Test
     public void testModulesCompilerNodeErrorInHtml() throws Exception {
         testModulesCompilerErrorInHtml(new ModulesCompilerNode());
@@ -90,11 +90,11 @@ public class ModulesCompilerTest extends UnitTestCase {
         } catch (Exception e) {
             e.printStackTrace();
             String message = Throwables.getRootCause(e).getMessage();
-            assertEquals("Error: modules/errorInHtml/errorInHtml.html: Unexpected token (2:5)",
-                    message.substring(0, 67));
+            assertTrue(message,
+                    message.contains("Error: modules/errorInHtml/errorInHtml.html: Unexpected token (2:5)"));
         }
     }
-    
+
     @Test
     public void testModulesCompilerNodeErrorInJs() throws Exception {
         testModulesCompilerErrorInJs(new ModulesCompilerNode());
@@ -112,7 +112,7 @@ public class ModulesCompilerTest extends UnitTestCase {
                 Charsets.UTF_8);
         String sourceClass = Files.toString(getResourceFile("/testdata/modules/errorInJs/errorInJs.js"),
                 Charsets.UTF_8);
-        
+
         Map<String, String> sources = new HashMap<>();
         sources.put("modules/errorInJs/errorInJs.js", sourceClass);
         sources.put("modules/errorInJs/errorInJs.html", sourceTemplate);
@@ -121,9 +121,8 @@ public class ModulesCompilerTest extends UnitTestCase {
             compiler.compile(entry, sources);
             fail("should report a syntax error");
         } catch (Exception e) {
-            Throwable cause = Throwables.getRootCause(e);
-            assertEquals("Error: modules/errorInJs/errorInJs.js: Unexpected token (1:11)",
-                    cause.getMessage().substring(0, 62));
+            String message = Throwables.getRootCause(e).getMessage();
+            assertTrue(message, message.contains("Error: modules/errorInJs/errorInJs.js: Unexpected token (1:11)"));
         }
     }
 }

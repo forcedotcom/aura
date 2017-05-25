@@ -30,7 +30,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
 public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
-    
+
     @Inject
     private ModulesCompilerService modulesCompilerService;
 

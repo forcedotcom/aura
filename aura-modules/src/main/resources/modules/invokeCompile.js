@@ -16,13 +16,5 @@
 
 module.exports = function(input) {
     const compiler = require(input.pathToCompilerJs);
-    const promise = compiler.compile(input.entry, input.options);
-    promise.then((result) => {
-        console.log('>>> output results: >>>:');
-        console.log(JSON.stringify(result));
-    })
-    .catch((error) => {
-        console.log('>>> output results: >>>:');
-        console.log(JSON.stringify({compilerError: error.toString()}));
-    });
+    return compiler.compile(input.entry, input.options);;
 }

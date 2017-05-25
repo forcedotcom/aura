@@ -191,6 +191,9 @@ InteropComponent.prototype.attributeChange = function (key, value) {
     }
 };
 
+
+InteropComponent._classNameCacheMap = {};
+
 /**
  * Creates a hash map for a given className string
  * e.g. `slds-grid slds-col` => { 'slds-grid': true, 'slds-col': true }
@@ -199,7 +202,13 @@ InteropComponent.prototype.attributeChange = function (key, value) {
  */
 InteropComponent.prototype.getMapFromClassName = function (className) {
     var SPACE_CHAR = 32;
-    var map = {};
+    var map = InteropComponent._classNameCacheMap[className];
+
+    if (map) {
+        return map;
+    }
+
+    map = {};
 
     var start = 0;
     var i, len = className.length;
@@ -217,6 +226,7 @@ InteropComponent.prototype.getMapFromClassName = function (className) {
         map[className.slice(start, i)] = true;
     }
 
+    InteropComponent._classNameCacheMap[className] = map;
     return map;
 };
 
@@ -226,7 +236,9 @@ InteropComponent.prototype.getMapFromClassName = function (className) {
  * @param value
  */
 InteropComponent.prototype.updateClassAttribute = function (element, value) {
-    var currentClassMap = this.currentClassMap || {};
+    var currentClassMap = this.currentClassMap;
+    $A.assert(currentClassMap !== null && (typeof currentClassMap === 'object'), 'Current Class Map must be an object.');
+    
     var classMap = this.getMapFromClassName(value);
 
     Object.keys(currentClassMap).forEach(function (className) {

@@ -173,9 +173,11 @@
                 ptv     = templateData.ptv,
                 itemVar = cmp.get('v.itemVar'),
                 clonedItem;
-            
-            ptv.set(itemVar, item);
-            
+
+            if ($A.util.isString(itemVar)) {
+                ptv.set(itemVar, item);
+            }
+
             cmp.markClean('v.items');
             $A.renderingService.rerenderDirty('virtualRendering');
 

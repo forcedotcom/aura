@@ -122,7 +122,7 @@
                         <configuration>
                             <target>
                                 <path id="definitions">
-                                    <fileset dir="src/main/components">
+                                    <fileset dir="src/main/components" erroronmissingdir="false">
                                         <include name="**/*.app" />
                                         <include name="**/*.auradoc" />
                                         <include name="**/*.cmp" />
@@ -137,7 +137,7 @@
                                         <include name="**/*.tokens" />
                                     </fileset>
                                 </path>
-                                <pathconvert property="definitionList" refid="definitions" pathsep=",">
+                                <pathconvert property="definitionList" refid="definitions" pathsep="," setonempty="false">
                                     <!-- Allow either slash (Windows actually uses both) -->
                                     <regexpmapper from=".*[/\\]([^/\\]*)[/\\]([^/\\]*)[/\\](.*)" to="\1/\2/\3" />
                                 </pathconvert>
@@ -154,11 +154,11 @@
                         <configuration>
                             <target>
                                 <path id="definitions">
-                                    <fileset dir="src/main/modules">
+                                    <fileset dir="src/main/modules" erroronmissingdir="false">
                                         <include name="**/*" />
                                     </fileset>
                                 </path>
-                                <pathconvert property="definitionList" refid="definitions" pathsep=",">
+                                <pathconvert property="definitionList" refid="definitions" pathsep="," setonempty="false">
                                     <!-- Allow either slash (Windows actually uses both) -->
                                     <regexpmapper from=".*[/\\]([^/\\]*)[/\\]([^/\\]*)[/\\](.*)" to="\1/\2/\3" />
                                 </pathconvert>

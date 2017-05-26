@@ -20,9 +20,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.module.ModuleDef;
@@ -50,7 +52,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     private final Set<String> moduleDependencies;
     private final String customElementName;
     private Set<DefDescriptor<?>> dependencies = null;
-    private final Map<CodeType, String> codes;
+    private Map<CodeType, String> codes;
     private final Set<PropertyReference> labelReferences;
 
     private ModuleDefImpl(Builder builder) {
@@ -113,6 +115,8 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     private Set<DefDescriptor<?>> getDependencyDescriptors(Set<String> dependencies) {
         Set<DefDescriptor<?>> results = Sets.newHashSet();
         DefinitionService definitionService = Aura.getDefinitionService();
+        ConfigAdapter configAdapter = Aura.getConfigAdapter();
+        Map<String, String> moduleAliases = Maps.newHashMap();
         for (String dep : dependencies) {
             if (dep.contains(":")) {
                 // specific reference with ":" indicates aura library in module
@@ -121,20 +125,58 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
                     results.add(libraryDefDescriptor);
                 }
             } else if (dep.contains("-")) {
-                dep = StringUtils.replaceOnce(dep, "-", ":");
-                String[] split = dep.split(":");
+                String colon = StringUtils.replaceOnce(dep, "-", ":");
+                String[] split = colon.split(":");
                 String namespace = split[0];
                 String name = split[1];
-                String descriptor = ModuleDefinitionUtil.convertToAuraDescriptor(namespace, name, Aura.getConfigAdapter());
 
-                DefDescriptor<ModuleDef> moduleDefDefDescriptor = definitionService.getDefDescriptor(descriptor, ModuleDef.class);
-                if (definitionService.exists(moduleDefDefDescriptor)) {
+                boolean moduleExists = false;
+                String descriptor = ModuleDefinitionUtil.convertToAuraDescriptor(namespace, name, configAdapter);
+                DefDescriptor<ModuleDef> moduleDescriptor = definitionService.getDefDescriptor(descriptor, ModuleDef.class);
+
+                String namespaceAlias = configAdapter.getModuleNamespaceAliases().get(namespace);
+                if (namespaceAlias != null) {
+                    String aliasedDescriptor = ModuleDefinitionUtil.convertToAuraDescriptor(namespaceAlias, name, configAdapter);
+                    DefDescriptor<ModuleDef> aliasedModuleDescriptor = definitionService.getDefDescriptor(aliasedDescriptor, ModuleDef.class);
+                    moduleExists = definitionService.exists(aliasedModuleDescriptor);
+                    if (moduleExists) {
+                        // aliased module exists so we reference aliased descriptor
+                        moduleDescriptor = aliasedModuleDescriptor;
+                        moduleAliases.put(dep, namespaceAlias + "-" + name);
+                    }
+                }
+
+                if (!moduleExists) {
+                    // aliased doesn't exist so we check original
+                    moduleExists = definitionService.exists(moduleDescriptor);
+                }
+
+                if (moduleExists) {
                     // if module exists, then add module dependency and continue
-                    results.add(moduleDefDefDescriptor);
+                    results.add(moduleDescriptor);
                 }
             }
         }
+        processDependencyAliases(moduleAliases);
         return results;
+    }
+
+    /**
+     * replaces references in compiled code for aliased modules
+     *
+     * @param moduleAliases map of aliased modules
+     */
+    private void processDependencyAliases(Map<String, String> moduleAliases) {
+        if (!moduleAliases.isEmpty()) {
+            Map<CodeType, String> newCodesMap = Maps.newHashMap();
+            this.codes.forEach( (type, code) -> {
+                String[] originals = moduleAliases.keySet().toArray(new String[0]);
+                String[] replaces = moduleAliases.values().toArray(new String[0]);
+                String newCode = StringUtils.replaceEach(code, originals, replaces);
+                newCodesMap.put(type, newCode);
+            });
+            this.codes = newCodesMap;
+        }
     }
 
     @Override

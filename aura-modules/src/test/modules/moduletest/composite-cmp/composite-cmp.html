@@ -1,12 +1,14 @@
 <template>
     <p>Modules Composite</p>
     <section class="composite-container">
-    	<moduletest-simple-cmp
-    		literal="literal"
-    		bound={bound}
-    		unbound={unbound}
-    		expression={expression}
-    		callbackaction={callbackaction}
-    	></moduletest-simple-cmp>
+        <moduletest-simple-cmp
+                literal="literal"
+                bound={bound}
+                unbound={unbound}
+                expression={expression}
+                callbackaction={callbackaction}
+        ></moduletest-simple-cmp>
     </section>
+
+    <alpha-text-cmp text="aliased text"></alpha-text-cmp>
 </template>

@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDefRef;
@@ -59,22 +58,14 @@ public class DefRefDelegate implements DefinitionReference {
     private void processReferences() throws DefinitionNotFoundException {
         this.switchable = false;
 
-        ConfigAdapter configAdapter = Aura.getConfigAdapter();
-        Set<String> moduleNamespaces = configAdapter.getModuleNamespaces();
-        String currentNamespace = this.componentDefRef.getDescriptor().getNamespace();
-
-        String actualNamespace = configAdapter.getNamespaceAliases().get(currentNamespace);
-        if (actualNamespace == null) {
-            actualNamespace = currentNamespace;
-        }
+        Set<String> moduleNamespaces = Aura.getConfigAdapter().getModuleNamespaces();
 
         // Only process references that have namespaces registered as modules
-        if (moduleNamespaces.contains(actualNamespace.toLowerCase())) {
+        if (moduleNamespaces.contains(this.componentDefRef.getDescriptor().getNamespace().toLowerCase())) {
 
             DefinitionService definitionService = Aura.getDefinitionService();
-            DefDescriptor<?> componentRefDescriptor = this.componentDefRef.getDescriptor();
-            String qualifiedName = DefDescriptor.MARKUP_PREFIX + "://" + actualNamespace + ":" + componentRefDescriptor.getName();
-            DefDescriptor<ModuleDef> moduleDefDescriptor = definitionService.getDefDescriptor(qualifiedName, ModuleDef.class);
+            DefDescriptor<ModuleDef> moduleDefDescriptor = definitionService.getDefDescriptor(this.componentDefRef.getDescriptor(),
+                    DefDescriptor.MARKUP_PREFIX, ModuleDef.class);
 
             boolean moduleExists = definitionService.exists(moduleDefDescriptor);
 

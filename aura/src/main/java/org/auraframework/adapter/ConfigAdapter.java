@@ -216,5 +216,5 @@ public interface ConfigAdapter extends AuraAdapter {
     
     boolean cdnEnabled();
 
-    Map<String, String> getNamespaceAliases();
+    Map<String, String> getModuleNamespaceAliases();
 }

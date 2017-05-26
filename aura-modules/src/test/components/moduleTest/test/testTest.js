@@ -52,33 +52,5 @@
                 });
             }
         ]
-    },
-
-    /**
-     * Verify creating a module whose definition is fetched from the server.
-     */
-    testFetchAliasedNewDefFromServer: {
-        labels : ["UnAdaptableTest"],
-        browsers : [ 'GOOGLECHROME', 'FIREFOX' ],
-        test: [
-            function (cmp) {
-                var actionComplete = false;
-                $A.createComponent("alpha:textCmp", {text: cmp.getReference("v.str3")}, function (newCmp) {
-                    var body = cmp.get("v.body");
-                    body.push(newCmp);
-                    cmp.set("v.body", body);
-                    actionComplete = true;
-                });
-
-                $A.test.addWaitFor(true, function () {
-                    return actionComplete;
-                }, function () {
-                    var textCmp = cmp.get("v.body")[0];
-                    $A.test.assertEquals("beta:textCmp", textCmp.getDef().getDescriptor().getFullName(), "Should be using aliased namespace component");
-                    $A.test.assertTrue(!!textCmp["interopClass"], "Should be InteropComponent for modules");
-                    $A.test.assertEquals(cmp.get("v.str3"), textCmp.get("v.text"), "Failed to pass attribute values to created component");
-                });
-            }
-        ]
     }
 })

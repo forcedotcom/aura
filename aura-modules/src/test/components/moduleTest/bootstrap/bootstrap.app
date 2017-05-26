@@ -82,6 +82,5 @@
                 <!-- <ui:button label="{!item.label}"></ui:button> -->
              </aura:iteration>
         </section>
-        <alpha:textCmp text="alpha to beta" />
     </section>
 </aura:application>

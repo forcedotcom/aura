@@ -110,28 +110,12 @@ public class ComponentController implements GlobalController {
     public Instance getComponent(@Key(value = "name", loggable = true) String name,
                                  @Key("attributes") Map<String, Object> attributes,
                                  @Key(value = "chainLoadLabels", loggable = true) Boolean loadLabels) throws QuickFixException {
-        if (contextService.getCurrentContext().isModulesEnabled()) {
-            // dynamic module definition
             DefDescriptor<ModuleDef> moduleDesc = definitionService.getDefDescriptor(name, ModuleDef.class);
-            String currentNamespace = moduleDesc.getNamespace();
-            String actualNamespace = configAdapter.getNamespaceAliases().get(currentNamespace);
-            boolean aliased = true;
-            if (actualNamespace == null) {
-                actualNamespace = currentNamespace;
-                aliased = false;
-            }
-            if (configAdapter.getModuleNamespaces().contains(actualNamespace)) {
-                if (aliased) {
-                    // create descriptor with alias namespace
-                    String qualified = DefDescriptor.MARKUP_PREFIX + "://" + actualNamespace + ":" + moduleDesc.getName();
-                    moduleDesc = definitionService.getDefDescriptor(qualified, ModuleDef.class);
-                }
-                if (definitionService.exists(moduleDesc)) {
+        if (contextService.getCurrentContext().isModulesEnabled() &&
+                configAdapter.getModuleNamespaces().contains(moduleDesc.getNamespace()) && moduleDesc.exists()) {
                     definitionService.updateLoaded(moduleDesc);
                     return instanceService.getInstance(moduleDesc, attributes);
                 }
-            }
-        }
         return getBaseComponent(Component.class, ComponentDef.class, name, attributes, loadLabels);
     }
 

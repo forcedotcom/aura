@@ -17,13 +17,13 @@
 package org.auraframework.modules.impl.alias;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.modules.NamespaceAlias;
+import org.auraframework.modules.ModuleNamespaceAlias;
 
 /**
- * "alpha" to "beta" namespace alias
+ * "alpha" to "beta" module namespace alias
  */
 @ServiceComponent
-public class AlphaBetaNamespaceAlias implements NamespaceAlias {
+public class AlphaBetaNamespaceAlias implements ModuleNamespaceAlias {
     @Override
     public String target() {
         return "alpha";

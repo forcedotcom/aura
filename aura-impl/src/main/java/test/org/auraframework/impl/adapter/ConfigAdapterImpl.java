@@ -57,7 +57,7 @@ import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.impl.util.BrowserInfo;
 import org.auraframework.instance.BaseComponent;
-import org.auraframework.modules.NamespaceAlias;
+import org.auraframework.modules.ModuleNamespaceAlias;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.CSPInliningService;
 import org.auraframework.service.DefinitionService;
@@ -152,7 +152,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private final Set<String> CACHEABLE_PREFIXES = ImmutableSet.of("aura", "java", "compound");
 
     private final Set<String> moduleNamespaces = Sets.newHashSet();
-    private final Map<String, String> namespaceAliases = Maps.newConcurrentMap();
+    private final Map<String, String> moduleNamespaceAliases = Maps.newConcurrentMap();
 
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
     private JavascriptGroup jsGroup;
@@ -886,14 +886,14 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
-    public Map<String, String> getNamespaceAliases() {
-        return ImmutableMap.copyOf(this.namespaceAliases);
+    public Map<String, String> getModuleNamespaceAliases() {
+        return ImmutableMap.copyOf(this.moduleNamespaceAliases);
     }
 
     @Autowired(required = false)
-    public void setNamespaceAliases(List<NamespaceAlias> aliases) {
-        for(NamespaceAlias ns : aliases) {
-            this.namespaceAliases.put(ns.target(), ns.alias());
+    public void setModuleNamespaceAliases(List<ModuleNamespaceAlias> aliases) {
+        for(ModuleNamespaceAlias ns : aliases) {
+            this.moduleNamespaceAliases.put(ns.target(), ns.alias());
         }
     }
 

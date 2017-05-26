@@ -16,9 +16,9 @@
 package org.auraframework.modules;
 
 /**
- * Define namespace alias from aura namespace to module namespace
+ * Define namespace alias for modules
  */
-public interface NamespaceAlias {
+public interface ModuleNamespaceAlias {
     /**
      * namespace to be aliased
      * @return target namespace to alias

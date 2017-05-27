@@ -127,7 +127,7 @@ InteropComponent.prototype.setupAttributes = function(config) {
         // Check is attribute is in the definition or is an HTML Global attribute then
         // assign it as an attribute
         var isAttrInDefinition =  attribute in this.interopDef["props"];
-        var assertionMessage = '"' + attribute  + '" must either be a public property of ' + this.getName() + ' or a global HTML attribute'
+        var assertionMessage = '"' + attribute  + '" must either be a public property of ' + this.getName() + ' or a global HTML attribute';
 
         $A.assert(isEvent || isAttrInDefinition || this.isHtmlGlobalAttr(attribute), assertionMessage);
         attributes[attribute] = valueConfig;

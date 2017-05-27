@@ -15,30 +15,8 @@
  */
 package org.auraframework.http;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
@@ -76,14 +54,35 @@ import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import javax.inject.Inject;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Supports test framework functionality, primarily for jstest mocks.
  */
 @ServiceComponent
 public class AuraTestFilter {
+
     private static final int DEFAULT_JSTEST_TIMEOUT = 30;
     private static final String BASE_URI = "/aura";
     private static final String GET_URI = BASE_URI
@@ -127,6 +126,9 @@ public class AuraTestFilter {
     private ConfigAdapter configAdapter;
     private ExceptionAdapter exceptionAdapter;
     private ServletUtilAdapter servletUtilAdapter;
+
+    private String testRunnerAppNamespace =  "aurajstest";
+    private String testRunnerAppName = "jstest";
     
     @Inject
     public void setTestContextAdapter(TestContextAdapter testContextAdapter) {
@@ -285,7 +287,7 @@ public class AuraTestFilter {
                         qs = qs + "&test=" + testName;
                     }
 
-                    String newUri = createURI("aurajstest", "jstest", DefType.APPLICATION, mode,
+                    String newUri = createURI(testRunnerAppNamespace, testRunnerAppName, DefType.APPLICATION, mode,
                             Format.HTML, Authentication.AUTHENTICATED.name(), NO_RUN, qs);
                     RequestDispatcher dispatcher = request.getServletContext().getContext(newUri).getRequestDispatcher(newUri);
                     if (dispatcher != null) {
@@ -318,6 +320,14 @@ public class AuraTestFilter {
 
     public void init(FilterConfig filterConfig) throws ServletException {
         processInjection(filterConfig);
+
+        String testRunnerAppNamespace = filterConfig.getInitParameter("testRunnerAppNamespace");
+        String testRunnerAppName = filterConfig.getInitParameter("testRunnerAppName");
+
+        if (testRunnerAppNamespace != null && testRunnerAppName != null) {
+            this.testRunnerAppNamespace = testRunnerAppNamespace;
+            this.testRunnerAppName = testRunnerAppName;
+        }
     }
 
     public void processInjection(FilterConfig filterConfig) {

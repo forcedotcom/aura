@@ -43,11 +43,11 @@ Aura.ExportsModule = {
         return new Promise(function (resolve, reject) {
             action.setBackground();
             $A.enqueueAction(action);
-            action.setCallback(null, function (action) {
-                if (action.getState() !== 'SUCCESS') {
-                    reject(new Error('Error fetching component: ' + JSON.stringify(action.getError())));
+            action.setCallback(null, function (response) {
+                if (response.getState() !== 'SUCCESS') {
+                    reject(new Error('Error fetching component: ' + JSON.stringify(response.getError())));
                 }
-                resolve(action.getReturnValue());
+                resolve(response.getReturnValue());
             });
         });
     },

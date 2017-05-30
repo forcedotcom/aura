@@ -230,9 +230,4 @@ public interface DefinitionService extends AuraService {
     boolean hasAccess(DefDescriptor<?> referencingDescriptor, DefDescriptor<?> accessDescriptor) throws QuickFixException;
 
     <D extends Definition> boolean hasAccess(DefDescriptor<?> referencingDescriptor, D def) throws QuickFixException;
-
-    /**
-     * make sure all of our registries are built.
-     */
-    void warmCaches();
 }

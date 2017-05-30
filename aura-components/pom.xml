@@ -218,6 +218,25 @@
                             <outputDirectory>${project.build.testOutputDirectory}/${component.negativetest.dir}</outputDirectory>
                         </configuration>
                     </execution>
+                    <execution>
+	                    <!-- copy back .registries to source tree -->
+                        <id>copy-registries</id>
+                        <phase>${component.compile.phase}</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.outputDirectory}/${component.dir}</directory>
+                                    <includes>
+                                        <include>.registries</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>src/main/components</outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>

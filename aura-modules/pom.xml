@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>aura-modules</artifactId>
-   
+
     <properties>
         <module.dir>modules_aura_modules</module.dir>
         <component.dir>components_aura_modules</component.dir>
@@ -307,6 +307,83 @@
                                 </resource>
                             </resources>
                             <outputDirectory>${project.build.testOutputDirectory}/${component.test.dir}</outputDirectory>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <!-- copy back .registries to source tree -->
+                        <id>copy-component-registries</id>
+                        <phase>${component.compile.phase}</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.outputDirectory}/${component.dir}</directory>
+                                    <includes>
+                                        <include>.registries</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>src/main/components</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- copy back .registries to source tree -->
+                        <id>copy-module-registries</id>
+                        <phase>${component.compile.phase}</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.outputDirectory}/${module.dir}</directory>
+                                    <includes>
+                                        <include>.registries</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>src/main/modules</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- copy back .registries to source tree -->
+                        <id>copy-component-test-registries</id>
+                        <phase>${component.test.compile.phase}</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.testOutputDirectory}/${component.test.dir}</directory>
+                                    <includes>
+                                        <include>.registries</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>src/test/components</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- copy back .registries to source tree -->
+                        <id>copy-module-test-registries</id>
+                        <phase>${component.test.compile.phase}</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.testOutputDirectory}/${module.test.dir}</directory>
+                                    <includes>
+                                        <include>.registries</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>src/test/modules</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>

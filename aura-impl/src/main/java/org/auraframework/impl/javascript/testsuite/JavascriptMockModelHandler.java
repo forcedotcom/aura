@@ -46,7 +46,8 @@ public class JavascriptMockModelHandler extends JavascriptMockHandler<ModelDef> 
     }
 
     @Override
-    protected ModelDef createDefinition(Map<String, Object> map) throws QuickFixException {
+    protected ModelDef createDefinition(Map<String, Object> map)
+            throws QuickFixException {
         ModelDef baseDef = getBaseDefinition((String) map.get("descriptor"), ModelDef.class);
         modelDefDescriptor = baseDef.getDescriptor();
 

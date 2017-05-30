@@ -25,10 +25,13 @@
         this.superAfterRender();
         helper.updateEmptyListContent(component);
     },
-    rerender : function(component, helper){
+    rerender : function(component){
         this.superRerender();
-        if (component.getConcreteComponent().isDirty('v.items')) {
-            helper.updateEmptyListContent(component);
+        var concreteCmp = component.getConcreteComponent();
+        if (concreteCmp.isDirty('v.items')) {
+            // Allow components that extend abstractList to implement their own
+            // updateEmptyListContent
+            concreteCmp.getDef().getHelper().updateEmptyListContent(component);
         }
     }
 })// eslint-disable-line semi

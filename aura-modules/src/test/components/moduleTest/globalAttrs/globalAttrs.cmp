@@ -1,7 +1,7 @@
 <aura:component render="client">
 
     <!-- HTML Global Attributes -->
-    <aura:attribute name="class" type="String" default="my-custom-class"/>
+    <aura:attribute name="class" type="String"/>
     <aura:attribute name="title" type="String" default="title"/>
     <aura:attribute name="accesskey" type="String" default="A"/>
     <aura:attribute name="tabindex" type="Integer" default="1"/>

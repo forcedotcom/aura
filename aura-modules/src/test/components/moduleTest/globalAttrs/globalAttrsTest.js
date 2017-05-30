@@ -1,5 +1,17 @@
 ({
     browsers: ['GOOGLECHROME'],
+
+    testWhenClassAttrIsUndefined: {
+        test: [
+            function (cmp) {
+                var customEl = this.getCustomElement(cmp);
+                var expectedClass = '';
+
+                $A.test.assertTrue(customEl.classList.value === expectedClass, 'There class attribute in Aura undefined, then the prop value must be empty');
+            }
+        ]
+    },
+
     testGlobalAttrInCustomELement: {
         attributes: {
             'title': 'my-title',

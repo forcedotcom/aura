@@ -201,6 +201,11 @@ InteropComponent._classNameCacheMap = {};
  * @returns {Object}
  */
 InteropComponent.prototype.getMapFromClassName = function (className) {
+
+    if (className === undefined || className === null || className === '') {
+        return {};
+    }
+
     var SPACE_CHAR = 32;
     var map = InteropComponent._classNameCacheMap[className];
 

@@ -30,14 +30,14 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-import static org.auraframework.http.AuraCSPInliningService.InlineScriptMode.HASH;
 import static org.auraframework.http.AuraCSPInliningService.InlineScriptMode.NONCE;
 import static org.auraframework.http.AuraCSPInliningService.InlineScriptMode.UNSUPPORTED;
 
 @ServiceComponent
 public class AuraCSPInliningService implements CSPInliningService {
-
-    static String INLINE = "<script>%s</script>";
+	static final long serialVersionUID = -5862171003552767370L;
+	
+	static String INLINE = "<script>%s</script>";
     static String INLINE_NONCE = "<script nonce=\"%s\">%s</script>";
 
     public enum InlineScriptMode{
@@ -52,7 +52,7 @@ public class AuraCSPInliningService implements CSPInliningService {
         }
 
         public String toDirective(String... params){
-            return String.format(format, params);
+            return String.format(format, (Object[]) params);
         }
     }
 
@@ -73,6 +73,10 @@ public class AuraCSPInliningService implements CSPInliningService {
                 break;
             case NONCE:
                 directives.add(scriptMode.toDirective(context.getScriptNonce()));
+                break;
+			case UNSUPPORTED:
+			default:
+				break;
         }
         return directives;
     }
@@ -82,6 +86,11 @@ public class AuraCSPInliningService implements CSPInliningService {
         switch(getInlineMode()){
             case HASH:
                 contextService.getCurrentContext().addScriptHash(hashScript(script));
+                break;
+			case NONCE:
+			case UNSUPPORTED:
+			default:
+				break;
         }
     }
 
@@ -102,6 +111,10 @@ public class AuraCSPInliningService implements CSPInliningService {
                     break;
                 case NONCE:
                     out.append(String.format(INLINE_NONCE, script));
+                    break;
+				case UNSUPPORTED:
+				default:
+					break;
             }
 
         }

@@ -36,9 +36,10 @@ public class PreInitJavascriptJSAppender implements InlineJSAppender {
      * Writes javascript into pre init "beforeFrameworkInit"
      *
      * @param def current application or component
-     * @param mode current Mode from AuraContext
+     * @param content current AuraContext
      * @param out response writer
      */
+    @Override
     public void append(BaseComponentDef def, AuraContext context, Appendable out) throws IOException {
         AuraContext.Mode mode = context.getMode();
         if (this.preInitJavascripts != null && !this.preInitJavascripts.isEmpty()) {

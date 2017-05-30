@@ -57,6 +57,7 @@ public class LocaleDataJsAppender implements InlineJSAppender{
         localeData = readLocaleData();
     }
 
+    @Override
     public void append(BaseComponentDef def, AuraContext context, Appendable out) throws IOException {
         AuraLocale auraLocale = localizationAdapter.getAuraLocale();
 

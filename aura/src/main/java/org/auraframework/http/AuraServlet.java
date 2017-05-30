@@ -131,12 +131,10 @@ public class AuraServlet extends AuraBaseServlet {
     private SerializationService serializationService;
     private LoggingService loggingService;
     private ServerService serverService;
-    private ManifestUtil manifestUtil;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        manifestUtil = new ManifestUtil(definitionService, contextService, configAdapter);
     }
 
     /**
@@ -547,12 +545,5 @@ public class AuraServlet extends AuraBaseServlet {
     @Inject
     public void setServerService(ServerService serverService) {
         this.serverService = serverService;
-    }
-
-    /**
-     * @param manifestUtil the manifestUtil to set
-     */
-    public void setManifestUtil(ManifestUtil manifestUtil) {
-        this.manifestUtil = manifestUtil;
     }
 }

@@ -128,7 +128,6 @@
                             <executable>${java.home}/bin/java</executable>
                             <classpathScope>test</classpathScope>
                             <arguments>
-                                <argument>-DadditionalConfigurationClasses=test.org.auraframework.AuraTestConfiguration</argument>
                                 <argument>-Daura.home=${basedir}/..</argument>
                                 <argument>-classpath</argument>
                                 <classpath />

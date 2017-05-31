@@ -30,7 +30,7 @@ Aura.ExportsModule = {
             return r;
         }, {});
     },
-    "fetchDynamicComponent": function (type, params) {
+    "fetchGlobalControllerAction": function (type, params) {
         var normalizeType = type.charAt(0).toUpperCase() + type.slice(1);
         var controllerName = 'c.aura://' + normalizeType + 'Controller.getComponent';
         var action = $A.get(controllerName);

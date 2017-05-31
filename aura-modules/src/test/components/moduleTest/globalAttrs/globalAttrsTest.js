@@ -5,9 +5,8 @@
         test: [
             function (cmp) {
                 var customEl = this.getCustomElement(cmp);
-                var expectedClass = '';
 
-                $A.test.assertTrue(customEl.classList.value === expectedClass, 'There class attribute in Aura undefined, then the prop value must be empty');
+                $A.test.assertFalse(customEl.hasAttribute('class'), 'There class attribute should not be if undefined is passed.');
             }
         ]
     },

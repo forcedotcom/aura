@@ -202,7 +202,7 @@ InteropComponent._classNameCacheMap = {};
  */
 InteropComponent.prototype.getMapFromClassName = function (className) {
 
-    if (className === undefined || className === null || className === '') {
+    if (className === undefined || className == null || className === '') {
         return {};
     }
 

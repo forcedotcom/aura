@@ -619,22 +619,12 @@ AuraClientService.prototype.initializeClientLibraries = function () {
  * @export
  */
 AuraClientService.prototype.loadClientLibrary = function(name, callback) {
-    var lib = this.clientLibraries[name.toLowerCase()];
+    name = name.toLowerCase();
+    var lib = this.clientLibraries[name];
     $A.assert(lib, 'ClientLibrary has not been registered');
 
     if (lib.loaded) {
         return callback();
-    }
-
-    lib.loading = lib.loading || [];
-    lib.loading.push($A.getCallback(callback));
-
-    function afterLoad() {
-        lib.loaded = true;
-        for (var i in lib.loading) {
-            lib.loading[i]();
-        }
-        lib.loading = [];
     }
 
     if (!lib.script) {
@@ -644,8 +634,30 @@ AuraClientService.prototype.loadClientLibrary = function(name, callback) {
         lib.script = script;
     }
 
+    lib.loading = lib.loading || [];
+    lib.loading.push($A.getCallback(callback));
+
+    function afterLoad() {
+        $A.metricsService.transactionEnd("aura", "performance:loadClientLibrary");
+
+        lib.loaded = true;
+
+        for (var i in lib.loading) {
+            lib.loading[i]();
+        }
+        lib.loading = [];
+    }
+
     lib.script.onload = afterLoad;
     lib.script.onerror = afterLoad;
+
+    $A.metricsService.transactionStart("aura", "performance:loadClientLibrary", {
+            "context": {
+                "attributes" : {
+                    "library": name
+                }
+            }
+        });
     lib.script.src = lib.script.getAttribute('data-src');
 };
 
@@ -3510,12 +3522,12 @@ AuraClientService.prototype.injectComponentAsync = function(config, locator, eve
                 callback(component);
             }
 
-            acs.renderInjection(component, locator, eventHandlers);     
+            acs.renderInjection(component, locator, eventHandlers);
         }, config, root, false, false, true);
     } finally {
         if (!priorAccess) {
             context.releaseCurrentAccess();
-        }        
+        }
     }
 
     // Now we go ahead and stick a label load on the request.

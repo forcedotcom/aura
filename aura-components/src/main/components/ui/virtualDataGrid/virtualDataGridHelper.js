@@ -322,7 +322,9 @@
             clonedRow;
 
         // Change the PTV -> dirty whatever is needed
-        ptv.set(itemVar, item);
+        if ($A.util.isString(itemVar)) {
+            ptv.set(itemVar, item);
+        }
 
         cmp.markClean('v.items'); // Mark ourselves clean before rerender (avoid calling rerender on ourselves)
         $A.renderingService.rerenderDirty('virtualRendering');

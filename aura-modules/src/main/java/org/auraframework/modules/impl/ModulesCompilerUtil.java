@@ -36,15 +36,21 @@ import org.json.JSONObject;
 import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Object;
 
-final class ModulesCompilerUtil {
+public final class ModulesCompilerUtil {
 
     static final String COMPILER_JS_PATH = pathToLocalTempFile("modules/compiler.min.js");
     static final String INVOKE_COMPILE_JS_PATH = pathToLocalTempFile("modules/invokeCompile.js");
 
-    private static String pathToLocalTempFile(String classpathResource) {
+    public static String pathToLocalTempFile(String classpathResource) {
+        return pathToLocalTempFile(ModulesCompilerUtil.class.getClassLoader(), classpathResource);
+    }
+
+    public static String pathToLocalTempFile(ClassLoader classLoader, String classpathResource) {
         try {
-            ClassLoader classLoader = ModulesCompilerUtil.class.getClassLoader();
             InputStream input = classLoader.getResourceAsStream(classpathResource);
+            if (input == null) {
+                throw new IllegalArgumentException(classpathResource + " not found in " + classLoader);
+            }
             File tempFile = new File(IOUtil.newTempDir("modules"), new File(classpathResource).getName());
             IOUtil.copyStream(input, new FileOutputStream(tempFile));
             return tempFile.getAbsolutePath();
@@ -67,22 +73,22 @@ final class ModulesCompilerUtil {
         file.deleteOnExit();
         return file;
     }
-    
+
     static JSONObject generateCompilerInput(String entry, Map<String, String> sources) throws JSONException {
         JSONObject options = new JSONObject();
         options.put("format", "amd");
         options.put("mode", "all");
         options.put("mapNamespaceFromPath", true);
-        
+
         // add entries for all files in the bundle
         JSONObject sourcesObject = new JSONObject();
-        for (Entry<String, String> sourceEntry: sources.entrySet()) {
+        for (Entry<String, String> sourceEntry : sources.entrySet()) {
             String name = sourceEntry.getKey();
             String source = sourceEntry.getValue();
             sourcesObject.put(name, source);
         }
         options.put("sources", sourcesObject);
-        
+
         JSONObject input = new JSONObject();
         input.put("entry", entry);
         input.put("options", options);
@@ -117,7 +123,7 @@ final class ModulesCompilerUtil {
         }
         return new ModulesCompilerData(codeMap, bundleDependencies, bundleLabels);
     }
-    
+
     static ModulesCompilerData parseCompilerOutput(JSONObject result) {
         JSONObject dev = result.getJSONObject("dev");
         JSONObject prod = result.getJSONObject("prod");

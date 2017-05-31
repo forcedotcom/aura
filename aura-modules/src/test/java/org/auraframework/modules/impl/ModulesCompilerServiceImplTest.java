@@ -15,8 +15,11 @@
  */
 package org.auraframework.modules.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.inject.Inject;
 
@@ -30,6 +33,8 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
 public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
+    
+    private static final Logger logger = Logger.getLogger(ModulesCompilerServiceImplTest.class.getName());
 
     @Inject
     private ModulesCompilerService modulesCompilerService;
@@ -51,5 +56,17 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
 
         assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
         assertEquals("[x-test]", compilerData.bundleDependencies.toString());
+    }
+    
+    @Test
+    public void showTimings() throws Exception {
+        List<Long> timings = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            long startNanos = System.nanoTime();
+            testCompile();
+            long elapsedMillis = (System.nanoTime() - startNanos) / 1000000;
+            timings.add(elapsedMillis);
+        }
+        logger.info("moduletest exec elapsed millis: " + timings);
     }
 }

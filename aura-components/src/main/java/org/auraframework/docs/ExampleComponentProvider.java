@@ -47,7 +47,7 @@ public class ExampleComponentProvider implements ComponentDescriptorProvider {
         if (realComponent != null) {
             DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(realComponent,
                   ComponentDef.class);
-            return desc;
+            return desc != null && definitionService.exists(desc) ? desc : null;
         }
         throw new AuraRuntimeException("Component " + realComponent + " not found");
     }

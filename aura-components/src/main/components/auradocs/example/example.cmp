@@ -20,11 +20,13 @@
     <aura:attribute name="description" type="String" required="true" access="global"/>
     <aura:attribute name="descriptor" type="String" required="true" access="global"/>
 
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
     <div class="container">
         <h3>{!v.label}</h3>
 
         <div class="description"><aura:unescapedHtml value="{!v.description}"/></div>
 
-        <auradocs:viewer descriptor="{!v.descriptor}"/>
+        {!v.body}
     </div>
 </aura:component>

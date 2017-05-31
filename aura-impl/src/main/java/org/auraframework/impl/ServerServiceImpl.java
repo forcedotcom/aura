@@ -47,7 +47,6 @@ import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.http.ManifestUtil;
-import org.auraframework.http.resource.InlineJs;
 import org.auraframework.impl.util.TemplateUtil;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
@@ -377,46 +376,45 @@ public class ServerServiceImpl implements ServerService {
         }
     }
 
-
     private String getDefinitionsString (Set<DefDescriptor<?>> dependencies, String key)
             throws QuickFixException, IOException {
 
         AuraContext context = contextService.getCurrentContext();
         boolean minify = context.getMode().minify();
-        
+
         JsonSerializationContext serializationContext = context.getJsonSerializationContext();
         serializationContext.pushFormatRootItems();
-        
+
         StringBuilder sb = new StringBuilder();
-        
+
         // Process Libraries with a lower granularity level, to prevent duplication of external includes.
         Collection<LibraryDef> libraryDefs = filterAndLoad(LibraryDef.class, dependencies, null);
         for (LibraryDef libraryDef : libraryDefs) {
             List<IncludeDefRef> includeDefs = libraryDef.getIncludes();
             for (IncludeDefRef defRef : includeDefs) {
-            	sb.append("$A.componentService.addLibraryExporter(\"" + defRef.getClientDescriptor() + "\", (function (){/*");
+                sb.append("$A.componentService.addLibraryExporter(\"" + defRef.getClientDescriptor() + "\", (function (){/*");
                 sb.append(defRef.getCode(minify));
                 sb.append("*/}));");
-                	
+
                 context.setClientClassLoaded(defRef.getDescriptor(), true);
             }
         }
-        
+
         // Append component classes.
         Collection<BaseComponentDef> componentDefs = filterAndLoad(BaseComponentDef.class, dependencies, null);
         for (BaseComponentDef def : componentDefs) {
             sb.append("$A.componentService.addComponent(\"" + def.getDescriptor() + "\", (function (){/*");
-            
-            	// Mark class as loaded in the client
-            	context.setClientClassLoaded(def.getDescriptor(), true);
-            	
-            	// Component Class
-            	sb.append(def.getCode(minify));
-            	
-            	// Component definition
-            	sb.append("return ");
-            	serializationService.write(def, null, BaseComponentDef.class, sb, "JSON");
-            	sb.append(";");
+
+                // Mark class as loaded in the client
+                context.setClientClassLoaded(def.getDescriptor(), true);
+
+                // Component Class
+                sb.append(def.getCode(minify));
+
+                // Component definition
+                sb.append("return ");
+                serializationService.write(def, null, BaseComponentDef.class, sb, "JSON");
+                sb.append(";");
 
             sb.append("*/}));\n");
         }
@@ -488,7 +486,7 @@ public class ServerServiceImpl implements ServerService {
 
         Set<D> out = Sets.newLinkedHashSet();
         if(dependencies != null) {
-        	AuraContext context = contextService.getCurrentContext();
+            AuraContext context = contextService.getCurrentContext();
             for (DefDescriptor<?> descriptor : dependencies) {
                 if (defType.isAssignableFrom(descriptor.getDefType().getPrimaryInterface())
                         && (extraFilter == null || extraFilter.apply(descriptor))) {
@@ -585,30 +583,34 @@ public class ServerServiceImpl implements ServerService {
     }
 
     private TemplateUtil templateUtil = new TemplateUtil();
-    
+
     @Override
     public <T extends BaseComponentDef> Component writeTemplate(AuraContext context,
             T value, Map<String, Object> componentAttributes, Appendable out)
             throws IOException, QuickFixException {
-        
+
         ComponentDef templateDef = value.getTemplateDef();
         Map<String, Object> attributes = Maps.newHashMap();
         Mode mode = context.getMode();
-        
+
         StringBuilder sb = new StringBuilder();
         templateUtil.writeHtmlStyle(configAdapter.getResetCssURL(), sb);
         attributes.put("auraResetTags", sb.toString());
         sb.setLength(0);
-        
+
         templateUtil.writeHtmlStyles(servletUtilAdapter.getStyles(context), sb);
         attributes.put("auraStyleTags", sb.toString());
         sb.setLength(0);
-        
+
+        templateUtil.writePrefetchScriptTags(servletUtilAdapter.getJsClientLibraryUrls(context), sb);
+        attributes.put("prefetchTags", sb.toString());
+        sb.setLength(0);
+
         StyleDef styleDef = templateDef.getStyleDef();
         if (styleDef != null) {
             attributes.put("auraInlineStyle", styleDef.getCode());
         }
-        
+
         if (mode.allowLocalRendering() && value.isLocallyRenderable()) {
             BaseComponent<?, ?> cmp = (BaseComponent<?, ?>) instanceService.getInstance(value, componentAttributes);
 
@@ -641,9 +643,9 @@ public class ServerServiceImpl implements ServerService {
             auraInit.put("pathPrefix", context.getPathPrefix());
             
             // appcached apps must receive the token via bootstrap to avoid caching of the token
-        	if (!manifestUtil.isManifestEnabled()) {
-        		auraInit.put("token", configAdapter.getCSRFToken());
-        	}
+            if (!manifestUtil.isManifestEnabled()) {
+                auraInit.put("token", configAdapter.getCSRFToken());
+            }
             
             String lockerWorkerURL = configAdapter.getLockerWorkerURL();
             if (configAdapter.isStrictCSPEnforced() && lockerWorkerURL != null) {
@@ -656,9 +658,8 @@ public class ServerServiceImpl implements ServerService {
             auraInit.put("context", new Literal(context.serialize(AuraContext.EncodingStyle.Full)));
             attributes.put("auraInit", JsonEncoder.serialize(auraInit));
         }
-        
+
         Component template = instanceService.getInstance(templateDef.getDescriptor(), attributes);
         return template;
-        
     }
 }

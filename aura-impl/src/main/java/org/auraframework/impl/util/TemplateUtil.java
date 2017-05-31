@@ -39,6 +39,8 @@ public class TemplateUtil {
         }
     }
 
+    private static final String PREFETCH_TAG = "<link rel=\"prefetch\" href=\"%s\" as=\"script\"/>\n";
+
     private static final String HTML_STYLE = "<link href=\"%s\" rel=\"stylesheet\" type=\"text/css\"/>\n";
 
     public void writeHtmlStyle(String url, Appendable out) throws IOException {
@@ -73,7 +75,7 @@ public class TemplateUtil {
             out.append(scriptLoadingType.toHTML(scriptUrl));
         }
     }
-    
+
     public void writeHtmlScripts(AuraContext context, List <String> scripts, Script scriptLoadingType, Appendable out)
             throws IOException {
         if (scripts != null && !scripts.isEmpty()) {
@@ -83,6 +85,14 @@ public class TemplateUtil {
             }
             for (String src : scripts) {
                 out.append(scriptLoadingType.toHTML(src));
+            }
+        }
+    }
+
+    public void writePrefetchScriptTags(List <String> scriptUrls, Appendable out) throws IOException {
+        if (scriptUrls != null) {
+            for (String url : scriptUrls) {
+                out.append(String.format(PREFETCH_TAG, url));
             }
         }
     }

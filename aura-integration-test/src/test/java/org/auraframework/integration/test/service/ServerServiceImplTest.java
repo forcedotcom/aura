@@ -17,6 +17,7 @@ package org.auraframework.integration.test.service;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -60,6 +61,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.json.JsonStreamReader;
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -680,7 +682,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         assertNotNull(outputObj);
         assertNull(outputObj.get("perf"));
     }
-    
+
     @Test
     public void testPreloadJSDependencies() throws Exception {
         DefDescriptor<ComponentDef> appDesc = definitionService
@@ -807,37 +809,56 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         return output.toString();
     }
 
-	@Test
+    @Test
     public void testWriteTemplateHasCsrfTokenIfAppcacheNotEnabled() throws Exception {
-		DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
-				String.format(baseApplicationTag, "useAppCache='false' render='client'", ""));
-		AuraContext context = contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-		context.setApplicationDescriptor(appDesc);
-		ApplicationDef appDef = definitionService.getDefinition(appDesc);
-		
-		Component template = serverService.writeTemplate(context , appDef, null, null);
-		
-		String init = (String)template.getAttributes().getValue("auraInit");
-		@SuppressWarnings("unchecked")
-		Map<String,Object> initMap = (Map<String, Object>) new JsonReader().read(init);
-		
-		assertEquals("Token should be sent if appcache is not enabled", "aura", initMap.get("token"));
+        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseApplicationTag, "useAppCache='false' render='client'", ""));
+        AuraContext context = contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+        context.setApplicationDescriptor(appDesc);
+        ApplicationDef appDef = definitionService.getDefinition(appDesc);
+
+        Component template = serverService.writeTemplate(context , appDef, null, null);
+
+        String init = (String)template.getAttributes().getValue("auraInit");
+        @SuppressWarnings("unchecked")
+        Map<String,Object> initMap = (Map<String, Object>) new JsonReader().read(init);
+
+        assertEquals("Token should be sent if appcache is not enabled", "aura", initMap.get("token"));
     }
 
     @Test
     public void testWriteTemplateHasNoCsrfTokenIfAppcacheEnabled() throws Exception {
-		DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
-				String.format(baseApplicationTag, "useAppCache='true' render='client'", ""));
-		AuraContext context = contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
-		context.setApplicationDescriptor(appDesc);
-		ApplicationDef appDef = definitionService.getDefinition(appDesc);
-		
-		Component template = serverService.writeTemplate(context , appDef, null, null);
-		
-		String init = (String)template.getAttributes().getValue("auraInit");
-		@SuppressWarnings("unchecked")
-		Map<String,Object> initMap = (Map<String, Object>) new JsonReader().read(init);
-		
-		assertEquals("Token should not be sent if appcache is enabled", false, initMap.containsKey("token"));
+        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseApplicationTag, "useAppCache='true' render='client'", ""));
+        AuraContext context = contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+        context.setApplicationDescriptor(appDesc);
+        ApplicationDef appDef = definitionService.getDefinition(appDesc);
+
+        Component template = serverService.writeTemplate(context , appDef, null, null);
+
+        String init = (String)template.getAttributes().getValue("auraInit");
+        @SuppressWarnings("unchecked")
+        Map<String,Object> initMap = (Map<String, Object>) new JsonReader().read(init);
+
+        assertEquals("Token should not be sent if appcache is enabled", false, initMap.containsKey("token"));
+    }
+
+    @Test
+    public void testWriteTemplateHasPrefetchTagsForClientLibraries() throws Exception {
+        // Arrange
+        String appMarkup = "<aura:application><aura:clientLibrary name='CkEditor' type='JS' /></aura:application>";
+        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, appMarkup);
+
+        AuraContext context = contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+        context.setApplicationDescriptor(appDesc);
+        definitionService.updateLoaded(appDesc);
+
+        // Act
+        ApplicationDef appDef = definitionService.getDefinition(appDesc);
+        Component template = serverService.writeTemplate(context , appDef, null, null);
+
+        // Assert
+        String actual = template.getAttributes().getValue("prefetchTags").toString();
+        assertThat(actual, CoreMatchers.containsString("ckeditor.js"));
     }
 }

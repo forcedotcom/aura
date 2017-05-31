@@ -37,7 +37,9 @@
 
     <aura:attribute name="autoInitialize"           type="String" default="true" description="Denotes whether Aura should auto-initialize (true) or not (false)."/>
     <aura:attribute name="autoInitializeSync"       type="String" default="false" />
-    <aura:attribute name="bootstrapInlineJs"           type="String" description="Allow inlineJS execution within the context of bootsttrap script"/>
+    <aura:attribute name="bootstrapInlineJs"        type="String" description="Allow inlineJS execution within the context of bootsttrap script"/>
+
+    <aura:attribute name="prefetchTags"             type="String" description="Prefetch resources tags"/>
 
     <aura:attribute name="doctype"                  type="String" access="GLOBAL" default="&lt;!DOCTYPE html&gt;"         description="The DOCTYPE declaration for the template."/>
     <aura:attribute name="loadingText"              type="String" access="GLOBAL" default="Loading"                       description="Loading text"/>
@@ -69,6 +71,7 @@
 <head>
     <title>{!v.title}</title>
     {!v.extraMetaTags}
+    {!v.prefetchTags}
 
     <!-- ====== Styles ====== -->
     {!v.auraResetTags}
@@ -122,15 +125,15 @@
     function initLocker () {
         if (auraConfig["safeEvalWorker"] &amp;&amp; !window['$$safe-eval$$'] &amp;&amp; !/^(.*?:)?\/\//.test(auraConfig["host"])) {
             initSafeEvalWorker = true;
-            
+
             // Check if strict-csp is being enforced by the browser
             var isEvalAllowed = true;
-            try { 
+            try {
                 eval("(function(){})();");
             }catch (e) {
                 isEvalAllowed = false;
             }
-            
+
             var isInlineAllowed;
             if (isEvalAllowed){
                 var inlineAllowedProp = "$unsafeInlineAllowed$";
@@ -143,7 +146,7 @@
                 isInlineAllowed = window[inlineAllowedProp] || false;
                 window[inlineAllowedProp] = undefined;
             }
-            
+
             if(isEvalAllowed &amp;&amp; isInlineAllowed){
                 // No need for the worker as main frame has no restriction
                 initSafeEvalWorker = false;
@@ -152,30 +155,30 @@
 
         if (initSafeEvalWorker) {
             var safeEvalWorkerLoaded = {};
-                        
+
             function rendezvousWorkersThenInitFramework() {
                 var id = this;
-                
+
                 safeEvalWorkerLoaded[id] = true;
-                
+
                 if (safeEvalWorkerLoaded.System &amp;&amp; safeEvalWorkerLoaded.Custom) {
                     initFramework();
                 }
             }
-            
+
             function createWorker(id) {
                 var workerId = "safeEvalWorker" + id;
                 var props = {
                     src: auraConfig.safeEvalWorker + "?id=" + id,
                     id: workerId, width: "0", height: "0", tabIndex: "-1", "aura-hidden": "true", title:"scripts" + id
                 };
-    
+
                 var el = document.getElementById(workerId);
                 if (!el) {
                     if (!auraConfig["safeEvalWorker"]) {
                         throw new Error("Aura(): Missing 'safeEvalWorker' configuration.");
                     }
-                    
+
                     el = document.createElement("iframe");
                     el.style.display = "none";
                     for (var i in props) { el.setAttribute(i, props[i]); }
@@ -185,7 +188,7 @@
                     el.addEventListener("error", function () { throw new Error("Aura(): Failed to load locker worker.");});
                 }
             }
-            
+
             createWorker("System");
             createWorker("Custom");
         } else {
@@ -199,7 +202,7 @@
     }
 
     function initFramework () {
-        window.Aura = window.Aura || {}; 
+        window.Aura = window.Aura || {};
         window.Aura.beforeFrameworkInit = Aura.beforeFrameworkInit || [];
         window.Aura.beforeFrameworkInit.push(auraPreInitBlock);
         window.Aura.inlineJsReady = time();

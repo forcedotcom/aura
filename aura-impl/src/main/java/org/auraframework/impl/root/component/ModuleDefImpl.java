@@ -142,7 +142,6 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
                     if (moduleExists) {
                         // aliased module exists so we reference aliased descriptor
                         moduleDescriptor = aliasedModuleDescriptor;
-                        moduleAliases.put(dep, namespaceAlias + "-" + name);
                     }
                 }
 
@@ -157,26 +156,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
                 }
             }
         }
-        processDependencyAliases(moduleAliases);
         return results;
-    }
-
-    /**
-     * replaces references in compiled code for aliased modules
-     *
-     * @param moduleAliases map of aliased modules
-     */
-    private void processDependencyAliases(Map<String, String> moduleAliases) {
-        if (!moduleAliases.isEmpty()) {
-            Map<CodeType, String> newCodesMap = Maps.newHashMap();
-            this.codes.forEach( (type, code) -> {
-                String[] originals = moduleAliases.keySet().toArray(new String[0]);
-                String[] replaces = moduleAliases.values().toArray(new String[0]);
-                String newCode = StringUtils.replaceEach(code, originals, replaces);
-                newCodesMap.put(type, newCode);
-            });
-            this.codes = newCodesMap;
-        }
     }
 
     @Override

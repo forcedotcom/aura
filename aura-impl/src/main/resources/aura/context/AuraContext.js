@@ -62,6 +62,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.accessStack=[];
     this.tokens={};
     this.isModulesEnabled = !!config["m"];
+    this.moduleNamespaceAliases = config["mna"] || {};
 
     var that = this;
 

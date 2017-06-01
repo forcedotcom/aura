@@ -682,15 +682,42 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
         factory();
     }
 
+    var namespaceAliases = $A.getContext().moduleNamespaceAliases;
+
     var deps = entry.dependencies.map(function (name) {
         if (name === 'exports') {
             exportns = {};
             return exportns;
         }
 
-        // processing library dependency
-        var desc = name.indexOf(":") !== -1 ? "markup://" + name : name;
-        var depEntry = this.moduleDefRegistry[desc];
+        var desc;
+        var depEntry;
+        if (name.indexOf(":") !== -1) {
+            // aura library dependency
+            desc = "markup://" + name;
+        } else {
+            // module dependency
+            desc = name;
+            // process aliased ns
+            var names = name.split('-');
+            var ns = names.shift();
+            var aliased = namespaceAliases[ns];
+            if (aliased) {
+                // module name with aliased namespace
+                var aliasedDesc = aliased + "-" + names.join("-");
+                var aliasedDep = this.moduleDefRegistry[aliasedDesc];
+                if (aliasedDep) {
+                    // set references to aliased module if it exists
+                    depEntry = aliasedDep;
+                    desc = aliasedDesc;
+                }
+            }
+        }
+
+        if (!depEntry) {
+            depEntry = this.moduleDefRegistry[desc];
+        }
+
         if (depEntry && depEntry.dependencies) {
             return this.moduleDefRegistry[desc].ns;
         }

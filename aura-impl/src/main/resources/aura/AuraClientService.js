@@ -567,12 +567,76 @@ AuraClientService.prototype.throwExceptionEvent = function(resp) {
 
         evt.fire();
     } else {
-        try {
-            $A.util.json.decodeString(resp["defaultHandler"])(values);
-        } catch (e) {
-            throw new $A.auraError("Error in defaultHandler for event: " + descriptor, e, $A.severity.QUIET);
+        switch (descriptor) {
+            case "markup://aura:noAccess":
+            this.handleNoAccessException(values);
+            break;
+
+            case "markup://aura:clientOutOfSync":
+            this.handleClientOutOfSyncException();
+            break;
+
+            case "markup://aura:invalidSession":
+            this.handleInvalidSessionException(values);
+            break;
+
+            case "markup://aura:systemError":
+            this.handleSystemErrorException();
+            break;
+
+            default:
+            this.handleGenericEventException();
         }
     }
+};
+
+/**
+ * Handler for remote NoAccessException
+ */
+AuraClientService.prototype.handleNoAccessException = function(values) {
+    var redirectURL = values["redirectURL"];
+    if (redirectURL) {
+        window.location = redirectURL;
+    } else {
+        this.hardRefresh();
+    }
+};
+
+/**
+ * Handler for remote ClientOutOfSyncException
+ */
+AuraClientService.prototype.handleClientOutOfSyncException = function() {
+    this.setOutdated();
+};
+
+/**
+ * Handler for remote InvalidSessionException
+ */
+AuraClientService.prototype.handleInvalidSessionException = function(values) {
+    var newToken = values["newToken"];
+    try {
+        this.invalidSession(newToken);
+    } catch (e) {
+        window.location.reload(true);
+    }
+};
+
+/**
+ * Handler for remote SystemErrorException
+ */
+AuraClientService.prototype.handleSystemErrorException = function() {
+    var e = new Error('[SystemErrorException from server] unknown error');
+    e.reported=true;
+    throw e;
+};
+
+/**
+ * Handler for remote GenericEventException
+ */
+ AuraClientService.prototype.handleGenericEventException = function() {
+    var e = new Error('[GenericEventException from server] Unable to process event');
+    e.reported=true;
+    throw e;
 };
 
 AuraClientService.prototype.fireDoneWaiting = function() {
@@ -3845,7 +3909,7 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
  * Saves the new token to storage then refreshes page.
  * @export
  */
-AuraClientService.prototype.invalidSession = function(token) {
+AuraClientService.prototype.invalidSession = function(newToken) {
     var acs = this;
 
     function refresh(disableParallelBootstrapLoad) {
@@ -3857,8 +3921,8 @@ AuraClientService.prototype.invalidSession = function(token) {
 
     // if new token provided then persist to storage and reload. if persisting
     // fails then we must go to the server for bootstrap.js to get a new token.
-    if (token && token["newToken"]) {
-        this._token = token["newToken"];
+    if (newToken) {
+        this._token = newToken;
         this.saveTokenToStorage()
             .then(refresh.bind(null, false), refresh.bind(null, true))
             .then(undefined, function(err) {

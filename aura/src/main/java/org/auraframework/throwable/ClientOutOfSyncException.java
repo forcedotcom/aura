@@ -29,7 +29,7 @@ public class ClientOutOfSyncException extends ClientSideEventException {
 
     /**
      * This is a special case for no client out of sync.
-     * 
+     *
      * @param message the message.
      */
     public ClientOutOfSyncException(String message) {
@@ -43,11 +43,6 @@ public class ClientOutOfSyncException extends ClientSideEventException {
         } catch (QuickFixException x) {
             throw new AuraRuntimeException(x);
         }
-    }
-
-    @Override
-    public JsFunction getDefaultHandler() {
-        return new JsFunction(ImmutableList.<String> of(),"$A.clientService.setOutdated()");
     }
 
     @Override

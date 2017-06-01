@@ -27,7 +27,7 @@ public abstract class ClientSideEventException extends AuraHandledException impl
 
     /**
      * Create an exception with a (visible) cause.
-     * 
+     *
      * @see AuraHandledException#AuraHandledException(Throwable)
      * @param cause the cause (usually logged).
      */
@@ -37,9 +37,9 @@ public abstract class ClientSideEventException extends AuraHandledException impl
 
     /**
      * Create an exception with a message and a (hidden) cause.
-     * 
+     *
      * @see AuraHandledException#AuraHandledException(String, Throwable)
-     * 
+     *
      * @param message the message for the client side.
      * @param cause the cause (usually logged).
      */
@@ -56,8 +56,6 @@ public abstract class ClientSideEventException extends AuraHandledException impl
 
     public abstract Event getEvent();
 
-    public abstract JsFunction getDefaultHandler();
-
     public abstract int getStatusCode();
 
     /**
@@ -71,7 +69,6 @@ public abstract class ClientSideEventException extends AuraHandledException impl
         json.writeMapBegin();
         json.writeMapEntry("exceptionEvent", Boolean.TRUE);
         json.writeMapEntry("event", getEvent());
-        json.writeMapEntry("defaultHandler", getDefaultHandler() == null ? null : getDefaultHandler().toString());
         json.writeMapEnd();
     }
 }

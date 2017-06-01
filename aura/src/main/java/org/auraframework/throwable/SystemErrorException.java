@@ -54,14 +54,6 @@ public class SystemErrorException extends ClientSideEventException {
     }
 
     @Override
-    public JsFunction getDefaultHandler() {
-        return new JsFunction(ImmutableList.<String> of(), 
-                "var e=new Error('[SystemErrorException from server] unknown error');" +
-                "e.reported=true;" +
-                "throw e;");
-    }
-
-    @Override
     public int getStatusCode() {
         return HttpStatus.SC_NOT_FOUND;
     }

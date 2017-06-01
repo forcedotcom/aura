@@ -98,14 +98,6 @@ public class GenericEventException extends ClientSideEventException {
     }
 
     @Override
-    public JsFunction getDefaultHandler() {
-        return new JsFunction(ImmutableList.<String> of(),
-                "var e=new Error('[GenericEventException from server] Unable to process event');" +
-                "e.reported=true;" +
-                "throw e;");
-    }
-
-    @Override
     public int getStatusCode() {
         return HttpStatus.SC_OK;
     }
@@ -120,7 +112,6 @@ public class GenericEventException extends ClientSideEventException {
         json.writeMapEntry("exceptionEvent", Boolean.TRUE);
         json.writeMapEntry("useDefault", this.useDefault);
         json.writeMapEntry("event", getEvent());
-        json.writeMapEntry("defaultHandler", getDefaultHandler() == null ? null : getDefaultHandler().toString());
         json.writeMapEnd();
     }
 }

@@ -503,7 +503,7 @@
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>node-tool</artifactId>
-                <version>0.0.3</version>
+                <version>0.0.4</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -1061,7 +1061,7 @@
                 <plugin>
                     <groupId>org.auraframework</groupId>
                     <artifactId>tools-maven-plugin</artifactId>
-                    <version>0.0.17</version>
+                    <version>0.0.18</version>
                     <configuration>
                         <arguments>
                             <argument>--max-warnings</argument>

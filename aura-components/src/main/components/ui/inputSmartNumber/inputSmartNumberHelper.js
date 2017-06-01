@@ -56,7 +56,6 @@
           , lib              = this.inputNumberLibrary.number
           , formatter        = cmp.get('v.format')
           , number           = cmp.get('v.inputValue');
-
         number = lib.isNumber(number) ? number : lib.unFormatNumber(number, formatter);
 
         return number <= MAX_SAFE_INTEGER && number >= MIN_SAFE_INTEGER;
@@ -101,7 +100,6 @@
         var lib = this.inputNumberLibrary.number;
         var formatter = cmp.get('v.format');
         var value = cmp.get('v.value');
-
         if ($A.util.isUndefinedOrNull(value)) {
             cmp.set('v.inputValue','');
             this.updateLastInputValue(cmp);
@@ -114,7 +112,11 @@
                 cmp.set('v.value',lib.unFormatNumber(value,formatter));
                 return;
             }
-
+            //Framework allows attribute of type Decimal to set to String number
+            if (typeof value === "string" && !$A.util.isEmpty(value)){
+                cmp.set("v.value", Number(value));
+            }
+            
             this.formatInputValue(cmp);
             this.updateLastInputValue(cmp);
         } else {

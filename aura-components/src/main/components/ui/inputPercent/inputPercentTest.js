@@ -154,7 +154,7 @@
         test: [function(component) {
             component.set('v.value', '56789');
         }, function(component) {
-            this.assertCmpElemValues(component, '56789', '5,678,900%');
+            this.assertCmpElemValues(component, 56789, '5,678,900%');
         }]
     },
 

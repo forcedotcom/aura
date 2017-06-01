@@ -309,7 +309,7 @@
         test: [function(component) {
             component.set('v.value', '56789');
         }, function(component) {
-            this.assertCmpElemValues(component, '56789', '56,789');
+            this.assertCmpElemValues(component, 56789, '56,789');
         }]
     },
 

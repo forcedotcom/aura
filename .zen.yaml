@@ -25,7 +25,7 @@ itest:
   modules:
     aura:
       optional_history_file: null
-      properties_name: org.auraframework
+      properties_name: aura.version
   ftest_labels: [~ignore,aura.sanity,aura.precheckin,one.precheckin,precheckin,precheckin.phantomjs]
   ab_enabled: true
 

@@ -41,27 +41,6 @@ Test.Tools.Aura.Stubs.Aura=new function(){
         },{callback:callback||null,params:params||{},returnValue:returnValue||{},state:state||{},callbackScope:{}});
     };
 
-    this.GetController=function(target){
-        if(target){
-            target.runAfter=Stubs.GetMethod("action",undefined);
-        }
-        return target;
-    };
-
-    /**
-     * Get an object that acts similar to an Aura event object.
-     *
-     * @param {Object} [params] Params are the set of values which would be accessed via setParams() and getParams()
-     */
-    this.GetEvent=function(params){
-        return Stubs.GetObject({
-            fire:{},
-            getParam:function(name){return this.params&&this.params[name];},
-            getParams:function(){return this.params;},
-            setParams:function(params){this.params=params;return this;}
-        },{params:params||{}});
-    };
-
     /**
      * Get an object that represents an Aura Object.
      * Allows you to specify additional data about the object via the constructor.
@@ -120,6 +99,8 @@ Test.Tools.Aura.Stubs.Aura=new function(){
         return stub;
     };
 
+    this.GetComponentConfig=function(){/*stub*/};
+
     this.GetComponentDef = function(descriptor, attributes, instancesOf, propertyBag) {
         var stubbedDescriptor=Stubs.GetObject({getQualifiedName:function(){return descriptor;}});
         var stubbedAttributeDefs=Stubs.GetList(attributes&&Object.keys(attributes)||[], {each:function(value){return this.Source_Value;}});
@@ -140,4 +121,26 @@ Test.Tools.Aura.Stubs.Aura=new function(){
 //            getAccessStackHierarchy: function() {}
         });
     };
+
+    this.GetController=function(target){
+        if(target){
+            target.runAfter=Stubs.GetMethod("action",undefined);
+        }
+        return target;
+    };
+
+    /**
+     * Get an object that acts similar to an Aura event object.
+     *
+     * @param {Object} [params] Params are the set of values which would be accessed via setParams() and getParams()
+     */
+    this.GetEvent=function(params){
+        return Stubs.GetObject({
+            fire:{},
+            getParam:function(name){return this.params&&this.params[name];},
+            getParams:function(){return this.params;},
+            setParams:function(params){this.params=params;return this;}
+        },{params:params||{}});
+    };
+
 }

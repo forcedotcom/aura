@@ -219,7 +219,7 @@ public interface ServletUtilAdapter extends AuraAdapter {
     /**
      * Set cache timeout for a resource in seconds.
      */
-    void setCacheTimeout(HttpServletResponse response, long expiration);
+    void setCacheTimeout(HttpServletResponse response, long expiration, boolean immutable);
 
     /**
      * are we in production mode?

@@ -91,7 +91,7 @@ public class Bootstrap extends AuraResourceImpl {
             cacheExpiration = appDef.getBootstrapPublicCacheExpiration();
         }
         if (cacheExpiration != null && cacheExpiration > 0) {
-            servletUtilAdapter.setCacheTimeout(response, cacheExpiration.longValue() * 1000);
+            servletUtilAdapter.setCacheTimeout(response, cacheExpiration.longValue() * 1000, false);
         } else {
             servletUtilAdapter.setNoCache(response);
         }

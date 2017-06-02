@@ -19,10 +19,14 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.doReturn;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,6 +49,7 @@ import org.auraframework.service.RenderingService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -276,5 +281,34 @@ public class ManifestTest extends AuraImplTestCase {
             assertTrue("Missing expected fallback scripts: " + content, index < lines.length);
             assertThat("Failed to find expected fallback script", lines[index], containsString(expectedScripts[i]));
         }
+    }
+
+    @Test
+    public void testManifestIncludesClientLibraries() throws Exception {
+        // Arrange
+        if (contextService.isEstablished()) {
+            contextService.endContext();
+        }
+        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor("appCache:testApp", ApplicationDef.class);
+        AuraContext context = contextService.startContext(AuraContext.Mode.PROD, AuraContext.Format.MANIFEST,
+                AuraContext.Authentication.AUTHENTICATED, appDesc);
+        context.setApplicationDescriptor(appDesc);
+
+        MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        MockHttpServletResponse mockResponse = new MockHttpServletResponse();
+
+        ServletUtilAdapter spyServletUtilAdapter = Mockito.spy(this.servletUtilAdapter);
+        String expected = "clientLibraryUrl";
+        doReturn(Arrays.asList(expected)).when(spyServletUtilAdapter).getJsClientLibraryUrls(any(AuraContext.class));
+
+        Manifest manifest = getManifest();
+        manifest.setServletUtilAdapter(spyServletUtilAdapter);
+
+        // Act
+        manifest.write(mockRequest, mockResponse, context);
+        String content = mockResponse.getContentAsString();
+
+        // Assert
+        assertThat("Failed to find expected client library in manifest file", content, containsString(expected));
     }
 }

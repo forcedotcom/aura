@@ -412,7 +412,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     @Override
-    public List <String> getJsClientLibraryUrls (AuraContext context) throws QuickFixException {
+    public List <String> getJsClientLibraryUrls(AuraContext context) throws QuickFixException {
         return getClientLibraryUrls(context, ClientLibraryDef.Type.JS);
     }
 
@@ -421,7 +421,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     public void writeScriptUrls(AuraContext context, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException {
             writeScriptUrls(context, null, componentAttributes, sb);
     }
-    
+
     @Override
     public void writeScriptUrls(AuraContext context, ComponentDef templateDef, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException {
         templateUtil.writeHtmlScripts(context, this.getJsClientLibraryUrls(context), Script.LAZY, sb);
@@ -655,7 +655,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      */
     @Override
     public void setLongCache(HttpServletResponse response) {
-        this.setCacheTimeout(response, LONG_EXPIRE);
+        this.setCacheTimeout(response, LONG_EXPIRE, true);
     }
 
     /**
@@ -668,7 +668,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      */
     @Override
     public void setShortCache(HttpServletResponse response) {
-        this.setCacheTimeout(response, SHORT_EXPIRE);
+        this.setCacheTimeout(response, SHORT_EXPIRE, false);
     }
 
     /**
@@ -677,14 +677,20 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      * This sets several headers to try to ensure that the page will be cached for the given length of time. Of note is
      * the last-modified header, which is set to a day ago so that browsers consider it to be safe.
      *
-     * @param response the HTTP response to which we will add headers.
-     * @param expiration timeout value in milliseconds.
+     * @param response - the HTTP response to which we will add headers.
+     * @param expiration - timeout value in milliseconds.
+     * @param immutable - if true, includes immutable header
      */
     @Override
-    public void setCacheTimeout(HttpServletResponse response, long expiration) {
-        long now = System.currentTimeMillis();
+    public void setCacheTimeout(HttpServletResponse response, long expiration, boolean immutable) {
         response.setHeader(HttpHeaders.VARY, "Accept-Encoding");
-        response.setHeader(HttpHeaders.CACHE_CONTROL, String.format("max-age=%s, public", expiration / 1000));
+        String cacheHeader = String.format("max-age=%s, public", expiration / 1000);
+        if (immutable) {
+            cacheHeader += ", immutable";
+        }
+        response.setHeader(HttpHeaders.CACHE_CONTROL, cacheHeader.toString());
+
+        long now = System.currentTimeMillis();
         response.setDateHeader(HttpHeaders.EXPIRES, now + expiration);
         response.setDateHeader(HttpHeaders.LAST_MODIFIED, now - SHORT_EXPIRE);
     }

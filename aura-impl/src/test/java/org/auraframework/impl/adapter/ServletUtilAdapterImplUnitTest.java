@@ -18,6 +18,7 @@ package org.auraframework.impl.adapter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.EmptyStackException;
 import java.util.List;
@@ -45,6 +46,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -635,96 +637,68 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
 
     @Test
     public void testSetLongCache() throws Exception {
-        ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        long now = System.currentTimeMillis();
-        long timeoutmSecs = 45*24L*60*60*1000;
+        ServletUtilAdapterImpl servletUtilAdapter = new ServletUtilAdapterImpl();
+        MockHttpServletResponse response = new MockHttpServletResponse();
 
-        sua.setCacheTimeout(response, timeoutmSecs);
+        servletUtilAdapter.setLongCache(response);
 
-        Mockito.verify(response, Mockito.times(1)).setHeader(HttpHeaders.VARY, "Accept-Encoding");
-        Mockito.verify(response, Mockito.times(1)).setHeader(HttpHeaders.CACHE_CONTROL, "max-age=3888000, public");
-
-        checkCacheDateHeaders(response, now, timeoutmSecs);
-
-        Mockito.verifyNoMoreInteractions(response);
+        String expectedVary = Arrays.asList("Accept-Encoding").toString();
+        assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
+        String expectedCacheControl = Arrays.asList("max-age=3888000", "public", "immutable").toString();
+        assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
     }
 
     @Test
     public void testSetShortCache() throws Exception {
-        ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        long now = System.currentTimeMillis();
-        long timeoutmSecs = 24L*60*60*1000;
+        ServletUtilAdapterImpl servletUtilAdapter = new ServletUtilAdapterImpl();
+        MockHttpServletResponse response = new MockHttpServletResponse();
 
-        sua.setCacheTimeout(response, timeoutmSecs);
+        servletUtilAdapter.setShortCache(response);
 
-        Mockito.verify(response, Mockito.times(1)).setHeader(HttpHeaders.VARY, "Accept-Encoding");
-        Mockito.verify(response, Mockito.times(1)).setHeader(HttpHeaders.CACHE_CONTROL, "max-age=86400, public");
-
-        checkCacheDateHeaders(response, now, timeoutmSecs);
-
-        Mockito.verifyNoMoreInteractions(response);
+        String expectedVary = Arrays.asList("Accept-Encoding").toString();
+        assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
+        String expectedCacheControl = Arrays.asList("max-age=86400", "public").toString();
+        assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
     }
 
     @Test
     public void testSetCacheTimeout() throws Exception {
-        ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        ServletUtilAdapterImpl servletUtilAdapter = new ServletUtilAdapterImpl();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        long expiration = 100000;
+
+        // Act
+        servletUtilAdapter.setCacheTimeout(response, expiration, true);
+
+        // Assert
+        String expectedVary = Arrays.asList("Accept-Encoding").toString();
+        assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
+        String expectedCacheControl = Arrays.asList("max-age=100", "public", "immutable").toString();
+        assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
+
         long now = System.currentTimeMillis();
-        long timeoutmSecs = 100000;
+        String expires = response.getHeader(HttpHeaders.EXPIRES);
+        assertTrue("Expires should be at least the expiration time", Long.parseLong(expires) >= now + expiration);
 
-        sua.setCacheTimeout(response, timeoutmSecs);
-
-        Mockito.verify(response, Mockito.times(1)).setHeader(HttpHeaders.VARY, "Accept-Encoding");
-        Mockito.verify(response, Mockito.times(1)).setHeader(HttpHeaders.CACHE_CONTROL, "max-age=100, public");
-
-        checkCacheDateHeaders(response, now, timeoutmSecs);
-
-        Mockito.verifyNoMoreInteractions(response);
+        String lastModified = response.getHeader(HttpHeaders.LAST_MODIFIED);
+        assertTrue("LastModified should be in the past", Long.parseLong(lastModified) < now);
     }
 
     @Test
     public void testSetCacheTimeoutVeryLong() throws Exception {
-        ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        long now = System.currentTimeMillis();
-        long timeoutmSecs = 10000000000L;
+        // Arrange
+        ServletUtilAdapterImpl servletUtilAdapterImp = new ServletUtilAdapterImpl();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        long expiration = 10000000000L;
 
-        sua.setCacheTimeout(response, timeoutmSecs);
+        // Act
+        servletUtilAdapterImp.setCacheTimeout(response, expiration, true);
 
-        Mockito.verify(response, Mockito.times(1)).setHeader(HttpHeaders.VARY, "Accept-Encoding");
-        Mockito.verify(response, Mockito.times(1)).setHeader(HttpHeaders.CACHE_CONTROL, "max-age=10000000, public");
-
-        checkCacheDateHeaders(response, now, timeoutmSecs);
-
-        Mockito.verifyNoMoreInteractions(response);
-    }
-
-    /**
-     * check to make sure that the two date headers for caching are set correctly.
-     */
-    private void checkCacheDateHeaders(HttpServletResponse response, long now, long timeoutmSecs) {
-        ArgumentCaptor<String> nameCaptors = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Long> dateCaptors = ArgumentCaptor.forClass(Long.class);
-
-        Mockito.verify(response, Mockito.times(2)).setDateHeader(nameCaptors.capture(), dateCaptors.capture());
-
-        List<String> names = nameCaptors.getAllValues();
-        List<Long> dates = dateCaptors.getAllValues();
-
-        // allow arbitrary ordering.
-        int expires = 0;
-        int lastModified = 1;
-        if (HttpHeaders.EXPIRES.equals(names.get(1))) {
-            expires = 1;
-            lastModified = 0;
-        }
-        assertEquals("Expires header should be 'EXPIRES'", HttpHeaders.EXPIRES, names.get(expires));
-        assertTrue("Expires should be in the future at least the timeout",
-                dates.get(expires).longValue() >= now + timeoutmSecs);
-        assertEquals("Expires header should be 'LAST_MODIFIED'", HttpHeaders.LAST_MODIFIED, names.get(lastModified));
-        assertTrue("LastModified should be in the past", dates.get(lastModified).longValue() < now);
+        // Assert
+        String expectedVary = Arrays.asList("Accept-Encoding").toString();
+        assertEquals(expectedVary, response.getHeaders(HttpHeaders.VARY).toString());
+        String expectedCacheControl = Arrays.asList("max-age=10000000", "public", "immutable").toString();
+        assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
     }
 
     /**

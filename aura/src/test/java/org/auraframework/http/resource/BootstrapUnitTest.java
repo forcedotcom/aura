@@ -268,7 +268,7 @@ public class BootstrapUnitTest extends UnitTestCase {
 
         if (shouldCache) {
             Mockito.verify(servletUtilAdapter).setCacheTimeout(Mockito.any(HttpServletResponse.class),
-                    Mockito.eq(expirationSetting.longValue() * 1000));
+                    Mockito.eq(expirationSetting.longValue() * 1000), Mockito.eq(false));
         } else {
             Mockito.verify(servletUtilAdapter).setNoCache(Mockito.any(HttpServletResponse.class));
         }

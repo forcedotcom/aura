@@ -32,15 +32,21 @@ final class ModulesCompilerNode implements ModulesCompiler {
 
     private static final Logger logger = Logger.getLogger(ModulesCompilerNode.class.getName());
 
-    private static final JSFunction compileFunction = new NodeServerPool(NodeTool.installDir(),
-            ModulesCompilerUtil.INVOKE_COMPILE_JS_PATH);
+    private static JSFunction compileFunction = null;
+
+    public synchronized static JSFunction getCompileFunction() {
+        if (compileFunction == null) {
+            compileFunction = new NodeServerPool(NodeTool.installDir(), ModulesCompilerUtil.INVOKE_COMPILE_JS_PATH);
+        }
+        return compileFunction;
+    }
 
     @Override
     public ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception {
         try {
             JSONObject input = ModulesCompilerUtil.generateCompilerInput(entry, sources);
             input.put("pathToCompilerJs", ModulesCompilerUtil.COMPILER_JS_PATH);
-            JSONObject output = compileFunction.invoke(input);
+            JSONObject output = getCompileFunction().invoke(input);
             if (output.has("compilerError")) {
                 String error = output.getString("compilerError");
                 logger.warning("ModulesCompilerNode: error " + entry + ": " + error);

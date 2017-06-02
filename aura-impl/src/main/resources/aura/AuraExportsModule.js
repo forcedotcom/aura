@@ -20,9 +20,10 @@ Aura.ExportsModule = {
         try {
             $A.eventService.newEvent(eventName).setParams(eventParams).fire();
         } finally {
-            context.releaseCurrentAccess();    
+            context.releaseCurrentAccess();
         }
     },
+
     "labels": function (obj) {
         return Object.keys(obj).reduce(function(r, cmpKey) {
             var key = obj[cmpKey];
@@ -30,27 +31,36 @@ Aura.ExportsModule = {
             return r;
         }, {});
     },
-    "fetchGlobalControllerAction": function (type, params) {
-        var normalizeType = type.charAt(0).toUpperCase() + type.slice(1);
-        var controllerName = 'c.aura://' + normalizeType + 'Controller.getComponent';
+
+    /**
+     * Execute a global controller action.
+     * @param {String} endpoint the controller and method to invoke.
+     * @param {Object} params parameters to pass to the controller.
+     * @return {Promise} promise that resolves when the action completes.
+     */
+    "executeGlobalController": function (endpoint, params) {
+        var controllerName = 'c.aura://' + endpoint;
         var action = $A.get(controllerName);
 
         if (!action) {
-            return Promise.reject(new Error('Controller for type: ' + type + ' is not registered'));
+            return Promise.reject(new Error('Controller for endpoint ' + endpoint + ' is not registered'));
         }
         action.setParams(params);
 
         return new Promise(function (resolve, reject) {
             action.setBackground();
-            $A.enqueueAction(action);
             action.setCallback(null, function (response) {
                 if (response.getState() !== 'SUCCESS') {
                     reject(new Error('Error fetching component: ' + JSON.stringify(response.getError())));
+                    return;
                 }
                 resolve(response.getReturnValue());
             });
+
+            $A.run(function() { $A.enqueueAction(action); });
         });
     },
+
     "registerModule": function (module) {
         $A.componentService.initModuleDefs([module]);
         return $A.componentService.evaluateModuleDef(module["descriptor"]);

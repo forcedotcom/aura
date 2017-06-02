@@ -128,7 +128,7 @@ function LockerService() {
                 var mapIsAvailable = typeof Map !== "undefined" && Map.prototype["keys"] !== undefined && Map.prototype["values"] !== undefined
                 && Map.prototype["entries"] !== undefined;
 
-                var proxyIsAvailable = typeof Proxy !== "undefined" && (new Proxy({}, {
+                var proxyIsAvailable = typeof Proxy !== "undefined" && typeof Node !== "undefined" && (new Proxy({}, {
                     getPrototypeOf: function() { return Node.prototype; }
                 })) instanceof Node;
 

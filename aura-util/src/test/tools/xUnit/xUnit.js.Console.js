@@ -1418,10 +1418,10 @@ xUnit.js.Stubs=new function(){
         method.Parameters=methodParameters;
         method.ReturnValue=methodReturnValue;
         return method;
-    };
+    };  
 
-    this.GetObject=function(methods,properties){
-        var object={};
+    this.GetObject=function(methods,properties,type){
+        var object=Object.create?Object.create(type&&type.prototype||type||null):{};
         if(methods){
             for(var x in methods){
                 var parameters=[];
@@ -3097,6 +3097,139 @@ System.EnvironmentStrategy.Dom.Implement(System.EnvironmentStrategy.IEnvironment
 System.EnvironmentStrategy.Dom.Implement(System.Script.Strategy.IStrategySpecification,'System.EnvironmentStrategy.Dom');
 
 System.Environment.Strategies.Add(System.EnvironmentStrategy.Dom); 
+ 
+Function.RegisterNamespace("System.EnvironmentStrategy");
+
+System.EnvironmentStrategy.Node=function(){
+    var _exec=null;
+
+    // IEnvironmentStrategy members
+    this.Execute=function(command,parameters,voidOutput){
+        if(!_exec)_exec=require("child_process").execSync;
+        var result=_exec([command].concat(parameters).join(' '), function(error, stdout, stderr) { 
+            result=stdout||stderr; 
+        });
+        if(!voidOutput)return result+'';
+    };
+
+    this.Exit=function(errorCode){
+        process.reallyExit(errorCode);
+    };
+
+    this.GetNewLine=function(){
+        return "\n";
+    };
+
+    this.GetParameters=function(){
+        var args={
+            named:{},
+            unnamed:[]
+        };
+        var params=process.argv;
+        // First arg is node, second is js file
+        for(var i=2;i<params.length;i++){
+            var param=String.Trim(params[i]+'');
+            if(String.StartsWith(param,'/')&&String.Contains(param,':')){
+                param=String.TrimStart(param,'/').split(':');
+                args.named[param[0].toLowerCase()]=param.slice(1).join(':');
+            }else args.unnamed.push(param);
+        }
+        return args;
+    };
+    
+    this.GetWorkingDirectory=function(){
+        return System.IO.Path.Normalize(process.cwd());
+    };
+
+    this.Write=function(message1,message2,messageN){
+        process.stdout.write(Array.prototype.slice.call(arguments,0).join(''));
+    };
+    
+    this.WriteError=function(message1,message2,messageN){
+        process.stderr.write(Array.prototype.slice.call(arguments,0).join(''));
+    };
+
+    // IStrategySpecification members
+    this.IsSatisfiedBy=function(candidate){
+        return (Object.Global()==Object.Global().global&&typeof(process)!="undefined"&&typeof(require)=="function");
+    };
+};
+
+System.EnvironmentStrategy.Node.Implement(System.EnvironmentStrategy.IEnvironmentStrategy,'System.EnvironmentStrategy.Node');
+System.EnvironmentStrategy.Node.Implement(System.Script.Strategy.IStrategySpecification,'System.EnvironmentStrategy.Node');
+
+System.Environment.Strategies.Add(System.EnvironmentStrategy.Node);
+ 
+ 
+Function.RegisterNamespace("System.EnvironmentStrategy");
+
+System.EnvironmentStrategy.Phantom=function(){
+    var _system=null;
+    var _process=null;
+
+    // IEnvironmentStrategy members
+    this.Execute=function(command,parameters,voidOutput){
+        if(!_process)_process=require("child_process");
+        var result=null;
+        _process.execFile(command, parameters, null, function (err, stdout, stderr){
+          result=stdout||stderr;
+        });
+        if(!voidOutput)return result+'';        
+    };
+
+    this.Exit=function(errorCode){
+        phantom.exit(errorCode);
+    };
+
+    this.GetNewLine=function(){
+        return "\n";
+    };
+
+    this.GetParameters=function(){
+        var args={
+            named:{},
+            unnamed:[]
+        };
+        var params=_system.args;
+        // First arg is js file
+        for(var i=1;i<params.length;i++){
+            var param=String.Trim(params[i]+'');
+            if(String.StartsWith(param,'/')&&String.Contains(param,':')){
+                param=String.TrimStart(param,'/').split(':');
+                args.named[param[0].toLowerCase()]=param.slice(1).join(':');
+            }else args.unnamed.push(param);
+        }
+        return args;
+    };
+    
+    this.GetWorkingDirectory=function(){
+        return System.IO.Path.Normalize(require('fs').workingDirectory);
+    };
+
+    this.Write=function(message1,message2,messageN){
+        _system.stdout.write(Array.prototype.slice.call(arguments,0).join(''));
+    };
+    
+    this.WriteError=function(message1,message2,messageN){
+        _system.stderr.write(Array.prototype.slice.call(arguments,0).join(''));
+    };
+
+    // IStrategySpecification members
+    this.IsSatisfiedBy=function(candidate){
+        if(typeof(phantom)!="undefined"&&typeof(require)=="function"){
+            _system=require("system");
+            System.Script.ScriptLoader.Strategies.Remove(System.Script.ScriptLoadStrategy.Dom);
+            return true;
+        }
+        return false;
+    };
+};
+
+System.EnvironmentStrategy.Phantom.Implement(System.EnvironmentStrategy.IEnvironmentStrategy,'System.EnvironmentStrategy.Phantom');
+System.EnvironmentStrategy.Phantom.Implement(System.Script.Strategy.IStrategySpecification,'System.EnvironmentStrategy.Phantom');
+
+System.Environment.Strategies.Add(System.EnvironmentStrategy.Phantom,0);
+ 
  
 Function.RegisterNamespace("System.EnvironmentStrategy");
 
@@ -5076,138 +5209,6 @@ xUnit.js.Console.EnvironmentStrategy.JsdbStrategy.Implement(System.EnvironmentSt
 xUnit.js.Console.EnvironmentStrategy.JsdbStrategy.Implement(System.Script.Strategy.IStrategySpecification,'xUnit.js.Console.EnvironmentStrategy.JsdbStrategy');
 
 System.Environment.Strategies.Add(xUnit.js.Console.EnvironmentStrategy.JsdbStrategy); 
- 
-Function.RegisterNamespace("System.EnvironmentStrategy");
-
-System.EnvironmentStrategy.Node=function(){
-
-    // IEnvironmentStrategy members
-    this.Execute=function(command,parameters,voidOutput){
-        var result=null;
-        process.exec([command].concat(parameters).join(' '), function(error, stdout, stderr) { 
-            result=stdout||stderr 
-        });
-        if(!voidOutput)return result;        
-    };
-
-    this.Exit=function(errorCode){
-        process.reallyExit(errorCode);
-    };
-
-    this.GetNewLine=function(){
-        return "\n";
-    };
-
-    this.GetParameters=function(){
-        var args={
-            named:{},
-            unnamed:[]
-        };
-        var params=process.argv;
-        // First arg is node, second is js file
-        for(var i=2;i<params.length;i++){
-            var param=String.Trim(params[i]+'');
-            if(String.StartsWith(param,'/')&&String.Contains(param,':')){
-                param=String.TrimStart(param,'/').split(':');
-                args.named[param[0].toLowerCase()]=param.slice(1).join(':');
-            }else args.unnamed.push(param);
-        }
-        return args;
-    };
-    
-    this.GetWorkingDirectory=function(){
-        return System.IO.Path.Normalize(process.cwd());
-    };
-
-    this.Write=function(message1,message2,messageN){
-        process.stdout.write(Array.prototype.slice.call(arguments,0).join(''));
-    };
-    
-    this.WriteError=function(message1,message2,messageN){
-        process.stderr.write(Array.prototype.slice.call(arguments,0).join(''));
-    };
-
-    // IStrategySpecification members
-    this.IsSatisfiedBy=function(candidate){
-        return (Object.Global()==Object.Global().global&&typeof(process)!="undefined"&&typeof(require)=="function");
-    };
-};
-
-System.EnvironmentStrategy.Node.Implement(System.EnvironmentStrategy.IEnvironmentStrategy,'System.EnvironmentStrategy.Node');
-System.EnvironmentStrategy.Node.Implement(System.Script.Strategy.IStrategySpecification,'System.EnvironmentStrategy.Node');
-
-System.Environment.Strategies.Add(System.EnvironmentStrategy.Node);
- 
- 
-Function.RegisterNamespace("System.EnvironmentStrategy");
-
-System.EnvironmentStrategy.Phantom=function(){
-    var system=null;
-    var process=null;
-
-    // IEnvironmentStrategy members
-    this.Execute=function(command,parameters,voidOutput){
-        if(!process)process=require("child_process");
-        var result=null;
-        process.execFile(command, parameters, null, function (err, stdout, stderr){
-          result=stdout||stderr;
-        });
-        if(!voidOutput)return result;        
-    };
-
-    this.Exit=function(errorCode){
-        phantom.exit(errorCode);
-    };
-
-    this.GetNewLine=function(){
-        return "\n";
-    };
-
-    this.GetParameters=function(){
-        var args={
-            named:{},
-            unnamed:[]
-        };
-        var params=system.args;
-        // First arg is js file
-        for(var i=1;i<params.length;i++){
-            var param=String.Trim(params[i]+'');
-            if(String.StartsWith(param,'/')&&String.Contains(param,':')){
-                param=String.TrimStart(param,'/').split(':');
-                args.named[param[0].toLowerCase()]=param.slice(1).join(':');
-            }else args.unnamed.push(param);
-        }
-        return args;
-    };
-    
-    this.GetWorkingDirectory=function(){
-        return System.IO.Path.Normalize(require('fs').workingDirectory);
-    };
-
-    this.Write=function(message1,message2,messageN){
-        system.stdout.write(Array.prototype.slice.call(arguments,0).join(''));
-    };
-    
-    this.WriteError=function(message1,message2,messageN){
-        system.stderr.write(Array.prototype.slice.call(arguments,0).join(''));
-    };
-
-    // IStrategySpecification members
-    this.IsSatisfiedBy=function(candidate){
-        if(typeof(phantom)!="undefined"&&typeof(require)=="function"){
-            system=require("system");
-            System.Script.ScriptLoader.Strategies.Remove(System.Script.ScriptLoadStrategy.Dom);
-            return true;
-        }
-        return false;
-    };
-};
-
-System.EnvironmentStrategy.Phantom.Implement(System.EnvironmentStrategy.IEnvironmentStrategy,'System.EnvironmentStrategy.Phantom');
-System.EnvironmentStrategy.Phantom.Implement(System.Script.Strategy.IStrategySpecification,'System.EnvironmentStrategy.Phantom');
-
-System.Environment.Strategies.Add(System.EnvironmentStrategy.Phantom,0);
- 
  
 Function.RegisterNamespace("xUnit.js.Console.IO.DirectoryStrategy");
 

@@ -116,8 +116,7 @@ Test.Tools.Aura.Stubs.Aura=new function(){
             isValid:{returnValue:true},
             removeEventHandler:{},
             set:set
-        },propertyBag||{});
-        stub.constructor=_stubAura.GetComponent;
+        },propertyBag||{},Object.Global().$A?$A.Component:null); //JBUCH: find a way to get this reference, obfuscated.
         return stub;
     };
 

@@ -468,7 +468,7 @@
                                     <pluginExecutionFilter>
                                         <groupId>org.auraframework</groupId>
                                         <artifactId>tools-maven-plugin</artifactId>
-                                        <versionRange>[0.0.8,)</versionRange>
+                                        <versionRange>[0.0.19,)</versionRange>
                                         <goals>
                                             <goal>eslint-raptor</goal>
                                         </goals>

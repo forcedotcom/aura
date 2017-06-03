@@ -36,6 +36,7 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.TokenDef;
 import org.auraframework.def.TokensDef;
+import org.auraframework.def.module.ModuleDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.Literal;
 import org.auraframework.expression.PropertyReference;
@@ -69,6 +70,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     private final String additionalAppCacheURLs;
     private final String bootstrapPublicCacheExpiration;
     private final List<DefDescriptor<TokensDef>> tokenOverrides;
+    private final List<DefDescriptor<ModuleDef>> moduleServices;
     private FlavorsDef flavorOverrides;
     private final DefDescriptor<FlavorsDef> externalFlavorOverrides;
 
@@ -86,6 +88,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         this.tokenOverrides = AuraUtil.immutableList(builder.tokenOverrides);
         this.flavorOverrides = builder.flavorOverrides;
         this.externalFlavorOverrides = builder.externalFlavorOverrides;
+        this.moduleServices = builder.services;
     }
 
     public static class Builder extends BaseComponentDefImpl.Builder<ApplicationDef>implements ApplicationDefBuilder {
@@ -97,6 +100,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         private List<DefDescriptor<TokensDef>> tokenOverrides;
         private FlavorsDef flavorOverrides;
         private DefDescriptor<FlavorsDef> externalFlavorOverrides;
+        private List <DefDescriptor<ModuleDef>> services;
 
         public Builder() {
             super(ApplicationDef.class);
@@ -109,6 +113,17 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             }
             for (String name : Splitter.on(',').trimResults().omitEmptyStrings().split(tokenOverrides)) {
                 this.tokenOverrides.add(Aura.getDefinitionService().getDefDescriptor(name, TokensDef.class));
+            }
+            return this;
+        }
+
+        @Override
+        public BaseComponentDefBuilder<ApplicationDef> setModuleServices(String services) {
+            if (this.services == null) {
+                this.services = new ArrayList<>();
+            }
+            for (String name : Splitter.on(',').trimResults().omitEmptyStrings().split(services)) {
+                this.services.add(Aura.getDefinitionService().getDefDescriptor(name, ModuleDef.class));
             }
             return this;
         }
@@ -247,6 +262,10 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
         if (externalFlavorOverrides != null) {
             dependencies.add(externalFlavorOverrides);
+        }
+
+        if (moduleServices != null) {
+            dependencies.addAll(moduleServices);
         }
     }
 
@@ -395,5 +414,10 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
                 tokens.put(token.getKey(), (String) token.getValue().getValue());
             }
         }
+    }
+
+    @Override
+    public List<DefDescriptor<ModuleDef>> getModuleServices() throws QuickFixException{
+        return moduleServices;
     }
 }

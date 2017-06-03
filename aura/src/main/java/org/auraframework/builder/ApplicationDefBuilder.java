@@ -42,4 +42,11 @@ public interface ApplicationDefBuilder extends BaseComponentDefBuilder<Applicati
      * @param flavorOverride The {@link FlavorsDef}.
      */
     BaseComponentDefBuilder<ApplicationDef> setFlavorOverrides(FlavorsDef flavorOverrides);
+
+    /**
+     * Specifies module services
+     *
+     * @param services
+     */
+    BaseComponentDefBuilder<ApplicationDef> setModuleServices(String services);
 }

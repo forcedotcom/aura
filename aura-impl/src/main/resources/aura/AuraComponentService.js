@@ -22,6 +22,7 @@
  */
 function AuraComponentService() {
     // Def registries
+    this.moduleEngine           = window["Engine"];
     this.moduleDefRegistry      = {};
     this.moduleRegistry         = {};
     this.componentDefRegistry   = {};
@@ -72,7 +73,7 @@ AuraComponentService.prototype.get = function(globalId) {
 };
 
 AuraComponentService.prototype.initCoreModules = function () {
-    this.addModule("markup://engine", "engine", [], null, window["Engine"]);
+    this.addModule("markup://engine", "engine", [], null, this.moduleEngine);
     this.addModule("markup://aura", "aura", [], null, Aura.ExportsModule);
 };
 

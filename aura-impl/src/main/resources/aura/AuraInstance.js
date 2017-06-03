@@ -588,6 +588,7 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
     if (!$A["hasErrors"]) {
         $A.addTearDownHandler();
         $A.clientService.initializeClientLibraries();
+        $A.clientService.initializeInjectedServices($A.context.moduleServices);
         $A.localizationService.init();
 
         var app = $A.clientService["init"](config, token, $A.util.getElement(container));

@@ -143,6 +143,7 @@ function AuraClientService () {
     this.protocols={"layout":true};
     this.namespaces={internal:{},privileged:{}};
     this.lastSendTime = Date.now();
+    this.moduleServices = {};
 
     // TODO: @dval We should send this from the server, but for LightningOut apps is a non-trivial change,
     // so for the time being I hard-coded the resource path here to ensure we can lazy fetch them.
@@ -2096,6 +2097,24 @@ AuraClientService.prototype.initializeApplication = function() {
             });
         });
     });
+};
+/**
+ * Initializes injected services
+ *
+ * Initializes module services defined in the application
+ * @memberOf AuraClientService
+ * @private
+ */
+AuraClientService.prototype.initializeInjectedServices = function(services) {
+    if (services) {
+        services.forEach(function (serviceDefinition) {
+            var serviceRegistry = $A.clientService.moduleServices;
+            var serviceConstructor = $A.componentService.evaluateModuleDef(serviceDefinition);
+            var service = serviceConstructor($A, $A.componentService.moduleEngine);
+            $A.assert(service.name, 'Unknown service name');
+            serviceRegistry[service.name] = service;
+        });
+    }
 };
 
 /**

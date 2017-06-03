@@ -26,10 +26,12 @@ import java.util.Set;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.module.ModuleDef;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
@@ -41,6 +43,7 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializers.NoneSerializer;
 
 import com.google.common.collect.Lists;
+
 
 /**
  * AuraContext JSON Serializer
@@ -65,16 +68,19 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void serialize(Json json, AuraContext ctx) throws IOException {
 
         json.writeMapBegin();
         json.writeMapEntry("mode", ctx.getMode());
+        boolean isApplication = false;
 
         DefDescriptor<? extends BaseComponentDef> appDesc = ctx.getApplicationDescriptor();
         if (appDesc != null) {
             if (appDesc.getDefType().equals(DefType.APPLICATION)) {
                 json.writeMapEntry("app", String.format("%s:%s", appDesc.getNamespace(), appDesc.getName()));
+                isApplication = true;
             } else {
                 json.writeMapEntry("cmp", String.format("%s:%s", appDesc.getNamespace(), appDesc.getName()));
             }
@@ -226,8 +232,22 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             json.writeMapEntry("m", 1);
         }
 
+        if (isApplication) {
+            try {
+                injectModuleServices(json, (DefDescriptor<ApplicationDef>) appDesc);
+            } catch (QuickFixException e) {}
+        }
+
         json.writeMapEnd();
 
+    }
+
+    private void injectModuleServices (Json json, DefDescriptor<ApplicationDef> appDesc) throws QuickFixException, IOException {
+        ApplicationDef appDef = definitionService.getDefinition(appDesc);
+        List<DefDescriptor<ModuleDef>> services = appDef.getModuleServices();
+        if (services != null && !services.isEmpty()) {
+            json.writeMapEntry("services", services);
+        }
     }
 
     private void addTrackedDefs(DefDescriptor<? extends BaseComponentDef> appDesc, 

@@ -27,6 +27,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.FlavorsDef;
+import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.service.ContextService;
@@ -111,6 +112,11 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             }
         }
 
+        String services = getAttributeValue(ATTRIBUTE_SERVICES);
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(services)) {
+            builder.setModuleServices(services);
+        }
+
         String isAppcacheEnabled = getAttributeValue(ATTRIBUTE_APPCACHE_ENABLED);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(isAppcacheEnabled)) {
             builder.isAppcacheEnabled = Boolean.parseBoolean(isAppcacheEnabled);
@@ -149,6 +155,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
     private static final String ATTRIBUTE_PRELOAD = "preload";
     private static final String ATTRIBUTE_TRACK = "track";
+    private static final String ATTRIBUTE_SERVICES = "services";
     private static final String ATTRIBUTE_LOCATION_CHANGE_EVENT = "locationChangeEvent";
     private static final String ATTRIBUTE_APPCACHE_ENABLED = "useAppcache";
     private static final String ATTRIBUTE_ADDITIONAL_APPCACHE_URLS = "additionalAppCacheURLs";
@@ -163,7 +170,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
     private static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
             ATTRIBUTE_PRELOAD, ATTRIBUTE_TRACK, ATTRIBUTE_LOCATION_CHANGE_EVENT,
-            ATTRIBUTE_TOKEN_OVERRIDES, ATTRIBUTE_FLAVOR_OVERRIDES, ATTRIBUTE_BOOTSTRAP_PUBLIC_CACHE_EXPIRATION)
+            ATTRIBUTE_TOKEN_OVERRIDES, ATTRIBUTE_SERVICES, ATTRIBUTE_FLAVOR_OVERRIDES, ATTRIBUTE_BOOTSTRAP_PUBLIC_CACHE_EXPIRATION)
             .addAll(ALLOWED_ATTRIBUTES)
             .addAll(BaseComponentDefHandler.INTERNAL_ALLOWED_ATTRIBUTES)
             .build();

@@ -53,6 +53,8 @@
 		test : [function(cmp) {
 			cmp.find("grid").resizeColumns(this.WIDTHS.smallerWidths);
 		}, function(cmp) {
+		    this.waitForResize(cmp, 0, this.WIDTHS.initialWidths[0]);
+		}, function(cmp) {
 			var grid = cmp.find("grid");
 			var columns = grid.getElement().querySelectorAll('th');
 			
@@ -105,5 +107,13 @@
 						"Column " + i + " is smaller than the minWidth value: " + this.WIDTHS.smallestWidths[i]);
 			}
 		}]
-	}
+	},
+	
+	waitForResize : function(cmp, columnIndex, initialSize) {
+        $A.test.addWaitForWithFailureMessage(true, function(){
+            var columns = cmp.find('grid').getElement().querySelectorAll('th');
+            return columns[columnIndex].clientWidth !== initialSize;
+        }, 'Column width did not change at columnIndex = ' + columnIndex +
+            ' and initial size was ' + initialSize);
+    }
 })

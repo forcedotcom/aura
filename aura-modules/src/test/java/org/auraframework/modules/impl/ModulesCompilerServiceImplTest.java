@@ -61,7 +61,7 @@ public final class ModulesCompilerServiceImplTest extends AuraImplTestCase {
     @Test
     public void showTimings() throws Exception {
         List<Long> timings = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             long startNanos = System.nanoTime();
             testCompile();
             long elapsedMillis = (System.nanoTime() - startNanos) / 1000000;

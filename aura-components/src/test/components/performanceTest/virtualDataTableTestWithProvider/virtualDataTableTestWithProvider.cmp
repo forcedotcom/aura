@@ -1,6 +1,6 @@
 <!-- tests ui:virtualDataGrid using a data provider -->
 
-<aura:component implements="performance:test">
+<aura:component>
 <div>
    <div class="body">
    <ui:scroller aura:id="scroller"

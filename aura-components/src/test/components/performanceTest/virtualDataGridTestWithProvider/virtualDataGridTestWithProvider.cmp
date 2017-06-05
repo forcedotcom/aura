@@ -1,6 +1,6 @@
 <!-- tests ui:virtualDataGrid using a data provider -->
 
-<aura:component implements="performance:test">
+<aura:component>
    
    <ui:virtualDataGrid aura:id="grid" fixedHeader="true" rowHeaderIndex="0">
       <aura:set attribute="headerColumns">

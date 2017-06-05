@@ -1,4 +1,4 @@
-<aura:component extends="performance:perfTest">
+<aura:component>
     <aura:attribute name="numTabs" type="Integer" default="8" description="the number of tabset tabs initialy on the page before the test starts"/>
     <!--only one of these 3 attributes should be set to true during a given test -->
 	<aura:attribute name="testDynamicTabLoading" type="Boolean" default="false"/>

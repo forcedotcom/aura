@@ -167,7 +167,7 @@ public abstract class XMLParserBase<D extends RootDefinition> {
             if (e instanceof AuraExceptionInfo) {
                 handler.setParseError(e);
             } else {
-                handler.setParseError(new AuraUnhandledException(String.format("%s for the component with the contents of '%s'", e.getLocalizedMessage(), source.getContents()),
+                handler.setParseError(new AuraUnhandledException(e.getLocalizedMessage(),
                     getLocation(xmlReader, source), e));
             }
             return handler;

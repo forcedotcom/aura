@@ -48,7 +48,7 @@ public class DesignDefHandlerTest extends AuraImplTestCase {
                     );
             fail("Expected InvalidDefinitionException to be thrown");
         } catch (Exception t) {
-            assertExceptionMessageContains(t, InvalidDefinitionException.class,
+            assertExceptionMessageEndsWith(t, InvalidDefinitionException.class,
                     "<design:component> may only contain one design:template definition");
         }
     }

@@ -96,50 +96,53 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
     /**
      * Use the javascript processor to generate javascript files in 5 modes. Gold file the five modes and also verify
      * that the file was not created in the 6th mode.
+     * @throws Exception 
      */
     @Test
-    public void testJavascriptGeneration() throws Exception {
+    public void testJavascriptGenerationProduction() throws Exception {
+    	doTestJavascriptGeneration(JavascriptGeneratorMode.PRODUCTION);
+    }
+    
+    @Test
+    public void testJavascriptGenerationDevelopment() throws Exception {
+    	doTestJavascriptGeneration(JavascriptGeneratorMode.DEVELOPMENT);
+    }
+
+    private void doTestJavascriptGeneration(JavascriptGeneratorMode mode) throws Exception {
         File file = getResourceFile("/testdata/javascript/testAllKindsOfDirectiveGenerate.js");
         DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("testDummy", file.getParentFile(),
                 file.getName(), ImmutableList.<DirectiveType<?>> of(DirectiveFactory.getMultiLineMockDirectiveType(),
                         DirectiveFactory.getMockDirective(), DirectiveFactory.getDummyDirectiveType()), EnumSet.of(
-                        JavascriptGeneratorMode.DEVELOPMENT, JavascriptGeneratorMode.AUTOTESTING,
-                        JavascriptGeneratorMode.PRODUCTION, JavascriptGeneratorMode.MOCK1,
-                        JavascriptGeneratorMode.MOCK2));
-        String expectedGenFiles[] = { "testDummy_auto", "testDummy_dev", "testDummy_mock1", "testDummy_mock2",
-                "testDummy_prod" };
+                        mode));
+        String genFileName = "testDummy_" + mode.getSuffix() + ".js";
         File dir = getResourceFile("/testdata/javascript/generated/");
         try {
             jg.parse();
             jg.generate(dir, false);
-            for (String genFileName : expectedGenFiles) {
-                File genFile = new File(dir, genFileName + ".js");
-                if (!genFile.exists()) {
-                    fail("Javascript processor failed to create " + genFile.getAbsolutePath());
-                } else {
-                    StringBuilder fileContents = new StringBuilder();
-                    BufferedReader reader = new BufferedReader(new FileReader(genFile));
-                    try {
-                        String line = reader.readLine();
-                        while (line != null) {
-                            fileContents.append(line);
-                            fileContents.append("\n");
-                            line = reader.readLine();
-                        }
-                    } finally {
-                        reader.close();
+            File genFile = new File(dir, genFileName);
+            if (!genFile.exists()) {
+                fail("Javascript processor failed to create " + genFile.getAbsolutePath());
+            } else {
+                StringBuilder fileContents = new StringBuilder();
+                BufferedReader reader = new BufferedReader(new FileReader(genFile));
+                try {
+                    String line = reader.readLine();
+                    while (line != null) {
+                        fileContents.append(line);
+                        fileContents.append("\n");
+                        line = reader.readLine();
                     }
-                    goldFileText(fileContents.toString(), "/" + genFileName + ".js");
+                } finally {
+                    reader.close();
                 }
+                goldFileText(fileContents.toString(), "/" + genFileName);
             }
         } finally {
             // Regardless of the javascript processor generating the files,
             // clean up the expected files
-            for (String genFileName : expectedGenFiles) {
-                File genFile = new File(dir, genFileName + ".js");
-                if (genFile.exists()) {
-                    genFile.delete();
-                }
+            File genFile = new File(dir, genFileName);
+            if (genFile.exists()) {
+                genFile.delete();
             }
         }
         File unExpectedGenFile = new File(dir, "testDummy_test.js");

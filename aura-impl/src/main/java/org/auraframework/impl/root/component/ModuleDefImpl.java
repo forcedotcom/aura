@@ -116,7 +116,6 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         Set<DefDescriptor<?>> results = Sets.newHashSet();
         DefinitionService definitionService = Aura.getDefinitionService();
         ConfigAdapter configAdapter = Aura.getConfigAdapter();
-        Map<String, String> moduleAliases = Maps.newHashMap();
         for (String dep : dependencies) {
             if (dep.contains(":")) {
                 // specific reference with ":" indicates aura library in module

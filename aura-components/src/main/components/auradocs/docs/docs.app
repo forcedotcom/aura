@@ -25,6 +25,8 @@
 
     <aura:dependency resource="auraStorage:*" />
 
+    <aura:attribute name="waitingCount" type="Integer" access="private" default="0"/>
+
     <aura:handler event="aura:waiting" action="{!c.waiting}"/>
     <aura:handler event="aura:doneWaiting" action="{!c.doneWaiting}"/>
     <aura:handler event="auradocs:locationChange" action="{!c.locationChange}"/>

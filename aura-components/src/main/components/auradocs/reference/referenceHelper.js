@@ -15,13 +15,21 @@
  */
 ({
     showWaiting : function(cmp){
-        $A.util.addClass(cmp.find('navbar').getElement(), "waiting");
+        var count = cmp.get("v.waitingCount") + 1;
+        cmp.set("v.waitingCount", count);
+        if (count === 1) { //waiting is racy so only act the first time
+            $A.util.addClass(cmp.find('navbar').getElement(), "waiting");
+        }
     },
 
     hideWaiting : function(cmp){
-        $A.util.removeClass(cmp.find('navbar').getElement(), "waiting");
+        var count = cmp.get("v.waitingCount") - 1;
+        cmp.set("v.waitingCount", count);
+        if (cmp.get("v.waitingCount") === 0) { //waiting is racy so only act when everyone is done
+            $A.util.removeClass(cmp.find('navbar').getElement(), "waiting");
+        }
     },
-    
+
     showRefreshing : function(cmp){
         $A.util.addClass(cmp.find('navbar').getElement(), "refreshing");
     },

@@ -128,6 +128,9 @@ public class HtmlRenderer implements Renderer {
             inliningService.processScript(scriptBody);
         }
         Appendable out = rc.getCurrent();
+        if (tag.equalsIgnoreCase("script") && inliningService.isSupported()){
+            inliningService.preScriptAppend(out);
+        }
         out.append('<');
         out.append(tag);
 

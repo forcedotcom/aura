@@ -213,7 +213,8 @@ public class AuraContextImpl implements AuraContext {
                 .setRecordStats(true)
                 .setSoftValues(true)
                 .build();
-        this.nonce = String.format("aura-%s", new Random().nextInt(Integer.MAX_VALUE));
+        Random r = new Random();
+        this.nonce = new UUID(r.nextLong(), r.nextLong()).toString();
     }
 
     @Override

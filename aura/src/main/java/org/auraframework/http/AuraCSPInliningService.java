@@ -38,7 +38,8 @@ public class AuraCSPInliningService implements CSPInliningService {
 	static final long serialVersionUID = -5862171003552767370L;
 	
 	static String INLINE = "<script>%s</script>";
-    static String INLINE_NONCE = "<script nonce=\"%s\">%s</script>";
+	static String INLINE_NONCE = "<!--\"'--><script nonce=\"%s\">%s</script>";
+	static String NONCE_INJECTION_PROTECTION = "<!--\"'-->";
 
     public enum InlineScriptMode{
         UNSUPPORTED(""),
@@ -123,6 +124,17 @@ public class AuraCSPInliningService implements CSPInliningService {
     @Override
     public boolean isSupported() {
         return getInlineMode() != UNSUPPORTED;
+    }
+
+    @Override
+    public void preScriptAppend(Appendable out) throws IOException {
+        switch(getInlineMode()){
+            case UNSUPPORTED:
+            case HASH:
+                return;
+            case NONCE:
+                out.append(NONCE_INJECTION_PROTECTION);
+        }
     }
 
     String hashScript(String script) {

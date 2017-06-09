@@ -46,7 +46,6 @@ import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.test.client.UserAgent;
-import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
@@ -313,8 +312,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
             index++;
         }
         assertEquals("Wrong URI path", expectedRedirect, location.substring(index));
-        assertEquals("no-cache, no-store", response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue());
-        assertEquals("no-cache", response.getFirstHeader(HttpHeaders.PRAGMA).getValue());
+        final String cacheControl = response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue();
+        assertTrue(cacheControl.contains("no-cache"));
+        assertTrue(cacheControl.contains("no-store"));
         assertDefaultAntiClickjacking(response, false, false); // Redirects don't have XFO/CSP guarding
     }
 
@@ -445,9 +445,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         HttpResponse response = perform(get);
         assertEquals("Failed to execute request successfully.", HttpStatus.SC_OK, getStatusCode(response));
 
-        assertEquals("Expected response to be marked for no-cache", "no-cache, no-store",
-                response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue());
-        assertEquals("no-cache", response.getFirstHeader(HttpHeaders.PRAGMA).getValue());
+        final String cacheControl = response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue();
+        assertTrue("Expected response to be marked for no-cache", cacheControl.contains("no-cache"));
+        assertTrue("Expected response to be marked for no-store", cacheControl.contains("no-store"));
         assertDefaultAntiClickjacking(response, true, false);
 
         String expiresHdr = response.getFirstHeader(HttpHeaders.EXPIRES).getValue();

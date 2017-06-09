@@ -18,6 +18,8 @@ package org.auraframework.integration.test.http;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -45,7 +47,7 @@ import org.junit.Test;
 public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     @Inject
     private MockConfigAdapter configAdapter;
-    
+
     /**
      * Verify style def ordering for components included as facets. Create a chain of components as facet and verify the
      * order of css(Style Defs)
@@ -292,12 +294,17 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         Header cacheControl[] = httpResponse.getHeaders(HttpHeaders.CACHE_CONTROL);
         assertEquals(HttpStatus.SC_OK, getStatusCode(httpResponse));
         assertTrue(HttpHeaders.CACHE_CONTROL + " header must exists for inline.js", cacheControl.length > 0);
-        assertTrue(HttpHeaders.CACHE_CONTROL + " header should be no-cache, no-store",
-                cacheControl[0].getValue().contains("no-cache, no-store"));
-        Header pragma[] = httpResponse.getHeaders(HttpHeaders.PRAGMA);
-        assertTrue(HttpHeaders.PRAGMA + " header must exists for inline.js", pragma.length > 0);
-        assertTrue(HttpHeaders.PRAGMA + " header should be no-cache",
-                pragma[0].getValue().contains("no-cache"));
+        assertTrue(HttpHeaders.CACHE_CONTROL + " header should include no-cache",
+                cacheControl[0].getValue().contains("no-cache"));
+        assertTrue(HttpHeaders.CACHE_CONTROL + " header should include no-store",
+                cacheControl[0].getValue().contains("no-store"));
+
+        String expiresHdr = httpResponse.getFirstHeader(HttpHeaders.EXPIRES).getValue();
+        Date expires = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH).parse(expiresHdr);
+        Date expected = new Date(System.currentTimeMillis());
+        assertTrue(String.format("Expires header should be in the past. Expected before %s, got %s (%s).", expected,
+                expires, expiresHdr), expires.before(expected));
+        assertNotNull(HttpHeaders.EXPIRES + " header should exist", httpResponse.getFirstHeader(HttpHeaders.EXPIRES));
     }
 
     @Test

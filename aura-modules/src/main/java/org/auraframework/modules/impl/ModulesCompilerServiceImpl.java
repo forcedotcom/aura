@@ -37,7 +37,7 @@ public class ModulesCompilerServiceImpl implements ModulesCompilerService {
         long startNanos = System.nanoTime();
         ModulesCompilerData data = compiler.compile(entry, sources);
         long elapsedMillis = (System.nanoTime() - startNanos) / 1000000;
-        loggingService.info("modules compiled " + entry + " in " + elapsedMillis + " ms");
+        loggingService.info("[node-tool] ModulesCompilerServiceImpl: entry=" + entry + ", elapsedMs=" + elapsedMillis);
         return data;
     }
 }

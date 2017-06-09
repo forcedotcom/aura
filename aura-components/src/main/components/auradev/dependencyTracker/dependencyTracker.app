@@ -63,37 +63,39 @@
                         <th>numberOfDeps</th>
                         <th>depSize</th>
                         <th>depProdSize</th>
-                        <th>error</th>
                     </tr>
                 </thead>
                 <tbody aura:id="table">
                     <aura:iteration items="{!v.dependencies}" var="item">
                         <tr>
                             <td>{!item.defType}</td>
-                            <td><a href="{! '?def=' + item.descriptor + '@' + item.defType}">{#item.descriptor}</a><br/>
-                            <p>used by:</p>
-                            <ul>
-                                <aura:iteration items="{!item.usages}" var="usage">
-                                    <li><a href="{! '?def=' + usage }">{#usage}</a></li>
-                                </aura:iteration>
-                            </ul>
-                            </td>
+                            <td><a href="{! '?def=' + item.descriptor + '@' + item.defType}">{#item.descriptor}</a></td>
                             <td>{!item.fileSize}</td>
                             <td>{!item.prodFileSize}</td>
                             <td>{!item.numberOfDependency}</td>
                             <td>{!item.innerDependencySize}</td>
                             <td>{!item.innerDependencyProdSize}</td>
-                            <td>{!item.error}</td>
                         </tr>
                     </aura:iteration>
                 </tbody>
             </table>
     </section>
     <section>
-        <ul>
-            <aura:iteration items="{!v.namespaces}" var="n">
-                <li>{! n.namespace } : {! n.size }</li>
-            </aura:iteration>
-        </ul>
+        <table width="75%">
+            <thead>
+                <tr>
+                    <th>namespace</th>
+                    <th>totalSize</th>
+                </tr>
+            </thead>
+            <tbody>
+                <aura:iteration items="{!v.namespaces}" var="n">
+                    <tr>
+                        <td>{!n.namespace}</td>
+                        <td>{!n.size}</td>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
     </section>
 </aura:application>

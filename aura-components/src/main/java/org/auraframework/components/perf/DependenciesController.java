@@ -255,7 +255,6 @@ public class DependenciesController implements Controller {
     public Map<String, Object> getDependencyMetrics(@Key("component") String component) {
         DefDescriptor<?> descriptor = null;
         Map<String, Object> dependencies = Maps.newHashMap();
-        String uid;
         String specifiedDefType = null;
 
         // Allows specifying what type you want, since descriptor isn't enough.
@@ -302,13 +301,8 @@ public class DependenciesController implements Controller {
                 return dependencies;
             }
 
-            descriptor = definition.getDescriptor();
-            uid = definitionService.getUid(null, descriptor);
-
-            Map<String, Set<DefDescriptor>> usages = Maps.newHashMap();
-            dependencies.put("dependencies", getDependenciesData(usages, descriptor, uid));
+            dependencies.put("dependencies", getDependenciesData(definition));
             dependencies.put("def", component);
-            dependencies.put("usages", usages);
 
             return dependencies;
 
@@ -318,29 +312,27 @@ public class DependenciesController implements Controller {
         }
     }
 
-    private ArrayList<Map<String, String>> getDependenciesData(Map<String, Set<DefDescriptor>> usages, DefDescriptor descriptor, String uid) {
-        SortedSet<DefDescriptor<?>> sorted = Sets.newTreeSet(definitionService.getDependencies(uid));
+    private ArrayList<Map<String, String>> getDependenciesData(Definition definition) throws DefinitionNotFoundException, QuickFixException {
+        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+        definition.appendDependencies(dependencies);
         ArrayList<Map<String, String>> dependenciesData = Lists.newArrayList();
 
-        for (DefDescriptor<?> dependency : sorted) {
+        for (DefDescriptor<?> dependency : dependencies) {
+            String key = dependency.toString();
+            // ignore itself
+            // ignore aura dependencies
+            if (key.equals(definition.getDescriptor().toString()) ||
+                dependency.getNamespace() == null ||
+                dependency.getNamespace().toLowerCase().equals("aura")) {
+                continue;
+            }
+ 
             DefType type = dependency.getDefType();
             if (type.equals(DefType.APPLICATION) ||
                 type.equals(DefType.COMPONENT) ||
                 type.equals(DefType.LIBRARY) ||
                 type.equals(DefType.MODULE)) {
-                String key = dependency.toString();
-                if (key.equals(descriptor.toString())) {
-                    continue;
-                }
-                Set<DefDescriptor> users;
-                if (usages.containsKey(key)) {
-                    users = usages.get(key);
-                } else {
-                    users = new HashSet<DefDescriptor>();
-                }
-                users.add(descriptor);
-                usages.put(key, users);
-                Map<String, String> returnData = getDependencyDetails(dependency, usages);
+                Map<String, String> returnData = getDependencyDetails(dependency);
                 dependenciesData.add(returnData);
             }
         }
@@ -349,10 +341,9 @@ public class DependenciesController implements Controller {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, String> getDependencyDetails(DefDescriptor dependency, Map<String, Set<DefDescriptor>> usages) {
+    private Map<String, String> getDependencyDetails(DefDescriptor<?> dependency) throws DefinitionNotFoundException, QuickFixException {
         Map<String, String> returnData = Maps.newHashMap();
         DefType type = dependency.getDefType();
-
         try {
             returnData.put("descriptor", dependency.toString());
             returnData.put("defType", type.toString());
@@ -399,12 +390,17 @@ public class DependenciesController implements Controller {
                 int innerDependencySize = 0;
                 int prodInnerDependencySize = 0;
                 int numberOfDeps = 0;
-                SortedSet<DefDescriptor<?>> sorted = Sets.newTreeSet(definitionService.getDependencies(dependencyUid));
-                for (DefDescriptor<?> innerDependency : sorted) {
+                SortedSet<DefDescriptor<?>> dependencies = Sets.newTreeSet(definitionService.getDependencies(dependencyUid));
+                for (DefDescriptor<?> innerDependency : dependencies) {
                     String key = innerDependency.toString();
-                    if (key.equals(dependency.toString())) {
+                    // ignore itself
+                    // ignore aura dependencies
+                    if (key.equals(dependency.toString()) ||
+                        innerDependency.getNamespace() == null ||
+                        innerDependency.getNamespace().equals("aura")) {
                         continue;
                     }
+
                     type = innerDependency.getDefType();
                     boolean outputInnerDependencyMetrics = false;
                     if (type.equals(DefType.COMPONENT)) {
@@ -423,14 +419,6 @@ public class DependenciesController implements Controller {
 
                     if (outputInnerDependencyMetrics) {
                         numberOfDeps++;
-                        Set<DefDescriptor> users;
-                        if (usages.containsKey(key)) {
-                            users = usages.get(key);
-                        } else {
-                            users = new HashSet<DefDescriptor>();
-                        }
-                        users.add(dependency);
-                        usages.put(key, users);
                     }
                 }
                 returnData.put("numberOfDependency", String.valueOf(numberOfDeps));

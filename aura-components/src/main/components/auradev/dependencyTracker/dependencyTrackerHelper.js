@@ -21,12 +21,10 @@
         action.setCallback(this, function () {
             var defs = action.getReturnValue();
             var namespaceMetrics = {};
-            if(defs && defs.dependencies && defs.usages) {
-                var usages = defs.usages;
+            if(defs && defs.dependencies) {
                 var dependencies = defs.dependencies.sort(this.dependencySorter);
                 for (var i = 0; i < dependencies.length; i++) {
                     var dependencyDescriptor = dependencies[i].descriptor;
-                    dependencies[i].usages = usages[dependencyDescriptor];
                     var namespace = (dependencyDescriptor.split("://")[1]).split(/[:.]/)[0];
                     if (!namespaceMetrics[namespace]) {
                         namespaceMetrics[namespace] = +dependencies[i].prodFileSize;
@@ -55,11 +53,11 @@
     },
 
     dependencySorter: function(a, b) {
-        if (a.fileSize && b.fileSize) {
-            return  b.fileSize - a.fileSize;
-        } else if (a.fileSize) {
+        if (a.innerDependencyProdSize && b.innerDependencyProdSize) {
+            return  b.innerDependencyProdSize - a.innerDependencyProdSize;
+        } else if (a.innerDependencyProdSize) {
             return -1;
-        } else if (b.fileSize) {
+        } else if (b.innerDependencyProdSize) {
             return 1;
         }
 

@@ -24,6 +24,7 @@ Test.Aura.AuraClientServiceTest = function() {
             return id === "safeEvalWorkerCustom" ? {} : undefined;
         }
     };
+    var AuraErrorMsg;
 
     var Importer = Mocks.GetMocks(Object.Global(), {
         "$A": $A,
@@ -82,7 +83,10 @@ Test.Aura.AuraClientServiceTest = function() {
             clientService: {
                 hardRefresh: function(){}
             },
-            warning: function() {}
+            warning: function() {},
+            error: function(msg) {
+                AuraErrorMsg = msg;
+            }
         },
         window:{
             location: {
@@ -2133,7 +2137,9 @@ Test.Aura.AuraClientServiceTest = function() {
         var actions = [{
             callAllAboardCallback: function() { return true; },
             isChained: function() { return false; },
-            prepareToSend: function() {}
+            prepareToSend: function() {},
+            markException: function() {},
+            finishAction: function () {}
         }];
 
         function setOverrides(target) {
@@ -2141,7 +2147,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 return false;
             };
             target.buildParams = function() {
-                return "";
+                return "message=something";
             };
             target.buildActionNameList = function () {
                 return "";
@@ -2150,7 +2156,8 @@ Test.Aura.AuraClientServiceTest = function() {
             target.createXHR = function() {
                 return {
                     open: function(){},
-                    send: function(){}
+                    send: function(){},
+                    setRequestHeader: function(){}
                 }
             };
         }
@@ -2195,13 +2202,44 @@ Test.Aura.AuraClientServiceTest = function() {
                 actual = true;
             };
 
+
             mockSetTimeout(function() {
                 mockGlobal(function() {
-                    target.send(auraXHR, actions, "POST", {});
+                    target.send(auraXHR, actions, "POST", {message:"something"});
                 });
             });
 
             Assert.True(actual);
+        }
+        [Fact]
+        function SendLogsErrorWhenParametersCauseJSONSerializationErrors() {
+            var actual = true;
+            var target;
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                setOverrides(target);
+                Object.Global()["$A"].util.json.encode = function () {
+                    throw "invalid json!";
+                };
+                actual = target.send(auraXHR, actions, "POST", {message:"something"});
+            });
+
+            Assert.Equal("failed to generate parameters for action xhr for action: undefined", AuraErrorMsg);
+        }
+        [Fact]
+        function SendReturnsFalseWhenParametersCauseJSONSerializationErrors() {
+            var actual = true;
+            var target;
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                setOverrides(target);
+                Object.Global()["$A"].util.json.encode = function () {
+                    throw "invalid json!";
+                };
+                actual = target.send(auraXHR, actions, "POST", {message:"something"});
+            });
+
+            Assert.False(actual);
         }
     }
 

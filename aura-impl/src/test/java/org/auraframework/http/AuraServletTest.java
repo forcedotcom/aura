@@ -33,6 +33,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.util.test.util.UnitTestCase;
@@ -162,6 +163,29 @@ public class AuraServletTest extends UnitTestCase {
         
         Mockito.verify(servletUtilAdapter).handleServletException(coos, false, auracontext, request, response, false);  
         Mockito.verify(serializationService, Mockito.never()).read(Mockito.any(), Mockito.any());
+    }
+
+    @Test
+    public void testDoPost_WithNoBodyThrowsAuraHandledException() throws Exception {
+        DefDescriptor<ApplicationDef> applicationDescriptor = Mockito.mock(DefDescriptor.class);
+        Mockito.when(applicationDescriptor.getDefType()).thenReturn(DefDescriptor.DefType.APPLICATION);
+        contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, applicationDescriptor);
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setMethod("POST");
+        request.setScheme("http");
+        request.setServerName("server");
+        request.setServerPort(9090);
+        request.setRequestURI("/aura");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
+
+        servlet.setServletUtilAdapter(servletUtilAdapter);
+        servlet.doPost(request, response);
+
+        Mockito.verify(servletUtilAdapter).handleServletException(Matchers.isA(AuraHandledException.class), Matchers.anyBoolean(),
+                Matchers.any(AuraContext.class), Matchers.any(), Matchers.any(), Matchers.anyBoolean());
     }
 
     @Test

@@ -249,6 +249,21 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         new JsonReader().read(response.substring(AuraBaseServlet.CSRF_PROTECT.length()));
     }
 
+    @Test
+    public void testPostEmptyBodyReturnsError() throws Exception {
+        HttpPost post = obtainPostMethod("/aura", null);
+        HttpResponse httpResponse = perform(post);
+        int statusCode = getStatusCode(httpResponse);
+        String response = getResponseBody(httpResponse);
+
+        if (HttpStatus.SC_OK != statusCode) {
+            fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
+                    HttpStatus.SC_OK, response));
+        }
+        assertTrue("response should have contained 'Invalid request, no message' but was: " + response,
+                response.contains("{\n  \"message\":\"Invalid request, no message\","));
+    }
+
     /**
      * This is actually an invalid test.
      *

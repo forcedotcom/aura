@@ -2878,6 +2878,8 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
             action.markException(e);
             action.finishAction(context);
         }
+        $A.error("failed to generate parameters for action xhr for action: " + actionsToSend[0], e);
+        return false;
     }
 
     url = this._host + "/aura?r=" + marker + "&" + this.buildActionNameList(actionsToSend);
@@ -2929,8 +2931,10 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     if (qs && method === "POST") {
         auraXHR.request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=ISO-8859-13');
         auraXHR.request["send"](qs);
-    } else {
+    } else if (method !== "POST") {
         auraXHR.request["send"]();
+    } else {
+        return false;
     }
 
     // start the timer if necessary

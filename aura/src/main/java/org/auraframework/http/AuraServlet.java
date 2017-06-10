@@ -55,6 +55,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Message;
+import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.SystemErrorException;
@@ -414,7 +415,7 @@ public class AuraServlet extends AuraBaseServlet {
             response.setContentType(servletUtilAdapter.getContentType(Format.JSON));
             String msg = messageParam.get(request);
             if (msg == null) {
-                throw new AuraRuntimeException("Invalid request, no message");
+                throw new AuraHandledException("Invalid request, no message");
             }
 
             String fwUID = configAdapter.getAuraFrameworkNonce();

@@ -69,11 +69,13 @@ public class ComponentDefRefArrayImpl implements JsonSerializable, ComponentDefR
         AuraContext context = Aura.getContextService().getCurrentContext();
         int idx = 0;
         for (DefinitionReference cdr : this.drs) {
-            context.getInstanceStack().setAttributeIndex(idx);
-            //components.add(cdr.newInstance(valueProvider));
-            components.add(instanceService.getInstance(cdr, valueProvider));
-            context.getInstanceStack().clearAttributeIndex(idx);
-            idx += 1;
+        	if(cdr != null) {
+	            context.getInstanceStack().setAttributeIndex(idx);
+	            //components.add(cdr.newInstance(valueProvider));
+	            components.add(instanceService.getInstance(cdr, valueProvider));
+	            context.getInstanceStack().clearAttributeIndex(idx);
+	            idx += 1;
+        	}
         }
         return components;
     }

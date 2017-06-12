@@ -196,6 +196,21 @@ Json.prototype._resolveRefs = function(config, cache, parent, property, collecto
     }
 };
 
+Json.prototype.stringifyReplacer = function(key, value) {
+    // We have to do this as JSON.stringify removes the property from
+    // the resulted JSON string if its value is a function
+    if (typeof value === 'function') {
+        return value + '';
+    } 
+
+    // Do not serialize components to the server
+    if($A.util.isComponent(value)) {
+        return null;
+    }
+
+    return value;
+};
+
 /**
  * Encodes an object into a JSON representation.
  *
@@ -209,15 +224,13 @@ Json.prototype.encode = function(obj, replacer, whiteSpace) {
     if (typeof JSON !== "undefined") {
         // Protect ourselves from the evils of libraries like Prototype.js that decorate Array with extra methods such as .toJSON() and do the wrong thing!
         var oldArrayToJSON = Array.prototype.toJSON;
+        var oldComponentToJSON = Component.prototype.toJSON;
         try {
             delete Array.prototype.toJSON;
+            delete Component.prototype.toJSON;
 
             if ($A.util.isUndefinedOrNull(replacer)) {
-                return JSON.stringify(obj, function(key, value) {
-                        // We have to do this as JSON.stringify removes the property from
-                        // the resulted JSON string if its value is a function
-                        return aura.util.json.encodeFunction(value);
-                    }, whiteSpace);
+                return JSON.stringify(obj, Json.prototype.stringifyReplacer, whiteSpace);
             } else {
                 return JSON.stringify(obj, replacer, whiteSpace);
             }
@@ -225,6 +238,9 @@ Json.prototype.encode = function(obj, replacer, whiteSpace) {
             if (oldArrayToJSON) {
                 // assign property back to Array only if it exists so it doesn't add the addition toJSON property.
                 Array.prototype.toJSON = oldArrayToJSON;
+            }
+            if(oldComponentToJSON) {
+                Component.prototype.toJSON = oldComponentToJSON;
             }
         }
     }
@@ -267,18 +283,6 @@ Json.prototype.encode = function(obj, replacer, whiteSpace) {
         default:
             return obj.toString();
     }
-};
-
-/**
- * Encode function to String.
- *
- * @param {Function} value The function to be encoded.
- */
-Json.prototype.encodeFunction = function(value) {
-    if (typeof value === 'function') {
-        return value + '';
-    }
-    return value;
 };
 
 /**

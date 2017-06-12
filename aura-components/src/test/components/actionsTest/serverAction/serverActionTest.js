@@ -553,7 +553,35 @@
 
                 // Wait for the callback to successfully come back
                 $A.test.addWaitFor(expected, function() { return actual; }, function(){});
+            },
+
+            /**
+             * Call getComponent directly.
+             */
+            function(cmp) {
+                var expected = "SUCCESS";
+                var actual = null;
+                var action = $A.get("c.aura://ComponentController.getComponent");
+                action.setParams({
+                    "name" : "markup://aura:if",
+                    "attributes": { 
+                        "isTrue": true,
+                        "body": [cmp] 
+                    }
+                });
+                action.setCallback(this, function(a, state, error) {
+                    var error = a.getError()[0];
+                    if(error) {
+                        $A.test.fail("Receieved an error from the server: " + error.message);
+                    }
+                    actual = a.getState();
+                });
+
+                $A.enqueueAction(action);
+
+                $A.test.addWaitFor(expected, function() { return actual; }, function(){});
             }
+
         ]
     },
 

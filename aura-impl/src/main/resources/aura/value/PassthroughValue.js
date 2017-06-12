@@ -24,7 +24,6 @@ function PassthroughValue(primaryProviders, component) {
     this.component = component;
     this.references={};
     this.handlers={};
-    this.primaryHandlers={};
 }
 
 /**
@@ -52,14 +51,8 @@ PassthroughValue.prototype.addValueHandler = function(config) {
         // If the provider is a reference to another value, then we need to go into that reference, and
         // then get the value we actually want.
         // Think v.items in iteration, we want item.label to become v.items.0.label
-        var reference = provider.getReference(path.slice(1).join('.'));
+        var reference = path.length > 1 ? provider.getReference(path.slice(1).join('.')) : provider;
         if(reference) {
-            var phandlers = this.primaryHandlers[path[0]];
-            if (!phandlers) {
-                phandlers = [];
-                this.primaryHandlers[path[0]] = phandlers;
-            }
-            phandlers.push({"reference":reference, "cmp":config["cmp"], "key":reference.getExpression() });
             reference.addChangeHandler(config["cmp"], reference.getExpression(), config["method"]);
             return;
         }
@@ -255,7 +248,8 @@ PassthroughValue.prototype.index = function () {
 };
 
 /**
- * Removes a handler for the specified type of event. Currently only supports 'change'.
+ * Removes a handler for the specified type of event. Currently only supports
+ * 'change'.
  * @export
  */
 PassthroughValue.prototype.removeValueHandler = function(config) {
@@ -275,35 +269,7 @@ PassthroughValue.prototype.removeValueHandler = function(config) {
         // Think v.items in iteration, we want item.label to become v.items.0.label
         var reference = provider.getReference(path.slice(1).join('.'));
         if(reference) {
-            //
-            // Also see PropertyReferenceValue
-            // Horrendous Hack. We add both the id and the component to the
-            // config so that we don't have to go back and look up the component here.
-            // Turns out that things are sometimes out of order and the component is then
-            // not in the global index, leading to a failure when adding and removing
-            // elements quickly.
-            //
-            var cmp = config["cmp"];
-            if (!cmp) {
-                cmp = $A.getCmp(config["id"]);
-            }
-            reference.removeChangeHandler(cmp, reference.getExpression());
-            //
-            // This block of code is horrendous. We have to clean up our tracking in case we get many
-            // different things added/removed during a run. Not sure that this is a "real" problem, but
-            // we won't know until someone starts running out of memory. Not fun.
-            //
-            var phandlers = this.primaryHandlers[path[0]];
-            if (phandlers) {
-                for (var j = 0; j < phandlers.length; j++) {
-                    var handler = phandlers[j];
-
-                    if (handler["reference"] === reference && handler["cmp"] === cmp
-                            && handler["key"] === reference.getExpression()) {
-                        phandlers.splice(j--, 1);
-                    }
-                }
-            }
+            reference.removeChangeHandler($A.getCmp(config["id"]), reference.getExpression());
             return;
         }
     }
@@ -363,38 +329,24 @@ PassthroughValue.prototype.set = function(key, value, ignoreChanges) {
             return undefined; // If the passthrough value is not set with data, return to avoid errors
         }
 
-        if (target === this.primaryProviders) {
-            // DOH! make sure that we clean up after ourselves.
-            var handlers = this.primaryHandlers[path[0]];
-            delete this.primaryHandlers[path[0]];
-            if (handlers) {
-                for (var i = 0; i < handlers.length; i++) {
-                    var handler = handlers[i];
-
-                    handler["reference"].removeChangeHandler(handler["cmp"], handler["key"]);
-                }
-            }
-        }
-
         var oldValue=target[key];
         target[key]=value;
 
-
         if(!ignoreChanges) {
-            var valueProvider = this.component;
-            while (valueProvider instanceof PassthroughValue) {
-                valueProvider = valueProvider.getComponent();
-            }
+	        var valueProvider = this.component;
+	        while (valueProvider instanceof PassthroughValue) {
+	            valueProvider = valueProvider.getComponent();
+	        }
 
-            valueProvider.fireChangeEvent(fullPath,oldValue,value,fullPath);
-            valueProvider.markDirty(fullPath);
+	        valueProvider.fireChangeEvent(fullPath,oldValue,value,fullPath);
+	        valueProvider.markDirty(fullPath);
 
 
-            // KRIS: HALO:
-            // Do we have any change events for the key?
-            // It's possible both we and the component have references that need
-            // to be fired, so I'm firing both here.
-            this.fireChangeEvent(key,oldValue,value,key);
+	        // KRIS: HALO:
+	        // Do we have any change events for the key?
+	        // It's possible both we and the component have references that need
+	        // to be fired, so I'm firing both here.
+	        this.fireChangeEvent(key,oldValue,value,key);
         }
 
         return value;

@@ -101,6 +101,10 @@ PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method, reb
         method.key=key;
         var config={"event": "change", "value": expression, "method": method, "cmp": cmp};
         this.valueProvider.addValueHandler(config);
+
+        // if(this.valueProvider instanceof PassthroughValue) {
+        //     this.valueProvider.addValueHandler({"event": "change", "value": this.expression, "method": method});
+        // }
     }
 };
 
@@ -123,16 +127,8 @@ PropertyReferenceValue.prototype.removeChangeHandler=function(cmp, key){
         expression = valueProvider.getExpression(expression);
         valueProvider=valueProvider.getComponent();
     }
-    if(this.valueProvider.removeValueHandler&&(valueProvider!==cmp||this.expression!==key)) {
-        //
-        // Also see PassThroughValue
-        // Horrendous Hack. We add both the id and the component to the
-        // config so that we don't have to go back and look up the component here.
-        // Turns out that things are sometimes out of order and the component is then
-        // not in the global index, leading to a failure when adding and removing
-        // elements quickly.
-        //
-        this.valueProvider.removeValueHandler({"event": "change", "value": this.expression, "id":cmp.getGlobalId(), "cmp":cmp, "key":key});
+    if(valueProvider&&valueProvider.removeValueHandler&&(valueProvider!==cmp||this.expression!==key)) {
+        valueProvider.removeValueHandler({"event": "change", "value": this.expression, "id":cmp.getGlobalId(),"key":key});
     }
 };
 

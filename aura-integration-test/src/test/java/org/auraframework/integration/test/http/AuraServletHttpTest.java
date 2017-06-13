@@ -46,6 +46,7 @@ import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.test.client.UserAgent;
+import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
@@ -178,9 +179,12 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
                 actionParams);
         a.run();
         String rawRes = a.getRawResponse();
+        
+        final String key = '"' + Json.ApplicationKey.COMPONENTCLASS.toString() + '"';
+        
+        int firstOccurrence = rawRes.indexOf(key);
+        int lastOccurrence = rawRes.lastIndexOf(key);
 
-        int firstOccurrence = rawRes.indexOf("componentClass");
-        int lastOccurrence = rawRes.lastIndexOf("componentClass");
         assertTrue("Component class should be returned in server response when requesting component",
                 firstOccurrence != -1);
         assertTrue("Server response should only return a single componentClass for a component, but got <" + rawRes

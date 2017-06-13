@@ -275,13 +275,13 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                         String.format("<aura:registerevent name='end' type='%s'/>", eventDesc.getDescriptorName())));
         open(cmpDesc);
         assertEquals("pow", getAuraUITestingUtil().getEval(String.format(
-                "return $A.getEvt('%s').getDef().getAttributeDefs().explode['default'];",
+                "return $A.getEvt('%s').getDef().getAttributeDefs().getDef('explode').getDefault();",
                 eventDesc.getDescriptorName())));
         updateStringSource(eventDesc,
                 "<aura:event type='APPLICATION'><aura:attribute name='explode' type='String' default='kaboom'/></aura:event>");
         open(cmpDesc);
         assertEquals("kaboom", getAuraUITestingUtil().getEval(String.format(
-                "return $A.getEvt('%s').getDef().getAttributeDefs().explode['default'];",
+                "return $A.getEvt('%s').getDef().getAttributeDefs().getDef('explode').getDefault();",
                 eventDesc.getDescriptorName())));
     }
 
@@ -535,7 +535,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 String.format("<aura:registerevent name='end' type='%s'/>", eventDesc.getDescriptorName()));
         open(cmpDesc);
         assertEquals("pow", getAuraUITestingUtil().getEval(String.format(
-                "return $A.getEvt('%s').getDef().getAttributeDefs().explode['default'];",
+                "return $A.getEvt('%s').getDef().getAttributeDefs().getDef('explode').getDefault();",
                 eventDesc.getDescriptorName())));
         updateStringSource(eventDesc,
                 "<aura:event type='APPLICATION'><aura:attribute name='explode' type='String' default='kaboom'/></aura:event>");
@@ -546,9 +546,10 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 getAuraUITestingUtil().waitForDocumentReady();
                 getAuraUITestingUtil().waitForAuraFrameworkReady(null);
                 String eval = String
-                        .format("return ((window.$A && $A.getEvt('%s')) && (window.$A && $A.getEvt('%s')).getDef().getAttributeDefs().explode['default']);",
+                        .format("return ((window.$A && $A.getEvt('%s')) && (window.$A && $A.getEvt('%s')).getDef().getAttributeDefs().getDef('explode').getDefault());",
                                 eventDesc.getDescriptorName(), eventDesc.getDescriptorName());
-                return "kaboom".equals(getAuraUITestingUtil().getEval(eval));
+                final String defaultValue = getAuraUITestingUtil().getEval(eval).toString(); 
+                return "kaboom".equals(defaultValue);
             }
         });
     }

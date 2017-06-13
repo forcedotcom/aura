@@ -55,6 +55,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.json.JsonStreamReader;
@@ -310,7 +311,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 null, null, null, false, false, AuraContext.Access.INTERNAL);
 
         Map<?, ?> json = (Map<?, ?>) new JsonReader().read(toJson(cmpDef));
-        String componentClass = (String) json.get("componentClass");
+        String componentClass = (String) json.get(Json.ApplicationKey.COMPONENTCLASS.toString());
 
         assertNotNull(componentClass);
     }
@@ -1357,7 +1358,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 "model='java://org.auraframework.components.test.java.model.TestJavaModel'", "");
         assertTrue("When a component has a model, the component has server dependencies .",
                 baseComponentDef.hasLocalDependencies());
-        assertEquals(true, this.serializeAndReadAttributeFromDef(baseComponentDef, "hasServerDeps"));
+        assertEquals(true, this.serializeAndReadAttributeFromDef(baseComponentDef, Json.ApplicationKey.HASSERVERDEPENDENCIES.toString()));
     }
 
     /**

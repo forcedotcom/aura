@@ -1,20 +1,9 @@
 {
   "xs":"I",
   "descriptor":"markup://aura:test",
-  "superDef":{
-    "descriptor":"markup://aura:component"
-  },
-  "attributeDefs":[
-    {
-      "name":"body",
-      "type":"aura://Aura.Component[]",
-      "xs":"G"
-    },
-    {
-      "name":"testAttributeDescriptorName",
-      "type":"aura://String",
-      "default":"testValue"
-    }
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["testAttributeDescriptorName","aura://String",null,false,"testValue"]
   ],
-  "componentClass":"function(){$A.componentService.addComponentClass(\"markup://aura:test\",function() {\nvar aura$test = {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\nreturn aura$test;\n});\n}"
+  "cc":"add(function() {\nreturn {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\n});\n"
 }

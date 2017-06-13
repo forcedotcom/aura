@@ -23,36 +23,36 @@
  * @export
  */
 function ActionDef(config) {
-    this.name = config["name"];
-    this.descriptor = config["descriptor"];
-    this.actionType = config["actionType"];
+    this.name = config[Json.ApplicationKey.NAME];
+    this.descriptor = config[Json.ApplicationKey.DESCRIPTOR];
+    this.actionType = config[Json.ApplicationKey.ACTIONTYPE];
     this.meth = null;
     this.paramDefs = {};
     this.background = false;
     this.caboose = false;
 
     if (this.actionType === "SERVER") {
-        this.returnType = config["returnType"]&&config["returnType"]["name"];
+        this.returnType = config[Json.ApplicationKey.RETURNTYPE]&&config[Json.ApplicationKey.RETURNTYPE]["name"]; // TODO: TW: what is this check? returntype is always a string
 
-        var params = config["params"];
+        var params = config[Json.ApplicationKey.PARAMS];
         if (!!params && $A.util.isArray(params)) {
             for ( var i = 0; i < params.length; i++) {
                 this.paramDefs[params[i]["name"]] = params[i];
             }
         }
-        if (config["background"]) {
+        if (config[Json.ApplicationKey.BACKGROUND]) {
             this.background = true;
         }
-        if (config["caboose"]) {
+        if (config[Json.ApplicationKey.CABOOSE]) {
             this.caboose = true;
         }
     }
 
     else if (this.actionType === "CLIENT") {
         try {
-            this.meth = $A.util.json.decodeString(config["code"]);
+            this.meth = $A.util.json.decodeString(config[Json.ApplicationKey.CODE]);
         } catch (e) {
-            throw new $A.auraError("ActionDef ctor decode error: " + config["code"], e, $A.severity.QUIET);
+            throw new $A.auraError("ActionDef ctor decode error: " + config[Json.ApplicationKey.CODE], e, $A.severity.QUIET);
         }
     }
 }

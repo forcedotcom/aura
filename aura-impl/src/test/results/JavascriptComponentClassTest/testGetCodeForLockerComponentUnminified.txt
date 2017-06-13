@@ -1,5 +1,5 @@
-$A.componentService.addComponentClass("markup://test:testComponent",function() {
-var nonInternal$testComponent = {
+add(function() {
+return {
   "meta":{
     "name":"nonInternal$testComponent",
     "extends":"markup://aura:component"
@@ -11,5 +11,4 @@ var nonInternal$testComponent = {
 }
 
 };
-return nonInternal$testComponent;
 });

@@ -1,36 +1,36 @@
 {
   "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController",
-  "actionDefs":[
+  "ac":[
     {
-      "name":"errorInForeground",
+      "n":"errorInForeground",
       "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$errorInForeground",
-      "actionType":"SERVER",
-      "returnType":"java://org.auraframework.impl.java.controller.ParallelActionTestController$Record",
-      "background":false,
-      "caboose":false,
-      "params":[
+      "at":"SERVER",
+      "rt":"java://org.auraframework.impl.java.controller.ParallelActionTestController$Record",
+      "b":false,
+      "ca":false,
+      "pa":[
 
       ]
     },
     {
-      "name":"executeInBackground",
+      "n":"executeInBackground",
       "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInBackground",
-      "actionType":"SERVER",
-      "returnType":"java://void",
-      "background":true,
-      "caboose":false,
-      "params":[
+      "at":"SERVER",
+      "rt":"java://void",
+      "b":true,
+      "ca":false,
+      "pa":[
 
       ]
     },
     {
-      "name":"executeInBackgroundWithReturn",
+      "n":"executeInBackgroundWithReturn",
       "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInBackgroundWithReturn",
-      "actionType":"SERVER",
-      "returnType":"java://org.auraframework.impl.java.controller.ParallelActionTestController$Record",
-      "background":true,
-      "caboose":false,
-      "params":[
+      "at":"SERVER",
+      "rt":"java://org.auraframework.impl.java.controller.ParallelActionTestController$Record",
+      "b":true,
+      "ca":false,
+      "pa":[
         {
           "name":"i",
           "type":"java://int"
@@ -38,24 +38,24 @@
       ]
     },
     {
-      "name":"executeInForeground",
+      "n":"executeInForeground",
       "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground",
-      "actionType":"SERVER",
-      "returnType":"java://void",
-      "background":false,
-      "caboose":false,
-      "params":[
+      "at":"SERVER",
+      "rt":"java://void",
+      "b":false,
+      "ca":false,
+      "pa":[
 
       ]
     },
     {
-      "name":"executeInForegroundWithReturn",
+      "n":"executeInForegroundWithReturn",
       "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForegroundWithReturn",
-      "actionType":"SERVER",
-      "returnType":"java://org.auraframework.impl.java.controller.ParallelActionTestController$Record",
-      "background":false,
-      "caboose":false,
-      "params":[
+      "at":"SERVER",
+      "rt":"java://org.auraframework.impl.java.controller.ParallelActionTestController$Record",
+      "b":false,
+      "ca":false,
+      "pa":[
         {
           "name":"i",
           "type":"java://int"
@@ -63,13 +63,13 @@
       ]
     },
     {
-      "name":"executeInForegroundWithStringReturn",
+      "n":"executeInForegroundWithStringReturn",
       "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForegroundWithStringReturn",
-      "actionType":"SERVER",
-      "returnType":"java://java.lang.String",
-      "background":false,
-      "caboose":false,
-      "params":[
+      "at":"SERVER",
+      "rt":"java://java.lang.String",
+      "b":false,
+      "ca":false,
+      "pa":[
         {
           "name":"s",
           "type":"java://java.lang.String"
@@ -77,24 +77,24 @@
       ]
     },
     {
-      "name":"throwsClientOutOfSyncException",
+      "n":"throwsClientOutOfSyncException",
       "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$throwsClientOutOfSyncException",
-      "actionType":"SERVER",
-      "returnType":"java://void",
-      "background":false,
-      "caboose":false,
-      "params":[
+      "at":"SERVER",
+      "rt":"java://void",
+      "b":false,
+      "ca":false,
+      "pa":[
 
       ]
     },
     {
-      "name":"throwsException",
+      "n":"throwsException",
       "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$throwsException",
-      "actionType":"SERVER",
-      "returnType":"java://void",
-      "background":false,
-      "caboose":false,
-      "params":[
+      "at":"SERVER",
+      "rt":"java://void",
+      "b":false,
+      "ca":false,
+      "pa":[
 
       ]
     }

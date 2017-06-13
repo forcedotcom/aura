@@ -154,6 +154,11 @@ public abstract class MockDefinition<D extends Definition> implements Definition
         @Override
         public void validateReferences() throws InvalidAccessValueException {
         }
+
+        @Override
+        public String getAccessCode() {
+            return "FAKE";
+        }
     }
 
     @Override

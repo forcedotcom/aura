@@ -29,6 +29,7 @@ import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.json.Json.ApplicationKey;
 
 /**
  * The default implementation for a java controller def.
@@ -78,8 +79,8 @@ public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> impleme
     @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
-        json.writeMapEntry("descriptor", getDescriptor());
-        json.writeMapEntry("actionDefs", actionMap.values());
+        json.writeMapEntry(ApplicationKey.DESCRIPTOR, getDescriptor());
+        json.writeMapEntry(ApplicationKey.ACTIONDEFS, actionMap.values());
         json.writeMapEnd();
     }
 

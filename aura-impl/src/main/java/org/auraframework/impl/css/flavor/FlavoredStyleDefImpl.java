@@ -87,11 +87,11 @@ public final class FlavoredStyleDefImpl extends AbstractStyleDef<FlavoredStyleDe
     @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
-        json.writeMapEntry("descriptor", descriptor);
+        json.writeMapEntry(Json.ApplicationKey.DESCRIPTOR, descriptor);
 
         AuraContext context = Aura.getContextService().getCurrentContext();
         if (!context.isPreloading() && !context.isPreloaded(getDescriptor())) {
-            json.writeMapEntry("code", getCode());
+            json.writeMapEntry(Json.ApplicationKey.CODE, getCode());
         }
         json.writeMapEnd();
     }

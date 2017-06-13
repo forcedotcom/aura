@@ -2436,11 +2436,13 @@ Component.prototype.getMethodHandler = function(methodDef){
             "name" : methodDef.getDescriptor().name,
             "arguments": null
         };
-        if(methodDef.attributes) {
+        if(methodDef.attributes && methodDef.attributes.getNames().length > 0) {
             params["arguments"]={};
             var counter=0;
-            for (var attribute in methodDef.attributes){
-                params["arguments"][attribute]=(arguments[counter] === undefined ? methodDef.attributes[attribute]["default"] : arguments[counter]) ;
+            var attributeNames = methodDef.attributes.getNames();
+            for (var a=0;a<attributeNames.length;a++) {
+                var attributeName = attributeNames[a];
+                params["arguments"][attributeName]=(arguments[counter] === undefined ? methodDef.attributes.getDef(attributeName).getDefault() : arguments[counter]) ;
                 counter++;
             }
             for(var i=counter;i<arguments.length;i++){

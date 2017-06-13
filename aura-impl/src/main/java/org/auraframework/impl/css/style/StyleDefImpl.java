@@ -56,17 +56,17 @@ public class StyleDefImpl extends AbstractStyleDef<StyleDef> implements StyleDef
     public void serialize(Json json) throws IOException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         json.writeMapBegin();
-        json.writeMapEntry("descriptor", descriptor);
+        json.writeMapEntry(Json.ApplicationKey.DESCRIPTOR, descriptor);
 
         if (!context.isPreloading() && !context.isPreloaded(getDescriptor())) {
             // Note that if this starts to depend on anything beside the name of
             // the type, StyleDefCSSFormatAdapter needs to know to restructure its cache
             // keys
             String out = getCode();
-            json.writeMapEntry("code", out);
+            json.writeMapEntry(Json.ApplicationKey.CODE, out);
         }
 
-        json.writeMapEntry("className", className);
+        json.writeMapEntry(Json.ApplicationKey.CLASSNAME, className);
         json.writeMapEnd();
     }
 

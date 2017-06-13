@@ -20,31 +20,11 @@
  * @export
  */
 function AttributeDef(config){
-    this.descriptor = new DefDescriptor(config["name"]);
-    this.typeDefDescriptor = config["type"];
-    this.access=config[Json.ApplicationKey.ACCESS];
-    // Kris: Attribute definitions are shared by reference
-    // So the first component will have its access set correctly, the following
-    // components will not. Thus I commented out the delete.
-    //delete config[Json.ApplicationKey.ACCESS];
-    this.defaultValue = config["default"];
-    if(this.defaultValue === undefined){
-        // KRIS: So if you specify any data type as an array (Boolean[], String[]) and then don't specify a defaultValue, it should be array.
-        // Obviously would be nice if we fixed this on the server.
-        // if(this.typeDefDescriptor === "aura://Aura.Component[]" || this.typeDefDescriptor === "aura://Aura.ComponentDefRef[]"){
-        //     this.defaultValue=[];
-        // }
-
-        // KRIS: GORDON is going to fix this by returning the proper default value.
-        // at which point we can remove this whole this.defaultValue === undefined block
-        var nativeType = this.getNativeType();
-        if(nativeType==="object") {
-            this.defaultValue=null;
-        } else if(nativeType==="array") {
-            this.defaultValue=[];
-        }
-    }
-    this.required = config["required"] === true;
+    this.descriptor = new DefDescriptor(config[0]);
+    this.typeDefDescriptor = config[1];
+    this.access = config[2];
+    this.required = config[3] === true;
+    this.defaultValue = config[4];
 }
 
 /**
@@ -64,16 +44,6 @@ AttributeDef.prototype.getDescriptor = function(){
  */
 AttributeDef.prototype.isRequired = function(){
     return this.required === true;
-};
-
-/**
- * Gets the type definition. Returns a TypeDef object.
- *
- * @returns {TypeDef}
- * @private
- */
-AttributeDef.prototype.getTypeDef = function(){
-    return this.typeDef;
 };
 
 /**

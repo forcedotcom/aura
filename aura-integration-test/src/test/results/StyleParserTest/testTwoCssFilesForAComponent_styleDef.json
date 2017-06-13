@@ -1,8 +1,5 @@
 {
-  "s":1,
-  "v":{
-    "descriptor":"css://test.testTwoCSSFiles",
-    "code":".testTestTwoCSSFiles .requiredLegend {color:#000000; font-weight:normal; float:right}",
-    "className":"testTestTwoCSSFiles"
-  }
+  "descriptor":"css://test.testTwoCSSFiles",
+  "co":".testTestTwoCSSFiles .requiredLegend {color:#000000; font-weight:normal; float:right}",
+  "cl":"testTestTwoCSSFiles"
 }

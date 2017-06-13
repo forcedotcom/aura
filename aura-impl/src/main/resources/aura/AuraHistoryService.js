@@ -308,9 +308,11 @@ AuraHistoryService.prototype.changeHandler = function(){
         //
         var parsedHash = this.parseLocation(loc);
         var parameters = {};
-        var attributes = event.getDef().getAttributeDefs();
-        for(var attribute in attributes) {
-            if(attributes["hasOwnProperty"](attribute) && parsedHash["hasOwnProperty"](attribute)) {
+        var attributes = event.getDef().getAttributeDefs().getNames();
+        var attribute;
+        for(var c=0,length=attributes.length;c<length;c++) {
+            attribute = attributes[c];
+            if(parsedHash.hasOwnProperty(attribute)) {
                 parameters[attribute] = parsedHash[attribute];
             }
         }

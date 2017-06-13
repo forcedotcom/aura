@@ -21,9 +21,9 @@
  * @export
  */
 function ControllerDef(config){
-    this.descriptor = config["descriptor"];
+    this.descriptor = config[Json.ApplicationKey.DESCRIPTOR];
     this.actionDefs = {};
-    var actionDefs = config["actionDefs"];
+    var actionDefs = config[Json.ApplicationKey.ACTIONDEFS];
 
     for(var i=0;i<actionDefs.length;i++){
         var actionDefConfig = actionDefs[i];

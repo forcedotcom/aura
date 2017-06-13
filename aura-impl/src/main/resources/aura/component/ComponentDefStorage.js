@@ -329,7 +329,7 @@ ComponentDefStorage.prototype.restoreAll = function(context) {
                 for (var key in items) {
                     var config = items[key];
 
-                    if (config["type"] && config["attributes"]) { // It's an event (although the signature is... interesting)
+                    if (config[Json.ApplicationKey.TYPE] && config[Json.ApplicationKey.ATTRIBUTES]) { // It's an event (although the signature is... interesting)
                         if (!$A.eventService.getEventDef(config)) {
                             $A.eventService.saveEventConfig(config);
                         }

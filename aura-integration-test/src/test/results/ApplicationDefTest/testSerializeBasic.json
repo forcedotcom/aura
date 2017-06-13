@@ -1,18 +1,12 @@
 {
   "xs":"I",
   "descriptor":"markup://aura:test",
-  "superDef":{
-    "descriptor":"markup://aura:application"
-  },
-  "attributeDefs":[
-    {
-      "name":"body",
-      "type":"aura://Aura.Component[]",
-      "xs":"G"
-    }
+  "su":"markup://aura:application",
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]]
   ],
-  "componentClass":"function(){$A.componentService.addComponentClass(\"markup://aura:test\",function() {\nvar aura$test = {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:application\"\n  }\n};\nreturn aura$test;\n});\n}",
-  "locationChangeEventDef":{
+  "cc":"add(function() {\nreturn {\n  \"meta\":{\n    \"name\":\"aura$test\",\n    \"extends\":\"markup://aura:application\"\n  }\n};\n});\n",
+  "lc":{
     "descriptor":"markup://aura:locationChange"
   }
 }

@@ -23,7 +23,7 @@ Aura.Method.MethodDef=function(config){
     this.descriptor = new DefDescriptor(config["name"]);
     this.access=config[Json.ApplicationKey.ACCESS];
     this.action=config["action"];
-    this.attributes=config["attributes"];
+    this.attributes = new AttributeDefSet(config["attributes"], this.descriptor.getNamespace());
 };
 
 /**

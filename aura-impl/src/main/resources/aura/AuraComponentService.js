@@ -96,7 +96,19 @@ AuraComponentService.prototype.getComponent = function(identifier) {
  * @private
  */
 AuraComponentService.prototype.getDescriptorFromConfig = function(descriptorConfig) {
-    var descriptor = descriptorConfig && descriptorConfig["descriptor"];
+    var descriptor = descriptorConfig;
+
+    // if string value was provided, try to extract from object
+    if (descriptorConfig && typeof descriptorConfig !== 'string') {
+        if (descriptorConfig.hasOwnProperty(Json.ApplicationKey.DESCRIPTOR)) {
+            descriptor = descriptorConfig[Json.ApplicationKey.DESCRIPTOR];
+        }
+        else {
+            // fallback
+            descriptor = descriptorConfig["descriptor"];
+        }
+    }
+
     $A.assert(descriptor, "Descriptor for Config required for registration");
     return descriptor;
 };
@@ -107,8 +119,20 @@ AuraComponentService.prototype.getDescriptorFromConfig = function(descriptorConf
  * @returns {String} Descriptor
  * @private
  */
-AuraComponentService.prototype.createDescriptorConfig = function(descriptor) {
-    descriptor = typeof descriptor === 'string' ? descriptor : descriptor["descriptor"].toString();
+AuraComponentService.prototype.createDescriptorConfig = function(descriptorConfig) {
+    var descriptor = descriptorConfig;
+
+    // if string value was provided, try to extract from object
+    if (descriptorConfig && typeof descriptorConfig !== 'string') {
+        if (descriptorConfig.hasOwnProperty(Json.ApplicationKey.DESCRIPTOR)) {
+            descriptor = descriptorConfig[Json.ApplicationKey.DESCRIPTOR];
+        }
+        else {
+            // fallback
+            descriptor = descriptorConfig["descriptor"];
+        }
+    }
+
     descriptor = descriptor.indexOf("://") < 0 ? "markup://" + descriptor : descriptor;
     return { "descriptor" : descriptor };
 };
@@ -1268,7 +1292,7 @@ AuraComponentService.prototype.hydrateComponent = function(descriptor, exporter)
     var tmp = exporter.toString();
     var pos = [tmp.indexOf('/*') + 2, tmp.indexOf('*/')];
     tmp = tmp.substr(pos[0], pos[1] - pos[0]);
-    exporter = $A.util.globalEval("function () {" + tmp + " }", undefined, $A.clientService.getSourceMapsUrl(descriptor));
+    exporter = this.buildComponentExporter(descriptor, tmp);
 
     if(!exporter) {
         var defDescriptor = new Aura.System.DefDescriptor(descriptor);
@@ -1282,6 +1306,17 @@ AuraComponentService.prototype.hydrateComponent = function(descriptor, exporter)
     }
 
     return exporter();
+};
+
+/**
+ * Evals the script and returns the result (exporter) of the operation
+ * @param {String} descriptor Uses the pattern of namespace:component
+ * @param {String} script A function that when executed will return the component object literal
+ * @export
+ */
+AuraComponentService.prototype.buildComponentExporter = function(descriptor, script) {
+    var exporter = 'function(){var add=function(c){$A.componentService.addComponentClass("' + descriptor + '",c);};' + script.toString() + '}';
+    return $A.util.globalEval(exporter, undefined, $A.clientService.getSourceMapsUrl(descriptor));
 };
 
 /**

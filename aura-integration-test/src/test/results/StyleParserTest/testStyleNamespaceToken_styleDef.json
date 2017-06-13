@@ -1,8 +1,5 @@
 {
-  "s":1,
-  "v":{
-    "descriptor":"css://test.testStyleNamespaceToken",
-    "code":".testTestStyleNamespaceToken {color:green}\n.testTestStyleNamespaceToken .menu {color:red}\n.testTestStyleNamespaceToken .otherMenu {color:black}\n@-webkit-keyframes something {\n  from {-webkit-transform:rotate(0deg)}\n  to {-webkit-transform:rotate(720deg)}\n}\n.testTestStyleNamespaceToken .mobilePanel button:active, .testTestStyleNamespaceToken .mobilePanel .actionMenu:active, .testTestStyleNamespaceToken .uiButton.default:active {background-color:#39bbe4; color:#fff; text-shadow:none; -webkit-box-shadow:none}",
-    "className":"testTestStyleNamespaceToken"
-  }
+  "descriptor":"css://test.testStyleNamespaceToken",
+  "co":".testTestStyleNamespaceToken {color:green}\n.testTestStyleNamespaceToken .menu {color:red}\n.testTestStyleNamespaceToken .otherMenu {color:black}\n@-webkit-keyframes something {\n  from {-webkit-transform:rotate(0deg)}\n  to {-webkit-transform:rotate(720deg)}\n}\n.testTestStyleNamespaceToken .mobilePanel button:active, .testTestStyleNamespaceToken .mobilePanel .actionMenu:active, .testTestStyleNamespaceToken .uiButton.default:active {background-color:#39bbe4; color:#fff; text-shadow:none; -webkit-box-shadow:none}",
+  "cl":"testTestStyleNamespaceToken"
 }

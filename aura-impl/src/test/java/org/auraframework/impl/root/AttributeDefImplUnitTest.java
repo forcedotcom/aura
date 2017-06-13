@@ -96,9 +96,9 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
         JsonEncoder json = Mockito.mock(JsonEncoder.class);
         buildDefinition().serialize(json);
         InOrder inOrder = Mockito.inOrder(json);
-        inOrder.verify(json).writeMapBegin();
-        inOrder.verify(json).writeMapEntry("name", this.descriptor);
-        inOrder.verify(json).writeMapEnd();
+        inOrder.verify(json).writeLiteral("[");
+        inOrder.verify(json).writeValue(this.descriptor);
+        inOrder.verify(json).writeLiteral("]");
     }
 
     @Test
@@ -106,9 +106,9 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
         JsonEncoder json = Mockito.mock(JsonEncoder.class);
         buildDefinition().serialize(json);
         InOrder inOrder = Mockito.inOrder(json);
-        inOrder.verify(json).writeMapBegin();
-        inOrder.verify(json).writeMapEntry("type", this.typeDefDescriptor);
-        inOrder.verify(json).writeMapEnd();
+        inOrder.verify(json).writeLiteral("[");
+        inOrder.verify(json).writeValue(this.typeDefDescriptor);
+        inOrder.verify(json).writeLiteral("]");
     }
 
     @Test
@@ -118,9 +118,9 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
         AttributeDef def = buildDefinition();
 		def.serialize(json);
         InOrder inOrder = Mockito.inOrder(json);
-        inOrder.verify(json).writeMapBegin();
-        inOrder.verify(json).writeMapEntry("default", "Hello");
-        inOrder.verify(json).writeMapEnd();
+        inOrder.verify(json).writeLiteral("[");
+        inOrder.verify(json).writeValue("Hello");
+        inOrder.verify(json).writeLiteral("]");
     }
 
     @Test
@@ -130,9 +130,31 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
         JsonEncoder json = Mockito.mock(JsonEncoder.class);
         buildDefinition().serialize(json);
         InOrder inOrder = Mockito.inOrder(json);
-        inOrder.verify(json).writeMapBegin();
-        inOrder.verify(json).writeMapEntry("required", this.required);
-        inOrder.verify(json).writeMapEnd();
+        inOrder.verify(json).writeLiteral("[");
+        inOrder.verify(json).writeValue(this.required);
+        inOrder.verify(json).writeLiteral("]");
+    }
+    
+    /**
+     * Since We serialize attributes using the position of the array, it's very important we do not change the order of
+     * the attribute serialization without also changing the client parsing. If you did that, then change this test to match.
+     * @throws Exception
+     */
+    @Test
+    public void testAttributeSerializationOrder() throws Exception {
+    	this.defaultValue = new AttributeDefRefImpl.Builder().setValue("Hello").build();
+    	this.required = true;
+        JsonEncoder json = Mockito.mock(JsonEncoder.class);
+        AttributeDef def = buildDefinition();
+		def.serialize(json);
+        InOrder inOrder = Mockito.inOrder(json);
+        inOrder.verify(json).writeLiteral("[");
+        inOrder.verify(json).writeValue(this.descriptor);
+        inOrder.verify(json).writeValue(this.typeDefDescriptor);
+        inOrder.verify(json).writeValue(this.access.getAccessCode());
+        inOrder.verify(json).writeValue(this.required);
+        inOrder.verify(json).writeValue(this.defaultValue.getValue());
+        inOrder.verify(json).writeLiteral("]");
     }
 
     @Test

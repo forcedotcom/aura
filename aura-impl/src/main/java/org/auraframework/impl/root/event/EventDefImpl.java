@@ -23,13 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.EventType;
-import org.auraframework.def.RegisterEventDef;
-import org.auraframework.def.RequiredVersionDef;
-import org.auraframework.def.RootDefinition;
+import org.auraframework.def.*;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -91,26 +85,31 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
             if (serializationContext.isSerializing()) {
 
                 json.writeMapBegin();
-                json.writeMapEntry("descriptor", descriptor);
+                json.writeMapEntry(Json.ApplicationKey.DESCRIPTOR, descriptor);
                 json.writeMapEnd();
 
             } else {
 
                 serializationContext.setSerializing(true);
                 json.writeMapBegin();
-                json.writeMapEntry("descriptor", getDescriptor());
-                json.writeMapEntry("type", eventType);
+                json.writeMapEntry(Json.ApplicationKey.DESCRIPTOR, getDescriptor());
+                json.writeMapEntry(Json.ApplicationKey.TYPE, eventType);
                 json.writeValue(getAccess());
                 if (extendsDescriptor != null) {
-                    json.writeMapEntry("superDef", Aura.getDefinitionService().getDefinition(extendsDescriptor));
+                    // Write out superDef if it's not a componentEvent or applicationEvent as those can be easily inferred
+                    Definition superDef = Aura.getDefinitionService().getDefinition(extendsDescriptor);
+                    if (superDef != null && !superDef.getDescriptor().getQualifiedName().equals("markup://aura:componentEvent") &&
+                                            !superDef.getDescriptor().getQualifiedName().equals("markup://aura:applicationEvent")) {
+                        json.writeMapEntry(Json.ApplicationKey.SUPERDEF, superDef);
+                    }
                 }
                 Map<DefDescriptor<AttributeDef>, AttributeDef> attrDefs = getAttributeDefs();
                 if (attrDefs.size() > 0) {
-                	json.writeMapEntry("attributes", getAttributeDefs());
+                    json.writeMapEntry(Json.ApplicationKey.ATTRIBUTES, attrDefs);
                 }
                 
                 if (requiredVersionDefs != null && requiredVersionDefs.size() > 0) {
-                    json.writeMapEntry("requiredVersionDefs", requiredVersionDefs);
+                    json.writeMapEntry(Json.ApplicationKey.REQUIREDVERSIONDEFS, requiredVersionDefs);
                 }
                 json.writeMapEnd();
                 serializationContext.setSerializing(false);

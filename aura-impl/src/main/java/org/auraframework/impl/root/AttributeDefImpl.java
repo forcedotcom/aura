@@ -112,20 +112,41 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
 
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeMapBegin();
-        json.writeMapEntry("name", descriptor);
-        json.writeMapEntry("type", typeDefDescriptor);
-        json.writeValue(getAccess());
+        json.writeLiteral("[");
+        // 0: name
+        json.writeValue(descriptor);
+        json.writeLiteral(",");
 
+        // 1: type
+        json.writeValue(typeDefDescriptor);
+        json.writeLiteral(",");
+
+        // 2: access
+        json.writeValue(getAccess().getAccessCode());
+        json.writeLiteral(",");
+
+        // 3: required
+        json.writeValue(required);
+
+        // 4: default
         if (defaultValue != null) {
-            json.writeMapEntry("default", defaultValue.getValue());
+            json.writeLiteral(",");
+            json.writeValue(defaultValue.getValue());
         }
-
-        if (required) {
-            json.writeMapEntry("required", true);
+        else {
+            if (typeDefDescriptor.getQualifiedName().equals("aura://List") || typeDefDescriptor.getName().endsWith("[]")) {
+                json.writeLiteral(",[]");
+            }
+            else if (!typeDefDescriptor.getQualifiedName().equals("aura://Boolean") &&
+                    !typeDefDescriptor.getQualifiedName().equals("aura://String") &&
+                    !typeDefDescriptor.getQualifiedName().equals("aura://Decimal") &&
+                    !typeDefDescriptor.getQualifiedName().equals("aura://Number") &&
+                    !typeDefDescriptor.getQualifiedName().equals("aura://Integer")) {
+                json.writeLiteral(",");
+                json.writeValue(null);
+            }
         }
-
-        json.writeMapEnd();
+        json.writeLiteral("]");
     }
 
     @Override

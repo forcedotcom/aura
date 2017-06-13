@@ -82,6 +82,7 @@ import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.json.Json.ApplicationKey;
 import org.auraframework.util.json.JsonSerializationContext;
 
 import com.google.common.base.Splitter;
@@ -981,68 +982,72 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             boolean preloaded = context.isPreloaded(getDescriptor());
             if (preloaded || serializationContext.isSerializing()) {
                 json.writeMapBegin();
-                json.writeMapEntry("descriptor", descriptor);
+                json.writeMapEntry(ApplicationKey.DESCRIPTOR, descriptor);
                 json.writeMapEnd();
             } else {
                 serializationContext.setSerializing(true);
                 json.writeMapBegin();
                 json.writeValue(getAccess());
-                json.writeMapEntry("descriptor", descriptor);
+                json.writeMapEntry(ApplicationKey.DESCRIPTOR, descriptor);
 
-                json.writeMapEntry("styleDef", getStyleDef());
+                json.writeMapEntry(ApplicationKey.STYLEDEF, getStyleDef());
                 if (flavoredStyle != null) {
-                    json.writeMapEntry("flavoredStyleDef", flavoredStyle);
+                    json.writeMapEntry(ApplicationKey.FLAVOREDSTYLEDEF, flavoredStyle);
                 }
 
                 ControllerDef controllerDef = getControllerDef();
                 if (controllerDef != null && hasServerAction(controllerDef)) {
-                    json.writeMapEntry("controllerDef", controllerDef);
+                    json.writeMapEntry(ApplicationKey.CONTROLLERDEF, controllerDef);
                 }
 
-                json.writeMapEntry("modelDef", getModelDef());
-                json.writeMapEntry("superDef", getSuperDef());
+                json.writeMapEntry(ApplicationKey.MODELDEF, getModelDef());
+
+                if (getSuperDef() != null && !getSuperDef().getDescriptor().getQualifiedName().equals("markup://aura:component")) {
+                    json.writeMapEntry(ApplicationKey.SUPERDEF, getSuperDef().getDescriptor());
+                }
+
                 boolean preloading = context.isPreloading();
                 if (preloading) {
-                    json.writeMapEntry("isCSSPreloaded", preloading);
+                    json.writeMapEntry(ApplicationKey.CSSPRELOADED, preloading);
                 }
 
                 Collection<AttributeDef> attributeDefs = getAttributeDefs().values();
                 if (!attributeDefs.isEmpty()) {
-                    json.writeMapEntry("attributeDefs", attributeDefs);
+                    json.writeMapEntry(ApplicationKey.ATTRIBUTEDEFS, attributeDefs);
                 }
 
                 Collection<MethodDef> methodDefs = getMethodDefs().values();
                 if (!methodDefs.isEmpty()) {
-                    json.writeMapEntry("methodDefs", methodDefs);
+                    json.writeMapEntry(ApplicationKey.METHODDEFS, methodDefs);
                 }
 
                 Collection<RequiredVersionDef> requiredVersionDefs = getRequiredVersionDefs().values();
                 if (requiredVersionDefs != null && !requiredVersionDefs.isEmpty()) {
-                    json.writeMapEntry("requiredVersionDefs", requiredVersionDefs);
+                    json.writeMapEntry(ApplicationKey.REQUIREDVERSIONDEFS, requiredVersionDefs);
                 }
 
                 Set<DefDescriptor<InterfaceDef>> allInterfaces = getAllInterfaces();
                 if (allInterfaces != null && !allInterfaces.isEmpty()) {
-                    json.writeMapEntry("interfaces", allInterfaces);
+                    json.writeMapEntry(ApplicationKey.INTERFACES, allInterfaces);
                 }
 
                 Collection<RegisterEventDef> regevents = getRegisterEventDefs().values();
                 if (!regevents.isEmpty()) {
-                    json.writeMapEntry("registerEventDefs", regevents);
+                    json.writeMapEntry(ApplicationKey.REGISTEREVENTDEFS, regevents);
                 }
 
                 Collection<EventHandlerDef> handlers = getHandlerDefs();
                 if (!handlers.isEmpty()) {
-                    json.writeMapEntry("handlerDefs", handlers);
+                    json.writeMapEntry(ApplicationKey.HANDLERDEFS, handlers);
                 }
 
                 Map<String, LocatorDef> locatorDefs = getLocators();
                 if (locatorDefs!=null && !locatorDefs.isEmpty()) {
-                    json.writeMapEntry("locatorDefs", locatorDefs);
+                    json.writeMapEntry(ApplicationKey.LOCATORDEFS, locatorDefs);
                 }
 
                 if (!facets.isEmpty()) {
-                    json.writeMapEntry("facets", facets);
+                    json.writeMapEntry(ApplicationKey.FACETS, facets);
                 }
 
                 boolean local = hasLocalDependencies();
@@ -1053,35 +1058,35 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 }
 
                 if (local) {
-                    json.writeMapEntry("hasServerDeps", true);
+                    json.writeMapEntry(ApplicationKey.HASSERVERDEPENDENCIES, true);
                 }
 
                 if (isAbstract) {
-                    json.writeMapEntry("isAbstract", isAbstract);
+                    json.writeMapEntry(ApplicationKey.ABSTRACT, isAbstract);
                 }
 
                 if (subDefs != null) {
-                    json.writeMapEntry("subDefs", subDefs.values());
+                    json.writeMapEntry(ApplicationKey.SUBDEFS, subDefs.values());
                 }
 
                 String defaultFlavorToSerialize = getDefaultFlavorOrImplicit();
                 if (defaultFlavorToSerialize != null) {
-                    json.writeMapEntry("defaultFlavor", defaultFlavorToSerialize);
+                    json.writeMapEntry(ApplicationKey.DEFAULTFLAVOR, defaultFlavorToSerialize);
                 }
 
                 if (hasFlavorableChild) {
-                    json.writeMapEntry("hasFlavorableChild", true);
+                    json.writeMapEntry(ApplicationKey.FLAVORABLECHILD, true);
                 }
 
                 if (dynamicallyFlavorable) {
-                    json.writeMapEntry("dynamicallyFlavorable", dynamicallyFlavorable);
+                    json.writeMapEntry(ApplicationKey.DYNAMICALLYFLAVORABLE, dynamicallyFlavorable);
                 }
 
                 if(!context.getClientClassLoaded(descriptor)) {
                     boolean minify = context.getMode().minify();
                     String code = getCode(minify);
                     if (!AuraTextUtil.isNullEmptyOrWhitespace(code)) {
-                        json.writeMapEntry("componentClass", "function(){" + code + "}");
+                        json.writeMapEntry(ApplicationKey.COMPONENTCLASS, code);
                     }
                 }
 
@@ -1094,6 +1099,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             throw new AuraUnhandledException("unhandled exception", e);
         }
     }
+
 
     protected abstract void serializeFields(Json json) throws IOException, QuickFixException;
 
@@ -1109,7 +1115,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         if (isLockerRequired()) {
-            js = convertToLocker(js);
+            js = convertToLocker(this.descriptor, js);
         }
 
         return js;
@@ -1129,10 +1135,10 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         return requireLocker;
     }
 
-    private static final Pattern COMPONENT_CLASS_PATTERN = Pattern.compile("^\\$A\\.componentService\\.addComponentClass\\(\"([^\"]*)\",\\s*function\\s*\\(\\s*\\)\\s*\\{\\n*(.*)\\}\\);\\s*$",
+    private static final Pattern COMPONENT_CLASS_PATTERN = Pattern.compile("^add\\(\\s*function\\s*\\(\\s*\\)\\s*\\{\\n*(.*)\\}\\);\\s*$",
             Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
-    public static String convertToLocker(String code) {
+    public static String convertToLocker(DefDescriptor descriptor, String code) {
 
         if (AuraTextUtil.isNullEmptyOrWhitespace(code)) {
             return code;
@@ -1144,8 +1150,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             return null;
         }
 
-        String clientDescriptor = matcher.group(1);
-        String objectVariable = matcher.group(2);
+        String clientDescriptor = descriptor.getQualifiedName();
+        String objectVariable = matcher.group(1);
 
         return makeLockerizedClass(clientDescriptor, objectVariable);
     }

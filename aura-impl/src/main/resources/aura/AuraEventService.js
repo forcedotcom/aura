@@ -1339,7 +1339,7 @@ AuraEventService.prototype.hasDefinition = function(descriptor) {
  * @private
  */
 AuraEventService.prototype.createDescriptorConfig = function(descriptor) {
-    descriptor = typeof descriptor === 'string' ? descriptor : descriptor["descriptor"].toString();
+    descriptor = typeof descriptor === 'string' ? descriptor : descriptor[Json.ApplicationKey.DESCRIPTOR].toString();
     descriptor = descriptor.indexOf("://") < 0 ? "markup://" + descriptor : descriptor;
     return { "descriptor" : descriptor };
 };
@@ -1390,7 +1390,7 @@ AuraEventService.prototype.getDefinition = function(descriptor, callback) {
  * @private
  */
 AuraEventService.prototype.getDescriptorFromConfig = function(descriptorConfig) {
-    var descriptor = descriptorConfig && descriptorConfig["descriptor"];
+    var descriptor = descriptorConfig && descriptorConfig[Json.ApplicationKey.DESCRIPTOR];
     $A.assert(descriptor, "Event Descriptor for Config required for registration");
     return descriptor;
 };
@@ -1402,7 +1402,7 @@ AuraEventService.prototype.getDescriptorFromConfig = function(descriptorConfig) 
  * @returns {EventDef} instance from registry
  */
 AuraEventService.prototype.createFromSavedConfigs = function(config) {
-    var descriptor = config["descriptor"];
+    var descriptor = config[Json.ApplicationKey.DESCRIPTOR];
     if (!descriptor && config["getDescriptor"]) {
         descriptor = config.getDescriptor();
     }
@@ -1446,8 +1446,8 @@ AuraEventService.prototype.createEventDef = function(config) {
  * @param {Object} config event definition config
  */
 AuraEventService.prototype.saveEventConfig = function(config) {
-    $A.assert(config && config["descriptor"], "Event config required for registration");
-    this.savedEventConfigs[config["descriptor"]] = config;
+    $A.assert(config && config[Json.ApplicationKey.DESCRIPTOR], "Event config required for registration");
+    this.savedEventConfigs[config[Json.ApplicationKey.DESCRIPTOR]] = config;
 };
 
 /**

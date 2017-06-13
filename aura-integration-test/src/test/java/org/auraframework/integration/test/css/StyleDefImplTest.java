@@ -25,6 +25,7 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.TokenValueNotFoundException;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.junit.Test;
@@ -129,11 +130,11 @@ public class StyleDefImplTest extends StyleTestCase {
         assertTrue(o instanceof Map);
         Map<String, Object> outerMap = (Map<String, Object>) o;
         assertEquals(styleDesc.toString(), outerMap.get("descriptor"));
-        assertEquals(styleDesc.getNamespace() + AuraTextUtil.initCap(styleDesc.getName()), outerMap.get("className"));
+        assertEquals(styleDesc.getNamespace() + AuraTextUtil.initCap(styleDesc.getName()), outerMap.get(Json.ApplicationKey.CLASSNAME.toString()));
         if (expectCode) {
-            assertEquals("StyleDef content not included.", definitionService.getDefinition(styleDesc).getCode(), outerMap.get("code"));
+            assertEquals("StyleDef content not included.", definitionService.getDefinition(styleDesc).getCode(), outerMap.get(Json.ApplicationKey.CODE.toString()));
         } else {
-            assertNull("StyleDef content should not be included.", outerMap.get("code"));
+            assertNull("StyleDef content should not be included.", outerMap.get(Json.ApplicationKey.CODE.toString()));
         }
     }
 }

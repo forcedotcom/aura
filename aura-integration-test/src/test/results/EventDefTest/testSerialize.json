@@ -1,31 +1,8 @@
 {
-  "s":1,
-  "v":{
-    "descriptor":"markup://fake:event",
-    "type":"COMPONENT",
-    "superDef":{
-      "s":2,
-      "v":{
-        "descriptor":"markup://aura:componentEvent"
-      }
-    },
-    "attributes":{
-      "testString":{
-        "s":3,
-        "v":{
-          "name":"testString",
-          "type":"java://testString",
-          "required":true
-        }
-      },
-      "testInt":{
-        "s":4,
-        "v":{
-          "name":"testInt",
-          "type":"java://testInt",
-          "required":true
-        }
-      }
-    }
+  "descriptor":"markup://fake:event",
+  "t":"COMPONENT",
+  "a":{
+    "testString":["testString","java://testString",null,true,null],
+    "testInt":["testInt","java://testInt",null,true,null]
   }
 }

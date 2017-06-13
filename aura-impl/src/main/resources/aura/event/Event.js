@@ -198,10 +198,10 @@ Aura.Event.Event.prototype.setParams = function(config) {
         var attributeDefs = this.eventDef.getAttributeDefs();
         for (var key in config){
             if (config.hasOwnProperty(key)) {
-                if (attributeDefs[key]) {
+                if (attributeDefs.hasAttribute(key)) {
                     this.params[key] = config[key];
                 } else {
-                    $A.warning("Event.setParams(): '" + key +"'('" + config[key] + "') is not a valid parameter. Valid parameters are '"+ Object.keys(this.eventDef.getAttributeDefs()).join("', '") + "'");
+                    $A.warning("Event.setParams(): '" + key +"'('" + config[key] + "') is not a valid parameter. Valid parameters are '"+ attributeDefs.getNames().join("', '") + "'");
                 }
             }
         }
@@ -220,10 +220,10 @@ Aura.Event.Event.prototype.setParam = function(key, value) {
     if (this.fired && this.componentEvent) {
         $A.assert(false, "Event.setParam(): cannot modify a component event that has already been fired.");
     }
-    if (this.eventDef.getAttributeDefs()[key]) {
+    if (this.eventDef.getAttributeDefs().hasAttribute(key)) {
         this.params[key] = value;
     } else {
-        $A.warning("Event.setParam(): '"+key+"' is not a valid parameter. Valid parameters are '" + Object.keys(this.eventDef.getAttributeDefs()).join("', '") + "'");
+        $A.warning("Event.setParam(): '"+key+"' is not a valid parameter. Valid parameters are '" + this.eventDef.getAttributeDefs().getNames().join("', '") + "'");
     }
 };
 

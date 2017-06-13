@@ -79,8 +79,8 @@ public final class RegisterEventDefImpl extends DefinitionImpl<RegisterEventDef>
         try {
             EventDef eventDef = Aura.getDefinitionService().getDefinition(reference);
             json.writeMapBegin();
-            json.writeMapEntry("eventDef", eventDef);
-            json.writeMapEntry("attributeName", descriptor.getName());
+            json.writeMapEntry(Json.ApplicationKey.EVENTDEF, eventDef.getDescriptor());
+            json.writeMapEntry(Json.ApplicationKey.NAME, descriptor.getName());
             json.writeValue(getAccess());
             json.writeMapEnd();
         } catch (QuickFixException e) {

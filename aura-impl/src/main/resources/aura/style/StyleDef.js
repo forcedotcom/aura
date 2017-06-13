@@ -19,9 +19,9 @@
  * @param {Object} config
  */
 function StyleDef(config){
-    this.code = config["code"];
-    this.className = config["className"];
-    this.descriptor = new DefDescriptor(config["descriptor"]);
+    this.code = config[Json.ApplicationKey.CODE];
+    this.className = config[Json.ApplicationKey.CLASSNAME];
+    this.descriptor = new DefDescriptor(config[Json.ApplicationKey.DESCRIPTOR]);
     this.preloaded = $A.util.isUndefinedOrNull(this.code);
 }
 

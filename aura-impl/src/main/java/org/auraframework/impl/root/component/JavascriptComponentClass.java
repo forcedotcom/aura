@@ -154,9 +154,7 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
 
             StringBuilder out = new StringBuilder();
 
-            out.append("$A.componentService.addComponentClass(");
-            out.append('"').append(jsDescriptor).append('"');
-            out.append(',');
+            out.append("add(");
             writeExporter(out);
             out.append(");\n");
 
@@ -187,10 +185,9 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
 
             String jsClassName = getClientClassName(descriptor);
 
-            out.append("var ").append(jsClassName).append(" = ");
+            out.append("return ");
             writeObjectLiteral(out);
             out.append(";\n");
-            out.append("return ").append(jsClassName).append(";\n");
         }
 
         private void writeObjectLiteral(StringBuilder out) throws IOException, QuickFixException {

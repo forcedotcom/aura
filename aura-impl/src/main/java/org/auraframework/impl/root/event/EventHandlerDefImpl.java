@@ -122,13 +122,13 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
         try {
             json.writeMapBegin();
             if (descriptor != null) {
-                json.writeMapEntry("eventDef", Aura.getDefinitionService().getDefinition(descriptor));
+                json.writeMapEntry(Json.ApplicationKey.EVENTDEF, Aura.getDefinitionService().getDefinition(descriptor));
             }
-            json.writeMapEntry("action", action);
-            json.writeMapEntry("value", value);
-            json.writeMapEntry("name", name);
-            json.writeMapEntry("phase", phase);
-            json.writeMapEntry("includeFacets", includeFacets);
+            json.writeMapEntry(Json.ApplicationKey.ACTION, action);
+            json.writeMapEntry(Json.ApplicationKey.VALUE, value);
+            json.writeMapEntry(Json.ApplicationKey.NAME, name);
+            json.writeMapEntry(Json.ApplicationKey.PHASE, phase);
+            json.writeMapEntry(Json.ApplicationKey.INCLUDEFACETS, includeFacets);
             json.writeMapEnd();
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);

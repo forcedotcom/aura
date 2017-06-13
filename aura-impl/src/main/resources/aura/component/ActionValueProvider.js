@@ -28,12 +28,13 @@ ActionValueProvider.prototype.get = function(key) {
     if (!actionDef) {
         actionDef = this.component['controller'] && this.component['controller'][key];
         if (actionDef) {
-            actionDef = new ActionDef({
-                "descriptor": this.component.getType() + "$controller$" + key,
-                "name": key,
-                "actionType": "CLIENT",
-                "code": actionDef
-            });
+            var clientDef = {};
+            clientDef[Json.ApplicationKey.DESCRIPTOR] = this.component.getType() + "$controller$" + key;
+            clientDef[Json.ApplicationKey.NAME] = key;
+            clientDef[Json.ApplicationKey.ACTIONTYPE] = "CLIENT";
+            clientDef[Json.ApplicationKey.CODE] = actionDef;
+
+            actionDef = new ActionDef(clientDef);
 
             //#if {"excludeModes" : ["PRODUCTION"]}
             if (this.controllerDef && this.controllerDef.hasActionDef(key)) {

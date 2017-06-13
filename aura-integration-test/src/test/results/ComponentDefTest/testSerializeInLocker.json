@@ -1,14 +1,7 @@
 {
   "descriptor":"markup://nonInternal:component",
-  "superDef":{
-    "descriptor":"markup://aura:component"
-  },
-  "attributeDefs":[
-    {
-      "name":"body",
-      "type":"aura://Aura.Component[]",
-      "xs":"G"
-    }
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]]
   ],
-  "componentClass":"function(){$A.componentService.addComponentClass(\"markup://nonInternal:component\",function() {\n  var def = $A.componentService.getDef(\"markup://nonInternal:component\");  var locker = $A.lockerService.createForDef(\n\"var nonInternal$component = {\\n  \\\"meta\\\":{\\n    \\\"name\\\":\\\"nonInternal$component\\\",\\n    \\\"extends\\\":\\\"markup://aura:component\\\"\\n  }\\n};\\nreturn nonInternal$component;\\n\", def);\n  return locker.returnValue;\n});\n}"
+  "cc":"$A.componentService.addComponentClass(\"markup://nonInternal:component\",function() {\n  var def = $A.componentService.getDef(\"markup://nonInternal:component\");  var locker = $A.lockerService.createForDef(\n\"return {\\n  \\\"meta\\\":{\\n    \\\"name\\\":\\\"nonInternal$component\\\",\\n    \\\"extends\\\":\\\"markup://aura:component\\\"\\n  }\\n};\\n\", def);\n  return locker.returnValue;\n});\n"
 }

@@ -237,14 +237,14 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     protected void serializeFields(Json json) throws IOException, QuickFixException {
         DefDescriptor<EventDef> locationChangeEventDescriptor = getLocationChangeEventDescriptor();
         if (locationChangeEventDescriptor != null) {
-            json.writeMapEntry("locationChangeEventDef", locationChangeEventDescriptor.getDef());
+            json.writeMapEntry(Json.ApplicationKey.LOCATIONCHANGEEVENTDEF, locationChangeEventDescriptor.getDef());
         }
         Map<String,String> tokens = getTokens();
         if (tokens != null && !tokens.isEmpty()) {
-            json.writeMapEntry("tokens",tokens);
+            json.writeMapEntry(Json.ApplicationKey.TOKENS, tokens);
         }
         if (flavorOverrides != null) {
-            json.writeMapEntry("flavorOverrides", flavorOverrides);
+            json.writeMapEntry(Json.ApplicationKey.FLAVOROVERRIDES, flavorOverrides);
         }
     }
 

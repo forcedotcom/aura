@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * @description The Event Definition including the descriptor, type, and attributes.
  * An EventDef instance is created as part of Aura initialization.
@@ -20,10 +21,24 @@
  * @export
  */
 function EventDef(config) {
-    this.descriptor = new DefDescriptor(config["descriptor"]);
-    this.superDef = this.initSuperDef(config);
-    this.attributeDefs = config["attributes"];   // TODO: real defs
-    this.type = config["type"];
+    // In cases where app.js hasn't loaded such as ClientOutOFSync. We only get
+    // a string descriptor and not a config bag.
+    if (typeof config === "string") {
+        this.descriptor = new DefDescriptor(config);
+        return;
+    }
+
+    this.descriptor = new DefDescriptor(config[Json.ApplicationKey.DESCRIPTOR]);
+    // Infer the event super def based on type, ignoring the root event defs
+    var superDef = config[Json.ApplicationKey.SUPERDEF];
+    if (!superDef && EventDef.KNOWN_SUPER_DEFS.hasOwnProperty(config[Json.ApplicationKey.TYPE])
+                  && EventDef.KNOWN_SUPER_DEFS[config[Json.ApplicationKey.TYPE]] !== config[Json.ApplicationKey.DESCRIPTOR]) {
+        superDef = EventDef.KNOWN_SUPER_DEFS[config[Json.ApplicationKey.TYPE]];
+    }
+    this.superDef = this.initSuperDef(superDef);
+    this.attributeDefsConfigs = config[Json.ApplicationKey.ATTRIBUTES];
+    this.attributeDefs = undefined; // Lazy loaded on getAttributeDefs() access
+    this.type = config[Json.ApplicationKey.TYPE];
     this.access=config[Json.ApplicationKey.ACCESS];
 }
 
@@ -51,6 +66,13 @@ EventDef.prototype.getEventType = function() {
  * @export
  */
 EventDef.prototype.getAttributeDefs = function() {
+    if(this.attributeDefs === undefined) {
+        var definitions = [];
+        for(var key in this.attributeDefsConfigs) {
+            definitions.push(this.attributeDefsConfigs[key]);
+        }
+        this.attributeDefs = new AttributeDefSet(definitions, this.getDescriptor().getNamespace());
+    }
     return this.attributeDefs;
 };
 
@@ -65,15 +87,19 @@ EventDef.prototype.getSuperDef = function() {
 
 /**
  * Initializes the event definition for the immediate super type.
- * @param {Object} config The argument that contains the super definition, or null if none exists.
+ * @param {Object} superDef The super definition, or null if none exists.
  * @private
  */
-EventDef.prototype.initSuperDef = function(config) {
-    if (config["superDef"]) {
-        return $A.eventService.createEventDef(config["superDef"]);
+EventDef.prototype.initSuperDef = function(superDef) {
+    if (superDef) {
+        return $A.eventService.createEventDef(superDef);
     } else {
         return null;
     }
 };
+
+EventDef.KNOWN_SUPER_DEFS = { "APPLICATION": "markup://aura:applicationEvent",
+                              "COMPONENT": "markup://aura:componentEvent",
+                              "VALUE": "markup://aura:valueEvent" };
 
 Aura.Event.EventDef = EventDef;

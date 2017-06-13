@@ -36,6 +36,10 @@ Test.Aura.Component.ComponentDefTest = function() {
                 }
             },
             "$A": {
+                "assert": function() {},
+                "componentService": {
+                    "createComponentDef": function() {}
+                }
             },
             "DefDescriptor": function() {
                 return {
@@ -44,7 +48,10 @@ Test.Aura.Component.ComponentDefTest = function() {
             },
             "Json": {
                 "ApplicationKey": {
-                    "ACCESS": "access"
+                    "ACCESS": "access",
+                    "HANDLERDEFS": "handlerDefs",
+                    "NAME": "name",
+                    "VALUE": "value"
                 }
             },
             "AttributeDefSet": function() {},

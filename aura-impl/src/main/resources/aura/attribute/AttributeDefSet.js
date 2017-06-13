@@ -21,10 +21,11 @@
  * @export
  */
 function AttributeDefSet(configs,defaultNamespace) {
+    this.values = {};
+    // maintain attribute order
+    this.valuesOrder = [];
+
     if (configs) {
-        this.values = {};
-        // maintain attribute order
-        this.valuesOrder = [];
         for (var i = 0; i < configs.length; i++) {
             var attributeDef = new AttributeDef(configs[i],defaultNamespace);
             var descriptor=attributeDef.getDescriptor();
@@ -54,6 +55,14 @@ AttributeDefSet.prototype.each = function(f) {
 };
 
 /**
+ * Does this attribute exist in the set?
+ * @param {String} name Complete attribute name. Does not split on .
+ */
+AttributeDefSet.prototype.hasAttribute = function(name) {
+    return this.values.hasOwnProperty(name);
+};
+
+/**
  * Returns the AttributeDef object.
  * @param {String} name The name of the AttributeDef instance, which matches the qualified name of the attributeDef descriptor.
  * @returns {AttributeDef} An AttributeDef object is stored in a parent definition, such as a ComponentDef object.
@@ -68,6 +77,7 @@ AttributeDefSet.prototype.getDef = function(name) {
  *
  * This provides access to an array, instead of having to walk the map.
  *
+ * @export
  * @return {Array} the array of names.
  */
 AttributeDefSet.prototype.getNames = function() {
@@ -76,6 +86,7 @@ AttributeDefSet.prototype.getNames = function() {
 
 /**
  * Returns map of AttributeDefs
+ * @export
  * @returns {Object} values
  */
 AttributeDefSet.prototype.getValues = function() {

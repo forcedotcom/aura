@@ -87,7 +87,8 @@ Test.Aura.AuraEventServiceTest = function() {
                     }
                 },
                 getRoot: function(){}
-            }
+            },
+            "Json": { "ApplicationKey": { "DESCRIPTOR": "descriptor" } }
         });
 
         [Fact]

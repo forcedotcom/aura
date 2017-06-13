@@ -40,4 +40,6 @@ public interface DefinitionAccess extends JsonSerializable,Serializable {
     void validate(String namespace, boolean allowAuth, boolean allowPrivate, ConfigAdapter configAdapter) throws InvalidAccessValueException;
 
     void validateReferences() throws InvalidAccessValueException;
+
+    String getAccessCode();
 }

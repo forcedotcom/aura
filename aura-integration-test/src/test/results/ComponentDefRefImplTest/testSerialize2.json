@@ -2,22 +2,11 @@
   "componentDef":{
     "xs":"I",
     "descriptor":"markup://test:text",
-    "superDef":{
-      "descriptor":"markup://aura:component"
-    },
-    "attributeDefs":[
-      {
-        "name":"body",
-        "type":"aura://Aura.Component[]",
-        "xs":"G"
-      },
-      {
-        "name":"value",
-        "type":"aura://String",
-        "xs":"I"
-      }
+    "ad":[
+      ["body","aura://Aura.Component[]","G",false,[]],
+      ["value","aura://String","I",false]
     ],
-    "facets":[
+    "fa":[
       {
         "descriptor":"body",
         "value":[
@@ -95,7 +84,7 @@
         ]
       }
     ],
-    "hasServerDeps":true,
-    "componentClass":"function(){$A.componentService.addComponentClass(\"markup://test:text\",function() {\nvar test$text = {\n  \"meta\":{\n    \"name\":\"test$text\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\nreturn test$text;\n});\n}"
+    "hs":true,
+    "cc":"add(function() {\nreturn {\n  \"meta\":{\n    \"name\":\"test$text\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\n});\n"
   }
 }

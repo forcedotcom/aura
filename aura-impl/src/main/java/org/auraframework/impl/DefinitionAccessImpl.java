@@ -191,28 +191,39 @@ public class DefinitionAccessImpl implements DefinitionAccess {
     }
 
     @Override
-    public void serialize(Json json) throws IOException{
+    public void serialize(Json json) throws IOException {
+        String accessCode = getAccessCode();
+        if (accessCode != null) {
+            json.writeMapEntry(accessKey, accessCode);
+        }
+    }
+
+    @Override
+    public String getAccessCode() {
         if(this.isGlobal()) {
             // "G" - GLOBAL
-            json.writeMapEntry(accessKey, 'G');
+            return "G";
         }
         if(this.isPrivileged()){
             // "PP" - PRIVILEGED
-            json.writeMapEntry(accessKey, "PP");
+            return "PP";
         }
         if(this.isPrivate()){
             // "p" - PRIVATE
-            json.writeMapEntry(accessKey, 'p');
+            return "p";
         }
         if(this.isPublic()||this.isInternal()){
             // "P" - PUBLIC, "I" - INTERNAL, "" - DEFAULT DEPENDING ON NAMESPACE
             Access defaultAccess=this.isInternalNamespace?Access.INTERNAL:Access.PUBLIC;
             Access currentAccess=getAccess();
             if(currentAccess!=defaultAccess){
-                json.writeMapEntry(accessKey, currentAccess.name().charAt(0));
+                return currentAccess.name().substring(0, 1);
             }
         }
+
+        return null;
     }
+
 
     protected void defaultAccess(boolean internalNamespace) {
         // Default access if necessary

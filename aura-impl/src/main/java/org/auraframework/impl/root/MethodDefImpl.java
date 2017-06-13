@@ -16,10 +16,7 @@
 package org.auraframework.impl.root;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
@@ -78,7 +75,10 @@ public final class MethodDefImpl extends RootDefinitionImpl<MethodDef> implement
             json.writeMapEntry("action", action);
         }
         if(attributeDefs!=null&&!attributeDefs.isEmpty()) {
-            json.writeMapEntry("attributes", attributeDefs);
+            Collection<AttributeDef> defs = attributeDefs.values();
+            if (!defs.isEmpty()) {
+                json.writeMapEntry("attributes", defs);
+            }
         }
         json.writeMapEnd();
     }

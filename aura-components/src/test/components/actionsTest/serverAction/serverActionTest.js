@@ -6,14 +6,22 @@
     testGetExternalAction : {
         test: [
             function(cmp) {
-                var eAction = $A.test.getExternalAction(cmp, "java://org.auraframework.components.test.java.controller.TestController/ACTION$getNamedComponent",
+                var eAction = $A.test.getExternalAction(cmp, 
+                        // Action
+                        "java://org.auraframework.components.test.java.controller.TestController/ACTION$getNamedComponent",
+                        // Params
                         {"componentName":"markup://aura:text", 'attributes':{'value':'valuable'}},
+                        // Return Type
                         "java://org.auraframework.instance.component",
+                        // Callback
                         function(action){
                             $A.test.assertTrue(action.state === "SUCCESS");
                         });
-                $A.test.addWaitForWithFailureMessage(true, function() { return $A.test.areActionsComplete([eAction]); },
-                        "external action didn't finish");
+
+                $A.test.addWaitForWithFailureMessage(true, function() { 
+                    return $A.test.areActionsComplete([eAction]); 
+                }, "external action didn't finish");
+
                 $A.enqueueAction(eAction);
             }
         ]

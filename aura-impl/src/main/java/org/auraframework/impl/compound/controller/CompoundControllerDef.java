@@ -26,6 +26,7 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.json.Json.ApplicationKey;
 
 /**
  * Compound controllers are what components usually deal with, they handle
@@ -65,8 +66,8 @@ public class CompoundControllerDef extends DefinitionImpl<ControllerDef> impleme
             json.writeValue(null);
         } else {
             json.writeMapBegin();
-            json.writeMapEntry("descriptor", getDescriptor());
-            json.writeMapEntry("actionDefs", filteredList);
+            json.writeMapEntry(ApplicationKey.DESCRIPTOR, getDescriptor());
+            json.writeMapEntry(ApplicationKey.ACTIONDEFS, filteredList);
             json.writeMapEnd();
         }
     }

@@ -357,13 +357,16 @@ TestInstance.prototype.getExternalAction = function(component, descriptor, param
             "name" : k
         });
     }
-    var def = new ActionDef({
-        "name" : descriptor,
-        "descriptor" : descriptor,
-        "actionType" : "SERVER",
-        "params" : paramDefs,
-        "returnType" : returnType
-    });
+
+    var config = {};
+    config[Json.ApplicationKey.NAME] = descriptor;
+    config[Json.ApplicationKey.DESCRIPTOR] = descriptor;
+    config[Json.ApplicationKey.ACTIONTYPE] = "SERVER";
+    config[Json.ApplicationKey.RETURNTYPE] = returnType;
+    config[Json.ApplicationKey.PARAMS] = paramDefs;
+
+    var def = new ActionDef(config);
+
     var action = def.newInstance(component);
     action.setParams(params);
     if (callback) {

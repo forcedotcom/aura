@@ -1,17 +1,7 @@
 {
-  "s":1,
-  "v":{
-    "descriptor":"markup://aura:testinterfacechild",
-    "attributes":{
-      "fakeAttribute":{
-        "s":2,
-        "v":{
-          "name":"fakeAttribute",
-          "type":"java://fakeAttribute",
-          "xs":"p"
-        }
-      }
-    },
-    "isAbstract":true
-  }
+  "descriptor":"markup://aura:testinterfacechild",
+  "attributes":{
+    "fakeAttribute":["fakeAttribute","java://fakeAttribute","p",false,null]
+  },
+  "isAbstract":true
 }

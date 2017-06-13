@@ -95,13 +95,13 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
     @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
-        json.writeMapEntry("name", getName());
-        json.writeMapEntry("descriptor", getDescriptor());
-        json.writeMapEntry("actionType", getActionType());
-        json.writeMapEntry("returnType", getReturnType());
-        json.writeMapEntry("background", isBackground());
-        json.writeMapEntry("caboose", isCaboose());
-        json.writeMapEntry("params", params);
+        json.writeMapEntry(Json.ApplicationKey.NAME, getName());
+        json.writeMapEntry(Json.ApplicationKey.DESCRIPTOR, getDescriptor());
+        json.writeMapEntry(Json.ApplicationKey.ACTIONTYPE, getActionType());
+        json.writeMapEntry(Json.ApplicationKey.RETURNTYPE, getReturnType());
+        json.writeMapEntry(Json.ApplicationKey.BACKGROUND, isBackground());
+        json.writeMapEntry(Json.ApplicationKey.CABOOSE, isCaboose());
+        json.writeMapEntry(Json.ApplicationKey.PARAMS, params);
         json.writeMapEnd();
     }
 

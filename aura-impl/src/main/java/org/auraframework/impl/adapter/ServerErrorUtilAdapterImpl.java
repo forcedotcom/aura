@@ -18,12 +18,16 @@ package org.auraframework.impl.adapter;
 import org.apache.log4j.Logger;
 import org.auraframework.adapter.ServerErrorUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.service.ContextService;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraExceptionUtil;
 import org.auraframework.throwable.ClientSideError;
 import org.auraframework.throwable.GenericEventException;
 import org.auraframework.util.json.JsonSerializable;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import java.util.UUID;
 
@@ -37,6 +41,7 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
 
     private static final String EVENTNAME = "aura:serverActionError";
     private static final Logger logger = Logger.getLogger(ServerErrorUtilAdapterImpl.class);
+    private ContextService contextService; 
 
     @Override
     public void handleException(String message) {
@@ -49,6 +54,12 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
         final String errorId = processError(message, thrown);
 
         // Create a new exception for the default error experience.
+        final GenericEventException gee = getDefaultException(errorId, message, thrown);
+        throw gee;
+    }
+
+    protected GenericEventException getDefaultException(String errorId, String message, @Nullable Throwable thrown) {
+        // Create a new exception for the default error experience.
         final GenericEventException gee = new GenericEventException(EVENTNAME, thrown);
         gee.setDefault();
 
@@ -56,10 +67,13 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
         // Otherwise use thrown's stack trace to build the client side error.
         final String stackTrace = thrown != null ? AuraExceptionUtil.getStackTrace(thrown) : AuraExceptionUtil.getStackTrace(gee);
 
-        final ClientSideError error = new ClientSideError(message, stackTrace, null, errorId);
+        AuraContext context = contextService.getCurrentContext();
+
+        // only output stacktrace for non PROD
+        final ClientSideError error = new ClientSideError(message, (context.getMode().equals(Mode.PROD) ? "" : stackTrace), null, errorId);
         gee.addParam("error", error);
 
-        throw gee;
+        return gee;
     }
 
     @Override
@@ -72,11 +86,19 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
         // Process the error and get its id.
         final String errorId = processError(message, thrown);
 
-        final GenericEventException gee = new GenericEventException(EVENTNAME, thrown);
-        final ClientSideError error = new ClientSideError(message, AuraExceptionUtil.getStackTrace(thrown), data, errorId);
-        gee.addParam("error", error);
+        final GenericEventException gee = getCustomException(errorId, message, thrown, data);
 
         throw gee;
+    }
+
+    protected GenericEventException getCustomException(String errorId, String message, Throwable thrown, @Nullable JsonSerializable data) {
+        final GenericEventException gee = new GenericEventException(EVENTNAME, thrown);
+        AuraContext context = contextService.getCurrentContext();
+
+        // only output stacktrace for non PROD
+        final ClientSideError error = new ClientSideError(message, (context.getMode().equals(Mode.PROD) ? "" : AuraExceptionUtil.getStackTrace(thrown)), data, errorId);
+        gee.addParam("error", error);
+        return gee;
     }
 
     /**
@@ -93,5 +115,13 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
 
         // Default implementation uses a random uuid for the error id.
         return UUID.randomUUID().toString();
+    }
+
+    /**
+     * Injection override.
+     */
+    @Inject
+    public void setContextService(ContextService contextService) {
+        this.contextService = contextService;
     }
 }

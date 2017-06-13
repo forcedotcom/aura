@@ -19,9 +19,14 @@ package org.auraframework.impl.adapter;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.auraframework.impl.test.util.LoggingTestAppender;
+import org.auraframework.service.ContextService;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.GenericEventException;
 import org.auraframework.util.test.util.UnitTestCase;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +36,16 @@ public class ServerErrorUtilAdapterImplUnitTest extends UnitTestCase {
     private static final String SERVER_ERROR_EVENT = "aura:serverActionError";
 
     private ServerErrorUtilAdapterImpl serverErrorUtilAdapter = new ServerErrorUtilAdapterImpl();
+
+    @Override
+    @Before
+    public void setUp() {
+        ContextService mockContextSerivce = Mockito.mock(ContextService.class);
+        AuraContext mockContext = Mockito.mock(AuraContext.class);
+        Mockito.when(mockContext.getMode()).thenReturn(Mode.DEV);
+        Mockito.when(mockContextSerivce.getCurrentContext()).thenReturn(mockContext);
+        serverErrorUtilAdapter.setContextService(mockContextSerivce);
+    }
 
     @Test
     public void handleException() throws Exception {

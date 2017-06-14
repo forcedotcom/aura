@@ -87,8 +87,89 @@ CryptoAdapter.IV_LENGTH = 16;
 /** A sentinel value to verify the key against pre-existing data. */
 CryptoAdapter.SENTINEL = "cryptoadapter";
 
-/** The Web Cryptography API */
-CryptoAdapter.engine = window["crypto"] && (window["crypto"]["subtle"] || window["crypto"]["webkitSubtle"]);
+/** Initializes he Web Cryptography API */
+CryptoAdapter.initializeEngine = function() {
+    /*
+     * Replace window.crypto with the IE11 vendor prefixed window.msCrypto
+     * See https://msdn.microsoft.com/en-us/library/dn302338(v=vs.85).aspx
+     */
+    if (window["msCrypto"] && !window["crypto"]) {
+        window["crypto"] = {};
+        window["crypto"]["subtle"] = {};
+
+        /*
+         * Wrap the window.crypto.subtle functions to make them return a Promise instead of a CryptoOperation
+         * See https://msdn.microsoft.com/en-us/library/dn904640(v=vs.85).aspx
+         */
+        window["crypto"]["subtle"]["importKey"] = function(format, keyData, algorithm, extractable, keyUsages) {
+            return new Promise(function(resolve, reject) {
+                var op = window["msCrypto"]["subtle"]["importKey"](format, keyData, algorithm, extractable, keyUsages);
+                op.onerror = function(evt) {
+                    // there isn't useful error information in evt, so just indicate a generic error
+                    reject(new Error('Failed to importKey'));
+                };
+
+                op.oncomplete = function(evt) {
+                    resolve(evt.target.result);
+                };
+            });
+        };
+
+        window["crypto"]["subtle"]["encrypt"] = function(algorithm, key, buffer) {
+            return new Promise(function(resolve, reject) {
+                var op = window["msCrypto"]["subtle"]["encrypt"](algorithm, key, buffer);
+                op.onerror = function(evt) {
+                    // there isn't useful error information in evt, so just indicate a generic error
+                    reject(new Error('Failed to encrypt'));
+                };
+
+                op.oncomplete = function(evt) {
+                    resolve(evt.target.result);
+                };
+
+                /*
+                 * If the initial buffer provided to the encrypt call is empty, the CryptoOperation waits for additional
+                 * data to be provided in chunks via the CryptoOperation.process method. In the case where trying to
+                 * encrypt an undefined value the buffer is empty so we have to manually tell the operation to finish.
+                 * See https://msdn.microsoft.com/en-us/library/dn302329(v=vs.85).aspx
+                 */
+                if (!buffer || buffer.byteLength === 0) {
+                    op.finish();
+                }
+            });
+        };
+
+        window["crypto"]["subtle"]["decrypt"] = function(algorithm, key, buffer) {
+            return new Promise(function(resolve, reject) {
+                var op = window["msCrypto"]["subtle"]["decrypt"](algorithm, key, buffer);
+                op.onerror = function(evt) {
+                    // there isn't useful error information in evt, so just indicate a generic error
+                    reject(new Error('Failed to decrypt'));
+                };
+
+                op.oncomplete = function(evt) {
+                    resolve(evt.target.result);
+                };
+
+                /*
+                 * If the initial buffer provided to the decrypt call is empty, the CryptoOperation waits for additional
+                 * data to be provided in chunks via the CryptoOperation.process method. I don't think there is a case
+                 * where the buffer will be empty for a decrypt call, but just in case it is we tell the operation to
+                 * finish without waiting for more data. See https://msdn.microsoft.com/en-us/library/dn302326(v=vs.85).aspx
+                 */
+                if (!buffer || buffer.byteLength === 0) {
+                    op.finish();
+                }
+            });
+        };
+
+        window["crypto"]["getRandomValues"] = window["msCrypto"]["getRandomValues"].bind(window["msCrypto"]);
+    }
+
+    CryptoAdapter.engine = window["crypto"] && (window["crypto"]["subtle"] || window["crypto"]["webkitSubtle"]);
+};
+
+CryptoAdapter.initializeEngine();
 
 
 /** Promise that resolves with the per-application encryption key. */

@@ -718,4 +718,375 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
         }
     }
 
+    [Fixture]
+    function initializeEngine() {
+        // Mock Promise to be synchronous
+        var MockPromise = function MockPromise(f) {
+            var ret;
+            try {
+                f(
+                    function resolve(v) { ret = ResolvePromise(v); },
+                    function reject(e) { ret = RejectPromise(e); }
+                );
+                return ret;
+            } catch (e) {
+                return RejectPromise(e);
+            }
+        };
+        MockPromise.resolve = ResolvePromise;
+        MockPromise.reject = RejectPromise;
+
+        // Mock a CryptoOperation that completes immediately
+        var SuccessfulCryptoResult = 'successful-crypto-result';
+        var CompletedCryptoOperation = {};
+        Object.defineProperty(CompletedCryptoOperation, 'oncomplete', {
+            enumerable: true,
+            configurable: false,
+            set: function(listener) {
+                listener({
+                    target: {
+                        result: SuccessfulCryptoResult
+                    }
+                });
+            }
+        });
+
+        // Mock a CryptoOperation that completes after the finish method is called
+        var UnfinishedCryptoOperation = {
+            finish: function() {
+                if (this._listener) {
+                    this._listener({
+                        target: {
+                            result: SuccessfulCryptoResult
+                        }
+                    });
+                }
+            }
+        };
+        Object.defineProperty(UnfinishedCryptoOperation, 'oncomplete', {
+            enumerable: true,
+            configurable: false,
+            set: function(listener) {
+                this._listener = listener;
+            }
+        });
+
+        // Mock a CryptoOperation that fails immediately
+        var FailedCryptoOperation = {};
+        Object.defineProperty(FailedCryptoOperation, 'onerror', {
+            enumerable: true,
+            configurable: false,
+            set: function(listener) {
+                listener();
+            }
+        });
+
+        [Fact]
+        function UsesMsCryptoForImportKeyFunction() {
+            var actual = false;
+            var mocks = Mocks.GetMocks(Object.Global(), {
+                Promise: MockPromise,
+                window: {
+                    msCrypto: {
+                        subtle: {
+                            importKey: function() {
+                                return CompletedCryptoOperation;
+                            }
+                        },
+                        getRandomValues: function() {}
+                    }
+                }
+            });
+
+            mockCrypto(function() {
+                mocks(function() {
+                    Aura.Storage.CryptoAdapter.initializeEngine();
+
+                    Aura.Storage.CryptoAdapter.engine.importKey().then(function(result) {
+                        actual = result;
+                    });
+                });
+            });
+
+            Assert.Equal(SuccessfulCryptoResult, actual);
+        }
+
+        [Fact]
+        function UsesMsCryptoForEncryptFunction() {
+            var actual = false;
+            var mocks = Mocks.GetMocks(Object.Global(), {
+                Promise: MockPromise,
+                window: {
+                    msCrypto: {
+                        subtle: {
+                            encrypt: function() {
+                                return CompletedCryptoOperation;
+                            }
+                        },
+                        getRandomValues: function() {}
+                    }
+                }
+            });
+
+            mockCrypto(function() {
+                mocks(function() {
+                    Aura.Storage.CryptoAdapter.initializeEngine();
+
+                    Aura.Storage.CryptoAdapter.engine.encrypt(null, null, new ArrayBuffer(1)).then(function(result) {
+                        actual = result;
+                    });
+                });
+            });
+
+            Assert.Equal(SuccessfulCryptoResult, actual);
+        }
+
+        [Fact]
+        function UsesMsCryptoForDecryptFunction() {
+            var actual = false;
+            var mocks = Mocks.GetMocks(Object.Global(), {
+                Promise: MockPromise,
+                window: {
+                    msCrypto: {
+                        subtle: {
+                            decrypt: function() {
+                                return CompletedCryptoOperation;
+                            }
+                        },
+                        getRandomValues: function() {}
+                    }
+                }
+            });
+
+            mockCrypto(function() {
+                mocks(function() {
+                    Aura.Storage.CryptoAdapter.initializeEngine();
+
+                    Aura.Storage.CryptoAdapter.engine.decrypt(null, null, new ArrayBuffer(1)).then(function(result) {
+                        actual = result;
+                    });
+                });
+            });
+
+            Assert.Equal(SuccessfulCryptoResult, actual);
+        }
+
+        [Fact]
+        function UsesMsCryptoForGetRandomValuesFunction() {
+            var actual = false;
+            var mocks = Mocks.GetMocks(Object.Global(), {
+                Promise: MockPromise,
+                window: {
+                    msCrypto: {
+                        subtle: {},
+                        getRandomValues: function() {
+                            actual = true;
+                        }
+                    }
+                }
+            });
+
+            mockCrypto(function() {
+                mocks(function() {
+                    Aura.Storage.CryptoAdapter.initializeEngine();
+
+                    window.crypto.getRandomValues();
+                });
+            });
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function RejectsPromiseWhenMsCryptoImportKeyFails() {
+            var actual = false;
+            var mocks = Mocks.GetMocks(Object.Global(), {
+                Promise: MockPromise,
+                window: {
+                    msCrypto: {
+                        subtle: {
+                            importKey: function() {
+                                return FailedCryptoOperation;
+                            }
+                        },
+                        getRandomValues: function() {}
+                    }
+                }
+            });
+
+            mockCrypto(function() {
+                mocks(function() {
+                    Aura.Storage.CryptoAdapter.initializeEngine();
+
+                    Aura.Storage.CryptoAdapter.engine.importKey().then(
+                        function() {},
+                        function(err) {
+                            actual = err;
+                        }
+                    );
+                });
+            });
+
+            Assert.Equal(new Error("Failed to importKey"), actual);
+        }
+
+        [Fact]
+        function RejectsPromiseWhenMsCryptoEncryptFails() {
+            var actual = false;
+            var mocks = Mocks.GetMocks(Object.Global(), {
+                Promise: MockPromise,
+                window: {
+                    msCrypto: {
+                        subtle: {
+                            encrypt: function() {
+                                return FailedCryptoOperation;
+                            }
+                        },
+                        getRandomValues: function() {}
+                    }
+                }
+            });
+
+            mockCrypto(function() {
+                mocks(function() {
+                    Aura.Storage.CryptoAdapter.initializeEngine();
+
+                    Aura.Storage.CryptoAdapter.engine.encrypt(null, null, new ArrayBuffer(1)).then(
+                        function() {},
+                        function(err) {
+                            actual = err;
+                        }
+                    );
+                });
+            });
+
+            Assert.Equal(new Error("Failed to encrypt"), actual);
+        }
+
+        [Fact]
+        function RejectsPromiseWhenMsCryptoDecryptFails() {
+            var actual = false;
+            var mocks = Mocks.GetMocks(Object.Global(), {
+                Promise: MockPromise,
+                window: {
+                    msCrypto: {
+                        subtle: {
+                            decrypt: function() {
+                                return FailedCryptoOperation;
+                            }
+                        },
+                        getRandomValues: function() {}
+                    }
+                }
+            });
+
+            mockCrypto(function() {
+                mocks(function() {
+                    Aura.Storage.CryptoAdapter.initializeEngine();
+
+                    Aura.Storage.CryptoAdapter.engine.decrypt(null, null, new ArrayBuffer(1)).then(
+                        function() {},
+                        function(err) {
+                            actual = err;
+                        }
+                    );
+                });
+            });
+
+            Assert.Equal(new Error("Failed to decrypt"), actual);
+        }
+
+        [Fact]
+        function EncryptHandlesEmptyBufferValues() {
+            var actual = false;
+            var mocks = Mocks.GetMocks(Object.Global(), {
+                Promise: MockPromise,
+                window: {
+                    msCrypto: {
+                        subtle: {
+                            encrypt: function() {
+                                return UnfinishedCryptoOperation;
+                            }
+                        },
+                        getRandomValues: function() {}
+                    }
+                }
+            });
+
+            mockCrypto(function() {
+                mocks(function() {
+                    Aura.Storage.CryptoAdapter.initializeEngine();
+
+                    Aura.Storage.CryptoAdapter.engine.encrypt(null, null, new ArrayBuffer(0)).then(function(result) {
+                        actual = result;
+                    });
+                });
+            });
+
+            Assert.Equal(SuccessfulCryptoResult, actual);
+        }
+
+        [Fact]
+        function DecryptHandlesEmptyBufferValues() {
+            var actual = false;
+            var mocks = Mocks.GetMocks(Object.Global(), {
+                Promise: MockPromise,
+                window: {
+                    msCrypto: {
+                        subtle: {
+                            decrypt: function() {
+                                return UnfinishedCryptoOperation;
+                            }
+                        },
+                        getRandomValues: function() {}
+                    }
+                }
+            });
+
+            mockCrypto(function() {
+                mocks(function() {
+                    Aura.Storage.CryptoAdapter.initializeEngine();
+
+                    Aura.Storage.CryptoAdapter.engine.decrypt(null, null, new ArrayBuffer(0)).then(function(result) {
+                        actual = result;
+                    });
+                });
+            });
+
+            Assert.Equal(SuccessfulCryptoResult, actual);
+        }
+
+        [Fact]
+        function IgnoresMsCryptoObjectIfStandardCryptoObjectPresent() {
+            var actual = false;
+            var mocks = Mocks.GetMocks(Object.Global(), {
+                window: {
+                    msCrypto: {
+                        subtle: {
+                            encrypt: function() {}
+                        },
+                        getRandomValues: function() {}
+                    },
+                    crypto: {
+                        subtle: {
+                            encrypt: function() {
+                                actual = true;
+                            }
+                        }
+                    }
+                }
+            });
+
+            mockCrypto(function() {
+                mocks(function() {
+                    Aura.Storage.CryptoAdapter.initializeEngine();
+
+                    Aura.Storage.CryptoAdapter.engine.encrypt();
+                });
+            });
+
+            Assert.True(actual);
+        }
+    }
+
 }

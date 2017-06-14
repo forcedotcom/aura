@@ -1,10 +1,10 @@
 import { Element } from 'engine';
 export default class Composite extends Element {
-    literal = "Default literal";
-    bound = "Default bound";
-    unbound = "Default unbound";
-    expression = 'Default expression';
-    callbackaction;
+    @api literal = "Default literal";
+    @api bound = "Default bound";
+    @api unbound = "Default unbound";
+    @api expression = 'Default expression';
+    @api callbackaction;
 
     constructor() {
         super();

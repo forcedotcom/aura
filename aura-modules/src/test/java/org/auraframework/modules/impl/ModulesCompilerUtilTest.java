@@ -40,7 +40,7 @@ public class ModulesCompilerUtilTest extends UnitTestCase {
 
         String compilerInput = ModulesCompilerUtil.generateCompilerInput(entry, sources).getJSONObject("options")
                 .toString();
-        String expected = "{\"mode\":\"all\",\"sources\":{\"modules/moduletest/moduletest.js\":\"export default class Test {\\n    stringQuote = 'str\\\"ing';\\n    stringDoubleQuote = \\\"str'ing\\\";\\n    stringBacktick = `key=${value}`;\\n    \\n    VALID_NAME_RE = /^([a-zA-Z]\\\\w*):([a-zA-Z]\\\\w*)$/;\\n}\",\"modules/moduletest/moduletest.html\":\"<template>\\n    <x-test>{test}<\\/x-test>\\n<\\/template>\"},\"mapNamespaceFromPath\":true,\"format\":\"amd\"}";
+        String expected = "{\"mode\":\"all\",\"sources\":{\"modules/moduletest/moduletest.js\":\"export default class Test {\\n    @api stringQuote = 'str\\\"ing';\\n    @api stringDoubleQuote = \\\"str'ing\\\";\\n    @api stringBacktick = `key=${value}`;\\n    \\n    @api VALID_NAME_RE = /^([a-zA-Z]\\\\w*):([a-zA-Z]\\\\w*)$/;\\n}\",\"modules/moduletest/moduletest.html\":\"<template>\\n    <x-test>{test}<\\/x-test>\\n<\\/template>\"},\"mapNamespaceFromPath\":true,\"format\":\"amd\"}";
         assertEquals(expected, compilerInput);
     }
 }

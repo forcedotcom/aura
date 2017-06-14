@@ -91,7 +91,7 @@ public class ModulesCompilerTest extends UnitTestCase {
             e.printStackTrace();
             String message = Throwables.getRootCause(e).getMessage();
             assertTrue(message,
-                    message.contains("Error: modules/errorInHtml/errorInHtml.html: Unexpected token (2:5)"));
+                    message.contains("Error: Self-closing syntax <x-foo/> is not allowed in custom elements, use an explicit closing tag instead <x-foo></x-foo>."));
         }
     }
 

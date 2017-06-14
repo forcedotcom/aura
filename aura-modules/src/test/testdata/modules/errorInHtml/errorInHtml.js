@@ -1,3 +1,3 @@
 export default class Bar {
-    @prop min = D5;
+    @api min = D5;
 }

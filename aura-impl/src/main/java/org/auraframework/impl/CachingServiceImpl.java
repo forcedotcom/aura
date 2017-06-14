@@ -36,6 +36,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.cache.CacheImpl;
+import org.auraframework.impl.cache.HardCacheImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.ModuleDefinitionUtil;
 import org.auraframework.service.CachingService;
@@ -143,7 +144,7 @@ public class CachingServiceImpl implements CachingService {
                 .setSoftValues(true).build();
 
         size = getCacheSize("aura.cache.altStringsCacheSize", ALT_STRINGS_CACHE_SIZE);
-        altStringsCache = this.<String, String> getCacheBuilder()
+        altStringsCache = new HardCacheImpl.Builder<String,String>()
                 .setInitialSize(size)
                 .setLoggingAdapter(loggingAdapter)
                 .setMaximumSize(size)

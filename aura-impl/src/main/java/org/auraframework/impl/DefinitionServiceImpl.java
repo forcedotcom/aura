@@ -486,7 +486,8 @@ public class DefinitionServiceImpl implements DefinitionService {
                                 matched.addAll(registryResults.stream()
                                         .filter(regRes -> {
                                             try {
-                                                return computeAccess(referenceDescriptor.getDescriptor(), regRes.getDef()) == null;
+                                                return computeAccess(referenceDescriptor.getDescriptor(),
+                                                    getDefinition(regRes)) == null;
                                             } catch (QuickFixException e) {
                                                 return false;
                                             }
@@ -751,6 +752,23 @@ public class DefinitionServiceImpl implements DefinitionService {
             throw de.qfe;
         }
         return de.uid;
+    }
+
+    /**
+     * Get the cacheable flag for a uid.
+     *
+     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
+     */
+    @Override
+    public boolean isDependencySetCacheable(String uid) {
+        if (uid == null) {
+            return false;
+        }
+        DependencyEntry de = contextService.getCurrentContext().getLocalDependencyEntry(uid);
+        if (de == null) {
+            return false;
+        }
+        return de.cacheable;
     }
 
     /**
@@ -1056,18 +1074,17 @@ public class DefinitionServiceImpl implements DefinitionService {
                 return de;
             }
 
-            de = createDependencyEntry(compiled, uid, clientLibs);
+            de = createDependencyEntry(compiled, uid, clientLibs, currentCC.shouldCacheDependencies);
 
             CompilingDef<T> cd = currentCC.getCompiling(descriptor);
             Cache<String, DependencyEntry> depsCache = cachingService.getDepsCache();
-            if (cd.cacheable) {
-                // put UID-qualified descriptor key for dependency
-                depsCache.put(makeGlobalKey(de.uid, descriptor, modulesEnabled), de);
 
-                // put unqualified descriptor key for dependency
-                if (currentCC.shouldCacheDependencies) {
-                    depsCache.put(makeNonUidGlobalKey(descriptor, modulesEnabled), de);
-                }
+            // put UID-qualified descriptor key for dependency
+            depsCache.put(makeGlobalKey(de.uid, descriptor, modulesEnabled), de);
+
+            // put unqualified descriptor key for dependency
+            if (currentCC.shouldCacheDependencies) {
+                depsCache.put(makeNonUidGlobalKey(descriptor, modulesEnabled), de);
             }
 
             // See localDependencies comment
@@ -1084,7 +1101,8 @@ public class DefinitionServiceImpl implements DefinitionService {
     }
 
     private DependencyEntry createDependencyEntry(List<CompilingDef<?>> compiled, String uid,
-                                                  List<ClientLibraryDef> clientLibs) {
+                                                  List<ClientLibraryDef> clientLibs,
+                                                  boolean cacheable) {
         Set<DefDescriptor<? extends Definition>> deps = Sets.newLinkedHashSet();
         // level sorting is important for css and aura:library dependency ordering
         Collections.sort(compiled);
@@ -1093,7 +1111,7 @@ public class DefinitionServiceImpl implements DefinitionService {
             deps.add(cd.descriptor);
         }
 
-        return new DependencyEntry(uid, Collections.unmodifiableSet(deps), clientLibs);
+        return new DependencyEntry(uid, Collections.unmodifiableSet(deps), clientLibs, cacheable);
     }
 
     /**

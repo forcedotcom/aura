@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -363,7 +364,7 @@ public class ServerServiceImpl implements ServerService {
         final boolean minify = context.getMode().minify();
 
         context.setPreloading(true);
-        DefDescriptor<?> appDesc = context.getLoadingApplicationDescriptor();
+        DefDescriptor<? extends BaseComponentDef> appDesc = context.getLoadingApplicationDescriptor();
 
         final String mKey = minify ? "MIN:" : "DEV:";
         final String uid = context.getUid(appDesc);
@@ -372,13 +373,22 @@ public class ServerServiceImpl implements ServerService {
         final String modules = context.isModulesEnabled() ? ":m" : "";
         final String key = "JS:" + mKey + uid + ":" + lockerServiceCacheBuster + modules;
                 
-        String cached = getAltCachedString(uid, appDesc, key,
-                () -> {
-                    String res = getDefinitionsString(dependencies, key);
-                    //log the cache miss here
-                    cachingService.getAltStringsCache().logCacheStatus("cache miss for key: "+key+";");
-                    return res;
-                });
+        final Callable<String> buildFunction = () -> {
+            String res = getDefinitionsString(dependencies, key);
+            //log the cache miss here
+            cachingService.getAltStringsCache().logCacheStatus("cache miss for key: "+key+";");
+            return res;
+        };
+        String cached;
+        //
+        // Careful here. We want to be sure that it is safe to 'permanently' cache the app.js
+        // string here. In the case of cacheable components, this is the case, otherwise, no.
+        //
+        if (definitionService.isDependencySetCacheable(uid)) {
+            cached = getAltCachedString(uid, appDesc, key, buildFunction);
+        } else {
+            cached = getCachedString(uid, appDesc, key, buildFunction);
+        }
 
         if (out != null) {
            out.append(cached);

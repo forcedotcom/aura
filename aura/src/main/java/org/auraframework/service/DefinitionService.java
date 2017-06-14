@@ -207,6 +207,16 @@ public interface DefinitionService extends AuraService {
     List<ClientLibraryDef> getClientLibraries(String uid);
 
     /**
+     * Check to see if the dependency set is cacheable or not.
+     *
+     * This is really about wether we expect the definition to change. If not, we can cache based on
+     * descriptor rather than uid, and we can expect those to be 'permanent'. If the entry is not
+     * cacheable, the UID should still give us the ability to cache, but we must be carefull about permanence,
+     * as the defintion may be dynamic.
+     */
+    boolean isDependencySetCacheable(String uid);
+
+    /**
      * assert that the referencingDescriptor has access to the definition.
      *
      * @param referencingDescriptor the descriptor of the component referencing the definition.

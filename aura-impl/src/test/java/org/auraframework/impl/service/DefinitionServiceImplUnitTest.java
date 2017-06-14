@@ -661,7 +661,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
     	
     	Set<DefDescriptor<? extends Definition>> dependencies = new HashSet<>();
     	List<ClientLibraryDef> clientLibraries = new ArrayList<>();
-    	DependencyEntry de = new DependencyEntry("testUID", dependencies, clientLibraries);
+    	DependencyEntry de = new DependencyEntry("testUID", dependencies, clientLibraries, false);
     	AuraContext context = new AuraContextImpl(Mode.DEV, registries,
                 null /* defaultPrefixes */,
                 Format.JSON, Authentication.AUTHENTICATED,
@@ -693,7 +693,7 @@ public class DefinitionServiceImplUnitTest extends AuraImplTestCase {
     	
     	Set<DefDescriptor<? extends Definition>> dependencies = new HashSet<>();
     	List<ClientLibraryDef> clientLibraries = new ArrayList<>();
-    	DependencyEntry de = new DependencyEntry("testUID", dependencies, clientLibraries);
+    	DependencyEntry de = new DependencyEntry("testUID", dependencies, clientLibraries, false);
     	AuraContext context = new AuraContextImpl(Mode.DEV, registries,
                 null /* defaultPrefixes */,
                 Format.JSON, Authentication.AUTHENTICATED,

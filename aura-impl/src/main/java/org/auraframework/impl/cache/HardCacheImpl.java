@@ -24,103 +24,135 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 
-public class CacheImpl<K, T> implements Cache<K, T> {
+/**
+ * A 'hard' cache, which is actually a map that looks like a cache.
+ */
+public class HardCacheImpl<K, T> implements Cache<K, T> {
     private LoggingAdapter loggingAdapter;
 
     /** A default name string */
     private static final String UNNAMED = "(unnamed)";
 
-    /** Longest interval at which to log cache stats in "normal" operation */
-    private static final long ONE_HOUR = 1000 * 60 * 60;
-
-    /** Shortest interval at which to log cache stats in "normal" operation */
-    private static final long ONE_MINUTE = 1000 * 60;
-
-    private com.google.common.cache.Cache<K, T> cache;
+    private final ConcurrentHashMap<K,T> map;
+    private final ConcurrentHashMap<K,ReentrantLock> lockMap;
     private String name;
+    private AtomicLong hitCount = new AtomicLong();
+    private AtomicLong missCount = new AtomicLong();
+    private AtomicLong loadCount = new AtomicLong();
+    private AtomicLong loadExceptionCount = new AtomicLong();
 
-    CacheImpl(com.google.common.cache.Cache<K, T> cache) {
-        this.cache = cache;
-        this.name = UNNAMED;
+    public CacheStats getStats() {
+        return new CacheStats(hitCount.get(), missCount.get(), loadCount.get(), loadExceptionCount.get(), 0, 0);
     }
 
     @Override
     public void logCacheStatus(String extraMessage) {
         LoggingContext loggingCtx = this.loggingAdapter.getLoggingContext();
-        CacheStats stats = cache.stats();
+        CacheStats stats = getStats();
+
         loggingCtx.logCacheInfo(name,
                 String.format(extraMessage+"hit rate=%.3f", stats.hitRate()),
-                cache.size(), stats);
+                map.size(), stats);
     }
 
-    public CacheImpl(Builder<K, T> builder) {
+    public HardCacheImpl(Builder<K, T> builder) {
         this.loggingAdapter = builder.loggingAdapter;
+        this.map = new ConcurrentHashMap<>(builder.initialCapacity, 0.75F, builder.concurrencyLevel);
+        this.lockMap = new ConcurrentHashMap<>(builder.initialCapacity, 0.75F, builder.concurrencyLevel);
         
-        // if builder.useSecondaryStorage is true, we should try to use a
-        // non-quava secondary-storage cache with streaming ability
-
-        com.google.common.cache.CacheBuilder<Object, Object> cb = com.google.common.cache.CacheBuilder
-                .newBuilder().initialCapacity(builder.initialCapacity)
-                .maximumSize(builder.maximumSize)
-                .concurrencyLevel(builder.concurrencyLevel);
-
-        if (builder.recordStats) {
-            cb = cb.recordStats();
-        }
-
-        if (builder.softValues) {
-            cb = cb.softValues();
-        }
         if (builder.name == null) {
             name = UNNAMED;
         } else {
             name = builder.name;
         }
-
-        CacheEvictionListenerImpl<K, T> listener;
-       
-        listener = new CacheEvictionListenerImpl<>(name, this.loggingAdapter, ONE_MINUTE, ONE_HOUR, 1000);
-        cb.removalListener(listener);
-        cache = cb.build();
-        listener.setCache(cache);
     }
 
     @Override
     public T getIfPresent(K key) {
-        return cache.getIfPresent(key);
+        T value = map.get(key);
+        if (value == null) {
+            missCount.incrementAndGet();
+        } else {
+            hitCount.incrementAndGet();
+        }
+        return value;
     }
 
     @Override
     public T get(K key, Callable<T> loader) throws ExecutionException {
-        return cache.get(key, loader);
+        T value = map.get(key);
+        if (value != null) {
+            hitCount.incrementAndGet();
+            return value;
+        }
+        ReentrantLock provisional = new ReentrantLock();
+        provisional.lock();
+        try {
+            ReentrantLock actual = lockMap.putIfAbsent(key, provisional);
+            if (actual == null) {
+                //
+                // Do a double check now that we have a lock to ensure that
+                // we didn't lose a race.
+                //
+                value = map.get(key);
+                if (value != null) {
+                    hitCount.incrementAndGet();
+                    return value;
+                }
+                missCount.incrementAndGet();
+                try {
+                    value = loader.call();
+                    loadCount.incrementAndGet();
+                    map.put(key, value);
+                } catch (Exception e) {
+                    throw new ExecutionException(e);
+                }
+            } else {
+                actual.lock();
+                try {
+                    value = map.get(key);
+                    hitCount.incrementAndGet();
+                } finally {
+                    actual.unlock();
+                }
+            }
+        } finally {
+            provisional.unlock();
+            lockMap.remove(key);
+        }
+        return value;
     }
 
     @Override
     public void put(K key, T data) {
-        cache.put(key, data);
+        map.put(key, data);
     }
 
     @Override
     public void invalidate(K key) {
-        cache.invalidate(key);
-
+        map.remove(key);
     }
 
     @Override
     public void invalidate(Iterable<K> keys) {
-        cache.invalidateAll(keys);
+        for (K key : keys) {
+            map.remove(key);
+        }
     }
 
     @Override
     public void invalidateAll() {
-        cache.invalidateAll();
+        map.clear();
     }
 
     @Override
     public Set<K> getKeySet() {
-        return cache.asMap().keySet();
+        return map.keySet();
     }
 
     @Override
@@ -141,14 +173,12 @@ public class CacheImpl<K, T> implements Cache<K, T> {
         }
 
         // invalidate collected items
-        if (!invalidItems.isEmpty()) {
-            cache.invalidate(invalidItems);
-        }
+        invalidate(invalidItems);
     }
 
     @Override
     public Object getPrivateUnderlyingCache() {
-        return cache;
+        return map;
     }
 
     @Inject
@@ -181,8 +211,6 @@ public class CacheImpl<K, T> implements Cache<K, T> {
             this.loggingAdapter = loggingAdapter;
             return this;
         }
-
-        ;
 
         @Override
         public Builder<K, T> setMaximumSize(long maximumSize) {
@@ -221,8 +249,8 @@ public class CacheImpl<K, T> implements Cache<K, T> {
         }
 
         @Override
-        public CacheImpl<K, T> build() {
-            return new CacheImpl<>(this);
+        public HardCacheImpl<K, T> build() {
+            return new HardCacheImpl<>(this);
         }
     }
 }

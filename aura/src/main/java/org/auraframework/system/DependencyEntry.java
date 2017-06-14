@@ -39,13 +39,15 @@ public class DependencyEntry {
     public final Set<DefDescriptor<?>> dependencies;
     public final List<ClientLibraryDef> clientLibraries;
     public final QuickFixException qfe;
+    public final boolean cacheable;
 
     public DependencyEntry(String uid, Set<DefDescriptor<? extends Definition>> dependencies,
-                           List<ClientLibraryDef> clientLibraries) {
+                           List<ClientLibraryDef> clientLibraries, boolean cacheable) {
         this.uid = uid;
         this.dependencies = dependencies;
         this.clientLibraries = Collections.unmodifiableList(clientLibraries);
         this.qfe = null;
+        this.cacheable = cacheable;
     }
 
     public DependencyEntry(QuickFixException qfe) {
@@ -53,6 +55,7 @@ public class DependencyEntry {
         this.dependencies = null;
         this.clientLibraries = null;
         this.qfe = qfe;
+        this.cacheable = false;
     }
 
     @Override
@@ -60,6 +63,9 @@ public class DependencyEntry {
         StringBuffer sb = new StringBuffer();
 
         sb.append(uid);
+        sb.append("[");
+        sb.append(cacheable);
+        sb.append("]");
         sb.append(" : ");
         if (qfe != null) {
             sb.append(qfe);

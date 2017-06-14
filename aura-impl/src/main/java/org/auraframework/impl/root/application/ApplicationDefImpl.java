@@ -301,17 +301,23 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
             AuraContext context = Aura.getContextService().getCurrentContext();
             Action previous = context.setCurrentAction(action);
+            boolean actionErrored = false;
             try {
+                action.setup();
                 action.run();
-            } finally {
+
+                @SuppressWarnings("unchecked")
+                List<String> additionalURLs = (List<String>) action.getReturnValue();
+                if (additionalURLs != null) {
+                    urls = additionalURLs;
+                }
+            }
+            finally {
+                action.cleanup();
                 context.setCurrentAction(previous);
             }
 
-            @SuppressWarnings("unchecked")
-            List<String> additionalURLs = (List<String>) action.getReturnValue();
-            if (additionalURLs != null) {
-                urls = additionalURLs;
-            }
+
         }
 
         return urls;
@@ -343,12 +349,15 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
                     AuraContext context = Aura.getContextService().getCurrentContext();
                     Action previous = context.setCurrentAction(action);
                     try {
+                        action.setup();
                         action.run();
+                        value = action.getReturnValue();
                     } finally {
+                        action.cleanup();
                         context.setCurrentAction(previous);
                     }
                     
-                    value = action.getReturnValue();
+
                 }
             }
 

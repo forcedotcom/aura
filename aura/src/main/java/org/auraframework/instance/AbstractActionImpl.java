@@ -149,6 +149,16 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
         this.callerVersion = callerVersion;
     }
 
+    @Override
+    public void setup(){
+        //by default do nothing
+    }
+
+    @Override
+    public void cleanup(){
+        //by default do nothing
+    }
+
     private String actionId;
     @Nonnull private final List<Action> actions;
     private boolean storable;

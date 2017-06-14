@@ -75,7 +75,9 @@ public class ActionDelegateTest extends UnitTestCase {
         
         oneCall(methodMap, calledMap, "getId");
         oneCall(methodMap, calledMap, "setId", new String("id"));
+        oneCall(methodMap, calledMap, "setup");
         oneCall(methodMap, calledMap, "run");
+        oneCall(methodMap, calledMap, "cleanup");
         oneCall(methodMap, calledMap, "add", (Object)null);
         oneCall(methodMap, calledMap, "getActions");
         oneCall(methodMap, calledMap, "getReturnValue");

@@ -78,6 +78,16 @@ public class JavascriptPseudoAction implements Action {
     }
 
     @Override
+    public void setup(){
+        //do nothing
+    }
+
+    @Override
+    public void cleanup(){
+        //do nothing
+    }
+
+    @Override
     public void add(List<Action> actions) {
         throw new UnsupportedOperationException("client-side Javascript actions do not contain other actions server-side");
     }

@@ -57,6 +57,16 @@ public abstract class ActionDelegate implements Action {
     }
 
     @Override
+    public void setup() {
+        original.setup();
+    }
+
+    @Override
+    public void cleanup() {
+        original.cleanup();
+    }
+
+    @Override
     public void add(List<Action> newActions) {
         original.add(newActions);
     }

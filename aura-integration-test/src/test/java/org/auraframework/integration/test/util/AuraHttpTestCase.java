@@ -699,6 +699,16 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
             }
         }
 
+        @Override
+        public void setup(){
+            //do nothing
+        }
+
+        @Override
+        public void cleanup(){
+            //do nothing
+        }
+
         public String getRawResponse() {
             return this.rawResponse;
         }

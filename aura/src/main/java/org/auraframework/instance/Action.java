@@ -53,6 +53,16 @@ public interface Action extends Instance<ActionDef> {
     void run() throws AuraExecutionException;
 
     /**
+     * setup the action before doing any activity
+     */
+    void setup();
+
+    /**
+     * cleanup the action after completing the activity
+     */
+    void cleanup();
+
+    /**
      * Add actions to run after this one.
      */
     void add(List<Action> actions);

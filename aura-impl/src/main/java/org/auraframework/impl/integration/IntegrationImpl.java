@@ -205,25 +205,36 @@ public class IntegrationImpl implements Integration {
                     labelAction.setId("aisLabels");
 
                     Action previous = context.setCurrentAction(action);
+                    boolean labelSetup = false;
                     try {
+                        action.setup();
                         action.run();
                         context.setCurrentAction(labelAction);
+                        labelAction.setup();
+                        labelSetup = true;
                         labelAction.run();
+
+                        Message message = new Message(Lists.newArrayList(action));
+
+                        init.append("var config = ");
+                        serializationService.write(message, null, Message.class, init);
+                        init.append(";\n");
+
+                        if (!actionEventHandlers.isEmpty()) {
+                            init.append("config.actionEventHandlers = ");
+                            init.append(jsonEventHandlers);
+                            init.append(";\n");
+                        }
+
                     } finally {
+                        action.cleanup();
+                        if (labelSetup) {
+                            labelAction.cleanup();
+                        }
                         context.setCurrentAction(previous);
                     }
 
-                    Message message = new Message(Lists.newArrayList(action));
 
-                    init.append("var config = ");
-                    serializationService.write(message, null, Message.class, init);
-                    init.append(";\n");
-
-                    if (!actionEventHandlers.isEmpty()) {
-                        init.append("config.actionEventHandlers = ");
-                        init.append(jsonEventHandlers);
-                        init.append(";\n");
-                    }
 
                     init.append(String.format("(function (w) {\n    w.Aura || (w.Aura = {});\n    w.Aura.afterAppReady = Aura.afterAppReady || [];\n    window.Aura.inlineJsLoaded = true;\n\n    function ais() {\n        $A.__aisScopedCallback(function() { \n            $A.clientService.injectComponent(config, \"%s\", \"%s\"); \n        }); \n    } \n\n    if (Aura.applicationReady) {\n        ais();\n    } else {\n        window.Aura.afterAppReady.push(ais); \n    }\n}(window));", locatorDomId, localId));
                 }

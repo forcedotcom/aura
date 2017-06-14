@@ -199,11 +199,17 @@ public class ServerServiceImpl implements ServerService {
             String aap = String.valueOf(++idx)+"$"+actionAndParams.toString();
             loggingService.startAction(aap, action);
             Action oldAction = context.setCurrentAction(action);
+            boolean earlyCleanup = false;
             try {
+                action.setup();
                 action.run();
             } catch (AuraExecutionException x) {
+                earlyCleanup = true;
                 exceptionAdapter.handleException(x, action);
             } finally {
+                if (earlyCleanup){
+                    action.cleanup();
+                }
                 context.setCurrentAction(oldAction);
                 loggingService.stopAction(aap);
             }
@@ -214,6 +220,9 @@ public class ServerServiceImpl implements ServerService {
             } finally {
                 loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION_AURA);
                 loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION);
+                if (!earlyCleanup){
+                    action.cleanup();
+                }
             }
 
             List<Action> additionalActions = action.getActions();

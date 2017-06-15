@@ -41,7 +41,7 @@ function LockerService() {
     var lockers = [];
     var keyToEnvironmentMap = {};
     var lockerShadows;
-    var isLockerEnabled;
+    var isEnabled;
 
     // This whilelist represents reflective ECMAScript APIs or reflective DOM APIs
     // which, by definition, do not provide authority or access to globals.
@@ -113,12 +113,12 @@ function LockerService() {
 
     // defining LockerService as a service
     var service = {
-            isEnabled : function() {	    
+            isEnabled : function() {
                 //cache the result to avoid having to do the lookup
-                if(isLockerEnabled === undefined){
-                    isLockerEnabled =  $A.getContext().isLockerServiceEnabled || false;
+                if(isEnabled === undefined){
+                    isEnabled =  this.containerSupportsRequiredFeatures();
                 }
-                return isLockerEnabled;
+                return isEnabled;
             },
 
             containerSupportsRequiredFeatures : function() {
@@ -148,7 +148,11 @@ function LockerService() {
                 return this.create(code, key, descriptorDebuggableURL);
             },
 
-            getEnv : function(key, doNotCreate) {
+            getEnv : function(key, /* deprecated*/ doNotCreate) {
+                if (!this.isEnabled()) {
+                    return;
+                }
+
                 var psuedoKeySymbol = JSON.stringify(key);
                 var env = keyToEnvironmentMap[psuedoKeySymbol];
                 if (!env && !doNotCreate) {
@@ -170,7 +174,11 @@ function LockerService() {
                 return key;
             },
 
-            getEnvForSecureObject : function(st, doNotCreate) {
+            getEnvForSecureObject : function(st, /* deprecated*/ doNotCreate) {
+                if (!this.isEnabled()) {
+                    return;
+                }
+
                 var key = ls_getKey(st);
                 return key ? this.getEnv(key, doNotCreate) : undefined;
             },

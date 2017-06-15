@@ -51,7 +51,6 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.allowedGlobals = config["allowedGlobals"];
     this.globals = config["globals"];
     this.enableAccessChecks=true;
-    this.isLockerServiceEnabled = this["isLockerServiceEnabled"] = false;
 
     // JBUCH: TOGGLE LOGGING OFF BY DEFAULT IN PROD MODE
     this.logAccessFailures= true
@@ -296,12 +295,11 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
     }
 
     this.enableAccessChecks=otherContext["enableAccessChecks"];
-    this.isLockerServiceEnabled = this["isLockerServiceEnabled"] = $A.lockerService.containerSupportsRequiredFeatures() && otherContext["lockerEnabled"];
     this.isModulesEnabled = !!otherContext["m"];
     this.moduleServices = otherContext["services"];
 
     try {
-        this.globalValueProviders.merge(otherContext["globalValueProviders"]);        
+        this.globalValueProviders.merge(otherContext["globalValueProviders"]);
     } finally {
         if (otherContext["libraryDefs"]) {
             defs = otherContext["libraryDefs"];
@@ -309,7 +307,7 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
                 $A.componentService.saveLibraryConfig(defs[i]);
             }
         }
-    
+
         if (otherContext["componentDefs"]) {
             defs = otherContext["componentDefs"];
             for (i = 0; i < defs.length; i++) {
@@ -319,7 +317,7 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
                 }
             }
         }
-    
+
         if (otherContext["eventDefs"]) {
             defs = otherContext["eventDefs"];
             for (i = 0; i < defs.length; i++) {
@@ -330,7 +328,7 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
         if (otherContext["moduleDefs"]) {
             $A.componentService.initModuleDefs(otherContext["moduleDefs"]);
         }
-    
+
         this.joinComponentConfigs(otherContext["components"], ""+this.getNum());
         this.joinLoaded(otherContext["loaded"]);
     }

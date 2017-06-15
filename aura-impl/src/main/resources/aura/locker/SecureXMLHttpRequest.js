@@ -42,9 +42,15 @@ function SecureXMLHttpRequest(key) {
 
 		// Properties
 		["readyState", "status", "statusText", "response", "responseType", "responseText",
-		 "responseXML", "responseURL", "timeout", "withCredentials", "upload"].forEach(function (name) {
+		 "responseURL", "timeout", "withCredentials", "upload"].forEach(function (name) {
 			SecureObject.addPropertyIfSupported(o, xhr, name);
 		});
+
+        SecureObject.addPropertyIfSupported(o, xhr, "responseXML", {
+            afterGetCallback: function(value) {
+                return value;
+            }
+        });
 
 		// Event handlers
 		["onloadstart", "onprogress", "onabort", "onerror", "onload", "ontimeout", "onloadend", "onreadystatechange"].forEach(function (name) {
@@ -80,7 +86,9 @@ function SecureXMLHttpRequest(key) {
 			getAllResponseHeaders: SecureObject.createFilteredMethod(o, xhr, "getAllResponseHeaders"),
 			getResponseHeader: SecureObject.createFilteredMethod(o, xhr, "getResponseHeader"),
 
-			setRequestHeader: SecureObject.createFilteredMethod(o, xhr, "setRequestHeader")
+			setRequestHeader: SecureObject.createFilteredMethod(o, xhr, "setRequestHeader"),
+
+            overrideMimeType: SecureObject.createFilteredMethod(o, xhr, "overrideMimeType")
 		});
 
         ls_setRef(o, xhr, key);

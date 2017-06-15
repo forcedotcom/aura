@@ -22,6 +22,7 @@
     <aura:method name="testCannotAccessAuraEndpoints" action="{!c.testCannotAccessAuraEndpoints}"/>
     <aura:method name="testAddEventListener" action="{!c.testAddEventListener}"/>
     <aura:method name="testOnReadyStateChange" action="{!c.testOnReadyStateChange}"/>
+    <aura:method name="testResponseXML" action="{!c.testResponseXML}"/>
 
     <div id="title">SecureXHR test</div>
 </aura:component>

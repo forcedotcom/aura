@@ -28,5 +28,11 @@
         test: function(cmp) {
             cmp.testOnReadyStateChange();
         }
+    },
+
+    testResponseXML: {
+        test: function(cmp) {
+            cmp.testResponseXML();
+        }
     }
 })

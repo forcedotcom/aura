@@ -16,7 +16,7 @@
 
 -->
 <aura:interface support="GA" description="Common interface across input date components">
-    <aura:attribute name="value" type="String" access="GLOBAL" description="The input value of the date/time."/>
+    <aura:attribute name="value" type="String" access="GLOBAL" description="The input value of the date/time as an ISO string."/>
     <aura:attribute name="format" type="String" access="GLOBAL" description="The java.text.SimpleDateFormat style format string."/>
     <aura:attribute name="displayDatePicker" type="Boolean" default="false" access="GLOBAL" description="Indicates if an icon that triggers the date picker is displayed in the field. The default is false."/>
     <aura:attribute name="langLocale" type="String" access="GLOBAL" description="Deprecated. The language locale used to format date time. It only allows to use the value which is provided by Locale Value Provider, otherwise, it falls back to the value of $Locale.langLocale. It will be removed in an upcoming release."/>

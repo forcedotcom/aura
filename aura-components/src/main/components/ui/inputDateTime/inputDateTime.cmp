@@ -21,7 +21,7 @@
     <aura:import library="ui:dateTimeLib" property="dateTimeLib"/>
 
     <aura:attribute name="useSingleInput" type="Boolean" default="{!$Browser.formFactor != 'DESKTOP'}" description="Use single input mode, even on desktop view. Defaults to true for phone and tablet devices (currently only windows devices with IE11)"/>
-    <aura:attribute name="value" type="String" access="GLOBAL" description="The input value of the date/time."/>
+    <aura:attribute name="value" type="String" access="GLOBAL" description="The input value of the date/time as an ISO string."/>
     <aura:attribute name="placeholder" type="String" description="The text that is displayed for date input by default. Set during init based on the 'format' value."/>
     <aura:attribute name="timePlaceholder" type="String" description="The text that is displayed for time input by default. Set during init based on the 'format' value."/>
     <aura:attribute name="loadDatePicker" type="Boolean" default="false" description="Set to true to load the date picker. The default is false."/>

@@ -679,7 +679,7 @@ AuraInstance.prototype.finishInit = function(doNotInitializeServices) {
     }
 
     // Unless we are in IntegrationServices, dispatch location hash change.
-    if (!doNotInitializeServices) {
+    if (!doNotInitializeServices && !Aura["disableHistoryService"]) {
         $A.historyService.init();
     }
 

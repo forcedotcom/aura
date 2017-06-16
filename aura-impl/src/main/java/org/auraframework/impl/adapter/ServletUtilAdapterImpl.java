@@ -977,6 +977,9 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         }
 
         @Override
+        public boolean isNonCspInlineEnabled() { return delegate.isNonCspInlineEnabled(); }
+
+        @Override
         public String getReportUrl() {
             return delegate.getReportUrl();
         }

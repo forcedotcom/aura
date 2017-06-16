@@ -41,7 +41,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
     private static List<String> sameOrigin = null;
     private final CSPInliningService cspInliningService;
 
-    private boolean allowInline;
+    private boolean nonCspInlineEnabled;
 
     /**
      * Returns the content security report URL.
@@ -67,7 +67,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
      * @param scriptService inline csp service
      */
     public DefaultContentSecurityPolicy(boolean inline, CSPInliningService scriptService) {
-        allowInline = inline;
+        nonCspInlineEnabled = inline;
         cspInliningService = scriptService;
     }
 
@@ -93,10 +93,10 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
      */
     @Override
     public Collection<String> getScriptSources() {
-        List<String> list = new ArrayList<>(allowInline ? 4 : 3);
+        List<String> list = new ArrayList<>(nonCspInlineEnabled ? 4 : 3);
         list.add(null); // Same origin allowed
 
-        if (!allowInline && cspInliningService != null){
+        if (!nonCspInlineEnabled && cspInliningService != null){
             list.addAll(cspInliningService.getCurrentScriptDirectives());
         }
 
@@ -104,7 +104,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
 
         boolean strictCSPEnforced = Aura.getConfigAdapter().isStrictCSPEnforced();
 
-        if (allowInline || !strictCSPEnforced) {
+        if (nonCspInlineEnabled || !strictCSPEnforced) {
             list.add(CSP.UNSAFE_INLINE);
         }
         
@@ -153,6 +153,11 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
         return null;
     }
 
+    @Override
+    public boolean isNonCspInlineEnabled() {
+        return nonCspInlineEnabled;
+    }
+
     /**
      * We can connect only to the same origin. Which should be default by the browser anyway.
      */
@@ -172,10 +177,10 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
 
     @Override
     public String getCspHeaderValue() {
-        String header = allowInline ? inlineHeader : defaultHeader;
+        String header = nonCspInlineEnabled ? inlineHeader : defaultHeader;
         if (header == null) {
             header = buildHeaderNormally(this);
-            if (allowInline) {
+            if (nonCspInlineEnabled) {
                 inlineHeader = header;
             } else {
                 defaultHeader = header;

@@ -128,6 +128,12 @@ public interface ContentSecurityPolicy {
      */
     Collection<String> getMediaSources();
 
+    /***
+     * return if the this policy allows unprocted inlines
+     * @return true if unprotected inline is allowed
+     */
+    boolean isNonCspInlineEnabled();
+
     /** Gets the URL for reporting. */
     String getReportUrl();
 }

@@ -1076,7 +1076,7 @@ public class DefinitionServiceImpl implements DefinitionService {
 
             de = createDependencyEntry(compiled, uid, clientLibs, currentCC.shouldCacheDependencies);
 
-            CompilingDef<T> cd = currentCC.getCompiling(descriptor);
+            currentCC.getCompiling(descriptor);
             Cache<String, DependencyEntry> depsCache = cachingService.getDepsCache();
 
             // put UID-qualified descriptor key for dependency

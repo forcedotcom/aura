@@ -167,6 +167,11 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         }
 
         @Override
+        public boolean isNonCspInlineEnabled() {
+            return baseline.isNonCspInlineEnabled();
+        }
+
+        @Override
         public String getCspHeaderValue() {
             return DefaultContentSecurityPolicy.buildHeaderNormally(this);
         }

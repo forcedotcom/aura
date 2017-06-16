@@ -58,7 +58,7 @@ public class AuraCSPInliningService implements CSPInliningService {
     }
 
     @Inject
-    private ContextService contextService;
+    protected ContextService contextService;
 
     @Override
     public List<String> getCurrentScriptDirectives() {
@@ -111,7 +111,7 @@ public class AuraCSPInliningService implements CSPInliningService {
                     out.append(String.format(INLINE, script));
                     break;
                 case NONCE:
-                    out.append(String.format(INLINE_NONCE, script));
+                    out.append(String.format(INLINE_NONCE, contextService.getCurrentContext().getScriptNonce(), script));
                     break;
 				case UNSUPPORTED:
 				default:
@@ -149,7 +149,7 @@ public class AuraCSPInliningService implements CSPInliningService {
         }
     }
 
-    InlineScriptMode getInlineMode() {
+    protected InlineScriptMode getInlineMode() {
         return UNSUPPORTED;
     }
 }

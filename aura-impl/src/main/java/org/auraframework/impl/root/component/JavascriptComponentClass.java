@@ -183,7 +183,7 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
 
         private void writeObjectVariable(StringBuilder out) throws IOException, QuickFixException {
 
-            String jsClassName = getClientClassName(descriptor);
+            getClientClassName(descriptor);
 
             out.append("return ");
             writeObjectLiteral(out);

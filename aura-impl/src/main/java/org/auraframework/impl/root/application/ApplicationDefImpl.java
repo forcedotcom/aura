@@ -301,7 +301,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
             AuraContext context = Aura.getContextService().getCurrentContext();
             Action previous = context.setCurrentAction(action);
-            boolean actionErrored = false;
             try {
                 action.setup();
                 action.run();

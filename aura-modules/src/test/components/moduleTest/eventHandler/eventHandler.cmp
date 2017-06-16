@@ -1,4 +1,5 @@
 <aura:component render="client">
     <aura:attribute name="somethingName" type="String"/>
-    <moduleTest:eventHandlerTests onsomething="{! c.handleSomething }"/>
+    <moduleTest:eventHandlerTests onsomething="{! c.handleSomething }"
+                                  onchange="{! c.handleChange }"/>
 </aura:component>

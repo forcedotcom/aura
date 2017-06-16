@@ -693,7 +693,7 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
     var exportns;
     var url;
 
-    $A.assert(entry, "We couldn't found the definition for dependency: " + descriptor);
+    $A.assert(entry, "Failed to find definition for dependency: " + descriptor);
 
     // If we have resolved already the exports (libraries case), return them
     if (entry.ns) {

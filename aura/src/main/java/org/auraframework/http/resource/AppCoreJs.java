@@ -27,29 +27,31 @@ import javax.servlet.http.HttpServletResponse;
 import org.auraframework.adapter.AppJsUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.http.resource.AuraResourceImpl.AuraResourceException;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 
 @ServiceComponent
-public class AppJs extends AuraResourceImpl {
-    private static final String APPJS_APPEND = "\nAura.appJsReady = true;Aura.appDefsReady&&Aura.appDefsReady();";
+public class AppCoreJs extends AuraResourceImpl {
+
+    private static final String APPJS_PREPEND = "\"undefined\"===typeof Aura&&(Aura={});Aura.bootstrap||(Aura.bootstrap={});Aura.frameworkJsReady||(Aura.ApplicationDefs={cmpExporter:{},libExporter:{}},$A={componentService:{addComponent:function(a,b){Aura.ApplicationDefs.cmpExporter[a]=b},addLibraryExporter:function(a,b){Aura.ApplicationDefs.libExporter[a]=b},initEventDefs:function(a){Aura.ApplicationDefs.eventDefs=a},initLibraryDefs:function(a){Aura.ApplicationDefs.libraryDefs=a},initControllerDefs:function(a){Aura.ApplicationDefs.controllerDefs=a},initModuleDefs:function(a){Aura.ApplicationDefs.moduleDefs=a}}});\n";
     private AppJsUtilAdapter appJsUtilAdapter;
 
-    public AppJs() {
-        super("app.js", Format.JS);
+    public AppCoreJs() {
+        super("appcore.js", Format.JS);
     }
 
     @Override
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context) throws IOException {
-        Set<DefDescriptor<?>> dependencies = appJsUtilAdapter.getPartDependencies(request, response, context, 1);
+        Set<DefDescriptor<?>> dependencies = appJsUtilAdapter.getPartDependencies(request, response, context, 0);
         if (dependencies == null) {
             return;
         }
 
         try {
             PrintWriter writer = response.getWriter();
-            serverService.writeDefinitions(dependencies, writer, true, 1);
-            writer.append(APPJS_APPEND);
+            writer.append(APPJS_PREPEND);
+            serverService.writeDefinitions(dependencies, writer, true, 0);
         } catch (Throwable t) {
             servletUtilAdapter.handleServletException(t, false, context, request, response, false);
             exceptionAdapter.handleException(new AuraResourceException(getName(), response.getStatus(), t));

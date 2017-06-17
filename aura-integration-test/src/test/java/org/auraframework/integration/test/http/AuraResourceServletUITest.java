@@ -94,9 +94,10 @@ public class AuraResourceServletUITest extends WebDriverTestCase {
 
     @Test
     @ThreadHostileTest
+    @Ignore("TODO: revisit for app.js split work")
     public void testAltStringsCacheContainsAppJs() throws Exception {
         openCachesAppWithRefresh("altStringsCache", "markup://performance:caches@JS");
-        //assertEquals("There should be 1 entry in the alt strings cache for JS", "1", getCount());
+        assertEquals("There should be 1 entry in the alt strings cache for JS", "1", getCount());
         checkCount("There should be 1 entry in the alt strings cache for JS", "1");
     }
 

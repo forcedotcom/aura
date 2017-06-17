@@ -120,11 +120,12 @@ LibraryIncludeRegistry.prototype.getLibraryInclude = function(descriptor) {
 
 
 LibraryIncludeRegistry.prototype.hydrateLibrary = function(descriptor, exporter) {
-    var tmp = exporter.toString();
-    var pos = [tmp.indexOf('/*') + 2, tmp.indexOf('*/')];
-
-    tmp = tmp.substr(pos[0], pos[1] - pos[0]);
-    exporter = $A.util.globalEval("function () {" + tmp + " }", undefined, $A.clientService.getSourceMapsUrl(descriptor, 'lib'));
+    if (exporter.name === 'l') {
+        var tmp = exporter.toString();
+        var pos = [tmp.indexOf('/*') + 2, tmp.indexOf('*/')];
+        tmp = tmp.substr(pos[0], pos[1] - pos[0]);
+        exporter = $A.util.globalEval("function () {" + tmp + " }", undefined, $A.clientService.getSourceMapsUrl(descriptor, 'lib'));
+    }
 
     if(!exporter) {
         var defDescriptor = new Aura.System.DefDescriptor(descriptor);

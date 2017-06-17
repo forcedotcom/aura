@@ -85,7 +85,7 @@
       }
     ],
     "hs":true,
-    "cc":"add(function() {\nreturn {\n  \"meta\":{\n    \"name\":\"test$text\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\n});\n"
+    "cc":"$A.componentService.addComponentClass(\"markup://test:text\",function() {\nreturn {\n  \"meta\":{\n    \"name\":\"test$text\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\n});\n"
   },
   "attributes":{
     "values":{
@@ -179,7 +179,7 @@
                 }
               ],
               "hs":true,
-              "cc":"add(function() {\nreturn {\n  \"meta\":{\n    \"name\":\"test$text\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\n});\n"
+              "cc":"$A.componentService.addComponentClass(\"markup://test:text\",function() {\nreturn {\n  \"meta\":{\n    \"name\":\"test$text\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\n});\n"
             }
           }
         ]

@@ -145,6 +145,11 @@ public interface ServletUtilAdapter extends AuraAdapter {
     String getInlineJs(AuraContext context, ComponentDef templateDef) throws IOException;
 
     /**
+     * Get appcore.js url.
+     */
+    String getAppCoreJsUrl(AuraContext context, Map<String, Object> attributes);
+
+    /**
      * Get app.js url.
      */
     String getAppJsUrl(AuraContext context, Map<String, Object> attributes);

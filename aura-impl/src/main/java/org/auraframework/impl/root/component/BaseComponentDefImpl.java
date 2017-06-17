@@ -1115,7 +1115,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         if (isLockerRequired()) {
-            js = convertToLocker(this.descriptor, js);
+            js = convertToLocker(js);
         }
 
         return js;
@@ -1135,10 +1135,10 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         return requireLocker;
     }
 
-    private static final Pattern COMPONENT_CLASS_PATTERN = Pattern.compile("^add\\(\\s*function\\s*\\(\\s*\\)\\s*\\{\\n*(.*)\\}\\);\\s*$",
+    private static final Pattern COMPONENT_CLASS_PATTERN = Pattern.compile("^\\$A\\.componentService\\.addComponentClass\\(\"([^\"]*)\",\\s*function\\s*\\(\\s*\\)\\s*\\{\\n*(.*)\\}\\);\\s*$",
             Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
-    public static String convertToLocker(DefDescriptor descriptor, String code) {
+    public static String convertToLocker(String code) {
 
         if (AuraTextUtil.isNullEmptyOrWhitespace(code)) {
             return code;
@@ -1150,8 +1150,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             return null;
         }
 
-        String clientDescriptor = descriptor.getQualifiedName();
-        String objectVariable = matcher.group(1);
+        String clientDescriptor = matcher.group(1);
+        String objectVariable = matcher.group(2);
 
         return makeLockerizedClass(clientDescriptor, objectVariable);
     }

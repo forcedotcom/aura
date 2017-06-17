@@ -1,4 +1,4 @@
-add(function() {
+$A.componentService.addComponentClass("markup://test:testComponent",function() {
 return {
   "meta":{
     "name":"nonInternal$testComponent",

@@ -35,6 +35,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.auraframework.adapter.AppJsUtilAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.DefDescriptor;
@@ -44,21 +45,23 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
- * Simple (non-integration) test case for {@link AppJs}, most useful for exercising hard-to-reach error
+ * Simple (non-integration) test case for {@link AppCoreJs}, most useful for exercising hard-to-reach error
  * conditions. I would like this test to be in the "aura" module (vice "aura-impl"), but the configuration there isn't
  * friendly to getting a context service, and I think changing that may impact other tests, so I'm leaving it at least
  * for now.
  */
-public class AppJsTest extends UnitTestCase {
+public class AppCoreJsTest extends UnitTestCase {
     /**
      * Name is API!.
      */
     @Test
     public void testName() {
-        assertEquals("app.js", new AppJs().getName());
+        assertEquals("appcore.js", new AppCoreJs().getName());
     }
 
     /**
@@ -66,7 +69,7 @@ public class AppJsTest extends UnitTestCase {
      */
     @Test
     public void testFormat() {
-        assertEquals(Format.JS, new AppJs().getFormat());
+        assertEquals(Format.JS, new AppCoreJs().getFormat());
     }
 
     /**
@@ -81,23 +84,27 @@ public class AppJsTest extends UnitTestCase {
         ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
         ServerService serverService = mock(ServerService.class);
         ExceptionAdapter exceptionAdapter = mock(ExceptionAdapter.class);
-
-        AppJs appJs = new AppJs();
-        appJs.setServletUtilAdapter(servletUtilAdapter);
-        appJs.setServerService(serverService);
-        appJs.setExceptionAdapter(exceptionAdapter);
-
+        AppJsUtilAdapter appJsUtiAdapter = mock(AppJsUtilAdapter.class);
+        AppCoreJs appCoreJs = new AppCoreJs();
+        appCoreJs.setServletUtilAdapter(servletUtilAdapter);
+        appCoreJs.setServerService(serverService);
+        appCoreJs.setExceptionAdapter(exceptionAdapter);
+        appCoreJs.setAppJsUtilAdapter(appJsUtiAdapter);
         Set<DefDescriptor<?>> dependencies = new HashSet<>();
-        when(servletUtilAdapter.verifyTopLevel(any(HttpServletRequest.class), any(HttpServletResponse.class), any(AuraContext.class)))
+        when(appJsUtiAdapter.getPartDependencies(
+                any(HttpServletRequest.class),
+                any(HttpServletResponse.class),
+                any(AuraContext.class),
+                eq(0)))
             .thenReturn(dependencies);
 
         Throwable expectedException = new RuntimeException();
-        doThrow(expectedException).when(serverService).writeDefinitions(eq(dependencies), any(PrintWriter.class));
+        doThrow(expectedException).when(serverService).writeDefinitions(eq(dependencies), any(PrintWriter.class), eq(true), eq(0));
 
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         // Act
-        appJs.write(null, response, null);
+        appCoreJs.write(null, response, null);
 
         // Assert
         // Verify the exception first. Because we catch all exceptions and generate gacks,
@@ -108,9 +115,7 @@ public class AppJsTest extends UnitTestCase {
         verify(exceptionAdapter, times(1)).handleException(any(AuraResourceException.class));
 
         // Knock off the known calls. These are mocked above, and are internal implementation dependent.
-        verify(servletUtilAdapter, times(1)).verifyTopLevel(any(HttpServletRequest.class),
-                any(HttpServletResponse.class), any(AuraContext.class));
-        verify(serverService, times(1)).writeDefinitions(same(dependencies), any(PrintWriter.class));
+        verify(serverService, times(1)).writeDefinitions(same(dependencies), any(PrintWriter.class), eq(true), eq(0));
 
         // Make sure nothing else happens.
         verifyNoMoreInteractions(serverService);
@@ -126,15 +131,18 @@ public class AppJsTest extends UnitTestCase {
     @Test
     public void testNullDependencies() throws Exception {
         ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
-        ServerService serverService = mock(ServerService.class);
-        AppJs appJs = new AppJs();
-        appJs.setServletUtilAdapter(servletUtilAdapter);
-        appJs.setServerService(serverService);
-        when(servletUtilAdapter.verifyTopLevel(any(HttpServletRequest.class),
-                any(HttpServletResponse.class), any(AuraContext.class)))
+        AppJsUtilAdapter appJsUtiAdapter = mock(AppJsUtilAdapter.class);
+        AppCoreJs appCoreJs = new AppCoreJs();
+        appCoreJs.setServletUtilAdapter(servletUtilAdapter);
+        appCoreJs.setAppJsUtilAdapter(appJsUtiAdapter);
+        when(appJsUtiAdapter.getPartDependencies(
+                any(HttpServletRequest.class),
+                any(HttpServletResponse.class),
+                any(AuraContext.class),
+                eq(0)))
             .thenReturn(null);
 
-        appJs.write(null, null, null);
+        appCoreJs.write(null, null, null);
 
         // Verify the exception first. Because we catch all exceptions and generate gacks,
         // make sure the expected code path is exercised.
@@ -143,15 +151,8 @@ public class AppJsTest extends UnitTestCase {
                 any(HttpServletResponse.class), anyBoolean());
 
         //
-        // This is the known call to get the null.
-        //
-        verify(servletUtilAdapter, times(1)).verifyTopLevel(any(HttpServletRequest.class),
-                any(HttpServletResponse.class), any(AuraContext.class));
-
-        //
         // Nothing else should happen.
         //
-        verifyNoMoreInteractions(serverService);
         verifyNoMoreInteractions(servletUtilAdapter);
     }
 
@@ -160,13 +161,13 @@ public class AppJsTest extends UnitTestCase {
      */
     @Test
     public void testSetContentType() {
-        AppJs appJs = new AppJs();
+        AppCoreJs appCoreJs = new AppCoreJs();
         ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
-        appJs.setServletUtilAdapter(servletUtilAdapter);
+        appCoreJs.setServletUtilAdapter(servletUtilAdapter);
         when(servletUtilAdapter.getContentType(AuraContext.Format.JS)).thenReturn("text/javascript");
         HttpServletResponse response = new MockHttpServletResponse();
 
-        appJs.setContentType(response);
+        appCoreJs.setContentType(response);
 
         assertEquals("text/javascript", response.getContentType());
     }

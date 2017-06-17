@@ -358,7 +358,7 @@ public class ServerServiceImpl implements ServerService {
     }
 
     @Override
-    public void writeDefinitions(final Set<DefDescriptor<?>> dependencies, Writer out)
+    public void writeDefinitions(final Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex)
             throws IOException, QuickFixException {
         AuraContext context = contextService.getCurrentContext();
         final boolean minify = context.getMode().minify();
@@ -371,10 +371,10 @@ public class ServerServiceImpl implements ServerService {
         final String lockerServiceCacheBuster  = configAdapter.getLockerServiceCacheBuster();
         // modules definitions will be present with modules enabled so needs to be cached separately
         final String modules = context.isModulesEnabled() ? ":m" : "";
-        final String key = "JS:" + mKey + uid + ":" + lockerServiceCacheBuster + modules;
-                
+        final String key = "JS:" + mKey + uid + (hasParts ? ":" + partIndex : "") + ":" + lockerServiceCacheBuster + modules;
+
         final Callable<String> buildFunction = () -> {
-            String res = getDefinitionsString(dependencies, key);
+            String res = getDefinitionsString(dependencies, key, partIndex == 0);
             //log the cache miss here
             cachingService.getAltStringsCache().logCacheStatus("cache miss for key: "+key+";");
             return res;
@@ -395,7 +395,7 @@ public class ServerServiceImpl implements ServerService {
         }
     }
 
-    private String getDefinitionsString (Set<DefDescriptor<?>> dependencies, String key)
+    private String getDefinitionsString (Set<DefDescriptor<?>> dependencies, String key, boolean uncomment)
             throws QuickFixException, IOException {
 
         AuraContext context = contextService.getCurrentContext();
@@ -411,9 +411,19 @@ public class ServerServiceImpl implements ServerService {
         for (LibraryDef libraryDef : libraryDefs) {
             List<IncludeDefRef> includeDefs = libraryDef.getIncludes();
             for (IncludeDefRef defRef : includeDefs) {
-                sb.append("$A.componentService.addLibraryExporter(\"" + defRef.getClientDescriptor() + "\", (function (){/*");
+                if (uncomment) {
+                    sb.append("$A.componentService.addLibraryExporter(\"" + defRef.getClientDescriptor() + "\", (function (){");
+                } else {
+                    sb.append("$A.componentService.addLibraryExporter(\"" + defRef.getClientDescriptor() + "\", (function l(){/*");
+                }
+
                 sb.append(defRef.getCode(minify));
-                sb.append("*/}));");
+
+                if (uncomment) {
+                    sb.append("}));");
+                } else {
+                    sb.append("*/}));");
+                }
 
                 context.setClientClassLoaded(defRef.getDescriptor(), true);
             }
@@ -422,20 +432,28 @@ public class ServerServiceImpl implements ServerService {
         // Append component classes.
         Collection<BaseComponentDef> componentDefs = filterAndLoad(BaseComponentDef.class, dependencies, null);
         for (BaseComponentDef def : componentDefs) {
-            sb.append("$A.componentService.addComponent(\"" + def.getDescriptor() + "\", (function (){/*");
+            if (uncomment) {
+                sb.append("$A.componentService.addComponent(\"" + def.getDescriptor() + "\", (function (){");
+            } else {
+                sb.append("$A.componentService.addComponent(\"" + def.getDescriptor() + "\", (function c(){/*");
+            }
 
-                // Mark class as loaded in the client
-                context.setClientClassLoaded(def.getDescriptor(), true);
+            // Mark class as loaded in the client
+            context.setClientClassLoaded(def.getDescriptor(), true);
 
-                // Component Class
-                sb.append(def.getCode(minify));
+            // Component Class
+            sb.append(def.getCode(minify));
 
-                // Component definition
-                sb.append("return ");
-                serializationService.write(def, null, BaseComponentDef.class, sb, "JSON");
-                sb.append(";");
+            // Component definition
+            sb.append("return ");
+            serializationService.write(def, null, BaseComponentDef.class, sb, "JSON");
+            sb.append(";");
 
-            sb.append("*/}));\n");
+            if (uncomment) {
+                sb.append("}));\n");
+            } else {
+                sb.append("*/}));\n");
+            }
         }
 
         // Append event definitions

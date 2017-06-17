@@ -171,7 +171,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
         Set<DefDescriptor<?>> descs = ImmutableSet.<DefDescriptor<?>> of(libDesc);
         definitionService.getDefinition(libDesc);
         Writer writer = new StringWriter();
-        serverService.writeDefinitions(descs, writer);
+        serverService.writeDefinitions(descs, writer, false, -1);
         String actual = writer.toString();
         actual = actual.replaceFirst("//# sourceURL=libraries/string/thing[0-9]+/uncompressed[0-9]+\\.js\n", "");
         String expected = "function(){var a=\"truth\";window.blah&&(a+=\" hurts\");return a}";

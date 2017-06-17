@@ -20,6 +20,8 @@ import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -89,7 +91,7 @@ public interface ServerService extends AuraService {
      * 
      * This generates a complete set of definitions for an app in JS+JSON.
      */
-    void writeDefinitions(Set<DefDescriptor<?>> dependencies, Writer out) throws IOException, QuickFixException;
+    void writeDefinitions(Set<DefDescriptor<?>> dependencies, Writer out, boolean hasParts, int partIndex) throws IOException, QuickFixException;
 
     /**
      * Write out a set of components in JSON.

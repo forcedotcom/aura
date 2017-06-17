@@ -197,6 +197,7 @@ Logger.prototype.isExternalError = function(e) {
             fileName.match("engine.min.js") === null &&      // not from module engine PROD
             fileName.indexOf('/components/') === -1 &&       // not from components
             fileName.indexOf('/libraries/') === -1 &&        // not from libraries
+            fileName.match("appcore.js") === null &&         // not from appcore.js
             fileName.match("app.js") === null) {             // not from app.js
             count += 1;
         }

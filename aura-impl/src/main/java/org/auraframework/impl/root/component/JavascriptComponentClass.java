@@ -154,7 +154,7 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
 
             StringBuilder out = new StringBuilder();
 
-            out.append("add(");
+            out.append("$A.componentService.addComponentClass(\"" + descriptor.getQualifiedName() + "\",");
             writeExporter(out);
             out.append(");\n");
 
@@ -182,9 +182,6 @@ public class JavascriptComponentClass extends BaseJavascriptClass {
         }
 
         private void writeObjectVariable(StringBuilder out) throws IOException, QuickFixException {
-
-            getClientClassName(descriptor);
-
             out.append("return ");
             writeObjectLiteral(out);
             out.append(";\n");

@@ -433,6 +433,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         }
 
         templateUtil.writeHtmlScript(context, this.getFrameworkUrl(), Script.SYNC, sb);
+        templateUtil.writeHtmlScript(context, this.getAppCoreJsUrl(context, null), Script.SYNC, sb);
         templateUtil.writeHtmlScript(context, this.getAppJsUrl(context, null), Script.SYNC, sb);
         templateUtil.writeHtmlScript(context, this.getBootstrapUrl(context, componentAttributes), Script.SYNC, sb);
     }
@@ -492,6 +493,11 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
             ret += configAdapter.generateJwtToken();
         }
         return ret;
+    }
+
+    @Override
+    public String getAppCoreJsUrl(AuraContext context, Map<String,Object> attributes) {
+        return commonJsUrl("/appcore.js", context, attributes);
     }
 
     @Override

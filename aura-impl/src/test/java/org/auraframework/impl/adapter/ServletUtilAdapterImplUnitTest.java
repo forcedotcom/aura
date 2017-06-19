@@ -301,10 +301,11 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         AuraContext context = Mockito.mock(AuraContext.class);
         Map<String,Object> attributes = Maps.newHashMap();
         sua = Mockito.spy(sua);
-        List<String> expected = Lists.newArrayList("appjs");
+        List<String> expected = Lists.newArrayList("appcorejs", "appjs");
         List<String> actual;
 
         Mockito.doReturn("inline").when(sua).getInlineJsUrl(context, attributes);
+        Mockito.doReturn("appcorejs").when(sua).getAppCoreJsUrl(context, null);
         Mockito.doReturn("appjs").when(sua).getAppJsUrl(context, null);
         Mockito.doReturn("bootstrap").when(sua).getBootstrapUrl(context, attributes);
 
@@ -318,10 +319,11 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         AuraContext context = Mockito.mock(AuraContext.class);
         Map<String,Object> attributes = Maps.newHashMap();
         sua = Mockito.spy(sua);
-        List<String> expected = Lists.newArrayList("appjs");
+        List<String> expected = Lists.newArrayList("appcorejs", "appjs");
         List<String> actual;
 
         Mockito.doReturn("inline").when(sua).getInlineJsUrl(context, attributes);
+        Mockito.doReturn("appcorejs").when(sua).getAppCoreJsUrl(context, null);
         Mockito.doReturn("appjs").when(sua).getAppJsUrl(context, null);
         Mockito.doReturn("bootstrap").when(sua).getBootstrapUrl(context, attributes);
 
@@ -335,10 +337,11 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         AuraContext context = Mockito.mock(AuraContext.class);
         Map<String,Object> attributes = Maps.newHashMap();
         sua = Mockito.spy(sua);
-        List<String> expected = Lists.newArrayList("appjs", "bootstrap");
+        List<String> expected = Lists.newArrayList("appcorejs", "appjs", "bootstrap");
         List<String> actual;
 
         Mockito.doReturn("inline").when(sua).getInlineJsUrl(context, attributes);
+        Mockito.doReturn("appcorejs").when(sua).getAppCoreJsUrl(context, null);
         Mockito.doReturn("appjs").when(sua).getAppJsUrl(context, null);
         Mockito.doReturn("bootstrap").when(sua).getBootstrapUrl(context, attributes);
 
@@ -352,10 +355,11 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         AuraContext context = Mockito.mock(AuraContext.class);
         Map<String,Object> attributes = Maps.newHashMap();
         sua = Mockito.spy(sua);
-        List<String> expected = Lists.newArrayList("inline", "appjs", "bootstrap");
+        List<String> expected = Lists.newArrayList("inline", "appcorejs", "appjs", "bootstrap");
         List<String> actual;
 
         Mockito.doReturn("inline").when(sua).getInlineJsUrl(context, attributes);
+        Mockito.doReturn("appcorejs").when(sua).getAppCoreJsUrl(context, null);
         Mockito.doReturn("appjs").when(sua).getAppJsUrl(context, null);
         Mockito.doReturn("bootstrap").when(sua).getBootstrapUrl(context, attributes);
 

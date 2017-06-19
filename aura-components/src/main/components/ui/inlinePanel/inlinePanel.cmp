@@ -26,6 +26,7 @@
     <aura:attribute name="closeAction" type="Object"
                     description="Overrides default close action (which is destroy) on click outside, tab out and Esc key press. The action is called with two parameters: panel component and one of 'closeOnEsc', 'closeOnTabOut' or 'closeOnClickOut'"/>
     <aura:attribute name="autoFocus" type="Boolean" default="true" description="If true, sets the panel as the first focusable element. The default is true."/>
+    <aura:attribute name="trapFocus" type="Boolean" default="false" description="Indicates if we should trap the focus inside the panel. If true, the esc key always closes the current panel which has focus. If false, the esc key and tab out closes the panel. The default is false."/>
 
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" description="Enables panel manager and panels to communicate"/>
 

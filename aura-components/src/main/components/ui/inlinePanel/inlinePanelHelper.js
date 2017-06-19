@@ -34,9 +34,10 @@
         var libMethod = "get" + type.charAt(0).toUpperCase() + type.slice(1) + "EventListener";
         var conf = {};
         var closeAction = cmp.get("v.closeAction");
+        var trapFocus = $A.util.getBooleanValue(cmp.get('v.trapFocus'));
 
         if(type === 'key') {
-            conf = {closeOnEsc: true, closeOnTabOut:true};
+            conf = {closeOnEsc: true, closeOnTabOut: true, trapFocus: trapFocus};
         } else if (type === 'mouse') {
             conf = {closeOnClickOut: true};
             closeAction = function(panelCmp, action) {

@@ -94,7 +94,7 @@
                 formattedDate = $A.localizationService.formatDateUTC(date, "YYYY-MM-DD");
             }
         }
-        component.set("v.value", formattedDate);
+        component.set("v.value", formattedDate, true);
     },
 
     /**

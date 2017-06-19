@@ -508,6 +508,26 @@
         testUtils.assertNull(cmp.find("title").getElement().getAttribute("for"), "Should have got null when trying to access 'for' attributes on a div");
     },
 
+    testPropertyMeta: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+
+        var meta = document.createElement("meta");
+        meta.setAttribute("property", "og:title");
+        meta.setAttribute("content", "The Rock");
+        document.head.appendChild(meta);
+
+        var el = document.querySelector("meta"); // there should be only one we have access to
+        testUtils.assertEquals("og:title", el.getAttribute("property"));
+        testUtils.assertEquals("The Rock", el.getAttribute("content"));
+    },
+
+    testPropertyAttributeAllowedOnMetaOnly: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        // Negative test case to verify that "property" attribute cannot be read from other dom element types
+        testUtils.expectAuraWarning('SecureElement: [object HTMLDivElement]{ key: {"namespace":"lockerTest"} } does not allow getting/setting the property attribute, ignoring!');
+        testUtils.assertNull(cmp.find("title").getElement().getAttribute("property"), "Should have got null when trying to access 'property' attributes on a div");
+    },
+
     // Verify that element can traverse up the dom hierarchy using parentNode property
     testRecursiveTraversal: function(cmp, event, helper){
         var testUtils = cmp.get("v.testUtils");

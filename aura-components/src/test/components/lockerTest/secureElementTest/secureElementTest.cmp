@@ -45,7 +45,7 @@
     <aura:method name="testSvgGetBBox" action="{!c.testSvgGetBBox}"/>r
     <aura:method name="testScalarExpression" action="{!c.testScalarExpression}"/>
     <aura:method name="testTableAPI" action="{!c.testTableAPI}"/>
- 
+
     <aura:method name="testElementCache" action="{!c.testElementCache}"/>
 
     <aura:method name="getDiv" action="{!c.getDiv}"/>
@@ -72,6 +72,8 @@
     <aura:method name="testGetSetInvalidAttributes"/>
     <aura:method name="testLabelForInput"/>
     <aura:method name="testForAttributeAllowedOnLabelOnly"/>
+    <aura:method name="testPropertyMeta"/>
+    <aura:method name="testPropertyAttributeAllowedOnMetaOnly"/>
     <aura:method name="testRecursiveTraversal"/>
     <aura:method name="testInnerHtmlFiltering"/>
     <aura:method name="testTextContentFiltering"/>
@@ -111,7 +113,7 @@
 
   	<div aura:id="cacheTestA" id="cacheTestA"></div>
   	<div aura:id="cacheTestB" id="cacheTestB"></div>
-    
+
     <ui:stamp aura:id="sentinel" severity="success">Sentinel For Rendering Tests</ui:stamp>
 
     <div id="outsideFacet">

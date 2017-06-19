@@ -451,7 +451,12 @@ SecureElement.isValidAttributeName = function(raw, name, prototype, caseInsensit
 
     // Special case Label element's 'for' attribute. It called 'htmlFor' on prototype but
     // needs to be addressable as 'for' via accessors like .attributes/getAttribute()/setAtribute()
-    if(raw.tagName === "LABEL"  && name.toLowerCase() === "for"){
+    if(raw.tagName === "LABEL" && name.toLowerCase() === "for"){
+        return true;
+    }
+
+    // Special case Meta element's custom 'property' attribute. It used by the Open Graph protocol.
+    if(raw.tagName === "META" && name.toLowerCase() === "property"){
         return true;
     }
 

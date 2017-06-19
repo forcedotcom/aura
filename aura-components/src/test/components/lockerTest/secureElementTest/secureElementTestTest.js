@@ -245,6 +245,18 @@
         }
     },
 
+    testPropertyMeta: {
+        test: function(cmp) {
+            cmp.testPropertyMeta();
+        }
+    },
+
+    testPropertyAttributeAllowedOnMetaOnly: {
+        test: function(cmp) {
+            cmp.testPropertyAttributeAllowedOnMetaOnly();
+        }
+    },
+
     //FIXME - goliver - "LI" : [ "value" ],
 
     //FIXME - goliver - "LINK" : [ "crossOrigin", "href", "hreflang", "media", "rel", "sizes", "title", "type" ],
@@ -475,12 +487,12 @@
             cmp.testScalarExpression();
         }
     },
-    
+
     testTableAPI: {
         test: function(cmp) {
             cmp.testTableAPI();
         }
-    },    
+    },
 
     testElementCache: {
         test: function(cmp) {

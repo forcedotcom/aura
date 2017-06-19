@@ -18,6 +18,7 @@ package org.auraframework.components.perf;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,7 +27,7 @@ import java.util.SortedSet;
 
 import javax.inject.Inject;
 
-import org.auraframework.Aura;
+import org.apache.log4j.Logger;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
@@ -59,9 +60,10 @@ import com.google.gson.Gson;
 
 @ServiceComponent
 public class DependenciesController implements Controller {
+    private static final Logger logger = Logger.getLogger(DependenciesController.class);
+
     @Inject
     private DefinitionService definitionService;
-
 
     @AuraEnabled
     public Set<String> getAllDescriptors() {
@@ -71,19 +73,18 @@ public class DependenciesController implements Controller {
 
         matcher = new DescriptorFilter("markup://*:*", DefType.APPLICATION);
         descriptors.addAll(definitionService.find(matcher));
-        
+
         matcher = new DescriptorFilter("markup://*:*", DefType.LIBRARY);
         descriptors.addAll(definitionService.find(matcher));
-        
+
         Set<String> list = new HashSet<>();
         for (DefDescriptor<?> descriptor : descriptors) {
             list.add(descriptor.toString() + "@" + descriptor.getDefType());
         }
-        
+
         return list;
     }
-    
-    
+
     @AuraEnabled
     public Map<String, Object> getDependencies(@Key("component")String component) {
         DefDescriptor<?> descriptor;
@@ -91,9 +92,9 @@ public class DependenciesController implements Controller {
         Map<String, Object> dependencies = Maps.newHashMap();
         ArrayList<String> list = Lists.newArrayList();
         String uid;
-        
+
         int pos = component.indexOf("@");
-        
+
         if (pos != -1) {
             component = component.substring(0, pos);
         }
@@ -105,34 +106,34 @@ public class DependenciesController implements Controller {
             return null;
         }
         descriptor = descriptors.iterator().next();
-        
+
         try {
             Definition def = definitionService.getDefinition(descriptor);
             if (def == null) {
                 return null;
             }
-            
+
             descriptor = def.getDescriptor();
             uid = definitionService.getUid(null, descriptor);
             sorted = Sets.newTreeSet(definitionService.getDependencies(uid));
-            
+
             for (DefDescriptor<?> dep : sorted) {
                 def = definitionService.getDefinition(dep);
                 DefType type = dep.getDefType();
-                
-                if (type != DefType.EVENT && type != DefType.COMPONENT && type != DefType.INTERFACE && type != DefType.LIBRARY || 
+
+                if (type != DefType.EVENT && type != DefType.COMPONENT && type != DefType.INTERFACE && type != DefType.LIBRARY ||
                     (def.getDescriptor().getNamespace().equals("aura") || def.getDescriptor().getNamespace().equals("auradev"))) {
                     continue;
                 }
-                
+
                 list.add(dep.toString() + "@" + dep.getDefType());
             }
-            
-        dependencies.put("dependencies", list);
-        dependencies.put("def", component);
-        
-        return dependencies;    
-            
+
+            dependencies.put("dependencies", list);
+            dependencies.put("def", component);
+
+        return dependencies;
+
         } catch (Throwable t) {
             return null;
         }
@@ -140,9 +141,9 @@ public class DependenciesController implements Controller {
 
     /**
      * Used by the traceDependencies.app application.
-     * Returns a similar set of data to getDependencies method, but also includes UIDs and HashCodes which help us diagnose 
+     * Returns a similar set of data to getDependencies method, but also includes UIDs and HashCodes which help us diagnose
      * COOS issues.
-     * 
+     *
      * @param component
      * @return
      */
@@ -155,7 +156,7 @@ public class DependenciesController implements Controller {
         ArrayList<Map<String, String>> dependenciesData = Lists.newArrayList();
         String uid;
         String specifiedDefType = null;
-        
+
         // Allows specifying what type you want, since descriptor isn't enough.
         @SuppressWarnings("serial")
         final Map<String, Class> prefixToTypeMap = new HashMap<String, Class>() {{
@@ -164,8 +165,8 @@ public class DependenciesController implements Controller {
             put("js@controller", ControllerDef.class);
             put("js@renderer", RendererDef.class);
             put("js@provider", ProviderDef.class);
-        }};     
-        
+        }};
+
         if (component.contains("@")) {
             final String[] descriptorPair = component.split("@");
             component = descriptorPair[0];
@@ -177,12 +178,12 @@ public class DependenciesController implements Controller {
                 final String[] pair = component.split("://");
                 final String prefix = pair[0].toLowerCase();
                 final String key = (specifiedDefType != null) ? prefix + "@" + specifiedDefType : prefix;
-                
+
                 if(prefixToTypeMap.containsKey(key)) {
                     descriptor = definitionService.getDefDescriptor(component, prefixToTypeMap.get(key));
-                }           
-            } 
-            
+                }
+            }
+
             if(descriptor == null) {
                 final DescriptorFilter filter = new DescriptorFilter(component,
                         Lists.newArrayList(DefType.LIBRARY,DefType.COMPONENT,DefType.APPLICATION,DefType.FLAVORED_STYLE,DefType.HELPER,DefType.CONTROLLER,DefType.STYLE,DefType.EVENT,DefType.RENDERER));
@@ -191,29 +192,29 @@ public class DependenciesController implements Controller {
                     return null;
                 }
                 descriptor = descriptors.iterator().next();
-                    
+
             }
-            
+
             if(descriptor==null) {
-                return null; 
+                return null;
             }
-            
+
             Definition definition = definitionService.getDefinition(descriptor);
             if (definition == null) {
                 dependencies.put("error", "No Definition found for '" + descriptor.toString() + "'");
                 return dependencies;
             }
-            
+
             descriptor = definition.getDescriptor();
             uid = definitionService.getUid(null, descriptor);
             sorted = Sets.newTreeSet(definitionService.getDependencies(uid));
-            
+
             for (DefDescriptor<?> dependency : sorted) {
                 definition = definitionService.getDefinition(dependency);
                 DefType type = dependency.getDefType();
-                
+
                 Map<String, String> returnData = Maps.newHashMap();
-                
+
                 try {
                     String bundle = dependency.getBundle() != null ? dependency.getBundle().getQualifiedName() : "";
                     returnData.put("descriptor", dependency.toString());
@@ -221,22 +222,22 @@ public class DependenciesController implements Controller {
                     returnData.put("uid", definitionService.getUid(null, dependency));
                     returnData.put("bundleName", bundle);
                     returnData.put("hash", definitionService.getDefinition(dependency).getOwnHash());
-                    
+
                 } catch(ClientOutOfSyncException | QuickFixException ex) {
                     returnData.put("descriptor", dependency.toString());
                     returnData.put("defType", type.toString());
                     returnData.put("error", ex.getMessage());
-                    
+
                 }
-                
+
                 dependenciesData.add(returnData);
             }
-            
+
             dependencies.put("dependencies", dependenciesData);
             dependencies.put("def", component);
-            
-            return dependencies;    
-            
+
+            return dependencies;
+
         } catch (Throwable t) {
             dependencies.put("error", t.getMessage());
             return dependencies;
@@ -246,7 +247,7 @@ public class DependenciesController implements Controller {
     /**
      * Used by the dependencyTracker.app application. Returns a similar set of data to getDependencies method, but also
      * includes dependency code sizes which help us analyze app.js
-     * 
+     *
      * @param component
      * @return
      */
@@ -326,7 +327,7 @@ public class DependenciesController implements Controller {
                 dependency.getNamespace().toLowerCase().equals("aura")) {
                 continue;
             }
- 
+
             DefType type = dependency.getDefType();
             if (type.equals(DefType.APPLICATION) ||
                 type.equals(DefType.COMPONENT) ||
@@ -340,7 +341,6 @@ public class DependenciesController implements Controller {
         return dependenciesData;
     }
 
-    @SuppressWarnings("unchecked")
     private Map<String, String> getDependencyDetails(DefDescriptor<?> dependency) throws DefinitionNotFoundException, QuickFixException {
         Map<String, String> returnData = Maps.newHashMap();
         DefType type = dependency.getDefType();
@@ -393,6 +393,7 @@ public class DependenciesController implements Controller {
                 SortedSet<DefDescriptor<?>> dependencies = Sets.newTreeSet(definitionService.getDependencies(dependencyUid));
                 for (DefDescriptor<?> innerDependency : dependencies) {
                     String key = innerDependency.toString();
+
                     // ignore itself
                     // ignore aura dependencies
                     if (key.equals(dependency.toString()) ||
@@ -421,6 +422,7 @@ public class DependenciesController implements Controller {
                         numberOfDeps++;
                     }
                 }
+
                 returnData.put("numberOfDependency", String.valueOf(numberOfDeps));
                 returnData.put("innerDependencySize", String.valueOf(innerDependencySize));
                 returnData.put("innerDependencyProdSize", String.valueOf(prodInnerDependencySize));
@@ -439,7 +441,7 @@ public class DependenciesController implements Controller {
     public Boolean writeAllDependencies(@Key("file")String file) {
         Set<String> descriptors = getAllDescriptors();
         Map<String, Object> dependencies = Maps.newHashMap();
-   
+
             for (String rawDescriptor : descriptors) {
                 Map<String, Object> list = getDependencies(rawDescriptor);
                 if (list != null) {
@@ -448,7 +450,7 @@ public class DependenciesController implements Controller {
                 dependencies.put(rawDescriptor, list);
             }
 
-            Gson gson = new Gson(); 
+            Gson gson = new Gson();
             String json = gson.toJson(dependencies);
             String path = AuraFiles.Core.getPath() + "/aura-resources/src/main/resources/aura/resources/";
             try(PrintWriter out = new PrintWriter( path + file )) {
@@ -460,4 +462,90 @@ public class DependenciesController implements Controller {
 
         return true;
     }
+
+    @AuraEnabled
+    public Map<String, Node> createGraph(@Key("app")String app) throws Exception {
+        DescriptorFilter matcher = new DescriptorFilter(app, DefType.APPLICATION);
+        Set<DefDescriptor<?>> descriptors = definitionService.find(matcher);
+        if (descriptors == null || descriptors.size() == 0) {
+            return null;
+        }
+
+        DefDescriptor<?> root = (DefDescriptor<?>)descriptors.toArray()[0];
+        Node rootNode = new Node(root);
+
+        Graph graph = new Graph(rootNode);
+        Set<String> visited = new HashSet<>();
+        buildGraph(graph, rootNode, visited);
+
+        return graph.getNodes();
+    }
+
+    private void buildGraph(Graph graph, Node current, Set<String> visited)
+            throws DefinitionNotFoundException, QuickFixException {
+
+        if (visited.contains(current.getDescriptor().getQualifiedName())) {
+            return;
+        }
+
+        Definition def;
+        try {
+            def = definitionService.getDefinition(current.getDescriptor());
+        } catch(Exception e) {
+            // If it fails to get definition, have to drop it for now...
+            logger.error("Failed to get defnition for " + current, e);
+            return;
+        }
+
+        Set<DefDescriptor<?>> hardDependencies = new HashSet<>();
+        def.appendDependencies(hardDependencies);
+
+        //TODO: figure out if we can add the serialized def size as well
+        current.setOwnSize(getCodeSize(def));
+        visited.add(current.getDescriptor().getQualifiedName());
+
+        logger.info("Visiting : " + current.getDescriptor() );
+        logger.info("Found Deps: " + hardDependencies.toString() + " " + hardDependencies.size());
+
+        for (DefDescriptor<?> depDescr : hardDependencies) {
+            if (isWantedDescriptor(depDescr)) {
+                Node toNode = graph.findNode(depDescr.getQualifiedName());
+                if (toNode == null) {
+                    toNode = new Node(depDescr);
+                    graph.addNodeIfAbsent(toNode);
+                }
+                graph.addEdge(current, toNode);
+                buildGraph(graph, toNode, visited);
+            }
+        }
+    }
+
+    public final static Set<String> namespaceBlackList = new HashSet<>(Arrays.asList("aura", "auradev"));
+    public final static Set<DefType> defTypeWhitelist = new HashSet<>(Arrays.asList(
+            DefType.APPLICATION, DefType.COMPONENT, DefType.LIBRARY, DefType.INTERFACE, DefType.MODULE));
+
+    private boolean isWantedDescriptor(DefDescriptor<? extends Definition> descriptor) {
+        return defTypeWhitelist.contains(descriptor.getDefType()) && !namespaceBlackList.contains(descriptor.getNamespace());
+    }
+
+    private int getCodeSize(Definition def) {
+        DefType type = def.getDescriptor().getDefType();
+        switch (type) {
+            case APPLICATION :
+                return ((ApplicationDef) def).getCode(true).getBytes().length;
+            case COMPONENT:
+                return ((ComponentDef) def).getCode(true).getBytes().length;
+            case LIBRARY:
+                int libSize = 0;
+                for (IncludeDefRef includeDefRef : ((LibraryDef) def).getIncludes()) {
+                    libSize += includeDefRef.getCode(true).getBytes().length;
+                }
+                return libSize;
+            case MODULE:
+                return ((ModuleDef)def).getCode(CodeType.PROD).getBytes().length;
+            default:
+                return 0;
+        }
+    }
+
 }

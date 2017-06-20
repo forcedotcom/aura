@@ -160,38 +160,21 @@ Aura.Utils.Util.prototype.isIOSWebView = function() {
  *
  * @private
  */
-Aura.Utils.Util.prototype.globalEval = function(src, globals, optionalSourceURL) {
+Aura.Utils.Util.prototype.globalEval = function(src, optionalSourceURL) {
     var srcToEval = "return (" + src + ");";
     if (window["$$safe-eval-compat$$"]) {
         //For perf, disable pre-processing step and assume that src passed returns a value
-        return window["$$safe-eval-compat$$"](srcToEval, optionalSourceURL, true, window, globals);
+        return window["$$safe-eval-compat$$"](srcToEval, optionalSourceURL, true, window);
     }
 
     // --- backward compatibility ---
     // If eval is allowed by the browser (e.g. IE11, AIS, LO), we don't load safeEvalWorker. In such cases we fallback
     // to the old mechanism of evaluation.
-    // This evaluation occurs in the global scope and with the extra globals visible but not defined there.
-    var keys = [];
-    var vals = [];
-    var sourceURL = "";
-    for (var key in globals) {
-        keys.push(key);
-        vals.push(globals[key]);
-    }
+    // This evaluation occurs in the global scope.
+    var sourceURL = optionalSourceURL ? '\n//# sourceURL=' + optionalSourceURL : '';
 
-    if (optionalSourceURL) {
-        sourceURL = '\n//# sourceURL=' + optionalSourceURL;
-    }
-
-    if (keys.length > 0) {
-        return new Function(keys, srcToEval + sourceURL).apply({}, vals);
-    } else {
-        // for component and library hydration, globals is undefined
-        // Chrome new Function output hard-coded 1st line "(function() {"
-        // so use eval instead to keep script content consistent across browsers
-        // force an indirect eval so it uses global context
-        return (0,eval)("(function(){"+ srcToEval +"})();" + sourceURL);
-    }
+    // Force an indirect eval so it uses global context
+    return (0,eval)("(function(){"+ srcToEval +"})();" + sourceURL);
 };
 
 /**
@@ -2400,7 +2383,7 @@ Aura.Utils.Util.prototype.setText = function(node, text) {
 
 /**
  * Posts message to the provided window. This was done to workaround an issue where browser sets
- * event.source to be safeEvalWorker window (see W-3443540). 
+ * event.source to be safeEvalWorker window (see W-3443540).
  * @param {Window} targetWindow The destination window for the message
  * @param {Array} argsArray list of arguments to be posted
  * @export
@@ -2412,7 +2395,7 @@ Aura.Utils.Util.prototype.postMessage = function(targetWindow, argsArray){
 };
 
 /**
- * Get a string representation of component hierarchy by calling getOwner and walk up the component tree. 
+ * Get a string representation of component hierarchy by calling getOwner and walk up the component tree.
  * @param {component} leaf component to walk up the hierarchy
  * @private
  */
@@ -2437,7 +2420,7 @@ Aura.Utils.Util.prototype.getComponentHierarchy = function(component){
 Aura.Utils.Util.prototype.hasSourceURL = function() {
     if (this.sourceURLsupported === undefined) {
         try {
-            this.globalEval('(undefined).x', undefined, "testSourceURL.js");
+            this.globalEval('(undefined).x', "testSourceURL.js");
         } catch(e) {
             this.sourceURLsupported = e.stack.indexOf("testSourceURL.js") > -1;
         }
@@ -2544,7 +2527,7 @@ Aura.Utils.Util.prototype.getFunctionName = function(f) {
         }
         return t;
     };
-    
+
     /**
      * Loads a JavaScript resource.
      * @param {String} url The URL of the JavaScript resource to load.

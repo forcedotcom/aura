@@ -7,10 +7,10 @@
   function internalEval(source) {
       return eval(source);
   }
-  
+
   (function (window, placeholder, parent) {
       "use strict"
-      
+
       // TODO: improve returnable detection. `function (...` is a trick used today
       //       to return arbitrary code from actions, it should be legacy in the future.
       var returnableEx = /^(\s*)([{(["']|function\s*\()/;
@@ -56,26 +56,26 @@
                      }
                 }
             }
-            
+
             src = 'return ' + brackets[0] + '(function(window){\n' + src + '\n})' + brackets[1] + '.call(arguments[0], arguments[0])';
           }
-          
+
           for (var i = 0; i < options.levels; i++) {
               src = 'with(arguments[' + i + ']||{}){' + src + '}';
           }
-          
+
           var code = 'function ' + hookFn + '(){' + src + '}';
-          
+
           if (options.sourceURL) {
               code += '\n//# sourceURL=' + options.sourceURL;
           }
-          
+
           return code;
       }
 
       function evalAndReturn(src, useEval) {
           var result;
-          
+
           if (useEval) {
               result = internalEval("(" + src + "\n)");
           } else {
@@ -92,26 +92,26 @@
                   window[hookFn] = tmp;
               }
           }
-          
+
           return result;
       }
-      
+
       function safeEval(src, sourceURL, skipPreprocessing, lockerize, originalThis, originalArguments) {
           if (!src) {
               return undefined;
           }
-          
+
           var args = Array.prototype.slice.call(originalArguments, 3);
-          
+
           var scoped = addLexicalScopesToSource(src, {
               levels: args.length,
               lockerize: lockerize,
-              sourceURL: sourceURL, 
+              sourceURL: sourceURL,
               skipPreprocessing: skipPreprocessing
           });
-          
+
           var fn = evalAndReturn(scoped, !lockerize);
-          
+
           return fn.apply(originalThis, args);
       }
 
@@ -132,7 +132,7 @@
                   }
               });
               break;
-              
+
           default:
               throw new Error("Aura(): Unknown safeEval ID: " + id);
       }
@@ -175,7 +175,7 @@
                       return d ? d.set : undefined;
                   }
               });
-              
+
               // Immutable Prototype Exotic Objects
               // https://github.com/tc39/ecma262/issues/272
               Object.seal(o.prototype);

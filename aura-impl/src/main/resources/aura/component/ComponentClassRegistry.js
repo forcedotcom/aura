@@ -28,13 +28,13 @@ function ComponentClassRegistry () {
     this.classConstructors = {};
 }
 
-/** 
+/**
  * By default all components will use Aura.Component.Component as the constructor.
  * This wires up all the features a component might need.
- * Some rootComponents are moving into the framework with custom Component extensions. 
+ * Some rootComponents are moving into the framework with custom Component extensions.
  * This map defines the constructor they use in buildConstructor
  */
-ComponentClassRegistry.prototype.customConstructorMap = { 
+ComponentClassRegistry.prototype.customConstructorMap = {
     /*eslint-disable no-undef*/
     "aura$text":TextComponent,
     "aura$html":HtmlComponent,
@@ -192,11 +192,10 @@ ComponentClassRegistry.prototype.buildConstructor = function(componentProperties
     //#end
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    componentConstructor = $A.util.globalEval("(function " + className + "(config) { Ctor.call(this, config); })", {
-        "Ctor": Ctor
-    });
+    var createConstructor = $A.util.globalEval("function(Ctor) {return function " + className + "(config) { Ctor.call(this, config); }}");
+    componentConstructor = createConstructor(Ctor);
     //#end
-    
+
     // Extends from Component (and restore constructor).
     componentConstructor.prototype = Object.create(Ctor.prototype);
     componentConstructor.prototype.constructor = componentConstructor;

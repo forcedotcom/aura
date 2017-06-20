@@ -622,7 +622,7 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
     // Always comes back as a function to execute, which defines the component classes.
     var componentClassDef = config["componentClass"] || config["componentDef"]["componentClass"];
     if(componentClassDef && !this.hasComponentClass(desc)) {
-        componentClassDef = $A.util.globalEval(componentClassDef, undefined, $A.clientService.getSourceMapsUrl(desc));
+        componentClassDef = $A.util.globalEval(componentClassDef, $A.clientService.getSourceMapsUrl(desc));
         componentClassDef();
     }
 
@@ -702,7 +702,7 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
 
     if (!entry.dependencies) {
         url = $A.clientService.getSourceMapsUrl(descriptor);
-        factory = $A.util.globalEval(entry["exporter"], undefined, url);
+        factory = $A.util.globalEval(entry["exporter"], url);
         factory();
     }
 
@@ -1317,7 +1317,7 @@ AuraComponentService.prototype.hydrateComponent = function(descriptor, exporter)
  * @export
  */
 AuraComponentService.prototype.buildComponentExporter = function(descriptor, script) {
-	return $A.util.globalEval("function () {" + script + " }", undefined, $A.clientService.getSourceMapsUrl(descriptor));
+	return $A.util.globalEval("function () {" + script + " }", $A.clientService.getSourceMapsUrl(descriptor));
 };
 
 /**
@@ -1459,7 +1459,7 @@ AuraComponentService.prototype.saveLibraryConfig = function(config) {
 
     // Initialize the concrete include classes if provided
     if (config.hasOwnProperty("includeClasses")) {
-        var includeClasses = $A.util.globalEval(config["includeClasses"], undefined, $A.clientService.getSourceMapsUrl(config["descriptor"], 'lib'));
+        var includeClasses = $A.util.globalEval(config["includeClasses"], $A.clientService.getSourceMapsUrl(config["descriptor"], 'lib'));
         includeClasses();
     }
 };

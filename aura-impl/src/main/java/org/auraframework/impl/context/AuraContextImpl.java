@@ -889,13 +889,15 @@ public class AuraContextImpl implements AuraContext {
                     json.writeMapEntry("test", testContext.getName());
                 }
             }
-            
-            json.writeMapEntry("ls", configAdapter.getLockerServiceCacheBuster());
+
+            if (configAdapter.isLockerServiceEnabled()) {
+                json.writeMapEntry("ls", 1);
+            }
 
             if (this.isModulesEnabled) {
                 json.writeMapEntry("m", 1);
             }
-            
+
             json.writeMapEnd();
         } catch (IOException ioe) {
             // This can't possibly happen.

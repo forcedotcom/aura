@@ -225,7 +225,7 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
 
 
         if (configAdapter.isLockerServiceEnabled()) {
-            json.writeMapEntry("lockerEnabled", true);
+            json.writeMapEntry("ls", 1);
         }
 
         if (ctx.isModulesEnabled()) {

@@ -109,7 +109,7 @@ public class ServerServiceImpl implements ServerService {
 
     @Inject
     private ServletUtilAdapter servletUtilAdapter;
-    
+
     @Inject
     private InstanceService instanceService;
 
@@ -368,10 +368,10 @@ public class ServerServiceImpl implements ServerService {
 
         final String mKey = minify ? "MIN:" : "DEV:";
         final String uid = context.getUid(appDesc);
-        final String lockerServiceCacheBuster  = configAdapter.getLockerServiceCacheBuster();
+        final String lockerService = configAdapter.isLockerServiceEnabled() ? ":ls" : "";
         // modules definitions will be present with modules enabled so needs to be cached separately
         final String modules = context.isModulesEnabled() ? ":m" : "";
-        final String key = "JS:" + mKey + uid + (hasParts ? ":" + partIndex : "") + ":" + lockerServiceCacheBuster + modules;
+        final String key = "JS:" + mKey + uid + (hasParts ? ":" + partIndex : "") + ":" + lockerService + modules;
 
         final Callable<String> buildFunction = () -> {
             String res = getDefinitionsString(dependencies, key, partIndex == 0);
@@ -561,7 +561,7 @@ public class ServerServiceImpl implements ServerService {
      * @param key the key.
      * @param loader the loader for the string
      * @throws QuickFixException
-     * @throws IOException 
+     * @throws IOException
      */
     private String getCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader)
             throws QuickFixException, IOException {
@@ -576,7 +576,7 @@ public class ServerServiceImpl implements ServerService {
      * @param key the key.
      * @param loader the loader for the string
      * @throws QuickFixException
-     * @throws IOException 
+     * @throws IOException
      */
     private String getAltCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader)
             throws QuickFixException, IOException {
@@ -663,7 +663,7 @@ public class ServerServiceImpl implements ServerService {
             servletUtilAdapter.writeScriptUrls(context, templateDef, componentAttributes, sb);
 
             attributes.put("auraNamespacesScriptTags", sb.toString());
-            
+
             Map<String, Object> auraInit = Maps.newHashMap();
             if (componentAttributes != null && !componentAttributes.isEmpty()) {
                 auraInit.put("attributes", componentAttributes);
@@ -678,17 +678,17 @@ public class ServerServiceImpl implements ServerService {
             auraInit.put("deftype", value.getDescriptor().getDefType());
             auraInit.put("host", context.getContextPath());
             auraInit.put("pathPrefix", context.getPathPrefix());
-            
+
             // appcached apps must receive the token via bootstrap to avoid caching of the token
             if (!manifestUtil.isManifestEnabled()) {
                 auraInit.put("token", configAdapter.getCSRFToken());
             }
-            
+
             String lockerWorkerURL = configAdapter.getLockerWorkerURL();
             if (configAdapter.isStrictCSPEnforced() && lockerWorkerURL != null) {
                 auraInit.put("safeEvalWorker", lockerWorkerURL);
             }
-            
+
             auraInit.put("MaxParallelXHRCount", configAdapter.getMaxParallelXHRCount());
             auraInit.put("XHRExclusivity", configAdapter.getXHRExclusivity());
 

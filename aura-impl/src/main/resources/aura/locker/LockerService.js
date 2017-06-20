@@ -41,7 +41,9 @@ function LockerService() {
     var lockers = [];
     var keyToEnvironmentMap = {};
     var lockerShadows;
-    var isEnabled;
+
+    var isLockerInitialized;
+    var isLockerEnabled = false;
 
     // This whilelist represents reflective ECMAScript APIs or reflective DOM APIs
     // which, by definition, do not provide authority or access to globals.
@@ -113,12 +115,15 @@ function LockerService() {
 
     // defining LockerService as a service
     var service = {
-            isEnabled : function() {
-                //cache the result to avoid having to do the lookup
-                if(isEnabled === undefined){
-                    isEnabled =  this.containerSupportsRequiredFeatures();
+            initialize: function(context) {
+                if (!isLockerInitialized) {
+                    isLockerEnabled = (context && !!context["ls"]) && this.containerSupportsRequiredFeatures();
+                    isLockerInitialized = true;
                 }
-                return isEnabled;
+            },
+
+            isEnabled : function() {
+                return isLockerEnabled;
             },
 
             containerSupportsRequiredFeatures : function() {
@@ -327,6 +332,7 @@ function LockerService() {
     };
 
     // Exports
+    service["initialize"] = service.initialize;
     service["create"] = service.create;
     service["createForDef"] = service.createForDef;
     service["getEnv"] = service.getEnv;

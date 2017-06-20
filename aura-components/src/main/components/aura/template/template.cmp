@@ -211,8 +211,13 @@
         if (!window.Aura.frameworkJsReady) {
             window.Aura.initConfig = auraConfig;
         } else {
+
+            // LockerService must be initialized before scripts can be executed.
+            $A.lockerService.initialize(auraConfig.context);
+
             // scripts inside custom templates with Locker active are stored until now since we need FW and safeEval
             // loaded before running
+
             var scripts = window.Aura.inlineJsLocker;
             if (scripts) {
                 for (var i = 0; i &lt; scripts.length; i++) {

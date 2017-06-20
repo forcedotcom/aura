@@ -777,11 +777,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         return requireLocker;
     }
 
-    @Override
-    public String getLockerServiceCacheBuster() {
-        return isLockerServiceEnabled() ? "Y" : "N";
-    }
-
     protected boolean isSafeEvalWorkerURI(String uri) {
         return uri.endsWith(SAFE_EVAL_HTML_URI);
     }

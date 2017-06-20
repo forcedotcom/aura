@@ -54,7 +54,7 @@ Aura.bootstrapMark = function (mark, value) {
         // wait for "in progress" app cache
         // 1.state['appcache'] is appCache progress indicator, if it's undefined, then we don't wait
         // 2.when offline is disabled, progress = 0 when page initially loads
-        //  if progress < 0 then considered an error; 
+        //  if progress < 0 then considered an error;
         //  if progress >=100 then considered done, so we wait for < 100.
         //
         // inline.js will always be set to true as long as inline.js was actually loaded and didn't 404 or 5XX
@@ -278,8 +278,12 @@ window['aura'] = window['$A'];
 */
 
 Aura["frameworkJsReady"] = true;
-// only run scripts from custom template if inlineJs is complete, otherwise inline will handle them
-if (Aura["inlineJsLocker"] && Aura["inlineJsReady"]) {
+
+// This should be similar to initFramework
+if (Aura["initConfig"]) {
+    // LockerService must be initialized before scripts can be executed.
+    $A.lockerService.initialize(Aura["initConfig"]["context"]);
+
     var scripts = Aura["inlineJsLocker"];
     if (scripts) {
         for (var i = 0; i < scripts.length; i++) {
@@ -287,12 +291,10 @@ if (Aura["inlineJsLocker"] && Aura["inlineJsReady"]) {
         }
         delete Aura["inlineJsLocker"];
     }
-}
-if (Aura["initConfig"]) {
-  setTimeout(function () {
-    $A.initAsync(Aura["initConfig"]);
-  }, 0);
-}
 
+    setTimeout(function () {
+        $A.initAsync(Aura["initConfig"]);
+    }, 0);
+}
 
 // External libraries (like moment.js) will be appended here

@@ -726,7 +726,7 @@ HtmlComponent.prototype["helper"] = {
                 element.setAttribute("href", "javascript:void(0);");
             }
 
-            if ($A.getContext().isLockerServiceEnabled) {
+            if ($A.lockerService.isEnabled()) {
                 element.addEventListener("click", this.inlineJavasciptCSPViolationPreventer);
             }
       }

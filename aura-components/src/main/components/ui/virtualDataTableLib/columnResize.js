@@ -487,12 +487,14 @@ function lib(w) { //eslint-disable-line no-unused-vars
          */
         _onStart : function(e) {
             var th = this._findParentTH(e.target);
+            var targetX = e.target.getBoundingClientRect().left;
 
             // Save what's being resized so we can reference it later
             this.current = {
                 element : th,
                 range : this._findRangeElement(th),
-                startX : e.clientX,
+                offsetX : e.clientX - targetX,
+                startX : targetX,
                 width : th.clientWidth,
                 tableOffset : this.table.getBoundingClientRect().left
             };
@@ -503,7 +505,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
             this.table.classList.add("resizing");
             this._setDividerHeight(this.indicator);
 
-            this._slideIndicator(e.clientX);
+            this._slideIndicator(targetX);
         },
 
         /**
@@ -514,10 +516,11 @@ function lib(w) { //eslint-disable-line no-unused-vars
          */
         _onMove : function(e) {
             var current = this.current;
-            var currentWidth = e.clientX - current.element.offsetLeft - current.tableOffset;
+            var currentWidth = e.clientX + current.offsetX - current.element.offsetLeft - current.tableOffset;
 
-            if (currentWidth > this.config.minWidth || e.clientX > current.startX) {
-                this._slideIndicator(e.clientX);
+            var normalizedX = e.clientX - current.offsetX;
+            if (currentWidth > this.config.minWidth || normalizedX > current.startX) {
+                this._slideIndicator(normalizedX);
                 current.width = currentWidth;
             }
         },

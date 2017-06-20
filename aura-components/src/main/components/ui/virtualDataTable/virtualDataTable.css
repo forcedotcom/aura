@@ -22,13 +22,13 @@
     position: absolute;
     display: block;
     cursor: col-resize;
-    opacity: 0;
+    visibility: hidden;
     z-index: 5000;
     user-select:none;
 }
 
 .THIS.indicator.active {
-    opacity: 1;
+    visibility: visible;
 }
 
 .THIS.indicator .divider {

@@ -546,7 +546,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         attributes.put("second", "sv");
 
         Mockito.doReturn("contextPath").when(context).getContextPath();
-        Mockito.doReturn("nonce").when(context).getEncodedURL(AuraContext.EncodingStyle.Normal);
+        Mockito.doReturn("nonce").when(context).getEncodedURL(AuraContext.EncodingStyle.AppResource);
 
         actual = sua.getAppJsUrl(context, attributes);
         assertEquals(expected, actual);

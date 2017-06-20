@@ -498,12 +498,12 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
 
     @Override
     public String getAppCoreJsUrl(AuraContext context, Map<String,Object> attributes) {
-        return commonJsUrl("/appcore.js", context, attributes);
+        return commonJsUrl("/appcore.js", context, attributes, AuraContext.EncodingStyle.AppResource);
     }
 
     @Override
     public String getAppJsUrl(AuraContext context, Map<String,Object> attributes) {
-        return commonJsUrl("/app.js", context, attributes);
+        return commonJsUrl("/app.js", context, attributes, AuraContext.EncodingStyle.AppResource);
     }
 
     @Override
@@ -516,8 +516,12 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     protected String commonJsUrl (String filepath, AuraContext context, Map<String,Object> attributes) {
+        return commonJsUrl(filepath, context, attributes, AuraContext.EncodingStyle.Normal);
+    }
+
+    protected String commonJsUrl (String filepath, AuraContext context, Map<String,Object> attributes, AuraContext.EncodingStyle encodingStyle) {
         StringBuilder url = new StringBuilder(context.getContextPath()).append("/l/");
-        url.append(context.getEncodedURL(AuraContext.EncodingStyle.Normal));
+        url.append(context.getEncodedURL(encodingStyle));
         url.append(filepath);
         if (attributes != null) {
             addAttributes(url, attributes);

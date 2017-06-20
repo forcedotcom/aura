@@ -1,0 +1,2317 @@
+$A.componentService.addComponent("markup://auradocs:searchFilterTree", (function c(){/*$A.componentService.addComponentClass("markup://auradocs:searchFilterTree",function() {
+return {
+  "meta":{
+    "name":"auradocs$searchFilterTree",
+    "extends":"markup://aura:component"
+  },
+  "controller":{
+    "handleSearch":function(cmp, event, helper) {
+        var tree = cmp.get('v.tree');
+        $A.assert(tree.isInstanceOf("ui:tree"), "Tree must be a ui:tree");
+        
+        tree.getEvent('getChildren').setParams({'callback' : function(nodes) {
+            
+            
+            var searchTerm = event.getParam('searchTerm') || event.getSource().getElement().value;
+            
+            for (var i = 0, n = nodes.length; i < n; i++) {
+                
+                
+                var root = nodes[i];
+                var searchVisitor = helper.initSearchFilterVisitor(searchTerm);
+                
+                if (searchTerm !== '') {
+                    var callback = function(args) {
+                        args.visitor = searchVisitor;
+                        var evt = root.getEvent("traverse");
+                        evt.setParams(args);
+                        evt.fire();
+                    };
+                    root.getEvent("makeVisitor").setParams({
+                        "visitor" : null,
+                        "traverser" : "PostOrderTraverser",
+                        "callback" : callback 
+                    }).fire();
+                } else {
+                    
+                    
+                    
+                    
+                    root.getEvent("makeVisitor").setParams({
+                        "visitor" : "ApplyVisitor",
+                        "traverser" : "PostOrderTraverser",
+                        "callback" : function(args) {
+                            args.visitor.funcToApply = function(node) {
+                                node.set('v.hidden', false);
+                            };
+                            root.getEvent("traverse").setParams(args).fire();
+                        }
+                    }).fire();
+                }
+            }
+        }}).fire();
+    }
+  },
+  "helper":{
+    "initSearchFilterVisitor":function(query) {
+        var helper = this;
+        if (!helper.SearchFilterVisitor) {
+            
+
+            helper.SearchFilterVisitor = function(qry) {
+            	this.query = qry;
+                this.queryRe = new RegExp(qry, "i");
+                
+                
+                this.stack = [];
+            };
+
+            
+
+            helper.SearchFilterVisitor.prototype.accept = function(node) {
+                var title = node.get('v.item.title') || '' + node.get('v.title') || '';
+                
+                if (this.queryRe.test(title)) {
+                    
+                    var record = this.stack[this.stack.length - 1];
+                    record.match = true;
+                }
+            };
+
+            
+
+            helper.SearchFilterVisitor.prototype.visit = function(node) {
+                
+                this.stack.push({
+                    "node" : node,
+                    "match" : false
+                });
+                return true;
+            };
+
+            
+
+            helper.SearchFilterVisitor.prototype.endVisit = function(node) {
+                var record = this.stack.pop();
+                
+                
+                $A.assert(node === record.node, "endVisit got an unexpected node");
+
+                if (!record.match) {
+                    
+                    node.set('v.expanded', false);
+                } else {
+                    var title = node.get('v.item.title') || '' + node.get('v.title') || '';
+                    
+
+                    console.log(title);
+                    
+                    node.set('v.expanded', true);
+                    
+                    node.set('v.hidden', false);
+
+                    
+                    
+                    
+                    var parentIndex = this.stack.length - 1;
+                    if (parentIndex >= 0) {
+                        var parentRecord = this.stack[parentIndex];
+                        parentRecord.match = true;
+                    }
+                }
+            };
+        }
+
+        return new helper.SearchFilterVisitor(query);
+    }
+  }
+};
+});
+return {
+  "xs":"I",
+  "descriptor":"markup://auradocs:searchFilterTree",
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["tree","aura://Aura.Component","I",false,null]
+  ],
+  "re":[
+    {
+      "ed":"markup://ui:searchEvent",
+      "n":"search",
+      "xs":"I"
+    }
+  ],
+  "hd":[
+    {
+      "x":"{!c.handleSearch}",
+      "n":"search"
+    }
+  ],
+  "fa":[
+    {
+      "descriptor":"body",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "id":"searchDiv"
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"div"
+              },
+              "body":{
+                "descriptor":"body",
+                "value":[
+                  {
+                    "componentDef":{
+                      "descriptor":"markup://ui:inputSearch"
+                    },
+                    "localId":"searchBox",
+                    "attributes":{
+                      "values":{
+                        "class":{
+                          "descriptor":"class",
+                          "value":"searchBox"
+                        },
+                        "placeholder":{
+                          "descriptor":"placeholder",
+                          "value":"Search"
+                        },
+                        "search":{
+                          "descriptor":"search",
+                          "value":"{!c.handleSearch}"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:expression"
+          },
+          "attributes":{
+            "values":{
+              "value":{
+                "descriptor":"value",
+                "value":"{!v.body}"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+};*/}));
+$A.componentService.addComponent("markup://auradocs:nav", (function c(){/*$A.componentService.addComponentClass("markup://auradocs:nav",function() {
+return {
+  "meta":{
+    "name":"auradocs$nav",
+    "extends":"markup://aura:component"
+  },
+  "controller":{
+    "handleLocationChange":function(cmp, event) {
+        if ($A.util.isUndefinedOrNull(cmp._activeCmp)) {
+            
+            
+            
+            cmp._activeCmp = cmp.find('help');
+        }
+        
+        
+        if (cmp._activeCmp && cmp._activeCmp.getElement()) {
+            cmp._activeCmp.getElement().setAttribute('active', false);
+        }
+        
+        
+        var token = event.getParam('token');
+        var newLocationComp = cmp.find(token);
+        if ($A.util.isUndefinedOrNull(newLocationComp)) {
+            newLocationComp = cmp.find('help');
+        }
+        
+        
+        
+        cmp._activeCmp = newLocationComp;
+        if (cmp._activeCmp && cmp._activeCmp.getElement()) {
+            cmp._activeCmp.getElement().setAttribute('active', true);
+        }
+    }
+  }
+};
+});
+return {
+  "xs":"I",
+  "descriptor":"markup://auradocs:nav",
+  "st":{
+    "descriptor":"css://auradocs.nav",
+    "cl":"auradocsNav"
+  },
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["referenceOnly","aura://Boolean","I",false,false]
+  ],
+  "hd":[
+    {
+      "ed":{
+        "descriptor":"markup://auradocs:locationChange"
+      },
+      "x":"{!c.handleLocationChange}"
+    }
+  ],
+  "fa":[
+    {
+      "descriptor":"body",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "class":"navbar",
+                  "role":"navigation"
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"nav"
+              },
+              "body":{
+                "descriptor":"body",
+                "value":[
+                  {
+                    "componentDef":{
+                      "descriptor":"markup://aura:html"
+                    },
+                    "attributes":{
+                      "values":{
+                        "HTMLAttributes":{
+                          "descriptor":"HTMLAttributes",
+                          "value":{
+                            "class":"logo"
+                          }
+                        },
+                        "tag":{
+                          "descriptor":"tag",
+                          "value":"div"
+                        },
+                        "body":{
+                          "descriptor":"body",
+                          "value":[
+                            {
+                              "componentDef":{
+                                "descriptor":"markup://aura:html"
+                              },
+                              "attributes":{
+                                "values":{
+                                  "HTMLAttributes":{
+                                    "descriptor":"HTMLAttributes",
+                                    "value":{
+                                      "href":"#"
+                                    }
+                                  },
+                                  "tag":{
+                                    "descriptor":"tag",
+                                    "value":"a"
+                                  },
+                                  "body":{
+                                    "descriptor":"body",
+                                    "value":[
+                                      {
+                                        "componentDef":{
+                                          "descriptor":"markup://ui:image"
+                                        },
+                                        "attributes":{
+                                          "values":{
+                                            "alt":{
+                                              "descriptor":"alt",
+                                              "value":"Aura"
+                                            },
+                                            "src":{
+                                              "descriptor":"src",
+                                              "value":"/auraFW/resources/aura/images/logo.png"
+                                            },
+                                            "imageType":{
+                                              "descriptor":"imageType",
+                                              "value":"informational"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "componentDef":{
+                      "descriptor":"markup://aura:if"
+                    },
+                    "attributes":{
+                      "values":{
+                        "isTrue":{
+                          "descriptor":"isTrue",
+                          "value":{
+                            "exprType":"FUNCTION",
+                            "code":function(cmp, fn) { return fn.ne(cmp.get("v.referenceOnly"),true); },
+                            "args":[
+                              "{!v.referenceOnly}"
+                            ],
+                            "byValue":false
+                          }
+                        },
+                        "body":{
+                          "descriptor":"body",
+                          "value":[
+                            {
+                              "componentDef":{
+                                "descriptor":"markup://aura:html"
+                              },
+                              "attributes":{
+                                "values":{
+                                  "HTMLAttributes":{
+                                    "descriptor":"HTMLAttributes",
+                                    "value":{
+                                      "class":"navList"
+                                    }
+                                  },
+                                  "tag":{
+                                    "descriptor":"tag",
+                                    "value":"ul"
+                                  },
+                                  "body":{
+                                    "descriptor":"body",
+                                    "value":[
+                                      {
+                                        "componentDef":{
+                                          "descriptor":"markup://aura:html"
+                                        },
+                                        "localId":"help",
+                                        "attributes":{
+                                          "values":{
+                                            "HTMLAttributes":{
+                                              "descriptor":"HTMLAttributes",
+                                              "value":{
+
+                                              }
+                                            },
+                                            "tag":{
+                                              "descriptor":"tag",
+                                              "value":"li"
+                                            },
+                                            "body":{
+                                              "descriptor":"body",
+                                              "value":[
+                                                {
+                                                  "componentDef":{
+                                                    "descriptor":"markup://auradocs:navLink"
+                                                  },
+                                                  "attributes":{
+                                                    "values":{
+                                                      "location":{
+                                                        "descriptor":"location",
+                                                        "value":"help"
+                                                      },
+                                                      "body":{
+                                                        "descriptor":"body",
+                                                        "value":[
+                                                          {
+                                                            "componentDef":{
+                                                              "descriptor":"markup://aura:text"
+                                                            },
+                                                            "attributes":{
+                                                              "values":{
+                                                                "value":{
+                                                                  "descriptor":"value",
+                                                                  "value":"Help"
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        ]
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "componentDef":{
+                                          "descriptor":"markup://aura:html"
+                                        },
+                                        "localId":"reference",
+                                        "attributes":{
+                                          "values":{
+                                            "HTMLAttributes":{
+                                              "descriptor":"HTMLAttributes",
+                                              "value":{
+
+                                              }
+                                            },
+                                            "tag":{
+                                              "descriptor":"tag",
+                                              "value":"li"
+                                            },
+                                            "body":{
+                                              "descriptor":"body",
+                                              "value":[
+                                                {
+                                                  "componentDef":{
+                                                    "descriptor":"markup://auradocs:navLink"
+                                                  },
+                                                  "attributes":{
+                                                    "values":{
+                                                      "location":{
+                                                        "descriptor":"location",
+                                                        "value":"reference"
+                                                      },
+                                                      "body":{
+                                                        "descriptor":"body",
+                                                        "value":[
+                                                          {
+                                                            "componentDef":{
+                                                              "descriptor":"markup://aura:text"
+                                                            },
+                                                            "attributes":{
+                                                              "values":{
+                                                                "value":{
+                                                                  "descriptor":"value",
+                                                                  "value":"Reference"
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        ]
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "componentDef":{
+                                "descriptor":"markup://aura:html"
+                              },
+                              "attributes":{
+                                "values":{
+                                  "HTMLAttributes":{
+                                    "descriptor":"HTMLAttributes",
+                                    "value":{
+                                      "class":"fuelGauge"
+                                    }
+                                  },
+                                  "tag":{
+                                    "descriptor":"tag",
+                                    "value":"div"
+                                  },
+                                  "body":{
+                                    "descriptor":"body",
+                                    "value":[
+                                      {
+                                        "componentDef":{
+                                          "descriptor":"markup://auraStorage:fuelGauge"
+                                        },
+                                        "attributes":{
+                                          "values":{
+                                            "storageName":{
+                                              "descriptor":"storageName",
+                                              "value":"actions"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "componentDef":{
+                      "descriptor":"markup://ui:image"
+                    },
+                    "attributes":{
+                      "values":{
+                        "class":{
+                          "descriptor":"class",
+                          "value":"spinner"
+                        },
+                        "imageType":{
+                          "descriptor":"imageType",
+                          "value":"decorative"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+};*/}));
+$A.componentService.addComponent("markup://auradocs:navLink", (function c(){/*$A.componentService.addComponentClass("markup://auradocs:navLink",function() {
+return {
+  "meta":{
+    "name":"auradocs$navLink",
+    "extends":"markup://aura:component"
+  }
+};
+});
+return {
+  "xs":"I",
+  "descriptor":"markup://auradocs:navLink",
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["location","aura://String","I",true]
+  ],
+  "fa":[
+    {
+      "descriptor":"body",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "href":{
+                    "exprType":"FUNCTION",
+                    "code":function(cmp, fn) { return fn.add("#",cmp.get("v.location")); },
+                    "args":[
+                      "{!v.location}"
+                    ],
+                    "byValue":false
+                  }
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"a"
+              },
+              "body":{
+                "descriptor":"body",
+                "value":[
+                  {
+                    "componentDef":{
+                      "descriptor":"markup://aura:expression"
+                    },
+                    "attributes":{
+                      "values":{
+                        "value":{
+                          "descriptor":"value",
+                          "value":"{!v.body}"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+};*/}));
+$A.componentService.addComponent("markup://auradev:blankTemplate", (function c(){/*$A.componentService.addComponentClass("markup://auradev:blankTemplate",function() {
+return {
+  "meta":{
+    "name":"auradev$blankTemplate",
+    "extends":"markup://aura:component"
+  }
+};
+});
+return {
+  "xs":"I",
+  "descriptor":"markup://auradev:blankTemplate",
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]]
+  ],
+  "fa":[
+    {
+      "descriptor":"body",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:expression"
+          },
+          "attributes":{
+            "values":{
+              "value":{
+                "descriptor":"value",
+                "value":"{!v.body}"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+};*/}));
+$A.componentService.addComponent("markup://auradocs:openTopicTree", (function c(){/*$A.componentService.addComponentClass("markup://auradocs:openTopicTree",function() {
+return {
+  "meta":{
+    "name":"auradocs$openTopicTree",
+    "extends":"markup://aura:component"
+  },
+  "controller":{
+    "doInit":function(cmp, evt, helper) {
+        if (helper.preprocessTree(cmp, evt)) {
+            helper.doUpdate(cmp);
+        }
+    },
+    "treeChange":function(cmp, evt, helper) {
+        if (helper.preprocessTree(cmp, evt)) {
+            helper.doUpdate(cmp);
+        }
+    },
+    "handleLocationChange":function(cmp, event, helper) {
+        var token = event.getParam('token');
+        if (token === cmp.get('v.layoutToken')) {
+            
+            helper.doUpdate(cmp);
+        }
+    }
+  },
+  "helper":{
+    "initActiveTopicVisitor":function(topicMap, parentMap) {
+        var helper = this;
+        if (!helper.ActiveTopicVisitor) {
+            
+
+            helper.ActiveTopicVisitor = function(topicMapInside, parentMapInside) {
+                
+                this.stack = [];
+                this.topicMap = topicMapInside;
+                this.parentMap = parentMapInside;
+            };
+
+            
+
+            helper.ActiveTopicVisitor.prototype.visit = function(node) {
+                this.stack.push(node);
+                return true;
+            };
+
+            
+
+            helper.ActiveTopicVisitor.prototype.accept = function(node) {
+                
+                var href = null;
+                if (node.get('v.item')) {
+                    href = node.get('v.item.href');
+                } else {
+                    href = node.get('v.href');
+                }
+              
+                if (href) {
+                    if (this.topicMap[href]) {
+                        throw new Error("auradocs:openTopicTree got a topic collision at " + href);
+                    } 
+                    this.topicMap[href] = node;
+                }
+                
+                
+                var parentIndex = this.stack.length - 2;
+                $A.assert(parentIndex >= -1);
+                if (parentIndex > -1) {
+                    this.parentMap[node.getGlobalId()] = this.stack[parentIndex];
+                }
+            };
+
+            helper.ActiveTopicVisitor.prototype.endVisit = function() {
+                this.stack.pop();
+            };
+        }
+        return new helper.ActiveTopicVisitor(topicMap, parentMap);
+    },
+    "preprocessTree":function(cmp) {
+        cmp._topicMap = {};
+        cmp._parentMap = {};
+        cmp._activeCmp = null;
+        
+        var helper = this;
+        
+        
+        var tree = cmp.get('v.tree');
+        if (!$A.util.isComponent(tree)) {
+            return false;
+        }
+        $A.assert(tree.isInstanceOf("ui:tree"), "Tree must be a ui:tree");
+     
+        tree.getEvent('getChildren').setParams({'callback' : function (nodes) {
+            for (var i = 0, n = nodes.length; i < n; i++) {
+                var root = nodes[i];
+                root.getEvent("makeVisitor").setParams({
+                    "traverser" : "PostOrderTraverser",
+                    "callback" : function(args) {
+                        args.visitor = helper.initActiveTopicVisitor(cmp._topicMap, cmp._parentMap);
+                        root.getEvent("traverse").setParams(args).fire();
+                    }
+                }).fire(); 
+            }
+        }}).fire(); 
+        
+        return true;
+    },
+    "expandActiveAncestry":function(cmp) {
+        var toExpand = cmp._parentMap[cmp._activeCmp.getGlobalId()];
+        
+        while (toExpand) {
+            toExpand.set('v.expanded', true);
+            toExpand = cmp._parentMap[toExpand.getGlobalId()];
+        }
+    },
+    "highlightActive":function(cmp) {
+        cmp._activeCmp.set('v.active', true);
+    },
+    "setActive":function(cmp) {        
+        
+        if (cmp._activeCmp && cmp._activeCmp.getElement()) {
+            cmp._activeCmp.getElement().setAttribute('active', false);
+        }
+
+        
+        var newLocation = window.location.hash;
+        cmp._activeCmp = cmp._topicMap[newLocation];
+        if (!cmp._activeCmp) {
+            
+            cmp._activeCmp = cmp._topicMap[cmp.get("v.catchAllHref")];
+        }
+        $A.assert(!$A.util.isUndefinedOrNull(cmp._activeCmp), "no activeCmp");
+    },
+    "doUpdate":function(cmp) {
+        this.setActive(cmp);
+        this.expandActiveAncestry(cmp);
+        this.highlightActive(cmp);
+    }
+  }
+};
+});
+return {
+  "xs":"I",
+  "descriptor":"markup://auradocs:openTopicTree",
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["layoutToken","aura://String","I",false],
+    ["catchAllHref","aura://String","I",false],
+    ["tree","aura://Aura.Component","I",false,null]
+  ],
+  "hd":[
+    {
+      "x":"{!c.treeChange}",
+      "v":"{!v.tree}",
+      "n":"change"
+    },
+    {
+      "x":"{!c.doInit}",
+      "v":"{!this}",
+      "n":"init"
+    },
+    {
+      "ed":{
+        "descriptor":"markup://auradocs:locationChange"
+      },
+      "x":"{!c.handleLocationChange}"
+    }
+  ],
+  "fa":[
+    {
+      "descriptor":"body",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:expression"
+          },
+          "attributes":{
+            "values":{
+              "value":{
+                "descriptor":"value",
+                "value":"{!v.body}"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+};*/}));
+$A.componentService.addComponent("markup://auradocs:docs", (function c(){/*$A.componentService.addComponentClass("markup://auradocs:docs",function() {
+return {
+  "meta":{
+    "name":"auradocs$docs",
+    "extends":"markup://aura:application"
+  },
+  "controller":{
+    "updateAuraAssist":function(cmp) {
+        var a = cmp.get("c.updateAuraAssistServer");
+
+        a.setCallback(cmp, function(action){
+        	var state = action.getState();
+            if (state === "SUCCESS") {
+            	
+
+               alert('Done! Content written to:'+ action.getReturnValue());
+            } else if(state === "INCOMPLETE" || state === "ERROR") {
+            	
+
+               alert('Ooops! Something went wrong check your console.');
+            }
+        });
+
+        $A.enqueueAction(a);
+    },
+    "waiting":function(cmp, event, helper) {
+        helper.showWaiting(cmp);
+    },
+    "doneWaiting":function(cmp, event, helper) {
+        helper.hideWaiting(cmp);
+    },
+    "refreshBegin":function(cmp, event, helper) {
+        helper.showRefreshing(cmp);
+    },
+    "refreshEnd":function(cmp, event, helper) {
+        helper.hideRefreshing(cmp);
+    },
+    "locationChange":function(cmp, event, helper) {
+        var token = event.getParam("token");
+        var layout = token === "reference" ? "reference" : "help";
+
+        helper.setLayout(cmp, layout, event.getParams());
+    }
+  },
+  "helper":{
+    "showWaiting":function(cmp) {
+        var count = cmp.get("v.waitingCount") + 1;
+        cmp.set("v.waitingCount", count);
+        if (count === 1) { 
+            $A.util.addClass(cmp.find('navbar').getElement(), "waiting");
+        }
+    },
+    "hideWaiting":function(cmp) {
+        var count = cmp.get("v.waitingCount") - 1;
+        cmp.set("v.waitingCount", count);
+        if (cmp.get("v.waitingCount") === 0) { 
+            $A.util.removeClass(cmp.find('navbar').getElement(), "waiting");
+        }
+    },
+    "showRefreshing":function(cmp) {
+        $A.util.addClass(cmp.find('navbar').getElement(), "refreshing");
+    },
+    "hideRefreshing":function(cmp) {
+        $A.util.removeClass(cmp.find('navbar').getElement(), "refreshing");
+    },
+    "setLayout":function(cmp, layout, parameters) {
+        var action = layout == "reference" ? cmp.get("c.getReference") : cmp.get("c.getTopic");
+        action.setStorable();
+        action.setParams(parameters);
+
+        action.setCallback(this, function(action) {
+            var state = action.getState();
+            if (state === "SUCCESS") {
+                var ret = action.getReturnValue();
+                if(ret) {
+                    var content = cmp.find("content");
+                    var newComponents = $A.createComponentFromConfig(ret);
+
+                    content.set("v.body", newComponents);
+
+                    if(layout === "reference") {
+                        var sidebar = cmp.find("sidebar");
+                        if(sidebar.get("v.body").length === 0) {
+                            $A.createComponent("markup://auradocs:referenceTree", {}, function(referenceTree, status, messages) {
+                            	if (status === "SUCCESS") {
+                            		sidebar.set("v.body", referenceTree);
+                            	}
+                            });
+                        }
+                    }
+                    
+
+                }
+            } else if(state === "INCOMPLETE" || state === "ERROR") {
+
+                
+                
+                throw new Error("Layout Failed for the docs app.");
+            }
+        });
+
+        $A.enqueueAction(action);
+    }
+  }
+};
+});
+return {
+  "xs":"G",
+  "descriptor":"markup://auradocs:docs",
+  "st":{
+    "descriptor":"css://auradocs.docs",
+    "cl":"auradocsDocs"
+  },
+  "cd":{
+    "descriptor":"compound://auradocs.docs",
+    "ac":[
+      {
+        "n":"getDemo",
+        "descriptor":"java://org.auraframework.docs.DocsController/ACTION$getDemo",
+        "at":"SERVER",
+        "rt":"java://org.auraframework.instance.Component",
+        "b":false,
+        "ca":false,
+        "pa":[
+          {
+            "name":"demo",
+            "type":"java://java.lang.String"
+          }
+        ]
+      },
+      {
+        "n":"getReference",
+        "descriptor":"java://org.auraframework.docs.DocsController/ACTION$getReference",
+        "at":"SERVER",
+        "rt":"java://org.auraframework.instance.Component",
+        "b":false,
+        "ca":false,
+        "pa":[
+          {
+            "name":"topic",
+            "type":"java://java.lang.String"
+          },
+          {
+            "name":"descriptor",
+            "type":"java://java.lang.String"
+          },
+          {
+            "name":"defType",
+            "type":"java://java.lang.String"
+          }
+        ]
+      },
+      {
+        "n":"getTopic",
+        "descriptor":"java://org.auraframework.docs.DocsController/ACTION$getTopic",
+        "at":"SERVER",
+        "rt":"java://org.auraframework.instance.Component",
+        "b":false,
+        "ca":false,
+        "pa":[
+          {
+            "name":"topic",
+            "type":"java://java.lang.String"
+          }
+        ]
+      }
+    ]
+  },
+  "su":"markup://aura:application",
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["waitingCount","aura://Integer","p",false,0]
+  ],
+  "i":[
+    "markup://auraStorage:refreshObserver"
+  ],
+  "re":[
+    {
+      "ed":"markup://auraStorage:refreshStatusChange",
+      "n":"refreshEnd",
+      "xs":"I"
+    },
+    {
+      "ed":"markup://auraStorage:refreshStatusChange",
+      "n":"refreshBegin",
+      "xs":"I"
+    }
+  ],
+  "hd":[
+    {
+      "ed":{
+        "descriptor":"markup://aura:waiting"
+      },
+      "x":"{!c.waiting}"
+    },
+    {
+      "ed":{
+        "descriptor":"markup://aura:doneWaiting"
+      },
+      "x":"{!c.doneWaiting}"
+    },
+    {
+      "ed":{
+        "descriptor":"markup://auradocs:locationChange"
+      },
+      "x":"{!c.locationChange}"
+    },
+    {
+      "x":"{!c.refreshBegin}",
+      "n":"refreshBegin"
+    },
+    {
+      "x":"{!c.refreshEnd}",
+      "n":"refreshEnd"
+    }
+  ],
+  "fa":[
+    {
+      "descriptor":"body",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"header"
+              },
+              "body":{
+                "descriptor":"body",
+                "value":[
+                  {
+                    "componentDef":{
+                      "descriptor":"markup://auradocs:nav"
+                    },
+                    "localId":"navbar"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "localId":"container",
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "class":"container"
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"div"
+              },
+              "body":{
+                "descriptor":"body",
+                "value":[
+                  {
+                    "componentDef":{
+                      "descriptor":"markup://aura:html"
+                    },
+                    "localId":"sidebar",
+                    "attributes":{
+                      "values":{
+                        "HTMLAttributes":{
+                          "descriptor":"HTMLAttributes",
+                          "value":{
+                            "class":"sidebar"
+                          }
+                        },
+                        "tag":{
+                          "descriptor":"tag",
+                          "value":"aside"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "componentDef":{
+                      "descriptor":"markup://aura:html"
+                    },
+                    "localId":"content",
+                    "attributes":{
+                      "values":{
+                        "HTMLAttributes":{
+                          "descriptor":"HTMLAttributes",
+                          "value":{
+                            "class":"content"
+                          }
+                        },
+                        "tag":{
+                          "descriptor":"tag",
+                          "value":"article"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "componentDef":{
+                      "descriptor":"markup://aura:html"
+                    },
+                    "attributes":{
+                      "values":{
+                        "HTMLAttributes":{
+                          "descriptor":"HTMLAttributes",
+                          "value":{
+
+                          }
+                        },
+                        "tag":{
+                          "descriptor":"tag",
+                          "value":"footer"
+                        },
+                        "body":{
+                          "descriptor":"body",
+                          "value":[
+                            {
+                              "componentDef":{
+                                "descriptor":"markup://aura:text"
+                              },
+                              "attributes":{
+                                "values":{
+                                  "value":{
+                                    "descriptor":"value",
+                                    "value":"Copyright © 2015 salesforce.com, inc."
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "lc":{
+    "descriptor":"markup://auradocs:locationChange"
+  }
+};*/}));
+$A.componentService.addComponent("markup://auradocs:referenceTree", (function c(){/*$A.componentService.addComponentClass("markup://auradocs:referenceTree",function() {
+return {
+  "meta":{
+    "name":"auradocs$referenceTree",
+    "extends":"markup://auradocs:sidebar"
+  },
+  "controller":{
+    "doInit":function(cmp) {
+        var tree = cmp.find('tree');
+        cmp.find('topicTree').set('v.tree', tree);
+        cmp.find('searchTree').set('v.tree', tree);
+    }
+  }
+};
+});
+return {
+  "xs":"I",
+  "descriptor":"markup://auradocs:referenceTree",
+  "st":{
+    "descriptor":"css://auradocs.referenceTree",
+    "cl":"auradocsReferenceTree"
+  },
+  "md":{
+    "descriptor":"java://org.auraframework.docs.ReferenceTreeModel",
+    "members":[
+      {
+        "name":"tree",
+        "type":"java://java.util.List"
+      }
+    ]
+  },
+  "su":"markup://auradocs:sidebar",
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["toolbar","aura://Aura.Component[]","I",false,[]]
+  ],
+  "hd":[
+    {
+      "x":"{!c.doInit}",
+      "v":"{!this}",
+      "n":"init"
+    }
+  ],
+  "fa":[
+    {
+      "descriptor":"toolbar",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://ui:tabset"
+          },
+          "attributes":{
+            "values":{
+              "body":{
+                "descriptor":"body",
+                "value":[
+                  {
+                    "componentDef":{
+                      "descriptor":"markup://ui:tab"
+                    },
+                    "attributes":{
+                      "values":{
+                        "title":{
+                          "descriptor":"title",
+                          "value":"Namespace"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "componentDef":{
+                      "descriptor":"markup://ui:tab"
+                    },
+                    "attributes":{
+                      "values":{
+                        "title":{
+                          "descriptor":"title",
+                          "value":"Category"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"ul"
+              },
+              "body":{
+                "descriptor":"body",
+                "value":[
+                  {
+                    "componentDef":{
+                      "descriptor":"markup://aura:html"
+                    },
+                    "attributes":{
+                      "values":{
+                        "HTMLAttributes":{
+                          "descriptor":"HTMLAttributes",
+                          "value":{
+
+                          }
+                        },
+                        "tag":{
+                          "descriptor":"tag",
+                          "value":"li"
+                        },
+                        "body":{
+                          "descriptor":"body",
+                          "value":[
+                            {
+                              "componentDef":{
+                                "descriptor":"markup://aura:text"
+                              },
+                              "attributes":{
+                                "values":{
+                                  "value":{
+                                    "descriptor":"value",
+                                    "value":"\n\t\t\t\tShow only:\n\t\t\t\t"
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "componentDef":{
+                                "descriptor":"markup://aura:html"
+                              },
+                              "attributes":{
+                                "values":{
+                                  "HTMLAttributes":{
+                                    "descriptor":"HTMLAttributes",
+                                    "value":{
+
+                                    }
+                                  },
+                                  "tag":{
+                                    "descriptor":"tag",
+                                    "value":"select"
+                                  },
+                                  "body":{
+                                    "descriptor":"body",
+                                    "value":[
+                                      {
+                                        "componentDef":{
+                                          "descriptor":"markup://aura:html"
+                                        },
+                                        "attributes":{
+                                          "values":{
+                                            "HTMLAttributes":{
+                                              "descriptor":"HTMLAttributes",
+                                              "value":{
+
+                                              }
+                                            },
+                                            "tag":{
+                                              "descriptor":"tag",
+                                              "value":"option"
+                                            },
+                                            "body":{
+                                              "descriptor":"body",
+                                              "value":[
+                                                {
+                                                  "componentDef":{
+                                                    "descriptor":"markup://aura:text"
+                                                  },
+                                                  "attributes":{
+                                                    "values":{
+                                                      "value":{
+                                                        "descriptor":"value",
+                                                        "value":"PROTO"
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "componentDef":{
+                                          "descriptor":"markup://aura:html"
+                                        },
+                                        "attributes":{
+                                          "values":{
+                                            "HTMLAttributes":{
+                                              "descriptor":"HTMLAttributes",
+                                              "value":{
+
+                                              }
+                                            },
+                                            "tag":{
+                                              "descriptor":"tag",
+                                              "value":"option"
+                                            },
+                                            "body":{
+                                              "descriptor":"body",
+                                              "value":[
+                                                {
+                                                  "componentDef":{
+                                                    "descriptor":"markup://aura:text"
+                                                  },
+                                                  "attributes":{
+                                                    "values":{
+                                                      "value":{
+                                                        "descriptor":"value",
+                                                        "value":"BETA"
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "componentDef":{
+                                          "descriptor":"markup://aura:html"
+                                        },
+                                        "attributes":{
+                                          "values":{
+                                            "HTMLAttributes":{
+                                              "descriptor":"HTMLAttributes",
+                                              "value":{
+
+                                              }
+                                            },
+                                            "tag":{
+                                              "descriptor":"tag",
+                                              "value":"option"
+                                            },
+                                            "body":{
+                                              "descriptor":"body",
+                                              "value":[
+                                                {
+                                                  "componentDef":{
+                                                    "descriptor":"markup://aura:text"
+                                                  },
+                                                  "attributes":{
+                                                    "values":{
+                                                      "value":{
+                                                        "descriptor":"value",
+                                                        "value":"GA"
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "class":"search",
+                  "type":"search",
+                  "placeholder":"Search for..."
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"input"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "descriptor":"body",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://auradocs:openTopicTree"
+          },
+          "localId":"topicTree",
+          "attributes":{
+            "values":{
+              "layoutToken":{
+                "descriptor":"layoutToken",
+                "value":"reference"
+              },
+              "catchAllHref":{
+                "descriptor":"catchAllHref",
+                "value":"#reference"
+              }
+            }
+          }
+        },
+        {
+          "componentDef":{
+            "descriptor":"markup://auradocs:searchFilterTree"
+          },
+          "localId":"searchTree"
+        },
+        {
+          "componentDef":{
+            "descriptor":"markup://ui:tree"
+          },
+          "localId":"tree",
+          "attributes":{
+            "values":{
+              "nodes":{
+                "descriptor":"nodes",
+                "value":"{!m.tree}"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "hs":true
+};*/}));
+$A.componentService.addComponent("markup://auradocs:template", (function c(){/*$A.componentService.addComponentClass("markup://auradocs:template",function() {
+return {
+  "meta":{
+    "name":"auradocs$template",
+    "extends":"markup://aura:template"
+  }
+};
+});
+return {
+  "xs":"I",
+  "descriptor":"markup://auradocs:template",
+  "st":{
+    "descriptor":"templateCss://auradocs.template",
+    "cl":"auradocsTemplate"
+  },
+  "su":"markup://aura:template",
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["title","aura://String","G",false,"Aura"],
+    ["auraStyleTags","aura://String","I",false],
+    ["afterBody","aura://String","I",false],
+    ["auraNamespacesScriptTags","aura://String","I",false],
+    ["auraResetStyle","aura://String","I",false,"reset"],
+    ["auraResetTags","aura://String","p",false],
+    ["auraInlineStyle","aura://String","I",false],
+    ["auraInit","aura://String","I",false],
+    ["auraInitSync","aura://String","I",false],
+    ["auraPreInitBlock","aura://Aura.Component[]","G",false,[]],
+    ["auraInitBlock","aura://Aura.Component[]","I",false,[]],
+    ["autoInitialize","aura://String","I",false,"true"],
+    ["autoInitializeSync","aura://String","I",false,"false"],
+    ["bootstrapInlineJs","aura://String","I",false],
+    ["prefetchTags","aura://String","I",false],
+    ["doctype","aura://String","G",false,"\u003C!DOCTYPE html\u003E"],
+    ["loadingText","aura://String","G",false,"Loading"],
+    ["errorTitle","aura://String","G",false,"Sorry to interrupt"],
+    ["errorMessage","aura://String","G",false,"CSS Error"],
+    ["defaultBodyClass","aura://String","G",false,"loading"],
+    ["bodyClass","aura://String","G",false],
+    ["extraStyleTags","aura://Aura.Component[]","I",false,[]],
+    ["extraScriptTags","aura://Aura.Component[]","I",false,[]],
+    ["extraMetaTags","aura://Aura.Component[]","I",false,[]],
+    ["forceError","aura://Boolean","I",false,false],
+    ["manifest","aura://String","I",false],
+    ["lastMod","aura://String","I",false],
+    ["afterAuraInit","aura://String","I",false],
+    ["inlineStyle","aura://Aura.Component[]","I",false,[
+      {
+        "componentDef":{
+          "descriptor":"markup://aura:text"
+        },
+        "attributes":{
+          "values":{
+            "value":{
+              "descriptor":"value",
+              "value":"\n        .auraMsgMask{position:absolute;top:0;bottom:0;left:0;right:0;background:-webkit-radial-gradient(circle,rgba(0,0,0,.2),#000);z-index:1000;display:none}.auraMsgBox{display:none;width:100%;margin:120px auto 0;background-color:#708090;z-index:1002;border-radius:5px;box-shadow:0 20px 40px rgba(0,0,0,.8),inset 0 1px 1px rgba(255,255,255,.3);overflow:hidden}.auraMsgBox span{font-weight:700;font-size:1.5em;line-height:1.5em;margin:0;padding:10px;overflow:hidden}.auraErrorBox span{color:#fff}.auraMsgBox a.close{float:right;font-weight:700;font-size:20px;line-height:1em;color:#fff;background-color:transparent;border:1px solid #666;box-shadow:inset 0 1px 1px rgba(255,255,255,.2),0 1px 1px rgba(0,0,0,.4);border-radius:4px;padding:0 6px 4px;margin:0}.auraLoadingBox{text-align:center;width:200px;line-height:80px}#auraErrorMask.auraForcedErrorBox,body.loading .auraLoadingBox,body.auraError #auraErrorMask{display:block}.assistiveText{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)}.visible{display:block}.invisible{display:none}#auraErrorMask{width:100%;height:100%;position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(126,140,153,0.8);z-index:8000;visibility:visible;opacity:1;display:none}.auraErrorBox{position:relative;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;margin:0 2rem;height:100%;padding:0;border-radius:.25rem;z-index:8001}@media (min-width: 48em){.auraErrorBox{margin:0 auto;width:60%;max-width:40rem;min-width:20rem}}.auraErrorBox span{-webkit-flex-shrink:0;-ms-flex-negative:0;flex-shrink:0;position:relative;border-top-right-radius:.25rem;border-top-left-radius:.25rem;border-bottom:0;padding:1rem;text-align:center;font-weight:300;font-size:1.25rem;line-height:1.25;color:#fff;background:#54698d;background-image:-webkit-linear-gradient(45deg,rgba(0,0,0,0.025) 25%,transparent 25%,transparent 50%,rgba(0,0,0,0.025) 50%,rgba(0,0,0,0.025) 75%,transparent 75%,transparent);background-image:linear-gradient(45deg,rgba(0,0,0,0.025) 25%,transparent 25%,transparent 50%,rgba(0,0,0,0.025) 50%,rgba(0,0,0,0.025) 75%,transparent 75%,transparent);background-size:64px 64px}.auraErrorBox a.close{display:inline-block;padding:0;background:transparent;background-clip:border-box;border:1px solid transparent;border-radius:.25rem;font-weight:700;font-size:2rem;line-height:1em;color:#fff;text-decoration:none;width:2rem;height:2rem;position:absolute;top:-2.5rem;right:-.5rem;cursor:pointer}#auraErrorMessage{padding:1rem 2rem;overflow:hidden;overflow-y:auto;background:#FFF;font-size:13px;line-height:19.5px;white-space:pre-wrap}#auraErrorStack{margin:0;padding:0 2rem;font-family:monospace;font-size:.7rem;max-height:15rem;line-height:1.5;white-space:pre;background:#FFF;overflow:auto}.auraErrorFooter{border-bottom-right-radius:.25rem;border-bottom-left-radius:.25rem;padding:.75rem 1rem;background:#FFF;box-shadow:0 2px 3px 0 rgba(0,0,0,.16);border-top:0;text-align:center}#auraErrorReload{position:relative;padding:0 2rem;text-align:center;vertical-align:middle;border:1px solid #d8dde6;background-color:#fff;background-clip:border-box;border-radius:.25rem;font-size:.75rem;line-height:1.875rem;text-decoration:none;color:#0070d2;white-space:normal;cursor:pointer;display:none}#auraErrorReload:hover{background-color:#f4f6f9}#auraErrorReload.show{display:inline-block}\n    "
+            }
+          }
+        }
+      }
+    ]],
+    ["appcacheProgressBarStyle","aura://Aura.Component[]","I",false,[
+      {
+        "componentDef":{
+          "descriptor":"markup://aura:text"
+        },
+        "attributes":{
+          "values":{
+            "value":{
+              "descriptor":"value",
+              "value":"\n        #auraAppcacheProgress{display:none;position:absolute;width:120px;height:26px;top:-10px;left:50%;margin-left:-60px;background-color:gray;border-radius:5px;overflow:hidden;z-index:9999}#auraAppcacheProgress .progressBox{position:absolute;top:14px;left:10px;width:100px;height:6px;overflow:hidden;background-color:white;border-style:solid;border-color:#999;border-width:1px}#auraAppcacheProgress .progressBar{width:1px;height:8px;overflow:hidden;background-color:blue;border-style:solid;border-color:black;border-width:1px}#auraAppcacheProgress.error .progressBar{border-color:red;background-color:pink}\n    "
+            }
+          }
+        }
+      }
+    ]]
+  ],
+  "fa":[
+    {
+      "descriptor":"extraStyleTags",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "href":"/auraFW/resources/codemirror/lib/codemirror.css",
+                  "rel":"stylesheet"
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"link"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "descriptor":"extraScriptTags",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "src":"/auraFW/resources/codemirror/lib/codemirror.js"
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"script"
+              }
+            }
+          }
+        },
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "src":"/auraFW/resources/codemirror/addon/display/autorefresh.js"
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"script"
+              }
+            }
+          }
+        },
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "src":"/auraFW/resources/codemirror/mode/clike/clike.js"
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"script"
+              }
+            }
+          }
+        },
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "src":"/auraFW/resources/codemirror/mode/css/css.js"
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"script"
+              }
+            }
+          }
+        },
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "src":"/auraFW/resources/codemirror/mode/htmlmixed/htmlmixed.js"
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"script"
+              }
+            }
+          }
+        },
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "src":"/auraFW/resources/codemirror/mode/javascript/javascript.js"
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"script"
+              }
+            }
+          }
+        },
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "src":"/auraFW/resources/codemirror/mode/xml/xml.js"
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"script"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "descriptor":"title",
+      "value":"Aura Documentation"
+    },
+    {
+      "descriptor":"extraMetaTags",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "content":"Aura is a UI framework for developing dynamic web apps for mobile and desktop devices. It comes with a rich and extensible component set to kick start building apps.",
+                  "name":"description"
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"meta"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "descriptor":"auraPreInitBlock",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://auraStorage:init"
+          },
+          "attributes":{
+            "values":{
+              "secure":{
+                "descriptor":"secure",
+                "value":true
+              },
+              "persistent":{
+                "descriptor":"persistent",
+                "value":false
+              },
+              "name":{
+                "descriptor":"name",
+                "value":"actions"
+              },
+              "maxSize":{
+                "descriptor":"maxSize",
+                "value":4096
+              },
+              "debugLoggingEnabled":{
+                "descriptor":"debugLoggingEnabled",
+                "value":true
+              },
+              "defaultExpiration":{
+                "descriptor":"defaultExpiration",
+                "value":3600
+              },
+              "clearStorageOnInit":{
+                "descriptor":"clearStorageOnInit",
+                "value":false
+              },
+              "defaultAutoRefreshInterval":{
+                "descriptor":"defaultAutoRefreshInterval",
+                "value":3600
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "hs":true
+};*/}));
+$A.componentService.addComponent("markup://auraStorage:crypto", (function c(){/*$A.componentService.addComponentClass("markup://auraStorage:crypto",function() {
+return {
+  "meta":{
+    "name":"auraStorage$crypto",
+    "extends":"markup://aura:component"
+  }
+};
+});
+return {
+  "xs":"I",
+  "descriptor":"markup://auraStorage:crypto",
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["debugLoggingEnabled","aura://Boolean","I",false,false]
+  ],
+  "hs":true
+};*/}));
+$A.componentService.addComponent("markup://auradocs:sidebar", (function c(){/*$A.componentService.addComponentClass("markup://auradocs:sidebar",function() {
+return {
+  "meta":{
+    "name":"auradocs$sidebar",
+    "extends":"markup://aura:component"
+  }
+};
+});
+return {
+  "xs":"I",
+  "descriptor":"markup://auradocs:sidebar",
+  "st":{
+    "descriptor":"css://auradocs.sidebar",
+    "cl":"auradocsSidebar"
+  },
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["toolbar","aura://Aura.Component[]","I",false,[]]
+  ],
+  "fa":[
+    {
+      "descriptor":"body",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:expression"
+          },
+          "attributes":{
+            "values":{
+              "value":{
+                "descriptor":"value",
+                "value":"{!v.body}"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+};*/}));
+$A.componentService.addComponent("markup://auraStorage:fuelGauge", (function c(){/*$A.componentService.addComponentClass("markup://auraStorage:fuelGauge",function() {
+return {
+  "meta":{
+    "name":"auraStorage$fuelGauge",
+    "extends":"markup://aura:component"
+  },
+  "controller":{
+    "init":function(cmp, event, helper) {
+        var enabled = helper.isEnabled(cmp);
+        cmp.set("v.enabled", enabled);
+        if (enabled) {
+            $A.eventService.addHandler({
+                "event": "markup://auraStorage:modified",
+                "globalId": cmp.getGlobalId(),
+                "handler": $A.getCallback(function(e) {
+                    if (!cmp.isValid()) {
+                        return;
+                    }
+                    var eventStorageName = e.getParam("name");
+                    var storageName = cmp.get("v.storageName");
+                    if (eventStorageName !== storageName) {
+                        return;
+                    }
+                    helper.update(cmp);
+                })
+            });
+        }
+    },
+    "destroy":function(cmp) {
+        if (cmp.get("v.enabled")) {
+            $A.eventService.removeHandler({
+                "event": "markup://auraStorage:modified",
+                "globalId": cmp.getGlobalId()
+            });
+        }
+    },
+    "showStats":function(cmp) {
+        var storage = $A.storageService.getStorage(cmp.get("v.storageName"));
+
+        storage.getSize().then(
+            undefined,
+            function() { return "unknown"; }
+        ).then($A.getCallback(function(size) {
+            var message = $A.util.format("Storage name: {0}\nAdapter: {1}\nSize: {2} of {3} KB\n\nPress OK to clear ALL storages or cancel to abort.",
+                cmp.get("v.storageName"),
+                storage.getName(),
+                size.toFixed ? size.toFixed(0) : size,
+                storage.getMaxSize()
+            );
+            var confirmed = confirm(message); 
+            if (confirmed) {
+                $A.log("Asynchronously clearing all storages");
+                var storages = $A.storageService.getStorages();
+                var promises = [];
+                for (var name in storages) {
+                    promises.push(storages[name].clear());
+                }
+                Promise.all(promises).then(function() {
+                    $A.log("All storages cleared");
+                }, function(e) {
+                    $A.warning("Error while clearing storages: ", e);
+                });
+            }
+        }));
+    }
+  },
+  "helper":{
+    "getStorage":function(cmp) {
+        if (!cmp.isValid()) {
+            return undefined;
+        }
+        return $A.storageService.getStorage(cmp.get("v.storageName"));
+    },
+    "isEnabled":function(cmp) {
+        var mode = $A.getContext().getMode();
+        return !$A.util.isUndefinedOrNull(this.getStorage(cmp)) && (mode !== "PROD");
+    },
+    "update":function(cmp) {
+        var storage = this.getStorage(cmp);
+        var maxSize = storage.getMaxSize();
+
+        storage.getSize().then($A.getCallback(function(size) {
+            var severity;
+            if (size < maxSize / 2) {
+                severity = "success";
+            } else if (size < maxSize) {
+                severity = "warning";
+            } else {
+                severity = "important";
+            }
+
+            var stamp = cmp.find("stamp");
+            stamp.set("v.severity", severity);
+            cmp.set("v.value", Math.round(size * 100) / 100);
+        }));
+    }
+  }
+};
+});
+return {
+  "xs":"I",
+  "descriptor":"markup://auraStorage:fuelGauge",
+  "st":{
+    "descriptor":"css://auraStorage.fuelGauge",
+    "cl":"auraStorageFuelGauge"
+  },
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["storageName","aura://String","I",true],
+    ["value","aura://Decimal","I",false,0],
+    ["enabled","aura://Boolean","I",false]
+  ],
+  "hd":[
+    {
+      "x":"{!c.init}",
+      "v":"{!this}",
+      "n":"init"
+    },
+    {
+      "x":"{!c.destroy}",
+      "v":"{!this}",
+      "n":"destroy"
+    }
+  ],
+  "ld":{
+    "stamp":{
+      "description":"Fuel Gauge",
+      "alias":"fuel-gauge"
+    }
+  },
+  "fa":[
+    {
+      "descriptor":"body",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:if"
+          },
+          "attributes":{
+            "values":{
+              "isTrue":{
+                "descriptor":"isTrue",
+                "value":"{!v.enabled}"
+              },
+              "body":{
+                "descriptor":"body",
+                "value":[
+                  {
+                    "componentDef":{
+                      "descriptor":"markup://ui:stamp"
+                    },
+                    "localId":"stamp",
+                    "attributes":{
+                      "values":{
+                        "onclick":{
+                          "descriptor":"onclick",
+                          "value":"{!c.showStats}"
+                        },
+                        "body":{
+                          "descriptor":"body",
+                          "value":[
+                            {
+                              "componentDef":{
+                                "descriptor":"markup://aura:expression"
+                              },
+                              "attributes":{
+                                "values":{
+                                  "value":{
+                                    "descriptor":"value",
+                                    "value":"{!v.value}"
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "componentDef":{
+                                "descriptor":"markup://aura:text"
+                              },
+                              "attributes":{
+                                "values":{
+                                  "value":{
+                                    "descriptor":"value",
+                                    "value":" KB"
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "severity":{
+                          "descriptor":"severity",
+                          "value":"success"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+};*/}));
+$A.componentService.addComponent("markup://auraStorage:init", (function c(){/*$A.componentService.addComponentClass("markup://auraStorage:init",function() {
+return {
+  "meta":{
+    "name":"auraStorage$init",
+    "extends":"markup://aura:component"
+  },
+  "controller":{
+    "init":function(cmp, event, helper) {
+        helper.init(cmp);
+    },
+    "connectionLost":function(cmp, event, helper) {
+        var storage = helper.getStorage(cmp);
+        if (storage) {
+            storage.suspendSweeping();
+        }
+    },
+    "connectionResumed":function(cmp, event, helper) {
+        var storage = helper.getStorage(cmp);
+        if (storage) {
+            storage.resumeSweeping();
+        }
+    }
+  },
+  "helper":{
+    "getStorage":function(cmp) {
+        return $A.storageService.getStorage(cmp.get("v.name"));
+    },
+    "init":function(cmp) {
+        var debugLoggingEnabled = $A.util.getBooleanValue(cmp.get("v.debugLoggingEnabled"));
+        var name = cmp.get("v.name");
+        var defaultExpiration = parseInt(cmp.get("v.defaultExpiration"),10);
+        var defaultAutoRefreshInterval = parseInt(cmp.get("v.defaultAutoRefreshInterval"),10);
+        var maxSize = cmp.get("v.maxSize") * 1024.0; 
+        var clearStorageOnInit = $A.util.getBooleanValue(cmp.get("v.clearStorageOnInit"));
+        var persistent = $A.util.getBooleanValue(cmp.get("v.persistent"));
+        var secure = $A.util.getBooleanValue(cmp.get("v.secure"));
+        var version = cmp.get("v.version");
+
+        $A.storageService.initStorage({
+            "name":                name,
+            "persistent":          persistent,
+            "secure":              secure,
+            "maxSize":             maxSize,
+            "expiration":          defaultExpiration,
+            "debugLogging":        debugLoggingEnabled,
+            "clearOnInit":         clearStorageOnInit,
+            "version":             version,
+            "autoRefreshInterval": defaultAutoRefreshInterval
+        });
+
+    }
+  }
+};
+});
+return {
+  "xs":"G",
+  "descriptor":"markup://auraStorage:init",
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["name","aura://String","G",true],
+    ["persistent","aura://Boolean","G",false,false],
+    ["secure","aura://Boolean","G",false,false],
+    ["clearStorageOnInit","aura://Boolean","G",false,true],
+    ["defaultExpiration","aura://Integer","G",false,10],
+    ["defaultAutoRefreshInterval","aura://Integer","G",false,30],
+    ["maxSize","aura://Integer","G",false,1000],
+    ["debugLoggingEnabled","aura://Boolean","G",false,false],
+    ["version","aura://String","G",false,""]
+  ],
+  "hd":[
+    {
+      "x":"{!c.init}",
+      "v":"{!this}",
+      "n":"init"
+    },
+    {
+      "ed":{
+        "descriptor":"markup://aura:connectionLost"
+      },
+      "x":"{!c.connectionLost}"
+    },
+    {
+      "ed":{
+        "descriptor":"markup://aura:connectionResumed"
+      },
+      "x":"{!c.connectionResumed}"
+    }
+  ],
+  "hs":true
+};*/}));
+$A.componentService.initEventDefs([
+  {
+    "descriptor":"markup://auradocs:locationChange",
+    "t":"APPLICATION",
+    "xs":"I",
+    "su":{
+      "descriptor":"markup://aura:locationChange"
+    },
+    "a":{
+      "demo":["demo","aura://String","I",false],
+      "querystring":["querystring","aura://String","G",false],
+      "topic":["topic","aura://String","I",false],
+      "defType":["defType","aura://String","I",false],
+      "descriptor":["descriptor","aura://String","I",false],
+      "token":["token","aura://String","G",false],
+      "searchTerm":["searchTerm","aura://String","I",false]
+    }
+  },
+  {
+    "descriptor":"markup://auraStorage:refreshStatusChange",
+    "t":"COMPONENT",
+    "xs":"I",
+    "a":{
+      "action":["action","aura://Aura.Action","I",false,null],
+      "responseUpdated":["responseUpdated","aura://Boolean","I",false]
+    }
+  },
+  {
+    "descriptor":"markup://auraStorage:modified",
+    "t":"APPLICATION",
+    "xs":"I",
+    "a":{
+      "name":["name","aura://String","I",false]
+    }
+  }
+]);
+$A.componentService.initLibraryDefs([
+
+]);
+$A.componentService.initControllerDefs([
+
+]);
+
+Aura.appJsReady = true;Aura.appDefsReady&&Aura.appDefsReady();

@@ -1,0 +1,6 @@
+cd `dirname $0`/../aura-jetty
+
+# if you need to specify a Java system property, do so in aura-jetty/pom.xml, in the <systemProperties> section
+
+export MAVEN_OPTS="-Xmx1024m -Xms512m -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000"
+mvn org.mortbay.jetty:jetty-maven-plugin:run $@ &

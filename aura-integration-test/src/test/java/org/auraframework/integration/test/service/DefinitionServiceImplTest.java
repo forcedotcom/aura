@@ -15,23 +15,14 @@
  */
 package org.auraframework.integration.test.service;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.auraframework.Aura;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.HelperDef;
-import org.auraframework.def.StyleDef;
-import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.DefinitionServiceImpl;
@@ -58,10 +49,9 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Tests for DefinitionServiceImpl.
@@ -924,6 +914,32 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             }
         }
         assertTrue("markup://ui:button should have been added to depsCache again", foundit);
+    }
+
+    @Test
+    public void testUpdatingDependencyInAppUpdatesUid() throws Exception {
+
+        contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, laxSecurityApp);
+
+        DefDescriptor<?> changingCmp = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "", "<ui:button/>"));
+
+        DefDescriptor<?> app = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseApplicationTag, "", String.format("<%s:%s/>", changingCmp.getNamespace(), changingCmp.getName())));
+
+        String appUid = definitionService.getUid(null, app);
+
+        getAuraTestingUtil().addSourceAutoCleanup(changingCmp, String.format(baseComponentTag, "","<ui:inputText label='l'/>"), NamespaceAccess.INTERNAL, true);
+
+        contextService.endContext();
+
+        contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, laxSecurityApp);
+
+        String newAppUid = definitionService.getUid(null, app);
+
+        assertNotSame(String.format("App uid should be updated when dependent component is changed. Previous '%s' Current '%s'", appUid, newAppUid),
+                appUid, newAppUid);
+
     }
 
     public static class AuraTestRegistryProviderWithNulls extends AbstractRegistryAdapterImpl {

@@ -576,6 +576,7 @@ public interface AuraContext {
      */
     enum EncodingStyle {
         Bare, // ! Minimal context, no UIDs
+        AppResource, // ! Similar to Normal, except no FWUID and includes serializationVersion
         Normal, // ! Standard encoding, include UIDs
         Css, // ! Token UIDs, Client and StyleContext info included
         Full // ! Everything

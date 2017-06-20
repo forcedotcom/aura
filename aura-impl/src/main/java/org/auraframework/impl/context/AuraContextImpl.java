@@ -32,6 +32,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
+import org.auraframework.impl.ServerServiceImpl;
 import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.impl.css.token.StyleContextImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -825,10 +826,18 @@ public class AuraContextImpl implements AuraContext {
             }
             // UIDs in everything except Bare.
             if (style != EncodingStyle.Bare) {
-                if (getFrameworkUID() != null) {
-                    json.writeMapEntry("fwuid", getFrameworkUID());
+                // AppJs does not include fwuid
+                if (style == EncodingStyle.AppResource) {
+                    // AppJs does contain this serialization version as a cache busting key we can use when we change the format of the file.
+                    json.writeMapEntry("serializationVersion", ServerServiceImpl.AURA_SERIALIZATION_VERSION);
+                } else if (style == EncodingStyle.Css) {
+                    // don't include a serialized version nor fwuid
                 } else {
-                    json.writeMapEntry("fwuid", configAdapter.getAuraFrameworkNonce());
+                    if (getFrameworkUID() != null) {
+                        json.writeMapEntry("fwuid", getFrameworkUID());
+                    } else {
+                        json.writeMapEntry("fwuid", configAdapter.getAuraFrameworkNonce());
+                    }
                 }
 
                 Map<String, String> loadedStrings = Maps.newHashMap();
@@ -854,7 +863,7 @@ public class AuraContextImpl implements AuraContext {
             }
 
             // Normal and full get the locales, but not the css stuff
-            if (style == EncodingStyle.Normal || style == EncodingStyle.Full) {
+            if (style == EncodingStyle.Normal || style == EncodingStyle.Full || style == EncodingStyle.AppResource) {
                 if (getRequestedLocales() != null) {
                     List<String> locales = new ArrayList<>();
                     for (Locale locale : getRequestedLocales()) {

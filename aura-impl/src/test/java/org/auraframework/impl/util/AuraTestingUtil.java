@@ -296,7 +296,12 @@ public class AuraTestingUtil {
      */
     public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents,
             NamespaceAccess access) {
-        stringSourceLoader.putSource(descriptor, contents, false, access);
+        return addSourceAutoCleanup(descriptor, contents, access, false);
+    }
+
+    public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents,
+                NamespaceAccess access, Boolean overwrite) {
+        stringSourceLoader.putSource(descriptor, contents, overwrite, access);
         markForCleanup(descriptor);
         return descriptor;
     }

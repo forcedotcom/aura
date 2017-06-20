@@ -122,6 +122,8 @@ public class ServerServiceImpl implements ServerService {
 
     private static final long serialVersionUID = -2779745160285710414L;
 
+    public static final int AURA_SERIALIZATION_VERSION = 1;
+
     private Cache<String, String> stringsCache;
 
     private Cache<String, String> altStringsCache;

@@ -35,16 +35,17 @@ import static org.auraframework.http.AuraCSPInliningService.InlineScriptMode.UNS
 
 @ServiceComponent
 public class AuraCSPInliningService implements CSPInliningService {
-	static final long serialVersionUID = -5862171003552767370L;
-	
-	static String INLINE = "<script>%s</script>";
-	static String INLINE_NONCE = "<!--\"'--><script nonce=\"%s\">%s</script>";
-	static String NONCE_INJECTION_PROTECTION = "<!--\"'-->";
+    static final long serialVersionUID = -5862171003552767370L;
+    
+    static String INLINE = "<script>%s</script>";
+    static String INLINE_NONCE = "<!--\"'--><script nonce=\"%s\">%s</script>";
+    static String NONCE_INJECTION_PROTECTION = "<!--\"'-->";
 
     public enum InlineScriptMode{
         UNSUPPORTED(""),
         HASH("'sha256-%s'"),
-        NONCE("'nonce-%s'");
+        NONCE("'nonce-%s'"),
+        UNSAFEINLINE("");
 
         private String format;
 
@@ -75,9 +76,10 @@ public class AuraCSPInliningService implements CSPInliningService {
             case NONCE:
                 directives.add(scriptMode.toDirective(context.getScriptNonce()));
                 break;
-			case UNSUPPORTED:
-			default:
-				break;
+            case UNSUPPORTED:
+            case UNSAFEINLINE:
+            default:
+                break;
         }
         return directives;
     }
@@ -88,10 +90,11 @@ public class AuraCSPInliningService implements CSPInliningService {
             case HASH:
                 contextService.getCurrentContext().addScriptHash(hashScript(script));
                 break;
-			case NONCE:
-			case UNSUPPORTED:
-			default:
-				break;
+            case UNSAFEINLINE:
+            case NONCE:
+            case UNSUPPORTED:
+            default:
+                break;
         }
     }
 
@@ -107,15 +110,16 @@ public class AuraCSPInliningService implements CSPInliningService {
         if (script != null && script.length() > 0) {
             processScript(script);
             switch(getInlineMode()){
+                case UNSAFEINLINE:
                 case HASH:
                     out.append(String.format(INLINE, script));
                     break;
                 case NONCE:
                     out.append(String.format(INLINE_NONCE, contextService.getCurrentContext().getScriptNonce(), script));
                     break;
-				case UNSUPPORTED:
-				default:
-					break;
+                case UNSUPPORTED:
+                default:
+                    break;
             }
 
         }
@@ -129,9 +133,10 @@ public class AuraCSPInliningService implements CSPInliningService {
     @Override
     public void preScriptAppend(Appendable out) throws IOException {
         switch(getInlineMode()){
+            case UNSAFEINLINE:
             case UNSUPPORTED:
             case HASH:
-                return;
+                break;
             case NONCE:
                 out.append(NONCE_INJECTION_PROTECTION);
         }

@@ -120,7 +120,7 @@ LibraryIncludeRegistry.prototype.getLibraryInclude = function(descriptor) {
 
 
 LibraryIncludeRegistry.prototype.hydrateLibrary = function(descriptor, exporter) {
-    if (exporter.name === 'l') {
+    if ($A.util.getFunctionName(exporter) === 'l') {
         var tmp = exporter.toString();
         var pos = [tmp.indexOf('/*') + 2, tmp.indexOf('*/')];
         tmp = tmp.substr(pos[0], pos[1] - pos[0]);

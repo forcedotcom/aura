@@ -2446,6 +2446,22 @@ Aura.Utils.Util.prototype.hasSourceURL = function() {
     return this.sourceURLsupported;
 };
 
+Aura.Utils.Util.prototype.getFunctionName = function(f) {
+    if (f.name) {
+        return f.name;
+    }
+
+    var fnNameMatchRegex = /^\s*function\s+([^\(\s]*)\s*/;
+    var match, name;
+    if (f === Function || f === Function.prototype.constructor) {
+        name = "Function";
+    } else if (f !== Function.prototype) {
+        match = ("" + f).match(fnNameMatchRegex);
+        name = match && match[1];
+    }
+    return name || "";
+};
+
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     /**
      * Gets the aura debug tool component whether in an iframe or not.

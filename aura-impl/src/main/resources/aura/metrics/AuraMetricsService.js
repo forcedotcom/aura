@@ -971,6 +971,7 @@ Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
             "requestBootstrapJs" : "bootstrap.js",
             "requestInlineJs"    : "inline.js",
             "requestAppCss"      : "app.css",
+            "requestAppCoreJs"   : "appcore.js",
             "requestAppJs"       : "app.js",
             "requestAuraJs"      : "/aura_"
         };

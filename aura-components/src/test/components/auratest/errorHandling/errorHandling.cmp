@@ -93,6 +93,14 @@
         </td>
     </tr>
     <tr>
+        <td>Throw Error from Promise in Library Code in Component: </td>
+        <td>
+          <ui:button label="Throw"
+                     press="{!c.throwErrorFromPromiseInLibrary}"
+                     class="errorFromPromiseInLibraryButton"/>
+        </td>
+    </tr>
+    <tr>
         <td>Throw Error From Component Rerender: </td>
         <td>
           <ui:button label="Throw"

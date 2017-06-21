@@ -53,6 +53,10 @@
         helper.ErrorHandlingLib.ErrorService.throwAnErrorFromCallback();
     },
 
+    throwErrorFromPromiseInLibrary: function(cmp, event, helper) {
+        helper.ErrorHandlingLib.ErrorService.throwAnErrorInPromise();
+    },
+
     throwErrorFromRerender: function(cmp) {
         cmp.set("v.throwErrorFromRerender", true);
         cmp.set("v.message", "trigger rerender.");

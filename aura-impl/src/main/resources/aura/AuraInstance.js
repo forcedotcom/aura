@@ -856,6 +856,11 @@ AuraInstance.prototype.reportError = function(message, error) {
         ((this.lastKnownError && message && message.indexOf(this.lastKnownError.message) > -1) ? this.lastKnownError : null) ||
         new $A.auraError("[NoErrorObjectAvailable] " + message);
 
+    if (!error["component"] && error.setComponent) {
+        var component = error.findComponentFromStackTrace();
+        error.setComponent(component);
+    }
+
     $A.handleError(message, error);
 
     // only report the error to the server if sourceURL is supported

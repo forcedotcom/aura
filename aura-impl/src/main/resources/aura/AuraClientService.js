@@ -1091,7 +1091,8 @@ AuraClientService.prototype.showErrorDialogWithReload = function(e, additionalLo
                             "failedAction": e["component"] || "",
                             "clientError": e.message,
                             "clientStack": (e.stackTrace || e.stack || "").toString().substr(0, Aura.Utils.Logger.MAX_STACKTRACE_SIZE),
-                            "componentStack": ""
+                            "componentStack": "",
+                            "stacktraceIdGen": e["stacktraceIdGen"]
                         },
                         "version": null
                     }]

@@ -31,7 +31,6 @@
         attributes: {"handleSystemError": true},
         test: [
             function(cmp) {
-
                 $A.test.expectAuraError("Error from app client controller");
                 $A.test.clickOrTouch(cmp.find("errorFromClientControllerButton").getElement());
                 $A.test.addWaitForWithFailureMessage(true, function(){
@@ -180,6 +179,21 @@
             }
         ]
     },
+
+    testFailingDescriptorForErrorFromPromise: {
+        test: [
+            function(cmp) {
+                $A.test.clickOrTouch(cmp.find("errorFromPromiseButton").getElement());
+                this.waitForErrorModal();
+            },
+            function(cmp) {
+                var actual = this.findFailingDescriptorFromErrorModal();
+                var expected = "markup://auratest:errorHandlingApp";
+
+                $A.test.assertTrue(actual.indexOf(expected) > -1);
+            }
+        ]
+     },
 
     testFailingDescriptorForNonExistingEventHandlerError: {
         test: [

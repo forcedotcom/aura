@@ -79,7 +79,15 @@
     })();
 
     window.addEventListener("unhandledrejection", function (event) {
-        if (!$A.reportError(null, event.reason)) {
+        var error = event.reason;
+        var validError = false;
+
+        if (error.name && error.name.indexOf('Error') !== -1) {
+            error = new $A.auraError(null, error);
+            validError = true;
+        }
+
+        if (!validError || !$A.reportError(null, error)) {
             var console_error = (window.console && window.console.error);
             if (console_error) {
                 console_error(null, event.reason);

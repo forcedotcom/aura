@@ -147,9 +147,10 @@ Aura.Errors.GenerateErrorIdHashGen = function(componentName, stackFrames) {
     var isNonFrameworkStackFrame = false;
     var hashGen = componentName;
     for (var i = 0; i < stackFrames.length; i++) {
-        isNonFrameworkStackFrame = !stackFrames[i].fileName || stackFrames[i].fileName.match(/aura_[^\.]+\.js$/gi) === null;
-        if (isNonFrameworkStackFrame) {
-            hashGen = hashGen + "$" + stackFrames[i].functionName;
+        var frame = stackFrames[i];
+        // if non framework stackframe
+        if (!frame.fileName || frame.fileName.match(/aura_[^\.]+\.js$/gi) === null) {
+            hashGen = hashGen + "$" + frame.functionName;
             break;
         }
     }
@@ -171,6 +172,30 @@ AuraError.prototype.toString = function() {
 AuraError.prototype.setStackTrace = function(trace) {
     this.stackTrace = trace;
 };
+
+/**
+ * Returns the failing component descriptor based on stacktrace
+ */
+AuraError.prototype.findComponentFromStackTrace = function() {
+    for (var i = 0; i < this.stackFrames.length; i++) {
+        var frame = this.stackFrames[i];
+        var fileName = frame.fileName;
+        // if non framework stackframe
+        if (fileName && fileName.match(/aura_[^\.]+\.js$/gi) === null) {
+            var pathParts = fileName.replace(".js", "").split("/");
+
+            if (pathParts[pathParts.length - 3] === "components") {
+                return "markup://" + pathParts.slice(-2).join(":");
+            }
+            if (pathParts[pathParts.length - 4] === "libraries") {
+                pathParts = pathParts.slice(-3);
+                return "js://" + pathParts[0] + ":" + pathParts[1] + "." + pathParts[2];
+            }
+        }
+    }
+
+    return "";
+}
 
 AuraError.prototype.setComponent = function(component) {
     this["component"] = component;

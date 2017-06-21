@@ -150,6 +150,14 @@
         </td>
     </tr>
     <tr>
+        <td>Error from Promise: </td>
+        <td>
+          <ui:button label="Throw"
+                     press="{!c.throwErrorFromPromise}"
+                     aura:id="errorFromPromiseButton"/>
+        </td>
+    </tr>
+    <tr>
         <td>Fire Test Event: </td>
         <td>
           <ui:button label="Fire"

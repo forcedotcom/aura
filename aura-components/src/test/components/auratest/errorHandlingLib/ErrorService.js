@@ -9,6 +9,12 @@ function errService() {
                         throw Error("Error from a callback function in component library");
                     });
             setTimeout(callback, 0);
+        },
+
+        throwAnErrorInPromise: function() {
+            var promise = new Promise(function(resolve, reject) {
+                reject(new Error("Error from promise in component library"));
+            });
         }
     }
 }

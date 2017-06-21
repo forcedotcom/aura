@@ -183,28 +183,32 @@ Test.Aura.LoggingTest = function() {
         [Fact]
         function CallsReportErrorWithEventReason() {
             var reportError = Stubs.GetMethod("message", "error", true);
-            var expectedError = "bad reason";
+            var expected = "error message";
 
             Mocks.GetMocks(Object.Global(), {
                 "$A": {
-                    "reportError":reportError
+                    "reportError":reportError,
+                    "auraError": function(msg, err) {
+                        this.message = err.message;
+                    },
                 }
             })(function() {
-                eventHandler({reason:expectedError});
+                eventHandler({reason:new Error(expected)});
             });
 
-            Assert.Equal({"message":null, "error":expectedError}, reportError.Calls[0].Arguments);
+            var actual = reportError.Calls[0].Arguments["error"].message;
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
         function DoesNotCallConsoleErrorIfReportReturnsTrue() {
             var reportError = Stubs.GetMethod("message", "error", true);
             var consoleError = Stubs.GetMethod("message", "error", undefined);
-            var expectedError = "bad reason";
 
             Mocks.GetMocks(Object.Global(), {
                 "$A": {
-                    "reportError":reportError
+                    "reportError":reportError,
+                    "auraError": function(){}
                 },
                 "window": {
                     "console":{
@@ -212,7 +216,7 @@ Test.Aura.LoggingTest = function() {
                     }
                 }
             })(function() {
-                eventHandler({reason:expectedError});
+                eventHandler({reason:new Error()});
             });
 
             Assert.Equal(0, consoleError.Calls.length);

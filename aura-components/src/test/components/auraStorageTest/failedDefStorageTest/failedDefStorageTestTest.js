@@ -152,6 +152,7 @@
     },
 
     testBrokenGraphCookieGetsRemovedWhenStorageIsCleared: {
+        labels : ["UnAdaptableTest"],
         test: function(cmp) {
             $A.test.addCleanup(this.clearBrokenGraphCookie);
 
@@ -182,6 +183,7 @@
     },
 
     testBrokenGraphCookieIsNotRemovedWhenStorageFailsToClear: {
+        labels : ["UnAdaptableTest"],
         test: function(cmp) {
             $A.test.addCleanup(this.clearBrokenGraphCookie);
 
@@ -211,6 +213,7 @@
     },
 
     testDefStorageClearedWhenBrokenGraphCookieIsSet: {
+        labels : ["UnAdaptableTest"],
         test: function(cmp) {
             $A.test.addCleanup(this.clearBrokenGraphCookie);
 
@@ -222,7 +225,7 @@
                 });
 
             var expiration = new Date(new Date().getTime() + 1000*60*60); //1h
-            var existedCookie = this.BROKEN_GRAPH_COOKIE + "= true; expires=" + expiration.toUTCString();
+            var existedCookie = this.BROKEN_GRAPH_COOKIE + "=true; expires=" + expiration.toUTCString();
             document.cookie = existedCookie;
 
             var that = this;

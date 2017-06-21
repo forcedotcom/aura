@@ -38,8 +38,6 @@ script:
   sudo unmount /dev/shm
   sudo mount -t tmpfs -o rw,nosuid,nodev,noexec,relatime,size=512M,tmpfs /dev/shm
   mv localhost/* .
-  mkdir -p /home/mvn-user/.m2
-  sed -i 's/1024x768x24/960x640x16/g' /home/mvn-user/.profile
   cp settings.xml /home/mvn-user/.m2/settings.xml
   chown -R mvn-user /home/mvn-user/.m2
   chown -R mvn-user $(pwd)
@@ -54,8 +52,7 @@ script:
 # container, the commands in the script: section will be executed. No Zen-specific content
 # can be added.
 build:
-  image: ops0-artifactrepo1-0-prd.data.sfdc.net/dci/centos-aura-tools@sha256:a93bef87b76ccd5adae296acd22ee7b7b70f49d4540e41e83ac477f39c7ac979
-  pull: true
+  image: ops0-artifactrepo1-0-prd.data.sfdc.net/dci/centos-aura-tools:0.600@sha256:25b11b766dce8fcd27797e7e5766a83bdbadc205dda01349388e644e9dfef8e2
   auth_config:
     username: $$DOCKER_USERNAME
     password: $$DOCKER_PASSWORD
@@ -69,8 +66,7 @@ build:
     - ./.zenbuild.sh
 compose:
   external-tools:
-    image: ops0-artifactrepo1-0-prd.data.sfdc.net/dci/alpine-aura-tools-external@sha256:8b4febf1eff36ef5fca0d17b6561ef9305c86a6bd194e1372152c9bc2ffc1a05
-    pull: true
+    image: ops0-artifactrepo1-0-prd.data.sfdc.net/dci/alpine-aura-tools-external:0.6000@sha256:4f251c65452108fe7de7bbe6de15669f8896796dc2995da85c73ac87a938e726
     auth_config:
       username: $$DOCKER_USERNAME
       password: $$DOCKER_PASSWORD

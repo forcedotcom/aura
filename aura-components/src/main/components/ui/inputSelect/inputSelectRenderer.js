@@ -18,6 +18,7 @@
         this.superAfterRender();
 
 		var options = cmp.get("v.options");
+		options = $A.util.isUndefinedOrNull(options) ? [] : options;
 
 		if (!cmp.get("v.useMenu") && (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body")))) {
 			var optionElements = helper.renderOptions(cmp, options);

@@ -1,0 +1,93 @@
+/*
+ * Copyright 2017 salesforce.com, inc.
+ * All Rights Reserved
+ * Company Confidential
+ */
+ 
+.THIS.container1 {
+	height: 50%;
+	overflow: auto;
+}
+
+.THIS.container2 {
+	height: 50%;
+	overflow: auto;
+	display: none;
+}
+
+.THIS.container3 {
+	height: 50%;
+	overflow: auto;
+	display: none;
+}
+
+.THIS table {
+	height: 100%;
+	display: block;
+	table-layout:fixed;
+}
+
+
+.THIS table td,
+.THIS table th {
+	border-bottom: 1px solid rgb(216, 221, 230);
+}
+
+.THIS table td {
+	max-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	padding: .75em .5em;
+}
+
+.THIS table th:hover{
+	background-color: rgb(244, 246, 249)
+}
+
+.THIS table.resizable-cols .handle {
+	padding: 0;
+	margin: 0;
+}
+
+.THIS table.resizable-cols .handle:hover {
+	background-color:#1589ee;
+}
+
+.THIS table.resizable-cols th .resize-button {
+	width: 5px;
+	background-color: #1589ee;
+	border: none;
+	padding: 0;
+	margin: 0;
+}
+
+.THIS .indicator {
+	width: 5px;
+	background-color: #1589ee;
+	border: none;
+	padding: 0;
+	margin: 0;
+}
+
+.THIS table.resizable-cols .handle [type="range"]:focus ~ .resize-button {
+	outline: none;
+	box-shadow: 0 0 3px #1589ee;
+	background-color: #1589ee;
+}
+
+.THIS table.resizable-cols .handle [type="range"]:focus ~ .resize-button .column-divider,
+.THIS .indicator .column-divider {
+	width: 1px;
+	background-color: #1589ee;
+	right: 2px;
+}
+
+.THIS table.resizable-cols th .content {
+	padding-right: 0;
+	padding: 0.5rem;
+}
+
+.THIS .slds-resizable__input {
+	visibility: hidden;
+}

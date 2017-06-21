@@ -176,6 +176,19 @@ function lib(w) { //eslint-disable-line no-unused-vars
             var totalWidth = 0;
             var columns = this.columns;
 
+            // initialWidths can be set to NULL to avoid setting any widths on the table header on initialization
+           if (this.config.initialWidths === null) {
+                // in this case we just initialize the handles and do nothing else
+                for (var i = 0; i < columns.length; i++) {
+                    var column = columns[i];
+                    if (!this.hasHandle(column)) {
+                        var handle = this._createHandle();
+                        this._attachHandle(column, handle);
+                    }
+                }
+                return;
+            }
+
             var initialWidths = this.config.initialWidths || [];
             // Create and attach a handle to each column
             var promise = Promise.resolve();
@@ -712,6 +725,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 var column = this.columns[i];
                 var width = widths[i];
 
+                // we must be able to set widths that are smaller than min width due to "system columns"
                 if ($A.util.isUndefinedOrNull(width)) {
                     width = this.config.minWidth;
                 }

@@ -1,0 +1,94 @@
+<!--
+  ~ Copyright 2017 salesforce.com, inc.
+  ~ All Rights Reserved
+  ~ Company Confidential
+  -->
+<aura:component>
+	<aura:attribute name="prevResize" type="Object" />
+	<aura:attribute name="initialWidths" type="Integer[]" default="[200, 400, 100]" />
+
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+	<div aura:id="container1" class="container1">
+		<ui:virtualDataTable aura:id="grid" class="testGrid"
+			enableResizableColumns="true"
+			onColumnResize="{!c.onResize}">
+			
+			<aura:set attribute="headerColumns">
+				<ui:dataTableHeader name="id"		label="Id" sortable="true"/>
+				<ui:dataTableHeader name="name"	label="Name"/>
+				<ui:dataTableHeader name="grade" label="Grade"/>
+				<ui:dataTableHeader name=""      label="Actions" hideLabel="true"/>
+			</aura:set>
+			
+			<aura:set attribute="columns">
+				<ui:outputText value="{!item.id}"/>
+				<ui:outputText value="{!item.name}"/>
+				<ui:outputText value="{!item.grade}"/>
+				{!item.id}
+			</aura:set>
+			
+			<aura:set attribute="dataModel">
+				<uitest:virtualDataGrid_dataProvider />
+			</aura:set>
+		</ui:virtualDataTable>
+	</div>
+	
+	<div>
+		Column: <ui:outputText aura:id="srcColumn" value="{!v.prevResize.src.label}"/> <br/>
+		Index: <ui:outputText aura:id="srcIndex" value="{!v.prevResize.src.index}"/> <br />
+		Width: <ui:outputText aura:id="srcWidth" value="{!v.prevResize.width}"/> 
+	</div>
+	
+	<ui:button aura:id="showGrid2Btn" label="Show Grid #2" press="{!c.showGrid2}"/>
+	<ui:button aura:id="addColBtn" label="Add Column" press="{!c.addCol}"/>
+	<ui:button aura:id="removeColBtn" label="Remove Column" press="{!c.removeCol}"/>
+	<ui:button aura:id="switchColBtn" label="Switch Column" press="{!c.switchCol}"/>
+	
+	<div aura:id="container2" class="container2">
+		<ui:virtualDataTable aura:id="grid2" class="testGrid"
+			enableResizableColumns="true"
+			onColumnResize="{!c.onResize}">
+			
+			<aura:set attribute="headerColumns">
+				<ui:dataTableHeader name="id"		label="Id" sortable="true"/>
+				<ui:dataTableHeader name="name"	label="Name"/>
+				<ui:dataTableHeader name="grade" label="Grade"/>
+			</aura:set>
+			
+			<aura:set attribute="columns">
+				<ui:outputText value="{!item.id}"/>
+				<ui:outputText value="{!item.name}"/>
+				<ui:outputText value="{!item.grade}"/>
+			</aura:set>
+			
+			<aura:set attribute="dataModel">
+				<uitest:virtualDataGrid_dataProvider />
+			</aura:set>
+		</ui:virtualDataTable>
+	</div>
+
+	<div aura:id="container3" class="container2">
+		<ui:virtualDataTable aura:id="grid3" class="testGrid"
+							 enableResizableColumns="true"
+							 onColumnResize="{!c.onResize}">
+
+			<aura:set attribute="headerColumns">
+				<ui:dataTableHeader name="id"		label="Id" sortable="true"/>
+				<ui:dataTableHeader name="name"	label="Name"/>
+				<ui:dataTableHeader name="grade" label="Grade"/>
+			</aura:set>
+
+			<aura:set attribute="columns">
+				<ui:outputText value="{!item.id}"/>
+				<ui:outputText value="{!item.name}"/>
+				<ui:outputText value="{!item.grade}"/>
+			</aura:set>
+
+			<aura:set attribute="dataModel">
+				<uitest:virtualDataGrid_dataProvider />
+			</aura:set>
+		</ui:virtualDataTable>
+	</div>
+
+</aura:component>

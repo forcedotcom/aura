@@ -25,7 +25,7 @@ import java.util.Locale;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
-import com.google.common.collect.ImmutableList;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
@@ -48,7 +48,12 @@ import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import com.google.common.collect.ImmutableList;
+
 public class InlineJsTest extends AuraImplTestCase {
+
+    public static final String IE11_WINDOWS_8_UA = "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko";
+    public static final String CHROME58_MAC10_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
 
     @Inject
     private ContextService contextService;
@@ -96,7 +101,7 @@ public class InlineJsTest extends AuraImplTestCase {
     }
 
     @Test
-    public void testInlineScriptIsWritenIntoInlineJs() throws Exception {
+    public void testInlineScriptIsWrittenIntoInlineJs() throws Exception {
         // Arrange
         if (contextService.isEstablished()) {
             contextService.endContext();
@@ -115,6 +120,7 @@ public class InlineJsTest extends AuraImplTestCase {
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         mockRequest.addParameter("jwt", configAdapter.generateJwtToken());
+        mockRequest.addHeader(HttpHeaders.USER_AGENT, CHROME58_MAC10_UA);
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
         context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
 
@@ -129,7 +135,7 @@ public class InlineJsTest extends AuraImplTestCase {
     }
 
     @Test
-    public void testMultpleInlineScriptOnSameTemplate() throws Exception {
+    public void testMultipleInlineScriptOnSameTemplate() throws Exception {
         // Arrange
         if (contextService.isEstablished()) {
             contextService.endContext();
@@ -149,6 +155,7 @@ public class InlineJsTest extends AuraImplTestCase {
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         mockRequest.addParameter("jwt", configAdapter.generateJwtToken());
+        mockRequest.addHeader(HttpHeaders.USER_AGENT, CHROME58_MAC10_UA);
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
         context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
@@ -166,7 +173,7 @@ public class InlineJsTest extends AuraImplTestCase {
     }
 
     @Test
-    public void testMultpleInlineScriptOnTemplateInheritance() throws Exception {
+    public void testMultipleInlineScriptOnTemplateInheritance() throws Exception {
         // Arrange
         if (contextService.isEstablished()) {
             contextService.endContext();
@@ -191,6 +198,7 @@ public class InlineJsTest extends AuraImplTestCase {
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         mockRequest.addParameter("jwt", configAdapter.generateJwtToken());
+        mockRequest.addHeader(HttpHeaders.USER_AGENT, CHROME58_MAC10_UA);
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
         context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
 
@@ -225,6 +233,7 @@ public class InlineJsTest extends AuraImplTestCase {
 
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         mockRequest.addParameter("jwt", configAdapter.generateJwtToken());
+        mockRequest.addHeader(HttpHeaders.USER_AGENT, CHROME58_MAC10_UA);
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 
         InlineJs inlineJs = getInlineJs();
@@ -256,6 +265,7 @@ public class InlineJsTest extends AuraImplTestCase {
                 AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         mockRequest.addParameter("jwt", configAdapter.generateJwtToken());
+        mockRequest.addHeader(HttpHeaders.USER_AGENT, CHROME58_MAC10_UA);
         MockHttpServletResponse mockResponse = new MockHttpServletResponse();
         context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
 
@@ -298,4 +308,37 @@ public class InlineJsTest extends AuraImplTestCase {
         // JWT token failure returns 404 response code
         assertEquals(HttpStatus.SC_NOT_FOUND, response.getStatus());
     }
+
+//    @Test
+//    public void testPolyfillsForIE11() throws Exception {
+//        // Arrange
+//        if (contextService.isEstablished()) {
+//            contextService.endContext();
+//        }
+//
+//        String templateMarkup = String.format(baseComponentTag, "isTemplate='true'", "");
+//        DefDescriptor<ComponentDef> templateDesc = addSourceAutoCleanup(ComponentDef.class, templateMarkup);
+//        String appTagAttributes = String.format("template='%s'", templateDesc.getDescriptorName());
+//        String appMarkup = String.format(baseApplicationTag, appTagAttributes, "");
+//        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, appMarkup);
+//
+//        AuraContext context = contextService.startContext(
+//                AuraContext.Mode.DEV, AuraContext.Format.JS, AuraContext.Authentication.AUTHENTICATED, appDesc);
+//        context.setRequestedLocales(Arrays.asList(Locale.US));
+//
+//        MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+//        mockRequest.addParameter("jwt", configAdapter.generateJwtToken());
+//        mockRequest.addHeader(HttpHeaders.USER_AGENT, IE11_WINDOWS_8_UA);
+//        MockHttpServletResponse mockResponse = new MockHttpServletResponse();
+//        context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
+//
+//        InlineJs inlineJs = getInlineJs();
+//
+//        // Act
+//        inlineJs.write(mockRequest, mockResponse, context);
+//        String content = mockResponse.getContentAsString();
+//
+//        // Assert
+//        assertTrue("polyfill source not found in response", content.contains("CustomEvent"));
+//    }
 }

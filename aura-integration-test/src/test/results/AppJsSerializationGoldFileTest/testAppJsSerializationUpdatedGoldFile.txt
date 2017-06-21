@@ -2313,5 +2313,8 @@ $A.componentService.initLibraryDefs([
 $A.componentService.initControllerDefs([
 
 ]);
+$A.componentService.initModuleDefs([
+
+]);
 
 Aura.appJsReady = true;Aura.appDefsReady&&Aura.appDefsReady();

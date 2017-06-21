@@ -82,6 +82,10 @@
                 <!-- <ui:button label="{!item.label}"></ui:button> -->
              </aura:iteration>
         </section>
+
+        <section>
+            <moduleTest:async />
+        </section>
     </section>
 
     <!-- TODO(byao): Enable and fix this test

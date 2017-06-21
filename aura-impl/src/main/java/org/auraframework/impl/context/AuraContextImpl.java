@@ -903,10 +903,14 @@ public class AuraContextImpl implements AuraContext {
                 json.writeMapEntry("ls", 1);
             }
 
-            if (this.isModulesEnabled) {
+            if (this.isModulesEnabled()) {
                 json.writeMapEntry("m", 1);
             }
 
+            if (this.useCompatSource()) {
+                json.writeMapEntry("c", 1);
+            }
+            
             json.writeMapEnd();
         } catch (IOException ioe) {
             // This can't possibly happen.

@@ -22,10 +22,22 @@ class Test {
 
 }
 Test.publicProps = {
-    stringQuote: 1,
-    stringDoubleQuote: 1,
-    stringBacktick: 1,
-    VALID_NAME_RE: 1
+    stringQuote: {
+        config: 0,
+        type: "string"
+    },
+    stringDoubleQuote: {
+        config: 0,
+        type: "string"
+    },
+    stringBacktick: {
+        config: 0,
+        type: "undefined"
+    },
+    VALID_NAME_RE: {
+        config: 0,
+        type: "undefined"
+    }
 };
 
 return Test;

@@ -15,7 +15,3 @@ var stuff = {$i$:"am string", $numeros$:23525, $blah$:function(food) {
 }};
 
 };
-
- Aura.externalLibraries = function() {
-
-};

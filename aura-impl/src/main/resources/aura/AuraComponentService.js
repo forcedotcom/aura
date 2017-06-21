@@ -73,9 +73,26 @@ AuraComponentService.prototype.get = function(globalId) {
 };
 
 AuraComponentService.prototype.initCoreModules = function () {
+    var Engine = this.moduleEngine;
+    var compat = Engine && Engine["compat"];
     this.addModule("markup://engine", "engine", [], null, this.moduleEngine);
     this.addModule("markup://aura", "aura", [], null, Aura.ExportsModule);
     this.addModule("markup://aura-storage", "aura-storage", [], null, Aura.ExportsStorage);
+
+    // Register compat modules
+    if (compat) {
+        // Helpers
+        var helpers = compat["helpers"];
+        var prefix = "compat/helpers/";
+        Object.keys(helpers).forEach(function (helper) {
+            var moduleName = prefix + helper;
+            this.addModule("markup://" + moduleName, moduleName, [], null, helpers[helper]);
+        }.bind(this));
+
+        // Regenerator (for transpiling async stuff)
+        this.addModule("markup://compat/regeneratorRuntime", "compat/regenerator", [], null, compat["regeneratorRuntime"]);
+    }
+
 };
 
 /**

@@ -1,0 +1,3 @@
+<aura:component>
+    <moduleTest:importCmp aura:id="import-cmp" />
+</aura:component>

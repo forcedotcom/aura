@@ -75,6 +75,7 @@ AuraComponentService.prototype.get = function(globalId) {
 AuraComponentService.prototype.initCoreModules = function () {
     this.addModule("markup://engine", "engine", [], null, this.moduleEngine);
     this.addModule("markup://aura", "aura", [], null, Aura.ExportsModule);
+    this.addModule("markup://aura-storage", "aura-storage", [], null, Aura.ExportsStorage);
 };
 
 /**

@@ -207,9 +207,12 @@ Aura.bootstrapMark = function (mark, value) {
 // #include aura.AuraLocalizationService
 // #include aura.AuraStyleService
 // #include aura.metrics.AuraMetricsService
-// #include aura.AuraExportsModule
 
-// -- Mode injection ------------------------------------------------------
+//-- Module Exports ----------------------------------------------------------
+// #include aura.AuraExportsModule
+// #include aura.AuraExportsStorage
+
+// -- Mode injection ---------------------------------------------------------
 // #include {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"], "path" : "aura.AuraDevToolService"}
 
 //-- LockerService -----------------------------------------------------------

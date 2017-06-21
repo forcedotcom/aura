@@ -339,8 +339,11 @@ AuraLocalizationService.prototype.endOf = function(date, unit) {
 
 /**
  * Formats a date.
- * @param {String|Number|Date} date - The date format that the JavaScript Date object can parse.
- * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
+ * @param {String|Number|Date} date - The date parameter can be a String, Number, or most typically a JavaScript Date.
+ *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
+ * @param {String} formatString - A string containing tokens to format a date and time. For example, "YYYY-MM-DD" formats 15th January, 2017 as "2017-01-15".
+ * 	The default format string comes from the $Locale value provider.
+ *  For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
  * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
  * @return {String} A formatted and localized date string
  * @memberOf AuraLocalizationService
@@ -383,8 +386,11 @@ AuraLocalizationService.prototype.formatDate = function(date, formatString, loca
 
 /**
  * Formats a date in UTC.
- * @param {String|Number|Date} date - The date format that JS Date object can parse.
- * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
+ * @param {String|Number|Date} date - The date parameter can be a String, Number, or most typically a JavaScript Date.
+ *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
+ * @param {String} formatString - A string containing tokens to format a date and time. For example, "YYYY-MM-DD" formats 15th January, 2017 as "2017-01-15".
+ * 	The default format string comes from the $Locale value provider.
+ *  For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
  * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
  * @return {String} A formatted and localized date string
  * @memberOf AuraLocalizationService
@@ -427,8 +433,11 @@ AuraLocalizationService.prototype.formatDateUTC = function(date, formatString, l
 
 /**
  * Formats a datetime.
- * @param {String|Number|Date} date - The datetime format that the JavaScript Date object can parse.
- * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
+ * @param {String|Number|Date} date - The date parameter can be a String, Number, or most typically a JavaScript Date representing a datetime.
+ *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
+ * @param {String} formatString - A string containing tokens to format a date and time.
+ * 	The default format string comes from the $Locale value provider.
+ *  For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
  * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
  * @return {String} A formatted and localized datetime string
  * @memberOf AuraLocalizationService
@@ -471,8 +480,11 @@ AuraLocalizationService.prototype.formatDateTime = function(date, formatString, 
 
 /**
  * Formats a datetime in UTC.
- * @param {String|Number|Date} date - The datetime format that the JavaScript Date object can parse.
- * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
+ * @param {String|Number|Date} date - The date parameter can be a String, Number, or most typically a JavaScript Date representing a datetime.
+ *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
+ * @param {String} formatString - A string containing tokens to format a date and time.
+ * 	The default format string comes from the $Locale value provider.
+ *  For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
  * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
  * @return {String} A formatted and localized datetime string
  * @example
@@ -514,8 +526,11 @@ AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatStrin
 
 /**
  * Formats a time.
- * @param {String|Number|Date} date - The time format that JavaScript Date object can parse
- * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
+ * @param {String|Number|Date} date - The date parameter can be a String, Number, or most typically a JavaScript Date representing a time.
+ *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
+ * @param {String} formatString - A string containing tokens to format a time.
+ * 	The default format string comes from the $Locale value provider.
+ *  For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
  * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
  * @return {String} A formatted and localized time string
  * @memberOf AuraLocalizationService
@@ -558,8 +573,11 @@ AuraLocalizationService.prototype.formatTime = function(date, formatString, loca
 
 /**
  * Formats a time in UTC.
- * @param {String|Number|Date} date - The time format that JavaScript Date object can parse.
- * @param {String} formatString - A Java format string. The default is from LocaleValueProvider.
+ * @param {String|Number|Date} date - The date parameter can be a String, Number, or most typically a JavaScript Date representing a time.
+ *   If you provide a String value, use ISO 8601 format to avoid parsing warnings.
+ * @param {String} formatString - A string containing tokens to format a time.
+ * 	The default format string comes from the $Locale value provider.
+ *  For details on available tokens, see https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_format_dates.htm.
  * @param {String} [locale] - [Deprecated] (optional) Locale value from Locale Value Provider. It falls back to the value in $Locale.langLocale if using unavailable locale. The default value is from $Locale.langLocale.
  * @return {String} a formatted and localized time string
  * @memberOf AuraLocalizationService

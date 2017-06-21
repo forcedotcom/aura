@@ -52,7 +52,7 @@ script:
 # container, the commands in the script: section will be executed. No Zen-specific content
 # can be added.
 build:
-  image: ops0-artifactrepo1-0-prd.data.sfdc.net/dci/centos-aura-tools:0.600@sha256:25b11b766dce8fcd27797e7e5766a83bdbadc205dda01349388e644e9dfef8e2
+  image: ops0-artifactrepo1-0-prd.data.sfdc.net/dci/centos-aura-tools:0.600@sha256:44c89a78889fb2173baf1e702845af2ead25e9c463e9848b801dcdf9c7fe8065
   auth_config:
     username: $$DOCKER_USERNAME
     password: $$DOCKER_PASSWORD

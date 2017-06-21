@@ -744,7 +744,17 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
         }
 
         if (depEntry && depEntry.dependencies) {
-            return this.moduleDefRegistry[desc].ns;
+            var dep = this.moduleDefRegistry[desc];
+            if (dep.ns) {
+                return dep.ns;
+            } else {
+                // recursive/circular references
+                var tmp = function tmp() {
+                    return dep.ns;
+                }
+                tmp["_circular_"] = true;
+                return tmp;
+            }
         }
 
         return this.evaluateModuleDef(desc);

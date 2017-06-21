@@ -1,0 +1,8 @@
+<template>
+    <ul>
+        <template for:each={items} for:item="item">
+            <li>{item.label}</li>
+            <moduletest-list items={item.items}></moduletest-list>
+        </template>
+    </ul>
+</template>

@@ -352,7 +352,9 @@ InteropComponent.prototype.render = function () {
         } else if (this.isHtmlGlobalAttr(attrName)) {
             this.setGlobalAttribute(element, attrName, value);
         } else {
-            element[attrName] = value;
+            if (value !== undefined) {
+                element[attrName] = value;
+            }
         }
     }.bind(this));
 

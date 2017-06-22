@@ -14,48 +14,52 @@
  * limitations under the License.
  */
 ({
-	afterRender: function(cmp, helper) {
+    afterRender: function(cmp, helper) {
         this.superAfterRender();
 
-		var options = cmp.get("v.options");
-		options = $A.util.isUndefinedOrNull(options) ? [] : options;
+        var options = cmp.get("v.options");
+        options = $A.util.isUndefinedOrNull(options) ? [] : options;
 
-		if (!cmp.get("v.useMenu") && (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body")))) {
-			var optionElements = helper.renderOptions(cmp, options);
+        if (!cmp.get("v.useMenu") && (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body")))) {
+            var optionElements = helper.renderOptions(cmp, options);
 
-			cmp.find("select").getElement().appendChild(optionElements);
-		}
+            cmp.find("select").getElement().appendChild(optionElements);
+        }
 
-	},
+    },
 
-	rerender: function(cmp, helper) {
+    rerender: function(cmp, helper) {
         this.superRerender();
 
-		var options = cmp.get("v.options");
+        var options = cmp.get("v.options");
 
-		if (!cmp.get("v.useMenu") && (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body")))) {
-			var select = cmp.find("select").getElement();
-			var optionElements = select.children;
+        if (!cmp.get("v.useMenu") && (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body")))) {
 
-			// Remove extra option elements
-			while (optionElements.length > options.length) {
-				select.removeChild(optionElements[options.length]);
-			}
+            var selectCmp = cmp.find("select");
+            // select could have been unrendered/destroyed by users or the framework in some cases
+            if (selectCmp.isValid() && selectCmp.isRendered()) {
+                var select = selectCmp.getElement();
+                var optionElements = select.children;
 
-			// Update existing option elements with info from options array
-			var index = 0;
-			while (index < optionElements.length) {
-				helper.updateOptionElement(cmp, options[index], optionElements[index]);
-				index++;
-			}
+                // Remove extra option elements
+                while (optionElements.length > options.length) {
+                    select.removeChild(optionElements[options.length]);
+                }
 
-			// Create new option elements for the remaining options and add them to the DOM
-			if (index < options.length) {
-				var newElements = helper.renderOptions(cmp, options.slice(index));
+                // Update existing option elements with info from options array
+                var index = 0;
+                while (index < optionElements.length) {
+                    helper.updateOptionElement(cmp, options[index], optionElements[index]);
+                    index++;
+                }
 
-				select.appendChild(newElements);
-			}
-		}
+                // Create new option elements for the remaining options and add them to the DOM
+                if (index < options.length) {
+                    var newElements = helper.renderOptions(cmp, options.slice(index));
 
-	}
+                    select.appendChild(newElements);
+                }
+            }
+        }
+    }
 })// eslint-disable-line semi

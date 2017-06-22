@@ -24,12 +24,15 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraExceptionUtil;
 import org.auraframework.throwable.ClientSideError;
 import org.auraframework.throwable.GenericEventException;
+import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+import java.io.IOException;
 import java.util.UUID;
+import java.util.logging.Level;
 
 /**
  * Default implementation for the error util wrapper.
@@ -50,8 +53,13 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
 
     @Override
     public void handleException(String message, @Nullable Throwable thrown) {
+        handleException(message, thrown, Level.INFO);
+    }
+
+    @Override
+    public void handleException(String message, Throwable thrown, Level level) {
         // Process the error and get its id.
-        final String errorId = processError(message, thrown);
+        final String errorId = processError(message, thrown, level);
 
         // Create a new exception for the default error experience.
         final GenericEventException gee = getDefaultException(errorId, message, thrown);
@@ -83,11 +91,24 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
 
     @Override
     public void handleCustomException(String message, Throwable thrown, @Nullable JsonSerializable data) {
+        handleCustomException(message, thrown, data, Level.INFO);
+    }
+
+    @Override
+    public void handleCustomException(String message, Throwable thrown, JsonSerializable data, Level level) {
         // Process the error and get its id.
-        final String errorId = processError(message, thrown);
+        final String errorId = processError(message, thrown, level);
 
         final GenericEventException gee = getCustomException(errorId, message, thrown, data);
 
+        throw gee;
+    }
+
+    @Override
+    public void handleCustomException(String message, Throwable thrown, String customMessage, Level level) {
+        final String errorId = processError(message, thrown, level);
+        DefaultCustomErrorData data = new DefaultCustomErrorData(customMessage);
+        final GenericEventException gee = getCustomException(errorId, message, thrown, data);
         throw gee;
     }
 
@@ -109,9 +130,13 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
      * @param thrown    Error thrown
      * @return          The error's id
      */
-    protected String processError(String message, Throwable thrown) {
+    protected String processError(String message, Throwable thrown, Level level) {
         // Log the error.
-        logger.error(message, thrown);
+        if (level.equals(Level.INFO)) {
+            logger.info(message, thrown);
+        } else {
+            logger.error(message, thrown);
+        }
 
         // Default implementation uses a random uuid for the error id.
         return UUID.randomUUID().toString();
@@ -123,5 +148,22 @@ public class ServerErrorUtilAdapterImpl implements ServerErrorUtilAdapter {
     @Inject
     public void setContextService(ContextService contextService) {
         this.contextService = contextService;
+    }
+
+    /**
+     * A boilerplate JsonSerializable class with a string property for handleCustomException
+     */
+    private class DefaultCustomErrorData implements JsonSerializable {
+        private final String contextMessage;
+        DefaultCustomErrorData(String message) {
+            this.contextMessage = message;
+        }
+
+        @Override
+        public void serialize(Json json) throws IOException {
+            json.writeMapBegin();
+            json.writeMapEntry("contextMessage", this.contextMessage);
+            json.writeMapEnd();
+        }
     }
 }

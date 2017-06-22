@@ -15,6 +15,8 @@
  */
 package org.auraframework.adapter;
 
+import java.util.logging.Level;
+
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.util.json.JsonSerializable;
 
@@ -40,6 +42,15 @@ public interface ServerErrorUtilAdapter extends AuraAdapter {
     void handleException(String message, Throwable thrown);
 
     /**
+     * Provides the default experience for errors.
+     * Action error callback will not be invoked.
+     * @param message   Error message
+     * @param thrown    Exception being handled
+     * @param level     Logging level for the exception
+     */
+    void handleException(String message, Throwable thrown, Level level);
+
+    /**
      * Results in a customized error experienced.
      * Action error callback will be invoked.
      * @param message   Error message
@@ -55,4 +66,25 @@ public interface ServerErrorUtilAdapter extends AuraAdapter {
      * @param data      Custom properties for the error, available in the response.
      */
     void handleCustomException(String message, Throwable thrown, JsonSerializable data);
+
+    /**
+     * Results in a customized error experienced.
+     * Action error callback will be invoked.
+     * @param message   Error message
+     * @param thrown    Exception being handled
+     * @param data      Custom properties for the error, available in the response.
+     * @param level     Logging level for the exception 
+     */
+    void handleCustomException(String message, Throwable thrown, JsonSerializable data, Level level);
+
+    /**
+     * Results in a customized error experienced.
+     * Action error callback will be invoked.
+     * Note that this API should only be used if only custom string is desired in action callback
+     * @param message       Error message
+     * @param thrown        Exception being handled
+     * @param customMessage Custom string for the error, available in the contextMessage property in the response.
+     * @param level         Logging level for the exception 
+     */
+    void handleCustomException(String message, Throwable thrown, String customMessage, Level level);
 }

@@ -30,6 +30,7 @@ import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class ServerErrorUtilAdapterImplUnitTest extends UnitTestCase {
 
@@ -76,7 +77,7 @@ public class ServerErrorUtilAdapterImplUnitTest extends UnitTestCase {
         logger.addAppender(appender);
 
         String message = "err";
-        String errorId = serverErrorUtilAdapter.processError(message, new RuntimeException());
+        String errorId = serverErrorUtilAdapter.processError(message, new RuntimeException(), Level.INFO);
 
         // This will throw if errorId isn't a uuid.
         UUID.fromString(errorId);

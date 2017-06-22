@@ -9,7 +9,11 @@
 
     <polyfills>
         <!-- Aura -->
-        <polyfill>Array.prototype.indexOf</polyfill>
+        <polyfill>Array.prototype.find</polyfill>
+        <polyfill>Array.prototype.findIndex</polyfill>
+        <polyfill>Array.prototype.fill</polyfill>
+        <polyfill>Array.prototype.keys</polyfill>
+        <polyfill>Array.prototype.includes</polyfill>
         <polyfill>Function.prototype.bind</polyfill>
         <polyfill>Object.keys</polyfill>
         <polyfill>Object.assign</polyfill>

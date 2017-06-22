@@ -1,4 +1,5 @@
-({  handleClick: function (cmp, event, helper) {
+({
+    handleClick: function (cmp, event, helper) {
         console.log('Click!', event);
     },
     handlePress: function (cmp, event, helper) {

@@ -8,7 +8,8 @@ export default class Simple extends Element {
     @api unbound = "Default unbound";
     @api expression = 'Default expression';
     @api callbackaction;
-    @api nested = "Default nested"
+    @api nested = "Default nested";
+    @api date;
 
     static publicMethods = ['test'];
 

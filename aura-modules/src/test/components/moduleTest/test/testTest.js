@@ -52,5 +52,21 @@
                 });
             }
         ]
+    },
+    testPassingDateObject: {
+        test: [
+            function (cmp) {
+                cmp.set('v.date', new Date());
+            },
+            function (cmp) {
+                var el = cmp.getElement();
+                var dateInstance = cmp.get('v.date');
+                var expected = dateInstance.toString();
+                var actual = el.querySelector('.date-container').textContent;
+                var errorMsg = 'Date instance should be pass through a module cmp';
+
+                $A.test.assertEquals(expected, actual, errorMsg);
+            }
+        ]
     }
 })

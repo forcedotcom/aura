@@ -2,6 +2,7 @@
     <aura:attribute name="str1" type="String" default="Hello" access="GLOBAL" />
     <aura:attribute name="str2" type="String" default="World!!" access="GLOBAL" />
     <aura:attribute name="str3" type="String" default="Hello World!!" access="GLOBAL" />
+    <aura:attribute name="date" type="Object" access="GLOBAL"/>
 
     <aura:dependency resource="markup://moduleTest:testLib" type="LIBRARY"/>
 
@@ -14,6 +15,7 @@
             expression="{! v.str3 + '!!' }"
             callbackaction="{!c.handleCustomPress}"
             onpress="{!c.handlePress}"
+            date="{! v.date }"
         />
     </div>
 

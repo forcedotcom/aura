@@ -52,10 +52,11 @@ abstract class TestResource extends AuraResourceImpl {
             String descriptor = DESC_PARAM.get(request);
             String testName = TEST_PARAM.get(request);
             DefDescriptor<?> targetDesc = definitionService.getDefDescriptor(descriptor, ComponentDef.class);
-            DefDescriptor<TestSuiteDef> suiteDesc = definitionService.getDefDescriptor(targetDesc,
-                    DefDescriptor.JAVASCRIPT_PREFIX, TestSuiteDef.class);
+            DefDescriptor<TestSuiteDef> suiteDesc = definitionService.getDefDescriptor(
+                    DefDescriptor.JAVASCRIPT_PREFIX+"://"+targetDesc.getDescriptorName(),
+                    TestSuiteDef.class, targetDesc);
 
-            TestSuiteDef testSuite = suiteDesc.getDef();
+            TestSuiteDef testSuite = definitionService.getDefinition(suiteDesc);
             write(response, testSuite, testName);
         } catch (Throwable t) {
             servletUtilAdapter.handleServletException(t, false, context, request, response, false);

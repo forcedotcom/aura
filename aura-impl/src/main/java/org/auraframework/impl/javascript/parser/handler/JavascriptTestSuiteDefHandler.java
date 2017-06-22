@@ -23,9 +23,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.TestSuiteDef;
@@ -33,7 +30,6 @@ import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestCaseDef;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestSuiteDef;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestSuiteDef.Builder;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.TextSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -78,10 +74,6 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
         builder.setLocation(getLocation());
         builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
         builder.caseDefs = new ArrayList<>();
-
-        DefDescriptor<? extends BaseComponentDef> compDesc = DefDescriptorImpl
-                .getAssociateDescriptor(descriptor, ComponentDef.class,
-                        DefDescriptor.MARKUP_PREFIX);
 
         Map<String, Object> map = codeToMap(code);
         Map<String, Object> suiteAttributes = (Map<String, Object>) map.get("attributes");
@@ -173,12 +165,6 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                 Set<String> auraErrorsExpectedDuringInit = auraErrorsExpectedDuringInitList == null ? Collections.EMPTY_SET
                         : Sets.newHashSet(auraErrorsExpectedDuringInitList);
 
-                if (compDesc == null || !compDesc.exists()) {
-                    compDesc = DefDescriptorImpl.getAssociateDescriptor(
-                            descriptor, ApplicationDef.class,
-                            DefDescriptor.MARKUP_PREFIX);
-                }
-                DefType defType = compDesc.getDefType();
 
                 List<Object> caseMocks = (List<Object>) value.get("mocks");
 
@@ -197,6 +183,7 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                     putMocks(mocksMap, caseMocks);
                     mocks = Lists.newArrayList(mocksMap.values());
                 }
+                DefType defType = descriptor.getBundle().getDefType();
                 JavascriptTestCaseDef testCaseDef = new JavascriptTestCaseDef(descriptor, key, null, attributes, defType, labels,
                         browsers, mocks, auraErrorsExpectedDuringInit, scrumTeam, owner, caseAccess);
                 builder.caseDefs.add(testCaseDef);

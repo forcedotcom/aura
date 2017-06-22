@@ -26,8 +26,21 @@
 	/*****************************************************************************************
 	    Test for creating component belong to a DIFFERENT System namespace starts
 	******************************************************************************************/
+ 
+    //TODO(W-3736608): Put waitForErrorModal logic and ACF error verification in Test.js in library 
+    waitForErrorModal: function(callback) {
+        $A.test.addWaitForWithFailureMessage(true,
+            function(){
+                var element = document.getElementById('auraErrorMask');
+                var style = $A.test.getStyle(element, 'display');
+                return style === 'block';
+            },
+            "Error Modal didn't show up.",
+            callback);
+    },
+
 	
-	testCreateComponentWithDefaultAccessOfSystemNS:{
+    testCreateComponentWithDefaultAccessOfSystemNS:{
         test:[
         function cannotCreateComponentWithDefaultAccess(cmp){ 
         	$A.test.expectAuraError("Access Check Failed!");
@@ -39,13 +52,12 @@
             		completed = true;
             	}
             );
-            $A.test.addWaitForWithFailureMessage(true, function() { return completed; },
-                    "Didn't get ACF error box",
-                    function(){
+            this.waitForErrorModal(
+                function(){
                     $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                             "Access Check Failed! AuraComponentService.createComponentFromConfig(): \'markup://auratest:accessDefaultComponent",
                                 "markup://testCustomNS1:accessExternalNamespace");
-            });
+                });
         }
         ]
     },
@@ -62,13 +74,12 @@
             		completed = true;
             	}
             );
-            $A.test.addWaitForWithFailureMessage(true, function() { return completed; },
-                    "Didn't get ACF error box",
-                    function(){
+            this.waitForErrorModal(
+                function(){
                     $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                             "Access Check Failed! AuraComponentService.createComponentFromConfig(): \'markup://auratest:accessPublicComponent",
                                 "markup://testCustomNS1:accessExternalNamespace");
-            });
+                });
         }
         ]
     },
@@ -90,34 +101,24 @@
             $A.test.addWaitFor(true, function(){ return completed; });
         },
         function cannotAccessPrivateAttribute(cmp) {
-        	$A.test.expectAuraError("Access Check Failed!");
-        	var actual = this.componentCreated.get("v.privateAttribute");
-        	$A.test.addWaitForWithFailureMessage(
-                    true, 
-                    function() {
-                        return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                    },
-                    "Didn't get ACF error box",
-                    function() {
-                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
-                                "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://auratest:accessGlobalComponent",
-                                    "markup://testCustomNS1:accessExternalNamespace");
-                    });
+            $A.test.expectAuraError("Access Check Failed!");
+            var actual = this.componentCreated.get("v.privateAttribute");
+            this.waitForErrorModal(
+                function() {
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                            "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://auratest:accessGlobalComponent",
+                                "markup://testCustomNS1:accessExternalNamespace");
+                });
         },
         function cannotAccessPublicAttribute(cmp) {
-        	$A.test.expectAuraError("Access Check Failed!");
-        	var actual = this.componentCreated.get("v.publicAttribute");
-        	$A.test.addWaitForWithFailureMessage(
-                    true, 
-                    function() {
-                        return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                    },
-                    "Didn't get ACF error box",
-                    function() {
-                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
-                                "Access Check Failed! AttributeSet.get(): attribute \'publicAttribute\' of component \'markup://auratest:accessGlobalComponent",
-                                    "markup://testCustomNS1:accessExternalNamespace");
-                    });
+            $A.test.expectAuraError("Access Check Failed!");
+            var actual = this.componentCreated.get("v.publicAttribute");
+            this.waitForErrorModal(
+                function() {
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                            "Access Check Failed! AttributeSet.get(): attribute \'publicAttribute\' of component \'markup://auratest:accessGlobalComponent",
+                                "markup://testCustomNS1:accessExternalNamespace");
+                });
         },
         function canAccessGlobalAttribute(cmp) {
         	var actual = this.componentCreated.get("v.globalAttribute");

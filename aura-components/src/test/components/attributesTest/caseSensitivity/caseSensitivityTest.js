@@ -53,16 +53,15 @@
         		var testCompleted = false;
                 $A.test.expectAuraError("Access Check Failed!");
                 $A.createComponent("attributesTest:caseInsensitiveChild",{},
-                function(){
-                	testCompleted = true;
-                });
-                $A.test.addWaitForWithFailureMessage(true, function() { return testCompleted; },
-                        "Didn't get ACF error box",
-                        function(){
+                    function(){
+                        testCompleted = true;
+                    });
+                this.waitForErrorModal(
+                    function(){
                         $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                                 "Access Check Failed! Component.setupSuper():'SIMPLEAttribute' of component 'markup://attributesTest:caseInsensitiveChild",
                                     "markup://attributesTest:caseInsensitiveChild");
-                });
+                    });
         }
     },
     
@@ -76,17 +75,12 @@
             $A.test.assertEquals("An Aura of Lightning Lumenated the Plume", cmp.get("v.attr"));
             $A.test.expectAuraError("Access Check Failed!");
             cmp.get("v.Attr");
-            $A.test.addWaitForWithFailureMessage(
-                    true, 
-                    function() {
-                        return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                    },
-                    "Didn't get ACF error box",
-                    function() {
-                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
-                                "Access Check Failed! AttributeSet.get(): attribute 'Attr' of component 'markup://attributesTest:caseSensitivity",
-                                    "markup://attributesTest:caseSensitivity");
-                    });
+            this.waitForErrorModal(
+                function() {
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                            "Access Check Failed! AttributeSet.get(): attribute 'Attr' of component 'markup://attributesTest:caseSensitivity",
+                                "markup://attributesTest:caseSensitivity");
+                });
         }
     },
 
@@ -101,17 +95,23 @@
             // Setting the new value
             $A.test.expectAuraError("Access Check Failed!");
             cmp.set("v.Attr", "Something new");
-            $A.test.addWaitForWithFailureMessage(
-                    true, 
-                    function() {
-                        return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                    },
-                    "Didn't get ACF error box",
-                    function() {
-                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
-                                "Access Check Failed! AttributeSet.set(): 'Attr' of component 'markup://attributesTest:caseSensitivity",
-                                    "markup://attributesTest:caseSensitivity");
-                    });
+            this.waitForErrorModal(
+                function() {
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                            "Access Check Failed! AttributeSet.set(): 'Attr' of component 'markup://attributesTest:caseSensitivity",
+                                "markup://attributesTest:caseSensitivity");
+                });
         }
+    },
+
+    waitForErrorModal: function(callback) {
+        $A.test.addWaitForWithFailureMessage(true,
+            function(){
+                var element = document.getElementById('auraErrorMask');
+                var style = $A.test.getStyle(element, 'display');
+                return style === 'block';
+            },
+            "Error Modal didn't show up.",
+            callback);
     }
 })

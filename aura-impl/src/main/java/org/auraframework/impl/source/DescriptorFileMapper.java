@@ -273,9 +273,8 @@ public class DescriptorFileMapper {
 	                    ei.extension);
 	        case BUNDLE:
 	            if (bundle != null) {
-	                // whoops.
-	                throw new AuraRuntimeException("Invalid " + descriptor + "@" + descriptor.getDefType() + " with ei="
-	                        + ei);
+	            	assert descriptor.getName().equals(bundle.getName())
+	            	    && descriptor.getNamespace().equals(bundle.getNamespace());
 	            }
 	            // Alongside knowing the extension, we also know that namespace+name is a directory,
 	            // and name+ext is the file inside that directory:

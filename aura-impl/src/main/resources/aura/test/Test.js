@@ -1676,7 +1676,7 @@ TestInstance.prototype.getPopOverErrorMessage = function(errorMessage, delimiter
             this.fail("Access check error message verification failed. Did not receive expected error");
         }
     } else {
-        throw new Error("TestInstance:getPopOverErrorMessage  Did not receive expected error");
+        this.fail("TestInstance:getPopOverErrorMessage  Did not receive expected error");
     }
 };
 

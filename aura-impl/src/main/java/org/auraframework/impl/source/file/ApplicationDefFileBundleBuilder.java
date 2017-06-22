@@ -82,7 +82,7 @@ public class ApplicationDefFileBundleBuilder implements FileBundleSourceBuilder 
                     format = Format.XML;
                     break;
                 case "Test.js":
-                    descriptor = new DefDescriptorImpl<>("js", namespace, name, TestSuiteDef.class);
+                    descriptor = new DefDescriptorImpl<>("js", namespace, name, TestSuiteDef.class, cmpDesc);
                     format = Format.JS;
                     break;
                 case "Controller.js":

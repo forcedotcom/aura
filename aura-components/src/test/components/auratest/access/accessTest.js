@@ -80,12 +80,7 @@
                 $A.test.expectAuraError("Access Check Failed!");
                 
                 cmp.find("testRemoteAttributes").getElement().click();
-                $A.test.addWaitForWithFailureMessage(
-                        true, 
-                        function() {
-                            return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                        },
-                        "Didn't get ACF error box",
+                this.waitForErrorModal(
                         function() {
                             $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                                     "Access Check Failed! AttributeSet.get(): attribute \'Private\' of component \'markup://componentTest:accessAttributes",
@@ -97,12 +92,7 @@
                 cmp.set("v.testType","Public");
                 $A.test.expectAuraError("Access Check Failed!");
                 cmp.find("testRemoteAttributes").getElement().click();
-                $A.test.addWaitForWithFailureMessage(
-                        true, 
-                        function() {
-                            return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                        },
-                        "Didn't get ACF error box",
+                this.waitForErrorModal(
                         function() {
                             $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                                     "Access Check Failed! AttributeSet.get(): attribute \'Public\' of component \'markup://componentTest:accessAttributes",
@@ -387,12 +377,7 @@
         function cannotAccessPrivateAttribute(cmp) {
         	$A.test.expectAuraError("Access Check Failed!");
         	var actual = this.componentCreated.get("v.privateAttribute");
-        	$A.test.addWaitForWithFailureMessage(
-                    true, 
-                    function() {
-                        return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                    },
-                    "Didn't get ACF error box",
+                this.waitForErrorModal(
                     function() {
                         $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                                 "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://testCustomNS2:componentWithPublicAccess",
@@ -429,12 +414,7 @@
         function cannotAccessPrivateAttribute(cmp) {
         	$A.test.expectAuraError("Access Check Failed!");
         	var actual = this.componentCreated.get("v.privateAttribute");
-        	$A.test.addWaitForWithFailureMessage(
-                    true, 
-                    function() {
-                        return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                    },
-                    "Didn't get ACF error box",
+                this.waitForErrorModal(
                     function() {
                         $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                                 "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://testCustomNS2:componentWithGlobalAccess",
@@ -476,12 +456,7 @@
         function cannotAccessPrivateAttribute(cmp) {
         	$A.test.expectAuraError("Access Check Failed!");
         	var actual = this.componentCreated.get("v.privateAttribute");
-        	$A.test.addWaitForWithFailureMessage(
-                    true, 
-                    function() {
-                        return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                    },
-                    "Didn't get ACF error box",
+                this.waitForErrorModal(
                     function() {
                         $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                                 "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://testPrivilegedNS1:componentWithDefaultAccess",
@@ -518,12 +493,7 @@
         function cannotAccessPrivateAttribute(cmp) {
         	$A.test.expectAuraError("Access Check Failed!");
         	var actual = this.componentCreated.get("v.privateAttribute");
-        	$A.test.addWaitForWithFailureMessage(
-                    true, 
-                    function() {
-                        return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                    },
-                    "Didn't get ACF error box",
+                this.waitForErrorModal(
                     function() {
                         $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                                 "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://testPrivilegedNS1:componentWithPublicAccess",
@@ -576,31 +546,26 @@
     
 
 
-   testSetNonExistentAttribute: {
-       test: function(cmp) {
-           // One for the get old value on the set
-           $A.test.expectAuraError("Access Check Failed! AttributeSet.get(): attribute \'iDontExist\' of component \'markup://auratest:access");
-           // One for the set new value
-           $A.test.expectAuraError("Access Check Failed! AttributeSet.set(): \'iDontExist\' of component \'markup://auratest:access");
-           // One for the final read into v.output
-           $A.test.expectAuraError("Access Check Failed!");
+    testSetNonExistentAttribute: {
+        test: function(cmp) {
+            // One for the get old value on the set
+            $A.test.expectAuraError("Access Check Failed! AttributeSet.get(): attribute \'iDontExist\' of component \'markup://auratest:access");
+            // One for the set new value
+            $A.test.expectAuraError("Access Check Failed! AttributeSet.set(): \'iDontExist\' of component \'markup://auratest:access");
+            // One for the final read into v.output
+            $A.test.expectAuraError("Access Check Failed!");
            
-           cmp.testSetNonExistentAttribute();
-           $A.test.assertUndefined(cmp.get("v.output"), "Should not be able to set and retrieve attributes on a"
+            cmp.testSetNonExistentAttribute();
+            $A.test.assertUndefined(cmp.get("v.output"), "Should not be able to set and retrieve attributes on a"
                    + " component that do not exist");
-           $A.test.addWaitForWithFailureMessage(
-                   true, 
-                   function() {
-                       return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                   },
-                   "Didn't get ACF error box",
-                   function() {
-                       $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
-                               "Access Check Failed! AttributeSet.get(): attribute \'iDontExist\' of component \'markup://auratest:access",
-                                   "markup://auratest:access");
+            this.waitForErrorModal(
+                function() {
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                        "Access Check Failed! AttributeSet.get(): attribute \'iDontExist\' of component \'markup://auratest:access",
+                        "markup://auratest:access");
             });
-       }
-   },
+        }
+    },
 
    testSetNonExistentRemoteAttribute: {
        test: function(cmp) {
@@ -614,12 +579,7 @@
            cmp.testSetNonExistentRemoteAttribute();
            $A.test.assertUndefined(cmp.get("v.output"), "Should not be able to set and retrieve attributes on a"
                    + " component that do not exist");
-           $A.test.addWaitForWithFailureMessage(
-                   true, 
-                   function() {
-                       return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                   },
-                   "Didn't get ACF error box",
+            this.waitForErrorModal(
                    function() {
                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                                "Access Check Failed! AttributeSet.get(): attribute \'iDontExist\' of component \'markup://componentTest:accessAttributes",
@@ -665,12 +625,7 @@
        test: function(cmp) {
            $A.test.expectAuraError("Access Check Failed!");
            cmp.find("testRemoteMethods").getElement().click(); 
-           $A.test.addWaitForWithFailureMessage(
-                   true, 
-                   function() {
-                       return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                   },
-                   "Didn't get ACF error box",
+           this.waitForErrorModal(
                    function() {
                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                                "Access Check Failed! Component.method():\'markup://componentTest:publicMethod",
@@ -697,12 +652,7 @@
            $A.test.expectAuraError("Access Check Failed!");
            cmp.find("testRemoteMethods").getElement().click();
            $A.test.assertUndefined(cmp.find("remote").get("v.output"));
-           $A.test.addWaitForWithFailureMessage(
-                   true, 
-                   function() {
-                       return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                   },
-                   "Didn't get ACF error box",
+           this.waitForErrorModal(
                    function() {
                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                                "Access Check Failed! Component.method():\'markup://componentTest:privateMethod",
@@ -710,7 +660,18 @@
             });
            
        }
-   }
+   },
+
+    waitForErrorModal: function(callback) {
+        $A.test.addWaitForWithFailureMessage(true,
+            function(){
+                var element = document.getElementById('auraErrorMask');
+                var style = $A.test.getStyle(element, 'display');
+                return style === 'block';
+            },
+            "Error Modal didn't show up.",
+            callback);
+    }
    
     
 })

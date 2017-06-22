@@ -33,8 +33,10 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.cache.Cache;
 import org.auraframework.def.ActionDef;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -46,6 +48,7 @@ import org.auraframework.def.ParentedDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.controller.AuraGlobalControllerDefRegistry;
+import org.auraframework.impl.system.BundleAwareDefRegistry;
 import org.auraframework.impl.system.CompilingDefRegistry;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
@@ -167,6 +170,20 @@ public class DefinitionServiceImpl implements DefinitionService {
         return DefDescriptorImpl.getAssociateDescriptor(desc, defClass, prefix);
     }
 
+    // TEMPORARY HACK TO SUPPORT TEST SUITES IN MAIN WITHOUT CHANGES
+    private <T extends Definition> DefDescriptor<T> replaceBundleOnTestSuiteDescriptor(DefDescriptor<T> descriptor) {
+        DefDescriptor<? extends BaseComponentDef> bundle = null;
+        @SuppressWarnings("unchecked")
+        Class<T> clazz = (Class<T>)descriptor.getDefType().getPrimaryInterface();
+        bundle = getDefDescriptor(descriptor.getQualifiedName(), ComponentDef.class);
+        if (!exists(bundle)) {
+            bundle = getDefDescriptor(descriptor.getQualifiedName(), ApplicationDef.class);
+        }
+
+        return getDefDescriptor(descriptor.getQualifiedName(), clazz, bundle);
+    }
+    // END TEMPORARY HACK TO SUPPORT TEST SUITES IN MAIN WITHOUT CHANGES
+
     /**
      * Get a definition.
      *
@@ -182,12 +199,20 @@ public class DefinitionServiceImpl implements DefinitionService {
     public <T extends Definition> T getDefinition(@CheckForNull DefDescriptor<T> descriptor) throws QuickFixException {
         contextService.assertEstablished();
 
+
         AuraContext context = contextService.getCurrentContext();
         T def = null;
 
         if (descriptor == null) {
             return null;
         }
+
+        // TEMPORARY HACK TO SUPPORT TEST SUITES IN MAIN WITHOUT CHANGES
+        if (descriptor.getDefType() == DefType.TESTSUITE && descriptor.getBundle() == null) {
+            descriptor = replaceBundleOnTestSuiteDescriptor(descriptor);
+        }
+        // END TEMPORARY HACK TO SUPPORT TEST SUITES IN MAIN WITHOUT CHANGES
+
             
         // TODO: Clean up so that we just walk up descriptor trees and back down them.
         Optional<T> optLocalDef = null;
@@ -1669,7 +1694,8 @@ public class DefinitionServiceImpl implements DefinitionService {
         DefType [] types = new DefType [] { DefType.LIBRARY, DefType.COMPONENT, DefType.APPLICATION };
 
         for (DefRegistry registry : context.getRegistries().getAllRegistries()) {
-            if (registry instanceof CompilingDefRegistry) {
+            if (registry instanceof CompilingDefRegistry
+                    || (registry instanceof BundleAwareDefRegistry && registry.isCacheable())) {
                 incremental = System.currentTimeMillis();
                 for (String namespace : registry.getNamespaces()) {
                     for (DefType type : types) {

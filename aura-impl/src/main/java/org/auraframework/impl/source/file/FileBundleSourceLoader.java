@@ -31,21 +31,22 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.system.BundleSource;
+import org.auraframework.system.BundleSourceLoader;
 import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.InternalNamespaceSourceLoader;
 import org.auraframework.system.SourceListener;
-import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.FileMonitor;
 
 import com.google.common.collect.Sets;
+
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.resource.ResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
-public class FileBundleSourceLoader implements SourceLoader, InternalNamespaceSourceLoader, SourceListener {
+public class FileBundleSourceLoader implements BundleSourceLoader, InternalNamespaceSourceLoader, SourceListener {
 
     protected class FileEntry {
         public File file;
@@ -128,6 +129,13 @@ public class FileBundleSourceLoader implements SourceLoader, InternalNamespaceSo
             return (BundleSource<D>)provisional;
         }
         return null;
+    }
+
+    @Override
+    public BundleSource<?> getBundle(DefDescriptor<?> descriptor) {
+        String lookup = BundleSourceLoader.getBundleName(descriptor);
+
+        return createSource(fileMap.get(lookup));
     }
 
     /**

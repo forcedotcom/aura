@@ -14,12 +14,7 @@
             
             cmp.testAttributeAccess("Public");
             $A.test.assertEquals(undefined, cmp.get("v.output"));
-            $A.test.addWaitForWithFailureMessage(
-                    true, 
-                    function() {
-                        return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                    },
-                    "Didn't get ACF error box",
+            this.waitForErrorModal(
                     function() {
                         $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                                 "Access Check Failed! AttributeSet.get(): attribute \'Public\' of component \'markup://auratest:accessExtendsGlobalWithAttributes",
@@ -43,17 +38,23 @@
             
             cmp.testAttributeAccess("Private");
             $A.test.assertEquals(undefined, cmp.get("v.output"));
-            $A.test.addWaitForWithFailureMessage(
-                    true, 
-                    function() {
-                        return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                    },
-                    "Didn't get ACF error box",
+            this.waitForErrorModal(
                     function() {
                         $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                                 "Access Check Failed! AttributeSet.get(): attribute \'Private\' of component \'markup://auratest:accessExtendsGlobalWithAttributes",
                                     "markup://auratest:accessExtendsGlobalWithAttributes");
              });
         }
+    },
+
+    waitForErrorModal: function(callback) {
+        $A.test.addWaitForWithFailureMessage(true,
+            function(){
+                var element = document.getElementById('auraErrorMask');
+                var style = $A.test.getStyle(element, 'display');
+                return style === 'block';
+            },
+            "Error Modal didn't show up.",
+            callback);
     }
 })

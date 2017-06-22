@@ -356,6 +356,7 @@
          //TODO : W-3015661
     ]
     },
+
     waitForErrorModal: function(callback) {
         $A.test.addWaitForWithFailureMessage(true,
             function(){

@@ -23,6 +23,7 @@ import javax.inject.Inject;
 
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.components.AuraComponentsFiles;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.TestCaseDef;
@@ -55,8 +56,11 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
      */
     @Test
     public void testParse() throws Exception {
+        DefDescriptor<ComponentDef> cmpDescriptor = definitionService.getDefDescriptor(
+                "markup://test.testJSTestSuite",
+                ComponentDef.class);
         DefDescriptor<TestSuiteDef> descriptor = definitionService.getDefDescriptor(
-                "js://test.testJSTestSuite", TestSuiteDef.class);
+                "js://test.testJSTestSuite", TestSuiteDef.class, cmpDescriptor);
         TextSource<TestSuiteDef> source = getJavascriptSourceLoader().getSource(descriptor);
         // Step 1: Parse the source which refers to a simple component with a
         // reference to Javascript test suite
@@ -106,9 +110,10 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
      */
     @Test
     public void testJSTestSuite() throws Exception {
-
+        DefDescriptor<ComponentDef> cmpDescriptor = definitionService.getDefDescriptor(
+                "markup://test.testJSTestSuite", ComponentDef.class);
         DefDescriptor<TestSuiteDef> descriptor = definitionService.getDefDescriptor(
-                "js://test.testJSTestSuite", TestSuiteDef.class);
+                "js://test.testJSTestSuite", TestSuiteDef.class, cmpDescriptor);
         TextSource<TestSuiteDef> source = getJavascriptSourceLoader().getSource(descriptor);
 
         // Step 1: Parse the source which refers to a simple component with a
@@ -121,13 +126,10 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
 
         // Step 3: Verify the properties of the JavascriptTestSuiteDef object
         // OBject that is to be verified, Qualified name,
-        assertEquals("unexpected qualifiedName of testSuite",
-                "js://test.testJSTestSuite",
-                ((JavascriptTestSuiteDef) testSuite).getDescriptor()
-                        .getQualifiedName());
+        assertEquals("unexpected qualifiedName of testSuite", "js://test.testJSTestSuite",
+                ((JavascriptTestSuiteDef) testSuite).getDescriptor().getQualifiedName());
         // Step 4: Verify each testCaseDef objects in the test suite object
-        List<TestCaseDef> testCases = ((JavascriptTestSuiteDef) testSuite)
-                .getTestCaseDefs();
+        List<TestCaseDef> testCases = ((JavascriptTestSuiteDef) testSuite).getTestCaseDefs();
         assertEquals(3, testCases.size());
         for (Object o : testCases.toArray()) {
             assertTrue(o instanceof JavascriptTestCaseDef);
@@ -140,8 +142,7 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
                 // OBject that is to be verified, Qualified name
                 assertEquals("unexpected qualifiedName of testHelloWorld",
                         "js://test.testJSTestSuite/TESTCASE$testHelloWorld",
-                        ((DefinitionImpl<?>) o).getDescriptor()
-                                .getQualifiedName());
+                        ((DefinitionImpl<?>) o).getDescriptor().getQualifiedName());
             } else if (testCaseDef.getName().equals("testHelloWorld2")) {
                 assertTrue(attributes.size() == 1);
                 assertTrue(attributes.containsKey("num"));
@@ -150,8 +151,7 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
                 // OBject that is to be verified, Qualified name,
                 assertEquals("unexpected qualifiedName of testHelloWorld2",
                         "js://test.testJSTestSuite/TESTCASE$testHelloWorld2",
-                        ((DefinitionImpl<?>) o).getDescriptor()
-                                .getQualifiedName());
+                        ((DefinitionImpl<?>) o).getDescriptor().getQualifiedName());
             } else if (testCaseDef.getName().equals("testHelloWorld3")) {
                 assertTrue(attributes.size() == 2);
                 assertTrue(attributes.containsKey("num"));
@@ -161,12 +161,10 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
                 // OBject that is to be verified, Qualified name
                 assertEquals("unexpected qualifiedName of testHelloWorld3",
                         "js://test.testJSTestSuite/TESTCASE$testHelloWorld3",
-                        ((DefinitionImpl<?>) o).getDescriptor()
-                                .getQualifiedName());
+                        ((DefinitionImpl<?>) o).getDescriptor().getQualifiedName());
             } else {
                 fail("There should be no other test cases created");
             }
-
         }
     }
 
@@ -178,9 +176,12 @@ public class JavascriptTestSuiteParserTest extends AuraImplTestCase {
 
     @Test
     public void testJSTestSuiteWithoutAttributes() throws Exception {
+        DefDescriptor<ComponentDef> cmpDescriptor = definitionService.getDefDescriptor(
+                "markup://test.testJSTestSuiteWithoutAttributes",
+                ComponentDef.class);
         DefDescriptor<TestSuiteDef> descriptor = definitionService.getDefDescriptor(
                 "js://test.testJSTestSuiteWithoutAttributes",
-                TestSuiteDef.class);
+                TestSuiteDef.class, cmpDescriptor);
         TextSource<TestSuiteDef> source = getJavascriptSourceLoader().getSource(descriptor);
 
         // Step 1: Parse the source which refers to a simple component with a

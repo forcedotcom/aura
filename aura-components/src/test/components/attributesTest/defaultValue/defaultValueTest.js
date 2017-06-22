@@ -74,6 +74,19 @@
         }
     },
 
+    //TODO(W-3736608): Put waitForErrorModal logic and ACF error verification in Test.js in library 
+    waitForErrorModal: function(callback) {
+        $A.test.addWaitForWithFailureMessage(true,
+            function(){
+                var element = document.getElementById('auraErrorMask');
+                var style = $A.test.getStyle(element, 'display');
+                return style === 'block';
+            },
+            "Error Modal didn't show up.",
+            callback);
+    },
+
+
     testCaseSensitivity : {
         test : [
             function(cmp) {
@@ -82,30 +95,22 @@
             function(cmp) {
                 $A.test.expectAuraError("Access Check Failed!");
                 $A.test.assertUndefined(cmp.get("v.StrAttributeWithDefaultValue"));
-                $A.test.addWaitForWithFailureMessage(true, 
-                        function() {
-                            return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                        },
-                        "Didn't get ACF error box",
+                this.waitForErrorModal(
                         function(){
                             $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                                     "Access Check Failed! AttributeSet.get(): attribute 'StrAttributeWithDefaultValue' of component 'markup://attributesTest:defaultValue",
                                         "markup://attributesTest:defaultValue");
-                });
+                    });
             },
             function(cmp) {
                 $A.test.expectAuraError("Access Check Failed!");
                 $A.test.assertUndefined(cmp.get("v.strATTRIBUTEWithDefaultValue"));
-                $A.test.addWaitForWithFailureMessage(true, 
-                        function() {
-                            return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                        },
-                        "Didn't get ACF error box",
-                        function(){
-                            $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
-                                    "Access Check Failed! AttributeSet.get(): attribute 'strATTRIBUTEWithDefaultValue' of component 'markup://attributesTest:defaultValue",
-                                        "markup://attributesTest:defaultValue");
-                });
+                this.waitForErrorModal(
+                    function(){
+                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                                "Access Check Failed! AttributeSet.get(): attribute 'strATTRIBUTEWithDefaultValue' of component 'markup://attributesTest:defaultValue",
+                                    "markup://attributesTest:defaultValue");
+                    });
                 
             },
             function(cmp) {
@@ -113,16 +118,12 @@
                 $A.test.assertUndefined(cmp.get("v.strATTRIBUTEWithNODefaultValue"));
                 $A.test.expectAuraError("Access Check Failed!");
                 $A.test.assertUndefined(cmp.get("v.strATTRIBUTEWithDefaultValue"));
-                $A.test.addWaitForWithFailureMessage(true, 
-                        function() {
-                            return ($A.test.getAuraErrorMessage().indexOf("Access Check Failed!") !== -1);
-                        },
-                        "Didn't get ACF error box",
-                        function(){
-                            $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
-                                    "Access Check Failed! AttributeSet.get(): attribute 'strATTRIBUTEWithDefaultValue' of component 'markup://attributesTest:defaultValue",
-                                        "markup://attributesTest:defaultValue");
-                });
+                this.waitForErrorModal(
+                    function(){
+                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                                "Access Check Failed! AttributeSet.get(): attribute 'strATTRIBUTEWithDefaultValue' of component 'markup://attributesTest:defaultValue",
+                                    "markup://attributesTest:defaultValue");
+                    });
             }
         ]
     },

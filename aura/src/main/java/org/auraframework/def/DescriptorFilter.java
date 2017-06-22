@@ -18,6 +18,7 @@ package org.auraframework.def;
 import java.io.Serializable;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,6 +39,14 @@ public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializa
 
     public DescriptorFilter(String matcher) {
         this(matcher, "*");
+    }
+
+    public DescriptorFilter(GlobMatcher prefixMatch, GlobMatcher namespaceMatch, GlobMatcher nameMatch,
+            Collection<DefType> defTypes) {
+        this.prefixMatch = prefixMatch;
+        this.namespaceMatch = namespaceMatch;
+        this.nameMatch = nameMatch;
+        this.defTypes = Lists.newArrayList(defTypes);
     }
 
     public DescriptorFilter(String matcher, List<DefType> defTypes) {

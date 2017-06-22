@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.auraframework.annotations.Annotations.ServiceComponentModelInstance;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.TestCaseDef;
@@ -51,8 +54,14 @@ public class JSTestModel implements ModelInstance {
         String desc = (String) component.getAttributes().getValue("descriptor");
         DefType defType = DefType.valueOf(((String) component.getAttributes().getValue("defType")).toUpperCase());
 
+        DefDescriptor<? extends BaseComponentDef> bundle;
+        if (defType == DefType.COMPONENT) {
+            bundle = definitionService.getDefDescriptor(desc, ComponentDef.class);
+        } else {
+            bundle = definitionService.getDefDescriptor(desc, ApplicationDef.class);
+        }
         desc = "js://" + desc.replace(':', '.');
-        descriptor = definitionService.getDefDescriptor(desc, TestSuiteDef.class);
+        descriptor = definitionService.getDefDescriptor(desc, TestSuiteDef.class, bundle);
         def = definitionService.getDefinition(descriptor);
         if (def == null) {
             throw new DefinitionNotFoundException(descriptor);

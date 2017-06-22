@@ -21,7 +21,7 @@
     setUp: function(cmp){
         this.componentCreated = undefined;
     },
-    
+
      /**************************************************************************************************
         Test for creating component belong to a custom namespace starts
     ***************************************************************************************************/
@@ -29,45 +29,39 @@
     testCreateComponentWithDefaultAccessOfCustomNS:{
         test:[
         function cannotCreateComponentWithDefaultAccess(cmp){ 
-            var completed = false;
             $A.test.expectAuraError("Access Check Failed!");
             $A.createComponent(
                 "markup://testCustomNS1:componentWithDefaultAccess", 
                 {}, 
                 function(newCmp){
-                    completed = true;
                 }
             );
-            $A.test.addWaitForWithFailureMessage(true, function() { return completed; }, 
-                    "Didn't get ACF error box",
-                    function(){
-                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
-                                "Access Check Failed! AuraComponentService.createComponentFromConfig(): \'markup://testCustomNS1:componentWithDefaultAccess",
-                                    "markup://testPrivilegedNS1:componentWithDefaultAccess");
-                        });
-        }
+            this.waitForErrorModal(
+                function(){
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                            "Access Check Failed! AuraComponentService.createComponentFromConfig(): \'markup://testCustomNS1:componentWithDefaultAccess",
+                                "markup://testPrivilegedNS1:componentWithDefaultAccess");
+                    });
+            }
         ]
     },
     
     testCreateComponentWithPublicAccessOfCustomNS:{
         test:[
         function cannotCreateComponentWithPublicAccess(cmp){ 
-            var completed = false;
             $A.test.expectAuraError("Access Check Failed!");
             $A.createComponent(
                 "markup://testCustomNS1:componentWithPublicAccess", 
                 {}, 
                 function(newCmp){
-                    completed = true;
                 }
             );
-            $A.test.addWaitForWithFailureMessage(true, function() { return completed; }, 
-                    "Didn't get ACF error box",
-                    function(){
-                        $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
-                                "Access Check Failed! AuraComponentService.createComponentFromConfig(): \'markup://testCustomNS1:componentWithPublicAccess",
-                                    "markup://testPrivilegedNS1:componentWithDefaultAccess");
-                        });
+            this.waitForErrorModal(
+                function(){
+                    $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
+                            "Access Check Failed! AuraComponentService.createComponentFromConfig(): \'markup://testCustomNS1:componentWithPublicAccess",
+                                "markup://testPrivilegedNS1:componentWithDefaultAccess");
+                    });
         }
         ]
     },
@@ -531,16 +525,13 @@
         test:[
         function cannotCreateComponentWithDefaultAccess(cmp){
             $A.test.expectAuraError("Access Check Failed!");
-            var completed = false;
             $A.createComponent(
                 "markup://testPrivilegedNS2:componentWithDefaultAccess", 
                 {}, 
                 function(newCmp){
-                    completed = true;
                 }
             );
-            $A.test.addWaitForWithFailureMessage(true, function() { return completed; }, 
-                    "Didn't get ACF error box",
+            this.waitForErrorModal(
                     function(){
                         $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                            //"Access Check Failed! AuraComponentService.createComponentFromConfig(): 'markup://testPrivilegedNS2:componentWithDefaultAccess", 
@@ -554,17 +545,14 @@
     testCreateComponentWithPublicAccessOfAnotherPrivilegedNS:{
         test:[
         function cannotCreateComponentWithPublicAccess(cmp){
-            var completed = false;
             $A.test.expectAuraError("Access Check Failed!");
             $A.createComponent(
                 "markup://testPrivilegedNS2:componentWithPublicAccess", 
                 {}, 
                 function(newCmp){
-                    completed = true;
                 }
             );
-            $A.test.addWaitForWithFailureMessage(true, function() { return completed; }, 
-                    "Didn't get ACF error box",
+            this.waitForErrorModal(
                     function(){
                         $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                                 "Access Check Failed! AuraComponentService.createComponentFromConfig(): \'markup://testPrivilegedNS2:componentWithPublicAccess",
@@ -939,16 +927,13 @@
         test:[
         function cannotCreateComponentWithDefaultAccess(cmp){
             $A.test.expectAuraError("Access Check Failed!");
-            var completed = false;
             $A.createComponent(
                 "markup://auratest:accessDefaultComponent", 
                 {}, 
                 function(newCmp){
-                    completed = true;
                 }
             );
-            $A.test.addWaitForWithFailureMessage(true, function() { return completed; }, 
-                    "Didn't get ACF error box",
+            this.waitForErrorModal(
                     function(){
                         $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                                 "Access Check Failed! AuraComponentService.createComponentFromConfig(): \'markup://auratest:accessDefaultComponent",
@@ -963,16 +948,13 @@
         test:[
         function cannotCreateComponentWithPublicAccess(cmp){
             $A.test.expectAuraError("Access Check Failed!");
-            var completed = false;
             $A.createComponent(
                 "markup://auratest:accessPublicComponent", 
                 {}, 
                 function(newCmp){//newCmp will be null
-                    completed = true;
                 }
             );
-            $A.test.addWaitForWithFailureMessage(true, function() { return completed; }, 
-                    "Didn't get ACF error box",
+            this.waitForErrorModal(
                     function(){
                         $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                                 "Access Check Failed! AuraComponentService.createComponentFromConfig(): \'markup://auratest:accessPublicComponent",

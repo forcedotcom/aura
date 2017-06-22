@@ -21,7 +21,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import org.auraframework.def.ActionDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.TestCaseDef;
@@ -36,7 +38,9 @@ import com.google.common.collect.ImmutableMap;
 public class ObjectSerializationTest extends AuraImplTestCase {
     @Test
     public void testSerializeTestCaseDef() throws Exception {
-        TestSuiteDef suite = definitionService.getDefinition("js://auratest.jsmock", TestSuiteDef.class);
+    	DefDescriptor<ComponentDef> cmpDesc = definitionService.getDefDescriptor("markup://auratest:jsmock", ComponentDef.class);
+    	DefDescriptor<TestSuiteDef> testSuiteDesc = definitionService.getDefDescriptor("js://auratest.jsmock", TestSuiteDef.class, cmpDesc);
+        TestSuiteDef suite = definitionService.getDefinition(testSuiteDesc);
         TestCaseDef test = null;
         for (TestCaseDef caseDef : suite.getTestCaseDefs()) {
             if ("testActionString".equals(caseDef.getName())) {

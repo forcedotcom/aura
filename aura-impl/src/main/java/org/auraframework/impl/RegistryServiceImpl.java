@@ -52,6 +52,7 @@ import org.auraframework.impl.source.file.FileBundleSourceLoader;
 import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.impl.source.file.ModuleFileBundleSourceLoader;
 import org.auraframework.impl.source.resource.ResourceSourceLoader;
+import org.auraframework.impl.system.BundleAwareDefRegistry;
 import org.auraframework.impl.system.CompilingDefRegistry;
 import org.auraframework.impl.system.NonCachingDefRegistryImpl;
 import org.auraframework.impl.system.PassThroughDefRegistry;
@@ -146,10 +147,6 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
     private static final Set<String> MODULE_PREFIXES = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
 
     private static final Set<DefType> MODULE_DEFTYPES = EnumSet.of(DefType.MODULE);
-
-    // Subtracts supported bundle source DefTypes in order to create two separate registries
-    // for FileSourceLoader and FileBundleSourceLoader
-    private static final Set<DefType> MARKUP_DEFTYPES = Sets.difference(ALL_MARKUP_DEFTYPES, BundleSource.bundleDefTypes);
 
     private static class SourceLocationInfo {
         public final List<DefRegistry> staticLocationRegistries;
@@ -270,9 +267,8 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
             if (!modules) {
                 ResourceSourceLoader rsl = new ResourceSourceLoader(pkg);
                 markupLoaders.add(rsl);
-                markupRegistries.add(new CompilingDefRegistry(rsl, MARKUP_PREFIXES, MARKUP_DEFTYPES, compilerService));
-                markupRegistries.add(new CompilingDefRegistry(new FileBundleSourceLoader(pkg, fileMonitor, builders),
-                        MARKUP_PREFIXES, BundleSource.bundleDefTypes, compilerService));
+                markupRegistries.add(new BundleAwareDefRegistry(new FileBundleSourceLoader(pkg, fileMonitor, builders),
+                        MARKUP_PREFIXES, ALL_MARKUP_DEFTYPES, compilerService, true));
             } else {
                 moduleBundleSourceLoader = new ModuleFileBundleSourceLoader(pkg, fileMonitor, builders);
             }
@@ -286,20 +282,11 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
                     // modules requires BundleSource to allow multiple js/css files so skip FileSourceLoader
                     fsl = new FileSourceLoader(components, fileMonitor);
                     markupLoaders.add(fsl);
-                    // MARKUP_DEFTYPES is the difference between all and BundleSource DefTypes
-                    // Thus, creating two CompilingDefRegistry, FileSourceLoader and FileBundleSourceLoader
-                    // works without DefType registry conflicts
-                    markupRegistries.add(new CompilingDefRegistry(fsl, MARKUP_PREFIXES, MARKUP_DEFTYPES, compilerService));
-                    markupRegistries.add(new CompilingDefRegistry(new FileBundleSourceLoader(components, fileMonitor, builders),
-                            MARKUP_PREFIXES, BundleSource.bundleDefTypes, compilerService));
+                    markupRegistries.add(new BundleAwareDefRegistry(
+                            new FileBundleSourceLoader(components, fileMonitor, builders),
+                            MARKUP_PREFIXES, ALL_MARKUP_DEFTYPES, compilerService, true));
                 } else {
                     moduleBundleSourceLoader = new ModuleFileBundleSourceLoader(components, fileMonitor, builders);
-                }
-                File generatedJavaBase = location.getJavaGeneratedSourceDir();
-                if (generatedJavaBase != null && generatedJavaBase.exists()) {
-                    fsl = new FileSourceLoader(generatedJavaBase, fileMonitor);
-                    markupLoaders.add(fsl);
-                    markupRegistries.add(new CompilingDefRegistry(fsl, MARKUP_PREFIXES, MARKUP_DEFTYPES, compilerService));
                 }
                 try {
                     canonical = components.getCanonicalPath();

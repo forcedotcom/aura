@@ -1144,7 +1144,6 @@
   
   },
    
-    //TODO(W-3736608): Put waitForErrorModal logic and ACF error verification in Test.js in library 
     waitForErrorModal: function(callback) {
         $A.test.addWaitForWithFailureMessage(true,
             function(){

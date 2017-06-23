@@ -86,7 +86,6 @@ public class BundleModuleDefFactoryUnitTest {
         codeMap.put(CodeType.DEV, mockCompiled);
         codeMap.put(CodeType.PROD, mockCompiled);
         codeMap.put(CodeType.COMPAT, mockCompiled);
-        codeMap.put(CodeType.PROD_COMPAT, mockCompiled);
 
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
         ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet());
@@ -277,7 +276,6 @@ public class BundleModuleDefFactoryUnitTest {
         codeMap.put(CodeType.DEV, mockCompiled);
         codeMap.put(CodeType.PROD, mockCompiled);
         codeMap.put(CodeType.COMPAT, mockCompiled);
-        codeMap.put(CodeType.PROD_COMPAT, mockCompiled);
 
         ModulesCompilerService mockCompiler = mock(ModulesCompilerService.class);
         ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet());

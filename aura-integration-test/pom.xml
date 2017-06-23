@@ -118,6 +118,10 @@
             <artifactId>ios-client</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>biz.aQute</groupId>
+            <artifactId>bnd</artifactId>
+        </dependency>
     </dependencies>
     <properties>
         <chromedriver.download.root.url>http://chromedriver.storage.googleapis.com</chromedriver.download.root.url>

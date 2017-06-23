@@ -15,16 +15,13 @@
  */
 package org.auraframework;
 
-import org.polyfill.api.configurations.PolyfillApiConfig;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 /**
  * Spring configuration to autoscan all aura packages
  */
 @Configuration
 @ComponentScan(basePackages = {"org.auraframework"}, lazyInit = true)
-@Import(PolyfillApiConfig.class)
 public class AuraConfiguration {
 }

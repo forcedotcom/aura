@@ -61,7 +61,6 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.accessStack=[];
     this.tokens={};
     this.isModulesEnabled = !!config["m"];
-    this.useCompatSource = !!config["c"];
     this.moduleNamespaceAliases = config["mna"] || {};
 
     var that = this;
@@ -274,9 +273,6 @@ Aura.Context.AuraContext.prototype.encodeForServer = function(includeDynamic) {
     if(this.isModulesEnabled) {
         contextToSend["m"] = 1;
     }
-    if(this.useCompatSource) {
-        contextToSend["c"] = 1;
-    }
     return $A.util.json.encode(contextToSend);
 };
 
@@ -299,6 +295,7 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
     }
 
     this.enableAccessChecks=otherContext["enableAccessChecks"];
+    this.isModulesEnabled = !!otherContext["m"];
     this.moduleServices = otherContext["services"];
 
     try {

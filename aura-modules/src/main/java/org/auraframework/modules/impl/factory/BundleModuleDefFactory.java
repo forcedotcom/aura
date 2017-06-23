@@ -189,7 +189,7 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
                                        Location location)
             throws InvalidDefinitionException {
         StringBuilder processedCode = new StringBuilder();
-        if (codeType == CodeType.COMPAT || codeType == CodeType.PROD_COMPAT) {
+        if (codeType == CodeType.COMPAT) {
             String amdString = "define(";
             int amdIndex = code.indexOf(amdString);
             String polyfills = code.substring(0, amdIndex);

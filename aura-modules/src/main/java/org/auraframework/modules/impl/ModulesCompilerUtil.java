@@ -100,21 +100,17 @@ public final class ModulesCompilerUtil {
         V8Object dev = result.getObject("dev");
         V8Object prod = result.getObject("prod");
         V8Object compat = result.getObject("compat");
-        // TODO COMPAT : update to "prod_compat" when compiler is updated
-        V8Object prodCompat = result.getObject("compat");
 
         String devCode = dev.getString("code");
         String prodCode = prod.getString("code");
         String compatCode = compat.getString("code");
-        String prodCompatCode = prodCompat.getString("code");
 
         Map<CodeType, String> codeMap = new EnumMap<>(CodeType.class);
         codeMap.put(CodeType.DEV, devCode);
         codeMap.put(CodeType.PROD, prodCode);
         codeMap.put(CodeType.COMPAT, compatCode);
-        codeMap.put(CodeType.PROD_COMPAT, prodCompatCode);
 
-        V8Object metadata = prodCompat.getObject("metadata");
+        V8Object metadata = dev.getObject("metadata");
         V8Array v8BundleDependencies = metadata.getArray("bundleDependencies");
         V8Array v8BundleLabels = metadata.getArray("bundleLabels");
         Set<String> bundleDependencies = new HashSet<>();
@@ -132,21 +128,17 @@ public final class ModulesCompilerUtil {
         JSONObject dev = result.getJSONObject("dev");
         JSONObject prod = result.getJSONObject("prod");
         JSONObject compat = result.getJSONObject("compat");
-        // TODO COMPAT : update to "prod_compat" when compiler is updated
-        JSONObject prodCompat = result.getJSONObject("compat");
 
         String devCode = dev.getString("code");
         String prodCode = prod.getString("code");
         String compatCode = compat.getString("code");
-        String prodCompatCode = prodCompat.getString("code");
 
         Map<CodeType, String> codeMap = new EnumMap<>(CodeType.class);
         codeMap.put(CodeType.DEV, devCode);
         codeMap.put(CodeType.PROD, prodCode);
         codeMap.put(CodeType.COMPAT, compatCode);
-        codeMap.put(CodeType.PROD_COMPAT, prodCompatCode);
 
-        JSONObject metadata = prodCompat.getJSONObject("metadata");
+        JSONObject metadata = dev.getJSONObject("metadata");
         JSONArray v8BundleDependencies = metadata.getJSONArray("bundleDependencies");
         JSONArray v8BundleLabels = metadata.getJSONArray("bundleLabels");
         Set<String> bundleDependencies = new HashSet<>();

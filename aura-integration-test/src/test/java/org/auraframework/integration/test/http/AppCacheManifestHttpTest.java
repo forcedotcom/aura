@@ -89,7 +89,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
 
     private List<String> getRequiredLinks() throws Exception {
         List<String> required = Lists.newArrayList();
-        required.add(".*/aura_.*\\.js");
+        required.add(".*/aura_prod\\.js");
         return required;
     }
 
@@ -220,7 +220,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         String response = getResponseBody(httpResponse);
         get.releaseConnection();
 
-        assertManifest(response, Lists.newArrayList(".*/app.*\\.css", ".*/app.*\\.js"));
+        assertManifest(response, Lists.newArrayList(".*/app\\.css", ".*/app\\.js"));
     }
 
     /**

@@ -471,6 +471,11 @@
                 <version>1.0.0</version>
             </dependency>
             <dependency>
+                <groupId>biz.aQute</groupId>
+                <artifactId>bnd</artifactId>
+                <version>1.50.0</version>
+            </dependency>
+            <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongo-java-driver</artifactId>
                 <version>3.0.2</version>
@@ -499,11 +504,6 @@
                 <groupId>org.auraframework</groupId>
                 <artifactId>node-tool</artifactId>
                 <version>0.0.8</version>
-            </dependency>
-            <dependency>
-                <groupId>org.polyfills</groupId>
-                <artifactId>polyfill-service-api</artifactId>
-                <version>0.9.13</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -18,11 +18,8 @@ package org.auraframework.util.javascript.directive;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -101,25 +98,16 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
     // name for threads that compress and write the output
     public static final String THREAD_NAME = "jsgen.";
 
-    private static final String COMPAT_SUFFIX = "_compat";
-
     private final List<DirectiveType<?>> directiveTypes;
     private final Set<JavascriptGeneratorMode> modes;
     private final File startFile;
     private CountDownLatch counter;
     private Map<String, Throwable> errors;
 
-    private String librariesContent = "";
-    private String librariesContentMin = "";
-    private String engine = "";
-    private String engineMin = "";
-    private String engineCompat= "";
-    private String engineCompatMin = "";
-
     // used during parsing, should be clear for storing in memory
     private DirectiveParser parser;
 
-    private ResourceLoader resourceLoader = null;
+    private ResourceLoader resourceLoader;
 
     public DirectiveBasedJavascriptGroup(String name, File root, String start) throws IOException {
         this(name, root, start, DirectiveTypes.DEFAULT_TYPES, EnumSet.of(JavascriptGeneratorMode.DEVELOPMENT,
@@ -159,12 +147,9 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         if (parser == null) {
             throw new RuntimeException("No parser available to generate with");
         }
-        // generating all modes along with engine compatibility
-        counter = new CountDownLatch(modes.size() * 2);
+
+        counter = new CountDownLatch(modes.size());
         errors = new HashMap<>();
-
-        fetchIncludedSources();
-
         for (JavascriptGeneratorMode mode : modes) {
             generateForMode(destRoot, mode);
         }
@@ -179,156 +164,99 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         errors = null;
     }
 
-    private void fetchIncludedSources() throws MalformedURLException {
-        List<String> libraries = new ArrayList<>();
-        libraries.add("aura/resources/moment/moment");
-        libraries.add("aura/resources/moment-timezone/moment-timezone-with-data-1999-2020");
-        libraries.add("aura/resources/DOMPurify/DOMPurify");
-
-        StringBuilder libs = new StringBuilder();
-        StringBuilder libsMin = new StringBuilder();
-
-        libraries.forEach( (path) -> {
-            String source = null;
-            String minSource = null;
-            try {
-                source = getSource(path + ".js");
-                minSource = getSource(path +".min.js");
-            } catch (MalformedURLException e) {}
-            if (source != null) {
-                libs.append(source);
-            }
-            if (minSource != null) {
-                libsMin.append(minSource);
-            }
-        });
-
-        String libsContent = libs.toString();
-        if (!libsContent.isEmpty()) {
-            this.librariesContent = "\nAura.externalLibraries = function() {\n" + libsContent + "\n};";
-        }
-
-        String libsContentMin = libs.toString();
-        if (!libsContentMin.isEmpty()) {
-            this.librariesContentMin = "\nAura.externalLibraries = function() { " + libsContentMin + " };";
-        }
-
-        // Engine
-        String engineSource = null;
-        String engineMinSource = null;
-        String engineCompatSource = null;
-        String engineCompatMinSource = null;
-        String compatHelpersSource = null;
-        String compatHelpersMinSource = null;
-        try {
-            engineSource = getSource("aura/resources/engine/engine.js");
-            engineMinSource = getSource("aura/resources/engine/engine.min.js");
-            engineCompatSource = getSource("aura/resources/engine/engine_compat.js");
-            engineCompatMinSource = getSource("aura/resources/engine/engine_compat.min.js");
-            compatHelpersSource = getSource("aura/resources/compat-helpers/compat-helpers.js");
-            compatHelpersMinSource = getSource("aura/resources/compat-helpers/compat-helpers.min.js");
-        }  catch (MalformedURLException e) {}
-
-        if (engineSource != null) {
-            this.engine = "try {\n" + engineSource + "\n} catch (e) {}";
-        }
-        
-        if (engineMinSource != null) {
-            this.engineMin = "try { " + engineMinSource + " } catch (e) {}";
-        }
-        
-        if (compatHelpersSource != null && engineCompatSource != null) {
-            this.engineCompat = "try {\n" + compatHelpersSource + "\n" + engineCompatSource + "\n} catch (e) {}";
-        }
-        
-        if (compatHelpersMinSource != null && engineCompatMinSource != null) {
-            this.engineCompatMin = "try { " + compatHelpersMinSource + "\n" + engineCompatMinSource + " } catch (e) {}";
-        }
-
-        // TODO COMPAT : prefetch compat helper resources
-
-    }
-
-    private String getSource(String path) throws MalformedURLException {
-        if (this.resourceLoader == null) {
-            this.resourceLoader = new ResourceLoader(LIB_CACHE_TEMP_DIR, true);
-        }
-        URL lib = this.resourceLoader.getResource(path);
-        String source = null;
-        if (lib != null) {
-            try {
-                source = Resources.toString(lib, Charsets.UTF_8);
-            } catch (IOException ignored) { }
-        }
-        return source;
-    }
-
     protected void generateForMode(File destRoot, final JavascriptGeneratorMode mode) throws IOException {
-        final File modeJs = new File(destRoot, getName() + "_" + mode.getSuffix() + ".js");
-        final File modeCompatJs = new File(destRoot, getName() + "_" + mode.getSuffix() + COMPAT_SUFFIX + ".js");
-
-        List<File> filesToWrite = new ArrayList<>();
-        filesToWrite.add(modeJs);
-        filesToWrite.add(modeCompatJs);
-
+        final File dest = new File(destRoot, getName() + "_" + mode.getSuffix() + ".js");
+        if (dest.exists()) {
+            if (dest.lastModified() < getLastMod()) {
+                dest.delete();
+            } else {
+                // its up to date already, skip
+                counter.countDown();
+                return;
+            }
+        }
+        dest.getParentFile().mkdirs();
         final String everything = buildContent(mode);
         final String threadName = THREAD_NAME + mode;
-        int writtenCount = 0;
-        List<File> writtenFiles = new ArrayList<>();
-
-        for (File file : filesToWrite) {
-            if (file.exists()) {
-                if (file.lastModified() < getLastMod()) {
-                    file.delete();
-                } else {
-                    // its up to date already, skip
-                    counter.countDown();
-                    writtenFiles.add(file);
-                    if (++writtenCount == 2) return; else continue;
-                }
-            }
-            file.getParentFile().mkdirs();
-        }
-
-        Runnable writeMode = () -> {
-            try {
-                Writer writer = null;
-                String libs = mode.allowedInProduction() ? librariesContentMin : librariesContent;
-                StringWriter stringWriter = new StringWriter();
-                mode.getJavascriptWriter().compress(everything, stringWriter, modeJs.getName());
-                String compressed = stringWriter.toString();
-
-                for (File output : filesToWrite) {
-                    if (writtenFiles.contains(output)) continue;
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Writer writer = null;
                     try {
-                        writer = new FileWriter(output);
-                        if (mode != JavascriptGeneratorMode.DOC) {
-                            // jsdoc errors when parsing engine.js
-                            boolean isCompat = output.getName().contains(COMPAT_SUFFIX);
-                            String eng = mode.allowedInProduction() ?
-                                    (isCompat ? engineCompatMin : engineMin) :
-                                    (isCompat ? engineCompat : engine);
-                            writer.append(eng);
-                            // TODO COMPAT : append compat helpers
-                        }
-                        writer.append(compressed).append("\n").append(libs);
+                        ResourceLoader rl = getResourceLoader();
+                        writer = new FileWriter(dest);
+                        prependInterop(writer, rl);
+                        mode.getJavascriptWriter().compress(everything, writer, dest.getName());
+                        writer.write('\n');
+                        appendExternalLibraries(writer, rl);
                     } finally {
                         if (writer != null) {
                             writer.close();
                         }
-                        output.setReadOnly();
-                        counter.countDown();
+                        dest.setReadOnly();
+                    }
+                } catch (Throwable t) {
+                    // Store any problems, to be thrown in a composite runtime exception from the main thread.
+                    // Otherwise, they kill this worker thread but are basically ignored.
+                    errors.put(threadName, t);
+                } finally {
+                    counter.countDown();
+                }
+            }
+
+            private void prependInterop(Writer writer, ResourceLoader rl) throws IOException {
+                // Skipping DOC mode due to parsing issues on our very old SpiderMonkey version dependency
+                if (mode != JavascriptGeneratorMode.DOC) {
+                    String minified = "";
+                    if (mode.allowedInProduction()) {
+                        minified = ".min";
+                    }
+                    URL engineResource = rl.getResource("aura/resources/engine/engine" + minified + ".js");
+
+                    if (engineResource != null) {
+                        writer.write("try {\n");
+                        appendResourceToWriter(writer, "engine", engineResource);
+                        writer.write("\n} catch (e) {}");
                     }
                 }
-            } catch (Throwable t) {
-                // Store any problems, to be thrown in a composite runtime exception from the main thread.
-                // Otherwise, they kill this worker thread but are basically ignored.
-                errors.put(threadName, t);
             }
-        };
 
-        new Thread(writeMode, threadName).start();
+            private void appendExternalLibraries(Writer writer, ResourceLoader rl) throws IOException {
+                String minified = "";
+                if (mode.allowedInProduction()) {
+                    minified = ".min";
+                }
 
+                writer.write("\n Aura.externalLibraries = function() {\n");
+                try {
+                    appendResourceToWriter(writer, "moment", rl.getResource("aura/resources/moment/moment" + minified + ".js"));
+                    // 1999 is selected since it's when SFDC starts
+                    appendResourceToWriter(writer, "moment-timezone-with-data-1999-2020", rl.getResource("aura/resources/moment-timezone/moment-timezone-with-data-1999-2020" + minified + ".js"));
+                    appendResourceToWriter(writer, "DOMPurify", rl.getResource("aura/resources/DOMPurify/DOMPurify" + minified + ".js"));
+                } catch (Exception ignored) {
+                }
+
+                writer.write("\n};");
+            }
+
+            private void appendResourceToWriter(Writer writer, String name, URL url) throws IOException {
+                String src = Resources.toString(url, Charsets.UTF_8);
+                if (src != null) {
+                    writer.write("// " + name + "\n");
+                    writer.write(src);
+                    writer.write("\n");
+                }
+            }
+
+            private ResourceLoader getResourceLoader() throws IOException {
+                if (resourceLoader == null) {
+                    resourceLoader = new ResourceLoader(LIB_CACHE_TEMP_DIR, true);
+                }
+                return resourceLoader;
+            }
+        }, threadName);
+        t.start();
     }
 
     protected String buildContent(JavascriptGeneratorMode mode) {

@@ -24,7 +24,7 @@ import org.auraframework.def.Definition;
 public interface ModuleDef extends Definition {
 
     enum CodeType {
-        DEV, PROD, COMPAT, PROD_COMPAT
+        DEV, PROD, COMPAT
     }
 
     String TEMPLATE_PREFIX = "template";

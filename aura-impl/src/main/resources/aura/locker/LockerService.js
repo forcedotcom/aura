@@ -133,16 +133,9 @@ function LockerService() {
                 var mapIsAvailable = typeof Map !== "undefined" && Map.prototype["keys"] !== undefined && Map.prototype["values"] !== undefined
                 && Map.prototype["entries"] !== undefined;
 
-                var proxyIsAvailable = false;
-                try {
-                    proxyIsAvailable = typeof Proxy !== "undefined" && typeof Node !== "undefined" && (new Proxy({}, {
-                            getPrototypeOf: function () {
-                                return Node.prototype;
-                            }
-                        })) instanceof Node;
-                } catch (ignored) {
-                    // in case Proxy polyfill fails to support
-                }
+                var proxyIsAvailable = typeof Proxy !== "undefined" && typeof Node !== "undefined" && (new Proxy({}, {
+                    getPrototypeOf: function() { return Node.prototype; }
+                })) instanceof Node;
 
                 return isStrictModeAvailable && mapIsAvailable && proxyIsAvailable;
             },

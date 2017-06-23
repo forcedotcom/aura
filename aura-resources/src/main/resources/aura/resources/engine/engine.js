@@ -20,7 +20,7 @@ var assert = {
         }
     },
     block: function (fn) {
-        fn();
+        fn.call();
     },
     vnode: function (vnode) {
         assert.isTrue(vnode && "sel" in vnode && "data" in vnode && "children" in vnode && "text" in vnode && "elm" in vnode && "key" in vnode, vnode + " is not a vnode.");
@@ -444,7 +444,7 @@ function getMapFromClassName(className) {
 }
 
 var hooks = ['wiring', 'rehydrated', 'connected', 'disconnected', 'piercing'];
-/* eslint-enable */
+// eslint-disable-line no-undef
 var Services = create(null);
 function register(service) {
     assert.isTrue(isObject(service), "Invalid service declaration, " + service + ": service must be an object");
@@ -590,12 +590,6 @@ function h(sel, data, children) {
 }
 // [c]ustom element node
 function c(sel, Ctor, data) {
-    // The compiler produce AMD modules that do not support circular dependencies
-    // We need to create an indirection to circumvent those cases.
-    // We could potentially move this check to the definition
-    if (Ctor.__circular__) {
-        Ctor = Ctor();
-    }
     assert.isTrue(isString(sel), "c() 1st argument sel must be a string.");
     assert.isTrue(isFunction(Ctor), "c() 2nd argument Ctor must be a function.");
     assert.isTrue(isObject(data), "c() 3nd argument data must be an object.");
@@ -1313,143 +1307,6 @@ function markComponentAsDirty(vm) {
     vm.isDirty = true;
 }
 
-/*eslint-enable*/
-var TargetSlot = Symbol();
-var MembraneSlot = Symbol();
-function isReplicable(value) {
-    var type = typeof value;
-    return value && (type === 'object' || type === 'function');
-}
-function getReplica(membrane, value) {
-    if (value === null || !isReplicable(value)) {
-        return value;
-    }
-    assert.isTrue(membrane instanceof Membrane, "getReplica() first argument must be a membrane.");
-    var cells = membrane.cells, cache = membrane.cache;
-    if (cache.has(value)) {
-        return value;
-    }
-    var r = cells.get(value);
-    if (r) {
-        return r;
-    }
-    var replica = new Proxy(value, membrane); // eslint-disable-line no-undef
-    cells.set(value, replica);
-    cache.add(replica);
-    return replica;
-}
-var Membrane = (function () {
-    function Membrane(handler) {
-        this.handler = handler;
-        this.cells = new WeakMap();
-        this.cache = new WeakSet();
-    }
-    Membrane.prototype.get = function (target, key) {
-        if (key === TargetSlot) {
-            return target;
-        }
-        else if (key === MembraneSlot) {
-            return this;
-        }
-        var value = this.handler.get(target, key);
-        return getReplica(this, value);
-    };
-    Membrane.prototype.set = function (target, key, newValue) {
-        return this.handler.set(target, key, newValue);
-    };
-    Membrane.prototype.deleteProperty = function (target, key) {
-        if (key === TargetSlot) {
-            return false;
-        }
-        return this.handler.deleteProperty(target, key);
-    };
-    Membrane.prototype.apply = function (target, thisArg, argumentsList) {
-        thisArg = unwrap(thisArg);
-        argumentsList = unwrap(argumentsList);
-        if (isArray(argumentsList)) {
-            argumentsList = ArrayMap.call(argumentsList, unwrap);
-        }
-        var value = this.handler.apply(target, thisArg, argumentsList);
-        return getReplica(this, value);
-    };
-    Membrane.prototype.construct = function (target, argumentsList, newTarget) {
-        argumentsList = unwrap(argumentsList);
-        if (isArray(argumentsList)) {
-            argumentsList = ArrayMap.call(argumentsList, unwrap);
-        }
-        var value = this.handler.construct(target, argumentsList, newTarget);
-        return getReplica(this, value);
-    };
-    return Membrane;
-}());
-function unwrap(replicaOrAny) {
-    return (replicaOrAny && replicaOrAny[TargetSlot]) || replicaOrAny;
-}
-function setKey(replicaOrAny, key, newValue) {
-    var shouldReturn = false;
-    return shouldReturn ? newValue : undefined;
-}
-function deleteKey(replicaOrAny, key) {
-}
-
-/* eslint-enable */
-function piercingHook(vm, target, key, value) {
-    assert.vm(vm);
-    var piercing = Services.piercing;
-    if (piercing) {
-        var component = vm.component, data = vm.vnode.data, def = vm.def, context = vm.context;
-        var result_1 = value;
-        var next_1 = true;
-        var callback = function (newValue) {
-            next_1 = false;
-            result_1 = newValue;
-        };
-        for (var i = 0, len = piercing.length; next_1 && i < len; ++i) {
-            piercing[i].call(undefined, component, data, def, context, target, key, value, callback);
-        }
-        return result_1;
-    }
-}
-var PiercingMembraneHandler = (function () {
-    function PiercingMembraneHandler(vm) {
-        assert.vm(vm);
-        this.vm = vm;
-    }
-    PiercingMembraneHandler.prototype.get = function (target, key) {
-        if (key === OwnerKey) {
-            return undefined;
-        }
-        var value = target[key];
-        return piercingHook(this.vm, target, key, value);
-    };
-    PiercingMembraneHandler.prototype.set = function (target, key, newValue) {
-        assert.logError("A protective membrane is preventing mutations to " + key + " member property of " + toString(target) + " to the value of " + toString(newValue) + ".");
-        return false;
-    };
-    PiercingMembraneHandler.prototype.deleteProperty = function (target, key) {
-        assert.logError("A protective membrane is preventing deletion of " + key + " member property of " + toString(target) + ".");
-        return false;
-    };
-    PiercingMembraneHandler.prototype.apply = function (targetFn, thisArg, argumentsList) {
-        return targetFn.apply(thisArg, argumentsList);
-    };
-    PiercingMembraneHandler.prototype.construct = function (targetFn, argumentsList, newTarget) {
-        assert.isTrue(newTarget, "construct handler expects a 3rd argument with a newly created object that will be ignored in favor of the wrapped constructor.");
-        return new (targetFn.bind.apply(targetFn, [void 0].concat(argumentsList)))();
-    };
-    return PiercingMembraneHandler;
-}());
-function pierce(vm, value) {
-    assert.vm(vm);
-    var membrane = vm.membrane;
-    if (!membrane) {
-        var handler = new PiercingMembraneHandler(vm);
-        membrane = new Membrane(handler);
-        vm.membrane = membrane;
-    }
-    return getReplica(membrane, value);
-}
-
 var _a$2 = Element.prototype;
 var querySelector = _a$2.querySelector;
 var querySelectorAll = _a$2.querySelectorAll;
@@ -1460,13 +1317,13 @@ function shadowRootQuerySelector(shadowRoot, selector) {
     var vm = shadowRoot[ViewModelReflection];
     assert.isFalse(isBeingConstructed(vm), "this.root.querySelector() cannot be called during the construction of the custom element for " + this + " because no content has been rendered yet.");
     var elm = getLinkedElement$2(shadowRoot);
-    return pierce(vm, elm).querySelector(selector);
+    return getMembrane(vm).pierce(elm).querySelector(selector);
 }
 function shadowRootQuerySelectorAll(shadowRoot, selector) {
     var vm = shadowRoot[ViewModelReflection];
     assert.isFalse(isBeingConstructed(vm), "this.root.querySelectorAll() cannot be called during the construction of the custom element for " + this + " because no content has been rendered yet.");
     var elm = getLinkedElement$2(shadowRoot);
-    return pierce(vm, elm).querySelectorAll(selector);
+    return getMembrane(vm).pierce(elm).querySelectorAll(selector);
 }
 function Root(vm) {
     assert.vm(vm);
@@ -1516,15 +1373,14 @@ function getFirstMatch(vm, elm, selector) {
     // search for all, and find the first node that is owned by the VM in question.
     for (var i = 0, len = nodeList.length; i < len; i += 1) {
         if (isNodeOwnedByVM(vm, nodeList[i])) {
-            return pierce(vm, nodeList[i]);
+            return getMembrane(vm).pierce(nodeList[i]);
         }
     }
-    return null;
 }
 function getAllMatches(vm, elm, selector) {
     var nodeList = querySelectorAll.call(elm, selector);
     var filteredNodes = ArrayFilter.call(nodeList, function (node) { return isNodeOwnedByVM(vm, node); });
-    return pierce(vm, filteredNodes);
+    return getMembrane(vm).pierce(filteredNodes);
 }
 function isParentNodeKeyword(key) {
     return (key === 'parentNode' || key === 'parentElement');
@@ -1563,7 +1419,8 @@ function querySelectorAllFromComponent(cmp, selectors) {
     var elm = getLinkedElement(cmp);
     return elm.querySelectorAll(selectors);
 }
-function createPublicPropertyDescriptor(propName) {
+function createPublicPropertyDescriptorMap(propName) {
+    var descriptors = {};
     function getter() {
         var vm = this[ViewModelReflection];
         assert.vm(vm);
@@ -1590,51 +1447,13 @@ function createPublicPropertyDescriptor(propName) {
         // proxifying before storing it is a must for public props
         cmpProps[propName] = isObject(value) ? getPropertyProxy(value) : value;
     }
-    var descriptor = {
+    descriptors[propName] = {
         get: getter,
         set: setter,
         enumerable: true,
         configurable: true,
     };
-    return descriptor;
-}
-function createWiredPropertyDescriptor(propName) {
-    function getter() {
-        var vm = this[ViewModelReflection];
-        assert.vm(vm);
-        var cmpWired = vm.cmpWired;
-        if (isUndefined(cmpWired)) {
-            cmpWired = vm.cmpWired = getPropertyProxy(create(null)); // lazy creation of the value
-        }
-        var value = cmpWired[propName];
-        if (isRendering) {
-            // this is needed because the proxy used by template is not sufficient
-            // for public props accessed from within a getter in the component.
-            subscribeToSetHook(vmBeingRendered, cmpWired, propName);
-        }
-        return value;
-    }
-    function setter(value) {
-        var vm = this[ViewModelReflection];
-        assert.vm(vm);
-        if (!value || !isObject(value)) {
-            assert.logError(vm + " failed to set new value into property \"" + propName + "\". It can only be set to an object.");
-            return;
-        }
-        var cmpWired = vm.cmpWired;
-        if (isUndefined(cmpWired)) {
-            cmpWired = vm.cmpWired = getPropertyProxy(create(null)); // lazy creation of the value
-        }
-        cmpWired[propName] = isObject(value) ? getPropertyProxy(value) : value;
-        notifyListeners(cmpWired, propName);
-    }
-    var descriptor = {
-        get: getter,
-        set: setter,
-        enumerable: true,
-        configurable: true,
-    };
-    return descriptor;
+    return descriptors;
 }
 // This should be as performant as possible, while any initialization should be done lazily
 function ComponentElement() {
@@ -1724,7 +1543,7 @@ ComponentElement.prototype = {
         for (var i = 0, len = nodeList.length; i < len; i += 1) {
             if (wasNodePassedIntoVM(vm, nodeList[i])) {
                 // TODO: locker service might need to return a membrane proxy
-                return pierce(vm, nodeList[i]);
+                return getMembrane(vm).pierce(nodeList[i]);
             }
         }
         assert.block(function () {
@@ -1732,7 +1551,6 @@ ComponentElement.prototype = {
                 assert.logWarning("this.querySelector() can only return elements that were passed into " + vm.component + " via slots. It seems that you are looking for elements from your template declaration, in which case you should use this.root.querySelector() instead.");
             }
         });
-        return null;
     },
     querySelectorAll: function (selectors) {
         var _this = this;
@@ -1746,7 +1564,7 @@ ComponentElement.prototype = {
                 assert.logWarning("this.querySelectorAll() can only return elements that were passed into " + vm.component + " via slots. It seems that you are looking for elements from your template declaration, in which case you should use this.root.querySelectorAll() instead.");
             }
         });
-        return pierce(vm, filteredNodes);
+        return getMembrane(vm).pierce(filteredNodes);
     },
     get tagName() {
         var elm = getLinkedElement(this);
@@ -1885,32 +1703,19 @@ function createComponentDef(Ctor) {
     var methods = getPublicMethodsHash(Ctor);
     var observedAttrs = getObservedAttributesHash(Ctor);
     var wire = getWireHash(Ctor);
-    var proto = Ctor.prototype;
-    for (var propName in props) {
-        // initializing getters and setters for each public prop on the target prototype
-        var descriptor = getOwnPropertyDescriptor(proto, propName);
-        var isComputed = descriptor && (isFunction(descriptor.get) || isFunction(descriptor.set));
-        assert.invariant(!descriptor || isComputed, "Invalid " + name + ".prototype." + propName + " definition, it cannot be a prototype definition if it is a public property. Instead use the constructor to define it.");
-        defineProperty(proto, propName, createPublicPropertyDescriptor(propName));
-    }
-    if (wire) {
-        for (var propName in wire) {
-            var descriptor = getOwnPropertyDescriptor(proto, propName);
-            // for decorated methods we need to do nothing
-            if (isUndefined(wire[propName].method)) {
-                // initializing getters and setters for each public prop on the target prototype
-                var isComputed = descriptor && (isFunction(descriptor.get) || isFunction(descriptor.set));
-                assert.invariant(!descriptor || isComputed, "Invalid " + name + ".prototype." + propName + " definition, it cannot be a prototype definition if it is a property decorated with the @wire decorator.");
-                defineProperty(proto, propName, createWiredPropertyDescriptor(propName));
-            }
-        }
-    }
     var superProto = getPrototypeOf(Ctor);
     if (superProto !== ComponentElement) {
         var superDef = getComponentDef(superProto);
-        props = assign(create(null), superDef.props, props);
-        methods = assign(create(null), superDef.methods, methods);
-        wire = (superDef.wire || wire) ? assign(create(null), superDef.wire, wire) : undefined;
+        props = assign({}, superDef.props, props);
+        methods = assign({}, superDef.methods, methods);
+        observedAttrs = assign({}, superDef.observedAttrs, observedAttrs);
+        wire = assign({}, superDef.wire, wire);
+    }
+    var proto = Ctor.prototype;
+    for (var propName in props) {
+        // initializing getters and setters for each public prop on the target prototype
+        assert.invariant(!getOwnPropertyDescriptor(proto, propName), "Invalid " + name + ".prototype." + propName + " definition, it cannot be a prototype definition if it is a public property. Instead use the constructor to define it.");
+        defineProperties(proto, createPublicPropertyDescriptorMap(propName));
     }
     var def = {
         name: name,
@@ -1924,7 +1729,7 @@ function createComponentDef(Ctor) {
         freeze(wire);
         freeze(props);
         freeze(methods);
-        freeze(observedAttrs);
+        //freeze(observedAttrs);
         for (var key in def) {
             defineProperty(def, key, {
                 configurable: false,
@@ -1935,17 +1740,17 @@ function createComponentDef(Ctor) {
     return def;
 }
 function getWireHash(target) {
-    var wire = target.wire;
+    var wire = target.wire || {};
     if (!wire || !getOwnPropertyNames(wire).length) {
-        return;
+        return EmptyObject;
     }
     assert.block(function devModeCheck() {
         // TODO: check that anything in `wire` is correctly defined in the prototype
     });
-    return assign(create(null), wire);
+    return wire;
 }
 function getPublicPropertiesHash(target) {
-    var props = target.publicProps;
+    var props = target.publicProps || {};
     if (!props || !getOwnPropertyNames(props).length) {
         return EmptyObject;
     }
@@ -1987,11 +1792,10 @@ function getPublicMethodsHash(target) {
     }, create(null));
 }
 function getObservedAttributesHash(target) {
-    var observedAttributes = target.observedAttributes;
-    if (!observedAttributes || !observedAttributes.length) {
+    if (!target.observedAttributes || !target.observedAttributes.length) {
         return EmptyObject;
     }
-    return observedAttributes.reduce(function (observedAttributes, attrName) {
+    return target.observedAttributes.reduce(function (observedAttributes, attrName) {
         observedAttributes[attrName] = 1;
         return observedAttributes;
     }, create(null));
@@ -2005,6 +1809,92 @@ function getComponentDef(Ctor) {
     CtorToDefMap.set(Ctor, def);
     return def;
 }
+
+var GetTarget = Symbol('internal');
+function isReplicable(value) {
+    var type = typeof value;
+    return value && (type === 'object' || type === 'function');
+}
+function getTarget(membrane, replicaOrAny) {
+    assert.isTrue(membrane instanceof Membrane, "getTarget() first argument must be a membrane.");
+    if (isReplicable(replicaOrAny) && membrane.cache.has(replicaOrAny)) {
+        return replicaOrAny[GetTarget];
+    }
+    return replicaOrAny;
+}
+function getReplica(membrane, value) {
+    if (value === null || !isReplicable(value)) {
+        return value;
+    }
+    assert.isTrue(membrane instanceof Membrane, "getReplica() first argument must be a membrane.");
+    var cells = membrane.cells, cache = membrane.cache;
+    if (cache.has(value)) {
+        return value;
+    }
+    var r = cells.get(value);
+    if (r) {
+        return r;
+    }
+    var replica = new Proxy(value, membrane); // eslint-disable-line no-undef
+    cells.set(value, replica);
+    cache.add(replica);
+    return replica;
+}
+function piercingHook(vm, target, key, value) {
+    assert.vm(vm);
+    var piercing = Services.piercing;
+    if (piercing) {
+        var component = vm.component, data = vm.vnode.data, def = vm.def, context = vm.context;
+        var result_1 = value;
+        var next_1 = true;
+        var callback = function (newValue) {
+            next_1 = false;
+            result_1 = newValue;
+        };
+        for (var i = 0, len = piercing.length; next_1 && i < len; ++i) {
+            piercing[i].call(undefined, component, data, def, context, target, key, value, callback);
+        }
+        return result_1;
+    }
+}
+var Membrane = (function () {
+    function Membrane(vm) {
+        assert.vm(vm);
+        this.vm = vm;
+        this.cells = new WeakMap();
+        this.cache = new WeakSet();
+    }
+    Membrane.prototype.get = function (target, key) {
+        if (key === OwnerKey) {
+            return undefined;
+        }
+        if (key === GetTarget) {
+            return target;
+        }
+        var value = target[key];
+        value = piercingHook(this.vm, target, key, value);
+        return getReplica(this, value);
+    };
+    Membrane.prototype.set = function (target, key, newValue) {
+        assert.logError("A protective membrane is preventing mutations to " + key + " member property of " + toString(target) + " to the value of " + toString(newValue) + ".");
+        return false;
+    };
+    Membrane.prototype.apply = function (targetFn, thisArg, argumentsList) {
+        var _this = this;
+        // TODO: argumentsList should be unwrap as well
+        thisArg = getTarget(this, thisArg);
+        argumentsList = getTarget(this, argumentsList);
+        if (isArray(argumentsList)) {
+            argumentsList = ArrayMap.call(argumentsList, function (value) { return getTarget(_this, value); });
+        }
+        var value = targetFn.apply(thisArg, argumentsList);
+        return getReplica(this, value);
+    };
+    Membrane.prototype.pierce = function (value) {
+        return value;
+    };
+    return Membrane;
+}());
 
 var idx = 0;
 var uid = 0;
@@ -2034,7 +1924,6 @@ function createVM(vnode) {
         def: def,
         context: {},
         cmpProps: {},
-        cmpWired: undefined,
         cmpState: undefined,
         cmpSlots: undefined,
         cmpEvents: undefined,
@@ -2124,6 +2013,16 @@ function wasNodePassedIntoVM(vm, node) {
     // TODO: we need to walk the parent path here as well, in case they passed it via slots multiple times
     // @ts-ignore
     return node[OwnerKey] === ownerUid;
+}
+function getMembrane(vm) {
+    assert.vm(vm);
+    var membrane = vm.membrane;
+    if (membrane) {
+        return membrane;
+    }
+    membrane = new Membrane(vm);
+    vm.membrane = membrane;
+    return membrane;
 }
 
 // this hook will set up the component instance associated to the new vnode,
@@ -3148,10 +3047,7 @@ exports.createElement = createElement;
 exports.getComponentDef = getComponentDef;
 exports.Element = ComponentElement;
 exports.register = register;
-exports.unwrap = unwrap;
-exports.setKey = setKey;
-exports.deleteKey = deleteKey;
 
 }((this.Engine = this.Engine || {})));
-/** version: 0.11.7 */
+/** version: 0.11.3 */
 //# sourceMappingURL=engine.js.map

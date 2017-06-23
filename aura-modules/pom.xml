@@ -10,7 +10,6 @@
     <artifactId>aura-modules</artifactId>
    
     <properties>
-        <aura.home>${basedir}/..</aura.home>
         <module.dir>modules_aura_modules</module.dir>
         <component.dir>components_aura_modules</component.dir>
         <module.test.dir>modules_aura_modules_test</module.test.dir>

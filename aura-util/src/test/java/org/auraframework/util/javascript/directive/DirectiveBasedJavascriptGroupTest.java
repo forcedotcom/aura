@@ -114,15 +114,12 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
                 file.getName(), ImmutableList.<DirectiveType<?>> of(DirectiveFactory.getMultiLineMockDirectiveType(),
                         DirectiveFactory.getMockDirective(), DirectiveFactory.getDummyDirectiveType()), EnumSet.of(
                         mode));
-        File dir = getResourceFile("/testdata/javascript/generated/");
-
         String genFileName = "testDummy_" + mode.getSuffix() + ".js";
-        String genCompatFileName = "testDummy_" + mode.getSuffix() + "_compat" + ".js";
-
-        jg.parse();
-        jg.generate(dir, false);
-        File genFile = new File(dir, genFileName);
+        File dir = getResourceFile("/testdata/javascript/generated/");
         try {
+            jg.parse();
+            jg.generate(dir, false);
+            File genFile = new File(dir, genFileName);
             if (!genFile.exists()) {
                 fail("Javascript processor failed to create " + genFile.getAbsolutePath());
             } else {
@@ -141,19 +138,13 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
                 goldFileText(fileContents.toString(), "/" + genFileName);
             }
         } finally {
+            // Regardless of the javascript processor generating the files,
+            // clean up the expected files
+            File genFile = new File(dir, genFileName);
             if (genFile.exists()) {
                 genFile.delete();
             }
         }
-
-        // assert compat version also exists
-        File genCompatFile = new File(dir, genCompatFileName);
-        boolean compatFileExists = genCompatFile.exists();
-        assertTrue("compat file does not exist", compatFileExists);
-        if (compatFileExists) {
-            genCompatFile.delete();
-        }
-
         File unExpectedGenFile = new File(dir, "testDummy_test.js");
         assertFalse(
                 "javascript processor generated a file for test mode even though the group was not specified to do so.",

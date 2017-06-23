@@ -537,7 +537,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         HttpResponse response = perform(get);
         assertEquals(HttpStatus.SC_OK, getStatusCode(response));
         // Fetch the latest timestamp of the JS group and construct URL for DEV mode.
-        String expectedFWUrl = String.format("/auraFW/javascript/%s/aura_dev_compat.js",
+        String expectedFWUrl = String.format("/auraFW/javascript/%s/aura_dev.js",
                 configAdapter.getAuraFrameworkNonce());
         String scriptTag = String.format("<script src=\"%s\"", expectedFWUrl);
         assertTrue("Expected Aura FW Script tag not found. Expected to see: " + scriptTag,

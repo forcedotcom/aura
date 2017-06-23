@@ -302,8 +302,10 @@ InteropComponent.prototype.get = function (key) {
     path.shift();
     var prop = $A.expressionService.resolve(path.join('.'), this.attributes);
 
-    if (prop) {
+    if (prop !== undefined && prop !== null) {
         return $A.util.isExpression(prop.value) ? prop.value.evaluate() : prop;
+    } else {
+        return prop;
     }
 };
 

@@ -1,0 +1,4 @@
+<aura:component>
+    <aura:attribute name="bool" type="Boolean" default="false"/>
+    <moduleTest:simpleCmp aura:id="main" literal="{!v.bool}" />
+</aura:component>

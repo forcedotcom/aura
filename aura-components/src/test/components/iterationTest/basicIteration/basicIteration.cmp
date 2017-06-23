@@ -20,6 +20,9 @@
     <aura:attribute name="items" type="List"/>
     <aura:attribute name="start" type="Object"/>
     <aura:attribute name="end" type="Object"/>
+    <aura:attribute name="newTemplate" type="Aura.ComponentDefRef[]">
+        {!var + ':' + idx + ','}
+    </aura:attribute>
     <aura:attribute name="iterationCompleteFired" type="Boolean" default="false" />
     <aura:attribute name="iterationCompleteOperation" type="String" default="" />
 

@@ -144,7 +144,11 @@ return {
   ],
   "hd":[
     {
-      "x":"{!c.handleSearch}",
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.handleSearch"
+      },
       "n":"search"
     }
   ],
@@ -188,7 +192,12 @@ return {
                         },
                         "search":{
                           "descriptor":"search",
-                          "value":"{!c.handleSearch}"
+                          "value":{
+                            "exprType":"PROPERTY",
+                            "byValue":false,
+                            "target":"auradocs:searchFilterTree",
+                            "path":"c.handleSearch"
+                          }
                         }
                       }
                     }
@@ -206,7 +215,12 @@ return {
             "values":{
               "value":{
                 "descriptor":"value",
-                "value":"{!v.body}"
+                "value":{
+                  "exprType":"PROPERTY",
+                  "byValue":false,
+                  "target":"auradocs:searchFilterTree",
+                  "path":"v.body"
+                }
               }
             }
           }
@@ -269,7 +283,11 @@ return {
       "ed":{
         "descriptor":"markup://auradocs:locationChange"
       },
-      "x":"{!c.handleLocationChange}"
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.handleLocationChange"
+      }
     }
   ],
   "fa":[
@@ -377,7 +395,12 @@ return {
                             "exprType":"FUNCTION",
                             "code":function(cmp, fn) { return fn.ne(cmp.get("v.referenceOnly"),true); },
                             "args":[
-                              "{!v.referenceOnly}"
+                              {
+                                "exprType":"PROPERTY",
+                                "byValue":false,
+                                "target":"auradocs:nav",
+                                "path":"v.referenceOnly"
+                              }
                             ],
                             "byValue":false
                           }
@@ -622,7 +645,12 @@ return {
                     "exprType":"FUNCTION",
                     "code":function(cmp, fn) { return fn.add("#",cmp.get("v.location")); },
                     "args":[
-                      "{!v.location}"
+                      {
+                        "exprType":"PROPERTY",
+                        "byValue":false,
+                        "target":"auradocs:navLink",
+                        "path":"v.location"
+                      }
                     ],
                     "byValue":false
                   }
@@ -643,7 +671,12 @@ return {
                       "values":{
                         "value":{
                           "descriptor":"value",
-                          "value":"{!v.body}"
+                          "value":{
+                            "exprType":"PROPERTY",
+                            "byValue":false,
+                            "target":"auradocs:navLink",
+                            "path":"v.body"
+                          }
                         }
                       }
                     }
@@ -684,7 +717,12 @@ return {
             "values":{
               "value":{
                 "descriptor":"value",
-                "value":"{!v.body}"
+                "value":{
+                  "exprType":"PROPERTY",
+                  "byValue":false,
+                  "target":"auradev:blankTemplate",
+                  "path":"v.body"
+                }
               }
             }
           }
@@ -845,20 +883,40 @@ return {
   ],
   "hd":[
     {
-      "x":"{!c.treeChange}",
-      "v":"{!v.tree}",
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.treeChange"
+      },
+      "v":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"v.tree"
+      },
       "n":"change"
     },
     {
-      "x":"{!c.doInit}",
-      "v":"{!this}",
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.doInit"
+      },
+      "v":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"this"
+      },
       "n":"init"
     },
     {
       "ed":{
         "descriptor":"markup://auradocs:locationChange"
       },
-      "x":"{!c.handleLocationChange}"
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.handleLocationChange"
+      }
     }
   ],
   "fa":[
@@ -873,7 +931,12 @@ return {
             "values":{
               "value":{
                 "descriptor":"value",
-                "value":"{!v.body}"
+                "value":{
+                  "exprType":"PROPERTY",
+                  "byValue":false,
+                  "target":"auradocs:openTopicTree",
+                  "path":"v.body"
+                }
               }
             }
           }
@@ -1076,26 +1139,46 @@ return {
       "ed":{
         "descriptor":"markup://aura:waiting"
       },
-      "x":"{!c.waiting}"
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.waiting"
+      }
     },
     {
       "ed":{
         "descriptor":"markup://aura:doneWaiting"
       },
-      "x":"{!c.doneWaiting}"
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.doneWaiting"
+      }
     },
     {
       "ed":{
         "descriptor":"markup://auradocs:locationChange"
       },
-      "x":"{!c.locationChange}"
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.locationChange"
+      }
     },
     {
-      "x":"{!c.refreshBegin}",
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.refreshBegin"
+      },
       "n":"refreshBegin"
     },
     {
-      "x":"{!c.refreshEnd}",
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.refreshEnd"
+      },
       "n":"refreshEnd"
     }
   ],
@@ -1281,8 +1364,16 @@ return {
   ],
   "hd":[
     {
-      "x":"{!c.doInit}",
-      "v":"{!this}",
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.doInit"
+      },
+      "v":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"this"
+      },
       "n":"init"
     }
   ],
@@ -1585,7 +1676,12 @@ return {
             "values":{
               "nodes":{
                 "descriptor":"nodes",
-                "value":"{!m.tree}"
+                "value":{
+                  "exprType":"PROPERTY",
+                  "byValue":false,
+                  "target":"auradocs:referenceTree",
+                  "path":"m.tree"
+                }
               }
             }
           }
@@ -1965,7 +2061,12 @@ return {
             "values":{
               "value":{
                 "descriptor":"value",
-                "value":"{!v.body}"
+                "value":{
+                  "exprType":"PROPERTY",
+                  "byValue":false,
+                  "target":"auradocs:sidebar",
+                  "path":"v.body"
+                }
               }
             }
           }
@@ -2089,13 +2190,29 @@ return {
   ],
   "hd":[
     {
-      "x":"{!c.init}",
-      "v":"{!this}",
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.init"
+      },
+      "v":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"this"
+      },
       "n":"init"
     },
     {
-      "x":"{!c.destroy}",
-      "v":"{!this}",
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.destroy"
+      },
+      "v":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"this"
+      },
       "n":"destroy"
     }
   ],
@@ -2117,7 +2234,12 @@ return {
             "values":{
               "isTrue":{
                 "descriptor":"isTrue",
-                "value":"{!v.enabled}"
+                "value":{
+                  "exprType":"PROPERTY",
+                  "byValue":false,
+                  "target":"auraStorage:fuelGauge",
+                  "path":"v.enabled"
+                }
               },
               "body":{
                 "descriptor":"body",
@@ -2131,7 +2253,12 @@ return {
                       "values":{
                         "onclick":{
                           "descriptor":"onclick",
-                          "value":"{!c.showStats}"
+                          "value":{
+                            "exprType":"PROPERTY",
+                            "byValue":false,
+                            "target":"auraStorage:fuelGauge",
+                            "path":"c.showStats"
+                          }
                         },
                         "body":{
                           "descriptor":"body",
@@ -2144,7 +2271,12 @@ return {
                                 "values":{
                                   "value":{
                                     "descriptor":"value",
-                                    "value":"{!v.value}"
+                                    "value":{
+                                      "exprType":"PROPERTY",
+                                      "byValue":false,
+                                      "target":"auraStorage:fuelGauge",
+                                      "path":"v.value"
+                                    }
                                   }
                                 }
                               }
@@ -2252,21 +2384,37 @@ return {
   ],
   "hd":[
     {
-      "x":"{!c.init}",
-      "v":"{!this}",
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.init"
+      },
+      "v":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"this"
+      },
       "n":"init"
     },
     {
       "ed":{
         "descriptor":"markup://aura:connectionLost"
       },
-      "x":"{!c.connectionLost}"
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.connectionLost"
+      }
     },
     {
       "ed":{
         "descriptor":"markup://aura:connectionResumed"
       },
-      "x":"{!c.connectionResumed}"
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.connectionResumed"
+      }
     }
   ],
   "hs":true

@@ -455,6 +455,10 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
 
     @Override
     public void addExpressionReferences(Set<PropertyReference> propRefs) {
+        DefDescriptor<T> target=builder.getDescriptor();
+        for(PropertyReference propRef:propRefs){
+            propRef.setTarget(target);
+        }
         builder.addAllExpressionRefs(propRefs);
     }
 }

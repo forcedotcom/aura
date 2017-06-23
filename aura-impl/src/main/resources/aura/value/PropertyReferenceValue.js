@@ -19,11 +19,14 @@
  * @protected
  * @export
  */
-function PropertyReferenceValue(path, valueProvider) {
+function PropertyReferenceValue(path, valueProvider, target) {
     var isArray=$A.util.isArray(path);
     this.path = isArray?path:path.split('.');
     this.expression = isArray?path.join('.'):path;
     this.isGlobal=this.expression.charAt(0) === '$';
+    // if($A.util.isString(target)){
+    //     debugger;
+    // }
     this.valueProvider=this.isGlobal?null:valueProvider;
     this.context=this.isGlobal?null:((valueProvider instanceof PassthroughValue)?valueProvider:$A.getContext().getCurrentAccess());
     this.lastResult=null;

@@ -42,7 +42,7 @@
 		var name = cmp.get('v.name');
 		if (name) {
 		    var namePath = name.split('.'),
-		        propertyReference = this.createPropertyReference('value', ['item'].concat(namePath));
+		        propertyReference = this.createPropertyReference('value', 'item.'+namePath);
 		    
 		    defRef.attributes = {
 		        values: {

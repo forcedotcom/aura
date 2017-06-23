@@ -23,8 +23,8 @@
         <aura:iteration items="{!v.namespaces}" var="namespace">
             <h3 class="title">{!namespace.title}</h3>
             <ul class="nav nav-list">
-                <aura:iteration items="{!namespace.children}" var="def">
-                    <li><a href="{!'#'+def.name+'?defType='+def.defType}">{!def.title}</a></li>
+                <aura:iteration items="{!namespace.children}" var="item">
+                    <li><a href="{!'#'+item.name+'?defType='+item.defType}">{!item.title}</a></li>
                 </aura:iteration>
             </ul>
         </aura:iteration>

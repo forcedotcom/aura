@@ -22,15 +22,12 @@
         test: [
         function(cmp) {
             cmp.set("v.items", ["start1","start2","start3","start4","start5"]);
-            cmp.find("iteration").set("v.template", [
-                {attributes: {values: {value: "{!item}"}}, componentDef: {descriptor: "aura:expression"}},
-                {attributes: {values: {value: ":"}}, componentDef: {descriptor: "aura:text"}},
-                {attributes: {values: {value: "{!index}"}}, componentDef: {descriptor: "aura:expression"}},
-                {attributes: {values: {value: "\n"}}, componentDef: {descriptor: "aura:text"}},
-                
-                // This line included to force a server request
-                {attributes: {values: {value: "{!item}"}}, componentDef: {descriptor: "ui:inputText"}}
-            ]);
+            var template=cmp.get("v.newTemplate");
+            //JBUCH: THIS WILL BREAK ON ComponentConfig change
+            // This line included to force a server request
+            template.push({attributes: {values: {value: {"exprType":"PROPERTY","path":"item"}}}, componentDef: {descriptor: "ui:inputText"}});
+
+            cmp.find("iteration").set("v.template", template);
             cmp.set("v.items", ["next1","next2","next3","next4","next5"]);
 
             $A.test.addWaitFor(true, function() {
@@ -52,15 +49,12 @@
         test: [
         function(cmp) {
             cmp.set("v.items", ["start1","start2","start3","start4","start5"]);
-            cmp.find("iteration").set("v.template", [
-                {attributes: {values: {value: "{!item}"}}, componentDef: {descriptor: "aura:expression"}},
-                {attributes: {values: {value: ":"}}, componentDef: {descriptor: "aura:text"}},
-                {attributes: {values: {value: "{!index}"}}, componentDef: {descriptor: "aura:expression"}},
-                {attributes: {values: {value: "\n"}}, componentDef: {descriptor: "aura:text"}},
-                
-                // This line included to force a server request
-                {attributes: {values: {value: "{!item}"}}, componentDef: {descriptor: "iterationTest:iterationWithModelInnerCmp"}}
-            ]);
+            var template=cmp.get("v.newTemplate");
+            //JBUCH: THIS WILL BREAK ON ComponentConfig change
+            // This line included to force a server request
+            template.push({attributes: {values: {value: {"exprType":"PROPERTY","path":"item"}}}, componentDef: {descriptor: "iterationTest:iterationWithModelInnerCmp"}});
+
+            cmp.find("iteration").set("v.template", template);
             cmp.set("v.items", ["next1","next2","next3","next4","next5"]);
 
             $A.test.addWaitFor(true, function() {

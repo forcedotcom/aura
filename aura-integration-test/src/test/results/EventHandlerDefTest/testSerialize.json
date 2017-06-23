@@ -8,5 +8,9 @@
       "att2":["att2","aura://Boolean","I",true]
     }
   },
-  "x":"{!c.foo}"
+  "x":{
+    "exprType":"PROPERTY",
+    "byValue":false,
+    "path":"c.foo"
+  }
 }

@@ -211,6 +211,12 @@ IterationComponent.prototype.isInstanceOf = function(type) {
     return type === "aura:iteration" || type === "aura:rootComponent";
 };
 
+// IterationComponent.ItemValueProvider=function(component){
+//     this.get=function(path){
+//         throw new Error("DIGGING IN THE RIGHT PLACE");
+//     }
+// };
+
 IterationComponent.prototype["controller"] = {
     "rangeChange": function(component, evt, helper) {
         helper.updateBody(component);
@@ -225,6 +231,7 @@ IterationComponent.prototype["controller"] = {
     },
 
     "init": function(component, evt, helper) {
+//        component.addValueProvider(component.get("v.var"),new IterationComponent.ItemValueProvider(component));
         var bodyTemplate = component.attributeSet.getBody(component.globalId);
         var template = component.attributeSet.getValue("template");
 
@@ -343,7 +350,6 @@ IterationComponent.prototype["helper"] = {
     },
 
     buildBody: function (component, itemHandler, completeHandler) {
-
         var items = component.attributeSet.getValue("items");
         var template = component.attributeSet.getValue("template");
         var startIndex = this.getStart(component);

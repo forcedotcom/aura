@@ -122,12 +122,7 @@
         test: [function(cmp){
             cmp.set("v.loaded",false);
             var list = cmp.find("list");
-            list.set("v.itemTemplate", [
-                {attributes:{values:{value:"{!row.char}"}},componentDef:{descriptor:"aura:expression"}},
-                {attributes:{values:{value:":"}},componentDef:{descriptor:"aura:text"}},
-                {attributes:{values:{value:"{!row.index}"}},componentDef:{descriptor:"aura:expression"}},
-                {attributes:{values:{value:","}},componentDef:{descriptor:"aura:text"}}
-            ]);
+            list.set("v.itemTemplate", cmp.get("v.newTemplate"));
 
             $A.test.addWaitFor(true, function(){
             	return cmp.get("v.loaded");

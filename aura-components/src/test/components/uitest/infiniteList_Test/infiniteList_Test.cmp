@@ -20,6 +20,7 @@
 	<aura:attribute name="showMoreCallback" type="boolean" default="false"/>
 	<aura:attribute name="refreshCallBack" type="boolean" default="false"/>
     <aura:attribute name="loaded" type="boolean" default="false"/>
+    <aura:attribute name="newTemplate" type="Aura.ComponentDefRef[]">{!row.char}:{!row.index},</aura:attribute>
 
 	<ui:infiniteList aura:id="list" itemVar="row" currentPage="{!v.currentPage}" pageSize="{!v.pageSize}" totalItems="{!v.totalItems}" listComplete="{!c.listComplete}">
 		<aura:set attribute="dataProvider">

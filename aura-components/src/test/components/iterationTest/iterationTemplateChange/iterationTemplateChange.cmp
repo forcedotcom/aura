@@ -18,6 +18,9 @@
 <aura:component>
     <aura:attribute name="items" type="List" />
     <aura:attribute name="status" type="String" default="Initial" description="Used to update status of iteration for testing purposes"/>
+    <aura:attribute name="newTemplate" type="Aura.ComponentDefRef[]">
+        {!item+': '+index}<br/>
+    </aura:attribute>
 
     <aura:iteration aura:id="iteration" items="{!v.items}" var="item" indexVar="index">
         {!index}: {!item}<br/>

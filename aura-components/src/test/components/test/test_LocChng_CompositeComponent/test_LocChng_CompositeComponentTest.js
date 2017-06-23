@@ -31,7 +31,7 @@
 			aura.test.assertTrue(handlerDefs.length === 1, "Component has more than 1 handlers");
 			for ( var i = 0; i < handlerDefs.length; i++) {
 				if (handlerDefs[i].eventDef.getDescriptor().getQualifiedName() === 'markup://test:test_LocChng_Event2') {
-					aura.test.assertTrue((handlerDefs[i].action === "{!c.clicked}"), "Incorrect action registered for location change handler");
+					aura.test.assertTrue((handlerDefs[i].action.path === "c.clicked"), "Incorrect action registered for location change handler");
 				} else {
 					aura.test.fail("Unkown action/handler registered with component");
 				}

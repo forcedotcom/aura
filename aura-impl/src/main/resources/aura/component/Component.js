@@ -1544,7 +1544,7 @@ Component.prototype.getComponentValueProvider = function() {
 
 /**
  * Returns the owner of the component. This should represent the lexical scope for markup components, and the
- * component calling the create method for dynamic components.
+ * component calling the create method for dynamically instantiated components, i.e. $A.createComponent().
  *
  * @return {Object} Owning component
  * @public
@@ -2421,7 +2421,7 @@ Component.prototype.validatePartialConfig=function(config, partialConfig){
 
 Component.prototype.getMethodHandler = function(methodDef){
     var component=this;
-    var observer=this.getActionCaller(this,methodDef.action||("c."+methodDef.getDescriptor().name));
+    var observer=this.getActionCaller(this,this.getReference(methodDef.action||("c."+methodDef.getDescriptor().name)));
     return function Component$getMethodHandler(/*param1,param2,paramN*/){
         if(!$A.clientService.allowAccess(methodDef,component)) {
             var context = $A.getContext();
@@ -2599,7 +2599,7 @@ Component.prototype.setupApplicationEventHandlers = function() {
             $A.eventService.addEventHandler(
                 this,
                 handlerDef["eventDef"],
-                this.getReference(handlerDef["action"]),
+                valueFactory.create(handlerDef["action"],this),
                 handlerDef["phase"],
                 handlerDef["includeFacets"]
             );

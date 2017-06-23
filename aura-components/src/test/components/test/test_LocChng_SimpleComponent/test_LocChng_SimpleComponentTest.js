@@ -27,14 +27,14 @@
 			aura.test.assertTrue(handlerDefs.length === 3);
 			for ( var i = 0; i < handlerDefs.length; i++) {
 				var qname = handlerDefs[i].eventDef.getDescriptor().getQualifiedName();
-				var action = handlerDefs[i].action;
+				var action = handlerDefs[i].action.path;
 				
 				if (qname === 'markup://test:test_LocChng_Event') {
-					aura.test.assertTrue(action === "{!c.locationChange}", "Incorrect action registered for location change handler");
+					aura.test.assertTrue(action === "c.locationChange", "Incorrect action registered for location change handler");
 				} else if (qname === 'markup://test:test_LocChng_Event2') {
-					aura.test.assertTrue(action === "{!c.locationChangeComposite}", "Incorrect action registered for location change handler");
+					aura.test.assertTrue(action === "c.locationChangeComposite", "Incorrect action registered for location change handler");
 				} else if (qname === 'markup://aura:locationChange') {
-					aura.test.assertTrue(action === "{!c.locationChangeGeneric}", "Incorrect action registered for location change handler");
+					aura.test.assertTrue(action === "c.locationChangeGeneric", "Incorrect action registered for location change handler");
 				} else {
 					aura.test.fail("Unknown handler/action registered");
 				}

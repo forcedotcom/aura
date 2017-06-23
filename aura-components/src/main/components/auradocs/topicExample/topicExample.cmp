@@ -20,12 +20,12 @@
     <aura:attribute name="defType" type="String" default="Component"/>
 
     <aura:if isTrue="{!m.error == null}">
-        <aura:iteration items="{!m.defs}" var="def">
-                <auradocs:editorPanel title="{!def.name+' source'}" descriptor="{!def.descriptor}" defType="{!def.defType}"/>
+        <aura:iteration items="{!m.defs}" var="item">
+                <auradocs:editorPanel title="{!item.name+' source'}" descriptor="{!item.descriptor}" defType="{!item.defType}"/>
             </aura:iteration>
 
-            <aura:iteration items="{!m.includeDefs}" var="def">
-                <auradocs:stretchEditorPanel title="{!def.includeDefName + '.js'}" descriptor="{!def.descriptor}" defType="{!def.defType}" includeDefName="{! def.includeDefName}"/>
+            <aura:iteration items="{!m.includeDefs}" var="item">
+                <auradocs:stretchEditorPanel title="{!item.includeDefName + '.js'}" descriptor="{!item.descriptor}" defType="{!item.defType}" includeDefName="{! item.includeDefName}"/>
             </aura:iteration>
 
         <aura:set attribute="else">

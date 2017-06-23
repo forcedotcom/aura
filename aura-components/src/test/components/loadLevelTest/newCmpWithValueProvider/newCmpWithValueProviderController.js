@@ -18,7 +18,7 @@
      * Create a new component whose definition was already preloaded and use the current component as attribute value provider.
      */
     createCmpWithPreloadedDef : function(cmp, evt, helper){
-    	var expression = "{!v.stringAttribute}";
+    	var expression = {"exprType":"PROPERTY","path":"v.stringAttribute"};
     	var config = {
             descriptor : "markup://aura:text",
             attributes : {
@@ -36,7 +36,7 @@
      * W-1308292 - Passing localId in config for newCmp will invoke the fix
      */
     createCmpWithPassthroughValue : function(cmp, evt, helper){
-        var expression = "{!v.nameAttribute}";
+        var expression = {"exprType":"PROPERTY","path":"v.nameAttribute"};
         var avp = $A.expressionService.createPassthroughValue({}, cmp);
         var config = {
             descriptor : "markup://aura:text",
@@ -56,7 +56,7 @@
      */
     createCmpByFetchingDefFromServer : function(cmp, evt, helper){
         //Use attribute of current component as value for new cmp's attribute
-        var expression = "{!v.numberAttribute}";
+        var expression = "v.numberAttribute";
 
         //Specify current component's attribute as value for new cmp's attribute
         var config = {
@@ -76,7 +76,7 @@
      Note: this no longer get component from server, not sure why, need to look into it.
      */
     createCmpWithMapValuePropRefValueFromServer : function(cmp, evt, helper){
-    	var expression = "{!v.stringAttribute}";
+    	var expression = {"exprType":"PROPERTY","path":"v.stringAttribute"};
     	var config = {
             descriptor:"markup://loadLevelTest:displayMap",
             attributes:{

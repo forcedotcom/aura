@@ -249,12 +249,7 @@
             function changeTemplate(cmp){
                 var iteration=cmp.find("iteration");
                 var expected="a:0,b:1,c:2,d:3,e:4,";
-                iteration.set("v.template",[
-                    {attributes:{values:{value:"{!var}"}},componentDef:{descriptor:"aura:expression"}},
-                    {attributes:{values:{value:":"}},componentDef:{descriptor:"aura:text"}},
-                    {attributes:{values:{value:"{!idx}"}},componentDef:{descriptor:"aura:expression"}},
-                    {attributes:{values:{value:","}},componentDef:{descriptor:"aura:text"}}
-                ]);
+                iteration.set("v.template",cmp.get("v.newTemplate"));
 
                 $A.test.addWaitFor(true,function(){return iteration.get("v.loaded");},function(){
                     var actual=$A.test.getTextByComponent(iteration);
@@ -340,12 +335,7 @@
             // Clear any attribute changes from loading component
             cmp.set("v.iterationCompleteFired", false);
             cmp.set("v.iterationCompleteOperation", "");
-            cmp.find("iteration").set("v.template",[
-                {attributes:{values:{value:"{!var}"}},componentDef:{descriptor:"aura:expression"}},
-                {attributes:{values:{value:":"}},componentDef:{descriptor:"aura:text"}},
-                {attributes:{values:{value:"{!idx}"}},componentDef:{descriptor:"aura:expression"}},
-                {attributes:{values:{value:","}},componentDef:{descriptor:"aura:text"}}
-            ]);
+            cmp.find("iteration").set("v.template",cmp.get("v.newTemplate"));
 
             $A.test.addWaitForWithFailureMessage(true,
                     function() {

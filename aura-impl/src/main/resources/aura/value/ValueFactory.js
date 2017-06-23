@@ -24,9 +24,18 @@ var valueFactory = {
         }
         if (aura.util.isPlainObject(valueConfig)) {
             if (valueConfig["exprType"] === "PROPERTY") {
+                var isGlobal=valueConfig["path"].charAt(0)==='$';
+                if(valueConfig["byValue"]){
+                    return (isGlobal?$A:component).get(valueConfig["path"]);
+                }
+                if(isGlobal) {
+                    return $A.expressionService.getReference(valueConfig["path"],component);
+                }else if($A.util.isComponent(component)){
+                    return component.getReference(valueConfig["path"],component);
+                }
                 return new PropertyReferenceValue(valueConfig["path"], component);
             } else if (valueConfig["exprType"] === "FUNCTION") {
-                return new FunctionCallValue(valueConfig, component);
+                return new FunctionCallValue(valueConfig, component, valueConfig["target"]);
             }else{
                 // Recurse over child objects to create Actions, PropertyReferences, and FunctionCalls
                 var childConfig={};
@@ -36,23 +45,25 @@ var valueFactory = {
                 valueConfig=childConfig;
             }
         } else if (aura.util.isString(valueConfig) && valueConfig.charAt(0)==='{' && component) {
-            var expression=valueConfig.substring(2, valueConfig.length - 1);
-            var isGlobal=expression.charAt(0)==='$';
-            // Property Expressions:
-            switch(valueConfig.charAt(1)){
-                // By Value
-                case '#':
-                    return (isGlobal?$A:component).get(expression);
-                // By Reference
-                case '!':
-//                  //JBUCH: HALO: FIXME: FIND A BETTER WAY TO HANDLE DEFAULT EXPRESSIONS
-                    if(isGlobal) {
-                        return $A.expressionService.getReference(valueConfig,component);
-                    }else if($A.util.isComponent(component)){
-                        return component.getReference(valueConfig);
-                    }
-                    return new PropertyReferenceValue(expression.split("."), component);
-            }
+            //JBUCH: TODO: REMOVE THIS ELSEIF CLAUSE ONCE USES IN CORE ARE FIXED
+            $A.log("Aura ValueFactory: String expressions are no longer supported.");
+//             var expression=valueConfig.substring(2, valueConfig.length - 1);
+//             var isGlobal=expression.charAt(0)==='$';
+//             // Property Expressions:
+//             switch(valueConfig.charAt(1)){
+//                 // By Value
+//                 case '#':
+//                     return (isGlobal?$A:component).get(expression);
+//                 // By Reference
+//                 case '!':
+// //                  //JBUCH: HALO: FIXME: FIND A BETTER WAY TO HANDLE DEFAULT EXPRESSIONS
+//                     if(isGlobal) {
+//                         return $A.expressionService.getReference(valueConfig,component);
+//                     }else if($A.util.isComponent(component)){
+//                         return component.getReference(valueConfig);
+//                     }
+//                     return new PropertyReferenceValue(expression.split("."), component);
+//             }
         }
         return valueConfig;
     }

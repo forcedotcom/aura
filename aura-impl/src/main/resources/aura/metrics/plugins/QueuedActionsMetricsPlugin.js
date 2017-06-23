@@ -125,12 +125,14 @@ QueuedActionsMetricsPlugin.prototype.actionsProcessResponses = function() {
     // the decoded and json parsed message is only available in the response to this method
     var perfSummary = message && message["perfSummary"];
     if (perfSummary && perfSummary["version"] === "core") {
-        var actions = perfSummary["actions"] || [];
-        for (var i = 0; i < actions.length; i++) {
-            var action = actions[i];
+        var actions = perfSummary["actions"] || {};
+        var keys = Object.keys(actions);
+        for (var i = 0; i < keys.length; i++) {
+            var id = keys[i];
+            var serverTime = actions[id];
             this.metricsService["mark"](QueuedActionsMetricsPlugin.NAME, 'receive', {
-                "id"         : action["id"],
-                "serverTime" : action["duration"]
+                "id"         : id,
+                "serverTime" : serverTime
             });
         }
     }

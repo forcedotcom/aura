@@ -40,6 +40,37 @@
         }
     },
 
+    // BUG: W-4039086
+    // The issue here is that if can not remove elements from the facetInfo collection, depending on the rendering cycle functions.
+    // When can we safely destroy the facetInfo collection after unrendering it?
+    // You can't do it if you're inside a renderIf, so need to figure some things out here.
+    _testRawNestedIfs: {
+        test: function(component) {
+            var container = component.find("container");
+            var containerElement = container.getElement();
+
+            component.edit();
+
+            // Break the thread
+            setTimeout(function(){
+                component.save();
+            }, 100);
+            
+            // Wait for the Edit button to be the only thing left.
+            $A.test.addWaitFor(true, function() {
+                var buttons = containerElement.querySelectorAll("button");
+                if(buttons.length !== 1) {
+                    return false;
+                }
+
+                var button = buttons[0];
+                return button != null && $A.util.hasClass(button, "edit");
+            });
+
+        }
+    },
+
+
     whatItIs : function(component, name, outervalue, innervalue){
         if (outervalue) {
             $A.test.assertNotNull($A.test.getElementByClass("outerIsTrue"), name+"Outer If was not displayed.");

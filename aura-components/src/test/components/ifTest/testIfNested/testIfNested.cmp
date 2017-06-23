@@ -16,32 +16,58 @@
 
 -->
 <aura:component>
-	<aura:attribute name="outer" type="Boolean"/>
-	<aura:attribute name="inner" type="Boolean"/>
-	
-	<span aura:id="whatIsIt">
-		<aura:if isTrue="{!v.outer}">
-			<span class="outerIsTrue">
-				<aura:if isTrue="{!v.inner}">
-					<span class="itIsTrue">It is true.</span>
-					<aura:set attribute="else">
-						<span class="itWishesItWasTrue">It wishes it was true.</span>	
-					</aura:set>
-				</aura:if>
-				<aura:if isTrue="{! !v.inner}">
-					<span class="itIsNotTrue">It is not true.</span>
-					<aura:set attribute="else">
-						<span class="itWishesItWasNotTrue">It wishes it was not true.</span>	
-					</aura:set>
-				</aura:if>
-			</span>	
-			
-			<aura:set attribute="else">
-				<span class="outerIsFalse">
-					<ifTest:testIfElse thang="{!v.inner}"/>
-				</span> 		
-			</aura:set>
-		</aura:if>
-	</span>
-	
+    <aura:attribute name="outer" type="Boolean"/>
+    <aura:attribute name="inner" type="Boolean"/>
+    <aura:attribute name="isEdit" type="boolean" default="false"/>
+    <aura:attribute name="isSaving" type="boolean" default="false"/>
+
+    <aura:method name="edit"/>
+    <aura:method name="save"/>
+
+    <span aura:id="whatIsIt">
+        <aura:if isTrue="{!v.outer}">
+            <span class="outerIsTrue">
+                <aura:if isTrue="{!v.inner}">
+                    <span class="itIsTrue">It is true.</span>
+                    <aura:set attribute="else">
+                        <span class="itWishesItWasTrue">It wishes it was true.</span>   
+                    </aura:set>
+                </aura:if>
+                <aura:if isTrue="{! !v.inner}">
+                    <span class="itIsNotTrue">It is not true.</span>
+                    <aura:set attribute="else">
+                        <span class="itWishesItWasNotTrue">It wishes it was not true.</span>    
+                    </aura:set>
+                </aura:if>
+            </span> 
+            
+            <aura:set attribute="else">
+                <span class="outerIsFalse">
+                    <ifTest:testIfElse thang="{!v.inner}"/>
+                </span>         
+            </aura:set>
+        </aura:if>
+    </span>
+
+    <div aura:id="container">
+        <aura:if isTrue="{!v.isEdit == false}">   
+            <button class="slds-button edit"  onclick="{!c.edit}">
+               Edit
+            </button>
+            <aura:set attribute="else">
+                <aura:if isTrue="{!v.isEdit}">
+                    <aura:if isTrue="{!v.isSaving == true}">
+                        Saving...
+                        <aura:set attribute="else">
+                            <button class="slds-button saving" onclick="{!c.save}" aura:id="save-button"> Save (isEdit = {!v.isEdit})
+                            </button>
+                        </aura:set>
+                    </aura:if>
+                </aura:if>
+            </aura:set>
+        </aura:if>  
+    </div>
+
+
+    
 </aura:component>

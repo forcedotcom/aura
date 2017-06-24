@@ -91,7 +91,7 @@ public class ModulesCompilerTest extends UnitTestCase {
             e.printStackTrace();
             String message = Throwables.getRootCause(e).getMessage();
             assertTrue(message,
-                    message.contains("Error: Self-closing syntax <x-foo/> is not allowed in custom elements, use an explicit closing tag instead <x-foo></x-foo>."));
+                    message.contains("Invalid HTML syntax: non-void-html-element-start-tag-with-trailing-solidus. For more information, please visit https://html.spec.whatwg.org/multipage/parsing.html#parse-error-non-void-html-element-start-tag-with-trailing-solidus"));
         }
     }
 

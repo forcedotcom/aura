@@ -1360,6 +1360,13 @@ function markComponentAsDirty(vm) {
     vm.isDirty = true;
 }
 
+var isCompatMode = typeof Proxy === 'undefined';
+function compat(fn) {
+    if (isCompatMode) {
+        fn();
+    }
+}
+
 /*eslint-enable*/
 var TargetSlot = Symbol();
 var MembraneSlot = Symbol();
@@ -1434,9 +1441,30 @@ function unwrap(replicaOrAny) {
 }
 function setKey(replicaOrAny, key, newValue) {
     var shouldReturn = false;
+    compat(function () {
+        shouldReturn = true;
+        var target = unwrap(replicaOrAny);
+        if (target === replicaOrAny) {
+            // non-proxified assignment
+            target[key] = newValue;
+        }
+        else {
+            replicaOrAny[MembraneSlot].set(target, key, newValue);
+        }
+    });
     return shouldReturn ? newValue : undefined;
 }
 function deleteKey(replicaOrAny, key) {
+    compat(function () {
+        var target = unwrap(replicaOrAny);
+        if (target === replicaOrAny) {
+            // non-profixied delete
+            delete target[key];
+        }
+        else {
+            replicaOrAny[MembraneSlot].deleteProperty(target, key);
+        }
+    });
 }
 
 /* eslint-enable */
@@ -3187,4 +3215,4 @@ exports.deleteKey = deleteKey;
 
 }((this.Engine = this.Engine || {})));
 /** version: 0.11.9 */
-//# sourceMappingURL=engine.js.map
+//# sourceMappingURL=engine_compat.js.map

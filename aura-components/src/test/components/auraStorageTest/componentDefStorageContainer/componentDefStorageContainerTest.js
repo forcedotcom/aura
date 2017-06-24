@@ -7,7 +7,7 @@
     //                  value over OSS autobuilds
     labels : ["threadHostile", "UnAdaptableTest"],
 
-    testComponentDefsPersisted: {
+    _testComponentDefsPersisted: {
         // TODO(kevinv 9/24/2016): re-enabled tests so marking as a flapper to get some non-blocking jenkins runs
         labels : ["flapper"],
         test: [
@@ -57,7 +57,7 @@
         ]
     },
 
-    testComponentDefStorageEviction: {
+    _testComponentDefStorageEviction: {
         // TODO(tbliss 8/18/2016): let it run in jenkins and monitor for a bit before removing the annotation.
         labels : ["flapper"],
         test: [
@@ -107,7 +107,7 @@
      * server to not send the defs, resulting in a broken def graph being persisted on the client (the in-memory graph is correct
      * though).
      */
-    testEvictedDefsAreRefetchedWithoutReload: {
+    _testEvictedDefsAreRefetchedWithoutReload: {
         // TODO(tbliss 8/18/2016): let it run in jenkins and monitor for a bit before removing the annotation.
         labels : ["flapper"],
         test: [

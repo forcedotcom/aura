@@ -2419,9 +2419,10 @@ Component.prototype.validatePartialConfig=function(config, partialConfig){
     }
 };
 
-Component.prototype.getMethodHandler = function(methodDef){
+Component.prototype.getMethodHandler = function(methodDef,methodEventDef){
     var component=this;
-    var observer=this.getActionCaller(this,this.getReference(methodDef.action||("c."+methodDef.getDescriptor().name)));
+    var methodName=methodDef.getDescriptor().name;
+    var actionTarget=methodDef.action||("c."+methodName);
     return function Component$getMethodHandler(/*param1,param2,paramN*/){
         if(!$A.clientService.allowAccess(methodDef,component)) {
             var context = $A.getContext();
@@ -2442,36 +2443,37 @@ Component.prototype.getMethodHandler = function(methodDef){
                 //Intentional fallthrough
             }
         }
-        var eventDef = $A.eventService.getEventDef("aura:methodCall");
-        var dispatcher = {};
-        dispatcher[eventDef.getDescriptor().getQualifiedName()] = {"default": [observer]};
-        var methodEvent = new Aura.Event.Event({
-            "eventDef" : eventDef,
-            "eventDispatcher" : dispatcher
-        });
-        var params={
-            "name" : methodDef.getDescriptor().name,
-            "arguments": null
-        };
-        if(methodDef.attributes && methodDef.attributes.getNames().length > 0) {
-            params["arguments"]={};
-            var counter=0;
-            var attributeNames = methodDef.attributes.getNames();
-            for (var a=0;a<attributeNames.length;a++) {
-                var attributeName = attributeNames[a];
-                params["arguments"][attributeName]=(arguments[counter] === undefined ? methodDef.attributes.getDef(attributeName).getDefault() : arguments[counter]) ;
-                counter++;
+        var action=component.get(actionTarget);
+        if(action){
+            var methodEvent = new Aura.Event.Event({
+                "eventDef" : methodEventDef
+            });
+            var params={
+                "name" : methodName,
+                "arguments": null
+            };
+            if(methodDef.attributes && methodDef.attributes.getNames().length > 0) {
+                params["arguments"]={};
+                var counter=0;
+                var attributeNames = methodDef.attributes.getNames();
+                for (var a=0;a<attributeNames.length;a++) {
+                    var attributeName = attributeNames[a];
+                    params["arguments"][attributeName]=(arguments[counter] === undefined ? methodDef.attributes.getDef(attributeName).getDefault() : arguments[counter]) ;
+                    counter++;
+                }
+                for(var i=counter;i<arguments.length;i++){
+                    params["argument_"+i]=arguments[i];
+                }
+            }else{
+                params["arguments"]=$A.util.toArray(arguments);
             }
-            for(var i=counter;i<arguments.length;i++){
-                params["argument_"+i]=arguments[i];
-            }
-        }else{
-            params["arguments"]=$A.util.toArray(arguments);
+            methodEvent.setParams(params);
+            methodEvent.fired=true;
+        
+            action.runDeprecated(methodEvent);
+            return action.returnValue;
         }
-        methodEvent.setParams(params);
-        methodEvent.setComponentEvent();
-        methodEvent.fire();
-    };
+    }
 };
 
 Component.prototype.getActionCaller = function(valueProvider, actionExpression) {
@@ -2625,10 +2627,11 @@ Component.prototype.setupValueEventHandlers = function(cmp) {
 Component.prototype.setupMethods = function() {
     var defs = this.componentDef.methodDefs;
     if (defs) {
-        var method;
+        var methodEventDef=$A.eventService.getEventDef("aura:methodCall");
+        var methodDef;
         for(var i=0;i<defs.length;i++){
-            method=new Aura.Method.MethodDef(defs[i]);
-            this[method.getDescriptor().name]=this.getMethodHandler(method);
+            methodDef=new Aura.Method.MethodDef(defs[i]);
+            this[methodDef.getDescriptor().name]=this.getMethodHandler(methodDef,methodEventDef);
         }
     }
 };

@@ -343,6 +343,7 @@ public enum UserAgent {
             // they mean "can it be treated like Chrome" and Chromeframe can be.
             return (ua.contains(UA.CHROME) || ua.contains(UA.CHROME_IOS))
                     && !ua.contains(UA.TRIDENT)
+                    && !ua.contains(UA.EDGE)
                     && !ua.contains(UA.GOODACCESS)
                     && !ua.contains(UA.GOOD_ACCESS);
         }
@@ -406,7 +407,8 @@ public enum UserAgent {
                     && !ua.contains(UA.PLAYBOOK)
                     && !ua.contains(UA.BLACKBERRY)
                     && !ua.contains(UA.BLACKBERRY10_AND_ABOVE)
-                    && !ua.contains(UA.SILK));
+                    && !ua.contains(UA.SILK)
+                    && !ua.contains(UA.EDGE));
         }
 
         @Override
@@ -669,6 +671,7 @@ public enum UserAgent {
         boolean match(String ua) {
             // is KHTML, but doesn't match other specific UserAgent instances
             return (ua.contains(UA.KHTML) && !ua.contains(UA.GECKO)
+                    && !ua.contains(UA.EDGE)
                     && !ua.contains(UA.GOODACCESS)
                     && !ua.contains(UA.GOOD_ACCESS)
                     && !ua.contains(UA.BLACKBERRY10_AND_ABOVE)
@@ -798,6 +801,34 @@ public enum UserAgent {
             return UA.UNSPECIFIED;
         }
 
+    },
+
+    EDGE(25) {
+
+        @Override
+        boolean match(String ua) {
+            return ua.contains(UA.EDGE);
+        }
+
+        @Override
+        int majorVersion(String ua) {
+            try {
+                int verStart = ua.indexOf(UA.EDGE) + 5;
+                int verEnd = ua.indexOf(UA.DOT, verStart);
+                return Integer.parseInt(ua.substring(verStart, verEnd));
+            } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
+            }
+            return UA.UNSPECIFIED;
+        }
+
+        /**
+         * 001 if mobile/phone 003 if we are confident it is a tablet 010 if compatibility mode 100 if explicitly touch
+         * enabled 000 otherwise
+         */
+        @Override
+        int flags(String ua) {
+            return UA.UNSPECIFIED;
+        }
     },
 
     /**
@@ -943,9 +974,7 @@ public enum UserAgent {
 
     /**
      * Gets the major version for this browser as an int, or 0 if unknown.
-     * 
-     * If overridden and a a calculated int may be returned, it should be no greater than
-     * {@link UserAgent#MAX_SUPPORTED_VERSION}.
+     *
      * 
      * @param userAgent a non-null user agent String to parse
      * 
@@ -1072,9 +1101,11 @@ public enum UserAgent {
         // MS
         static final String MSIE = "msie ";
         static final String MOZILLA_4_MSIE = "Mozilla/4.0 (compatible; MSIE";
-        static final String MOZILLA_5_MSIE = "Mozilla/5.0 (compatible; MSIE";
+        static final String MOZILLA_5 = "Mozilla/5.0";
+        static final String MOZILLA_5_MSIE = MOZILLA_5 + " (compatible; MSIE";
         static final String MSIE_7 = "msie 7"; // for compatibility view checks not IE7 checks
         static final String TRIDENT = "trident/"; // identifier for > IE7
+        static final String EDGE = "edge/"; // identifier for Microsoft Edge
         static final String TRIDENT_3_1 = "trident/3.1"; // IEMobile 7
         static final String TRIDENT_4 = "trident/4.0"; // IE8
         static final String TRIDENT_5 = "trident/5.0"; // IE9

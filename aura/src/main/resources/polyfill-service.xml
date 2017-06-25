@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurations>
+    <!-- gate all polyfills -->
+    <gated>true</gated>
+    <!-- send minified source -->
+    <minify>true</minify>
+    <!-- load polyfills when user agent is unknown -->
+    <load-on-unknown-ua>true</load-on-unknown-ua>
+
+    <polyfills>
+        <!-- Aura -->
+        <polyfill>Array.prototype.find</polyfill>
+        <polyfill>Array.prototype.findIndex</polyfill>
+        <polyfill>Array.prototype.fill</polyfill>
+        <polyfill>Array.prototype.keys</polyfill>
+        <polyfill>Array.prototype.includes</polyfill>
+        <polyfill>Function.prototype.bind</polyfill>
+        <polyfill>Object.keys</polyfill>
+        <polyfill>Object.assign</polyfill>
+        <!--
+        Current Promise polyfill requires setImmediate which is too new to be used.
+        Additionally, https://github.com/reiniergs/polyfill-service/issues/150
+
+        <polyfill>Promise</polyfill>
+        -->
+        <polyfill>Date.now</polyfill>
+        <polyfill>requestAnimationFrame</polyfill>
+        <!-- modules -->
+        <!--
+        WeakMap polyfill does not work for IE11
+        TODO COMPAT : find or create custom polyfills that work
+        <polyfill>WeakMap</polyfill>
+        -->
+        <polyfill>Symbol</polyfill>
+        <polyfill>Function.name</polyfill>
+        <polyfill>Proxy</polyfill>
+        <polyfill>CustomEvent</polyfill>
+        <polyfill>Event</polyfill>
+    </polyfills>
+
+</configurations>

@@ -78,7 +78,9 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         AuraContext context = Aura.getContextService().getCurrentContext();
         boolean compat = context.useCompatSource();
         boolean minified = context.getMode().minify();
-        CodeType codeType = compat ? CodeType.COMPAT : (minified ? CodeType.PROD : CodeType.DEV);
+        CodeType codeType = compat ?
+                ( minified ? CodeType.PROD_COMPAT : CodeType.COMPAT ) :
+                ( minified ? CodeType.PROD : CodeType.DEV );
         String code = this.codes.get(codeType);
         json.writeMap(ImmutableMap.of(
                 "descriptor", getDescriptor().getQualifiedName(),
@@ -117,7 +119,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         ConfigAdapter configAdapter = Aura.getConfigAdapter();
         for (String dep : dependencies) {
             if (dep.contains(":")) {
-                // specific reference with ":" indicates aura library in module
+                // specific reference with ":" indicates aura library dependency in module
                 DefDescriptor<LibraryDef> libraryDefDescriptor = definitionService.getDefDescriptor(dep, LibraryDef.class);
                 if (definitionService.exists(libraryDefDescriptor)) {
                     results.add(libraryDefDescriptor);

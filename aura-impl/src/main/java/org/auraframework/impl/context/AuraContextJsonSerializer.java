@@ -228,10 +228,6 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
             json.writeMapEntry("ls", 1);
         }
 
-        if (ctx.isModulesEnabled()) {
-            json.writeMapEntry("m", 1);
-        }
-
         if (isApplication) {
             try {
                 injectModuleServices(json, (DefDescriptor<ApplicationDef>) appDesc);

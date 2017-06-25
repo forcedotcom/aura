@@ -372,7 +372,8 @@ public class ServerServiceImpl implements ServerService {
         final String lockerService = configAdapter.isLockerServiceEnabled() ? ":ls" : "";
         // modules definitions will be present with modules enabled so needs to be cached separately
         final String modules = context.isModulesEnabled() ? ":m" : "";
-        final String key = "JS:" + mKey + uid + (hasParts ? ":" + partIndex : "") + ":" + lockerService + modules;
+        final String compat = context.useCompatSource() ? ":c" : "";
+        final String key = "JS:" + mKey + uid + (hasParts ? ":" + partIndex : "") + ":" + lockerService + modules + compat;
 
         final Callable<String> buildFunction = () -> {
             String res = getDefinitionsString(dependencies, key, partIndex == 0);
@@ -477,13 +478,10 @@ public class ServerServiceImpl implements ServerService {
         serializationService.writeCollection(controllers, ControllerDef.class, sb, "JSON");
         sb.append(");\n");
 
-        if (context.isModulesEnabled()) { // Prevents caching of module defs when modules are disabled.
-            // modules
-            sb.append("$A.componentService.initModuleDefs(");
-            Collection<ModuleDef> modules = filterAndLoad(ModuleDef.class, dependencies, null);
-            serializationService.writeCollection(modules, ModuleDef.class, sb, "JSON");
-            sb.append(");\n");
-        }
+        sb.append("$A.componentService.initModuleDefs(");
+        Collection<ModuleDef> modules = filterAndLoad(ModuleDef.class, dependencies, null);
+        serializationService.writeCollection(modules, ModuleDef.class, sb, "JSON");
+        sb.append(");\n");
 
         return sb.toString();
     }

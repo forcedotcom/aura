@@ -13,26 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def.module;
-
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
+package org.auraframework.http;
 
 /**
- * Module Definition
+ * Interface to determine browser compatibility for MODULES
  */
-public interface ModuleDef extends Definition {
-
-    enum CodeType {
-        DEV, PROD, COMPAT, PROD_COMPAT
-    }
-
-    String TEMPLATE_PREFIX = "template";
-
-    @Override
-    DefDescriptor<ModuleDef> getDescriptor();
-
-    String getCode(CodeType codeType);
-
-    String getPath();
+public interface BrowserCompatibilityService {
+    boolean isCompatible(String userAgent);
 }

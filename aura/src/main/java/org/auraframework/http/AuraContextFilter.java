@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -92,6 +93,7 @@ public class AuraContextFilter implements Filter {
     protected ConfigAdapter configAdapter;
     protected SerializationService serializationService;
     private LocalizationAdapter localizationAdapter;
+    private BrowserCompatibilityService browserCompatibilityService;
 
     @Inject
     public void setContextService(ContextService service) {
@@ -140,6 +142,11 @@ public class AuraContextFilter implements Filter {
         this.localizationAdapter = localizationAdapter;
     }
 
+    @Inject
+    public void setBrowserCompatibilityService(BrowserCompatibilityService browserCompatibilityService) {
+        this.browserCompatibilityService = browserCompatibilityService;
+    }
+
     public AuraTestFilter getAuraTestFilter() {
         return testFilter;
     }
@@ -160,11 +167,11 @@ public class AuraContextFilter implements Filter {
             loggingService.setValue(LoggingService.AURA_REQUEST_URI, request.getRequestURI());
             loggingService.setValue(LoggingService.AURA_REQUEST_QUERY, request.getQueryString());
             loggingService.setValue(LoggingService.PAGE_URI, pageURI.get(request));
-            DefDescriptor app = context.getApplicationDescriptor();
+            DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();
             if (app != null) {
                 loggingService.setValue(LoggingService.APP, app.getDescriptorName());
             }
-            
+
             if (testFilter != null) {
                 testFilter.doFilter(req, res, chain);
             } else {
@@ -246,7 +253,7 @@ public class AuraContextFilter implements Filter {
         context.setRequestedLocales(requestedLocales);
         context.setClient(new Client(request.getHeader(HttpHeaders.USER_AGENT)));
         context.setModulesEnabled(isModulesEnabled(request, configMap, m));
-        context.setUseCompatSource(useCompatSource(request, m));
+        context.setUseCompatSource(useCompatSource(request, configMap, m));
         if (configMap != null) {
             getLoaded(context, configMap.get("loaded"));
             @SuppressWarnings("unchecked")
@@ -307,9 +314,7 @@ public class AuraContextFilter implements Filter {
                         // see them, but, well, we don't have that now.
                     }
                     if (type != null) {
-                        DefDescriptor<?> ld = null;
-
-                        ld = definitionService.getDefDescriptor(defStr, type.getPrimaryInterface());
+                        DefDescriptor<?> ld = definitionService.getDefDescriptor(defStr, type.getPrimaryInterface());
                         clientLoaded.put(ld, uid);
                     }
                 }
@@ -336,8 +341,7 @@ public class AuraContextFilter implements Filter {
         // Get the passed in mode param.
         // Check the aura.mode param first then fall back to the mode value
         // embedded in the aura.context param
-        Mode m = null;
-        m = mode.get(request);
+        Mode m = mode.get(request);
         if (m == null && configMap != null && configMap.containsKey("mode")) {
             m = Mode.valueOf((String) configMap.get("mode"));
         }
@@ -374,15 +378,9 @@ public class AuraContextFilter implements Filter {
      */
     protected boolean isModulesEnabled(HttpServletRequest request, Map<String, Object> configMap, Mode mode) {
         if (configMap != null) {
-            // configMap is present when processing requests with url encoded AuraContext ie app.js
-            if (configMap.containsKey("m")) {
-                // when m is present, it's a request to fetch module enabled content
-                // hence, this AuraContext should also be module enabled
-                String configValue = String.valueOf(configMap.get("m"));
-                return "1".equals(configValue);
-            } else {
-                return false;
-            }
+            // when m is present, it's a request to fetch module enabled content
+            // hence, this AuraContext should also be module enabled
+            return configMapContains("m", "1", configMap);
         }
 
         if (mode != Mode.PROD) {
@@ -404,16 +402,30 @@ public class AuraContextFilter implements Filter {
      * @param mode Aura context mode
      * @return whether compat module should be served
      */
-    protected boolean useCompatSource(HttpServletRequest request, Mode mode) {
-        // TODO: define when we want to serve compat module source
-        return false;
+    protected boolean useCompatSource(HttpServletRequest request, Map<String, Object> configMap, Mode mode) {
+        if (configMap != null) {
+            // when c is present, it's a request to fetch module compiled code in compatibility mode
+            return configMapContains("c", "1", configMap);
+        }
+
+        String uaHeader = request.getHeader(HttpHeaders.USER_AGENT);
+        return !this.browserCompatibilityService.isCompatible(uaHeader);
+    }
+
+    private boolean configMapContains(@Nonnull String key, @Nonnull String value, @Nonnull Map<String, Object> configMap) {
+        // configMap is present when processing requests with url encoded AuraContext ie app.js
+        if (configMap.containsKey(key)) {
+            String configValue = String.valueOf(configMap.get(key));
+            return value.equals(configValue);
+        } else {
+            return false;
+        }
     }
 
     private DefDescriptor<? extends BaseComponentDef> getAppParam(HttpServletRequest request, Map<String, Object> configMap) {
-        String appName = null;
+        String appName = app.get(request, null);
         String cmpName = null;
 
-        appName = app.get(request, null);
         if (appName == null && configMap != null) {
             appName = (String) configMap.get("app");
             if (appName == null) {

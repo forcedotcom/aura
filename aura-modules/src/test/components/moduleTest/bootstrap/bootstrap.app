@@ -84,6 +84,10 @@
         </section>
     </section>
 
+    <section>
+        <moduleTest:async />
+    </section>
+
     <!-- TODO(byao): Enable and fix this test
     <div>
         <moduleTest:recursive />

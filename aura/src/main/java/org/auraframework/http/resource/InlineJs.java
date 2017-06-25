@@ -46,6 +46,7 @@ public class InlineJs extends AuraResourceImpl {
     private RenderingService renderingService;
     private List<InlineJSAppender> inlineJsAppenders;
 
+
     public InlineJs() {
         super("inline.js", Format.JS);
     }
@@ -60,7 +61,7 @@ public class InlineJs extends AuraResourceImpl {
     public void setInlineJSAppenders(List<InlineJSAppender> inlineJsAppenders) { this.inlineJsAppenders = inlineJsAppenders; }
 
     private <T extends BaseComponentDef> void internalWrite(HttpServletRequest request,
-            HttpServletResponse response, DefDescriptor<T> defDescriptor, AuraContext context)
+                                                            HttpServletResponse response, DefDescriptor<T> defDescriptor, AuraContext context)
             throws IOException, QuickFixException {
 
         servletUtilAdapter.checkFrameworkUID(context);
@@ -93,6 +94,7 @@ public class InlineJs extends AuraResourceImpl {
         for(InlineJSAppender appender : MoreObjects.firstNonNull(inlineJsAppenders, ImmutableList.<InlineJSAppender>of())){
             appender.append(def, context, out);
         }
+
         renderingService.render(template, null, out);
     }
 
@@ -124,8 +126,5 @@ public class InlineJs extends AuraResourceImpl {
             }
         }
     }
-
-
-
 
 }

@@ -1,0 +1,12 @@
+<aura:component>
+    <ui:inputText label="Input 0"/>
+    <ui:inputText label="Input 1"/>
+    <ui:inputText label="Input 2"/>
+    <ui:inputText label="Input 3"/>
+    <ui:inputText label="Input 4"/>
+    <ui:inputText label="Input 5"/>
+    <ui:inputText label="Input 6"/>
+    <ui:inputText label="Input 7"/>
+    <ui:inputText label="Input 8"/>
+    <ui:inputText label="Input 9"/>
+</aura:component>

@@ -27,25 +27,53 @@
     <aura:attribute name="namespaces" type="List"/>
     <aura:attribute name="processing" type="Boolean" default="false"/>
     <aura:attribute name="error" type="String"/>
+    <aura:attribute name="metrics" type="Map"/>
+    <aura:attribute name="state" type="Map" default="{}"/>
         
     <header>
-        <h1>Dependency Tracker App </h1>
-        <aura:if isTrue="{! !empty(v.def) }">
-            <h3>
-                Showing ({! v.dependencies.length }) Dependencies for: <span>{!v.def}</span>
-            </h3>
-        </aura:if>
-
+        <h1>Hard Dependencies App </h1>
         <blockquote>
             <h3>
                 Usage
             </h3>
             <code>
-                /auradev/dependencyTracker.app?def=markup://foo:bar<br/>
-                /auradev/dependencyTracker.app?def=js://foo:bar@HELPER<br/>
+                /auradev/hardDependencies.app?def=markup://foo:bar<br/>
+                /auradev/hardDependencies.app?def=js://foo:bar@HELPER<br/>
             </code>
         </blockquote>
         <div class="error">{!v.error}</div>
+
+         <aura:if isTrue="{! !empty(v.def) }">        
+            <h2>
+                Showing ({! v.dependencies.length }) Dependencies for: <span>{!v.def}</span>
+            </h2>
+        </aura:if>
+        <aura:if isTrue="{! !empty(v.metrics) }">
+            <table>
+            <aura:iteration items="{!v.metrics.counts}" var="item">
+                <tr>
+                    <td>{!item.defType}</td>
+                    <td>{!item.count}</td>
+                </tr>
+            </aura:iteration>
+            </table>
+
+            <h2>File sizes for the different app.js files</h2>
+            <table>
+                <tr>
+                    <td>AppJS</td><td>{!v.metrics.appjs}</td><td>PROD</td>
+                </tr>
+                <tr>
+                    <td>App Core</td><td>{!v.metrics.appcorejs}</td><td>PROD</td>
+                </tr>
+                <tr>
+                    <td>AppJS Compressed</td><td>{!v.metrics.appjs_compressed}</td><td>PROD GZIP</td>
+                </tr>
+                <tr>
+                    <td>App Core Compressed</td><td>{!v.metrics.appcorejs_compressed}</td><td>PROD GZIP</td>
+                </tr>
+            </table>
+        </aura:if>
     </header>
         
     <section class="container" aura:id="container"> 

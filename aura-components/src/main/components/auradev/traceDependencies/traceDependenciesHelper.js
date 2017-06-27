@@ -23,6 +23,9 @@
             if(defs && defs.dependencies) {
                 var dependencies = defs.dependencies.sort(this.dependencySorter);
                 cmp.set("v.dependencies", dependencies);
+
+                var metrics = this.getMetricsOnDependencies(dependencies);
+                this.addMetrics(cmp, metrics);
             } else {
                 cmp.set("v.dependencies", []);
             }
@@ -46,5 +49,44 @@
         }
 
         return a.defType > b.defType?1:-1;
+    },
+    
+    getMetricsOnDependencies: function(data) {
+        var counts = {};
+        var defType;
+        for(var c=0;c<data.length;c++) {
+            defType = data[c].defType;
+            if(!counts.hasOwnProperty(defType)) {
+                counts[defType] = 0;
+            }
+            counts[defType]++;
+        }
+
+        var returnedCounts = [];
+        for(defType in counts) {
+            returnedCounts.push({"defType": defType, "count": counts[defType]});
+        }
+
+        return { "counts": returnedCounts };
+    },
+
+    // 
+    getFileSizes: function(cmp) {
+        var action = cmp.get("c.getApplicationScriptFileSizes");
+        action.setParam("definition", cmp.get("v.def"));
+        action.setParam("host", window.location.origin);
+
+        action.setCallback(this, function() {
+            var sizes = action.getReturnValue();
+            this.addMetrics(cmp, sizes);
+        });
+
+        $A.enqueueAction(action);
+    },
+
+    addMetrics: function(cmp, newMetrics) {
+        var metrics = cmp.get("v.metrics") || {};
+        Object.assign(metrics, newMetrics);
+        cmp.set("v.metrics", metrics);
     }
 })// eslint-disable-line semi

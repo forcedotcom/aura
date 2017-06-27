@@ -76,10 +76,13 @@ public class ManifestUtil {
             @SuppressWarnings("unchecked")
             DefDescriptor<ApplicationDef> appDefDesc = (DefDescriptor<ApplicationDef>)desc;
             try {
-                Boolean useAppcache = definitionService.getUnlinkedDefinition(appDefDesc).isAppcacheEnabled();
-                if (useAppcache != null) {
-                    return useAppcache.booleanValue();
-                }
+            	ApplicationDef appDef = definitionService.getUnlinkedDefinition(appDefDesc);
+            	if(appDef != null) {
+	                Boolean useAppcache = appDef.isAppcacheEnabled();
+	                if (useAppcache != null) {
+	                    return useAppcache.booleanValue();
+	                }
+            	}
                 return false;
             } catch (QuickFixException e) {
                 return false;

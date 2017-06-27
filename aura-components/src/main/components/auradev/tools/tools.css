@@ -13,15 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    "init": function (cmp, event, helper) {
-        var def = cmp.get('v.def');
-        if (def) {
-            helper.getDependencies(cmp);
-            helper.getFileSizes(cmp);
-        }
-    },
-    "updateDependencies": function(cmp, event, helper) {
-        helper.getDependencies(cmp);
-    }
-})// eslint-disable-line semi
+
+.THIS h1 {
+    font-size:2em;
+    font-weight: bold;
+    margin: 0 0 10px 0;
+}
+
+.THIS h2 {
+    font-size:1.2em;
+    font-weight: bold;
+    margin: 0 0 10px 0;
+}
+
+
+.THIS h3 {
+    font-size:1.2em;
+    font-weight: bold;
+}
+
+
+.THIS em {
+    font-style:italic;
+}
+
+DIV.container.THIS {
+    margin:10px;
+}
+
+.THIS section {
+    margin: 10px 0 15px 0;
+    padding: 10px;
+    border-top: 1px solid #dfdfdf;
+}
+
+.THIS section p {
+    padding: 5px 0;
+}

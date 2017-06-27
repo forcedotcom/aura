@@ -15,8 +15,14 @@
  */
 package org.auraframework.components.perf;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,12 +30,20 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.zip.GZIPOutputStream;
 
 import javax.inject.Inject;
 
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -45,9 +59,15 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.ds.servicecomponent.Controller;
+import org.auraframework.http.resource.AppJs;
+import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Key;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -64,6 +84,68 @@ public class DependenciesController implements Controller {
 
     @Inject
     private DefinitionService definitionService;
+    
+
+    @Inject
+    AppJs appJs;
+    
+    @Inject
+    ContextService contextService;
+    
+    @Inject
+    ServletUtilAdapter servletUtilAdapter;
+
+    
+    private final DefDescriptor<?> getDescriptor(String definition) {
+        final DescriptorFilter filter = new DescriptorFilter(definition, Lists.newArrayList(DefType.COMPONENT,DefType.APPLICATION));
+        final Set<DefDescriptor<?>> descriptors = definitionService.find(filter);
+        if (descriptors.size() != 1) {
+            return null;
+        }
+        return descriptors.iterator().next();
+    }
+
+    @AuraEnabled
+    public Map<String, String> getApplicationScriptFileSizes(@Key("definition")String definition, @Key("host")String host) {
+        final Map<String, String> fileSizes = new HashMap<String, String>();
+        final DecimalFormat formatter = new DecimalFormat("#,###");
+        
+        DefDescriptor<?> descriptor = getDescriptor(definition);
+        
+        @SuppressWarnings("unchecked")
+        AuraContext context = contextService.startContextNoGVP(Mode.PROD, Format.JS, Authentication.AUTHENTICATED, (DefDescriptor<? extends BaseComponentDef>) descriptor);
+        
+        final String appJsUrl = host + servletUtilAdapter.getAppJsUrl(context, null);
+        final String appJsCoreUrl = host + servletUtilAdapter.getAppCoreJsUrl(context, null);
+        
+        final String appJsContent = getUrlContent(appJsUrl);
+        final String appCoreJsContent = getUrlContent(appJsCoreUrl);
+        
+        fileSizes.put("appjs", formatter.format(appJsContent.length()));
+        fileSizes.put("appcorejs", formatter.format(appCoreJsContent.length()));
+        fileSizes.put("appjs_compressed", formatter.format(gzipString(appJsContent).length()));
+        fileSizes.put("appcorejs_compressed", formatter.format(gzipString(appCoreJsContent).length()));
+        
+        return fileSizes;
+    }
+
+    @AuraEnabled
+    public Map<String, Node> createGraph(@Key("app")String app) throws Exception {
+        DescriptorFilter matcher = new DescriptorFilter(app, DefType.APPLICATION);
+        Set<DefDescriptor<?>> descriptors = definitionService.find(matcher);
+        if (descriptors == null || descriptors.size() == 0) {
+            return null;
+        }
+
+        DefDescriptor<?> root = (DefDescriptor<?>)descriptors.toArray()[0];
+        Node rootNode = new Node(root);
+
+        Graph graph = new Graph(rootNode);
+        Set<String> visited = new HashSet<>();
+        buildGraph(graph, rootNode, visited);
+
+        return graph.getNodes();
+    }
 
     @AuraEnabled
     public Set<String> getAllDescriptors() {
@@ -313,6 +395,33 @@ public class DependenciesController implements Controller {
         }
     }
 
+
+    @AuraEnabled
+    public Boolean writeAllDependencies(@Key("file")String file) {
+        Set<String> descriptors = getAllDescriptors();
+        Map<String, Object> dependencies = Maps.newHashMap();
+
+            for (String rawDescriptor : descriptors) {
+                Map<String, Object> list = getDependencies(rawDescriptor);
+                if (list != null) {
+                    list.remove("def");
+                }
+                dependencies.put(rawDescriptor, list);
+            }
+
+            Gson gson = new Gson();
+            String json = gson.toJson(dependencies);
+            String path = AuraFiles.Core.getPath() + "/aura-resources/src/main/resources/aura/resources/";
+            try(PrintWriter out = new PrintWriter( path + file )) {
+                out.println(json);
+            } catch (FileNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        return true;
+    }
+
     private ArrayList<Map<String, String>> getDependenciesData(Definition definition) throws DefinitionNotFoundException, QuickFixException {
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
         definition.appendDependencies(dependencies);
@@ -437,49 +546,6 @@ public class DependenciesController implements Controller {
         return returnData;
     }
 
-    @AuraEnabled
-    public Boolean writeAllDependencies(@Key("file")String file) {
-        Set<String> descriptors = getAllDescriptors();
-        Map<String, Object> dependencies = Maps.newHashMap();
-
-            for (String rawDescriptor : descriptors) {
-                Map<String, Object> list = getDependencies(rawDescriptor);
-                if (list != null) {
-                    list.remove("def");
-                }
-                dependencies.put(rawDescriptor, list);
-            }
-
-            Gson gson = new Gson();
-            String json = gson.toJson(dependencies);
-            String path = AuraFiles.Core.getPath() + "/aura-resources/src/main/resources/aura/resources/";
-            try(PrintWriter out = new PrintWriter( path + file )) {
-                out.println(json);
-            } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-        return true;
-    }
-
-    @AuraEnabled
-    public Map<String, Node> createGraph(@Key("app")String app) throws Exception {
-        DescriptorFilter matcher = new DescriptorFilter(app, DefType.APPLICATION);
-        Set<DefDescriptor<?>> descriptors = definitionService.find(matcher);
-        if (descriptors == null || descriptors.size() == 0) {
-            return null;
-        }
-
-        DefDescriptor<?> root = (DefDescriptor<?>)descriptors.toArray()[0];
-        Node rootNode = new Node(root);
-
-        Graph graph = new Graph(rootNode);
-        Set<String> visited = new HashSet<>();
-        buildGraph(graph, rootNode, visited);
-
-        return graph.getNodes();
-    }
 
     private void buildGraph(Graph graph, Node current, Set<String> visited)
             throws DefinitionNotFoundException, QuickFixException {
@@ -519,6 +585,58 @@ public class DependenciesController implements Controller {
             }
         }
     }
+
+    // Request a url and return its content.
+    private final String getUrlContent(final String url) {
+
+        HttpResponse response;
+        try {
+            HttpClient client = new DefaultHttpClient();
+            HttpGet request = new HttpGet(url);
+    
+            // add request header
+            request.addHeader("User-Agent", HttpHeaders.USER_AGENT);
+
+            response = client.execute(request);
+            
+            BufferedReader rd = new BufferedReader(
+                           new InputStreamReader(response.getEntity().getContent()));
+    
+            StringBuffer result = new StringBuffer();
+            String line = "";
+            while ((line = rd.readLine()) != null) {
+                result.append(line);
+            }
+    
+            return result.toString();
+        } catch(Exception ex) {
+            System.out.print(ex.getMessage());
+        }
+        return "";
+    }
+    
+    // Compress a string using GZIP so we can measure its size after compression.
+    private final String gzipString(final String content) {
+        if(content == null || content.length() == 0) {
+            return content;
+        }
+        
+        
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream(content.length());
+            GZIPOutputStream zip = new GZIPOutputStream(out);
+            
+            zip.write(content.getBytes());
+            zip.close();
+            
+            return out.toString();
+        } catch(IOException ex) {
+            
+        }
+        
+        return "";
+    }
+
 
     public final static Set<String> namespaceBlackList = new HashSet<>(Arrays.asList("aura", "auradev"));
     public final static Set<DefType> defTypeWhitelist = new HashSet<>(Arrays.asList(

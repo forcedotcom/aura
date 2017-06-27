@@ -37,6 +37,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.pathPrefix = config["pathPrefix"];
     this.moduleServices = config["services"];
     this.num = 0;
+    this.scriptNonce = config["scriptNonce"];
 
     // To keep track of re-rendering service call
     this.renderNum = 0;

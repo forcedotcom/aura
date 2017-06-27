@@ -214,8 +214,6 @@ public class AuraContextImpl implements AuraContext {
                 .setRecordStats(true)
                 .setSoftValues(true)
                 .build();
-        Random r = new Random();
-        this.nonce = new UUID(r.nextLong(), r.nextLong()).toString();
     }
 
     @Override
@@ -423,6 +421,11 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public String getScriptNonce() {
         return nonce;
+    }
+
+    @Override
+    public void setScriptNonce(String nonce){
+        this.nonce = nonce;
     }
 
     @Override
@@ -903,7 +906,11 @@ public class AuraContextImpl implements AuraContext {
                 json.writeMapEntry("ls", 1);
             }
 
-            if (this.isModulesEnabled()) {
+            if (nonce != null){
+                json.writeMapEntry("scriptNonce", nonce);
+            }
+
+            if (this.isModulesEnabled) {
                 json.writeMapEntry("m", 1);
             }
 

@@ -66,6 +66,11 @@ function lazyInitInlinedSafeEvalWorkaround() {
 	      function evalAndReturn(src) {
 	          var script = document.createElement('script');
 	          script.type = 'text/javascript';
+	          if ($A.context.scriptNonce){
+	              var nonce = document.createAttribute("nonce");
+	              nonce.value = $A.context.scriptNonce;
+	              script.attributes.setNamedItem(nonce);
+	          }
 	          window[hookFn] = undefined;
 	          script.appendChild(document.createTextNode(src));
 	          placeholder.appendChild(script);

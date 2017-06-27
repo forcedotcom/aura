@@ -29,6 +29,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 import static org.auraframework.http.AuraCSPInliningService.InlineScriptMode.NONCE;
 import static org.auraframework.http.AuraCSPInliningService.InlineScriptMode.UNSUPPORTED;
@@ -101,6 +103,7 @@ public class AuraCSPInliningService implements CSPInliningService {
     @Override
     public void writeInlineScriptAttributes(Appendable out) throws IOException {
         if (getInlineMode() == NONCE){
+            ensureNoncePresent();
             out.append(String.format(" nonce=\"%s\" ", contextService.getCurrentContext().getScriptNonce()));
         }
     }
@@ -115,6 +118,7 @@ public class AuraCSPInliningService implements CSPInliningService {
                     out.append(String.format(INLINE, script));
                     break;
                 case NONCE:
+                    ensureNoncePresent();
                     out.append(String.format(INLINE_NONCE, contextService.getCurrentContext().getScriptNonce(), script));
                     break;
                 case UNSUPPORTED:
@@ -156,5 +160,15 @@ public class AuraCSPInliningService implements CSPInliningService {
 
     protected InlineScriptMode getInlineMode() {
         return UNSUPPORTED;
+    }
+
+
+    private void ensureNoncePresent() {
+        AuraContext currentContext = contextService.getCurrentContext();
+        if (currentContext.getScriptNonce() == null){
+            Random r = new Random();
+            String nonce = new UUID(r.nextLong(), r.nextLong()).toString();
+            currentContext.setScriptNonce(nonce);
+        }
     }
 }

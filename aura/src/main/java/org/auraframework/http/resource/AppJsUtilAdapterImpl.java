@@ -43,15 +43,21 @@ public class AppJsUtilAdapterImpl implements AppJsUtilAdapter {
     public Set<DefDescriptor<?>> getPartDependencies(HttpServletRequest request, HttpServletResponse response, AuraContext context, int partIndex) throws IOException {
         Set<DefDescriptor<?>> deps = servletUtilAdapter.verifyTopLevel(request, response, context);
         DefDescriptor<? extends BaseComponentDef> appDesc = context.getApplicationDescriptor();
+        return getPartDependencies(deps, appDesc, partIndex);
+    }
+
+
+    @Override
+    public Set<DefDescriptor<?>> getPartDependencies(Set<DefDescriptor<?>> dependencies, DefDescriptor<? extends BaseComponentDef> appDesc, int partIndex) {
         String appName = appDesc.getQualifiedName();
-        if (deps == null) {
+        if (dependencies == null) {
             return null;
         }
-
+    
         Set<DefDescriptor<?>> dependenciesPart1 = Sets.newHashSet();
         Set<DefDescriptor<?>> dependenciesPart2 = Sets.newHashSet();
-        int size = deps.size();
-        Iterator<DefDescriptor<?>> it = deps.iterator();
+        int size = dependencies.size();
+        Iterator<DefDescriptor<?>> it = dependencies.iterator();
         for (int i = 0; i < size && it.hasNext(); i++) {
             DefDescriptor<?> descriptor = it.next();
             if (filterCriteria(descriptor, appName)) {
@@ -60,7 +66,7 @@ public class AppJsUtilAdapterImpl implements AppJsUtilAdapter {
                 dependenciesPart2.add(descriptor);
             }
         }
-
+    
         return partIndex == 0 ? dependenciesPart1 : dependenciesPart2;
     }
 

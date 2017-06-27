@@ -121,10 +121,19 @@ public class DependenciesController implements Controller {
         final String appJsContent = getUrlContent(appJsUrl);
         final String appCoreJsContent = getUrlContent(appJsCoreUrl);
         
-        fileSizes.put("appjs", formatter.format(appJsContent.length()));
-        fileSizes.put("appcorejs", formatter.format(appCoreJsContent.length()));
-        fileSizes.put("appjs_compressed", formatter.format(gzipString(appJsContent).length()));
-        fileSizes.put("appcorejs_compressed", formatter.format(gzipString(appCoreJsContent).length()));
+        final Integer appJsSize = appJsContent.length();
+        final Integer appJsCoreSize = appCoreJsContent.length();
+
+        final Integer appJsCompressed = gzipString(appJsContent).length();
+        final Integer appJsCoreCompresed = gzipString(appCoreJsContent).length();
+
+
+        fileSizes.put("appjs", formatter.format(appJsSize));
+        fileSizes.put("appcorejs", formatter.format(appJsCoreSize));
+        fileSizes.put("appjs_compressed", formatter.format(appJsCompressed));
+        fileSizes.put("appcorejs_compressed", formatter.format(appJsCoreCompresed));
+        fileSizes.put("total", formatter.format(appJsSize + appJsCoreSize));
+        fileSizes.put("total_compressed", formatter.format(appJsCompressed + appJsCoreCompresed));
         
         return fileSizes;
     }

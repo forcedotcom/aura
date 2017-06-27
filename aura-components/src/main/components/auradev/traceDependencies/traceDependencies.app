@@ -61,17 +61,19 @@
             <h2>File sizes for the different app.js files</h2>
             <table>
                 <tr>
-                    <td>AppJS</td><td>{!v.metrics.appjs}</td><td>PROD</td>
+                    <th>Script</th><th>PROD Size</th><th>PROD GZIP Size</th>
                 </tr>
                 <tr>
-                    <td>App Core</td><td>{!v.metrics.appcorejs}</td><td>PROD</td>
+                    <td>AppJS</td><td>{!v.metrics.appjs}</td><td>{!v.metrics.appjs_compressed}</td>
                 </tr>
                 <tr>
-                    <td>AppJS Compressed</td><td>{!v.metrics.appjs_compressed}</td><td>PROD GZIP</td>
+                    <td>App Core</td><td>{!v.metrics.appcorejs}</td><td>{!v.metrics.appcorejs_compressed}</td>
                 </tr>
-                <tr>
-                    <td>App Core Compressed</td><td>{!v.metrics.appcorejs_compressed}</td><td>PROD GZIP</td>
-                </tr>
+                <tfoot>
+                    <tr>
+                        <td>Total</td><td>{!v.metrics.total}</td><td>{!v.metrics.total_compressed}</td>
+                    </tr>
+                </tfoot>
             </table>
         </aura:if>
 

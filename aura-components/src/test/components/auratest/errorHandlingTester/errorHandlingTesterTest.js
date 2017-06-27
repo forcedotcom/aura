@@ -239,6 +239,23 @@
         ]
     },
 
+    testDefaultHandleErrorInModelWhenSerialize: {
+        test: function(cmp) {
+            var iframeSrc = "/auratest/errorHandlingErrorModelApp.app";
+            this.loadIframe(iframeSrc, cmp, "iframeContainer");
+
+            var that = this;
+            var iframe = this.getIframe();
+            this.waitForErrorMaskVisibleInIframe(iframe, function() {
+                var errorMsg = that.getErrorMessageFromIframe(iframe);
+
+                var expectedMsg = "TestModelThrowsInGetter.badThing: intentional exception for bad thing";
+                $A.test.assertTrue($A.test.contains(errorMsg, expectedMsg),
+                        "Failed to find expected error message. Expected message: " + expectedMsg + "; Actual: " + errorMsg);
+            });
+        }
+    },
+
     isErrorMaskIsNotVisibleInIframe: function(iframe) {
         var errorMaskElement = iframe.document.getElementById("auraErrorMask");
         return $A.util.hasClass(errorMaskElement, "auraForcedErrorBox")

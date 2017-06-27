@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application access="unauthenticated" render="client"
+<aura:application render="client"
         model="java://org.auraframework.components.test.java.model.TestModelThrowsInGetter">
    <div>Hi There!</div>
 </aura:application>

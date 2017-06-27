@@ -47,20 +47,24 @@ Aura.bootstrapMark = function (mark, value) {
 
         var state = $A.clientService.getBootstrapState();
 
-        // wait for bootstrap to load from storage:
+        // wait for bootstrap to load from storage or network:
         // 1. wait for $A.initAsync()'s AuraContext callback to be invoked: gvpsFromStorage gets assigned true/false
-        // 2. if gvpsFromStorage is true then wait for bootstrap from storage (if false then bootstrap is not loaded from storage)
+        // 2. if gvpsFromStorage is true then wait for bootstrap from storage
+        // 3. if gvpsFromStorage is false then bootstrap is not loaded from storage so wait for bootstrap from network
+        // Note: When offline is disabled: gvpsFromStorage will always be false.
         //
         // wait for "in progress" app cache
-        // 1.state['appcache'] is appCache progress indicator, if it's undefined, then we don't wait
-        // 2.when offline is disabled, progress = 0 when page initially loads
-        //  if progress < 0 then considered an error;
-        //  if progress >=100 then considered done, so we wait for < 100.
+        // state['appcache'] is appCache progress indicator.
+        //  1. progress = undefined, there is no app.manifest on the page, so don't wait.
+        //  2. progress = 0 when page initially loads
+        //  3. if progress = -1 then considered an app cache error(the app would work but app cache won't be available) so we wait for >= 0.
+        //  4. if progress >=100 then considered done, so we wait for < 100.
         //
         // inline.js will always be set to true as long as inline.js was actually loaded and didn't 404 or 5XX
         //  if inline.js failed to load, we're really screwed and we'll need to attempt a reload.
-        if (state["inline.js"] && ($A.clientService.gvpsFromStorage === undefined || ($A.clientService.gvpsFromStorage && Aura["appBootstrapCacheStatus"] === undefined)) ||
-            (typeof state["appcache"] !== "undefined" && state["appcache"] < 100)) {
+        var appCacheProgress = state["appcache"];
+        if ((state["inline.js"] && ($A.clientService.gvpsFromStorage === undefined || ($A.clientService.gvpsFromStorage && Aura["appBootstrapCacheStatus"] === undefined))) ||
+            (typeof appCacheProgress !== "undefined" && appCacheProgress >= 0 && appCacheProgress < 100)) {
             setTimeout(verifyBootstrap, 1000);
             return;
         }
@@ -69,7 +73,7 @@ Aura.bootstrapMark = function (mark, value) {
             return prev && state[curr];
         }, true);
         if (!allFilesLoaded) {
-            $A.clientService.dumpCachesAndReload(true);
+            $A.clientService.dumpCachesAndReload(true, {"cause": "Aura.verifyBootstrap: Failed bootstrap state: " + JSON.stringify(state)});
         }
     }
 

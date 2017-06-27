@@ -168,10 +168,10 @@ function AuraClientService () {
     // can set this flag if ever required.
     this._disableBootstrapCacheCookie = "auraDisableBootstrapCache";
 
-    // appcache progress. is 0 if appcache is not in use; otherwise ranges from 0 to 100.
-    this.appCacheProgress = 0;
-
-    // appcache progress. is 0 if appcache is not in use; otherwise ranges from 0 to 100.
+    // appcache progress.
+    // = -1 on app cache error state.
+    // = 0 on initial page load state or if appcache is not in use.
+    // otherwise ranges from 0 to 100.
     this.appCacheProgress = 0;
 
     this.NOOP = function() {};
@@ -454,6 +454,7 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
             var appCache = window.applicationCache;
             if (appCache && (appCache.status === appCache.IDLE || appCache.status === appCache.UPDATEREADY || appCache.status === appCache.OBSOLETE)) {
                 try {
+                    $A.log("[AuraClientService.decode]: Communication error, status - " + status + ". Check for app cache updates using applicationCache.update()");
                     appCache.update();
                 } catch (ignore) {
                     // appcache quirk: calling update() throws in some environments. we have no recovery
@@ -595,6 +596,7 @@ AuraClientService.prototype.throwExceptionEvent = function(resp) {
  * Handler for remote NoAccessException
  */
 AuraClientService.prototype.handleNoAccessException = function(values) {
+    $A.log("[AuraClientService.handleNoAccessException]: Reloading the page.");
     var redirectURL = values["redirectURL"];
     if (redirectURL) {
         window.location = redirectURL;
@@ -607,6 +609,7 @@ AuraClientService.prototype.handleNoAccessException = function(values) {
  * Handler for remote ClientOutOfSyncException
  */
 AuraClientService.prototype.handleClientOutOfSyncException = function() {
+    $A.log("[AuraClientService.handleClientOutOfSyncException]: Client out of sync.");
     this.setOutdated();
 };
 
@@ -618,6 +621,7 @@ AuraClientService.prototype.handleInvalidSessionException = function(values) {
     try {
         this.invalidSession(newToken);
     } catch (e) {
+        $A.log("[AuraClientService.handleInvalidSessionException]: Invalid session, reloading the page.");
         window.location.reload(true);
     }
 };
@@ -929,6 +933,7 @@ AuraClientService.prototype.hardRefresh = function() {
     }
 
     if (!this.isManifestPresent() || location.href.indexOf(cacheBustKey) > -1) {
+        $A.log("[AuraClientService.hardRefresh]: Reloading page - " + location.href);
         window.location.reload(true);
         return;
     }
@@ -941,6 +946,7 @@ AuraClientService.prototype.hardRefresh = function() {
     // state is null: don't need to track the state with popstate
     // title is null: don't want to set the page title.
     // also ensures loading a 'nocache' url if the user hits "back" button.
+    $A.log("[AuraClientService.hardRefresh]: loading page - " + url);
     history.pushState(null /* state */, null /* title */, url);
     location.href = url;
 };
@@ -953,16 +959,18 @@ AuraClientService.prototype.isDevMode = function() {
 /**
  * Clears caches (actions/GVP, ComponentDefStorage) then requests the .app
  * from the server.
+ * @param {Object} [metricsPayload] optional payload to send to metrics service.
  * @private
  */
-AuraClientService.prototype.actualDumpCachesAndReload = function() {
+AuraClientService.prototype.actualDumpCachesAndReload = function(metricsPayload) {
     function reload() {
         // use location.reload(true) to clear browser cache.
         // Using hardRefresh() made browser use old versions even though appCache was updated
+        $A.log("[AuraClientService:actualDumpCachesAndReload] Reloading the page. Cause - " + JSON.stringify(metricsPayload));
         window.location.reload(true);
     }
 
-    $A.componentService.clearDefsFromStorage({"cause": "appcache"})
+    $A.componentService.clearDefsFromStorage(metricsPayload)
         .then(reload, reload);
 };
 
@@ -973,14 +981,15 @@ AuraClientService.prototype.actualDumpCachesAndReload = function() {
  * @param {Boolean} force True to force an immediate cache dump and reload. By default the
  * request is enqueued until framework has finished initialization. This should only be
  * used if $A.initAsync() will not be invoked (eg severe bootstrap error).
+ * @param {Object} [metricsPayload] optional payload to send to metrics service.
  */
-AuraClientService.prototype.dumpCachesAndReload = function(force) {
+AuraClientService.prototype.dumpCachesAndReload = function(force, metricsPayload) {
     // avoid concurrent dump/reload executions
     if (this.reloadFunction) {
         return;
     }
 
-    this.reloadFunction = this.actualDumpCachesAndReload.bind(this);
+    this.reloadFunction = this.actualDumpCachesAndReload.bind(this, metricsPayload);
 
     if (this.reloadPointPassed || force) {
         if (this.shouldPreventReload()) {
@@ -1167,7 +1176,7 @@ AuraClientService.prototype.handleAppCache = function() {
                 // quirk: some browser's incorrectly throw InvalidStateError
             }
             // dump caches due to change in fwk and/or app.
-            acs.dumpCachesAndReload();
+            acs.dumpCachesAndReload(false, {"cause": "applicationCache.updateready: Swap old cache for new one."});
         }
     }
 
@@ -1218,7 +1227,7 @@ AuraClientService.prototype.handleAppCache = function() {
         // quirk: spec says if manifest changed during download sequence that it'll fire error event
         // then retry. i've never seen the retry happen.
         if (acs.isOutdated && acs.appcacheDownloadingEventFired) {
-            acs.dumpCachesAndReload();
+            acs.dumpCachesAndReload(false, {"cause": "applicationCache.error: App gets outdated while downloading app cache resources."});
             return;
         }
 
@@ -1250,7 +1259,7 @@ AuraClientService.prototype.handleAppCache = function() {
         // appcache refresh indicates all files are up to date but the app has indicated the app/fwk
         // is out of date. thus caches must be cleared and .app?t loaded from server.
         if (acs.isOutdated) {
-            acs.dumpCachesAndReload();
+            acs.dumpCachesAndReload(false, {"cause": "applicationCache.noupdate: App gets outdated even if all app cache resources are up to date."});
         }
     }
 
@@ -1264,7 +1273,7 @@ AuraClientService.prototype.handleAppCache = function() {
         // refresh cycle and fires relevant events.
         // note: error events may be fired before and after obsolete is fired so error handler explicitly
         // noops when obsolete with errors.
-        acs.dumpCachesAndReload();
+        acs.dumpCachesAndReload(false, {"cause": "applicationCache.obsolete: App cache resources are obsolete."});
     }
 
     if (window.applicationCache && window.applicationCache.addEventListener) {
@@ -1343,6 +1352,7 @@ AuraClientService.prototype.startBootTimers = function() {
         }
 
         // no progress made so reload the page
+        $A.log("[AuraClientService.startBootTimers]: No progress made, reloading the page.");
         window.location.reload(true);
     }, AuraClientService.BOOT_TIMER_DURATION);
 };
@@ -1359,10 +1369,11 @@ AuraClientService.prototype.startBootTimers = function() {
 AuraClientService.prototype.setOutdated = function() {
     this.isOutdated = true;
 
+    var logPrefix = "AuraClientService.setOutdated";
     if (!$A.getContext()) {
         // exception in inline.js does not create aura context and reloadPointPassed is never true
         // so we perform actual dump caches and reload
-        this.actualDumpCachesAndReload();
+        this.actualDumpCachesAndReload({"cause": logPrefix + ": Exception in inline.js does not create aura context."});
         return;
     }
 
@@ -1374,13 +1385,13 @@ AuraClientService.prototype.setOutdated = function() {
     // if appcache isn't supported then dump caches and reload. the browser will request .app?t then
     // .app from the the server.
     if (!appCache) {
-        this.dumpCachesAndReload();
+        this.dumpCachesAndReload(false, {"cause": logPrefix + ": App cache not supported."});
     }
 
     // if appcache isn't activated (eg hasn't successfully downloaded all files, not enabled in the app)
     // then dump caches and reload. the browser will request .app?t then .app from the the server.
     else if (appCache.status === appCache.UNCACHED) {
-        this.dumpCachesAndReload();
+        this.dumpCachesAndReload(false, {"cause": logPrefix + ": UNCACHED app cache status."});
     }
 
     // appcache is obsolete (eg manifest returned 4xx) so dump caches and reload. the browser will
@@ -1389,19 +1400,20 @@ AuraClientService.prototype.setOutdated = function() {
     // appcache. the browser will start the refresh cycle, get a 4xx on the manifest marking it
     // obsolete again, and handleAppCache() is invoked.
     else if (appCache.status === appCache.OBSOLETE) {
-        this.dumpCachesAndReload();
+        this.dumpCachesAndReload(false, {"cause": logPrefix + ": OBSOLETE app cache status."});
     }
 
     // appcache is in use. it's idle (eg not checking for an update) so request the browser start the
     // refresh cycle (fetch the manifest). this will trigger appcache events / invoke handleAppCache().
     else if (appCache.status === appCache.IDLE) {
         try {
+            $A.log("[" + logPrefix + "]: IDLE app cache status. Check for app cache updates using applicationCache.update()");
             appCache.update();
         } catch (e) {
             // appcache quirk: calling update() throws in some environments. take a more extreme
             // recovery of dumping caches and reloading .app from server to trigger appcache
             // population cycle.
-            this.dumpCachesAndReload();
+            this.dumpCachesAndReload(false, {"cause": logPrefix + ": IDLE app cache status."});
         }
     }
 
@@ -1420,6 +1432,7 @@ AuraClientService.prototype.updateAppCacheIfOnlineAndIdle = function() {
         // perform only when online (OR onLine not supported) and appcache IDLE status
         try {
             // force browser to keep trying to get updated js resources as manifest should be updated at this point
+            $A.log("[AuraClientService.updateAppCacheIfOnlineAndIdle]: Check for app cache updates using applicationCache.update()");
             window.applicationCache.update();
             return true;
         } catch (ignore) {
@@ -1783,7 +1796,7 @@ AuraClientService.prototype.getAppBootstrap = function() {
         // (which may be stale) gets reused, which will cause an infinite reload. therefore only
         // reload the .app?t when appcache is idle or not in use.
         if (!window.applicationCache || window.applicationCache.status === window.applicationCache.UNCACHED || window.applicationCache.status === window.applicationCache.IDLE) {
-            this.dumpCachesAndReload();
+            this.dumpCachesAndReload(false, {"cause": "AuraClientService.getAppBootstrap: Failed to load bootstrap.js from network or cache."});
         }
     }
 
@@ -1871,7 +1884,7 @@ AuraClientService.prototype.runAfterBootstrapReady = function (callback) {
         }
     }
 
-    $A.log("Bootstrap loaded and processed from " + bootstrap.source);
+    $A.log("[AuraClientService.runAfterBootstrapReady]: Bootstrap loaded and processed from " + bootstrap.source);
     this.appBootstrap = boot;
 
     if (bootstrap.source === "cache" && this.getParallelBootstrapLoad() && Aura["appBootstrapStatus"] !== "failed") {
@@ -1928,7 +1941,7 @@ AuraClientService.prototype.checkBootstrapUIDs = function(boot) {
 
         if (context.fwuid !== boot["context"]["fwuid"] || currentAppUid !== bootAppUid) {
             if (!this.updateAppCacheIfOnlineAndIdle()) {
-                this.dumpCachesAndReload();
+                this.dumpCachesAndReload(false, {"cause": "AuraClientService.checkBootstrapUIDs: Framework or App UID is different between cached and network version."});
             }
         }
     }
@@ -3945,6 +3958,7 @@ AuraClientService.prototype.invalidSession = function(newToken) {
         if (disableParallelBootstrapLoad) {
             acs.disableParallelBootstrapLoadOnNextLoad();
         }
+        $A.log("[AuraClientService.invalidSession]: Reloading the page.");
         $A.clientService.hardRefresh();
     }
 

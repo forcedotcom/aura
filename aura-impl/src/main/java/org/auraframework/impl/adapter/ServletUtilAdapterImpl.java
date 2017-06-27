@@ -424,11 +424,11 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     @Override
-    public void writeScriptUrls(AuraContext context, ComponentDef templateDef, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException {
+    public void writeScriptUrls(AuraContext context, BaseComponentDef def, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException {
         templateUtil.writeHtmlScripts(context, this.getJsClientLibraryUrls(context), Script.LAZY, sb);
 
-        if (cspInliningService.isSupported() && templateDef != null) {
-            cspInliningService.writeInlineScript(this.getInlineJs(context, templateDef), sb);
+        if (cspInliningService.isSupported() && def != null) {
+            cspInliningService.writeInlineScript(this.getInlineJs(context, def), sb);
         } else {
             templateUtil.writeHtmlScript(context, this.getInlineJsUrl(context, componentAttributes), Script.SYNC, sb);
         }
@@ -475,10 +475,10 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     @Override
-    public String getInlineJs(AuraContext context, ComponentDef templateDef) throws IOException {
+    public String getInlineJs(AuraContext context, BaseComponentDef def) throws IOException {
         StringBuilder out = new StringBuilder();
         for(InlineJSAppender appender : MoreObjects.firstNonNull(inlineJsAppenders, ImmutableList.<InlineJSAppender>of())){
-            appender.append(templateDef, context, out);
+            appender.append(def, context, out);
         }
         return out.toString();
     }

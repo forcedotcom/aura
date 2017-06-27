@@ -659,7 +659,7 @@ public class ServerServiceImpl implements ServerService {
                 attributes.put("manifest", servletUtilAdapter.getManifestUrl(context, componentAttributes));
             }
 
-            servletUtilAdapter.writeScriptUrls(context, templateDef, componentAttributes, sb);
+            servletUtilAdapter.writeScriptUrls(context, value, componentAttributes, sb);
 
             attributes.put("auraNamespacesScriptTags", sb.toString());
 

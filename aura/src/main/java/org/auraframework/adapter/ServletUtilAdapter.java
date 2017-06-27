@@ -122,8 +122,9 @@ public interface ServletUtilAdapter extends AuraAdapter {
      * @param def
      * @param componentAttributes Component attributes.
      * @param sb the string builder to use.
+     * @param beforeBootstrap string to put into sb before writing bootstrap.js
      */
-    void writeScriptUrls(AuraContext context, BaseComponentDef def, Map<String, Object> componentAttributes, StringBuilder sb) throws QuickFixException, IOException;
+    void writeScriptUrls(AuraContext context, BaseComponentDef def, Map<String, Object> componentAttributes, StringBuilder sb, String beforeBootstrap) throws QuickFixException, IOException;
 
     /**
      * Get bootstrap url.

@@ -314,7 +314,7 @@ public class IntegrationImpl implements Integration {
             Map<String, Object> attributes = Maps.newHashMap();
 
             StringBuilder sb = new StringBuilder();
-            templateUtil.writeHtmlStyles(servletUtilAdapter.getStyles(context), sb);
+            templateUtil.writeHtmlStyles(servletUtilAdapter.getStyles(context), null, sb);
             attributes.put("auraStyleTags", sb.toString());
 
             sb.setLength(0);

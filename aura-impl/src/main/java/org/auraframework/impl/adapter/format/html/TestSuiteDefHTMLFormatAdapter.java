@@ -70,7 +70,7 @@ public class TestSuiteDefHTMLFormatAdapter extends HTMLFormatAdapter<TestSuiteDe
         attribs.put("bodyClass", " ");
 
         StringBuilder sb = new StringBuilder();
-        writeHtmlStyles(servletUtilAdapter.getStyles(context), sb);
+        writeHtmlStyles(servletUtilAdapter.getStyles(context), null, sb);
         attribs.put("auraStyleTags", sb.toString());
 
         sb = new StringBuilder();

@@ -39,12 +39,12 @@ public abstract class HTMLFormatAdapter<T> extends BaseFormatAdapter<T> {
         return name;
     }
 
-    protected void writeHtmlStyle(String url, Appendable out) throws IOException {
-        templateUtil.writeHtmlStyle(url, out);
+    protected void writeHtmlStyle(String url, String clazz, Appendable out) throws IOException {
+        templateUtil.writeHtmlStyle(url, clazz, out);
     }
 
-    protected void writeHtmlStyles(List<String> urls, Appendable out) throws IOException {
-        templateUtil.writeHtmlStyles(urls, out);
+    protected void writeHtmlStyles(List<String> urls, String clazz, Appendable out) throws IOException {
+        templateUtil.writeHtmlStyles(urls, clazz, out);
     }
     
     protected void writeHtmlScript(AuraContext context, String url, Script scriptLoadingType, Appendable out) throws IOException {

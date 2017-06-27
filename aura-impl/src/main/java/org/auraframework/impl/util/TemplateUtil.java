@@ -42,17 +42,26 @@ public class TemplateUtil {
     private static final String PREFETCH_TAG = "<link rel=\"prefetch\" href=\"%s\" as=\"script\"/>\n";
 
     private static final String HTML_STYLE = "<link href=\"%s\" rel=\"stylesheet\" type=\"text/css\"/>\n";
+    private static final String HTML_STYLE_CLASSED = "<link href=\"%s\" class=\"%s\" rel=\"stylesheet\" type=\"text/css\"/>\n";
 
-    public void writeHtmlStyle(String url, Appendable out) throws IOException {
+    public void writeHtmlStyle(String url, String clazz, Appendable out) throws IOException {
         if (url != null) {
-            out.append(String.format(HTML_STYLE, url));
+            if (clazz != null) {
+                out.append(String.format(HTML_STYLE_CLASSED, url, clazz));
+            } else {
+                out.append(String.format(HTML_STYLE, url));
+            }
         }
     }
 
-    public void writeHtmlStyles(List<String> styles, Appendable out) throws IOException {
+    public void writeHtmlStyles(List<String> styles, String clazz, Appendable out) throws IOException {
         if (styles != null) {
             for (String style : styles) {
-                out.append(String.format(HTML_STYLE, style));
+                if (clazz != null) {
+                    out.append(String.format(HTML_STYLE_CLASSED, style, clazz));
+                } else {
+                    out.append(String.format(HTML_STYLE, style));
+                }
             }
         }
     }

@@ -630,13 +630,6 @@ public class ServerServiceImpl implements ServerService {
         Mode mode = context.getMode();
 
         StringBuilder sb = new StringBuilder();
-        templateUtil.writeHtmlStyle(configAdapter.getResetCssURL(), sb);
-        attributes.put("auraResetTags", sb.toString());
-        sb.setLength(0);
-
-        templateUtil.writeHtmlStyles(servletUtilAdapter.getStyles(context), sb);
-        attributes.put("auraStyleTags", sb.toString());
-        sb.setLength(0);
 
         templateUtil.writePrefetchScriptTags(servletUtilAdapter.getJsClientLibraryUrls(context), sb);
         attributes.put("prefetchTags", sb.toString());
@@ -647,9 +640,18 @@ public class ServerServiceImpl implements ServerService {
             attributes.put("auraInlineStyle", styleDef.getCode());
         }
 
+        templateUtil.writeHtmlStyle(configAdapter.getResetCssURL(), null, sb);
+        attributes.put("auraResetTags", sb.toString());
+        sb.setLength(0);
+
+        StringBuilder styleTagStringBuilder = new StringBuilder();
+        templateUtil.writeHtmlStyles(servletUtilAdapter.getStyles(context), "auraCss", styleTagStringBuilder);
+
         if (mode.allowLocalRendering() && value.isLocallyRenderable()) {
+
             BaseComponent<?, ?> cmp = (BaseComponent<?, ?>) instanceService.getInstance(value, componentAttributes);
 
+            attributes.put("auraStyleTags", styleTagStringBuilder.toString());
             attributes.put("body", Lists.<BaseComponent<?, ?>> newArrayList(cmp));
             attributes.put("bodyClass", "");
             attributes.put("defaultBodyClass", "");
@@ -659,7 +661,7 @@ public class ServerServiceImpl implements ServerService {
                 attributes.put("manifest", servletUtilAdapter.getManifestUrl(context, componentAttributes));
             }
 
-            servletUtilAdapter.writeScriptUrls(context, value, componentAttributes, sb);
+            servletUtilAdapter.writeScriptUrls(context, value, componentAttributes, sb, styleTagStringBuilder.toString());
 
             attributes.put("auraNamespacesScriptTags", sb.toString());
 

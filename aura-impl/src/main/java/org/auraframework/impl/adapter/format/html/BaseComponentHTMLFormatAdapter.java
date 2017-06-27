@@ -80,12 +80,12 @@ public abstract class BaseComponentHTMLFormatAdapter<T extends BaseComponent<?, 
             Map<String, Object> attributes = Maps.newHashMap();
 
             StringBuilder sb = new StringBuilder();
-            writeHtmlStyle(configAdapter.getResetCssURL(), sb);
+            writeHtmlStyle(configAdapter.getResetCssURL(), null, sb);
             attributes.put("auraResetTags", sb.toString());
 
 
             sb.setLength(0);
-            writeHtmlStyles(servletUtilAdapter.getStyles(context), sb);
+            writeHtmlStyles(servletUtilAdapter.getStyles(context), null, sb);
             attributes.put("auraStyleTags", sb.toString());
 
             sb.setLength(0);

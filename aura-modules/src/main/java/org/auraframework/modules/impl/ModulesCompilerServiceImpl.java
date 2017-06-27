@@ -29,8 +29,12 @@ public class ModulesCompilerServiceImpl implements ModulesCompilerService {
     
     private static final ModulesCompiler compiler = new ModulesCompilerNode();
 
-    @Inject
     private LoggingService loggingService;
+    
+    @Inject
+    public void setLoggingService(LoggingService loggingService) {
+        this.loggingService = loggingService;
+    }
 
     @Override
     public final ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception {

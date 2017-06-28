@@ -445,14 +445,14 @@ AttributeSet.prototype.isTypeOfArray = function(attributeName) {
  *            attributes - new attributes configuration
  * @private
  */
-AttributeSet.prototype.merge = function(attributes, attributeDefSet) {
+AttributeSet.prototype.merge = function(attributes, attributeDefSet, component) {
 	if(attributeDefSet){
         $A.assert(attributeDefSet instanceof AttributeDefSet, "AttributeSet.merge: A valid AttributeDefSet is required to merge attributes.");
         this.attributeDefSet = attributeDefSet;
     }
 
 	// Reinitialize attribute values
-	this.initialize(attributes);
+	this.initialize(attributes,component);
 };
 
 /**
@@ -533,7 +533,7 @@ AttributeSet.prototype.destroy = function() {
  *            config - attribute configuration
  * @private
  */
-AttributeSet.prototype.initialize = function(attributes) {
+AttributeSet.prototype.initialize = function(attributes,component) {
     var attributeDefs = this.attributeDefSet.getValues();
 	var attributeNames = this.attributeDefSet.getNames();
 	if (!attributeDefs || !attributeNames) {
@@ -551,7 +551,7 @@ AttributeSet.prototype.initialize = function(attributes) {
 		var value = configValues[name];
 
 		if (!hasValue && !hasAttribute) {
-			value = this.getDefault(name);
+			value = valueFactory.create(this.getDefault(name),component);
 			hasValue = value !== undefined;
 		}
 

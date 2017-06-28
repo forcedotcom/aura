@@ -2371,10 +2371,10 @@ Component.prototype.setupAttributes = function(config, localCreation) {
 
     if(this.concreteComponentId) {
         var concreteComponent=this.getConcreteComponent();
-        concreteComponent.attributeSet.merge(attributes);
+        concreteComponent.attributeSet.merge(attributes,null,this);
         this.attributeSet=concreteComponent.attributeSet;
     }else{
-        this.attributeSet.initialize(attributes);
+        this.attributeSet.initialize(attributes, this);
     }
 };
 
@@ -2776,7 +2776,7 @@ Component.prototype.setProvided = function(realComponentDef, attributes) {
 
     // JBUCH: HALO: TODO: FIND BETTER WAY TO RESET THESE AFTER PROVIDER INJECTION
     this.componentDef = realComponentDef;
-    this.attributeSet.merge(attributes, realComponentDef.getAttributeDefs());
+    this.attributeSet.merge(attributes, realComponentDef.getAttributeDefs(), this);
 
     // KRIS: IN THE MIDDLE OF THIS FOR PROVIDED COMPONENTS
     this.replaceComponentClass(realComponentDef.getDescriptor().getQualifiedName());

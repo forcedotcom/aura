@@ -94,19 +94,14 @@ AttributeSet.prototype.get = function(key, component) {
     }
     var defs=AttributeSet.getDef(attribute,component);
     if(!$A.clientService.allowAccess(defs[0], defs[1])){
-        var context=$A.getContext();
-        var contextCmp = context && context.getCurrentAccess();
-        var message="Access Check Failed! AttributeSet.get(): attribute '"+attribute+"' of component '"+component+"' is not visible to '"+contextCmp+"'.";
-        if(context.enableAccessChecks){
-            if(context.logAccessFailures){
-                var ae = new $A.auraError(message);
-                ae.setComponent(contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName());
-                ae["componentStack"] = context && context.getAccessStackHierarchy();
-                $A.error(null, ae);
+        var message="Access Check Failed! AttributeSet.get(): attribute '"+attribute+"' of component '"+component+"' is not visible to '"+$A.clientService.currentAccess+"'.";
+        if($A.clientService.enableAccessChecks){
+            if($A.clientService.logAccessFailures){
+                $A.error(null,new $A.auraError(message));
             }
             return undefined;
         }else{
-            if(context.logAccessFailures){
+            if($A.clientService.logAccessFailures){
                 $A.warning(message);
             }
         }
@@ -246,19 +241,14 @@ AttributeSet.prototype.set = function(key, value, component) {
     }
     var defs=AttributeSet.getDef(attribute,component);
     if(!$A.clientService.allowAccess(defs[0],defs[1])){
-        var context=$A.getContext();
-        var contextCmp = context && context.getCurrentAccess();
-        var message="Access Check Failed! AttributeSet.set(): '"+attribute+"' of component '"+component+"' is not visible to '"+contextCmp+"'.";
-        if(context.enableAccessChecks){
-            if(context.logAccessFailures){
-                var ae = new $A.auraError(message);
-                ae.setComponent(contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName());
-                ae["componentStack"] = context && context.getAccessStackHierarchy();
-                $A.error(null, ae);
+        var message="Access Check Failed! AttributeSet.set(): '"+attribute+"' of component '"+component+"' is not visible to '"+$A.clientService.currentAccess+"'.";
+        if($A.clientService.enableAccessChecks){
+            if($A.clientService.logAccessFailures){
+                $A.error(null,new $A.auraError(message));
             }
             return;
         }else{
-            if(context.logAccessFailures){
+            if($A.clientService.logAccessFailures){
                 $A.warning(message);
             }
         }

@@ -97,7 +97,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
 
         boolean requireErrorId = true;
         String expectedMessage = "Error in $A.getCallback() [Error from server action callback in app]";
-        String failingDescriptor = "markup://auratest:errorHandlingApp";
+        String failingDescriptor = "auratest:errorHandlingApp";
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
 
@@ -118,7 +118,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
 
         boolean requireErrorId = true;
         String expectedMessage = "Error in $A.getCallback() [Error from function wrapped in getCallback in app]";
-        String failingDescriptor = "markup://auratest:errorHandlingApp";
+        String failingDescriptor = "auratest:errorHandlingApp";
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
 
@@ -135,7 +135,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         String log = logs.get(0);
 
         boolean requireErrorId = true;
-        String failingDescriptor = "markup://auratest:errorHandlingApp";
+        String failingDescriptor = "auratest:errorHandlingApp";
         String expectedMessage = String.format("rerender threw an error in '%s' [Error from app rerender]", failingDescriptor);
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
@@ -186,7 +186,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
 
         boolean requireErrorId = true;
         String expectedMessage = "Error in $A.getCallback() [Error from component server action callback]";
-        String failingDescriptor = "markup://auratest:errorHandling";
+        String failingDescriptor = "auratest:errorHandling";
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
 
@@ -202,7 +202,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
 
         boolean requireErrorId = true;
         String expectedMessage = "Error in $A.getCallback() [Error from function wrapped in getCallback in component]";
-        String failingDescriptor = "markup://auratest:errorHandling";
+        String failingDescriptor = "auratest:errorHandling";
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
 
@@ -217,7 +217,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         String log = logs.get(0);
 
         boolean requireErrorId = true;
-        String failingDescriptor = "markup://auratest:errorHandling";
+        String failingDescriptor = "auratest:errorHandling";
         String expectedMessage = String.format("rerender threw an error in '%s' [Error from component rerender]", failingDescriptor);
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }
@@ -233,7 +233,7 @@ public class ErrorHandlingLoggingUITest extends AbstractLoggingUITest {
         String log = logs.get(0);
 
         boolean requireErrorId = true;
-        String failingDescriptor = "markup://auratest:errorHandling";
+        String failingDescriptor = "auratest:errorHandling";
         String expectedMessage = String.format("unrender threw an error in '%s' [Error from component unrender]", failingDescriptor);
         assertClientErrorLogContains(log, expectedMessage, requireErrorId, failingDescriptor);
     }

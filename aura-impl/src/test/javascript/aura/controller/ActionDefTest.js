@@ -42,6 +42,7 @@ Test.Aura.Controller.ActionDefTest = function() {
             "Action": _action,
             "$A": {
                 getContext : function() {return null;},
+                clientService:{},
                 lockerService: {
                     trust: function() {}
                 }

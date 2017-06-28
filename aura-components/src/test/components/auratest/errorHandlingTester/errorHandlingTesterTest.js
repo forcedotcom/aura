@@ -66,7 +66,7 @@
                 $A.test.assertTrue($A.test.contains(errorMsg, originalErrorMsg),
                         "Failed to find original error message. Expected message: " + originalErrorMsg + "; Actual: " + errorMsg);
 
-                var failingDescriptor = "Failing descriptor: {markup://auratest:errorHandling}";
+                var failingDescriptor = "Failing descriptor: {auratest:errorHandling}";
                 $A.test.assertTrue($A.test.contains(errorMsg, failingDescriptor),
                         "The error message has incorrect failing descriptor. Expected descriptor: " + failingDescriptor + "; Actual: " + errorMsg);
             });
@@ -87,7 +87,7 @@
                 $A.test.assertTrue($A.test.contains(errorMsg, originalErrorMsg),
                         "Failed to find original error message. Expected message: " + originalErrorMsg + "; Actual: " + errorMsg);
 
-                var failingDescriptor = "Failing descriptor: {markup://auratest:errorHandling}";
+                var failingDescriptor = "Failing descriptor: {auratest:errorHandling}";
                 $A.test.assertTrue($A.test.contains(errorMsg, failingDescriptor),
                         "The error message has incorrect failing descriptor. Expected descriptor: " + failingDescriptor + "; Actual: " + errorMsg);
             });
@@ -113,7 +113,7 @@
                     $A.test.assertTrue($A.test.contains(errorMsg, originalErrorMsg),
                             "Failed to find original error message. Expected message: " + originalErrorMsg + "; Actual: " + errorMsg);
 
-                    var failingDescriptor = "Failing descriptor: {markup://auratest:errorHandling}";
+                    var failingDescriptor = "Failing descriptor: {auratest:errorHandling}";
                     $A.test.assertTrue($A.test.contains(errorMsg, failingDescriptor),
                             "The error message has incorrect failing descriptor. Expected descriptor: " + failingDescriptor + "; Actual: " + errorMsg);
                 });
@@ -136,7 +136,7 @@
                         "Failed to find original error message. Expected message: " + originalErrorMsg + "; Actual: " + errorMsg);
 
                 // FIXME? should show the cmp with error renderer? seems the stacktrace gives right point.
-                var failingDescriptor = "Failing descriptor: {markup://auratest:errorHandlingExtend}";
+                var failingDescriptor = "Failing descriptor: {auratest:errorHandlingExtend}";
                 $A.test.assertTrue($A.test.contains(errorMsg, failingDescriptor),
                         "The error message has incorrect failing descriptor. Expected descriptor: " + failingDescriptor + "; Actual: " + errorMsg);
             });
@@ -164,7 +164,7 @@
                             "Failed to find original error message. Expected message: " + originalErrorMsg + "; Actual: " + errorMsg);
 
                     // FIXME? same as above
-                    var failingDescriptor = "Failing descriptor: {markup://auratest:errorHandlingExtend}";
+                    var failingDescriptor = "Failing descriptor: {auratest:errorHandlingExtend}";
                     $A.test.assertTrue($A.test.contains(errorMsg, failingDescriptor),
                             "The error message has incorrect failing descriptor. Expected descriptor: " + failingDescriptor + "; Actual: " + errorMsg);
                 });
@@ -211,7 +211,7 @@
                 $A.test.assertTrue($A.test.contains(errorMsg, expectedMsg),
                         "Failed to find original error message. Expected message: " + expectedMsg + "; Actual: " + errorMsg);
 
-                var failingDescriptor = "Failing descriptor: {markup://auratest:errorHandlingApp}";
+                var failingDescriptor = "Failing descriptor: {auratest:errorHandlingApp}";
                 $A.test.assertTrue($A.test.contains(errorMsg, failingDescriptor),
                         "The error message has incorrect failing descriptor. Expected descriptor: " + failingDescriptor + "; Actual: " + errorMsg);
             });

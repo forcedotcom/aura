@@ -34,12 +34,7 @@
     //#end
 
     $A.logger.subscribe("ASSERT", function(level, message) {
-        var a = new $A.auraError(message);
-        var context = $A.getContext();
-        if (context) {
-            a["componentStack"] = context.getAccessStackHierarchy();
-        }
-        throw a;
+        throw new $A.auraError(message);
     });
 
     $A.logger.subscribe("ERROR", function(level, message, e) {

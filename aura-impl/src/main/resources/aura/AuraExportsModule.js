@@ -15,12 +15,11 @@
  */
 Aura.ExportsModule = {
     "dispatchGlobalEvent": function (eventName, eventParams) {
-        var context = $A.getContext();
-        context.setCurrentAccess($A.getRoot());
+        $A.clientService.setCurrentAccess($A.getRoot());
         try {
             $A.eventService.newEvent(eventName).setParams(eventParams).fire();
         } finally {
-            context.releaseCurrentAccess();
+            $A.clientService.releaseCurrentAccess();
         }
     },
 

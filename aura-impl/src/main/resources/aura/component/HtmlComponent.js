@@ -45,7 +45,7 @@ function HtmlComponent(config, localCreation) {
     this.localIndex = {};
     this.destroyed=0;
     this.version = config["version"];
-    this.owner = context.getCurrentAccess();
+    this.owner = $A.clientService.currentAccess;
     this.name='';
 
     // allows components to skip creation path checks if it's doing something weird

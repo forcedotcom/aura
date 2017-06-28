@@ -2075,7 +2075,7 @@ TestInstance.prototype.runInternal = function(name) {
     var that = this;
 
     this.cmp = $A.getRoot();
-    $A.getContext().setCurrentAccess(this.cmp);
+    $A.clientService.setCurrentAccess(this.cmp);
     var useLabel = function(labelName) {
         var suiteLevel = that.suite[labelName] || false;
         var testLevel = that.suite[name][labelName];

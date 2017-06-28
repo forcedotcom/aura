@@ -46,7 +46,7 @@ function Component(config, localCreation) {
     this.localIndex = {};
     this.destroyed=0;
     this.version = config["version"];
-    this.owner = context.getCurrentAccess();
+    this.owner = $A.clientService.currentAccess;
     this.name='';
     this.type='';
     this._marker = null;
@@ -1186,7 +1186,7 @@ Component.prototype.getReference = function(key) {
         return null;
     }
     key = $A.expressionService.normalize(key);
-    var access=$A.getContext().getCurrentAccess();
+    var access=$A.clientService.currentAccess;
     var accessId=access&&access.getGlobalId();
     if(!this.references.hasOwnProperty(key)) {
         this.references[key] = {};
@@ -1631,19 +1631,14 @@ Component.prototype.getEvent = function(name) {
         return null;
     }
     if (!$A.clientService.allowAccess(eventDef,this)) {
-        var context=$A.getContext();
-        var contextCmp = context && context.getCurrentAccess();
-        var message="Access Check Failed! Component.getEvent():'" + name + "' of component '" + this + "' is not visible to '" + contextCmp + "'.";
-        if(context.enableAccessChecks) {
-            if(context.logAccessFailures){
-                var ae = new $A.auraError(message);
-                ae.setComponent(contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName());
-                ae["componentStack"] = context && context.getAccessStackHierarchy();
-                $A.error(null, ae);
+        var message="Access Check Failed! Component.getEvent():'" + name + "' of component '" + this + "' is not visible to '" + $A.clientService.currentAccess + "'.";
+        if($A.clientService.enableAccessChecks) {
+            if($A.clientService.logAccessFailures){
+                $A.error(null,new $A.auraError(message));
             }
             return null;
         }else{
-            if(context.logAccessFailures){
+            if($A.clientService.logAccessFailures){
                 $A.warning(message);
             }
         }
@@ -1869,8 +1864,7 @@ Component.prototype.render = function() {
     }
     var render = this["renderer"] && this["renderer"]["render"];
     if(render){
-        var context = $A.getContext();
-        context.setCurrentAccess(this);
+        $A.clientService.setCurrentAccess(this);
         try {
             var secureThis = $A.lockerService.wrapComponent(this);
             var result = render(secureThis, this["helper"]);
@@ -1884,7 +1878,7 @@ Component.prototype.render = function() {
 
             return result;
         } finally {
-            context.releaseCurrentAccess();
+            $A.clientService.releaseCurrentAccess();
         }
     } else {
         return this.superRender();
@@ -1901,12 +1895,11 @@ Component.prototype.afterRender = function() {
     }
     var afterRender = this["renderer"] && this["renderer"]["afterRender"];
     if(afterRender){
-        var context=$A.getContext();
-        context.setCurrentAccess(this);
+        $A.clientService.setCurrentAccess(this);
         try {
             afterRender($A.lockerService.wrapComponent(this), this["helper"]);
         } finally {
-            context.releaseCurrentAccess();
+            $A.clientService.releaseCurrentAccess();
         }
     } else {
         this.superAfterRender();
@@ -1924,8 +1917,7 @@ Component.prototype.rerender = function() {
     }
     var rerender = this["renderer"] && this["renderer"]["rerender"];
     if(rerender){
-        var context=$A.getContext();
-        context.setCurrentAccess(this);
+       $A.clientService.setCurrentAccess(this);
         try {
             var secureThis = $A.lockerService.wrapComponent(this);
             var result = rerender(secureThis, this["helper"]);
@@ -1937,7 +1929,7 @@ Component.prototype.rerender = function() {
             }
             return result;
         } finally {
-            context.releaseCurrentAccess();
+            $A.clientService.releaseCurrentAccess();
         }
      } else {
         return this.superRerender();
@@ -1957,12 +1949,11 @@ Component.prototype.unrender = function() {
 
     var unrender = this["renderer"] && this["renderer"]["unrender"];
     if(unrender){
-        var context=$A.getContext();
-        context.setCurrentAccess(this);
+        $A.clientService.setCurrentAccess(this);
         try {
             unrender($A.lockerService.wrapComponent(this), this["helper"]);
         } finally {
-            context.releaseCurrentAccess();
+            $A.clientService.releaseCurrentAccess();
         }
      } else {
         // If a component extends the root component and doesn't implement it's own
@@ -1997,9 +1988,7 @@ Component.prototype.getVersion = function() {
  * @private
  */
 Component.prototype.getVersionInternal = function() {
-    var context = $A.getContext();
-    var ns = this.getDef().getDescriptor().getNamespace();
-    return context ? context.getAccessVersion(ns) : null;
+    return $A.clientService.getAccessVersion(this.getType().split(':')[0]);
 };
 
 Component.prototype.getValueProvider = function(key) {
@@ -2079,7 +2068,6 @@ Component.prototype.createComponentStack = function(facets, valueProvider){
         if (action) {
             action.pushCreationPath(facetName);
         }
-        var context = $A.getContext();
         var components = [];
         for (var index = 0; index < facetConfig.length; index++) {
             var config = facetConfig[index];
@@ -2091,7 +2079,7 @@ Component.prototype.createComponentStack = function(facets, valueProvider){
                     action.setCreationPathIndex(index);
                 }
 
-                context.setCurrentAccess(valueProvider);
+                $A.clientService.setCurrentAccess(valueProvider);
                 try {
                     var facetConfigAttr = { "values": {} };
                     var facetConfigClone = $A.util.apply({}, config);
@@ -2107,7 +2095,7 @@ Component.prototype.createComponentStack = function(facets, valueProvider){
                     facetConfigClone["containerComponentId"] = this.globalId;
                     components.push($A.componentService.createComponentPriv(facetConfigClone));
                 } finally {
-                    context.releaseCurrentAccess();
+                    $A.clientService.releaseCurrentAccess();
                 }
             } else {
                 // KRIS: HALO: This is hit, when you create a newComponentDeprec and use raw values, vs configs on the attribute values.
@@ -2134,8 +2122,7 @@ Component.prototype.setupSuper = function(configAttributes) {
         superConfig["concreteComponentId"] = this.concreteComponentId || this.globalId;
 
         $A.pushCreationPath("super");
-        var context = $A.getContext();
-        context.setCurrentAccess(this);
+        $A.clientService.setCurrentAccess(this);
         try {
             if (configAttributes) {
                 superAttributes["values"] = {};
@@ -2145,18 +2132,14 @@ Component.prototype.setupSuper = function(configAttributes) {
                     for (var i = 0; i < facets.length; i++) {
                         var facetDef = AttributeSet.getDef(facets[i]["descriptor"], this.componentDef);
                         if (!$A.clientService.allowAccess(facetDef[0], facetDef[1])) {
-                            var contextCmp = context && context.getCurrentAccess();
-                            var message="Access Check Failed! Component.setupSuper():'" + facets[i]["descriptor"] + "' of component '" + this + "' is not visible to '" + contextCmp + "'.";
-                            if(context.enableAccessChecks) {
-                                if(context.logAccessFailures){
-                                    var ae = new $A.auraError(message);
-                                    ae.setComponent(contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName());
-                                    ae["componentStack"] = context && context.getAccessStackHierarchy();
-                                    $A.error(null, ae);
+                            var message="Access Check Failed! Component.setupSuper():'" + facets[i]["descriptor"] + "' of component '" + this + "' is not visible to '" + $A.clientService.currentAccess + "'.";
+                            if($A.clientService.enableAccessChecks) {
+                                if($A.clientService.logAccessFailures){
+                                    $A.error(null,new $A.auraError(message));
                                 }
                                 continue;
                             }else{
-                                if(context.logAccessFailures){
+                                if($A.clientService.logAccessFailures){
                                     $A.warning(message);
                                 }
                             }
@@ -2173,7 +2156,7 @@ Component.prototype.setupSuper = function(configAttributes) {
 
             this.setSuperComponent($A.componentService.createComponentPriv(superConfig));
         } finally {
-            context.releaseCurrentAccess();
+            $A.clientService.releaseCurrentAccess();
             $A.popCreationPath("super");
         }
     }
@@ -2263,19 +2246,14 @@ Component.prototype.setupAttributes = function(config, localCreation) {
         if (!setByDefault[attribute]){
             var def=AttributeSet.getDef(attribute,this.getDef());
             if(!$A.clientService.allowAccess(def[0],def[1])) {
-                var context=$A.getContext();
-                var contextCmp = context && context.getCurrentAccess();
-                var message="Access Check Failed! Component.setupAttributes():'" + attribute + "' of component '" + this + "' is not visible to '" + contextCmp + "'.";
-                if(context.enableAccessChecks){
-                    if(context.logAccessFailures){
-                        var ae = new $A.auraError(message);
-                        ae.setComponent(contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName());
-                        ae["componentStack"] = context && context.getAccessStackHierarchy();
-                        $A.error(null, ae);
+                var message="Access Check Failed! Component.setupAttributes():'" + attribute + "' of component '" + this + "' is not visible to '" + $A.clientService.currentAccess + "'.";
+                if($A.clientService.enableAccessChecks){
+                    if($A.clientService.logAccessFailures){
+                        $A.error(null,new $A.auraError(message));
                     }
                     continue;
                 }else{
-                    if(context.logAccessFailures){
+                    if($A.clientService.logAccessFailures){
                         $A.warning(message);
                     }
                 }
@@ -2425,19 +2403,14 @@ Component.prototype.getMethodHandler = function(methodDef,methodEventDef){
     var actionTarget=methodDef.action||("c."+methodName);
     return function Component$getMethodHandler(/*param1,param2,paramN*/){
         if(!$A.clientService.allowAccess(methodDef,component)) {
-            var context = $A.getContext();
-            var contextCmp = context && context.getCurrentAccess();
-            var message = "Access Check Failed! Component.method():'" + methodDef.getDescriptor().toString() + "' is not visible to '" + contextCmp + "'.";
-            if (context.enableAccessChecks) {
-                if (context.logAccessFailures) {
-                    var ae = new $A.auraError(message);
-                    ae.setComponent(contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName());
-                    ae["componentStack"] = context && context.getAccessStackHierarchy();
-                    $A.error(null, ae);
+            var message = "Access Check Failed! Component.method():'" + methodDef.getDescriptor().toString() + "' is not visible to '" + $A.clientService.currentAccess + "'.";
+            if ($A.clientService.enableAccessChecks) {
+                if ($A.clientService.logAccessFailures) {
+                    $A.error(null,new $A.auraError(message));
                 }
                 return;
             } else {
-                if (context.logAccessFailures) {
+                if ($A.clientService.logAccessFailures) {
                     $A.warning(message);
                 }
                 //Intentional fallthrough
@@ -2709,12 +2682,12 @@ Component.prototype.injectComponent = function(config, localCreation) {
         }
 
         if (this["provider"]) {
-            context.setCurrentAccess(this);
+            $A.clientService.setCurrentAccess(this);
             try {
                 var providedConfig = this.provide(localCreation);
                 this.setProvided(providedConfig['componentDef'], providedConfig['attributes']);
             } finally {
-                context.releaseCurrentAccess();
+                $A.clientService.releaseCurrentAccess();
             }
         } else {
             $A.assert(this.partialConfig,

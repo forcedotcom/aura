@@ -75,8 +75,7 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     // FIXME: need to expose for plugins
     this.refreshAction = undefined;
 
-    var ctx = $A.getContext();
-    this.callingCmp = ctx ? ctx.getCurrentAccess() : null;
+    this.callingCmp = $A.clientService.currentAccess;
 
     // propagating locker key when possible
     $A.lockerService.trust(cmp, this);
@@ -504,8 +503,7 @@ Action.prototype.setCallback = function(scope, callback, name) {
             && name !== "ABORTED") {
         throw new $A.auraError("Action.setCallback(): Invalid callback name '" + name + "'");
     }
-    var context=$A.getContext();
-    if(context&&context.getCurrentAccess()&&$A.clientService.inAuraLoop()) {
+    if($A.clientService.currentAccess&&$A.clientService.inAuraLoop()) {
         callback = $A.getCallback(callback);
     }
     // If name is undefined or specified as "ALL", then apply same callback in all cases
@@ -578,7 +576,7 @@ Action.prototype.setAllAboardCallback = function(scope, callback) {
 Action.prototype.callAllAboardCallback = function (context) {
     if (this.allAboardCallback) {
         var previous = context.setCurrentAction(this);
-        context.setCurrentAccess(this.cmp);
+        $A.clientService.setCurrentAccess(this.cmp);
         try {
             this.allAboardCallback();
         } catch (e) {
@@ -586,7 +584,7 @@ Action.prototype.callAllAboardCallback = function (context) {
             return false;
         } finally {
             context.setCurrentAction(previous);
-            context.releaseCurrentAccess();
+            $A.clientService.releaseCurrentAccess();
         }
     }
     return true;
@@ -654,7 +652,7 @@ Action.prototype.runDeprecated = function(evt) {
     $A.assert(this.def && this.def.isClientAction(),
              "run() cannot be called on a server action. Use $A.enqueueAction() instead.");
     this.state = "RUNNING";
-    $A.getContext().setCurrentAccess(this.cmp);
+    $A.clientService.setCurrentAccess(this.cmp);
     try {
         var secureCmp = $A.lockerService.wrapComponent(this.cmp);
         var secureEvt = $A.lockerService.wrapComponentEvent(secureCmp, evt);
@@ -667,7 +665,7 @@ Action.prototype.runDeprecated = function(evt) {
     } catch (e) {
         this.markException(e);
     } finally {
-        $A.getContext().releaseCurrentAccess();
+        $A.clientService.releaseCurrentAccess();
     }
 };
 
@@ -932,7 +930,7 @@ Action.prototype.finishAction = function(context) {
     var id = this.getId(context);
     var error = undefined;
     var oldDisplayFlag = $A.showErrors();
-    context.setCurrentAccess(this.cmp);
+    $A.clientService.setCurrentAccess(this.cmp);
     try {
         if (this.isFromStorage()) {
             // suppress errors dialogs while performing cached actions.
@@ -995,7 +993,7 @@ Action.prototype.finishAction = function(context) {
             clearComponents = true;
         }
     } finally {
-        context.releaseCurrentAccess();
+        $A.clientService.releaseCurrentAccess();
     }
     context.setCurrentAction(previous);
     if (clearComponents) {

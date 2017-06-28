@@ -22,7 +22,7 @@
  */
 Aura.Event.Event = function(config) {
     // source is only used to calculate the path, not determine access
-    this.source = config["component"] || $A.getContext().getCurrentAccess() || $A.getRoot();
+    this.source = config["component"] || $A.clientService.currentAccess || $A.getRoot();
     this.eventDef = config["eventDef"];
     this.eventDispatcher = config["eventDispatcher"];
     this.eventName = config["name"];
@@ -303,7 +303,6 @@ Aura.Event.Event.prototype.executeHandlerIterator = function(handlerIterator) {
     var res = {};
     var value;
 
-    var context=$A.getContext();
     var isSystemError = this.eventDef.getDescriptor().toString() === "markup://aura:systemError";
     var isCustomerError = this.eventDef.getDescriptor().toString() === "markup://aura:customerError";
     var isComponentEventType = this.getEventExecutionType() === "COMPONENT";
@@ -338,11 +337,11 @@ Aura.Event.Event.prototype.executeHandlerIterator = function(handlerIterator) {
                 }
             }
             else {
-                context.setCurrentAccess(value.cmp);
+                $A.clientService.setCurrentAccess(value.cmp);
                 try {
                     value.handler(this);
                 } finally {
-                    context.releaseCurrentAccess();
+                    $A.clientService.releaseCurrentAccess();
                 }
             }
         }

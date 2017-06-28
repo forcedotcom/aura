@@ -474,7 +474,7 @@ TestInstance.getDump = function() {
 
     function runInternal(name) {
         priv.cmp = $A.getRoot();
-        $A.getContext().setCurrentAccess(priv.cmp);
+        $A.clientService.setCurrentAccess(priv.cmp);
         var useLabel = function(labelName) {
             var suiteLevel = priv.suite[labelName] || false;
             var testLevel = priv.suite[name][labelName];

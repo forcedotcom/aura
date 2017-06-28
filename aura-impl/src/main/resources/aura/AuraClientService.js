@@ -141,7 +141,6 @@ function AuraClientService () {
     this.isOutdated = false;
     this.finishedInitDefs = false;
     this.protocols={"layout":true};
-    this.namespaces={internal:{},privileged:{}};
     this.lastSendTime = Date.now();
     this.moduleServices = {};
 
@@ -150,6 +149,18 @@ function AuraClientService () {
     this.clientLibraries = {
         "ckeditor" : { resourceUrl : "/auraFW/resources/{fwuid}/ckeditor/ckeditor-4.x/rel/ckeditor.js" }
     };
+
+    // Access Control
+    this.accessStack=[];
+    this.namespaces={internal:{},privileged:{}};
+    this.currentAccess=null;
+    this.enableAccessChecks=true;
+    this.logAccessFailures= true
+                            // Logging off by default in PROD mode
+                            // #if {"modes" : ["PRODUCTION"]}
+                            && false
+                            // #end
+                            ;
 
     // whether an appcache error event has been received
     this.appCacheError = false;
@@ -1601,7 +1612,7 @@ AuraClientService.prototype.init = function(config, token, container) {
     var component = $A.componentService.createComponentPriv(config);
     Aura.bootstrapMark("appCreationEnd");
 
-    context.setCurrentAccess(component);
+    this.setCurrentAccess(component);
     try {
         Aura.bootstrapMark("appRenderingStart");
         $A.renderingService.render(component, container || document.body);
@@ -1610,13 +1621,10 @@ AuraClientService.prototype.init = function(config, token, container) {
         if (e instanceof $A.auraError) {
             throw e;
         } else {
-            var ae = new $A.auraError("Error during rendering in init", e, $A.severity.QUIET);
-            ae.setComponent(component.getDef().getDescriptor().toString());
-            ae['componentStack'] = context.getAccessStackHierarchy();
-            throw ae;
+            throw new $A.auraError("Error during rendering in init", e, $A.severity.QUIET);
         }
     } finally {
-        context.releaseCurrentAccess();
+        this.releaseCurrentAccess();
         Aura.bootstrapMark("appRenderingEnd");
     }
 
@@ -2121,7 +2129,7 @@ AuraClientService.prototype.initializeApplication = function() {
  */
 AuraClientService.prototype.initializeInjectedServices = function(services) {
     if (services) {
-        var serviceRegistry = $A.clientService.moduleServices;
+        var serviceRegistry = this.moduleServices;
         services.forEach(function (serviceDefinition) {
             try {
                 var serviceConstructor = $A.componentService.evaluateModuleDef(serviceDefinition);
@@ -2931,7 +2939,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
         }
     };
 
-    if(context&&context.getCurrentAccess()&&this.inAuraLoop()){
+    if(this.currentAccess&&this.inAuraLoop()){
         onReady = $A.getCallback(onReady);
     }
 
@@ -3232,10 +3240,10 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
         this.setToken(token, true);
     }
     var context=$A.getContext();
-    var priorAccess=context.getCurrentAccess();
+    var priorAccess=this.currentAccess;
 
     if(!priorAccess){
-        context.setCurrentAccess($A.getRoot());
+        this.setCurrentAccess($A.getRoot());
     }
     try {
         if ("context" in responseMessage) {
@@ -3247,7 +3255,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
         $A.logger.reportError(e);
     }finally{
         if(!priorAccess){
-            context.releaseCurrentAccess();
+            this.releaseCurrentAccess();
         }
     }
 
@@ -3459,7 +3467,7 @@ AuraClientService.prototype.injectComponent = function(config, locatorDomId, loc
     // Save off any context global stuff like new labels
     var context = $A.getContext();
     context['merge'](config["context"]);
-    var priorAccess = context.getCurrentAccess();
+    var priorAccess = this.currentAccess;
 
     var actionResult = config["actions"][0];
     var action = $A.get("c.aura://ComponentController.getComponent");
@@ -3468,7 +3476,7 @@ AuraClientService.prototype.injectComponent = function(config, locatorDomId, loc
     action.setCallback(action, function(a) {
         var root = $A.getRoot();
         if(!priorAccess){
-            context.setCurrentAccess(root);
+            self.setCurrentAccess(root);
         }
         try {
             var element = $A.util.getElement(locatorDomId);
@@ -3526,7 +3534,7 @@ AuraClientService.prototype.injectComponent = function(config, locatorDomId, loc
             $A.afterRender(c);
         } finally {
             if (!priorAccess) {
-                context.releaseCurrentAccess();
+                self.releaseCurrentAccess();
             }
         }
     });
@@ -3615,12 +3623,11 @@ AuraClientService.prototype.renderInjection = function(component, locator, actio
  * @export
  */
 AuraClientService.prototype.injectComponentAsync = function(config, locator, eventHandlers, callback) {
-    var acs = this;
-    var context = $A.getContext();
-    var priorAccess = context.getCurrentAccess();
+    var self = this;
+    var priorAccess = this.currentAccess;
     var root = $A.getRoot();
     if (!priorAccess) {
-        context.setCurrentAccess(root);
+        self.setCurrentAccess(root);
     }
     try {
         $A.componentService.newComponentAsync(undefined, function(component) {
@@ -3628,18 +3635,18 @@ AuraClientService.prototype.injectComponentAsync = function(config, locator, eve
                 callback(component);
             }
 
-            acs.renderInjection(component, locator, eventHandlers);
+            self.renderInjection(component, locator, eventHandlers);
         }, config, root, false, false, true);
     } finally {
         if (!priorAccess) {
-            context.releaseCurrentAccess();
+            self.releaseCurrentAccess();
         }
     }
 
     // Now we go ahead and stick a label load on the request.
     var labelAction = $A.get("c.aura://ComponentController.loadLabels");
     labelAction.setCallback(this, function() {});
-    acs.enqueueAction(labelAction);
+    self.enqueueAction(labelAction);
 };
 
 /**
@@ -3731,10 +3738,10 @@ AuraClientService.prototype.enqueueAction = function(action, background) {
  */
 AuraClientService.prototype.deferAction = function (action) {
     $A.deprecated("$A.deferAction is broken, do not use it.","Use '$A.enqueueAction(action);'.","2017/01/06","2017/02/17");
-    var acs = this;
+    var self = this;
     var promise = new Promise(function(success, error) {
 
-        action.wrapCallback(acs, function (a) {
+        action.wrapCallback(self, function (a) {
             if (a.getState() === 'SUCCESS') {
                 success(a.getReturnValue());
             }
@@ -3745,7 +3752,7 @@ AuraClientService.prototype.deferAction = function (action) {
             }
         });
 
-        acs.enqueueAction(action);
+        self.enqueueAction(action);
     });
 
     return promise;
@@ -3867,6 +3874,7 @@ AuraClientService.prototype.invalidateAction = function(descriptor, params, succ
     );
 };
 
+// ACCESS CONTROL
 AuraClientService.prototype.isInternalNamespace = function(namespace) {
     return this.namespaces.internal.hasOwnProperty(namespace);
 };
@@ -3875,22 +3883,68 @@ AuraClientService.prototype.isPrivilegedNamespace = function(namespace) {
     return this.namespaces.privileged.hasOwnProperty(namespace);
 };
 
+AuraClientService.prototype.getAccessStackHierarchy=function(){
+    return this.currentAccess ? this.accessStack.map(function(component) {
+        return "[" + component.getType() + "]";
+    }).join(" > ") : "";
+};
+
+AuraClientService.prototype.setCurrentAccess=function(component){
+    if(!component){
+        component=this.currentAccess;
+    }else{
+        while(component instanceof PassthroughValue){
+            component=component.getComponent();
+        }
+    }
+    if(component){
+        this.accessStack.push(component);
+        this.currentAccess=component;
+    }
+};
+
+AuraClientService.prototype.releaseCurrentAccess=function(){
+    this.accessStack.pop();
+    this.currentAccess=this.accessStack[this.accessStack.length-1];
+};
+
+AuraClientService.prototype.getAccessVersion = function(name) {
+    var currentAccessCaller = this.accessStack[this.accessStack.length-2];
+    var ret = null;
+    if (currentAccessCaller) {
+        var def = currentAccessCaller.getDef();
+        if (def) {
+            // return the version of currentAccessCaller if namespaces are the same
+            if (def.getDescriptor().getNamespace() === name) {
+                ret = currentAccessCaller.get("version");
+            }
+            else {
+                ret = def.getRequiredVersionDefs().getDef(name);
+                if (ret) {
+                    ret = ret.getVersion();
+                }
+            }
+        }
+    }
+
+    return ret;
+};
+
 AuraClientService.prototype.allowAccess = function(definition, component) {
     if(definition&&definition.getDescriptor){
         var context;
-        var currentAccess;
+        var currentAccess=this.currentAccess;
         if(definition.access==='G'){
             // GLOBAL means accessible from anywhere
             return true;
         }else if(definition.access==='p'){
             // PRIVATE means "same component only".
-            context=$A.getContext();
-            currentAccess=context&&context.getCurrentAccess();
             return currentAccess&&(currentAccess===component||currentAccess.getComponentValueProvider()===component||currentAccess.getDef()===component);
         }else{
             // Compute PRIVILEGED, INTERNAL, PUBLIC, and default (omitted)
-            context=$A.getContext();
-            currentAccess=(context&&context.getCurrentAccess())||component;
+            if(!currentAccess){
+                currentAccess=component;
+            }
             if(currentAccess){
                 var accessDef=null;
                 var accessFacetDef=null;
@@ -3938,7 +3992,7 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
             return (definition.isInstanceOf && definition.isInstanceOf("aura:application")) ||
             // #if {"excludeModes" : ["PRODUCTION","PRODUCTIONDEBUG"]}
             // JBUCH: HACK: REMOVE WHEN WE NO LONGER LOAD COMPONENTS DIRECTTLY FOR DEV/TEST
-            (!$A.getRoot() || !$A.getRoot().isInstanceOf('aura:application')) && !(context&&context.getCurrentAccess()) ||
+            (!$A.getRoot() || !$A.getRoot().isInstanceOf('aura:application')) && !this.currentAccess ||
             // #end
             false;
         }
@@ -3952,14 +4006,14 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
  * @export
  */
 AuraClientService.prototype.invalidSession = function(newToken) {
-    var acs = this;
+    var self = this;
 
     function refresh(disableParallelBootstrapLoad) {
         if (disableParallelBootstrapLoad) {
-            acs.disableParallelBootstrapLoadOnNextLoad();
+            self.disableParallelBootstrapLoadOnNextLoad();
         }
         $A.log("[AuraClientService.invalidSession]: Reloading the page.");
-        $A.clientService.hardRefresh();
+        self.hardRefresh();
     }
 
     // if new token provided then persist to storage and reload. if persisting
@@ -4073,11 +4127,11 @@ AuraClientService.prototype.populatePersistedActionsFilter = function() {
         return Promise["resolve"]();
     }
 
-    var acs = this;
+    var self = this;
     return actionStorage.getAll([], true)
         .then(function(items) {
             for (var key in items) {
-                acs.persistedActionFilter[key] = true;
+                self.persistedActionFilter[key] = true;
             }
             $A.log("AuraClientService: restored " + Object.keys(items).length + " actions");
         });

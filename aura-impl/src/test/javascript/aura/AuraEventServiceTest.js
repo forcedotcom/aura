@@ -81,10 +81,7 @@ Test.Aura.AuraEventServiceTest = function() {
                         throw new Error(msg);
                     }
                 },
-                getContext: function() {
-                    return {
-                        getCurrentAccess: function() {}
-                    }
+                clientService:{
                 },
                 getRoot: function(){}
             },

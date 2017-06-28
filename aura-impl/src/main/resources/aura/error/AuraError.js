@@ -92,6 +92,13 @@ function AuraError(message, innerError, severity) {
     this["stackFrames"] = this.stackFrames;
     this["stacktraceIdGen"] = "";
     this["id"] = "";
+
+    // Access Stack defaults - takes dependency on $A.clientService
+    if(typeof($A)!="undefined"&&$A.clientService&&$A.clientService.currentAccess){
+        this.setComponent($A.clientService.currentAccess.getType());
+        this["componentStack"]=$A.clientService.getAccessStackHierarchy();
+    }
+
 }
 
 /* port murmur32 from guava */

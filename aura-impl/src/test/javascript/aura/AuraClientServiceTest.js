@@ -74,8 +74,9 @@ Test.Aura.AuraClientServiceTest = function() {
             getContext : function() {
                 return {
                     encodeForServer: function(){},
-                    getCurrentAccess: function(){}
                 };
+            },
+            clientService:{
             },
             auraError: function(msg) {
                 this.message = msg;
@@ -1167,6 +1168,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 target.saveTokenToStorage = function() {
                     return ResolvePromise();
                 };
+                target.hardRefresh=function(){};
 
                 // Act
                 target.invalidSession();

@@ -98,7 +98,7 @@
             },
             function(cmp) {
                 var actual = this.findFailingDescriptorFromErrorModal();
-                var expected = cmp.getDef().getDescriptor().getQualifiedName();
+                var expected = cmp.getType();
 
                 $A.test.assertEquals(expected, actual);
             }
@@ -132,7 +132,7 @@
             },
             function(cmp) {
                 var actual = this.findFailingDescriptorFromErrorModal();
-                var expected = cmp.find("containedCmp").getDef().getDescriptor().getQualifiedName();
+                var expected = cmp.find("containedCmp").getType();
 
                 $A.test.assertEquals(expected, actual);
             }
@@ -145,7 +145,7 @@
      * The test approach is that call a client action to trigger a function wrapped by $A.getCallback, which
      * trigger another a funtion wrapped by $A.getCallback via aura:method. The actual error is from the latter
      * function, so the failing descriptor is the owner component of that function, which is the contained
-     * component (markup://auratest:errorHandling).
+     * component (auratest:errorHandling).
      */
     testFailingDescriptorForErrorFromNestedGetCallbackFunctions: {
         test: [
@@ -157,7 +157,7 @@
             },
             function(cmp) {
                 var actual = this.findFailingDescriptorFromErrorModal();
-                var expected = cmp.find("containedCmp").getDef().getDescriptor().getQualifiedName();
+                var expected = cmp.find("containedCmp").getType();
 
                 $A.test.assertEquals(expected, actual);
             }
@@ -188,7 +188,7 @@
             },
             function(cmp) {
                 var actual = this.findFailingDescriptorFromErrorModal();
-                var expected = "markup://auratest:errorHandlingApp";
+                var expected = "auratest:errorHandlingApp";
 
                 $A.test.assertTrue(actual.indexOf(expected) > -1);
             }

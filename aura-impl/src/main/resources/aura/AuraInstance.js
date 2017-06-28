@@ -952,17 +952,9 @@ AuraInstance.prototype.message = function(msg, error, showReload) {
  */
 AuraInstance.prototype.getCallback = function(callback) {
     $A.assert($A.util.isFunction(callback),"$A.getCallback(): 'callback' must be a valid Function");
-    var context=$A.getContext().getCurrentAccess();
-    var contextComponentStack = $A.getContext().getAccessStackHierarchy();
-    var contextComponent = null;
-    if (context && context.getDef) {
-        var contextComponentDef = context.getDef();
-        if (contextComponentDef) {
-            contextComponent = contextComponentDef.getDescriptor().toString();
-        }
-    }
+    var context=$A.clientService.currentAccess;
     function callbackWrapper(){
-        $A.getContext().setCurrentAccess(context);
+        $A.clientService.setCurrentAccess(context);
         $A.clientService.pushStack("$A.getCallback()");
         try {
             return callback.apply(this,Array.prototype.slice.call(arguments));
@@ -970,9 +962,6 @@ AuraInstance.prototype.getCallback = function(callback) {
             // no need to wrap AFE with auraError as
             // customers who throw AFE would want to handle it with their own custom experience.
             if (e instanceof $A.auraError) {
-                e.setComponent(e["component"] || contextComponent);
-                e["componentStack"] = e["componentStack"] || contextComponentStack;
-                $A.lastKnownError = e;
                 throw e;
             } else {
                 // create a synthetic stack frame for errors from callback wrapped in $A.getCallback called by Action.finishAction
@@ -1004,14 +993,12 @@ AuraInstance.prototype.getCallback = function(callback) {
                 if (syntheticStackFrame) {
                     errorWrapper.setStackTrace(syntheticStackFrame + errorWrapper.stackTrace);
                 }
-                errorWrapper.setComponent(contextComponent);
-                errorWrapper["componentStack"] = contextComponentStack;
                 $A.lastKnownError = errorWrapper;
                 throw errorWrapper;
             }
         } finally {
             $A.clientService.popStack("$A.getCallback()");
-            $A.getContext().releaseCurrentAccess();
+            $A.clientService.releaseCurrentAccess();
         }
     }
     if(callback.reference&&callback.toString()===callbackWrapper.toString()){ // don't double-wrap
@@ -1371,9 +1358,7 @@ AuraInstance.prototype.deprecated = function(message,workaround,sinceDate,dueDat
 
     // JBUCH: TEMPORARILY IGNORE CALLS BY ui: and aura: NAMESPACES.
     // REMOVE WHEN VIEW LOGIC IS COMPILED WITH FRAMEWORK.
-    var context=$A.getContext();
-    context=context&&context.getCurrentAccess();
-    if(/^(ui|aura):\w+$/.test(context&&context.getType())){
+    if(/^(ui|aura):\w+$/.test($A.clientService.currentAccess&&$A.clientService.currentAccess.getType())){
         // $A.log("Framework component use of deprecated method: "+message);
         return;
     }

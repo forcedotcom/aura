@@ -33,12 +33,7 @@ Test.Aura.Event.Event=function(){
     function executeHandlerIterator() {
 		var auraContext = {
 				stack : [],
-				"setCurrentAccess": function(cmp) {
-					this.stack.push(cmp)
-				},
-				"releaseCurrentAccess": function() {
-					this.stack.pop();
-				},
+
 				"getStackLength": function() {
 					return this.stack.length;
 				},
@@ -51,6 +46,14 @@ Test.Aura.Event.Event=function(){
 	            "getContext": function() {
 	            	return auraContext;
 	            },
+				"clientService":{
+					"setCurrentAccess": function(cmp) {
+						auraContext.stack.push(cmp)
+					},
+					"releaseCurrentAccess": function() {
+						auraContext.stack.pop();
+					},
+				},
 				"lockerService": {
 	            	"trust": function(a, b) {}
 	            }

@@ -1276,19 +1276,14 @@ AuraEventService.prototype.getDef = function(descriptor) {
     var definition = this.getEventDef(descriptor);
 
     if(definition && !$A.clientService.allowAccess(definition)) {
-        var context=$A.getContext();
-        var contextCmp = context&&context.getCurrentAccess();
-        var message="Access Check Failed! EventService.getEventDef():'" + definition.getDescriptor().toString() + "' is not visible to '" + contextCmp + "'.";
-        if(context.enableAccessChecks) {
-            if(context.logAccessFailures){
-                var ae = new $A.auraError(message);
-                ae.setComponent(contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName());
-                ae["componentStack"] = context && context.getAccessStackHierarchy();
-                $A.error(null, ae);
+        var message="Access Check Failed! EventService.getEventDef():'" + definition.getDescriptor().toString() + "' is not visible to '" + $A.clientService.currentAccess + "'.";
+        if($A.clientService.enableAccessChecks) {
+            if($A.clientService.logAccessFailures){
+                $A.error(null,new $A.auraError(message));
            }
             return null;
         } else {
-            if(context.logAccessFailures){
+            if($A.clientService.logAccessFailures){
                 $A.warning(message);
             }
             // Intentional fallthrough
@@ -1310,20 +1305,14 @@ AuraEventService.prototype.getDef = function(descriptor) {
 AuraEventService.prototype.hasDefinition = function(descriptor) {
     var definition = this.getEventDef(descriptor);
     if(definition && !$A.clientService.allowAccess(definition)) {
-        var context=$A.getContext();
-        var contextCmp = context&&context.getCurrentAccess();
-        var message="Access Check Failed! EventService.hasDefinition():'" + definition.getDescriptor().toString() + "' is not visible to '" + contextCmp + "'.";
-
-        if(context.enableAccessChecks) {
-            if(context.logAccessFailures){
-                var ae = new $A.auraError(message);
-                ae.setComponent(contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName());
-                ae["componentStack"] = context && context.getAccessStackHierarchy();
-                $A.error(null, ae);
+        var message="Access Check Failed! EventService.hasDefinition():'" + definition.getDescriptor().toString() + "' is not visible to '" + $A.clientService.currentAccess + "'.";
+        if($A.clientService.enableAccessChecks) {
+            if($A.clientService.logAccessFailures){
+                $A.error(null,new $A.auraError(message));
             }
             return false;
         }else{
-            if(context.logAccessFailures){
+            if($A.clientService.logAccessFailures){
                 $A.warning(message);
             }
             //Intentional fallthrough

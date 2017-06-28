@@ -44,7 +44,7 @@ function IfComponent(config, localCreation) {
     this.localIndex = {};
     this.destroyed=0;
     this.version = config["version"];
-    this.owner = context.getCurrentAccess();
+    this.owner = $A.clientService.currentAccess;
     this.name='';
     this.isRootComponent = true;
 

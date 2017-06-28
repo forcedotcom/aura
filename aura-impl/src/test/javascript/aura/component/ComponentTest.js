@@ -55,8 +55,6 @@ Test.Aura.Component.ComponentTest=function(){
                 assert:function(condition,message){if(!condition)throw new Error(message)},
                 error:function(message){throw new Error(message)},
                 getContext:function(){return {
-                    getAccessVersion:function(){},
-                    getCurrentAccess:function(){},
                     getCurrentAction:function(){
                         return {
                             topPath: function () {},
@@ -65,10 +63,13 @@ Test.Aura.Component.ComponentTest=function(){
                             getCurrentPath: function () {}
                         };
                     },
-                    containsComponentConfig: function () { return true;},
+                    containsComponentConfig: function () { return true;}
+                }},
+                clientService:{
+                    getAccessVersion:function(){},
                     releaseCurrentAccess:function(){},
                     setCurrentAccess: function(){}
-                }},
+                },
                 componentService:{
                     get:function(){},
                     getDef:function(){
@@ -80,7 +81,8 @@ Test.Aura.Component.ComponentTest=function(){
                                 getValues:function(){return null}
                             },
                             descriptor: {
-                                getFullName: function() { return "" }
+                                getFullName: function() { return "" },
+                                getNamespace:function(){}
                             },
                             getAllEvents:function(){
                                 return []
@@ -89,9 +91,7 @@ Test.Aura.Component.ComponentTest=function(){
                             getCmpHandlerDefs:function(){},
                             getControllerDef:function(){},
                             getDescriptor:function(){
-                                return {
-                                    getNamespace:function(){}
-                                }
+                                return this.descriptor;
                             },
                             getEventDef:function(){
                                 return {getDescriptor:function(){
@@ -158,46 +158,8 @@ Test.Aura.Component.ComponentTest=function(){
         function NotFiredInitWhenDefHasNoHandler() {
             var fired = false;
             mockFramework(function() {
-                $A.componentService.getDef = function(){
-                    return {
-                        attributeDefs:{
-                            getDef:function(){},
-                            getNames:function(){return []},
-                            getValues:function(){return null}
-                        },
-                        descriptor: {
-                            getFullName: function() { return "" }
-                        },
-                        getAllEvents:function(){
-                            return []
-                        },
-                        getAppHandlerDefs:function(){},
-                        getCmpHandlerDefs:function(){},
-                        getControllerDef:function(){},
-                        getDescriptor:function(){
-                            return {
-                                getNamespace:function(){}
-                            }
-                        },
-                        getEventDef:function(){
-                            return {getDescriptor:function(){
-                                return {
-                                    getQualifiedName:function(){}
-                                }
-                            }}
-                        },
-                        getModelDef:function(){},
-                        getSuperDef:function(){},
-                        getValueHandlerDefs:function(){},
-                        isAbstract:function(){},
-                        isInstanceOf:function(){},
-                        hasInit:function(){
-                            return false;
-                        }
-                    };
-                };
-                Aura.Component.Component.prototype.fire = function() {
-                    fired = true;
+                Aura.Component.Component.prototype.fire=function(){
+                    fired=true;
                 };
                 new Aura.Component.Component({});
             });

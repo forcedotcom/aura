@@ -21,7 +21,6 @@
  * @export
  */
 function InteropComponent(config) {
-    var context = $A.getContext();
     var cmpDef = $A.componentService.getDef(config['componentDef']);
     this.concreteComponentId = config["concreteComponentId"];
     this.containerComponentId = config["containerComponentId"];
@@ -36,7 +35,7 @@ function InteropComponent(config) {
     this.valueProviders = {};
     this.localId = config['localId'];
     this.attributeValueProvider = config['attributes']['valueProvider'];
-    this.owner = context.getCurrentAccess();
+    this.owner = $A.clientService.currentAccess;
     this.currentClassMap = {};
 
     this.setupGlobalId(config['globalId']);

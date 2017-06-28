@@ -51,15 +51,6 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.contextPath = config["contextPath"] || "";
     this.allowedGlobals = config["allowedGlobals"];
     this.globals = config["globals"];
-    this.enableAccessChecks=true;
-
-    // JBUCH: TOGGLE LOGGING OFF BY DEFAULT IN PROD MODE
-    this.logAccessFailures= true
-                            // #if {"modes" : ["PRODUCTION"]}
-                            && false
-                            // #end
-                            ;
-    this.accessStack=[];
     this.tokens={};
     this.isModulesEnabled = !!config["m"];
     this.useCompatSource = !!config["c"];
@@ -155,59 +146,6 @@ Aura.Context.AuraContext.prototype.getMode = function() {
     return this.mode;
 };
 
-Aura.Context.AuraContext.prototype.getCurrentAccess=function(){
-    return this.accessStack[this.accessStack.length-1];
-};
-
-Aura.Context.AuraContext.prototype.getCurrentAccessCaller=function(){
-    return this.accessStack[this.accessStack.length-2];
-};
-
-Aura.Context.AuraContext.prototype.getAccessStackHierarchy=function(){
-    return this.accessStack ? this.accessStack.map(function(component) {
-        return "[" + component.getType() + "]";
-    }).join(" > ") : null;
-};
-
-Aura.Context.AuraContext.prototype.setCurrentAccess=function(component){
-    if(!component){
-        component=this.getCurrentAccess();
-    }else{
-        while(component instanceof PassthroughValue){
-            component=component.getComponent();
-        }
-    }
-    if(component){
-        this.accessStack.push(component);
-    }
-};
-
-Aura.Context.AuraContext.prototype.releaseCurrentAccess=function(){
-    this.accessStack.pop();
-};
-
-Aura.Context.AuraContext.prototype.getAccessVersion = function(name) {
-    var currentAccessCaller = this.getCurrentAccessCaller();
-    var ret = null;
-    if (currentAccessCaller) {
-        var def = currentAccessCaller.getDef();
-        if (def) {
-            // return the version of currentAccessCaller if namespaces are the same
-            if (def.getDescriptor().getNamespace() === name) {
-                ret = currentAccessCaller.get("version");
-            }
-            else {
-                ret = def.getRequiredVersionDefs().getDef(name);
-                if (ret) {
-                    ret = ret.getVersion();
-                }
-            }
-        }
-    }
-
-    return ret;
-};
-
 /**
  * Gets the application configuration tokens allowed to be used in component markup.
  * @private
@@ -299,7 +237,7 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
         throw new $A.auraError("framework mismatch", null, $A.severity.QUIET);
     }
 
-    this.enableAccessChecks=otherContext["enableAccessChecks"];
+    $A.clientService.enableAccessChecks=otherContext["enableAccessChecks"];
     this.moduleServices = otherContext["services"];
 
     try {

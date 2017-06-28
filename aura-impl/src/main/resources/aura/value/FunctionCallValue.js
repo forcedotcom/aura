@@ -23,7 +23,7 @@ function FunctionCallValue(config, valueProvider){
     this.valueProvider = valueProvider;
     this.byValue = config["byValue"];
     this.code = $A.util.json.decodeString(config["code"]);
-    this.context = $A.getContext().getCurrentAccess();
+    this.context = $A.clientService.currentAccess;
 
     this.args = [];
     for (var i = 0; i < config["args"].length; i++) {
@@ -60,7 +60,7 @@ FunctionCallValue.prototype.isDirty = function(){
  * @param {Object} valueProvider The value provider to resolve.
  */
 FunctionCallValue.prototype.evaluate = function(valueProvider){
-    $A.getContext().setCurrentAccess(this.context);
+    $A.clientService.setCurrentAccess(this.context);
     try {
         var result = this.code.call(null, valueProvider || this.valueProvider, this.expressionFunctions);
         if(!this.hasOwnProperty("result")){
@@ -68,7 +68,7 @@ FunctionCallValue.prototype.evaluate = function(valueProvider){
         }    
         return result;
     } finally {
-        $A.getContext().releaseCurrentAccess();
+        $A.clientService.releaseCurrentAccess();
     }
 };
 

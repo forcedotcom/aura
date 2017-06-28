@@ -48,6 +48,10 @@ Test.Aura.Controller.ActionTest = function() {
         Mocks.GetMocks(Object.Global(), {
             "$A": {
                 getContext: function() {},
+                clientService:{
+                    setCurrentAccess:function(){},
+                    releaseCurrentAccess:function(){}
+                },
                 lockerService: {
                     trust: function() {}
                 }
@@ -62,6 +66,7 @@ Test.Aura.Controller.ActionTest = function() {
     var mockActionDependencies = Mocks.GetMocks(Object.Global(), {
             "$A": {
                 getContext: function() { return null; },
+                clientService:{},
                 lockerService: {
                     trust: function() {}
                 },
@@ -632,6 +637,10 @@ Test.Aura.Controller.ActionTest = function() {
                     actual = param;
                 },
                 auraError:Aura.Errors.AuraError,
+                clientService:{
+                    setCurrentAccess:function(){},
+                    releaseCurrentAccess:function(){}
+                },
                 lockerService : {
                     wrapComponent: function(component) {
                         return component;
@@ -683,6 +692,10 @@ Test.Aura.Controller.ActionTest = function() {
                     return Stubs.Aura.GetContext();
                 },
                 assert : function(param) {
+                },
+                clientService:{
+                    setCurrentAccess:function(){},
+                    releaseCurrentAccess:function(){}
                 },
                 lockerService : {
                     wrapComponent: function(component) {
@@ -749,6 +762,8 @@ Test.Aura.Controller.ActionTest = function() {
                         };
                     },
                     clientService: {
+                        setCurrentAccess:function(){},
+                        releaseCurrentAccess:function(){},
                         inAuraLoop: function () {
                             return false;
                         }
@@ -1114,7 +1129,9 @@ Test.Aura.Controller.ActionTest = function() {
                 clientService : {
                     inAuraLoop : function() {
                         return inloop;
-                    }
+                    },
+                    setCurrentAccess:function(){},
+                    releaseCurrentAccess:function(){}
                 },
                 warning : function() {
                 },
@@ -1161,8 +1178,6 @@ Test.Aura.Controller.ActionTest = function() {
             // Act
             mockContext(false)(function() {
                 target.finishAction({
-                    setCurrentAccess: function(){},
-                    releaseCurrentAccess: function(){},
                     setCurrentAction: function () {},
                     joinComponentConfigs: function () {},
                     finishComponentConfigs: function () {}
@@ -1178,8 +1193,6 @@ Test.Aura.Controller.ActionTest = function() {
             var target = newAction();
             var expectedId = "9955";
             var context = {
-                setCurrentAccess: function(){},
-                releaseCurrentAccess: function(){},
                 joinComponentConfigs : function() {},
                 setCurrentAction : function() {}
             };
@@ -1212,8 +1225,6 @@ Test.Aura.Controller.ActionTest = function() {
             var target = newAction();
             var expectedId = "9955";
             var context = {
-                setCurrentAccess: function(){},
-                releaseCurrentAccess: function(){},
                 joinComponentConfigs : function() {},
                 setCurrentAction : function() {}
             };
@@ -1247,8 +1258,6 @@ Test.Aura.Controller.ActionTest = function() {
             var target = newAction();
             var expectedId = "9955";
             var context = {
-                setCurrentAccess: function(){},
-                releaseCurrentAccess: function(){},
                 joinComponentConfigs : function() {},
                 setCurrentAction : function() {}
             };

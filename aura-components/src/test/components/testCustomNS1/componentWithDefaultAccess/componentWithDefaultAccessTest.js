@@ -929,7 +929,7 @@
                 this.waitForErrorModal(function() {
                     var failingDescriptor = that.findFailingDescriptorFromErrorModal();
 
-                    var expected = cmp.getDef().getDescriptor().getQualifiedName();
+                    var expected = cmp.getType();
                     $A.test.assertEquals(expected, failingDescriptor);
                     $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                             "Access Check Failed! AuraComponentService.createComponentFromConfig(): \'markup://testCustomNS2:componentWithDefaultAccess",
@@ -958,7 +958,7 @@
                 this.waitForErrorModal(function() {
                     var failingDescriptor = that.findFailingDescriptorFromErrorModal();
 
-                    var expected = cmp.getDef().getDescriptor().getQualifiedName();
+                    var expected = cmp.getType();
                     $A.test.assertEquals(expected, failingDescriptor);
                     $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                             "Access Check Failed! AttributeSet.get(): attribute \'privateAttribute\' of component \'markup://testCustomNS1:componentWithDefaultAccess2",
@@ -987,7 +987,7 @@
                 this.waitForErrorModal(function() {
                     var failingDescriptor = that.findFailingDescriptorFromErrorModal();
 
-                    var expected = cmp.getDef().getDescriptor().getQualifiedName();
+                    var expected = cmp.getType();
                     $A.test.assertEquals(expected, failingDescriptor);
                     $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                             "Access Check Failed! AttributeSet.set(): \'privateAttribute\' of component \'markup://testCustomNS1:componentWithDefaultAccess2",
@@ -1015,7 +1015,7 @@
                 this.waitForErrorModal(function() {
                     var failingDescriptor = that.findFailingDescriptorFromErrorModal();
 
-                    var expected = cmp.getDef().getDescriptor().getQualifiedName();
+                    var expected = cmp.getType();
                     $A.test.assertEquals(expected, failingDescriptor);
                     $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                             "Access Check Failed! Component.method():\'markup://testCustomNS1:privateMethod",
@@ -1044,7 +1044,7 @@
                 this.waitForErrorModal(function() {
                     var failingDescriptor = that.findFailingDescriptorFromErrorModal();
 
-                    var expected = cmp.getDef().getDescriptor().getQualifiedName();
+                    var expected = cmp.getType();
                     $A.test.assertEquals(expected, failingDescriptor);
                     $A.test.getPopOverErrorMessage($A.test.getAuraErrorMessage(),"\' is not visible to \'",
                             "Access Check Failed! Component.getEvent():\'NS2eventWithPublicAccessRegisteredWithPublicAccess",

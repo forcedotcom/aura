@@ -44,7 +44,7 @@ function ExpressionComponent(config, localCreation) {
     this.localIndex = {};
     this.destroyed=0;
     this.version = config["version"];
-    this.owner = context.getCurrentAccess();
+    this.owner = $A.clientService.currentAccess;
     this.name='';
 
     // allows components to skip creation path checks if it's doing something weird
@@ -169,12 +169,11 @@ ExpressionComponent.prototype.setContainerComponentId = function(containerCompon
     // Specific to Expressions only.
     if(this.isValid()) {
         // set the containerComponentId for expression values to the expression component itself
-        var context = $A.getContext();
-        var enableAccessChecks = context.enableAccessChecks;
+        var enableAccessChecks = $A.clientService.enableAccessChecks;
         try {
             // JBA: turn off access checks so we can evaluate this expression
             // safely just for this statement
-            context.enableAccessChecks = false;
+            $A.clientService.enableAccessChecks = false;
             var facetValue = this.get("v.value");
             if($A.util.isArray(facetValue)){
                 for(var fidx = 0; fidx < facetValue.length; fidx++) {
@@ -192,7 +191,7 @@ ExpressionComponent.prototype.setContainerComponentId = function(containerCompon
         }
         finally {
             // flip access checks back to their initial value
-            context.enableAccessChecks = enableAccessChecks;
+            $A.clientService.enableAccessChecks = enableAccessChecks;
         }
     }
 };
@@ -240,13 +239,12 @@ ExpressionComponent.prototype["renderer"] = {
         if(!($A.util.isComponent(value) || $A.util.isArray(value))){
             // JBUCH: HALO: TODO: MIGHT BE ABLE TO RETURN THIS TO SIMPLE TEXTNODE MANAGEMENT
             var owner = component.getOwner();
-            var context = $A.getContext();
-            context.setCurrentAccess(owner);
+            $A.clientService.setCurrentAccess(owner);
             try {
                 value = component._lastRenderedTextNode = $A.createComponentFromConfig({ "descriptor": "markup://aura:text", "attributes":{ value: value } });
                 value.setContainerComponentId(component.globalId);                
             } finally {
-                context.releaseCurrentAccess();
+                $A.clientService.releaseCurrentAccess();
             }
             
             $A.lockerService.trust(owner, value);

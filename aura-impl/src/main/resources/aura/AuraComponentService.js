@@ -549,24 +549,18 @@ AuraComponentService.prototype.newComponentDeprecated = function(config, attribu
             }
         };
     } else {
-        // var currentAccess = $A.getContext().getCurrentAccess();
         // Server should handle the case of an unknown def fetched "lazily"
-        if(!$A.clientService.allowAccess(def) /* && currentAccess  */) {
-            var context=$A.getContext();
-            var contextCmp = context && context.getCurrentAccess();
+        if(!$A.clientService.allowAccess(def)) {
             var message="Access Check Failed! AuraComponentService.newComponentDeprecated(): '" +
                     (def && def.getDescriptor().getQualifiedName()) + "' is not visible to '" +
-                    contextCmp + "'.";
-            if(context.enableAccessChecks) {
-                if(context.logAccessFailures){
-                    var ae = new $A.auraError(message);
-                    ae.setComponent(contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName());
-                    ae["componentStack"] = context && context.getAccessStackHierarchy();
-                    $A.error(null, ae);
+                    $A.clientService.currentAccess + "'.";
+            if($A.clientService.enableAccessChecks) {
+                if($A.clientService.logAccessFailures){
+                    $A.error(null,new $A.auraError(message));
                 }
                 return null;
             }else{
-                if(context.logAccessFailures){
+                if($A.clientService.logAccessFailures){
                     $A.warning(message);
                 }
                 // Intentional fallthrough
@@ -929,19 +923,14 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
                 if($A.clientService.allowAccess(def)) {
                     collectComponent(this["newComponentDeprecated"](configItem, attributeValueProvider, localCreation, doForce),"SUCCESS","",i);
                 }else{
-                    var context=$A.getContext();
-                    var contextCmp = context && context.getCurrentAccess();
-                    var message="Access Check Failed! AuraComponentService.newComponentAsync(): '" + def.getDescriptor().getQualifiedName() + "' is not visible to '" + contextCmp + "'.";
-                    if(context.enableAccessChecks) {
-                        if(context.logAccessFailures){
-                            var ae = new $A.auraError(message);
-                            ae.setComponent(contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName());
-                            ae["componentStack"] = context && context.getAccessStackHierarchy();
-                            $A.error(null, ae);
+                    var message="Access Check Failed! AuraComponentService.newComponentAsync(): '" + def.getDescriptor().getQualifiedName() + "' is not visible to '" + $A.clientService.currentAccess + "'.";
+                    if($A.clientService.enableAccessChecks) {
+                        if($A.clientService.logAccessFailures){
+                            $A.error(null,new $A.auraError(message));
                         }
                         collectComponent(null, "ERROR", "Unknown component '" + desc + "'.", i);
                     }else{
-                        if(context.logAccessFailures){
+                        if($A.clientService.logAccessFailures){
                             $A.warning(message);
                         }
                         collectComponent(this["newComponentDeprecated"](configItem, attributeValueProvider, localCreation, doForce),"SUCCESS","",i);
@@ -991,8 +980,7 @@ AuraComponentService.prototype.requestComponent = function(callback, config, avp
 
         // We won't be able to do an access check if the access is invalid, so
         // just skip trying to do anything.
-        var currentAccess = $A.getContext().getCurrentAccess();
-        if(currentAccess && !currentAccess.isValid()) {
+        if($A.clientService.currentAccess && !$A.clientService.currentAccess.isValid()) {
             return;
         }
 
@@ -1198,20 +1186,15 @@ AuraComponentService.prototype.getDefinition = function(descriptor, callback) {
 
     if (def) {
         if(!$A.clientService.allowAccess(def)) {
-            var context=$A.getContext();
-            var contextCmp = context&&context.getCurrentAccess();
-            var message="Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + contextCmp + "'.";
-            if(context.enableAccessChecks) {
-                if(context.logAccessFailures){
-                    var ae = new $A.auraError(message);
-                    ae.setComponent(contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName());
-                    ae["componentStack"] = context && context.getAccessStackHierarchy();
-                    $A.error(null, ae);
+            var message="Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + $A.clientService.currentAccess + "'.";
+            if($A.clientService.enableAccessChecks) {
+                if($A.clientService.logAccessFailures){
+                    $A.error(null,new $A.auraError(message));
                 }
                 callback(null);
                 return;
             }else{
-                if(context.logAccessFailures){
+                if($A.clientService.logAccessFailures){
                     $A.warning(message);
                 }
                 //Intentional fallthrough
@@ -1283,19 +1266,14 @@ AuraComponentService.prototype.getDef = function(descriptor) {
     var def = this.getComponentDef(this.createDescriptorConfig(descriptor));
 
     if (def && !$A.clientService.allowAccess(def)) {
-        var context=$A.getContext();
-        var contextCmp = context&&context.getCurrentAccess();
-        var message="Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + contextCmp + "'.";
-        if(context.enableAccessChecks){
-            if(context.logAccessFailures){
-                var ae = new $A.auraError(message);
-                ae.setComponent(contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName());
-                ae["componentStack"] = context && context.getAccessStackHierarchy();
-                $A.error(null, ae);
+        var message="Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + $A.clientService.currentAccess + "'.";
+        if($A.clientService.enableAccessChecks){
+            if($A.clientService.logAccessFailures){
+                $A.error(null,new $A.auraError(message));
             }
             return null;
         }else{
-            if(context.logAccessFailures){
+            if($A.clientService.logAccessFailures){
                 $A.warning(message);
             }
             // Intentional fallthrough
@@ -1812,18 +1790,13 @@ AuraComponentService.prototype.createComponentPriv = function (config, callback)
                 }
             }
         }else{
-            var context=$A.getContext();
-            var contextCmp = context && context.getCurrentAccess();
-            var message="Access Check Failed! AuraComponentService.createComponentFromConfig(): '" + descriptor + "' is not visible to '" + contextCmp + "'.";
-            if(context.enableAccessChecks) {
-                if(context.logAccessFailures){
-                    var ae = new $A.auraError(message);
-                    ae.setComponent(contextCmp && contextCmp.getDef().getDescriptor().getQualifiedName());
-                    ae["componentStack"] = context && context.getAccessStackHierarchy();
-                    $A.error(null, ae);
+            var message="Access Check Failed! AuraComponentService.createComponentFromConfig(): '" + descriptor + "' is not visible to '" + $A.clientService.currentAccess + "'.";
+            if($A.clientService.enableAccessChecks) {
+                if($A.clientService.logAccessFailures){
+                    $A.error(null,new $A.auraError(message));
                 }
             }else{
-                if(context.logAccessFailures){
+                if($A.clientService.logAccessFailures){
                     $A.warning(message);
                 }
                 if(def) {

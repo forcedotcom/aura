@@ -63,7 +63,6 @@ public class FileSourceLoader extends BaseSourceLoader implements InternalNamesp
         // add the namespace root to the file monitor
         if (fileMonitor != null) {
             fileMonitor.subscribeToChangeNotification(this);
-            fileMonitor.addDirectory(base.getPath());
         }
     }
 

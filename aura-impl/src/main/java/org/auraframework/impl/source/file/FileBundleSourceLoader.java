@@ -116,7 +116,6 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
         // add the namespace root to the file monitor
         if (fileMonitor != null) {
             fileMonitor.subscribeToChangeNotification(this);
-            fileMonitor.addDirectory(base.getPath());
         }
     }
 

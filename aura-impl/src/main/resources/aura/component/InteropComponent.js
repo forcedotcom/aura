@@ -418,29 +418,29 @@ InteropComponent.prototype.deIndex = function(){};
  * @export
  */
 InteropComponent.prototype.find = function(){
-    this.raiseInvalidInteropApi('find', arguments);
+    return null;
 };
 
 /**
  * @private
  */
 InteropComponent.prototype.findInstancesOf = function(){
-    this.raiseInvalidInteropApi('findInstancesOf', arguments);
+    return [];
 };
 
 /**
+ * @private
+ */
+InteropComponent.prototype.findInstanceOf = function(){
+    return null;
+};
+
+/**
+ * 
  * @private
  */
 InteropComponent.prototype.getSuperest = function(){
     this.raiseInvalidInteropApi('getSuperest', arguments);
-};
-
-/**
- *
- * @private
- */
-InteropComponent.prototype.findInstanceOf = function(){
-    this.raiseInvalidInteropApi('findInstanceOf', arguments);
 };
 
 /**

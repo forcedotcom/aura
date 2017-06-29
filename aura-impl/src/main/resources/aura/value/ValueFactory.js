@@ -45,25 +45,10 @@ var valueFactory = {
                 valueConfig=childConfig;
             }
         } else if (aura.util.isString(valueConfig) && valueConfig.charAt(0)==='{' && component) {
-            //JBUCH: TODO: REMOVE THIS ELSEIF CLAUSE ONCE USES IN CORE ARE FIXED
-            $A.log("Aura ValueFactory: String expressions are no longer supported.");
-//             var expression=valueConfig.substring(2, valueConfig.length - 1);
-//             var isGlobal=expression.charAt(0)==='$';
-//             // Property Expressions:
-//             switch(valueConfig.charAt(1)){
-//                 // By Value
-//                 case '#':
-//                     return (isGlobal?$A:component).get(expression);
-//                 // By Reference
-//                 case '!':
-// //                  //JBUCH: HALO: FIXME: FIND A BETTER WAY TO HANDLE DEFAULT EXPRESSIONS
-//                     if(isGlobal) {
-//                         return $A.expressionService.getReference(valueConfig,component);
-//                     }else if($A.util.isComponent(component)){
-//                         return component.getReference(valueConfig);
-//                     }
-//                     return new PropertyReferenceValue(expression.split("."), component);
-//             }
+            if(valueConfig.charAt(1)==='!'||valueConfig.charAt(1)==='#'){
+                //JBUCH: TODO: REMOVE THIS ELSEIF CLAUSE ONCE USES IN CORE ARE FIXED
+                $A.log("Aura ValueFactory: String expressions are no longer supported.");
+            }
         }
         return valueConfig;
     }

@@ -37,8 +37,8 @@ public class AuraClientExceptionUtilUnitTest extends UnitTestCase {
     @Test
     public void testParseCauseDescriptorWithQualifiedNameSetsNamespaceAndName() {
         AuraClientException target = Mockito.mock(AuraClientException.class);
-        String qualifiedName = "markup://namespace:name";
-        Mockito.when(target.getCauseDescriptor()).thenReturn(qualifiedName);
+        String typeName = "namespace:name";
+        Mockito.when(target.getCauseDescriptor()).thenReturn(typeName);
 
         AuraClientExceptionUtil.parseCauseDescriptor(target);
 
@@ -72,7 +72,7 @@ public class AuraClientExceptionUtilUnitTest extends UnitTestCase {
 
         AuraClientExceptionUtil.parseStacktrace(auraClientException, jsStack, definitionService, configAdapter, contextService);
 
-        String expected = "markup://auratest:errorHandlingApp";
+        String expected = "auratest:errorHandlingApp";
         Mockito.verify(auraClientException).setFailedComponentMethod("throwErrorFromClientController");
         Mockito.verify(auraClientException).setCauseDescriptor(expected);
         Mockito.verify(auraClientException).setFailedComponentNamespace("auratest");
@@ -89,7 +89,7 @@ public class AuraClientExceptionUtilUnitTest extends UnitTestCase {
 
         AuraClientExceptionUtil.parseStacktrace(auraClientException, jsStack, definitionService, configAdapter, contextService);
 
-        String expected = "markup://auratest:errorHandling";
+        String expected = "auratest:errorHandling";
         Mockito.verify(auraClientException).setFailedComponentMethod("rerender");
         Mockito.verify(auraClientException).setCauseDescriptor(expected);
         Mockito.verify(auraClientException).setFailedComponentNamespace("auratest");
@@ -105,7 +105,7 @@ public class AuraClientExceptionUtilUnitTest extends UnitTestCase {
         ContextService contextService = Mockito.mock(ContextService.class);
 
         AuraClientExceptionUtil.parseStacktrace(auraClientException, jsStack, definitionService, configAdapter, contextService);
-        String expected = "markup://one:appNavBarItem";
+        String expected = "one:appNavBarItem";
         Mockito.verify(auraClientException).setFailedComponentMethod("eval");
         Mockito.verify(auraClientException).setCauseDescriptor(expected);
         Mockito.verify(auraClientException).setFailedComponentNamespace("one");
@@ -123,7 +123,7 @@ public class AuraClientExceptionUtilUnitTest extends UnitTestCase {
         ContextService contextService = Mockito.mock(ContextService.class);
 
         AuraClientExceptionUtil.parseStacktrace(auraClientException, jsStack, definitionService, configAdapter, contextService);
-        String expected = "markup://auratest:errorHandlingLib";
+        String expected = "auratest:errorHandlingLib";
         Mockito.verify(auraClientException).setFailedComponentMethod("Object.throwAnError");
         Mockito.verify(auraClientException).setCauseDescriptor(expected);
         Mockito.verify(auraClientException).setFailedComponentNamespace("auratest");

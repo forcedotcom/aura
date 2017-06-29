@@ -74,7 +74,7 @@ public class AuraClientException extends Exception {
         }
 
         // use cause to track failing component markup if action is not sent.
-        if (this.causeDescriptor == null && desc != null && desc.contains("markup://")) {
+        if (this.causeDescriptor == null && desc != null) {
             this.causeDescriptor = desc;
         }
 

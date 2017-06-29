@@ -25,8 +25,6 @@ import org.auraframework.def.LibraryDef;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.impl.util.ModuleDefinitionUtil;
-import org.auraframework.impl.util.TypeParser;
-import org.auraframework.impl.util.TypeParser.Type;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
@@ -39,24 +37,18 @@ public class AuraClientExceptionUtil {
 
     static void parseCauseDescriptor(AuraClientException auraClientException) {
         String descriptor = auraClientException.getCauseDescriptor();
-        // "markup://namespace:name"
-        int markupIndex = descriptor.indexOf("markup://");
-        if (markupIndex > -1) {
-            String markup = descriptor.substring(markupIndex).split(" ")[0];
-            Type t = TypeParser.parseTag(markup);
-            auraClientException.setFailedComponentNamespace(t.namespace);
-            auraClientException.setFailedComponent(t.name);
-        } else {
-            // namespace:name$controller$method
-            String[] parts = descriptor.split("[$]");
-            if (parts.length > 1) {
-                String[] componentInfoParts = parts[0].split(":");
-                if (componentInfoParts.length > 1) {
-                    auraClientException.setFailedComponentNamespace(componentInfoParts[0]);
-                    auraClientException.setFailedComponent(componentInfoParts[1]);
-                }
-                auraClientException.setFailedComponentMethod(parts[parts.length-1]);
-            }
+
+        // namespace:name$controller$method
+        String[] parts = descriptor.split("[$]");
+        if (parts.length > 1) {
+            auraClientException.setFailedComponentMethod(parts[parts.length-1]);
+        }
+
+        // namespace:name
+        String[] componentInfoParts = parts[0].split(":");
+        if (componentInfoParts.length > 1) {
+            auraClientException.setFailedComponentNamespace(componentInfoParts[0]);
+            auraClientException.setFailedComponent(componentInfoParts[1]);
         }
     }
 
@@ -109,10 +101,10 @@ public class AuraClientExceptionUtil {
                             namespacePart = isComponent ? pathparts[pathparts.length-2] : pathparts[pathparts.length-3];
                         }
 
-                        String qualifiedName = String.format("markup://%s:%s", namespacePart, namePart);
+                        String typeName = String.format("%s:%s", namespacePart, namePart);
                         if (auraClientException.getFailedComponent() == null || auraClientException.getFailedComponent().isEmpty()) {
                             if (auraClientException.getCauseDescriptor() == null || auraClientException.getCauseDescriptor().isEmpty()) {
-                                auraClientException.setCauseDescriptor(qualifiedName);
+                                auraClientException.setCauseDescriptor(typeName);
                             }
                             auraClientException.setFailedComponent(namePart);
                             auraClientException.setFailedComponentNamespace(namespacePart);
@@ -126,6 +118,7 @@ public class AuraClientExceptionUtil {
                             }
                         }
 
+                        String qualifiedName = String.format("markup://%s:%s", namespacePart, namePart);
                         String code = isComponent ?
                                 getComponentSourceCode(qualifiedName, definitionService, shouldMinified, isModule) :
                                 getLibrarySourceCode(qualifiedName, libraryPart, definitionService, shouldMinified, isModule);

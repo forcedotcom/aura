@@ -29,24 +29,12 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
 
     @Test
     public void testCreateAuraClientExceptionWithQualifiedName() {
-        String descriptor = "markup://foo:bar";
+        String descriptor = "foo:bar";
 
         AuraClientException ace = new AuraClientException(descriptor, null, null, null, null, null, null, null, null, null, null);
 
         String expectedNamespace = "foo";
         String expectedComponent = "bar";
-        assertEquals(expectedNamespace, ace.getFailedComponentNamespace());
-        assertEquals(expectedComponent, ace.getFailedComponent());
-    }
-
-    @Test
-    public void testCreateAuraClientExceptionWithInvalidComponentQualifiedName() {
-        String descriptor = "InvalidComponent markup://c:DTE_ImageCarousel {10:149;a}";
-
-        AuraClientException ace = new AuraClientException(descriptor, null, null, null, null, null, null, null, null, null, null);
-
-        String expectedNamespace = "c";
-        String expectedComponent = "DTE_ImageCarousel";
         assertEquals(expectedNamespace, ace.getFailedComponentNamespace());
         assertEquals(expectedComponent, ace.getFailedComponent());
     }
@@ -94,7 +82,7 @@ public class AuraClientExceptionUnitTest extends UnitTestCase {
 
         String expectedNamespace = "one";
         String expectedComponent = "appNavBarItem";
-        String expectedFailingDescriptor = "markup://one:appNavBarItem";
+        String expectedFailingDescriptor = "one:appNavBarItem";
         assertEquals(expectedNamespace, ace.getFailedComponentNamespace());
         assertEquals(expectedComponent, ace.getFailedComponent());
         assertEquals(expectedFailingDescriptor, ace.getCauseDescriptor());

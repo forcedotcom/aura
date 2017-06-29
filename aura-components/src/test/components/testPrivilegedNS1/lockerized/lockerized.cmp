@@ -19,6 +19,7 @@
     <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
     <aura:attribute name="valueByRef" type="String" default="default string" />
 
+    <aura:method name="testPrivilegedComponentIsLockerized"/>
     <aura:method name="testCreateComponentWithPRV"/>
     <aura:method name="testCreateComponentWithNestedPRV"/>
     <aura:method name="testCreateComponents"/>

@@ -39,6 +39,7 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef, C
     public static final String TAG = "aura:component";
 
     private static final String ATTRIBUTE_ISTEMPLATE = "isTemplate";
+    private static final String ATTRIBUTE_MINVERSION = "minVersion";
 
     private static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .add(ATTRIBUTE_ISTEMPLATE)
@@ -47,6 +48,7 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef, C
     private static final Set<String> INTERNAL_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .addAll(ALLOWED_ATTRIBUTES)
             .addAll(BaseComponentDefHandler.INTERNAL_ALLOWED_ATTRIBUTES)
+            .add(ATTRIBUTE_MINVERSION)
             .build();
     
     public ComponentDefHandler() {
@@ -84,6 +86,7 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef, C
     protected void readAttributes() throws QuickFixException {
         boolean isTemplate = getBooleanAttributeValue(ATTRIBUTE_ISTEMPLATE);
         builder.isTemplate = isTemplate;
+        builder.minVersion = getDoubleAttributeValue(ATTRIBUTE_MINVERSION);
         if (tc != null) {
             tc.callback(isTemplate);
         }

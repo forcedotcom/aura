@@ -15,6 +15,12 @@
         cmp.set("v.testUtils", $A.test);
     },
 
+    testPrivilegedComponentIsLockerized: {
+        test: function(cmp) {
+            cmp.testPrivilegedComponentIsLockerized();
+        }
+    },
+
     testCreateComponentWithPRV: {
         test: function(cmp) {
             cmp.testCreateComponentWithPRV();

@@ -18,10 +18,14 @@ package org.auraframework.impl.root.component;
 import java.io.IOException;
 import java.util.List;
 
+import org.auraframework.Aura;
 import org.auraframework.builder.ComponentDefBuilder;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 /**
@@ -58,6 +62,21 @@ public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> impleme
         @Override
         public DefDescriptor<ComponentDef> getDefaultExtendsDescriptor() {
             return ComponentDefImpl.PROTOTYPE_COMPONENT;
+        }
+    }
+
+    /**
+     * @throws QuickFixException
+     * @see org.auraframework.def.BaseXmlElement#validateReferences()
+     */
+    @Override
+    public void validateReferences() throws QuickFixException {
+        super.validateReferences();
+
+        // Only GLOBAL components can specify a minVersion
+        if (this.getMinVersion() != null && !this.getAccess().isGlobal()) {
+            throw new InvalidDefinitionException(
+                    "Cannot specify minVersion if access is not GLOBAL", getLocation());
         }
     }
 

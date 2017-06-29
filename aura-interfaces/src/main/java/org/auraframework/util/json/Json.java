@@ -118,6 +118,7 @@ public interface Json {
         LOCATIONCHANGEEVENTDEF("locationChangeEventDef","lc"),
         LOCATORDEFS("locaterDefs","ld"),
         MEMBERS("members","mm"),
+        MINVERSION("minVersion", "mv"),
         MODEL("model","m"),
         MODELDEF("modelDef","md"),
         METHODDEFS("methodDefs","med"),

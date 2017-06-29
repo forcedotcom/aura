@@ -762,7 +762,7 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
                 // recursive/circular references
                 var tmp = function tmp() {
                     return dep.ns;
-                }
+                };
                 tmp["_circular_"] = true;
                 return tmp;
             }
@@ -1757,6 +1757,8 @@ AuraComponentService.prototype.createComponentPriv = function (config, callback)
     var def = this.getComponentDef({ "descriptor" : descriptor });
     var cmp = null;
     var createMark;
+    var currentAccessCmp = $A.clientService.currentAccess;
+    var currentAccessCmpDef = currentAccessCmp && currentAccessCmp.getDef();
 
     if (!this.trackingCreate && descriptor.indexOf("markup://aura") < 0) {
         createMark = $A.metricsService.mark("component", "create", {"name" : descriptor});
@@ -1765,6 +1767,19 @@ AuraComponentService.prototype.createComponentPriv = function (config, callback)
 
     try {
         if($A.clientService.allowAccess(def)) {
+            // minVersion validation to check if calling component's API version is not less than minVersion requirement of component being created
+            var minVersion = def.getMinVersion();
+            var currAccessCmpApiVer = currentAccessCmpDef && currentAccessCmpDef.getApiVersion();
+            if (minVersion && currAccessCmpApiVer && (parseInt(minVersion) > parseInt(currAccessCmpApiVer))) {
+                var mveMessage = $A.util.format("Component API version is too old: '{0}' must be set to API version '{1}' or later to use component '{2}'",
+                    currentAccessCmpDef.getDescriptor().getQualifiedName(),
+                    minVersion,
+                    descriptor);
+                var minVersionValidationError = new $A.auraError(mveMessage);
+                minVersionValidationError.setComponent(currentAccessCmpDef.getDescriptor().getQualifiedName());
+                throw minVersionValidationError;
+            }
+            
             var classConstructor = this.getComponentClass(descriptor, def);
 
             if (!classConstructor) {
@@ -1790,7 +1805,7 @@ AuraComponentService.prototype.createComponentPriv = function (config, callback)
                 }
             }
         }else{
-            var message="Access Check Failed! AuraComponentService.createComponentFromConfig(): '" + descriptor + "' is not visible to '" + $A.clientService.currentAccess + "'.";
+            var message="Access Check Failed! AuraComponentService.createComponentFromConfig(): '" + descriptor + "' is not visible to '" + currentAccessCmp + "'.";
             if($A.clientService.enableAccessChecks) {
                 if($A.clientService.logAccessFailures){
                     $A.error(null,new $A.auraError(message));

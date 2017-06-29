@@ -37,6 +37,7 @@ function ComponentDef(config) {
     this.modelDef = config[Json.ApplicationKey.MODELDEF] ? $A.componentService.createModelDef(config[Json.ApplicationKey.MODELDEF]) : undefined;
     this.methodDefs = config[Json.ApplicationKey.METHODDEFS] ? config[Json.ApplicationKey.METHODDEFS]: undefined;
     this.tokens = config[Json.ApplicationKey.TOKENS] ? config[Json.ApplicationKey.TOKENS] : undefined;
+    this.minVersion = config[Json.ApplicationKey.MINVERSION] ? config[Json.ApplicationKey.MINVERSION] : undefined;
 
     this.interfaces = {};
     var intfConfig = config[Json.ApplicationKey.INTERFACES];
@@ -700,6 +701,29 @@ ComponentDef.prototype.initStyleDefs = function() {
     }
     if (this.flavoredStyleDef) {
         this.allFlavoredStyleDefs.push(this.flavoredStyleDef);
+    }
+};
+
+/**
+ * Returns the minimum API version that a component should be at to use this component
+ * @returns {undefined | String}
+ * @private
+ */
+ComponentDef.prototype.getMinVersion = function() {
+    return this.minVersion;
+};
+
+/**
+ * Returns the API Version of the ComponentDef
+ *
+ * @private
+ * @return {String | undefined} The API version string.
+ */
+ComponentDef.prototype.getApiVersion = function() {
+    // Hacky way of getting bundle API version for component def bundles on platform
+    if (!$A.clientService.isInternalNamespace(this.descriptor.getNamespace())) {
+        var requiredVersionDef = this.getRequiredVersionDefs().getDef("aura");
+        return requiredVersionDef ? requiredVersionDef.getVersion() : null;
     }
 };
 

@@ -1,4 +1,10 @@
 ({
+    testPrivilegedComponentIsLockerized: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertTrue(cmp.toString().indexOf("SecureComponent") === 0,
+            "Component from privileged namespace should be lockerized");
+    },
+
     testCreateComponentWithPRV: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var complete = false;

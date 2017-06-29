@@ -108,6 +108,11 @@ public abstract class BaseXMLElementHandler {
         return Boolean.parseBoolean(getAttributeValue(name));
     }
 
+    protected Double getDoubleAttributeValue(String name) {
+        String attrValue = getAttributeValue(name);
+        return AuraTextUtil.isNullEmptyOrWhitespace(attrValue)? null : Double.valueOf(attrValue);
+    }
+
     protected String getTagName() {
         return xmlReader.getName().getLocalPart();
     }

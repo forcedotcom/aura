@@ -107,7 +107,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
                     "model", "apiVersion", "abstract", "extensible", "extends", "isTemplate");
             internalAttrs = Sets.newHashSet("render", "template", "provider", "style", "helper",
                     "renderer", "support", "defaultFlavor",
-                    "dynamicallyFlavorable");
+                    "dynamicallyFlavorable", "minVersion");
             super.setUp();
         }
 

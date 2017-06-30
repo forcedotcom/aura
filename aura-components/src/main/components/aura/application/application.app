@@ -20,5 +20,4 @@
          access="UNAUTHENTICATED" implements="aura:rootComponent" support="GA" useAppcache="false" description="The root of the application hierarchy.">
     <aura:attribute name="body" access="GLOBAL" type="Aura.Component[]" description="The components to render within this application."/>
 
-    <aura:clientLibrary name="CkEditor" type="JS" />
 </aura:application>

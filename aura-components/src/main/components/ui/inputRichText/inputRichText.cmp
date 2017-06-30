@@ -18,7 +18,6 @@
 <aura:component access="GLOBAL" support="GA" extends="ui:inputTextArea" extensible="true" description="An input field for entering rich text. This component is not supported by LockerService.">
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-    <aura:clientLibrary name="CkEditor" type="JS" />
 
 	<aura:attribute name="toolbar" type="String" default="basic" description="Specify the toolbar config to be used. Possible values: standard, full, email and custom. Default value is &quot;basic&quot;. Custom config can be added in inputRichTextHelper"/>
 	<aura:attribute name="customToolbarConfig" type="Object" description="A custom configuration for the toolbar"/>

@@ -18,12 +18,15 @@ package org.auraframework.integration.test.error;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
+import org.auraframework.integration.test.util.WebDriverTestCase.TargetBrowsers;
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.system.AuraContext.Mode;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 
+@TargetBrowsers({ BrowserType.GOOGLECHROME })
 public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
     /**
@@ -392,40 +395,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
         String actualMessage = findErrorMessage();
         String expectedMsg = "Error from app rerender";
-        assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
-    }
-
-    /**
-     * Verify custom handle on App can hanle systemError event when an error is thrown from rerender() of its contained
-     * component.
-     */
-    @Test
-    public void testHandleErrorThrownFromRerenderWhenMarkEventHandled() throws Exception {
-        String expectedContainedMessage = "Error from component rerender";
-        open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
-
-        // click throw Error in rerender() on Component and handle it in app.
-        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromRerenderButton"));
-        // wait for custom handler on App handled the event.
-        getAuraUITestingUtil().waitForElementText(By.cssSelector("div[id='eventHandledOnApp']"), "true", true, "not handled", false);
-
-        String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
-        assertThat("Did not find expected error in error message element.", actualMessage,
-                containsString(expectedContainedMessage));
-        assertErrorMaskIsNotVisible();
-    }
-
-    /**
-     * Verify Aura default error handler can handle systemError event when an error is thrown from unrender().
-     */
-    @Test
-    public void testDefaultHandleErrorThrownFromUnrender() throws Exception {
-        open("/auratest/errorHandlingApp.app", Mode.PROD);
-
-        findAndClickElement(By.cssSelector(".errorFromCmpTable .errorFromUnrenderButton"));
-
-        String actualMessage = findErrorMessage();
-        String expectedMsg = "Error from component unrender";
         assertThat("Error modal doesn't contain expected message", actualMessage, containsString(expectedMsg));
     }
 

@@ -1,4 +1,6 @@
 ({
+    browsers : [ "GOOGLECHROME" ],
+
     /**
      * Verify that error message box displays in the auraErrorMask div and can be dismissed using the close button.
      */

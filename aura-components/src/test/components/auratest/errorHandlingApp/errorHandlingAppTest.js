@@ -1,4 +1,6 @@
 ({
+    browsers : [ "GOOGLECHROME" ],
+
     /**
      * Verify that AuraError's severity default value is Quiet
      */

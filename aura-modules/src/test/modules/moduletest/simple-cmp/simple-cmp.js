@@ -1,6 +1,6 @@
 import { Element } from "engine";
-import { const1 } from "moduleTest:testLib";
-import { log } from "util.js";
+import { const1 } from "moduleTest:testLib"; // eslint-disable-line no-unused-vars
+import { log } from "util.js"; // eslint-disable-line no-unused-vars
 
 export default class Simple extends Element {
     @api literal = "Default literal";

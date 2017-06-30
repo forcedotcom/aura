@@ -117,7 +117,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         assertNotNull("Nothing added to SVG cache", svgCache);
 
         // Now force a source change event and verify cache is emptied
-        fileMonitor.onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
+        fileMonitor.onSourceChanged(SourceListener.SourceMonitorEvent.CHANGED, null);
 
         svgCache = cachingService.getStringsCache().getIfPresent(getKey(uid, svgDesc, key));
         assertNull("SVG cache not cleared after source change event", svgCache);

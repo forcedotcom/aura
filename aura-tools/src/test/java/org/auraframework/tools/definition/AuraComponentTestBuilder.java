@@ -64,7 +64,7 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
             }
         }
 
-        sourceListener.onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
+        sourceListener.onSourceChanged(SourceListener.SourceMonitorEvent.CHANGED, null);
     }
 
     /**

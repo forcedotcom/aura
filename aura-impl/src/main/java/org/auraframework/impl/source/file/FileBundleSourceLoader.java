@@ -226,7 +226,7 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
     }
 
     @Override
-    public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
+    public void onSourceChanged(SourceMonitorEvent event, String filePath) {
         // rip out namespace cache if need be.
         // Note that this is a little more aggressive than it has to be, but, well, it does only do it
         // for creation/deletion. There is a race condition whereby this will cause odd failures if files

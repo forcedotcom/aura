@@ -176,8 +176,9 @@ public class AuraTestingUtil {
      * @param desc definition descriptor of the resource
      * @param content new content for the descriptor
      */
-    public void updateSource(final DefDescriptor<?> desc, String content) {
+    public void updateSource(DefDescriptor<?> desc, String content) {
         Source<?> src = getSource(desc);
+        final String expectedName = desc.getQualifiedName();
 
         if (src == null) {
             throw new RuntimeException("unable to find "+desc);
@@ -185,8 +186,8 @@ public class AuraTestingUtil {
         final Semaphore updated = new Semaphore(0);
         SourceListener changeListener = new SourceListener() {
             @Override
-            public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
-                if (desc.equals(source)) {
+            public void onSourceChanged(SourceMonitorEvent event, String filePath) {
+                if (expectedName.equals(filePath)) {
                     updated.release();
                 }
             }
@@ -627,6 +628,28 @@ public class AuraTestingUtil {
         return new StringSource<D>(descriptor, contents, descriptor.getQualifiedName(), fmt);
     }
 
+    /**
+     * Build a single text source with a static name and bundle.
+     *
+     * This is intended for unit testing, or submodule testing. The source provided here is not registered
+     * anywhere and cannot be looked up by aura. This means that it can only be used for sub-unit testing.
+     *
+     * Preferably use the version without the name.
+     *
+     * @param namespace the namespace (should be one of the provided ones here) - specifies internal/priveleged/custom
+     * @param namespace the name
+     * @param defClass the class of the source.
+     * @param contents the contents for the source.
+     * @param bundle the bundle for the descriptor.
+     */
+    public <D extends Definition> TextSource<D> buildTextSource(String namespace, String name, Class<D> defClass,
+            String contents, DefDescriptor<?> bundle) {
+        DefType type = DefType.getDefType(defClass);
+        DefDescriptor<D> descriptor = new DefDescriptorImpl<>(prefixMap.get(type), namespace, name, defClass, bundle);
+        return new StringSource<>(descriptor, contents, descriptor.getQualifiedName(), formatMap.get(type));
+    }
+
+
 
     /**
      * Build a single text source with a static name.
@@ -643,9 +666,7 @@ public class AuraTestingUtil {
      */
     public <D extends Definition> TextSource<D> buildTextSource(String namespace, String name, Class<D> defClass,
             String contents) {
-        DefType type = DefType.getDefType(defClass);
-        DefDescriptor<D> descriptor = new DefDescriptorImpl<>(prefixMap.get(type), namespace, name, defClass);
-        return new StringSource<>(descriptor, contents, descriptor.getQualifiedName(), formatMap.get(type));
+        return buildTextSource(namespace, name, defClass, contents, null);
     }
 
     /**
@@ -660,7 +681,23 @@ public class AuraTestingUtil {
      */
     public <D extends Definition> TextSource<D> buildTextSource(String namespace, Class<D> defClass,
             String contents) {
-        return buildTextSource(namespace, "name"+random.nextLong(), defClass, contents);
+        return buildTextSource(namespace, "name"+random.nextLong(), defClass, contents, null);
+    }
+
+    /**
+     * Build a single text source with a bundle.
+     *
+     * This is intended for unit testing, or submodule testing. The source provided here is not registered
+     * anywhere and cannot be looked up by aura. This means that it can only be used for sub-unit testing.
+     *
+     * @param namespace the namespace (should be one of the provided ones here) - specifies internal/priveleged/custom
+     * @param defClass the class of the source.
+     * @param contents the contents for the source.
+     * @param bundle the bundle for the descriptor.
+     */
+    public <D extends Definition> TextSource<D> buildTextSource(String namespace, Class<D> defClass,
+            String contents, DefDescriptor<?> bundle) {
+        return buildTextSource(namespace, "name"+random.nextLong(), defClass, contents, bundle);
     }
 
     /**

@@ -47,9 +47,7 @@ import org.auraframework.impl.compound.controller.CompoundControllerDefFactory;
 import org.auraframework.impl.controller.AuraGlobalControllerDefRegistry;
 import org.auraframework.impl.java.JavaSourceLoader;
 import org.auraframework.impl.source.file.FileBundleSourceLoader;
-import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.impl.source.file.ModuleFileBundleSourceLoader;
-import org.auraframework.impl.source.resource.ResourceSourceLoader;
 import org.auraframework.impl.system.BundleAwareDefRegistry;
 import org.auraframework.impl.system.CompilingDefRegistry;
 import org.auraframework.impl.system.NonCachingDefRegistryImpl;
@@ -64,6 +62,7 @@ import org.auraframework.service.RegistryService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.BundleSource;
+import org.auraframework.system.BundleSourceLoader;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.InternalNamespaceSourceLoader;
@@ -241,13 +240,13 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
         DefRegistry[] staticRegs = getStaticRegistries(location);
         String pkg = location.getComponentSourcePackage();
         String canonical = null;
-        SourceLoader markupLoader = null;
+        BundleSourceLoader markupLoader = null;
         List<DefRegistry> markupRegistries = Lists.newArrayList();
         ModuleFileBundleSourceLoader moduleBundleSourceLoader = null;
         if (pkg != null) {
             if (!modules) {
-                markupLoader = new ResourceSourceLoader(pkg);
-                markupRegistries.add(new BundleAwareDefRegistry(new FileBundleSourceLoader(pkg, fileMonitor, builders),
+                markupLoader = new FileBundleSourceLoader(pkg, fileMonitor, builders);
+                markupRegistries.add(new BundleAwareDefRegistry(markupLoader,
                         MARKUP_PREFIXES, ALL_MARKUP_DEFTYPES, compilerService, true));
             } else {
                 moduleBundleSourceLoader = new ModuleFileBundleSourceLoader(pkg, fileMonitor, builders);
@@ -267,10 +266,8 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
                     fileMonitor.addDirectory(canonical);
                 }
                 if (!modules) {
-                    // modules requires BundleSource to allow multiple js/css files so skip FileSourceLoader
-                    markupLoader = new FileSourceLoader(components, fileMonitor);
-                    markupRegistries.add(new BundleAwareDefRegistry(
-                            new FileBundleSourceLoader(components, fileMonitor, builders),
+                    markupLoader = new FileBundleSourceLoader(components, fileMonitor, builders);
+                    markupRegistries.add(new BundleAwareDefRegistry(markupLoader,
                             MARKUP_PREFIXES, ALL_MARKUP_DEFTYPES, compilerService, true));
                 } else {
                     moduleBundleSourceLoader = new ModuleFileBundleSourceLoader(components, fileMonitor, builders);
@@ -326,7 +323,7 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
      * Get the component location adapter registries.
      */
     private List<DefRegistry> getCLARegistries() {
-        Collection<ComponentLocationAdapter> markupLocations = getAllComponentLocationAdapters();
+        Collection<ComponentLocationAdapter> markupLocations = locationAdapters;
         List<DefRegistry> regBuild = Lists.newArrayList();
 
         regBuild.add(AuraStaticTypeDefRegistry.INSTANCE);
@@ -433,20 +430,8 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
                 MODULE_PREFIXES, MODULE_DEFTYPES, compilerService);
     }
 
-    private  Collection<ComponentLocationAdapter> getAllComponentLocationAdapters() {
-        List<ComponentLocationAdapter> ret = Lists.newArrayList();
-        //ret.addAll(ServiceLocator.get().getAll(ComponentLocationAdapter.class));
-        ret.addAll(locationAdapters);
-
-        String prop = System.getProperty("aura.componentDir");
-        if (prop != null) {
-            ret.add(new ComponentLocationAdapter.Impl(new File(prop)));
-        }
-        return ret;
-    }
-
     @Override
-    public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
+    public void onSourceChanged(SourceMonitorEvent event, String filePath) {
         synchronized (this) {
             if (filePath != null) {
                 File file = new File(filePath);

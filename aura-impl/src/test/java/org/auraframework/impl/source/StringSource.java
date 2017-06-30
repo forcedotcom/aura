@@ -113,7 +113,7 @@ public class StringSource<D extends Definition> extends AbstractTextSourceImpl<D
             data.getBuffer().setLength(0);
             data.write(newContents.toString());
             if (sourceListener != null) {
-                sourceListener.onSourceChanged(getDescriptor(), SourceMonitorEvent.CHANGED, null);
+                sourceListener.onSourceChanged(SourceMonitorEvent.CHANGED, null);
             }
         }
         return true;
@@ -123,7 +123,7 @@ public class StringSource<D extends Definition> extends AbstractTextSourceImpl<D
         data.getBuffer().setLength(0);
         data.touch();
         if (sourceListener != null) {
-            sourceListener.onSourceChanged(getDescriptor(), SourceMonitorEvent.CHANGED, null);
+            sourceListener.onSourceChanged(SourceMonitorEvent.CHANGED, null);
         }
     }
 

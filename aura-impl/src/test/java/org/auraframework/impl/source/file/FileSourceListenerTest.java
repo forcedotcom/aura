@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.source.file;
 
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.SourceListener;
 import org.auraframework.util.FileChangeEvent;
 import org.auraframework.util.test.util.UnitTestCase;
@@ -27,11 +26,9 @@ import org.mockito.MockitoAnnotations;
 
 import java.nio.file.FileSystems;
 
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -39,10 +36,12 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link FileSourceListener}
  */
 public class FileSourceListenerTest extends UnitTestCase {
-    @Captor
-    private ArgumentCaptor<DefDescriptor<?>> defDescriptorCaptor;
-
     private FileSourceListener listener = new FileSourceListener(null);
+
+    @Captor
+    ArgumentCaptor<String> fileCaptor;
+
+    final private String filename = "/some/awesome/ui/inputSearch/inputSearch.cmp";
 
     @Mock
     private FileChangeEvent fileChangeEvent;
@@ -56,165 +55,28 @@ public class FileSourceListenerTest extends UnitTestCase {
 
     @Test
     public void testCreateEvent() throws Exception {
-        when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath("/some/awesome/ui/inputSearch/inputSearch.cmp"));
+        when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath(filename));
 
         listener.fileCreated(fileChangeEvent);
-        verify(listener, atLeastOnce()).onSourceChanged(defDescriptorCaptor.capture(),
-                eq(SourceListener.SourceMonitorEvent.CREATED), anyString());
-
-        assertFileChangeEvent();
+        verify(listener, atLeastOnce()).onSourceChanged(eq(SourceListener.SourceMonitorEvent.CREATED), fileCaptor.capture());
+        assertEquals(filename, fileCaptor.getValue());
     }
 
     @Test
     public void testDeleteEvent() throws Exception {
-        when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath("/some/awesome/ui/inputSearch/inputSearch.cmp"));
+        when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath(filename));
 
         listener.fileDeleted(fileChangeEvent);
-        verify(listener, atLeastOnce()).onSourceChanged(defDescriptorCaptor.capture(),
-                eq(SourceListener.SourceMonitorEvent.DELETED), anyString());
-
-        assertFileChangeEvent();
+        verify(listener, atLeastOnce()).onSourceChanged(eq(SourceListener.SourceMonitorEvent.DELETED), fileCaptor.capture());
+        assertEquals(filename, fileCaptor.getValue());
     }
 
     @Test
     public void testChangeEvent() throws Exception {
-        when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath("/some/awesome/ui/inputSearch/inputSearch.cmp"));
+        when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath(filename));
 
         listener.fileChanged(fileChangeEvent);
-        verify(listener, atLeastOnce()).onSourceChanged(defDescriptorCaptor.capture(),
-                eq(SourceListener.SourceMonitorEvent.CHANGED), anyString());
-
-        assertFileChangeEvent();
-    }
-
-    private void assertFileChangeEvent() {
-        DefDescriptor<?> dd = defDescriptorCaptor.getValue();
-        assertEquals("ui", dd.getNamespace());
-        assertEquals("inputSearch", dd.getName());
-        assertEquals(DefDescriptor.DefType.COMPONENT, dd.getDefType());
-        assertEquals("markup", dd.getPrefix());
-    }
-
-    /**
-     * If the file that changed does not match the list of {@link DefDescriptor.DefType} (i.e. java) in
-     * {@link FileSourceListener} then null should be passed to DefinitionService.onSourceChanged() to wipe out the
-     * whole cache.
-     */
-    @Test
-    public void testNullDefDescriptor() throws Exception {
-        when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath("/some/awesome/ui/inputSearch/inputSearchModel.java"));
-
-        listener.fileChanged(fileChangeEvent);
-        verify(listener, atLeastOnce()).onSourceChanged(defDescriptorCaptor.capture(),
-                eq(SourceListener.SourceMonitorEvent.CHANGED), anyString());
-
-        assertNull(defDescriptorCaptor.getValue());
-    }
-
-    @Test
-    public void testSourceChangedApplication() throws Exception {
-        assertSourceChangedCalled("markup", "appCache", "withpreload", DefDescriptor.DefType.APPLICATION,
-                "/some/awesome/appCache/withpreload/withpreload.app");
-    }
-
-    @Test
-    public void testSourceChangedComponent() throws Exception {
-        assertSourceChangedCalled("markup", "ui", "inputSearch", DefDescriptor.DefType.COMPONENT,
-                "/some/awesome/ui/inputSearch/inputSearch.cmp");
-    }
-
-    @Test
-    public void testSourceChangedEvent() throws Exception {
-        assertSourceChangedCalled("markup", "ui", "focus", DefDescriptor.DefType.EVENT,
-                "/some/awesome/ui/focus/focus.evt");
-    }
-
-    @Test
-    public void testSourceChangedInterface() throws Exception {
-        assertSourceChangedCalled("markup", "ui", "visible", DefDescriptor.DefType.INTERFACE,
-                "/some/awesome/ui/visible/visible.intf");
-    }
-
-    @Test
-    public void testSourceChangedStyle() throws Exception {
-        assertSourceChangedCalled("css", "ui", "inputSearch", DefDescriptor.DefType.STYLE,
-                "/some/awesome/ui/inputSearch/inputSearch.css");
-    }
-
-    @Test
-    public void testSourceChangedStandardFlavor() throws Exception {
-        assertSourceChangedCalled("css", "ui", "inputSearch", DefDescriptor.DefType.FLAVORED_STYLE,
-                "/some/awesome/ui/inputSearch/inputSearchFlavors.css");
-    }
-
-    @Test
-    public void testSourceChangedCustomFlavor() throws Exception {
-        assertSourceChangedCalled(DefDescriptor.CUSTOM_FLAVOR_PREFIX, "foo", "ui-inputSearchFlavors", DefDescriptor.DefType.FLAVORED_STYLE,
-                "/some/awesome/foo/flavors/ui-inputSearchFlavors.css");
-    }
-
-    @Test
-    public void testSourceChangedFlavorAssortment() throws Exception {
-        assertSourceChangedCalled("markup", "ui", "baseFlavors", DefDescriptor.DefType.FLAVORS,
-                "/some/awesome/ui/baseFlavors/baseFlavors.flavors");
-    }
-
-    @Test
-    public void testSourceChangedTokens() throws Exception {
-        assertSourceChangedCalled("markup", "ui", "uiNamespace", DefDescriptor.DefType.TOKENS,
-                "/some/awesome/ui/uiNamespace/uiNamespace.tokens");
-    }
-
-    @Test
-    public void testSourceChangedTestSuite() throws Exception {
-        assertSourceChangedCalled("js", "ui", "inputSelect", DefDescriptor.DefType.TESTSUITE,
-                "/some/awesome/ui/inputSelect/inputSelectTest.js");
-    }
-
-    @Test
-    public void testSourceChangedController() throws Exception {
-        assertSourceChangedCalled("js", "ui", "inputSearch", DefDescriptor.DefType.CONTROLLER,
-                "/some/awesome/ui/inputSearch/inputSearchController.js");
-    }
-
-    @Test
-    public void testSourceChangedRenderer() throws Exception {
-        assertSourceChangedCalled("js", "ui", "inputSearch", DefDescriptor.DefType.RENDERER,
-                "/some/awesome/ui/inputSearch/inputSearchRenderer.js");
-    }
-
-    @Test
-    public void testSourceChangedProvider() throws Exception {
-        assertSourceChangedCalled("js", "ui", "pager", DefDescriptor.DefType.PROVIDER,
-                "/some/awesome/ui/pager/pagerProvider.js");
-    }
-
-    @Test
-    public void testSourceChangedHelper() throws Exception {
-        assertSourceChangedCalled("js", "ui", "inputSearch", DefDescriptor.DefType.HELPER,
-                "/some/awesome/ui/inputSearch/inputSearchHelper.js");
-    }
-
-    @Test
-    public void testSourceChangedModel() throws Exception {
-        assertSourceChangedCalled("js", "test", "jsModel", DefDescriptor.DefType.MODEL,
-                "/some/awesome/test/jsModel/jsModelModel.js");
-    }
-
-    private void assertSourceChangedCalled(String prefix, String namespace, String name, DefDescriptor.DefType defType,
-            String filePath) throws Exception {
-
-        when(fileChangeEvent.getPath()).thenReturn(FileSystems.getDefault().getPath(filePath));
-
-        listener.fileChanged(fileChangeEvent);
-        verify(listener, times(1)).onSourceChanged(defDescriptorCaptor.capture(),
-                eq(SourceListener.SourceMonitorEvent.CHANGED), anyString());
-
-        DefDescriptor<?> dd = defDescriptorCaptor.getValue();
-
-        assertEquals(namespace, dd.getNamespace());
-        assertEquals(name, dd.getName());
-        assertEquals(defType, dd.getDefType());
-        assertEquals(prefix, dd.getPrefix());
+        verify(listener, atLeastOnce()).onSourceChanged(eq(SourceListener.SourceMonitorEvent.CHANGED), fileCaptor.capture());
+        assertEquals(filename, fileCaptor.getValue());
     }
 }

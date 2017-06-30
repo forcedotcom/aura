@@ -1,0 +1,12 @@
+<aura:component>
+    <ui:spinner />
+    <ui:spinner />
+    <ui:spinner />
+    <ui:spinner />
+    <ui:spinner />
+    <ui:spinner />
+    <ui:spinner />
+    <ui:spinner />
+    <ui:spinner />
+    <ui:spinner />
+</aura:component>

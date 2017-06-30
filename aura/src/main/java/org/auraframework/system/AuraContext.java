@@ -753,4 +753,10 @@ public interface AuraContext {
      * @return the request scoped nonce
      */
     String getScriptNonce();
+
+    /**
+     * get a flag indicating whether app.js split is enabled
+     * @return true if split is enabled, false if only one app.js file is desired.
+     */
+    boolean isAppJsSplitEnabled();
 }

@@ -45,7 +45,6 @@ import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ClientLibraryDef.Type;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.CSP;
@@ -394,7 +393,10 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
             ret.add(getInlineJsUrl(context, attributes));
         }
 
-        ret.add(getAppCoreJsUrl(context, null));
+        if (context.isAppJsSplitEnabled()) {
+            ret.add(getAppCoreJsUrl(context, null));
+        }
+
         ret.add(getAppJsUrl(context, null));
 
         if (!ignoreNonCacheableScripts) {
@@ -434,7 +436,10 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         }
 
         templateUtil.writeHtmlScript(context, this.getFrameworkUrl(), Script.SYNC, sb);
-        templateUtil.writeHtmlScript(context, this.getAppCoreJsUrl(context, null), Script.SYNC, sb);
+        if (context.isAppJsSplitEnabled()) {
+            templateUtil.writeHtmlScript(context, this.getAppCoreJsUrl(context, null), Script.SYNC, sb);
+        }
+
         templateUtil.writeHtmlScript(context, this.getAppJsUrl(context, null), Script.SYNC, sb);
         if (beforeBootstrap != null) {
             sb.append(beforeBootstrap);

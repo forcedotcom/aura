@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.auraframework.adapter.AppJsUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.http.resource.AuraResourceImpl.AuraResourceException;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 

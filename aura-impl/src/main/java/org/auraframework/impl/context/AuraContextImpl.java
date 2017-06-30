@@ -1020,4 +1020,9 @@ public class AuraContextImpl implements AuraContext {
     public boolean useCompatSource() {
         return this.useCompatSource;
     }
+
+    @Override
+    public boolean isAppJsSplitEnabled() {
+        return false;
+    }
 }

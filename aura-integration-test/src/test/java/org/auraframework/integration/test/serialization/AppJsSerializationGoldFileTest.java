@@ -16,26 +16,23 @@
 package org.auraframework.integration.test.serialization;
 
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpHeaders;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.http.resource.AppJs;
-import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.system.AuraContext;
-import org.auraframework.util.test.diff.GoldFileUtils;
-import org.junit.Test;
-import org.mockito.Matchers;
-import org.mockito.Mockito;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.net.URL;
+
+import org.apache.http.HttpHeaders;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.http.resource.AppJs;
+import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.system.AuraContext;
+import org.junit.Test;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
 
 public class AppJsSerializationGoldFileTest extends AuraImplTestCase {
 
@@ -54,6 +51,7 @@ public class AppJsSerializationGoldFileTest extends AuraImplTestCase {
         Mockito.when(httpResponse.getWriter()).thenReturn(new PrintWriter(stringWriter));
 
         AuraContext auraContext = Mockito.mock(AuraContext.class);
+        Mockito.when(auraContext.isAppJsSplitEnabled()).thenReturn(false);
         DefDescriptor<? extends BaseComponentDef> applicationDef = definitionService.getDefDescriptor("auradocs:docs", ApplicationDef.class);
         Mockito.<DefDescriptor<? extends BaseComponentDef>>when(auraContext.getApplicationDescriptor()).thenReturn(applicationDef);
         Mockito.when(auraContext.getUid(Matchers.any())).thenReturn("APPLICATION:markup://auradocs:docs");

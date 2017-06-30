@@ -32,6 +32,7 @@ import org.auraframework.system.AuraContext.Format;
 
 @ServiceComponent
 public class AppJs extends AuraResourceImpl {
+    private static final String APPJS_PREPEND = "\"undefined\"===typeof Aura&&(Aura={});Aura.bootstrap||(Aura.bootstrap={});Aura.frameworkJsReady||(Aura.ApplicationDefs={cmpExporter:{},libExporter:{}},$A={componentService:{addComponent:function(a,b){Aura.ApplicationDefs.cmpExporter[a]=b},addLibraryExporter:function(a,b){Aura.ApplicationDefs.libExporter[a]=b},initEventDefs:function(a){Aura.ApplicationDefs.eventDefs=a},initLibraryDefs:function(a){Aura.ApplicationDefs.libraryDefs=a},initControllerDefs:function(a){Aura.ApplicationDefs.controllerDefs=a},initModuleDefs:function(a){Aura.ApplicationDefs.moduleDefs=a}}});\n";
     private static final String APPJS_APPEND = "\nAura.appJsReady = true;Aura.appDefsReady&&Aura.appDefsReady();";
     private AppJsUtilAdapter appJsUtilAdapter;
 
@@ -41,13 +42,23 @@ public class AppJs extends AuraResourceImpl {
 
     @Override
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context) throws IOException {
-        Set<DefDescriptor<?>> dependencies = appJsUtilAdapter.getPartDependencies(request, response, context, 1);
+        boolean isSplitEnabled = context.isAppJsSplitEnabled();
+        Set<DefDescriptor<?>> dependencies = isSplitEnabled ?
+                    appJsUtilAdapter.getPartDependencies(request, response, context, 1) :
+                    servletUtilAdapter.verifyTopLevel(request, response, context);
         if (dependencies == null) {
             return;
         }
 
         try {
             PrintWriter writer = response.getWriter();
+            if (isSplitEnabled) {
+                serverService.writeDefinitions(dependencies, writer, true, 1);
+            } else {
+                writer.append(APPJS_PREPEND);
+                serverService.writeDefinitions(dependencies, writer, false, -1);
+            }
+
             serverService.writeDefinitions(dependencies, writer, true, 1);
             writer.append(APPJS_APPEND);
         } catch (Throwable t) {

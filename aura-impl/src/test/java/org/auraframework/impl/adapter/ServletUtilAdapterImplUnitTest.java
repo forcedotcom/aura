@@ -299,6 +299,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
     public void testGetFrameworkScriptsSafeNoCache() throws Exception {
         ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
         AuraContext context = Mockito.mock(AuraContext.class);
+        Mockito.when(context.isAppJsSplitEnabled()).thenReturn(true);
         Map<String,Object> attributes = Maps.newHashMap();
         sua = Mockito.spy(sua);
         List<String> expected = Lists.newArrayList("appcorejs", "appjs");
@@ -317,6 +318,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
     public void testGetFrameworkScriptsUnSafeNoCache() throws Exception {
         ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
         AuraContext context = Mockito.mock(AuraContext.class);
+        Mockito.when(context.isAppJsSplitEnabled()).thenReturn(true);
         Map<String,Object> attributes = Maps.newHashMap();
         sua = Mockito.spy(sua);
         List<String> expected = Lists.newArrayList("appcorejs", "appjs");
@@ -335,6 +337,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
     public void testGetFrameworkScriptsUnSafeCache() throws Exception {
         ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
         AuraContext context = Mockito.mock(AuraContext.class);
+        Mockito.when(context.isAppJsSplitEnabled()).thenReturn(true);
         Map<String,Object> attributes = Maps.newHashMap();
         sua = Mockito.spy(sua);
         List<String> expected = Lists.newArrayList("appcorejs", "appjs", "bootstrap");
@@ -353,6 +356,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
     public void testGetFrameworkScriptsSafeCache() throws Exception {
         ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
         AuraContext context = Mockito.mock(AuraContext.class);
+        Mockito.when(context.isAppJsSplitEnabled()).thenReturn(true);
         Map<String,Object> attributes = Maps.newHashMap();
         sua = Mockito.spy(sua);
         List<String> expected = Lists.newArrayList("inline", "appcorejs", "appjs", "bootstrap");

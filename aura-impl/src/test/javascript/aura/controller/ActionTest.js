@@ -21,9 +21,9 @@ Test.Aura.Controller.ActionTest = function() {
         "Controller": {},
         "Errors":{},
         "lockerService": {
-        	wrapComponent: function(component) {
-        		return component;
-        	}
+            wrapComponent: function(component) {
+                return component;
+            }
         }
     };
 
@@ -676,7 +676,7 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Act
             mockAura(function() {
-		        target.runDeprecated();
+                target.runDeprecated();
             })
 
             // Assert
@@ -729,7 +729,7 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Act
             mockAssert(function() {
-            	target.runDeprecated();
+                target.runDeprecated();
             })
 
             // Assert
@@ -1131,7 +1131,14 @@ Test.Aura.Controller.ActionTest = function() {
                         return inloop;
                     },
                     setCurrentAccess:function(){},
-                    releaseCurrentAccess:function(){}
+                    releaseCurrentAccess:function(){},
+                    getActionStorage : function() {
+                        return {
+                            isStorageEnabled: function() {
+                                return true;
+                            }
+                        }
+                    }
                 },
                 warning : function() {
                 },
@@ -1233,9 +1240,7 @@ Test.Aura.Controller.ActionTest = function() {
             target.components = [ {
                 "creationPath" : "hi"
             } ];
-            target.getStorage = function() {
-                return true;
-            };
+
             target.storable = true;
             target.getId = function() {
                 return expectedId;
@@ -1827,14 +1832,17 @@ Test.Aura.Controller.ActionTest = function() {
     [ Fixture ]
     function GetStorage() {
         [Fact]
-        function ReturnsStorageServiceGetStorage() {
+        function ReturnsStorage() {
             // Arrange
             var target = newAction();
+            var mockGetStorage = Stubs.GetMethod();
             var mockStorageService = Mocks.GetMocks(Object.Global(), {
                 "$A": {
-                    storageService : {
-                        getStorage : function(param) {
-                            return param === "actions";
+                    clientService : {
+                        getActionStorage: function() {
+                            return {
+                                getStorage: mockGetStorage
+                            }
                         }
                     }
                 },
@@ -1848,7 +1856,7 @@ Test.Aura.Controller.ActionTest = function() {
             })
 
             // Assert
-            Assert.True(actual);
+            Assert.Equal(1, mockGetStorage.Calls.length);
         }
     }
 

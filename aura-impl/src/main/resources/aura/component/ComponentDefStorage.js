@@ -96,8 +96,8 @@ ComponentDefStorage.prototype.setupDefinitionStorage = function() {
         // aren't persisted and defs are then components get rendered without labels (or with
         // the label placeholder in non-prod mode).
 
-        var actions = Action.getStorage();
-        if (actions && actions.isPersistent()) {
+        var actionStorage = $A.clientService.getActionStorage();
+        if (actionStorage.isStoragePersistent()) {
 
             var storage = $A.storageService.getStorage(this.STORAGE_NAME);
             var removeStorage = false;
@@ -474,8 +474,8 @@ ComponentDefStorage.prototype.clear = function(metricsPayload) {
                     var errorDuringClear = false;
 
                     var actionClear;
-                    var actionStorage = Action.getStorage();
-                    if (actionStorage && actionStorage.isPersistent()) {
+                    var actionStorage = $A.clientService.getActionStorage();
+                    if (actionStorage.isStoragePersistent()) {
                         // TODO W-3375904 need to reset the persistent actions filter
                         actionClear = actionStorage.clear().then(
                             undefined, // noop on success

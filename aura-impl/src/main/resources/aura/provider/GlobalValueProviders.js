@@ -290,12 +290,8 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
  * @private
  */
 GlobalValueProviders.prototype.getStorage = function () {
-    var storage = Action.getStorage();
-    if (!storage) {
-        return undefined;
-    }
-
-    return storage.isPersistent() ? storage : undefined;
+    var storage = $A.storageService.getStorage($A.clientService.getActionStorageName());
+    return storage && storage.isPersistent() ? storage : undefined;
 };
 
 /**

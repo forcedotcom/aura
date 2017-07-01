@@ -494,10 +494,6 @@ AuraInstance.prototype.initAsync = function(config) {
         // Actions depend on defs depend on GVP (labels). so load them in dependency order and skip
         // loading depending items if anything fails to load.
 
-        // Start by enabling the actions filter if relevant. populatePersistedActionsFilter() populates it,
-        // called only if GVP + defs are loaded.
-        $A.clientService.setupPersistedActionsFilter();
-
         //  do not modify - used by bootstrapRobustness() and instrumentation
         $A.clientService.gvpsFromStorage = context.globalValueProviders.LOADED_FROM_PERSISTENT_STORAGE;
 
@@ -509,11 +505,11 @@ AuraInstance.prototype.initAsync = function(config) {
                 $A.clientService.loadTokenFromStorage(),
                 $A.clientService.loadBootstrapFromStorage(),
                 $A.componentService.restoreDefsFromStorage(context),
-                $A.clientService.populatePersistedActionsFilter()
+                $A.clientService.populateActionsFilter()
             ])
                 .then(initializeApp, function (err) {
                     $A.log("Aura.initAsync: failed to load defs, get bootstrap or actions from storage", err);
-                    $A.clientService.clearPersistedActionsFilter();
+                    $A.clientService.clearActionsFilter();
                     return initializeApp();
                 })
                 .then(undefined, reportError);

@@ -137,6 +137,7 @@ function AuraClientService () {
     this._isDisconnected = false;
     this._parallelBootstrapLoad = true;
     this.auraStack = [];
+    this.actionStorage = new Aura.Controller.ActionStorage();
     this.appcacheDownloadingEventFired = false;
     this.isOutdated = false;
     this.finishedInitDefs = false;
@@ -217,20 +218,6 @@ function AuraClientService () {
 
     this.reloadFunction = undefined;
     this.reloadPointPassed = false;
-
-    // a map of action keys limited to those visible to the current browser tab.
-    //
-    // actions can depend on defs. defs are loaded at framework init and so the same
-    // must be done for actions: loaded at framework init. otherwise storable actions
-    // may get cache hits that reference defs the current tab does not have in a
-    // multi-tab scenario.
-    //
-    // if action storage doesn't exist no filtering is required. if action storage isn't
-    // persistent then the actions cache is inherently scoped to the current tab.
-    this.persistedActionFilter = undefined;
-
-    // allows the app to explicitly disable the filter
-    this.persistedActionFilterEnabled = true;
 
     this.handleAppCache();
     this.setupBootstrapErrorReloadButton();
@@ -1040,7 +1027,7 @@ AuraClientService.prototype.shouldPreventReload = function() {
             if (idb) {
                 // if inline.js fails then none of the storages are initialized
                 // so must brute force as methods in ComponentDefStorage won't work.
-                idb.deleteDatabase(Action.STORAGE_NAME);
+                idb.deleteDatabase(this.getActionStorageName());
                 idb.deleteDatabase($A.componentService.getComponentDefStorageName());
             }
 
@@ -1490,7 +1477,7 @@ AuraClientService.prototype.setConnected = function(isConnected) {
 AuraClientService.prototype.saveTokenToStorage = function() {
     // update the persisted CSRF token so it's accessible when the app is launched while offline.
     // fire-and-forget style, matching action response persistence.
-    var storage = Action.getStorage();
+    var storage = $A.storageService.getStorage(this.getActionStorageName());
     if (storage && storage.isPersistent() && this._token) {
         var token = this._token;
 
@@ -1532,7 +1519,7 @@ AuraClientService.prototype.saveTokenToStorage = function() {
  */
 AuraClientService.prototype.loadTokenFromStorage = function() {
     var self = this;
-    var storage = Action.getStorage();
+    var storage = $A.storageService.getStorage(this.getActionStorageName());
     if (storage && storage.isPersistent()) {
         // loads token when storage's adapter is ready
         return storage.enqueue(function(resolve, reject) {
@@ -2038,14 +2025,14 @@ AuraClientService.prototype.loadBootstrapFromStorage = function() {
     }
 
     // if no storage then no cache hit
-    var storage = Action.getStorage();
+    var storage = $A.storageService.getStorage(this.getActionStorageName());
     if (!storage || !storage.isPersistent()) {
         Aura["appBootstrapCacheStatus"] = "failed";
         return Promise["resolve"]();
     }
 
     // else load from storage
-    return storage.get(AuraClientService.BOOTSTRAP_KEY, true)
+    return storage.get(AuraClientService.BOOTSTRAP_KEY)
         .then(
             function(value) {
                 if (value) {
@@ -2072,8 +2059,8 @@ AuraClientService.prototype.loadBootstrapFromStorage = function() {
  *  network on next app load.
  */
 AuraClientService.prototype.saveBootstrapToStorage = function(boot) {
-    var actionStorage = Action.getStorage();
-    if (!actionStorage || !actionStorage.isPersistent()) {
+    var storage = $A.storageService.getStorage(this.getActionStorageName());
+    if (!storage || !storage.isPersistent()) {
         return Promise["resolve"]();
     }
 
@@ -2087,7 +2074,7 @@ AuraClientService.prototype.saveBootstrapToStorage = function(boot) {
             }
         );
 
-    var bootstrapPromise = actionStorage.set(AuraClientService.BOOTSTRAP_KEY, boot)
+    var bootstrapPromise = storage.set(AuraClientService.BOOTSTRAP_KEY, boot)
         .then(
             undefined,
             function(e) {
@@ -2232,6 +2219,7 @@ AuraClientService.prototype.continueProcessing = function() {
     var index = 0;
     var action;
     var actionList;
+    var isStorageEnabled = this.actionStorage.isStorageEnabled();
 
     // Protect against server actions collecting early.
     this.collector.actionsToCollect += 1;
@@ -2247,10 +2235,9 @@ AuraClientService.prototype.continueProcessing = function() {
             }
             if (action.getDef().isServerAction()) {
                 this.collector.actionsToCollect += 1;
-                var storage = action.getStorage();
                 this.collector.collected[index] = undefined;
                 this.collector.collecting[index] = action;
-                if (!action.isRefreshAction() && action.isStorable() && storage) {
+                if (!action.isRefreshAction() && action.isStorable() && isStorageEnabled) {
                     this.collectStorableAction(action, index);
                 } else {
                     this.collectServerAction(action, index);
@@ -2275,42 +2262,6 @@ AuraClientService.prototype.continueProcessing = function() {
         this.runClientActions();
     } else {
         this.continueClientActions();
-    }
-};
-
-/**
- * Handle a single server action.
- */
-AuraClientService.prototype.getStoredResult = function(action, storage, index) {
-    //
-    // For storable actions check the storage service to see if we already have a viable cached action
-    // response we can complete immediately. In this case, we get a callback, so we create a callback
-    // for each one (ugh, this could have been handled via passing an additional param to the action,
-    // but we don't have that luxury now.)
-    //
-    var that = this;
-    var key;
-
-    key = action.getStorageKey();
-    if (that.persistedActionFilter && !that.persistedActionFilter[key]) {
-        // persisted action filter is active and action is not visible so go to server
-        that.collectServerAction(action, index);
-    } else {
-        storage.get(key, true).then(
-            function(value) {
-                if (value) {
-                    that.executeStoredAction(action, value, that.collector.collected, index);
-                    that.collector.actionsToCollect -= 1;
-                    that.finishCollection();
-                } else {
-                    that.collectServerAction(action, index);
-                }
-            },
-            function(/*error*/) {
-                // error fetching from storage so go to the server
-                that.collectServerAction(action, index);
-            }
-        );
     }
 };
 
@@ -2342,8 +2293,7 @@ AuraClientService.prototype.processStorableActions = function() {
     this.collector.collectedStorableActions = [];
 
     // if no storage then all actions go to the server
-    var storage = Action.getStorage();
-    if (!storage) {
+    if (!this.actionStorage.isStorageEnabled()) {
         for (i = 0; i < collectedStorableActions.length; i++) {
             action = collectedStorableActions[i];
             if (!action) {
@@ -2361,6 +2311,11 @@ AuraClientService.prototype.processStorableActions = function() {
         action = collectedStorableActions[i];
         if (action) {
             key = action.getStorageKey();
+            if (this.actionStorage.isStoragePersistent() && this.actionStorage.isKeyAbsentFromCache(key)) {
+                this.collectServerAction(action, i);
+                continue;
+            }
+
             arr = keysToActions[key];
             if (!arr) {
                 arr = [];
@@ -2370,8 +2325,12 @@ AuraClientService.prototype.processStorableActions = function() {
         }
     }
 
+    if (Object.keys(keysToActions).length === 0) {
+        return;
+    }
+
     var that = this;
-    storage.getAll(Object.keys(keysToActions), true)
+    this.actionStorage.getAll(Object.keys(keysToActions))
         .then(
             function(items) {
                 var value;
@@ -2438,15 +2397,11 @@ AuraClientService.prototype.persistStorableActions = function(actions) {
 
             doStore = true;
             values[key] = value;
-            if (this.persistedActionFilter) {
-                this.persistedActionFilter[key] = true;
-            }
         }
     }
 
-    var storage = Action.getStorage();
-    if (doStore && storage) {
-        storage.setAll(values)
+    if (doStore && this.actionStorage.isStorageEnabled()) {
+        this.actionStorage.setAll(values)
             .then(
                 undefined,
                 function(error){
@@ -3703,15 +3658,14 @@ AuraClientService.prototype.enqueueAction = function(action, background) {
         $A.deprecated("Do not use the deprecated background parameter",null,"2017/03/08","2018/03/08");
     }
 
-    if(this.allowFlowthrough){
+    if (this.allowFlowthrough) {
         // special queue if all criteria are met:
         // - server action
         // - not a refresh action
-        // - does not have a cache hit (if persisted actions filter is disabled then assume a cache miss)
-        var isServerAction=action.getDef().isServerAction()&&!action.isRefreshAction();
-        if(isServerAction){
-            var isPersisted=this.persistedActionFilterEnabled && this.persistedActionFilter && this.persistedActionFilter.hasOwnProperty(action.getStorageKey());
-            if (!isPersisted) {
+        // - does not have a cache hit (if storage is persistent but failed to populate stored actions, then assume a cache miss)
+        var isServerAction = action.getDef().isServerAction() && !action.isRefreshAction();
+        if (isServerAction) {
+            if (!this.actionStorage.isPersistent() || this.actionStorage.isKeyAbsentFromCache(action.getStorageKey())) {
                 var auraXHR = this.getAvailableXHR(false);
                 if (auraXHR) {
                     if (!this.send(auraXHR, [action], "POST")) {
@@ -3768,22 +3722,20 @@ AuraClientService.prototype.deferAction = function (action) {
  * @export
  */
 AuraClientService.prototype.isActionInStorage = function(descriptor, params, callback) {
-    var storage = Action.getStorage();
     callback = callback || this.NOOP;
 
-    if (!$A.util.isString(descriptor) || !$A.util.isObject(params) || !storage) {
+    if (!$A.util.isString(descriptor) || !$A.util.isObject(params) || !this.actionStorage.isStorageEnabled()) {
         callback(false);
         return;
     }
 
     var key = Action.getStorageKey(descriptor, params);
-    if (this.persistedActionFilter && !this.persistedActionFilter[key]) {
-        // persisted action filter is active and action is not visible
+    if (this.actionStorage.isStoragePersistent() && this.actionStorage.isKeyAbsentFromCache(key)) {
         callback(false);
         return;
     }
 
-    storage.get(key).then(
+    this.actionStorage.get(key).then(
         function(value) {
             $A.run(function() {
                 callback(!!value);
@@ -3808,25 +3760,24 @@ AuraClientService.prototype.isActionInStorage = function(descriptor, params, cal
  * @export
  */
 AuraClientService.prototype.revalidateAction = function(descriptor, params, callback) {
-    var storage = Action.getStorage();
     callback = callback || this.NOOP;
 
-    if (!$A.util.isString(descriptor) || !$A.util.isObject(params) || !storage) {
+    if (!$A.util.isString(descriptor) || !$A.util.isObject(params) || !this.actionStorage.isStorageEnabled()) {
         callback(false);
         return;
     }
 
     var key = Action.getStorageKey(descriptor, params);
-    if (this.persistedActionFilter && !this.persistedActionFilter[key]) {
-        // persisted action filter is active and action is not visible
+    if (this.actionStorage.isStoragePersistent() && this.actionStorage.isKeyAbsentFromCache(key)) {
         callback(false);
         return;
     }
 
-    storage.get(key, true).then(
+    var that = this;
+    this.actionStorage.get(key).then(
         function(value) {
             if (value) {
-                storage.set(key, value).then(
+                that.actionStorage.set(key, value).then(
                     function() { callback(true); },
                     function(/*error*/) { callback(false); }
                 );
@@ -3852,23 +3803,21 @@ AuraClientService.prototype.revalidateAction = function(descriptor, params, call
  * @export
  */
 AuraClientService.prototype.invalidateAction = function(descriptor, params, successCallback, errorCallback) {
-    var storage = Action.getStorage();
     successCallback = successCallback || this.NOOP;
     errorCallback = errorCallback || this.NOOP;
 
-    if (!$A.util.isString(descriptor) || !$A.util.isObject(params) || !storage) {
+    if (!$A.util.isString(descriptor) || !$A.util.isObject(params) || !this.actionStorage.isStorageEnabled()) {
         successCallback(false);
         return;
     }
 
     var key = Action.getStorageKey(descriptor, params);
-    if (this.persistedActionFilter && !this.persistedActionFilter[key]) {
-        // persisted action filter is active and action is not visible
+    if (this.actionStorage.isStoragePersistent() && this.actionStorage.isKeyAbsentFromCache(key)) {
         successCallback(true);
         return;
     }
 
-    storage.remove(key).then(
+    this.actionStorage.remove(key).then(
         function() { successCallback(true); },
         errorCallback
     );
@@ -4054,8 +4003,7 @@ AuraClientService.prototype.setParallelBootstrapLoad = function(parallel) {
  */
 AuraClientService.prototype.disableParallelBootstrapLoadOnNextLoad = function() {
     // can only get a cache hit on bootstrap.js with persistent storage
-    var storage = Action.getStorage();
-    if (storage && storage.isPersistent()) {
+    if (this.actionStorage.isStoragePersistent()) {
         var duration = 1000*60*60*24*7; // 1 week
         $A.util.setCookie(this._disableBootstrapCacheCookie, "true", duration);
     }
@@ -4107,70 +4055,17 @@ AuraClientService.prototype.setXHRTimeout = function(timeout) {
  * Populates the persisted actions filter if applicable.
  * @return {Promise} a promise that resolves when the action keys are loaded.
  */
-AuraClientService.prototype.populatePersistedActionsFilter = function() {
-    this.setupPersistedActionsFilter();
-
-    // if filter isn't active then noop
-    if (!this.persistedActionFilter) {
-        return Promise["resolve"]();
-    }
-
+AuraClientService.prototype.populateActionsFilter = function() {
     // if GVP didn't load then don't populate the filter, effectively hiding all persisted actions
     var context = $A.getContext();
     if (!context.globalValueProviders.LOADED_FROM_PERSISTENT_STORAGE) {
         return Promise["resolve"]();
     }
 
-    // if actions isn't persistent then nothing to do
-    var actionStorage = Action.getStorage();
-    if (!actionStorage || !actionStorage.isPersistent()) {
-        return Promise["resolve"]();
-    }
-
-    var self = this;
-    return actionStorage.getAll([], true)
+    return this.actionStorage.populateActionsFilter()
         .then(function(items) {
-            for (var key in items) {
-                self.persistedActionFilter[key] = true;
-            }
-            $A.log("AuraClientService: restored " + Object.keys(items).length + " actions");
+            $A.log("ActionStorage: restored " + Object.keys(items).length + " actions");
         });
-};
-
-
-AuraClientService.prototype.clearPersistedActionsFilter = function () {
-    this.persistedActionFilter = undefined;
-    this.setupPersistedActionsFilter();
-};
-/**
- * Setup the persisted actions filter.
- *
- * Actions can depend on defs. And defs can depend on GVPs (particularly $Label).
- * Defs are loaded at framework init so the available actions must be determined
- * at the same time: framework init. Otherwise in a multi-tab scenario actions from
- * other tabs may be visible, and those actions may reference defs this tab doesn't have.
- */
-AuraClientService.prototype.setupPersistedActionsFilter = function() {
-    // single execution guard
-    if (this.persistedActionFilter !== undefined) {
-        return;
-    }
-
-    this.persistedActionFilter = null;
-
-    // if the app has explicitly disabled the filter
-    if (!this.persistedActionFilterEnabled) {
-        return;
-    }
-
-    // if actions isn't persistent then cross-tab action sharing isn't possible
-    var actionStorage = Action.getStorage();
-    if (!actionStorage || !actionStorage.isPersistent()) {
-        return;
-    }
-
-    // enable actions filter
-    this.persistedActionFilter = {};
 };
 
 /**
@@ -4186,7 +4081,27 @@ AuraClientService.prototype.setupPersistedActionsFilter = function() {
  * @export
  */
 AuraClientService.prototype.setPersistedActionsFilter = function(enable) {
-    this.persistedActionFilterEnabled = !!enable;
+    this.actionStorage.enableActionsFilter(enable);
+};
+
+AuraClientService.prototype.clearActionsFilter = function () {
+    this.actionStorage.clearActionsFilter();
+};
+
+/**
+ * Returns Action storage
+ * @returns {ActionStorage}
+ */
+AuraClientService.prototype.getActionStorage = function() {
+    return this.actionStorage;
+};
+
+/**
+ * Returns name of Action storage
+ * @returns {String} name of Action storage
+ */
+AuraClientService.prototype.getActionStorageName = function() {
+    return this.actionStorage.STORAGE_NAME;
 };
 
 Aura.Services.AuraClientService = AuraClientService;

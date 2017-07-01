@@ -133,19 +133,19 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
                             }
                         }
                     },
+                    clientService: {
+                        getActionStorage: function() {
+                            return {
+                                isStoragePersistent: function() {
+                                    return actionStorageIsPersistent;
+                                }
+                            };
+                        }
+                    },
                     getContext: function() {
                         return {
                             getApp: function() {
                                 return "foo";
-                            }
-                        }
-                    }
-                },
-                "Action": {
-                    getStorage: function() {
-                        return {
-                            isPersistent: function() {
-                                return actionStorageIsPersistent;
                             }
                         }
                     }

@@ -1909,12 +1909,10 @@ AuraComponentService.prototype.buildDependencyGraph = function() {
     var actionsBlackList = ["globalValueProviders",                                 /* GlobalValueProviders.js */
                             "aura://ComponentController/ACTION$getApplication"];    /* AuraClientService.js */
 
-
     var promises = [];
-    var actionStorage = Action.getStorage();
-    var actionsGetAll = actionStorage ? actionStorage.getAll([], true) : Promise["resolve"]([]);
-    promises.push(actionsGetAll);
-    promises.push(this.componentDefStorage.getAll([], true));
+    var actionStorage = $A.clientService.getActionStorage();
+    promises.push(actionStorage.getAll());
+    promises.push(this.componentDefStorage.getAll());
 
     // promise will reject if either getAll rejects
     return Promise.all(promises).then(function (results) {
@@ -2046,7 +2044,7 @@ AuraComponentService.prototype.splitComponentsAndActions = function(graph, keys,
  */
 AuraComponentService.prototype.evictDefsFromStorage = function(sortedKeys, graph, requiredSpaceKb) {
     var defStorage    = this.componentDefStorage.getStorage();
-    var actionStorage = Action.getStorage();
+    var actionStorage = $A.clientService.getActionStorage();
     var self          = this;
 
     return defStorage.getSize().then(function(startingSize) {
@@ -2073,8 +2071,8 @@ AuraComponentService.prototype.evictDefsFromStorage = function(sortedKeys, graph
              * @return {Promise} a promise that resolves when the actions are removed.
              */
             function removeActions(actions) {
-                if (!actionStorage || !actions.length) {
-                    $A.assert(actions.length === 0 || actionStorage, "Actions store doesn't exist but requested removal of " + actions.length + " actions");
+                if (!actionStorage.isStorageEnabled() || !actions.length) {
+                    $A.assert(actions.length === 0 || actionStorage.isStorageEnabled(), "Actions store doesn't exist but requested removal of " + actions.length + " actions");
                     return Promise["resolve"]();
                 }
 

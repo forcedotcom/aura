@@ -175,6 +175,7 @@ Aura.bootstrapMark = function (mark, value) {
 // -- Controller ---------------------------------------------------------
 // #include aura.controller.ActionDef
 // #include aura.controller.Action
+// #include aura.controller.ActionStorage
 // #include aura.controller.ControllerDef
 
 // -- Attribute ----------------------------------------------------------

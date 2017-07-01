@@ -83,14 +83,8 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
 
 // Static methods:
 
-Action.STORAGE_NAME = "actions";
-
 Action.getStorageKey = function(descriptor, params) {
     return descriptor + ":" + $A.util["json"].orderedEncode(params);
-};
-
-Action.getStorage = function() {
-    return $A.storageService.getStorage(Action.STORAGE_NAME);
 };
 
 // Instance methods:
@@ -975,7 +969,7 @@ Action.prototype.finishAction = function(context) {
                 }
 
                 this.complete();
-                if (this.components && (cb || !this.storable || !this.getStorage())) {
+                if (this.components && (cb || !this.storable || !$A.clientService.getActionStorage().isStorageEnabled())) {
                     context.finishComponentConfigs(id);
                     clearComponents = false;
                 }
@@ -1340,12 +1334,12 @@ Action.prototype.copyToRefresh = function() {
  */
 Action.prototype.getRefreshAction = function(originalResponse) {
     var storage = originalResponse["storage"];
-    var storageService = this.getStorage();
+    var actionStorage = $A.clientService.getActionStorage().getStorage();
     var autoRefreshInterval =
             (this.storableConfig && !$A.util.isUndefined(this.storableConfig["refresh"])
              && $A.util.isNumber(this.storableConfig["refresh"]))
                     ? this.storableConfig["refresh"] * 1000
-                    : storageService.getDefaultAutoRefreshInterval();
+                    : actionStorage.getDefaultAutoRefreshInterval();
 
     // only refresh the action if it is sufficiently old
     var now = new Date().getTime();
@@ -1386,11 +1380,11 @@ Action.prototype.getRetryFromStorageAction = function() {
  * Gets the Action storage.
  *
  * @returns {Storage}
- * @private
+ * @deprecated
  * @export
  */
 Action.prototype.getStorage = function() {
-    return Action.getStorage();
+    return $A.clientService.getActionStorage().getStorage();
 };
 
 /**

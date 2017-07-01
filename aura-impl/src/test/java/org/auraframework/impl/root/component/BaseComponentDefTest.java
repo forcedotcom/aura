@@ -60,6 +60,7 @@ import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.base.Function;
@@ -1166,7 +1167,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     @Test
     public void testGetDependenciesDefaultNamespace() throws QuickFixException {
         T baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*://aura:*\" type=\"EVENT\"/>");
-        assertEquals("Dependency not found", "[*://aura:*[EVENT]]", baseComponentDef.getDependencies().toString());
+        assertEquals("Dependency not found", "[markup://aura:*[EVENT]]", baseComponentDef.getDependencies().toString());
     }
 
     /**
@@ -1176,19 +1177,20 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     @Test
     public void testGetDependenciesNonDefaultNamespace() throws QuickFixException {
         T baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*://auratest:*\" type=\"EVENT\"/>");
-        assertEquals("Dependency not found", "[*://auratest:*[EVENT]]", baseComponentDef.getDependencies().toString());
+        assertEquals("Dependency not found", "[markup://auratest:*[EVENT]]", baseComponentDef.getDependencies().toString());
     }
 
     /**
      * InvalidDefinitionException for nonexistent dependency.
      */
     @Test
+    @Ignore("this is no longer thrown")
     public void testDependencyNonExistent() {
         try {
             define(baseTag, "", "<aura:dependency resource=\"*://idontexist:*\"/>");
             fail("Should not be able to load non-existant resource as dependency");
         } catch (QuickFixException e) {
-            checkExceptionFull(e, InvalidDefinitionException.class, "Invalid dependency *://idontexist:*[COMPONENT]");
+            checkExceptionFull(e, InvalidDefinitionException.class, "Invalid dependency ://idontexist:*[COMPONENT]");
         }
     }
 

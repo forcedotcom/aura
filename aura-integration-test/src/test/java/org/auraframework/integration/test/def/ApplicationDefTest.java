@@ -30,6 +30,7 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -110,6 +111,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
      * @throws Exception
      */
     @Test
+    @Ignore("we dropped this exception")
     public void testNonExistantNameSpace() throws Exception {
         try {
             definitionService.getDefinition("auratest:test_Preload_ScrapNamespace", ApplicationDef.class);

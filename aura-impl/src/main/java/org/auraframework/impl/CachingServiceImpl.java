@@ -289,7 +289,11 @@ public class CachingServiceImpl implements CachingService {
                     SourceListener sl = i.get();
     
                     if (sl != null) {
-                        sl.onSourceChanged(event, filePath);
+                        try {
+                            sl.onSourceChanged(event, filePath);
+                        } catch (Exception e) {
+                            logger.error(e.getMessage(), e);
+                        }
                     }
                 }
             }

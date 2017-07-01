@@ -66,5 +66,13 @@ Aura.ExportsModule = {
     },
     "sanitizeDOM": function (dirty, config) {
         return $A.util.sanitizeDOM(dirty, config);
+    },
+    "createComponent" : function (componentName, attributes, callback) {
+        $A.clientService.setCurrentAccess($A.getRoot());
+        try {
+            $A.createComponent(componentName, attributes, $A.getCallback(callback));
+        } finally {
+            $A.clientService.releaseCurrentAccess();
+        }
     }
 };

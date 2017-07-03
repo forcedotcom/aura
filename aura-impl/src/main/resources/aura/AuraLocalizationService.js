@@ -374,7 +374,7 @@ AuraLocalizationService.prototype.formatDate = function(date, formatString, loca
 
         if (!this.isAvailableLocale(locale)) {
             langLocale = $A.get("$Locale.langLocale");
-            $A.warning("AuraLocalizationService.formatDateUTC(): Locale '" + locale + "' is not available. " +
+            $A.warning("AuraLocalizationService.formatDate(): Locale '" + locale + "' is not available. " +
                     "Falls back to the locale in $Locale.langLocale: " + langLocale);
         }
     } else {
@@ -1010,7 +1010,7 @@ AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, pa
         $A.deprecated("$A.localizationService.parseDateTimeUTC(dateTimeString, parseFormat, locale, strictParsing) is deprecated. " +
                 "Do NOT rely on the [locale] parameter. It only allows to use the value which is provided " +
                 "by Locale Value Provider. It will be removed in an upcoming release.",
-                "Use $A.localizationService.parseDateTime(dateTimeString, parseFormat, strictParsing)", "2017-02-26", "2018-03-30");
+                "Use $A.localizationService.parseDateTimeUTC(dateTimeString, parseFormat, strictParsing)", "2017-02-26", "2018-03-30");
 
         if (!this.isAvailableLocale(locale)) {
             langLocale = $A.get("$Locale.langLocale");

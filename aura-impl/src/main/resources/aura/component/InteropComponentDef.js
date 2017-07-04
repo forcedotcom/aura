@@ -34,6 +34,7 @@ function InteropComponentDef(config) {
     this.interopClass     = config.interopClass;
     this.elementName      = this.moduleName;
     this.interopClassName = this.descriptor.getNamespace() + "$" + this.descriptor.getName();
+    this.minVersion       = config[Json.ApplicationKey.MINVERSION] ? config[Json.ApplicationKey.MINVERSION] : undefined;
 }
 
 InteropComponentDef.prototype.hasInit = function() {
@@ -93,6 +94,26 @@ InteropComponentDef.prototype.getHelper = function() {
  */
 InteropComponentDef.prototype.getRequiredVersionDefs = function() {
     return this.requiredVersionDefs;
+};
+
+/**
+ * Returns the minimum API version that a component should be at to use this component
+ * @returns {undefined | String}
+ * @private
+ */
+InteropComponentDef.prototype.getMinVersion = function() {
+    return this.minVersion;
+};
+
+
+/**
+ * Returns the API Version of the ComponentDef
+ *
+ * @private
+ * @return {String | undefined} The API version string.
+ */
+InteropComponentDef.prototype.getApiVersion = function() {
+    return undefined;
 };
 
 /**

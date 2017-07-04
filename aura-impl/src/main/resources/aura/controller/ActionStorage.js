@@ -97,7 +97,7 @@ ActionStorage.prototype.clearActionsFilter = function() {
 
 ActionStorage.prototype.isActionsFilterEnabled = function() {
     return this.actionsFilterEnabled;
-}
+};
 
 /**
  * Check if an action is absent in Action Storage (from in-memory cache).
@@ -153,6 +153,7 @@ ActionStorage.prototype.isStorageEnabled = function() {
  * @returns {Promise} A promise that resolves when all of the actionKey-value pairs are stored.
  */
 ActionStorage.prototype.setAll = function(values) {
+    var key;
     var storage = this.getStorage();
     if (!storage) {
         return Promise["resolve"]();
@@ -165,7 +166,7 @@ ActionStorage.prototype.setAll = function(values) {
     // since storing operation will be enqueued and async, put the key in cache for now.
     // if storage fails to save the actions, these actions are sent to the server when
     // processing storable actions
-    for (var key in values) {
+    for (key in values) {
         this.actionKeysFilter[key] = true;
     }
 
@@ -176,7 +177,7 @@ ActionStorage.prototype.setAll = function(values) {
             function(e) {
                 // TODO: if prior to this setAll() the entries existed in storage,
                 // then they actually remain accessible
-                for (var key in values) {
+                for (key in values) {
                     that.actionKeysFilter[key] = undefined;
                 }
                 throw e;
@@ -216,11 +217,12 @@ ActionStorage.prototype.getAll = function(actionKeys) {
     }
 
     var that = this;
+    var key;
     return storage.getAll(actionKeys, true)
         .then(function(items) {
             if (Array.isArray(actionKeys) && actionKeys.length > 0) {
                 for (var i = 0; i < actionKeys.length; i++) {
-                    var key = actionKeys[i];
+                    key = actionKeys[i];
                     // clean up non-existing keys
                     if (!items[key] && that.actionKeysFilter[key]) {
                         delete that.actionKeysFilter[key];
@@ -228,7 +230,7 @@ ActionStorage.prototype.getAll = function(actionKeys) {
                 }
             }
 
-            for (var key in items) {
+            for (key in items) {
                 that.actionKeysFilter[key] = true;
             }
 

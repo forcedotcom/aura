@@ -85,12 +85,13 @@ public class AuraJavascriptGroup extends DirectiveBasedJavascriptGroup implement
 
 
     @Override
-    public void onSourceChanged(SourceMonitorEvent event, String filePath) {
-        if (filePath != null && filePath.startsWith(ROOT_DIR.getPath())) {
+    public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
+        if (filePath != null) {
             File updatedFile = new File(filePath);
-            if (JS_FILTER.accept(updatedFile)) {
+            if (filePath.startsWith(ROOT_DIR.getPath()) && JS_FILTER.accept(updatedFile)) {
                 isStale = true;
             }
         }
     }
+
 }

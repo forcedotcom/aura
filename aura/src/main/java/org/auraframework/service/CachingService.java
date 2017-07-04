@@ -76,5 +76,5 @@ public interface CachingService extends AuraService {
 
     void notifyDependentSourceChange(
             Collection<WeakReference<SourceListener>> listeners,
-            SourceMonitorEvent event, String filePath);
+            DefDescriptor<?> source, SourceMonitorEvent event, String filePath);
 }

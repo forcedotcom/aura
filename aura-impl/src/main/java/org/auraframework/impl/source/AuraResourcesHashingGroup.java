@@ -18,6 +18,7 @@ package org.auraframework.impl.source;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -93,10 +94,10 @@ public class AuraResourcesHashingGroup extends HashingGroup implements SourceLis
     }
 
     @Override
-    public void onSourceChanged(SourceMonitorEvent event, String filePath) {
-        if (filePath != null && filePath.startsWith(ROOT_DIR.getPath())) {
+    public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
+        if (filePath != null) {
             File updatedFile = new File(filePath);
-            if (FILE_FILTER.accept(updatedFile)) {
+            if (filePath.startsWith(ROOT_DIR.getPath()) && FILE_FILTER.accept(updatedFile)) {
                 isStale = true;
                 updateResource(updatedFile);
             }

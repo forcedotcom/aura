@@ -393,8 +393,8 @@ public class AuraImplUnitTestingUtil {
         builder = new DependencyDefImpl.Builder();
         builder.setParentDescriptor(parentDescriptor);
         builder.setResource(resource);
-        builder.setLocation(location);
         builder.setType(type);
+        builder.setLocation(location);
         return builder.build();
     }
 

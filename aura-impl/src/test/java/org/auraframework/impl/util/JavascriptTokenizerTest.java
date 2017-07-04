@@ -41,7 +41,7 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     DefDescriptor<RootDefinition> parentDescriptor;
 
     @Test
-    public void testProcessDoesNothingWithSimpleCode() throws Exception {
+    public void testProcessDoesNothingWithSimpleCode() {
         String code = "";
         JavascriptTokenizer tokenizer = new JavascriptTokenizer(parentDescriptor, code, location);
 
@@ -50,7 +50,7 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     }
 
     @Test
-    public void testProcessAddsLabelForSingleLabel() throws Exception {
+    public void testProcessAddsLabelForSingleLabel() {
         String code = "({a: function() { $A.get($Label.xxx.yyy); }})";
         JavascriptTokenizer tokenizer = new JavascriptTokenizer(parentDescriptor, code, location);
 
@@ -66,7 +66,7 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     }
 
     @Test
-    public void testProcessAddsLabelForMultipleLabels() throws Exception {
+    public void testProcessAddsLabelForMultipleLabels() {
         String code = "({a: function() { $A.get($Label.xxx.yyy); }, b: function() { $A.get($Label.yyy.zzz); }})";
         JavascriptTokenizer tokenizer = new JavascriptTokenizer(parentDescriptor, code, location);
 
@@ -87,7 +87,7 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     }
 
     @Test
-    public void testProcessDoesNothingWithOnePartLabel() throws Exception {
+    public void testProcessDoesNothingWithOnePartLabel() {
         String code = "({a: function() { $A.get($Label.xxx); }})";
         JavascriptTokenizer tokenizer = new JavascriptTokenizer(parentDescriptor, code, location);
 
@@ -96,7 +96,7 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     }
 
     @Test
-    public void testProcessAddsDependencyForSingleDependency() throws Exception {
+    public void testProcessAddsDependencyForSingleDependency() {
         String code = "({a: function() { $A.createComponent(\"markup://ui:outputText\"); }})";
         JavascriptTokenizer tokenizer = new JavascriptTokenizer(parentDescriptor, code, location);
 
@@ -118,7 +118,7 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     }
 
     @Test
-    public void testProcessAddsDependencyForMultipleDependencies() throws Exception {
+    public void testProcessAddsDependencyForMultipleDependencies() {
         String code = "({a: function() { $A.createComponent(\"markup://ui:outputText\"); }, "
                       +" b: function() { $A.createComponent(\"markup://aura:inputText\"); }})";
         JavascriptTokenizer tokenizer = new JavascriptTokenizer(parentDescriptor, code, location);
@@ -154,7 +154,7 @@ public class JavascriptTokenizerTest extends UnitTestCase {
     }
 
     @Test
-    public void testProcessDoesNotAddDependencyForBrokenDescriptor() throws Exception {
+    public void testProcessDoesNotAddDependencyForBrokenDescriptor() {
         String code = "({a: function() { $A.createComponent(\"markup://ui:\"); }})";
         JavascriptTokenizer tokenizer = new JavascriptTokenizer(parentDescriptor, code, location);
 

@@ -46,14 +46,10 @@ public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializa
         this.prefixMatch = prefixMatch;
         this.namespaceMatch = namespaceMatch;
         this.nameMatch = nameMatch;
-        if (defTypes != null) {
-            this.defTypes = Lists.newArrayList(defTypes);
-        } else {
-            this.defTypes = null;
-        }
+        this.defTypes = Lists.newArrayList(defTypes);
     }
 
-    public DescriptorFilter(String matcher, Collection<DefType> defTypes) {
+    public DescriptorFilter(String matcher, List<DefType> defTypes) {
         String prefix = "*", namespace = "*", name = "*";
         String remainder = matcher;
 
@@ -84,18 +80,14 @@ public class DescriptorFilter implements Comparable<DescriptorFilter>, Serializa
         } catch (IllegalArgumentException iae) {
             throw new IllegalArgumentException("Illegal name in " + matcher);
         }
-        if (defTypes != null) {
-            this.defTypes = Lists.newArrayList(defTypes);
-        } else {
-            this.defTypes = null;
-        }
+        this.defTypes = defTypes;
     }
 
     public DescriptorFilter(String matcher, DefType defType) {
         this(matcher, Lists.newArrayList(defType));
     }
 
-    public static Collection<DefType> parseDefTypes(String typeStr) {
+    private static List<DefType> parseDefTypes(String typeStr) {
         if ("*".equals(typeStr)) {
             return null;
         } else if (typeStr != null) {

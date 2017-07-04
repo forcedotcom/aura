@@ -402,14 +402,14 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
             NamespaceInfo namespaceInfo = getOrAddNamespace(namespace, access);
 
             boolean containsKey = namespaceInfo.put(source, overwrite);
-            if (containsKey) {
-                event = SourceMonitorEvent.CHANGED;
-            }
+                if (containsKey) {
+                    event = SourceMonitorEvent.CHANGED;
+                }
         } finally {
             nsLock.unlock();
         }
         // notify source listeners of change
-        fileMonitor.onSourceChanged(event, descriptor.getQualifiedName());
+        fileMonitor.onSourceChanged(descriptor, event, null);
 
         return source;
     }
@@ -433,7 +433,7 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
             nsLock.unlock();
         }
         // notify source listeners of change
-        fileMonitor.onSourceChanged(SourceMonitorEvent.DELETED, descriptor.getQualifiedName());
+        fileMonitor.onSourceChanged(descriptor, SourceMonitorEvent.DELETED, null);
     }
 
     /**

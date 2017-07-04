@@ -27,13 +27,18 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.builder.CacheBuilder;
 import org.auraframework.cache.Cache;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.impl.cache.HardCacheImpl;
+import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.util.ModuleDefinitionUtil;
 import org.auraframework.service.CachingService;
 import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.RegistrySet;
@@ -80,6 +85,8 @@ public class CachingServiceImpl implements CachingService {
     
     private LoggingAdapter loggingAdapter;
 
+    private ConfigAdapter configAdapter;
+    
     private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
     private final WriteLock wLock = rwLock.writeLock();
 
@@ -264,7 +271,7 @@ public class CachingServiceImpl implements CachingService {
     @Override
     public void notifyDependentSourceChange(
             Collection<WeakReference<SourceListener>> listeners,
-            SourceListener.SourceMonitorEvent event,
+            DefDescriptor<?> source, SourceListener.SourceMonitorEvent event,
             String filePath) {
         boolean haveLock = false;
 
@@ -280,8 +287,17 @@ public class CachingServiceImpl implements CachingService {
                 return;
             }
 
+            if (filePath != null) {
+                // check whether changed file is a module file.
+                // current descriptor look up from DescriptorFileMapper does not handle modules
+                DefDescriptor<?> moduleDescriptor = ModuleDefinitionUtil.getModuleDescriptorFromFilePath(filePath, configAdapter);
+                if (moduleDescriptor != null) {
+                    source = moduleDescriptor;
+                }
+            }
+
             // successfully acquired the lock, start clearing caches
-            invalidateSourceRelatedCaches();
+            invalidateSourceRelatedCaches(source);
 
             // notify provided listeners, presumably to clear caches
             if (listeners != null) {
@@ -289,11 +305,7 @@ public class CachingServiceImpl implements CachingService {
                     SourceListener sl = i.get();
     
                     if (sl != null) {
-                        try {
-                            sl.onSourceChanged(event, filePath);
-                        } catch (Exception e) {
-                            logger.error(e.getMessage(), e);
-                        }
+                        sl.onSourceChanged(source, event, filePath);
                     }
                 }
             }
@@ -305,20 +317,44 @@ public class CachingServiceImpl implements CachingService {
         }
     }
 
-    private void invalidateSourceRelatedCaches() {
+    private void invalidateSourceRelatedCaches(DefDescriptor<?> descriptor) {
+        
         depsCache.invalidateAll();
         descriptorFilterCache.invalidateAll();
         stringsCache.invalidateAll();
         altStringsCache.invalidateAll();
         clientLibraryOutputCache.invalidateAll();
         registrySetCache.invalidateAll();
-        defsCache.invalidateAll();
-        existsCache.invalidateAll();
+
+        if (descriptor == null) {
+            defsCache.invalidateAll();
+            existsCache.invalidateAll();
+        } else {
+            DefDescriptor<ComponentDef> cdesc = new DefDescriptorImpl<>(descriptor, ComponentDef.class, "markup");
+            DefDescriptor<ApplicationDef> adesc = new DefDescriptorImpl<>(descriptor, ApplicationDef.class, "markup");
+
+            defsCache.invalidate(descriptor);
+            existsCache.invalidate(descriptor);
+            defsCache.invalidate(cdesc);
+            existsCache.invalidate(cdesc);
+            defsCache.invalidate(adesc);
+            existsCache.invalidate(adesc);
+
+            DefDescriptor<?> bundleParent = descriptor.getBundle();
+            if (bundleParent != null) {
+                invalidateSourceRelatedCaches(bundleParent);
+            }
+        }
     }
 
     @Inject
     void setLoggingAdapter(LoggingAdapter loggingAdapter) {
         this.loggingAdapter = loggingAdapter;
+    }
+
+    @Inject
+    public void setConfigAdapter(ConfigAdapter configAdapter) {
+        this.configAdapter = configAdapter;
     }
 
     /**

@@ -16294,6 +16294,161 @@ $A.componentService.initControllerDefs([
         ]
       }
     ]
+  },
+  {
+    "descriptor":"aura://TestController",
+    "ac":[
+      {
+        "n":"baseBallDivisions",
+        "descriptor":"aura://TestController/ACTION$baseBallDivisions",
+        "at":"SERVER",
+        "rt":"java://org.auraframework.instance.Component",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"basketBallDivisions",
+        "descriptor":"aura://TestController/ACTION$basketBallDivisions",
+        "at":"SERVER",
+        "rt":"java://org.auraframework.instance.Component",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"currentCallingDescriptor",
+        "descriptor":"aura://TestController/ACTION$currentCallingDescriptor",
+        "at":"SERVER",
+        "rt":"java://java.lang.String",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"doSomething",
+        "descriptor":"aura://TestController/ACTION$doSomething",
+        "at":"SERVER",
+        "rt":"java://void",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"getAppCacheUrls",
+        "descriptor":"aura://TestController/ACTION$getAppCacheUrls",
+        "at":"SERVER",
+        "rt":"java://java.util.List",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"getBootstrapPublicCacheExpiration",
+        "descriptor":"aura://TestController/ACTION$getBootstrapPublicCacheExpiration",
+        "at":"SERVER",
+        "rt":"java://int",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"getNamedComponent",
+        "descriptor":"aura://TestController/ACTION$getNamedComponent",
+        "at":"SERVER",
+        "rt":"java://org.auraframework.instance.Component",
+        "b":false,
+        "ca":false,
+        "pa":[
+          {
+            "name":"componentName",
+            "type":"java://java.lang.String"
+          },
+          {
+            "name":"attributes",
+            "type":"java://java.util.Map\u003Cjava.lang.String,java.lang.Object\u003E"
+          }
+        ]
+      },
+      {
+        "n":"getString",
+        "descriptor":"aura://TestController/ACTION$getString",
+        "at":"SERVER",
+        "rt":"java://java.lang.String",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"handleCustomException",
+        "descriptor":"aura://TestController/ACTION$handleCustomException",
+        "at":"SERVER",
+        "rt":"java://void",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"handleCustomExceptionWithData",
+        "descriptor":"aura://TestController/ACTION$handleCustomExceptionWithData",
+        "at":"SERVER",
+        "rt":"java://void",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"handleException",
+        "descriptor":"aura://TestController/ACTION$handleException",
+        "at":"SERVER",
+        "rt":"java://void",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"handleExceptionWithThrownArgument",
+        "descriptor":"aura://TestController/ACTION$handleExceptionWithThrownArgument",
+        "at":"SERVER",
+        "rt":"java://void",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"throwException",
+        "descriptor":"aura://TestController/ACTION$throwException",
+        "at":"SERVER",
+        "rt":"java://java.lang.String",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      }
+    ]
   }
 ]);
 $A.componentService.initModuleDefs([
@@ -32591,6 +32746,161 @@ $A.componentService.initControllerDefs([
             "name":"extraStyles",
             "type":"java://java.util.List\u003Cjava.lang.String\u003E"
           }
+        ]
+      }
+    ]
+  },
+  {
+    "descriptor":"aura://TestController",
+    "ac":[
+      {
+        "n":"baseBallDivisions",
+        "descriptor":"aura://TestController/ACTION$baseBallDivisions",
+        "at":"SERVER",
+        "rt":"java://org.auraframework.instance.Component",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"basketBallDivisions",
+        "descriptor":"aura://TestController/ACTION$basketBallDivisions",
+        "at":"SERVER",
+        "rt":"java://org.auraframework.instance.Component",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"currentCallingDescriptor",
+        "descriptor":"aura://TestController/ACTION$currentCallingDescriptor",
+        "at":"SERVER",
+        "rt":"java://java.lang.String",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"doSomething",
+        "descriptor":"aura://TestController/ACTION$doSomething",
+        "at":"SERVER",
+        "rt":"java://void",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"getAppCacheUrls",
+        "descriptor":"aura://TestController/ACTION$getAppCacheUrls",
+        "at":"SERVER",
+        "rt":"java://java.util.List",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"getBootstrapPublicCacheExpiration",
+        "descriptor":"aura://TestController/ACTION$getBootstrapPublicCacheExpiration",
+        "at":"SERVER",
+        "rt":"java://int",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"getNamedComponent",
+        "descriptor":"aura://TestController/ACTION$getNamedComponent",
+        "at":"SERVER",
+        "rt":"java://org.auraframework.instance.Component",
+        "b":false,
+        "ca":false,
+        "pa":[
+          {
+            "name":"componentName",
+            "type":"java://java.lang.String"
+          },
+          {
+            "name":"attributes",
+            "type":"java://java.util.Map\u003Cjava.lang.String,java.lang.Object\u003E"
+          }
+        ]
+      },
+      {
+        "n":"getString",
+        "descriptor":"aura://TestController/ACTION$getString",
+        "at":"SERVER",
+        "rt":"java://java.lang.String",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"handleCustomException",
+        "descriptor":"aura://TestController/ACTION$handleCustomException",
+        "at":"SERVER",
+        "rt":"java://void",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"handleCustomExceptionWithData",
+        "descriptor":"aura://TestController/ACTION$handleCustomExceptionWithData",
+        "at":"SERVER",
+        "rt":"java://void",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"handleException",
+        "descriptor":"aura://TestController/ACTION$handleException",
+        "at":"SERVER",
+        "rt":"java://void",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"handleExceptionWithThrownArgument",
+        "descriptor":"aura://TestController/ACTION$handleExceptionWithThrownArgument",
+        "at":"SERVER",
+        "rt":"java://void",
+        "b":false,
+        "ca":false,
+        "pa":[
+
+        ]
+      },
+      {
+        "n":"throwException",
+        "descriptor":"aura://TestController/ACTION$throwException",
+        "at":"SERVER",
+        "rt":"java://java.lang.String",
+        "b":false,
+        "ca":false,
+        "pa":[
+
         ]
       }
     ]

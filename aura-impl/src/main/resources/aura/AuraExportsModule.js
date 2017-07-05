@@ -50,7 +50,13 @@ Aura.ExportsModule = {
             action.setBackground();
             action.setCallback(null, function (response) {
                 if (response.getState() !== 'SUCCESS') {
-                    reject(new Error('Error fetching component: ' + JSON.stringify(response.getError())));
+                    var actionErrors = response.getError();
+                    if (actionErrors.length > 0) {
+                        reject(actionErrors[0]);
+                    } else {
+                        reject(new Error('Error fetching component'));
+                    }
+
                     return;
                 }
                 resolve(response.getReturnValue());

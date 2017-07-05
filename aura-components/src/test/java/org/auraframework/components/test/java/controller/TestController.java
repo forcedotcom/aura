@@ -25,7 +25,7 @@ import org.auraframework.adapter.ServerErrorUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.ds.servicecomponent.Controller;
+import org.auraframework.ds.servicecomponent.GlobalController;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Component;
 import org.auraframework.service.ContextService;
@@ -39,7 +39,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @ServiceComponent
-public class TestController implements Controller {
+public class TestController implements GlobalController {
+
+    private static final String NAME = "aura://TestController";
 
     @Inject
     private InstanceService instanceService;
@@ -50,6 +52,10 @@ public class TestController implements Controller {
     @Inject
     private ServerErrorUtilAdapter serverErrorUtilAdapter;
 
+    @Override
+    public String getQualifiedName() {
+        return NAME;
+    }
 
     @AuraEnabled
     public void doSomething() {

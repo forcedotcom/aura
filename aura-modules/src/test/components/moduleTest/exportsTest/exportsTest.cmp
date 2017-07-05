@@ -1,0 +1,3 @@
+<aura:component>
+    <aura:import library="moduleTest:exports" property="exports" />
+</aura:component>

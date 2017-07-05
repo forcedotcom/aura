@@ -58,7 +58,6 @@
         <npm.download.root.url>http://repo.auraframework.org/simple/plugins-release-local/npm/</npm.download.root.url>
         <node.version>v4.2.1</node.version>
         <npm.version>2.14.7</npm.version>
-        <eslint.max.warnings>100000</eslint.max.warnings>
     </properties>
     <repositories>
         <repository>
@@ -930,7 +929,7 @@
                                             <goal>npm</goal>
                                             <goal>grunt</goal>
                                         </goals>
-                
+
                                         <versionRange>[0.0,)</versionRange>
                                     </pluginExecutionFilter>
                                     <action>
@@ -1065,10 +1064,11 @@
                     <configuration>
                         <arguments>
                             <argument>--max-warnings</argument>
-                            <argument>${eslint.max.warnings}</argument>
+                            <argument>0</argument>
                             <argument>${project.basedir}/src/main/modules</argument>
                             <argument>${project.basedir}/src/test/modules</argument>
                         </arguments>
+                        <errorHintMessage>(NOTE: to check modules with eslint use: mvn tools:eslint-raptor)</errorHintMessage>
                     </configuration>
                 </plugin>
             </plugins>
@@ -1140,6 +1140,32 @@
                                 <phase>package</phase>
                                 <goals>
                                     <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>eslint-modules</id>
+            <activation>
+                <property>
+                    <name>eslint.enabled</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.auraframework</groupId>
+                        <artifactId>tools-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <!-- run eslint on raptor modules -->
+                                <id>eslint-raptor</id>
+                                <phase>process-classes</phase>
+                                <goals>
+                                    <goal>eslint-raptor</goal>
                                 </goals>
                             </execution>
                         </executions>

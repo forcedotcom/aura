@@ -426,20 +426,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.auraframework</groupId>
-                <artifactId>tools-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <!-- run eslint on raptor modules -->
-                        <id>eslint-raptor</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>eslint-raptor</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>

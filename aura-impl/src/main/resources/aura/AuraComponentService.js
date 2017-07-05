@@ -763,7 +763,7 @@ AuraComponentService.prototype.evaluateModuleDef = function (descriptor) {
                 var tmp = function tmp() {
                     return dep.ns;
                 };
-                tmp["_circular_"] = true;
+                tmp["__circular__"] = true;
                 return tmp;
             }
         }

@@ -108,4 +108,20 @@ Test.Aura.Metrics.AuraMetricsServiceTest=function(){
             Assert.Equal(expected, actual);
         }
     }
+
+    [Fixture]
+    function ResourcePerfInfo() {
+
+        [Fact]
+        function SummarizeResourcePerfInfoIncludesInitiatorType() {
+            var expected = "SCRIPT";
+
+            var target = new Aura.Services.MetricsService();
+            var actual = target.summarizeResourcePerfInfo({
+                "initiatorType": expected
+            }).initiatorType;
+
+            Assert.Equal(expected, actual);
+        }
+    }
 }

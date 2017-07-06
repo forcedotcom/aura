@@ -850,6 +850,7 @@ Aura.Services.MetricsService.prototype.registerBeacon = function (beacon) {
 Aura.Services.MetricsService.prototype.summarizeResourcePerfInfo = function (r) {
     return {
         "name"            : r.name,
+        "initiatorType"   : r.initiatorType,
         "duration"        : parseInt(r.responseEnd - r.startTime, 10),
         "startTime"       : parseInt(r.startTime, 10),
         "fetchStart"      : parseInt(r.fetchStart, 10),

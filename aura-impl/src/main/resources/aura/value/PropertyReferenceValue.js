@@ -19,7 +19,7 @@
  * @protected
  * @export
  */
-function PropertyReferenceValue(path, valueProvider, target) {
+function PropertyReferenceValue(path, valueProvider/*, target*/) {
     var isArray=$A.util.isArray(path);
     this.path = isArray?path:path.split('.');
     this.expression = isArray?path.join('.'):path;

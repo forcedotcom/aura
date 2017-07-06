@@ -104,7 +104,7 @@ CryptoAdapter.initializeEngine = function() {
         window["crypto"]["subtle"]["importKey"] = function(format, keyData, algorithm, extractable, keyUsages) {
             return new Promise(function(resolve, reject) {
                 var op = window["msCrypto"]["subtle"]["importKey"](format, keyData, algorithm, extractable, keyUsages);
-                op.onerror = function(evt) {
+                op.onerror = function(/*evt*/) {
                     // there isn't useful error information in evt, so just indicate a generic error
                     reject(new Error('Failed to importKey'));
                 };
@@ -118,7 +118,7 @@ CryptoAdapter.initializeEngine = function() {
         window["crypto"]["subtle"]["encrypt"] = function(algorithm, key, buffer) {
             return new Promise(function(resolve, reject) {
                 var op = window["msCrypto"]["subtle"]["encrypt"](algorithm, key, buffer);
-                op.onerror = function(evt) {
+                op.onerror = function(/*evt*/) {
                     // there isn't useful error information in evt, so just indicate a generic error
                     reject(new Error('Failed to encrypt'));
                 };
@@ -142,7 +142,7 @@ CryptoAdapter.initializeEngine = function() {
         window["crypto"]["subtle"]["decrypt"] = function(algorithm, key, buffer) {
             return new Promise(function(resolve, reject) {
                 var op = window["msCrypto"]["subtle"]["decrypt"](algorithm, key, buffer);
-                op.onerror = function(evt) {
+                op.onerror = function(/*evt*/) {
                     // there isn't useful error information in evt, so just indicate a generic error
                     reject(new Error('Failed to decrypt'));
                 };

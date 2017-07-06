@@ -94,7 +94,7 @@ function AuraError(message, innerError, severity) {
     this["id"] = "";
 
     // Access Stack defaults - takes dependency on $A.clientService
-    if(typeof($A)!="undefined"&&$A.clientService&&$A.clientService.currentAccess){
+    if((typeof $A)!=="undefined"&&$A.clientService&&$A.clientService.currentAccess){
         this.setComponent($A.clientService.currentAccess.getType());
         this["componentStack"]=$A.clientService.getAccessStackHierarchy();
     }
@@ -151,7 +151,6 @@ Aura.Errors.GenerateErrorId = function(hashGen) {
 };
 
 Aura.Errors.GenerateErrorIdHashGen = function(componentName, stackFrames) {
-    var isNonFrameworkStackFrame = false;
     var hashGen = componentName;
     for (var i = 0; i < stackFrames.length; i++) {
         var frame = stackFrames[i];
@@ -202,7 +201,7 @@ AuraError.prototype.findComponentFromStackTrace = function() {
     }
 
     return "";
-}
+};
 
 AuraError.prototype.setComponent = function(component) {
     this["component"] = component;

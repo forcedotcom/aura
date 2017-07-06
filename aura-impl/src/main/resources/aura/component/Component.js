@@ -2408,7 +2408,7 @@ Component.prototype.getMethodHandler = function(methodDef,methodEventDef){
                 if ($A.clientService.logAccessFailures) {
                     $A.error(null,new $A.auraError(message));
                 }
-                return;
+                return undefined;
             } else {
                 if ($A.clientService.logAccessFailures) {
                     $A.warning(message);
@@ -2446,7 +2446,8 @@ Component.prototype.getMethodHandler = function(methodDef,methodEventDef){
             action.runDeprecated(methodEvent);
             return action.returnValue;
         }
-    }
+        return undefined;
+    };
 };
 
 Component.prototype.getActionCaller = function(valueProvider, actionExpression) {

@@ -46,7 +46,7 @@
     findDependencies: function(cmp, onlyUniqueDep) {
         var result = [];
         var nodes = cmp.get("v.nodes");
-        var app = cmp.get("v.app")
+        var app = cmp.get("v.app");
 
         for(var descr in nodes) {
             if(descr === app) {
@@ -91,7 +91,7 @@
 
         var callees = nodes[component]["callees"];
         // leaves
-        if(callees.length == 0) {
+        if(callees.length === 0) {
             return 0;
         }
 
@@ -120,7 +120,7 @@
 
         var callees = nodes[component]["callees"];
         // leaves
-        if(callees.length == 0) {
+        if(callees.length === 0) {
             return nodes[component]["ownSize"];
         }
 
@@ -139,4 +139,4 @@
         cmp.set("v.paths", undefined);
         cmp.set("v.uniqueDeps", undefined);
     }
-})
+})// eslint-disable-line semi

@@ -3881,7 +3881,6 @@ AuraClientService.prototype.getAccessVersion = function(name) {
 
 AuraClientService.prototype.allowAccess = function(definition, component) {
     if(definition&&definition.getDescriptor){
-        var context;
         var currentAccess=this.currentAccess;
         if(definition.access==='G'){
             // GLOBAL means accessible from anywhere

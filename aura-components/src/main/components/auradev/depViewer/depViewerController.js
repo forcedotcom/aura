@@ -76,4 +76,4 @@
         });
         cmp.set("v.uniqueDeps", uniqueDeps);
     }
-})
+})// eslint-disable-line semi

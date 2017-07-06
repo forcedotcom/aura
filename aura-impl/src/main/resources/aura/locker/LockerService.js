@@ -162,7 +162,7 @@ function LockerService() {
 
             getEnv : function(key, /* deprecated*/ doNotCreate) {
                 if (!this.isEnabled()) {
-                    return;
+                    return undefined;
                 }
 
                 var psuedoKeySymbol = JSON.stringify(key);
@@ -188,7 +188,7 @@ function LockerService() {
 
             getEnvForSecureObject : function(st, /* deprecated*/ doNotCreate) {
                 if (!this.isEnabled()) {
-                    return;
+                    return undefined;
                 }
 
                 var key = ls_getKey(st);

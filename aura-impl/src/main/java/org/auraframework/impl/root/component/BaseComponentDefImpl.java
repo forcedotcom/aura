@@ -1901,6 +1901,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     } else if (dep.getDefType() == DefType.INTERFACE) {
                         InterfaceDefImpl depDef = (InterfaceDefImpl) dep.getDef();
                         ret = ret && depDef.isInConcreteAndHasLocalProvider();
+                    } else if (dep.getDefType() == DefType.MODULE) {
+                        // modules must be client rendered
+                        return false;
                     }
                 }
             }

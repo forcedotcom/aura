@@ -906,7 +906,7 @@ public class AuraContextImpl implements AuraContext {
                 json.writeMapEntry("ls", 1);
             }
 
-            if (nonce != null){
+            if (nonce != null && style == EncodingStyle.Full){
                 json.writeMapEntry("scriptNonce", nonce);
             }
 

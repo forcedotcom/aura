@@ -36,6 +36,7 @@ import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.InstanceStack;
+import org.auraframework.service.CSPInliningService;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext;
@@ -356,6 +357,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
     public void testGetFrameworkScriptsSafeCache() throws Exception {
         ServletUtilAdapterImpl sua = new ServletUtilAdapterImpl();
         AuraContext context = Mockito.mock(AuraContext.class);
+        CSPInliningService inliningService = Mockito.mock(CSPInliningService.class);
         Mockito.when(context.isAppJsSplitEnabled()).thenReturn(true);
         Map<String,Object> attributes = Maps.newHashMap();
         sua = Mockito.spy(sua);
@@ -366,6 +368,8 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         Mockito.doReturn("appcorejs").when(sua).getAppCoreJsUrl(context, null);
         Mockito.doReturn("appjs").when(sua).getAppJsUrl(context, null);
         Mockito.doReturn("bootstrap").when(sua).getBootstrapUrl(context, attributes);
+        Mockito.doReturn(false).when(inliningService).isSupported();
+        sua.setCspInliningService(inliningService);
 
         actual = sua.getFrameworkScripts(context, true, false, attributes);
         assertEquals(expected, actual);

@@ -403,7 +403,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         throws QuickFixException {
         List<String> ret = Lists.newArrayList();
 
-        if (safeInlineJs && !ignoreNonCacheableScripts) {
+        if (safeInlineJs && !ignoreNonCacheableScripts && !cspInliningService.isSupported()) {
             ret.add(getInlineJsUrl(context, attributes));
         }
 

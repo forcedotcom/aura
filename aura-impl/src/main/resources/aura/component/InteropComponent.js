@@ -548,7 +548,7 @@ InteropComponent.prototype.getEventByDescriptor = function() {
  * @export
  */
 InteropComponent.prototype.toString = function(){
-    return 'InteropComponent';
+    return 'InteropComponent: ' + this.componentDef.getDescriptor().toString();
 };
 
 /**
@@ -567,8 +567,8 @@ InteropComponent.prototype.raiseInvalidInteropApi = function(func, args) {
     if (argsArr.length) {
         error += ' with arguments [' + argsArr.join(',') + ']';
     }
-    if (this._globalId && this._componentDef) {
-        error += ', ' + this._componentDef + ' [' + this._globalId + ']';
+    if (this.globalId && this.componentDef) {
+        error += ', ' + this.componentDef + ' [' + this.globalId + ']';
     }
 
     var ae = new $A.auraError(error, null, $A.severity.QUIET);

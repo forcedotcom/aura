@@ -6,6 +6,8 @@
 
     <aura:dependency resource="markup://moduleTest:testLib" type="LIBRARY"/>
 
+    <moduleTest:simpleLib aura:id="simple-lib" />
+
     <div>
         <moduleTest:simpleCmp
             aura:id="simple"

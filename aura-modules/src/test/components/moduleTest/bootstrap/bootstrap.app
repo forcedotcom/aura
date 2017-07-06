@@ -88,10 +88,8 @@
         <moduleTest:async />
     </section>
 
-    <!-- TODO(byao): Enable and fix this test
     <div>
         <moduleTest:recursive />
     </div>
-    -->
 
 </aura:application>

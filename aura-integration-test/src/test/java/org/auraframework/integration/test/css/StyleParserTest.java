@@ -24,7 +24,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.test.client.UserAgent;
-import org.auraframework.throwable.quickfix.StyleParserException;
 import org.junit.Ignore;
 import org.junit.Test;
 

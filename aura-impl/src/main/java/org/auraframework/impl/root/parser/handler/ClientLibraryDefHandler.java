@@ -48,8 +48,9 @@ public class ClientLibraryDefHandler<P extends RootDefinition> extends ParentedT
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_TYPE = "type";
     private static final String ATTRIBUTE_MODES = "modes";
+    private static final String ATTRIBUTE_PREFETCH = "prefetch";
 
-    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_TYPE, ATTRIBUTE_MODES);
+    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_TYPE, ATTRIBUTE_MODES, ATTRIBUTE_PREFETCH);
 
     private ClientLibraryDefImpl.Builder builder;
 
@@ -105,6 +106,14 @@ public class ClientLibraryDefHandler<P extends RootDefinition> extends ParentedT
             }
         }
         builder.setModes(modes);
+        
+        final String prefetch = getAttributeValue(ATTRIBUTE_PREFETCH);
+        if(prefetch != null && !prefetch.isEmpty()) {
+            builder.setShouldPrefetch(Boolean.getBoolean(prefetch));
+        } else {
+            // Default is to prefetch
+            builder.setShouldPrefetch(true);
+        }
     }
 
     @Override

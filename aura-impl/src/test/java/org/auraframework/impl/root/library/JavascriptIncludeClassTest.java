@@ -17,12 +17,15 @@ package org.auraframework.impl.root.library;
 
 import java.util.Arrays;
 
+import javax.inject.Inject;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.IncludeDef;
 import org.auraframework.def.IncludeDefRef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.def.DefinitionTest;
 import org.auraframework.impl.javascript.BaseJavascriptClass;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -35,6 +38,9 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
 
     @Mock(answer = Answers.RETURNS_MOCKS)
     DefDescriptor<IncludeDef> descriptor;
+
+    @Inject
+    private DefinitionService definitionService;
 
     @Test
     @Ignore("IncludeDefRef.validateReferences should not create a JavascriptIncludeClass")
@@ -190,7 +196,7 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
       addSourceAutoCleanup(includeDesc, code);
       builder.setDescriptor(includeDesc);
         BaseJavascriptClass javascriptClass = new JavascriptIncludeClass.Builder()
-                .setDefinition(builder, includeDesc.getDef()).setMinify(true).build();
+                .setDefinition(builder, definitionService.getDefinition(includeDesc)).setMinify(true).build();
 
       String minifiedCode = javascriptClass.getMinifiedCode();
 
@@ -220,7 +226,7 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
         addSourceAutoCleanup(includeDesc, code);
         builder.setDescriptor(includeDesc);
         BaseJavascriptClass javascriptClass = new JavascriptIncludeClass.Builder()
-                .setDefinition(builder, includeDesc.getDef()).setMinify(false).build();
+                .setDefinition(builder, definitionService.getDefinition(includeDesc)).setMinify(false).build();
 
         String minifiedCode = javascriptClass.getMinifiedCode();
         assertNull(minifiedCode);
@@ -237,7 +243,7 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
         addSourceAutoCleanup(includeDesc, code);
         builder.setDescriptor(includeDesc);
         BaseJavascriptClass.Builder jsIncludeBuilder = new JavascriptIncludeClass.Builder()
-                .setDefinition(builder, includeDesc.getDef()).setMinify(true);
+                .setDefinition(builder, definitionService.getDefinition(includeDesc)).setMinify(true);
 
         try{
             jsIncludeBuilder.build();
@@ -259,7 +265,7 @@ public class JavascriptIncludeClassTest extends DefinitionTest<IncludeDef> {
         addSourceAutoCleanup(includeDesc, code);
         builder.setDescriptor(includeDesc);
         BaseJavascriptClass.Builder jsIncludeBuilder = new JavascriptIncludeClass.Builder()
-                .setDefinition(builder, includeDesc.getDef()).setMinify(false);
+                .setDefinition(builder, definitionService.getDefinition(includeDesc)).setMinify(false);
         try {
             jsIncludeBuilder.build();
             fail("expected exception");

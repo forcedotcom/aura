@@ -18,7 +18,6 @@ package org.auraframework.throwable;
 import java.io.IOException;
 
 import org.auraframework.instance.Event;
-import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 

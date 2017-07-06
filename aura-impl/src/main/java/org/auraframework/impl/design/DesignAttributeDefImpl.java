@@ -26,7 +26,6 @@ import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignAttributeDefaultDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;

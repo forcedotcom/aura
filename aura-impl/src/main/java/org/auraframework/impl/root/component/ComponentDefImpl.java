@@ -18,11 +18,9 @@ package org.auraframework.impl.root.component;
 import java.io.IOException;
 import java.util.List;
 
-import org.auraframework.Aura;
 import org.auraframework.builder.ComponentDefBuilder;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;

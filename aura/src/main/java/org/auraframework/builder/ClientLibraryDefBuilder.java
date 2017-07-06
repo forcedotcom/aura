@@ -30,4 +30,6 @@ public interface ClientLibraryDefBuilder extends DefBuilder<ClientLibraryDef, Cl
     ClientLibraryDefBuilder setName(String name);
     ClientLibraryDefBuilder setType(ClientLibraryDef.Type type);
     ClientLibraryDefBuilder setModes(Set<AuraContext.Mode> modes);
+    ClientLibraryDefBuilder setShouldPrefetch(boolean shouldPrefetch);
+    
 }

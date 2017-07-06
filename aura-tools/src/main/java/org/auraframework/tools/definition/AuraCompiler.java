@@ -25,7 +25,6 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.RegistryService;
 import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerException;
 import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerLogger;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.google.common.collect.Lists;

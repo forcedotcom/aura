@@ -45,8 +45,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Test;
-import org.mockito.Matchers;
-import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**

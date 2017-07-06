@@ -370,7 +370,21 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
             throws QuickFixException {
         return new ArrayList<>(clientLibraryService.getUrls(context, type));
     }
-
+    
+    /**
+     * Gets all client libraries specified. Uses client library service to resolve any urls that weren't specified.
+     * Returns list of non empty client library urls.
+     *
+     *
+     * @param context aura context
+     * @param type CSS or JS
+     * @return list of urls for client libraries
+     */
+    private List<String> getClientLibraryJSPrefetchUrls(AuraContext context)
+            throws QuickFixException {
+        return new ArrayList<>(clientLibraryService.getPrefetchUrls(context, ClientLibraryDef.Type.JS));
+    }
+    
     /**
      * Get the set of base scripts for a context.
      */
@@ -417,6 +431,11 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     @Override
     public List <String> getJsClientLibraryUrls(AuraContext context) throws QuickFixException {
         return getClientLibraryUrls(context, ClientLibraryDef.Type.JS);
+    }
+    
+    @Override
+    public List <String> getJsPrefetchUrls(AuraContext context) throws QuickFixException {
+        return getClientLibraryJSPrefetchUrls(context);
     }
 
     @Override

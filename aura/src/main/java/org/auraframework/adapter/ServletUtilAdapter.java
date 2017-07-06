@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.AuraContext;
@@ -252,4 +251,12 @@ public interface ServletUtilAdapter extends AuraAdapter {
             AuraContext context) throws IOException;
 
     void checkFrameworkUID(AuraContext context) throws ClientOutOfSyncException;
+    
+    /**
+     * Get all the urls to include in the Prefetch block of the page.
+     * 
+     * @param context
+     * @return
+     */
+    List<String> getJsPrefetchUrls(AuraContext context) throws QuickFixException;
 }

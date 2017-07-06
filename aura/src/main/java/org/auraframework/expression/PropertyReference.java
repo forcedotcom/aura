@@ -19,8 +19,6 @@ import java.util.List;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 
-import com.salesforce.omakase.broadcast.annotation.Description;
-
 /**
  * A reference to some property, i.e. a parsed list of strings separated by dots.
  */

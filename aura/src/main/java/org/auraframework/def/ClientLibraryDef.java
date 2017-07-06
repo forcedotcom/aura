@@ -52,6 +52,12 @@ public interface ClientLibraryDef extends Definition {
     Set<AuraContext.Mode> getModes();
 
     /**
+     * Should this clientLibrary be included in the apps prefetch
+     * @return
+     */
+    boolean shouldPrefetch();
+    
+    /**
      * Determines whether library should be included for mode. Compares modes specified
      *
      * @param mode aura mode
@@ -75,4 +81,5 @@ public interface ClientLibraryDef extends Definition {
      * @return true if same client library def with differing modes
      */
     boolean equalsIgnoreModes(ClientLibraryDef clientLibraryDef);
+    
 }

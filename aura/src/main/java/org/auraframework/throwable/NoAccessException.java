@@ -22,9 +22,6 @@ import org.auraframework.Aura;
 import org.auraframework.def.EventDef;
 import org.auraframework.instance.Event;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.JsFunction;
-
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 public class NoAccessException extends ClientSideEventException {

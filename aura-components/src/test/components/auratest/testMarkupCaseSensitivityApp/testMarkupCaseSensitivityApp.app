@@ -10,7 +10,7 @@
     <auraTEST:TESTMarkupCaseSensitivityOuterCmp/>
 
     <!-- dependency is case non-sensitive, this will load the 'correct' dependency withpreload -->
-    <aura:dependency resource="appCache:WITHPRELOAD" type="APPLICATION"/>
+    <aura:dependency resource="appCache:SLATE" type="COMPONENT"/>
 
     <!-- aura:import library, library name is case insensitive , property name is case sensitive -->
     <aura:import library="test:test_Library" property="importED" />

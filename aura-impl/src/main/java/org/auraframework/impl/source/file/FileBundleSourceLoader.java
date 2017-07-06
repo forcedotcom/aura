@@ -34,6 +34,7 @@ import org.auraframework.system.BundleSource;
 import org.auraframework.system.BundleSourceLoader;
 import org.auraframework.system.FileBundleSourceBuilder;
 import org.auraframework.system.InternalNamespaceSourceLoader;
+import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
@@ -116,17 +117,36 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
         // add the namespace root to the file monitor
         if (fileMonitor != null) {
             fileMonitor.subscribeToChangeNotification(this);
-            fileMonitor.addDirectory(base.getPath());
         }
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <D extends Definition> BundleSource<D> getSource(DefDescriptor<D> descriptor) {
-        String lookup = descriptor.getDescriptorName().toLowerCase();
-        BundleSource<?> provisional = createSource(fileMap.get(lookup));
-        if (provisional != null && provisional.getDescriptor().equals(descriptor)) {
-            return (BundleSource<D>)provisional;
+    public <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
+        BundleSource<?> provisional = getBundle(descriptor);
+        Source<D> bundledProvisional;
+        if (provisional == null) {
+            return null;
+        }
+        // If the provisional source matches the descriptor, we are done.
+        if (provisional.getDescriptor().equals(descriptor)) {
+            return (Source<D>)provisional;
+        }
+        // Blindly try to get the descriptor from the parts.
+        bundledProvisional = (Source<D>)provisional.getBundledParts().get(descriptor);
+        if (bundledProvisional != null) {
+            return bundledProvisional;
+        }
+        if (descriptor.getPrefix().equals(DefDescriptor.TEMPLATE_CSS_PREFIX)
+                && descriptor.getDefType() == DefType.STYLE) {
+            // try harder.
+            for (Source<?> part : provisional.getBundledParts().values()) {
+                // this violates a pile of rules, but then, the caller is as well.
+                if (part.getDescriptor().getDefType() == DefType.STYLE
+                        && part.getDescriptor().getDescriptorName().equals(descriptor.getDescriptorName())) {
+                    return (Source<D>)part;
+                }
+            }
         }
         return null;
     }
@@ -227,7 +247,7 @@ public class FileBundleSourceLoader implements BundleSourceLoader, InternalNames
     }
 
     @Override
-    public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
+    public void onSourceChanged(SourceMonitorEvent event, String filePath) {
         // rip out namespace cache if need be.
         // Note that this is a little more aggressive than it has to be, but, well, it does only do it
         // for creation/deletion. There is a race condition whereby this will cause odd failures if files

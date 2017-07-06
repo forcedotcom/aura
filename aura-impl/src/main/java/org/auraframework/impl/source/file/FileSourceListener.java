@@ -16,8 +16,6 @@
 package org.auraframework.impl.source.file;
 
 import org.apache.log4j.Logger;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.impl.source.DescriptorFileMapper;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
 import org.auraframework.util.FileChangeEvent;
@@ -26,10 +24,11 @@ import org.auraframework.util.FileListener;
 import java.nio.file.Path;
 
 /**
- * Used by {@link FileSourceLoader} to monitor and notify when file has changed. When a file does change, it notifies
- * its listener to clear cache of specific descriptor.
+ * Used by many things to monitor and notify when file has changed.
+ *
+ * When a file does change, it notifies its listener with the file name, and possibly a descriptor.
  */
-public class FileSourceListener extends DescriptorFileMapper implements FileListener {
+public class FileSourceListener implements FileListener {
     private SourceListener sourceListener;
 
     public FileSourceListener(SourceListener sourceListener) {
@@ -53,10 +52,9 @@ public class FileSourceListener extends DescriptorFileMapper implements FileList
         notifySourceChanges(event, SourceMonitorEvent.CHANGED);
     }
 
-    public void onSourceChanged(DefDescriptor<?> defDescriptor, SourceListener.SourceMonitorEvent smEvent,
-            String filePath) {
+    public void onSourceChanged(SourceListener.SourceMonitorEvent smEvent, String filePath) {
         if (sourceListener != null) {
-            sourceListener.onSourceChanged(defDescriptor, smEvent, filePath);
+            sourceListener.onSourceChanged(smEvent, filePath);
         }
     }
 
@@ -64,9 +62,6 @@ public class FileSourceListener extends DescriptorFileMapper implements FileList
         Path path = event.getPath();
         String filePath = path.toString();
         LOG.info("File " + filePath + " changed due to: " + smEvent);
-
-        // TODO: getDescriptor uses DescriptorFileMapper which will NOT find the correct descriptor for modules
-        DefDescriptor<?> defDescriptor = getDescriptor(filePath);
-        onSourceChanged(defDescriptor, smEvent, filePath);
+        onSourceChanged(smEvent, filePath);
     }
 }

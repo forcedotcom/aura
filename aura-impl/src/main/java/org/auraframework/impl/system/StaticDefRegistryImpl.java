@@ -20,8 +20,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.impl.source.SourceFactory;
 import org.auraframework.system.Source;
+import org.auraframework.system.SourceLoader;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -35,7 +35,7 @@ public class StaticDefRegistryImpl extends DefRegistryImpl {
 
     private static final long serialVersionUID = 1L;
     protected final Map<DefDescriptor<?>, Definition> defs;
-    private transient SourceFactory sourceFactory = null;
+    private transient SourceLoader sourceLoader = null;
     private String name;
 
     public StaticDefRegistryImpl(Set<DefType> defTypes, Set<String> prefixes, Set<String> namespaces,
@@ -60,8 +60,8 @@ public class StaticDefRegistryImpl extends DefRegistryImpl {
         return (D)defs.get(descriptor);
     }
 
-    public void setSourceFactory(SourceFactory sourceFactory) {
-        this.sourceFactory = sourceFactory;
+    public void setSourceLoader(SourceLoader sourceLoader) {
+        this.sourceLoader = sourceLoader;
     }
 
     @Override
@@ -88,8 +88,8 @@ public class StaticDefRegistryImpl extends DefRegistryImpl {
 
     @Override
     public <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
-        if (sourceFactory != null) {
-            return sourceFactory.getSource(descriptor);
+        if (sourceLoader != null) {
+            return sourceLoader.getSource(descriptor);
         }
         return null;
     }

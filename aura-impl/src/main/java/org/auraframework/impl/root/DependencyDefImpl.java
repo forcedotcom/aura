@@ -15,10 +15,15 @@
  */
 package org.auraframework.impl.root;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Set;
+
 import org.auraframework.Aura;
 import org.auraframework.builder.DependencyDefBuilder;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.RootDefinition;
@@ -28,44 +33,39 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.text.GlobMatcher;
 
-import java.io.IOException;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 /**
  * The definition of a declared dependency.
  */
 public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> implements DependencyDef {
     private static final long serialVersionUID = -3245215240391599759L;
+    private final static Set<DefType> ALLOWED_TYPES = new ImmutableSet.Builder<DefType>()
+        .add(DefType.COMPONENT)
+        .add(DefType.EVENT)
+        .add(DefType.INTERFACE)
+        .add(DefType.LIBRARY)
+        .build();
+    private final static Set<DefType> DEFAULT_TYPES = new ImmutableSet.Builder<DefType>()
+        .add(DefType.COMPONENT)
+        .build();
     private final DefDescriptor<? extends RootDefinition> parentDescriptor;
     private final DescriptorFilter dependency;
-    private QuickFixException error;
 
     protected DependencyDefImpl(Builder builder) {
         super(builder);
 
-        DescriptorFilter tmp = null;
-        QuickFixException caught = null;
-
         this.parentDescriptor = builder.parentDescriptor;
-        if (builder.resource != null) {
-            try {
-                tmp = new DescriptorFilter(builder.resource, builder.type);
-            } catch (IllegalArgumentException iae) {
-                caught = new InvalidDefinitionException(iae.getMessage(), getLocation());
-            }
-        } else {
-            caught = new InvalidDefinitionException("Missing required resource", getLocation());
-        }
-        this.dependency = tmp;
-        this.error = caught;
+        this.dependency = builder.filter;
     }
 
     @Override
     public void validateDefinition() throws QuickFixException {
-        // super.validateDefinition();
-        if (error != null) {
-            throw this.error;
+        if (parseError != null) {
+            throw parseError;
         }
         //
         //We would like to check for this, but it will break current code.
@@ -82,9 +82,6 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
     @Override
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
-        if (this.error != null) {
-            throw this.error;
-        }
     }
 
     @Override
@@ -96,10 +93,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
     public void appendDependencies(Set<DefDescriptor<?>> dependencies, BaseComponentDef referenceDescriptor) {
         Set<DefDescriptor<?>> found = Aura.getDefinitionService().find(this.dependency, referenceDescriptor);
         if (found.size() == 0) {
-            // TODO: QuickFix for broken dependency.
-            if (error == null) {
-                error = new InvalidDefinitionException("Invalid dependency " + this.dependency, getLocation());
-            }
+            // This should warn, but let's not error out here.
         }
         dependencies.addAll(found);
     }
@@ -140,14 +134,36 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
         }
 
         private DefDescriptor<? extends RootDefinition> parentDescriptor;
+        private DescriptorFilter filter;
         private String resource;
-        private String type;
+        private Set<DefType> types;
 
         /**
          * @see org.auraframework.impl.system.DefinitionImpl.BuilderImpl#build()
          */
         @Override
         public DependencyDefImpl build() {
+            if (resource != null) {
+                try {
+                    this.filter = new DescriptorFilter(resource, types);
+                    //
+                    // Now lets make sure that our filter is sane.
+                    // Currently the only check is for 'markup'. If the user specified something other than that,
+                    // we replace it with markup.
+                    //
+                    GlobMatcher prefixMatch = filter.getPrefixMatch();
+                    if (!prefixMatch.isConstant() || !prefixMatch.match(DefDescriptor.MARKUP_PREFIX)) {
+                        prefixMatch = new GlobMatcher(DefDescriptor.MARKUP_PREFIX);
+                        GlobMatcher namespaceMatch = filter.getNamespaceMatch();
+                        GlobMatcher nameMatch = filter.getNameMatch();
+                        this.filter = new DescriptorFilter(prefixMatch, namespaceMatch, nameMatch, types);
+                    }
+                } catch (IllegalArgumentException iae) {
+                    setParseError(new InvalidDefinitionException(iae.getMessage(), getLocation()));
+                }
+            } else {
+                setParseError(new InvalidDefinitionException("Missing required resource", getLocation()));
+            }
             return new DependencyDefImpl(this);
         }
 
@@ -180,7 +196,20 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
          */
         @Override
         public Builder setType(String type) {
-            this.type = type;
+            this.types = Sets.newHashSet();
+            Collection<DefType> parsed = null;
+            try {
+                parsed = DescriptorFilter.parseDefTypes(type);
+            } catch (Throwable t) {
+                setParseError(new InvalidDefinitionException("Invalid type: "+t.getMessage(), getLocation(), t));
+            }
+            if (parsed != null) {
+                this.types.addAll(parsed);
+                this.types = Sets.intersection(this.types, ALLOWED_TYPES);
+            }
+            if (this.types.isEmpty()) {
+                this.types = DEFAULT_TYPES;
+            }
             return this;
         }
     }

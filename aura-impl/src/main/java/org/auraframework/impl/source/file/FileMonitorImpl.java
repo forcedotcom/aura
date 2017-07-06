@@ -302,13 +302,13 @@ public final class FileMonitorImpl implements FileMonitor, Runnable {
     }
 
     @Override
-    public void onSourceChanged(DefDescriptor<?> source, SourceListener.SourceMonitorEvent event, String filePath) {
+    public void onSourceChanged(SourceListener.SourceMonitorEvent event, String filePath) {
         for (WeakReference<SourceListener> i : listeners) {
             if (i.get() == null) {
                 listeners.remove(i);
             }
         }
-        cachingService.notifyDependentSourceChange(listeners, source, event, filePath);
+        cachingService.notifyDependentSourceChange(listeners, event, filePath);
     }
 
     @Override

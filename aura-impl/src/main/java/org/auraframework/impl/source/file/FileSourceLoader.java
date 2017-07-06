@@ -24,16 +24,28 @@ import java.util.List;
 import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.impl.source.BaseSourceLoader;
+import org.auraframework.impl.source.DescriptorFileMapper;
 import org.auraframework.system.InternalNamespaceSourceLoader;
 import org.auraframework.system.SourceListener;
+import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.FileMonitor;
 import org.auraframework.util.IOUtil;
 
-public class FileSourceLoader extends BaseSourceLoader implements InternalNamespaceSourceLoader, SourceListener {
+public class FileSourceLoader extends DescriptorFileMapper implements InternalNamespaceSourceLoader, SourceListener, SourceLoader {
+
+    @Override
+    public Set<String> getPrefixes() {
+        return super.getPrefixes();
+    }
+
+    @Override
+    public Set<DefType> getDefTypes() {
+        return super.getDefTypes();
+    }
 
     protected final File base;
     protected final int baseLen;
@@ -63,7 +75,6 @@ public class FileSourceLoader extends BaseSourceLoader implements InternalNamesp
         // add the namespace root to the file monitor
         if (fileMonitor != null) {
             fileMonitor.subscribeToChangeNotification(this);
-            fileMonitor.addDirectory(base.getPath());
         }
     }
 
@@ -272,7 +283,7 @@ public class FileSourceLoader extends BaseSourceLoader implements InternalNamesp
     }
 
     @Override
-    public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
+    public void onSourceChanged(SourceMonitorEvent event, String filePath) {
         // rip out namespace cache if need be.
         // Note that this is a little more aggressive than it has to be, but, well, it does only do it
         // for creation/deletion. There is a race condition whereby this will cause odd failures if files

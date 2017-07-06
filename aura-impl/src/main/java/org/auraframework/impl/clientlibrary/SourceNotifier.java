@@ -16,7 +16,6 @@
 package org.auraframework.impl.clientlibrary;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.service.CachingService;
 import org.auraframework.system.SourceListener;
 import org.auraframework.util.FileMonitor;
@@ -37,7 +36,7 @@ class SourceNotifier implements SourceListener {
     }
 
     @Override
-    public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
+    public void onSourceChanged(SourceMonitorEvent event, String filePath) {
         cachingService.getClientLibraryOutputCache().invalidateAll();
     }
 }

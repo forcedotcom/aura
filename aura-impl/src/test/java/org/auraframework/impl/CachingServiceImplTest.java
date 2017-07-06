@@ -97,7 +97,7 @@ public class CachingServiceImplTest extends AuraImplTestCase {
             lock.lock();
 
             // try to notify
-            cachingService.notifyDependentSourceChange(null, null, null, null);
+            cachingService.notifyDependentSourceChange(null, null, null);
             long start = System.nanoTime();
             do {
                 if (!events.isEmpty()) {
@@ -124,9 +124,6 @@ public class CachingServiceImplTest extends AuraImplTestCase {
 
     @Test
     public void testNotifyDependentSourceChange_NotifiesListeners() {
-        DefDescriptor<?> source = definitionService.getDefDescriptor(
-                getAuraTestingUtil().getNonce("some:descriptor"),
-                ComponentDef.class);
         SourceMonitorEvent event = SourceMonitorEvent.CHANGED;
         String filePath = "someFilePath";
         Collection<WeakReference<SourceListener>> listeners = Sets.newHashSet();
@@ -138,18 +135,14 @@ public class CachingServiceImplTest extends AuraImplTestCase {
         CachingServiceImpl cachingService = new CachingServiceImpl();
         cachingService.setLoggingAdapter(loggingAdapter);
         cachingService.initializeCaches();
-        cachingService.notifyDependentSourceChange(listeners, source, event, filePath);
+        cachingService.notifyDependentSourceChange(listeners, event, filePath);
         for (WeakReference<SourceListener> ref : listeners) {
-            Mockito.verify(ref.get(), Mockito.times(1)).onSourceChanged(source,
-                    event, filePath);
+            Mockito.verify(ref.get(), Mockito.times(1)).onSourceChanged(event, filePath);
         }
     }
 
     @Test
     public void testNotifyDependentSourceChange_NotifiesNoListeners() {
-        DefDescriptor<?> source = definitionService.getDefDescriptor(
-                getAuraTestingUtil().getNonce("some:descriptor"),
-                ComponentDef.class);
         SourceMonitorEvent event = SourceMonitorEvent.CHANGED;
         String filePath = "someFilePath";
         Collection<WeakReference<SourceListener>> listeners = Sets.newHashSet();
@@ -157,7 +150,7 @@ public class CachingServiceImplTest extends AuraImplTestCase {
         CachingServiceImpl cachingService = new CachingServiceImpl();
         cachingService.setLoggingAdapter(loggingAdapter);
         cachingService.initializeCaches();
-        cachingService.notifyDependentSourceChange(listeners, source, event, filePath);
+        cachingService.notifyDependentSourceChange(listeners, event, filePath);
     }
 
     private <K, V> void testNotifyDependentSourceChange_InvalidatesSomeCachedValues(
@@ -178,16 +171,14 @@ public class CachingServiceImplTest extends AuraImplTestCase {
 
         // call target function
         cachingService.notifyDependentSourceChange(
-                Collections.<WeakReference<SourceListener>> emptySet(), source,
-                null, null);
+                Collections.<WeakReference<SourceListener>> emptySet(), null, null);
 
         // check for invalidated and untouched keys
         for (K key : keys) {
             V val = cache.getIfPresent(key);
+            // we only test for invalidated, as we may kill more than the minimum
             if (invalidatedKeys.contains(key)) {
                 assertNull("Cache not invalidated for " + key, val);
-            } else {
-                assertNotNull("Missing cached value for " + key, val);
             }
         }
     }

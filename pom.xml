@@ -1060,7 +1060,7 @@
                 <plugin>
                     <groupId>org.auraframework</groupId>
                     <artifactId>tools-maven-plugin</artifactId>
-                    <version>0.0.30</version>
+                    <version>0.0.33</version>
                     <configuration>
                         <arguments>
                             <argument>--max-warnings</argument>

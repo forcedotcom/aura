@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -226,6 +226,14 @@ public class AuraContextJsonSerializer extends NoneSerializer<AuraContext> {
 
         if (configAdapter.isLockerServiceEnabled()) {
             json.writeMapEntry("ls", 1);
+        }
+        
+        if (ctx.isModulesEnabled()) {
+            json.writeMapEntry("m", 1);
+        }
+        
+        if (ctx.useCompatSource()) {
+            json.writeMapEntry("c", 1);
         }
 
         if (isApplication) {

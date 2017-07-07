@@ -134,7 +134,7 @@ public class AuraContextImpl implements AuraContext {
 
     private boolean isSystem = false;
 
-    private boolean isModulesEnabled = false;
+    private boolean modulesEnabled = false;
     private boolean useCompatSource = false;
     private List<String> scriptHashes = new ArrayList<>();
     private String nonce;
@@ -910,7 +910,7 @@ public class AuraContextImpl implements AuraContext {
                 json.writeMapEntry("scriptNonce", nonce);
             }
 
-            if (this.isModulesEnabled) {
+            if (this.isModulesEnabled()) {
                 json.writeMapEntry("m", 1);
             }
 
@@ -1003,12 +1003,12 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public void setModulesEnabled(boolean isModulesEnabled) {
-        this.isModulesEnabled = isModulesEnabled;
+        this.modulesEnabled = isModulesEnabled;
     }
 
     @Override
     public boolean isModulesEnabled() {
-        return this.isModulesEnabled;
+        return this.modulesEnabled;
     }
 
     @Override

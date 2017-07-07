@@ -317,6 +317,140 @@ Test.Aura.Util.UtilTest = function() {
     }
 
     [Fixture]
+    function equals(){
+        var falseyValues=[null,undefined,0,''];
+        var testPrimitives=falseyValues.concat([7357,"expected",true,false]);
+        
+        [Fact, Data(testPrimitives)]
+        function ReturnsTrueIfPrimitivesMatch(data){
+            var actual=targetUtil.equals(data,data);
+
+            Assert.True(actual,"Failed on data='"+data+"'");
+        }
+
+        [Fact, Data(testPrimitives)]
+        function ReturnsFalseIfPrimitivesDoNotMatch(data){
+            var actual=targetUtil.equals(data,"unexpected");
+
+            Assert.False(actual,"Failed on data='"+data+"'");
+        }
+
+        [Fact, Data(falseyValues)]
+        function ReturnsFalseIfExpectedIsFalseyWithoutMatch(data){
+            var actual=targetUtil.equals(data,"unexpected");
+
+            Assert.False(actual,"Failed on data='"+data+"'");
+        }
+
+        [Fact, Data(falseyValues)]
+        function ReturnsFalseIfActualIsFalseyWithoutMatch(data){
+            var actual=targetUtil.equals("unexpected",data);
+
+            Assert.False(actual,"Failed on data='"+data+"'");
+        }
+
+        //Objects
+        [Fact]
+        function ReturnsFalseIfExpectedIsAnObjectAndActualIsNot(){
+            var actual=targetUtil.equals({},"unexpected");
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseIfActualIsAnObjectAndExpectedIsNot(){
+            var actual=targetUtil.equals("unexpected",{});
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsTrueIfThereAreNoObjectMembers(){
+            var actual=targetUtil.equals({},{});
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseIfObjectMemberNotFound(){
+            var actual=targetUtil.equals({one:"one"},{});
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseIfObjectMembersDoNotMatch(){
+            var actual=targetUtil.equals({one:"one"},{one:"two"});
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsTrueIfObjectMembersMatch(){
+            var actual=targetUtil.equals({one:"one",two:"two"},{one:"one",two:"two"});
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ReturnsTrueIgnoringAdditionalObjectMembers(){
+            var actual=targetUtil.equals({one:"one"},{one:"one",two:"two"});
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ReturnsTrueIfObjectMembersMatchRecursively(){
+            var actual=targetUtil.equals({one:{two:"two"},three:"three"},{one:{two:"two",four:"four"},three:"three",five:"five"});
+
+            Assert.True(actual);
+        }
+
+        // Arrays
+        [Fact]
+        function ReturnsFalseIfExpectedIsAnArrayAndActualIsNot(){
+            var actual=targetUtil.equals([],"unexpected");
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseIfActualIsAnArrayAndExpectedIsNot(){
+            var actual=targetUtil.equals("unexpected",[]);
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseIfArrayLengthsDoNotMatch(){
+            var actual=targetUtil.equals([1,1],[1,1,1]);
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsFalseIfArrayEntriesDoNotMatch(){
+            var actual=targetUtil.equals([1,2],[2,1]);
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function ReturnsTrueifArrayEntriesMatch(){
+            var actual=targetUtil.equals([1,2],[1,2]);
+
+            Assert.True(actual);            
+        }
+
+        [Fact]
+        function ReturnsTrueifArrayEntriesMatchRecursively(){
+            var actual=targetUtil.equals([1,[1,{one:"one"}]],[1,[1,{one:"one"}]]);
+
+            Assert.True(actual);            
+        }
+    }
+
+    [Fixture]
     function merge() {
         [Fact]
         function testMerge() {

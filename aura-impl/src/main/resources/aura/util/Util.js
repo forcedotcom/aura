@@ -524,8 +524,56 @@ Aura.Utils.Util.prototype.copy = function(value){
 };
 
 /**
+ * Compares value equality of two variables. Returns true if primitive values match, 
+ * or if Object or Array members contain the same values. Checks Objects and Arrays recursively. 
+ * Fails fast. Note that objects stop comparing after satisfying 'likeness' against 'expected' -- i.e., 
+ * 'actual' is allowed to exhibit members that 'expected' does not, as long as all members of 'expected' are matched.
+ * 
+ * @param {Object} expected The baseline value to use in the comparison against 'actual'.
+ * @param {Object} actual The value to compare against 'expected'.
+ * @returns {Boolean} Returns true if the values match, and false if they do not. 
+ */
+Aura.Utils.Util.prototype.equals = function(expected,actual){
+    if(expected===actual){
+        return true; // primitive similarity, reference equality.
+    }
+    if(!expected||!actual){ 
+        return false; // no === match, but one value is falsey (null, undefined, 0, false, '', ...)
+    }
+    if(this.isObject(expected)){
+        if(!this.isObject(actual)){
+            return false;
+        }
+        for(var x in expected){
+            if(expected.hasOwnProperty(x)){
+                if(!actual.hasOwnProperty(x)){
+                    return false;
+                }
+                if(!this.equals(expected[x],actual[x])){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    if(this.isArray(expected)){
+        if(!this.isArray(actual)||expected.length!==actual.length){
+            return false;
+        }
+        for(var i=0;i<expected.length;i++){
+            if(!this.equals(expected[i],actual[i])){
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+};
+
+/**
  * Compares values. In the case of an Array or Object, compares first level references only.
  * In the case of a literal, directly compares value and type equality.
+ * USE IN TESTS ONLY. HAS NON-TRIVIAL PERFORMANCE IMPLICATIONS.
  *
  * @param {Object} expected The source value to compare.
  * @param {Object} actual The target value to compare.

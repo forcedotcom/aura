@@ -2205,7 +2205,7 @@ Component.prototype.setupAttributes = function(config, localCreation) {
             var defaultDef = attributeDefs.getDef(name);
             var defaultValue = defaultDef.getDefault();
             if (defaultValue!==undefined) {
-                if (!configValues.hasOwnProperty(name)||defaultValue===configValues[name]) {
+                if (!configValues.hasOwnProperty(name)||$A.util.equals(configValues[name],defaultValue)) {
                     setByDefault[name]=true;
                     if (defaultDef.getTypeDefDescriptor() === "aura://Aura.Component[]" || defaultDef.getTypeDefDescriptor() === "aura://Aura.ComponentDefRef[]") {
                         defaultValue = $A.util.apply([], defaultValue, true, true);

@@ -588,8 +588,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
 
         sua.setNoCache(response);
 
-        Mockito.verify(response, Mockito.times(1)).setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store");
-        Mockito.verify(response, Mockito.times(1)).setHeader(HttpHeaders.PRAGMA, "no-cache");
+        Mockito.verify(response, Mockito.times(1)).setHeader(HttpHeaders.CACHE_CONTROL, "no-cache,no-store");
 
         ArgumentCaptor<String> nameCaptors = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Long> dateCaptors = ArgumentCaptor.forClass(Long.class);
@@ -784,7 +783,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
 
         // for JS with appCache disabled, SC_OK
         Mockito.verify(mockResponse).setStatus(HttpStatus.SC_OK);
-        Mockito.verify(mockResponse).setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store");
+        Mockito.verify(mockResponse).setHeader(HttpHeaders.CACHE_CONTROL, "no-cache,no-store");
         Mockito.verify(mockContextService, Mockito.atLeastOnce()).endContext();
     }
 

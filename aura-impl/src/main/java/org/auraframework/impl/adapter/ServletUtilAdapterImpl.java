@@ -248,7 +248,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 }
             } else if (mappedEx instanceof DefinitionNotFoundException && isProductionMode(context.getMode())
                     && format == Format.HTML) {
-            	DefDescriptor<? extends BaseComponentDef> appDescriptor = context.getApplicationDescriptor();
+                DefDescriptor<? extends BaseComponentDef> appDescriptor = context.getApplicationDescriptor();
                 if (appDescriptor != null && appDescriptor.equals(((DefinitionNotFoundException) mappedEx).getDescriptor())) {
                     // We're in production and tried to hit an aura app that doesn't exist.
                     // just show the standard 404 page.
@@ -567,8 +567,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     @Override
     public void setNoCache(HttpServletResponse response) {
         long past = System.currentTimeMillis() - LONG_EXPIRE;
-        response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store");
-        response.setHeader(HttpHeaders.PRAGMA, "no-cache");
+        response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache,no-store");
         response.setDateHeader(HttpHeaders.EXPIRES, past);
         response.setDateHeader(HttpHeaders.LAST_MODIFIED, past);
     }
@@ -601,7 +600,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                     csp = new SystemModeSafeEvalSecurityPolicy(csp);
                 }
             }
-            
+
             rsp.addHeader(CSP.Header.SECURE, csp.getCspHeaderValue());
             Collection<String> terms = csp.getFrameAncestors();
             if (terms != null) {
@@ -950,13 +949,13 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     public void setManifestUtil(ManifestUtil manifestUtil) {
         this.manifestUtil = manifestUtil;
     }
-    
-    
+
+
     private static class SystemModeSafeEvalSecurityPolicy implements ContentSecurityPolicy {
         SystemModeSafeEvalSecurityPolicy(ContentSecurityPolicy delegate) {
             this.delegate = delegate;
         }
-        
+
         @Override
         public String getCspHeaderValue() {
             return DefaultContentSecurityPolicy.buildHeaderNormally(this);
@@ -1021,9 +1020,9 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         public String getReportUrl() {
             return delegate.getReportUrl();
         }
-        
+
         private final ContentSecurityPolicy delegate;
     }
-    
+
     private static final String SAFE_EVAL_HTML_URI = "/lockerservice/safeEval.html";
 }

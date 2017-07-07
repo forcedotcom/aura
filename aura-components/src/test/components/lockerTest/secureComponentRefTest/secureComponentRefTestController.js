@@ -91,6 +91,23 @@
         testUtils.assertTrue(handlerCalled, "Value handler never called on SecureComponentRef via addValueHandler");
     },
 
+    testDestroy: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var secureComponentRef = cmp.find("facet");
+        testUtils.assertNotUndefinedOrNull(secureComponentRef.destroy);
+        secureComponentRef.destroy();
+
+        testUtils.addWaitForWithFailureMessage(
+            false,
+            function () {
+                return secureComponentRef.isValid();
+            },
+            "SecureComponentRef never destroyed",
+            function () {
+                testUtils.assertUndefined(cmp.find("facet"));
+            });
+    },
+
     onFooDynamic: function(cmp) {
         cmp.set("v.message", "Hello from onFooDynamic()");	
     },

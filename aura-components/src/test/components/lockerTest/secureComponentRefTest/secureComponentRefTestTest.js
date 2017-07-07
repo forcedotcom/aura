@@ -61,5 +61,11 @@
         test: function(cmp) {
             cmp.testAddValueHandler();
         }
+    },
+
+    testDestroy: {
+        test: function(cmp) {
+            cmp.testDestroy();
+        }
     }
 })

@@ -30,7 +30,7 @@
     /**
      * Verify indexedDB is scoped by partitionName if partitionName is set
      */
-    testIndexedDBScopedByPartitionName: {
+    testIndexedDBWithoutPartition: {
         test: [
             function loadCmpInIframe(cmp) {
                 var that = this;
@@ -41,11 +41,23 @@
                 })
                 .then (function() {
                     cmp._itemWithoutPartition = cmp._iframeLib.getIframeRootCmp().get("v.item");
+                    cmp._objectStoreNames = cmp._iframeLib.getIframeRootCmp().get("v.objectStoreNames")
                 })
                 .catch(function (error) {
                     $A.test.fail(error.toString());
                 });
             },
+            function verifyStorages(cmp) {
+                $A.test.assertEquals("value", cmp._itemWithoutPartition,
+                    "Unexpected value within storage without partition");
+                $A.test.assertEquals("auraStorageTest:partitionTest", cmp._objectStoreNames[0],
+                    "Unexpected object store name for storage without partition");
+            }
+        ]
+    },
+
+    testIndexedDBScopedByPartitionName: {
+        test: [
             function loadCmpInIframeWithPartition(cmp) {
                 var that = this;
                 var frameSrc = cmp._appName.concat("partitionName=partition", "&storageItemValue=valuePartition");
@@ -62,14 +74,9 @@
                 });
             },
             function verifyStorages(cmp) {
-                $A.test.assertEquals("value", cmp._itemWithoutPartition,
-                    "Unexpected value within storage without partition");
                 $A.test.assertEquals("valuePartition", cmp._itemWithPartition,
-                    "Unexpected value within storage with partition"); 
-
-                $A.test.assertEquals("auraStorageTest:partitionTest", cmp._objectStoreNames[0],
-                    "Unexpected object store name for storage without partition");
-                $A.test.assertEquals("partition", cmp._objectStoreNames[1],
+                    "Unexpected value within storage with partition");
+                $A.test.assertEquals("partition", cmp._objectStoreNames[0],
                     "Unexpected object store name for storage with partition");
             } 
         ]

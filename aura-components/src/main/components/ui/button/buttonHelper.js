@@ -29,6 +29,12 @@
     },
 
     /*
+    * List of valid button types
+    */
+    VALID_BUTTON_TYPES: ['submit', 'button', 'reset'],
+    /*
+
+    /*
      * In order to not attach all declared dom handlers automatically, we just
      * attach the ones that have an action to be dispatched
     */
@@ -41,6 +47,17 @@
             if (dispatcher[e] && dispatcher[e]["bubble"] && dispatcher[e]["bubble"].length) {
                 htmlAttr[this.EVENT_DISPATCH[e]] = cmp.getReference('c.' + e);
             }
+        }
+    },
+
+    /*
+    * Check and replace button type if it is invalid
+    */
+    validateButtonType: function(cmp) {
+        var buttonType = cmp.get("v.buttonType");
+        if(this.VALID_BUTTON_TYPES.indexOf(buttonType.toLowerCase()) === -1) {
+            //Revert to default browser button type if v.buttonType is invalid
+            cmp.set("v.buttonType", "submit");
         }
     },
 

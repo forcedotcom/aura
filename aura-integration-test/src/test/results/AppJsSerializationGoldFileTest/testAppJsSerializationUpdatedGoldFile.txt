@@ -6987,6 +6987,7 @@ return {
   "controller":{
     "init":function(cmp, event, helper) {
         helper.initializeHandlers(cmp);
+        helper.validateButtonType(cmp);
     },
     "addHandler":function(cmp, event, helper) {
         var params = event.getParam('arguments');
@@ -7022,6 +7023,11 @@ return {
       "blur":"onblur",
       "press":"onclick"
     },
+    "VALID_BUTTON_TYPES":[
+      "submit",
+      "button",
+      "reset"
+    ],
     "initializeHandlers":function(cmp) {
         var htmlButton = cmp.find('button');
         var htmlAttr   = htmlButton.get('v.HTMLAttributes');
@@ -7031,6 +7037,13 @@ return {
             if (dispatcher[e] && dispatcher[e]["bubble"] && dispatcher[e]["bubble"].length) {
                 htmlAttr[this.EVENT_DISPATCH[e]] = cmp.getReference('c.' + e);
             }
+        }
+    },
+    "validateButtonType":function(cmp) {
+        var buttonType = cmp.get("v.buttonType");
+        if(this.VALID_BUTTON_TYPES.indexOf(buttonType.toLowerCase()) === -1) {
+            
+            cmp.set("v.buttonType", "submit");
         }
     },
     "addHandler":function(cmp, handlerParams) {

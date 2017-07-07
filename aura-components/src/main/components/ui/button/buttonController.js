@@ -16,6 +16,7 @@
 ({
     init: function (cmp, event, helper) {
         helper.initializeHandlers(cmp);
+        helper.validateButtonType(cmp);
     },
     addHandler: function (cmp, event, helper) {
         var params = event.getParam('arguments');

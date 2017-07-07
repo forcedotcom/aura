@@ -59,7 +59,6 @@ public class AppJs extends AuraResourceImpl {
                 serverService.writeDefinitions(dependencies, writer, false, -1);
             }
 
-            serverService.writeDefinitions(dependencies, writer, true, 1);
             writer.append(APPJS_APPEND);
         } catch (Throwable t) {
             servletUtilAdapter.handleServletException(t, false, context, request, response, false);

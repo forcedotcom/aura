@@ -44,7 +44,7 @@
 
     testContextOfController: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
-        testUtils.assertUndefined(this, "Expected 'this' in Locker controller to be undefined");
+        testUtils.assertTrue(this === cmp, "Expected 'this' in Locker controller to be the SecureComponent");
     },
 
     testDefineGetterExploit: function(cmp) {
@@ -178,17 +178,17 @@
                 " be a SecureComponent");
         testUtils.assertStartsWith("SecureComponent", cmp._eventParamValue.toString(), "init handler event param" +
                 " should be a SecureComponent");
-        testUtils.assertUndefined(cmp._thisFromInit, "'this' in init handler should be undefined");
-        testUtils.assertUndefined(this, "'this' in controller method should be undefined");
+        testUtils.assertTrue(cmp._thisFromInit === cmp, "'this' in init handler should be the SecureComponent");
+        testUtils.assertTrue(this === cmp, "'this' in controller method should be the SecureComponent");
     },
-    
+
     testCtorAnnotation: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         var audio = new Audio();
         testUtils.assertStartsWith("SecureElement", audio.toString(), "Expected result of new Audio() to be a SecureElement");
         testUtils.assertTrue(audio.toString().indexOf("HTMLAudioElement") > 0, "Expected result of new Audio() to be an HTMLAudioElement");
     },
-    
+
     testSecureElementPrototypeCounterMeasures: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
 
@@ -201,7 +201,7 @@
     // this should only be run on browsers where Locker is not supported
     testLockerDisabledForUnsupportedBrowser: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
-        testUtils.assertStartsWith("[object Window]", window.toString(), 
+        testUtils.assertStartsWith("[object Window]", window.toString(),
                 "Unsupported browsers should not have Locker enabled and should return raw window object");
         // do some minor operation to prove Aura is booted and functional
         var text = cmp.find("outputText").get("v.value");
@@ -224,7 +224,7 @@
                             "SecureComponent passed to another namespace should be filtered to SecureComponentRef");
                 });
     },
-    
+
     testInstanceOf: function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
 
@@ -237,17 +237,17 @@
 
         o = {};
         testUtils.assertTrue(o instanceof Object, "Object created via object literal should be an instance of Object");
-        
+
         // Pull object through the locker membrane
         cmp.set("v.object", o);
         var oFromMembrane = cmp.get("v.object");
         testUtils.assertTrue(oFromMembrane instanceof Object, "Object created via object literal should be an instance of Object");
-        
+
         // Test Function
         function foo() {
             return "foo";
-        }       
-        
+        }
+
         testUtils.assertTrue(foo instanceof Function, "Function foo() should be an instance of Function");
 
         // Test Array
@@ -260,10 +260,10 @@
         // Test Date
         var date = new Date();
         testUtils.assertTrue(date instanceof Date, "Array created via 'new Date()' should be an instance of Date");
-        
+
         var iso = $A.localizationService.toISOString(date);
         testUtils.assertEquals(date.toISOString(), iso);
-                
+
         // Test Element
         var element = document.createElement("div");
         testUtils.assertTrue(element instanceof HTMLDivElement, "DIV element should be an instance of HTMLDivElement");
@@ -271,10 +271,10 @@
         testUtils.assertTrue(element instanceof Element, "DIV element should be an instance of Element");
         testUtils.assertTrue(element instanceof Node, "DIV element should be an instance of Node");
         testUtils.assertTrue(element instanceof EventTarget, "DIV element should be an instance of EventTarget");
-        
-        // DCHASMAN TODO Negative assertions for now - we expect that functions, arrays, 
+
+        // DCHASMAN TODO Negative assertions for now - we expect that functions, arrays,
         // and objects created in system mode will not match the type system of the locker.
-        // However, these will flip to true once universal proxy is enabled where we can then explicitly wire up 
+        // However, these will flip to true once universal proxy is enabled where we can then explicitly wire up
         // the prototype/or proxied getPrototypeOf() to cross realms /or masquarade as the underlying type (e.g. SecureWindow instanceof Window)!
         testUtils.assertFalse(cmp instanceof Object, "Object cmp should not be an instance of Object");
         testUtils.assertFalse(cmp.getGlobalId instanceof Function, "Function cmp.getGlobalId should not be an instance of Function");
@@ -282,19 +282,19 @@
         testUtils.assertFalse(document instanceof Document, "document should not be an instance of Document");
         testUtils.assertFalse(window instanceof Window, "window should not be an instance of Window");
     },
-    
+
     testFilteringProxy: function(cmp, event, helper) {
         var testUtils = cmp.get("v.testUtils");
-                
+
         var o = helper._o;
         var po = helper._po;
         var TestPrototype = helper._TestPrototype;
-    	
+
         testUtils.assertEquals("fooValue", po.foo());
-        
+
         testUtils.assertTrue(o instanceof TestPrototype);
         testUtils.assertTrue(po instanceof TestPrototype);
-        
+
         testUtils.assertTrue("foo" in po);
         testUtils.assertEquals("fooValue", po.foo());
 
@@ -304,11 +304,11 @@
 
         // Add a dynamic property and make sure its visible on the proxy
         po.expando = "expandoValue";
-        testUtils.assertEquals("expandoValue", po.expando);    
-        
+        testUtils.assertEquals("expandoValue", po.expando);
+
         // Verify that an expando set on one reference is reflected in another reference from a different namespace
         testUtils.assertEquals(JSON.stringify(Object.keys(o)), JSON.stringify(Object.keys(po)));
-        
+
         delete po.expando;
 
         testUtils.assertEquals(JSON.stringify(Object.keys(o)), JSON.stringify(Object.keys(po)));

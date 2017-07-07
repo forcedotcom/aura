@@ -55,11 +55,10 @@
     /**
      * Negative test case:Verify providing non numeric value for Value attribute.
      */
-    //TODO: W-967009
-    _testNonNumericValue: {
-        attributes : {value : 'foo'},
+    testNonNumericValue: {
+        attributes : {value : 'NotANumber'},
         test: function(component){
-            $A.test.assertEquals('The value attribute must be assigned a numeric value', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message.");
+            $A.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Should gracefully display nothing");
         }
     },
     /**

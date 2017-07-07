@@ -1104,11 +1104,11 @@ public class DefinitionServiceImpl implements DefinitionService {
             currentCC.getCompiling(descriptor);
             Cache<String, DependencyEntry> depsCache = cachingService.getDepsCache();
 
-            // put UID-qualified descriptor key for dependency
-            depsCache.put(makeGlobalKey(de.uid, descriptor, modulesEnabled), de);
-
-            // put unqualified descriptor key for dependency
             if (currentCC.shouldCacheDependencies) {
+                // put UID-qualified descriptor key for dependency
+                depsCache.put(makeGlobalKey(de.uid, descriptor, modulesEnabled), de);
+
+                // put unqualified descriptor key for dependency
                 depsCache.put(makeNonUidGlobalKey(descriptor, modulesEnabled), de);
             }
 

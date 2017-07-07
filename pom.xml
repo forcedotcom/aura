@@ -502,7 +502,7 @@
             <dependency>
                 <groupId>org.polyfills</groupId>
                 <artifactId>polyfill-service-api</artifactId>
-                <version>0.11.0</version>
+                <version>0.12.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -601,6 +601,7 @@
                         <exclude>**/.gitignore</exclude>
                         <exclude>**/.index</exclude>
                         <exclude>**/version.prop</exclude>
+                        <exclude>aura/src/main/resources/**</exclude>
                         <exclude>aura-resources/src/main/resources/**</exclude>
                         <exclude>aura-modules/src/main/resources/**</exclude>
                         <exclude>aura-archetype/src/main/resources/archetype-resources/**</exclude>

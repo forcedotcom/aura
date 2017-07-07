@@ -59,6 +59,7 @@ var create = Object.create;
 var assign = Object.assign;
 var defineProperty = Object.defineProperty;
 var getPrototypeOf = Object.getPrototypeOf;
+var setPrototypeOf = Object.setPrototypeOf;
 var getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 var getOwnPropertyNames = Object.getOwnPropertyNames;
 var defineProperties = Object.defineProperties;
@@ -66,6 +67,7 @@ var hasOwnProperty = Object.hasOwnProperty;
 var isArray = Array.isArray;
 var _a$1 = Array.prototype;
 var ArrayFilter = _a$1.filter;
+var ArraySlice = _a$1.slice;
 var ArraySplice = _a$1.splice;
 var ArrayIndexOf = _a$1.indexOf;
 var ArrayPush = _a$1.push;
@@ -92,7 +94,7 @@ function isPromise(obj) {
     return typeof obj === 'object' && obj === Promise.resolve(obj);
 }
 var OtS = {}.toString;
-function toString(obj) {
+function toString$1(obj) {
     if (obj && typeof obj === 'object' && !obj.toString) {
         return OtS.call(obj);
     }
@@ -572,9 +574,16 @@ function h(sel, data, children) {
     assert.isTrue(isArray(children), "h() 3rd argument children must be an array.");
     // checking reserved internal data properties
     assert.invariant(data.class === undefined, "vnode.data.class should be undefined when calling h().");
-    var classMap = data.classMap, className = data.className;
+    var classMap = data.classMap, className = data.className, style = data.style, styleMap = data.styleMap;
     assert.isFalse(className && classMap, "vnode.data.className and vnode.data.classMap ambiguous declaration.");
     data.class = classMap || (className && getMapFromClassName(className));
+    assert.isFalse(styleMap && style, "vnode.data.styleMap and vnode.data.style ambiguous declaration.");
+    assert.block(function devModeCheck() {
+        if (style && !isString(style)) {
+            assert.logWarning("Invalid 'style' attribute passed to <" + sel + "> should be a string value, and will be ignored.");
+        }
+    });
+    data.style = styleMap || (style && style + '');
     assert.block(function devModeCheck() {
         children.forEach(function (vnode) {
             if (vnode === null) {
@@ -601,19 +610,27 @@ function c(sel, Ctor, data) {
     assert.isTrue(isObject(data), "c() 3nd argument data must be an object.");
     // checking reserved internal data properties
     assert.invariant(data.class === undefined, "vnode.data.class should be undefined when calling c().");
-    var key = data.key, slotset = data.slotset, attrs = data.attrs, on = data.on, className = data.className, classMap = data.classMap, _props = data.props;
+    var key = data.key, slotset = data.slotset, styleMap = data.styleMap, style = data.style, attrs = data.attrs, on = data.on, className = data.className, classMap = data.classMap, _props = data.props;
     assert.isTrue(arguments.length < 4, "Compiler Issue: Custom elements expect up to 3 arguments, received " + arguments.length + " instead.");
     data = { hook: lifeCycleHooks, key: key, slotset: slotset, attrs: attrs, on: on, _props: _props };
     assert.isFalse(className && classMap, "vnode.data.className and vnode.data.classMap ambiguous declaration.");
     data.class = classMap || (className && getMapFromClassName(className));
+    assert.isFalse(styleMap && style, "vnode.data.styleMap and vnode.data.style ambiguous declaration.");
+    assert.block(function devModeCheck() {
+        if (style && !isString(style)) {
+            assert.logWarning("Invalid 'style' attribute passed to <" + sel + "> should be a string value, and will be ignored.");
+        }
+    });
+    data.style = styleMap || (style && style + '');
     return v(sel, data, [], undefined, undefined, Ctor);
 }
 // [i]terable node
 function i(items, factory) {
-    var len = isArray(items) ? items.length : 0;
+    var len = (items && items.length) || 0; // supporting arrays and objects alike
+    var last = len ? (len - 1) : 0;
     var list = [];
     var _loop_1 = function (i_2) {
-        var vnode = factory(items[i_2], i_2, i_2 === 0, i_2 === len);
+        var vnode = factory(items[i_2], i_2, i_2 === 0, i_2 === last);
         if (isArray(vnode)) {
             ArrayPush.apply(list, vnode);
         }
@@ -625,7 +642,7 @@ function i(items, factory) {
             vnodes.forEach(function (vnode) {
                 if (vnode && isObject(vnode) && vnode.sel && vnode.Ctor && isUndefined(vnode.key)) {
                     // TODO - it'd be nice to log the owner component rather than the iteration children
-                    assert.logWarning("Missing \"key\" attribute in iteration with child \"" + toString(vnode.Ctor.name) + "\", index " + i_2 + " of " + len + ". Instead set a unique \"key\" attribute value on all iteration children so internal state can be preserved during rehydration.");
+                    assert.logWarning("Missing \"key\" attribute in iteration with child \"" + toString$1(vnode.Ctor.name) + "\", index " + i_2 + " of " + len + ". Instead set a unique \"key\" attribute value on all iteration children so internal state can be preserved during rehydration.");
                 }
             });
         });
@@ -689,223 +706,235 @@ var api = Object.freeze({
 	b: b
 });
 
-var TargetToReactiveRecordMap = new WeakMap();
-function notifyListeners(target, key) {
-    var reactiveRecord = TargetToReactiveRecordMap.get(target);
-    if (reactiveRecord) {
-        var value = reactiveRecord[key];
-        if (value) {
-            var len = value.length;
-            for (var i = 0; i < len; i += 1) {
-                var vm = value[i];
-                assert.vm(vm);
-                console.log("Marking " + vm + " as dirty: property \"" + toString(key) + "\" of " + toString(target) + " was set to a new value.");
-                if (!vm.isDirty) {
-                    markComponentAsDirty(vm);
-                    console.log("Scheduling " + vm + " for rehydration due to mutation.");
-                    scheduleRehydration(vm);
-                }
-            }
-        }
-    }
+/*eslint-enable*/
+var TargetSlot = Symbol();
+var MembraneSlot = Symbol();
+function isReplicable(value) {
+    var type = typeof value;
+    return value && (type === 'object' || type === 'function');
 }
-function subscribeToSetHook(vm, target, key) {
-    assert.vm(vm);
-    var reactiveRecord = TargetToReactiveRecordMap.get(target);
-    if (isUndefined(reactiveRecord)) {
-        var newRecord = create(null);
-        reactiveRecord = newRecord;
-        TargetToReactiveRecordMap.set(target, newRecord);
+function getReplica(membrane, value) {
+    if (isNull(value)) {
+        return value;
     }
-    var value = reactiveRecord[key];
-    if (isUndefined(value)) {
-        value = [];
-        reactiveRecord[key] = value;
+    value = unwrap(value);
+    if (!isReplicable(value)) {
+        return value;
     }
-    if (ArrayIndexOf.call(value, vm) === -1) {
-        ArrayPush.call(value, vm);
-        // we keep track of the sets that vm is listening from to be able to do some clean up later on
-        ArrayPush.call(vm.deps, value);
+    assert.isTrue(membrane instanceof Membrane, "getReplica() first argument must be a membrane.");
+    var cells = membrane.cells;
+    var r = cells.get(value);
+    if (r) {
+        return r;
     }
+    var replica = new XProxy(value, membrane); // eslint-disable-line no-undef
+    cells.set(value, replica);
+    return replica;
+}
+var Membrane = (function () {
+    function Membrane(handler) {
+        this.handler = handler;
+        this.cells = new WeakMap();
+    }
+    Membrane.prototype.get = function (target, key) {
+        if (key === TargetSlot) {
+            return target;
+        }
+        else if (key === MembraneSlot) {
+            return this;
+        }
+        return this.handler.get(this, target, key);
+    };
+    Membrane.prototype.set = function (target, key, newValue) {
+        return this.handler.set(this, target, key, newValue);
+    };
+    Membrane.prototype.deleteProperty = function (target, key) {
+        if (key === TargetSlot) {
+            return false;
+        }
+        return this.handler.deleteProperty(this, target, key);
+    };
+    Membrane.prototype.apply = function (target, thisArg, argumentsList) {
+        thisArg = unwrap(thisArg);
+        argumentsList = unwrap(argumentsList);
+        if (isArray(argumentsList)) {
+            argumentsList = ArrayMap.call(argumentsList, unwrap);
+        }
+        return this.handler.apply(this, target, thisArg, argumentsList);
+    };
+    Membrane.prototype.construct = function (target, argumentsList, newTarget) {
+        argumentsList = unwrap(argumentsList);
+        if (isArray(argumentsList)) {
+            argumentsList = ArrayMap.call(argumentsList, unwrap);
+        }
+        return this.handler.construct(this, target, argumentsList, newTarget);
+    };
+    return Membrane;
+}());
+function unwrap(replicaOrAny) {
+    return (replicaOrAny && replicaOrAny[TargetSlot]) || replicaOrAny;
 }
 
-var ObjectPropertyToProxyCache = new WeakMap();
-var ProxyCache = new WeakSet(); // used to identify any proxy created by this piece of logic.
-function propertyGetter(target, key) {
-    var value = target[key];
-    if (isRendering && vmBeingRendered) {
-        subscribeToSetHook(vmBeingRendered, target, key);
-    }
-    return (value && isObject(value)) ? getPropertyProxy(value) : value;
-}
-function propertySetter(target, key, value) {
-    if (isRendering) {
-        assert.logError("Setting property \"" + toString(key) + "\" of " + toString(target) + " during the rendering process of " + vmBeingRendered + " is invalid. The render phase must have no side effects on the state of any component.");
-        return false;
-    }
-    var oldValue = target[key];
-    if (oldValue !== value) {
-        target[key] = value;
-        notifyListeners(target, key);
-    }
-    else if (key === 'length' && isArray(target)) {
-        // fix for issue #236: push will add the new index, and by the time length
-        // is updated, the internal length is already equal to the new length value
-        // therefore, the oldValue is equal to the value. This is the forking logic
-        // to support this use case.
-        notifyListeners(target, key);
-    }
-    return true;
-}
-function propertyDelete(target, key) {
-    delete target[key];
-    notifyListeners(target, key);
-    return true;
-}
-var propertyProxyHandler = {
-    get: propertyGetter,
-    set: propertySetter,
-    deleteProperty: propertyDelete,
-};
-function getPropertyProxy(value) {
-    assert.isTrue(isObject(value), "perf-optimization: avoid calling this method for non-object value.");
-    // TODO: Provide a holistic way to deal with built-ins, right now we just care ignore Date
-    if (isNull(value) || value.constructor === Date) {
-        return value;
-    }
-    // TODO: perf opt - we should try to give identity to propertyProxies so we can test
-    // them faster than a weakmap lookup.
-    if (ProxyCache.has(value)) {
-        return value;
-    }
-    assert.block(function devModeCheck() {
-        var isNode = value instanceof Node;
-        assert.invariant(!isNode, "Do not store references to DOM Nodes. Instead use `this.querySelector()` and `this.querySelectorAll()` to find the nodes when needed.");
-    });
-    var proxy = ObjectPropertyToProxyCache.get(value);
-    if (proxy) {
-        return proxy;
-    }
-    proxy = new Proxy(value, propertyProxyHandler);
-    ObjectPropertyToProxyCache.set(value, proxy);
-    ProxyCache.add(proxy);
-    return proxy;
-}
-var InstanceField = 0;
-var RegularField = 1;
-var ExpandoField = 2;
-var MutatedField = 3;
-var ObjectToFieldsMap = new WeakMap();
-function extractOwnFields(component, allowInstanceFields) {
-    var fields = ObjectToFieldsMap.get(component);
-    var type = allowInstanceFields ? InstanceField : ExpandoField;
-    if (isUndefined(fields)) {
-        // only the first batch are considered private fields
-        type = RegularField;
-        fields = {};
-        ObjectToFieldsMap.set(component, fields);
-    }
-    var _loop_1 = function (propName) {
-        if (hasOwnProperty.call(component, propName) && isUndefined(fields[propName])) {
-            fields[propName] = type;
-            var value_1 = component[propName];
-            if (!allowInstanceFields) {
-                // replacing the field with a getter and a setter to track the mutations
-                // and provide meaningful errors
-                defineProperty(component, propName, {
-                    get: function () { return value_1; },
-                    set: function (newValue) {
-                        value_1 = newValue;
-                        fields[propName] = MutatedField;
-                    },
-                    configurable: false,
-                });
-            }
-        }
+var lastRevokeFn;
+var ProxyCompat = function Proxy(target, handler) {
+    var targetIsFunction = isFunction(target);
+    var targetIsArray = isArray(target);
+    assert.invariant(isObject(target) || targetIsFunction, "Cannot create proxy with a non-object as target");
+    assert.invariant(isObject(handler), "new Proxy expects the second argument to a CompatProxyHandler");
+    var get = handler.get, set = handler.set, apply = handler.apply, construct = handler.construct;
+    assert.invariant(isFunction(get) && isFunction(set) && isFunction(apply) && isFunction(construct), "CompatProxyHandler requires get, set, apply and construct traps to be defined.");
+    // Construct revoke function, and set lastRevokeFn so that Proxy.revocable can steal it.
+    // The caller might get the wrong revoke function if a user replaces or wraps XProxy
+    // to call itself, but that seems unlikely especially when using the polyfill.
+    var throwRevoked = function (trap) { }; // eslint-disable-line no-unused-vars
+    lastRevokeFn = function () {
+        throwRevoked = function (trap) {
+            throw new TypeError("Cannot perform '" + trap + "' on a proxy that has been revoked");
+        };
     };
-    for (var propName in component) {
-        _loop_1(propName);
+    // Define proxy as Object, or Function (if either it's callable, or apply is set).
+    var proxy = this; // reusing the already created object, eventually the prototype will be resetted
+    if (targetIsFunction) {
+        proxy = function Proxy() {
+            var usingNew = (this && this.constructor === proxy);
+            var args = ArraySlice.call(arguments);
+            throwRevoked(usingNew ? 'construct' : 'apply');
+            if (usingNew) {
+                return construct.call(handler, target, args, this);
+            }
+            else {
+                return apply.call(handler, target, this, args);
+            }
+        };
     }
-    return fields;
-}
-function getOwnFields(target) {
-    var fields = ObjectToFieldsMap.get(target);
-    if (isUndefined(fields)) {
-        fields = {};
+    function linkProperty(target, handler, key, enumerable) {
+        // arrays are usually mutable, but objects are not... normally, in compat mode they will use the accessor keys
+        // instead of interacting with the object directly, but if they bypass that for some reason, having the right
+        // value for configurable helps to detect those early errors.
+        var configurable = targetIsArray;
+        var desc = {
+            enumerable: enumerable,
+            configurable: configurable,
+            get: function () {
+                throwRevoked('get');
+                return get.call(handler, target, key);
+            },
+            set: function (value) {
+                throwRevoked('set');
+                var result = set.call(handler, target, key, value);
+                if (result === false) {
+                    throw new TypeError("'set' on proxy: trap returned falsish for property '" + key + "'");
+                }
+            },
+        };
+        Object.defineProperty(proxy, key, desc);
     }
-    return fields;
-}
+    // Clone enumerable properties
+    for (var key in target) {
+        linkProperty(target, handler, key, true);
+    }
+    // Set the prototype, or clone all prototype methods (always required if a getter is provided).
+    var proto = getPrototypeOf(target);
+    setPrototypeOf(proxy, proto);
+    if (targetIsArray) {
+        linkProperty(target, handler, 'length', false);
+    }
+    linkProperty(target, handler, MembraneSlot, false);
+    linkProperty(target, handler, TargetSlot, false);
+    return proxy;
+};
+ProxyCompat.revocable = function (target, handler) {
+    var p = new XProxy(target, handler);
+    return {
+        proxy: p,
+        revoke: lastRevokeFn,
+    };
+};
+// trap `preventExtensions` can be covered by a patched version of:
+// [ ] Object.preventExtensions()
+// [ ] Reflect.preventExtensions()
+// trap `getOwnPropertyDescriptor` can be covered by a patched version of:
+// [ ] Object.getOwnPropertyDescriptor()
+// [ ] Reflect.getOwnPropertyDescriptor()
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/defineProperty
+// trap `defineProperty` can be covered by a patched version of:
+// [ ] Object.defineProperty()
+// [ ] Reflect.defineProperty()
+// trap `deleteProperty` can be covered by the transpilation and the patched version of:
+// [ ] Reflect.deleteProperty()
+// trap `ownKeys` can be covered by a patched version of:
+// [*] Object.getOwnPropertyNames()
+// [ ] Object.getOwnPropertySymbols()
+// [*] Object.keys()
+// [ ] Reflect.ownKeys()
+// trap `isExtensible` can be covered by a patched version of:
+// [ ] Object.isExtensible()
+// [ ] Reflect.isExtensible()
+// trap `setPrototypeOf` can be covered by a patched version of:
+// [ ] Object.setPrototypeOf()
+// [ ] Reflect.setPrototypeOf()
+var XProxy = typeof Proxy !== "undefined" ? Proxy : undefined;
+
+
+
+
+
+
+// enable/disable is meant to be used by our test infrastructure only
+
+
+// initialization
 
 var EmptySlots = create(null);
 function getSlotsetValue(slotset, slotName) {
-    assert.isTrue(isObject(slotset), "Invalid slotset value " + toString(slotset));
+    assert.isTrue(isObject(slotset), "Invalid slotset value " + toString$1(slotset));
     // TODO: mark slotName as reactive
     return slotset && slotset[slotName];
 }
 var slotsetProxyHandler = {
     get: function (slotset, key) { return getSlotsetValue(slotset, key); },
     set: function () {
-        assert.invariant(false, "$slotset object cannot be mutated from template.");
+        assert.logError("$slotset object cannot be mutated from template.");
         return false;
     },
     deleteProperty: function () {
-        assert.invariant(false, "$slotset object cannot be mutated from template.");
+        assert.logError("$slotset object cannot be mutated from template.");
         return false;
+    },
+    apply: function () {
+        assert.fail("invalid call invocation from slotset");
+    },
+    construct: function () {
+        assert.fail("invalid construction invocation from slotset");
     },
 };
-// we use inception to track down the memoized object for each value used in a template from a component
-var currentMemoized = null;
-var cmpProxyHandler = {
-    get: function (cmp, key) {
-        assert.invariant(currentMemoized !== null && vmBeingRendered !== null && vmBeingRendered.component === cmp, " getFieldValue() should only be accessible during rendering phase.");
-        if (key in currentMemoized) {
-            return currentMemoized[key];
+function validateSlots(vm, html) {
+    var _a = vm.cmpSlots, cmpSlots = _a === void 0 ? EmptySlots : _a;
+    var _b = html.slots, slots = _b === void 0 ? [] : _b;
+    for (var slotName in cmpSlots) {
+        if (ArrayIndexOf.call(slots, slotName) === -1) {
+            // TODO: this should never really happen because the compiler should always validate
+            console.warn("Ignoring unknown provided slot name \"" + slotName + "\" in " + vm + ". This is probably a typo on the slot attribute.");
         }
-        assert.block(function devModeCheck() {
-            if (hasOwnProperty.call(cmp, key)) {
-                var fields = getOwnFields(cmp);
-                switch (fields[key]) {
-                    case 0: break; // Instance fields that have special privileges can go though
-                    case 1:
-                        assert.logError(cmp + "'s template is accessing `this." + toString(key) + "` directly, which is declared in the constructor and considered a private field. Instead access it via a getter or make it reactive by moving it to `this.state." + toString(key) + "`.");
-                        break;
-                    case 2:
-                        assert.logError(cmp + "'s template is accessing `this." + toString(key) + "` directly, which is added as an expando property of the component and considered a private field. Instead access it via a getter or make it reactive by moving it to `this.state." + toString(key) + "`.");
-                        break;
-                    case 3:
-                        assert.logError(cmp + "'s template is accessing `this." + toString(key) + "`, which is considered a mutable private field but mutations cannot be observed. Instead move it to `this.state." + toString(key) + "`.");
-                        break;
-                    default:
-                        // TODO: this should never really happen because the compiler should always validate
-                        console.warn(cmp + "'s template is accessing `this." + toString(key) + "`, which is not declared by the component. This is likely a typo in the template.");
-                }
-            }
-        });
-        // slow path to access component's properties from template
-        var value;
-        var _a = vmBeingRendered, cmpState = _a.cmpState, cmpProps = _a.cmpProps, publicPropsConfig = _a.def.props; // eslint-disable-line no-undef
-        if (key === 'state' && cmpState) {
-            value = cmpState;
+    }
+}
+function validateFields(vm, html) {
+    var component = vm.component;
+    // validating identifiers used by template that should be provided by the component
+    var _a = html.ids, ids = _a === void 0 ? [] : _a;
+    ids.forEach(function (propName) {
+        if (!(propName in component)) {
+            console.warn("The template rendered by " + vm + " references `this." + propName + "`, which is not declared. This is likely a typo in the template.");
         }
-        else if (key in publicPropsConfig && key in cmpProps) {
-            subscribeToSetHook(vmBeingRendered, cmpProps, key); // eslint-disable-line no-undef
-            value = cmpProps[key];
+        else if (hasOwnProperty.call(component, propName)) {
+            assert.fail(component + "'s template is accessing `this." + toString$1(propName) + "` directly, which is considered a private field. Instead access it via a getter or make it reactive by moving it to `this.state." + toString$1(propName) + "`.");
         }
-        else {
-            value = cmp[key];
-        }
-        currentMemoized[key] = value; // eslint-disable-line no-undef
-        return value;
-    },
-    set: function (cmp, key) {
-        assert.logError("Invalid assignment: " + cmp + " cannot set a new value for property " + key + " during the rendering phase.");
-        return false;
-    },
-    deleteProperty: function (cmp, key) {
-        assert.logError("Invalid delete statement: " + cmp + " cannot delete property " + key + " during the rendering phase.");
-        return false;
-    },
-};
+    });
+}
+function validateTemplate(vm, html) {
+    validateSlots(vm, html);
+    validateFields(vm, html);
+}
 function evaluateTemplate(vm, html) {
     assert.vm(vm);
     assert.isTrue(isFunction(html), "evaluateTemplate() second argument must be a function instead of " + html);
@@ -915,38 +944,15 @@ function evaluateTemplate(vm, html) {
     if (html !== cmpTemplate) {
         context.tplCache = create(null);
         vm.cmpTemplate = html;
+        assert.block(function devModeCheck() {
+            validateTemplate(vm, html);
+        });
     }
     assert.isTrue(isObject(context.tplCache), "vm.context.tplCache must be an object associated to " + cmpTemplate + ".");
-    assert.block(function devModeCheck() {
-        // before every render, in dev-mode, we will like to know all expandos and
-        // all private-fields-like properties, so we can give meaningful errors.
-        extractOwnFields(component);
-        // validating slot names
-        var _a = html.slots, slots = _a === void 0 ? [] : _a;
-        for (var slotName in cmpSlots) {
-            if (ArrayIndexOf.call(slots, slotName) === -1) {
-                // TODO: this should never really happen because the compiler should always validate
-                console.warn("Ignoring unknown provided slot name \"" + slotName + "\" in " + vm + ". This is probably a typo on the slot attribute.");
-            }
-        }
-        // validating identifiers used by template that should be provided by the component
-        var _b = html.ids, ids = _b === void 0 ? [] : _b;
-        ids.forEach(function (propName) {
-            if (!(propName in component)) {
-                // TODO: this should never really happen because the compiler should always validate
-                console.warn("The template rendered by " + vm + " references `this." + propName + "`, which is not declared. This is likely a typo in the template.");
-            }
-        });
-    });
-    var _b = Proxy.revocable(cmpSlots, slotsetProxyHandler), slotset = _b.proxy, slotsetRevoke = _b.revoke;
-    var _c = Proxy.revocable(component, cmpProxyHandler), cmp = _c.proxy, componentRevoke = _c.revoke;
-    var outerMemoized = currentMemoized;
-    currentMemoized = create(null);
-    var vnodes = html.call(undefined, api, cmp, slotset, context.tplCache);
+    var _b = XProxy.revocable(cmpSlots, slotsetProxyHandler), slotset = _b.proxy, slotsetRevoke = _b.revoke;
+    var vnodes = html.call(undefined, api, component, slotset, context.tplCache);
     assert.invariant(isArray(vnodes), "Compiler should produce html functions that always return an array.");
-    currentMemoized = outerMemoized; // inception to memoize the accessing of keys from cmp for every render cycle
     slotsetRevoke();
-    componentRevoke();
     return vnodes;
 }
 
@@ -1084,6 +1090,175 @@ function invokeComponentAttributeChangedCallback(vm, attrName, oldValue, newValu
     }
 }
 
+var TargetToReactiveRecordMap = new WeakMap();
+function notifyListeners(target, key) {
+    var reactiveRecord = TargetToReactiveRecordMap.get(target);
+    if (reactiveRecord) {
+        var value = reactiveRecord[key];
+        if (value) {
+            var len = value.length;
+            for (var i = 0; i < len; i += 1) {
+                var vm = value[i];
+                assert.vm(vm);
+                console.log("Marking " + vm + " as dirty: property \"" + toString$1(key) + "\" of " + toString$1(target) + " was set to a new value.");
+                if (!vm.isDirty) {
+                    markComponentAsDirty(vm);
+                    console.log("Scheduling " + vm + " for rehydration due to mutation.");
+                    scheduleRehydration(vm);
+                }
+            }
+        }
+    }
+}
+function subscribeToSetHook(vm, target, key) {
+    assert.vm(vm);
+    var reactiveRecord = TargetToReactiveRecordMap.get(target);
+    if (isUndefined(reactiveRecord)) {
+        var newRecord = create(null);
+        reactiveRecord = newRecord;
+        TargetToReactiveRecordMap.set(target, newRecord);
+    }
+    var value = reactiveRecord[key];
+    if (isUndefined(value)) {
+        value = [];
+        reactiveRecord[key] = value;
+    }
+    if (ArrayIndexOf.call(value, vm) === -1) {
+        ArrayPush.call(value, vm);
+        // we keep track of the sets that vm is listening from to be able to do some clean up later on
+        ArrayPush.call(vm.deps, value);
+    }
+}
+
+/*eslint-enable*/
+var ReplicableToReplicaMap = new WeakMap();
+function propertyGetter(target, key) {
+    if (key === TargetSlot) {
+        return target;
+    }
+    else if (key === MembraneSlot) {
+        return propertyProxyHandler;
+    }
+    var value = target[key];
+    if (isRendering && vmBeingRendered) {
+        subscribeToSetHook(vmBeingRendered, target, key);
+    }
+    return (value && isObject(value)) ? getPropertyProxy(value) : value;
+}
+function propertySetter(target, key, value) {
+    if (isRendering) {
+        assert.logError("Setting property \"" + toString$1(key) + "\" of " + toString$1(target) + " during the rendering process of " + vmBeingRendered + " is invalid. The render phase must have no side effects on the state of any component.");
+        return false;
+    }
+    var oldValue = target[key];
+    if (oldValue !== value) {
+        target[key] = value;
+        notifyListeners(target, key);
+    }
+    else if (key === 'length' && isArray(target)) {
+        // fix for issue #236: push will add the new index, and by the time length
+        // is updated, the internal length is already equal to the new length value
+        // therefore, the oldValue is equal to the value. This is the forking logic
+        // to support this use case.
+        notifyListeners(target, key);
+    }
+    return true;
+}
+function propertyDelete(target, key) {
+    delete target[key];
+    notifyListeners(target, key);
+    return true;
+}
+var propertyProxyHandler = {
+    get: propertyGetter,
+    set: propertySetter,
+    deleteProperty: propertyDelete,
+    apply: function (target /*, thisArg: any, argArray?: any*/) {
+        assert.fail("invalid call invocation for property proxy " + target);
+    },
+    construct: function (target /*, argArray: any, newTarget?: any*/) {
+        assert.fail("invalid construction invocation for property proxy " + target);
+    },
+};
+function getPropertyProxy(value) {
+    assert.isTrue(isObject(value), "perf-optimization: avoid calling this method for non-object value.");
+    // TODO: Provide a holistic way to deal with built-ins, right now we just care ignore Date
+    if (isNull(value) || value.constructor === Date) {
+        return value;
+    }
+    value = unwrap(value);
+    assert.block(function devModeCheck() {
+        var isNode = value instanceof Node;
+        assert.invariant(!isNode, "Do not store references to DOM Nodes. Instead use `this.querySelector()` and `this.querySelectorAll()` to find the nodes when needed.");
+    });
+    var proxy = ReplicableToReplicaMap.get(value);
+    if (proxy) {
+        return proxy;
+    }
+    proxy = new XProxy(value, propertyProxyHandler);
+    ReplicableToReplicaMap.set(value, proxy);
+    return proxy;
+}
+
+/* eslint-enable */
+function piercingHook(membrane, target, key, value) {
+    var vm = membrane.handler.vm;
+    assert.vm(vm);
+    var piercing = Services.piercing;
+    if (piercing) {
+        var component = vm.component, data = vm.vnode.data, def = vm.def, context = vm.context;
+        var result_1 = value;
+        var next_1 = true;
+        var callback = function (newValue) {
+            next_1 = false;
+            result_1 = newValue;
+        };
+        for (var i = 0, len = piercing.length; next_1 && i < len; ++i) {
+            piercing[i].call(undefined, component, data, def, context, target, key, value, callback);
+        }
+        return result_1 === value ? getReplica(membrane, result_1) : result_1;
+    }
+}
+var PiercingMembraneHandler = (function () {
+    function PiercingMembraneHandler(vm) {
+        assert.vm(vm);
+        this.vm = vm;
+    }
+    PiercingMembraneHandler.prototype.get = function (membrane, target, key) {
+        if (key === OwnerKey) {
+            return undefined;
+        }
+        var value = target[key];
+        return piercingHook(membrane, target, key, value);
+    };
+    PiercingMembraneHandler.prototype.set = function (membrane, target, key, newValue) {
+        target[key] = newValue;
+        return true;
+    };
+    PiercingMembraneHandler.prototype.deleteProperty = function (membrane, target, key) {
+        delete target[key];
+        return true;
+    };
+    PiercingMembraneHandler.prototype.apply = function (membrane, targetFn, thisArg, argumentsList) {
+        return getReplica(membrane, targetFn.apply(thisArg, argumentsList));
+    };
+    PiercingMembraneHandler.prototype.construct = function (membrane, targetFn, argumentsList, newTarget) {
+        assert.isTrue(newTarget, "construct handler expects a 3rd argument with a newly created object that will be ignored in favor of the wrapped constructor.");
+        return getReplica(membrane, new (targetFn.bind.apply(targetFn, [void 0].concat(argumentsList)))());
+    };
+    return PiercingMembraneHandler;
+}());
+function pierce(vm, value) {
+    assert.vm(vm);
+    var membrane = vm.membrane;
+    if (!membrane) {
+        var handler = new PiercingMembraneHandler(vm);
+        membrane = new Membrane(handler);
+        vm.membrane = membrane;
+    }
+    return getReplica(membrane, value);
+}
+
 var vmBeingConstructed = null;
 function isBeingConstructed(vm) {
     assert.vm(vm);
@@ -1096,23 +1271,27 @@ function createComponent(vm, Ctor) {
     vmBeingConstructed = vm;
     var component = invokeComponentConstructor(vm, Ctor);
     vmBeingConstructed = vmBeingConstructedInception;
-    assert.block(function devModeCheck() {
-        extractOwnFields(component);
-    });
     assert.isTrue(vm.component === component, "Invalid construction for " + vm + ", maybe you are missing the call to super() on classes extending Element.");
 }
 function linkComponent(vm) {
     assert.vm(vm);
     var elm = vm.vnode.elm, component = vm.component, _a = vm.def, publicMethodsConfig = _a.methods, publicProps = _a.props;
     var descriptors = {};
+    var _loop_1 = function (key) {
+        var getter = (function (component, key) {
+            var args = [];
+            for (var _i = 2; _i < arguments.length; _i++) {
+                args[_i - 2] = arguments[_i];
+            }
+            return component[key].apply(component, args);
+        }).bind(undefined, component, key);
+        descriptors[key] = {
+            get: function () { return getter; }
+        };
+    };
     // expose public methods as props on the Element
     for (var key in publicMethodsConfig) {
-        var getter = function (component, key) {
-            return component[key];
-        };
-        descriptors[key] = {
-            get: getter.bind(undefined, component, key),
-        };
+        _loop_1(key);
     }
     for (var key in publicProps) {
         var getter = publicProps[key].getter;
@@ -1150,10 +1329,6 @@ function linkComponent(vm) {
         var wiring = Services.wiring;
         if (wiring) {
             invokeServiceHook(vm, wiring);
-            assert.block(function devModeCheck() {
-                // Mark instance properties for services special
-                extractOwnFields(component, true);
-            });
         }
     }
 }
@@ -1291,9 +1466,10 @@ function dispatchComponentEvent(vm, event) {
         uninterrupted = false;
         stopImmediatePropagation.call(this);
     };
+    var e = pierce(vm, event);
     for (var i = 0, len = handlers.length; uninterrupted && i < len; i += 1) {
         // TODO: only if the event is `composed` it can be dispatched
-        invokeComponentCallback(vm, handlers[i], component, [event]);
+        invokeComponentCallback(vm, handlers[i], component, [e]);
     }
     // restoring original methods
     event.stopImmediatePropagation = stopImmediatePropagation;
@@ -1301,7 +1477,7 @@ function dispatchComponentEvent(vm, event) {
 function addComponentSlot(vm, slotName, newValue) {
     assert.vm(vm);
     assert.invariant(!isRendering, vmBeingRendered + ".render() method has side effects on the state of slot " + slotName + " in " + vm);
-    assert.isTrue(isArray(newValue) && newValue.length > 0, "Slots can only be set to a non-empty array, instead received " + toString(newValue) + " for slot " + slotName + " in " + vm + ".");
+    assert.isTrue(isArray(newValue) && newValue.length > 0, "Slots can only be set to a non-empty array, instead received " + toString$1(newValue) + " for slot " + slotName + " in " + vm + ".");
     var cmpSlots = vm.cmpSlots;
     var oldValue = cmpSlots && cmpSlots[slotName];
     // TODO: hot-slots names are those slots used during the last rendering cycle, and only if
@@ -1358,143 +1534,6 @@ function markComponentAsDirty(vm) {
     assert.isFalse(vm.isDirty, "markComponentAsDirty() for " + vm + " should not be called when the componet is already dirty.");
     assert.isFalse(isRendering, "markComponentAsDirty() for " + vm + " cannot be called during rendering of " + vmBeingRendered + ".");
     vm.isDirty = true;
-}
-
-/*eslint-enable*/
-var TargetSlot = Symbol();
-var MembraneSlot = Symbol();
-function isReplicable(value) {
-    var type = typeof value;
-    return value && (type === 'object' || type === 'function');
-}
-function getReplica(membrane, value) {
-    if (value === null || !isReplicable(value)) {
-        return value;
-    }
-    assert.isTrue(membrane instanceof Membrane, "getReplica() first argument must be a membrane.");
-    var cells = membrane.cells, cache = membrane.cache;
-    if (cache.has(value)) {
-        return value;
-    }
-    var r = cells.get(value);
-    if (r) {
-        return r;
-    }
-    var replica = new Proxy(value, membrane); // eslint-disable-line no-undef
-    cells.set(value, replica);
-    cache.add(replica);
-    return replica;
-}
-var Membrane = (function () {
-    function Membrane(handler) {
-        this.handler = handler;
-        this.cells = new WeakMap();
-        this.cache = new WeakSet();
-    }
-    Membrane.prototype.get = function (target, key) {
-        if (key === TargetSlot) {
-            return target;
-        }
-        else if (key === MembraneSlot) {
-            return this;
-        }
-        var value = this.handler.get(target, key);
-        return getReplica(this, value);
-    };
-    Membrane.prototype.set = function (target, key, newValue) {
-        return this.handler.set(target, key, newValue);
-    };
-    Membrane.prototype.deleteProperty = function (target, key) {
-        if (key === TargetSlot) {
-            return false;
-        }
-        return this.handler.deleteProperty(target, key);
-    };
-    Membrane.prototype.apply = function (target, thisArg, argumentsList) {
-        thisArg = unwrap(thisArg);
-        argumentsList = unwrap(argumentsList);
-        if (isArray(argumentsList)) {
-            argumentsList = ArrayMap.call(argumentsList, unwrap);
-        }
-        var value = this.handler.apply(target, thisArg, argumentsList);
-        return getReplica(this, value);
-    };
-    Membrane.prototype.construct = function (target, argumentsList, newTarget) {
-        argumentsList = unwrap(argumentsList);
-        if (isArray(argumentsList)) {
-            argumentsList = ArrayMap.call(argumentsList, unwrap);
-        }
-        var value = this.handler.construct(target, argumentsList, newTarget);
-        return getReplica(this, value);
-    };
-    return Membrane;
-}());
-function unwrap(replicaOrAny) {
-    return (replicaOrAny && replicaOrAny[TargetSlot]) || replicaOrAny;
-}
-function setKey(replicaOrAny, key, newValue) {
-    var shouldReturn = false;
-    return shouldReturn ? newValue : undefined;
-}
-function deleteKey(replicaOrAny, key) {
-}
-
-/* eslint-enable */
-function piercingHook(vm, target, key, value) {
-    assert.vm(vm);
-    var piercing = Services.piercing;
-    if (piercing) {
-        var component = vm.component, data = vm.vnode.data, def = vm.def, context = vm.context;
-        var result_1 = value;
-        var next_1 = true;
-        var callback = function (newValue) {
-            next_1 = false;
-            result_1 = newValue;
-        };
-        for (var i = 0, len = piercing.length; next_1 && i < len; ++i) {
-            piercing[i].call(undefined, component, data, def, context, target, key, value, callback);
-        }
-        return result_1;
-    }
-}
-var PiercingMembraneHandler = (function () {
-    function PiercingMembraneHandler(vm) {
-        assert.vm(vm);
-        this.vm = vm;
-    }
-    PiercingMembraneHandler.prototype.get = function (target, key) {
-        if (key === OwnerKey) {
-            return undefined;
-        }
-        var value = target[key];
-        return piercingHook(this.vm, target, key, value);
-    };
-    PiercingMembraneHandler.prototype.set = function (target, key, newValue) {
-        target[key] = newValue;
-        return true;
-    };
-    PiercingMembraneHandler.prototype.deleteProperty = function (target, key) {
-        delete target[key];
-        return true;
-    };
-    PiercingMembraneHandler.prototype.apply = function (targetFn, thisArg, argumentsList) {
-        return targetFn.apply(thisArg, argumentsList);
-    };
-    PiercingMembraneHandler.prototype.construct = function (targetFn, argumentsList, newTarget) {
-        assert.isTrue(newTarget, "construct handler expects a 3rd argument with a newly created object that will be ignored in favor of the wrapped constructor.");
-        return new (targetFn.bind.apply(targetFn, [void 0].concat(argumentsList)))();
-    };
-    return PiercingMembraneHandler;
-}());
-function pierce(vm, value) {
-    assert.vm(vm);
-    var membrane = vm.membrane;
-    if (!membrane) {
-        var handler = new PiercingMembraneHandler(vm);
-        membrane = new Membrane(handler);
-        vm.membrane = membrane;
-    }
-    return getReplica(membrane, value);
 }
 
 var _a$2 = Element.prototype;
@@ -1579,24 +1618,32 @@ function isParentNodeKeyword(key) {
 // Registering a service to enforce the shadowDOM semantics via the Raptor membrane implementation
 register({
     piercing: function (component, data, def, context, target, key, value, callback) {
-        if (value === querySelector) {
-            // TODO: it is possible that they invoke the querySelector() function via call or apply to set a new context, what should
-            // we do in that case? Right now this is essentially a bound function, but the original is not.
-            return callback(function (selector) { return getFirstMatch(component[ViewModelReflection], target, selector); });
-        }
-        if (value === querySelectorAll) {
-            // TODO: it is possible that they invoke the querySelectorAll() function via call or apply to set a new context, what should
-            // we do in that case? Right now this is essentially a bound function, but the original is not.
-            return callback(function (selector) { return getAllMatches(component[ViewModelReflection], target, selector); });
-        }
-        if (value && value.splitText && isParentNodeKeyword(key)) {
-            if (value === component[ViewModelReflection].vnode.elm) {
-                // walking up via parent chain might end up in the shadow root element
-                return callback(component.root);
+        var vm = component[ViewModelReflection];
+        var elm = vm.vnode.elm; // eslint-disable-line no-undef
+        if (value) {
+            if (value === querySelector) {
+                // TODO: it is possible that they invoke the querySelector() function via call or apply to set a new context, what should
+                // we do in that case? Right now this is essentially a bound function, but the original is not.
+                return callback(function (selector) { return getFirstMatch(vm, target, selector); });
             }
-            else if (target[OwnerKey] !== value[OwnerKey]) {
-                // cutting out access to something outside of the shadow of the current target by calling back with undefined
-                return callback();
+            if (value === querySelectorAll) {
+                // TODO: it is possible that they invoke the querySelectorAll() function via call or apply to set a new context, what should
+                // we do in that case? Right now this is essentially a bound function, but the original is not.
+                return callback(function (selector) { return getAllMatches(vm, target, selector); });
+            }
+            if (isParentNodeKeyword(key)) {
+                if (value === elm) {
+                    // walking up via parent chain might end up in the shadow root element
+                    return callback(component.root);
+                }
+                else if (target[OwnerKey] !== value[OwnerKey]) {
+                    // cutting out access to something outside of the shadow of the current target (usually slots)
+                    return callback();
+                }
+            }
+            if (value === elm) {
+                // prevent access to the original Host element
+                return callback(component);
             }
         }
     }
@@ -1812,6 +1859,21 @@ ComponentElement.prototype = {
         var elm = getLinkedElement(this);
         return elm.tagName + ''; // avoiding side-channeling
     },
+    get tabIndex() {
+        var elm = getLinkedElement(this);
+        return elm.tabIndex;
+    },
+    set tabIndex(value) {
+        var vm = this[ViewModelReflection];
+        assert.vm(vm);
+        assert.isFalse(isRendering, "Setting property \"tabIndex\" of " + toString(value) + " during the rendering process of " + vmBeingRendered + " is invalid. The render phase must have no side effects on the state of any component.");
+        if (isBeingConstructed(vm)) {
+            assert.fail("Setting property \"tabIndex\" during the construction process of " + vm + " is invalid.");
+            return;
+        }
+        var elm = getLinkedElement(this);
+        elm.tabIndex = value;
+    },
     get classList() {
         var vm = this[ViewModelReflection];
         assert.vm(vm);
@@ -1851,20 +1913,7 @@ ComponentElement.prototype = {
             assert.logError(vm + " failed to set new state to " + newState + ". `this.state` can only be set to an object.");
             return;
         }
-        var cmpState = vm.cmpState;
-        if (isUndefined(cmpState)) {
-            cmpState = vm.cmpState = getPropertyProxy(create(null)); // lazy creation of the cmpState
-        }
-        if (cmpState !== newState) {
-            for (var key in cmpState) {
-                if (!(key in newState)) {
-                    cmpState[key] = undefined; // prefer setting to undefined over deleting for perf reasons
-                }
-            }
-            for (var key in newState) {
-                cmpState[key] = newState[key];
-            }
-        }
+        vm.cmpState = getPropertyProxy(newState); // lazy creation of the cmpState
     },
     toString: function () {
         var vm = this[ViewModelReflection];
@@ -1941,7 +1990,7 @@ function isElementComponent(Ctor, protoSet) {
 function createComponentDef(Ctor) {
     assert.isTrue(isElementComponent(Ctor), Ctor + " is not a valid component, or does not extends Element from \"engine\". You probably forgot to add the extend clause on the class declaration.");
     var name = Ctor.name;
-    assert.isTrue(name && isString(name), toString(Ctor) + " should have a \"name\" property with string value, but found " + name + ".");
+    assert.isTrue(name && isString(name), toString$1(Ctor) + " should have a \"name\" property with string value, but found " + name + ".");
     assert.isTrue(Ctor.constructor, "Missing " + name + ".constructor, " + name + " should have a \"constructor\" property.");
     var props = getPublicPropertiesHash(Ctor);
     var methods = getPublicMethodsHash(Ctor);
@@ -2151,7 +2200,7 @@ function rehydrate(vm) {
     if (vm.idx && vm.isDirty) {
         var vnode = vm.vnode;
         assert.isTrue(vnode.elm instanceof HTMLElement, "rehydration can only happen after " + vm + " was patched the first time.");
-        assert.invariant(isArray(vnode.children), "Rendered " + vm + ".children should always have an array of vnodes instead of " + toString(vnode.children));
+        assert.invariant(isArray(vnode.children), "Rendered " + vm + ".children should always have an array of vnodes instead of " + toString$1(vnode.children));
         // when patch() is invoked from within the component life-cycle due to
         // a dirty state, we create a new VNode (oldVnode) with the exact same data was used
         // to patch this vnode the last time, mimic what happen when the
@@ -2931,20 +2980,30 @@ function updateStyle(oldVnode, vnode) {
     style = style || {};
     var name;
     var elm = vnode.elm;
-    for (name in oldStyle) {
-        if (!(name in style)) {
-            elm.style.removeProperty(name);
-        }
+    if (isString(style)) {
+        elm.style.cssText = style;
     }
-    for (name in style) {
-        var cur = style[name];
-        if (cur !== oldStyle[name]) {
-            if (name.charCodeAt(0) === DashCharCode && name.charCodeAt(1) === DashCharCode) {
-                // if the name is prefied with --, it will be considered a variable, and setProperty() is needed
-                elm.style.setProperty(name, cur);
+    else {
+        if (isString(oldStyle)) {
+            elm.style.cssText = '';
+        }
+        else {
+            for (name in oldStyle) {
+                if (!(name in style)) {
+                    elm.style.removeProperty(name);
+                }
             }
-            else {
-                elm.style[name] = cur;
+        }
+        for (name in style) {
+            var cur = style[name];
+            if (cur !== oldStyle[name]) {
+                if (name.charCodeAt(0) === DashCharCode && name.charCodeAt(1) === DashCharCode) {
+                    // if the name is prefied with --, it will be considered a variable, and setProperty() is needed
+                    elm.style.setProperty(name, cur);
+                }
+                else {
+                    elm.style[name] = cur;
+                }
             }
         }
     }
@@ -3083,7 +3142,7 @@ function linkAttributes(element, vm) {
         attrName = attrName.toLocaleLowerCase();
         var propName = getPropNameFromAttrName(attrName);
         if (propsConfig[propName]) {
-            assert.error("Invalid attribute \"" + attrName + "\" for " + vm + ". Instead update the public property with `element." + propName + " = value;`.");
+            assert.logError("Invalid attribute \"" + attrName + "\" for " + vm + ". Instead update the public property with `element." + propName + " = value;`.");
             return;
         }
         var oldValue = getAttribute.call(element, attrName);
@@ -3182,9 +3241,7 @@ exports.getComponentDef = getComponentDef;
 exports.Element = ComponentElement;
 exports.register = register;
 exports.unwrap = unwrap;
-exports.setKey = setKey;
-exports.deleteKey = deleteKey;
 
 }((this.Engine = this.Engine || {})));
-/** version: 0.11.9 */
+/** version: 0.12.2 */
 //# sourceMappingURL=engine.js.map

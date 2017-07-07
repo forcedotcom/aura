@@ -1,0 +1,6 @@
+{
+    "browsers": {
+        "ie": "11"
+    },
+    "detectSource": "typeof Proxy !== 'undefined'"
+}

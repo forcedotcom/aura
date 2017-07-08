@@ -22,5 +22,14 @@
         test: function(cmp) {
             cmp.testLanguage();
         }
+    },
+
+    /**
+     * navigator.mediaDevices is enabled only for 2 specific namespaces in SecureObject.addRTCMediaApis
+     */
+    testMediaDevicesBlocked: {
+        test: function(cmp) {
+            cmp.testMediaDevicesBlocked();
+        }
     }
 })

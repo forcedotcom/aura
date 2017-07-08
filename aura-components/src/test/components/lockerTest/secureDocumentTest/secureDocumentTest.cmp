@@ -32,7 +32,7 @@
     <aura:method name="testCookiesAddRemove" />
     <aura:method name="testDocumentTitle"/>
     <aura:method name="testQuerySelectorAllReturnsSecureNodeList"/>
-    <aura:method name="testDocumentBodyConstructorNotExposed"/>
+    <aura:method name="testDocumentBodyConstructorNotInvocable"/>
     <aura:method name="testCreateElementCoersionExploit"/>
     <aura:method name="testCreateElementNSForSVGElement"/>
     <aura:method name="testGetElementsByTagNameForScriptTag"/>

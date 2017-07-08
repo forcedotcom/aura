@@ -98,9 +98,9 @@
         }
     },
 
-    testDocumentBodyConstructorNotExposed: {
+    testDocumentBodyConstructorNotInvocable: {
         test: function(cmp) {
-            cmp.testDocumentBodyConstructorNotExposed();
+            cmp.testDocumentBodyConstructorNotInvocable();
         }
     },
 

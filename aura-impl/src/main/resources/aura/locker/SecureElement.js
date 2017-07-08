@@ -257,10 +257,11 @@ function SecureElement(el, key) {
         var prototype = (function() {
             function SecureElementPrototype() {
             }
-
             SecureElementPrototype.prototype["tagName"] = tagName;
 
-            return new SecureElementPrototype();
+            var sep = new SecureElementPrototype();
+            sep.constructor = function() {throw new TypeError("Illegal constructor");};
+            return sep;
         })();
 
         SecureElement.addStandardMethodAndPropertyOverrides(prototype, caseInsensitiveAttributes, key);
@@ -906,6 +907,7 @@ SecureElement.metadata = {
             "setSinkId":                      FUNCTION,
             "sinkId":                         DEFAULT,
             "src":                            DEFAULT,
+            "srcObject":                      DEFAULT,
             "textTracks":                     DEFAULT,
             "volume":                         DEFAULT,
             "webkitAudioDecodedByteCount":    DEFAULT,

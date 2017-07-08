@@ -20,6 +20,7 @@
 
     <aura:method name="testPropertiesExposed" action="{!c.testPropertiesExposed}"/>
     <aura:method name="testLanguage" action="{!c.testLanguage}"/>
+    <aura:method name="testMediaDevicesBlocked" action="{!c.testMediaDevicesBlocked}"/>
 
     <div id="title">SecureNavigator test</div>
 </aura:component>

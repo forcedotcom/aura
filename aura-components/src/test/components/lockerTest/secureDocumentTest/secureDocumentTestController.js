@@ -111,9 +111,21 @@
         });
     },
 
-    testDocumentBodyConstructorNotExposed: function(cmp) {
+    testDocumentBodyConstructorNotInvocable: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
-        testUtils.assertUndefined(document.body.constructor, "document.body.constructor should not be defined in Locker");
+        var bodyConstructor = document.body.constructor;
+        try {
+            new bodyConstructor();
+            testUtils.fail("document.body.constructor should not be usable like a constructor in Locker");
+        } catch (e) {
+            testUtils.assertEquals("Illegal constructor", e.message, "Unexpected error message when using document.body.constructor like a constructor");
+        }
+        try {
+            bodyConstructor();
+            testUtils.fail("document.body.constructor should not be usable like a function in Locker");
+        } catch (e) {
+            testUtils.assertEquals("Illegal constructor", e.message, "Unexpected error message when using document.body.constructor like a function");
+        }
     },
 
     testCreateElementCoersionExploit: function(cmp) {

@@ -34,8 +34,13 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
     if (o) {
         return o;
     }
+    // Create prototype to allow basic object operations like hasOwnProperty etc
+    var emptyProto = {};
+    // Do not treat window like a plain object, $A.util.isPlainObject() returns true if we leave the constructor intact
+    emptyProto.constructor = null;
+    Object.freeze(emptyProto);
 
-    o = Object.create(null, {
+    o = Object.create(emptyProto, {
         document: {
             enumerable: true,
             value: SecureDocument(win.document, key)
@@ -239,7 +244,7 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
         SecureObject.addPropertyIfSupported(o, win, name);
     });
 
-    SecureObject.addRTCMediaApis(o, win, "webkitRTCPeerConnection", key);
+    SecureObject.addRTCMediaApis(o, win, "RTCPeerConnection", key);
 
     var workerFrame = win.document.getElementById("safeEvalWorkerCustom");
     var safeEvalWindow = workerFrame && workerFrame.contentWindow;            
@@ -360,7 +365,7 @@ SecureWindow.metadata = {
                 "Error":                                FUNCTION,
                 "ErrorEvent":                           FUNCTION,
                 "EvalError":                            FUNCTION,
-                "Event":                                FUNCTION,
+                "Event":                                CTOR,
                 "EventSource":                          FUNCTION,
                 "EventTarget":                          RAW,
                 "FederatedCredential":                  FUNCTION,
@@ -487,6 +492,7 @@ SecureWindow.metadata = {
                 "MediaQueryListEvent":                  FUNCTION,
                 "MediaRecorder":                        CTOR,
                 "MediaSource":                          FUNCTION,
+                "MediaStream":                          RAW,
                 "MediaStreamAudioDestinationNode":      CTOR,
                 "MediaStreamAudioSourceNode":           CTOR,
                 "MediaStreamEvent":                     CTOR,
@@ -537,7 +543,7 @@ SecureWindow.metadata = {
                 "PromiseRejectionEvent":                FUNCTION,
                 "RTCCertificate":                       FUNCTION,
                 "RTCIceCandidate":                      FUNCTION,
-                "RTCSessionDescription":                FUNCTION,
+                "RTCSessionDescription":                CTOR,
                 "RadioNodeList":                        FUNCTION,
                 "Range":                                FUNCTION,
                 "RangeError":                           FUNCTION,

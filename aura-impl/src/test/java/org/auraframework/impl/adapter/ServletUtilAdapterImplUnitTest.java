@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
+import java.util.Date;
 import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Map;
@@ -677,7 +678,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         ServletUtilAdapterImpl servletUtilAdapter = new ServletUtilAdapterImpl();
         MockHttpServletResponse response = new MockHttpServletResponse();
         long expiration = 100000;
-
+        
         // Act
         servletUtilAdapter.setCacheTimeout(response, expiration, true);
 
@@ -687,12 +688,14 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         String expectedCacheControl = Arrays.asList("max-age=100", "public", "immutable").toString();
         assertEquals(expectedCacheControl, response.getHeaders(HttpHeaders.CACHE_CONTROL).toString());
 
+        // Expires header loses ms precision, so adding in a slight buffer.
+        long buffer = 1000;
         long now = System.currentTimeMillis();
-        String expires = response.getHeader(HttpHeaders.EXPIRES);
-        assertTrue("Expires should be at least the expiration time", Long.parseLong(expires) >= now + expiration);
+        long expires = response.getDateHeader(HttpHeaders.EXPIRES) + buffer;
+        assertTrue("Expires should be at least the expiration time", expires >= now + expiration);
 
-        String lastModified = response.getHeader(HttpHeaders.LAST_MODIFIED);
-        assertTrue("LastModified should be in the past", Long.parseLong(lastModified) < now);
+        long lastModified = response.getDateHeader(HttpHeaders.LAST_MODIFIED);
+        assertTrue("LastModified should be in the past", lastModified < now);
     }
 
     @Test

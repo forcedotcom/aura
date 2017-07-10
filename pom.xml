@@ -52,7 +52,7 @@
         <xunit.js.coverage>false</xunit.js.coverage>
         <xunit.js.isStrict>true</xunit.js.isStrict>
         <xunit.js.currentModule>${project.basedir}</xunit.js.currentModule>
-        <spring.version>4.1.7.RELEASE</spring.version>
+        <spring.version>4.3.6.RELEASE</spring.version>
         <jetty.version>8.1.15.v20140411</jetty.version>
         <node.download.root.url>http://repo.auraframework.org/simple/plugins-release-local/node/</node.download.root.url>
         <npm.download.root.url>http://repo.auraframework.org/simple/plugins-release-local/npm/</npm.download.root.url>

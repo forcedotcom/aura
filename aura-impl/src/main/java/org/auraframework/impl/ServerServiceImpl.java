@@ -434,6 +434,11 @@ public class ServerServiceImpl implements ServerService {
         // Append component classes.
         Collection<BaseComponentDef> componentDefs = filterAndLoad(BaseComponentDef.class, dependencies, null);
         for (BaseComponentDef def : componentDefs) {
+            // templates are not needed in app.js as they are rendered server side and html sent to client
+            if (def.isTemplate()) {
+                continue;
+            }
+
             if (uncomment) {
                 sb.append("$A.componentService.addComponent(\"" + def.getDescriptor() + "\", (function (){");
             } else {

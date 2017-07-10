@@ -772,6 +772,18 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     // }
 
     /**
+     * Tests that application templates are no included in app.js
+     */
+    @Test
+    public void testTemplatesNotIncludedInAppJS() throws Exception {
+        String source = "<aura:application template=\"auradocs:template\"></aura:application>";
+        String js = getDefinitionsOutput(source.toString(), AuraContext.Mode.PROD);
+
+        assertFalse("auradocs:template or its base aura:template was present in app.js",
+                    js.contains(":template"));
+    }
+
+    /**
      * This is verification for W-2657282. The bug was when an IOException is thrown in try block,
      * a new exception may be thrown in finally block, so the new exception will hide the original
      * exception.

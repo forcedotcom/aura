@@ -497,7 +497,7 @@
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>node-tool</artifactId>
-                <version>0.0.9</version>
+                <version>0.0.10</version>
             </dependency>
             <dependency>
                 <groupId>org.polyfills</groupId>
@@ -1061,7 +1061,7 @@
                 <plugin>
                     <groupId>org.auraframework</groupId>
                     <artifactId>tools-maven-plugin</artifactId>
-                    <version>0.0.33</version>
+                    <version>0.0.36</version>
                     <configuration>
                         <arguments>
                             <argument>--max-warnings</argument>
@@ -1069,6 +1069,7 @@
                             <argument>${project.basedir}/src/main/modules</argument>
                             <argument>${project.basedir}/src/test/modules</argument>
                         </arguments>
+                        <modulesEslintrc>${basedir}/modules.eslintrc.js</modulesEslintrc>
                         <errorHintMessage>(NOTE: to check modules with eslint use: mvn tools:eslint-raptor)</errorHintMessage>
                     </configuration>
                 </plugin>
@@ -1154,6 +1155,9 @@
                 <property>
                     <name>eslint.enabled</name>
                 </property>
+                <file>
+                    <exists>${basedir}/modules.eslintrc.js</exists>
+                </file>
             </activation>
             <build>
                 <plugins>

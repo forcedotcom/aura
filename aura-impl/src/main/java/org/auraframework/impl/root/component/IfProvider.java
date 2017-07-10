@@ -81,7 +81,7 @@ public class IfProvider implements ComponentConfigProvider {
         
         // 0 is false, any other number true
         if(value instanceof Number) {
-            return new Double(((Number) value).doubleValue()) != 0;
+            return ((Number) value).intValue() != 0;
         }
         
         // Empty strings are false

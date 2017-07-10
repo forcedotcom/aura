@@ -225,14 +225,20 @@ Aura.Utils.Util.prototype.isPlainObject = function(o){
     // If has modified constructor
     if (typeof o.constructor !== 'function') { return false; }
 
-    // If has modified prototype
-    var p = o.constructor.prototype;
-    if (isObjectObject(p) === false) { return false; }
 
-    // If constructor does not have an Object-specific method
-    if (p.hasOwnProperty('isPrototypeOf') === false) {
-        return false;
-    }
+    // @dval: Added temporal try/catch until we figure out a better way
+    // to guarantee proxification in intrinsic/primordials:
+    // https://git.soma.salesforce.com/raptor/raptor/issues/406
+    try {
+        // If has modified prototype
+        var p = o.constructor.prototype;
+        if (isObjectObject(p) === false) { return false; }
+
+        // If constructor does not have an Object-specific method
+        if (p.hasOwnProperty('isPrototypeOf') === false) {
+            return false;
+        }
+    } catch (e) { /* Assume is  object when throws */}
 
     // Most likely a plain Object
     return true;

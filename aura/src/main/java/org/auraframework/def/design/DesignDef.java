@@ -15,12 +15,12 @@
  */
 package org.auraframework.def.design;
 
+import java.util.List;
+import java.util.Map;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.genericxml.GenericXmlCapableDef;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -47,19 +47,6 @@ public interface DesignDef extends RootDefinition, GenericXmlCapableDef {
      * @return the attribute design definition
      */
     DesignAttributeDef getAttributeDesignDef(String name);
-
-
-    /**
-     * Get a layout based on name, If no name was provided it will be an empty string
-     * @return A layout with the given name, can be null if no layout exists
-     */
-    Map<String, DesignLayoutDef> getDesignLayoutDefs();
-
-    /**
-     * Returns the default template (with no name or name="")
-     * @return the default design layout
-     */
-    DesignLayoutDef getDefaultDesignLayoutDef();
 
     /**
      * Get the value of a option given its name

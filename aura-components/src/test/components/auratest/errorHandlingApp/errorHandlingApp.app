@@ -158,6 +158,15 @@
         </td>
     </tr>
     <tr>
+        <td>Error from $A.error(): </td>
+        <td>
+          <ui:button label="Throw"
+                     press="{!c.throwErrorFromAError}"
+                     class="errorFromAErrorButton"
+                     aura:id="errorFromAErrorButton"/>
+        </td>
+    </tr>
+    <tr>
         <td>Fire Test Event: </td>
         <td>
           <ui:button label="Fire"

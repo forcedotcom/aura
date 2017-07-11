@@ -77,7 +77,7 @@
         var error = event.reason;
         var validError = false;
 
-        if (error.name && error.name.indexOf('Error') !== -1) {
+        if (error && error.name && error.name.indexOf('Error') !== -1) {
             error = new $A.auraError(null, error);
             validError = true;
         }

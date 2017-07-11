@@ -118,14 +118,11 @@ LibraryIncludeRegistry.prototype.getLibraryInclude = function(descriptor) {
     return instance;
 };
 
-
 LibraryIncludeRegistry.prototype.hydrateLibrary = function(descriptor, exporter) {
-    if ($A.util.getFunctionName(exporter) === 'l') {
-        var tmp = exporter.toString();
-        var pos = [tmp.indexOf('/*') + 2, tmp.indexOf('*/')];
-        tmp = tmp.substr(pos[0], pos[1] - pos[0]);
-        exporter = $A.util.globalEval("function () {" + tmp + " }", $A.clientService.getSourceMapsUrl(descriptor, 'lib'));
-    }
+    var tmp = exporter.toString();
+    var pos = [tmp.indexOf('/*') + 2, tmp.indexOf('*/')];
+    tmp = tmp.substr(pos[0], pos[1] - pos[0]);
+    exporter = $A.util.globalEval("function () {" + tmp + " }", $A.clientService.getSourceMapsUrl(descriptor, 'lib'));
 
     if(!exporter) {
         var defDescriptor = new Aura.System.DefDescriptor(descriptor);
@@ -140,8 +137,6 @@ LibraryIncludeRegistry.prototype.hydrateLibrary = function(descriptor, exporter)
 
     return exporter();
 };
-
-
 
 /**
  * Try to build an instance for the specified library include.

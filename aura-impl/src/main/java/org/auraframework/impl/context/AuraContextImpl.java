@@ -1023,6 +1023,6 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public boolean isAppJsSplitEnabled() {
-        return false;
+        return true;
     }
 }

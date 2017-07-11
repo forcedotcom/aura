@@ -1295,12 +1295,10 @@ AuraComponentService.prototype.addComponent = function(descriptor, exporter) {
 
 
 AuraComponentService.prototype.hydrateComponent = function(descriptor, exporter) {
-    if ($A.util.getFunctionName(exporter) === 'c') {
-        var tmp = exporter.toString();
-        var pos = [tmp.indexOf('/*') + 2, tmp.indexOf('*/')];
-        tmp = tmp.substr(pos[0], pos[1] - pos[0]);
-        exporter = this.buildComponentExporter(descriptor, tmp);
-    }
+    var tmp = exporter.toString();
+    var pos = [tmp.indexOf('/*') + 2, tmp.indexOf('*/')];
+    tmp = tmp.substr(pos[0], pos[1] - pos[0]);
+    exporter = this.buildComponentExporter(descriptor, tmp);
 
     if(!exporter) {
         var defDescriptor = new Aura.System.DefDescriptor(descriptor);

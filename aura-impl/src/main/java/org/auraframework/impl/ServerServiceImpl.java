@@ -376,7 +376,7 @@ public class ServerServiceImpl implements ServerService {
         final String key = "JS:" + mKey + uid + (hasParts ? ":" + partIndex : "") + ":" + lockerService + modules + compat;
 
         final Callable<String> buildFunction = () -> {
-            String res = getDefinitionsString(dependencies, key, partIndex == 0);
+            String res = getDefinitionsString(dependencies, key);
             //log the cache miss here
             cachingService.getAltStringsCache().logCacheStatus("cache miss for key: "+key+";");
             return res;
@@ -397,7 +397,7 @@ public class ServerServiceImpl implements ServerService {
         }
     }
 
-    private String getDefinitionsString (Set<DefDescriptor<?>> dependencies, String key, boolean uncomment)
+    private String getDefinitionsString (Set<DefDescriptor<?>> dependencies, String key)
             throws QuickFixException, IOException {
 
         AuraContext context = contextService.getCurrentContext();
@@ -413,19 +413,11 @@ public class ServerServiceImpl implements ServerService {
         for (LibraryDef libraryDef : libraryDefs) {
             List<IncludeDefRef> includeDefs = libraryDef.getIncludes();
             for (IncludeDefRef defRef : includeDefs) {
-                if (uncomment) {
-                    sb.append("$A.componentService.addLibraryExporter(\"" + defRef.getClientDescriptor() + "\", (function (){");
-                } else {
-                    sb.append("$A.componentService.addLibraryExporter(\"" + defRef.getClientDescriptor() + "\", (function l(){/*");
-                }
+                sb.append("$A.componentService.addLibraryExporter(\"" + defRef.getClientDescriptor() + "\", (function (){/*");
 
                 sb.append(defRef.getCode(minify));
 
-                if (uncomment) {
-                    sb.append("}));");
-                } else {
-                    sb.append("*/}));");
-                }
+                sb.append("*/}));");
 
                 context.setClientClassLoaded(defRef.getDescriptor(), true);
             }
@@ -439,11 +431,7 @@ public class ServerServiceImpl implements ServerService {
                 continue;
             }
 
-            if (uncomment) {
-                sb.append("$A.componentService.addComponent(\"" + def.getDescriptor() + "\", (function (){");
-            } else {
-                sb.append("$A.componentService.addComponent(\"" + def.getDescriptor() + "\", (function c(){/*");
-            }
+            sb.append("$A.componentService.addComponent(\"" + def.getDescriptor() + "\", (function (){/*");
 
             // Mark class as loaded in the client
             context.setClientClassLoaded(def.getDescriptor(), true);
@@ -456,11 +444,7 @@ public class ServerServiceImpl implements ServerService {
             serializationService.write(def, null, BaseComponentDef.class, sb, "JSON");
             sb.append(";");
 
-            if (uncomment) {
-                sb.append("}));\n");
-            } else {
-                sb.append("*/}));\n");
-            }
+            sb.append("*/}));\n");
         }
 
         // Append event definitions

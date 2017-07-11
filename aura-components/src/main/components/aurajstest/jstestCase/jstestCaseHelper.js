@@ -38,7 +38,7 @@
         }
 
         if (!root) {
-            if (!win.$A.test.isComplete()) {
+            if(!win.$A || !win.$A.test || !win.$A.test.isComplete()){
                 cmp.set("v.status", "spin");
                 setTimeout(function () {
                     cmp.getDef().getHelper().runTest(cmp);

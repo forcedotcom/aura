@@ -16,24 +16,19 @@
 
 package org.auraframework.impl.root;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.management.modelmbean.XMLParseException;
-
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
 import org.auraframework.def.genericxml.GenericXmlElement;
 import org.auraframework.def.genericxml.GenericXmlValidator;
 import org.auraframework.impl.system.BaseXmlElementImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.management.modelmbean.XMLParseException;
+import java.util.*;
+
 
 /**
  * Generic tag implementation. Responsible for basic xml validation.
@@ -119,7 +114,7 @@ public class GenericXmlElementImpl extends BaseXmlElementImpl implements Generic
     public static class Builder extends BaseBuilderImpl {
 
         private final Class<? extends GenericXmlValidator> validatorClass;
-        private Multimap<Class<? extends GenericXmlValidator>, GenericXmlElement> children = LinkedHashMultimap.create();
+        private Multimap<Class<? extends GenericXmlValidator>, GenericXmlElement> children = HashMultimap.create();
         private Map<String, String> attributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         private String text = null;
 

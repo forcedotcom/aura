@@ -164,7 +164,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private Long buildTimestamp;
     private String auraVersionString;
     private boolean lastGenerationHadCompilationErrors = false;
-    private boolean validateCss;
+    private Boolean validateCss;
 
     @Inject
     private LocalizationAdapter localizationAdapter;
@@ -216,59 +216,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             throw new AuraRuntimeException(e);
         }
 
-        // Framework JS
-        JavascriptGroup tempGroup = null;
-        try {
-            tempGroup = newAuraJavascriptGroup();
-            try {
-                tempGroup.parse();
-            } catch (IOException x) {
-                throw new AuraError("Unable to initialize aura client javascript", x);
-            }
-            tempGroup.postProcess();
-        } catch (IOException x) {
-            /*
-             * js source wasn't found, we must be in jar land, just let the files be accessed from there... however, we
-             * do want a hash. Question: hypothetically, could we have a hybrid with a subset of files as files, and the
-             * rest in jars? This wouldn't be accounted for here.
-             */
-            tempGroup = new CompiledGroup(AuraJavascriptGroup.GROUP_NAME, AuraJavascriptGroup.FILE_NAME);
-        }
-        jsGroup = tempGroup;
-
-        // Aura Resources
-        FileGroup tempResourcesGroup;
-        try {
-            tempResourcesGroup = newAuraResourcesHashingGroup();
-            tempResourcesGroup.getGroupHash();
-        } catch (IOException e) {
-            tempResourcesGroup = new CompiledGroup(AuraResourcesHashingGroup.GROUP_NAME,
-                    AuraResourcesHashingGroup.FILE_NAME);
-        }
-        resourcesGroup = tempResourcesGroup;
-
-        Properties props = null;
-        try {
-            props = loadProperties();
-            auraVersionString = props.getProperty(VERSION_PROPERTY);
-        } catch (AuraError t) {
-            auraVersionString = "development";
-        }
-        if (props != null) {
-            buildTimestamp = readBuildTimestamp(props);
-        } else {
-            buildTimestamp = System.currentTimeMillis();
-        }
-
-        if (auraVersionString == null || auraVersionString.isEmpty()) {
-            throw new AuraError("Unable to read build version from version.prop file");
-        }
-
-        Properties config = loadConfig();
-        String validateCssString = config.getProperty(VALIDATE_CSS_CONFIG);
-        validateCss = AuraTextUtil.isNullEmptyOrWhitespace(validateCssString)
-                || Boolean.parseBoolean(validateCssString.trim());
-
         contextService.registerGlobal("isVoiceOver", true, false);
         contextService.registerGlobal("dynamicTypeSize", true, "");
 
@@ -277,6 +224,51 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         }
         contextService.registerGlobal("isVoiceOver", true, false);
         contextService.registerGlobal("dynamicTypeSize", true, "");
+    }
+
+    private JavascriptGroup getJSGroup() {
+        synchronized (this) {
+            if (jsGroup != null) {
+                return jsGroup;
+            }
+            // Framework JS
+            JavascriptGroup tempGroup = null;
+            try {
+                tempGroup = newAuraJavascriptGroup();
+                try {
+                    tempGroup.parse();
+                } catch (IOException x) {
+                    throw new AuraError("Unable to initialize aura client javascript", x);
+                }
+                tempGroup.postProcess();
+            } catch (IOException x) {
+                /*
+                 * js source wasn't found, we must be in jar land, just let the files be accessed from there...
+                 */
+                tempGroup = new CompiledGroup(AuraJavascriptGroup.GROUP_NAME, AuraJavascriptGroup.FILE_NAME);
+            }
+            jsGroup = tempGroup;
+        }
+        return jsGroup;
+    }
+
+    private FileGroup getResourcesGroup() {
+        synchronized (this) {
+            if (resourcesGroup != null) {
+                return resourcesGroup;
+            }
+            // Aura Resources
+            FileGroup tempResourcesGroup;
+            try {
+                tempResourcesGroup = newAuraResourcesHashingGroup();
+                tempResourcesGroup.getGroupHash();
+            } catch (IOException e) {
+                tempResourcesGroup = new CompiledGroup(AuraResourcesHashingGroup.GROUP_NAME,
+                        AuraResourcesHashingGroup.FILE_NAME);
+            }
+            resourcesGroup = tempResourcesGroup;
+        }
+        return resourcesGroup;
     }
 
     protected FileGroup newAuraResourcesHashingGroup() throws IOException {
@@ -344,7 +336,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
          * If we're missing source, jsGroup will be an AuraResourceGroup and isStale() is always false. If we're in
          * production, we're using the resources too. But if we have source, regenerate from it if it's changed:
          */
-        if (!isProduction() && jsGroup != null && (jsGroup.isStale() || lastGenerationHadCompilationErrors)) {
+        if (!isProduction() && (getJSGroup().isStale() || lastGenerationHadCompilationErrors)) {
             try {
                 logger.info("Regenerating framework javascript");
                 File dest = AuraImplFiles.AuraResourceJavascriptDirectory.asFile();
@@ -504,7 +496,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public long getAuraJSLastMod() {
         regenerateAuraJS();
-        return jsGroup != null ? jsGroup.getLastMod() : getBuildTimestamp();
+        return getJSGroup().getLastMod();
     }
 
     @Override
@@ -540,25 +532,37 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         return this.isProduction() ? Mode.PROD : Mode.DEV;
     }
 
-    private Properties loadProperties() {
-
-        Properties props = new Properties();
-        try {
-            loadProperties("/version.prop", props);
-        } catch (IOException e) {
-            throw new AuraError("Could not read version.prop information");
+    private void loadProperties() {
+        if (auraVersionString == null) {
+            Properties props = new Properties();
+            try {
+                loadProperties("/version.prop", props);
+                auraVersionString = props.getProperty(VERSION_PROPERTY);
+                buildTimestamp = readBuildTimestamp(props);
+            } catch (IOException e) {
+                props = null;
+                auraVersionString = "development";
+                buildTimestamp = System.currentTimeMillis();
+            }
+            if (auraVersionString == null || auraVersionString.isEmpty()) {
+                throw new AuraError("Unable to read build version from version.prop file");
+            }
         }
-        return props;
     }
 
-    private Properties loadConfig() {
-        Properties props = new Properties();
-        try {
-            loadProperties("/aura.conf", props);
-        } catch (IOException e) {
-            // ignore
+    private void loadConfig() {
+        if (validateCss == null) {
+            Properties props = new Properties();
+            String validateCssString = null;
+            try {
+                loadProperties("/aura.conf", props);
+                validateCssString = props.getProperty(VALIDATE_CSS_CONFIG);
+            } catch (IOException e) {
+                // ignore
+            }
+            validateCss = AuraTextUtil.isNullEmptyOrWhitespace(validateCssString)
+                    || Boolean.parseBoolean(validateCssString.trim());
         }
-        return props;
     }
 
     private Properties loadProperties(String path, Properties props) throws IOException {
@@ -592,17 +596,23 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public long getBuildTimestamp() {
+        if (buildTimestamp == null) {
+            loadProperties();
+        }
         return buildTimestamp;
     }
 
     @Override
     public String getAuraVersion() {
+        if (auraVersionString == null) {
+            loadProperties();
+        }
         return auraVersionString;
     }
 
     @Override
     public boolean isAuraJSStatic() {
-        return jsGroup == null;
+        return false;
     }
 
     /**
@@ -615,6 +625,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public boolean validateCss() {
+        if (validateCss == null) {
+            loadConfig();
+        }
         return validateCss;
     }
 
@@ -623,7 +636,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         regenerateAuraJS();
         try {
             // framework nonce now consists of Aura JS and resources files (CSS and JS) and if locker service is enabled
-            String jsHash = jsGroup.getGroupHash().toString();
+            String jsHash = getJSGroup().getGroupHash().toString();
             String resourcesHash = getAuraResourcesNonce();
 
             /*
@@ -658,10 +671,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     private String getAuraResourcesNonce() {
         try {
-            if (!isProduction() && resourcesGroup != null && resourcesGroup.isStale()) {
-                resourcesGroup.reset();
+            FileGroup rg = getResourcesGroup();
+            if (!isProduction() && rg.isStale()) {
+                rg.reset();
             }
-            return resourcesGroup.getGroupHash().toString();
+            return rg.getGroupHash().toString();
         } catch (IOException e) {
             throw new AuraRuntimeException("Can't read Aura resources files", e);
         }

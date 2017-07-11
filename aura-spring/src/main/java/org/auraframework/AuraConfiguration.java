@@ -15,10 +15,17 @@
  */
 package org.auraframework;
 
+import java.util.List;
+
+import org.polyfill.api.components.ServiceConfig;
 import org.polyfill.api.configurations.PolyfillApiConfig;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
+
+import com.google.common.collect.Lists;
 
 /**
  * Spring configuration to autoscan all aura packages
@@ -27,4 +34,33 @@ import org.springframework.context.annotation.Import;
 @ComponentScan(basePackages = {"org.auraframework"}, lazyInit = true)
 @Import(PolyfillApiConfig.class)
 public class AuraConfiguration {
+    @Primary
+    @Bean
+    public ServiceConfig getAuraPolyfillServiceConfig() {
+        List<String> polyfills = Lists.newArrayList();
+        polyfills.add("Array.prototype.find");
+        polyfills.add("Array.prototype.findIndex");
+        polyfills.add("Array.prototype.fill");
+        polyfills.add("Array.prototype.keys");
+        polyfills.add("Array.prototype.includes");
+        polyfills.add("CustomEvent");
+        polyfills.add("Date.now");
+        polyfills.add("Event");
+        polyfills.add("Function.name");
+        polyfills.add("Function.prototype.bind");
+        polyfills.add("Object.keys");
+        polyfills.add("Object.assign");
+        polyfills.add("requestAnimationFrame");
+        polyfills.add("WeakMap");
+        polyfills.add("WeakSet");
+        polyfills.add("Symbol");
+        polyfills.add("compat.classList");
+        polyfills.add("compat.freeze");
+
+        return new ServiceConfig()
+                .setGated(true)
+                .setMinify(true)
+                .setLoadOnUnknownUA(true)
+                .setPolyfills(polyfills);
+    }
 }

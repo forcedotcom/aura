@@ -32,6 +32,8 @@
 
     <aura:attribute access="PRIVATE" name="hasMenuOpened" type="Boolean" default="false"/>
 
+    <aura:method name="update" action="{!c.update}" description="Makes this component aware of the items inside itself, to hook the proper event handlers to them. Useful when some items are in another component, with ui:menuListProvider."/>
+
     <aura:registerEvent access="GLOBAL" name="menuCollapse" type="ui:collapse" description="The event fired when the menu list collapses."/>
     <aura:registerEvent access="GLOBAL" name="menuExpand" type="ui:expand" description="The event fired when the menu list displays."/>
     <aura:registerEvent access="GLOBAL" name="menuSelect" type="ui:menuSelect" description="The event fired when the user select a menu item."/>

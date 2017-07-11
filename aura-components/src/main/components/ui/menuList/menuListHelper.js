@@ -39,12 +39,14 @@
                 children.push(child);
             } else if (child.isInstanceOf("aura:iteration") || child.isInstanceOf("aura:if")) {
                 this.setHandlersOnMenuItems(component, child.get("v.body"), children, existingChildren);
+            } else if (child.isInstanceOf("ui:menuListProvider")) {
+                this.setHandlersOnMenuItems(component, child.getSuper().get("v.body"), children, existingChildren);
             } else if (child.isInstanceOf("aura:expression")) {
                 this.setHandlersOnMenuItems(component, child.get("v.value"), children, existingChildren);
             }
         }
     },
-    
+
     getMenuItem: function(component, index) {
         var menuItems = component.get("v.childMenuItems");
         if (menuItems) {
@@ -95,7 +97,7 @@
     	var helper = this;
     	if (!component._keyboardEventHandler) {
     		component._keyboardEventHandler = function(event) {
-                // @dval: There a multiple corner cases 
+                // @dval: There a multiple corner cases
                 // were we might endup in the wrong branch
                 // Make this more robust once we refactor this component
     			var concreteCmp = component.getConcreteComponent();
@@ -173,10 +175,10 @@
         }
         var previousFocusCmp = menuItems[previousIndex];
         previousFocusCmp.setFocus();
-        
+
         this.fireMenuFocusChangeEvent(component, srcComponent, previousFocusCmp);
     },
-    
+
     fireMenuFocusChangeEvent: function(component, previousItem, currentItem) {
     	var event = component.getEvent("menuFocusChange");
     	event.setParams({

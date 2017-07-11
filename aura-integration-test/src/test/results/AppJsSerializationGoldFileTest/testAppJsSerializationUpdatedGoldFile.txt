@@ -4491,6 +4491,8 @@ return {
                 children.push(child);
             } else if (child.isInstanceOf("aura:iteration") || child.isInstanceOf("aura:if")) {
                 this.setHandlersOnMenuItems(component, child.get("v.body"), children, existingChildren);
+            } else if (child.isInstanceOf("ui:menuListProvider")) {
+                this.setHandlersOnMenuItems(component, child.getSuper().get("v.body"), children, existingChildren);
             } else if (child.isInstanceOf("aura:expression")) {
                 this.setHandlersOnMenuItems(component, child.get("v.value"), children, existingChildren);
             }
@@ -4612,7 +4614,7 @@ return {
         }
         var previousFocusCmp = menuItems[previousIndex];
         previousFocusCmp.setFocus();
-        
+
         this.fireMenuFocusChangeEvent(component, srcComponent, previousFocusCmp);
     },
     "fireMenuFocusChangeEvent":function(component, previousItem, currentItem) {
@@ -4769,6 +4771,13 @@ return {
     ["childMenuItems","aura://Aura.Component[]","I",false,[]],
     ["triggerTypeAhead","aura://Boolean","I",false,false],
     ["hasMenuOpened","aura://Boolean","p",false,false]
+  ],
+  "med":[
+    {
+      "name":"ui:update",
+      "xs":"I",
+      "action":"{!c.update}"
+    }
   ],
   "i":[
     "markup://ui:visible"

@@ -80,6 +80,9 @@ Aura.bootstrapMark = function (mark, value) {
     document.addEventListener('DOMContentLoaded', verifyBootstrap);
 })();
 //#end
+
+function noop() {}
+
 // This, $A, is supposed to be our ONLY window-polluting top-level variable.
 // Everything else in Aura is attached to it.
 // window['$A'] = {};
@@ -211,8 +214,10 @@ Aura.bootstrapMark = function (mark, value) {
 // #include aura.metrics.AuraMetricsService
 
 //-- Module Exports ----------------------------------------------------------
-// #include aura.AuraExportsModule
-// #include aura.AuraExportsStorage
+// #include aura.modules.AuraExportsCompat
+// #include aura.modules.AuraExportsStorage
+// #include aura.modules.AuraExportsLogger
+// #include aura.modules.AuraExportsAssert
 
 // -- Mode injection ---------------------------------------------------------
 // #include {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"], "path" : "aura.AuraDevToolService"}

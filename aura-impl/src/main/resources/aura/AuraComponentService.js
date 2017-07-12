@@ -76,6 +76,8 @@ AuraComponentService.prototype.initCoreModules = function () {
     var Engine = this.moduleEngine;
     var compat = Engine && Engine["compat"];
     this.addModule("markup://engine", "engine", [], null, this.moduleEngine);
+    this.addModule("markup://assert", "assert", [], null, Aura.ExportsAssert);
+    this.addModule("markup://logger", "logger", [], null, Aura.ExportsLogger);
     this.addModule("markup://aura", "aura", [], null, Aura.ExportsModule);
     this.addModule("markup://aura-storage", "aura-storage", [], null, Aura.ExportsStorage);
 

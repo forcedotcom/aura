@@ -730,7 +730,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         }
         source.append("</aura:application>");
 
-        String js = getDefinitionsOutput(source.toString(),
+        getDefinitionsOutput(source.toString(),
                 AuraContext.Mode.PROD);
 //        assertFalse(
 //                "There are syntax errors preventing compression of application javascript",

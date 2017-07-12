@@ -58,14 +58,14 @@ Aura.Utils.Util.prototype.isIE = (navigator.userAgent.indexOf("MSIE") !== -1) ||
 Aura.Utils.Util.prototype.isLocalStorageEnabled = function () {
     if (this.localStorageEnabled === undefined) {
         this.localStorageEnabled = false;
-        if (window.localStorage) {
-            try {
+        try {
+            if (window.localStorage) {
                 window.localStorage.setItem("__AURA_LOCAL_STORAGE_ENABLED_TEST", "");
                 window.localStorage.removeItem("__AURA_LOCAL_STORAGE_ENABLED_TEST");
                 this.localStorageEnabled = true;
-            } catch (ignore) {
-                // do nothing
             }
+        } catch (ignore) {
+            // do nothing
         }
     }
 
@@ -80,14 +80,15 @@ Aura.Utils.Util.prototype.isLocalStorageEnabled = function () {
 Aura.Utils.Util.prototype.isSessionStorageEnabled = function () {
     if (this.sessionStorageEnabled === undefined) {
         this.sessionStorageEnabled = false;
-        if (window.sessionStorage) {
-            try {
-                window.sessionStorage.setItem("__AURA_SESSION_STORAGE_ENABLED_TEST", "");
-                window.sessionStorage.removeItem("__AURA_SESSION_STORAGE_ENABLED_TEST");
-                this.sessionStorageEnabled = true;
-            } catch (ignore) {
-                // do nothing
+        try {
+            if (window.sessionStorage) {
+
+                    window.sessionStorage.setItem("__AURA_SESSION_STORAGE_ENABLED_TEST", "");
+                    window.sessionStorage.removeItem("__AURA_SESSION_STORAGE_ENABLED_TEST");
+                    this.sessionStorageEnabled = true;
             }
+        } catch (ignore) {
+            // do nothing
         }
     }
 

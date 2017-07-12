@@ -1295,6 +1295,7 @@ AuraClientService.prototype.getBootstrapState = function() {
     var state = {
         "inline.js": !!Aura["inlineJsLoaded"],
         "aura.js": !!Aura["frameworkJsReady"],
+        "appcore.js": !!Aura["appCoreJsReady"],
         "app.js": !!Aura["appJsReady"],
         "bootstrap.js": !!Aura["appBootstrap"] || !!Aura["appBootstrapCache"] || !!this.appBootstrap
     };
@@ -1724,7 +1725,7 @@ AuraClientService.prototype.setNamespacePrivileges = function(sentNs) {
  */
 
 AuraClientService.prototype.initDefs = function() {
-    if (!Aura["appJsReady"]) {
+    if (!Aura["appCoreJsReady"] || !Aura["appJsReady"]) {
         Aura["appDefsReady"] = this.initDefs.bind(this);
         return;
     }

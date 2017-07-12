@@ -14963,4 +14963,4 @@ $A.componentService.initModuleDefs([
 
 ]);
 
-Aura.appJsReady = true;Aura.appDefsReady&&Aura.appDefsReady();
+Aura.appCoreJsReady=true;Aura.appJsReady=true;Aura.appDefsReady&&Aura.appDefsReady();

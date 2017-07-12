@@ -28,7 +28,7 @@
     
     initialize: function (cmp) {
         // Internal variables we use
-        cmp._templates        = [];
+        this.destroyTemplates(cmp);
         cmp._virtualItems     = [];
         cmp._ptv              = null;
         cmp._dirtyFlag        = 0;
@@ -639,9 +639,12 @@
     },
     
     destroyTemplates: function (cmp) {
-        var tmpls = cmp._templates;
-        for (var i = 0; i < tmpls.length; ++i) {
-            tmpls[i].destroy();
+        if (cmp && cmp._templates) {
+            var tmpls = cmp._templates;
+            for (var i = 0; i < tmpls.length; ++i) {
+                tmpls[i].destroy();
+            }
         }
+        cmp._templates = [];
     }
 })// eslint-disable-line semi

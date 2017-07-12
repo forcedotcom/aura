@@ -35,11 +35,11 @@ import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
-
-import com.google.common.collect.ImmutableMap;
+import org.auraframework.util.json.Json.ApplicationKey;
 
 /**
  * ModuleDef holds compiled code and serializes for client
@@ -53,6 +53,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     private Set<DefDescriptor<?>> dependencies = null;
     private Map<CodeType, String> codes;
     private final Set<PropertyReference> labelReferences;
+    private Double minVersion;
 
     private ModuleDefImpl(Builder builder) {
         super(builder);
@@ -61,6 +62,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         this.moduleDependencies = builder.moduleDependencies;
         this.customElementName = builder.customElementName;
         this.labelReferences = builder.labelReferences;
+        this.minVersion = builder.minVersion;
     }
 
     @Override
@@ -70,7 +72,12 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
 
     @Override
     public String getPath() {
-        return path;
+        return this.path;
+    }
+
+    @Override
+    public Double getMinVersion() {
+        return this.minVersion;
     }
 
     @Override
@@ -82,10 +89,16 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
                 ( minified ? CodeType.PROD_COMPAT : CodeType.COMPAT ) :
                 ( minified ? CodeType.PROD : CodeType.DEV );
         String code = this.codes.get(codeType);
-        json.writeMap(ImmutableMap.of(
-                "descriptor", getDescriptor().getQualifiedName(),
-                "name", this.customElementName,
-                "code", code));
+
+        json.writeMapBegin();
+        json.writeMapEntry(ApplicationKey.DESCRIPTOR, getDescriptor().getQualifiedName());
+        json.writeMapEntry(ApplicationKey.NAME, this.customElementName);
+        json.writeMapEntry(ApplicationKey.ACCESS, this.getAccess().getAccessCode());
+        json.writeMapEntry(ApplicationKey.CODE, code);
+        if (this.minVersion != null) {
+            json.writeMapEntry(ApplicationKey.MINVERSION, this.minVersion);
+        }
+        json.writeMapEnd();
     }
 
     @Override
@@ -160,6 +173,15 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
     }
 
     @Override
+    public void validateDefinition() throws QuickFixException {
+        super.validateDefinition();
+
+        if (this.minVersion != null && !this.access.isGlobal()) {
+            throw new InvalidDefinitionException("Module must be exposed to have a minVersion", this.location);
+        }
+    }
+
+    @Override
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
         validateLabels();
@@ -196,6 +218,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         private Set<String> moduleDependencies;
         private String customElementName;
         private Set<PropertyReference> labelReferences = new HashSet<>();
+        private Double minVersion = null;
 
         public Builder() {
             super(ModuleDef.class);
@@ -225,6 +248,10 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
                 }
                 this.labelReferences.add(new PropertyReferenceImpl(label, location));
             }
+        }
+
+        public void setMinVersion(double minVersion) {
+            this.minVersion = minVersion;
         }
 
         @Override

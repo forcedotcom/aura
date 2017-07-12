@@ -15,6 +15,7 @@
  */
 package org.auraframework.modules.impl.factory;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -28,7 +29,6 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
@@ -72,12 +72,18 @@ public class BundleModuleDefFactoryUnitTest {
         when(htmlFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/module-cmp.html");
         when(htmlFileSource.getContents()).thenReturn("template code here");
 
+        FileSource<ModuleDef> jsonFileSource = mock(FileSource.class);
+        when(jsonFileSource.getSystemId()).thenReturn("/User/me/project/src/main/modules/namespace/module-cmp/lightning.json");
+        when(jsonFileSource.getContents()).thenReturn("{ description: 'hello there', expose: 'true', minVersion: '12.3' }");
+
         DefDescriptor<ModuleDef> module = new DefDescriptorImpl<>(DefDescriptor.MARKUP_PREFIX, "nameSpace", "moduleCmp", ModuleDef.class);
         DefDescriptor<ModuleDef> template = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, "nameSpace", "moduleCmp-module-cmp", ModuleDef.class, module);
+        DefDescriptor<ModuleDef> json = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, "nameSpace", "moduleCmp-lightning", ModuleDef.class, module);
 
         Map<DefDescriptor<?>, Source<?>> mockBundledParts = Maps.newHashMap();
         mockBundledParts.put(module, jsFileSource);
         mockBundledParts.put(template, htmlFileSource);
+        mockBundledParts.put(json, jsonFileSource);
 
         when(mockBundleSource.getBundledParts()).thenReturn(mockBundledParts);
 
@@ -92,11 +98,7 @@ public class BundleModuleDefFactoryUnitTest {
         ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet());
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
 
-        ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
-        when(mockConfigAdapter.isInternalNamespace(anyString())).thenReturn(true);
-
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
-        moduleDefFactory.setConfigAdapter(mockConfigAdapter);
         moduleDefFactory.setModulesCompilerService(mockCompiler);
 
         ModuleDef moduleDef = moduleDefFactory.getDefinition(module, mockBundleSource);
@@ -112,6 +114,9 @@ public class BundleModuleDefFactoryUnitTest {
         assertTrue("compat code should be wrapped in function",
                 compatCode.startsWith("function() { "));
         assertNotNull("ownHash should not be null", moduleDef.getOwnHash());
+
+        assertEquals("minVersion from json file is different", new Double(12.3), moduleDef.getMinVersion());
+        assertTrue("access should be global with json file", moduleDef.getAccess().isGlobal());
     }
 
     @Test
@@ -236,11 +241,7 @@ public class BundleModuleDefFactoryUnitTest {
         ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet());
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
 
-        ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
-        when(mockConfigAdapter.isInternalNamespace(anyString())).thenReturn(true);
-
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
-        moduleDefFactory.setConfigAdapter(mockConfigAdapter);
         moduleDefFactory.setModulesCompilerService(mockCompiler);
 
         try {
@@ -283,11 +284,7 @@ public class BundleModuleDefFactoryUnitTest {
         ModulesCompilerData compilerData = new ModulesCompilerData(codeMap, Sets.newHashSet(), Sets.newHashSet());
         when(mockCompiler.compile(anyString(), anyMap())).thenReturn(compilerData);
 
-        ConfigAdapter mockConfigAdapter = mock(ConfigAdapter.class);
-        when(mockConfigAdapter.isInternalNamespace(anyString())).thenReturn(true);
-
         BundleModuleDefFactory moduleDefFactory = new BundleModuleDefFactory();
-        moduleDefFactory.setConfigAdapter(mockConfigAdapter);
         moduleDefFactory.setModulesCompilerService(mockCompiler);
 
         ContextService mockContextService = mock(ContextService.class);
@@ -305,5 +302,7 @@ public class BundleModuleDefFactoryUnitTest {
 
         ModuleDef moduleDef = moduleDefFactory.getDefinition(module, mockBundleSource);
         moduleDef.validateReferences();
+
+        assertTrue("access should be public without json file", moduleDef.getAccess().isPublic());
     }
 }

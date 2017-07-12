@@ -27,7 +27,12 @@ public interface ModuleDef extends Definition {
         DEV, PROD, COMPAT, PROD_COMPAT
     }
 
+    // arbitrary descriptor prefix for html template
     String TEMPLATE_PREFIX = "template";
+    // arbitrary descriptor prefix for metadata
+    String META_PREFIX = "meta";
+    // base name of metadata file
+    String META_FILE_BASENAME = "lightning";
 
     @Override
     DefDescriptor<ModuleDef> getDescriptor();
@@ -35,4 +40,6 @@ public interface ModuleDef extends Definition {
     String getCode(CodeType codeType);
 
     String getPath();
+
+    Double getMinVersion();
 }

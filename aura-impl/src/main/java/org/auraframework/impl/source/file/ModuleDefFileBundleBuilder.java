@@ -19,7 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
@@ -99,7 +99,7 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
             }
 
             if (moduleDescriptorFilePath != null) {
-                processBundle(base, sourceMap, 0, modDesc, moduleDescriptorFilePath, modDesc.getNamespace());
+                processBundle(base, sourceMap, modDesc, moduleDescriptorFilePath, modDesc.getNamespace());
             }
         } catch (IOException ignored) {
             // ignore file path issues
@@ -108,19 +108,19 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
         return new BundleSourceImpl<ModuleDef>(modDesc, sourceMap, true);
     }
 
-    private void processBundle(File base, Map<DefDescriptor<?>, Source<?>> sourceMap, int level,
-                               DefDescriptor<ModuleDef> moduleDescriptor, String moduleDescriptorPath,
+    private void processBundle(File base, Map<DefDescriptor<?>, Source<?>> sourceMap,
+                               DefDescriptor<ModuleDef> moduleDescriptor, String moduleDescriptorFilePath,
                                String namespace)
             throws IOException {
 
         for (File file : base.listFiles()) {
 
             if (file.isDirectory()) {
-                processBundle(file, sourceMap, ++level, moduleDescriptor, moduleDescriptorPath, namespace);
+                processBundle(file, sourceMap, moduleDescriptor, moduleDescriptorFilePath, namespace);
                 continue;
             }
 
-            if (level == 0 && file.getCanonicalPath().equals(moduleDescriptorPath)) {
+            if (file.getCanonicalPath().equals(moduleDescriptorFilePath)) {
                 // skip if first level and module descriptor source is already set
                 // to the current file
                 continue;
@@ -129,8 +129,11 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
             DefDescriptor<?> descriptor = null;
             Format format = null;
 
+            int lastSeparator = moduleDescriptorFilePath.lastIndexOf(File.separator);
+            String baseDir = moduleDescriptorFilePath.substring(0, lastSeparator);
+            String descriptorName = createDescriptorName(file, baseDir, moduleDescriptor.getName());
             String fileName = file.getName().toLowerCase();
-            String descriptorName = createDescriptorName(file, moduleDescriptor.getName(), level);
+
 
             if (fileName.endsWith(".html")) {
                 descriptor = new DefDescriptorImpl<>(ModuleDef.TEMPLATE_PREFIX, namespace, descriptorName, ModuleDef.class, moduleDescriptor);
@@ -144,20 +147,23 @@ public class ModuleDefFileBundleBuilder implements FileBundleSourceBuilder {
                 descriptor = new DefDescriptorImpl<>(DefDescriptor.CSS_PREFIX, namespace, descriptorName, ModuleDef.class, moduleDescriptor);
                 format = Format.CSS;
             }
+            // Handle json metadata source. Must be specific named file
+            if (descriptor == null && fileName.equals(ModuleDef.META_FILE_BASENAME + ".json")) {
+                descriptor = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, namespace, descriptorName, ModuleDef.class, moduleDescriptor);
+                format = Format.JS;
+            }
+
             if (descriptor != null) {
                 sourceMap.put(descriptor, new FileSource<>(descriptor, file, format));
             }
         }
     }
 
-    private String createDescriptorName(File file, String baseName, int level) {
-        String name = FilenameUtils.getBaseName(file.getName());
-        File parent = file;
-        for (int i = 0; i < level; i++) {
-            parent = parent.getParentFile();
-            name = parent.getName() + "-" + name;
-        }
-        return baseName + "-" + name;
+    private String createDescriptorName(File file, String baseFilePath, String descriptorName) throws IOException {
+        String path = file.getCanonicalPath();
+        path = path.substring(baseFilePath.length(), path.lastIndexOf("."));
+        path = StringUtils.replace(path, File.separator, "-");
+        return descriptorName + path;
     }
 
     private File getFileFromBase(File base, String extension) {

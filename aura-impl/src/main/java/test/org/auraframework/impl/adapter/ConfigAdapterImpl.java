@@ -909,4 +909,8 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         }
     }
 
+    @Override
+    public boolean isAllowedModuleNamespace(String namespace) {
+        return true;
+    }
 }

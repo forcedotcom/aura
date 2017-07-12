@@ -25,8 +25,8 @@
  * @export
  */
 function InteropComponentDef(config) {
-    this.interop = true;
-    this.access = 'G';
+    this.interop          = true;
+    this.access           = config.access;
     this.descriptor       = new DefDescriptor(config.descriptor);
     this.dependencies     = config.dependencies;
     this.definition       = config.definition;
@@ -34,7 +34,7 @@ function InteropComponentDef(config) {
     this.interopClass     = config.interopClass;
     this.elementName      = this.moduleName;
     this.interopClassName = this.descriptor.getNamespace() + "$" + this.descriptor.getName();
-    this.minVersion       = config[Json.ApplicationKey.MINVERSION] ? config[Json.ApplicationKey.MINVERSION] : undefined;
+    this.minVersion       = config.minVersion;
 }
 
 InteropComponentDef.prototype.hasInit = function() {

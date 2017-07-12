@@ -215,5 +215,19 @@ public interface ConfigAdapter extends AuraAdapter {
     
     boolean cdnEnabled();
 
+    /**
+     * Module namespace aliases
+     *
+     * @return map of a module namespace aliases
+     */
     Map<String, String> getModuleNamespaceAliases();
+
+    /**
+     * Checks whether module namespace is allowed to be used in components
+     * that are not internal
+     *
+     * @param namespace namespace to check
+     * @return whether module namespace is allowed by non internal components
+     */
+    boolean isAllowedModuleNamespace(String namespace);
 }

@@ -47,6 +47,7 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.ParentedDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
+import org.auraframework.def.module.ModuleDef;
 import org.auraframework.impl.controller.AuraGlobalControllerDefRegistry;
 import org.auraframework.impl.system.BundleAwareDefRegistry;
 import org.auraframework.impl.system.CompilingDefRegistry;
@@ -97,9 +98,9 @@ public class DefinitionServiceImpl implements DefinitionService {
     private CachingService cachingService;
 
     private LoggingService loggingService;
-    
+
     private ConfigAdapter configAdapter;
-    
+
     private AuraGlobalControllerDefRegistry globalControllerDefRegistry;
 
     @Override
@@ -213,7 +214,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         }
         // END TEMPORARY HACK TO SUPPORT TEST SUITES IN MAIN WITHOUT CHANGES
 
-            
+
         // TODO: Clean up so that we just walk up descriptor trees and back down them.
         Optional<T> optLocalDef = null;
         if (descriptor instanceof SubDefDescriptor) {
@@ -889,12 +890,19 @@ public class DefinitionServiceImpl implements DefinitionService {
             throw new RuntimeException("Missing access declaration for " + def.getDescriptor()
                     + " of type "+def.getClass().getSimpleName());
         }
+
+        DefDescriptor<?> desc = def.getDescriptor();
+
+        if (desc.getDefType() == DefType.MODULE) {
+            return computeModuleAccess(referencingDescriptor, (ModuleDef) def);
+        }
+
         if (access.isGlobal() || !access.requiresAuthentication()) {
             return null;
         }
         if (access.isPrivate()) {
             // make sure private is really private.
-            if (def.getDescriptor().equals(referencingDescriptor)) {
+            if (desc.equals(referencingDescriptor)) {
                 return null;
             }
         }
@@ -917,8 +925,6 @@ public class DefinitionServiceImpl implements DefinitionService {
                 return null;
             }
         }
-
-        DefDescriptor<?> desc = def.getDescriptor();
 
         String namespace;
         String target;
@@ -945,9 +951,8 @@ public class DefinitionServiceImpl implements DefinitionService {
             // We may re-enter this code, but only in race conditions. We should generate the
             // same string, and the only way to protect against this is to lock it.
 
-            DefDescriptor<? extends Definition> descriptor = def.getDescriptor();
             if (!configAdapter.isUnsecuredNamespace(namespace)
-                    && !configAdapter.isUnsecuredPrefix(descriptor.getPrefix())) {
+                    && !configAdapter.isUnsecuredPrefix(desc.getPrefix())) {
                 if (referencingNamespace == null || referencingNamespace.isEmpty()) {
                     status = String
                             .format("Access to %s '%s' is not allowed: referencing namespace was empty or null",
@@ -974,6 +979,49 @@ public class DefinitionServiceImpl implements DefinitionService {
         }
 
         return status.isEmpty() ? null : status;
+    }
+
+    /**
+     * Computes access for modules
+     *
+     * @param referencingDescriptor used by
+     * @param def module to be used
+     * @return null for access or String error message
+     */
+    private String computeModuleAccess(DefDescriptor<?> referencingDescriptor, ModuleDef def) {
+        DefDescriptor<?> desc = def.getDescriptor();
+        String targetNamespace = desc.getNamespace();
+        DefinitionAccess access = def.getAccess();
+
+        String aliasedTarget = configAdapter.getModuleNamespaceAliases().get(targetNamespace);
+
+        String from = "";
+        if (referencingDescriptor != null) {
+            String referencingNamespace = referencingDescriptor.getNamespace();
+
+            String alias = configAdapter.getModuleNamespaceAliases().get(referencingNamespace);
+            if (referencingNamespace.equals(targetNamespace) || (alias != null && alias.equals(targetNamespace))
+                    || (aliasedTarget != null && referencingNamespace.equals(aliasedTarget))) {
+                // Modules from the same namespace (or alias namespace) can always access each other
+                return null;
+            }
+
+            boolean isReferencingInternal = configAdapter.isInternalNamespace(referencingNamespace);
+
+            if (access.isGlobal()) {
+                // modules has global access aka expose: true
+                if (isReferencingInternal) {
+                    // referencing is internal namespace
+                    return null;
+                }
+                if (!isReferencingInternal && configAdapter.isAllowedModuleNamespace(targetNamespace) && def.getMinVersion() != null) {
+                    // not internal namespace && namespace allowed to be used externally && module has minVersion
+                    return null;
+                }
+            }
+            from = " from " + referencingNamespace + ":" + referencingDescriptor.getName();
+        }
+        return "Access to MODULE " + targetNamespace + ":" + desc.getName() + " is not allowed" + from;
     }
 
     // FIXME: These should move to caching service.

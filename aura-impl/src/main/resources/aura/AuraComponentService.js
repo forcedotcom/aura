@@ -671,8 +671,8 @@ AuraComponentService.prototype.initModuleDefs = function(modules) {
     var moduleDefRegistry = this.moduleDefRegistry;
 
     modules.forEach(function (module) {
-        var exporter = { "exporter": module["code"] };
-        moduleDefRegistry[module["descriptor"]] = moduleDefRegistry[module["name"]] = exporter;
+        var exporter = { "exporter": module[Json.ApplicationKey.CODE], "minVersion": module[Json.ApplicationKey.MINVERSION], "access": module[Json.ApplicationKey.ACCESS] };
+        moduleDefRegistry[module[Json.ApplicationKey.DESCRIPTOR]] = moduleDefRegistry[module[Json.ApplicationKey.NAME]] = exporter;
     });
 };
 
@@ -786,6 +786,8 @@ AuraComponentService.prototype.createInteropComponentDef = function (descriptor)
         definition   : module.definition,
         descriptor   : module.descriptor,
         moduleName   : module.moduleName,
+        access       : module["access"],
+        minVersion   : module["minVersion"],
         interopClass : Ctor
     });
 

@@ -24,16 +24,20 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import org.auraframework.adapter.ConfigAdapter;
+import com.google.gson.Gson;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.module.ModuleDef;
 import org.auraframework.def.module.ModuleDef.CodeType;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.root.component.ModuleDefImpl;
+import org.auraframework.impl.root.component.ModuleDefImpl.Builder;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.modules.ModulesCompilerData;
+import org.auraframework.modules.impl.source.Meta;
 import org.auraframework.service.ModulesCompilerService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.BundleSource;
 import org.auraframework.system.DefinitionFactory;
 import org.auraframework.system.Location;
@@ -51,7 +55,7 @@ import com.google.common.base.CharMatcher;
 @ServiceComponent
 public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<ModuleDef>, ModuleDef> {
 
-    private ConfigAdapter configAdapter;
+    private static final Gson GSON = new Gson();
     
     private ModulesCompilerService modulesCompilerService;
 
@@ -117,7 +121,8 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         sourceMap.forEach( (desc, entrySource) -> {
             String path = entrySource.getSystemId();
             String relativePath = path.substring(start + 1);
-            if (entrySource instanceof TextSource) {
+            if (entrySource instanceof TextSource && !desc.getPrefix().equals(ModuleDef.META_PREFIX)) {
+                // ignore json config because compiler will do nothing with it
                 sources.put(relativePath, ((TextSource<?>) entrySource).getContents());
             }
         });
@@ -128,14 +133,15 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         builder.setTagName(descriptor.getDescriptorName());
         builder.setLocation(location);
 
-        // access
-        boolean isInInternalNamespace = configAdapter.isInternalNamespace(descriptor.getNamespace());
-        builder.setAccess(new DefinitionAccessImpl(
-                isInInternalNamespace ? AuraContext.Access.INTERNAL : AuraContext.Access.PUBLIC));
+        // default access public
+        builder.setAccess(new DefinitionAccessImpl(AuraContext.Access.PUBLIC));
 
         // module
         builder.setPath(baseFilePath);
         builder.setCustomElementName(getCustomElementName(componentPath));
+
+        // meta (lightning.json)
+        processJson(descriptor, builder, sourceMap);
 
         ModulesCompilerData compilerData;
         try {
@@ -150,6 +156,35 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         builder.setOwnHash(calculateOwnHash(descriptor, codes));
         return builder.build();
     }
+
+    /**
+     * Processes json metadata file.
+     * minVersion - minimum support version
+     *
+     * @param descriptor current descriptor
+     * @param builder def builder
+     * @param sourceMap source map
+     */
+    private void processJson(DefDescriptor<ModuleDef> descriptor, Builder builder,
+                             Map<DefDescriptor<?>, Source<?>> sourceMap) {
+        DefDescriptor<ModuleDef> jsonDefDescriptor = new DefDescriptorImpl<>(ModuleDef.META_PREFIX,
+                descriptor.getNamespace(), descriptor.getName() + "-" + ModuleDef.META_FILE_BASENAME, ModuleDef.class, descriptor);
+        Source<?> jsonSource = sourceMap.get(jsonDefDescriptor);
+        if (jsonSource != null) {
+            if (jsonSource instanceof TextSource) {
+                Meta result = GSON.fromJson(((TextSource<?>) jsonSource).getContents(), Meta.class);
+                Double minVersion = result.getMinVersion();
+                if (minVersion != null) {
+                    builder.setMinVersion(minVersion);
+                }
+                Boolean expose = result.isExpose();
+                if (expose != null && expose) {
+                    builder.setAccess(new DefinitionAccessImpl(Access.GLOBAL));
+                }
+            }
+        }
+    }
+
 
     /**
      * Processes different versions of the compiled code
@@ -245,11 +280,6 @@ public class BundleModuleDefFactory implements DefinitionFactory<BundleSource<Mo
         return hashBuilder.build().toString();
     }
 
-    @Inject
-    public void setConfigAdapter(ConfigAdapter configAdapter) {
-        this.configAdapter = configAdapter;
-    }
-    
     @Inject
     public void setModulesCompilerService(ModulesCompilerService modulesCompilerService) {
         this.modulesCompilerService = modulesCompilerService;

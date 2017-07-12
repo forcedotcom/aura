@@ -79,7 +79,11 @@ public class ModuleDefFileBundleBuilderUnitTest {
         setupMockFile(mockDataJsFile, mockBaseFile, "data.js");
         DefDescriptor<ModuleDef> dataJs = new DefDescriptorImpl<>(DefDescriptor.JAVASCRIPT_PREFIX, "nameSpace", "moduleCmp-data", ModuleDef.class, module);
 
-        File[] baseListFiles = new File[] { mockJsFile, mockCssFile, mockTemplateFile, mockUtilJsFile, mockDataJsFile };
+        File mockJsonFile = mock(File.class);
+        setupMockFile(mockJsonFile, mockBaseFile, "lightning.json");
+        DefDescriptor<ModuleDef> json = new DefDescriptorImpl<>(ModuleDef.META_PREFIX, "nameSpace", "moduleCmp-lightning", ModuleDef.class, module);
+
+        File[] baseListFiles = new File[] { mockJsFile, mockCssFile, mockTemplateFile, mockJsonFile, mockUtilJsFile, mockDataJsFile };
 
         when(mockBaseFile.listFiles()).thenReturn(baseListFiles);
 
@@ -115,6 +119,7 @@ public class ModuleDefFileBundleBuilderUnitTest {
         assertEquals("incorrect base template entry", "/namespace/module-cmp/module-cmp.html", sourceMap.get(template).getSystemId());
         assertEquals("incorrect base utils js entry", "/namespace/module-cmp/utils.js",  sourceMap.get(utilJs).getSystemId());
         assertEquals("incorrect base data js entry", "/namespace/module-cmp/data.js", sourceMap.get(dataJs).getSystemId());
+        assertEquals("incorrect base data js entry", "/namespace/module-cmp/lightning.json", sourceMap.get(json).getSystemId());
     }
 
     /**
@@ -250,7 +255,7 @@ public class ModuleDefFileBundleBuilderUnitTest {
         when(mockSecondNestFolder.getName()).thenReturn("egg");
         when(mockSecondNestFolder.getParentFile()).thenReturn(mockNestFolder);
 
-        File[] nestListFiles = new File[] { mockNestUtilJsFile, mockNestDataJsFile, mockSecondNestFolder };
+        File[] nestListFiles = new File[] { mockSecondNestFolder, mockNestUtilJsFile, mockNestDataJsFile };
 
         File mockSecondNestUtilJsFile = mock(File.class);
         setupMockFile(mockSecondNestUtilJsFile, mockBaseFile, "nest/egg/utils.js");

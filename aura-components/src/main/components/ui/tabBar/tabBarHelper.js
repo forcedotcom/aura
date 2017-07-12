@@ -301,7 +301,8 @@
     },
 
     getActiveTabWidth: function(cmp) {
-        return cmp._activeTab && cmp._activeTab.isValid() ? this.getOuterWidth(cmp._activeTab.getElement()) : 0;
+        var tab = cmp._activeTab;
+        return tab && tab.isValid() && tab.isRendered() ? this.getOuterWidth(tab.getElement()) : 0;
     },
 
     getOverflowMenuWidth: function(cmp) {

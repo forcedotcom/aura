@@ -1341,14 +1341,14 @@ AuraComponentService.prototype.createFromSavedComponentConfigs = function(config
     var definition = typeof cmpConfig === 'function' ? this.hydrateComponent(descriptor, cmpConfig) : cmpConfig;
     // should only allow new ComponentDef when we are sure exporter or component class exists
     var alreadyHasConstructor = this.componentClassRegistry.classConstructors[descriptor] || this.componentClassRegistry.classExporter[descriptor];
-
+    
     // Definitions that come back from the server in the context have their component class on the definition.
     var hasBuiltInConstructor = cmpConfig.hasOwnProperty(Json.ApplicationKey.COMPONENTCLASS);
     if (alreadyHasConstructor || hasBuiltInConstructor) {
         var def = new ComponentDef(definition);
         this.componentDefRegistry[descriptor] = def;
         delete this.savedComponentConfigs[descriptor];
-        return def;
+        return def;        
     }
 
     return null;
@@ -1808,8 +1808,22 @@ AuraComponentService.prototype.createComponentPriv = function (config, callback)
                 auraError.setComponent(descriptor);
                 throw auraError;
             }
+<<<<<<< HEAD
 
             cmp = new classConstructor(config);
+=======
+            try {
+                cmp = new classConstructor(config);
+            } catch (e){
+                if (e instanceof $A.auraError) {
+                    throw e;
+                } else {
+                    var creationError = new $A.auraError("Component class instance initialization error", e);
+                    creationError.setComponent(descriptor);
+                    throw creationError;
+                }
+            }
+>>>>>>> 2554b90... Revert some unrelated changes from vince
         }else{
             var message="Access Check Failed! AuraComponentService.createComponentFromConfig(): '" + descriptor + "' is not visible to '" + currentAccessCmp + "'.";
             if($A.clientService.enableAccessChecks) {

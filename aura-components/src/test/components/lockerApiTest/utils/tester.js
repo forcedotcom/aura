@@ -19,9 +19,9 @@ function tester() {
 		showResults : function(cmp) {
 			cmp.set("v.secureAPI", testName.secureAPI);
 			cmp.set("v.systemAPI", testName.systemAPI);
-			
+
 			var report = makeReport();
-						
+
 			cmp.set("v.report", report);
 		}
 	};
@@ -61,7 +61,7 @@ function tester() {
 		Object.keys(testResults).forEach(function(proto) {
 			// Only execute tests for interfaces that object actually implements
 			var p = window[proto];
-			if (p && raw instanceof p) {			
+			if (p && raw instanceof p) {
 				Object.keys(testResults[proto]).forEach(function(prop) {
 					var index = props.indexOf(prop);
 					if (index >= 0) {
@@ -85,7 +85,7 @@ function tester() {
 		// Always test type
 		var value = object[prop];
 		type.value = getType(value);
-		
+
 		if (plan && plan.type) {
 			if (plan.support === false) {
 				type.status = "fail";
@@ -98,7 +98,7 @@ function tester() {
 					if (type.value === toLockerType(expected)) {
 						type.status = "pass";
 					} else {
-						if ($A.util.isString(plan.support)) {					
+						if ($A.util.isString(plan.support)) {
 							type.status = "warn";
 							type.value = getExternalVersion(plan.support);
 						} else {
@@ -134,15 +134,14 @@ function tester() {
 
 	function addResults(proto, prop, source, results) {
 		if (!testResults) {
-			testResults = {};
+			testResults = Object.create(null);
 		}
 		if (!testResults[proto]) {
-			testResults[proto] = {};
+			testResults[proto] = Object.create(null);
 		}
 		if (!testResults[proto][prop]) {
-			testResults[proto][prop] = {};
+			testResults[proto][prop] = Object.create(null);
 		}
-
 		testResults[proto][prop][source] = results;
 	}
 
@@ -152,7 +151,7 @@ function tester() {
 
 	// Return all tests results by property and by prototype.
 	function makeReport() {
-		// Pivot the data		
+		// Pivot the data
 		var report = {
 			"protos" : Object.keys(testResults).map(function(proto) {
 				return {
@@ -169,10 +168,10 @@ function tester() {
 				};
 			})
 		};
-		
+
 		// Export the results for LockerAPIShapeTest to consume
 		window.__lsTesterReport = report;
-		
+
 		return report;
 	}
 
@@ -211,7 +210,7 @@ function tester() {
 
 	function getType(object) {
 		var type = typeof object;
-				
+
 		if (type === "object") {
 			switch (object) {
 				case Window.prototype:
@@ -303,7 +302,7 @@ function tester() {
 				case SVGElement.prototype:
 					return "SVGElement";
 			}
-			
+
 			// These types have browser compatibility issues currently and have to be guarded
 			if (window.EventTarget && object === window.EventTarget.prototype) {
 				return "EventTarget";
@@ -318,11 +317,11 @@ function tester() {
 			}
 
 			type = Object.prototype.toString.call(object);
-			
+
 			if (type.startsWith("[object ") && type.endsWith("]")) {
 				type = type.substring(8, type.length - 1);
 			}
-			
+
 			// Re-map for older versions of Chrome
 			if (type === "global") {
 				type = "Window";
@@ -330,14 +329,14 @@ function tester() {
 				type = "Object";
 			}
 		}
-		
+
 		return type;
 	}
 
 	function toLockerType(type) {
-		
+
 		// DCHASMAN TODO Improve this to be LS SecureObject savvy!
-		
+
 		switch (type) {
 		case "Window".prototype:
 		case "HTMLDocument":
@@ -349,7 +348,7 @@ function tester() {
 		case "NodeList":
 			return "Array";
 		}
-		
+
 		return type;
 	}
 
@@ -372,14 +371,14 @@ function tester() {
 			return hash;
 		}, {});
 	}
-	
+
 	function getExternalVersion(releaseVersion) {
 		var releaseToExternal = {
 			"202": "Summer'16",
 			"204": "Winter'17",
 			"206": "Spring'17"
 		};
-		
+
 		return releaseToExternal[releaseVersion] || "TBD";
 	}
 

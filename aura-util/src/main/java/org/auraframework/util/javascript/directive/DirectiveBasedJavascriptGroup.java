@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.concurrent.CountDownLatch;
 
 import org.auraframework.util.IOUtil;
@@ -186,8 +187,8 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         libraries.add("aura/resources/moment-timezone/moment-timezone-with-data-1999-2020");
         libraries.add("aura/resources/DOMPurify/DOMPurify");
 
-        StringBuilder libs = new StringBuilder();
-        StringBuilder libsMin = new StringBuilder();
+        StringJoiner libs = new StringJoiner("\n");
+        StringJoiner libsMin = new StringJoiner("\n");
 
         libraries.forEach( (path) -> {
             String source = null;
@@ -197,10 +198,10 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                 minSource = getSource(path +".min.js");
             } catch (MalformedURLException e) {}
             if (source != null) {
-                libs.append(source);
+                libs.add(source);
             }
             if (minSource != null) {
-                libsMin.append(minSource);
+                libsMin.add(minSource);
             }
         });
 
@@ -209,9 +210,9 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
             this.librariesContent = "\nAura.externalLibraries = function() {\n" + libsContent + "\n};";
         }
 
-        String libsContentMin = libs.toString();
+        String libsContentMin = libsMin.toString();
         if (!libsContentMin.isEmpty()) {
-            this.librariesContentMin = "\nAura.externalLibraries = function() { " + libsContentMin + " };";
+            this.librariesContentMin = "\nAura.externalLibraries = function() {\n" + libsContentMin + "\n};";
         }
 
         // Engine

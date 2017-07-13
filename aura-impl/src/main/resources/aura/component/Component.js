@@ -80,105 +80,118 @@ function Component(config, localCreation) {
         //$A.log("l: [" + this.creationPath + "]");
     }
 
-    // create the globally unique id for this component
-    this.setupGlobalId(config["globalId"], localCreation);
+    try {
 
+        // create the globally unique id for this component
+        this.setupGlobalId(config["globalId"], localCreation);
 
-    var partialConfig;
-    if (this.creationPath && this.creationPath !== "client created") {
-        partialConfig = context.getComponentConfig(this.creationPath);
+        var partialConfig;
+        if (this.creationPath && this.creationPath !== "client created") {
+            partialConfig = context.getComponentConfig(this.creationPath);
+    
+            // Done with it in the context, it's now safe to remove so we don't process it again later.
+            context.removeComponentConfig(this.creationPath);
+        }
+    
+        if (partialConfig) {
+            this.validatePartialConfig(config,partialConfig);
+            this.partialConfig = partialConfig;
+        }
+    
+        // get server rendering if there was one
+        if (config["rendering"]) {
+            this.rendering = config["rendering"];
+        } else if (partialConfig && partialConfig["rendering"]) {
+            this.rendering = this.partialConfig["rendering"];
+        }
+    
+        // add this component to the global index
+        $A.componentService.index(this);
+    
+        // sets this components definition, preferring partialconfig if it exists
+        this.setupComponentDef(this.partialConfig || config);
+    
+        // Saves a flag to indicate whether the component implements the root marker interface.
+        this.isRootComponent = $A.util.isUndefinedOrNull(this["meta"] && this["meta"]["extends"]) && this.isInstanceOf("aura:rootComponent");
+    
+        // join attributes from partial config and config, preferring partial when overlapping
+        var configAttributes = { "values": {} };
+    
+        if (config["attributes"]) {
+            $A.util.apply(configAttributes["values"], config["attributes"]["values"], true);
+            configAttributes["valueProvider"] = config["attributes"]["valueProvider"] || config["valueProvider"];
+        }
+    
+        if (partialConfig && partialConfig["attributes"]) {
+            $A.util.apply(configAttributes["values"], partialConfig["attributes"]["values"], true);
+            // NOTE: IT USED TO BE SOME LOGIC HERE TO OVERRIDE THE VALUE PROVIDER BECAUSE OF PARTIAL CONFIGS
+            // IF WE RUN INTO ISSUES AT SOME POINT AFTER HALO, LOOK HERE FIRST!
+        }
+    
+        if (!configAttributes["facetValueProvider"]) {
+            configAttributes["facetValueProvider"] = this;
+        }
+    
+        //JBUCH: HALO: FIXME: THIS IS A DIRTY FILTHY HACK AND I HAVE BROUGHT SHAME ON MY FAMILY
+        this.attributeValueProvider = configAttributes["valueProvider"];
+        this.facetValueProvider = configAttributes["facetValueProvider"];
 
-        // Done with it in the context, it's now safe to remove so we don't process it again later.
-        context.removeComponentConfig(this.creationPath);
-    }
+        // instantiates this components model
+        this.setupModel(config["model"]);
 
-    if (partialConfig) {
-        this.validatePartialConfig(config,partialConfig);
-        this.partialConfig = partialConfig;
-    }
+        // create all value providers for this component m/v/c etc.
+        this.setupValueProviders(config["valueProviders"]);
 
-    // get server rendering if there was one
-    if (config["rendering"]) {
-        this.rendering = config["rendering"];
-    } else if (partialConfig && partialConfig["rendering"]) {
-        this.rendering = this.partialConfig["rendering"];
-    }
+        // initialize attributes
+        this.setupAttributes(configAttributes);
 
-    // add this component to the global index
-    $A.componentService.index(this);
+        // runs component provider and replaces this component with the provided one
+        this.injectComponent(config, localCreation);
 
-    // sets this components definition, preferring partialconfig if it exists
-    this.setupComponentDef(this.partialConfig || config);
+        // instantiates this components methods
+        this.setupMethods(config);
 
-    // Saves a flag to indicate whether the component implements the root marker interface.
-    this.isRootComponent = $A.util.isUndefinedOrNull(this["meta"] && this["meta"]["extends"]) && this.isInstanceOf("aura:rootComponent");
+        // sets up component level events
+        this.setupComponentEvents(this, configAttributes);
 
-    // join attributes from partial config and config, preferring partial when overlapping
-    var configAttributes = { "values": {} };
+        // instantiate super component(s)
+        this.setupSuper(configAttributes, localCreation);
 
-    if (config["attributes"]) {
-        $A.util.apply(configAttributes["values"], config["attributes"]["values"], true);
-        configAttributes["valueProvider"] = config["attributes"]["valueProvider"] || config["valueProvider"];
-    }
+        // for application type events
+        this.setupApplicationEventHandlers();
 
-    if (partialConfig && partialConfig["attributes"]) {
-        $A.util.apply(configAttributes["values"], partialConfig["attributes"]["values"], true);
-        // NOTE: IT USED TO BE SOME LOGIC HERE TO OVERRIDE THE VALUE PROVIDER BECAUSE OF PARTIAL CONFIGS
-        // IF WE RUN INTO ISSUES AT SOME POINT AFTER HALO, LOOK HERE FIRST!
-    }
+        // index this component with its value provider (if it has a localid)
+        this.doIndex(this);
 
-    if (!configAttributes["facetValueProvider"]) {
-        configAttributes["facetValueProvider"] = this;
-    }
+        // instantiate the renderer for this component
 
-    //JBUCH: HALO: FIXME: THIS IS A DIRTY FILTHY HACK AND I HAVE BROUGHT SHAME ON MY FAMILY
-    this.attributeValueProvider = configAttributes["valueProvider"];
-    this.facetValueProvider = configAttributes["facetValueProvider"];
+        // starting watching all values for events
+        this.setupValueEventHandlers(this);
 
-    // instantiates this components model
-    this.setupModel(config["model"]);
+        // setup flavors
+        this.setupFlavors(config, configAttributes);
 
-    // create all value providers for this component m/v/c etc.
-    this.setupValueProviders(config["valueProviders"]);
+        // clean up refs to partial config
+        this.partialConfig = undefined;
 
-    // initialize attributes
-    this.setupAttributes(configAttributes);
+        if (forcedPath && act && this.creationPath) {
+            act.releaseCreationPath(this.creationPath);
+        }
 
-    // runs component provider and replaces this component with the provided one
-    this.injectComponent(config, localCreation);
-
-    // instantiates this components methods
-    this.setupMethods(config);
-
-    // sets up component level events
-    this.setupComponentEvents(this, configAttributes);
-
-    // instantiate super component(s)
-    this.setupSuper(configAttributes, localCreation);
-
-    // for application type events
-    this.setupApplicationEventHandlers();
-
-    // index this component with its value provider (if it has a localid)
-    this.doIndex(this);
-
-    // instantiate the renderer for this component
-
-    // starting watching all values for events
-    this.setupValueEventHandlers(this);
-
-    // setup flavors
-    this.setupFlavors(config, configAttributes);
-
-    // clean up refs to partial config
-    this.partialConfig = undefined;
-
-    if (forcedPath && act && this.creationPath) {
-        act.releaseCreationPath(this.creationPath);
-    }
-
-    if(this.getDef().hasInit()) {
-        this.fire("init");
+        if(this.getDef().hasInit()) {
+            this.fire("init");
+        }
+    } catch (e) {
+        if (e instanceof $A.auraError) {
+            if (!e["component"]) {
+                e.setComponent(config && config["componentDef"] && config["componentDef"]["descriptor"]);
+            }
+            throw e;
+        } else {
+            var creationError = new $A.auraError("Component class instance initialization error", e);
+            creationError.setComponent(config && config["componentDef"] && config["componentDef"]["descriptor"]);
+            throw creationError;
+        }
     }
 }
 

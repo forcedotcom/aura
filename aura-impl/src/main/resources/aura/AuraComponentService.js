@@ -1795,17 +1795,8 @@ AuraComponentService.prototype.createComponentPriv = function (config, callback)
                 auraError.setComponent(descriptor);
                 throw auraError;
             }
-            try {
-                cmp = new classConstructor(config);
-            } catch (e){
-                if (e instanceof $A.auraError) {
-                    throw e;
-                } else {
-                    var creationError = new $A.auraError("Component class instance initialization error", e);
-                    creationError.setComponent(descriptor);
-                    throw creationError;
-                }
-            }
+
+            cmp = new classConstructor(config);
         }else{
             var message="Access Check Failed! AuraComponentService.createComponentFromConfig(): '" + descriptor + "' is not visible to '" + currentAccessCmp + "'.";
             if($A.clientService.enableAccessChecks) {

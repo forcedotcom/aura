@@ -21,6 +21,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
     var SCROLLER = w.__S || (w.__S = {}),
         PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {}),
         Logger   = SCROLLER.Logger,
+        SUPPORT  = SCROLLER.support,
 
         CONFIG_DEFAULTS = {
             labelNoData  : 'No more data to display',
@@ -31,6 +32,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
         },
         CLASS_LOADING = 'loading',
         CLASS_IDLE    = 'il',
+        FORCE_REFLOW_EVENT = 'FORCEREFLOW',
 
         // when zoomed, values become fractional and precision
         // is lost depending on how browsers handle it.
@@ -44,13 +46,18 @@ function lib(w) { //eslint-disable-line no-unused-vars
         init: function () {
             this._mergeInfiniteLoading();
             this.on('_initialize', this._initializeInfiniteLoading);
-            
-            // Allows a forced reflow of this scroller through the firing of a global custom event, "FORCEREFLOW"
-            this._reflowHandler = this._forceReflow.bind(this);
-            document.addEventListener("FORCEREFLOW", this._reflowHandler);
+
+            // reflow only needs to happen to mobile devices using css transition 
+            // with multiple nesting scrollers
+            if (this.opts.useCSSTransition && SUPPORT.touch) {
+                this._reflowHandler = this._forceReflow.bind(this);
+                document.addEventListener(FORCE_REFLOW_EVENT, this._reflowHandler);    
+            }
         },
         destroy: function () {
-        	document.removeEventListener("FORCEREFLOW", this._reflowHandler);
+            if (this.opts.useCSSTransition && SUPPORT.touch) {
+        	   document.removeEventListener(FORCE_REFLOW_EVENT, this._reflowHandler);
+            }
         },
         _mergeInfiniteLoading: function () {
             this.opts.infiniteLoadingConfig = this._mergeConfigOptions(
@@ -249,14 +256,14 @@ function lib(w) { //eslint-disable-line no-unused-vars
             }
         },
         /**
-         * Forces this scroller to reflow after the next aura rendering cycle.
-         * This is used as a workaround for a browser bug where scroller's position is improperly rendered.
+         * Forces this scroller to reflow.
+         * This is used as a workaround where scroller's position is improperly calculated.
          * W-3410155
          */
         _forceReflow: function() {
-            this.scroller.style.position = 'fixed';
+            this.scroller.style.overflow = 'scroll';
             window.setTimeout(function() {
-                this.scroller.style.position = '';
+                this.scroller.style.overflow = '';
             }.bind(this), 0);
         },
         _setNoMoreData: function(noMoreData) {

@@ -32,6 +32,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.javascript.CommonJavascriptGroupImpl;
+import org.auraframework.util.javascript.JavascriptWriter;
 import org.auraframework.util.resource.ResourceLoader;
 import org.auraframework.util.text.Hash;
 
@@ -293,9 +294,11 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         Runnable writeMode = () -> {
             try {
                 Writer writer = null;
-                String libs = mode.allowedInProduction() ? librariesContentMin : librariesContent;
+                JavascriptWriter jsWriter = mode.getJavascriptWriter();
+                boolean minified = jsWriter == JavascriptWriter.CLOSURE_AURA_PROD;
+                String libs = minified ? librariesContentMin : librariesContent;
                 StringWriter stringWriter = new StringWriter();
-                mode.getJavascriptWriter().compress(everything, stringWriter, modeJs.getName());
+                jsWriter.compress(everything, stringWriter, modeJs.getName());
                 String compressed = stringWriter.toString();
 
                 for (File output : filesToWrite) {
@@ -305,7 +308,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                         if (mode != JavascriptGeneratorMode.DOC) {
                             // jsdoc errors when parsing engine.js
                             boolean isCompat = output.getName().contains(COMPAT_SUFFIX);
-                            String eng = mode.allowedInProduction() ?
+                            String eng = minified ?
                                     (isCompat ? engineCompatMin : engineMin) :
                                     (isCompat ? engineCompat : engine);
                             writer.append(eng);

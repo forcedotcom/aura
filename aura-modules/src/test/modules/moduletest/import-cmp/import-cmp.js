@@ -1,4 +1,5 @@
 import engine from 'engine';
+// eslint-disable-next-line raptor/no-compat
 import aura from 'aura';
 import storage from 'aura-storage';
 
@@ -19,6 +20,4 @@ export default class ImportCmp extends engine.Element {
     getAuraStorage(f) {
         f(storage);
     }
-
-
 }

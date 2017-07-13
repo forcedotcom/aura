@@ -1,4 +1,4 @@
-module.exports = {
+{
     "extends" : [ "plugin:raptor/recommended" ],
     "plugins" : [ "raptor" ],
     "rules" : {
@@ -9,8 +9,10 @@ module.exports = {
                         "raptor/no-set-timeout" : [ "**/aura-modules/src/test/modules/moduletest/async/async.js" ],
                         "dot-notation" : [ "**/aura-modules/src/test/modules/moduletest/exports/exports.js" ],
                         "no-console" : [ "**/src/test/modules/**/*.js" ],
-                        "no-unused-vars" : [ "**/src/test/modules/**/*.js" ]
+                        "no-unused-vars" : [ "**/src/test/modules/**/*.js" ],
+                        "raptor/no-compat" : [ "**/aura-modules/src/test/modules/moduletest/import-cmp/import-cmp.js" ],
+                        "raptor/no-compat-execute" : [ "**/aura-modules/src/test/modules/moduletest/exports/exports.js" ]
                     }
                 } ]
     }
-};
+}

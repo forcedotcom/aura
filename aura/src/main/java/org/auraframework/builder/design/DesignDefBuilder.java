@@ -20,14 +20,11 @@ import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignDef;
-import org.auraframework.def.design.DesignLayoutDef;
 import org.auraframework.def.design.DesignTemplateDef;
 
 public interface DesignDefBuilder extends RootDefinitionBuilder<DesignDef> {
     public DesignDefBuilder addAttributeDesign(DefDescriptor<DesignAttributeDef> desc,
             DesignAttributeDef attributeDesign);
-
-    public DesignDefBuilder addLayoutDesign(String desc, DesignLayoutDef layoutDesign);
 
     public DesignDefBuilder setLabel(String label);
 

@@ -15,23 +15,18 @@
  */
 package org.auraframework.integration.test.java.design;
 
+import java.util.Map;
+
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignDef;
-import org.auraframework.def.design.DesignItemsDef;
-import org.auraframework.def.design.DesignLayoutDef;
-import org.auraframework.def.design.DesignLayoutItemDef;
-import org.auraframework.def.design.DesignSectionDef;
 import org.auraframework.def.design.DesignTemplateDef;
 import org.auraframework.def.design.DesignTemplateRegionDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.junit.Test;
-
-import java.util.Iterator;
-import java.util.Map;
 
 public class DesignDefTest extends AuraImplTestCase {
     @Test
@@ -138,48 +133,6 @@ public class DesignDefTest extends AuraImplTestCase {
         for (DefDescriptor<InterfaceDef> intf : regionThree.getAllowedInterfaces()) {
             assertTrue("InterfaceDef not found!", intf.exists());
         }
-    }
-
-    /**
-     * Design layouts should allow multiple layouts, sections, items and item. This tests the order and overall
-     * functionality of the design system.
-     * @throws Exception
-     */
-    @Test
-    public void testDesignLayoutWithMultipleSectionsAndItems() throws Exception {
-        ComponentDef cmp = definitionService.getDefinition("test:fakeDesign", ComponentDef.class);
-        DesignDef c = cmp.getDesignDef();
-        //Get default layout (empty string is default)
-        DesignLayoutDef layout = c.getDefaultDesignLayoutDef();
-        assertNotNull(layout);
-
-        DesignLayoutDef secondLayout = c.getDesignLayoutDefs().get("second");
-        assertNotNull("Unable to retrieve second layout", secondLayout);
-
-        //Sections should keep order
-        Iterator<DesignSectionDef> sections = layout.getSections().iterator();
-        DesignSectionDef firstSection = sections.next();
-        assertEquals("Name of first section was incorrect, maybe order incorrect", "", firstSection.getName());
-        DesignSectionDef secondSection = sections.next();
-        assertEquals("Name of second section was incorrect, maybe order incorrect", "second", secondSection.getName());
-
-        //Items should keep order as well
-        Iterator<DesignItemsDef> items = firstSection.getItems().iterator();
-        DesignItemsDef firstItem = items.next();
-        assertEquals("Items name was incorrect, should be default of empty string", "", firstItem.getName());
-        DesignItemsDef secondItem = items.next();
-        assertEquals("Items name was incorrect, maybe order is not preserved", "second", secondItem.getName());
-
-        //And layoutItem as well
-        Iterator<DesignLayoutItemDef> layoutItems = firstItem.getItems().iterator();
-        DesignLayoutItemDef firstLayoutItem = layoutItems.next();
-        assertTrue("First layout attribute should be an attribute", firstLayoutItem.isAttribute());
-        assertEquals("Name of the first layout attribute is incorrect", "something", firstLayoutItem.getAttribute().getName());
-        DesignLayoutItemDef secondLayoutItem = layoutItems.next();
-        assertFalse("Second item should be a component, got attribute instead", secondLayoutItem.isAttribute());
-        DefDescriptor<ComponentDef> cmpDef = definitionService.getDefDescriptor("ui:button", ComponentDef.class);
-        assertEquals("Second layout components name incorrect", cmpDef, secondLayoutItem.getComponent().getComponentDef());
-
     }
 
     @Test

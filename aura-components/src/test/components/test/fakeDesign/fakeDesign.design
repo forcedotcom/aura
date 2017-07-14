@@ -13,30 +13,4 @@
         <design:region name="regionTwo"/>
         <design:region name="regionThree" allowedInterfaces="test:fakeInterface,auratest:testInterface"/>
     </design:template>
-
-    <design:layout>
-        <design:section>
-            <design:layoutItems>
-                <design:layoutAttribute name="something"/>
-                <design:layoutComponent name="ui:button"/>
-            </design:layoutItems>
-            <design:layoutItems name="second">
-                <design:layoutAttribute name="else"/>
-            </design:layoutItems>
-        </design:section>
-
-        <design:section name="second">
-            <design:layoutItems>
-                <design:layoutAttribute name="entities"/>
-            </design:layoutItems>
-        </design:section>
-    </design:layout>
-
-    <design:layout name="second">
-        <design:section>
-            <design:layoutItems>
-                <design:layoutAttribute name="something"/>
-            </design:layoutItems>
-        </design:section>
-    </design:layout>
 </design:component>

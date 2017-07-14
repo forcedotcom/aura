@@ -620,7 +620,7 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
 
     // See if there is a component specific class
     var def = config["componentDef"];
-    var desc = def["descriptor"] || def;
+    var desc = def[Json.ApplicationKey.DESCRIPTOR] || def;
     // Not sure why you would pass in the ComponentDef as the descriptor, but it's being done.
     if(desc.getDescriptor) {
         desc = desc.getDescriptor().getQualifiedName();
@@ -634,7 +634,7 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
     // config["componentClass"] - Result of a getComponent() action
     // config["componentDef"]["componentClass"] - Result of sending component defs back from the server.
     // Always comes back as a function to execute, which defines the component classes.
-    var componentClassDef = config["componentClass"] || config["componentDef"]["componentClass"];
+    var componentClassDef = config["componentClass"] || config["componentDef"][Json.ApplicationKey.COMPONENTCLASS];
     if(componentClassDef && !this.hasComponentClass(desc)) {
         componentClassDef = $A.util.globalEval(componentClassDef, $A.clientService.getSourceMapsUrl(desc));
         componentClassDef();
@@ -1125,7 +1125,7 @@ AuraComponentService.prototype.getComponentConfigs = function(config, attributeV
     var componentDef = configuration["componentDef"];
     def = this.getDef(componentDef);
 
-    if (!def && componentDef["attributeDefs"]) {
+    if (!def && componentDef[Json.ApplicationKey.ATTRIBUTEDEFS]) {
         // create definition if it doesn't current exist and component definition config provided
         def = this.createComponentDef(componentDef);
     }
@@ -1133,7 +1133,7 @@ AuraComponentService.prototype.getComponentConfigs = function(config, attributeV
     if (def) {
         desc = def.getDescriptor().toString();
     } else {
-        desc = componentDef["descriptor"] ? componentDef["descriptor"] : componentDef;
+        desc = componentDef[Json.ApplicationKey.DESCRIPTOR] ? componentDef[Json.ApplicationKey.DESCRIPTOR] : componentDef;
     }
 
     return {
@@ -1643,23 +1643,23 @@ AuraComponentService.prototype.saveComponentConfig = function(config) {
 
     this.savedComponentConfigs[componentDescriptor] = config;
 
-    var controllerDef = config["controllerDef"];
+    var controllerDef = config[Json.ApplicationKey.CONTROLLERDEF];
     if (controllerDef) {
-        if (controllerDef["descriptor"]) {
+        if (controllerDef[Json.ApplicationKey.DESCRIPTOR]) {
             // save reference to component descriptor for ControllerDef
-            this.controllerDefRelationship[controllerDef["descriptor"]] = componentDescriptor;
+            this.controllerDefRelationship[controllerDef[Json.ApplicationKey.DESCRIPTOR]] = componentDescriptor;
         }
 
-        if (controllerDef["actionDefs"]) {
-            var actionDefs = controllerDef["actionDefs"],
+        if (controllerDef[Json.ApplicationKey.ACTIONDEFS]) {
+            var actionDefs = controllerDef[Json.ApplicationKey.ACTIONDEFS],
                 len = actionDefs.length,
                 i;
 
             for (i = 0; i < len; i++) {
                 // loop and save reference to ComponentDef descriptor for each ActionDef
                 var actionDef = actionDefs[i];
-                if (actionDef["descriptor"]) {
-                    this.actionDefRelationship[actionDef["descriptor"]] = componentDescriptor;
+                if (actionDef[Json.ApplicationKey.DESCRIPTOR]) {
+                    this.actionDefRelationship[actionDef[Json.ApplicationKey.DESCRIPTOR]] = componentDescriptor;
                 }
             }
         }

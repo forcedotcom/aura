@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.EnumSet;
 
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -34,6 +35,7 @@ import com.google.common.collect.ImmutableList;
  * {@link DirectiveBasedJavascriptGroup}. Javascript files can be grouped in modules. This helps in keeping the
  * javascript modularized.
  */
+@UnAdaptableTest("Gold files will yield different results depending on available classpath")
 public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
     /**
      * Should not be able to specify a Directory as start file for a Javascript group

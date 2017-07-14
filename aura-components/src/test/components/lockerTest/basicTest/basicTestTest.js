@@ -182,7 +182,7 @@
             cmp.testAddExpandoToCachedItem();
         }
     },
-    
+
     testSecureElementPrototypeCounterMeasures: {
         test: function(cmp) {
             cmp.testSecureElementPrototypeCounterMeasures();
@@ -210,13 +210,13 @@
             cmp.testInstanceOf(window);
         }
     },
-    
+
     testFilteringProxy: {
         test: function(cmp) {
             function TestPrototype() {
             	return this;
             };
-                        
+
             var o = Object.create(TestPrototype.prototype, {
             	someProperty: {
             		configurable: true,
@@ -228,7 +228,7 @@
             		configurable: true,
             		value: "nonEnumerablePropertyValue",
             	},
-            	
+
             	foo: {
             		enumerable: true,
             		value: function() {
@@ -236,7 +236,7 @@
             		}
             	}
             });
-                                   
+
             var otherNamespace = cmp.find("otherNamespace");
             otherNamespace.set("v.obj", o);
             otherNamespace.setupTestFilteringProxy();
@@ -245,7 +245,7 @@
             helper._o = o;
             helper._TestPrototype = TestPrototype;
             helper._po = otherNamespace.getDef().getHelper()._po;
-            
+
             cmp.testFilteringProxy();
         }
     }

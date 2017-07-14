@@ -47,15 +47,38 @@
         testUtils.assertTrue(this === cmp, "Expected 'this' in Locker controller to be the SecureComponent");
     },
 
+    // Reference W-2961201
     testDefineGetterExploit: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
+
+        var defprop = ({}).__defineGetter__;
+
+        // Without our patch:
+        // - On Safari the defineGetter call errors with
+        //   "TypeError: undefined is not an object"
+        // - On Firefox the defineGetter call errors with
+        //   "TypeError: can't convert undefined to object"
+        // - On Chrome, the property is defined on window.
+        // With our patch:
+        // - On all browsers, we should get somehting along the lines
+        //   "TypeError: Object.defineProperty called on non-object".
+        // See https://github.com/tc39/ecma262/issues/907
         try {
-            var defprop = ({}).__defineGetter__;
+            // This might not fail, the TC39 specifications appear to have a
+            // but. We might be checking for a side effect by expecting an
+            // error. See https://github.com/tc39/ecma262/issues/907
             defprop('FOO', function() { return this; });
-            testUtils.fail("Expected attempt to overwrite __defineGetter__ to throw an error");
-        } catch (e) {
-            testUtils.assertStartsWith("TypeError", e.toString(), "Unexpected error. Expected TypeError, got " + e);
+        } catch(e) {
+          // Checking for the error message is incorrect: many situations can
+          // create that error (for example, a coding error in our secure
+          // implementation can generate an error of any type), and the error
+          // messages are too inconsistent to be reliable (we might disable
+          // our workaround for the platform that behave properly).
         }
+
+        // The exploit we need to guard against is the creation of a property
+        // FOO accessible in the current context (and giving us access to window).
+        testUtils.assertTrue(typeof FOO === 'undefined', "And unexpected property FOO was found in the current context");
     },
 
     testSetTimeoutNonFunctionParamExploit: function(cmp) {

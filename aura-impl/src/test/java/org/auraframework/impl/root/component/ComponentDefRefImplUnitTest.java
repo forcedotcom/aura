@@ -24,6 +24,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.root.component.ComponentDefRefImpl.Builder;
 import org.auraframework.impl.system.DefinitionImplUnitTest;
+import org.auraframework.system.Location;
+import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.util.Map;
@@ -60,5 +62,17 @@ public class ComponentDefRefImplUnitTest extends
             }
         }
         return super.buildDefinition(builder);
+    }
+    
+
+
+    @Test
+    public void testEqualsNullLocation() throws Exception {
+        Builder builder = getBuilder();
+        ComponentDefRef cdr1 = builder.build();
+        assertNull("Location should initialize to null", cdr1.getLocation());
+        ComponentDefRef cdr2 = builder.build();
+        assertNull("Location should initialize to null", cdr2.getLocation());
+        assertEquals(cdr1,  cdr2);
     }
 }

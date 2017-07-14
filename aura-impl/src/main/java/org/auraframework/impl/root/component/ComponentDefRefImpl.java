@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ComponentDefRefBuilder;
@@ -198,7 +199,7 @@ public class ComponentDefRefImpl extends DefinitionReferenceImpl<ComponentDef> i
             ComponentDefRefImpl other = (ComponentDefRefImpl) obj;
 
             // TODO: factor attributeDefs into this? #W-689622
-            return descriptor.equals(other.getDescriptor()) && location.equals(other.getLocation());
+            return Objects.equals(descriptor, other.getDescriptor()) && Objects.equals(location, other.getLocation());
         }
 
         return false;

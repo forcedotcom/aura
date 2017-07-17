@@ -14,8 +14,24 @@
  * limitations under the License.
  */
 ({
+
     testUTCToWallTime: {
         test: function() {
+            var date = $A.localizationService.parseDateTimeISO8601("2013-12-03T06:01:00.000Z");
+            var format = "MMM d, yyyy h:mm:ss a";
+            var expected = "Dec 3, 2013 1:01:00 AM";
+
+            $A.localizationService.UTCToWallTime(date, "America/New_York", function(walltime) {
+                var actual = $A.localizationService.formatDateTimeUTC(walltime, format);
+                $A.test.assertEquals(expected, actual);
+            });
+        }
+    },
+
+    testUTCToWallTimeWhenGlobalMomentGetsOverridden :{
+        test: function() {
+            window.moment = {};
+
             var date = $A.localizationService.parseDateTimeISO8601("2013-12-03T06:01:00.000Z");
             var format = "MMM d, yyyy h:mm:ss a";
             var expected = "Dec 3, 2013 1:01:00 AM";

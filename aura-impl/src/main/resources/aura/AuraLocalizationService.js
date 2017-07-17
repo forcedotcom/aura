@@ -315,7 +315,7 @@ AuraLocalizationService.prototype.displayDurationInYears = function(d) {
  * @platform
  */
 AuraLocalizationService.prototype.duration = function(num, unit) {
-    return unit ? moment["duration"](num, unit) : moment["duration"](num);
+    return unit ? this.moment["duration"](num, unit) : this.moment["duration"](num);
 };
 
 /**
@@ -334,7 +334,7 @@ AuraLocalizationService.prototype.duration = function(num, unit) {
  * @platform
  */
 AuraLocalizationService.prototype.endOf = function(date, unit) {
-    return moment(date)["endOf"](unit)["toDate"]();
+    return this.moment(date)["endOf"](unit)["toDate"]();
 };
 
 /**
@@ -356,7 +356,7 @@ AuraLocalizationService.prototype.endOf = function(date, unit) {
  * @platform
  */
 AuraLocalizationService.prototype.formatDate = function(date, formatString, locale) {
-    var mDate = moment(date);
+    var mDate = this.moment(date);
     if (!mDate || !mDate["isValid"]()) {
         throw { message: "Invalid date value" };
     }
@@ -403,7 +403,7 @@ AuraLocalizationService.prototype.formatDate = function(date, formatString, loca
  * @platform
  */
 AuraLocalizationService.prototype.formatDateUTC = function(date, formatString, locale) {
-    var mDate = moment["utc"](date);
+    var mDate = this.moment["utc"](date);
     if (!mDate || !mDate["isValid"]()) {
         throw { message: "Invalid date value" };
     }
@@ -450,7 +450,7 @@ AuraLocalizationService.prototype.formatDateUTC = function(date, formatString, l
  * @platform
  */
 AuraLocalizationService.prototype.formatDateTime = function(date, formatString, locale) {
-    var mDate = moment(date);
+    var mDate = this.moment(date);
     if (!mDate || !mDate["isValid"]()) {
         throw { message: "Invalid date time value" };
     }
@@ -496,7 +496,7 @@ AuraLocalizationService.prototype.formatDateTime = function(date, formatString, 
  * @platform
  */
 AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatString, locale) {
-    var mDate = moment["utc"](date);
+    var mDate = this.moment["utc"](date);
     if (!mDate || !mDate["isValid"]()) {
         throw { message: "Invalid date time value" };
     }
@@ -543,7 +543,7 @@ AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatStrin
  * @platform
  */
 AuraLocalizationService.prototype.formatTime = function(date, formatString, locale) {
-    var mDate = moment(date);
+    var mDate = this.moment(date);
     if (!mDate || !mDate["isValid"]()) {
         throw { message: "Invalid time value" };
     }
@@ -590,7 +590,7 @@ AuraLocalizationService.prototype.formatTime = function(date, formatString, loca
  * @platform
  */
 AuraLocalizationService.prototype.formatTimeUTC = function(date, formatString, locale) {
-    var mDate = moment["utc"](date);
+    var mDate = this.moment["utc"](date);
     if (!mDate || !mDate["isValid"]()) {
         throw { message: "Invalid time value" };
     }
@@ -663,7 +663,7 @@ AuraLocalizationService.prototype.getHoursInDuration = function(d) {
 AuraLocalizationService.prototype.getLocalizedDateTimeLabels = function() {
     var langLocale = $A.get("$Locale.langLocale");
     var l = this.getAvailableMomentLocale(langLocale);
-    return moment["localeData"](l);
+    return this.moment["localeData"](l);
 };
 
 /**
@@ -839,7 +839,7 @@ AuraLocalizationService.prototype.isPeriodTimeView = function(pattern) {
  * @platform
  */
 AuraLocalizationService.prototype.isAfter = function(date1, date2, unit) {
-    return moment(date1)["isAfter"](date2, unit);
+    return this.moment(date1)["isAfter"](date2, unit);
 };
 
 /**
@@ -860,7 +860,7 @@ AuraLocalizationService.prototype.isAfter = function(date1, date2, unit) {
  * @platform
  */
 AuraLocalizationService.prototype.isBefore = function(date1, date2, unit) {
-    return moment(date1)["isBefore"](date2, unit);
+    return this.moment(date1)["isBefore"](date2, unit);
 };
 
 /**
@@ -883,7 +883,7 @@ AuraLocalizationService.prototype.isBefore = function(date1, date2, unit) {
  * @platform
  */
 AuraLocalizationService.prototype.isSame = function(date1, date2, unit) {
-    return moment(date1)["isSame"](date2, unit);
+    return this.moment(date1)["isSame"](date2, unit);
 };
 
 /**
@@ -907,7 +907,7 @@ AuraLocalizationService.prototype.isSame = function(date1, date2, unit) {
  * @platform
  */
 AuraLocalizationService.prototype.isBetween = function(date, fromDate, toDate, unit) {
-    return moment(date)["isBetween"](fromDate, toDate, unit, '[]');
+    return this.moment(date)["isBetween"](fromDate, toDate, unit, '[]');
 };
 
 /**
@@ -951,7 +951,7 @@ AuraLocalizationService.prototype.parseDateTime = function(dateTimeString, parse
 
     var format = strictParsing ? this.getStrictModeFormat(parseFormat) : this.getNormalizedFormat(parseFormat);
     var value = strictParsing ? this.getStrictModeDateTimeString(dateTimeString) : dateTimeString;
-    var mDate = moment(value, format, this.getAvailableMomentLocale(langLocale), strictParsing);
+    var mDate = this.moment(value, format, this.getAvailableMomentLocale(langLocale), strictParsing);
     if (!mDate || !mDate["isValid"]()) {
         return null;
     }
@@ -973,7 +973,7 @@ AuraLocalizationService.prototype.parseDateTimeISO8601 = function(dateTimeString
         return null;
     }
 
-    var mDate = moment(dateTimeString);
+    var mDate = this.moment(dateTimeString);
     if (mDate && mDate["isValid"]()) {
         return mDate["toDate"]();
     }
@@ -1025,7 +1025,7 @@ AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, pa
 
     var format = strictParsing ? this.getStrictModeFormat(parseFormat) : this.getNormalizedFormat(parseFormat);
     var value = strictParsing ? this.getStrictModeDateTimeString(dateTimeString) : dateTimeString;
-    var mDate = moment["utc"](value, format, this.getAvailableMomentLocale(langLocale), strictParsing);
+    var mDate = this.moment["utc"](value, format, this.getAvailableMomentLocale(langLocale), strictParsing);
     if (!mDate || !mDate["isValid"]()) {
         return null;
     }
@@ -1048,7 +1048,7 @@ AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, pa
  * @platform
  */
 AuraLocalizationService.prototype.startOf = function(date, unit) {
-    return moment(date)["startOf"](unit)["toDate"]();
+    return this.moment(date)["startOf"](unit)["toDate"]();
 };
 
 /**
@@ -1214,9 +1214,9 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
         return;
     }
 
-    if (!moment["tz"]) {
+    if (!this.moment["tz"]) {
         var message = "AuraLocalizationService.UTCToWallTime(): moment-timezone lib is missing on moment. " +
-                      "It could be overridden by another version of moment-js in userland code. Current moment-js version: " + moment["version"];
+                      "It could be overridden by another version of moment-js in userland code. Current moment-js version: " + this.moment["version"];
         $A.warning(message);
         $A.logger.reportError(new $A.auraError(message));
 
@@ -1224,7 +1224,7 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
         return;
     }
 
-    if (!timezone || !moment["tz"]["zone"](timezone)) {
+    if (!timezone || !this.moment["tz"]["zone"](timezone)) {
         $A.warning("AuraLocalizationService.UTCToWallTime(): unsupported time zone: " +
             timezone + ". Fallback to default timezone.");
         timezone = $A.get("$Locale.timezone");
@@ -1237,9 +1237,9 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
 
     var walltimeDate = date;
     try {
-        var zone = moment["tz"]["zone"](timezone);
+        var zone = this.moment["tz"]["zone"](timezone);
         var offset = zone["offset"](date.getTime());
-        var walltime = moment(date)["subtract"](offset, "minutes");
+        var walltime = this.moment(date)["subtract"](offset, "minutes");
         walltimeDate = walltime["toDate"]();
     } catch (e) {
         // the try-catch block is just for backward compatibility, so that there is no any error
@@ -1272,9 +1272,9 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
         return;
     }
 
-    if (!moment["tz"]) {
+    if (!this.moment["tz"]) {
         var message = "AuraLocalizationService.WallTimeToUTC(): moment-timezone lib is missing on moment. " +
-                      "It could be overridden by another version of moment-js in userland code. Current moment-js version: " + moment["version"];
+                      "It could be overridden by another version of moment-js in userland code. Current moment-js version: " + this.moment["version"];
         $A.warning(message);
         $A.logger.reportError(new $A.auraError(message));
 
@@ -1282,7 +1282,7 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
         return;
     }
 
-    if (!timezone || !moment["tz"]["zone"](timezone)) {
+    if (!timezone || !this.moment["tz"]["zone"](timezone)) {
         $A.warning("AuraLocalizationService.WallTimeToUTC(): unsupported time zone: " +
             timezone + ". Fallback to default timezone.");
         timezone = $A.get("$Locale.timezone");
@@ -1295,9 +1295,9 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
 
     var utcDate = date;
     try {
-        var zone = moment["tz"]["zone"](timezone);
+        var zone = this.moment["tz"]["zone"](timezone);
         var offset = zone["offset"](date.getTime());
-        var utc = moment(date)["add"](offset, "minutes");
+        var utc = this.moment(date)["add"](offset, "minutes");
         utcDate = utc["toDate"]();
     } catch (e) {
         // the try-catch block is just for backward compatibility, so that there is no any error
@@ -1326,6 +1326,9 @@ AuraLocalizationService.prototype.init = function() {
         Aura["loadLocaleData"] = undefined;
     }
 
+    // using local reference to prevent Aura depended moment gets overriden
+    this.moment = moment;
+
     // TODO: remove this when locales are consolidated.
     // Caching all available locales. This is for backward compatibility. At this moment, there are three locales
     // in Locale Value Provider. Keep them all available for now to avoid breaking consumers.
@@ -1340,7 +1343,7 @@ AuraLocalizationService.prototype.init = function() {
     this.localeCache[ltngLocale] = this.normalizeToMomentLocale(ltngLocale);
 
     // set moment default locale
-    moment.locale(this.localeCache[langLocale]);
+    this.moment.locale(this.localeCache[langLocale]);
 };
 
 /**
@@ -1356,7 +1359,7 @@ AuraLocalizationService.prototype.normalizeToMomentLocale = function(locale) {
     }
 
     // all locales that have been loaded in moment
-    var locales = moment["locales"]();
+    var locales = this.moment["locales"]();
     var momentLocale;
 
     var normalized = this.normalizeLocale(locale);

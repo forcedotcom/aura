@@ -384,12 +384,10 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
     @Test
     public void testExtendedAppWithRegisteredEventsAsync() throws Exception {
-        DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
-                ComponentDef.class,
-                getIntegrationStubMarkup(
-                        "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererWithExtendedApp",
-                        true, true, true, true)
-                );
+        String integrationStubMarkup = getIntegrationStubMarkup(
+                "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererWithExtendedApp",
+                true, true, true, true);
+        DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(ComponentDef.class, integrationStubMarkup);
         verifyComponentWithRegisteredEvents(stub, true);
     }
 
@@ -400,12 +398,11 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
     @Test
     public void testComponentWithRegisteredEvents() throws Exception {
+        String integrationStubMarkup = getIntegrationStubMarkup(
+                "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForAISWithCustomJScript",
+                true, true, true);
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
-                ComponentDef.class,
-                getIntegrationStubMarkup(
-                        "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForAISWithCustomJScript",
-                        true, true, true)
-                );
+                ComponentDef.class, integrationStubMarkup);
         verifyComponentWithRegisteredEvents(stub, false);
     }
 
@@ -416,12 +413,11 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
     @Test
     public void testComponentWithRegisteredEventsAsync() throws Exception {
+        String integrationStubMarkup = getIntegrationStubMarkup(
+                "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForAISWithCustomJScript",
+                true, true, true, true);
         DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
-                ComponentDef.class,
-                getIntegrationStubMarkup(
-                        "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForAISWithCustomJScript",
-                        true, true, true, true)
-                );
+                ComponentDef.class, integrationStubMarkup);
         verifyComponentWithRegisteredEvents(stub, false);
     }
 

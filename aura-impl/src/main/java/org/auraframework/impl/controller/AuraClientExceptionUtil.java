@@ -44,6 +44,9 @@ public class AuraClientExceptionUtil {
             auraClientException.setFailedComponentMethod(parts[parts.length-1]);
         }
 
+        // parse out ://
+        parts[0] = parts[0].replaceAll("\\S+://", "");
+
         // namespace:name
         String[] componentInfoParts = parts[0].split(":");
         if (componentInfoParts.length > 1) {

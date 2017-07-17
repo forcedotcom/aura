@@ -190,12 +190,22 @@ AuraError.prototype.findComponentFromStackTrace = function() {
         if (fileName && fileName.match(/aura_[^\.]+\.js$/gi) === null) {
             var pathParts = fileName.replace(".js", "").split("/");
 
+            // aura components: ORIGIN/components/namespace/name.js
             if (pathParts[pathParts.length - 3] === "components") {
                 return "markup://" + pathParts.slice(-2).join(":");
             }
+            // aura libraries: ORIGIN/libraries/namespace/libraryName/name.js
             if (pathParts[pathParts.length - 4] === "libraries") {
                 pathParts = pathParts.slice(-3);
                 return "js://" + pathParts[0] + ":" + pathParts[1] + "." + pathParts[2];
+            }
+
+            // module components: ORIGIN/components/namespace-name.js
+            if (pathParts[pathParts.length - 2] === "components") {
+                var moduleName = pathParts[pathParts.length - 1];
+                pathParts = moduleName.split(/-(.+)/);
+                // convert to Aura descriptor
+                return pathParts[0] + ":" + $A.util.hyphensToCamelCase(pathParts[1]);
             }
         }
     }

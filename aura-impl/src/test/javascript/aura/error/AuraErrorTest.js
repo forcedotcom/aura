@@ -23,19 +23,31 @@ Test.Aura.AuraErrorTest = function() {
     var _murmurHash3;
     var _generateErrorId;
     var _generateErrorIdHashGen;
+    var _Util;
 
     Mocks.GetMocks(Object.Global(), {
-        "Aura": {Errors: {}},
+        "Aura": {
+            "Errors": {},
+            "Utils": {
+                "SecureFilters": {}
+            }
+        },
+        "navigator": {
+            "userAgent": ""
+        },
+        "window": {}
     })(function() {
         Import("aura-impl/src/main/resources/aura/polyfill/stackframe.js");
         Import("aura-impl/src/main/resources/aura/polyfill/error-stack-parser.js");
         Import("aura-impl/src/main/resources/aura/error/AuraError.js");
+        Import("aura-impl/src/main/resources/aura/util/Util.js");
         _StackFrame = StackFrame;
         _ErrorStackParser = ErrorStackParser;
         _AuraError = AuraError;
         _murmurHash3 = Aura.Errors.MurmurHash3;
         _generateErrorId = Aura.Errors.GenerateErrorId;
         _generateErrorIdHashGen = Aura.Errors.GenerateErrorIdHashGen;
+        _Util = Aura.Utils.Util;
         delete StackFrame;
         delete ErrorStackParser;
         delete AuraError;
@@ -43,7 +55,7 @@ Test.Aura.AuraErrorTest = function() {
 
     function getAuraMock(during) {
         return Mocks.GetMocks(Object.Global(), {
-            Aura: {
+            "Aura": {
                 Errors: {
                     AuraError: _AuraError,
                     StackFrame: _StackFrame,
@@ -52,7 +64,15 @@ Test.Aura.AuraErrorTest = function() {
                     GenerateErrorId: _generateErrorId,
                     GenerateErrorIdHashGen: _generateErrorIdHashGen,
                 }
+            },
+            "$A": {
+                // To create util object, it needs to import couple more files,
+                // so only injects needed function here.
+                util: {
+                    hyphensToCamelCase: _Util.prototype.hyphensToCamelCase
+                }
             }
+
         })(during);
     }
 
@@ -313,6 +333,23 @@ Object.show()@https://gus.lightning.force.com/components/ui/panel.js:12:177\n\
 show()@https://gus.lightning.force.com/components/ui/panel.js:3:398";
 
             var expected = "js://ui:panelPositioningLib.elementProxyFactory";
+
+            var actual;
+            getAuraMock(function() {
+                var auraError = new Aura.Errors.AuraError(null, innerError);
+                actual = auraError.findComponentFromStackTrace();
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ReturnsFailingDescriptorForModule() {
+            var innerError = new Error();
+            innerError.message = "Error from module";
+            innerError.stack = "eval()@http://pre-compiling.lightning.localhost.soma.force.com:6109/components/one-app-nav-bar-item.js:57:23";
+
+            var expected = "one:appNavBarItem";
 
             var actual;
             getAuraMock(function() {

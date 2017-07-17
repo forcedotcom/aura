@@ -16,7 +16,7 @@
 ({
     updateTemplate:function(cmp){
         if(!cmp.get("v.updating")){
-            cmp.set("v.template", cmp.get("v.body"));
+            cmp.set("v.template",cmp.get("v.body"));
         }
         cmp.set("v.updating",false);
     },
@@ -26,36 +26,47 @@
         // No value, clear out body
         if(!value||!$A.util.isString(value)){
             cmp.set("v.updating",true);
-            return cmp.getSuper().set("v.body",[]);
+            cmp.getSuper().set("v.body",[]);
+            return;
         }
 
         // No template, or no format index in value, use value as is
         var formatRegex=/\{(\d+)\}/gm;
         var template=cmp.get("v.template");
         if(!template||!template.length||!formatRegex.test(value)){
-            // JBUCH: CHANGE TO $A.createComponent ONCE COMPONENTCONFIGS ARE AVAILABLE
-            var valueText=$A.createComponentFromConfig({descriptor:"markup://aura:text",attributes:{value:value}});
             cmp.set("v.updating",true);
-            return cmp.getSuper().set("v.body",[valueText]);
+            $A.createComponent("aura:text",{"value":value},function(valueText){
+                cmp.getSuper().set("v.body",[valueText]);
+            });
+            return;
         }
 
         // Replace as many indexes as we can find, or as many body components, whichever comes first
+        var texts=[];
         var body=[];
         var startIndex=0;
-        value.replace(formatRegex, function(match, position, index) {
-            var substitution = template[position];
-            if (substitution !== undefined) {
-                // JBUCH: CHANGE TO $A.createComponent ONCE COMPONENTCONFIGS ARE AVAILABLE
-                body.push($A.createComponentFromConfig({descriptor:"markup://aura:text",attributes:{value:value.substring(startIndex,index)}}));
+        value.replace(formatRegex,function(match,position,index){
+            var substitution=template[position];
+            if(substitution!==undefined){
+                texts.push(["aura:text",{"value":value.substring(startIndex,index)}]);
+                body.push(null);
                 body.push(substitution);
                 startIndex=index+match.length;
             }
         });
         // Append the tail of the string
         if(startIndex<value.length){
-            body.push($A.createComponentFromConfig({descriptor:"markup://aura:text",attributes:{value:value.substring(startIndex)}}));
+            texts.push(["aura:text",{"value":value.substring(startIndex)}]);
+            body.push(null);
         }
         cmp.set("v.updating",true);
-        cmp.getSuper().set("v.body",body);
+        $A.createComponents(texts,function(valueTexts){
+            for(var i=0;i<body.length;i++){
+                if(body[i]===null){
+                    body[i]=valueTexts.shift();
+                }
+            }
+            cmp.getSuper().set("v.body",body);
+        });
     }
-})// eslint-disable-line semi
+})//eslint-disable-line semi

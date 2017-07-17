@@ -1,3 +1,5 @@
+
+
 new function() {
 var rrrrr = "ARRRRRRRR";
 function dress() {
@@ -15,3 +17,4 @@ var stuff = {$i$:"am string", $numeros$:23525, $blah$:function(food) {
 }};
 
 };
+

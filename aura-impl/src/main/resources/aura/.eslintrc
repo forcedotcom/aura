@@ -153,7 +153,7 @@
     "ls_registerFilteringProxy": true,
     "ls_isSecureFunction": true,
     "ls_registerSecureFunction": true,
-    "lazyInitInlinedSafeEvalWorkaround": true,
+    "InitSecureEval": true,
     "SVGGraphicsElement": true,
     "SVGGeometryElement": true,
     "Attr"

@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-// DCHASMAN TODO Revert this after we clear issues with CKEditor and unsafe inline from W-3028925
-function lazyInitInlinedSafeEvalWorkaround() {
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// WARNING: IF YOU MODIFY THIS FILE, YOU MUST MANUALLY UPDATE THE MINIFIED VERSION:
+//
+// npm install -g uglifyjs
+// cd aura-resources/src/main/resources/aura/resources/lockerservice
+// uglifyjs InlineSafeEval.js -c -m -o InlineSafeEval.min.js
+//
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 	if (!window['$$safe-eval$$']) {
 	  (function (window, placeholder, parent) {
 	      'use strict';
@@ -91,7 +98,7 @@ function lazyInitInlinedSafeEvalWorkaround() {
 	                  var fn = evalAndReturn(addLexicalScopesToSource(src, {
 	                      levels: args.length,
 	                      useStrict: true,
-	                      sourceURL: sourceURL, 
+	                      sourceURL: sourceURL,
 	                      skipPreprocessing: skipPreprocessing
 	                  }));
 	                  return fn.apply(undefined, args);
@@ -150,4 +157,3 @@ function lazyInitInlinedSafeEvalWorkaround() {
 	      }
 	  })(window, document.body, window);
 	}
-}

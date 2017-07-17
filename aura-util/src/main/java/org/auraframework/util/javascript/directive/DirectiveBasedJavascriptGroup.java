@@ -113,6 +113,10 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
     private String librariesContent = "";
     private String librariesContentMin = "";
+
+    private String secureEval = "";
+    private String secureEvalMin = "";
+
     private String engine = "";
     private String engineMin = "";
     private String engineCompat= "";
@@ -215,6 +219,23 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
             this.librariesContentMin = "\nAura.externalLibraries = function() {\n" + libsContentMin + "\n};";
         }
 
+        // Locker Secure Evaluator
+        String secureEvalSource = null;
+        String secureEvalMinSource = null;
+        try {
+            secureEvalSource = getSource("aura/resources/lockerservice/InlineSafeEval.js");
+            secureEvalMinSource = getSource("aura/resources/lockerservice/InlineSafeEval.min.js");
+        }  catch (MalformedURLException e) {}
+
+        if (secureEvalSource != null) {
+            this.secureEval = "\nInitSecureEval = function() {\n" + secureEvalSource + "\n};";
+        }
+
+        if (secureEvalMinSource != null) {
+            this.secureEvalMin = "\nInitSecureEval = function() {\n" + secureEvalMinSource + "\n};";
+        }
+
+
         // Engine
         String engineSource = null;
         String engineMinSource = null;
@@ -234,21 +255,20 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         if (engineSource != null) {
             this.engine = "try {\n" + engineSource + "\n} catch (e) {}";
         }
-        
+
         if (engineMinSource != null) {
             this.engineMin = "try { " + engineMinSource + " } catch (e) {}";
         }
-        
+
         if (compatHelpersSource != null && engineCompatSource != null) {
             this.engineCompat = "try {\n" + compatHelpersSource + "\n" + engineCompatSource + "\n} catch (e) {}";
         }
-        
+
         if (compatHelpersMinSource != null && engineCompatMinSource != null) {
             this.engineCompatMin = "try { " + compatHelpersMinSource + "\n" + engineCompatMinSource + " } catch (e) {}";
         }
 
         // TODO COMPAT : prefetch compat helper resources
-
     }
 
     private String getSource(String path) throws MalformedURLException {
@@ -298,6 +318,8 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                 JavascriptWriter jsWriter = mode.getJavascriptWriter();
                 boolean minified = jsWriter == JavascriptWriter.CLOSURE_AURA_PROD;
                 String libs = minified ? librariesContentMin : librariesContent;
+                String eval = mode.allowedInProduction() ? secureEvalMin : secureEval;
+
                 StringWriter stringWriter = new StringWriter();
                 jsWriter.compress(everything, stringWriter, modeJs.getName());
                 String compressed = stringWriter.toString();
@@ -306,16 +328,21 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                     if (writtenFiles.contains(output)) continue;
                     try {
                         writer = new FileWriter(output);
+
                         if (mode != JavascriptGeneratorMode.DOC) {
                             // jsdoc errors when parsing engine.js
                             boolean isCompat = output.getName().contains(COMPAT_SUFFIX);
                             String eng = minified ?
                                     (isCompat ? engineCompatMin : engineMin) :
                                     (isCompat ? engineCompat : engine);
-                            writer.append(eng);
+                            writer.append(eng).append("\n");
                             // TODO COMPAT : append compat helpers
                         }
-                        writer.append(compressed).append("\n").append(libs);
+
+                        writer.append(eval).append("\n");
+                        writer.append(compressed).append("\n");
+                        writer.append(libs).append("\n");
+
                     } finally {
                         if (writer != null) {
                             writer.close();

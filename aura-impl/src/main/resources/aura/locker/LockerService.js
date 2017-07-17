@@ -16,7 +16,6 @@
 function LockerService() {
     "use strict";
 
-    // #include aura.locker.InlineSafeEval
     // #include aura.locker.LockerKeyManager
     // #include aura.locker.SecureObject
     // #include aura.locker.SecureDOMEvent
@@ -210,7 +209,7 @@ function LockerService() {
                 var envRec;
 
                 if (!lockerShadows) {
-                    lazyInitInlinedSafeEvalWorkaround();
+                    InitSecureEval();
                 }
 
                 if (forceLocker || this.isEnabled()) {

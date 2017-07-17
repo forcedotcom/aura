@@ -58,7 +58,7 @@
         <npm.download.root.url>http://repo.auraframework.org/simple/plugins-release-local/npm/</npm.download.root.url>
         <node.version>v4.2.1</node.version>
         <npm.version>2.14.7</npm.version>
-        <eslint.extra.arg>--version</eslint.extra.arg>
+        <eslint.extra.arg>--no-color</eslint.extra.arg>
     </properties>
     <repositories>
         <repository>
@@ -1062,7 +1062,7 @@
                 <plugin>
                     <groupId>org.auraframework</groupId>
                     <artifactId>tools-maven-plugin</artifactId>
-                    <version>0.0.41</version>
+                    <version>0.0.42</version>
                     <configuration>
                         <arguments>
                             <argument>${eslint.extra.arg}</argument>

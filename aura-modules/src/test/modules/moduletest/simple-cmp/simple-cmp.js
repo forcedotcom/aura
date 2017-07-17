@@ -1,5 +1,6 @@
 import { Element } from "engine";
-import { const1 } from "moduleTest:testLib"; // eslint-disable-line no-unused-vars
+// eslint-disable-next-line no-unused-vars, raptor/no-aura-libs
+import { const1 } from "moduleTest:testLib";
 import { log } from "util.js"; // eslint-disable-line no-unused-vars
 
 export default class Simple extends Element {
@@ -21,9 +22,9 @@ export default class Simple extends Element {
 
     handlePressEvent() {
         const event = new CustomEvent('press', {
-            bubbles: true,
+            bubbles   : true,
             cancelable: true,
-            detail: { value: 'test!' }
+            detail    : { value: 'test!' }
         });
 
         this.dispatchEvent(event);

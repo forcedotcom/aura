@@ -178,7 +178,7 @@ InteropComponent.prototype.setupMethods = function () {
 };
 
 /**
- * Function called when an attribute changed in Aura lang
+ * Function called when an attribute changed in Aura land
  * @param key - { String }
  * @param value - { String }
  */
@@ -298,7 +298,9 @@ InteropComponent.prototype.setGlobalAttribute = function (element, attrName, val
 InteropComponent.prototype.get = function (key) {
     key = $A.expressionService.normalize(key);
     var path = key.split('.');
-    path.shift();
+    path.shift(); // remove provider
+    $A.assert(path.length === 1, 'This component does not allow to get nested properties');
+
     var prop = $A.expressionService.resolve(path.join('.'), this.attributes);
 
     if (prop !== undefined && prop !== null) {
@@ -328,12 +330,28 @@ InteropComponent.prototype.set = function (key, value) {
             + ' is not the owner of property "' + expr 
             + '" and should not change it directly'
         );
-
         attrValue.value.set(value);
+    } else if (attrValue.getExpression) { // PRV
+        attrValue.set(value);
     } else {
         this.attributes[expr] = value;
-        this.attributeChange(expr, value);
     }
+};
+
+InteropComponent.prototype.attachOnChangeToElement = function (element) {
+    var self = this;
+    function handleInteropChange(event) {
+        var detail = event.detail;
+        if (detail && event.target === element) {
+            Object.keys(detail).forEach(function (attrName) {
+                if (self.attributes[attrName]) {
+                    self.set('v.' + attrName, detail[attrName]);
+                }
+            });
+        }
+    }
+    
+    element.addEventListener('change', handleInteropChange);
 };
 
 /**
@@ -342,8 +360,10 @@ InteropComponent.prototype.set = function (key, value) {
  */
 InteropComponent.prototype.render = function () {
     var Ctor = this.interopClass;
-    var element = window["Engine"]['createElement'](this.componentDef.elementName, { 'is': Ctor });
+    var element = window['Engine']['createElement'](this.componentDef.elementName, { 'is': Ctor });
     var cmp = this;
+
+    this.attachOnChangeToElement(element);
 
     Object.keys(this.attributes).forEach(function (attrName) {
         var value = cmp.get('v.' + attrName);
@@ -358,6 +378,7 @@ InteropComponent.prototype.render = function () {
             }
         }
     }.bind(this));
+
 
     return [element];
 };

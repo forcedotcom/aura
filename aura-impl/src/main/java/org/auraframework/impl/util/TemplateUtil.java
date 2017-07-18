@@ -26,7 +26,8 @@ public class TemplateUtil {
         SYNC("<script src=\"%s\"></script>"),
         ASYNC("<script src=\"%s\" async defer></script>"),
         DEFER("<script src=\"%s\" defer></script>"),
-        LAZY("<script data-src=\"%s\"></script>");
+        LAZY("<script data-src=\"%s\"></script>"),
+        UNSAFELINE("<script>%s</script>");
 
         private final String tag;
 
@@ -62,6 +63,14 @@ public class TemplateUtil {
                 } else {
                     out.append(String.format(HTML_STYLE, style));
                 }
+            }
+        }
+    }
+
+    public void writeUnsafeInlineHtmlScripts(AuraContext context, List<String> scripts, Appendable out) throws IOException {
+        if (scripts != null) {
+            for (String src : scripts) {
+                out.append(Script.UNSAFELINE.toHTML(src));
             }
         }
     }

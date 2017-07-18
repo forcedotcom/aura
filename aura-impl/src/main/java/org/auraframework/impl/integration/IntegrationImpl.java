@@ -319,6 +319,8 @@ public class IntegrationImpl implements Integration {
 
             sb.setLength(0);
             templateUtil.writeInlineHtmlScripts(context, servletUtilAdapter.getScripts(context, false, false, null), sb);
+            //inline.js is not included with AIS but the non-templated scripts associated with inline are still required
+            templateUtil.writeUnsafeInlineHtmlScripts(context, Lists.newArrayList(servletUtilAdapter.getInlineJs(context, appDef)), sb);
             attributes.put("auraScriptTags", sb.toString());
 
             StyleDef styleDef = templateDef.getStyleDef();

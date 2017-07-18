@@ -1110,9 +1110,15 @@ AuraClientService.prototype.showErrorDialogWithReload = function(e, additionalLo
                 context = $A.getContext().encodeForServer(true);
             } catch (ce) {
                 // special "UNKNOWN" case will allow reportFailedAction's to be logged, but nothing else. This will return a COOSE, but we don't check the response here and there's little more we can do about it.
-                context = {"fwuid": AuraClientService.UNKNOWN_FRAMEWORK_UID};
+                context = $A.util.json.encode({"fwuid": AuraClientService.UNKNOWN_FRAMEWORK_UID});
             }
-            xhr.send("message=" + encodeURIComponent(JSON.stringify(payload)) + "&aura.context=" + encodeURIComponent(JSON.stringify(context)));
+
+            var params = {
+                    "message=": $A.util.json.encode(payload),
+                    "aura.context": context
+            };
+            var queryString = this.buildParams(params);
+            xhr.send(queryString);
         }
     }
 };

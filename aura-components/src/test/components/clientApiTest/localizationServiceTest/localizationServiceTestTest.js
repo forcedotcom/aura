@@ -28,8 +28,10 @@
         }
     },
 
-    testUTCToWallTimeWhenGlobalMomentGetsOverridden :{
+    testUTCToWallTimeWhenGlobalMomentGetsOverridden: {
         test: function() {
+            var momentJs = window.moment;
+            $A.test.addCleanup(function() { window.moment = momentJs });
             window.moment = {};
 
             var date = $A.localizationService.parseDateTimeISO8601("2013-12-03T06:01:00.000Z");

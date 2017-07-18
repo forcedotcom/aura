@@ -22,6 +22,7 @@ import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptProcessingError.Level;
 import org.auraframework.util.javascript.directive.DirectiveParser;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 
 import javax.inject.Inject;
@@ -32,6 +33,7 @@ import java.util.Set;
 /**
  * Automation for Aura JavascriptGroup.
  */
+@UnAdaptableTest("JS Generation only happens in file system mode. When running in UITier we're not going to have the right access to the file system. These tests still run in OSS Build.")
 public class AuraJavascriptGroupTest extends AuraImplTestCase {
     @Inject
     private FileMonitor fileMonitor;

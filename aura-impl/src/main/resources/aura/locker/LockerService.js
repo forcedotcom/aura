@@ -17,7 +17,6 @@ function LockerService() {
     "use strict";
 
     // #include aura.locker.LockerKeyManager
-    // #include aura.locker.SecureObject
     // #include aura.locker.SecureDOMEvent
     // #include aura.locker.SecureIFrameElement
     // #include aura.locker.SecureElement
@@ -36,6 +35,8 @@ function LockerService() {
     // #include aura.locker.SecureComponentRef
     // #include aura.locker.SecureLocation
     // #include aura.locker.SecurePropertyReferenceValue
+    // #include aura.locker.SecureCanvasRenderingContext2D
+    // #include aura.locker.SecureObject
 
     var lockers = [];
     var keyToEnvironmentMap = {};

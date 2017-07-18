@@ -114,6 +114,7 @@
     "HTMLTrackElement": true,
     "SecureAura": true,
     "SecureObject": true,
+    "SecureCanvasRenderingContext2D": true,
     "SecureComponentRef": true,
     "SecureComponent": true,
     "SecureMutationObserver": true,

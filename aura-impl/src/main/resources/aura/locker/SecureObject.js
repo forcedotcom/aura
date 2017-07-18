@@ -189,6 +189,9 @@ SecureObject.filterEverything = function(st, raw, options) {
                 SecureObject.addPropertyIfSupported(swallowed, raw, "opener");
 
                 mutated = true;
+            } else if (raw instanceof CanvasRenderingContext2D) {
+                swallowed = SecureCanvasRenderingContext2D(raw, key);
+                mutated = true;
             } else if (SecureObject.isUnfilteredType(raw)) {
                 // return raw for unfiltered types
                 mutated = false;
@@ -1444,6 +1447,8 @@ function getSupportedInterfaces(o) {
         interfaces.push("CharacterData", "Node");
     } else if (o instanceof Attr) {
         interfaces.push("Attr", "Node", "EventTarget");
+    } else if (o instanceof CanvasRenderingContext2D) {
+        interfaces.push("CanvasRenderingContext2D");
     }
 
     return interfaces;

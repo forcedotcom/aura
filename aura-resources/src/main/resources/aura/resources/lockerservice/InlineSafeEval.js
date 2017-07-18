@@ -17,11 +17,13 @@
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // WARNING: IF YOU MODIFY THIS FILE, YOU MUST MANUALLY UPDATE THE MINIFIED VERSION:
 //
-// npm install -g uglifyjs
+// npm install -g uglify-js
 // cd aura-resources/src/main/resources/aura/resources/lockerservice
 // uglifyjs InlineSafeEval.js -c -m -o InlineSafeEval.min.js
 //
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+/* global scriptNonce */
 
 	if (!window['$$safe-eval$$']) {
 	  (function (window, placeholder, parent) {
@@ -73,9 +75,9 @@
 	      function evalAndReturn(src) {
 	          var script = document.createElement('script');
 	          script.type = 'text/javascript';
-	          if ($A.context.scriptNonce){
+	          if (scriptNonce){
 	              var nonce = document.createAttribute("nonce");
-	              nonce.value = $A.context.scriptNonce;
+	              nonce.value = scriptNonce;
 	              script.attributes.setNamedItem(nonce);
 	          }
 	          window[hookFn] = undefined;

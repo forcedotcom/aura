@@ -228,11 +228,11 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         }  catch (MalformedURLException e) {}
 
         if (secureEvalSource != null) {
-            this.secureEval = "\nInitSecureEval = function() {\n" + secureEvalSource + "\n};";
+            this.secureEval = "\nInitSecureEval = function(scriptNonce) {\n" + secureEvalSource + "\n};";
         }
 
         if (secureEvalMinSource != null) {
-            this.secureEvalMin = "\nInitSecureEval = function() {\n" + secureEvalMinSource + "\n};";
+            this.secureEvalMin = "\nInitSecureEval = function(scriptNonce) {\n" + secureEvalMinSource + "\n};";
         }
 
 

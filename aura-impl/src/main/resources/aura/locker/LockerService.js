@@ -44,6 +44,7 @@ function LockerService() {
 
     var isLockerInitialized;
     var isLockerEnabled = false;
+    var scriptNonce;
 
     // This whilelist represents reflective ECMAScript APIs or reflective DOM APIs
     // which, by definition, do not provide authority or access to globals.
@@ -118,6 +119,7 @@ function LockerService() {
             initialize: function(context) {
                 if (!isLockerInitialized) {
                     isLockerEnabled = (context && !!context["ls"]) && this.containerSupportsRequiredFeatures();
+                    scriptNonce = (context && context["scriptNonce"]);
                     isLockerInitialized = true;
                 }
             },
@@ -210,7 +212,7 @@ function LockerService() {
                 var envRec;
 
                 if (!lockerShadows) {
-                    InitSecureEval();
+                    InitSecureEval(scriptNonce);
                 }
 
                 if (forceLocker || this.isEnabled()) {

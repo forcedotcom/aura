@@ -254,18 +254,22 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * @private
 		 */
 		_createIndicator : function() {
+            var indicator = document.createElement('div');
+            var indicatorClasses = $A.util.isString(this.config.indicatorClasses) ? this.config.indicatorClasses : '';
 
+            indicatorClasses = indicatorClasses.split(/\s+/);
+            // We should manually add all classes because IE does not support multiple arguments for 'add' https://developer.mozilla.org/en-US/docs/Web/API/Element/classList
+            for (var i = 0; i < indicatorClasses.length; i++) {
+                indicator.classList.add(indicatorClasses[i]);
+            }
 
-			var indicator = document.createElement('div');
-	    	indicator.classList.add(this.config.indicatorClasses);
-	    	indicator.classList.add("indicator");
+            indicator.classList.add("indicator");
+            var columnDivider = document.createElement('span');
+            columnDivider.classList.add(COLUMN_DIVIDER_CLASS);
 
-	    	var columnDivider = document.createElement('span');
-	    	columnDivider.classList.add(COLUMN_DIVIDER_CLASS);
+            indicator.appendChild(columnDivider);
 
-	    	indicator.appendChild(columnDivider);
-
-	    	return indicator;
+            return indicator;
 		},
 
 		/**

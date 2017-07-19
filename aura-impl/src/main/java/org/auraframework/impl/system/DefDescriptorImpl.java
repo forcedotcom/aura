@@ -44,7 +44,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     private final int hashCode;
 
     public DefDescriptorImpl(DefDescriptor<?> associate, Class<T> defClass, String newPrefix) {
-        this.bundle = null;
         this.defType = DefType.getDefType(defClass);
         this.prefix = newPrefix;
         this.name = associate.getName();
@@ -54,6 +53,12 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         int pos = name.indexOf('<');
         this.nameParameters = pos >= 0 ? name.substring(pos).replaceAll("\\s", "") : null;
         this.hashCode = createHashCode();
+        // FIXME This is a bit ugly.
+        if (this.defType == DefType.TESTSUITE) {
+            this.bundle = associate;
+        } else {
+            this.bundle = null;
+        }
     }
 
     public DefDescriptorImpl(String prefix, String namespace, String name, Class<T> defClass) {
@@ -331,7 +336,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     public T getDef() throws QuickFixException {
         return Aura.getDefinitionService().getDefinition(this);
     }
-
+    
     public static <E extends Definition> DefDescriptor<E> getAssociateDescriptor(DefDescriptor<?> desc,
             Class<E> defClass, String newPrefix) {
         if (desc == null) {

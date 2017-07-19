@@ -44,7 +44,7 @@
     },
 
     facetChange: function(cmp, event) {
-        if(this.updating){
+        if(cmp.updating){
             return;
         }
         var j;
@@ -71,16 +71,16 @@
                 facets[i][j].autoDestroy(false);
             }
         }
-        this.updating=true;
+        cmp.updating=true;
         cmp.set("v.body", isTrue?template:elseTemplate);
-        this.updating=false;
+        cmp.updating=false;
     },
 
     updateBody:function(cmp){
         var isTrue = $A.util.getBooleanValue(cmp.get("v.isTrue"));
-        this.updating=true;
+        cmp.updating=true;
         cmp.set("v.body", isTrue?cmp.get("v.template"):cmp.get("v.else"));
-        this.updating=false;
+        cmp.updating=false;
     }
 
 })// eslint-disable-line semi

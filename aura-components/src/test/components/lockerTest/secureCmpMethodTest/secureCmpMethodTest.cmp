@@ -16,17 +16,31 @@
 
 -->
 <aura:component implements="aura:requireLocker">
-    <aura:attribute name="testUtils" type="Object" description="Test utility with assert methods defined" />
-    <aura:attribute name="strAttr" type="String"/>
-    <aura:attribute name="listAttr" type="List"/>
-    <aura:attribute name="ObjAttr" type="Object"/>
-    <aura:method name="testMethodParamFilteringOnNonLockerFacet"/>
-    <aura:method name="testMethodParamFilteringInSameLocker"/>
-    <aura:method name="testMethodParamFilteringInDifferentLocker"/>
+    <aura:attribute name="testUtils" type="Object"/>
 
-    <lockerTest:nonlockerizedFacet aura:id="unlockedFacet"/>
+    <aura:attribute name="booleanAttr" type="Boolean"/>
+    <aura:attribute name="dateAttr" type="Date"/>
+    <aura:attribute name="dateTimeAttr" type="DateTime"/>
+    <aura:attribute name="decimalAttr" type="Decimal"/>
+    <aura:attribute name="doubleAttr" type="Double"/>
+    <aura:attribute name="integerAttr" type="Integer"/>
+    <aura:attribute name="longAttr" type="Long"/>
+    <aura:attribute name="stringAttr" type="String"/>
+    <aura:attribute name="stringArrayAttr" type="String[]"/>
+    <aura:attribute name="objectAttr" type="Object"/>
+    <aura:attribute name="listAttr" type="List"/>
+    <aura:attribute name="mapAttr" type="Map"/> 
+    <aura:attribute name="setAttr" type="Set"/>
+
+    <aura:method name="testMethodParamFilteringOnLockerFacetInSame"/>
+    <aura:method name="testMethodParamFilteringOnNonLockerFacetInSame"/>
+    <aura:method name="testMethodParamFilteringOnLockerFacetInDifferent"/>
+    <aura:method name="testMethodParamFilteringOnNonLockerFacetInDifferent"/>
+
     <div aura:id="resultHolder"></div>
 
-    <lockerTest:facet aura:id="sameLocker"/>
-    <lockerTestOtherNamespace:facetLocked aura:id="differentLocker"/>
+    <lockerTest:facet aura:id="lockerFacetInSame"/>
+    <lockerTest:nonlockerizedFacet aura:id="nonLockerFacetInSame"/>
+    <lockerTestOtherNamespace:facetLocked aura:id="lockerFacetInDifferent"/>
+    <lockerTestOtherNamespace:facetUnlocked aura:id="nonLockerFacetInDifferent"/>
 </aura:component>

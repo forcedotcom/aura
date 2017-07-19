@@ -12,21 +12,27 @@
         cmp.set("v.testUtils", $A.test);
     },
 
-    testMethodParamFilteringOnNonLockerFacet : {
+    testMethodParamFilteringOnLockerFacetInSame : {
         test: function(cmp) {
-            cmp.testMethodParamFilteringOnNonLockerFacet();
+            cmp.testMethodParamFilteringOnLockerFacetInSame();
         }
     },
 
-    testMethodParamFilteringInSameLocker : {
+    testMethodParamFilteringOnNonLockerFacetInSame : {
         test: function(cmp) {
-            cmp.testMethodParamFilteringInSameLocker();
+            cmp.testMethodParamFilteringOnNonLockerFacetInSame();
         }
     },
 
-    testMethodParamFilteringInDifferentLocker : {
+    testMethodParamFilteringOnLockerFacetInDifferent : {
         test: function(cmp) {
-            cmp.testMethodParamFilteringInDifferentLocker();
+            cmp.testMethodParamFilteringOnLockerFacetInDifferent();
+        }
+    },
+
+    testMethodParamFilteringOnNonLockerFacetInDifferent : {
+        test: function(cmp) {
+            cmp.testMethodParamFilteringOnNonLockerFacetInDifferent();
         }
     }
 })

@@ -19,10 +19,22 @@
     <aura:attribute name="methodCalled" type="Boolean"/>
     <aura:method name="inspectMethodParams" action="{!c.inspectMethodParams}">
         <aura:attribute name="cmpParam" type="String"/>
-        <aura:attribute name="strParam" type="String"/>
-        <aura:attribute name="listParam" type="List"/>
-        <aura:attribute name="objParam" type="Object"/>
         <aura:attribute name="testUtils" type="Object"/>
+
+        <aura:attribute name="booleanParam" type="Boolean"/>
+        <aura:attribute name="dateParam" type="Date"/>
+        <aura:attribute name="dateTimeParam" type="DateTime"/>
+        <aura:attribute name="decimalParam" type="Decimal"/>
+        <aura:attribute name="doubleParam" type="Double"/>
+        <aura:attribute name="integerParam" type="Integer"/>
+        <aura:attribute name="longParam" type="Long"/>
+        <aura:attribute name="stringParam" type="String"/>
+        <aura:attribute name="stringArrayParam" type="String[]"/>
+        <aura:attribute name="objectParam" type="Object"/>
+        <aura:attribute name="listParam" type="List"/>
+        <aura:attribute name="mapParam" type="Map"/> 
+        <aura:attribute name="setParam" type="Set"/>
+        
         <aura:attribute name="resultHolder" type="Object"/>
     </aura:method>
 </aura:component>

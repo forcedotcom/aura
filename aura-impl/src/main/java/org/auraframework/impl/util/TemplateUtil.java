@@ -41,6 +41,7 @@ public class TemplateUtil {
     }
 
     private static final String PREFETCH_TAG = "<link rel=\"prefetch\" href=\"%s\" as=\"script\"/>\n";
+    private static final String PRELOAD_TAG = "<link rel=\"preload\" href=\"%s\" as=\"script\"/>\n";
 
     private static final String HTML_STYLE = "<link href=\"%s\" rel=\"stylesheet\" type=\"text/css\"/>\n";
     private static final String HTML_STYLE_CLASSED = "<link href=\"%s\" class=\"%s\" rel=\"stylesheet\" type=\"text/css\"/>\n";
@@ -111,6 +112,14 @@ public class TemplateUtil {
         if (scriptUrls != null) {
             for (String url : scriptUrls) {
                 out.append(String.format(PREFETCH_TAG, url));
+            }
+        }
+    }
+    
+    public void writePreloadScriptTags(List<String> scriptUrls, Appendable out) throws IOException {
+        if (scriptUrls != null) {
+            for (String url : scriptUrls) {
+                out.append(String.format(PRELOAD_TAG, url));
             }
         }
     }

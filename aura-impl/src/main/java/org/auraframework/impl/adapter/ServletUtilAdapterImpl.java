@@ -437,6 +437,18 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     public List <String> getJsPrefetchUrls(AuraContext context) throws QuickFixException {
         return getClientLibraryJSPrefetchUrls(context);
     }
+    
+	@Override
+	public List<String> getJsPreloadUrls(AuraContext context) throws QuickFixException {
+		final List<String> urls = Lists.newArrayList();
+		if(context.isAppJsSplitEnabled()) {
+			urls.add(this.getAppJsUrl(context, null));
+			urls.add(this.getAppCoreJsUrl(context, null));
+		} else {
+			urls.add(this.getAppJsUrl(context, null));
+		}
+		return urls;
+	}
 
     @Override
     @Deprecated
@@ -1025,4 +1037,5 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     private static final String SAFE_EVAL_HTML_URI = "/lockerservice/safeEval.html";
+
 }

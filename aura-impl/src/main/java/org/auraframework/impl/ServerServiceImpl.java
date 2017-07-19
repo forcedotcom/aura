@@ -620,6 +620,7 @@ public class ServerServiceImpl implements ServerService {
 
         StringBuilder sb = new StringBuilder();
 
+        templateUtil.writePreloadScriptTags(servletUtilAdapter.getJsPreloadUrls(context), sb);
         templateUtil.writePrefetchScriptTags(servletUtilAdapter.getJsPrefetchUrls(context), sb);
         attributes.put("prefetchTags", sb.toString());
         sb.setLength(0);

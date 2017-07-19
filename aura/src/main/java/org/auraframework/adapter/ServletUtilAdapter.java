@@ -251,12 +251,23 @@ public interface ServletUtilAdapter extends AuraAdapter {
             AuraContext context) throws IOException;
 
     void checkFrameworkUID(AuraContext context) throws ClientOutOfSyncException;
-    
+
     /**
      * Get all the urls to include in the Prefetch block of the page.
+     * You would want to prefetch something that you expect COULD be used on this page or another page the user could visit.
      * 
      * @param context
      * @return
      */
     List<String> getJsPrefetchUrls(AuraContext context) throws QuickFixException;
+    
+    /**
+     * Get all the urls to include as Preloads. 
+     * These are scripts we know with 99% certainty the user will be using in the loading of the page. 
+     * We just want to start them downloading as soon as possible. 
+     * 
+     * @param context
+     * @return
+     */
+    List<String> getJsPreloadUrls(AuraContext context) throws QuickFixException;
 }

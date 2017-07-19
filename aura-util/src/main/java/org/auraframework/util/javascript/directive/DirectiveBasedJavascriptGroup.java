@@ -341,8 +341,13 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
                         writer.append(eval).append("\n");
                         writer.append(compressed).append("\n");
-                        writer.append(libs).append("\n");
 
+                        // strip out spaces and comments for external libraries
+                        jsWriter = JavascriptWriter.CLOSURE_WHITESPACE_ONLY;
+                        stringWriter = new StringWriter();
+                        jsWriter.compress(libs, stringWriter, modeJs.getName());
+                        compressed = stringWriter.toString();
+                        writer.append(compressed).append("\n");
                     } finally {
                         if (writer != null) {
                             writer.close();

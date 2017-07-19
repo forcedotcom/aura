@@ -32,6 +32,13 @@ import com.google.javascript.jscomp.Compiler;
  */
 public enum JavascriptWriter {
 
+    CLOSURE_WHITESPACE_ONLY {
+        @Override
+        public void setClosureOptions(CompilerOptions options) {
+            CompilationLevel.WHITESPACE_ONLY.setOptionsForCompilationLevel(options);
+        }
+    },
+
     CLOSURE_WHITESPACE {
         @Override
         public void setClosureOptions(CompilerOptions options) {

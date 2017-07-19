@@ -49,6 +49,7 @@ public class AuraConfiguration {
             "Event",
             "Function.name",
             "Function.prototype.bind",
+            "Map",
             "Object.keys",
             "Object.assign",
             "requestAnimationFrame",

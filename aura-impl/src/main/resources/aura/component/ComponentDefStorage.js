@@ -143,17 +143,20 @@ ComponentDefStorage.prototype.getStorage = function () {
  * @param {Array} cmpConfigs The component definitions to store.
  * @param {Array} libConfigs The library definitions to store.
  * @param {Array} evtConfigs The event definitions to store.
+ * @param {Array} moduleConfigs The module definitions to store.
  * @param {AuraContext} context The Aura context.
  * @return {Promise} Promise that resolves when storing is complete.
  */
-ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, evtConfigs, context) {
-    if (!this.useDefinitionStorage() || (!cmpConfigs.length && !libConfigs.length && !evtConfigs.length)) {
+ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, evtConfigs, moduleConfigs, context) {
+    if (!this.useDefinitionStorage() || (!cmpConfigs.length && !libConfigs.length && !evtConfigs.length && !moduleConfigs.length)) {
         return Promise["resolve"]();
     }
 
     // build the payload to store
     var toStore = {};
-    var descriptor, encodedConfig, i;
+    var descriptor;
+    var encodedConfig;
+    var i;
 
     for (i = 0; i < cmpConfigs.length; i++) {
         descriptor = cmpConfigs[i]["descriptor"];
@@ -171,6 +174,12 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs, evtCo
     for (i = 0; i < evtConfigs.length; i++) {
         descriptor = evtConfigs[i]["descriptor"];
         encodedConfig = $A.util.json.encode(evtConfigs[i]);
+        toStore[descriptor] = encodedConfig;
+    }
+
+    for (i = 0; i < moduleConfigs.length; i++) {
+        descriptor = moduleConfigs[i]["descriptor"];
+        encodedConfig = $A.util.json.encode(moduleConfigs[i]);
         toStore[descriptor] = encodedConfig;
     }
 
@@ -301,6 +310,8 @@ ComponentDefStorage.prototype.restoreAll = function(context) {
                 var cmpCount = 0;
                 var evtCount = 0;
 
+                var moduleDefs = [];
+
                 // Decode all items
                 // TODO W-3037639 the following type checking is REALLY loose and flaky.
                 // it needs to be replaced with actual type declaration values.
@@ -317,6 +328,9 @@ ComponentDefStorage.prototype.restoreAll = function(context) {
                             $A.componentService.saveLibraryConfig(config);
                         }
                         libCount++;
+                    } else if (config[Json.ApplicationKey.NAME] && config[Json.ApplicationKey.CODE]) {
+                        // module definition - only module def serialization has NAME and CODE
+                        moduleDefs.push(config);
                     } else {
                         // Otherwise, it's a component
                         if (config["uuid"]) {
@@ -328,7 +342,14 @@ ComponentDefStorage.prototype.restoreAll = function(context) {
                         cmpCount++;
                     }
                 }
-                $A.log("ComponentDefStorage: restored " + cmpCount + " components, " + libCount + " libraries, " + evtCount + " events from storage into registry");
+
+                if (moduleDefs.length > 0) {
+                    // stores module definitions in moduleDefRegistry and class constructor creation is lazy
+                    $A.componentService.initModuleDefs(moduleDefs);
+                }
+
+                $A.log("ComponentDefStorage: restored " + cmpCount + " components, " + libCount + " libraries, "
+                    + evtCount + " events, " + moduleDefs.length + " modules from storage into registry");
             }
         )
         .then(

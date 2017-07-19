@@ -93,7 +93,7 @@ public class ModuleDefImpl extends DefinitionImpl<ModuleDef> implements ModuleDe
         json.writeMapBegin();
         json.writeMapEntry(ApplicationKey.DESCRIPTOR, getDescriptor().getQualifiedName());
         json.writeMapEntry(ApplicationKey.NAME, this.customElementName);
-        json.writeMapEntry(ApplicationKey.ACCESS, this.getAccess().getAccessCode());
+        json.writeValue(getAccess());
         json.writeMapEntry(ApplicationKey.CODE, code);
         if (this.minVersion != null) {
             json.writeMapEntry(ApplicationKey.MINVERSION, this.minVersion);

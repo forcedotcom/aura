@@ -1712,8 +1712,9 @@ AuraComponentService.prototype.saveDefsToStorage = function (config, context) {
     var cmpConfigs = config["componentDefs"] || [];
     var libConfigs = config["libraryDefs"] || [];
     var evtConfigs = config["eventDefs"] || [];
+    var moduleConfigs = config["moduleDefs"] || [];
 
-    if (cmpConfigs.length === 0 && libConfigs.length === 0 && evtConfigs.length === 0) {
+    if (cmpConfigs.length === 0 && libConfigs.length === 0 && evtConfigs.length === 0 && moduleConfigs.length === 0) {
         return Promise["resolve"]();
     }
 
@@ -1726,12 +1727,13 @@ AuraComponentService.prototype.saveDefsToStorage = function (config, context) {
     var defSizeKb = $A.util.estimateSize(cmpConfigs) / 1024;
     var libSizeKb = $A.util.estimateSize(libConfigs) / 1024;
     var evtSizeKb = $A.util.estimateSize(evtConfigs) / 1024;
+    var moduleSizeKb = $A.util.estimateSize(moduleConfigs) / 1024;
 
     // def AuraStorage mutual exclusion is not required to
-    return self.pruneDefsFromStorage(defSizeKb + libSizeKb + evtSizeKb)
+    return self.pruneDefsFromStorage(defSizeKb + libSizeKb + evtSizeKb + moduleSizeKb)
         .then(
             function() {
-                return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs, evtConfigs, context);
+                return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs, evtConfigs, moduleConfigs, context);
             }
         )
         .then(

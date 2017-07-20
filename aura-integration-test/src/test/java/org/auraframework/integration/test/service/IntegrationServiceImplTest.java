@@ -47,7 +47,7 @@ import java.util.regex.Pattern;
  * preload definitions etc.
  */
 public class IntegrationServiceImplTest extends AuraImplTestCase {
-	
+
     private final String simpleComponentTag = "ui:button";
     private final String arraysComponentTag = "expressionTest:arrays";
 
@@ -56,16 +56,15 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
 
     @Inject
     private ContextService contextService;
-    
+
     @Inject
     private AuraTestingMarkupUtil tmu;
-    
-    
+
     public IntegrationServiceImplTest() {
         super();
         setShouldSetupContext(false);
     }
-    
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -171,21 +170,21 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         }
         assertEquals("Bootstrap template should be written out only once.", 1, counter);
     }
-    
+
     /**
      * Verify injection a component with different attribute types.
      * 
      * @throws Exception
      */
     public void runTestAttributeTypes(boolean async) throws Exception {
-    	String attributeMarkup = tmu.getCommonAttributeMarkup(true, true, true, false)
-        		+tmu.getCommonAttributeListMarkup(true, true, true, false, false);
-    	String attributeWithDefaultsMarkup = 
-        		tmu.getCommonAttributeWithDefaultMarkup(true, true, true, false, 
-        				"'IS'", "'true'", "'fooBar'", "") +
-        		tmu.getCommonAttributeListWithDefaultMarkup(true, true, true, false, true,
-        				"'foo,bar'", "'Melon,Berry,Grapes'", "'[true,false,false]'","","<div/><span/>text<p/>");
-    	
+        String attributeMarkup = tmu.getCommonAttributeMarkup(true, true, true, false)
+                +tmu.getCommonAttributeListMarkup(true, true, true, false, false);
+        String attributeWithDefaultsMarkup =
+                tmu.getCommonAttributeWithDefaultMarkup(true, true, true, false,
+                        "'IS'", "'true'", "'fooBar'", "") +
+                tmu.getCommonAttributeListWithDefaultMarkup(true, true, true, false, true,
+                        "'foo,bar'", "'Melon,Berry,Grapes'", "'[true,false,false]'","","<div/><span/>text<p/>");
+
         DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", attributeMarkup + attributeWithDefaultsMarkup));
         Map<String, Object> attributes = Maps.newHashMap();
@@ -204,23 +203,23 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
                     + unexpected.getMessage());
         }
     }
-    
+
     /**
      * Verify injection a component with different attribute types.
      * 
      * @throws Exception
      */
     public void  testAttributeTypes() throws Exception {
-    	runTestAttributeTypes(false);
+        runTestAttributeTypes(false);
     }
-    
+
     /**
      * Verify injection a component with different attribute types.
      * 
      * @throws Exception
      */
     public void  testAttributeTypesAsync() throws Exception {
-    	runTestAttributeTypes(true);
+        runTestAttributeTypes(true);
     }
 
     /**
@@ -240,7 +239,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("strAttr", "");
         attributes.put("booleanAttr", false);
-        
+
         attributes.put("press", "function(e){alert('press')}");
         attributes.put("mouseout", "function(e){alert('mouseout')}");
 
@@ -269,8 +268,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
             assertEquals("Unknown attribute or event ui:button - fooBar", expected.getMessage());
         }
     }
-    
-    
+
     /**
      * Verify that pass attributes with wrong type to injected cmp will result in some exception.
      * W-2359123: This is currently not throwing any error , the injected cmp will take whatever container gives it
@@ -289,10 +287,10 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
             assertEquals("Whatever we gonna throw ....", expected.getMessage());
         }
     }
-    
-	private Integration createIntegration() throws QuickFixException {
+
+    private Integration createIntegration() throws QuickFixException {
         return integrationService.createIntegration("", Mode.UTEST, true, null, getNoDefaultPreloadsApp().getQualifiedName(), null);
-	}
+    }
 
     @Ignore("W-1505382")
     @Test
@@ -373,15 +371,15 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
     /**
      * Verify that definition of interface which skips default preloads can be fetched.
      * Implementing this interface by an application and using that application with Integration service will help
-     * trim the preloads size by skipping the default preloads. 
+     * trim the preloads size by skipping the default preloads.
      */
     @Test
     public void testNoDefaultsPreloadInterfaceIsInGoodState(){
         contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
-        DefDescriptor<InterfaceDef> noDefaultPreloadsInterfaceDef = definitionService.getDefDescriptor(IntegrationService.NO_DEFAULT_PRELOADS_INTERFACE, 
+        DefDescriptor<InterfaceDef> noDefaultPreloadsInterfaceDef = definitionService.getDefDescriptor(IntegrationService.NO_DEFAULT_PRELOADS_INTERFACE,
                 InterfaceDef.class);
         try{
-        	definitionService.getDefinition(noDefaultPreloadsInterfaceDef);
+            definitionService.getDefinition(noDefaultPreloadsInterfaceDef);
         }catch(QuickFixException e){
             fail("Failed to get definition of noDefaultPreloads interface. IntegrationService may suffer performance degredation.");
         }
@@ -405,7 +403,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
             assertEquals("Application must extend aura:integrationServiceApp.", expected.getMessage());
         }
     }
-    
+
     private void assertException(Integration obj, String tag, Map<String, Object> attributes, String localId,
             String locatorDomId, Appendable out) throws Exception {
         try {
@@ -436,13 +434,13 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         obj.injectComponentHtml(simpleComponentTag, attributes, "", "", out);
         return out;
     }
-    
+
     private DefDescriptor<ApplicationDef> getNoDefaultPreloadsApp(){
         String appMarkup = "<aura:application extends='aura:integrationServiceApp' implements='%s'></aura:application>";
         DefDescriptor<ApplicationDef> appDesc = getAuraTestingUtil().addSourceAutoCleanup(
-                ApplicationDef.class, 
+                ApplicationDef.class,
                 String.format(appMarkup, IntegrationService.NO_DEFAULT_PRELOADS_INTERFACE));
         return appDesc;
     }
-    
+
 }

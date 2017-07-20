@@ -662,16 +662,21 @@ AuraClientService.prototype.tearDown = function() {
  * @private
 */
 AuraClientService.prototype.initializeClientLibraries = function () {
-// Lazy load data-src scripts
+    // Lazy load data-src scripts
     var scripts = document.getElementsByTagName("script");
     if (scripts) {
-        for ( var i = 0, len = scripts.length; i < len; i++) {
+        for (var i = 0, len = scripts.length; i < len; i++) {
             var script = scripts[i];
             if (script.getAttribute("data-src") && !script.getAttribute("src")) {
                 var source = script.getAttribute("data-src");
                 var name = source.split('/').pop().split('.').shift().toLowerCase();
 
-                this.clientLibraries[name] = $A.util.apply(this.clientLibraries[name] || {}, {
+                var lib = this.clientLibraries[name];
+                if (lib && lib["loaded"]) {
+                    continue;
+                }
+
+                this.clientLibraries[name] = $A.util.apply(lib || {}, {
                     script : script,
                     loaded : false,
                     loading : []
@@ -682,21 +687,28 @@ AuraClientService.prototype.initializeClientLibraries = function () {
 };
 
 /**
- * Load ClientLibraries
+ * Reference an external JavaScript library which is registered on component by aura:clientLibrary.
+ * It loads the required client library from the server if needed.
+ *
+ * @param {String} name - client library name
+ * @param {Function} callback - a callback function that is executed if library is loaded
+ *
  * @export
  */
 AuraClientService.prototype.loadClientLibrary = function(name, callback) {
+    $A.assert(typeof name === "string", "AuraClientService.loadClientLibrary(): name must be a String.");
+
     name = name.toLowerCase();
     var lib = this.clientLibraries[name];
-    $A.assert(lib, 'ClientLibrary has not been registered');
+    $A.assert(lib, "AuraClientService.loadClientLibrary(): ClientLibrary has not been registered: " + name);
 
     if (lib.loaded) {
         return callback();
     }
 
     if (!lib.script) {
-        var script = window.document.createElement('script');
-        script.setAttribute('data-src', lib.resourceUrl.replace('{fwuid}', $A.getContext().fwuid));
+        var script = window.document.createElement("script");
+        script.setAttribute("data-src", lib.resourceUrl.replace("{fwuid}", $A.getContext().fwuid));
         window.document.body.appendChild(script);
         lib.script = script;
     }
@@ -725,7 +737,7 @@ AuraClientService.prototype.loadClientLibrary = function(name, callback) {
                 }
             }
         });
-    lib.script.src = lib.script.getAttribute('data-src');
+    lib.script.src = lib.script.getAttribute("data-src");
 };
 
 
@@ -3430,6 +3442,9 @@ AuraClientService.prototype.injectComponent = function(config, locatorDomId, loc
     var context = $A.getContext();
     context['merge'](config["context"]);
     var priorAccess = this.currentAccess;
+
+    // workaround for client library. register client libraries on injected component
+    this.initializeClientLibraries();
 
     var actionResult = config["actions"][0];
     var action = $A.get("c.aura://ComponentController.getComponent");

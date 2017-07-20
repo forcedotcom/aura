@@ -1211,6 +1211,52 @@ Test.Aura.AuraClientServiceTest = function() {
 
             Assert.Equal(script, actual.script);
         }
+
+        [Fact]
+        function DoesNotOverrideLoadedLib() {
+            var libName = "libName";
+            var script = {
+                getAttribute: function(attribute) {
+                    if(attribute === "data-src") {
+                        return "path/" + libName + ".js";
+                    }
+                }
+            }
+            var mockApply = Stubs.GetMethod();
+
+            var mockGlobals = Mocks.GetMocks(Object.Global(), {
+                "$A": {
+                    util: {
+                        apply: mockApply
+                    }
+                },
+                window: {},
+                Aura: Aura
+            });
+
+            var mockDocument = Mocks.GetMocks(Object.Global(), {
+                document: {
+                    getElementById: function() {},
+                    getElementsByTagName: function(tagName) {
+                        if(tagName === "script") {
+                            return [script];
+                        }
+                    }
+                },
+            });
+
+            var actual;
+            mockGlobals(function() {
+                mockDocument(function() {
+                    var target = new Aura.Services.AuraClientService();
+                    target.clientLibraries[libName.toLowerCase()] = { "loaded": true };
+
+                    target.initializeClientLibraries();
+                })
+            });
+
+            Assert.Equal(0, mockApply.Calls.length);
+        }
     }
 
     [Fixture]

@@ -18,6 +18,7 @@ package org.auraframework.impl.integration;
 import com.google.common.collect.ImmutableMap;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -60,6 +61,7 @@ public class IntegrationImplTest {
         SerializationService serializationService = mock(SerializationService.class);
         ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
         RenderContext renderContext = mock(RenderContext.class);
+        ClientLibraryService clientLibraryService = mock(ClientLibraryService.class);
 
         AuraContext.Mode mode = AuraContext.Mode.UTEST;
         String contextPath = "/mockPath";
@@ -94,7 +96,8 @@ public class IntegrationImplTest {
         //ACT
         IntegrationImpl target = new IntegrationImpl(contextPath, mode, initializeAura, userAgent,
                             application, instanceService, definitionService, serializationService,
-                            contextService, configAdapter, renderingService, servletUtilAdapter);
+                            contextService, configAdapter, renderingService, servletUtilAdapter,
+                            clientLibraryService);
         target.injectComponent(tag, attributes, localId, locatorDomId, renderContext, useAsync);
 
         //ASSERT

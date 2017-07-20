@@ -75,12 +75,6 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         warning: function(){}
     });
 
-    var mockInvalidDate = {
-        isValid:function(){
-            return false;
-        }
-    };
-
     var mockDate = {
         isValid:function(){
             return true;
@@ -102,24 +96,6 @@ Test.Aura.AuraLocalizationServiceTest = function() {
         }
     };
 
-    var mockTime = {
-        isValid:function(){
-            return true;
-        },
-        toString:function(){
-            return targetTime;
-        }
-    };
-
-
-
-    var mockGetNormalizedFormat = Mocks.GetMock(targetService, "getNormalizedFormat", function(format){
-        return format;
-    });
-
-    var mockGetAvailableMomentLocale = Mocks.GetMock(targetService, "getAvailableMomentLocale", function(locale){
-        return locale;
-    });
 
     [Fixture]
     function displayDuration(){
@@ -1620,6 +1596,12 @@ Test.Aura.AuraLocalizationServiceTest = function() {
 
         var createTargetService = function() {
              var targetService = new Aura.Services.AuraLocalizationService();
+             var mockInvalidDate = {
+                    isValid: function(){
+                        return false;
+                    }
+                };
+
              targetService.moment = function(dateTimeString) {
                 if(dateTimeString === targetDateTime) return mockDateTime;
                 if(dateTimeString === "null") return null;

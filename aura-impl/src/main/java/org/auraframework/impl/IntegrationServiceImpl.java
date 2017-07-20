@@ -18,6 +18,7 @@ package org.auraframework.impl;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.impl.integration.IntegrationImpl;
 import org.auraframework.integration.Integration;
 import org.auraframework.service.ContextService;
@@ -43,13 +44,14 @@ public class IntegrationServiceImpl implements IntegrationService {
     private RenderingService renderingService;
     private ConfigAdapter configAdapter;
     private ServletUtilAdapter servletUtilAdapter;
+    private ClientLibraryService clientLibraryService;
  
     @Override
     public Integration createIntegration(String contextPath, Mode mode, boolean initializeAura, String userAgent,
                                          String application, Object dummy) throws QuickFixException {
         return new IntegrationImpl(contextPath, mode, initializeAura, userAgent, application, instanceService,
                 definitionService, serializationService, contextService, configAdapter,
-                renderingService, servletUtilAdapter);
+                renderingService, servletUtilAdapter, clientLibraryService);
     }
 
     @Inject
@@ -85,5 +87,10 @@ public class IntegrationServiceImpl implements IntegrationService {
     @Inject
     public void setServletUtilAdapter(ServletUtilAdapter servletUtilAdapter) {
         this.servletUtilAdapter = servletUtilAdapter;
+    }
+
+    @Inject
+    public void setClientLibraryService(ClientLibraryService clientLibraryService) {
+        this.clientLibraryService = clientLibraryService;
     }
 }

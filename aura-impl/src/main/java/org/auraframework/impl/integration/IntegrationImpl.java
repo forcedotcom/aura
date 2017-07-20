@@ -16,13 +16,18 @@
 package org.auraframework.impl.integration;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.AttributeDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -30,6 +35,7 @@ import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.system.RenderContextHTMLImpl;
 import org.auraframework.impl.util.TemplateUtil;
+import org.auraframework.impl.util.TemplateUtil.Script;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.Component;
@@ -73,13 +79,14 @@ public class IntegrationImpl implements Integration {
     private ConfigAdapter configAdapter;
     private RenderingService renderingService;
     private ServletUtilAdapter servletUtilAdapter;
+    private ClientLibraryService clientLibraryService;
 
     public IntegrationImpl(String contextPath, Mode mode, boolean initializeAura, String userAgent,
                            String application, InstanceService instanceService,
                            DefinitionService definitionService, SerializationService serializationService,
                            ContextService contextService, ConfigAdapter configAdapter,
-                           RenderingService renderingService, ServletUtilAdapter servletUtilAdapter
-                           ) throws QuickFixException {
+                           RenderingService renderingService, ServletUtilAdapter servletUtilAdapter,
+                           ClientLibraryService clientLibraryService) throws QuickFixException {
         this.client = userAgent != null ? new Client(userAgent) : null;
         this.contextPath = contextPath;
         this.mode = mode;
@@ -92,6 +99,7 @@ public class IntegrationImpl implements Integration {
         this.configAdapter = configAdapter;
         this.renderingService = renderingService;
         this.servletUtilAdapter = servletUtilAdapter;
+        this.clientLibraryService = clientLibraryService;
     }
 
     @Override
@@ -134,6 +142,18 @@ public class IntegrationImpl implements Integration {
             Map<String, String> actionEventHandlers = Maps.newHashMap();
 
             ComponentDef componentDef = this.definitionService.getDefinition(descriptor);
+
+            // workaround for component with client library.
+            // integrationService dynamically creates and injects the component,
+            // so the client library on injected component has no way to become a
+            // dependency of the integrationService app.
+            BaseComponentDef baseCmpDef = (BaseComponentDef)componentDef;
+            List<String> clientLibUrls = new ArrayList<>();
+            for (ClientLibraryDef def : baseCmpDef.getClientLibraries()) {
+                clientLibUrls.add(this.clientLibraryService.getResolvedUrl(def));
+            }
+            templateUtil.writeHtmlScripts(context, clientLibUrls, Script.LAZY, rc.getCurrent());
+
             if (attributes != null) {
                 for (Map.Entry<String, Object> entry : attributes.entrySet()) {
                     String key = entry.getKey();
@@ -156,7 +176,6 @@ public class IntegrationImpl implements Integration {
             }
 
             try {
-
                 StringBuilder jsonEventHandlers = null;
                 if (!actionEventHandlers.isEmpty()) {
                     // serialize registered event handlers into js object
@@ -178,7 +197,6 @@ public class IntegrationImpl implements Integration {
                     String newComponentScript = String.format("(function (w) {\n    w.Aura || (w.Aura = {});\n    w.Aura.afterAppReady = Aura.afterAppReady || [];\n    w.Aura.inlineJsLoaded = true;\n\n    function ais() {\n        $A.__aisScopedCallback(function() { \n            $A.clientService.injectComponentAsync(%s, '%s', %s); \n        }); \n    } \n\n    if (Aura.applicationReady) {\n        ais();\n    } else {\n        window.Aura.afterAppReady.push(ais); \n    }\n}(window));", def, locatorDomId, eventHandlers);
 
                     init.append(newComponentScript);
-
                 } else {
                     // config printed onto HTML page
 
@@ -233,8 +251,6 @@ public class IntegrationImpl implements Integration {
                         }
                         context.setCurrentAction(previous);
                     }
-
-
 
                     init.append(String.format("(function (w) {\n    w.Aura || (w.Aura = {});\n    w.Aura.afterAppReady = Aura.afterAppReady || [];\n    window.Aura.inlineJsLoaded = true;\n\n    function ais() {\n        $A.__aisScopedCallback(function() { \n            $A.clientService.injectComponent(config, \"%s\", \"%s\"); \n        }); \n    } \n\n    if (Aura.applicationReady) {\n        ais();\n    } else {\n        window.Aura.afterAppReady.push(ais); \n    }\n}(window));", locatorDomId, localId));
                 }
@@ -321,6 +337,7 @@ public class IntegrationImpl implements Integration {
             templateUtil.writeInlineHtmlScripts(context, servletUtilAdapter.getScripts(context, false, false, null), sb);
             //inline.js is not included with AIS but the non-templated scripts associated with inline are still required
             templateUtil.writeUnsafeInlineHtmlScripts(context, Lists.newArrayList(servletUtilAdapter.getInlineJs(context, appDef)), sb);
+
             attributes.put("auraScriptTags", sb.toString());
 
             StyleDef styleDef = templateDef.getStyleDef();

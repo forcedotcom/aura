@@ -121,6 +121,8 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
     private String engineMin = "";
     private String engineCompat= "";
     private String engineCompatMin = "";
+    private String engineProdDebug = "";
+    private String engineCompatProdDebug = "";
 
     // used during parsing, should be clear for storing in memory
     private DirectiveParser parser;
@@ -241,13 +243,21 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         String engineMinSource = null;
         String engineCompatSource = null;
         String engineCompatMinSource = null;
+        String engineProdDebugSource = null;
+        String engineCompatProdDebugSource = null;
         String compatHelpersSource = null;
         String compatHelpersMinSource = null;
+
         try {
             engineSource = getSource("aura/resources/engine/engine.js");
             engineMinSource = getSource("aura/resources/engine/engine.min.js");
+
             engineCompatSource = getSource("aura/resources/engine/engine_compat.js");
             engineCompatMinSource = getSource("aura/resources/engine/engine_compat.min.js");
+
+            engineProdDebugSource = getSource("aura/resources/engine/engine_debug.js");
+            engineCompatProdDebugSource = getSource("aura/resources/engine/engine_compat_debug.js");
+
             compatHelpersSource = getSource("aura/resources/compat-helpers/compat-helpers.js");
             compatHelpersMinSource = getSource("aura/resources/compat-helpers/compat-helpers.min.js");
         }  catch (MalformedURLException e) {}
@@ -266,6 +276,14 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
         if (compatHelpersMinSource != null && engineCompatMinSource != null) {
             this.engineCompatMin = "try { " + compatHelpersMinSource + "\n" + engineCompatMinSource + " } catch (e) {}";
+        }
+
+        if (engineProdDebugSource != null) {
+            this.engineProdDebug = "try { " + engineProdDebugSource + " } catch (e) {}";
+        }
+
+        if (compatHelpersSource != null && engineCompatProdDebugSource != null) {
+            this.engineCompatProdDebug = "try {\n" + compatHelpersSource + "\n" + engineCompatProdDebugSource + "\n} catch (e) {}";
         }
 
         // TODO COMPAT : prefetch compat helper resources
@@ -331,10 +349,11 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
                         if (mode != JavascriptGeneratorMode.DOC) {
                             // jsdoc errors when parsing engine.js
+                            boolean isProdDebug = mode == JavascriptGeneratorMode.PRODUCTIONDEBUG;
                             boolean isCompat = output.getName().contains(COMPAT_SUFFIX);
                             String eng = minified ?
                                     (isCompat ? engineCompatMin : engineMin) :
-                                    (isCompat ? engineCompat : engine);
+                                    (isCompat ? ( isProdDebug ? engineCompatProdDebug : engineCompat) : ( isProdDebug ? engineProdDebug : engine));
                             writer.append(eng).append("\n");
                             // TODO COMPAT : append compat helpers
                         }

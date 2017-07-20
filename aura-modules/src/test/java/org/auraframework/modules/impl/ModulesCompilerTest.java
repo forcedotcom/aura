@@ -59,7 +59,7 @@ public class ModulesCompilerTest extends UnitTestCase {
         String expected = Files.toString(getResourceFile("/testdata/modules/moduletest/expected.js"), Charsets.UTF_8);
 
         assertEquals(expected.trim(), compilerData.codes.get(CodeType.DEV).trim());
-        assertEquals("[x-test]", compilerData.bundleDependencies.toString());
+        assertEquals("[x-test, engine]", compilerData.bundleDependencies.toString());
     }
 
     @Test

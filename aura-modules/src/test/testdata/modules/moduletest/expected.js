@@ -1,4 +1,4 @@
-define('modules-moduletest', ['x-test'], function (_xTest) {
+define('modules-moduletest', ['x-test', 'engine'], function (_xTest, engine) {
 
 function tmpl($api, $cmp, $slotset, $ctx) {
     return [$api.c("x-test", _xTest, {
@@ -8,12 +8,11 @@ function tmpl($api, $cmp, $slotset, $ctx) {
     })];
 }
 
-class Test {
-    constructor() {
-        this.stringQuote = 'str"ing';
-        this.stringDoubleQuote = "str'ing";
-        this.stringBacktick = `key=${value}`;
-        this.VALID_NAME_RE = /^([a-zA-Z]\w*):([a-zA-Z]\w*)$/;
+class Test extends engine.Element {
+    constructor(...args) {
+        var _temp;
+
+        return _temp = super(...args), this.stringQuote = 'str"ing', this.stringDoubleQuote = "str'ing", this.stringBacktick = `key=${value}`, this.VALID_NAME_RE = /^([a-zA-Z]\w*):([a-zA-Z]\w*)$/, _temp;
     }
 
     render() {

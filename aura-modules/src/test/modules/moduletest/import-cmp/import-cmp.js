@@ -1,9 +1,10 @@
-import engine from 'engine';
+import * as engine from 'engine';
+import { Element } from 'engine';
 // eslint-disable-next-line raptor/no-compat
 import aura from 'aura';
 import storage from 'aura-storage';
 
-export default class ImportCmp extends engine.Element {
+export default class ImportCmp extends Element {
     // @api functions are called from aura component moduleTest:importTest
 
     @api

@@ -22,6 +22,23 @@ import java.util.List;
  * CSPInliningService controls how to annotate and process an script block with an inline body to apply CSP-2 security
  */
 public interface CSPInliningService extends AuraService {
+    enum InlineScriptMode{
+        UNSUPPORTED(""),
+        HASH("'sha256-%s'"),
+        NONCE("'nonce-%s'"),
+        UNSAFEINLINE("");
+
+        private String format;
+
+        InlineScriptMode(String format){
+            this.format = format;
+        }
+
+        public String toDirective(String... params){
+            return String.format(format, (Object[]) params);
+        }
+    }
+
     /**
      * will return all directives to append to CSP header
      * @return the list of CSP directives
@@ -49,11 +66,7 @@ public interface CSPInliningService extends AuraService {
      */
     void writeInlineScript(String script, Appendable out) throws IOException;
 
-    /**
-     * check to determine if a script inlining is supported
-     * @return true if inlining is supported
-     */
-    boolean isSupported();
+    InlineScriptMode getInlineMode();
 
     /**
      * prepend the script block with protection against injection.
@@ -61,4 +74,5 @@ public interface CSPInliningService extends AuraService {
      * @throws IOException
      */
     void preScriptAppend(Appendable out) throws IOException;
+
 }

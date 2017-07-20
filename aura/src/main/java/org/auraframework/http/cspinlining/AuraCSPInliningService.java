@@ -13,27 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.http;
+package org.auraframework.http.cspinlining;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.auraframework.service.ContextService;
 import org.auraframework.service.CSPInliningService;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
-import static org.auraframework.http.AuraCSPInliningService.InlineScriptMode.NONCE;
-import static org.auraframework.http.AuraCSPInliningService.InlineScriptMode.UNSUPPORTED;
+import static org.auraframework.service.CSPInliningService.InlineScriptMode.NONCE;
 
 @ServiceComponent
 public class AuraCSPInliningService implements CSPInliningService {
@@ -43,25 +40,15 @@ public class AuraCSPInliningService implements CSPInliningService {
     static String INLINE_NONCE = "<!--\"'--><script nonce=\"%s\">%s</script>";
     static String NONCE_INJECTION_PROTECTION = "<!--\"'-->";
 
-    public enum InlineScriptMode{
-        UNSUPPORTED(""),
-        HASH("'sha256-%s'"),
-        NONCE("'nonce-%s'"),
-        UNSAFEINLINE("");
+    private List<CSPInliningRule> rules;
 
-        private String format;
-
-        InlineScriptMode(String format){
-            this.format = format;
-        }
-
-        public String toDirective(String... params){
-            return String.format(format, (Object[]) params);
-        }
-    }
-
-    @Inject
     protected ContextService contextService;
+
+    @Autowired
+    public void setContextService(ContextService contextService){this.contextService = contextService;}
+
+    @Autowired(required = false)
+    public void setRules(List<CSPInliningRule> rules){this.rules = rules;}
 
     @Override
     public List<String> getCurrentScriptDirectives() {
@@ -130,8 +117,13 @@ public class AuraCSPInliningService implements CSPInliningService {
     }
 
     @Override
-    public boolean isSupported() {
-        return getInlineMode() != UNSUPPORTED;
+    public InlineScriptMode getInlineMode() {
+        CSPInliningCriteria criteria = new CSPInliningCriteria(contextService.getCurrentContext());
+        List<CSPInliningRule> rules = MoreObjects.firstNonNull(this.rules, ImmutableList.<CSPInliningRule>of());
+
+        rules.stream().filter(r -> r.isRelevant(criteria)).forEach(r -> r.process(criteria));
+
+        return criteria.getMode();
     }
 
     @Override
@@ -158,11 +150,6 @@ public class AuraCSPInliningService implements CSPInliningService {
         }
     }
 
-    protected InlineScriptMode getInlineMode() {
-        return UNSUPPORTED;
-    }
-
-
     private void ensureNoncePresent() {
         AuraContext currentContext = contextService.getCurrentContext();
         if (currentContext.getScriptNonce() == null){
@@ -170,5 +157,9 @@ public class AuraCSPInliningService implements CSPInliningService {
             String nonce = new UUID(r.nextLong(), r.nextLong()).toString();
             currentContext.setScriptNonce(nonce);
         }
+    }
+
+    public List<CSPInliningRule> getRules() {
+        return rules;
     }
 }

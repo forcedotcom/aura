@@ -55,6 +55,7 @@ import org.auraframework.impl.util.TemplateUtil;
 import org.auraframework.impl.util.TemplateUtil.Script;
 import org.auraframework.impl.util.UserAgent;
 import org.auraframework.instance.InstanceStack;
+import org.auraframework.service.CSPInliningService.InlineScriptMode;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.CSPInliningService;
 import org.auraframework.service.DefinitionService;
@@ -403,7 +404,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         throws QuickFixException {
         List<String> ret = Lists.newArrayList();
 
-        if (safeInlineJs && !ignoreNonCacheableScripts && !cspInliningService.isSupported()) {
+        if (safeInlineJs && !ignoreNonCacheableScripts && cspInliningService.getInlineMode() == InlineScriptMode.UNSUPPORTED) {
             ret.add(getInlineJsUrl(context, attributes));
         }
 
@@ -460,7 +461,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     public void writeScriptUrls(AuraContext context, BaseComponentDef def, Map<String, Object> componentAttributes, StringBuilder sb, String beforeBootstrap) throws QuickFixException, IOException {
         templateUtil.writeHtmlScripts(context, this.getJsClientLibraryUrls(context), Script.LAZY, sb);
 
-        if (cspInliningService.isSupported() && def != null) {
+        if (cspInliningService.getInlineMode() != InlineScriptMode.UNSUPPORTED && def != null) {
             cspInliningService.writeInlineScript(this.getInlineJs(context, def), sb);
         } else {
             templateUtil.writeHtmlScript(context, this.getInlineJsUrl(context, componentAttributes), Script.SYNC, sb);

@@ -38,6 +38,7 @@ import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.CSPInliningService;
+import org.auraframework.service.CSPInliningService.InlineScriptMode;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext;
@@ -369,7 +370,7 @@ public class ServletUtilAdapterImplUnitTest extends UnitTestCase {
         Mockito.doReturn("appcorejs").when(sua).getAppCoreJsUrl(context, null);
         Mockito.doReturn("appjs").when(sua).getAppJsUrl(context, null);
         Mockito.doReturn("bootstrap").when(sua).getBootstrapUrl(context, attributes);
-        Mockito.doReturn(false).when(inliningService).isSupported();
+        Mockito.doReturn(InlineScriptMode.UNSUPPORTED).when(inliningService).getInlineMode();
         sua.setCspInliningService(inliningService);
 
         actual = sua.getFrameworkScripts(context, true, false, attributes);

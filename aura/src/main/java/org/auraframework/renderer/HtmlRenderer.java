@@ -34,6 +34,7 @@ import org.auraframework.expression.Expression;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.instance.Instance;
+import org.auraframework.service.CSPInliningService.InlineScriptMode;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.CSPInliningService;
 import org.auraframework.service.DefinitionService;
@@ -69,6 +70,7 @@ public class HtmlRenderer implements Renderer {
         List<Component> body = (List<Component>) component.getAttributes().getValue("body");
         boolean script = (tag != null && tag.equals("script") && body != null && body.size() > 0);
         String scriptBody = "";
+        boolean isCspInlineSupported = inliningService.getInlineMode() != InlineScriptMode.UNSUPPORTED;
 
         if (script) {
             int numParens = new Random().nextInt(128) + 1;
@@ -119,7 +121,8 @@ public class HtmlRenderer implements Renderer {
                         ", '" + namespace + "');\n"
                 );
             }
-            if (rc.popScript() || !inliningService.isSupported()){
+
+            if (rc.popScript() || !isCspInlineSupported){
                 //we are still within a script block
                 return;
             }
@@ -128,7 +131,7 @@ public class HtmlRenderer implements Renderer {
             inliningService.processScript(scriptBody);
         }
         Appendable out = rc.getCurrent();
-        if (tag.equalsIgnoreCase("script") && inliningService.isSupported()){
+        if (tag.equalsIgnoreCase("script") && isCspInlineSupported){
             inliningService.preScriptAppend(out);
         }
         out.append('<');

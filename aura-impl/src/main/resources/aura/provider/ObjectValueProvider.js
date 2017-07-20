@@ -34,7 +34,7 @@ ObjectValueProvider.prototype.getValues = function() {
  * @param values
  */
 ObjectValueProvider.prototype.merge = function(values) {
-    $A.util.apply(this.values, values, true, true);
+    $A.util.applyNotFromPrototype(this.values, values, true, true);
 };
 
 /**

@@ -1587,6 +1587,44 @@ Aura.Utils.Util.prototype.apply = function(/* Object|Function */ baseObject, /* 
     return baseObject;
 };
 
+/**
+ * apply() has a bug that it copies values from the prototype.
+ * This was found in late 210 a week before FF. Thats to late for a change to apply(), so Kris Gray created
+ * this method which does the right thing.
+ *
+ * We'll fix the bug by using this new method, and in 212, we'll switch apply() to behave like this method.
+ * The API and functionality is the same except that it does not copy values from the prototype.
+ * Please DO NOT EXPORT THIS METHOD. That makes it much harder to replace in 212.
+ */
+Aura.Utils.Util.prototype.applyNotFromPrototype = function(/* Object|Function */ baseObject, /* Object|Function*/ members, /* bool */ forceCopy, /* bool */ deepCopy) {
+    if(members) {
+        var value=null;
+        for (var property in members) {
+            var setValue=forceCopy||!baseObject.hasOwnProperty(property);
+            if(setValue||deepCopy){
+                value=members[property];
+                if(deepCopy&&value!=undefined) {//eslint-disable-line eqeqeq
+                    var branchValue = null;
+                    if (this.isArray(value)) {
+                        branchValue = baseObject[property] || [];
+                    } else if (this.isPlainObject(value)) {
+                        branchValue = baseObject[property] || {};
+                    }
+                    if (branchValue) {
+                        baseObject[property] = this.apply(branchValue, value, forceCopy, deepCopy);
+                        continue;
+                    }
+                }
+                if(setValue) {
+                    baseObject[property] = value;
+                }
+            }
+        }
+    }
+    return baseObject;
+};
+
+
 Aura.Utils.Util.prototype.CAMEL_CASE_TO_HYPHENS_REGEX = /([A-Z])/g;
 
 /**

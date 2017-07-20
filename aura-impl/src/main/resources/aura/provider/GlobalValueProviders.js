@@ -121,7 +121,7 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
                 // set values into its value provider
                 valueProvider.merge(newGvp["values"]);
             } else {
-                $A.util.apply(valueProvider,newGvp["values"],true);
+                $A.util.applyNotFromPrototype(valueProvider,newGvp["values"],true);
             }
             $A.expressionService.updateGlobalReferences(type,newGvp["values"]);
         } catch(e) {

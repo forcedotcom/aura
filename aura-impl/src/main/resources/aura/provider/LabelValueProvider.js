@@ -129,7 +129,7 @@ LabelValueProvider.prototype.getValues = function() {
  * Merges $Label values
  */
 LabelValueProvider.prototype.merge = function(values) {
-    $A.util.apply(this.values, values, true, true);
+    $A.util.applyNotFromPrototype(this.values, values, true, true);
 };
 
 /**

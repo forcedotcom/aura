@@ -5,8 +5,8 @@ export default class BidirectionalPrimitive extends Element {
 
     connectedCallback() {
         this.dispatchEvent(new CustomEvent('change', {
-            bubbles: true, 
-            detail: { primitive: 'changedValue' }
+            bubbles: true,
+            detail : { primitive: 'changedValue' }
         }));
     }
 }

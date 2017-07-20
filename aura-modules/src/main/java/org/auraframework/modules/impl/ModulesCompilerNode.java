@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 import org.auraframework.modules.ModulesCompilerData;
 import org.auraframework.tools.node.JSFunction;
 import org.auraframework.tools.node.NodeServerPool;
-import org.auraframework.tools.node.NodeTool;
+import org.auraframework.tools.node.NodeToolInstaller;
 import org.json.JSONObject;
 
 /**
@@ -30,13 +30,18 @@ import org.json.JSONObject;
  */
 final class ModulesCompilerNode implements ModulesCompiler {
 
+    private static final int POOL_SIZE = 4;
+    private static final long INVOKE_TIMEOUT_1_MINUTE = 60 * 1000;
+    private static final long NODE_RESTART_HALF_DAY = 12 * 60 * 60 * 1000;
+
     private static final Logger logger = Logger.getLogger(ModulesCompilerNode.class.getName());
 
     private static JSFunction compileFunction = null;
 
     public synchronized static JSFunction getCompileFunction() {
         if (compileFunction == null) {
-            compileFunction = new NodeServerPool(NodeTool.installDir(), ModulesCompilerUtil.INVOKE_COMPILE_JS_PATH);
+            compileFunction = new NodeServerPool("node-tool", NodeToolInstaller.installDir(), ModulesCompilerUtil.INVOKE_COMPILE_JS_PATH,
+                    POOL_SIZE, INVOKE_TIMEOUT_1_MINUTE, NODE_RESTART_HALF_DAY);
         }
         return compileFunction;
     }

@@ -325,15 +325,18 @@ InteropComponent.prototype.set = function (key, value) {
     var expr = path.join('.');
     var attrValue = this.attributes[expr];
 
-    if (attrValue && $A.util.isExpression(attrValue.value)) {
-        $A.warning('Component ' + this.componentDef.interopClassName 
-            + ' is not the owner of property "' + expr 
-            + '" and should not change it directly'
-        );
-        attrValue.value.set(value);
-    } else if (attrValue.getExpression) { // PRV
-        attrValue.set(value);
+    if (attrValue) {
+        if ($A.util.isExpression(attrValue.value)) {
+            $A.warning('Component ' + this.componentDef.interopClassName
+                + ' is not the owner of property "' + expr
+                + '" and should not change it directly'
+            );
+            attrValue.value.set(value);
+        } else if (attrValue.getExpression) { // PRV
+            attrValue.set(value);
+        }
     } else {
+        // set in case attribute was not explicitly set in markup
         this.attributes[expr] = value;
     }
 };

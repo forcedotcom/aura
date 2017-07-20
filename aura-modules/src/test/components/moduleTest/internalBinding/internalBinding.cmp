@@ -4,7 +4,7 @@
     <aura:handler name="change" value="{!v.primitive}" action="{!c.primitiveChanged}"/>
 
     <section>
-       <interopTest:bidirectionalPrimitive aura:id="internal" primitive="{!v.primitive}" />
+       <moduleTest:bidirectionalPrimitive aura:id="internal" primitive="{!v.primitive}" />
     </section>
 
 </aura:component>

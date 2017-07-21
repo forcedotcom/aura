@@ -2139,12 +2139,12 @@ AuraClientService.prototype.initializeInjectedServices = function(services) {
         services.forEach(function (serviceDefinition) {
             try {
                 var serviceConstructor = $A.componentService.evaluateModuleDef(serviceDefinition);
-                var service = serviceConstructor($A, $A.componentService.moduleEngine);
+                var service = serviceConstructor(Aura.ServiceApi, $A.componentService.moduleEngine);
                 $A.assert(service.name, 'Unknown service name');
                 serviceRegistry[service.name] = service;
             } catch (e) {
                 // TODO W-4060924 revert making service initialization a soft error
-                console.warn('Failed to initialize service ', serviceDefinition); //eslint-disable-line no-console
+                console.warn('Failed to initialize service ', serviceDefinition, e); //eslint-disable-line no-console
             }
         });
     }

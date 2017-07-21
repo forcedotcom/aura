@@ -20,13 +20,16 @@ import org.auraframework.Aura;
 import org.auraframework.def.EventDef;
 import org.auraframework.instance.Event;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.JsFunction;
+
+import com.google.common.collect.ImmutableList;
 
 public class ClientOutOfSyncException extends ClientSideEventException {
     private static final long serialVersionUID = 7178941169236716678L;
 
     /**
      * This is a special case for no client out of sync.
-     *
+     * 
      * @param message the message.
      */
     public ClientOutOfSyncException(String message) {
@@ -40,6 +43,11 @@ public class ClientOutOfSyncException extends ClientSideEventException {
         } catch (QuickFixException x) {
             throw new AuraRuntimeException(x);
         }
+    }
+
+    @Override
+    public JsFunction getDefaultHandler() {
+        return new JsFunction(ImmutableList.<String> of(),"$A.clientService.setOutdated()");
     }
 
     @Override

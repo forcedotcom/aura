@@ -46,6 +46,7 @@ import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.test.client.UserAgent;
+import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
@@ -316,6 +317,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         @SuppressWarnings("unchecked")
         Map<String, Object> eventJson = (Map<String, Object>) json.get("event");
         assertEquals("markup://aura:clientOutOfSync", eventJson.get("descriptor"));
+        Object f = json.get("defaultHandler");
+        assertEquals(JsFunction.class, f.getClass());
+        assertEquals("$A.clientService.setOutdated()", ((JsFunction) f).getBody());
     }
 
     private void assertNoCacheRequest(String inputUrl, String expectedRedirect) throws Exception {

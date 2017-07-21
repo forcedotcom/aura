@@ -27,6 +27,7 @@ import org.apache.http.util.EntityUtils;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.integration.test.util.AuraHttpTestCase;
+import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.AuraTestLabels;
@@ -91,6 +92,11 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
         assertEquals("Expected to see a aura:systemError event", "markup://aura:systemError", event.get("descriptor"));
         assertEquals("Missing parameter value for aura.token",
                 ((Map<String, Object>) ((Map<String, Object>) ((event.get("attributes")))).get("values")).get("message"));
+        Object f = json.get("defaultHandler");
+        assertEquals(JsFunction.class, f.getClass());
+        assertEquals("var e=new Error('[SystemErrorException from server] unknown error');" +
+                "e.reported=true;" +
+                "throw e;", ((JsFunction) f).getBody());
     }
 
     /**

@@ -22,6 +22,9 @@ import org.auraframework.Aura;
 import org.auraframework.def.EventDef;
 import org.auraframework.instance.Event;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.JsFunction;
+
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 public class NoAccessException extends ClientSideEventException {
@@ -30,7 +33,7 @@ public class NoAccessException extends ClientSideEventException {
 
     /**
      * This is a special case for no access where the security provider failed.
-     *
+     * 
      * @param message the message.
      * @param cause the cause of the failure in the security provider (should be
      *            logged).
@@ -57,6 +60,15 @@ public class NoAccessException extends ClientSideEventException {
             return Aura.getInstanceService().getInstance("aura:noAccess", EventDef.class, attrs);
         } catch (QuickFixException x) {
             throw new AuraRuntimeException(x);
+        }
+    }
+
+    @Override
+    public JsFunction getDefaultHandler() {
+        if (this.redirectURL != null) {
+            return new JsFunction(ImmutableList.<String> of(), String.format("window.location = '%s';", redirectURL));
+        } else {
+            return new JsFunction(ImmutableList.<String> of(), "$A.clientService.hardRefresh()");
         }
     }
 

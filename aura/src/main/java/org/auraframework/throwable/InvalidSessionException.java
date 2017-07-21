@@ -22,7 +22,9 @@ import org.auraframework.Aura;
 import org.auraframework.def.EventDef;
 import org.auraframework.instance.Event;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.JsFunction;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 public class InvalidSessionException extends ClientSideEventException {
@@ -48,6 +50,12 @@ public class InvalidSessionException extends ClientSideEventException {
         } catch (QuickFixException x) {
             throw new AuraRuntimeException(x);
         }
+    }
+
+    @Override
+    public JsFunction getDefaultHandler() {
+        return new JsFunction(ImmutableList.of("token"),
+                "try{$A.clientService.invalidSession(token);}catch(e){window.location.reload(true);}");
     }
 
     @Override

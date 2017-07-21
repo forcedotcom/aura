@@ -22,6 +22,9 @@ import org.auraframework.Aura;
 import org.auraframework.def.EventDef;
 import org.auraframework.instance.Event;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.JsFunction;
+
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 public class SystemErrorException extends ClientSideEventException {
@@ -48,6 +51,14 @@ public class SystemErrorException extends ClientSideEventException {
         } catch (QuickFixException x) {
             throw new AuraRuntimeException(x);
         }
+    }
+
+    @Override
+    public JsFunction getDefaultHandler() {
+        return new JsFunction(ImmutableList.<String> of(), 
+                "var e=new Error('[SystemErrorException from server] unknown error');" +
+                "e.reported=true;" +
+                "throw e;");
     }
 
     @Override

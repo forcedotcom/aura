@@ -25,6 +25,18 @@
 
             $A.test.addWaitFor(expected, function() { return actual; });          
     	}
+    },
+
+    testMethodReturnValue: {
+        test: function(cmp) {
+            var expected = "EXPECTED";
+            var actual;
+
+            actual = cmp.withReturnValue(expected);
+
+            $A.test.assertEquals(expected, actual);
+        }
+
     }
     
 })

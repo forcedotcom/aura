@@ -64,6 +64,11 @@
 	    } else {
 	    	 throw new Error("did not get the value from stringAttr2");
 	     }
+	},
+
+	withReturnValue: function(cmp, event, helper) {
+		return event.getParam('arguments').value;
+
 	}
 	
 })

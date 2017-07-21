@@ -44,4 +44,8 @@
     <aura:method name="methodInParent">
         <aura:attribute name="stringAttrParent" type="String" default="default string in Parent"/>
     </aura:method>
+
+    <aura:method name="withReturnValue">
+        <aura:attribute name="value" type="String" default="What you pass in here will be the return value of the method"/>
+    </aura:method>
 </aura:component>

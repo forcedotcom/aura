@@ -13,19 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.http.cspinlining;
+package org.auraframework.impl.http.cspinlining;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.http.cspinlining.CSPInliningCriteria;
+import org.auraframework.http.cspinlining.CSPInliningRule;
+import org.auraframework.impl.util.BrowserInfo;
+import org.auraframework.impl.util.UserAgent;
 import org.springframework.core.annotation.Order;
 
 import static org.auraframework.service.CSPInliningService.InlineScriptMode.UNSUPPORTED;
 
 /**
- * IE 11 and less do not support CSP2 headers
+ * Browser support matrix for browsers that do not support CSP2 headers
  */
 @ServiceComponent
 @Order(1)
-public class CSPInliningIERule implements CSPInliningRule {
+public class CSPInliningBrowserRule implements CSPInliningRule {
+
+
     @Override
     public boolean isRelevant(CSPInliningCriteria criteria) {
         return criteria.getMode() != UNSUPPORTED;
@@ -33,21 +39,19 @@ public class CSPInliningIERule implements CSPInliningRule {
 
     @Override
     public void process(CSPInliningCriteria criteria) {
-        switch(criteria.getContext().getClient().getType()){
-            case WEBKIT:
-            case FIREFOX:
-            case IE12:
-            case OTHER:
-                break;
+        String userAgent = criteria.getContext().getClient().getUserAgent();
+        BrowserInfo bi = new BrowserInfo(userAgent);
 
-            case IE6:
-            case IE7:
-            case IE8:
-            case IE9:
-            case IE10:
-            case IE11:
-                criteria.setMode(UNSUPPORTED);
-                break;
+        boolean isSupported = false;
+
+        isSupported |= bi.isBrowser(UserAgent.CHROME, 40, true); //covers mobile and desktop
+        isSupported |= bi.isBrowser(UserAgent.EDGE, 15, true);
+        isSupported |= bi.isBrowser(UserAgent.FIREFOX, 31, true);
+        isSupported |= bi.isBrowser(UserAgent.SAFARI, 10, true); //covers mobile and desktop
+        isSupported |= bi.isBrowser(UserAgent.OPERA, 23, true);
+
+        if (!isSupported){
+            criteria.setMode(UNSUPPORTED);
         }
     }
 }

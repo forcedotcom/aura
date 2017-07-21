@@ -289,7 +289,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         // TODO COMPAT : prefetch compat helper resources
     }
 
-    private String getSource(String path) throws MalformedURLException {
+    public String getSource(String path) throws MalformedURLException {
         if (this.resourceLoader == null) {
             this.resourceLoader = new ResourceLoader(LIB_CACHE_TEMP_DIR, true);
         }

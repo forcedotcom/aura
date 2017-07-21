@@ -147,7 +147,7 @@ public class IntegrationImpl implements Integration {
             // integrationService dynamically creates and injects the component,
             // so the client library on injected component has no way to become a
             // dependency of the integrationService app.
-            BaseComponentDef baseCmpDef = (BaseComponentDef)componentDef;
+            BaseComponentDef baseCmpDef = componentDef;
             List<String> clientLibUrls = new ArrayList<>();
             for (ClientLibraryDef def : baseCmpDef.getClientLibraries()) {
                 clientLibUrls.add(this.clientLibraryService.getResolvedUrl(def));

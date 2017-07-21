@@ -21,12 +21,15 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import com.google.common.collect.ImmutableList;
 
@@ -104,7 +107,7 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
     public void testJavascriptGenerationProduction() throws Exception {
     	doTestJavascriptGeneration(JavascriptGeneratorMode.PRODUCTION);
     }
-    
+
     @Test
     public void testJavascriptGenerationDevelopment() throws Exception {
     	doTestJavascriptGeneration(JavascriptGeneratorMode.DEVELOPMENT);
@@ -116,6 +119,17 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
                 file.getName(), ImmutableList.<DirectiveType<?>> of(DirectiveFactory.getMultiLineMockDirectiveType(),
                         DirectiveFactory.getMockDirective(), DirectiveFactory.getDummyDirectiveType()), EnumSet.of(
                         mode));
+
+        jg = Mockito.spy(jg);
+
+        String mockEngineCompat = "var mock='engine compat';console.log(mock);";
+
+        // mock out getSource for engine to test compat
+        Mockito.when(jg.getSource("aura/resources/engine/engine_compat.js")).thenReturn(mockEngineCompat);
+        Mockito.when(jg.getSource("aura/resources/engine/engine_compat.min.js")).thenReturn(mockEngineCompat);
+        Mockito.when(jg.getSource("aura/resources/compat-helpers/compat-helpers.js")).thenReturn("");
+        Mockito.when(jg.getSource("aura/resources/compat-helpers/compat-helpers.min.js")).thenReturn("");
+
         File dir = getResourceFile("/testdata/javascript/generated/");
 
         String genFileName = "testDummy_" + mode.getSuffix() + ".js";
@@ -124,36 +138,41 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
         jg.parse();
         jg.generate(dir, false);
         File genFile = new File(dir, genFileName);
-        try {
-            if (!genFile.exists()) {
-                fail("Javascript processor failed to create " + genFile.getAbsolutePath());
-            } else {
-                StringBuilder fileContents = new StringBuilder();
-                BufferedReader reader = new BufferedReader(new FileReader(genFile));
-                try {
-                    String line = reader.readLine();
-                    while (line != null) {
-                        fileContents.append(line);
-                        fileContents.append("\n");
-                        line = reader.readLine();
-                    }
-                } finally {
-                    reader.close();
-                }
-                goldFileText(fileContents.toString(), "/" + genFileName);
-            }
-        } finally {
-            if (genFile.exists()) {
-                genFile.delete();
-            }
-        }
-
-        // assert compat version also exists
         File genCompatFile = new File(dir, genCompatFileName);
-        boolean compatFileExists = genCompatFile.exists();
-        assertTrue("compat file does not exist", compatFileExists);
-        if (compatFileExists) {
-            genCompatFile.delete();
+        List<File> filesToCheck = new ArrayList<>();
+        filesToCheck.add(genFile);
+        filesToCheck.add(genCompatFile);
+
+        for (File fileToCheck: filesToCheck) {
+            try {
+                if (!fileToCheck.exists()) {
+                    fail("Javascript processor failed to create " + fileToCheck.getAbsolutePath());
+                } else {
+                    StringBuilder fileContents = new StringBuilder();
+                    BufferedReader reader = new BufferedReader(new FileReader(fileToCheck));
+                    try {
+                        String line = reader.readLine();
+                        while (line != null) {
+                            fileContents.append(line);
+                            fileContents.append("\n");
+                            line = reader.readLine();
+                        }
+                    } finally {
+                        reader.close();
+                    }
+                    String fileToCheckContents = fileContents.toString();
+                    String fileToCheckFileName = fileToCheck.getName();
+
+                    if (fileToCheckFileName.endsWith("_compat.js")) {
+                        assertTrue("compat file should have contents from engine_compat", fileToCheckContents.contains(mockEngineCompat));
+                    }
+                    goldFileText(fileToCheckContents.toString(), "/" + fileToCheck.getName());
+                }
+            } finally {
+                if (fileToCheck.exists()) {
+                    fileToCheck.delete();
+                }
+            }
         }
 
         File unExpectedGenFile = new File(dir, "testDummy_test.js");

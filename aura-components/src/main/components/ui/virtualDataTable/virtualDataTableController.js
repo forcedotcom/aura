@@ -134,7 +134,7 @@
     sort: function(cmp, event, helper) {
         var sortBy = event.getParam('arguments').sortBy;
         
-        if (sortBy) {
+        if ($A.util.isString(sortBy)) {
             helper.updateSortData(cmp, sortBy);
         }
     },

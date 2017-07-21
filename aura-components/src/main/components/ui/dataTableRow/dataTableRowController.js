@@ -21,7 +21,7 @@
         var el = cmp.getElement();
         var target = e.target;
         // check tagName whether exist, since it may reach #root document
-        while(el !== target && target.tagName){
+        while(target && el !== target && target.tagName) {
             if(target.tagName === "A"){
                 return;
             }

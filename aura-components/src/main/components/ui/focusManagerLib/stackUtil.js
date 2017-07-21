@@ -82,6 +82,15 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
         return false;
     }
 
+    function sanitizeClassName(className) {       
+        if (className) {
+            var path = String(className).trim();
+            return '.' + path.replace(/\s+/g, ".");
+        } else {
+            return "";
+        }
+    }
+
     /**
      * Generates selector for a given element.
      * @param {Element} element
@@ -91,20 +100,19 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
         if (!(element instanceof Element)) {
             return undefined;
         }
-
         var selector = [];
         while (element && element.nodeType === Node.ELEMENT_NODE) {
             var path = element.nodeName.toLowerCase();
-                var sibling = element, index = 1;
-                while ((sibling = sibling.previousElementSibling)) {
-                    if (sibling.nodeName.toLowerCase() === path) {
-                        index++;
-                    }
+            var sibling = element, index = 1;
+            while ((sibling = sibling.previousElementSibling)) {
+                if (sibling.nodeName.toLowerCase() === path) {
+                    index++;
                 }
-                if (index !== 1) {
-                    path += ":nth-of-type("+index+")";
-                }
-            selector.unshift(path + (element.className ? '.' + element.className.trim().replace(/\s+/g, ".") : ''));
+            }
+            if (index !== 1) {
+                path += ":nth-of-type("+index+")";
+            }
+            selector.unshift(path + sanitizeClassName(element.className));
             element = element.parentNode;
         }
         return selector.join(" > ");

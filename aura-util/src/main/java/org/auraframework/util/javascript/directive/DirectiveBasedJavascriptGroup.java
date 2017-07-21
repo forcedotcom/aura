@@ -342,6 +342,12 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                 jsWriter.compress(everything, stringWriter, modeJs.getName());
                 String compressed = stringWriter.toString();
 
+                // strip out spaces and comments for external libraries
+                JavascriptWriter libsJsWriter = JavascriptWriter.CLOSURE_WHITESPACE_ONLY;
+                StringWriter libsWriter = new StringWriter();
+                libsJsWriter.compress(libs, libsWriter, modeJs.getName());
+                String libsCompressed = libsWriter.toString();
+
                 for (File output : filesToWrite) {
                     if (writtenFiles.contains(output)) continue;
                     try {
@@ -355,18 +361,12 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                                     (isCompat ? engineCompatMin : engineMin) :
                                     (isCompat ? ( isProdDebug ? engineCompatProdDebug : engineCompat) : ( isProdDebug ? engineProdDebug : engine));
                             writer.append(eng).append("\n");
-                            // TODO COMPAT : append compat helpers
                         }
 
                         writer.append(eval).append("\n");
                         writer.append(compressed).append("\n");
+                        writer.append(libsCompressed).append("\n");
 
-                        // strip out spaces and comments for external libraries
-                        jsWriter = JavascriptWriter.CLOSURE_WHITESPACE_ONLY;
-                        stringWriter = new StringWriter();
-                        jsWriter.compress(libs, stringWriter, modeJs.getName());
-                        compressed = stringWriter.toString();
-                        writer.append(compressed).append("\n");
                     } finally {
                         if (writer != null) {
                             writer.close();

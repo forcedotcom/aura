@@ -23,7 +23,7 @@
             <artifactId>aura-interfaces</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.polyfills</groupId>
+            <groupId>org.polyfillservice</groupId>
             <artifactId>polyfill-service-api</artifactId>
         </dependency>
     </dependencies>

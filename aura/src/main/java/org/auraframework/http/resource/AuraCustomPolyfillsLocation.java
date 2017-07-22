@@ -16,7 +16,7 @@
 package org.auraframework.http.resource;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
-import org.polyfill.api.interfaces.PolyfillLocation;
+import org.polyfillservice.api.interfaces.PolyfillLocation;
 import org.springframework.context.annotation.Primary;
 
 /**

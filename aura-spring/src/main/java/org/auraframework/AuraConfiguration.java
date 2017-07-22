@@ -15,19 +15,16 @@
  */
 package org.auraframework;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.polyfill.api.components.Feature;
-import org.polyfill.api.components.Query;
-import org.polyfill.api.components.ServiceConfig;
-import org.polyfill.api.configurations.PolyfillApiConfig;
+import org.polyfillservice.api.components.ServiceConfig;
+import org.polyfillservice.api.configurations.PolyfillApiConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Spring configuration to autoscan all aura packages
@@ -63,15 +60,11 @@ public class AuraConfiguration {
     @Primary
     @Bean
     public ServiceConfig getAuraPolyfillServiceConfig() {
-        return new ServiceConfig().setPolyfills(this.polyfills);
-    }
-
-    @Primary
-    @Bean
-    public Query defaultQuery() {
-        List<Feature> polyfillRequestList = this.polyfills.stream()
-                .map(Feature::new)
-                .collect(Collectors.toList());
-        return new Query.Builder(polyfillRequestList).build();
+        return new ServiceConfig.Builder()
+                .setPolyfills(this.polyfills)
+                .setGated(true)
+                .setMinify(true)
+                .setLoadOnUnknownUA(true)
+                .build();
     }
 }

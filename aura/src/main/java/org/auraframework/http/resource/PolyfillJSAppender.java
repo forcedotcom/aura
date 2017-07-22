@@ -23,9 +23,9 @@ import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.http.BrowserCompatibilityService;
 import org.auraframework.system.AuraContext;
-import org.polyfill.api.interfaces.PolyfillService;
-import org.polyfill.api.interfaces.UserAgent;
-import org.polyfill.api.interfaces.UserAgentParserService;
+import org.polyfillservice.api.interfaces.PolyfillService;
+import org.polyfillservice.api.interfaces.UserAgent;
+import org.polyfillservice.api.interfaces.UserAgentParserService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @ServiceComponent

@@ -1366,6 +1366,10 @@ Aura.Utils.Util.prototype.on = (function() {
 Aura.Utils.Util.prototype.removeOn = function(element, eventName, listener, useCapture) {
     $A.assert(element, "try to remove an event listener from a no-longer-exist DOM element");
 
+    if (this.isUndefined(listener)) {
+        return;
+    }
+
     if (listener.registeredAuraHandler) {
         listener = listener.registeredAuraHandler;
     }

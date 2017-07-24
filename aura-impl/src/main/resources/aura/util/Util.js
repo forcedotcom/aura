@@ -1604,6 +1604,7 @@ Aura.Utils.Util.prototype.applyNotFromPrototype = function(/* Object|Function */
     if(members) {
         var value=null;
         for (var property in members) {
+            if(!members.hasOwnProperty(property)) {continue;}
             var setValue=forceCopy||!baseObject.hasOwnProperty(property);
             if(setValue||deepCopy){
                 value=members[property];
@@ -1615,7 +1616,7 @@ Aura.Utils.Util.prototype.applyNotFromPrototype = function(/* Object|Function */
                         branchValue = baseObject[property] || {};
                     }
                     if (branchValue) {
-                        baseObject[property] = this.apply(branchValue, value, forceCopy, deepCopy);
+                        baseObject[property] = this.applyNotFromPrototype(branchValue, value, forceCopy, deepCopy);
                         continue;
                     }
                 }

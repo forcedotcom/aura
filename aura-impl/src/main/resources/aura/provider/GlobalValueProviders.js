@@ -204,7 +204,7 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
                                 map[type] = {};
                                 value.push({"type":type, "values":map[type]});
                             }
-                            $A.util.apply(map[type], toStore[j]["values"], true, true);
+                            $A.util.applyNotFromPrototype(map[type], toStore[j]["values"], true, true);
                         }
 
                         toStore = value;

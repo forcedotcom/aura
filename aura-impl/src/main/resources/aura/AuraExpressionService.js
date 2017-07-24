@@ -295,10 +295,17 @@ AuraExpressionService.prototype.resolveLocatorContext = function (cmp, locatorDe
     }
 
     var context = {};
-    for (var key in contextDefs) {
-        var expression = this.create(cmp, contextDefs[key]);
-        if (expression) {
-            context[key] = typeof expression === "string" ? expression : expression.evaluate();
+    if (cmp.isValid()) {
+        try {
+            $A.clientService.setCurrentAccess(cmp);
+            for (var key in contextDefs) {
+                var expression = this.create(cmp, contextDefs[key]);
+                if (expression) {
+                    context[key] = typeof expression === "string" ? expression : expression.evaluate();
+                }
+            }
+        } finally {
+            $A.clientService.releaseCurrentAccess();
         }
     }
     return context;

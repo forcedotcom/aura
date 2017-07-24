@@ -154,7 +154,7 @@ public class AuraResourceServletTest extends AuraTestCase {
 
         // For etag to work properly, we need to "disable" the browser from caching it permanently.
         headers = mockResponse.getHeaders(HttpHeaders.CACHE_CONTROL);
-        assertTrue("Failed to find expected value in header: " + headers, headers.contains("no-cache"));
+        assertTrue("Failed to find expected value in header: " + headers, headers.contains("private,must-revalidate,max-age=0"));
 
         // If referer is not null, the image should be sent as a embedded image.
         // IE not an attachment.

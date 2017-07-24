@@ -16,6 +16,11 @@
 
 package org.auraframework.http.resource;
 
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.http.HttpHeaders;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.DefDescriptor;
@@ -25,10 +30,6 @@ import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @ServiceComponent
 public class ResourceSvg extends AuraResourceImpl {
@@ -43,7 +44,7 @@ public class ResourceSvg extends AuraResourceImpl {
         try {
             //For Security and caching we require the host to validate the cache. Thus we need to overwrite
             //the original caching
-            response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache");
+            response.setHeader(HttpHeaders.CACHE_CONTROL, "private,must-revalidate,max-age=0");
 
             String fqn = lookup.get(request);
             if (fqn == null || fqn.isEmpty()) {

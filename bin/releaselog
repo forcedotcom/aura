@@ -1,1 +1,14 @@
-git log  --pretty=format:'%ae : %s' --no-merges  aura-framework-$1..aura-framework-$2 | grep -v "\[maven-release-plugin\]" | sed "s/gus.*\//\[GUS\]\//g" | sed "s/@rev\([^@]*\)@/[REVIEWED BY: \1]/g" | sed ':a;N;$!ba;s/\n/    ;    /g'
+#!/bin/bash 
+
+checkVersion() {
+  git rev-parse "$1^{tag}" >/dev/null 2>&1 && echo "$1"
+}
+
+findVersion() {
+  checkVersion "v$1" || checkVersion "aura-framework-$1" || checkVersion "$1" || echo ">>>$1<<<"
+}
+
+OLD=$(findVersion $1)
+NEW=$(findVersion $2)
+
+git log  --pretty=format:'%ae : %s' --no-merges  $OLD..$NEW | grep -v "\[maven-release-plugin\]" | sed "s/gus.*\//\[GUS\]\//g" | sed "s/@rev\([^@]*\)@/[REVIEWED BY: \1]/g" | sed ':a;N;$!ba;s/\n/    ;    /g'

@@ -25,6 +25,7 @@ import org.auraframework.impl.factory.XMLParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Test;
 
@@ -43,6 +44,7 @@ import java.util.function.Function;
  */
 public class GenericXmlHandlerTest extends AuraImplTestCase {
     private final static String TAG = "aura:designTest";
+    private final static String TAG2 = "aura:xmlTest";
     private final static List<String> nonPriviledgedAttr = Lists.newArrayList("testattr");
     private final static List<String> priviledgedAttr = Lists.newArrayList("priviledged", "testattr");
 
@@ -271,6 +273,67 @@ public class GenericXmlHandlerTest extends AuraImplTestCase {
         }
         assertExceptionMessageContains(exception, AuraRuntimeException.class, "Unexpected tag");
 
+    }
+
+    @Test
+    public void testDuplicateElementsAttribute() throws Exception {
+        GenericXmlValidator validator = new MockValidator(TAG2, false, ATTRIBUTE_FUNC);
+        GenericXmlValidator rootValidator = new MockValidator(TAG, false,
+                f -> Collections.emptyList(), Collections.singleton(validator));
+        final String xml = "<aura:designtest> " +
+                "<aura:xmlTest testattr=\"test\"/> " +
+                "<aura:xmlTest testattr=\"test\"/>" +
+                "</aura:designtest>";
+        GenericXmlElementHandler handler = createGenericXmlHandler(xml, rootValidator);
+        Exception cause = null;
+        try {
+            handler.createElement().validateDefinition();
+        } catch (Exception e) {
+            cause = e;
+        }
+
+        assertExceptionMessageContains(cause, InvalidDefinitionException.class, "aura:xmlTest");
+    }
+
+    @Test
+    public void testDuplicateElementsText() throws Exception {
+        GenericXmlValidator validator = new MockValidator(TAG2, true, ATTRIBUTE_FUNC);
+        GenericXmlValidator rootValidator = new MockValidator(TAG, false,
+                f -> Collections.emptyList(), Collections.singleton(validator));
+        final String xml = "<aura:designtest> " +
+                "<aura:xmlTest>someText</aura:xmlTest>" +
+                "<aura:xmlTest>someText</aura:xmlTest>" +
+                "</aura:designtest>";
+        GenericXmlElementHandler handler = createGenericXmlHandler(xml, rootValidator);
+        Exception cause = null;
+        try {
+            handler.createElement().validateDefinition();
+        } catch (Exception e) {
+            cause = e;
+        }
+
+        assertExceptionMessageContains(cause, InvalidDefinitionException.class, "aura:xmlTest");
+    }
+
+    @Test
+    public void testDuplicateElementsIgnoreChild() throws Exception {
+        GenericXmlValidator validator1 = new MockValidator(TAG2, false, ATTRIBUTE_FUNC);
+        GenericXmlValidator validator = new MockValidator(TAG2, false, ATTRIBUTE_FUNC, Collections.singleton(validator1));
+        GenericXmlValidator rootValidator = new MockValidator(TAG, false,
+                f -> Collections.emptyList(), Collections.singleton(validator));
+        final String xml = "<aura:designtest> " +
+                "<aura:xmlTest testattr=\"test\"> <aura:xmlTest/> </aura:xmlTest>" +
+                "<aura:xmlTest testattr=\"test\"/>" +
+                "</aura:designtest>";
+        GenericXmlElementHandler handler = createGenericXmlHandler(xml, rootValidator);
+        Exception cause = null;
+        try {
+            handler.createElement().validateDefinition();
+        } catch (Exception e) {
+            cause = e;
+        }
+
+        assertExceptionMessageContains(cause, InvalidDefinitionException.class, "aura:xmlTest");
     }
 
     private static class MockValidator extends GenericXmlValidator {

@@ -29,6 +29,7 @@ import javax.management.modelmbean.XMLParseException;
 import org.auraframework.def.genericxml.GenericXmlElement;
 import org.auraframework.def.genericxml.GenericXmlValidator;
 import org.auraframework.impl.system.BaseXmlElementImpl;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableSet;
@@ -137,6 +138,12 @@ public class GenericXmlElementImpl extends BaseXmlElementImpl implements Generic
             if (text != null) {
                 setParseError(new XMLParseException("Elements can not contain child tags and text."));
                 return;
+            }
+            if (children.containsEntry(validatorClass, child)) {
+                setParseError(new InvalidDefinitionException(
+                        String.format("Element <%s> already exists", child.getName()), getLocation()));
+                return;
+
             }
             children.put(validatorClass, child);
         }

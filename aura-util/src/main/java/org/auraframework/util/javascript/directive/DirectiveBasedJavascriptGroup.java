@@ -271,11 +271,11 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         }
 
         if (compatHelpersSource != null && engineCompatSource != null) {
-            this.engineCompat = "try {\n" + compatHelpersSource + "\n" + engineCompatSource + "\n} catch (e) {}";
+            this.engineCompat = "try {\n" + engineCompatSource + "\n" + compatHelpersSource + "\n} catch (e) {}";
         }
 
         if (compatHelpersMinSource != null && engineCompatMinSource != null) {
-            this.engineCompatMin = "try { " + compatHelpersMinSource + "\n" + engineCompatMinSource + " } catch (e) {}";
+            this.engineCompatMin = "try { " + engineCompatMinSource + "\n" + compatHelpersMinSource + " } catch (e) {}";
         }
 
         if (engineProdDebugSource != null) {
@@ -283,10 +283,8 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         }
 
         if (compatHelpersSource != null && engineCompatProdDebugSource != null) {
-            this.engineCompatProdDebug = "try {\n" + compatHelpersSource + "\n" + engineCompatProdDebugSource + "\n} catch (e) {}";
+            this.engineCompatProdDebug = "try {\n" + engineCompatProdDebugSource + "\n" + compatHelpersSource + "\n} catch (e) {}";
         }
-
-        // TODO COMPAT : prefetch compat helper resources
     }
 
     public String getSource(String path) throws MalformedURLException {

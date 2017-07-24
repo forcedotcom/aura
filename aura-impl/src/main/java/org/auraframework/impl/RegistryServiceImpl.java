@@ -102,7 +102,11 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
 
     private CachingService cachingService;
 
-    private List<ComponentLocationAdapter> locationAdapters;
+    @Inject
+    private Optional<List<ComponentLocationAdapter>> locationAdapters;
+
+    // FIXME: This is busted.
+    private List<ComponentLocationAdapter> sortedAdapters;
 
     private AuraGlobalControllerDefRegistry globalControllerDefRegistry;
 
@@ -324,19 +328,21 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
      * Get the component location adapter registries.
      */
     private List<DefRegistry> getCLARegistries() {
-        Collection<ComponentLocationAdapter> markupLocations = locationAdapters;
+        Collection<ComponentLocationAdapter> markupLocations = getLocationAdapters();
         List<DefRegistry> regBuild = Lists.newArrayList();
 
         regBuild.add(AuraStaticTypeDefRegistry.INSTANCE);
         regBuild.add(globalControllerDefRegistry);
 
-        for (ComponentLocationAdapter location : markupLocations) {
-            if (location != null) {
-                SourceLocationInfo sli = getSourceLocationInfo(location);
-                if (!sli.isChanged() && sli.staticLocationRegistries != null) {
-                    regBuild.addAll(sli.staticLocationRegistries);
-                } else {
-                    regBuild.addAll(sli.markupRegistries);
+        if (markupLocations != null) {
+            for (ComponentLocationAdapter location : markupLocations) {
+                if (location != null) {
+                    SourceLocationInfo sli = getSourceLocationInfo(location);
+                    if (!sli.isChanged() && sli.staticLocationRegistries != null) {
+                        regBuild.addAll(sli.staticLocationRegistries);
+                    } else {
+                        regBuild.addAll(sli.markupRegistries);
+                    }
                 }
             }
         }
@@ -530,20 +536,35 @@ public class RegistryServiceImpl implements RegistryService, SourceListener {
      * @return the locationAdapters
      */
     public List<ComponentLocationAdapter> getLocationAdapters() {
-        return locationAdapters;
+        // Synchronize on this because location adapters can be replaced.
+        synchronized(this) {
+            if (this.sortedAdapters == null) {
+                List<ComponentLocationAdapter> working;
+                working = locationAdapters.orElse(null);
+                if (working == null) {
+                    working = Lists.newArrayList();
+                } else {
+                    working = Lists.newArrayList(working);
+                }
+                working.sort(Comparator.comparing(ComponentLocationAdapter::type));
+                this.sortedAdapters = working;
+            }
+            return this.sortedAdapters;
+        }
     }
 
     /**
      * @param locationAdapters the locationAdapters to set
      */
-    @Inject
     public void setLocationAdapters(List<ComponentLocationAdapter> locationAdapters) {
         // FIXME!!!!
         // component locations MUST be processed first as their namespaces MUST be available for lookup
         // to allow modules to override as their namespace are all lower cased
         // DefType.COMPONENT before DefType.MODULE
-    	locationAdapters.sort(Comparator.comparing(ComponentLocationAdapter::type));
-        this.locationAdapters = locationAdapters;
+        synchronized (this) {
+            this.locationAdapters = Optional.of(locationAdapters);
+            this.sortedAdapters = null;
+        }
     }
 
     @Inject

@@ -20,9 +20,9 @@ import javax.annotation.Nullable;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.system.BundleSourceLoader;
 import org.auraframework.system.InternalNamespaceSourceLoader;
 import org.auraframework.system.Source;
-import org.auraframework.system.SourceLoader;
 
 /**
  * This source loader allows tests to load and unload source from strings.
@@ -36,7 +36,7 @@ import org.auraframework.system.SourceLoader;
  * represented. This could be fixed by providing a fixed view into the namespaces provided.
  *
  */
-public interface StringSourceLoader extends SourceLoader, InternalNamespaceSourceLoader {
+public interface StringSourceLoader extends BundleSourceLoader, InternalNamespaceSourceLoader {
     String DEFAULT_NAMESPACE = "string";
     String OTHER_NAMESPACE = "string1";
     String DEFAULT_CUSTOM_NAMESPACE = "cstring";

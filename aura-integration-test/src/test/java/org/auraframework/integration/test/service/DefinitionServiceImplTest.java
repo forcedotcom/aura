@@ -15,14 +15,24 @@
  */
 package org.auraframework.integration.test.service;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
+
 import org.auraframework.Aura;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.StyleDef;
+import org.auraframework.def.TestSuiteDef;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.DefinitionServiceImpl;
@@ -49,9 +59,10 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Tests for DefinitionServiceImpl.
@@ -66,6 +77,66 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
     @Override
     public void tearDown() throws Exception {
         super.tearDown();
+    }
+
+    @Test
+    public void testDefDescriptorForTestSuiteOnApplicationWithNoBundle() throws Exception {
+        String appSource = "<aura:application />";
+        String appTestSource = "({ testNothing: { test: function() {} }})";
+
+        DefDescriptor<ApplicationDef> appDesc = getAuraTestingUtil().addSourceAutoCleanup(
+                ApplicationDef.class, appSource, StringSourceLoader.DEFAULT_NAMESPACE+":testSuiteApp",
+                NamespaceAccess.INTERNAL);
+        DefDescriptor<TestSuiteDef> realTestDesc = definitionService.getDefDescriptor(appDesc,
+                DefDescriptor.JAVASCRIPT_PREFIX, TestSuiteDef.class);
+        DefDescriptor<TestSuiteDef> fakeTestDesc = definitionService.getDefDescriptor(
+                "js://"+appDesc.getNamespace()+"."+appDesc.getName(), TestSuiteDef.class);
+        getAuraTestingUtil().addSourceAutoCleanup(realTestDesc, appTestSource);
+
+        startDefaultContext();
+        try {
+            assertNull(fakeTestDesc.getBundle());
+            assertTrue(definitionService.exists(fakeTestDesc));
+            assertNotNull(definitionService.getDefinition(fakeTestDesc));
+            DescriptorFilter filter = new DescriptorFilter("js://"+appDesc.getDescriptorName(), DefType.TESTSUITE);
+            Set<DefDescriptor<?>> found = definitionService.find(filter);
+            assertEquals(1, found.size());
+            filter = new DescriptorFilter(appDesc.getDescriptorName(), DefType.TESTSUITE);
+            found = definitionService.find(filter);
+            assertEquals(1, found.size());
+        } finally {
+            endContextIfEstablished();
+        }
+    }
+
+    @Test
+    public void testDefDescriptorForTestSuiteOnComponentWithNoBundle() throws Exception {
+        String cmpSource = "<aura:component />";
+        String cmpTestSource = "({ testNothing: { test: function() {} }})";
+
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().addSourceAutoCleanup(
+                ComponentDef.class, cmpSource, StringSourceLoader.DEFAULT_NAMESPACE+":testSuiteApp",
+                NamespaceAccess.INTERNAL);
+        DefDescriptor<TestSuiteDef> realTestDesc = definitionService.getDefDescriptor(cmpDesc,
+                DefDescriptor.JAVASCRIPT_PREFIX, TestSuiteDef.class);
+        DefDescriptor<TestSuiteDef> fakeTestDesc = definitionService.getDefDescriptor(
+                "js://"+cmpDesc.getNamespace()+"."+cmpDesc.getName(), TestSuiteDef.class);
+        getAuraTestingUtil().addSourceAutoCleanup(realTestDesc, cmpTestSource);
+
+        startDefaultContext();
+        try {
+            assertNull(fakeTestDesc.getBundle());
+            assertTrue(definitionService.exists(fakeTestDesc));
+            assertNotNull(definitionService.getDefinition(fakeTestDesc));
+            DescriptorFilter filter = new DescriptorFilter("js://"+cmpDesc.getDescriptorName(), DefType.TESTSUITE);
+            Set<DefDescriptor<?>> found = definitionService.find(filter);
+            assertEquals(1, found.size());
+            filter = new DescriptorFilter(cmpDesc.getDescriptorName(), DefType.TESTSUITE);
+            found = definitionService.find(filter);
+            assertEquals(1, found.size());
+        } finally {
+            endContextIfEstablished();
+        }
     }
     
     @Test

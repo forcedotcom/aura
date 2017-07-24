@@ -69,6 +69,23 @@
     },
 
     /**
+     * Verify the failing descriptor is set as the created component when error is thrown during component creation.
+     */
+    testFailingDescriptorForErrorDuringComponentCreation: {
+        test: function(cmp) {
+            var expected = "auratest:errorHandling$controller$init";
+
+            try {
+                $A.createComponent("markup://auratest:errorHandling", { throwErrorFromInit: true }, function() {});
+                $A.test.fail("Expecting an error thrown from $A.createComponent.");
+            } catch (e) {
+                var actual = e["component"];
+                $A.test.assertEquals(expected, actual);
+            }
+        }
+    },
+
+    /**
      * Verify that failing descriptor is correct when an Error gets thrown from aura:method.
      * The test approach is to click a button to call aura:method in controller.
      */

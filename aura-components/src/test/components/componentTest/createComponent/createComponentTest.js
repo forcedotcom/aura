@@ -136,8 +136,7 @@
         }]
     },
 
-    // TODO(W-2529066): Newly created component not indexed against component it's added to
-    _testCreatesButtonWithLocalId:{
+    testCreatesButtonWithLocalId:{
         test:[function(component){
             var targetId="testButton";
             var actionComplete = false;

@@ -27,7 +27,6 @@
                         if (status === "SUCCESS") {
                             cmp.set("v.childCmp", [newCmp]);
                             cmp.set("v.childCmpLoaded", true);
-                            cmp.index(newCmp.getLocalId(), newCmp.getGlobalId()); // because of W-2529066
                         } else if (status === "INCOMPLETE") {
                             $A.log("No response from server or client is offline.");
                         } else if (status === "ERROR") {

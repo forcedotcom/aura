@@ -84,7 +84,7 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
 
     function sanitizeClassName(className) {       
         if (className) {
-            var path = String(className).trim();
+            var path = typeof className.trim === "function" ? className.trim() : $A.util.trim(className);
             return '.' + path.replace(/\s+/g, ".");
         } else {
             return "";
@@ -118,6 +118,7 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
         return selector.join(" > ");
     }
 
+
     /**
      * Pushes the given element or activeElement and its Selector into the stack.
      * @param {Element} [element] - Element to which the focus should return.
@@ -135,20 +136,21 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
     }
 
     /**
-     * For a given component that has focus it pops the element, xPath and
-     * sets focus to it if its visible in the DOM.
+     * For a given component that has focus it pops the element, xPath.
      * @param {Component} component - Component from which this method is called.
      */
-    function unstackFocus(component) {
+    function popFocus(component) {
         if (!hasFocus(component)) {
-            return;
-        }
-
+            return null;
+        } 
+        
         var el = pop();
         while (el && (!document.body.contains(el.domElement) || focusUtil.isElementHidden(el.domElement))) {
             if(el.selector) {
                 var element = getQuerySelector(el.selector);
-                if(element && document.body.contains(element) && !focusUtil.isElementHidden(element)) {
+                if(element && 
+                    document.body.contains(element) && 
+                    !focusUtil.isElementHidden(element)) {
                     el.domElement = element;
                     break;
                 }
@@ -156,16 +158,34 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
             el = pop();
         }
 
-        if (!$A.util.isUndefinedOrNull(el) && !getActiveElement()) {
+        if ($A.util.isUndefinedOrNull(el)) {
+            return null;
+        }
+
+        if(!getActiveElement()) {
             // last resort, make sure focus is in the document
             el.domElement = document.body;
         }
-        el && el.domElement.focus();
+        return el.domElement;
+    }    
+
+    /**
+     * For a given component that has focus it pops the element, xPath and
+     * sets focus to it if its visible in the DOM.
+     * @param {Component} component - Component from which this method is called.
+     */
+    function unstackFocus(component) {
+        var domElement = popFocus(component);
+        
+        if (domElement && domElement.focus) {
+            domElement.focus();
+        } 
     }
 
     return {
         stackFocus   : stackFocus,
-        unstackFocus : unstackFocus
+        unstackFocus : unstackFocus,
+        popFocus : popFocus
     };
 
 }

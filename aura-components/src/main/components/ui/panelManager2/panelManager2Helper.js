@@ -190,7 +190,7 @@
             panelObj   = this.PANELS_INSTANCE[panelId],
             panel      = panelObj.panel;
 
-        this.setReturnFocusElement(panel);
+        this.pushReturnFocusElement(panel);
                 
         $A.assert(panelObj, 'Couldnt find instance to show');
 
@@ -221,11 +221,8 @@
 
         stack.splice(index, 1);
 
-        // Update the return focus element if the panel has a selector specified.
-        var returnFocusElementSelector = panel.get("v.returnFocusElementSelector");
-        if (returnFocusElementSelector) {
-            cmp.returnFocus = document.querySelector(returnFocusElementSelector);
-        }
+        // pop return focus before panel is destroyed.
+        var returnFocus = this.popReturnFocusElement(panel);
 
         this.containerManager.destroyContainer(panel);
 
@@ -244,9 +241,8 @@
         
         // Set the return focus. This has to happen after activating the next panel (above), otherwise activate will steal the focus.
         if (panel.closedBy !== "closeOnClickOut" &&
-            shouldReturnFocus === true && cmp.returnFocus) {
-            cmp.returnFocus.focus();
-            cmp.returnFocus = null;
+            shouldReturnFocus === true && returnFocus) {
+            returnFocus.focus();
         }
 
         // this will happen if a panel is destroyed
@@ -381,17 +377,32 @@
     },
 
     /**
-     * returns the element to be focused when the panel is destroyed.
+     * Stack the element to be focused when the panel is destroyed.
      * @param panelComponent
      * @private
      */
-    setReturnFocusElement: function(panelComponent) {
-        var returnFocusElement = panelComponent.get('v.returnFocusElement');
+    pushReturnFocusElement: function(panel) {
+        var returnFocusElement = panel.get('v.returnFocusElement');
 
         if ($A.util.isUndefinedOrNull(returnFocusElement)) {
         	returnFocusElement = document.activeElement;
         }
 
         this.focusLib.stackUtil.stackFocus(returnFocusElement);
+    },
+
+    /**
+     * return the element to be focused when the panel is destroyed.
+     * @param panel
+     * @param cmp
+     * @private
+     */
+    popReturnFocusElement: function(panel) {
+        var selector = panel.get("v.returnFocusElementSelector");
+        var focusElement = this.focusLib.stackUtil.popFocus(panel);
+        if (selector) {
+            focusElement = document.querySelector(selector);
+        }
+        return focusElement;
     }
 })// eslint-disable-line semi

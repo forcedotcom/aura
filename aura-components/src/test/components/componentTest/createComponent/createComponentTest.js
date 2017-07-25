@@ -391,5 +391,56 @@
                 $A.test.assertTrue(actual.indexOf(expected) != -1, "Received unexpected action status message: <"+actual+">");
             });
         }
+    },
+
+    /**
+     * Verify that when we pass in string with the same format 
+     * as an expression to create component, it doesn't not convert it to a reference. 
+     *
+     * 1. Set v.reference to something known
+     * 2. Create a text component with a string that is an expression
+     * 3. Get the value that the text component was created with
+     * 4. Validate that it is the raw string value, not the value that the expression would have pointed at if it was a live reference.
+     */
+    testCreateWithExpression: {
+        test: function(cmp) {
+            var expected = "{!v.reference}";
+            var actual;
+
+            cmp.set("v.reference", "testCreateWithExpression");
+            $A.createComponent("aura:text", {
+                value: expected
+            }, function(textCmp) {
+                actual = textCmp.get("v.value");
+            });
+
+            $A.test.assertEquals(expected, actual);
+        }
+    },
+
+    /**
+     * Verify that when we pass in string with the same format 
+     * as a Function Call value to create component, it doesn't not convert it to a reference. 
+     *
+     * 1. Set v.reference to something known
+     * 2. Create a text component with a string that is a string version of an function call value
+     * 3. Get the value that the text component was created with
+     * 4. Validate that it is the raw string value, not the value that the expression would have pointed at if it was a live reference.
+     */
+    testCreateWithFunctionCallValue: {
+        test: function(cmp) {
+            var expected = "{!v.reference + v.handledEvent}";
+            var actual;
+
+            cmp.set("v.handledEvent", false);
+            cmp.set("v.reference", "testCreateWithFunctionCallValue");
+            $A.createComponent("aura:text", {
+                value: expected
+            }, function(textCmp) {
+                actual = textCmp.get("v.value");
+            });
+
+            $A.test.assertEquals(expected, actual);
+        }
     }
 })

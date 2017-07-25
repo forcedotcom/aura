@@ -17,5 +17,6 @@
 -->
 <aura:component>
     <aura:attribute name="handledEvent" type="Boolean" default="false"/>
+    <aura:attribute name="reference" type="String"/>
     <div aura:id="createdComponents">{!v.body}</div>
 </aura:component>

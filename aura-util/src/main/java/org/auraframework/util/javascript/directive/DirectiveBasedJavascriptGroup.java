@@ -215,7 +215,6 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         if (!libsContent.isEmpty()) {
             this.librariesContent = "\nAura.externalLibraries = function() {\n" + libsContent + "\n};";
         }
-
         String libsContentMin = libsMin.toString();
         if (!libsContentMin.isEmpty()) {
             this.librariesContentMin = "\nAura.externalLibraries = function() {\n" + libsContentMin + "\n};";
@@ -229,12 +228,12 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
             secureEvalMinSource = getSource("aura/resources/lockerservice/InlineSafeEval.min.js");
         }  catch (MalformedURLException e) {}
 
+        // This must be loaded early and needs to guard against Aura not been defined yet.
         if (secureEvalSource != null) {
-            this.secureEval = "\nInitSecureEval = function(scriptNonce) {\n" + secureEvalSource + "\n};";
+            this.secureEval = "\nwindow.Aura || (window.Aura = {}); window.Aura.InitSecureEval = function(scriptNonce) {\n" + secureEvalSource + "\n};";
         }
-
         if (secureEvalMinSource != null) {
-            this.secureEvalMin = "\nInitSecureEval = function(scriptNonce) {\n" + secureEvalMinSource + "\n};";
+            this.secureEvalMin = "\nwindow.Aura || (window.Aura = {}); window.Aura.InitSecureEval = function(scriptNonce) {\n" + secureEvalMinSource + "\n};";
         }
 
 

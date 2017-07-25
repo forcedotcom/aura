@@ -1023,6 +1023,289 @@ return {
     }
   ]
 };*/}));
+$A.componentService.addComponent("markup://ui:checkboxMenuItem", (function (){/*$A.componentService.addComponentClass("markup://ui:checkboxMenuItem",function() {
+return {
+  "meta":{
+    "name":"ui$checkboxMenuItem",
+    "extends":"markup://ui:menuItem"
+  },
+  "controller":{
+    "init":function(cmp) {
+        var bodyAttribute = cmp.get("v.body");
+        var hasBodyAttribute = bodyAttribute !== null && bodyAttribute.length > 0;
+        if (hasBodyAttribute) {
+            cmp.find("anchor").set("v.body", bodyAttribute);
+        }
+    },
+    "onClick":function(cmp, event) {
+        if (cmp.isValid()) {
+            $A.util.squash(event, true);
+            cmp.getConcreteComponent().select();
+        }
+    },
+    "select":function(component) {
+        var concreteComponent = component.getConcreteComponent();
+
+        if (concreteComponent.get("v.disabled")) {
+            return;
+        }
+
+        var current = concreteComponent.get("v.selected");
+        concreteComponent.set("v.selected", !current);
+
+        component.getSuper().select();
+    }
+  },
+  "helper":{
+    "buildBody":function(cmp) {
+        var anchorElement = cmp.find("anchor").getElement();
+
+        var label = cmp.get("v.label");
+        var isDisabled = cmp.get("v.disabled");
+        var isSelected = cmp.get("v.selected");
+
+        var role = cmp.get("v.role");
+        if (role) {
+            anchorElement.setAttribute("role", role);
+        }
+
+        anchorElement.setAttribute("aria-disabled", isDisabled);
+        anchorElement.setAttribute("tabindex", isDisabled ? "-1" : "0");
+        anchorElement.setAttribute("title", label);
+        anchorElement.setAttribute("aria-checked", isSelected);
+
+        var bodyAttribute = cmp.get("v.body");
+        var hasBodyAttribute = bodyAttribute !== null && bodyAttribute.length > 0;
+
+        if (!hasBodyAttribute) {
+            $A.util.clearNode(anchorElement);
+            anchorElement.appendChild(document.createTextNode(label));
+        }
+
+        if (isSelected === true) {
+            $A.util.addClass(anchorElement, "selected");
+        } else {
+            $A.util.removeClass(anchorElement, "selected");
+        }
+    }
+  },
+  "renderer":{
+    "render":function(cmp, helper) {
+        var ret = cmp.superRender();
+
+        helper.buildBody(cmp);
+
+        return ret;
+    },
+    "rerender":function(cmp, helper) {
+        cmp.superRerender();
+
+        helper.buildBody(cmp);
+    }
+  }
+};
+});
+return {
+  "xs":"G",
+  "descriptor":"markup://ui:checkboxMenuItem",
+  "st":{
+    "descriptor":"css://ui.checkboxMenuItem",
+    "cl":"uiCheckboxMenuItem"
+  },
+  "su":"markup://ui:menuItem",
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["class","aura://String","G",false],
+    ["dir","aura://String","I",false,"ltr"],
+    ["namespaceOverride","aura://String","I",false],
+    ["actionable","aura://Boolean","I",false,true],
+    ["role","aura://String","I",false,"menuitemcheckbox"],
+    ["ariaDescribedBy","aura://String","PP",false,""],
+    ["value","aura://Object","PP",false,null],
+    ["visible","aura://Boolean","I",false,true],
+    ["selected","aura://Boolean","G",false,false],
+    ["type","aura://String","G",false],
+    ["label","aura://String","G",false],
+    ["hideMenuAfterSelected","aura://Boolean","G",false,true],
+    ["disabled","aura://Boolean","G",false,false]
+  ],
+  "med":[
+    {
+      "name":"ui:select",
+      "xs":"I",
+      "action":"{!c.select}"
+    },
+    {
+      "name":"ui:setFocus",
+      "xs":"I",
+      "action":"{!c.setFocus}"
+    }
+  ],
+  "re":[
+    {
+      "ed":"markup://ui:select",
+      "n":"select",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:blur",
+      "n":"blur",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:focus",
+      "n":"focus",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:keypress",
+      "n":"keypress",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:keyup",
+      "n":"keyup",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:keydown",
+      "n":"keydown",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:dblclick",
+      "n":"dblclick",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mouseover",
+      "n":"mouseover",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mouseout",
+      "n":"mouseout",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mouseup",
+      "n":"mouseup",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mousemove",
+      "n":"mousemove",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:click",
+      "n":"click",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mousedown",
+      "n":"mousedown",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:menuSelect",
+      "n":"menuSelect",
+      "xs":"PP"
+    }
+  ],
+  "hd":[
+    {
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.init"
+      },
+      "v":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"this"
+      },
+      "n":"init"
+    }
+  ],
+  "ld":{
+    "anchor":{
+      "description":"Select checkBoxMenuItem",
+      "context":{
+        "body":{
+          "exprType":"PROPERTY",
+          "byValue":false,
+          "target":"ui:checkboxMenuItem",
+          "path":"v.body"
+        }
+      },
+      "alias":"select-checkBoxMenuItem"
+    }
+  },
+  "fa":[
+    {
+      "descriptor":"body",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "class":{
+                    "exprType":"PROPERTY",
+                    "byValue":false,
+                    "target":"ui:checkboxMenuItem",
+                    "path":"v.class"
+                  },
+                  "role":"presentation"
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"li"
+              },
+              "body":{
+                "descriptor":"body",
+                "value":[
+                  {
+                    "componentDef":{
+                      "descriptor":"markup://aura:html"
+                    },
+                    "localId":"anchor",
+                    "attributes":{
+                      "values":{
+                        "HTMLAttributes":{
+                          "descriptor":"HTMLAttributes",
+                          "value":{
+                            "onclick":{
+                              "exprType":"PROPERTY",
+                              "byValue":false,
+                              "target":"ui:checkboxMenuItem",
+                              "path":"c.onClick"
+                            }
+                          }
+                        },
+                        "tag":{
+                          "descriptor":"tag",
+                          "value":"a"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+};*/}));
 $A.componentService.addComponent("markup://ui:interactive", (function (){/*$A.componentService.addComponentClass("markup://ui:interactive",function() {
 return {
   "meta":{
@@ -1316,6 +1599,400 @@ return {
   ],
   "ab":true
 };*/}));
+$A.componentService.addComponent("markup://ui:menuItemSeparator", (function (){/*$A.componentService.addComponentClass("markup://ui:menuItemSeparator",function() {
+return {
+  "meta":{
+    "name":"ui$menuItemSeparator",
+    "extends":"markup://aura:component"
+  }
+};
+});
+return {
+  "xs":"G",
+  "descriptor":"markup://ui:menuItemSeparator",
+  "st":{
+    "descriptor":"css://ui.menuItemSeparator",
+    "cl":"uiMenuItemSeparator"
+  },
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["class","aura://String","G",false],
+    ["dir","aura://String","I",false,"ltr"],
+    ["namespaceOverride","aura://String","I",false],
+    ["actionable","aura://Boolean","I",false,true],
+    ["role","aura://String","I",false],
+    ["ariaDescribedBy","aura://String","PP",false,""],
+    ["value","aura://Object","PP",false,null],
+    ["visible","aura://Boolean","I",false,true],
+    ["label","aura://String","I",false]
+  ],
+  "i":[
+    "markup://ui:visible"
+  ],
+  "re":[
+    {
+      "ed":"markup://ui:dblclick",
+      "n":"dblclick",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mouseover",
+      "n":"mouseover",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mouseout",
+      "n":"mouseout",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mouseup",
+      "n":"mouseup",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mousemove",
+      "n":"mousemove",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:click",
+      "n":"click",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mousedown",
+      "n":"mousedown",
+      "xs":"G"
+    }
+  ],
+  "fa":[
+    {
+      "descriptor":"body",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "class":{
+                    "exprType":"PROPERTY",
+                    "byValue":false,
+                    "target":"ui:menuItemSeparator",
+                    "path":"v.class"
+                  },
+                  "role":"separator"
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"li"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+};*/}));
+$A.componentService.addComponent("markup://ui:radioMenuItem", (function (){/*$A.componentService.addComponentClass("markup://ui:radioMenuItem",function() {
+return {
+  "meta":{
+    "name":"ui$radioMenuItem",
+    "extends":"markup://ui:menuItem"
+  },
+  "controller":{
+    "init":function(cmp) {
+        var bodyAttribute = cmp.get("v.body");
+        var hasBodyAttribute = bodyAttribute !== null && bodyAttribute.length > 0;
+        if (hasBodyAttribute) {
+            cmp.find("anchor").set("v.body", bodyAttribute);
+        }
+    },
+    "onClick":function(cmp, event) {
+        if (cmp.isValid()) {
+            $A.util.squash(event, true);
+            cmp.getConcreteComponent().select();
+        }
+    },
+    "select":function(component, event, helper) {
+        var concreteComponent = component.getConcreteComponent();
+
+        if (concreteComponent.get("v.disabled")) {
+            return;
+        }
+
+        var current = concreteComponent.get("v.selected");
+        if (current === false) {
+            concreteComponent.set("v.selected", true);
+        }
+
+        helper.fireSelectEvent(concreteComponent, event, {
+            "deselectSiblings": true
+        });
+    }
+  },
+  "helper":{
+    "buildBody":function(cmp) {
+        var anchorElement = cmp.find("anchor").getElement();
+
+        var label = cmp.get("v.label");
+        var isDisabled = cmp.get("v.disabled");
+        var isSelected = cmp.get("v.selected");
+
+        var role = cmp.get("v.role");
+        if (role) {
+            anchorElement.setAttribute("role", role);
+        }
+
+        anchorElement.setAttribute("aria-disabled", isDisabled);
+        anchorElement.setAttribute("tabindex", isDisabled ? "-1" : "0");
+        anchorElement.setAttribute("title", label);
+        anchorElement.setAttribute("aria-checked", isSelected);
+
+        var bodyAttribute = cmp.get("v.body");
+        var hasBodyAttribute = bodyAttribute !== null && bodyAttribute.length > 0;
+
+        if (!hasBodyAttribute) {
+            $A.util.clearNode(anchorElement);
+
+            
+            
+            anchorElement.appendChild(document.createElement("b"));
+
+            anchorElement.appendChild(document.createTextNode(label));
+        }
+
+        if (isSelected === true) {
+            $A.util.addClass(anchorElement, "selected");
+        } else {
+            $A.util.removeClass(anchorElement, "selected");
+        }
+    }
+  },
+  "renderer":{
+    "render":function(cmp, helper) {
+        var ret = cmp.superRender();
+
+        helper.buildBody(cmp);
+
+        return ret;
+    },
+    "rerender":function(cmp, helper) {
+        cmp.superRerender();
+
+        helper.buildBody(cmp);
+    }
+  }
+};
+});
+return {
+  "xs":"G",
+  "descriptor":"markup://ui:radioMenuItem",
+  "st":{
+    "descriptor":"css://ui.radioMenuItem",
+    "cl":"uiRadioMenuItem"
+  },
+  "su":"markup://ui:menuItem",
+  "css":true,
+  "ad":[
+    ["body","aura://Aura.Component[]","G",false,[]],
+    ["class","aura://String","G",false],
+    ["dir","aura://String","I",false,"ltr"],
+    ["namespaceOverride","aura://String","I",false],
+    ["actionable","aura://Boolean","I",false,true],
+    ["role","aura://String","I",false,"menuitemradio"],
+    ["ariaDescribedBy","aura://String","PP",false,""],
+    ["value","aura://Object","PP",false,null],
+    ["visible","aura://Boolean","I",false,true],
+    ["selected","aura://Boolean","G",false,false],
+    ["type","aura://String","G",false],
+    ["label","aura://String","G",false],
+    ["hideMenuAfterSelected","aura://Boolean","G",false,false],
+    ["disabled","aura://Boolean","G",false,false]
+  ],
+  "med":[
+    {
+      "name":"ui:select",
+      "xs":"I",
+      "action":"{!c.select}"
+    },
+    {
+      "name":"ui:setFocus",
+      "xs":"I",
+      "action":"{!c.setFocus}"
+    }
+  ],
+  "re":[
+    {
+      "ed":"markup://ui:select",
+      "n":"select",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:blur",
+      "n":"blur",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:focus",
+      "n":"focus",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:keypress",
+      "n":"keypress",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:keyup",
+      "n":"keyup",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:keydown",
+      "n":"keydown",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:dblclick",
+      "n":"dblclick",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mouseover",
+      "n":"mouseover",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mouseout",
+      "n":"mouseout",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mouseup",
+      "n":"mouseup",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mousemove",
+      "n":"mousemove",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:click",
+      "n":"click",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:mousedown",
+      "n":"mousedown",
+      "xs":"G"
+    },
+    {
+      "ed":"markup://ui:menuSelect",
+      "n":"menuSelect",
+      "xs":"PP"
+    }
+  ],
+  "hd":[
+    {
+      "x":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"c.init"
+      },
+      "v":{
+        "exprType":"PROPERTY",
+        "byValue":false,
+        "path":"this"
+      },
+      "n":"init"
+    }
+  ],
+  "ld":{
+    "anchor":{
+      "description":"Radio menu item action",
+      "context":{
+        "body":{
+          "exprType":"PROPERTY",
+          "byValue":false,
+          "target":"ui:radioMenuItem",
+          "path":"v.body"
+        }
+      },
+      "alias":"select-radioMenuItem"
+    }
+  },
+  "fa":[
+    {
+      "descriptor":"body",
+      "value":[
+        {
+          "componentDef":{
+            "descriptor":"markup://aura:html"
+          },
+          "localId":"listitem",
+          "attributes":{
+            "values":{
+              "HTMLAttributes":{
+                "descriptor":"HTMLAttributes",
+                "value":{
+                  "class":{
+                    "exprType":"PROPERTY",
+                    "byValue":false,
+                    "target":"ui:radioMenuItem",
+                    "path":"v.class"
+                  },
+                  "role":"presentation"
+                }
+              },
+              "tag":{
+                "descriptor":"tag",
+                "value":"li"
+              },
+              "body":{
+                "descriptor":"body",
+                "value":[
+                  {
+                    "componentDef":{
+                      "descriptor":"markup://aura:html"
+                    },
+                    "localId":"anchor",
+                    "attributes":{
+                      "values":{
+                        "HTMLAttributes":{
+                          "descriptor":"HTMLAttributes",
+                          "value":{
+                            "onclick":{
+                              "exprType":"PROPERTY",
+                              "byValue":false,
+                              "target":"ui:radioMenuItem",
+                              "path":"c.onClick"
+                            }
+                          }
+                        },
+                        "tag":{
+                          "descriptor":"tag",
+                          "value":"a"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+};*/}));
 $A.componentService.addComponent("markup://aura:iteration", (function (){/*$A.componentService.addComponentClass("markup://aura:iteration",function() {
 return {
   "meta":{
@@ -1458,10 +2135,10 @@ return {
   },
   "helper":{
     "typeMap":{
-      "action":"ui:actionMenuItem",
-      "checkbox":"ui:checkboxMenuItem",
-      "radio":"ui:radioMenuItem",
-      "separator":"ui:menuItemSeparator"
+      "action":"markup://ui:actionMenuItem",
+      "checkbox":"markup://ui:checkboxMenuItem",
+      "radio":"markup://ui:radioMenuItem",
+      "separator":"markup://ui:menuItemSeparator"
     },
     "addMenuItemDomEvents":function(component) {
         var events = ["click", "keydown", "mouseover"];

@@ -235,7 +235,11 @@ public class BundleAwareDefRegistry implements DefRegistry {
 
     @Override
     public <T extends Definition> boolean exists(DefDescriptor<T> descriptor) {
-        return getSource(descriptor) != null;
+        try {
+            return getDef(descriptor) != null;
+        } catch (QuickFixException qfe) {
+            return false;
+        }
     }
 
     @Override

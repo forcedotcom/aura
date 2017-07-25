@@ -52,13 +52,13 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         this.descriptorName = buildDescriptorName(prefix, namespace, name);
         int pos = name.indexOf('<');
         this.nameParameters = pos >= 0 ? name.substring(pos).replaceAll("\\s", "") : null;
+        this.hashCode = createHashCode();
         // FIXME This is a bit ugly.
         if (this.defType == DefType.TESTSUITE) {
             this.bundle = associate;
         } else {
             this.bundle = null;
         }
-        this.hashCode = createHashCode();
     }
 
     public DefDescriptorImpl(String prefix, String namespace, String name, Class<T> defClass) {

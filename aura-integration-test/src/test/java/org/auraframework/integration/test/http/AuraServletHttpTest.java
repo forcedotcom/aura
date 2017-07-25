@@ -582,8 +582,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         HttpResponse httpResponse = perform(get);
 
 
+        assertEquals(HttpStatus.SC_OK, getStatusCode(httpResponse));
         String response = getResponseBody(httpResponse);
-        assertEquals("Unexpected return code with body: "+response, HttpStatus.SC_OK, getStatusCode(httpResponse));
         assertTrue(
                 "Expected 'Invalid Descriptor Format' but got: " + response,
                 response.contains("Invalid Descriptor Format: any:thing&lt;svg&gt;&lt;script&gt;"));

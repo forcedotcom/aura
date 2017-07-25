@@ -25,28 +25,43 @@ Function.RegisterNamespace("Aura.Component");
 Test.Aura.Component.ComponentTest=function(){
     var Aura = {
         "Component": {},
-        "Attribute": {}
+        "Attribute": {},
+        "Errors": {}
     };
+    var _PassthroughValue;
 
     Mocks.GetMocks(Object.Global(), {
         "Aura": Aura,
         "Component": function(){}, // Prevent Global
-        "AttributeSet": function(){} // Prevent Global
+        "AttributeSet": function(){}, // Prevent Global
+        "AuraError": function(){},// Prevent Global
+        "PassthroughValue": function(){},// Prevent Global
+        "StackFrame": function(){},
+        "ErrorStackParser": function(){}
     })(function(){
         [Import("aura-impl/src/main/resources/aura/component/Component.js"),
          Import("aura-impl/src/main/resources/aura/component/EventValueProvider.js"),
+         Import("aura-impl/src/main/resources/aura/value/PassthroughValue.js"),
          Import("aura-impl/src/main/resources/aura/component/StyleValueProvider.js"),
          Import("aura-impl/src/main/resources/aura/component/ActionValueProvider.js"),
-         Import("aura-impl/src/main/resources/aura/attribute/AttributeSet.js")]
+         Import("aura-impl/src/main/resources/aura/attribute/AttributeSet.js"),
+         Import("aura-impl/src/main/resources/aura/polyfill/stackframe.js"),
+         Import("aura-impl/src/main/resources/aura/polyfill/error-stack-parser.js"),
+         Import("aura-impl/src/main/resources/aura/error/AuraError.js")]
+
+        _PassthroughValue = PassthroughValue;
     });
 
     delete StyleValueProvider;
     delete ActionValueProvider;
     delete EventValueProvider;
+    delete AuraError;
 
     function mockFramework(during){
         var mock = {
+            "Aura":Aura,
             "Component": Aura.Component.Component,
+            "PassthroughValue": _PassthroughValue,
             "AttributeSet": Aura.Attribute.AttributeSet,
             "StyleValueProvider": Aura.Component.StyleValueProvider,
             "ActionValueProvider": Aura.Component.ActionValueProvider,
@@ -145,7 +160,8 @@ Test.Aura.Component.ComponentTest=function(){
                     wrapComponent: function(component) {
                         return component;
                     }
-                }
+                },
+                auraError: Aura.Errors.AuraError
             }
         };
 
@@ -173,6 +189,7 @@ Test.Aura.Component.ComponentTest=function(){
         //this cover when localIndex does not exist
         [Fact]
         function ReturnsNullForNullIndex() {
+
             //Arrange
             var target = null;
             var actual=null;

@@ -70,7 +70,7 @@ build:
     - ./.zenbuild.sh
 compose:
   external-tools:
-    image: ops0-artifactrepo1-0-prd.data.sfdc.net/dci/alpine-aura-tools-external:0.6000@sha256:4f251c65452108fe7de7bbe6de15669f8896796dc2995da85c73ac87a938e726
+    image: ops0-artifactrepo1-0-prd.data.sfdc.net/dci/alpine-aura-tools-external:0.6000@sha256:60374665ad5f5fa36f17aa80902d6649a7122daed2c0c29dbb477b036a809410
     auth_config:
       username: $$DOCKER_USERNAME
       password: $$DOCKER_PASSWORD

@@ -18,27 +18,30 @@
         helper.setDefaultAttrs(cmp);
         helper.handleNewValue(cmp);
     },
-    handleCompositionStart : function(cmp) {
-        cmp.set('v.privateIsCompositionstarted', true);
+    handleCompositionStart : function (cmp, event, helper) {
+        helper.startComposition(cmp);
     },
-    handleCompositionEnd : function(cmp) {
-        cmp.set('v.privateIsCompositionstarted', false);
+    handleCompositionEnd : function (cmp, event, helper) {
+        // compositionend is unreliable, but when it happens, we want to
+        // make sure the internal state is reset
+        helper.resetCompositionState(cmp);
     },
     handleOnInput : function (cmp, event, helper) {
-        if (cmp.get('v.privateIsCompositionstarted')) {
-            // on iOS japanese keyboard, input gets refocused after finishing input
-            // entry. This work around was put in to prevent duplicate value being
-            // set. For example if enter 123 then value would be 123123 after refocus.
-            cmp.set('v.inputValue', event.data);
-        } else {
-            cmp.set('v.inputValue', event.target.value);
-        }
+        cmp.set('v.inputValue', event.target.value);
 
-        if (helper.isInputValueValid(cmp)) {
+        // compositionend is not fired consistently, so we handle it here.
+        // this path should only be triggered by the composition keyboard
+        if (helper.isCompositionEnd(cmp)) {
+            helper.resetCompositionState(cmp);
+            // undo inserting composed text by keyboard or else we'll have duplicated inputs.
+            helper.restoreLastInputValue(cmp);
+
+        } else if (helper.isInputValueValid(cmp)) {
             helper.updateLastInputValue(cmp);
-            if (helper.weHaveToUpdate(cmp,'input')) {
+            if (helper.weHaveToUpdate(cmp, 'input')) {
                 helper.setNewValue(cmp);
             }
+
         } else {
             helper.restoreLastInputValue(cmp);
         }
@@ -54,6 +57,10 @@
         }
     },
     handleOnBlur : function (cmp, event, helper) {
+        if (helper.isCompositionStart(cmp)) {
+            helper.endComposition(cmp);
+        }
+
         if (helper.hasChangedValue(cmp)) {
             helper.setNewValue(cmp);
             helper.formatInputValue(cmp);
@@ -68,7 +75,7 @@
         }
     },
     handleOnFocus : function (cmp, event, helper) {
-        cmp.set('v.inputValue',helper.removeSymbols(cmp.get('v.inputValue')));
+        cmp.set('v.inputValue', helper.removeSymbols(cmp.get('v.inputValue')));
         helper.updateLastInputValue(cmp);
     }
 });

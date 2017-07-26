@@ -480,6 +480,74 @@
         }]
     },
 
+    /**
+     * Test to make sure some IME with compositional num keypad works correctly.
+     */
+    testIMEInput: {
+        test: [function(component) {
+            var inputElm = component.getElement();
+            inputElm.value = "123";
+            $A.test.fireDomEvent(inputElm, "compositionstart");
+            $A.test.fireDomEvent(inputElm, "input");
+        }, function(component) {
+            // v.value is undefined because we haven't triggered change event yet
+            this.assertCmpElemValues(component, undefined, "123");
+        }, function(component) {
+            var inputElm = component.getElement();
+            $A.test.fireDomEvent(inputElm, "input");
+            $A.test.fireDomEvent(inputElm, "compositionend");
+
+        // after compositionend, we should be able to modify the value as usual
+        }, function(component) {
+            var inputElm = component.getElement();
+            inputElm.value = "123456";
+            $A.test.fireDomEvent(inputElm, "input");
+            $A.test.fireDomEvent(inputElm, "blur");
+        }, function(component) {
+            // v.value is undefined because we haven't triggered change event yet
+            this.assertCmpElemValues(component, 1234.56, "123,456%");
+        }]
+    },
+
+    /**
+     * Test to make sure some IME with compositional num keypad works correctly.
+     * This test replaces compositionend with blur since some IME doesn't fire
+     * compositionend when user blurs away.
+     */
+    testIMEWithBlurAndNoCompositionEnd: {
+        test: [function(component) {
+            var inputElm = component.getElement();
+            inputElm.value = "123";
+            $A.test.fireDomEvent(inputElm, "compositionstart");
+            $A.test.fireDomEvent(inputElm, "input");
+        }, function(component) {
+            // v.value is undefined because we haven't triggered change event yet
+            this.assertCmpElemValues(component, undefined, "123");
+        }, function(component) {
+            var inputElm = component.getElement();
+            $A.test.fireDomEvent(inputElm, "blur");
+
+        // after blur, IME will try to insert the composed text, the cmp should
+        // revert the inserted text to prevent duplicated text
+        }, function(component) {
+            var inputElm = component.getElement();
+            inputElm.value = "123123"; // input + composed text
+            $A.test.fireDomEvent(inputElm, "focus");
+            $A.test.fireDomEvent(inputElm, "input");
+        }, function(component) {
+            // value shoud stay the same as the composed text is reverted
+            this.assertCmpElemValues(component, 1.23, "123");
+        }, function(component) {
+            // now we should be able to type normally again
+            var inputElm = component.getElement();
+            inputElm.value = "123456";
+            $A.test.fireDomEvent(inputElm, "input");
+            $A.test.fireDomEvent(inputElm, "blur");
+        }, function(component) {
+            this.assertCmpElemValues(component, 1234.56, "123,456%");
+        }]
+    },
+
     /*****************
      * Helpers
      *****************/

@@ -187,7 +187,8 @@
         var inputValue = cmp.get("v.inputValue");
         
         // convertInputValueToInternalValue() returns 0 whenever inputValue is ""
-        return String(this.convertInputValueToInternalValue(cmp)) !== value || (inputValue === "" && value === "0");
+        return String(this.convertInputValueToInternalValue(cmp)) !== value
+            || (inputValue === '' && value === '0');
     },
     removeSymbols : function (string) {
         var decimalSeparator  = $A.get("$Locale.decimal");
@@ -199,5 +200,20 @@
         var reg = '[^\\' + groupingSeparator + '\\' + decimalSeparator +'\\d\+\-]';
             reg = new RegExp(reg,'g');
         return string.replace(reg,'');
+    },
+    isCompositionStart : function (cmp) {
+        return cmp.get('v.compositionState') === 'start';
+    },
+    isCompositionEnd : function (cmp) {
+        return cmp.get('v.compositionState') === 'end';
+    },
+    startComposition : function (cmp) {
+        cmp.set('v.compositionState', 'start');
+    },
+    endComposition : function (cmp) {
+        cmp.set('v.compositionState', 'end');
+    },
+    resetCompositionState : function (cmp) {
+        cmp.set('v.compositionState', '');
     }
 });

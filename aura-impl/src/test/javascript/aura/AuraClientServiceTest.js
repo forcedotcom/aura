@@ -18,7 +18,7 @@ Function.RegisterNamespace("Test.Aura");
 [Fixture]
 Test.Aura.AuraClientServiceTest = function() {
     var $A = {};
-    var Aura = {Services: {}, Controller: {}, Utils: {Util:{prototype:{on:function(){}}}}};
+    var Aura = {Services: {}, Controller: {}, Utils: {Logger: {MAX_STACKTRACE_SIZE:100000},Util:{prototype:{on:function(){}}}}};
     var document = {
         getElementById : function(id) {
             return id === "safeEvalWorkerCustom" ? {} : undefined;
@@ -3306,5 +3306,120 @@ Test.Aura.AuraClientServiceTest = function() {
 
             Assert.Equal(expected, actual);
         }
+    }
+
+
+    [Fixture]
+    function showErrorDialogWithReload() {
+
+        var mockGlobal = Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                log : function() {},
+                message: function(){},
+                assert : function(condition, message) {
+                    if(!condition){
+                        throw message;
+                    }
+                },
+                util : {
+                    apply: function() {},
+                    estimateSize: function() {
+                        return 0;
+                    },
+                    on: function() {},
+                    isUndefinedOrNull : function(obj){
+                        return obj === undefined || obj === null;
+                    },
+                    isUndefined : function() {},
+                    isArray : function() {},
+                    json : {
+                        encode : function(toEncode) {
+                            return "<<" + JSON.stringify(toEncode) + ">>";
+                        },
+                        orderedEncode: function(obj) {
+                            return this.encode(obj);
+                        }
+                    },
+                    isFiniteNumber: function(n) {
+                        return typeof n === 'number' && isFinite(n);
+                    },
+                    clearCookie: function() {},
+                    isString : function(obj) {
+                        return typeof obj === 'string';
+                    },
+                    isArray : function(obj) {
+                        return obj instanceof Array;
+                    },
+                    isObject: function(obj) {
+                        return typeof obj === "object" && obj !== null && !(obj instanceof Array);
+                    }
+                },
+                mark : function() {},
+                getContext : function() {
+                    return {
+                        encodeForServer: function(){throw new Error(''); },
+                    };
+                },
+                clientService:{
+                },
+                auraError: function(msg) {
+                    this.message = msg;
+                },
+                clientService: {
+                    hardRefresh: function(){}
+                },
+                warning: function() {},
+                error: function(msg) {
+                    AuraErrorMsg = msg;
+                },
+                run: function(fn) {
+                    fn();
+                }
+            },
+            window:{
+                location: {
+                    pathname : "/pathname",
+                    search : "?search=1",
+                    hash : "#hash"
+                }
+            },
+            "document": document,
+            "Aura": Aura,
+            "Action": Aura.Controller.Action,
+            "AuraClientService": Aura.Services.AuraClientService
+        });
+
+
+        [Fact]
+        function JsonSerializeContextOnEncodeForServerError() {
+             // Arrange
+            var target;
+            var actual;
+            var expected = "<<" + JSON.stringify({"fwuid": "UNKNOWN"}) + ">>";
+
+            // Act
+            mockGlobal(function() {
+                var sendData;
+                target = new Aura.Services.AuraClientService();
+                target.createXHR = function() {
+                    return {
+                        "open": function(){},
+                        "setRequestHeader": function(){},
+                        "send": function(queryString){}
+                    }
+                };
+                target.buildParams = function(params) {
+                    sendData = params;
+                };
+
+                target.showErrorDialogWithReload(new Error("message"));
+                actual = sendData["aura.context"];
+            });
+
+            
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
     }
 }

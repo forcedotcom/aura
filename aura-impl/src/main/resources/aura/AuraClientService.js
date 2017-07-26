@@ -1096,7 +1096,7 @@ AuraClientService.prototype.showErrorDialogWithReload = function(e, additionalLo
             // we've failed utterly. One possible scenario is if inline.js failed to load, since it defines the context / fwuid, which reportError relies upon
             // Let's try to manually send an XHR down, since we don't care about the response format
             // we can just use XMLHttpRequest which is available in IE too.
-            var xhr = new XMLHttpRequest();
+            var xhr = this.createXHR();
             xhr.open("POST", "/aura?r=0", true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=ISO-8859-13');
             var payload = {

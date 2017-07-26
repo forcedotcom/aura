@@ -34,6 +34,7 @@ script:
   rm -r {node,node_modules} || true
   wget --quiet --recursive --no-parent --reject "index.html*" --level=99 http://localhost/node_modules/ || true
   wget --quiet --recursive --no-parent --reject "index.html*" --level=99 http://localhost/node/ || true
+  nodedir="`pwd`/node"
   chmod -R 0755 localhost
   sudo unmount /dev/shm
   sudo mount -t tmpfs -o rw,nosuid,nodev,noexec,relatime,size=512M,tmpfs /dev/shm
@@ -44,6 +45,7 @@ script:
   status=0
   rm */target/eslint-output || true
   sudo -iu mvn-user bash -c "cd $(pwd);mvn pre-clean $MAVEN_ARGS -Dmaven.repo.local=$(pwd)/.m2/repository -Dnode.download.root.url=http://localhost/node/ -Dnpm.download.root.url=http://localhost/npm/ -Deslint.enabled -Peslint || { cat */target/eslint-output; exit 1; }" || export status=$? || true
+  [ ${status} -eq 0 ] && sudo -iu mvn-user bash -c "cd $(pwd);set -x;export LANG=\"en_US.UTF-8\";${nodedir}/node aura-util/src/test/tools/xUnit/xUnit.js.Console.js /dependency:aura-util/src/test/tools/xUnit/dependencies /strict:false /verbose:false aura-impl/src/test/javascript/ aura-components/src/test/javascript" || export status=$? || true
   [ ${status} -eq 0 ] && sudo -iu mvn-user bash -c "cd $(pwd);mvn clean deploy $MAVEN_ARGS -Dmaven.repo.local=$(pwd)/.m2/repository -DaltDeploymentRepository=zen::default::file://$(pwd)/$LOCAL_DEPLOY_DIR -Dnode.download.root.url=http://localhost/node/ -Dchromedriver.download.root.url=http://localhost/chromedriver -Dnpm.download.root.url=http://localhost/npm/ -Deslint.enabled" || export status=$? || true
   [ ${status} -eq 0 ] && sudo -iu mvn-user bash -c "cd $(pwd);set -x;export LANG=\"en_US.UTF-8\";mvn verify $MAVEN_ARGS -Dmaven.repo.local=$(pwd)/.m2/repository -DaltDeploymentRepository=zen::default::file://$(pwd)/$LOCAL_DEPLOY_DIR -Dnode.download.root.url=http://localhost/node/ -Dchromedriver.download.root.url=http://localhost/chromedriver -Dnpm.download.root.url=http://localhost/npm/ -Pdesktop -DskipJsDoc -DskipComponentCompile -DskipUnitTests -DrunIntTests -Dwebdriver.browser.type=GOOGLECHROME -Dwebdriver.chrome.nosandbox=true -Dwebdriver.reusebrowser=true -Dwebdriver.timeout=90 -Dwebdriver.timeout.getdriver=30 -DtestThreadCount=3" || export status=$? || true
   chown -R $ORIG_UID:$ORIG_UID $(pwd)

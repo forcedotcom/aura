@@ -48,6 +48,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
         .add(DefType.EVENT)
         .add(DefType.INTERFACE)
         .add(DefType.LIBRARY)
+        .add(DefType.MODULE)
         .build();
     private final static Set<DefType> DEFAULT_TYPES = new ImmutableSet.Builder<DefType>()
         .add(DefType.COMPONENT)

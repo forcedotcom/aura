@@ -17,7 +17,9 @@
 ({
     afterRender: function (cmp, helper) {
         this.superAfterRender();
-        helper.scopeScrollables(cmp);
+        if(cmp.get('v.scopeScrollables')){
+            helper.scopeScrollables(cmp);
+        }
         helper.iNoBounce(cmp.getElement());
     },
     rerender: function (cmp, helper) {
@@ -42,7 +44,9 @@
                 currentEl.classList.add(cl);
             });
         }
-        helper.scopeScrollables(cmp);
+        if(cmp.get('v.scopeScrollables')){
+            helper.scopeScrollables(cmp);
+        }
     },
     unrender : function (cmp, helper) {
         var el;

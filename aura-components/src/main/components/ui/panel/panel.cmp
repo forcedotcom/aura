@@ -47,6 +47,7 @@
     <aura:attribute name="boxDirectionPad" type="Integer" default="5" description="The box direction padding in pixels. The default is 5px." />
     <aura:attribute name="classNames" type="String" default="" description="The extra classname can be added to panel." />
     <aura:attribute name="trapFocus" type="Boolean" default="false" description="Indicates if we should trap the focus inside the panel. If true, the esc key always closes the current panel which has focus. If false, the esc key and tab out closes the panel. The default is false."/>
+    <aura:attribute name="scopeScrollables" type="Boolean" default="true" description="Indicates if we should scope the scrollable elements in the body of the panel or allow the panel to scroll with the page scroll"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}" />
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" description="Enables panel manager and panels to communicate"/>

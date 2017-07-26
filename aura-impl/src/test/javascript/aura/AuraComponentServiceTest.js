@@ -16,10 +16,10 @@
 
 Function.RegisterNamespace("Test.Aura");
 
-[Fixture, Skip("TODO include Engine")]
+[Fixture]
 Test.Aura.AuraComponentServiceTest = function(){
     var $A = {
-        assert: function(condition, message7) {
+        assert: function(condition, message) {
             if (!condition) {
                 var error = new Error(message);
                 throw error;
@@ -41,8 +41,7 @@ Test.Aura.AuraComponentServiceTest = function(){
         Library: {
             LibraryRegistry: function () {},
             LibraryIncludeRegistry: function () {}
-        },
-
+        }
     };
     var Engine = {
     };
@@ -77,23 +76,30 @@ Test.Aura.AuraComponentServiceTest = function(){
 
     [Fixture]
     function createComponent(){
-        var $Amock=Mocks.GetMock(Object.Global(),"$A",{
-            assert:function(condition,message){
-                if(!condition)throw message;
-            },
-            enqueueAction:function(){},
-            util:{
-                isString:function(obj){
-                    return typeof obj === 'string';
+        var $Amock=Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                assert:function(condition,message){
+                    if(!condition)throw message;
                 },
-                isObject:function(obj){
-                    return typeof obj === "object" && obj !== null && !this.isArray(obj);
+                enqueueAction:function(){},
+                util:{
+                    isString:function(obj){
+                        return typeof obj === 'string';
+                    },
+                    isObject:function(obj){
+                        return typeof obj === "object" && obj !== null && !this.isArray(obj);
+                    },
+                    isFunction:function(obj){
+                        return !!obj && Object.prototype.toString.apply(obj) === '[object Function]';
+                    }
                 },
-                isFunction:function(obj){
-                    return !!obj && Object.prototype.toString.apply(obj) === '[object Function]';
+                clientService: {
                 }
             },
-            clientService: {
+            "Json": {
+                "ApplicationKey": {
+                    "DESCRIPTOR": "d"
+                }
             }
         });
 
@@ -360,13 +366,20 @@ Test.Aura.AuraComponentServiceTest = function(){
     [Fixture]
     function hasDefinition() {
 
-        var $Amock=Mocks.GetMock(Object.Global(),"$A",{
-            assert:function(condition,message){
-                if(!condition)throw message;
+        var $Amock=Mocks.GetMocks(Object.Global(), {
+            "$A": {
+                assert:function(condition,message){
+                    if(!condition)throw message;
+                },
+                clientService: {
+                    allowAccess: function () {
+                        return true;
+                    }
+                }
             },
-            clientService: {
-                allowAccess: function () {
-                    return true;
+            "Json": {
+                "ApplicationKey": {
+                    "DESCRIPTOR": "d"
                 }
             }
         });

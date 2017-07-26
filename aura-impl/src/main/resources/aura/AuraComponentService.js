@@ -1369,8 +1369,8 @@ AuraComponentService.prototype.createComponentDef = function(config) {
             definition = this.createFromSavedComponentConfigs(config);
         } else {
             // should only allow new ComponentDef when we are sure exporter or component class exists
-            if (!!$A.componentService.componentClassRegistry.classConstructors[descriptor] ||
-                !!$A.componentService.componentClassRegistry.classExporter[descriptor]) {
+            if (!!this.componentClassRegistry.classConstructors[descriptor] ||
+                !!this.componentClassRegistry.classExporter[descriptor]) {
                 definition = new ComponentDef(config);
                 this.componentDefRegistry[descriptor] = definition;
             }

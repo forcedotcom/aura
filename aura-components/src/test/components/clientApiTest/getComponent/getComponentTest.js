@@ -155,7 +155,9 @@
 
                 $A.test.addWaitFor(true, function() {
                         return typeof createdComponent !== "undefined";
-                });
+                    }, function() {
+                        cmp.index(localId, createdComponent.getGlobalId());
+                    });
             }, function(cmp) {
                 var localId = "auraButton";
                 var expected = cmp.find(localId);

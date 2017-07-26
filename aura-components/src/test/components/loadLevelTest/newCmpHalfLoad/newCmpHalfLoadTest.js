@@ -18,10 +18,12 @@
     setUp: function(cmp) {
         var receiverCmp = "markup://"+cmp.get("v.receiverCmp");
         var receiverCmpAuraId = cmp.get("v.receiverCmpAuraId");
+        var thisCmp = cmp;
         console.log(receiverCmp);
-        $A.createComponent(receiverCmp, {"aura:id":receiverCmpAuraId},
+        $A.createComponent(receiverCmp, {},
             function(newCmp){
-                cmp.set("v.body", [newCmp]);
+                thisCmp.set("v.body", [newCmp]);
+                thisCmp.index(receiverCmpAuraId, newCmp.getGlobalId());
             }                
         );
     },

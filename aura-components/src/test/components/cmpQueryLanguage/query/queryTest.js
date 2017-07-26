@@ -69,11 +69,12 @@
              var lock = {};
              $A.createComponent(
                  "markup://aura:text",
-                 {"aura:id":"txt_Id"},
+                 {},
                  function(newCmp){
                      var body = cmp.get("v.body");
                      body.push(newCmp);
                      cmp.set("v.body", body);
+                     cmp.index("txt_Id", newCmp.getGlobalId());
                      lock.set = true;
                  }
               );

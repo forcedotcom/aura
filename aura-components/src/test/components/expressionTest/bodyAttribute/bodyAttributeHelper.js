@@ -21,11 +21,11 @@
         $A.createComponent(
             "ui:button",
             {
-                "aura:id":"newButton",
                 label : "New Button"
             },
             function(newCmp){
                 cmp.find(id).set("v.body", [newCmp]);
+                cmp.index("newButton", newCmp.getGlobalId());
             }
         );
     },
@@ -33,7 +33,6 @@
         $A.createComponent(
             "ui:button",
             {
-                "aura:id":"addButton",
                 label : "Added Button"
             },
             function(newCmp){
@@ -41,6 +40,7 @@
                 var newBody = body.length > 0 ? [body[0]] : [];
                 newBody.push(newCmp);
                 cmp.find(id).set("v.body", newBody);
+                cmp.index("addButton", newCmp.getGlobalId());
             }
         );
     }

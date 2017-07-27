@@ -68,7 +68,13 @@ Aura.ExportsModule = {
 
     "registerModule": function (module) {
         $A.componentService.initModuleDefs([module]);
-        return $A.componentService.evaluateModuleDef(module["descriptor"]);
+        return module["descriptor"];
+    },
+    "hasModule": function(moduleName) {
+        return $A.componentService.getComponentDef($A.componentService.createDescriptorConfig(moduleName));
+    },
+    "getModule": function(moduleName) {
+        return $A.componentService.evaluateModuleDef(moduleName);
     },
     "sanitizeDOM": function (dirty, config) {
         return $A.util.sanitizeDOM(dirty, config);

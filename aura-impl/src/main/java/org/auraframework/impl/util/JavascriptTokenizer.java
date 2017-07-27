@@ -83,7 +83,7 @@ public class JavascriptTokenizer {
             // JS can only get "root" definitions, minus applications, as applications can only be loaded
             // as a "top level" load. Libraries could arguably be excluded.
             //
-            ddb.setType("COMPONENT,INTERFACE,EVENT,LIBRARY");
+            ddb.setType("COMPONENT,INTERFACE,EVENT,LIBRARY,MODULE");
             builder.addDependency(ddb.build());
         }
     }

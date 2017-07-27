@@ -109,11 +109,12 @@ public class JavascriptTokenizerTest extends UnitTestCase {
         assertEquals("markup", dependency.getDependency().getPrefixMatch().toString());
         assertEquals("ui", dependency.getDependency().getNamespaceMatch().toString());
         assertEquals("outputText", dependency.getDependency().getNameMatch().toString());
-        assertEquals(4, dependency.getDependency().getDefTypes().size());
+        assertEquals(5, dependency.getDependency().getDefTypes().size());
         assertTrue(dependency.getDependency().getDefTypes().contains(DefType.COMPONENT));
         assertTrue(dependency.getDependency().getDefTypes().contains(DefType.LIBRARY));
         assertTrue(dependency.getDependency().getDefTypes().contains(DefType.INTERFACE));
         assertTrue(dependency.getDependency().getDefTypes().contains(DefType.EVENT));
+        assertTrue(dependency.getDependency().getDefTypes().contains(DefType.MODULE));
         Mockito.verifyNoMoreInteractions(builder);
     }
 
@@ -134,21 +135,23 @@ public class JavascriptTokenizerTest extends UnitTestCase {
         assertEquals("markup", dependencies.get(0).getDependency().getPrefixMatch().toString());
         assertEquals("ui", dependencies.get(0).getDependency().getNamespaceMatch().toString());
         assertEquals("outputText", dependencies.get(0).getDependency().getNameMatch().toString());
-        assertEquals(4, dependencies.get(0).getDependency().getDefTypes().size());
+        assertEquals(5, dependencies.get(0).getDependency().getDefTypes().size());
         assertTrue(dependencies.get(0).getDependency().getDefTypes().contains(DefType.COMPONENT));
         assertTrue(dependencies.get(0).getDependency().getDefTypes().contains(DefType.LIBRARY));
         assertTrue(dependencies.get(0).getDependency().getDefTypes().contains(DefType.INTERFACE));
         assertTrue(dependencies.get(0).getDependency().getDefTypes().contains(DefType.EVENT));
+        assertTrue(dependencies.get(0).getDependency().getDefTypes().contains(DefType.MODULE));
 
         assertEquals(location, dependencies.get(1).getLocation());
         assertEquals("markup", dependencies.get(1).getDependency().getPrefixMatch().toString());
         assertEquals("aura", dependencies.get(1).getDependency().getNamespaceMatch().toString());
         assertEquals("inputText", dependencies.get(1).getDependency().getNameMatch().toString());
-        assertEquals(4, dependencies.get(1).getDependency().getDefTypes().size());
+        assertEquals(5, dependencies.get(1).getDependency().getDefTypes().size());
         assertTrue(dependencies.get(1).getDependency().getDefTypes().contains(DefType.COMPONENT));
         assertTrue(dependencies.get(1).getDependency().getDefTypes().contains(DefType.LIBRARY));
         assertTrue(dependencies.get(1).getDependency().getDefTypes().contains(DefType.INTERFACE));
         assertTrue(dependencies.get(1).getDependency().getDefTypes().contains(DefType.EVENT));
+        assertTrue(dependencies.get(0).getDependency().getDefTypes().contains(DefType.MODULE));
 
         Mockito.verifyNoMoreInteractions(builder);
     }

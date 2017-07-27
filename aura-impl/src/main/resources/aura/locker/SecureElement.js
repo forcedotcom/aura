@@ -1047,6 +1047,7 @@ SecureElement.metadata = {
             "alt":                            DEFAULT,
             "autocapitalize":                 DEFAULT,
             "autocomplete":                   DEFAULT,
+            "autocorrect":                    DEFAULT,
             "autofocus":                      DEFAULT,
             "checkValidity":                  FUNCTION,
             "checked":                        DEFAULT,
@@ -1077,6 +1078,7 @@ SecureElement.metadata = {
             "readOnly":                       DEFAULT,
             "reportValidity":                 FUNCTION,
             "required":                       DEFAULT,
+            "results":                        DEFAULT,
             "select":                         FUNCTION,
             "selectionDirection":             DEFAULT,
             "selectionEnd":                   DEFAULT,
@@ -1099,7 +1101,8 @@ SecureElement.metadata = {
             "webkitEntries":                  DEFAULT,
             "webkitdirectory":                DEFAULT,
             "width":                          DEFAULT,
-            "willValidate":                   DEFAULT
+            "willValidate":                   DEFAULT,
+            "x-moz-errormessage":             DEFAULT
         },
         "HTMLLabelElement": {
             "control":                        DEFAULT,

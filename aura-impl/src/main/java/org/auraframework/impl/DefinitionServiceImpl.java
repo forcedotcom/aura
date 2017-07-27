@@ -1153,10 +1153,14 @@ public class DefinitionServiceImpl implements DefinitionService {
             currentCC.getCompiling(descriptor);
             Cache<String, DependencyEntry> depsCache = cachingService.getDepsCache();
 
-            if (currentCC.shouldCacheDependencies) {
-                // put UID-qualified descriptor key for dependency
-                depsCache.put(makeGlobalKey(de.uid, descriptor, modulesEnabled), de);
+            // put UID-qualified descriptor key for dependency
+            // This is always placed in cache, which means that we will not trigger COOSE for components
+            // that have already been put in cache, and have the UID on the client.
+            // This behaviour is the same as historical behaviour, and we will not change it at the
+            // moment. Note that it also helps perf markedly.
+            depsCache.put(makeGlobalKey(de.uid, descriptor, modulesEnabled), de);
 
+            if (currentCC.shouldCacheDependencies) {
                 // put unqualified descriptor key for dependency
                 depsCache.put(makeNonUidGlobalKey(descriptor, modulesEnabled), de);
             }

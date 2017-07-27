@@ -358,7 +358,7 @@
             if ((item = this._getItemAttached(target))) {
                 break;
             }
-            target = target.parentElement;
+            target = target.parentNode;
         }
 
         if (!handlers.length > 0) {

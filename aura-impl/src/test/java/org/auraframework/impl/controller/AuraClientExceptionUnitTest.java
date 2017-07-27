@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 /**
- * Unit tests for ComponentController$AuraClientException
+ * Unit tests for AuraClientException
  */
 public class AuraClientExceptionUnitTest extends UnitTestCase {
 

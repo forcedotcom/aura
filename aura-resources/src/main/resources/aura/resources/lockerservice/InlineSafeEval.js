@@ -103,7 +103,12 @@
 	                      sourceURL: sourceURL,
 	                      skipPreprocessing: skipPreprocessing
 	                  }));
-	                  return fn.apply(undefined, args);
+
+	                  if (typeof fn === 'function') {
+			            return fn.apply(undefined, args);
+			          } else {
+			            throw new SyntaxError("Unable to evaluate code at: " + sourceURL);
+			          }
 	              }
 	          }
 	      });

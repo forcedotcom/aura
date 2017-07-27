@@ -23,7 +23,7 @@
         };
 
         var displayValue = function (returnValue) {
-            this.setInputValue(component, returnValue.date);
+            this.setInputValue(component, returnValue.isoString);
         }.bind(this);
 
         var value = component.get("v.value");
@@ -32,8 +32,14 @@
 
     setInputValue: function (component, displayValue) {
         var inputElement = component.find("inputDateHtml").getElement();
-        if (!$A.util.isUndefinedOrNull(inputElement)) {
-            inputElement.value = displayValue ? displayValue : "";
+
+        if (!$A.util.isEmpty(displayValue)) {
+            // localizationService.format() will format in the user's locale, which is not accepted by the input
+            displayValue = displayValue.split("T", 1)[0] || displayValue;
+
+            inputElement.value = displayValue;
+        } else {
+            inputElement.value = '';
         }
     }
 });

@@ -49,7 +49,7 @@ public class DefRefDelegate implements DefinitionReference {
 
     private DefinitionReference componentDefRef;
     private DefinitionReference moduleDefRef = null;
-    private Boolean switchable = null;
+    private transient Boolean switchable = null;
 
     public DefRefDelegate(ComponentDefRef componentDefRef) throws DefinitionNotFoundException {
         this.componentDefRef = componentDefRef;
@@ -169,6 +169,16 @@ public class DefRefDelegate implements DefinitionReference {
         select().serialize(json);
     }
 
+    /**
+     * This is broken.
+     *
+     * the contract with validate definition is that it may not depend on things outside the definition, but in
+     * this case, we attempt to validate based on the existence or non-existence of a different component. My guess
+     * is that this all needs to be set up so that we do validation here, then have validateReferences do the right
+     * thing based on existence. This is complicated by the fact that this is violating the mechanisms of the compiler
+     * without actually correcting those mechanisms. I.e. appendDependencies is assumed to be constant for a given
+     * definition. This violates that assumption.
+     */
     @Override
     public void validateDefinition() throws QuickFixException {
         select().validateDefinition();

@@ -142,6 +142,9 @@ public class BundleAwareDefRegistry implements DefRegistry {
     }
 
     private BundleSource<RootDefinition> getSource(DefHolder holder) {
+        if (holder == null) {
+            return null;
+        }
         if (holder.source != null) {
             return holder.source;
         } else {
@@ -235,11 +238,7 @@ public class BundleAwareDefRegistry implements DefRegistry {
 
     @Override
     public <T extends Definition> boolean exists(DefDescriptor<T> descriptor) {
-        try {
-            return getDef(descriptor) != null;
-        } catch (QuickFixException qfe) {
-            return false;
-        }
+        return getSource(descriptor) != null;
     }
 
     @Override
@@ -260,9 +259,11 @@ public class BundleAwareDefRegistry implements DefRegistry {
     @Override
     public <T extends Definition> Source<T> getSource(DefDescriptor<T> descriptor) {
         DefHolder holder = getHolder(descriptor);
-
         BundleSource<?> bundleSource = getSource(holder);
 
+        if (bundleSource == null) {
+            return null;
+        }
         if (holder.descriptor.equals(descriptor)) {
             @SuppressWarnings("unchecked")
             Source<T> source = (Source<T>)bundleSource;

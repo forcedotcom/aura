@@ -174,11 +174,15 @@ public class DefinitionServiceImpl implements DefinitionService {
     // TEMPORARY HACK TO SUPPORT TEST SUITES IN MAIN WITHOUT CHANGES
     private <T extends Definition> DefDescriptor<T> replaceBundleOnTestSuiteDescriptor(DefDescriptor<T> descriptor) {
         DefDescriptor<? extends BaseComponentDef> bundle = null;
+
+        if (descriptor.getDefType() != DefType.TESTSUITE || descriptor.getBundle() != null) {
+            return descriptor;
+        }
         @SuppressWarnings("unchecked")
         Class<T> clazz = (Class<T>)descriptor.getDefType().getPrimaryInterface();
-        bundle = getDefDescriptor(descriptor.getQualifiedName(), ComponentDef.class);
+        bundle = getDefDescriptor(descriptor, DefDescriptor.MARKUP_PREFIX, ComponentDef.class);
         if (!exists(bundle)) {
-            bundle = getDefDescriptor(descriptor.getQualifiedName(), ApplicationDef.class);
+            bundle = getDefDescriptor(descriptor, DefDescriptor.MARKUP_PREFIX, ApplicationDef.class);
         }
 
         return getDefDescriptor(descriptor.getQualifiedName(), clazz, bundle);
@@ -208,12 +212,7 @@ public class DefinitionServiceImpl implements DefinitionService {
             return null;
         }
 
-        // TEMPORARY HACK TO SUPPORT TEST SUITES IN MAIN WITHOUT CHANGES
-        if (descriptor.getDefType() == DefType.TESTSUITE && descriptor.getBundle() == null) {
-            descriptor = replaceBundleOnTestSuiteDescriptor(descriptor);
-        }
-        // END TEMPORARY HACK TO SUPPORT TEST SUITES IN MAIN WITHOUT CHANGES
-
+        descriptor = replaceBundleOnTestSuiteDescriptor(descriptor);        // TESTSUITE HACK.
 
         // TODO: Clean up so that we just walk up descriptor trees and back down them.
         Optional<T> optLocalDef = null;
@@ -351,6 +350,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         AuraContext context = contextService.getCurrentContext();
         boolean regExists;
 
+        descriptor = replaceBundleOnTestSuiteDescriptor(descriptor);        // TESTSUITE HACK.
         Optional<D> optLocalDef = context.getLocalDef(descriptor);
         if (optLocalDef != null) {
             return optLocalDef.isPresent();
@@ -445,6 +445,7 @@ public class DefinitionServiceImpl implements DefinitionService {
             DefDescriptor<?> singleMatch = getDefDescriptor(
                     prefix, matcher.getNamespaceMatch().toString(), matcher.getNameMatch().toString(),
                     matcher.getDefTypes().get(0));
+            singleMatch = replaceBundleOnTestSuiteDescriptor(singleMatch);        // TESTSUITE HACK.
             if (exists(singleMatch)) {
                 matched.add(singleMatch);
             }

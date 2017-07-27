@@ -153,7 +153,7 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
             return bundleDescriptor.getName();
         }
 
-        private BundleSource<? extends Definition> getBundle(DefDescriptor<?> descriptor) {
+        public BundleSource<? extends Definition> getBundle(DefDescriptor<?> descriptor) {
             return bundles.get(getBundleKey(descriptor));
         }
         
@@ -596,5 +596,18 @@ public final class StringSourceLoaderImpl implements StringSourceLoader {
 
     @Override
     public void reset() {
+    }
+
+    @Override
+    public BundleSource<?> getBundle(DefDescriptor<?> descriptor) {
+        if (descriptor == null) {
+            return null;
+        }
+        NamespaceInfo namespaceInfo = namespaces.get(getNamespace(descriptor));
+
+        if (namespaceInfo != null) {
+            return namespaceInfo.getBundle(descriptor);
+        }
+        return null;
     }
 }

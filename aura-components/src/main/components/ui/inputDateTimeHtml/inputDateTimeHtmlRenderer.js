@@ -20,10 +20,12 @@
     },
 
     rerender: function (component, helper) {
-        // If treating the value as local time, don't convert it to the user's timezone on rerender
-        if (!component._considerLocalDateTime) {
+        if (!component._ignoreChange) {
             helper.formatValue(component);
         }
+
+        // reset the flag
+        component._ignoreChange = false;
         this.superRerender();
     }
 });

@@ -16,23 +16,28 @@
 ({
     formatValue: function (component) {
         var value = component.get("v.value");
+        var timezone = component.get("v.timezone");
+
         var inputElement = component.find("inputDateTimeHtml").getElement();
 
         if (!$A.util.isEmpty(value)) {
             var isoDate = $A.localizationService.parseDateTimeISO8601(value);
-            var timezone = component.get("v.timezone");
 
             $A.localizationService.UTCToWallTime(isoDate, timezone, function (walltime) {
-                var walltimeISO = $A.localizationService.toISOString(walltime);
-
-                // datetime-local input doesn't support any time zone offset information,
-                // so we need to remove the 'Z' off of the end.
-                var displayValue = walltimeISO.split("Z", 1)[0] || walltimeISO;
-                inputElement.value = displayValue;
-            });
+                this.setInputValue(inputElement, walltime);
+            }.bind(this));
         } else {
             inputElement.value = "";
         }
+    },
+
+    setInputValue: function (elem, date) {
+        var isoString = $A.localizationService.toISOString(date);
+
+        // datetime-local input doesn't support any time zone offset information,
+        // so we need to remove the 'Z' off of the end.
+        var displayValue = isoString.split("Z", 1)[0] || isoString;
+        elem.value = displayValue;
     },
 
     /**
@@ -40,6 +45,12 @@
      */
     doUpdate: function (component, value) {
         var timezone = component.get("v.timezone");
+
+        // When there is no initial value, consider the input as local date/time
+        // checking here instead of init because v.value could be set later, e.g. in a callback
+        if ($A.util.isUndefined(component._considerLocalDateTime)) {
+            component._considerLocalDateTime = $A.util.isEmpty(component.get("v.value"));
+        }
 
         if (component._considerLocalDateTime) {
             // When v.value is empty and the new value is 2017-04-12T01:00, we use parseDateTime method that will parse
@@ -56,6 +67,7 @@
     },
 
     setValue: function (component, value) {
-        component.set("v.value", $A.localizationService.toISOString(value), true);
+        component.set("v.value", $A.localizationService.toISOString(value));
+        component._ignoreChange = true;
     }
 });

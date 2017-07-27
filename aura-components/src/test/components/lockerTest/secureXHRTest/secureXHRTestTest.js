@@ -31,6 +31,8 @@
     },
 
     testResponseXML: {
+        // Remove UnAdaptableTest label when test is updated to use content guaranteed to be XML (via mock or actual asset)
+        labels: ["UnAdaptableTest"],
         test: function(cmp) {
             cmp.testResponseXML();
         }

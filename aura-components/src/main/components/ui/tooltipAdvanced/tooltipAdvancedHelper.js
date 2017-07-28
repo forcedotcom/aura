@@ -29,6 +29,12 @@
 	},
 
 	show: function(cmp) {
+		var target = $A.getComponent(cmp.get('v.target'));
+		if (!target) {
+			// the target its invalid, so, nothing to show
+			return;
+		}
+
 		var classList = this.ttLib.tooltip.getClassList(cmp);
 
 		classList.push('transition-start');

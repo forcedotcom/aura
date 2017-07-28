@@ -22,6 +22,7 @@ import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.http.BrowserCompatibilityService;
 import org.auraframework.service.*;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.RenderContext;
@@ -62,6 +63,7 @@ public class IntegrationImplTest {
         ServletUtilAdapter servletUtilAdapter = mock(ServletUtilAdapter.class);
         RenderContext renderContext = mock(RenderContext.class);
         ClientLibraryService clientLibraryService = mock(ClientLibraryService.class);
+        BrowserCompatibilityService browserCompatibilityService = mock(BrowserCompatibilityService.class);
 
         AuraContext.Mode mode = AuraContext.Mode.UTEST;
         String contextPath = "/mockPath";
@@ -92,16 +94,20 @@ public class IntegrationImplTest {
         when(definitionService.getDefDescriptor(tag, ComponentDef.class)).thenReturn(componentDefDescriptor);
         when(definitionService.getDefinition(componentDefDescriptor)).thenReturn(componentDef);
         when(renderContext.getCurrent()).thenReturn(currentRenderAppendable);
+        when(configAdapter.isModulesEnabled()).thenReturn(true);
+        when(browserCompatibilityService.isCompatible(anyString())).thenReturn(false);
 
         //ACT
         IntegrationImpl target = new IntegrationImpl(contextPath, mode, initializeAura, userAgent,
                             application, instanceService, definitionService, serializationService,
                             contextService, configAdapter, renderingService, servletUtilAdapter,
-                            clientLibraryService);
+                            clientLibraryService, browserCompatibilityService);
         target.injectComponent(tag, attributes, localId, locatorDomId, renderContext, useAsync);
 
         //ASSERT
         verify(servletUtilAdapter).getInlineJs(context, applicationDef);
+        verify(configAdapter, atLeastOnce()).isModulesEnabled();
+        verify(browserCompatibilityService, atLeastOnce()).isCompatible(anyString());
     }
 
 

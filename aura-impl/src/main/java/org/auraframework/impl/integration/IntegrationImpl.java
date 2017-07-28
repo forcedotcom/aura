@@ -33,6 +33,7 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.http.BrowserCompatibilityService;
 import org.auraframework.impl.system.RenderContextHTMLImpl;
 import org.auraframework.impl.util.TemplateUtil;
 import org.auraframework.impl.util.TemplateUtil.Script;
@@ -67,6 +68,15 @@ public class IntegrationImpl implements Integration {
     private static final String COMPONENT_DEF_TEMPLATE =
         "{'componentDef': 'markup://%s', 'attributes': { 'values' : %s }, 'localId': '%s'}";
 
+    private static final String DEFAULT_APPLICATION = "aura:integrationServiceApp";
+
+    private final String contextPath;
+    private final Mode mode;
+    private final boolean initializeAura;
+    private final Client client;
+    private final String application;
+    private String userAgent;
+
     private TemplateUtil templateUtil = new TemplateUtil();
 
     private boolean hasApplicationBeenWritten = false;
@@ -80,13 +90,16 @@ public class IntegrationImpl implements Integration {
     private RenderingService renderingService;
     private ServletUtilAdapter servletUtilAdapter;
     private ClientLibraryService clientLibraryService;
+    private BrowserCompatibilityService browserCompatibilityService;
 
     public IntegrationImpl(String contextPath, Mode mode, boolean initializeAura, String userAgent,
                            String application, InstanceService instanceService,
                            DefinitionService definitionService, SerializationService serializationService,
                            ContextService contextService, ConfigAdapter configAdapter,
                            RenderingService renderingService, ServletUtilAdapter servletUtilAdapter,
-                           ClientLibraryService clientLibraryService) throws QuickFixException {
+                           ClientLibraryService clientLibraryService,
+                           BrowserCompatibilityService browserCompatibilityService) throws QuickFixException {
+        this.userAgent = userAgent;
         this.client = userAgent != null ? new Client(userAgent) : null;
         this.contextPath = contextPath;
         this.mode = mode;
@@ -100,6 +113,7 @@ public class IntegrationImpl implements Integration {
         this.renderingService = renderingService;
         this.servletUtilAdapter = servletUtilAdapter;
         this.clientLibraryService = clientLibraryService;
+        this.browserCompatibilityService = browserCompatibilityService;
     }
 
     @Override
@@ -308,6 +322,10 @@ public class IntegrationImpl implements Integration {
         context.setContextPath(contextPath);
         context.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
 
+        // modulesEnabled and useCompatSource are REQUIRED
+        context.setModulesEnabled(configAdapter.isModulesEnabled());
+        context.setUseCompatSource(!this.browserCompatibilityService.isCompatible(this.userAgent));
+
         if (num != null) {
             context.setNum(num);
         }
@@ -379,12 +397,4 @@ public class IntegrationImpl implements Integration {
     private DefDescriptor<ApplicationDef> getApplicationDescriptor(String application) {
         return definitionService.getDefDescriptor(application, ApplicationDef.class);
     }
-
-    private static final String DEFAULT_APPLICATION = "aura:integrationServiceApp";
-
-    private final String contextPath;
-    private final Mode mode;
-    private final boolean initializeAura;
-    private final Client client;
-    private final String application;
 }

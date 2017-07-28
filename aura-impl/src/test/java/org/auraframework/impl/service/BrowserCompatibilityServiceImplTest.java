@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.modules.impl;
+package org.auraframework.impl.service;
 
 import org.auraframework.http.BrowserCompatibilityService;
+import org.auraframework.impl.service.BrowserCompatibilityServiceImpl;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -30,7 +31,9 @@ public class BrowserCompatibilityServiceImplTest {
     @Test
     public void isCompatible() throws Exception {
         List<UserAgentResult> uaTestEntries = new ArrayList<>();
-        uaTestEntries.add(new UserAgentResult("Safari 10.1.2", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/603.3.1 (KHTML, like Gecko) Version/10.1.2 Safari/603.3.1", true));
+        uaTestEntries.add(new UserAgentResult("Safari 10.1.0", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/603.3.1 (KHTML, like Gecko) Version/10.1.0 Safari/603.3.1", true));
+        uaTestEntries.add(new UserAgentResult("Safari 10.1.1", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/603.3.1 (KHTML, like Gecko) Version/10.1.1 Safari/603.3.1", true));
+        uaTestEntries.add(new UserAgentResult("Safari 10.1.2", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/603.3.8 (KHTML, like Gecko) Version/10.1.2 Safari/603.3.8", false));
         uaTestEntries.add(new UserAgentResult("Safari 10.0.3", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/602.4.8 (KHTML, like Gecko) Version/10.0.3 Safari/602.4.8", false));
         uaTestEntries.add(new UserAgentResult("Chrome 58", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36", true));
         uaTestEntries.add(new UserAgentResult("Chrome 55", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36", false));
@@ -40,13 +43,15 @@ public class BrowserCompatibilityServiceImplTest {
         uaTestEntries.add(new UserAgentResult("MS Edge 15", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36 Edge/15.14986", true));
         uaTestEntries.add(new UserAgentResult("Firefox 53", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.16.5; rv:53.0) Gecko/20100101 Firefox/53.0", true));
         uaTestEntries.add(new UserAgentResult("Firefox 52", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_19_2; rv:52.0a) Gecko/20100101 Firefox/52.0a", false));
+        uaTestEntries.add(new UserAgentResult("null", null, false));
+        uaTestEntries.add(new UserAgentResult("empty", "", false));
 
         BrowserCompatibilityService bcs = new BrowserCompatibilityServiceImpl();
 
         for (UserAgentResult uar : uaTestEntries) {
             boolean isUserAgentCompatible = bcs.isCompatible(uar.ua);
             boolean expected = uar.compatible;
-            assertEquals(uar.name + ": expected " + expected + ", actual " + uar, expected, isUserAgentCompatible);
+            assertEquals(uar.name + ": expected " + expected + ", actual " + isUserAgentCompatible, expected, isUserAgentCompatible);
         }
     }
 

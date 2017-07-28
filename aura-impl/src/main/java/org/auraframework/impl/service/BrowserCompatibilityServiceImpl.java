@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.modules.impl;
+package org.auraframework.impl.service;
 
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.http.BrowserCompatibilityService;
@@ -28,7 +28,7 @@ public class BrowserCompatibilityServiceImpl implements BrowserCompatibilityServ
 
     /**
      * chrome 58
-     * safari 10.1
+     * safari 10.1.1
      * firefox 53
      * edge 15
      *
@@ -38,16 +38,25 @@ public class BrowserCompatibilityServiceImpl implements BrowserCompatibilityServ
     @Override
     public boolean isCompatible(String userAgent) {
 
+        if (userAgent == null || (userAgent != null && userAgent.isEmpty())) {
+            return false;
+        }
+
         BrowserInfo bi = new BrowserInfo(userAgent);
         boolean isCompatibleSafari10 = false;
         if (bi.isBrowser(UserAgent.SAFARI, 10)) {
             int minor = 0;
+            int rev = 2;
             try {
                 int minorStart = userAgent.indexOf("Version/10.") + 11;
                 int minorEnd = userAgent.indexOf(".", minorStart);
                 minor = Integer.parseInt(userAgent.substring(minorStart, minorEnd));
+                int revStart = userAgent.indexOf(".", minorEnd);
+                int revEnd = userAgent.indexOf(" ", revStart);
+                rev = Integer.parseInt(userAgent.substring(revStart + 1, revEnd));
             } catch (NumberFormatException | IndexOutOfBoundsException ignored) {}
-            isCompatibleSafari10 = minor > 0;
+            // Only 10.1.0, 10.1.1 are compatible
+            isCompatibleSafari10 = minor == 1 && rev != 2;
         }
 
         return bi.isBrowser(UserAgent.CHROME, 56, true) ||

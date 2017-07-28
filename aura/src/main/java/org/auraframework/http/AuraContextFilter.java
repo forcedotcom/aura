@@ -80,6 +80,7 @@ public class AuraContextFilter implements Filter {
     private static final StringParam contextConfig = new StringParam(AuraServlet.AURA_PREFIX + "context", 0, false);
     protected static final StringParam pageURI = new StringParam(AuraServlet.AURA_PREFIX + "pageURI", 0, false);
     protected static final BooleanParam modulesParam = new BooleanParam(AuraServlet.AURA_PREFIX + "modules", false);
+    protected static final BooleanParam compatParam = new BooleanParam(AuraServlet.AURA_PREFIX + "compat", false);
 
     private String componentDir = null;
 
@@ -411,6 +412,15 @@ public class AuraContextFilter implements Filter {
         if (configMap != null) {
             // when c is present, it's a request to fetch module compiled code in compatibility mode
             return configMapContains("c", "1", configMap);
+        }
+
+        if (mode == Mode.DEV || mode == Mode.SELENIUM) {
+            // DO NOT allow url param override in prod
+            String compatEnabledParam = request.getParameter(AuraServlet.AURA_PREFIX + "compat");
+            if (compatEnabledParam != null) {
+                // Uses BooleanParam which is true for "1", "true", "yes". Anything else is false.
+                return compatParam.get(request);
+            }
         }
 
         String uaHeader = request.getHeader(HttpHeaders.USER_AGENT);

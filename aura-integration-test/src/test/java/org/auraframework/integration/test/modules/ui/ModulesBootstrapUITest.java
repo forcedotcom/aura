@@ -16,18 +16,17 @@
 package org.auraframework.integration.test.modules.ui;
 
 import org.auraframework.integration.test.util.WebDriverTestCase;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
-import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
 import org.openqa.selenium.By;
 
 /**
  * Runs the /moduletest/bootstrap.app app to verify module and aura/module interoperability works.
  */
-@UnAdaptableTest
 public class ModulesBootstrapUITest extends WebDriverTestCase {
 
-    // private static final By BY_BUTTON_TOGGLE = By.cssSelector(".button-toggle");
+    private static final By BY_BUTTON_TOGGLE = By.cssSelector(".button-toggle");
     private static final By BY_BUTTON_SET1 = By.cssSelector(".button-set1");
     private static final By BY_BUTTON_SET2 = By.cssSelector(".button-set2");
     private static final By BY_BUTTON_SET3 = By.cssSelector(".button-set3");
@@ -41,10 +40,32 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
     private static final By BY_M_EXPR = By.cssSelector(".m-expr");
 
     @Test
-    @ExcludeBrowsers({BrowserType.IE11, BrowserType.SAFARI})
-    public void testInterop() throws Exception {
-        open("/moduletest/bootstrap.app");
+    @ExcludeBrowsers({BrowserType.IE11, BrowserType.SAFARI}) // non-compat will fail in unsupported browsers
+    public void testInteropMinified() throws Exception {
+        open("/moduletest/bootstrap.app?aura.compat=0", Mode.SELENIUM);
+        doInteropTest();
+    }
 
+    @Test
+    public void testInteropMinifiedCompat() throws Exception {
+        open("/moduletest/bootstrap.app?aura.compat=1", Mode.SELENIUM);
+        doInteropTest();
+    }
+
+    @Test
+    @ExcludeBrowsers({BrowserType.IE11, BrowserType.SAFARI}) // non-compat will fail in unsupported browsers
+    public void testInteropDev() throws Exception {
+        open("/moduletest/bootstrap.app?aura.compat=0", Mode.DEV);
+        doInteropTest();
+    }
+
+    @Test
+    public void testInteropDevCompat() throws Exception {
+        open("/moduletest/bootstrap.app?aura.compat=1", Mode.DEV);
+        doInteropTest();
+    }
+
+    private void doInteropTest() {
         // check initial state
         assertEquals("I'm modules!", findDomElement(By.cssSelector(".i-am-modules")).getText());
         assertState(
@@ -93,9 +114,16 @@ public class ModulesBootstrapUITest extends WebDriverTestCase {
                 "Unbound: I'm v.test2",
                 "Expression: v.test3 | 3!!");
 
-        // TODO: "Toggle if ..." button fails with: Cannot read property 'replace' of undefined
-    }
+        // toogle aura:if to hide/show component
+        findDomElement(BY_BUTTON_TOGGLE).click();
+        waitForCondition("return $A.getRoot().find('simple') === undefined");
+        findDomElement(BY_BUTTON_TOGGLE).click();
+        waitForCondition("return $A.getRoot().find('simple') !== undefined");
 
+        // iteration should display multiple module components
+        assertTrue(findDomElements(By.cssSelector(".modules-container")).size() > 1);
+    }
+    
     private void assertState(String aRes1, String aRes2, String aRes3, String aExpr, String mLiteral, String mBound,
             String mUnbound, String mExpr) {
         assertEquals(aRes1, findDomElement(BY_A_RES1).getText());

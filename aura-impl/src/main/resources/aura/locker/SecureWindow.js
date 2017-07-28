@@ -14,19 +14,6 @@
  * limitations under the License.
  */
 
-
-/**
- * Construct a SecureWindow.
- *
- * @public
- * @class
- * @constructor
- *
- * @param {Object}
- *            win - the DOM window
- * @param {Object}
- *            key - the key to apply to the secure window
- */
 function SecureWindow(win, key, globalAttributeWhitelist) {
     "use strict";
 
@@ -97,6 +84,10 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
                 var ret = location.href = value;
                 return ret;
             }
+        },
+        URL: {
+            enumerable: true,
+            value: SecureURL
         },
         toString: {
             value: function() {
@@ -250,7 +241,7 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
     });
 
     var workerFrame = win.document.getElementById("safeEvalWorkerCustom");
-    var safeEvalWindow = workerFrame && workerFrame.contentWindow;            
+    var safeEvalWindow = workerFrame && workerFrame.contentWindow;
     var globalScope = safeEvalWindow || win;
 
     // Has to happen last because it depends on the secure getters defined above that require the object to be keyed
@@ -692,7 +683,8 @@ SecureWindow.metadata = {
                 "TypeError":                            FUNCTION,
                 "UIEvent":                              FUNCTION,
                 "URIError":                             FUNCTION,
-                "URL":                                  RAW,
+                // Replaced by SecureURL
+                // "URL":                                  RAW,
                 "URLSearchParams":                      FUNCTION,
                 "Uint16Array":                          RAW,
                 "Uint32Array":                          RAW,

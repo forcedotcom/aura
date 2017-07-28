@@ -17,6 +17,7 @@ function LockerService() {
     "use strict";
 
     // #include aura.locker.LockerKeyManager
+    // #include aura.locker.SecureURL
     // #include aura.locker.SecureDOMEvent
     // #include aura.locker.SecureIFrameElement
     // #include aura.locker.SecureElement

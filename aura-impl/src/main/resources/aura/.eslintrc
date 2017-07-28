@@ -131,6 +131,7 @@
     "SecureDOMEvent": true,
     "SecureAuraEvent": true,
     "SecureLocation": true,
+    "SecureURL": true,
     "SecurePropertyReferenceValue": true,
     "TimeRanges": true,
     "ValidityState": true,

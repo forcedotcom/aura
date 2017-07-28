@@ -204,8 +204,9 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     private ContentSecurityPolicy csp;
     private Consumer<String> csrfValidationFunction = null;
     private Supplier<String> csrfTokenFunction = null;
-	private Supplier<String> jwtTokenFunction = null;
+    private Supplier<String> jwtTokenFunction = null;
     private Boolean isLockerServiceEnabledGlobally;
+    private Boolean isActionPublicCachingEnabled = null;
 
     public MockConfigAdapterImpl() {
         super();
@@ -225,6 +226,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
         csrfTokenFunction = null;
         jwtTokenFunction = null;
         isLockerServiceEnabledGlobally = null;
+        isActionPublicCachingEnabled = null;
     }
 
     @Override
@@ -422,5 +424,24 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     @Override
     public boolean isLockerServiceEnabled() {
         return (isLockerServiceEnabledGlobally == null) ? super.isLockerServiceEnabled() : isLockerServiceEnabledGlobally;
+    }
+
+    @Override
+    public void setActionPublicCachingEnabled(boolean enabled) {
+        isActionPublicCachingEnabled = enabled;
+    }
+
+    @Override
+    public boolean isActionPublicCachingEnabled() {
+        if (isActionPublicCachingEnabled != null) {
+            return isActionPublicCachingEnabled;
+        }
+        
+        if (testContextAdapter.getTestContext() != null) {
+            // needed to test action caching in jstests
+            return true;
+        }
+        
+        return super.isActionPublicCachingEnabled();
     }
 }

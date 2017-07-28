@@ -82,4 +82,15 @@ public interface Annotations {
     @interface Type {
         String value();
     }
+
+    /**
+     * Marks a server action to be cacheable on public HTTP cache.
+     * 
+     * The expiration value sets the cache expiration time in seconds.
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    @interface PublicCachingEnabled {
+        int expiration();
+    }
 }

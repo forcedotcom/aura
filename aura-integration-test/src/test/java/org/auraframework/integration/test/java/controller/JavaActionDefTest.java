@@ -134,6 +134,34 @@ public class JavaActionDefTest extends AuraImplTestCase {
         assertEquals("parameters marked as loggable should not be logged", 0, loggableParams.size());
     }
 
+    /**
+     * Verify Java action without public cached annotation is not publicly cached
+     */
+    @Test
+    public void testJavaActionDefIsNotPublicCachedByDefault() throws Exception {
+        String controllerName = "java://org.auraframework.impl.java.controller.PublicCachingTestController";
+        String actionName = "executeWithoutPublicCaching";
+        ActionDef actionDef = getJavaActionDef(controllerName, actionName);
+
+        boolean actual = ((JavaActionDef) actionDef).isPublicCachingEnabled();
+        assertFalse("JavaActionDef should NOT be public cached by default", actual);
+    }
+
+    /**
+     * Verify Java action with public cached annotation is publicly cached with given expiration
+     */
+    @Test
+    public void testJavaActionDefIsPublicCachedWithAnnotation() throws Exception {
+        String controllerName = "java://org.auraframework.impl.java.controller.PublicCachingTestController";
+        String actionName = "executeWithPublicCaching";
+        ActionDef actionDef = getJavaActionDef(controllerName, actionName);
+
+        boolean actualEnabled = ((JavaActionDef) actionDef).isPublicCachingEnabled();
+        int actualExpiration = ((JavaActionDef) actionDef).getPublicCachingExpiration();
+        assertTrue("JavaActionDef should be publicly cached", actualEnabled);
+        assertEquals("JavaActionDef public cache expiration should be 10", 10, actualExpiration); 
+    }
+
     private JavaActionDef getJavaActionDef(String controllerQualifiedName, String actionName) throws Exception {
         ControllerDef controllerDef = definitionService.getDefinition(controllerQualifiedName, ControllerDef.class);
         ActionDef actionDef = controllerDef.getSubDefinition(actionName);

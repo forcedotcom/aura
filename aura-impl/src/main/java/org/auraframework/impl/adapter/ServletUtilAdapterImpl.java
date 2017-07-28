@@ -31,8 +31,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.auraframework.adapter.ConfigAdapter;
@@ -47,33 +45,39 @@ import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ClientLibraryDef.Type;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.http.CSP;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.http.resource.InlineJSAppender;
+import org.auraframework.impl.java.controller.JavaActionDef;
 import org.auraframework.impl.util.BrowserUserAgent;
 import org.auraframework.impl.util.TemplateUtil;
 import org.auraframework.impl.util.TemplateUtil.Script;
 import org.auraframework.impl.util.UserAgent;
+import org.auraframework.instance.Action;
 import org.auraframework.instance.InstanceStack;
+import org.auraframework.service.CSPInliningService;
 import org.auraframework.service.CSPInliningService.InlineScriptMode;
 import org.auraframework.service.ContextService;
-import org.auraframework.service.CSPInliningService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.SerializationService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.AuraResource;
+import org.auraframework.system.Message;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @ServiceComponent
 public class ServletUtilAdapterImpl implements ServletUtilAdapter {
@@ -591,6 +595,45 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     @Override
     public boolean isProductionMode(Mode mode) {
         return mode == Mode.PROD || configAdapter.isProduction();
+    }
+
+    private JavaActionDef getPubliclyCacheableAction(Message message) throws QuickFixException {
+        if (message.getActions().size() == 1) {
+            Action action = message.getActions().get(0);
+
+            Definition def = definitionService.getDefinition(action.getDescriptor());
+
+            if (def instanceof JavaActionDef) {
+                JavaActionDef javaActionDef = (JavaActionDef) def;
+
+                if (javaActionDef.isPublicCachingEnabled() && javaActionDef.getPublicCachingExpiration() > 0) {
+                    return javaActionDef;
+                }
+            }
+        }
+
+        return null;
+    }
+    /**
+     * Check to see if the incoming message is for a publicly cacheable action
+     */
+    @Override
+    public boolean isPubliclyCacheableAction(Message message) throws QuickFixException {
+        return getPubliclyCacheableAction(message) != null;
+    }
+
+    /**
+     * Return the cacheable action expiration time (in seconds) OR -1 if the action is not publicly cacheable
+     */
+    @Override
+    public long getPubliclyCacheableActionExpiration(Message message) throws QuickFixException {
+        JavaActionDef publiclyCacheableJavaActionDef = getPubliclyCacheableAction(message);
+
+        if (publiclyCacheableJavaActionDef != null) {
+            return publiclyCacheableJavaActionDef.getPublicCachingExpiration();
+        }
+
+        return -1;
     }
 
     /**

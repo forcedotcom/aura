@@ -71,6 +71,7 @@ Test.Aura.AuraClientServiceTest = function() {
                     return typeof n === 'number' && isFinite(n);
                 },
                 clearCookie: function() {},
+                isAction: function () { return true; },
                 isString : function(obj) {
                     return typeof obj === 'string';
                 },
@@ -84,16 +85,19 @@ Test.Aura.AuraClientServiceTest = function() {
             mark : function() {},
             getContext : function() {
                 return {
-                    encodeForServer: function(){},
+                    encodeForServer: function(includeDynamic, includeExtraPropertiesForCacheableXHR) { 
+                        return 'encodedForServer:' + includeDynamic + ':' + includeExtraPropertiesForCacheableXHR; 
+                    }
                 };
-            },
-            clientService:{
             },
             auraError: function(msg) {
                 this.message = msg;
             },
             clientService: {
                 hardRefresh: function(){}
+            },
+            storageService: {
+                getStorage: function() { return null; }
             },
             warning: function() {},
             error: function(msg) {
@@ -345,6 +349,31 @@ Test.Aura.AuraClientServiceTest = function() {
             // Assert
             Assert.Equal(4, target.countAvailableXHRs());
         }
+
+        [Fact]
+        function PubliclyCacheableActionInXHRRetrievableWithNoId() {
+            // mock the $A.assert function called in getAction()
+            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
+                assert: function() {}
+            });
+
+            // Arrange
+            var newAction = new MockAction("servercacheable");
+            var target = new Aura.Services.AuraClientService$AuraXHR();
+            var addedAction;
+
+            // Act
+            target.addAction(newAction);
+
+            // note there is no parameter provided to getAction here
+            mockAssert(function() {
+                addedAction = target.getAction();
+            });
+
+            // Assert
+            Assert.Equal(newAction, addedAction);
+         }
+
     };
 
     var id = 0;
@@ -369,24 +398,45 @@ Test.Aura.AuraClientServiceTest = function() {
         this.isAbortable = Stubs.GetMethod(false);
         this.isCaboose = Stubs.GetMethod(false);
         this.isBackground = Stubs.GetMethod(false);
+        this.isPublicCachingEnabled = Stubs.GetMethod(false);
         this.runDeprecated = Stubs.GetMethod();
         this.addCallbackGroup = Stubs.GetMethod();
         this.abortableId = undefined;
         this.getAbortableId = function () { return undefined; };
         this.setAbortableId = function (nid) { };
         this.abort = Stubs.GetMethod();
-        this.getDef = Stubs.GetMethod({
+        this.def = {
             isClientAction : Stubs.GetMethod(true),
-            isServerAction : Stubs.GetMethod(false)
-        });
+            isServerAction : Stubs.GetMethod(false),
+            isPublicCachingEnabled : Stubs.GetMethod(false),
+            getPublicCachingExpiration : Stubs.GetMethod(0)
+        };
+
+        this.getDef = Stubs.GetMethod(this.def);
+
         var sdef = Stubs.GetMethod({
             isClientAction : Stubs.GetMethod(false),
-            isServerAction : Stubs.GetMethod(true)
+            isServerAction : Stubs.GetMethod(true),
+            isPublicCachingEnabled: Stubs.GetMethod(false),
+            getPublicCachingExpiration: Stubs.GetMethod(0)
         });
+
+        var cacheableDef = {
+            isClientAction : Stubs.GetMethod(false),
+            isServerAction : Stubs.GetMethod(true),
+            isPublicCachingEnabled: Stubs.GetMethod(true),
+            getPublicCachingExpiration: Stubs.GetMethod(100)
+        };
+
+        this.isPubliclyCacheable = function() {
+            return this.def.isPublicCachingEnabled() && this.def.getPublicCachingExpiration() > 0;
+        }
+
         if (type === "clientbackground") {
             this.isBackground = Stubs.GetMethod(true);
         } else if (type === "server") {
             this.getDef = sdef;
+            this.isRefreshAction = Stubs.GetMethod(false);
         } else if (type === "serverbackground") {
             this.getDef = sdef;
             this.isBackground = Stubs.GetMethod(true);
@@ -396,6 +446,9 @@ Test.Aura.AuraClientServiceTest = function() {
         } else if (type === "serverforceboxcar") {
             this.getDef = sdef;
             this.isCaboose = Stubs.GetMethod(true);
+        } else if (type === "servercacheable") {
+            this.def = cacheableDef;
+            this.getDef = Stubs.GetMethod(cacheableDef);
         }
     };
 
@@ -843,6 +896,56 @@ Test.Aura.AuraClientServiceTest = function() {
             });
 
             Assert.False(actual);
+        }
+    }
+
+    [Fixture]
+    function enqueueActionFlowthrough() {
+
+        function getMockedService() {
+            var target = new Aura.Services.AuraClientService();
+            target.allowFlowthrough = true;
+            target.getAvailableXHR = Stubs.GetMethod(true);
+            return target;
+        }
+
+        [Fact]
+        function CallsSend() {
+            var target;
+            
+            // arrange
+            var mockAction = new MockAction();
+
+            mockGlobal(function () {
+                target = getMockedService();
+                target.send = Stubs.GetMethod(true);
+
+                // act
+                target.enqueueAction(mockAction);
+            });
+
+            // assert
+            Assert.Equal(1, target.send.Calls.length);
+        }
+
+        [Fact]
+        function CallsSendWithGetIfPubliclyCacheable() {
+            
+            // arrange
+            var target;
+            var mockAction = new MockAction();
+            mockAction.isPubliclyCacheable = Stubs.GetMethod(true);
+
+            mockGlobal(function () {
+                target = getMockedService();
+                target.send = Stubs.GetMethod('auraXHR', 'actions', 'method', true);
+
+                // act
+                target.enqueueAction(mockAction);
+            });
+
+            // assert
+            Assert.Equal('GET', target.send.Calls[0].Arguments.method);
         }
     }
 
@@ -2254,10 +2357,12 @@ Test.Aura.AuraClientServiceTest = function() {
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
                 setOverrides(target);
-                Object.Global()["$A"].util.json.encode = function () {
-                    throw "invalid json!";
-                };
-                actual = target.send(auraXHR, actions, "POST", {message:"something"});
+
+                var mockJsonEncode = Mocks.GetMock(Object.Global().$A.util.json, "encode", function() { throw "invalid json!"; });
+
+                mockJsonEncode(function() {
+                    actual = target.send(auraXHR, actions, "POST", {message:"something"});
+                });
             });
 
             Assert.Equal("failed to generate parameters for action xhr for action: undefined", AuraErrorMsg);
@@ -2269,10 +2374,12 @@ Test.Aura.AuraClientServiceTest = function() {
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
                 setOverrides(target);
-                Object.Global()["$A"].util.json.encode = function () {
-                    throw "invalid json!";
-                };
-                actual = target.send(auraXHR, actions, "POST", {message:"something"});
+
+                var mockJsonEncode = Mocks.GetMock(Object.Global().$A.util.json, "encode", function() { throw "invalid json!"; });
+
+                mockJsonEncode(function() {
+                    actual = target.send(auraXHR, actions, "POST", {message:"something"});
+                });
             });
 
             Assert.False(actual);
@@ -2281,11 +2388,19 @@ Test.Aura.AuraClientServiceTest = function() {
 
     [Fixture]
     function sendAsSingle() {
+        var getMockAction = function(actionId) {
+            return Stubs.GetObject({
+                isPubliclyCacheable: function() { return false; }
+            }, {
+                id: actionId
+            });
+        };
+        
         [Fact]
         function testSendsAll() {
             var target;
             var expected={
-                actions:[ "1", "2", "3", "4", "5" ],
+                actions:[ getMockAction("1"), getMockAction("2"), getMockAction("3"), getMockAction("4"), getMockAction("5") ],
                 sent:5,
                 deDuped:5
             };
@@ -2318,8 +2433,8 @@ Test.Aura.AuraClientServiceTest = function() {
         function testSendsOneAndEnqueuesRest() {
             var target;
             var expected={
-                actions:[ "1"],
-                deferred:["2", "3", "4", "5" ],
+                actions:[ getMockAction("1")],
+                deferred:[getMockAction("2"), getMockAction("3"), getMockAction("4"), getMockAction("5") ],
                 sent:1,
                 deDuped:5
             };
@@ -2385,7 +2500,18 @@ Test.Aura.AuraClientServiceTest = function() {
         var actionTypeDeferred = "DEFERRED";
         var actionTypeBackground = "BACKGROUND";
         var actionTypeCaboose = "CABOOSE";
-        var mockAction = function(actionType, abort) {
+        var actionTypeCacheable = "CACHEABLE";
+
+        var mockAction = function(actionType, abort, cachingEnabled) {
+            var def = {
+                isPublicCachingEnabled : function() {
+                    return actionType === actionTypeCacheable ? true : false;
+                },
+                getPublicCachingExpiration : function() {
+                    return actionType === actionTypeCacheable ? 100 : 0;
+                }
+            };
+
             return {
                 abortIfComponentInvalid : function(v) {
                     return abort;
@@ -2399,6 +2525,24 @@ Test.Aura.AuraClientServiceTest = function() {
                 isCaboose : function() {
                     return actionType === actionTypeCaboose;
                 },
+                getDef : function() {
+                    return def;
+                },
+                isStorable : function() {
+                    return false;
+                },
+                isPubliclyCacheable : function() {
+                    return cachingEnabled && def.isPublicCachingEnabled() && def.getPublicCachingExpiration() > 0;
+                },
+                callAllAboardCallback: function () {
+                    return true;
+                },
+                isChained: function () {
+                    return false;
+                },
+                prepareToSend: function () {
+                    return true;
+                }
             }
         };
 
@@ -2537,6 +2681,164 @@ Test.Aura.AuraClientServiceTest = function() {
             target.actionsDeferred = actions;
             target.sendActionXHRs();
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function testOneForegroundOneCacheableSentInTwoXHRs() {
+            var actions = [ mockAction(actionTypeForeground, false, true), mockAction(actionTypeCacheable, false, true) ];
+            var expected = [ [ actions[0] ], [ actions[1] ] ];
+            var actual = [];
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.getAvailableXHR = function(background) {
+                    return true;
+                };
+                target.shouldSendOutForegroundActions = function(x,y) {
+                    return true;
+                };
+                target.send = function(xhr, actionsToSend, method) {
+                    actual.push(actionsToSend);
+                    return true;
+                };
+            });
+
+            target.actionsDeferred = actions;
+            target.sendActionXHRs();
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function testTwoCacheableSentInTwoXHRs() {
+            var actions = [ mockAction(actionTypeCacheable, false, true), mockAction(actionTypeCacheable, false, true) ];
+            var expected = [ [ actions[0] ], [ actions[1] ] ];
+            var actual = [];
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.getAvailableXHR = function(background) {
+                    return true;
+                };
+
+                // skip sending out foreground actions (since there are none)
+                target.shouldSendOutForegroundActions = function(x,y) {
+                    return false;
+                };
+
+                target.send = function(xhr, actionsToSend, method) {
+                    actual.push(actionsToSend);
+                    return true;
+                };
+            });
+
+            target.actionsDeferred = actions;
+            target.sendActionXHRs();
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function testGroupingStillWorksForNonContiguousGroupableActions() {
+            var actions = [ mockAction(actionTypeForeground, false, true), mockAction(actionTypeCacheable, false, true), mockAction(actionTypeForeground, false, true) ];
+            var expected = [ [ actions[0], actions[2] ], [ actions[1] ] ];
+            var actual = [];
+            var target;
+
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.getAvailableXHR = function(background) {
+                    return true;
+                };
+                target.shouldSendOutForegroundActions = function(x,y) {
+                    return true;
+                };
+                target.send = function(xhr, actionsToSend, method) {
+                    actual.push(actionsToSend);
+                    return true;
+                };
+            });
+
+            target.actionsDeferred = actions;
+            target.sendActionXHRs();
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fixture]
+        function testCacheableActionRequest() {
+            // Arrange
+            var action = mockAction(actionTypeCacheable, false, true);
+
+            var actions = [action];
+
+            var mockAuraXHR = {
+                addAction: function () {}
+            };
+
+            var mockXHR = Stubs.GetObject({
+                open: function (method, url) {},
+                setRequestHeader: function () {},
+                send: function () {}
+            });
+
+            var mockSetTimeout = Mocks.GetMocks(Object.Global(), {
+                setTimeout: function() {}
+            });
+
+            mockSetTimeout(function() {
+                mockGlobal(function () {
+                    var target = new Aura.Services.AuraClientService();
+                    target.getAvailableXHR = function () {
+                        return mockAuraXHR;
+                    };
+                    target.buildActionNameList = function (action) {
+                        return action;
+                    };
+                    target.createXHR = function () {
+                        return mockXHR;
+                    };
+
+                    target.actionsDeferred = actions;
+
+                    // Execute
+                    target.sendActionXHRs()
+                });
+            });
+
+            [Fact]
+            function usesGetMethod() {
+                var expectedMethod = "GET";
+
+                // Verify
+                Assert.Equal({
+                    calls: 1,
+                    method: expectedMethod
+                }, {
+                    calls: mockXHR.open.Calls.length,
+                    method: mockXHR.open.Calls[0].Arguments.method
+                });
+            }
+
+            [Fact]
+            function usesExpectedURL() {
+                var expectedUrl = '/aura?'
+                        + 'message=%3C%3C%7B%22actions%22%3A%5Btrue%5D%7D%3E%3E&' 
+                        + 'aura.context=encodedForServer%3Afalse%3Atrue&' 
+                        + 'aura.isAction=true';
+
+                // Verify
+                Assert.Equal({
+                    calls: 1,
+                    url: expectedUrl
+                }, {
+                    calls: mockXHR.open.Calls.length,
+                    url: mockXHR.open.Calls[0].Arguments.url
+                });
+            }
+
         }
 
         [Fact]

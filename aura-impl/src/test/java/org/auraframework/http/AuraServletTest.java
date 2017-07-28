@@ -15,24 +15,24 @@
  */
 package org.auraframework.http;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.auraframework.AuraConfiguration;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.instance.Action;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.SerializationService;
+import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -50,13 +50,19 @@ import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.GenericWebApplicationContext;
-
 import test.org.auraframework.impl.adapter.ConfigAdapterImpl;
+
+import javax.inject.Inject;
+import java.util.Arrays;
+import java.util.List;
 
 public class AuraServletTest extends UnitTestCase {
 
     @Inject
     private ContextService contextService;
+
+    @Mock
+    private ServerService serverService;
 
     private AuraServlet servlet;
 
@@ -84,6 +90,11 @@ public class AuraServletTest extends UnitTestCase {
         servlet = new AuraServlet();
         servlet.init(servletConfig);
         servlet.setServletUtilAdapter(servletUtilAdapter);
+        servlet.setSerializationService(serializationService);
+        servlet.setConfigAdapter(configAdapter);
+        servlet.setDefinitionService(definitionService);
+        servlet.setServerService(serverService);
+        
     }
 
     @Override
@@ -96,7 +107,7 @@ public class AuraServletTest extends UnitTestCase {
      * The handling of standard ports may vary (in .getRequestURL) according to the version of MockHttpServletRequest
      * provided, so just use a non-standard port.
      */
-    private MockHttpServletRequest getBaseAuraRequest() {
+    private static MockHttpServletRequest getBaseAuraRequest() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setMethod("GET");
         request.setScheme("http");
@@ -105,6 +116,34 @@ public class AuraServletTest extends UnitTestCase {
         request.setRequestURI("/aura");
         request.addParameter("aura.tag", "aura:text");
         return request;
+    }
+    
+    /*
+     * Returns a mock action with the given name
+     */
+    @SuppressWarnings("unchecked")
+    private static Action getAction(String name) {
+        DefDescriptor<ActionDef> actionDescriptor = Mockito.mock(DefDescriptor.class);
+        Action action = Mockito.mock(Action.class);
+        Mockito.when(action.getDescriptor()).thenReturn(actionDescriptor);
+        Mockito.when(actionDescriptor.getQualifiedName()).thenReturn(name);
+        return action;
+    }
+    
+    /*
+     * Starts authenticated context and sets framework UID. 
+     */
+    private AuraContext startContext() {
+        DefDescriptor<ApplicationDef> applicationDescriptor = Mockito.mock(DefDescriptor.class);
+        Mockito.when(applicationDescriptor.getDefType()).thenReturn(DefDescriptor.DefType.APPLICATION);
+        contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, applicationDescriptor);
+        
+        AuraContext auracontext = contextService.getCurrentContext();
+        
+        auracontext.setFrameworkUID("testFWUID");
+        Mockito.when(configAdapter.getAuraFrameworkNonce()).thenReturn("testFWUID");
+
+        return auracontext;
     }
 
     private void assertSingleHeader(MockHttpServletResponse response, String name, String value) {
@@ -130,14 +169,14 @@ public class AuraServletTest extends UnitTestCase {
     public void testDoPost_CoosBeforeQFE() throws Exception {
         DefDescriptor<ApplicationDef> applicationDescriptor = Mockito.mock(DefDescriptor.class);
         Mockito.when(applicationDescriptor.getDefType()).thenReturn(DefDescriptor.DefType.APPLICATION);
-    	contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, applicationDescriptor);
+        contextService.startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED, applicationDescriptor);
         
         AuraContext auracontext = contextService.getCurrentContext();
         
         auracontext.setFrameworkUID("testFWUID");
         Mockito.when(configAdapter.getAuraFrameworkNonce()).thenReturn("testFWUID");
         
-    	MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletRequest request = new MockHttpServletRequest();
         request.setMethod("POST");
         request.setScheme("http");
         request.setServerName("server");
@@ -153,12 +192,8 @@ public class AuraServletTest extends UnitTestCase {
         Mockito.doThrow(coos).when(definitionService).updateLoaded(Mockito.any());        
         
         DefinitionNotFoundException qfe = Mockito.mock(DefinitionNotFoundException.class);
-		Mockito.doThrow(qfe).when(serializationService).read(Mockito.any(), Mockito.any());
+        Mockito.doThrow(qfe).when(serializationService).read(Mockito.any(), Mockito.any());
         
-        servlet.setSerializationService(serializationService);
-        servlet.setServletUtilAdapter(servletUtilAdapter);
-        servlet.setConfigAdapter(configAdapter);
-        servlet.setDefinitionService(definitionService);
         servlet.doPost(request, response);
         
         Mockito.verify(servletUtilAdapter).handleServletException(coos, false, auracontext, request, response, false);  
@@ -181,7 +216,6 @@ public class AuraServletTest extends UnitTestCase {
 
         Mockito.when(servletUtilAdapter.actionServletGetPre(Matchers.any(), Matchers.any())).thenReturn(false);
 
-        servlet.setServletUtilAdapter(servletUtilAdapter);
         servlet.doPost(request, response);
 
         Mockito.verify(servletUtilAdapter).handleServletException(Matchers.isA(AuraHandledException.class), Matchers.anyBoolean(),
@@ -437,6 +471,175 @@ public class AuraServletTest extends UnitTestCase {
 
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, response.getStatus());
         assertSingleHeader(response, HttpHeaders.LOCATION, "/");
+        Mockito.verify(servletUtilAdapter).setNoCache(response);
+    }
+    
+    @Test
+    public void testDoPostRunsMessage() throws Exception {
+        // Arrange
+        startContext();
+        
+        MockHttpServletRequest request = getBaseAuraRequest();
+        request.setParameter("aura.token", "token");
+        request.setParameter("message", "someMessage");
+        
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        Message message = new Message(Arrays.asList(getAction("someAction")));
+        Mockito.doReturn(message).when(serializationService).read(Mockito.any(), Mockito.eq(Message.class));
+
+        // Act
+        servlet.doPost(request, response);
+        
+        // Assert
+        Mockito.verify(serverService).run(Mockito.same(message), Mockito.any(), Mockito.any(), Mockito.any());
+    }
+    
+    @Test
+    public void testDoGetActionFails() throws Exception {
+        // Arrange
+        startContext();
+        
+        MockHttpServletRequest request = getBaseAuraRequest();
+        request.setParameter("aura.token", "token");
+        request.setParameter("aura.isAction", "true");
+        request.setParameter("message", "someMessage");
+        
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        Message message = new Message(Arrays.asList(getAction("someAction")));
+        Mockito.doReturn(message).when(serializationService).read(Mockito.any(), Mockito.eq(Message.class));
+
+        Mockito.when(configAdapter.isActionPublicCachingEnabled()).thenReturn(true);
+
+        // Act
+        servlet.doGet(request, response);
+
+        // Assert
+        Mockito.verify(servletUtilAdapter).handleServletException(Mockito.any(), Mockito.anyBoolean(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+    }
+
+    @Test
+    public void testDoGetActionFailsWhenPublicCachingDisabled() throws Exception {
+        // Arrange
+        startContext();
+
+        MockHttpServletRequest request = getBaseAuraRequest();
+        request.setParameter("aura.token", "token");
+        request.setParameter("aura.isAction", "true");
+        request.setParameter("message", "someMessage");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        Message message = new Message(Arrays.asList(getAction("someAction")));
+        Mockito.doReturn(message).when(serializationService).read(Mockito.any(), Mockito.eq(Message.class));
+
+        Mockito.when(configAdapter.isActionPublicCachingEnabled()).thenReturn(false);
+
+        // Act
+        servlet.doGet(request, response);
+
+        // Assert
+        Mockito.verify(servletUtilAdapter).handleServletException(Mockito.any(), Mockito.anyBoolean(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+    }
+
+    @Test
+    public void testDoGetForPubliclyCacheableAction() throws Exception {
+        // Arrange
+    	AuraContext context = startContext();
+
+        MockHttpServletRequest request = getBaseAuraRequest();
+        request.setParameter("aura.token", "token");
+        request.setParameter("aura.isAction", "true");
+        request.setParameter("message", "someMessage");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        Message message = new Message(Arrays.asList(getAction("someAction")));
+        Mockito.doReturn(message).when(serializationService).read(Mockito.any(), Mockito.eq(Message.class));
+
+        Mockito.when(configAdapter.isActionPublicCachingEnabled()).thenReturn(true);
+        Mockito.when(servletUtilAdapter.isPubliclyCacheableAction(message)).thenReturn(true);
+        Mockito.when(servletUtilAdapter.getPubliclyCacheableActionExpiration(message)).thenReturn(10L);
+
+        context.setActionPublicCacheKey("somekey");
+        Mockito.when(configAdapter.getActionPublicCacheKey()).thenReturn(context.getActionPublicCacheKey());
+
+        // Act
+        servlet.doGet(request, response);
+
+        // Assert
+        Mockito.verify(serverService).run(Mockito.same(message), Mockito.any(), Mockito.any(), Mockito.any());
+    }
+    
+    @Test
+    public void testDoGetForPubliclyCacheableActionReturnsCacheHeaders() throws Exception {
+        // Arrange
+        AuraContext context = startContext();
+        
+        MockHttpServletRequest request = getBaseAuraRequest();
+        request.setParameter("message", "test");
+        request.setParameter("aura.token", "token");
+        request.setParameter("aura.isAction", "true");
+        
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        DefDescriptor<ActionDef> actionDescriptor = Mockito.mock(DefDescriptor.class);
+        Action action = Mockito.mock(Action.class);
+        Mockito.when(action.getDescriptor()).thenReturn(actionDescriptor);
+        Mockito.when(actionDescriptor.getQualifiedName()).thenReturn("someName");
+
+        Message message = new Message(Arrays.asList(action));
+        Mockito.doReturn(message).when(serializationService).read(Mockito.any(), Mockito.eq(Message.class));
+
+        Mockito.when(configAdapter.isActionPublicCachingEnabled()).thenReturn(true);
+        Mockito.when(servletUtilAdapter.isPubliclyCacheableAction(message)).thenReturn(true);
+        Mockito.when(servletUtilAdapter.getPubliclyCacheableActionExpiration(message)).thenReturn(10L);
+
+        context.setActionPublicCacheKey("somekey");
+        Mockito.when(configAdapter.getActionPublicCacheKey()).thenReturn(context.getActionPublicCacheKey());
+
+        // Act
+        servlet.doGet(request, response);
+
+        // Assert
+
+        // verify the method used to set the headers was called
+        // multiply expected expiration by 1000 since it must be passed in milliseconds
+        Mockito.verify(servletUtilAdapter).setCacheTimeout(response, 10 * 1000, false);
+    }
+
+    @Test
+    public void testDoGetForPubliclyCacheableActionReturnsNoCacheHeadersWhenActionPublicCacheKeyDiffers() throws Exception {
+        // Arrange
+        AuraContext context = startContext();
+
+        MockHttpServletRequest request = getBaseAuraRequest();
+        request.setParameter("message", "test");
+        request.setParameter("aura.token", "token");
+        request.setParameter("aura.isAction", "true");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        DefDescriptor<ActionDef> actionDescriptor = Mockito.mock(DefDescriptor.class);
+        Action action = Mockito.mock(Action.class);
+        Mockito.when(action.getDescriptor()).thenReturn(actionDescriptor);
+        Mockito.when(actionDescriptor.getQualifiedName()).thenReturn("someName");
+
+        Message message = new Message(Arrays.asList(action));
+        Mockito.doReturn(message).when(serializationService).read(Mockito.any(), Mockito.eq(Message.class));
+
+        context.setActionPublicCacheKey("someKey");
+        Mockito.when(configAdapter.getActionPublicCacheKey()).thenReturn("someOtherKey");
+
+        Mockito.when(configAdapter.isActionPublicCachingEnabled()).thenReturn(true);
+        Mockito.when(servletUtilAdapter.isPubliclyCacheableAction(message)).thenReturn(true);
+        Mockito.when(servletUtilAdapter.getPubliclyCacheableActionExpiration(message)).thenReturn(10L);
+
+        // Act
+        servlet.doGet(request, response);
+
+        // Assert
         Mockito.verify(servletUtilAdapter).setNoCache(response);
     }
 }

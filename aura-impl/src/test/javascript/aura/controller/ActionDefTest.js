@@ -61,7 +61,9 @@ Test.Aura.Controller.ActionDefTest = function() {
                     "DESCRIPTOR": "descriptor",
                     "NAME": "name",
                     "RETURNTYPE": "returnType",
-                    "PARAMS": "params"
+                    "PARAMS": "params", 
+                    "PUBLICCACHINGENABLED": "publicCachingEnabled", 
+                    "PUBLICCACHINGEXPIRATION": "publicCachingExpiration"
                 }
             }
         })(during);
@@ -328,6 +330,60 @@ Test.Aura.Controller.ActionDefTest = function() {
                     Assert.Null(actual);
                 });
             }
+
+            [Fact]
+            function DefaultPublicCachingEnabled() {
+                getAuraMock(function() {
+                    // Arrange
+                    var config = {
+                        actionType : "SERVER",
+                    };
+
+                    // Act
+                    var actualPublicCachingEnabled = new Aura.Controller.ActionDef(config).publicCachingEnabled;
+                    var actualPublicCachingExpiration = new Aura.Controller.ActionDef(config).publicCachingExpiration;
+
+                    // Assert
+                    Assert.False(actualPublicCachingEnabled);
+                });
+            }
+
+            [Fact]
+            function SetsPublicCachingEnabled() {
+                getAuraMock(function() {
+                    // Arrange
+                    var expected = "expected";
+                    var config = {
+                        actionType : "SERVER",
+                        publicCachingEnabled: expected
+                    };
+
+                    // Act
+                    var actualPublicCachingEnabled = new Aura.Controller.ActionDef(config).publicCachingEnabled;
+
+                    // Assert
+                    Assert.True(actualPublicCachingEnabled);
+                });
+            }
+
+            [Fact]
+            function SetsPublicCachingExpiration() {
+                getAuraMock(function() {
+                    // Arrange
+                    var expectedPublicCachingExpiration = 100;
+                    var config = {
+                        actionType : "SERVER",
+                        publicCachingEnabled : true,
+                        publicCachingExpiration : expectedPublicCachingExpiration
+                    };
+
+                    // Act
+                    var actualPublicCachingExpiration = new Aura.Controller.ActionDef(config).publicCachingExpiration;
+
+                    // Assert
+                    Assert.Equal(expectedPublicCachingExpiration, actualPublicCachingExpiration);
+                });
+            }
         }
 
         [Fixture]
@@ -443,6 +499,68 @@ Test.Aura.Controller.ActionDefTest = function() {
                 });
             }
 
+            [Fact]
+            function DoesNotSetPublicCachingExpirationIfNotAllowed() {
+                getAuraMock(function() {
+                    // Arrange
+                    var config = {
+                        actionType : "SERVER",
+                        publicCachingExpiration : 100
+                    };
+                    var actualPublicCachingExpiration;
+
+                    // Act
+                    mockAuraUtil(function() {
+                        actualPublicCachingExpiration = new Aura.Controller.ActionDef(config).publicCachingExpiration;
+                    });
+
+                    // Assert
+                    Assert.Equal(-1, actualPublicCachingExpiration);
+                });
+            }
+
+            [Fact]
+            function DoesNotSetPublicCachingEnabledForClientAction() {
+                getAuraMock(function() {
+                    // Arrange
+                    var config = {
+                        actionType : "CLIENT",
+                        publicCachingEnabled : true,
+                            publicCachingExpiration : 100
+                    };
+                    var actualPublicCachingEnabled;
+
+                    // Act
+                    mockAuraUtil(function() {
+                        actualPublicCachingEnabled = new Aura.Controller.ActionDef(config).publicCachingEnabled;
+                    });
+
+                    // Assert
+                    Assert.False(actualPublicCachingEnabled);
+                });
+            }
+
+            [Fact]
+            function DoesNotSetPublicCachingExpirationForClientAction() {
+                getAuraMock(function() {
+                    // Arrange
+                    var config = {
+                        actionType : "CLIENT",
+                        publicCachingEnabled : true,
+                            publicCachingExpiration : 100
+                    };
+                    var actualPublicCachingExpiration;
+
+                    // Act
+                    mockAuraUtil(function() {
+                        actualPublicCachingExpiration = new Aura.Controller.ActionDef(config).publicCachingExpiration;
+                    });
+
+                    // Assert
+                    Assert.Equal(-1, actualPublicCachingExpiration);
+                });
+            }
+
             [Fixture]
             function LogsDecodeError() {
 
@@ -531,10 +649,10 @@ Test.Aura.Controller.ActionDefTest = function() {
                         Assert.Equal(expected, actual);
                     });
                 }
-
             }
         }
     }
+
     [Fixture]
     function GetName() {
         [Fact]
@@ -681,6 +799,79 @@ Test.Aura.Controller.ActionDefTest = function() {
 
                 // Assert
                 Assert.False(actual);
+            });
+        }
+    }
+
+    [Fixture]
+    function IsCaboose() {
+        [Fact]
+        function ReturnsTrueIfCabooseTrue() {
+            getAuraMock(function() {
+                var target = new Aura.Controller.ActionDef({});
+                target.caboose = true;
+
+                var actual = target.isCaboose();
+
+                Assert.True(actual);
+            });
+        }
+
+        [Fact]
+        function ReturnsFalseIfCabooseNotTrue() {
+            getAuraMock(function() {
+                var target = new Aura.Controller.ActionDef({});
+                target.caboose = "true";
+
+                var actual = target.isCaboose();
+
+                Assert.False(actual);
+            });
+        }
+    }
+
+    [Fixture]
+    function IsPublicCachingEnabled() {
+        [Fact]
+        function ReturnsTrueIfPublicCachingTrue() {
+            getAuraMock(function() {
+                var target = new Aura.Controller.ActionDef({});
+                target.publicCachingEnabled = true;
+
+                var actual = target.isPublicCachingEnabled();
+
+                Assert.True(actual);
+            });
+        }
+
+        [Fact]
+        function ReturnsFalseIfPublicCachingNotTrue() {
+            getAuraMock(function() {
+                var target = new Aura.Controller.ActionDef({});
+                target.publicCachingEnabled = "true";
+
+                var actual = target.isPublicCachingEnabled();
+
+                Assert.False(actual);
+            });
+        }
+    }
+
+    [Fixture]
+    function GetPublicCachingExpiration() {
+        [Fact]
+        function ReturnsPublicCachingExpiration() {
+            getAuraMock(function() {
+                // Arrange
+                var expected = "expected";
+                var target = new Aura.Controller.ActionDef({});
+                target.publicCachingExpiration = expected;
+
+                // Act
+                var actual = target.getPublicCachingExpiration();
+
+                // Assert
+                Assert.Equal(expected, actual);
             });
         }
     }

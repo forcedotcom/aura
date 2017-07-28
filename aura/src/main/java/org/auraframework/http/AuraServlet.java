@@ -18,6 +18,8 @@ package org.auraframework.http;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URI;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -41,6 +43,7 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.http.RequestParam.BooleanParam;
 import org.auraframework.http.RequestParam.EnumParam;
 import org.auraframework.http.RequestParam.InvalidParamException;
 import org.auraframework.http.RequestParam.MissingParamException;
@@ -119,7 +122,8 @@ public class AuraServlet extends AuraBaseServlet {
     public final static StringParam tag = new StringParam(AURA_PREFIX + "tag", 128, true);
     public final static EnumParam<DefType> defTypeParam = new EnumParam<>(AURA_PREFIX + "deftype", false,
             DefType.class);
-    
+
+    private final static BooleanParam isActionParam = new BooleanParam(AURA_PREFIX + "isAction", false);
     private final static StringParam csrfToken = new StringParam(AURA_PREFIX + "token", 0, true);
     private final static StringParam formatAdapterParam = new StringParam(AURA_PREFIX + "formatAdapter", 0, false);
     private final static StringParam messageParam = new StringParam("message", 0, false);
@@ -207,8 +211,9 @@ public class AuraServlet extends AuraBaseServlet {
     /**
      * Handle an HTTP GET operation.
      *
-     * The HTTP GET operation is used to retrieve resources from the Aura servlet. It is only used for this purpose,
-     * where POST is used for actions.
+     * The HTTP GET operation is used to retrieve resources from the Aura servlet AND for publicly cacheable actions.
+     *
+     * All other action requests use POST.
      *
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
@@ -226,6 +231,13 @@ public class AuraServlet extends AuraBaseServlet {
         if (servletUtilAdapter.actionServletGetPre(request, response)) {
             return;
         }
+
+        // check if the GET request is for a publicly cacheable action, and if so, handle it
+        if (isActionGetRequest(request)) {
+            handleActionRequest(request, response, true);
+            return;
+        }
+
         //
         // Initial setup. This should never fail.
         //
@@ -357,6 +369,18 @@ public class AuraServlet extends AuraBaseServlet {
         return attributes;
     }
 
+    /**
+     * Determine from the params if a GET request is for an action.
+     *
+     * We're trusting the request with this check, and assuming a more thorough check will be done later (it is)
+     *
+     * @param request the HTTP GET request
+     * @return if the isAction and message params were specified
+     */
+    private boolean isActionGetRequest(HttpServletRequest getRequest) {
+        return isActionParam.get(getRequest, false) && messageParam.get(getRequest) != null;
+    }
+
     private boolean isBootstrapAction(Message message, boolean productionMode) {
         // The bootstrap action cannot not have a CSRF token so we let it through
         boolean isBootstrapAction = false;
@@ -388,37 +412,28 @@ public class AuraServlet extends AuraBaseServlet {
         return isBootstrapAction;
     }
 
-
-    /**
-     * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest,
-     *      javax.servlet.http.HttpServletResponse)
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    private void handleActionRequest(HttpServletRequest request, HttpServletResponse response, boolean isGet) throws ServletException, IOException {
         AuraContext context = contextService.getCurrentContext();
         response.setCharacterEncoding(UTF_ENCODING);
         boolean written = false;
 
         servletUtilAdapter.setNoCache(response);
 
-        //
-        // Pre-hook
-        //
-        if (servletUtilAdapter.actionServletPostPre(request, response)) {
-            return;
-        }
         try {
             if (context.getFormat() != Format.JSON) {
                 throw new AuraRuntimeException("Invalid request, post must use JSON");
             }
+
             response.setContentType(servletUtilAdapter.getContentType(Format.JSON));
+
             String msg = messageParam.get(request);
+
             if (msg == null) {
                 throw new AuraHandledException("Invalid request, no message");
             }
 
             String fwUID = configAdapter.getAuraFrameworkNonce();
+
             if (!fwUID.equals(context.getFrameworkUID())) {
                 if (UNKNOWN_FRAMEWORK_UID.equals(context.getFrameworkUID()) && msg.contains(REPORT_ERROR_ACTION)) {
                     // we had a serious boostrap issue and want to log the failed action (5x reload)
@@ -440,12 +455,14 @@ public class AuraServlet extends AuraBaseServlet {
                         serverService.run(message, context, response.getWriter(), null);
                     }
                 }
-                throw new ClientOutOfSyncException("Framework has been updated. Expected: " + fwUID +
-                        " Actual: " + context.getFrameworkUID());
+
+                throw new ClientOutOfSyncException("Framework has been updated. Expected: " + fwUID + " Actual: " + context.getFrameworkUID());
             }
+
             context.setFrameworkUID(fwUID);
 
             DefDescriptor<? extends BaseComponentDef> applicationDescriptor = context.getApplicationDescriptor();
+
             if (applicationDescriptor != null) {
                 // Check only if client app out of sync
                 try {
@@ -462,33 +479,57 @@ public class AuraServlet extends AuraBaseServlet {
 
             Message message;
             loggingService.startTimer(LoggingService.TIMER_DESERIALIZATION);
+
             try {
                 message = serializationService.read(new StringReader(msg), Message.class);
             } finally {
                 loggingService.stopTimer(LoggingService.TIMER_DESERIALIZATION);
             }
 
+            // For GET requests, verify action public caching is enabled AND the action is publicly cacheable based on the ActionDef
+            if (isGet && !(configAdapter.isActionPublicCachingEnabled() && servletUtilAdapter.isPubliclyCacheableAction(message))) {
+                throw new AuraHandledException("Invalid request: Public caching disabled or specified action not marked as publicly cacheable");
+            }
+
             // The bootstrap action cannot not have a CSRF token so we let it through
             boolean isBootstrapAction = isBootstrapAction(message, servletUtilAdapter.isProductionMode(context.getMode()));
 
-            if (!isBootstrapAction) {
+            Map<String, Object> attributes = null;
+            if (isBootstrapAction) {
+                attributes = Maps.newHashMap();
+                attributes.put("token", configAdapter.getCSRFToken());
+            } else if (!isGet) {
                 configAdapter.validateCSRFToken(csrfToken.get(request));
             }
 
-            // Knowing the app, we can do the HTTP headers, some of which depend on
-            // the app in play, so we couldn't do this
+            // some of the CSP headers depend on the app, so pass in the app descriptor here
             servletUtilAdapter.setCSPHeaders(applicationDescriptor, request, response);
 
-            Map<String, Object> attributes = null;
-            if (isBootstrapAction) {
-            	attributes = Maps.newHashMap();
-            	attributes.put("token", configAdapter.getCSRFToken());
-            }
-
             PrintWriter out = response.getWriter();
-            written = true;
-            out.write(CSRF_PROTECT);
-            serverService.run(message, context, out, attributes);
+
+            if (isGet && 
+            		context.getActionPublicCacheKey() != null && context.getActionPublicCacheKey().equals(configAdapter.getActionPublicCacheKey())) {
+                // We will set cache headers to allow caching for publicly cacheable action if 
+                // the action public cache key sent in the context is the same as the current value AND there are no errors.
+                // So we need to use a string buffer for the action output first so that we can then check the action status
+                // and set any cache headers before writing the response body.
+                Writer outputBuffer = new StringWriter();
+                outputBuffer.write(CSRF_PROTECT);
+                serverService.run(message, context, outputBuffer, attributes);
+
+                // Set cache headers if no errors
+                if (message.getActions().get(0).getErrors() == null || message.getActions().get(0).getErrors().size() == 0) {
+                    servletUtilAdapter.setCacheTimeout(response, servletUtilAdapter.getPubliclyCacheableActionExpiration(message) * 1000, false);
+                }
+                
+                // Write the response body after we are done writing cache headers
+                written = true;
+                out.write(outputBuffer.toString());
+            } else {
+                written = true;
+                out.write(CSRF_PROTECT);
+                serverService.run(message, context, out, attributes);
+            }
         } catch (InvalidParamException | MissingParamException ipe) {
             servletUtilAdapter.handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
             return;
@@ -497,6 +538,24 @@ public class AuraServlet extends AuraBaseServlet {
         } catch (Exception e) {
             servletUtilAdapter.handleServletException(e, false, context, request, response, written);
         }
+    }
+
+    /**
+     * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest,
+     *      javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        //
+        // Pre-hook
+        //
+        if (servletUtilAdapter.actionServletPostPre(request, response)) {
+            return;
+        }
+
+        handleActionRequest(request, response, false);
     }
 
     /**
@@ -530,9 +589,9 @@ public class AuraServlet extends AuraBaseServlet {
     }
 
     protected ConfigAdapter getConfigAdapter() {
-    	return configAdapter;
+        return configAdapter;
     }
-    
+
     @Inject
     public void setSerializationService(SerializationService serializationService) {
         this.serializationService = serializationService;

@@ -759,4 +759,16 @@ public interface AuraContext {
      * @return true if split is enabled, false if only one app.js file is desired.
      */
     boolean isAppJsSplitEnabled();
+    
+    /**
+     * Get the action public cache key
+     * @return The action public cache key
+     */
+    String getActionPublicCacheKey();
+    
+    /**
+     * Set the action public cache key
+     * @param actionPublicCacheKey The action public cache key
+     */
+    void setActionPublicCacheKey(String actionPublicCacheKey);
 }

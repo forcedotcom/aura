@@ -2265,4 +2265,165 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
     }
+
+    [Fixture]
+    function PrepareToSend() {
+        var def = {
+            isPublicCachingEnabled: function() {
+                return true;
+            },
+            getPublicCachingExpiration: function() {
+                return 100;
+            },
+            getDescriptor: function() {
+                return "publiclyCacheableAction";
+            }
+        };
+
+        var mockAura = Mocks.GetMock(Object.Global(), "$A", {
+            getContext: function() {
+                return {
+                    isActionPublicCachingEnabled : function() {
+                        return true;
+                    }
+                }
+            }
+        });
+
+        [Fact]
+        function RemoveIdForPubliclyCacheableActions() {
+            // Arrange
+            var target = newAction(def);
+            var expected = undefined;
+
+            // Act
+            var actual;
+
+            mockAura(function() {
+                actual = target.prepareToSend();
+            });
+
+            // Assert
+            Assert.Equal(expected, actual.id);
+        }
+
+        [Fact]
+        function IdSentForRegularActions() {
+            // Arrange
+            def.isPublicCachingEnabled = function() {
+                return false;
+            };
+            def.getPublicCachingExpiration = function() {
+                return 0;
+            };
+
+            var target = newAction(def);
+            var expected = undefined;
+
+            // Act
+            var actual;
+
+            mockAura(function() {
+                actual = target.prepareToSend();
+            });
+
+            // Assert
+            Assert.NotEqual(expected, actual.id);
+        }
+    }
+
+    [Fixture]
+    function IsPubliclyCacheable() {
+
+        var getDef = function(isPublicCachingEnabled, publicCachingExpiration) { 
+            return {
+                isPublicCachingEnabled: function() {
+                    return isPublicCachingEnabled;
+                },
+                getPublicCachingExpiration: function() {
+                    return publicCachingExpiration;
+                }
+            };
+        };
+
+        var getAuraMock = function(isActionPublicCachingEnabled) { 
+            return Mocks.GetMock(Object.Global(), "$A", {
+                getContext: function() {
+                    return {
+                        isActionPublicCachingEnabled : function() {
+                            return isActionPublicCachingEnabled;
+                        }
+                    }
+                }
+            });
+        };
+
+        [Fact]
+        function ReturnsTrue() {
+            // Arrange
+            var target = newAction(getDef(true, 1));
+            var expected = true;
+
+            // Act
+            var actual;
+
+            getAuraMock(true)(function() {
+                actual = target.isPubliclyCacheable();
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ReturnsFalseWhenActionPublicCachingDisabled() {
+            // Arrange
+            var target = newAction(getDef(true, 1));
+            var expected = false;
+
+            // Act
+            var actual;
+
+            getAuraMock(false)(function() {
+                actual = target.isPubliclyCacheable();
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ReturnsFalseWhenActionPublicCachingNotAllowed() {
+            // Arrange
+            var target = newAction(getDef(false, 1));
+            var expected = false;
+
+            // Act
+            var actual;
+
+            getAuraMock(true)(function() {
+                actual = target.isPubliclyCacheable();
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ReturnsFalseWhenActionPublicCachingExpirationIsZero() {
+            // Arrange
+            var target = newAction(getDef(true, 0));
+            var expected = false;
+
+            // Act
+            var actual;
+
+            getAuraMock(true)(function() {
+                actual = target.isPubliclyCacheable();
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+    }
 }

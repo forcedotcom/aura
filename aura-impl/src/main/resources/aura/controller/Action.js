@@ -906,10 +906,18 @@ Action.prototype.getStored = function() {
 
 /**
  * Returns the json representation of the action
+ * If the action is publicly cacheable, the ID is stripped out
  * @private
  */
 Action.prototype.prepareToSend = function() {
-    return this.toJSON();
+    var json = this.toJSON();
+
+    // publicly cacheable actions need to have their IDs stripped out before sending
+    if (this.isPubliclyCacheable()) {
+        delete json.id;
+    }
+
+    return json;
 };
 
 /**
@@ -1242,13 +1250,16 @@ Action.prototype.toJSON = function() {
 
     // calling component has requiredVersionDefs or component is versioned.
     var isVersioned = (requiredVersionDefs && requiredVersionDefs.values) || version;
-    return {
+
+    var json = {
         "id" : this.getId(),
         "descriptor" : (this.def?this.def.getDescriptor():"UNKNOWN"),
         "callingDescriptor" : isVersioned ? (callingComponentDef ? callingComponentDef.getDescriptor().getQualifiedName() : "UNKNOWN") : "UNKNOWN",
         "params" : this.params,
         "version" : isVersioned ? version : null
     };
+
+    return json;
 };
 
 /**
@@ -1429,6 +1440,18 @@ Action.prototype.fireRefreshEvent = function(event, responseUpdated) {
             }).fire();
         }
     }
+};
+
+/**
+ * Returns true if public caching is enabled and the current action is publicly cacheable (based on the definition).
+ *
+ * For server-side Actions only.
+ *
+ * @returns {Boolean}
+ * @private
+ */
+Action.prototype.isPubliclyCacheable = function() {
+    return $A.getContext().isActionPublicCachingEnabled() && this.def.isPublicCachingEnabled() && this.def.getPublicCachingExpiration() > 0;
 };
 
 Aura.Controller.Action = Action;

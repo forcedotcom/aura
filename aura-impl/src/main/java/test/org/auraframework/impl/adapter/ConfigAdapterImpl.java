@@ -913,4 +913,14 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public boolean isAllowedModuleNamespace(String namespace) {
         return true;
     }
+
+    @Override
+    public boolean isActionPublicCachingEnabled() {
+        return false;
+	}
+
+    @Override
+    public String getActionPublicCacheKey() {
+        return "";
+    }
 }

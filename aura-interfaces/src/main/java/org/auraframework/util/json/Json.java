@@ -129,6 +129,8 @@ public interface Json {
         PHASE("phase","ph"),
         PROVIDE("provide","p"),
         PROVIDERDEF("providerDef","pd"),
+        PUBLICCACHINGENABLED("publicCachingEnabled", "pce"),
+        PUBLICCACHINGEXPIRATION("publicCachingExpiration", "pcex"),
         REGISTEREVENTDEFS("registerEventDefs","re"),
         RENDERERDEF("rendererDef","rd"),
         REQUIRED("required","rq"),

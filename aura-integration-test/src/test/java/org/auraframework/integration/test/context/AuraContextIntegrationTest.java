@@ -16,10 +16,7 @@
 package org.auraframework.integration.test.context;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.inject.Inject;
 
@@ -50,6 +47,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.GlobalValue;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.RegistrySet;
+import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -810,5 +808,28 @@ public class AuraContextIntegrationTest extends AuraImplTestCase {
 
         String res = JsonEncoder.serialize(ctx, serCtx);
         goldFileJson(res);
+    }
+
+    /**
+     * Verify action-public-caching-enabled (acpe) and action-public-cache-key properties are added to JSON when action 
+     * public caching is enabled in Full encoding style
+     */
+    @Test
+    public void testSerializeWithActionPublicCaching() throws Exception {
+        MockConfigAdapter mockConfigAdapter = getMockConfigAdapter();
+        mockConfigAdapter.setActionPublicCachingEnabled(true);
+
+        AuraContext ctx = contextService.startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
+        ctx.setActionPublicCacheKey("someKey");
+
+        String res = ctx.serialize(AuraContext.EncodingStyle.Full);
+
+        assertTrue(res.contains("\"apce\":1"));
+        assertTrue(res.contains("\"apck\":\"someKey\""));
+
+        res = ctx.serialize(AuraContext.EncodingStyle.Normal);
+
+        assertTrue(!res.contains("\"apce\":1"));
+        assertTrue(!res.contains("\"apck\":\"someKey\""));
     }
 }

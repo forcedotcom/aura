@@ -32,6 +32,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.AuraResource;
+import org.auraframework.system.Message;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -223,7 +224,7 @@ public interface ServletUtilAdapter extends AuraAdapter {
     void setLongCache(HttpServletResponse response);
 
     /**
-     * Set cache timeout for a resource in seconds.
+     * Set cache timeout for a resource in milliseconds.
      */
     void setCacheTimeout(HttpServletResponse response, long expiration, boolean immutable);
 
@@ -231,6 +232,20 @@ public interface ServletUtilAdapter extends AuraAdapter {
      * are we in production mode?
      */
     boolean isProductionMode(Mode mode);
+
+    /**
+     * Return true if the the request is for a publicly cacheable action
+     *
+     * @param message the deserialized request action content
+     */
+    boolean isPubliclyCacheableAction(Message message) throws QuickFixException;
+
+    /**
+     * Return the cacheable action expiration time (in seconds) OR -1 if the action is not publicly cacheable
+     *
+     * @param message the deserialized request action content
+     */
+    long getPubliclyCacheableActionExpiration(Message message) throws QuickFixException;
 
     /**
      * Setup basic security headers.

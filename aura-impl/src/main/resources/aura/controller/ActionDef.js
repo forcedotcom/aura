@@ -30,6 +30,8 @@ function ActionDef(config) {
     this.paramDefs = {};
     this.background = false;
     this.caboose = false;
+    this.publicCachingEnabled = false;
+    this.publicCachingExpiration = -1;
 
     if (this.actionType === "SERVER") {
         this.returnType = config[Json.ApplicationKey.RETURNTYPE]&&config[Json.ApplicationKey.RETURNTYPE]["name"]; // TODO: TW: what is this check? returntype is always a string
@@ -45,6 +47,10 @@ function ActionDef(config) {
         }
         if (config[Json.ApplicationKey.CABOOSE]) {
             this.caboose = true;
+        }
+        if (config[Json.ApplicationKey.PUBLICCACHINGENABLED]) {
+            this.publicCachingEnabled = true;
+            this.publicCachingExpiration = config[Json.ApplicationKey.PUBLICCACHINGEXPIRATION];
         }
     }
 
@@ -125,6 +131,25 @@ ActionDef.prototype.isBackground = function() {
  */
 ActionDef.prototype.isCaboose = function() {
     return this.caboose === true;
+};
+
+/**
+ * Returns true if the action is defined to enable public caching (i.e. @PublicCachingEnabled on the java class)
+ * @protected
+ * @returns {Boolean}
+ */
+ActionDef.prototype.isPublicCachingEnabled = function() {
+    return this.publicCachingEnabled === true;
+};
+
+/**
+ * Returns the public caching expiration time (in seconds) if the action is defined to enable public caching, 0 otherwise
+ * (i.e. the expiration value in @PublicCachingEnabled on the java class)
+ * @protected
+ * @returns {Number}
+ */
+ActionDef.prototype.getPublicCachingExpiration = function() {
+    return this.publicCachingExpiration;
 };
 
 /**

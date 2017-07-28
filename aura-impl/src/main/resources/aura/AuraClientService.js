@@ -52,11 +52,25 @@ Aura.Services.AuraClientService$AuraXHR.prototype.addAction = function(action) {
  * get an action for a response.
  */
 Aura.Services.AuraClientService$AuraXHR.prototype.getAction = function(id) {
-    var action = this.actions[id];
+    var action;
+    var key = id;
+
+    if (!key) {
+        var keys = Object.keys(this.actions);
+
+        $A.assert(keys.length === 1, "When no ID is specified, there should only be one action in the XHR.");
+
+        if (keys.length === 1) {
+            key = keys[0];
+        }
+    }
+
+    action = this.actions[key];
 
     if (action) {
-        this.actions[id] = undefined;
+        this.actions[key] = undefined;
     }
+
     return action;
 };
 
@@ -2601,6 +2615,8 @@ AuraClientService.prototype.sendActionXHRs = function() {
     var processing;
     var foreground = [];
     var background = [];
+    var publiclyCacheableAndBackground = [];
+    var publiclyCacheable = [];
     var deferred = [];
     var action, auraXHR;
     var caboose = 0;
@@ -2615,6 +2631,10 @@ AuraClientService.prototype.sendActionXHRs = function() {
         }
         if (action.isDeferred()) {
             deferred.push(action);
+        } else if (!action.isBackground() && action.isPubliclyCacheable()) {
+            publiclyCacheable.push(action);
+        } else if (action.isBackground() && action.isPubliclyCacheable()) {
+            publiclyCacheableAndBackground.push(action);
         } else if (action.isBackground()) {
             background.push(action);
         } else {
@@ -2644,6 +2664,14 @@ AuraClientService.prototype.sendActionXHRs = function() {
         }
     }
 
+    if (publiclyCacheable.length) {
+        this.sendAsSingle(publiclyCacheable, publiclyCacheable.length, { background: false });
+    }
+
+    if (publiclyCacheableAndBackground.length) {
+        this.sendAsSingle(publiclyCacheableAndBackground, publiclyCacheableAndBackground.length, { background: true });
+    }
+
     if (background.length) {
         this.sendAsSingle(background, background.length, { background: true });
     }
@@ -2666,7 +2694,7 @@ AuraClientService.prototype.sendActionXHRs = function() {
  * @private
  * @param {Array} actions the set of actions to send.
  * @param {int} count the number of actions to send.
- * @param {Options} options extra options for the send, allows callers to set headers.
+ * @param {Options} options extra options for the send, allows callers to set headers and background option
  */
 AuraClientService.prototype.sendAsSingle = function(actions, count, options) {
     var i;
@@ -2687,7 +2715,7 @@ AuraClientService.prototype.sendAsSingle = function(actions, count, options) {
             sent += 1;
             auraXHR = this.getAvailableXHR(background);
             if (auraXHR) {
-                if (!this.send(auraXHR, [ action ], "POST", options)) {
+                if (!this.send(auraXHR, [ action ], action.isPubliclyCacheable() ? "GET" : "POST", options)) {
                     this.releaseXHR(auraXHR);
                 }
             }
@@ -2824,11 +2852,12 @@ AuraClientService.prototype.getAndClearDupes = function(key) {
  *
  * @param auraXHR the wrapped XHR.
  * @param actions the set of actions to send.
- * @param method GET or POST
- * @param options extra options for the send, allows callers to set headers.
+ * @param method GET or POST. GET method is for publicly cacheable actions.
+ * @param options extra options for the send, allows callers to set headers and background option
  * @return true if the XHR was sent, otherwise false.
  */
 AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
+    options = options || { background: false };
     var actionsToSend = [];
     var that = this;
     var action;
@@ -2864,14 +2893,19 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     try {
         var params = {
             "message"      : $A.util.json.encode({ "actions" : actionsToSend }),
-            "aura.context" : context.encodeForServer(method === "POST"),
-            "aura.pageURI" : loc.pathname + loc.search + loc.hash
+            "aura.context" : context.encodeForServer(method === "POST", method === "GET")
         };
+
         if (method === "GET") {
-            params["aura.access"] = "UNAUTHENTICATED";
+            // Indicate the GET request is an action
+            params["aura.isAction"] = true;
         } else {
+            // Send page URI
+            // This is not sent for cacheable GET requests as it will vary the url, we'll fallback to referer header on the server side
+            params["aura.pageURI"] = loc.pathname + loc.search + loc.hash;
             params["aura.token"] = this._token;
         }
+
         qs = this.buildParams(params);
     } catch (e) {
         for (i = 0; i < actions.length; i++) {
@@ -2883,9 +2917,15 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
         return false;
     }
 
-    url = this._host + "/aura?r=" + marker + "&" + this.buildActionNameList(actionsToSend);
+    if (method === "GET") {
+        // for cacheable (GET) requests we don't want the marker parameter
+        // or the action name list and we want the query string in the URL
+        url = this._host + "/aura?" + qs;
+    } else {
+        url = this._host + "/aura?r=" + marker + "&" + this.buildActionNameList(actionsToSend);
+    }
 
-    auraXHR.background = options && options.background;
+    auraXHR.background = options.background;
     auraXHR.length = qs.length;
     auraXHR.request = this.createXHR();
     auraXHR.request["open"](method, url, this._appNotTearingDown);
@@ -2919,7 +2959,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
 
     auraXHR.request["onreadystatechange"] = onReady;
 
-    if (options && options["headers"]) {
+    if (options["headers"]) {
         var key, headers = options["headers"];
 
         for (key in headers) {
@@ -3254,6 +3294,9 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
         action = null;
         try {
             response = actionResponses[r];
+
+            $A.assert((!response["id"] ? actionResponses.length === 1 : true), "When an action has no ID, there should be only one action in the response.");
+
             action = auraXHR.getAction(response["id"]);
             if (action) {
                 if (response["storable"] && !action.isStorable()) {
@@ -3690,7 +3733,7 @@ AuraClientService.prototype.enqueueAction = function(action, background) {
             if (!this.actionStorage.isStoragePersistent() || this.actionStorage.isKeyAbsentFromCache(action.getStorageKey())) {
                 var auraXHR = this.getAvailableXHR(false);
                 if (auraXHR) {
-                    if (!this.send(auraXHR, [action], "POST")) {
+                    if (!this.send(auraXHR, [action], action.isPubliclyCacheable() ? "GET" : "POST")) {
                         this.releaseXHR(auraXHR);
                     }
                     return;

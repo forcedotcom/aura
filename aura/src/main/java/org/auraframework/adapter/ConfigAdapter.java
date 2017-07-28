@@ -230,4 +230,14 @@ public interface ConfigAdapter extends AuraAdapter {
      * @return whether module namespace is allowed by non internal components
      */
     boolean isAllowedModuleNamespace(String namespace);
+
+    /**
+     * @return if public caching of actions is enabled
+     */
+    boolean isActionPublicCachingEnabled();
+
+    /**
+     * @return Cache key to add to the context for action public caching.
+     */
+    String getActionPublicCacheKey();
 }

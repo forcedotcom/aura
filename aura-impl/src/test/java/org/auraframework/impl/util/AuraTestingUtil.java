@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
@@ -27,6 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.Nullable;
 
 import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -51,6 +53,7 @@ import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.source.StringSourceLoader.NamespaceAccess;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.FileMonitor;
 import org.auraframework.util.json.JsonEncoder;
 
@@ -333,6 +336,7 @@ public class AuraTestingUtil {
             throws QuickFixException {
         AuraContext ctxt = contextService.startContext(mode, format, Authentication.AUTHENTICATED, desc);
         ctxt.setFrameworkUID(configAdapter.getAuraFrameworkNonce());
+        ctxt.setActionPublicCacheKey(configAdapter.getActionPublicCacheKey());
 
         // start debug block
         DefRegistry registry = ctxt.getRegistries().getRegistryFor(desc);
@@ -398,16 +402,26 @@ public class AuraTestingUtil {
 
     public String buildContextForPost(Mode mode, DefDescriptor<? extends BaseComponentDef> app)
             throws QuickFixException {
-        return buildContextForPost(mode, app, null, null, null, null);
+        return buildContentForXHR(mode, app, null, null, null, null, null);
     }
 
     public String buildContextForPost(Mode mode, DefDescriptor<? extends BaseComponentDef> app,
             Map<DefDescriptor<?>, String> extraLoaded, List<String> dn) throws QuickFixException {
-        return buildContextForPost(mode, app, null, null, extraLoaded, dn);
+        return buildContentForXHR(mode, app, null, null, extraLoaded, dn, null);
+    }
+
+    public String buildContextForPost(Mode mode, DefDescriptor<? extends BaseComponentDef> app, String appUid,
+            String fwuid, Map<DefDescriptor<?>, String> extraLoaded, List<String> dn) throws QuickFixException {
+        return buildContentForXHR(mode, app, appUid, fwuid, extraLoaded, dn, null);
+    }
+    
+    public String buildContextForPublicCacheableXHR(Mode mode, DefDescriptor<? extends BaseComponentDef> app, 
+    		String actionPublicCacheKey) throws QuickFixException{
+    	return AuraTextUtil.urlencode(buildContentForXHR(mode, app, null, null, null, null, actionPublicCacheKey));
     }
 
     /**
-     * Serialize a context for a post.
+     * Serialize a context for an XHR.
      *
      * This must remain in sync with AuraContext.js
      *
@@ -423,8 +437,9 @@ public class AuraTestingUtil {
      * });
      * </code>
      */
-    public String buildContextForPost(Mode mode, DefDescriptor<? extends BaseComponentDef> app, String appUid,
-            String fwuid, Map<DefDescriptor<?>, String> extraLoaded, List<String> dn) throws QuickFixException {
+    private String buildContentForXHR(Mode mode, DefDescriptor<? extends BaseComponentDef> app, String appUid,
+            String fwuid, Map<DefDescriptor<?>, String> extraLoaded, List<String> dn, 
+            String actionPublicCacheKey) throws QuickFixException {
         StringBuffer sb = new StringBuffer();
         JsonEncoder json = new JsonEncoder(sb, false);
         Map<String, String> loaded = Maps.newHashMap();
@@ -465,6 +480,9 @@ public class AuraTestingUtil {
             json.writeMapEntry("dn", dn);
             json.writeMapEntry("fwuid", fwuid);
             json.writeMapEntry("test", "undefined");
+            if (actionPublicCacheKey != null) {
+                json.writeMapEntry("apck", actionPublicCacheKey);
+            }
             json.writeMapEnd();
         } catch (IOException ioe) {
             // you can't get an io exception writing to a stringbuffer.....

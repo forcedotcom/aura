@@ -57,6 +57,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
+import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -73,6 +74,7 @@ public class AuraContextFilter implements Filter {
     private static final EnumParam<Authentication> access = new EnumParam<>(AuraServlet.AURA_PREFIX
             + "access", false, Authentication.class);
 
+    private static final BooleanParam isActionParam = new BooleanParam(AuraServlet.AURA_PREFIX + "isAction", false);
     private static final StringParam app = new StringParam(AuraServlet.AURA_PREFIX + "app", 0, false);
     private static final StringParam num = new StringParam(AuraServlet.AURA_PREFIX + "num", 0, false);
     private static final StringParam contextConfig = new StringParam(AuraServlet.AURA_PREFIX + "context", 0, false);
@@ -166,7 +168,8 @@ public class AuraContextFilter implements Filter {
             loggingService.setValue(LoggingService.REQUEST_METHOD, request.getMethod());
             loggingService.setValue(LoggingService.AURA_REQUEST_URI, request.getRequestURI());
             loggingService.setValue(LoggingService.AURA_REQUEST_QUERY, request.getQueryString());
-            loggingService.setValue(LoggingService.PAGE_URI, pageURI.get(request));
+
+            loggingService.setValue(LoggingService.PAGE_URI, pageURI.get(request, request.getHeader("Referer")));
             DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();
             if (app != null) {
                 loggingService.setValue(LoggingService.APP, app.getDescriptorName());
@@ -219,7 +222,7 @@ public class AuraContextFilter implements Filter {
         // a fixed format, so we should have a way of getting that.
         //
         if (f == null) {
-            if ("GET".equals(request.getMethod())) {
+            if ("GET".equals(request.getMethod()) && !isActionParam.get(request, false)) {
                 f = Format.HTML;
             } else {
                 f = Format.JSON;
@@ -251,9 +254,11 @@ public class AuraContextFilter implements Filter {
         context.setContextPath(contextPath);
         context.setNum(num.get(request));
         context.setRequestedLocales(requestedLocales);
+        
         context.setClient(new Client(request.getHeader(HttpHeaders.USER_AGENT)));
         context.setModulesEnabled(isModulesEnabled(request, configMap, m));
         context.setUseCompatSource(useCompatSource(request, configMap, m));
+        context.setActionPublicCacheKey(getActionPublicCacheKey(configMap));
         if (configMap != null) {
             getLoaded(context, configMap.get("loaded"));
             @SuppressWarnings("unchecked")
@@ -443,6 +448,17 @@ public class AuraContextFilter implements Filter {
     protected Mode getMode(HttpServletRequest request) {
         Map<String, Object> configMap = getConfigMap(request);
         return getMode(request, configMap);
+    }
+    
+    protected String getActionPublicCacheKey(Map<String, Object> configMap) {
+        if (configMap != null) {
+            if (configMap.containsKey("apck")) {
+                return (String) configMap.get("apck");
+            } else {
+                return null;
+            }
+        }
+        return configAdapter.getActionPublicCacheKey();
     }
 
     protected void endContext() {

@@ -42,6 +42,7 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.BackgroundAction;
 import org.auraframework.system.Annotations.CabooseAction;
 import org.auraframework.system.Annotations.Key;
+import org.auraframework.system.Annotations.PublicCachingEnabled;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.DefFactory;
@@ -145,6 +146,11 @@ public class JavaControllerDefFactory implements DefinitionFactory<JavaSourceImp
         
         actionBuilder.setBackground(method.isAnnotationPresent(BackgroundAction.class));
         actionBuilder.setCaboose(method.isAnnotationPresent(CabooseAction.class));
+
+        PublicCachingEnabled publicCachingAnnotation = method.getAnnotation(PublicCachingEnabled.class);
+        actionBuilder.setPublicCachingEnabled(publicCachingAnnotation != null);
+        actionBuilder.setPublicCachingExpiration(publicCachingAnnotation == null ? 
+        		-1 : publicCachingAnnotation.expiration());
 
         actionBuilder.setAccess(new DefinitionAccessImpl(Access.INTERNAL));
 

@@ -138,6 +138,7 @@ public class AuraContextImpl implements AuraContext {
     private boolean useCompatSource = false;
     private List<String> scriptHashes = new ArrayList<>();
     private String nonce;
+    private String actionPublicCacheKey;
 
     /**
      * The set of defs that are thread local.
@@ -228,7 +229,7 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public boolean isSystemMode() {
-    	return this.isSystem;
+        return this.isSystem;
     }
 
     @Override
@@ -876,6 +877,12 @@ public class AuraContextImpl implements AuraContext {
                 }
             }
             
+            if (configAdapter.isActionPublicCachingEnabled() && 
+            		(style == EncodingStyle.Normal || style == EncodingStyle.Full)) {
+                json.writeMapEntry("apce", 1);
+                json.writeMapEntry("apck", getActionPublicCacheKey());
+            }
+            
             if (style == EncodingStyle.Full) {
                 String contextPath = getContextPath();
                 if (!contextPath.isEmpty()) {
@@ -1024,5 +1031,15 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public boolean isAppJsSplitEnabled() {
         return true;
+    }
+    
+    @Override
+    public String getActionPublicCacheKey() {
+        return this.actionPublicCacheKey;
+    }
+
+    @Override
+    public void setActionPublicCacheKey(String actionPublicCacheKey) {
+        this.actionPublicCacheKey = actionPublicCacheKey;
     }
 }

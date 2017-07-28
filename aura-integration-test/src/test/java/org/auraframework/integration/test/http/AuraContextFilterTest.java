@@ -15,37 +15,47 @@
  */
 package org.auraframework.integration.test.http;
 
-import com.google.common.collect.ImmutableList;
+import static org.auraframework.system.AuraContext.Format.HTML;
+import static org.auraframework.system.AuraContext.Format.JSON;
+import static org.auraframework.system.AuraContext.Format.MANIFEST;
+import static org.mockito.Mockito.verify;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Vector;
+
+import javax.inject.Inject;
+import javax.servlet.FilterChain;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.http.HttpHeaders;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.http.AuraContextFilter;
+import org.auraframework.http.AuraServlet;
 import org.auraframework.http.BrowserCompatibilityService;
 import org.auraframework.modules.impl.BrowserCompatibilityServiceImplTest.UserAgentResult;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Format;
 import org.auraframework.test.util.AuraTestCase;
+import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Vector;
+import com.google.common.collect.ImmutableList;
 
 public class AuraContextFilterTest extends AuraTestCase {
     @Inject
     private ContextService contextService;
-
-    @Inject
-    private LoggingService loggingService;
 
     @Inject
     private DefinitionService definitionService;
@@ -59,7 +69,35 @@ public class AuraContextFilterTest extends AuraTestCase {
     @Inject
     private BrowserCompatibilityService browserCompatibilityService;
 
-    private void assertContextPath(AuraContextFilter filter, HttpServletRequest mock, String input, String expected)
+    @Mock
+    private LoggingService loggingService;
+
+    @Mock
+    private HttpServletRequest request;
+    
+    @Mock
+    private HttpServletResponse response;
+    
+    @Mock
+    private FilterChain filterChain;
+
+    private AuraContextFilter filter = new AuraContextFilter();
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        
+        filter.setContextService(contextService);
+        filter.setLoggingService(loggingService);
+        filter.setDefinitionService(definitionService);
+        filter.setConfigAdapter(configAdapter);
+        filter.setLocalizationAdapter(localizationAdapter);
+        filter.setBrowserCompatibilityService(browserCompatibilityService);
+        
+        Mockito.when(request.getLocales()).thenReturn(new Vector<>(ImmutableList.of(Locale.ENGLISH)).elements());
+    }
+    
+    private static void assertContextPath(AuraContextFilter filter, HttpServletRequest mock, String input, String expected)
             throws Exception {
         Mockito.when(mock.getContextPath()).thenReturn(input);
         AuraContext context = AuraPrivateAccessor.invoke(filter, "startContext", mock, null, null);
@@ -67,34 +105,14 @@ public class AuraContextFilterTest extends AuraTestCase {
         AuraPrivateAccessor.invoke(filter, "endContext");
     }
 
-    private AuraContextFilter setupFilter() {
-        AuraContextFilter filter = new AuraContextFilter();
-        filter.setContextService(contextService);
-        filter.setLoggingService(loggingService);
-        filter.setDefinitionService(definitionService);
-        filter.setConfigAdapter(configAdapter);
-        filter.setLocalizationAdapter(localizationAdapter);
-        filter.setBrowserCompatibilityService(browserCompatibilityService);
-        SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(filter);
-        return filter;
-    }
-
     @Test
     public void testStartContextContextPath() throws Exception {
-        System.out.println(definitionService.hashCode());
-        AuraContextFilter filter = setupFilter();
-        HttpServletRequest mock = Mockito.mock(HttpServletRequest.class);
-        Mockito.when(mock.getLocales()).thenReturn(new Vector<>(ImmutableList.of(Locale.ENGLISH)).elements());
-
-        assertContextPath(filter, mock, "/something", "/something");
-        assertContextPath(filter, mock, "/", "");
-        assertContextPath(filter, mock, "", "");
-    }
+        assertContextPath(filter, request, "/something", "/something");
+        assertContextPath(filter, request, "/", "");
+        assertContextPath(filter, request, "", "");    }
 
     @Test
     public void testUseCompatWithDifferentUserAgents() throws Exception {
-        AuraContextFilter filter = setupFilter();
-
         List<UserAgentResult> uaTestEntries = new ArrayList<>();
         uaTestEntries.add(new UserAgentResult("Safari 10.1.2", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/603.3.1 (KHTML, like Gecko) Version/10.1.2 Safari/603.3.1", true));
         uaTestEntries.add(new UserAgentResult("Safari 10.0.3", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/602.4.8 (KHTML, like Gecko) Version/10.0.3 Safari/602.4.8", false));
@@ -118,6 +136,114 @@ public class AuraContextFilterTest extends AuraTestCase {
         }
 
     }
-
-
+    
+    @Test
+    public void testStartContextSetsFormatFromFormatRequestParam() throws Exception {
+    	// Arrange
+    	Format expected = MANIFEST;
+        Mockito.when(request.getParameter(AuraServlet.AURA_PREFIX + "format")).thenReturn("MANIFEST");
+    	
+    	// Act
+        AuraContext context = AuraPrivateAccessor.invoke(filter, "startContext", request, null, null);
+        Format actual = context.getFormat(); 
+        
+        // Assert
+        assertEquals(expected, actual);
+    }
+    
+    @Test
+    public void testStartContextSetsHTMLFormatForGETRequests() throws Exception {
+    	// Arrange
+    	Format expected = HTML;
+        Mockito.when(request.getMethod()).thenReturn("GET");
+    	
+    	// Act
+        AuraContext context = AuraPrivateAccessor.invoke(filter, "startContext", request, null, null);
+        Format actual = context.getFormat(); 
+        
+        // Assert
+        assertEquals(expected, actual);
+    }
+    
+    @Test
+    public void testStartContextSetsJSONFormatForPOSTRequests() throws Exception {
+    	// Arrange
+    	Format expected = JSON;
+        Mockito.when(request.getMethod()).thenReturn("POST");
+    	
+    	// Act
+        AuraContext context = AuraPrivateAccessor.invoke(filter, "startContext", request, null, null);
+        Format actual = context.getFormat(); 
+        
+        // Assert
+        assertEquals(expected, actual);
+    }
+    
+    @Test
+    public void testStartContextSetsJSONFormatForActionGETRequests() throws Exception {
+    	// Arrange
+    	Format expected = JSON;
+        Mockito.when(request.getParameter(AuraServlet.AURA_PREFIX + "isAction")).thenReturn("true");
+        Mockito.when(request.getMethod()).thenReturn("GET");
+    	
+    	// Act
+        AuraContext context = AuraPrivateAccessor.invoke(filter, "startContext", request, null, null);
+        Format actual = context.getFormat(); 
+        
+        // Assert
+        assertEquals(expected, actual);
+    }
+    
+    @Test
+    public void testDoFilterSetsLoggingServicePageURI() throws Exception {
+    	// Arrange
+    	String expected = "someURI";
+        Mockito.when(request.getParameter(AuraServlet.AURA_PREFIX + "pageURI")).thenReturn("someURI");
+        
+        // Act
+    	filter.doFilter(request, response, filterChain);
+    	
+    	// Assert
+    	verify(loggingService).setValue(LoggingService.PAGE_URI, expected);
+    }
+    
+    @Test
+    public void testDoFilterSetsLoggingServicePageURIFromReferrerHeader() throws Exception {
+    	// Arrange
+    	String expected = "refererURI";
+        Mockito.when(request.getHeader("Referer")).thenReturn("refererURI");
+        
+        // Act
+    	filter.doFilter(request, response, filterChain);
+    	
+    	// Assert
+    	verify(loggingService).setValue(LoggingService.PAGE_URI, expected);
+    }
+    
+    @Test
+    public void testStartContextSetsActionPublicCacheKeyFromServer() throws Exception {
+        // Arrange
+        String expected = configAdapter.getActionPublicCacheKey();
+        
+        // Act
+        AuraContext context = AuraPrivateAccessor.invoke(filter, "startContext", request, null, null);
+        String actual = context.getActionPublicCacheKey();
+        
+        // Assert
+        assertEquals(expected, actual);
+    }
+    
+    @Test
+    public void testStartContextSetsActionPublicCacheKeyFromClient() throws Exception {
+        // Arrange
+    	String expected = "someKey";
+        Mockito.when(request.getParameter("aura.context")).thenReturn("{apck:'" + expected + "'}");
+        
+        // Act
+        AuraContext context = AuraPrivateAccessor.invoke(filter, "startContext", request, null, null);
+        String actual = context.getActionPublicCacheKey();
+        
+        // Assert
+        assertEquals(expected, actual);
+    }
 }

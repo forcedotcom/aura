@@ -21,6 +21,8 @@ import org.auraframework.def.TypeDef;
 import org.auraframework.def.ValueDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 import java.io.IOException;
@@ -39,6 +41,8 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
     private final Method method;
     private final boolean background;
     private final boolean caboose;
+    private final boolean publicCachingEnabled;
+    private final int publicCachingExpiration;
 
     protected JavaActionDef(Builder builder) {
         super(builder);
@@ -49,6 +53,8 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         this.method = builder.method;
         this.background = builder.background;
         this.caboose = builder.caboose;
+        this.publicCachingEnabled = builder.publicCachingEnabled;
+        this.publicCachingExpiration = builder.publicCachingExpiration;
     }
 
     @Override
@@ -92,6 +98,14 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
     	return caboose;
     }
 
+    public boolean isPublicCachingEnabled() {
+        return publicCachingEnabled;
+    }
+
+    public int getPublicCachingExpiration() {
+        return publicCachingExpiration;
+    }
+
     @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
@@ -102,7 +116,20 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         json.writeMapEntry(Json.ApplicationKey.BACKGROUND, isBackground());
         json.writeMapEntry(Json.ApplicationKey.CABOOSE, isCaboose());
         json.writeMapEntry(Json.ApplicationKey.PARAMS, params);
+        if (isPublicCachingEnabled()) {
+            json.writeMapEntry(Json.ApplicationKey.PUBLICCACHINGENABLED, true);
+            json.writeMapEntry(Json.ApplicationKey.PUBLICCACHINGEXPIRATION, getPublicCachingExpiration());
+        }
         json.writeMapEnd();
+    }
+    
+    @Override
+    public void validateDefinition() throws QuickFixException {
+    	super.validateDefinition();
+    	
+        if (this.isPublicCachingEnabled() && this.getPublicCachingExpiration() <= 0) {
+            throw new InvalidDefinitionException("When public caching is enabled, public caching expiration time must be greater than 0.", location);
+    	}
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<ActionDef> {
@@ -118,6 +145,8 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         private Method method;
         private boolean background = false;
         private boolean caboose = false;
+        private boolean publicCachingEnabled = false;
+        private int publicCachingExpiration = -1;
 
         @Override
         public JavaActionDef build() {
@@ -170,6 +199,14 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
 
         public void setCaboose(boolean caboose) {
             this.caboose = caboose;
+        }
+
+        public void setPublicCachingEnabled(boolean publicCachingEnabled) {
+            this.publicCachingEnabled = publicCachingEnabled;
+        }
+
+        public void setPublicCachingExpiration(int publicCachingExpiration) {
+            this.publicCachingExpiration = publicCachingExpiration;
         }
     }
 }

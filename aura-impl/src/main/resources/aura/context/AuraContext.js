@@ -55,6 +55,10 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.isModulesEnabled = !!config["m"];
     this.useCompatSource = !!config["c"];
     this.moduleNamespaceAliases = config["mna"] || {};
+    this.actionPublicCachingEnabled = !!config["apce"];
+    if (this.actionPublicCachingEnabled) {
+        this.actionPublicCacheKey = config["apck"];
+    }
 
     var that = this;
 
@@ -192,7 +196,7 @@ Aura.Context.AuraContext.prototype.getGlobalValueProvider = function(type) {
  * @return {String} json representation
  * @private
  */
-Aura.Context.AuraContext.prototype.encodeForServer = function(includeDynamic) {
+Aura.Context.AuraContext.prototype.encodeForServer = function(includeDynamic, includeCacheKeyForCacheableXHR) {
     var contextToSend = {
         "mode" : this.mode,
         "fwuid" : this.fwuid
@@ -209,6 +213,9 @@ Aura.Context.AuraContext.prototype.encodeForServer = function(includeDynamic) {
         contextToSend["loaded"] = this.loaded;
         contextToSend["dn"] = $A.services.component.getDynamicNamespaces();
         contextToSend["globals"] = this.globalValueProviders.getValueProvider("$Global").serializeForServer();
+    }
+    if (includeCacheKeyForCacheableXHR) {
+        contextToSend["apck"] = this.actionPublicCacheKey;
     }
     if(this.isModulesEnabled) {
         contextToSend["m"] = 1;
@@ -609,4 +616,20 @@ Aura.Context.AuraContext.prototype.getContextPath = function() {
 /** @export */
 Aura.Context.AuraContext.prototype.setContextPath = function(path) {
     this.contextPath = path;
+};
+
+/**
+ * @return {boolean} if action public caching is enabled or not
+ * @export
+ */
+Aura.Context.AuraContext.prototype.isActionPublicCachingEnabled = function() {
+    return this.actionPublicCachingEnabled;
+};
+
+/**
+ * @return {String} The action public cache key
+ * @export
+ */
+Aura.Context.AuraContext.prototype.getActionPublicCacheKey = function() {
+    return this.actionPublicCacheKey;
 };

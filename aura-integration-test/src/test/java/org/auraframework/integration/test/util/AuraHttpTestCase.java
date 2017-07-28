@@ -617,6 +617,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                 for (int i = 0; i < qualifiedName.size(); i++) {
                     Map<String, Object> actionInstance = Maps.newHashMap();
                     actionInstance.put("descriptor", qualifiedName.get(i));
+
                     if (actionParams.get(i) != null) {
                         actionInstance.put("params", actionParams.get(i));
                     }

@@ -15,10 +15,12 @@
  */
 package org.auraframework.integration.test.http;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,10 +44,12 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
+import org.auraframework.impl.java.controller.PublicCachingTestController;
 import org.auraframework.integration.test.util.AuraHttpTestCase;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.test.client.UserAgent;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
@@ -53,6 +57,8 @@ import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Automation to verify the handling of AuraServlet requests.
@@ -459,6 +465,38 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
+     * Submit a request and check that the specified cache expiration is set correctly.
+     *
+     * @param url the url
+     * @param expiration the expiration expected to be set in the response headers (in milliseconds)
+     * @param immutable flag indicating if the immutable header should be expected
+     */
+    private void assertResponseSetToSpecifiedCacheExpiration(String url, long expiration, boolean immutable) throws Exception {
+        // a buffer to account for differences in system time at header generation and now in test execution
+        // 10 minutes should be more than adequate...
+        long BUFFER = (1000L * 60 * 10);
+        Date expected = new Date(System.currentTimeMillis() + expiration - BUFFER);
+
+        HttpGet get = obtainGetMethod(url);
+        HttpResponse response = perform(get);
+
+        assertEquals("Failed to execute request successfully.", HttpStatus.SC_OK, getStatusCode(response));
+
+        assertEquals("Expected response to have long cache headers",
+                     String.format("max-age=%s, public" + (immutable ? ", immutable" : ""), expiration / 1000),
+                     response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue());
+        assertDefaultAntiClickjacking(response, true, false);
+        String expiresHdr = response.getFirstHeader(HttpHeaders.EXPIRES).getValue();
+        Date expires = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH).parse(expiresHdr);
+
+        // show all of the related dates/strings to help with debugging.
+        assertTrue(String.format("Expires header is earlier than expected. Expected !before %s, got %s (%s).",
+                                 expected, expires, expiresHdr), !expires.before(expected));
+
+        get.releaseConnection();
+    }
+    
+    /**
      * Submit a request and check that the 'no cache' is set correctly.
      *
      * We are very generous with the expires time here, as we really don't care other than to have it well in the past.
@@ -611,5 +649,108 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
                         + response,
                 response.contains("AuraUnhandledException: Unable to process your request"));
         get.releaseConnection();
+    }
+
+    /**
+     * Test GET of publicly cacheable action returns caching headers
+     */
+    @Test
+    public void testGetPubliclyCacheableActionHasCachingHeaders() throws Exception {
+        MockConfigAdapter mca = getMockConfigAdapter();
+        mca.setActionPublicCachingEnabled(true);
+
+        // Send the default actionPublicCacheKey value. Tried setting a value on MockConfigAdapter and sending the same 
+        // value in the XHR, but found that it doesn't work because MockConfigAdapterImpl is a singleton and it causes 
+        // problems with tests run in parallel.
+        String url = getPubliclyCacheableActionUrl(PublicCachingTestController.class, "executeWithPublicCaching", null, 
+                mca.getActionPublicCacheKey());
+
+        // multiply expiration by 1000 since milliseconds are expected
+        assertResponseSetToSpecifiedCacheExpiration(url, 10 * 1000, false);
+    }
+
+    /**
+     * Test GET of publicly cacheable action returns expected return value
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testGetPubliclyCacheableActionReturnValue() throws Exception {
+        MockConfigAdapter mca = getMockConfigAdapter();
+        mca.setActionPublicCachingEnabled(true);
+        
+        String url = getPubliclyCacheableActionUrl(
+                PublicCachingTestController.class, 
+                "executeWithPublicCachingWithReturn", 
+                ImmutableMap.<String, Object>builder().put("i", 10).build(),
+                mca.getActionPublicCacheKey());
+        
+        HttpGet get = obtainGetMethod(url);
+        HttpResponse response = perform(get);
+
+        assertEquals("Failed to execute request successfully.", HttpStatus.SC_OK, getStatusCode(response));
+        
+        String body = getResponseBody(response);
+        assertTrue("Cannot find CSRF token in response body", body.startsWith(AuraBaseServlet.CSRF_PROTECT));
+        
+        Map<String, Object> json = (Map<String, Object>) new JsonReader().read(body.substring(
+                AuraBaseServlet.CSRF_PROTECT.length()));
+        List<Map<String, Object>> actions = (List<Map<String, Object>>) json.get("actions");
+        assertEquals("Unexpected number of actions in response", 1, actions.size());
+        assertEquals("Unexpected action state", "SUCCESS", actions.get(0).get("state"));
+        
+        Map<String, Object> returnValue = (Map<String, Object>) actions.get(0).get("returnValue");
+        assertEquals("Unexpected return value", 10, Number.class.cast(returnValue.get("id")).intValue());
+    }
+
+    /**
+     * Test GET of publicly cacheable action with an error is returned with no-cache headers
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testGetPubliclyCacheableActionWithExceptionSendsNoCacheHeaders() throws Exception {
+        MockConfigAdapter mca = getMockConfigAdapter();
+        mca.setActionPublicCachingEnabled(true);
+        
+        String url = getPubliclyCacheableActionUrl(PublicCachingTestController.class, 
+                "executeWithPublicCachingWithException", null, mca.getActionPublicCacheKey());
+        
+        assertResponseSetToNoCache(url);
+    }
+    
+    /**
+     * Test GET of publicly cacheable action with different cache key from server is returned with no-cache headers
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testGetPubliclyCacheableActionWithNewCacheKeySendsNoCache() throws Exception {
+        MockConfigAdapter mca = getMockConfigAdapter();
+        mca.setActionPublicCachingEnabled(true);
+
+        String url = getPubliclyCacheableActionUrl(PublicCachingTestController.class, "executeWithPublicCaching", null, 
+                "someKey");
+
+        assertResponseSetToNoCache(url);
+    }
+    
+    private String getPubliclyCacheableActionUrl(Class<?> controllerClass, String methodName, Map<String, Object> params,
+                String actionPublicCacheKey) throws UnsupportedEncodingException, QuickFixException {
+        DefDescriptor<ApplicationDef> app = definitionService.getDefDescriptor("aura:application", ApplicationDef.class);
+        String contextUrl = getAuraTestingUtil().buildContextForPublicCacheableXHR(Mode.DEV, app, actionPublicCacheKey);
+
+        Map<String, Object> action = ImmutableMap.<String, Object>builder()
+                .put("descriptor", String.format("java://%s/ACTION$%s", controllerClass.getName(), methodName))
+                .put("callingDescriptor", "UNKNOWN")
+                .put("params", params != null ? params : new HashMap<>())
+                .build();
+        
+        Map<String, Object> message = ImmutableMap.<String, Object>builder()
+                .put("actions", Arrays.asList(action))
+                .build();
+        
+        return String.format("/aura?%s.%s=1&message=%s&aura.token=token&aura.isAction=true&aura.context=%s",
+                controllerClass.getSimpleName(), 
+                methodName, 
+                URLEncoder.encode(JsonEncoder.serialize(message), "UTF-8"), 
+                URLEncoder.encode(contextUrl, "UTF-8"));
     }
 }

@@ -1,0 +1,2 @@
+<aura:component controller="java://org.auraframework.impl.java.controller.PublicCachingTestController">
+</aura:component>

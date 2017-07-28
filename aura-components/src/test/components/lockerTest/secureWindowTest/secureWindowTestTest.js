@@ -151,5 +151,11 @@
         test: function (cmp) {
             cmp.testFile_WithScriptTagsBlocked();
         }
+    },
+
+    testMediaStreamBlocked: {
+        test: function (cmp) {
+            cmp.testMediaStreamBlocked();
+        }
     }
 })

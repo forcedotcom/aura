@@ -192,7 +192,7 @@ SecureObject.filterEverything = function(st, raw, options) {
             } else if (raw instanceof CanvasRenderingContext2D) {
                 swallowed = SecureCanvasRenderingContext2D(raw, key);
                 mutated = true;
-            } else if (SecureObject.isUnfilteredType(raw)) {
+            } else if (SecureObject.isUnfilteredType(raw, key)) {
                 // return raw for unfiltered types
                 mutated = false;
             } else if (raw instanceof PropertyReferenceValue) {
@@ -1666,8 +1666,7 @@ function getUnfilteredTypes() {
                                "ValidityState",
                                "Crypto",
                                "DOMTokenList",
-                               "ArrayBuffer",
-                               "MediaStream"];
+                               "ArrayBuffer"];
     unfilteredTypesMeta.forEach(function(unfilteredType){
         if (typeof window[unfilteredType] !== "undefined") {
             ret.push(window[unfilteredType]);
@@ -1677,13 +1676,19 @@ function getUnfilteredTypes() {
 }
 var unfilteredTypes = getUnfilteredTypes();
 
-SecureObject.isUnfilteredType = function(raw) {
+SecureObject.isUnfilteredType = function(raw, key) {
     for (var n = 0; n < unfilteredTypes.length; n++) {
         if ($A.lockerService.instanceOf(raw, unfilteredTypes[n])) {
             return true;
         }
     }
 
+    var namespace = key["namespace"];
+    // Special previlege for RTC, TODO:RJ remove it once we have SecureMediaStream
+    if ((namespace === "runtime_rtc_spark" || namespace === "runtime_rtc")
+        && $A.lockerService.instanceOf(raw, window["MediaStream"])) {
+        return true;
+    }
     // Do not filter ArrayBufferView types. https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView
     if (raw && $A.lockerService.instanceOf(raw.buffer, ArrayBuffer) && raw.byteLength !== undefined) {
         return true;

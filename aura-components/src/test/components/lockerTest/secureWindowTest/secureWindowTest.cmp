@@ -41,6 +41,7 @@
     <aura:method name="testFile" action="{!c.testFile}"/>
     <aura:method name="testFile_WithScriptTagsBlocked" action="{!c.testFile_WithScriptTagsBlocked}"/>
     <aura:method name="testModifyWindowLocation"/>
+    <aura:method name="testMediaStreamBlocked"/>
 
     <ui:button label="Modify Window Location" press="{!c.testModifyWindowLocation}"/>
 

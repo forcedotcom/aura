@@ -209,5 +209,17 @@
         testUtils.assertEquals(location, window.location);
         testUtils.assertEquals("/lockerTest/secureWindowTest.cmp", window.location.pathname);
         testUtils.assertEquals("#view", window.location.hash);
+    },
+
+    testMediaStreamBlocked: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        testUtils.assertUndefined(window["MediaStream"]);
+        try {
+            new MediaStream();
+            testUtils.fail("Should not be able to create MediaStream object");
+        }catch (e) {
+            // Expected, do nothing
+            testUtils.assertStartsWith("TypeError: MediaStream is not a constructor", e.toString());
+        }
     }
 })

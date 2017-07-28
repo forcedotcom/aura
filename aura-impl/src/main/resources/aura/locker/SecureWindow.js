@@ -244,7 +244,10 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
         SecureObject.addPropertyIfSupported(o, win, name);
     });
 
-    SecureObject.addRTCMediaApis(o, win, "RTCPeerConnection", key);
+    // Add RTC related api only to specific namespaces
+    ["RTCPeerConnection", "MediaStream"].forEach(function(name) {
+        SecureObject.addRTCMediaApis(o, win, name, key);
+    });
 
     var workerFrame = win.document.getElementById("safeEvalWorkerCustom");
     var safeEvalWindow = workerFrame && workerFrame.contentWindow;            
@@ -492,7 +495,6 @@ SecureWindow.metadata = {
                 "MediaQueryListEvent":                  FUNCTION,
                 "MediaRecorder":                        CTOR,
                 "MediaSource":                          FUNCTION,
-                "MediaStream":                          RAW,
                 "MediaStreamAudioDestinationNode":      CTOR,
                 "MediaStreamAudioSourceNode":           CTOR,
                 "MediaStreamEvent":                     CTOR,

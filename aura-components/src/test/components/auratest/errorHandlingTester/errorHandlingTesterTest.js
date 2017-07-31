@@ -54,32 +54,6 @@
         ]
     },
 
-    /**
-     * Verify that failing descriptor gets reported for error through $A.error()
-     */
-    testFailingDescriptorForErrorViaAError: {
-        test: [
-            function(cmp) {
-                var iframeSrc = "/auratest/errorHandlingApp.app";
-                this.loadIframe(iframeSrc, cmp, "iframeContainer");
-                this.waitForAuraReadyInIframe(this.getIframe());
-            },
-            function(cmp) {
-                var that = this;
-                var iframe = this.getIframe();
-
-                iframe.document.querySelector(".errorFromAppTable .errorFromAErrorButton").click();
-                this.waitForErrorMaskVisibleInIframe(iframe, function() {
-                        var errorMsg = that.getErrorMessageFromIframe(iframe);
-
-                        var failingDescriptor = "Failing descriptor: {auratest:errorHandlingApp}";
-                        $A.test.assertTrue($A.test.contains(errorMsg, failingDescriptor),
-                                "The error message has incorrect failing descriptor. Expected descriptor: " + failingDescriptor + "; Actual: " + errorMsg);
-                    });
-            }
-        ]
-    },
-
     testErrorFromContainedCmpRender: {
         test: function(cmp) {
             var iframeSrc = "/auratest/errorHandlingApp.app?throwErrorFromContainedCmpRender=true";

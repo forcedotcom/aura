@@ -387,18 +387,18 @@ Test.Aura.LoggerTest = function() {
         var called = false;
         var clientStackLength = -1;
         var mockAction = {
-        		params : {},
+                params : {},
                 setParams: function(config) { 
                     if(config) {
-                    	for ( var key in config) {
-                    		this.params[key] = config[key];
-                    	}
+                        for ( var key in config) {
+                            this.params[key] = config[key];
+                        }
                     }
                 },
                 getParam: function(name) {
-                	if(name) { 
-                		return this.params[name];
-                	}
+                    if(name) { 
+                        return this.params[name];
+                    }
                 },
                 setCallback: function() {},
                 setCaboose: function() {}
@@ -408,12 +408,20 @@ Test.Aura.LoggerTest = function() {
                 get: function() { return mockAction; },
                 clientService: {
                     enqueueAction: function(reportAction) {
-                    	called = true;
-                    	var clientStack = reportAction.getParam('clientStack');
-                    	if(clientStack) {
-                    		clientStackLength = clientStack.length;
-                    	}
+                        called = true;
+                        var clientStack = reportAction.getParam('clientStack');
+                        if(clientStack) {
+                            clientStackLength = clientStack.length;
+                        }
                     }
+                },
+                auraError: function(msg, e) {
+                    e.name = "AuraError";
+                    e.findComponentFromStackTrace = function() {};
+                    e.setComponent = function() {
+                        this["setComponentCalled"] = true;
+                    };
+                    return e;
                 }
             }, Aura:{Utils:{Logger:{MAX_STACKTRACE_SIZE:25000}}}
         });
@@ -454,18 +462,64 @@ Test.Aura.LoggerTest = function() {
         
         [Fact]
         function noLongerThan25000Charactors() {
-        	var mockError = {
-        		'stackTrace' : Array(25010).join('x'),
-        		'reported' : false,
-        		toString : function() { }
-        	}
-        	var target = new Error();
+            var mockError = {
+                'stackTrace' : Array(25010).join('x'),
+                'reported' : false,
+                toString : function() { }
+            }
 
             mockDeps(function() {
                 logger.reportError(mockError, "testAction", "testId");
             });
             
             Assert.True(clientStackLength === 25000);
+        }
+
+        [Fact]
+        function wrapsErrorInAuraError() {
+            var target = new Error();
+
+            mockDeps(function() {
+                logger.reportError(target);
+            });
+
+            Assert.Equal("AuraError", target.name);
+        }
+
+        [Fact]
+        function callsSetComponentWhenNoComponent() {
+            var target = new Error();
+
+            mockDeps(function() {
+                logger.reportError(target);
+            });
+
+            Assert.True(target["setComponentCalled"]);
+        }
+
+        [Fact]
+        function callsSetComponentWhenNoStacktraceIdGen() {
+            var target = new Error();
+            target["component"] = "test";
+
+            mockDeps(function() {
+                logger.reportError(target);
+            });
+
+            Assert.True(target["setComponentCalled"]);
+        }
+
+        [Fact]
+        function notCallSetComponentWhenHasComponentAndStacktraceIdGen() {
+            var target = new Error();
+            target["component"] = "test";
+            target["stacktraceIdGen"] = "gen";
+
+            mockDeps(function() {
+                logger.reportError(target);
+            });
+
+            Assert.Undefined(target["setComponentCalled"]);
         }
     }
 

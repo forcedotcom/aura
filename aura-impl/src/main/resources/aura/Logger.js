@@ -149,6 +149,16 @@ Logger.prototype.reportError = function(e, action, foreground){
         }
     }
 
+    // wrapping non aura error, so that required info can be set to the error
+    if (!(e instanceof $A.auraError)) {
+        e = new $A.auraError(null, e);
+    }
+
+    if (!e["component"] || !e["stacktraceIdGen"]) {
+        var component = e.findComponentFromStackTrace();
+        e.setComponent(component);
+    }
+
     // Post the action failure to the server, where we can keep track of it for bad client code.
     // But don't keep re-posting if the report of failure fails.  Do we want this to be production
     // mode only or similar?

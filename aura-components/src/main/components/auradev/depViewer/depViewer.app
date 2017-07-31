@@ -19,6 +19,7 @@
     <aura:attribute name="app" type="String"/>
     <aura:attribute name="appDepsSize" type="String"/>
     <aura:attribute name="nodes" type="Map"/>
+    <aura:attribute name="message" type="String"/>
 
     <aura:attribute name="paths" type="String[]"/>
     <aura:attribute name="uniqueDeps" type="Map"/>
@@ -45,6 +46,13 @@
         <section>
             <ui:button label="Show All Deps" press="{!c.findAllUniqueDeps}"/>
             <ui:inputCheckbox aura:id="uniqDepsOnly" label="Unique Dependencies Only" value="true"/>
+        </section>
+        <section>
+            <ui:button label="Show All Client Library Deps" press="{!c.showClientLibraryDependencies}"/>
+        </section>
+
+        <section>
+            {!v.message}
         </section>
 
         <table width="100%">

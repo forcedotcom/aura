@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -43,6 +44,7 @@ import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -83,18 +85,16 @@ public class DependenciesController implements Controller {
 
     @Inject
     private DefinitionService definitionService;
-    
 
     @Inject
     AppJs appJs;
-    
+
     @Inject
     ContextService contextService;
-    
+
     @Inject
     ServletUtilAdapter servletUtilAdapter;
 
-    
     private final DefDescriptor<?> getDescriptor(String definition) {
         final DescriptorFilter filter = new DescriptorFilter(definition, Lists.newArrayList(DefType.COMPONENT,DefType.APPLICATION));
         final Set<DefDescriptor<?>> descriptors = definitionService.find(filter);
@@ -108,18 +108,18 @@ public class DependenciesController implements Controller {
     public Map<String, String> getApplicationScriptFileSizes(@Key("definition")String definition, @Key("host")String host) {
         final Map<String, String> fileSizes = new HashMap<String, String>();
         final DecimalFormat formatter = new DecimalFormat("#,###");
-        
+
         DefDescriptor<?> descriptor = getDescriptor(definition);
-        
+
         @SuppressWarnings("unchecked")
         AuraContext context = contextService.startContextNoGVP(Mode.PROD, Format.JS, Authentication.AUTHENTICATED, (DefDescriptor<? extends BaseComponentDef>) descriptor);
-        
+
         final String appJsUrl = host + servletUtilAdapter.getAppJsUrl(context, null);
         final String appJsCoreUrl = host + servletUtilAdapter.getAppCoreJsUrl(context, null);
-        
+
         final String appJsContent = getUrlContent(appJsUrl);
         final String appCoreJsContent = getUrlContent(appJsCoreUrl);
-        
+
         final Integer appJsSize = appJsContent.length();
         final Integer appJsCoreSize = appCoreJsContent.length();
 
@@ -133,7 +133,7 @@ public class DependenciesController implements Controller {
         fileSizes.put("appcorejs_compressed", formatter.format(appJsCoreCompresed));
         fileSizes.put("total", formatter.format(appJsSize + appJsCoreSize));
         fileSizes.put("total_compressed", formatter.format(appJsCompressed + appJsCoreCompresed));
-        
+
         return fileSizes;
     }
 
@@ -153,6 +153,49 @@ public class DependenciesController implements Controller {
         buildGraph(graph, rootNode, visited);
 
         return graph.getNodes();
+    }
+
+    @AuraEnabled
+    public Map<String, Map<String, String>> getClientLibraryDependencies(@Key("app")String app) throws Exception {
+        Map<String, Map<String, String>> result = new HashMap<>();
+        Map<String, List<String>> consumers = new HashMap<>();
+
+        DescriptorFilter matcher = new DescriptorFilter(app, DefType.APPLICATION);
+        Set<DefDescriptor<?>> descriptors = definitionService.find(matcher);
+        if (descriptors == null || descriptors.size() == 0) {
+            return null;
+        }
+
+        DefDescriptor<?> appDesc = (DefDescriptor<?>)descriptors.toArray()[0];
+        String uid = definitionService.getUid(null, appDesc);
+
+        List<ClientLibraryDef> clientLibDefs = definitionService.getClientLibraries(uid);
+        for (ClientLibraryDef clientLibDef : clientLibDefs) {
+            String clientLibName = clientLibDef.getLibraryName();
+            Map<String, String> info = new HashMap<>();
+            info.put("prefetch", Boolean.toString(clientLibDef.shouldPrefetch()));
+            result.put(clientLibName, info);
+            consumers.put(clientLibName, new ArrayList<>());
+        }
+
+        // find all components which include the client library to the app
+        for (DefDescriptor<?> dependency : definitionService.getDependencies(uid)) {
+            Definition def = definitionService.getDefinition(dependency);
+            if (def instanceof BaseComponentDef) {
+                List<ClientLibraryDef> clientLibDeps = ((BaseComponentDef)def).getClientLibraries();
+                for (ClientLibraryDef clientLibDep : clientLibDeps) {
+                    List<String> list = consumers.get(clientLibDep.getLibraryName());
+                    list.add(dependency.getQualifiedName());
+                }
+            }
+        }
+
+        for (ClientLibraryDef clientLibDef : clientLibDefs) {
+            String clientLibName = clientLibDef.getLibraryName();
+            result.get(clientLibName).put("consumers", consumers.get(clientLibName).toString());
+        }
+
+        return result;
     }
 
     @AuraEnabled
@@ -601,53 +644,53 @@ public class DependenciesController implements Controller {
         try {
             HttpClient client = new DefaultHttpClient();
             HttpGet request = new HttpGet(url);
-    
+
             // add request header
             request.addHeader("User-Agent", HttpHeaders.USER_AGENT);
 
             response = client.execute(request);
-            
+
             BufferedReader rd = new BufferedReader(
                            new InputStreamReader(response.getEntity().getContent()));
-    
+
             StringBuffer result = new StringBuffer();
             String line = "";
             while ((line = rd.readLine()) != null) {
                 result.append(line);
             }
-    
+
             return result.toString();
         } catch(Exception ex) {
             System.out.print(ex.getMessage());
         }
         return "";
     }
-    
+
     // Compress a string using GZIP so we can measure its size after compression.
     private final String gzipString(final String content) {
         if(content == null || content.length() == 0) {
             return content;
         }
-        
-        
+
+
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream(content.length());
             GZIPOutputStream zip = new GZIPOutputStream(out);
-            
+
             zip.write(content.getBytes());
             zip.close();
-            
+
             return out.toString();
         } catch(IOException ex) {
-            
+
         }
-        
+
         return "";
     }
 
 
-    public final static Set<String> namespaceBlackList = new HashSet<>(Arrays.asList("aura", "auradev"));
-    public final static Set<DefType> defTypeWhitelist = new HashSet<>(Arrays.asList(
+    private final static Set<String> namespaceBlackList = new HashSet<>(Arrays.asList("aura", "auradev"));
+    private final static Set<DefType> defTypeWhitelist = new HashSet<>(Arrays.asList(
             DefType.APPLICATION, DefType.COMPONENT, DefType.LIBRARY, DefType.INTERFACE, DefType.MODULE));
 
     private boolean isWantedDescriptor(DefDescriptor<? extends Definition> descriptor) {

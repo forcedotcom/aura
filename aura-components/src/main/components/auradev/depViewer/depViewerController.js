@@ -14,6 +14,37 @@
  * limitations under the License.
  */
 ({
+    showClientLibraryDependencies: function(cmp, evt, helper) {
+        helper.resetTables(cmp);
+
+        var action = cmp.get("c.getClientLibraryDependencies");
+        var app = cmp.get("v.app");
+        if(!app) {
+            // using auradoc as default app
+            app = "markup://auradocs:docs";
+            cmp.set("v.app", app);
+        }
+
+        action.setParam("app", app);
+
+        action.setCallback(this, function (result) {
+            var ret = result.getReturnValue();
+            if (!ret || ret.length === 0) {
+                cmp.set("v.message", "The app has no any client library dependecies.");
+            } else {
+                var clientLibs = [];
+                for (var libName in ret) {
+                    var clientLib = ret[libName];
+                    var info = libName + ", prefetch: " + clientLib["prefetch"] + ", consumers: " + clientLib["consumers"];
+                    clientLibs.push(info);
+                }
+                cmp.set("v.paths", clientLibs);
+            }
+        });
+
+        $A.enqueueAction(action);
+    },
+
     getDeps: function(cmp, evt, helper) {
         var action = cmp.get("c.createGraph");
         var app = cmp.get("v.app");
@@ -25,8 +56,8 @@
 
         action.setParam("app", app);
 
-        action.setCallback(this, function () {
-            var nodes = action.getReturnValue();
+        action.setCallback(this, function (result) {
+            var nodes = result.getReturnValue();
 
             if(!nodes || Object.keys(nodes).length < 2) {
                 var message = "Something is wrong! Failed to get dependency graph from server.";
@@ -53,7 +84,11 @@
         }
 
         var paths = helper.findCallerPaths(cmp, startComponent.trim());
-        cmp.set("v.paths", paths);
+        if (!paths || paths.length === 0) {
+            cmp.set("v.message", "The component is not a dependency of the app.");
+        } else {
+            cmp.set("v.paths", paths);
+        }
     },
 
     findAllUniqueDeps: function(cmp, evt, helper) {

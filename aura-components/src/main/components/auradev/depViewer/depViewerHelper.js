@@ -25,7 +25,7 @@
 
     traverse: function(nodes, component, paths, pathHolder) {
         // visited
-        if(pathHolder.indexOf(component) > -1) {
+        if(pathHolder.indexOf(component) > -1 || !nodes[component]) {
             return;
         }
 
@@ -136,6 +136,7 @@
     },
 
     resetTables: function(cmp) {
+        cmp.set("v.message", undefined);
         cmp.set("v.paths", undefined);
         cmp.set("v.uniqueDeps", undefined);
     }

@@ -2183,7 +2183,7 @@ Component.prototype.setSuperComponent = function(component) {
 
 Component.prototype.isCollectionOfAuraComponentDefs = function (facetValueConfig) {
     if ($A.util.isArray(facetValueConfig)) {
-        for (var i in facetValueConfig) {
+        for (var i = 0; i < facetValueConfig.length; i++) {
             var facetItem = facetValueConfig[i];
             if (!facetItem["componentDef"] || !facetItem["componentDef"]["descriptor"]) {
                 return false;

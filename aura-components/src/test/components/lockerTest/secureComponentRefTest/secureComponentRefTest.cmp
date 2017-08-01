@@ -30,8 +30,13 @@
     <aura:method name="testAddHandler" action="{!c.testAddHandler}"/>
     <aura:method name="testAddValueHandler" action="{!c.testAddValueHandler}"/>
     <aura:method name="testDestroy" action="{!c.testDestroy}"/>
+    <aura:method name="testModuleLibrary" action="{!c.testModuleLibrary}"/>
+    <aura:method name="testModulePublicMethod" action="{!c.testModulePublicMethod}"/>
 
     <div>SecureComponentRef test</div>
     <ui:button label="ui:button component" aura:id="facet"/>
-    <lockerTestOtherNamespace:eventSource aura:id="eventSource" foo="{!c.doFoo}"/>    
+    <lockerTestOtherNamespace:eventSource aura:id="eventSource" foo="{!c.doFoo}"/>
+
+    <moduleTest:simpleLib aura:id="module-lib"/>
+    <moduleTest:simpleCmp aura:id="module-cmp"/>
 </aura:component>

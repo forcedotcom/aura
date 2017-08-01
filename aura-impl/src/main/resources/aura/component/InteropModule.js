@@ -54,12 +54,21 @@ InteropModule.prototype = Object.create(Aura.Component.InteropComponent.prototyp
 InteropModule.prototype.constructor = InteropModule;
 
 /**
+ * Returns a list public methods names available on the module
+ * @returns {string[]}
+ * @export
+ */
+InteropModule.prototype.getPublicMethodNames = function() {
+    return Object.getOwnPropertyNames(this.interopClass);
+};
+
+/**
  * Adds module keys to instance of InteroptModule
  */
 InteropModule.prototype.setupMethods = function () {
     var interopClass = this.interopClass;
     var self = this;
-    Object.getOwnPropertyNames(interopClass).forEach(function (m) {
+    this.getPublicMethodNames().forEach(function (m) {
         Object.defineProperty(self, m, {
             get: function () {
                 return interopClass[m];

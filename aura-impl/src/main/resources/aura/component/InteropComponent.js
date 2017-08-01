@@ -163,10 +163,18 @@ InteropComponent.HTML_GLOBAL_ATTRS = {
     'role': true
 };
 
+/**
+ * Returns a list public methods names available on the component
+ * @returns {string[]}
+ * @export
+ */
+InteropComponent.prototype.getPublicMethodNames = function() {
+    return Object.keys(this.interopDef['methods']);
+};
+
 InteropComponent.prototype.setupMethods = function () {
-    var interopDef = this.interopDef;
     var self = this;
-    Object.keys(interopDef['methods']).forEach(function (m) {
+    this.getPublicMethodNames().forEach(function (m) {
         self[m] = function () {
             if (!self.rendered) {
                 return $A.warning('Methods are not available until the component is rendered');

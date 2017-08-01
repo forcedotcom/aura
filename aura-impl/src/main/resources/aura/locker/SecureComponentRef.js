@@ -81,20 +81,27 @@ function SecureComponentRef(component, key) {
         return baseObject;
     }
 
-    // The shape of the component depends on the methods exposed in the definitions:
-    var defs = component.getDef().methodDefs;
-    if (defs) {
-        defs.forEach(function(method) {
+    var methodsNames = [];
+    if (component instanceof Aura.Component.InteropComponent) {
+        methodsNames = component.getPublicMethodNames();
+    } else {
+        var defs = component.getDef().methodDefs || [];
+        methodsNames = defs.map(function(method) {
             var descriptor = new DefDescriptor(method.name);
-            SecureObject.addMethodIfSupported(o, component, descriptor.getName(),
-                {
-                    defaultKey: key,
-                    // If SecureComponentRef is an unlockerized component, then let it have access to raw arguments
-                    unfilterEverything: ($A.lockerService.wrapComponent(component) === component) ? function(args){ return deepUnfilterMethodArguments([], args); } : undefined
-                }
-            );
-        }, o);
+            return descriptor.getName();
+        });
     }
+
+    methodsNames.forEach(function(methodName) {
+        var methodOptions = {
+            defaultKey: key,
+            // If SecureComponentRef is an unlockerized component, then let it have access to raw arguments
+            unfilterEverything: ($A.lockerService.wrapComponent(component) === component) ? 
+                function(args){ return deepUnfilterMethodArguments([], args); } : 
+                undefined
+        };
+        SecureObject.addMethodIfSupported(o, component, methodName, methodOptions);
+    });
 
     // DCHASMAN TODO Workaround for ui:button redefining addHandler using aura:method!!!
     if (!("addHandler" in o)) {

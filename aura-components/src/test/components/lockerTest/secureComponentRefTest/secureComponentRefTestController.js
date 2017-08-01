@@ -107,6 +107,24 @@
                 testUtils.assertUndefined(cmp.find("facet"));
             });
     },
+    
+    testModuleLibrary: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var secureComponentRef = cmp.find("module-lib");
+
+        testUtils.assertStartsWith("SecureComponentRef", secureComponentRef.toString());
+
+        var value = "Hello module";
+        testUtils.assertEquals(secureComponentRef.identity(value), value);
+    },
+
+    testModulePublicMethod: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var secureComponentRef = cmp.find("module-cmp");
+
+        testUtils.assertStartsWith("SecureComponentRef", secureComponentRef.toString());
+        secureComponentRef.test();
+    },
 
     onFooDynamic: function(cmp) {
         cmp.set("v.message", "Hello from onFooDynamic()");	

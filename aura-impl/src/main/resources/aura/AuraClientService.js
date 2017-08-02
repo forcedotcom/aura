@@ -3728,21 +3728,40 @@ AuraClientService.prototype.enqueueAction = function(action, background) {
         // - server action
         // - not a refresh action
         // - does not have a cache hit (if storage is persistent but failed to populate stored actions, then assume a cache miss)
+        //                             (if actions filter has not been set up yet, assume a cache miss)
         var isServerAction = action.getDef().isServerAction() && !action.isRefreshAction();
-        if (isServerAction) {
-            if (!this.actionStorage.isStoragePersistent() || this.actionStorage.isKeyAbsentFromCache(action.getStorageKey())) {
-                var auraXHR = this.getAvailableXHR(false);
-                if (auraXHR) {
-                    if (!this.send(auraXHR, [action], action.isPubliclyCacheable() ? "GET" : "POST")) {
-                        this.releaseXHR(auraXHR);
-                    }
-                    return;
-                } // no XHR available; fall through to default behavior
-            } // not persisted
-        } // not a server action or cache refresh
+        if (isServerAction && this.isActionAbsentFromStorage(action)) {
+            var auraXHR = this.getAvailableXHR(false);
+            if (auraXHR) {
+                if (!this.send(auraXHR, [action], action.isPubliclyCacheable() ? "GET" : "POST")) {
+                    this.releaseXHR(auraXHR);
+                }
+                return;
+            } // no XHR available; fall through to default behavior
+        } // not a server action or cache refresh, and no cache hit
     }
 
     this.actionsQueued.push(action);
+};
+
+/**
+ * This function is used in enqueueAction when hotspot flow is set.
+ *
+ * @param {Action} action the action
+ * @returns {Boolean} true if the action storage key is guaranteed to not be accessible from storage; false if accessible or unknown.
+ * @private
+ */
+AuraClientService.prototype.isActionAbsentFromStorage = function(action) {
+    if (!action || !action.isStorable()) {
+        return true;
+    }
+
+    // if actions filter has not been set up yet, assume a cache miss
+    if (!this.actionStorage.isStoragePersistent() || !this.actionStorage.isActionsFilterInitialized()) {
+        return true;
+    }
+
+    return this.actionStorage.isKeyAbsentFromCache(action.getStorageKey());
 };
 
 /**

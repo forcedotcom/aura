@@ -85,8 +85,8 @@ Test.Aura.AuraClientServiceTest = function() {
             mark : function() {},
             getContext : function() {
                 return {
-                    encodeForServer: function(includeDynamic, includeExtraPropertiesForCacheableXHR) { 
-                        return 'encodedForServer:' + includeDynamic + ':' + includeExtraPropertiesForCacheableXHR; 
+                    encodeForServer: function(includeDynamic, includeExtraPropertiesForCacheableXHR) {
+                        return 'encodedForServer:' + includeDynamic + ':' + includeExtraPropertiesForCacheableXHR;
                     }
                 };
             },
@@ -912,7 +912,7 @@ Test.Aura.AuraClientServiceTest = function() {
         [Fact]
         function CallsSend() {
             var target;
-            
+
             // arrange
             var mockAction = new MockAction();
 
@@ -930,7 +930,6 @@ Test.Aura.AuraClientServiceTest = function() {
 
         [Fact]
         function CallsSendWithGetIfPubliclyCacheable() {
-            
             // arrange
             var target;
             var mockAction = new MockAction();
@@ -946,6 +945,120 @@ Test.Aura.AuraClientServiceTest = function() {
 
             // assert
             Assert.Equal('GET', target.send.Calls[0].Arguments.method);
+        }
+
+        [Fact]
+        function SendsXhrIfStorageIsNotPersistent() {
+            // Arrange
+            var target;
+            var mockAction = new MockAction("server", true);
+
+            var mockStorage = {
+                isStoragePersistent: function() {
+                    return false;
+                }
+            };
+
+            mockGlobal(function () {
+                target = getMockedService();
+                target.send = Stubs.GetMethod(true);
+                target.actionStorage = mockStorage;
+
+                // Act
+                target.enqueueAction(mockAction);
+            });
+
+            // Assert
+            Assert.Equal(1, target.send.Calls.length);
+        }
+
+        [Fact]
+        function SendsXhrIfActionsFilterIsNotInitialized() {
+            // Arrange
+            var target;
+            var mockAction = new MockAction("server", true);
+
+            var mockStorage = {
+                isStoragePersistent: function() {
+                    return true;
+                },
+                isActionsFilterInitialized: function() {
+                    return false;
+                }
+            };
+
+            mockGlobal(function () {
+                target = getMockedService();
+                target.send = Stubs.GetMethod(true);
+                target.actionStorage = mockStorage;
+
+                // Act
+                target.enqueueAction(mockAction);
+            });
+
+            // Assert
+            Assert.Equal(1, target.send.Calls.length);
+        }
+
+        [Fact]
+        function SendsXhrIfActionIsNotStored() {
+            // Arrange
+            var target;
+            var mockAction = new MockAction("server", true);
+
+            var mockStorage = {
+                isStoragePersistent: function() {
+                    return true;
+                },
+                isActionsFilterInitialized: function() {
+                    return true;
+                },
+                isKeyAbsentFromCache: function() {
+                    return true;
+                }
+            };
+
+            mockGlobal(function () {
+                target = getMockedService();
+                target.send = Stubs.GetMethod(true);
+                target.actionStorage = mockStorage;
+
+                // Act
+                target.enqueueAction(mockAction);
+            });
+
+            // Assert
+            Assert.Equal(1, target.send.Calls.length);
+        }
+
+        [Fact]
+        function EnqueuesActionIfActionIsStored() {
+            // Arrange
+            var target;
+            var mockAction = new MockAction("server", true);
+
+            var mockStorage = {
+                isStoragePersistent: function() {
+                    return true;
+                },
+                isActionsFilterInitialized: function() {
+                    return true;
+                },
+                isKeyAbsentFromCache: function() {
+                    return false;
+                }
+            };
+
+            mockGlobal(function () {
+                target = getMockedService();
+                target.actionStorage = mockStorage;
+
+                // Act
+                target.enqueueAction(mockAction);
+            });
+
+            // Assert
+            Assert.True(target.actionsQueued.indexOf(mockAction) > -1);
         }
     }
 
@@ -2395,7 +2508,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 id: actionId
             });
         };
-        
+
         [Fact]
         function testSendsAll() {
             var target;
@@ -2825,8 +2938,8 @@ Test.Aura.AuraClientServiceTest = function() {
             [Fact]
             function usesExpectedURL() {
                 var expectedUrl = '/aura?'
-                        + 'message=%3C%3C%7B%22actions%22%3A%5Btrue%5D%7D%3E%3E&' 
-                        + 'aura.context=encodedForServer%3Afalse%3Atrue&' 
+                        + 'message=%3C%3C%7B%22actions%22%3A%5Btrue%5D%7D%3E%3E&'
+                        + 'aura.context=encodedForServer%3Afalse%3Atrue&'
                         + 'aura.isAction=true';
 
                 // Verify
@@ -3718,7 +3831,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 actual = sendData["aura.context"];
             });
 
-            
+
             // Assert
             Assert.Equal(expected, actual);
         }

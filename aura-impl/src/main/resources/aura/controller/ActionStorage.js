@@ -100,6 +100,13 @@ ActionStorage.prototype.isActionsFilterEnabled = function() {
 };
 
 /**
+ * Check if actions filter has been set up.
+ */
+ActionStorage.prototype.isActionsFilterInitialized = function() {
+    return this.actionsFilterInited;
+};
+
+/**
  * Check if an action is absent in Action Storage (from in-memory cache).
  * This function only guarantees that an action storage key is absent in storage.
  * It doesn't guarantee that an action can be retrieved from storage if it returns false.

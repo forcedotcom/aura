@@ -86,5 +86,8 @@
         cmp = helper._getRootComponent(cmp);
 
         return helper.getComponentByIndex(cmp, index, callback);
+    },
+    destroy: function (cmp, event, helper) {
+        helper._destroyShapes(cmp);
     }
 })// eslint-disable-line semi

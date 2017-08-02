@@ -47,6 +47,7 @@
     </aura:method>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:handler name="destroy" value="{!this}" action="{!c.destroy}"/>
     <aura:handler name="change" value="{!v.items}" action="{!c.handleItemsChange}"/>
     <aura:handler name="change" value="{!v.itemTemplate}" action="{!c.handleTemplateChange}"/>
     <aura:handler name="change" value="{!v.templateMap}" action="{!c.handleTemplateMapChange}"/>

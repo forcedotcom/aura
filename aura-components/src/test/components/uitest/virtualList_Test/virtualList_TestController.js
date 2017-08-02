@@ -27,5 +27,8 @@
 	sendTemplateMap : function(cmp, evt, helper) {
 	    helper.generateItemTemplates(cmp);
 	    cmp.find("list").set("v.templateMap", cmp.get("v.templateMap"));
+	},
+	destroyCmp: function(cmp, evt, helper) {
+	    cmp.find("list").destroy();
 	}
 })

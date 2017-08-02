@@ -35,6 +35,7 @@
 		<ui:button class="kitchenButton" label="Re-fire datagrid's provide" press="{!c.replaceData}"/>
 		<ui:button class="kitchenButtonEmptyData" label="Fire Data Provider With Empty Data" press="{!c.emptyData}"/>         
 		<ui:button label="Update List with Multiple Templates" press="{!c.sendTemplateMap}" />
+        <ui:button label="Destroy the component" press="{!c.destroyCmp}" />
         <br/>
 	</div>
     <div>

@@ -52,7 +52,7 @@ var SecureURLMethods = Object.create(null,{
   }
 });
 
-var SecureURL = new Proxy(unsecureURL, {
+var SecureURL = typeof Proxy === "undefined" ? unsecureURL : new Proxy(unsecureURL, {
   get: function (target, name) {
     // Give priority to the overritten methods.
     var desc = Object.getOwnPropertyDescriptor(SecureURLMethods, name);

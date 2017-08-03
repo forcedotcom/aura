@@ -73,13 +73,6 @@
         abortEvent.fire();
     },
     
-    updateItems: function(cmp) {
-        var items = cmp.get("v.items");
-        if (items && items.length > 0) {
-            cmp.set("v.privateItems", items);
-        }
-    },
-
     getEventSourceOptionComponent: function (component, event) {
         //option could be a compound component so look for the right option
         var element = event.target || event.srcElement;
@@ -167,7 +160,9 @@
         var concreteCmp = component.getConcreteComponent();
         var newItems = event.getParam("data");
         // Users of the component that implement their own v.matchFunc rely on this being set.
-        concreteCmp.set("v.items", newItems);
+        // The last arguments indicates that this shouldn't lead to a re-render, causing
+        // performance issues.
+        concreteCmp.set("v.items", newItems, true);
         if (concreteCmp.get("v.disableMatch") === true) {
             for (var j = 0; j < newItems.length; j++) {
                 newItems[j].visible = true;
@@ -538,7 +533,7 @@
         }
         this.showLoading(component, false);
 
-        component.set("v.privateItems", items);
+        component.set("v.items", items);
 
         this.fireMatchDoneEvent(component, items);
     },
@@ -551,8 +546,6 @@
                 // - it should not be an action but js function
                 // - it should not have the responsability to set the items directly
                 // - we should not fire yet another stupid event since we are in the callback
-
-                //this.matchFunc(component, items);
                 this.matchFuncDone(component, items);
             });
             action.setParams({items: items});

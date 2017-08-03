@@ -44,7 +44,6 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="change" value="{!v.visible}" action="{!c.visibleChange}"/>
-    <aura:handler name="change" value="{!v.items}" action="{!c.handleItemChange}"/>
     <aura:handler name="listHighlight" action="{!c.handleListHighlight}"/>
     <aura:handler name="matchText" action="{!c.matchText}"/>
     <aura:handler name="pressOnHighlighted" action="{!c.handlePressOnHighlighted}"/>
@@ -57,6 +56,6 @@
     </aura:set>
 
     <ul aura:id="list" class="{!'lookup__list ' + (v.visible ? ' visible' : '')}" role="presentation" onclick="{!c.handleClick}" onmousedown="{!c.handleMouseDown}">
-        <aura:iteration aura:id="iter" items="{!v.privateItems}" var="{!v.itemVar}" body="{!v.itemTemplate}"/>
+        <aura:iteration aura:id="iter" items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}"/>
     </ul>
 </aura:component>

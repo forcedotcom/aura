@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 ({
-    init: function(component, event, helper) {
+    init: function(component) {
         // This is only needed for tests, we should update the tests to not use the models anymore and then
         // this whole method can be removed
         var dataProvider = component.get("v.dataProvider[0]");
         if(dataProvider && dataProvider.getModel()) {
             component.set("v.items", dataProvider.get("m.items"));
         }
-        helper.updateItems(component);
     },
-    
-    handleItemChange: function(cmp, event, helper) {
-        helper.updateItems(cmp);
-    },    
-    
+
     fetchData: function (component, event, helper) {
         var superCmp   = component.getSuper(),
             isExtended = superCmp.getType() !== 'aura:component',

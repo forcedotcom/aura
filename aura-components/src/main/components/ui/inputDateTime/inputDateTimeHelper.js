@@ -120,7 +120,13 @@
                     return;
                 }
             }
-            this.setDateTimeValue(component, dateValue, timeValue);
+
+            var dateTimeParams = {
+                date: dateValue,
+                time: timeValue,
+                ignoreChange: true        // change event is fired through the input, no need to fire it again.
+            };
+            this.setDateTimeValue(component, dateTimeParams);
         }
     },
 
@@ -312,8 +318,8 @@
             var date = $A.localizationService.parseDateTimeUTC(dateValue, this.DATE_FORMAT, component._locale);
 
             var setValue = function (isoValue) {
-                component.set("v.value", isoValue);
-            };
+                this.setComponentValue(component, isoValue);
+            }.bind(this);
 
             this.dateTimeLib.dateTimeService.getISOValue(date, config, $A.getCallback(setValue));
         }
@@ -324,8 +330,12 @@
 
         this.displayDate(component, displayValue);
 
-        var currentTimeString = this.getTimeString(component);
-        this.setDateTimeValue(component, displayValue, currentTimeString);
+        var dateTimeParams = {
+            date: displayValue,
+            time: this.getTimeString(component),
+            ignoreChange: false
+        };
+        this.setDateTimeValue(component, dateTimeParams);
     },
 
     setTimeValue: function (component, selectedHours, selectedMinutes) {
@@ -335,14 +345,19 @@
 
         var currentDateString = this.getDateString(component);
         if (!$A.util.isEmpty(currentDateString)) {
-            this.setDateTimeValue(component, currentDateString, displayValue);
+            var dateTimeParams = {
+                date: currentDateString,
+                time: displayValue,
+                ignoreChange: false
+            };
+            this.setDateTimeValue(component, dateTimeParams);
         }
     },
 
-    setDateTimeValue: function (component, dateString, timeString) {
-        var hasTime = !$A.util.isEmpty(timeString);
+    setDateTimeValue: function (component, dateTimeParams) {
+        var hasTime = !$A.util.isEmpty(dateTimeParams.time);
 
-        var date = this.getDateTime(component, dateString, timeString);
+        var date = this.getDateTime(component, dateTimeParams.date, dateTimeParams.time);
         if (!$A.util.isUndefinedOrNull(date)) {
             var config = {
                 timezone: component._timezone
@@ -355,14 +370,14 @@
             }
 
             var setValue = function (isoValue) {
-                component.set("v.value", isoValue);
-            };
+                this.setComponentValue(component, isoValue, dateTimeParams.ignoreChange);
+            }.bind(this);
 
             this.dateTimeLib.dateTimeService.getISOValue(date, config, $A.getCallback(setValue));
         } else {
             // date time was invalid, let server do validation
-            var value = hasTime ? dateString + " " + timeString : dateString;
-            component.set("v.value", value);
+            var value = hasTime ? dateTimeParams.date + " " + dateTimeParams.time : dateTimeParams.date;
+            this.setComponentValue(component, value, dateTimeParams.ignoreChange);
         }
     },
 
@@ -514,6 +529,19 @@
                     datepicker.focus();
                 }
             }
+        }
+    },
+
+    setComponentValue: function (component, newValue, ignoreChange) {
+        if (component.get("v.value") !== newValue) {
+            component.set("v.value", newValue);
+            this.fireChangeEvent(component, ignoreChange);
+        }
+    },
+
+    fireChangeEvent: function (component, ignoreChange) {
+        if (!ignoreChange) {
+            component.getEvent("change").fire();
         }
     },
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 ({
-    clearValue: function (component) {
-        component.set("v.value", "");
+    clearValue: function (component, event, helper) {
+        helper.setComponentValue(component, "");
     },
 
     doInit: function (component, event, helper) {

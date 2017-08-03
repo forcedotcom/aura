@@ -201,8 +201,19 @@
     handleDateSelectionByManager: function (component, event) {
         var dateValue = event.getParam("value") || event.getParam("arguments").value;
         if (dateValue) {
-            component.set("v.value", dateValue);
+            this.setComponentValue(component, dateValue);
         }
+    },
+
+    setComponentValue: function (component, newValue) {
+        if (component.get("v.value") !== newValue) {
+            component.set("v.value", newValue);
+            this.fireChangeEvent(component);
+        }
+    },
+
+    fireChangeEvent: function (component) {
+        component.getEvent("change").fire();
     },
 
     setInputValue: function (component, displayValue) {

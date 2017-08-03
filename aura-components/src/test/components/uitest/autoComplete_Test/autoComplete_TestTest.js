@@ -243,7 +243,7 @@
                 var ul = autoList.getElement().getElementsByTagName("ul")[0];
                 $A.test.assertTrue($A.util.hasClass(ul, "visible"), "Class name should contain visible");
                 var listOption = ul.getElementsByTagName("a")[randomOption];
-                $A.test.fireDomEvent(listOption, "mouseover");
+                $A.test.fireDomEvent(listOption, "mouseenter");
             }, function(cmp){
                 var self = this;
                 $A.test.addWaitForWithFailureMessage(true, function(){

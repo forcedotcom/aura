@@ -27,10 +27,9 @@
     <aura:registerEvent name="listHighlight" type="ui:listHighlight" description="The event fired when a list option is highlighted, e.g. keyboard navigation."/>
     
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-    <aura:handler name="mouseover" action="{!c.handleMouseover}"/>
-    <aura:handler name="mouseout" action="{!c.handleMouseout}"/>
 
-    <li role="presentation" class="{!'lookup__item ' + v.class + ' ' + v.theme + (v.visible == false ? ' invisible' : '') + (v.highlighted == false ? '' : ' highlighted')}">
+    <li role="presentation" onmouseenter="{!c.handleMouseover}" onmouseleave="{!c.handleMouseout}"
+        class="{!'lookup__item ' + v.class + ' ' + v.theme + (v.visible == false ? ' invisible' : '') + (v.highlighted == false ? '' : ' highlighted')}">
         <a id="{!v.domId}" class="{!v.class}" aura:id="option" role="option">
             <aura:renderIf isTrue="{!v.body.length == 0}">
                 {!v.displayText}

@@ -22,20 +22,16 @@ class Test extends engine.Element {
 }
 Test.publicProps = {
     stringQuote: {
-        config: 0,
-        type: "string"
+        config: 0
     },
     stringDoubleQuote: {
-        config: 0,
-        type: "string"
+        config: 0
     },
     stringBacktick: {
-        config: 0,
-        type: "undefined"
+        config: 0
     },
     VALID_NAME_RE: {
-        config: 0,
-        type: "undefined"
+        config: 0
     }
 };
 

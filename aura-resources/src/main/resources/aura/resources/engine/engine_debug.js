@@ -287,6 +287,9 @@ function invokeServiceHook(vm, cbs) {
 
 function insert(vnode) {
     const { vm } = vnode;
+    if (vm.idx > 0) {
+        destroy(vnode); // moving the element from one place to another is observable via life-cycle hooks
+    }
     addInsertionIndex(vm);
     const { isDirty, component: { connectedCallback } } = vm;
     if (isDirty) {
@@ -319,7 +322,9 @@ function destroy(vnode) {
     }
 }
 function postpatch(oldVnode, vnode) {
-    if (vnode.vm.idx === 0) {
+    // TODO: we don't really need this anymore, but it will require changes
+    // on many tests that are just patching the element directly.
+    if (vnode.vm.idx === 0 && !vnode.isRoot) {
         // when inserting a root element, or when reusing a DOM element for a new
         // component instance, the insert() hook is never called because the element
         // was already in the DOM before creating the instance, and diffing the
@@ -1961,27 +1966,8 @@ function primitive(s) {
     return typeof s === 'string' || typeof s === 'number';
 }
 
-function createElement$1(tagName) {
-    return document.createElement(tagName);
-}
-function createElementNS(namespaceURI, qualifiedName) {
-    return document.createElementNS(namespaceURI, qualifiedName);
-}
-function createTextNode(text) {
-    return document.createTextNode(text);
-}
-function createComment(text) {
-    return document.createComment(text);
-}
-function insertBefore(parentNode, newNode, referenceNode) {
-    parentNode.insertBefore(newNode, referenceNode);
-}
-function removeChild(node, child) {
-    node.removeChild(child);
-}
-function appendChild(node, child) {
-    node.appendChild(child);
-}
+const { createElement: createElement$1, createElementNS, createTextNode, createComment, } = document;
+const { insertBefore: insertBefore$1, removeChild: removeChild$1, appendChild: appendChild$1, } = Node.prototype;
 function parentNode(node) {
     return node.parentNode;
 }
@@ -2008,13 +1994,27 @@ function isComment(node) {
     return node.nodeType === 8;
 }
 var htmlDomApi = {
-    createElement: createElement$1,
-    createElementNS: createElementNS,
-    createTextNode: createTextNode,
-    createComment: createComment,
-    insertBefore: insertBefore,
-    removeChild: removeChild,
-    appendChild: appendChild,
+    createElement(tagName) {
+        return createElement$1.call(document, tagName);
+    },
+    createElementNS(namespaceURI, qualifiedName) {
+        return createElementNS.call(document, namespaceURI, qualifiedName);
+    },
+    createTextNode(text) {
+        return createTextNode.call(document, text);
+    },
+    createComment(text) {
+        return createComment.call(document, text);
+    },
+    insertBefore(parentNode, newNode, referenceNode) {
+        insertBefore$1.call(parentNode, newNode, referenceNode);
+    },
+    removeChild(node, child) {
+        removeChild$1.call(node, child);
+    },
+    appendChild(node, child) {
+        appendChild$1.call(node, child);
+    },
     parentNode: parentNode,
     nextSibling: nextSibling,
     tagName: tagName,
@@ -2538,6 +2538,37 @@ const patch = init([
 ]);
 
 const { getAttribute, setAttribute, removeAttribute } = Element.prototype;
+const { removeChild, appendChild, insertBefore, replaceChild } = Node.prototype;
+const ConnectingSlot = Symbol();
+const DisconnectingSlot = Symbol();
+function callNodeSlot(node, slot) {
+    if (slot in node) {
+        node[slot]();
+    }
+    return node;
+}
+// monkey patching Node methods to be able to detect the insertions and removal of
+// root elements created via createElement.
+assign(Node.prototype, {
+    appendChild(newChild) {
+        const appendedNode = appendChild.call(this, newChild);
+        return callNodeSlot(appendedNode, ConnectingSlot);
+    },
+    insertBefore(newChild, referenceNode) {
+        const insertedNode = insertBefore.call(this, newChild, referenceNode);
+        return callNodeSlot(insertedNode, ConnectingSlot);
+    },
+    removeChild(oldChild) {
+        const removedNode = removeChild.call(this, oldChild);
+        return callNodeSlot(removedNode, DisconnectingSlot);
+    },
+    replaceChild(newChild, oldChild) {
+        const replacedNode = replaceChild.call(this, newChild, oldChild);
+        callNodeSlot(replacedNode, DisconnectingSlot);
+        callNodeSlot(newChild, ConnectingSlot);
+        return replacedNode;
+    }
+});
 function linkAttributes(element, vm) {
     const { def: { props: propsConfig, observedAttrs } } = vm;
     // replacing mutators and accessors on the element itself to catch any mutation
@@ -2612,6 +2643,13 @@ function upgradeElement(element, Ctor) {
     // current state.
     const { vm } = patch(element, vnode);
     linkAttributes(element, vm);
+    // providing the hook to detect insertion and removal
+    element[ConnectingSlot] = () => {
+        insert(vnode);
+    };
+    element[DisconnectingSlot] = () => {
+        destroy(vnode);
+    };
 }
 /**
  * This method is almost identical to document.createElement
@@ -2643,4 +2681,4 @@ exports.unwrap = unwrap;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.12.4 */
+/** version: 0.13.1 */

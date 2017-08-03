@@ -1006,7 +1006,17 @@ Aura.Utils.Util.prototype.appendChild = function(newEl, referenceEl) {
  * @export
  */
 Aura.Utils.Util.prototype.removeElement = function(element) {
-    if (element && !(element.parentNode === this.trashcan)) {
+    if (!element) {
+        return;
+    }
+
+    // Out early for custom elements
+    if (element.__customElement) {
+        element.parentElement.removeChild(element);
+        return;
+    }
+
+    if (!(element.parentNode === this.trashcan)) {
         if (element.parentNode) {
             //
             // We do a check to ensure that we don't try to add the element

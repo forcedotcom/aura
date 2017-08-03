@@ -26,7 +26,7 @@ var Logger = {
 };
 
 //#if {"excludeModes" : ["PRODUCTION"]}
-Logger.log = function () {
+Logger.log = function log() {
     window.console.log.apply(window.console, arguments);
 };
 //#end

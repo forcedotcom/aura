@@ -373,7 +373,7 @@ InteropComponent.prototype.render = function () {
     var Ctor = this.interopClass;
     var element = window['Engine']['createElement'](this.componentDef.elementName, { 'is': Ctor });
     var cmp = this;
-
+    element.__customElement = 1;
     this.attachOnChangeToElement(element);
 
     Object.keys(this.attributes).forEach(function (attrName) {

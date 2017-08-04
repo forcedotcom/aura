@@ -482,9 +482,10 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
         assertEquals("Failed to execute request successfully.", HttpStatus.SC_OK, getStatusCode(response));
 
-        assertEquals("Expected response to have long cache headers",
-                     String.format("max-age=%s, public" + (immutable ? ", immutable" : ""), expiration / 1000),
-                     response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue());
+        String cacheHeader = response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue().replace(" ", "");
+        String expectedCacheHeader = String.format("max-age=%s,public" + (immutable ? ",immutable" : ""), expiration / 1000);
+        assertEquals("Expected response to have long cache headers", expectedCacheHeader, cacheHeader);
+
         assertDefaultAntiClickjacking(response, true, false);
         String expiresHdr = response.getFirstHeader(HttpHeaders.EXPIRES).getValue();
         Date expires = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH).parse(expiresHdr);
@@ -495,7 +496,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
         get.releaseConnection();
     }
-    
+
     /**
      * Submit a request and check that the 'no cache' is set correctly.
      *
@@ -706,7 +707,6 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      * Test GET of publicly cacheable action with an error is returned with no-cache headers
      */
     @Test
-    @SuppressWarnings("unchecked")
     public void testGetPubliclyCacheableActionWithExceptionSendsNoCacheHeaders() throws Exception {
         MockConfigAdapter mca = getMockConfigAdapter();
         mca.setActionPublicCachingEnabled(true);
@@ -716,12 +716,11 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         
         assertResponseSetToNoCache(url);
     }
-    
+
     /**
      * Test GET of publicly cacheable action with different cache key from server is returned with no-cache headers
      */
     @Test
-    @SuppressWarnings("unchecked")
     public void testGetPubliclyCacheableActionWithNewCacheKeySendsNoCache() throws Exception {
         MockConfigAdapter mca = getMockConfigAdapter();
         mca.setActionPublicCachingEnabled(true);

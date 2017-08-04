@@ -87,7 +87,7 @@
     getOnClickFunction: function (component) {
         var f = function (event) {
             if (!this.isElementInComponent(component, event.target)) {
-                this.hide(component, false);
+                this.hide(component);
             }
         }.bind(this);
         return f;
@@ -111,11 +111,11 @@
 
     position: function (component) {
         var divCmp = component.find("datePicker");
-        var elem = divCmp ? divCmp.getElement() : null;
+        var element = divCmp ? divCmp.getElement() : null;
         var visible = component.get("v.visible");
         var referenceElem = component.getConcreteComponent().get("v.referenceElement");
 
-        if (elem && visible) {
+        if (element && visible) {
             if ($A.get("$Browser.isPhone")) {
                 this.attachToDocumentBody(component);
                 var scrollerDivCmp = component.find("scroller");
@@ -125,44 +125,36 @@
                 }
 
             } else if (!$A.util.isUndefinedOrNull(referenceElem)) {
+                element.style.opacity = 0;
 
-                if ($A.util.isEmpty(elem.style.top)) {
-                    // this is just an approximation for the initial position of the datepicker. The positioning library
-                    // will take care of the correct position. See W-2993774
-                    elem.style.top = referenceElem.getBoundingClientRect().bottom + window.pageYOffset + "px";
+                if ($A.util.isEmpty(element.style.top)) {
+                    // this is just an approximation for the initial position of the datepicker. The positioning
+                    // library will take care of the correct position. See W-2993774
+                    element.style.top = referenceElem.getBoundingClientRect().bottom + window.pageYOffset + "px";
                 }
 
-                if ($A.util.isEmpty(elem.style.left)) {
-                    elem.style.left = referenceElem.getBoundingClientRect().left + "px";
+                if ($A.util.isEmpty(element.style.left)) {
+                    element.style.left = referenceElem.getBoundingClientRect().left + "px";
                 }
 
                 if (!component.positionConstraint) {
-                    var referenceVerticalAlign = "bottom";
-                    var elementVerticalAlign = "top";
-                    var horizontalAlign = "left";
-
-                    if (this.shouldFlip(elem, referenceElem)) {
-                        referenceVerticalAlign = "top";
-                        elementVerticalAlign = "bottom";
-                    }
-
-                    if (this.shouldAlignToRight(elem, referenceElem)) {
-                        horizontalAlign = "right";
-                    }
-
-                    var referenceElementAlign = horizontalAlign + " " + referenceVerticalAlign;
-                    var elementAlign = horizontalAlign + " " + elementVerticalAlign;
+                    var shouldFlip = this.shouldFlip(element, referenceElem);
+                    var referenceVerticalAlign = shouldFlip ? "top" : "bottom";
+                    var elementVerticalAlign = shouldFlip ? "bottom" : "top";
+                    var horizontalAlign = this.shouldAlignToRight(element, referenceElem) ? "right" : "left";
 
                     component.positionConstraint = this.lib.panelPositioning.createRelationship({
-                        element: elem,
+                        element: element,
                         target: referenceElem,
                         appendToBody: true,
                         scrollableParentBound: true,
-                        align: elementAlign,
-                        targetAlign: referenceElementAlign
+                        align: horizontalAlign + " " + elementVerticalAlign,
+                        targetAlign: horizontalAlign + " " + referenceVerticalAlign
                     });
                 }
-                this.lib.panelPositioning.reposition();
+                this.lib.panelPositioning.reposition(function () {
+                    element.style.opacity = 1;
+                });
             }
         }
     },
@@ -268,8 +260,7 @@
 
     updateMonthYear: function (component, date) {
         date = $A.localizationService.translateToOtherCalendar(date);
-        var isDesktop = $A.get("$Browser.formFactor") === "DESKTOP";
-        if (!isDesktop) {
+        if (!this.isDesktopBrowser()) {
             this.updateMobileMonth(component, date);
         } else {
             var titleElem = component.find("calTitle").getElement();
@@ -312,47 +303,54 @@
     },
 
     toggleVisibility: function (component) {
-        var helper = this;
-        this.lib.panelPositioning.reposition();
         if (component.get("v.visible") === true) {
-            var element = component.getElement();
-            if (element) {
-                element.style.opacity = 0;
-            }
-            setTimeout($A.getCallback(function () {
-                if (component.isValid()) {
-                    helper.position(component);
-                    component.getElement().style.opacity = 1;
+            window.requestAnimationFrame($A.getCallback(function () {
+                if (!component.isValid()) {
+                    return;
                 }
-            }), 10);
+                this.position(component);
+            }.bind(this)));
         }
     },
 
     closeOnClickOut: function (component) {
         if (component.get("v.closeOnClickOut")) {
-            this.hide(component, true);
+            this.hideAndReturnFocus(component);
         }
     },
 
     hideOnSelect: function (component) {
         if (component.get("v.hideOnSelect")) {
-            this.hide(component, true);
+            this.hideAndReturnFocus(component);
         }
     },
 
-    hide: function (component, shouldFocusReferenceElem) {
+    hideAndReturnFocus: function (component) {
+        this.hide(component);
+        this.focusReferenceElement(component);
+    },
+
+    hide: function (component) {
         if (component._clickHandler) {
             component._clickHandler.setEnabled(false);
         }
         component.set("v.visible", false);
 
         this.unposition(component);
-        if ($A.get("$Browser.formFactor") === "DESKTOP" && shouldFocusReferenceElem) {
-            var referenceElem = component.get("v.referenceElement");
-            if (!$A.util.isUndefinedOrNull(referenceElem)) {
-                referenceElem.focus();
-            }
+    },
+
+    focusReferenceElement: function (component) {
+        if (!this.isDesktopBrowser()) {
+            return;
         }
+        var referenceElem = component.get("v.referenceElement");
+        if (!$A.util.isUndefinedOrNull(referenceElem)) {
+            referenceElem.focus();
+        }
+    },
+
+    isDesktopBrowser: function () {
+        return $A.get("$Browser.formFactor") === "DESKTOP";
     },
 
     getDateStringFromGrid: function (component) {
@@ -388,7 +386,7 @@
             "minutes": timeCmp.get("v.minutes")
         });
 
-        this.hide(component, true);
+        this.hideAndReturnFocus(component);
     },
 
     unposition: function (component) {

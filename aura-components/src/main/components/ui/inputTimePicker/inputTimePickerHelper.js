@@ -56,20 +56,18 @@
                 element.addEventListener('wheel', this._handleWheel);
             }
 
-            var referenceElementAlign = 'left bottom';
-            var elementAlign = 'left top';
-
-            if (this.shouldFlip(element, target)) {
-                referenceElementAlign = 'left top';
-                elementAlign = 'left bottom';
-            }
+            var shouldFlip = this.shouldFlip(element, target);
+            var referenceVerticalAlign = shouldFlip ? "top" : "bottom";
+            var elementVerticalAlign = shouldFlip ? "bottom" : "top";
+            var horizontalAlign = this.shouldAlignToRight(element, target) ? "right" : "left";
 
             component.positionConstraint = this.lib.panelPositioning.createRelationship({
                 element: element,
                 target: target,
                 appendToBody: true,
-                align: elementAlign,
-                targetAlign: referenceElementAlign
+                scrollableParentBound: true,
+                align: horizontalAlign + " " + elementVerticalAlign,
+                targetAlign: horizontalAlign + " " + referenceVerticalAlign
             });
             this.lib.panelPositioning.reposition($A.getCallback(function () {
                 self.scrollToSelectedTime(component);
@@ -117,6 +115,19 @@
 
         if (referenceElemRect.top >= height         // enough space above
             && (viewPort.height - referenceElemRect.bottom) < height) { // not enough space below
+            return true;
+        }
+        return false;
+    },
+
+    shouldAlignToRight: function (element, targetElement) {
+        var viewPort = $A.util.getWindowSize();
+        var elemRect = element.getBoundingClientRect();
+        var referenceElemRect = targetElement.getBoundingClientRect();
+        var width = typeof elemRect.width !== 'undefined' ? elemRect.width : elemRect.right - elemRect.left;
+
+        if (referenceElemRect.right >= width         // enough space on the left
+            && (viewPort.width - referenceElemRect.left) < width) { // not enough space on the right
             return true;
         }
         return false;
@@ -225,42 +236,39 @@
     scrollToSelectedTime: function (component) {
         var helper = this;
         window.requestAnimationFrame($A.getCallback(function () {
-            $A.run(function () {
-                var hours = component.get("v.hours"),
-                    minutes = component.get("v.minutes"),
-                    interval = component.get("v.interval"),
-                    closestMinute;
+            var hours = component.get("v.hours"),
+                minutes = component.get("v.minutes"),
+                interval = component.get("v.interval"),
+                closestMinute;
 
-                var mod = minutes % interval,
-                    quotient = Math.floor(minutes / interval);
-                if (mod === 0) {
-                    closestMinute = minutes;
-                } else {
-                    var multiplier = mod < interval / 2 ? quotient : quotient + 1;
-                    closestMinute = multiplier * interval;
-                    if (closestMinute >= 60) {
-                        if (hours === 23) {
-                            closestMinute -= interval;
-                        } else {
-                            closestMinute = 0;
-                            hours++;
-                        }
+            var mod = minutes % interval,
+                quotient = Math.floor(minutes / interval);
+            if (mod === 0) {
+                closestMinute = minutes;
+            } else {
+                var multiplier = mod < interval / 2 ? quotient : quotient + 1;
+                closestMinute = multiplier * interval;
+                if (closestMinute >= 60) {
+                    if (hours === 23) {
+                        closestMinute -= interval;
+                    } else {
+                        closestMinute = 0;
+                        hours++;
                     }
                 }
-                var time = ("0" + hours).slice(-2) + ("0" + closestMinute).slice(-2);
-                if (!$A.util.isUndefinedOrNull(time)) {
-                    var elem = document.querySelector(".visible li[id = '" + time + "']");
-                    if (!$A.util.isUndefinedOrNull(elem)) {
-                        helper.focusElement(component, elem);
-                    }
+            }
+            var time = ("0" + hours).slice(-2) + ("0" + closestMinute).slice(-2);
+            if (!$A.util.isUndefinedOrNull(time)) {
+                var elem = document.querySelector(".visible li[id = '" + time + "']");
+                if (!$A.util.isUndefinedOrNull(elem)) {
+                    helper.focusElement(component, elem);
                 }
-            });
+            }
         }));
     },
 
     focusElement: function (component, element) {
-        if (!$A.util.isUndefinedOrNull(component._focus) && component._focus === false) {
-            element.scrollIntoView();
+        if (this.shouldReturnFocusToInput(component)) {
             var referenceElement = component.get("v.referenceElement");
             if (referenceElement) {
                 referenceElement.focus();
@@ -268,6 +276,11 @@
         } else {
             element.focus();
         }
+    },
+
+    shouldReturnFocusToInput: function (component) {
+        return !$A.util.isUndefinedOrNull(component._focus)
+            && component._focus === false;
     },
 
     setEventHandlers: function (component) {

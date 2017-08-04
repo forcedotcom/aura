@@ -2542,7 +2542,7 @@ const { removeChild, appendChild, insertBefore, replaceChild } = Node.prototype;
 const ConnectingSlot = Symbol();
 const DisconnectingSlot = Symbol();
 function callNodeSlot(node, slot) {
-    if (slot in node) {
+    if (!isUndefined(node[slot])) {
         node[slot]();
     }
     return node;
@@ -2681,4 +2681,4 @@ exports.unwrap = unwrap;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/** version: 0.13.1 */
+/** version: 0.13.2 */

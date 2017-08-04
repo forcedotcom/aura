@@ -49,6 +49,7 @@ public class AuraConfiguration {
             "Map",
             "Object.keys",
             "Object.assign",
+            "Object.entries",
             "requestAnimationFrame",
             "WeakMap",
             "WeakSet",

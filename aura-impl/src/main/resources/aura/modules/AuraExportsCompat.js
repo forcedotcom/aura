@@ -82,7 +82,9 @@ Aura.ExportsModule = {
     "createComponent" : function (componentName, attributes, callback) {
         $A.clientService.setCurrentAccess($A.getRoot());
         try {
-            $A.createComponent(componentName, attributes, $A.getCallback(callback));
+            $A.run(function() {
+                $A.createComponent(componentName, attributes, $A.getCallback(callback));
+            });
         } finally {
             $A.clientService.releaseCurrentAccess();
         }

@@ -4,6 +4,7 @@
         var secureAction = cmp.get("c.getString");
         testUtils.assertStartsWith("SecureAction", secureAction.toString(), "Expected server-side action in the locker" +
             " to be a SecureAction");
+        testUtils.assertEquals("getString", secureAction.getName(), "Unexpected action name");
     },
 
     testClientActionIsSecureAction: function(cmp) {

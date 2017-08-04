@@ -362,6 +362,17 @@ Action.prototype.getDef = function() {
 };
 
 /**
+ * Gets name of the Action.
+ *
+ * @platform
+ * @returns {String} Name of the Action.
+ * @export
+ */
+Action.prototype.getName = function() {
+    return this.def.getName();
+};
+
+/**
  * Sets parameters for the Action.
  *
  * @public

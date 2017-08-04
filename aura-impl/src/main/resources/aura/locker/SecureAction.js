@@ -31,6 +31,7 @@ function SecureAction(action, key) {
     });
 
     Object.defineProperties(o, {
+        "getName": SecureObject.createFilteredMethod(o, action, "getName"),
         "setCallback": SecureObject.createFilteredMethod(o, action, "setCallback", { defaultKey: key }),
         "setParams": SecureObject.createFilteredMethod(o, action, "setParams", { defaultKey: key }),
         "setParam": SecureObject.createFilteredMethod(o, action, "setParam", { defaultKey: key }),

@@ -133,6 +133,7 @@
     "SecureLocation": true,
     "SecureURL": true,
     "SecurePropertyReferenceValue": true,
+    "SecureRTCPeerConnection": true,
     "TimeRanges": true,
     "ValidityState": true,
     "DOMPurify": true,
@@ -156,6 +157,7 @@
     "ls_isSecureFunction": true,
     "ls_registerSecureFunction": true,
     "InitSecureEval": true,
+    "RTCPeerConnection": true,
     "SVGGraphicsElement": true,
     "SVGGeometryElement": true,
     "Attr"

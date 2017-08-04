@@ -38,7 +38,7 @@ function SecureObject(thing, key) {
 }
 
 var defaultSecureObjectKey = {
-        defaultSecureObjectKey: true	
+        defaultSecureObjectKey: true
 };
 
 SecureObject.getRaw = function(so) {
@@ -284,7 +284,7 @@ var filteringProxyHandler = (function() {
         return value ? SecureObject.filterEverything(target, value) : value;
     };
 
-    FilteringProxyHandler.prototype["set"] = function(target, property, value) {   	
+    FilteringProxyHandler.prototype["set"] = function(target, property, value) {
         var raw = ls_getRef(target, ls_getKey(target));
 
         var filteredValue = value ? SecureObject.filterEverything(target, value) : value;
@@ -333,7 +333,7 @@ var filteringProxyHandler = (function() {
         var raw = ls_getRef(target, ls_getKey(target));
         var descriptor = Object.getOwnPropertyDescriptor(raw, property);
 
-        // If the descriptor is for a non-configurable property we need to shadow it directly on the surrogate 
+        // If the descriptor is for a non-configurable property we need to shadow it directly on the surrogate
         // to avoid proxy invariant violations
         if (descriptor && !descriptor.configurable && !Object.getOwnPropertyDescriptor(target, property)) {
             Object.defineProperty(target, property, descriptor);
@@ -350,7 +350,7 @@ var filteringProxyHandler = (function() {
     FilteringProxyHandler.prototype["preventExtensions"] = function(target) {
         var raw = ls_getRef(target, ls_getKey(target));
         return Object.preventExtensions(raw);
-    };    
+    };
 
     return Object.freeze(new FilteringProxyHandler());
 })();
@@ -501,7 +501,7 @@ SecureObject.createProxyForArrayLikeObjects = function(raw, key) {
     var surrogate = Object.create(Object.getPrototypeOf(raw));
     ls_setRef(surrogate, raw, key);
 
-    var proxy = new Proxy(surrogate, getArrayLikeThingProxyHandler(key));   
+    var proxy = new Proxy(surrogate, getArrayLikeThingProxyHandler(key));
     ls_setKey(proxy, key);
     ls_registerProxy(proxy);
 
@@ -753,6 +753,9 @@ function getArrayProxyHandler(key) {
                                 };
                             };
                             break;
+                        case "Symbol(Symbol.isConcatSpreadable)":
+                            ret = raw[Symbol.isConcatSpreadable];
+                            break;
                         default:
                             if (raw[property]) { // If trying to use array like an associative array
                                 ret = SecureObject.filterEverything(handler, raw[property]);
@@ -882,7 +885,7 @@ function getNamedNodeMapProxyHandler(key, prototype, caseInsensitiveAttributes) 
     }
 
     var handler = KEY_TO_NAMED_NODE_MAP_HANLDER.get(key);
-    if (!handler) {     
+    if (!handler) {
         handler = {
                 "get": function(target, property) {
                     var raw = ls_getRef(target, key);
@@ -1449,6 +1452,8 @@ function getSupportedInterfaces(o) {
         interfaces.push("Attr", "Node", "EventTarget");
     } else if (o instanceof CanvasRenderingContext2D) {
         interfaces.push("CanvasRenderingContext2D");
+    } else if (typeof RTCPeerConnection !== "undefined" && o instanceof RTCPeerConnection) {
+        interfaces.push("RTCPeerConnection");
     }
 
     return interfaces;

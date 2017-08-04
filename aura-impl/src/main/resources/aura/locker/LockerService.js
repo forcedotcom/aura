@@ -29,6 +29,7 @@ function LockerService() {
     // #include aura.locker.SecureNavigator
     // #include aura.locker.SecureNotification
     // #include aura.locker.SecureXMLHttpRequest
+    // #include aura.locker.SecureRTCPeerConnection
     // #include aura.locker.SecureWindow
     // #include aura.locker.SecureAuraEvent
     // #include aura.locker.SecureAction

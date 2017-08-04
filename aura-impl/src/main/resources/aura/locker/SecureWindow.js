@@ -236,9 +236,7 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
     });
 
     // Add RTC related api only to specific namespaces
-    ["RTCPeerConnection", "MediaStream"].forEach(function(name) {
-        SecureObject.addRTCMediaApis(o, win, name, key);
-    });
+    SecureWindow.addRTCPeerConnection(o, win, key);
 
     var workerFrame = win.document.getElementById("safeEvalWorkerCustom");
     var safeEvalWindow = workerFrame && workerFrame.contentWindow;
@@ -262,6 +260,20 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
 
     return o;
 }
+
+SecureWindow.addRTCPeerConnection = function(sw, win, key) {
+    var namespace = key["namespace"];
+    if (namespace === "runtime_rtc_spark" || namespace === "runtime_rtc") {
+        ["RTCPeerConnection", "webkitRTCPeerConnection"].forEach(function(name) {
+            if (name in win) {
+                 Object.defineProperty(sw, name, {
+                     enumerable : true,
+                     value : SecureRTCPeerConnection(win[name], key)
+                 });
+             }
+        });
+    }
+};
 
 var DEFAULT = SecureElement.DEFAULT;
 var FUNCTION = SecureElement.FUNCTION;

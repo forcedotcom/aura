@@ -452,17 +452,6 @@ Test.Aura.AuraClientServiceTest = function() {
         }
     };
 
-    var MockActionQueue = function() {
-        this.clientActions = [];
-        this.serverActions = [];
-        this.nextBackgroundAction = null;
-        this.xhr = false;
-        this.getClientActions = function() { return this.clientActions; };
-        this.getServerActions = function() { return this.serverActions; };
-        this.getNextBackgroundAction = function() { return this.nextBackgroundAction; };
-        this.needXHR = function() { return this.xhr; };
-    };
-
     [Fixture]
     function isActionInStorage() {
 
@@ -623,279 +612,355 @@ Test.Aura.AuraClientServiceTest = function() {
     }
 
     [Fixture]
-    function actionServices() {
-
-        // Mock action storage returned by the mockAction service when getStorage("action") is invoked.
-        // This object has a setup method which allows the test to assert what parameters should be passed into its
-        // get, set and remove functions.
-        var mockActionStorage = new (function MockActionStorage() {
-
-            this.setup = function(stubs) {
-                this._stubs = stubs;
-            };
-
-            this.clear = function() {
-                delete this._stubs;
-                return ResolvePromise();
-            };
-
-            this.get = function(key) {
-                if (this._stubs && this._stubs.get) {
-                    return ResolvePromise(this._stubs.get[key]);
-                } else {
-                    throw new Error("actionsStorage.get(..) called before it was stubbed out.");
-                }
-            };
-
-            this.set = function(key, value) {
-                if (this._stubs && this._stubs.set) {
-                    if (value === this._stubs.set[key]) {
-                        return ResolvePromise();
-                    } else {
-                        return RejectPromise("set stub not found for key: " + key);
-                    }
-                } else {
-                    throw new Error("actionsStorage.set(..) called before it was stubbed out.");
-                }
-            };
-
-            this.remove = function(key) {
-                if (this._stubs && this._stubs.remove) {
-                    if (key === this._stubs.remove){
-                        return ResolvePromise();
-                    } else {
-                        return RejectPromise("remove stub not found for key: " + key);
-                    }
-                } else {
-                    throw new Error("actionsStorage.remove(..) called before it was stubbed out.");
-                }
-            };
-
-            this.adapter = {
-                setItem: function() {}
-            };
-        })();
-
-        // Sets up the environment with a mock action storage:
-        var mockActionService = function(delegate) {
-            Mocks.GetMocks(Object.Global(), {
-                "Aura": Aura,
-                "Action": Aura.Controller.Action,
-                "$A" : {
-                    "storageService": {
-                        "getStorage": function(name) {
-                            //Assert.Equal("actions", name, "action service should only access the 'actions' cache");
-                            return mockActionStorage;
-                        }
-                    },
-                    assert : function() {},
-                    mark : function() {},
-                    util : {
-                        json : {
-                            encode : function(toEncode) {
-                                return "<<" + JSON.stringify(toEncode) + ">>";
-                            },
-                            orderedEncode: function(obj) {
-                                return this.encode(obj);
-                            }
-                        },
-                        isString : function(obj) {
-                            return typeof obj === 'string';
-                        },
-                        isArray : function(obj) {
-                            return obj instanceof Array;
-                        },
-                        isObject: function(obj) {
-                            return typeof obj === "object" && obj !== null && !(obj instanceof Array);
-                        },
-                        map: function(array, transformer, that) {
-                            return array.map(transformer, that);
-                        },
-                        sortObject: function(obj) {
-                            return obj;
-                        }
-                    },
-                    run : function (cb) {
-                        cb();
-                    },
-                    error : function (err) {
-                        throw err;
-                    },
-                    warning : function (warn) {},
-                    log : function (msg) {}
-                },
-                setTimeout : function(cb, time) {
-                    cb();
-                },
-                Promise : function(func) {
-                    return {
-                        then: function(suc, err) { func(suc, err); }
-                    };
-                },
-                window : Object.Global(),
-                document : document
-            })(function() {
-                mockActionStorage.clear()
-                    .then(function() { delegate(new Aura.Services.AuraClientService(), mockActionStorage); });
-            });
-        };
-
-        function assertBool(bool, message) {
-            return function(result) {
-                Assert[bool ? "True" : "False"](result, message);
-            }
-        }
+    function revalidateAction() {
 
         [Fact]
-        function testRevalidateActionSuccessfully() {
-            mockActionService(function(service, storage) {
-                var descriptor = "DESCRIPTOR";
-                var params = {params: "PARAMS"};
-                var stored = "STORED";
-                var actual;
-                var access = {};
-                access[Action.getStorageKey(descriptor, params)] = stored;
-                storage.setup({
-                    get: access,
-                    set: access
-                });
-
-                // don't worry about async, the mocks do everything synchronously.
-                // With descriptor and params, the action is revalidated:
-                service.revalidateAction(descriptor, params, function(result){actual = result;});
-
-                Assert.True(actual);
-            });
-        }
-
-        [Fact]
-        [Data({key: "DESCRIPTOR",   params: {}})]
-        [Data({key: "",             params: {params: "PARAMS"}})]
-        [Data({key: undefined,      params: {params: "PARAMS"}})]
-        [Data({key: null,           params: {params: "PARAMS"}})]
-        [Data({key: true,           params: {params: "PARAMS"}})]
-        [Data({key: new Array(),    params: {params: "PARAMS"}})]
-        [Data({key: "DESCRIPTOR",   params: {}})]
-        [Data({key: "DESCRIPTOR",   params: undefined})]
-        [Data({key: "DESCRIPTOR",   params: null})]
-        [Data({key: "DESCRIPTOR",   params: true})]
-        [Data({key: "DESCRIPTOR",   params: new Array()})]
-        function testRevalidateActionUnSuccessfully(data) {
-            mockActionService(function(service, storage) {
-                var actual;
-                var access = {};
-                access[Action.getStorageKey("DESCRIPTOR", {params: "PARAMS"})] = "STORED";
-                storage.setup({
-                    get: access,
-                    set: access
-                });
-
-                // don't worry about async, the mocks do everything synchronously.
-                // With descriptor and params, the action is revalidated:
-                service.revalidateAction(data.key, data.params, function(result){actual = result;});
-
-                Assert.Equal(false, actual);
-            });
-        }
-
-        [Fact]
-        function testInvalidateAction() {
-            mockActionService(function(service, storage) {
-                var descriptor = "DESCRIPTOR";
-                var params = {params: "PARAMS"};
-                var stored = "STORED";
-                var actual;
-
-                storage.setup({
-                    remove: Action.getStorageKey(descriptor, params)
-                });
-
-                // don't worry about async, the mocks do everything synchronously.
-
-                // With descriptor and params, the action is re-validated:
-                service.invalidateAction(descriptor, params, function(result){actual = result; });
-
-                Assert.True(actual);
-            });
-        }
-
-        [Fact]
-        function testInvalidateActionForInvalidKeyThrowsError(data) {
-            mockActionService(function(service, storage) {
-                var descriptor = "DESCRIPTOR";
-                var params = {params: "PARAMS"};
-                var stored = "STORED";
-                var expected = "remove stub not found for key: DESCRIPTOR:<<{}>>";
-                var actual;
-
-                storage.setup({
-                    remove: Action.getStorageKey(descriptor, params)
-                });
-
-                // When the actions are non-existent, remove is still called on them regardless of whether or not
-                // they are currently stored (test to ensure that the mockActionStorage is called with action keys it's
-                // not rigged to except by ensuring it throws the appropriate exceptions):
-                service.invalidateAction(
-                    descriptor,
-                    {},
-                    function(){},
-                    function(err) { actual = err; }
-                );
-
-                Assert.Equal(expected, actual);
-            });
-        }
-
-        [Fact]
-        function testInvalidateActionForInvalidParametersThrowsError(data) {
-            mockActionService(function(service, storage) {
-                var descriptor = "DESCRIPTOR";
-                var params = {params: "PARAMS"};
-                var stored = "STORED";
-                var expected = "remove stub not found for key: :<<{\"params\":\"PARAMS\"}>>";
-                var actual;
-
-                storage.setup({
-                    remove: Action.getStorageKey(descriptor, params)
-                });
-
-                service.invalidateAction(
-                    "",
-                    params,
-                    function(){},
-                    function(err) { actual = err; }
-                );
-
-                Assert.Equal(expected, actual);
-
-            });
-        }
-
-        [Fact]
-        [Data({key: undefined, params: {params: "PARAMS"}})]
-        [Data({key: null, params: {params: "PARAMS"}})]
-        [Data({key: true, params: {params: "PARAMS"}})]
-        [Data({key: new Array(), params: {params: "PARAMS"}})]
-        [Data({key: "DESCRIPTOR", params: undefined})]
-        [Data({key: "DESCRIPTOR", params: null})]
-        [Data({key: "DESCRIPTOR", params: true})]
-        [Data({key: "DESCRIPTOR", params: new Array()})]
-        function testInvalidateActionForInvalidKeys(data) {
+        function CallbackWithTrueIfRevalidationSucceeds() {
+            // Arrange
             var actual;
             var descriptor = "DESCRIPTOR";
             var params = {params: "PARAMS"};
-            var stored = "STORED";
 
-            mockActionService(function(service, storage) {
-                storage.setup({
-                    remove: Action.getStorageKey(descriptor, params)
-                });
+            mockGlobal(function() {
+                var targetService = new Aura.Services.AuraClientService();
 
-                // With invalid descriptor/params the callback is invoked with false:
-                service.invalidateAction(data.key, data.params, function(result) { actual = result; });
+                var actionKey = Aura.Controller.Action.getStorageKey(descriptor, params);
+                var mockActionStorage = {
+                    isStoragePersistent: function() {
+                        return false;
+                    },
+                    isStorageEnabled: function() {
+                        return true;
+                    },
+                    get: function(key) {
+                        if (key === actionKey) {
+                            return ResolvePromise("STORED");
+                        }
+                    },
+                    set: function() {
+                        return ResolvePromise();
+                    }
+                };
+                targetService.actionStorage = mockActionStorage;
+
+                // Action
+                targetService.revalidateAction(descriptor, params, function(result){actual = result;});
             });
 
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function CallbackWithFalseIfActionKeyWithDifferentParams() {
+            // Arrange
+            var actual;
+            var descriptor = "DESCRIPTOR";
+            var params = {params: "PARAMS"};
+
+            mockGlobal(function() {
+                var targetService = new Aura.Services.AuraClientService();
+
+                var actionKey = Aura.Controller.Action.getStorageKey(descriptor, params);
+                var mockActionStorage = {
+                    isStoragePersistent: function() {
+                        return false;
+                    },
+                    isStorageEnabled: function() {
+                        return true;
+                    },
+                    get: function(key) {
+                        if (key === actionKey) {
+                            return ResolvePromise("STORED");
+                        } else {
+                            return ResolvePromise(undefined);
+                        }
+                    }
+                };
+                targetService.actionStorage = mockActionStorage;
+
+                // Action
+                targetService.revalidateAction(descriptor, {}, function(result){actual = result;});
+            });
+
+            // Assert
             Assert.False(actual);
+        }
+
+        [Fact]
+        function CallbackWithFalseIfParamsIsNotObject() {
+            // Arrange
+            var actual;
+
+            mockGlobal(function() {
+                var targetService = new Aura.Services.AuraClientService();
+
+                var mockActionStorage = {
+                    isStoragePersistent: function() {
+                        return false;
+                    }
+                };
+                targetService.actionStorage = mockActionStorage;
+
+                // Action
+                targetService.revalidateAction("descriptor", null, function(result){actual = result;});
+            });
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function CallbackWithFalseIfDescriptorIsNotString() {
+            // Arrange
+            var actual;
+            var params = {params: "PARAMS"};
+
+            mockGlobal(function() {
+                var targetService = new Aura.Services.AuraClientService();
+
+                var mockActionStorage = {
+                    isStoragePersistent: function() {
+                        return false;
+                    }
+                };
+                targetService.actionStorage = mockActionStorage;
+
+                // Action
+                targetService.revalidateAction(null, params, function(result){actual = result;});
+            });
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function CallbackWithFalseIfStorageIsNotEnabled() {
+            // Arrange
+            var actual;
+            var descriptor = "DESCRIPTOR";
+            var params = {params: "PARAMS"};
+
+            mockGlobal(function() {
+                var targetService = new Aura.Services.AuraClientService();
+
+                var mockActionStorage = {
+                    isStorageEnabled: function() {
+                        return false;
+                    }
+                };
+                targetService.actionStorage = mockActionStorage;
+
+                // Action
+                targetService.revalidateAction(descriptor, params, function(result){actual = result;});
+            });
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function CallbackWithFalseIfKeyMissesInCacheForPersistentStorage() {
+            // Arrange
+            var actual;
+            var descriptor = "DESCRIPTOR";
+            var params = {params: "PARAMS"};
+
+            mockGlobal(function() {
+                var targetService = new Aura.Services.AuraClientService();
+
+                var mockActionStorage = {
+                    isStoragePersistent: function() {
+                        return true;
+                    },
+                    isStorageEnabled: function() {
+                        return true;
+                    },
+                    isKeyAbsentFromCache: function(key) {
+                        return true;
+                    }
+                };
+                targetService.actionStorage = mockActionStorage;
+
+                // Action
+                targetService.revalidateAction(descriptor, params, function(result){actual = result;});
+            });
+
+            // Assert
+            Assert.False(actual);
+        }
+    }
+
+    [Fixture]
+    function invalidateAction() {
+
+        [Fact]
+        function CallbackWithTrueIfInvalidationSucceeds() {
+            // Arrange
+            var actual = false;
+            var descriptor = "DESCRIPTOR";
+            var params = {params: "PARAMS"};
+
+            mockGlobal(function() {
+                var targetService = new Aura.Services.AuraClientService();
+
+                var actionKey = Aura.Controller.Action.getStorageKey(descriptor, params);
+                var mockActionStorage = {
+                    isStoragePersistent: function() {
+                        return false;
+                    },
+                    isStorageEnabled: function() {
+                        return true;
+                    },
+                    remove: function(key) {
+                        if (key === actionKey) {
+                            return ResolvePromise();
+                        }
+                    }
+                };
+                targetService.actionStorage = mockActionStorage;
+
+                // Action
+                targetService.invalidateAction(descriptor, params, function(result){actual = result;});
+            });
+
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function CallsErrorCallbackIfStorageRejectsWithError() {
+            // Arrange
+            var actual;
+            var descriptor = "DESCRIPTOR";
+            var params = {params: "PARAMS"};
+            var mockError = Stubs.GetObject();
+
+            mockGlobal(function() {
+                var targetService = new Aura.Services.AuraClientService();
+
+                var mockActionStorage = {
+                    isStoragePersistent: function() {
+                        return false;
+                    },
+                    isStorageEnabled: function() {
+                        return true;
+                    },
+                    remove: function(key) {
+                        return RejectPromise(mockError);
+                    }
+                };
+                targetService.actionStorage = mockActionStorage;
+
+                // Action
+                targetService.invalidateAction(descriptor, params, null, function(err){actual = err;});
+            });
+
+            // Assert
+            Assert.True(actual === mockError);
+        }
+
+        [Fact]
+        function CallbackWithFalseIfParamsIsNotObject() {
+            // Arrange
+            var actual;
+
+            mockGlobal(function() {
+                var targetService = new Aura.Services.AuraClientService();
+
+                var mockActionStorage = {
+                    isStoragePersistent: function() {
+                        return false;
+                    }
+                };
+                targetService.actionStorage = mockActionStorage;
+
+                // Action
+                targetService.invalidateAction("descriptor", null, function(result){actual = result;});
+            });
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function CallbackWithFalseIfDescriptorIsNotString() {
+            // Arrange
+            var actual;
+            var params = {params: "PARAMS"};
+
+            mockGlobal(function() {
+                var targetService = new Aura.Services.AuraClientService();
+
+                var mockActionStorage = {
+                    isStoragePersistent: function() {
+                        return false;
+                    }
+                };
+                targetService.actionStorage = mockActionStorage;
+
+                // Action
+                targetService.invalidateAction(null, params, function(result){actual = result;});
+            });
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function CallbackWithFalseIfStorageIsNotEnabled() {
+            // Arrange
+            var actual;
+            var descriptor = "DESCRIPTOR";
+            var params = {params: "PARAMS"};
+
+            mockGlobal(function() {
+                var targetService = new Aura.Services.AuraClientService();
+
+                var mockActionStorage = {
+                    isStorageEnabled: function() {
+                        return false;
+                    }
+                };
+                targetService.actionStorage = mockActionStorage;
+
+                // Action
+                targetService.invalidateAction(descriptor, params, function(result){actual = result;});
+            });
+
+            // Assert
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function CallbackWithTrueIfKeyMissesInCacheForPersistentStorage() {
+            // Arrange
+            var actual;
+            var descriptor = "DESCRIPTOR";
+            var params = {params: "PARAMS"};
+
+            mockGlobal(function() {
+                var targetService = new Aura.Services.AuraClientService();
+
+                var mockActionStorage = {
+                    isStoragePersistent: function() {
+                        return true;
+                    },
+                    isStorageEnabled: function() {
+                        return true;
+                    },
+                    isKeyAbsentFromCache: function(key) {
+                        return true;
+                    }
+                };
+                targetService.actionStorage = mockActionStorage;
+
+                // Action
+                targetService.invalidateAction(descriptor, params, function(result){actual = result;});
+            });
+
+            // Assert
+            Assert.True(actual);
         }
     }
 

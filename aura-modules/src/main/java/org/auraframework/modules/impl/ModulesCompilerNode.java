@@ -20,9 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.auraframework.modules.ModulesCompilerData;
-import org.auraframework.tools.node.JSFunction;
-import org.auraframework.tools.node.NodeServerPool;
-import org.auraframework.tools.node.NodeToolInstaller;
+import org.auraframework.tools.node.*;
 import org.json.JSONObject;
 
 /**
@@ -48,19 +46,29 @@ final class ModulesCompilerNode implements ModulesCompiler {
 
     @Override
     public ModulesCompilerData compile(String entry, Map<String, String> sources) throws Exception {
+        JSONObject input = ModulesCompilerUtil.generateCompilerInput(entry, sources);
+        input.put("pathToCompilerJs", ModulesCompilerUtil.COMPILER_JS_PATH);
+        JSFunction compile = getCompileFunction();
+        JSONObject output;
+
         try {
-            JSONObject input = ModulesCompilerUtil.generateCompilerInput(entry, sources);
-            input.put("pathToCompilerJs", ModulesCompilerUtil.COMPILER_JS_PATH);
-            JSONObject output = getCompileFunction().invoke(input);
-            if (output.has("compilerError")) {
-                String error = output.getString("compilerError");
-                logger.warning("ModulesCompilerNode: error " + entry + ": " + error);
-                throw new RuntimeException(error);
-            }
-            return ModulesCompilerUtil.parseCompilerOutput(output);
+            output = compile.invoke(input);
         } catch (Exception x) {
-            logger.log(Level.SEVERE, "ModulesCompilerNode: exception compiling " + entry + ": " + x, x);
-            throw x;
+            // an error at this level may be due to env (i.e. node process died), retry once
+            logger.log(Level.SEVERE, "ModulesCompilerNode: exception compiling (will retry once) " + entry + ": " + x, x);
+            try {
+                output = compile.invoke(input);
+            } catch (Exception xr) {
+                logger.log(Level.SEVERE, "ModulesCompilerNode: exception compiling (retry failed) " + entry + ": " + xr, xr);
+                throw xr;
+            }
         }
+
+        if (output.has("compilerError")) {
+            String error = output.getString("compilerError");
+            logger.warning("ModulesCompilerNode: compiler error " + entry + ": " + error);
+            throw new RuntimeException(error);
+        }
+        return ModulesCompilerUtil.parseCompilerOutput(output);
     }
 }

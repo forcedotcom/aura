@@ -147,15 +147,15 @@ public final class ModulesCompilerUtil {
         codeMap.put(CodeType.PROD_COMPAT, prodCompatCode);
 
         JSONObject metadata = prodCompat.getJSONObject("metadata");
-        JSONArray v8BundleDependencies = metadata.getJSONArray("bundleDependencies");
-        JSONArray v8BundleLabels = metadata.getJSONArray("bundleLabels");
+        JSONArray bundleDependenciesArray = metadata.getJSONArray("bundleDependencies");
+        JSONArray bundleLabelsArray = metadata.getJSONArray("bundleLabels");
         Set<String> bundleDependencies = new HashSet<>();
         Set<String> bundleLabels = new HashSet<>();
-        for (int i = 0; i < v8BundleDependencies.length(); i++) {
-            bundleDependencies.add(v8BundleDependencies.getString(i));
+        for (int i = 0; i < bundleDependenciesArray.length(); i++) {
+            bundleDependencies.add(bundleDependenciesArray.getString(i));
         }
-        for (int i = 0; i < v8BundleLabels.length(); i++) {
-            bundleLabels.add(v8BundleLabels.getString(i));
+        for (int i = 0; i < bundleLabelsArray.length(); i++) {
+            bundleLabels.add(bundleLabelsArray.getString(i));
         }
         return new ModulesCompilerData(codeMap, bundleDependencies, bundleLabels);
     }

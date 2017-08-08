@@ -87,7 +87,7 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
         },
         URL: {
             enumerable: true,
-            value: SecureURL
+            value: SecureURL(win.URL)
         },
         toString: {
             value: function() {

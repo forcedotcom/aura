@@ -28,49 +28,50 @@
 
 // Only FireFox implements the correct behavior.
 
-var unsecureURL = URL;
+function SecureURL(raw) {
 
-var SecureURLMethods = Object.create(null,{
-  'createObjectURL': {
-    value: function(object) {
-      if (Object.prototype.toString.call(object) === '[object Blob]') {
-        if (object.type === 'text/html') {
-          // There are no relible ways to convert syncronously
-          // a blob back to a string. Disallow until
-          // <rdar://problem/33575448> is declassified
-          throw new TypeError("SecureURL does not allow creation of Object URL from blob type " + object.type);
+  var SecureURLMethods = Object.create(null,{
+    'createObjectURL': {
+      value: function(object) {
+        if (Object.prototype.toString.call(object) === '[object Blob]') {
+          if (object.type === 'text/html') {
+            // There are no relible ways to convert syncronously
+            // a blob back to a string. Disallow until
+            // <rdar://problem/33575448> is declassified
+            throw new TypeError("SecureURL does not allow creation of Object URL from blob type " + object.type);
+          }
         }
+        // IMPORTANT: thisArg is the target of the proxy.
+        return raw.createObjectURL(object);
       }
-      // IMPORTANT: thisArg is the target of the proxy.
-      return unsecureURL.createObjectURL(object);
+    },
+    'toString': {
+      value: function() {
+        return "SecureURL: " + Object.prototype.toString.call(raw);
+      }
     }
-  },
-  'toString': {
-    value: function() {
-      return "SecureURL: " + Object.prototype.toString.call(unsecureURL);
-    }
-  }
-});
+  });
 
-var SecureURL = typeof Proxy === "undefined" ? unsecureURL : new Proxy(unsecureURL, {
-  get: function (target, name) {
-    // Give priority to the overritten methods.
-    var desc = Object.getOwnPropertyDescriptor(SecureURLMethods, name);
-    if (desc === undefined) {
-      desc = Object.getOwnPropertyDescriptor(target, name);
-    }
-    if (desc === undefined || desc.value === undefined) {
-      return undefined;
-    }
-    // Properties not found the object are not static.
-    if (Object.keys(target).indexOf(name) < 0) {
-      return desc.value;
-    }
-    // Prevent static methods from executing in the context of the proxy.
-    return function() {
-      return desc.value.apply(undefined, arguments);
-    };
+  return new Proxy(raw, {
+    get: function (target, name) {
+      // Give priority to the overritten methods.
+      var desc = Object.getOwnPropertyDescriptor(SecureURLMethods, name);
+      if (desc === undefined) {
+        desc = Object.getOwnPropertyDescriptor(target, name);
+      }
+      if (desc === undefined || desc.value === undefined) {
+        return undefined;
+      }
+      // Properties not found the object are not static.
+      if (Object.keys(target).indexOf(name) < 0) {
+        return desc.value;
+      }
+      // Prevent static methods from executing in the context of the proxy.
+      return function() {
+        return desc.value.apply(undefined, arguments);
+      };
+    },
+    set: function () { return true; }
+  });
 }
-});
-
 

@@ -211,6 +211,16 @@
         }
     },
 
+    testInstanceOf_IdentityDiscontinuitySymptoms: {
+        // TODO: Re-enable for Firefox and iOS when autobuilds use a version that supports all Proxy traps we implement
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-FIREFOX", "-IPAD", "-IPHONE"],
+        // TODO: Re-enable when strict CSP is on by default in core autobuilds
+        labels: ["UnAdaptableTest"],
+        test: function(cmp) {
+            cmp.testInstanceOf_IdentityDiscontinuitySymptoms(window);
+        }
+    },
+
     testFilteringProxy: {
         test: function(cmp) {
             function TestPrototype() {

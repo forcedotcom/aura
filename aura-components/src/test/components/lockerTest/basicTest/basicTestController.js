@@ -294,11 +294,16 @@
         testUtils.assertTrue(element instanceof Element, "DIV element should be an instance of Element");
         testUtils.assertTrue(element instanceof Node, "DIV element should be an instance of Node");
         testUtils.assertTrue(element instanceof EventTarget, "DIV element should be an instance of EventTarget");
-        
-        // DCHASMAN TODO Negative assertions for now - we expect that functions, arrays, 
-        // and objects created in system mode will not match the type system of the locker.
-        // However, these will flip to true once universal proxy is enabled where we can then explicitly wire up 
-        // the prototype/or proxied getPrototypeOf() to cross realms /or masquarade as the underlying type (e.g. SecureWindow instanceof Window)!
+    },
+
+    testInstanceOf_IdentityDiscontinuitySymptoms : function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        /**
+         * DCHASMAN TODO Negative assertions for now - we expect that functions, arrays,
+         * and objects created in system mode will not match the type system of the locker.
+         * However, these will flip to true once universal proxy is enabled where we can then explicitly wire up
+         * the prototype/or proxied getPrototypeOf() to cross realms /or masquarade as the underlying type (e.g. SecureWindow instanceof Window)!
+         */
         testUtils.assertFalse(cmp instanceof Object, "Object cmp should not be an instance of Object");
         testUtils.assertFalse(cmp.getGlobalId instanceof Function, "Function cmp.getGlobalId should not be an instance of Function");
         testUtils.assertFalse(cmp.get("v.body") instanceof Array, "Array cmp.get('v.body') should not be an instance of Array");

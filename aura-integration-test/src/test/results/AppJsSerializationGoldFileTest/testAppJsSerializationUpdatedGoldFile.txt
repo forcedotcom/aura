@@ -471,7 +471,7 @@ $A.componentService.addLibraryExporter("js://ui.panelPositioningLib.positioningU
     var observer;
     var proxyWheelEvents = true;
     var domHandle = config.element;
-    var scrollableParent = utils.getScrollableParent(config.target, w);
+    var scrollableParent = utils.getScrollableParent(config.target.tagName === "TEXTAREA" ? config.target.parentNode : config.target, w);
     if(w.MutationObserver) {
       var scrollableChildren = domHandle.querySelectorAll('[data-scoped-scroll\x3d"true"]');
       observer = new MutationObserver(function() {

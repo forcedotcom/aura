@@ -198,8 +198,8 @@
             "webkitHidden":                     {type: "boolean" },
             "webkitIsFullScreen":               {type: "boolean" },
             "webkitVisibilityState":            {type: "string" },
-            "write":                            {type: "function" },
-            "writeln":                          {type: "function" },
+            "write":                            {type: "function", support: false },
+            "writeln":                          {type: "function", support: false },
             "xmlEncoding":                      {type: "Null" },
             "xmlStandalone":                    {type: "boolean" },
             "xmlVersion":                       {type: "Null" }

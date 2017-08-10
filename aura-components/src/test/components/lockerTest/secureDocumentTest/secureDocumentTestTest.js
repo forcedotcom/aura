@@ -158,5 +158,11 @@
         test: function(cmp) {
             cmp.testDocumentConstructorPassesInstanceOf();
         }
+    },
+
+    testBlockedApis: {
+        test: function(cmp) {
+            cmp.testBlockedApis();
+        }
     }
 })

@@ -41,6 +41,7 @@
     <aura:method name="testDocumentImplementationHTMLDocumentCreation"/>
     <aura:method name="testDocumentElementHasNonZeroPropertyValues"/>
     <aura:method name="testDocumentConstructorPassesInstanceOf"/>
+    <aura:method name="testBlockedApis"/>
 
     <div id="title">SecureDocument test</div>
 

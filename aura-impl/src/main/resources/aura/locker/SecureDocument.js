@@ -333,8 +333,9 @@ SecureDocument.metadata = {
                 "webkitHidden":                     DEFAULT,
                 "webkitIsFullScreen":               DEFAULT,
                 "webkitVisibilityState":            DEFAULT,
-                "write":                            FUNCTION,
-                "writeln":                          FUNCTION,
+                // Blocked on purpose because of security risk
+                // "write":                            FUNCTION,
+                // "writeln":                          FUNCTION,
                 "xmlEncoding":                      DEFAULT,
                 "xmlStandalone":                    DEFAULT,
                 "xmlVersion":                       DEFAULT

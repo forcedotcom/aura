@@ -194,5 +194,14 @@
     testDocumentConstructorPassesInstanceOf: function(cmp) {
         var testUtils = cmp.get("v.testUtils");
         testUtils.assertTrue(document instanceof document.constructor, "document instanceof document.constructor should be true");
+    },
+
+    testBlockedApis: function(cmp) {
+        var testUtils = cmp.get("v.testUtils");
+        var blacklist = ["write", "writeln"];
+
+        blacklist.forEach(function(item){
+            testUtils.assertUndefined(document[item], "Access to document." + item +" should be blocked!");
+        });
     }
 })

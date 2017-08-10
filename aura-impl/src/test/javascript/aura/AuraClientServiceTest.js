@@ -58,7 +58,6 @@ Test.Aura.AuraClientServiceTest = function() {
                     return obj === undefined || obj === null;
                 },
                 isUndefined : function() {},
-                isArray : function() {},
                 json : {
                     encode : function(toEncode) {
                         return "<<" + JSON.stringify(toEncode) + ">>";
@@ -80,6 +79,12 @@ Test.Aura.AuraClientServiceTest = function() {
                 },
                 isObject: function(obj) {
                     return typeof obj === "object" && obj !== null && !(obj instanceof Array);
+                },
+                isEmpty: function(obj){
+                    return !obj || obj.length == 0;
+                },
+                isSessionStorageEnabled: function() {
+                    return false;
                 }
             },
             mark : function() {},
@@ -1171,7 +1176,13 @@ Test.Aura.AuraClientServiceTest = function() {
                         getStorage: function() { return mockStorage; }
                     },
                     util: {
-                        estimateSize: function(){}
+                        estimateSize: function(){},
+                        isString: function(obj){
+                            return typeof obj === 'string';
+                        },
+                        isEmpty: function(obj){
+                            return !obj || obj.length == 0;
+                        }
                     }
                 },
                 Aura: Aura,
@@ -1216,7 +1227,13 @@ Test.Aura.AuraClientServiceTest = function() {
                         getStorage: function() { return mockStorage; }
                     },
                     util: {
-                        estimateSize: function(){}
+                        estimateSize: function(){},
+                        isString: function(obj){
+                            return typeof obj === 'string';
+                        },
+                        isEmpty: function(obj){
+                            return !obj || obj.length == 0;
+                        }
                     }
                 },
                 Aura: Aura,
@@ -1296,7 +1313,13 @@ Test.Aura.AuraClientServiceTest = function() {
                         getStorage: function() { return mockStorage; }
                     },
                     util: {
-                        estimateSize: function(){}
+                        estimateSize: function(){},
+                        isString: function(obj){
+                            return typeof obj === 'string';
+                        },
+                        isEmpty: function(obj){
+                            return !obj || obj.length == 0;
+                        }
                     }
                 },
                 Aura: Aura,
@@ -1342,7 +1365,13 @@ Test.Aura.AuraClientServiceTest = function() {
                         getStorage: function() { return mockStorage; }
                     },
                     util: {
-                        estimateSize: function(){}
+                        estimateSize: function(){},
+                        isString: function(obj){
+                            return typeof obj === 'string';
+                        },
+                        isEmpty: function(obj){
+                            return !obj || obj.length == 0;
+                        }
                     }
                 },
                 Aura: Aura,
@@ -1379,7 +1408,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 };
 
                 // Act
-                target.invalidSession({newToken: "myToken"});
+                target.invalidSession("myToken");
 
                 // Assert
                 Assert.Equal(1, target.disableParallelBootstrapLoadOnNextLoad.Calls.length)
@@ -1429,10 +1458,11 @@ Test.Aura.AuraClientServiceTest = function() {
                     target.saveTokenToStorage = function() {
                         return ResolvePromise();
                     };
+                    target.hardRefresh=function(){};
 
                     document.cookie = "expected";
                     try {
-                        target.invalidSession({newToken: "myToken"});
+                        target.invalidSession("myToken");
 
                         Assert.Equal("expected", document.cookie);
                     } finally {
@@ -3529,7 +3559,13 @@ Test.Aura.AuraClientServiceTest = function() {
                         getStorage: function() { return mockStorage; }
                     },
                     util: {
-                        estimateSize: function(){}
+                        estimateSize: function(){},
+                        isString: function(obj){
+                            return typeof obj === 'string';
+                        },
+                        isEmpty: function(obj){
+                            return !obj || obj.length == 0;
+                        }
                     },
                     log: function(){}
                 },
@@ -3582,7 +3618,13 @@ Test.Aura.AuraClientServiceTest = function() {
                         getStorage: function() { return mockStorage; }
                     },
                     util: {
-                        estimateSize: function(){}
+                        estimateSize: function(){},
+                        isString: function(obj){
+                            return typeof obj === 'string';
+                        },
+                        isEmpty: function(obj){
+                            return !obj || obj.length == 0;
+                        }
                     }
                 },
                 Aura: Aura,
@@ -3811,7 +3853,6 @@ Test.Aura.AuraClientServiceTest = function() {
                         return obj === undefined || obj === null;
                     },
                     isUndefined : function() {},
-                    isArray : function() {},
                     json : {
                         encode : function(toEncode) {
                             return "<<" + JSON.stringify(toEncode) + ">>";

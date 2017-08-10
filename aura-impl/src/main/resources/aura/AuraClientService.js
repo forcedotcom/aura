@@ -1511,7 +1511,7 @@ AuraClientService.prototype.saveTokenToStorage = function() {
     // update the persisted CSRF token so it's accessible when the app is launched while offline.
     // fire-and-forget style, matching action response persistence.
     var storage = $A.storageService.getStorage(this.getActionStorageName());
-    if (storage && storage.isPersistent() && this._token) {
+    if (storage && storage.isPersistent() && $A.util.isString(this._token) && !$A.util.isEmpty(this._token) ) {
         var token = this._token;
 
         // satisfy the adapter API shape requirements; see AuraStorage.setItems().
@@ -1561,9 +1561,13 @@ AuraClientService.prototype.loadTokenFromStorage = function() {
                     function(items) {
                         if (items[AuraClientService.TOKEN_KEY]) {
                             var token = items[AuraClientService.TOKEN_KEY]["value"]["token"];
-                            self.setToken(token);
-                            $A.log("AuraClientService.loadTokenFromStorage(): token loaded");
-                            resolve(token);
+                            if ($A.util.isString(token) && !$A.util.isEmpty(token)) {
+                                self.setToken(token);
+                                $A.log("AuraClientService.loadTokenFromStorage(): token loaded");
+                                resolve(token);
+                            } else {
+                                resolve(undefined);
+                            }
                         } else {
                             $A.log("AuraClientService.loadTokenFromStorage(): no token found");
                             resolve(undefined);
@@ -4050,7 +4054,7 @@ AuraClientService.prototype.invalidSession = function(newToken) {
 
     // if new token provided then persist to storage and reload. if persisting
     // fails then we must go to the server for bootstrap.js to get a new token.
-    if (newToken) {
+    if ($A.util.isString(newToken) && !$A.util.isEmpty(newToken)) {
         this._token = newToken;
         this.saveTokenToStorage()
             .then(refresh.bind(null, false), refresh.bind(null, true))

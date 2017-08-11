@@ -32,6 +32,7 @@
     <aura:method name="testTimerReturns" action="{!c.testTimerReturns}"/>
     <aura:method name="testCreateImageElement" action="{!c.testCreateImageElement}"/>
 
+    <aura:method name="testArbitrarySchemes" action="{!c.testArbitrarySchemes}"/>
     <aura:method name="testOpen_HttpsUrl" action="{!c.testOpen_HttpsUrl}"/>
     <aura:method name="testOpen_HttpUrl" action="{!c.testOpen_HttpUrl}"/>
     <aura:method name="testOpen_RelativeUrl" action="{!c.testOpen_RelativeUrl}"/>

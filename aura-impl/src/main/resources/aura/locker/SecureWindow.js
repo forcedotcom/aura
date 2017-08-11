@@ -114,9 +114,9 @@ function SecureWindow(win, key, globalAttributeWhitelist) {
                 // If an url was provided to window.open()
                 if (url && typeof url === "string" && url.length > 1) {
                     // Only allow http|https|relative urls.
-                    var schemeRegex = /[\s]*(http:\/\/|https:\/\/|\/)/i;
+                    var schemeRegex = /^[\s]*(http:\/\/|https:\/\/|\/)/i;
                     if (!schemeRegex.test(url)){
-                        throw new $A.auraError("SecureWindow.open supports http://, https:// schemes and relative urls. It does not support javascript: scheme!");
+                        throw new $A.auraError("SecureWindow.open supports http://, https:// schemes and relative urls.");
                     }
                 }
             }

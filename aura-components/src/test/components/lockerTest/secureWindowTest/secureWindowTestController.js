@@ -84,6 +84,28 @@
         clearTimeout(setTimeoutReturn);
     },
 
+    testArbitrarySchemes: function(cmp){
+        var testUtils = cmp.get("v.testUtils");
+        var scripts = [
+            "data:text/html,<h1>The URL restriction is bypassed!</h1>",
+            "\s\s\s\s\sdata:text/html,<h1>The URL restriction is bypassed!</h1>",
+            "file://usr/local/bin/blt",
+            "     file://usr/local/bin/blt",
+            "ftp://user@host/path/file",
+            "\n\tftp://user@host/path/file",
+            "telnet://user:secret@somehost.internet.com:35/",
+            "\btelnet://user:secret@somehost.internet.com:35/"
+        ];
+        scripts.forEach(function(script){
+            try {
+                window.open(script);
+                testUtils.fail("Expect to block arbitrary scheme execution using window.open():" +  script);
+            } catch (e) {
+                testUtils.assertEquals("SecureWindow.open supports http://, https:// schemes and relative urls.", e.message);
+            }
+        });
+    },
+
     testOpen_HttpsUrl: function(cmp){
         var testUtils = cmp.get("v.testUtils");
         var url = "https://google.com";
@@ -126,7 +148,7 @@
                 window.open(script);
                 testUtils.fail("Expect to block javascript execution using window.open():" +  script);
             } catch (e) {
-                testUtils.assertEquals("SecureWindow.open supports http://, https:// schemes and relative urls. It does not support javascript: scheme!", e.message);
+                testUtils.assertEquals("SecureWindow.open supports http://, https:// schemes and relative urls.", e.message);
             }
         });
     },

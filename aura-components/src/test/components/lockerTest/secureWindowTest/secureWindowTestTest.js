@@ -87,6 +87,13 @@
         }
     },
 
+    testArbitrarySchemes: {
+        browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],
+        test: function(cmp) {
+            cmp.testArbitrarySchemes();
+        }
+    },
+
     testOpen_HttpsUrl: {
         // window.open will not open a new window for mobile autobuild runs
         browsers: ["-IE8", "-IE9", "-IE10", "-IE11", "-IPHONE", "-IPAD"],

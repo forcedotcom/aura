@@ -84,6 +84,14 @@ function SecureDocument(doc, key) {
                 return SecureElement(el, key);
             }
         },
+        domain: {
+            get: function() {
+                return doc.domain;
+            },
+            set: function() {
+                throw new Error("SecureDocument does not allow setting domain property.");
+            }
+        },
         querySelector: {
             value: function(selector) {
                 return SecureElement.secureQuerySelector(doc, key, selector);
@@ -197,7 +205,8 @@ SecureDocument.metadata = {
                 "doctype":                          DEFAULT,
                 "documentElement":                  DEFAULT,
                 "documentURI":                      DEFAULT,
-                "domain":                           DEFAULT,
+                // SecureDocument does not allow setting domain property.
+                // "domain":                           DEFAULT,
                 "elementFromPoint":                 FUNCTION,
                 "elementsFromPoint":                FUNCTION,
                 "embeds":                           DEFAULT,

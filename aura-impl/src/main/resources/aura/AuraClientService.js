@@ -2370,6 +2370,7 @@ AuraClientService.prototype.processStorableActions = function() {
     this.actionStorage.getAll(Object.keys(keysToActions))
         .then(
             function(items) {
+                var getAllStartTime = $A.metricsService.time();
                 var value;
                 for (var k in keysToActions) {
                     arr = keysToActions[k];
@@ -2391,6 +2392,7 @@ AuraClientService.prototype.processStorableActions = function() {
 
                     that.finishCollection();
                 }
+                $A.metricsService.mark('bpt', 'processStorableActions', {'duration': $A.metricsService.time() - getAllStartTime});
             },
             function(/*error*/) {
                 // error fetching from storage so all actions go to the server
@@ -2945,6 +2947,11 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     // sure that we only write it. And for safety's sake, just write it once.
     //
     var onReady = function() {
+        var inAuraLoop = that.inAuraLoop();
+        var onReadyStartTime;
+        if (!inAuraLoop) {
+            onReadyStartTime = $A.metricsService.time();
+        }
         // Ordering is important. auraXHR will no longer be valid after processed.
         if (processed === false && (auraXHR.request["readyState"] === 4 || timedOut)) {
             processed = true;
@@ -2954,6 +2961,9 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
             }
 
             that.receive(auraXHR, timedOut);
+        }
+        if (!inAuraLoop) {
+            $A.metricsService.mark('bpt', 'processXHRResponse', {'duration': $A.metricsService.time() - onReadyStartTime});
         }
     };
 

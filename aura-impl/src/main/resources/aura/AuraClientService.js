@@ -162,7 +162,8 @@ function AuraClientService () {
     // TODO: @dval We should send this from the server, but for LightningOut apps is a non-trivial change,
     // so for the time being I hard-coded the resource path here to ensure we can lazy fetch them.
     this.clientLibraries = {
-        "ckeditor" : { resourceUrl : "/auraFW/resources/{fwuid}/ckeditor/ckeditor-4.x/rel/ckeditor.js" }
+        "ckeditor": { resourceUrl : "/auraFW/resources/{fwuid}/ckeditor/ckeditor-4.x/rel/ckeditor.js" },
+        "quill": { resourceUrl : "/auraFW/resources/{fwuid}/quill.js" }
     };
 
     // Access Control
